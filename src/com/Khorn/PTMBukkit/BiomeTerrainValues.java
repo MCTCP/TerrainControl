@@ -2,7 +2,7 @@ package com.Khorn.PTMBukkit;
 
 public enum BiomeTerrainValues
 {
-    biomeTerrainSettingsName("BiomeTerrainModSettings.ini"),
+    biomeTerrainSettingsName("PhoenixTerrainModSettings.ini"),
     xLimit(16),
     zLimit(16),
     yLimit(128),
@@ -39,6 +39,7 @@ public enum BiomeTerrainValues
     flatBedrock(false),
     bedrockobsidian(false),
     disableNotchPonds(false),
+    denyObjectsUnderFill(false),
 
     caveRarity(7),
     caveFrequency(40),

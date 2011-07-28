@@ -42,17 +42,18 @@ class ChunkProviderPTM extends ChunkGenerator
 
     public ChunkProviderPTM(WorldWorker worker)
     {
-                this.localWrk = worker;
-                populatorList = new ArrayList<BlockPopulator>();
+        this.localWrk = worker;
+        populatorList = new ArrayList<BlockPopulator>();
         populatorList.add(worker.Spawner);
 
 
-   }
-    private void Init(World wrld, Random random)
+    }
+
+    public void Init(World wrld, Random random)
     {
 
         this.localWorld = wrld;
-        this.localWrk.localWorld = ((CraftWorld)wrld).getHandle();
+        this.localWrk.InitWorld(((CraftWorld) wrld).getHandle(),random);
 
         this.rnd = random;
 
@@ -317,8 +318,8 @@ class ChunkProviderPTM extends ChunkGenerator
         double d1 = 684.41200000000003D * this.localWrk.getFractureHorizontal();
         double d2 = 684.41200000000003D * this.localWrk.getFractureVertical();
 
-        double[] arrayOfDouble1 = ((CraftWorld)this.localWorld).getHandle().getWorldChunkManager().temperature;
-        double[] arrayOfDouble2 = ((CraftWorld)this.localWorld).getHandle().getWorldChunkManager().rain;
+        double[] arrayOfDouble1 = ((CraftWorld) this.localWorld).getHandle().getWorldChunkManager().temperature;
+        double[] arrayOfDouble2 = ((CraftWorld) this.localWorld).getHandle().getWorldChunkManager().rain;
         this.g = this.a.a(this.g, paramInt1, paramInt3, paramInt4, paramInt6, 1.121D, 1.121D, 0.5D);
         this.h = this.b.a(this.h, paramInt1, paramInt3, paramInt4, paramInt6, 200.0D, 200.0D, 0.5D);
 
@@ -418,31 +419,31 @@ class ChunkProviderPTM extends ChunkGenerator
     @Override
     public byte[] generate(World world, Random random, int x, int z)
     {
-        if(!this.isInit)
+        if (!this.isInit)
             this.Init(world, random);
 
         this.rnd.setSeed(x * 341873128712L + z * 132897987541L);
 
         byte[] arrayOfByte = new byte[32768];
 
-        this.BiomeArray = ((CraftWorld)this.localWorld).getHandle().getWorldChunkManager().a(this.BiomeArray, x * 16, z * 16, 16, 16);
-        double[] TempArray = ((CraftWorld)this.localWorld).getHandle().getWorldChunkManager().temperature; // was .a
+        this.BiomeArray = ((CraftWorld) this.localWorld).getHandle().getWorldChunkManager().a(this.BiomeArray, x * 16, z * 16, 16, 16);
+        double[] TempArray = ((CraftWorld) this.localWorld).getHandle().getWorldChunkManager().temperature; // was .a
 
         generateTerrain(x, z, arrayOfByte, TempArray);
         replaceBlocksForBiome(x, z, arrayOfByte, this.BiomeArray);
 
-        this.CaveGen.a( this.localWorld, x, z, arrayOfByte);
+        this.CaveGen.a(this.localWorld, x, z, arrayOfByte);
 
         this.localWrk.processChunkBlocks(arrayOfByte, this.BiomeArray);
 
-        return  arrayOfByte;
+        return arrayOfByte;
 
     }
 
     @Override
     public boolean canSpawn(World world, int x, int z)
     {
-        int i = ((CraftWorld)world).getHandle().a(x,z);
+        int i = ((CraftWorld) world).getHandle().a(x, z);
         return i != 0 && Block.byId[i].material.isSolid();
 
     }

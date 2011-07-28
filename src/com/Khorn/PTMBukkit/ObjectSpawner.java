@@ -278,6 +278,7 @@ public class ObjectSpawner extends BlockPopulator
     private boolean customObjects;
     private int objectSpawnRatio;
     private boolean notchBiomeTrees;
+    private boolean denyObjectsUnderFill;
 
     private int globalTreeDensity;
     private int rainforestTreeDensity;
@@ -901,6 +902,7 @@ public class ObjectSpawner extends BlockPopulator
         this.customObjects = this.worldWrk.ReadModSettins(BiomeTerrainValues.customObjects.name(), BiomeTerrainValues.customObjects.booleanValue());
         this.objectSpawnRatio = this.worldWrk.ReadModSettins(BiomeTerrainValues.objectSpawnRatio.name(), BiomeTerrainValues.objectSpawnRatio.intValue());
         this.notchBiomeTrees = this.worldWrk.ReadModSettins(BiomeTerrainValues.notchBiomeTrees.name(), BiomeTerrainValues.notchBiomeTrees.booleanValue());
+        this.denyObjectsUnderFill = this.worldWrk.ReadModSettins(BiomeTerrainValues.denyObjectsUnderFill.name(), BiomeTerrainValues.denyObjectsUnderFill.booleanValue());
         this.globalTreeDensity = this.worldWrk.ReadModSettins(BiomeTerrainValues.globalTreeDensity.name(), BiomeTerrainValues.globalTreeDensity.intValue());
         this.rainforestTreeDensity = this.worldWrk.ReadModSettins(BiomeTerrainValues.rainforestTreeDensity.name(), BiomeTerrainValues.rainforestTreeDensity.intValue());
         this.swamplandTreeDensity = this.worldWrk.ReadModSettins(BiomeTerrainValues.swamplandTreeDensity.name(), BiomeTerrainValues.swamplandTreeDensity.intValue());
@@ -1206,6 +1208,7 @@ public class ObjectSpawner extends BlockPopulator
         this.worldWrk.WriteModTitleSettings("Start BOB Objects Variables :");
         this.worldWrk.WriteModSettings(BiomeTerrainValues.customObjects.name(), this.customObjects);
         this.worldWrk.WriteModSettings(BiomeTerrainValues.objectSpawnRatio.name(), Integer.valueOf(this.objectSpawnRatio).intValue());
+        this.worldWrk.WriteModSettings(BiomeTerrainValues.denyObjectsUnderFill.name(), this.denyObjectsUnderFill);
 
         this.worldWrk.WriteModTitleSettings("Start Cactus&Tree Variables :");
         this.worldWrk.WriteModSettings(BiomeTerrainValues.notchBiomeTrees.name(), this.notchBiomeTrees);
@@ -1827,7 +1830,7 @@ public class ObjectSpawner extends BlockPopulator
             {
                 ChangeWorld(notify, (x + DataPoint.getX()), y + DataPoint.getY(), z + DataPoint.getZ(), DataPoint.workingData, DataPoint.workingExtra);
             }
-            if ((workObject.underFill) && (world.getTypeId(x + DataPoint.getX(), y, z + DataPoint.getZ()) > 0))
+            if ((!this.denyObjectsUnderFill) && (workObject.underFill) && (world.getTypeId(x + DataPoint.getX(), y, z + DataPoint.getZ()) > 0))
             {
                 int depthScanner = 0;
                 int blockForFill = world.getTypeId(x, y - 1, z);
@@ -2171,6 +2174,8 @@ public class ObjectSpawner extends BlockPopulator
     {
         this.world = ((CraftWorld)wrld).getHandle();
         this.rand = random;
+        this.worldWrk.InitWorld(((CraftWorld)wrld).getHandle(),random);
+
         if(this.c == null)
             this.c = new NoiseGeneratorOctaves(this.rand, 8);
         int x = chunk.getX();

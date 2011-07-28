@@ -4,6 +4,7 @@ import net.minecraft.server.BiomeBase;
 import net.minecraft.server.Block;
 import net.minecraft.server.MathHelper;
 import net.minecraft.server.World;
+import sun.reflect.generics.tree.ReturnType;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -75,6 +76,8 @@ public class WorldWorker
 
     public String SettingsDir;
 
+    private boolean isInit = false;
+
 
     public WorldWorker(String name,String settingsDir)
     {
@@ -88,7 +91,20 @@ public class WorldWorker
         this.Spawner.RegisterBOBPlugins();
 
 
-        System.out.println("PhoenixTerrainMod Bukkit Release 17 Loaded!");
+        System.out.println("PhoenixTerrainMod Bukkit version 0.5 Loaded!");
+    }
+
+    public void InitWorld(World world, Random rnd)
+    {
+        if(isInit)
+          return;
+
+        this.localWorld = world;
+        this.rand = rnd;
+
+        world.worldProvider.b = new WorldChunkProviderPTM(world,this);
+
+
     }
 
     void CorrectSettings()

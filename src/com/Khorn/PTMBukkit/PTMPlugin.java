@@ -22,7 +22,7 @@ public class PTMPlugin extends JavaPlugin
     public void onEnable()
     {
 
-        File pluginDir = new File("plugins" + FILE_SEPARATOR + "PTM" + FILE_SEPARATOR);
+        File pluginDir = new File("plugins" + FILE_SEPARATOR + "PhoenixTerrainMod" + FILE_SEPARATOR);
         if(!pluginDir.exists())
             pluginDir.mkdir();
         System.out.println(getDescription().getFullName() + " is now enabled");
@@ -31,10 +31,10 @@ public class PTMPlugin extends JavaPlugin
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
     {
-        File worldDir = new File("plugins" + FILE_SEPARATOR + "PTM"+ FILE_SEPARATOR + worldName + FILE_SEPARATOR);
+        File worldDir = new File("plugins" + FILE_SEPARATOR + "PhoenixTerrainMod"+ FILE_SEPARATOR + worldName + FILE_SEPARATOR);
         if (!worldDir.exists())
              worldDir.mkdir();
-        WorldWorker worker = new WorldWorker(worldName,"plugins" + FILE_SEPARATOR + "PTM"+ FILE_SEPARATOR + worldName + FILE_SEPARATOR);
+        WorldWorker worker = new WorldWorker(worldName,"plugins" + FILE_SEPARATOR + "PhoenixTerrainMod"+ FILE_SEPARATOR + worldName + FILE_SEPARATOR);
 
         return new ChunkProviderPTM(worker);
 
