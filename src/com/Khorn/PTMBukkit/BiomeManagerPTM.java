@@ -8,7 +8,7 @@ import net.minecraft.server.WorldChunkManager;
 
 import java.util.Random;
 
-class WorldChunkProviderPTM extends WorldChunkManager
+class BiomeManagerPTM extends WorldChunkManager
 {
 
     private WorldWorker localWrk;
@@ -17,7 +17,7 @@ class WorldChunkProviderPTM extends WorldChunkManager
     private NoiseGeneratorOctaves2 f;
     private NoiseGeneratorOctaves2 g;
 
-    public WorldChunkProviderPTM(World paramWorld , WorldWorker worker)
+    public BiomeManagerPTM(World paramWorld, WorldWorker worker)
     {
 
         this.localWrk = worker;
@@ -35,8 +35,8 @@ class WorldChunkProviderPTM extends WorldChunkManager
             paramArrayOfDouble = new double[paramInt3 * paramInt4];
         }
 
-        paramArrayOfDouble = this.e.a(paramArrayOfDouble, paramInt1, paramInt2, paramInt3, paramInt4, 0.025000000372529D / this.localWrk.getBiomeSize(), 0.025000000372529D / this.localWrk.getBiomeSize(), 0.25D);
-        this.c = this.g.a(this.c, paramInt1, paramInt2, paramInt3, paramInt4, 0.25D / this.localWrk.getBiomeSize(), 0.25D / this.localWrk.getBiomeSize(), 0.5882352941176471D);
+        paramArrayOfDouble = this.e.a(paramArrayOfDouble, paramInt1, paramInt2, paramInt3, paramInt4, 0.025000000372529D / this.localWrk.biomeSize, 0.025000000372529D / this.localWrk.biomeSize, 0.25D);
+        this.c = this.g.a(this.c, paramInt1, paramInt2, paramInt3, paramInt4, 0.25D / this.localWrk.biomeSize, 0.25D / this.localWrk.biomeSize, 0.5882352941176471D);
 
         int i = 0;
         for (int j = 0; j < paramInt3; j++)
@@ -50,11 +50,11 @@ class WorldChunkProviderPTM extends WorldChunkManager
                 double d4 = (paramArrayOfDouble[i] * 0.15D + 0.7D) * d3 + d1 * d2;
                 d4 = 1.0D - (1.0D - d4) * (1.0D - d4);
 
-                if (d4 < this.localWrk.getMinimumTemperature())
-                    d4 = this.localWrk.getMinimumTemperature();
-                if (d4 > this.localWrk.getMaximumTemperature())
+                if (d4 < this.localWrk.minTemperature)
+                    d4 = this.localWrk.minTemperature;
+                if (d4 > this.localWrk.maxTemperature)
                 {
-                    d4 = this.localWrk.getMaximumTemperature();
+                    d4 = this.localWrk.maxTemperature;
                 }
                 paramArrayOfDouble[i] = d4;
                 i++;
@@ -73,9 +73,9 @@ class WorldChunkProviderPTM extends WorldChunkManager
             paramArrayOfBiomeBase = new BiomeBase[paramInt3 * paramInt4];
         }
 
-        this.temperature = this.e.a(this.temperature, paramInt1, paramInt2, paramInt3, paramInt3, 0.025000000372529D / this.localWrk.getBiomeSize(), 0.025000000372529D / this.localWrk.getBiomeSize(), 0.25D);
-        this.rain = this.f.a(this.rain, paramInt1, paramInt2, paramInt3, paramInt3, 0.0500000007450581D / this.localWrk.getBiomeSize(), 0.0500000007450581D / this.localWrk.getBiomeSize(), 0.3333333333333333D);
-        this.c = this.g.a(this.c, paramInt1, paramInt2, paramInt3, paramInt3, 0.25D / this.localWrk.getBiomeSize(), 0.25D / this.localWrk.getBiomeSize(), 0.5882352941176471D);
+        this.temperature = this.e.a(this.temperature, paramInt1, paramInt2, paramInt3, paramInt3, 0.025000000372529D / this.localWrk.biomeSize, 0.025000000372529D / this.localWrk.biomeSize, 0.25D);
+        this.rain = this.f.a(this.rain, paramInt1, paramInt2, paramInt3, paramInt3, 0.0500000007450581D / this.localWrk.biomeSize, 0.0500000007450581D / this.localWrk.biomeSize, 0.3333333333333333D);
+        this.c = this.g.a(this.c, paramInt1, paramInt2, paramInt3, paramInt3, 0.25D / this.localWrk.biomeSize, 0.25D / this.localWrk.biomeSize, 0.5882352941176471D);
 
         int i = 0;
         for (int j = 0; j < paramInt3; j++)
@@ -92,15 +92,15 @@ class WorldChunkProviderPTM extends WorldChunkManager
                 double d5 = (this.rain[i] * 0.15D + 0.5D) * d3 + d1 * d2;
                 d4 = 1.0D - (1.0D - d4) * (1.0D - d4);
 
-                if (d4 < this.localWrk.getMinimumTemperature())
-                    d4 = this.localWrk.getMinimumTemperature();
-                if (d5 < this.localWrk.getMinimumMoisture())
-                    d5 = this.localWrk.getMinimumMoisture();
-                if (d4 > this.localWrk.getMaximumTemperature())
-                    d4 = this.localWrk.getMaximumTemperature();
-                if (d5 > this.localWrk.getMaximumMoisture())
+                if (d4 < this.localWrk.minTemperature)
+                    d4 = this.localWrk.minTemperature;
+                if (d5 < this.localWrk.minMoisture)
+                    d5 = this.localWrk.minMoisture;
+                if (d4 > this.localWrk.maxTemperature)
+                    d4 = this.localWrk.maxTemperature;
+                if (d5 > this.localWrk.maxMoisture)
                 {
-                    d5 = this.localWrk.getMaximumMoisture();
+                    d5 = this.localWrk.maxMoisture;
                 }
                 this.temperature[i] = d4;
                 this.rain[i] = d5;

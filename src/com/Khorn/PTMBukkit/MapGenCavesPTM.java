@@ -1,7 +1,6 @@
 package com.Khorn.PTMBukkit;
 
 import net.minecraft.server.Block;
-import net.minecraft.server.MapGenBase;
 import net.minecraft.server.MathHelper;
 import org.bukkit.World;
 
@@ -12,11 +11,11 @@ class MapGenCavesPTM
     private int a = 8;
     private Random b = new Random();
 
-    private WorldWorker localWrk;
+    private WorldWorker WorldSettings;
 
     public MapGenCavesPTM(WorldWorker wrk)
     {
-        this.localWrk = wrk;
+        this.WorldSettings = wrk;
     }
 
     void a(int paramInt1, int paramInt2, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3)
@@ -186,10 +185,10 @@ class MapGenCavesPTM
 
     void a(World paramWorld, int paramInt1, int paramInt2, int paramInt3, int paramInt4, byte[] paramArrayOfByte)
     {
-        int i = this.b.nextInt(this.b.nextInt(this.b.nextInt(this.localWrk.getCaveFrequency()) + 1) + 1);
-        if (this.localWrk.getEvenCaveDistribution())
-            i = this.localWrk.getCaveFrequency();
-        if (this.b.nextInt(100) > this.localWrk.getCaveRarity())
+        int i = this.b.nextInt(this.b.nextInt(this.b.nextInt(this.WorldSettings.caveFrequency) + 1) + 1);
+        if (this.WorldSettings.evenCaveDistribution)
+            i = this.WorldSettings.caveFrequency;
+        if (this.b.nextInt(100) > this.WorldSettings.caveRarity)
             i = 0;
 
         for (int j = 0; j < i; j++)
@@ -198,23 +197,23 @@ class MapGenCavesPTM
 
             double d2;
 
-            if (this.localWrk.getEvenCaveDistribution())
-                d2 = this.b.nextInt(this.localWrk.getCaveMaxAltitude() - this.localWrk.getCaveMinAltitude()) + this.localWrk.getCaveMinAltitude();
+            if (this.WorldSettings.evenCaveDistribution)
+                d2 = this.b.nextInt(this.WorldSettings.caveMaxAltitude - this.WorldSettings.caveMinAltitude) + this.WorldSettings.caveMinAltitude;
             else
-                d2 = this.b.nextInt(this.b.nextInt(this.localWrk.getCaveMaxAltitude() - this.localWrk.getCaveMinAltitude()) + this.localWrk.getCaveMinAltitude() + 1);
+                d2 = this.b.nextInt(this.b.nextInt(this.WorldSettings.caveMaxAltitude - this.WorldSettings.caveMinAltitude) + this.WorldSettings.caveMinAltitude + 1);
             double d3 = paramInt2 * 16 + this.b.nextInt(16);
 
-            int k = this.localWrk.getCaveSystemFrequency();
+            int k = this.WorldSettings.caveSystemFrequency;
             boolean l = false;
-            if (this.b.nextInt(100) <= this.localWrk.getIndividualCaveRarity())
+            if (this.b.nextInt(100) <= this.WorldSettings.individualCaveRarity)
             {
                 a(paramInt3, paramInt4, paramArrayOfByte, d1, d2, d3);
                 l = true;
             }
 
-            if ((l) || (this.b.nextInt(100) <= this.localWrk.getCaveSystemPocketChance() - 1))
+            if ((l) || (this.b.nextInt(100) <= this.WorldSettings.caveSystemPocketChance - 1))
             {
-                k += this.b.nextInt(this.localWrk.getCaveSystemPocketMaxSize() - this.localWrk.getCaveSystemPocketMinSize()) + this.localWrk.getCaveSystemPocketMinSize();
+                k += this.b.nextInt(this.WorldSettings.caveSystemPocketMaxSize - this.WorldSettings.caveSystemPocketMinSize) + this.WorldSettings.caveSystemPocketMinSize;
             }
             for (int m = 0; m < k; m++)
             {

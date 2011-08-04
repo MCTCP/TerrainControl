@@ -2,7 +2,6 @@ package com.Khorn.PTMBukkit;
 
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.Block;
-import net.minecraft.server.BlockSand;
 import net.minecraft.server.NoiseGeneratorOctaves;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
@@ -28,7 +27,7 @@ class ChunkProviderPTM extends ChunkGenerator
     private double[] r = new double[256];
     private double[] s = new double[256];
     private double[] t = new double[256];
-    private WorldWorker localWrk;
+    private WorldWorker WorldSettings;
     private MapGenCavesPTM CaveGen;
     private BiomeBase[] BiomeArray;
     private double[] d;
@@ -42,7 +41,7 @@ class ChunkProviderPTM extends ChunkGenerator
 
     public ChunkProviderPTM(WorldWorker worker)
     {
-        this.localWrk = worker;
+        this.WorldSettings = worker;
         populatorList = new ArrayList<BlockPopulator>();
         populatorList.add(worker.Spawner);
 
@@ -53,7 +52,7 @@ class ChunkProviderPTM extends ChunkGenerator
     {
 
         this.localWorld = wrld;
-        this.localWrk.InitWorld(((CraftWorld) wrld).getHandle(),random);
+        this.WorldSettings.InitWorld(((CraftWorld) wrld).getHandle(),random);
 
         this.rnd = random;
 
@@ -67,7 +66,7 @@ class ChunkProviderPTM extends ChunkGenerator
         this.b = new NoiseGeneratorOctaves(this.rnd, 16);
 
 
-        this.CaveGen = new MapGenCavesPTM(this.localWrk);
+        this.CaveGen = new MapGenCavesPTM(this.WorldSettings);
         this.isInit = true;
 
     }
@@ -75,7 +74,7 @@ class ChunkProviderPTM extends ChunkGenerator
     void generateTerrain(int paramInt1, int paramInt2, byte[] paramArrayOfByte, double[] paramArrayOfDouble)
     {
         int i1 = 4;
-        int i2 = this.localWrk.getWaterLevel();
+        int i2 = this.WorldSettings.getWaterLevel();
 
         int i3 = i1 + 1;
         int i4 = 17;
@@ -120,7 +119,7 @@ class ChunkProviderPTM extends ChunkGenerator
                                 int i14 = 0;
                                 if (i8 * 8 + i9 < i2)
                                 {
-                                    if ((d18 < this.localWrk.getIceThreshold()) && (i8 * 8 + i9 >= i2 - 1))
+                                    if ((d18 < this.WorldSettings.iceThreshold) && (i8 * 8 + i9 >= i2 - 1))
                                         i14 = Block.ICE.id;
                                     else
                                     {
@@ -150,9 +149,9 @@ class ChunkProviderPTM extends ChunkGenerator
 
     void replaceBlocksForBiome(int paramInt1, int paramInt2, byte[] paramArrayOfByte, BiomeBase[] paramArrayOfBiomeBase)
     {
-        if (this.localWrk.getNotUseOldGen())
+        if (!this.WorldSettings.oldGen)
         {
-            int i1 = this.localWrk.getWaterLevel();
+            int i1 = this.WorldSettings.getWaterLevel();
             double d1 = 0.03125D;
 
             this.r = this.n.a(this.r, paramInt1 * 16, paramInt2 * 16, 0.0D, 16, 16, 1, d1, d1, 1.0D);
@@ -176,9 +175,9 @@ class ChunkProviderPTM extends ChunkGenerator
                     {
                         int i11 = (i3 * 16 + i2) * 128 + i10;
 
-                        if ((i10 <= 0 + this.rnd.nextInt(5)) && (localWrk.createadminium(i10)))
+                        if ((i10 <= 0 + this.rnd.nextInt(5)) && (WorldSettings.createadminium(i10)))
                         {
-                            paramArrayOfByte[i11] = this.localWrk.getadminium();
+                            paramArrayOfByte[i11] = this.WorldSettings.getadminium();
                         } else
                         {
                             int i12 = paramArrayOfByte[i11];
@@ -229,7 +228,7 @@ class ChunkProviderPTM extends ChunkGenerator
                 }
         } else
         {
-            int i1 = this.localWrk.getWaterLevel();
+            int i1 = this.WorldSettings.getWaterLevel();
 
             double d1 = 0.03125D;
             this.r = this.n.a(this.r, paramInt1 * 16, paramInt2 * 16, 0.0D, 16, 16, 1, d1, d1, 1.0D);
@@ -253,9 +252,9 @@ class ChunkProviderPTM extends ChunkGenerator
                     {
                         int i11 = (i2 * 16 + i3) * 128 + i10;
 
-                        if ((i10 <= 0 + this.rnd.nextInt(5)) && (this.localWrk.createadminium(i10)))
+                        if ((i10 <= 0 + this.rnd.nextInt(5)) && (this.WorldSettings.createadminium(i10)))
                         {
-                            paramArrayOfByte[i11] = this.localWrk.getadminium();
+                            paramArrayOfByte[i11] = this.WorldSettings.getadminium();
                         } else
                         {
                             int i12 = paramArrayOfByte[i11];
@@ -315,8 +314,8 @@ class ChunkProviderPTM extends ChunkGenerator
             paramArrayOfDouble = new double[paramInt4 * paramInt5 * paramInt6];
         }
 
-        double d1 = 684.41200000000003D * this.localWrk.getFractureHorizontal();
-        double d2 = 684.41200000000003D * this.localWrk.getFractureVertical();
+        double d1 = 684.41200000000003D * this.WorldSettings.getFractureHorizontal();
+        double d2 = 684.41200000000003D * this.WorldSettings.getFractureVertical();
 
         double[] arrayOfDouble1 = ((CraftWorld) this.localWorld).getHandle().getWorldChunkManager().temperature;
         double[] arrayOfDouble2 = ((CraftWorld) this.localWorld).getHandle().getWorldChunkManager().rain;
@@ -360,7 +359,7 @@ class ChunkProviderPTM extends ChunkGenerator
                     d7 /= 2.0D;
                     if (d7 < -1.0D)
                         d7 = -1.0D;
-                    d7 -= this.localWrk.getMaxAverageDepth();
+                    d7 -= this.WorldSettings.getMaxAverageDepth();
                     d7 /= 1.4D;
                     d7 /= 2.0D;
                     d6 = 0.0D;
@@ -368,7 +367,7 @@ class ChunkProviderPTM extends ChunkGenerator
                 {
                     if (d7 > 1.0D)
                         d7 = 1.0D;
-                    d7 += this.localWrk.getMaxAverageHeight();
+                    d7 += this.WorldSettings.getMaxAverageHeight();
                     d7 /= 8.0D;
                 }
 
@@ -389,13 +388,13 @@ class ChunkProviderPTM extends ChunkGenerator
                     if (d10 < 0.0D)
                         d10 *= 4.0D;
 
-                    double d11 = this.e[i1] / 512.0D * this.localWrk.getVolatility1();
-                    double d12 = this.f[i1] / 512.0D * this.localWrk.getVolatility2();
+                    double d11 = this.e[i1] / 512.0D * this.WorldSettings.getVolatility1();
+                    double d12 = this.f[i1] / 512.0D * this.WorldSettings.getVolatility2();
 
                     double d13 = (this.d[i1] / 10.0D + 1.0D) / 2.0D;
-                    if (d13 < this.localWrk.getVolatilityWeight1())
+                    if (d13 < this.WorldSettings.getVolatilityWeight1())
                         d9 = d11;
-                    else if (d13 > this.localWrk.getVolatilityWeight2())
+                    else if (d13 > this.WorldSettings.getVolatilityWeight2())
                         d9 = d12;
                     else
                         d9 = d11 + (d12 - d11) * d13;
@@ -416,6 +415,97 @@ class ChunkProviderPTM extends ChunkGenerator
     }
 
 
+    public void processChunkBlocks(byte[] blocks, BiomeBase[] biomes)
+    {
+
+        for (int x = 0; x < BiomeTerrainValues.xLimit.intValue(); x++)
+            for (int z = 0; z < BiomeTerrainValues.zLimit.intValue(); z++)
+            {
+                BiomeBase currentBiome = biomes[(x * BiomeTerrainValues.zLimit.intValue() + z)];
+                for (int y = 0; y < BiomeTerrainValues.yLimit.intValue(); y++)
+                {
+                    int block = y + z * BiomeTerrainValues.yLimit.intValue() + x * BiomeTerrainValues.yLimit.intValue() * BiomeTerrainValues.zLimit.intValue();
+                    if (block >= BiomeTerrainValues.maxChunkBlockValue.intValue() - 1)
+                        continue;
+                    if ((this.WorldSettings.removeSurfaceDirtFromDesert) && (currentBiome == BiomeBase.DESERT) && ((blocks[block] == Block.GRASS.id) || (blocks[block] == Block.DIRT.id)) && (blocks[(block + 1)] == 0)) // next
+                        // block
+                        // is
+                        // air
+                        blocks[block] = (byte) Block.SAND.id;
+                    if ((this.WorldSettings.desertDirt) && (currentBiome == BiomeBase.DESERT) && (this.WorldSettings.desertDirtFrequency > 0) && (this.rnd.nextInt(this.WorldSettings.desertDirtFrequency * BiomeTerrainValues.xLimit.intValue() * BiomeTerrainValues.zLimit.intValue()) == 0) && (blocks[block] == Block.SAND.id) && (blocks[(block + 1)] == 0)) // next
+                        // block
+                        // is
+                        // air
+                        blocks[block] = (byte) Block.DIRT.id;
+                    if ((this.WorldSettings.waterlessDeserts) && (currentBiome == BiomeBase.DESERT) && ((blocks[block] == Block.STATIONARY_WATER.id) || (blocks[block] == Block.ICE.id)))
+                        blocks[block] = (byte) Block.SAND.id;
+                    if (((this.WorldSettings.muddySwamps) || (this.WorldSettings.claySwamps)) && (currentBiome == BiomeBase.SWAMPLAND) && ((blocks[block] == Block.SAND.id) || (blocks[block] == Block.DIRT.id) || (blocks[block] == Block.SAND.id)))
+                        createSwamps(blocks, block);
+                    if ((this.WorldSettings.removeSurfaceStone) && (blocks[block] == Block.STONE.id) && (blocks[(block + 1)] == 0)) // next
+                        // block
+                        // is
+                        // air
+                        blocks[block] = findNearestStoneReplacement(blocks, block, currentBiome);
+
+                }
+            }
+    }
+
+
+
+    private byte findNearestStoneReplacement(byte[] blocks, int block, BiomeBase currentBiome)
+    {
+        for (int w = 1; w < 16; w++)
+            for (int y = 0; y <= 2; y++)
+                for (int x = -1 * w; x <= w; x++)
+                    for (int z = -1 * w; z <= w; z++)
+                    {
+                        int newBlock = block + (y == 2 ? -1 : y) + z * BiomeTerrainValues.yLimit.intValue() + x * BiomeTerrainValues.yLimit.intValue() * BiomeTerrainValues.zLimit.intValue();
+                        if ((newBlock < 0) || (newBlock > BiomeTerrainValues.maxChunkBlockValue.intValue() - 1))
+                            continue;
+                        if ((blocks[newBlock] == Block.GRASS.id) || (blocks[newBlock] == Block.DIRT.id) || (blocks[newBlock] == Block.SAND.id) || (blocks[newBlock] == Block.GRAVEL.id) || (blocks[newBlock] == Block.CLAY.id))
+                            return blocks[newBlock];
+                    }
+        return (byte) ((currentBiome == BiomeBase.DESERT) || (currentBiome == BiomeBase.ICE_DESERT) ? Block.SAND.id : Block.GRASS.id);
+    }
+
+
+
+
+    private void createSwamps(byte[] blocks, int block)
+    {
+        int swampSize = this.WorldSettings.swampSize < 0 ? 0 : this.WorldSettings.swampSize > 15 ? 15 : this.WorldSettings.swampSize;
+        int Swamptype = (this.WorldSettings.muddySwamps) ? Block.SOUL_SAND.id : Block.CLAY.id;
+
+        if (this.WorldSettings.muddySwamps && this.WorldSettings.claySwamps)
+        {
+            Swamptype = (this.rnd.nextBoolean()) ? Block.SOUL_SAND.id : Block.CLAY.id;
+        }
+
+        if (blocks[(block + 1)] == Block.STATIONARY_WATER.id)
+        {
+
+            blocks[block] = (byte) Swamptype;
+            return;
+        }
+
+        for (int x = swampSize * -1; x < swampSize + 1; x++)
+            for (int z = swampSize * -1; z < swampSize + 1; z++)
+            {
+                int newBlock = block + z * BiomeTerrainValues.yLimit.intValue() + x * BiomeTerrainValues.yLimit.intValue() * BiomeTerrainValues.zLimit.intValue();
+                if ((newBlock < 0) || (newBlock > BiomeTerrainValues.maxChunkBlockValue.intValue() - 1))
+                    continue;
+                if (blocks[newBlock] != Block.STATIONARY_WATER.id)
+                    continue;
+                blocks[block] = (byte) Swamptype;
+                return;
+            }
+    }
+
+
+
+
+
     @Override
     public byte[] generate(World world, Random random, int x, int z)
     {
@@ -434,7 +524,7 @@ class ChunkProviderPTM extends ChunkGenerator
 
         this.CaveGen.a(this.localWorld, x, z, arrayOfByte);
 
-        this.localWrk.processChunkBlocks(arrayOfByte, this.BiomeArray);
+        this.processChunkBlocks(arrayOfByte, this.BiomeArray);   // Todo need optimise.
 
         return arrayOfByte;
 
