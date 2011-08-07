@@ -27,7 +27,7 @@ class ChunkProviderPTM extends ChunkGenerator
     private double[] r = new double[256];
     private double[] s = new double[256];
     private double[] t = new double[256];
-    private WorldWorker WorldSettings;
+    private Settings WorldSettings;
     private MapGenCavesPTM CaveGen;
     private BiomeBase[] BiomeArray;
     private double[] d;
@@ -39,22 +39,27 @@ class ChunkProviderPTM extends ChunkGenerator
     private boolean isInit = false;
     private ArrayList<BlockPopulator> populatorList;
 
-    public ChunkProviderPTM(WorldWorker worker)
+    public ChunkProviderPTM(Settings worker)
     {
         this.WorldSettings = worker;
         populatorList = new ArrayList<BlockPopulator>();
-        populatorList.add(worker.Spawner);
+        populatorList.add(new ObjectSpawner(this.WorldSettings));
 
 
     }
 
-    public void Init(World wrld, Random random)
+    public void Init(World wrld)
     {
 
         this.localWorld = wrld;
-        this.WorldSettings.InitWorld(((CraftWorld) wrld).getHandle(),random);
 
-        this.rnd = random;
+        if (!this.WorldSettings.isInit)
+        {
+            ((CraftWorld) this.localWorld).getHandle().worldProvider.b = new BiomeManagerPTM(((CraftWorld) this.localWorld).getHandle(), this.WorldSettings);
+            this.WorldSettings.isInit = true;
+        }
+
+        this.rnd = new Random(wrld.getSeed());
 
         this.k = new NoiseGeneratorOctaves(this.rnd, 16);
         this.l = new NoiseGeneratorOctaves(this.rnd, 16);
@@ -509,8 +514,9 @@ class ChunkProviderPTM extends ChunkGenerator
     @Override
     public byte[] generate(World world, Random random, int x, int z)
     {
+
         if (!this.isInit)
-            this.Init(world, random);
+            this.Init(world);
 
         this.rnd.setSeed(x * 341873128712L + z * 132897987541L);
 

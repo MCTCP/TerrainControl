@@ -11,13 +11,13 @@ import java.util.Random;
 class BiomeManagerPTM extends WorldChunkManager
 {
 
-    private WorldWorker localWrk;
+    private Settings localWrk;
 
     private NoiseGeneratorOctaves2 e;
     private NoiseGeneratorOctaves2 f;
     private NoiseGeneratorOctaves2 g;
 
-    public BiomeManagerPTM(World paramWorld, WorldWorker worker)
+    public BiomeManagerPTM(World paramWorld, Settings worker)
     {
 
         this.localWrk = worker;

@@ -1,8 +1,6 @@
 package com.Khorn.PTMBukkit;
 
-import net.minecraft.server.BiomeBase;
 import net.minecraft.server.Block;
-import net.minecraft.server.World;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,13 +11,12 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class WorldWorker
+public class Settings
 {
-    private String Name;
     private BufferedWriter SettingsWriter;
     private HashMap<String, String> ReadedSettings = new HashMap<String, String>();
     
-    public HashMap<Byte, Byte> replaceBlocks = new HashMap<Byte, Byte>();
+    public HashMap<Integer, Integer> replaceBlocks = new HashMap<Integer, Integer>();
 
 
     public ArrayList<CustomObject> Objects = new ArrayList<CustomObject>();
@@ -363,39 +360,26 @@ public class WorldWorker
     public int lavaLevelMax;
 
 
-    public ObjectSpawner Spawner;
-
 
     public String SettingsDir;
+    public PTMPlugin plugin;
 
-    private boolean isInit = false;
+    public boolean isInit = false;
 
 
-    public WorldWorker(String name, String settingsDir)
+    public Settings(String settingsDir, PTMPlugin plug)
     {
-        this.Name = name;
         this.SettingsDir = settingsDir;
-        this.Spawner = new ObjectSpawner(this);
 
         ReadSettings();
         CorrectSettings();
         WriteSettings();
         this.RegisterBOBPlugins();
+        this.plugin = plug;
 
-
-        System.out.println("PhoenixTerrainMod Bukkit version 0.5 Loaded!");
+        System.out.println("PhoenixTerrainMod Bukkit version 0.6.2 Loaded!");
     }
 
-    public void InitWorld(World world, Random rnd)
-    {
-        if (isInit)
-            return;
-
-
-        world.worldProvider.b = new BiomeManagerPTM(world, this);
-
-
-    }
 
     void CorrectSettings()
     {
@@ -1073,14 +1057,6 @@ public class WorldWorker
 
     }
 
-    public String ReadModSettins(String settingsName, String defaultValue)
-    {
-        if (this.ReadedSettings.containsKey(settingsName))
-        {
-            return String.valueOf(this.ReadedSettings.get(settingsName));
-        }
-        return defaultValue;
-    }
 
     public int ReadModSettins(String settingsName, int defaultValue)
     {
@@ -1113,7 +1089,7 @@ public class WorldWorker
     {
         if (this.ReadedSettings.containsKey("ReplacedBlocks"))
         {
-            if (this.ReadedSettings.get("ReplacedBlocks").trim().equals("") || !this.ReadedSettings.get("ReplacedBlocks").contains(","))
+            if (this.ReadedSettings.get("ReplacedBlocks").trim().equals("") || this.ReadedSettings.get("ReplacedBlocks").equals("None"))
                 return;
             String[] keys = this.ReadedSettings.get("ReplacedBlocks").split(",");
             try
@@ -1123,7 +1099,7 @@ public class WorldWorker
 
                     String[] blocks = key.split("=");
 
-                    this.replaceBlocks.put(Byte.valueOf(blocks[0]), Byte.valueOf(blocks[1]));
+                    this.replaceBlocks.put(Integer.valueOf(blocks[0]), Integer.valueOf(blocks[1]));
 
                 }
 
@@ -1132,39 +1108,8 @@ public class WorldWorker
                 System.out.println("Wrong replace settings: '" + this.ReadedSettings.get("ReplacedBlocks") + "'");
             }
 
-            return;
         }
 
-        for (Entry<String, String> me : this.ReadedSettings.entrySet())
-        {
-            if (me.getKey().contains("replace"))
-            {
-                byte testkey = 0;
-                byte testvalue = 0;
-
-                try
-                {
-                    testkey = Byte.parseByte((me.getKey()).replace("replace", ""));
-                    testvalue = Byte.parseByte(me.getValue());
-
-                } catch (NumberFormatException e)
-                {
-                    try
-                    {
-                        testkey = BiomeTerrainValues.valueOf((me.getKey()).replace("replace", "")).byteValue();
-                        testvalue = BiomeTerrainValues.valueOf(me.getValue()).byteValue();
-                    } catch (IllegalArgumentException ex)
-                    {
-                        System.out.println("Wrong replace settings: '" + me.getKey() + ":" + me.getValue() + "'");
-                    }
-
-                }
-                if (testkey == 0 && testvalue == 0)
-                    System.out.println("Wrong replace settings: '" + me.getKey() + ":" + me.getValue() + "'");
-
-                this.replaceBlocks.put(testkey, testvalue);
-            }
-        }
 
     }
 
@@ -1565,10 +1510,10 @@ public class WorldWorker
             return;
         }
         String output = "";
-        Iterator<Entry<Byte, Byte>> i = this.replaceBlocks.entrySet().iterator();
+        Iterator<Entry<Integer, Integer>> i = this.replaceBlocks.entrySet().iterator();
         while (i.hasNext())
         {
-            Map.Entry<Byte, Byte> me = i.next();
+            Map.Entry<Integer, Integer> me = i.next();
 
             output += me.getKey().toString() + "=" + me.getValue().toString();
             if (i.hasNext())
@@ -1944,7 +1889,7 @@ public class WorldWorker
 
     public boolean createadminium(int y)
     {
-        return (!this.disableBedrock) && ((!this.flatBedrock) || ((this.flatBedrock) && (y == 0)));
+        return (!this.disableBedrock) && ((!this.flatBedrock) || (y == 0));
     }
 
     public byte getadminium()

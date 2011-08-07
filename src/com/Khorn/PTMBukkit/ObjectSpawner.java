@@ -1,10 +1,14 @@
 package com.Khorn.PTMBukkit;
 
+import com.sun.xml.internal.bind.v2.TODO;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
+import org.bukkit.util.noise.PerlinNoiseGenerator;
 
+
+import javax.persistence.Version;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -12,22 +16,20 @@ public class ObjectSpawner extends BlockPopulator
 {
 
 
-
-    public NoiseGeneratorOctaves c;
-
+    public NoiseGeneratorOctaves treeNoise;
 
 
-    private WorldWorker WorldSettings;
+    private Settings WorldSettings;
     private Random rand;
     public World world;
 
-    public ObjectSpawner(WorldWorker wrk)
+    public ObjectSpawner(Settings wrk)
     {
         this.WorldSettings = wrk;
+        this.rand = new Random();
 
 
     }
-
 
 
     private boolean ObjectCantSpawn(CustomObject obj, BiomeBase localBiomeBase, boolean isTree)
@@ -413,7 +415,9 @@ public class ObjectSpawner extends BlockPopulator
             return;
         double d1 = 0.5D;
         int treeDensity = 0;
-        int treeDensityVariation = (int) ((this.c.a(x * d1, z * d1) / 8.0D + this.rand.nextDouble() * 4.0D + 4.0D) / 3.0D);
+        double temp = this.treeNoise.a(x * d1, z * d1);
+        int treeDensityVariation = (int) ((temp / 8.0D + this.rand.nextDouble() * 4.0D + 4.0D) / 3.0D);
+
 
         if (this.rand.nextInt(10) == 0)
             treeDensity++;
@@ -445,8 +449,8 @@ public class ObjectSpawner extends BlockPopulator
         for (int i = 0; i < treeDensity; i++)
         {
 
-            int _x = x + this.rand.nextInt(16) + 8;
-            int _z = z + this.rand.nextInt(16) + 8;
+            int _x = x + this.rand.nextInt(16);
+            int _z = z + this.rand.nextInt(16);
 
             WorldGenerator localWorldGenerator = currentBiome.a(this.rand);
             localWorldGenerator.a(1.0D, 1.0D, 1.0D);
@@ -459,47 +463,45 @@ public class ObjectSpawner extends BlockPopulator
 
     void processDepositMaterial(int _x, int _z, int rarity, int frequency, int minAltitude, int maxAltitude, int size, int type)
     {
-        Random rand = this.rand;
-        int xyPosMod = (type == Block.LONG_GRASS.id) || (type == Block.YELLOW_FLOWER.id) || (type == Block.RED_ROSE.id) || (type == Block.BROWN_MUSHROOM.id) || (type == Block.RED_MUSHROOM.id) || (type == Block.WATER.id) || (type == Block.LAVA.id) || (type == Block.FIRE.id) || (type == Block.CACTUS.id) || (type == Block.MOB_SPAWNER.id) || (type == Block.SUGAR_CANE_BLOCK.id) || (type == Block.PUMPKIN.id) || (type == Block.GLOWSTONE.id) ? 8 : 0;
 
         if ((type == Block.FIRE.id))
-            frequency = rand.nextInt(rand.nextInt(frequency) + 1) + 1;
+            frequency = this.rand.nextInt(this.rand.nextInt(frequency) + 1) + 1;
         else if ((type == Block.GLOWSTONE.id) && (size == -1))
         {
-            frequency = rand.nextInt(rand.nextInt(frequency) + 1);
+            frequency = this.rand.nextInt(this.rand.nextInt(frequency) + 1);
         }
         for (int i = 0; i < frequency; i++)
         {
-            if (rand.nextInt(100) >= rarity)
+            if (this.rand.nextInt(100) >= rarity)
                 continue;
-            int x = _x + rand.nextInt(16) + xyPosMod;
-            int z = _z + rand.nextInt(16) + xyPosMod;
-            int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
+            int x = _x + this.rand.nextInt(16);
+            int z = _z + this.rand.nextInt(16);
+            int y = this.rand.nextInt(maxAltitude - minAltitude) + minAltitude;
 
             if ((type == Block.YELLOW_FLOWER.id) || (type == Block.RED_ROSE.id || (type == Block.BROWN_MUSHROOM.id) || (type == Block.RED_MUSHROOM.id)))
-                new WorldGenFlowers(type).a(this.world, rand, x, y, z);
+                new WorldGenFlowers(type).a(this.world, this.rand, x, y, z);
             else if (type == Block.CACTUS.id)
-                new WorldGenCactus().a(this.world, rand, x, y, z);
+                new WorldGenCactus().a(this.world, this.rand, x, y, z);
             else if (type == Block.SUGAR_CANE_BLOCK.id)
-                new WorldGenReed().a(this.world, rand, x, y, z);
+                new WorldGenReed().a(this.world, this.rand, x, y, z);
             else if (type == Block.PUMPKIN.id)
-                new WorldGenPumpkin().a(this.world, rand, x, y, z);
+                new WorldGenPumpkin().a(this.world, this.rand, x, y, z);
             else if (type == Block.CLAY.id)
-                new WorldGenClay(size).a(this.world, rand, x, y, z);
+                new WorldGenClay(size).a(this.world, this.rand, x, y, z);
             else if (type == Block.WATER.id)
             {
                 if (!this.WorldSettings.evenWaterSourceDistribution)
-                    y = rand.nextInt(rand.nextInt(maxAltitude - minAltitude) + minAltitude + 1);
-                new WorldGenLiquids(type).a(this.world, rand, x, y, z);
+                    y = this.rand.nextInt(this.rand.nextInt(maxAltitude - minAltitude) + minAltitude + 1);
+                SpawnLiquid( x, y, z,type);
             } else if (type == Block.LAVA.id)
             {
                 if (!this.WorldSettings.evenLavaSourceDistribution)
-                    y = rand.nextInt(rand.nextInt(maxAltitude - minAltitude) + minAltitude + 1);
-                new WorldGenLiquids(type).a(this.world, rand, x, y, z);
+                    y = this.rand.nextInt(this.rand.nextInt(maxAltitude - minAltitude) + minAltitude + 1);
+                SpawnLiquid( x, y, z,type);
             } else if (type == Block.MOB_SPAWNER.id)
-                new WorldGenDungeons().a(this.world, rand, x, y, z);
+                new WorldGenDungeons().a(this.world, this.rand, x, y, z);
             else
-                new WorldGenMinable(type, size).a(this.world, rand, x, y, z);
+                new WorldGenMinable(type, size).a(this.world, this.rand, x, y, z);
         }
     }
 
@@ -528,9 +530,9 @@ public class ObjectSpawner extends BlockPopulator
             if ((currentBiome == BiomeBase.RAINFOREST) && (this.rand.nextInt(3) != 0))
                 grassType = 2;
 
-            _x = x + this.rand.nextInt(16) + 8;
+            _x = x + this.rand.nextInt(16);
             _y = this.rand.nextInt(128);
-            _z = z + this.rand.nextInt(16) + 8;
+            _z = z + this.rand.nextInt(16);
             new WorldGenGrass(Block.LONG_GRASS.id, grassType).a(this.world, this.rand, _x, _y, _z);
         }
 
@@ -539,9 +541,9 @@ public class ObjectSpawner extends BlockPopulator
 
             for (int i = 0; i < 2; i++)
             {
-                _x = x + this.rand.nextInt(16) + 8;
+                _x = x + this.rand.nextInt(16);
                 _y = this.rand.nextInt(128);
-                _z = z + this.rand.nextInt(16) + 8;
+                _z = z + this.rand.nextInt(16);
                 new WorldGenDeadBush(Block.DEAD_BUSH.id).a(this.world, this.rand, _x, _y, _z);
             }
         }
@@ -683,104 +685,150 @@ public class ObjectSpawner extends BlockPopulator
                     }
         }
     }
+    
+    public boolean SpawnLiquid( int x, int y, int z, int type ) {
+    if (this.world.getTypeId(x, y + 1, z) != Block.STONE.id) return false;
+    if (this.world.getTypeId(x, y - 1, z) != Block.STONE.id) return false;
+
+    if ((this.world.getTypeId(x, y, z) != 0) && (this.world.getTypeId(x, y, z) != Block.STONE.id)) return false;
+
+    int i = 0;
+    if (this.world.getTypeId(x - 1, y, z) == Block.STONE.id) i++;
+    if (this.world.getTypeId(x + 1, y, z) == Block.STONE.id) i++;
+    if (this.world.getTypeId(x, y, z - 1) == Block.STONE.id) i++;
+    if (this.world.getTypeId(x, y, z + 1) == Block.STONE.id) i++;
+
+    int j = 0;
+    if (this.world.isEmpty(x - 1, y, z)) j++;
+    if (this.world.isEmpty(x + 1, y, z)) j++;
+    if (this.world.isEmpty(x, y, z - 1)) j++;
+    if (this.world.isEmpty(x, y, z + 1)) j++;
+
+    if ((i == 3) && (j == 1)) {
+      this.world.setTypeId(x, y, z, type);
+
+    }
+
+    return true;
+  }   
 
     @Override
     public void populate(org.bukkit.World wrld, Random random, Chunk chunk)
     {
-        this.world = ((CraftWorld)wrld).getHandle();
-        this.rand = random;
-        this.WorldSettings.InitWorld(((CraftWorld)wrld).getHandle(),random);
+        BlockSand.instaFall = false;
 
-        if(this.c == null)
-            this.c = new NoiseGeneratorOctaves(this.rand, 8);
-        int x = chunk.getX();
-        int z = chunk.getZ();
+        this.world = ((CraftWorld) wrld).getHandle();
+        
+        if (!this.WorldSettings.isInit)
+        {
+            this.world.worldProvider.b = new BiomeManagerPTM(this.world, this.WorldSettings);
+            this.WorldSettings.isInit = true;
+        }
 
-        int i1 = x * 16;
-        int i2 = z * 16;
+        if (this.treeNoise == null)
+            this.treeNoise = new NoiseGeneratorOctaves(new Random(wrld.getSeed()), 8);
+        int chunk_x = chunk.getX();
+        int chunk_z = chunk.getZ();
 
-        BiomeBase localBiomeBase = world.getWorldChunkManager().getBiome(i1 + 16, i2 + 16);
+        int x = chunk_x * 16;
+        int z = chunk_z * 16;
+
+        BiomeBase localBiomeBase = world.getWorldChunkManager().getBiome(x + 16, z + 16);
 
 
         this.rand.setSeed(world.getSeed());
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
-        this.rand.setSeed(x * l1 + z * l2 ^ world.getSeed());
+        this.rand.setSeed(chunk_x * l1 + chunk_z * l2 ^ world.getSeed());
 
 
-        this.processUndergroundDeposits(i1, i2, localBiomeBase);
+        this.processUndergroundDeposits(x, z, localBiomeBase);
+        //System.out.println("Under ground debug: " + x  + " " + z + " " + rand.nextDouble());
         // ToDo add lavaLevelMin and lavaLevelMax here
         if (this.WorldSettings.notchBiomeTrees)
         {
             if (this.rand.nextInt(4) == 0)
             {
-                int i3 = i1 + this.rand.nextInt(16) + 8;
+                int i3 = x + this.rand.nextInt(16);
                 int i4 = this.rand.nextInt(128);
-                int i5 = i2 + this.rand.nextInt(16) + 8;
-                new WorldGenLakes(Block.STATIONARY_WATER.id).a(this.world, this.rand, i3, i4, i5);
+                int i5 = z + this.rand.nextInt(16);
+                WorldGenLakes lake = new WorldGenLakes(Block.STATIONARY_WATER.id);
+                //System.out.println("Lake debug: " + i3  + " " +i4 + " " + i5 + " " +lake.a(this.world, this.rand, i3, i4, i5) + " " + rand.nextDouble());
             }
 
             if (this.rand.nextInt(8) == 0)
             {
-                int i3 = i1 + this.rand.nextInt(16) + 8;
+                int i3 = x + this.rand.nextInt(16);
                 int i4 = this.rand.nextInt(this.rand.nextInt(120) + 8);
-                int i5 = i2 + this.rand.nextInt(16) + 8;
+                int i5 = z + this.rand.nextInt(16);
                 if ((i4 < 64) || (this.rand.nextInt(10) == 0))
                     new WorldGenLakes(Block.STATIONARY_LAVA.id).a(this.world, this.rand, i3, i4, i5);
             }
         }
 
-        int i6;
-        int i7;
 
-        this.processAboveGroundMaterials(i1, i2, localBiomeBase);
+        this.processAboveGroundMaterials(x, z, localBiomeBase);
 
+        //System.out.println("Above ground debug: " + x  + " " + z + " " + rand.nextDouble());
 
-        this.SpawnCustomObjects(i1, i2, localBiomeBase);
+        this.SpawnCustomObjects(x, z, localBiomeBase);
 
+        this.processTrees(x, z, localBiomeBase);
 
-        this.processTrees(i1, i2, localBiomeBase);
-
-        this.processGrass(i1, i2, localBiomeBase);
+        this.processGrass(x, z, localBiomeBase);
 
 
-        i6 = 0;
-
-        int i8;
-        int i9;
-        int i10;
-
+        int i = 0;
 
 
         double[] TemperatureArray = new double[256];
-        TemperatureArray = this.world.getWorldChunkManager().a(TemperatureArray, i1 + 8, i2 + 8, 16, 16);
-        for (i6 = i1 + 8; i6 < i1 + 8 + 16; i6++)
+        TemperatureArray = this.world.getWorldChunkManager().a(TemperatureArray, x, z, 16, 16);
+        for (int _x = x; _x < x + 16; _x++)
         {
-            for (i7 = i2 + 8; i7 < i2 + 8 + 16; i7++)
+            for (int _z = z; _z < z + 16; _z++)
             {
-                i8 = i6 - (i1 + 8);
-                i9 = i7 - (i2 + 8);
-                i10 = this.world.e(i6, i7);
-                double d2 = TemperatureArray[(i8 * 16 + i9)] - (i10 - 64) / 64.0D * 0.3D;
-                if ((d2 >= this.WorldSettings.snowThreshold) || (i10 <= 0) || (i10 >= 128) || (!this.world.isEmpty(i6, i10, i7)) || (!this.world.getMaterial(i6, i10 - 1, i7).isSolid()) || (this.world.getMaterial(i6, i10 - 1, i7) == Material.ICE))
-                    continue;
-                this.world.setTypeId(i6, i10, i7, Block.SNOW.id);
-            }
 
+
+                int _y = this.world.e(_x, _z);
+                double d2 = TemperatureArray[i] - (_y - 64) / 64.0D * 0.3D;
+                i++;
+                if (!((d2 >= this.WorldSettings.snowThreshold) || (_y <= 0) || (_y >= 128) || (!this.world.isEmpty(_x, _y, _z)) || (!this.world.getMaterial(_x, _y - 1, _z).isSolid()) || (this.world.getMaterial(_x, _y - 1, _z) == Material.ICE)))
+                    this.world.setTypeId(_x, _y, _z, Block.SNOW.id);
+
+                if (this.WorldSettings.replaceBlocks.size() > 0)
+                {
+                    for( int y = 0; y<128 ; y++)
+                    {
+                        int block = this.world.getTypeId(_x,y,_z);
+                        if(this.WorldSettings.replaceBlocks.containsKey(block))
+                            this.world.setTypeId(_x, y, _z, this.WorldSettings.replaceBlocks.get(block)) ;
+                    }
+                }
+
+
+
+            }
+            i = 0;
         }
 
-        if (this.WorldSettings.replaceBlocks.size() <= 0)
-            return;
 
-        byte[] blocks = this.world.getChunkAt(x, z).b;
 
-        for (int i = 0; i < blocks.length; i++)
+        /*byte[] blocks = this.world.getChunkAt(x, z).b;
+
+
+        for (i = 0; i < blocks.length; i++)
         {
             if (this.WorldSettings.replaceBlocks.containsKey(blocks[i]))
             {
+                this.world.setRawTypeId()
                 blocks[i] = this.WorldSettings.replaceBlocks.get(blocks[i]);
             }
-        }
+        }  Todo old version dont work, new slowwwwly...
+
+        */
+
+
+        BlockSand.instaFall = true;
     }
 
 }

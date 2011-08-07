@@ -11,9 +11,9 @@ class MapGenCavesPTM
     private int a = 8;
     private Random b = new Random();
 
-    private WorldWorker WorldSettings;
+    private Settings WorldSettings;
 
-    public MapGenCavesPTM(WorldWorker wrk)
+    public MapGenCavesPTM(Settings wrk)
     {
         this.WorldSettings = wrk;
     }
