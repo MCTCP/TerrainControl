@@ -183,7 +183,7 @@ class MapGenCavesPTM
         }
     }
 
-    void a(World paramWorld, int paramInt1, int paramInt2, int paramInt3, int paramInt4, byte[] paramArrayOfByte)
+    void a( int paramInt1, int paramInt2, int paramInt3, int paramInt4, byte[] paramArrayOfByte)
     {
         int i = this.b.nextInt(this.b.nextInt(this.b.nextInt(this.WorldSettings.caveFrequency) + 1) + 1);
         if (this.WorldSettings.evenCaveDistribution)
@@ -236,7 +236,7 @@ class MapGenCavesPTM
     for (int j = paramInt1 - i; j <= paramInt1 + i; j++)
       for (int k = paramInt2 - i; k <= paramInt2 + i; k++) {
         this.b.setSeed(j * l1 + k * l2 ^ paramWorld.getSeed());
-        a(paramWorld, j, k, paramInt1, paramInt2, paramArrayOfByte);
+        a( j, k, paramInt1, paramInt2, paramArrayOfByte);
       }
   }
 }

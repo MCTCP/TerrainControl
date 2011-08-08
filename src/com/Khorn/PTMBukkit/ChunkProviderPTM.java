@@ -154,161 +154,84 @@ class ChunkProviderPTM extends ChunkGenerator
 
     void replaceBlocksForBiome(int paramInt1, int paramInt2, byte[] paramArrayOfByte, BiomeBase[] paramArrayOfBiomeBase)
     {
-        if (!this.WorldSettings.oldGen)
-        {
-            int i1 = this.WorldSettings.getWaterLevel();
-            double d1 = 0.03125D;
 
-            this.r = this.n.a(this.r, paramInt1 * 16, paramInt2 * 16, 0.0D, 16, 16, 1, d1, d1, 1.0D);
-            this.s = this.n.a(this.s, paramInt1 * 16, 109.0134D, paramInt2 * 16, 16, 1, 16, d1, 1.0D, d1);
-            this.t = this.o.a(this.t, paramInt1 * 16, paramInt2 * 16, 0.0D, 16, 16, 1, d1 * 2.0D, d1 * 2.0D, d1 * 2.0D);
+        int i1 = this.WorldSettings.getWaterLevel();
+        double d1 = 0.03125D;
 
-            for (int i2 = 0; i2 < 16; i2++)
-                for (int i3 = 0; i3 < 16; i3++)
+        this.r = this.n.a(this.r, paramInt1 * 16, paramInt2 * 16, 0.0D, 16, 16, 1, d1, d1, 1.0D);
+        this.s = this.n.a(this.s, paramInt1 * 16, 109.0134D, paramInt2 * 16, 16, 1, 16, d1, 1.0D, d1);
+        this.t = this.o.a(this.t, paramInt1 * 16, paramInt2 * 16, 0.0D, 16, 16, 1, d1 * 2.0D, d1 * 2.0D, d1 * 2.0D);
+
+        for (int i2 = 0; i2 < 16; i2++)
+            for (int i3 = 0; i3 < 16; i3++)
+            {
+                BiomeBase localBiomeBase = paramArrayOfBiomeBase[(i2 + i3 * 16)];
+                int i4 = this.r[(i2 + i3 * 16)] + this.rnd.nextDouble() * 0.2D > 0.0D ? 1 : 0;
+                int i5 = this.s[(i2 + i3 * 16)] + this.rnd.nextDouble() * 0.2D > 3.0D ? 1 : 0;
+                int i6 = (int) (this.t[(i2 + i3 * 16)] / 3.0D + 3.0D + this.rnd.nextDouble() * 0.25D);
+
+                int i7 = -1;
+
+                byte i8 = localBiomeBase.p;
+                byte i9 = localBiomeBase.q;
+
+                for (int i10 = 127; i10 >= 0; i10--)
                 {
-                    BiomeBase localBiomeBase = paramArrayOfBiomeBase[(i2 + i3 * 16)];
-                    int i4 = this.r[(i2 + i3 * 16)] + this.rnd.nextDouble() * 0.2D > 0.0D ? 1 : 0;
-                    int i5 = this.s[(i2 + i3 * 16)] + this.rnd.nextDouble() * 0.2D > 3.0D ? 1 : 0;
-                    int i6 = (int) (this.t[(i2 + i3 * 16)] / 3.0D + 3.0D + this.rnd.nextDouble() * 0.25D);
+                    int i11 = (i3 * 16 + i2) * 128 + i10;
 
-                    int i7 = -1;
-
-                    byte i8 = localBiomeBase.p;
-                    byte i9 = localBiomeBase.q;
-
-                    for (int i10 = 127; i10 >= 0; i10--)
+                    if ((i10 <= 0 + this.rnd.nextInt(5)) && (WorldSettings.createadminium(i10)))
                     {
-                        int i11 = (i3 * 16 + i2) * 128 + i10;
+                        paramArrayOfByte[i11] = this.WorldSettings.getadminium();
+                    } else
+                    {
+                        int i12 = paramArrayOfByte[i11];
 
-                        if ((i10 <= 0 + this.rnd.nextInt(5)) && (WorldSettings.createadminium(i10)))
-                        {
-                            paramArrayOfByte[i11] = this.WorldSettings.getadminium();
-                        } else
-                        {
-                            int i12 = paramArrayOfByte[i11];
-
-                            if (i12 == 0)
-                                i7 = -1;
-                            else if (i12 == Block.STONE.id)
-                                if (i7 == -1)
+                        if (i12 == 0)
+                            i7 = -1;
+                        else if (i12 == Block.STONE.id)
+                            if (i7 == -1)
+                            {
+                                if (i6 <= 0)
                                 {
-                                    if (i6 <= 0)
-                                    {
+                                    i8 = 0;
+                                    i9 = (byte) Block.STONE.id;
+                                } else if ((i10 >= i1 - 4) && (i10 <= i1 + 1))
+                                {
+                                    i8 = localBiomeBase.p;
+                                    i9 = localBiomeBase.q;
+                                    if (i5 != 0)
                                         i8 = 0;
-                                        i9 = (byte) Block.STONE.id;
-                                    } else if ((i10 >= i1 - 4) && (i10 <= i1 + 1))
-                                    {
-                                        i8 = localBiomeBase.p;
-                                        i9 = localBiomeBase.q;
-                                        if (i5 != 0)
-                                            i8 = 0;
-                                        if (i5 != 0)
-                                            i9 = (byte) Block.GRAVEL.id;
-                                        if (i4 != 0)
-                                            i8 = (byte) Block.SAND.id;
-                                        if (i4 != 0)
-                                            i9 = (byte) Block.SAND.id;
-                                    }
-
-                                    if ((i10 < i1) && (i8 == 0))
-                                        i8 = (byte) Block.STATIONARY_WATER.id;
-
-                                    i7 = i6;
-                                    if (i10 >= i1 - 1)
-                                        paramArrayOfByte[i11] = i8;
-                                    else
-                                        paramArrayOfByte[i11] = i9;
-                                } else if (i7 > 0)
-                                {
-                                    i7--;
-                                    paramArrayOfByte[i11] = i9;
-                                    if ((i7 == 0) && (i9 == Block.SAND.id))
-                                    {
-                                        i7 = this.rnd.nextInt(4);
-                                        i9 = (byte) Block.SANDSTONE.id;
-                                    }
+                                    if (i5 != 0)
+                                        i9 = (byte) Block.GRAVEL.id;
+                                    if (i4 != 0)
+                                        i8 = (byte) Block.SAND.id;
+                                    if (i4 != 0)
+                                        i9 = (byte) Block.SAND.id;
                                 }
-                        }
+
+                                if ((i10 < i1) && (i8 == 0))
+                                    i8 = (byte) Block.STATIONARY_WATER.id;
+
+                                i7 = i6;
+                                if (i10 >= i1 - 1)
+                                    paramArrayOfByte[i11] = i8;
+                                else
+                                    paramArrayOfByte[i11] = i9;
+                            } else if (i7 > 0)
+                            {
+                                i7--;
+                                paramArrayOfByte[i11] = i9;
+                                if ((i7 == 0) && (i9 == Block.SAND.id))
+                                {
+                                    i7 = this.rnd.nextInt(4);
+                                    i9 = (byte) Block.SANDSTONE.id;
+                                }
+                            }
                     }
                 }
-        } else
-        {
-            int i1 = this.WorldSettings.getWaterLevel();
+            }
 
-            double d1 = 0.03125D;
-            this.r = this.n.a(this.r, paramInt1 * 16, paramInt2 * 16, 0.0D, 16, 16, 1, d1, d1, 1.0D);
-            this.s = this.n.a(this.s, paramInt2 * 16, 109.0134D, paramInt1 * 16, 16, 1, 16, d1, 1.0D, d1);
-            this.t = this.o.a(this.t, paramInt1 * 16, paramInt2 * 16, 0.0D, 16, 16, 1, d1 * 2.0D, d1 * 2.0D, d1 * 2.0D);
 
-            for (int i2 = 0; i2 < 16; i2++)
-                for (int i3 = 0; i3 < 16; i3++)
-                {
-                    BiomeBase localBiomeBase = paramArrayOfBiomeBase[(i2 * 16 + i3)];
-                    int i4 = this.r[(i2 * 16 + i3)] + this.rnd.nextDouble() * 0.2D > 0.0D ? 1 : 0;
-                    int i5 = this.s[(i2 * 16 + i3)] + this.rnd.nextDouble() * 0.2D > 3.0D ? 1 : 0;
-                    int i6 = (int) (this.t[(i2 * 16 + i3)] / 3.0D + 3.0D + this.rnd.nextDouble() * 0.25D);
-
-                    int i7 = -1;
-
-                    byte i8 = localBiomeBase.p;
-                    byte i9 = localBiomeBase.q;
-
-                    for (int i10 = 127; i10 >= 0; i10--)
-                    {
-                        int i11 = (i2 * 16 + i3) * 128 + i10;
-
-                        if ((i10 <= 0 + this.rnd.nextInt(5)) && (this.WorldSettings.createadminium(i10)))
-                        {
-                            paramArrayOfByte[i11] = this.WorldSettings.getadminium();
-                        } else
-                        {
-                            int i12 = paramArrayOfByte[i11];
-
-                            if (i12 == 0)
-                                i7 = -1;
-                            else if (i12 == Block.STONE.id)
-                                if (i7 == -1)
-                                {
-                                    if (i6 <= 0)
-                                    {
-                                        i8 = 0;
-                                        i9 = (byte) Block.STONE.id;
-                                    } else if ((i10 >= i1 - 4) && (i10 <= i1 + 1))
-                                    {
-                                        i8 = localBiomeBase.p;
-                                        i9 = localBiomeBase.q;
-                                        if (i5 != 0)
-                                            i8 = 0;
-                                        if (i5 != 0)
-                                            i9 = (byte) Block.GRAVEL.id;
-                                        if (i4 != 0)
-                                            i8 = (byte) Block.SAND.id;
-                                        if (i4 != 0)
-                                            i9 = (byte) Block.SAND.id;
-                                    }
-
-                                    if ((i10 < i1) && (i8 == 0))
-                                        i8 = (byte) Block.STATIONARY_WATER.id;
-
-                                    i7 = i6;
-                                    if (i10 >= i1 - 1)
-                                        paramArrayOfByte[i11] = i8;
-                                    else
-                                        paramArrayOfByte[i11] = i9;
-                                } else if (i7 > 0)
-                                {
-                                    i7--;
-                                    paramArrayOfByte[i11] = i9;
-                                    if ((i7 == 0) && (i9 == Block.SAND.id))
-                                    {
-                                        i7 = this.rnd.nextInt(4);
-                                        i9 = (byte) Block.SANDSTONE.id;
-                                    }
-                                }
-                        }
-                    }
-                }
-        }
     }
 
 
@@ -457,7 +380,6 @@ class ChunkProviderPTM extends ChunkGenerator
     }
 
 
-
     private byte findNearestStoneReplacement(byte[] blocks, int block, BiomeBase currentBiome)
     {
         for (int w = 1; w < 16; w++)
@@ -473,8 +395,6 @@ class ChunkProviderPTM extends ChunkGenerator
                     }
         return (byte) ((currentBiome == BiomeBase.DESERT) || (currentBiome == BiomeBase.ICE_DESERT) ? Block.SAND.id : Block.GRASS.id);
     }
-
-
 
 
     private void createSwamps(byte[] blocks, int block)
@@ -506,9 +426,6 @@ class ChunkProviderPTM extends ChunkGenerator
                 return;
             }
     }
-
-
-
 
 
     @Override

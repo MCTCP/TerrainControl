@@ -13,18 +13,6 @@ public class Coordinate
     public int branchDirection = -1;
     public boolean Digs;
 
-    /**
-     * Construct a new Coordinate from an X and Y coordinate.
-     * 
-     * @param initX
-     *            the X coordinate.
-     * @param initY
-     *            the Y coordinate.
-     * @param initZ
-     *            the Z coordinate.
-     * @param initData
-     * @param digs
-     */
     public Coordinate(int initX, int initY, int initZ, String initData, boolean digs)
     {
         x = initX;
@@ -34,21 +22,11 @@ public class Coordinate
         Digs = digs;
     }
 
-    /**
-     * Get the X coordinate of the Coordinate.
-     * 
-     * @return the X coordinate.
-     */
     public int getX()
     {
         return x;
     }
 
-    /**
-     * Get the Y coordinate of the Coordinate.
-     * 
-     * @return the Y coordinate.
-     */
     public int getY()
     {
         return y;

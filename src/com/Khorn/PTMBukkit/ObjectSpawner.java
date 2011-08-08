@@ -1,14 +1,10 @@
 package com.Khorn.PTMBukkit;
 
-import com.sun.xml.internal.bind.v2.TODO;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
-import org.bukkit.util.noise.PerlinNoiseGenerator;
 
-
-import javax.persistence.Version;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -194,7 +190,7 @@ public class ObjectSpawner extends BlockPopulator
         return objectSpawned;
     }
 
-
+    /*
     public boolean SpawnCustomTrees(int x, int y, int z)
     {
 
@@ -228,7 +224,7 @@ public class ObjectSpawner extends BlockPopulator
 
         }
         return objectSpawned;
-    }
+    }  */
 
     private boolean GenerateCustomObject(int x, int y, int z, CustomObject workObject, boolean notify)
     {
@@ -549,7 +545,7 @@ public class ObjectSpawner extends BlockPopulator
         }
     }
 
-    void processUndergroundDeposits(int x, int z, BiomeBase currentBiome)
+    void processUndergroundDeposits(int x, int z)
     {
 
         processDepositMaterial(x, z, this.WorldSettings.dungeonRarity, this.WorldSettings.dungeonFrequency, this.WorldSettings.dungeonMinAltitude, this.WorldSettings.dungeonMaxAltitude, -1, Block.MOB_SPAWNER.id);
@@ -742,7 +738,7 @@ public class ObjectSpawner extends BlockPopulator
         this.rand.setSeed(chunk_x * l1 + chunk_z * l2 ^ world.getSeed());
 
 
-        this.processUndergroundDeposits(x, z, localBiomeBase);
+        this.processUndergroundDeposits(x, z);
         //System.out.println("Under ground debug: " + x  + " " + z + " " + rand.nextDouble());
         // ToDo add lavaLevelMin and lavaLevelMax here
         if (this.WorldSettings.notchBiomeTrees)
@@ -753,6 +749,7 @@ public class ObjectSpawner extends BlockPopulator
                 int i4 = this.rand.nextInt(128);
                 int i5 = z + this.rand.nextInt(16);
                 WorldGenLakes lake = new WorldGenLakes(Block.STATIONARY_WATER.id);
+                lake.a(this.world, this.rand, i3, i4, i5);
                 //System.out.println("Lake debug: " + i3  + " " +i4 + " " + i5 + " " +lake.a(this.world, this.rand, i3, i4, i5) + " " + rand.nextDouble());
             }
 

@@ -27,7 +27,7 @@ public class Settings
 
     // public BiomeBase currentBiome;
     // --Commented out by Inspection (17.07.11 1:49):String seedValue;
-    public boolean oldGen;
+
     public double biomeSize;
     public double minMoisture;
     public double maxMoisture;
@@ -377,7 +377,7 @@ public class Settings
         this.RegisterBOBPlugins();
         this.plugin = plug;
 
-        System.out.println("PhoenixTerrainMod Bukkit version 0.6.2 Loaded!");
+        System.out.println("PhoenixTerrainMod Bukkit version 0.6.3 Loaded!");
     }
 
 
@@ -715,7 +715,7 @@ public class Settings
     private void ReadWorldSettings()
     {
 
-        this.oldGen = ReadModSettins(BiomeTerrainValues.oldGen.name(), BiomeTerrainValues.oldGen.booleanValue());
+
         this.biomeSize = ReadModSettins(BiomeTerrainValues.biomeSize.name(), BiomeTerrainValues.biomeSize.doubleValue());
         this.minMoisture = ReadModSettins(BiomeTerrainValues.minMoisture.name(), BiomeTerrainValues.minMoisture.doubleValue());
         this.maxMoisture = ReadModSettins(BiomeTerrainValues.maxMoisture.name(), BiomeTerrainValues.maxMoisture.doubleValue());
@@ -1151,7 +1151,7 @@ public class Settings
     {
         WriteModTitleSettings("Start Biome Variables :");
         WriteModTitleSettings("All Biome Variables");
-        WriteModSettings(BiomeTerrainValues.oldGen.name(), this.oldGen);
+
         WriteModSettings(BiomeTerrainValues.biomeSize.name(), this.biomeSize);
         WriteModSettings(BiomeTerrainValues.minMoisture.name(), this.minMoisture);
         WriteModSettings(BiomeTerrainValues.maxMoisture.name(), this.maxMoisture);

@@ -7,7 +7,6 @@ public enum BiomeTerrainValues
     zLimit(16),
     yLimit(128),
     maxChunkBlockValue(32768),
-    oldGen(false),
     biomeSize(1.5D),
     minMoisture(0.0D),
     maxMoisture(1.0D),
