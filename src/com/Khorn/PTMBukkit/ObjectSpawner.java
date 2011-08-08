@@ -488,12 +488,12 @@ public class ObjectSpawner extends BlockPopulator
             {
                 if (!this.WorldSettings.evenWaterSourceDistribution)
                     y = this.rand.nextInt(this.rand.nextInt(maxAltitude - minAltitude) + minAltitude + 1);
-                SpawnLiquid( x, y, z,type);
+                SpawnLiquid(x, y, z, type);
             } else if (type == Block.LAVA.id)
             {
                 if (!this.WorldSettings.evenLavaSourceDistribution)
                     y = this.rand.nextInt(this.rand.nextInt(maxAltitude - minAltitude) + minAltitude + 1);
-                SpawnLiquid( x, y, z,type);
+                SpawnLiquid(x, y, z, type);
             } else if (type == Block.MOB_SPAWNER.id)
                 new WorldGenDungeons().a(this.world, this.rand, x, y, z);
             else
@@ -637,7 +637,8 @@ public class ObjectSpawner extends BlockPopulator
             int xR = x + this.rand.nextInt(16);
             int yR = this.rand.nextInt(this.WorldSettings.undergroundLakeMaxAltitude - this.WorldSettings.undergroundLakeMinAltitude) + this.WorldSettings.undergroundLakeMinAltitude;
             int zR = z + this.rand.nextInt(16);
-            createUndergroundLake(this.rand.nextInt(this.WorldSettings.undergroundLakeMaxSize - this.WorldSettings.undergroundLakeMinSize) + this.WorldSettings.undergroundLakeMinSize, xR, yR, zR);
+            if (yR < this.world.getHighestBlockYAt(xR, zR))
+                createUndergroundLake(this.rand.nextInt(this.WorldSettings.undergroundLakeMaxSize - this.WorldSettings.undergroundLakeMinSize) + this.WorldSettings.undergroundLakeMinSize, xR, yR, zR);
         }
     }
 
@@ -668,6 +669,8 @@ public class ObjectSpawner extends BlockPopulator
                 for (int yLake = (int) (yAdjusted - verticalSize / 2.0D); yLake <= (int) (yAdjusted + verticalSize / 2.0D); yLake++)
                     for (int zLake = (int) (zAdjusted - horizontalSize / 2.0D); zLake <= (int) (zAdjusted + horizontalSize / 2.0D); zLake++)
                     {
+                        if(world.getTypeId(xLake, yLake, zLake) == 0)
+                            continue;
                         double xBounds = (xLake + 0.5D - xAdjusted) / (horizontalSize / 2.0D);
                         double yBounds = (yLake + 0.5D - yAdjusted) / (verticalSize / 2.0D);
                         double zBounds = (zLake + 0.5D - zAdjusted) / (horizontalSize / 2.0D);
@@ -681,32 +684,46 @@ public class ObjectSpawner extends BlockPopulator
                     }
         }
     }
-    
-    public boolean SpawnLiquid( int x, int y, int z, int type ) {
-    if (this.world.getTypeId(x, y + 1, z) != Block.STONE.id) return false;
-    if (this.world.getTypeId(x, y - 1, z) != Block.STONE.id) return false;
 
-    if ((this.world.getTypeId(x, y, z) != 0) && (this.world.getTypeId(x, y, z) != Block.STONE.id)) return false;
+    public boolean SpawnLiquid(int x, int y, int z, int type)
+    {
 
-    int i = 0;
-    if (this.world.getTypeId(x - 1, y, z) == Block.STONE.id) i++;
-    if (this.world.getTypeId(x + 1, y, z) == Block.STONE.id) i++;
-    if (this.world.getTypeId(x, y, z - 1) == Block.STONE.id) i++;
-    if (this.world.getTypeId(x, y, z + 1) == Block.STONE.id) i++;
+        if (this.world.getTypeId(x, y + 1, z) != Block.STONE.id)
+            return false;
+        if (this.world.getTypeId(x, y - 1, z) != Block.STONE.id)
+            return false;
 
-    int j = 0;
-    if (this.world.isEmpty(x - 1, y, z)) j++;
-    if (this.world.isEmpty(x + 1, y, z)) j++;
-    if (this.world.isEmpty(x, y, z - 1)) j++;
-    if (this.world.isEmpty(x, y, z + 1)) j++;
+        if ((this.world.getTypeId(x, y, z) != 0) && (this.world.getTypeId(x, y, z) != Block.STONE.id))
+            return false;
 
-    if ((i == 3) && (j == 1)) {
-      this.world.setTypeId(x, y, z, type);
+        int i = 0;
+        if (this.world.getTypeId(x - 1, y, z) == Block.STONE.id)
+            i++;
+        if (this.world.getTypeId(x + 1, y, z) == Block.STONE.id)
+            i++;
+        if (this.world.getTypeId(x, y, z - 1) == Block.STONE.id)
+            i++;
+        if (this.world.getTypeId(x, y, z + 1) == Block.STONE.id)
+            i++;
 
+        int j = 0;
+        if (this.world.isEmpty(x - 1, y, z))
+            j++;
+        if (this.world.isEmpty(x + 1, y, z))
+            j++;
+        if (this.world.isEmpty(x, y, z - 1))
+            j++;
+        if (this.world.isEmpty(x, y, z + 1))
+            j++;
+
+        if ((i == 3) && (j == 1))
+        {
+            this.world.setTypeId(x, y, z, type);
+
+        }
+
+        return true;
     }
-
-    return true;
-  }   
 
     @Override
     public void populate(org.bukkit.World wrld, Random random, Chunk chunk)
@@ -714,7 +731,7 @@ public class ObjectSpawner extends BlockPopulator
         BlockSand.instaFall = false;
 
         this.world = ((CraftWorld) wrld).getHandle();
-        
+
         if (!this.WorldSettings.isInit)
         {
             this.world.worldProvider.b = new BiomeManagerPTM(this.world, this.WorldSettings);
@@ -732,6 +749,7 @@ public class ObjectSpawner extends BlockPopulator
         BiomeBase localBiomeBase = world.getWorldChunkManager().getBiome(x + 16, z + 16);
 
 
+
         this.rand.setSeed(world.getSeed());
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
@@ -741,15 +759,17 @@ public class ObjectSpawner extends BlockPopulator
         this.processUndergroundDeposits(x, z);
         //System.out.println("Under ground debug: " + x  + " " + z + " " + rand.nextDouble());
         // ToDo add lavaLevelMin and lavaLevelMax here
-        if (this.WorldSettings.notchBiomeTrees)
+
+
+        if (!this.WorldSettings.disableNotchPonds)
         {
             if (this.rand.nextInt(4) == 0)
             {
                 int i3 = x + this.rand.nextInt(16);
                 int i4 = this.rand.nextInt(128);
                 int i5 = z + this.rand.nextInt(16);
-                WorldGenLakes lake = new WorldGenLakes(Block.STATIONARY_WATER.id);
-                lake.a(this.world, this.rand, i3, i4, i5);
+                //if (i4 <= this.world.getHighestBlockYAt(i3, i5))
+                    new WorldGenLakes(Block.STATIONARY_WATER.id).a(this.world, this.rand, i3, i4, i5);
                 //System.out.println("Lake debug: " + i3  + " " +i4 + " " + i5 + " " +lake.a(this.world, this.rand, i3, i4, i5) + " " + rand.nextDouble());
             }
 
@@ -794,20 +814,18 @@ public class ObjectSpawner extends BlockPopulator
 
                 if (this.WorldSettings.replaceBlocks.size() > 0)
                 {
-                    for( int y = 0; y<128 ; y++)
+                    for (int y = 0; y < 128; y++)
                     {
-                        int block = this.world.getTypeId(_x,y,_z);
-                        if(this.WorldSettings.replaceBlocks.containsKey(block))
-                            this.world.setTypeId(_x, y, _z, this.WorldSettings.replaceBlocks.get(block)) ;
+                        int block = this.world.getTypeId(_x, y, _z);
+                        if (this.WorldSettings.replaceBlocks.containsKey(block))
+                            this.world.setTypeId(_x, y, _z, this.WorldSettings.replaceBlocks.get(block));
                     }
                 }
-
 
 
             }
             i = 0;
         }
-
 
 
         /*byte[] blocks = this.world.getChunkAt(x, z).b;

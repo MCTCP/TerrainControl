@@ -377,7 +377,7 @@ public class Settings
         this.RegisterBOBPlugins();
         this.plugin = plug;
 
-        System.out.println("PhoenixTerrainMod Bukkit version 0.6.3 Loaded!");
+        System.out.println("PhoenixTerrainMod Bukkit version " + this.plugin.getDescription().getVersion()+ "  Loaded!");
     }
 
 
