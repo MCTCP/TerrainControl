@@ -2,6 +2,7 @@ package com.Khorn.PTMBukkit;
 
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
+import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
 
@@ -53,7 +54,7 @@ public class ObjectSpawner extends BlockPopulator
 
             if ((i1 == Block.GRASS.id))
             {
-                ChangeWorld(x, y - 1, z, Block.DIRT.id);
+                this.world.setRawTypeId(x, y - 1, z, Block.DIRT.id);
             }
             if ((world.getTypeId(x, y + 2, z) != Block.WATER.id) || (legacyObject.underwater))
             {
@@ -84,7 +85,7 @@ public class ObjectSpawner extends BlockPopulator
                                             int DownChecker = 1;
                                             while (world.getTypeId(x + (DataX - 4), (y - DownChecker), z + (DataY - 4)) == 0)
                                             {
-                                                ChangeWorld(x + (DataX - 4), (y - DownChecker), z + (DataY - 4), (byte) legacyObject.spawnID);
+                                                this.world.setRawTypeId(x + (DataX - 4), (y - DownChecker), z + (DataY - 4), (byte) legacyObject.spawnID);
                                             }
                                         }
                                     }
@@ -368,11 +369,7 @@ public class ObjectSpawner extends BlockPopulator
     }
 
 
-    private boolean ChangeWorld(int x, int y, int z, int type)
-    {
-        return world.setRawTypeId(x, y, z, type);
 
-    }
 
     private boolean ChangeWorld(boolean notify, int x, int y, int z, int type, int data)
     {
@@ -678,9 +675,9 @@ public class ObjectSpawner extends BlockPopulator
                             continue;
                         int uBlock = world.getTypeId(xLake, yLake - 1, zLake);
                         if ((yLake < y + 2) && ((this.WorldSettings.undergroundLakesInAir) || (uBlock != 0))) // not air
-                            this.ChangeWorld(xLake, yLake, zLake, Block.WATER.id);
+                            this.world.setRawTypeId(xLake, yLake, zLake, Block.WATER.id);
                         else
-                            this.ChangeWorld(xLake, yLake, zLake, 0); // Air block
+                            this.world.setRawTypeId(xLake, yLake, zLake, 0); // Air block
                     }
         }
     }
@@ -718,7 +715,7 @@ public class ObjectSpawner extends BlockPopulator
 
         if ((i == 3) && (j == 1))
         {
-            this.world.setTypeId(x, y, z, type);
+            this.world.setRawTypeId(x, y, z, type);
 
         }
 
@@ -810,17 +807,7 @@ public class ObjectSpawner extends BlockPopulator
                 double d2 = TemperatureArray[i] - (_y - 64) / 64.0D * 0.3D;
                 i++;
                 if (!((d2 >= this.WorldSettings.snowThreshold) || (_y <= 0) || (_y >= 128) || (!this.world.isEmpty(_x, _y, _z)) || (!this.world.getMaterial(_x, _y - 1, _z).isSolid()) || (this.world.getMaterial(_x, _y - 1, _z) == Material.ICE)))
-                    this.world.setTypeId(_x, _y, _z, Block.SNOW.id);
-
-                if (this.WorldSettings.replaceBlocks.size() > 0)
-                {
-                    for (int y = 0; y < 128; y++)
-                    {
-                        int block = this.world.getTypeId(_x, y, _z);
-                        if (this.WorldSettings.replaceBlocks.containsKey(block))
-                            this.world.setTypeId(_x, y, _z, this.WorldSettings.replaceBlocks.get(block));
-                    }
-                }
+                    this.world.setRawTypeId(_x, _y, _z, Block.SNOW.id);
 
 
             }
@@ -828,19 +815,19 @@ public class ObjectSpawner extends BlockPopulator
         }
 
 
-        /*byte[] blocks = this.world.getChunkAt(x, z).b;
+        byte[] blocks = ((CraftChunk)chunk).getHandle().b;
 
 
         for (i = 0; i < blocks.length; i++)
         {
-            if (this.WorldSettings.replaceBlocks.containsKey(blocks[i]))
+            byte blockId = blocks[i];
+            if (this.WorldSettings.replaceBlocks.containsKey(blockId))
             {
-                this.world.setRawTypeId()
                 blocks[i] = this.WorldSettings.replaceBlocks.get(blocks[i]);
             }
-        }  Todo old version dont work, new slowwwwly...
+        }
 
-        */
+
 
 
         BlockSand.instaFall = true;

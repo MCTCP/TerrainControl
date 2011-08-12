@@ -16,7 +16,7 @@ public class Settings
     private BufferedWriter SettingsWriter;
     private HashMap<String, String> ReadedSettings = new HashMap<String, String>();
     
-    public HashMap<Integer, Integer> replaceBlocks = new HashMap<Integer, Integer>();
+    public HashMap<Byte, Byte> replaceBlocks = new HashMap<Byte, Byte>();
 
 
     public ArrayList<CustomObject> Objects = new ArrayList<CustomObject>();
@@ -361,13 +361,13 @@ public class Settings
 
 
 
-    public String SettingsDir;
+    public File SettingsDir;
     public PTMPlugin plugin;
 
     public boolean isInit = false;
 
 
-    public Settings(String settingsDir, PTMPlugin plug)
+    public Settings(File settingsDir, PTMPlugin plug)
     {
         this.SettingsDir = settingsDir;
 
@@ -376,8 +376,6 @@ public class Settings
         WriteSettings();
         this.RegisterBOBPlugins();
         this.plugin = plug;
-
-        System.out.println("PhoenixTerrainMod Bukkit version " + this.plugin.getDescription().getVersion()+ "  Loaded!");
     }
 
 
@@ -1099,7 +1097,7 @@ public class Settings
 
                     String[] blocks = key.split("=");
 
-                    this.replaceBlocks.put(Integer.valueOf(blocks[0]), Integer.valueOf(blocks[1]));
+                    this.replaceBlocks.put(Byte.valueOf(blocks[0]), Byte.valueOf(blocks[1]));
 
                 }
 
@@ -1510,10 +1508,10 @@ public class Settings
             return;
         }
         String output = "";
-        Iterator<Entry<Integer, Integer>> i = this.replaceBlocks.entrySet().iterator();
+        Iterator<Entry<Byte, Byte>> i = this.replaceBlocks.entrySet().iterator();
         while (i.hasNext())
         {
-            Map.Entry<Integer, Integer> me = i.next();
+            Map.Entry<Byte, Byte> me = i.next();
 
             output += me.getKey().toString() + "=" + me.getValue().toString();
             if (i.hasNext())
@@ -1529,7 +1527,7 @@ public class Settings
         {
             try
             {
-                File BOBFolder = new File(SettingsDir.concat(PTMPlugin.FILE_SEPARATOR), "BOBPlugins");
+                File BOBFolder = new File(SettingsDir, "BOBPlugins");
                 if (!BOBFolder.exists())
                 {
                     if (!BOBFolder.mkdir())

@@ -73,7 +73,7 @@ class ChunkProviderPTM extends ChunkGenerator
 
         this.CaveGen = new MapGenCavesPTM(this.WorldSettings);
         this.isInit = true;
-        System.out.println("World seed here: " + wrld.getSeed());
+        //System.out.println("World seed here: " + wrld.getSeed());
 
     }
 
