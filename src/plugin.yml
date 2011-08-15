@@ -4,3 +4,8 @@ description: Generates a worlds.
 authors: ['Khorn', 'R-T-B']
 main: com.Khorn.PTMBukkit.PTMPlugin
 load: startup
+commands:
+    ptm:
+        description: Phoenix Terrain Mod commands
+        usage: |
+              /<command> <reload> [world]- Reload config

@@ -2,16 +2,21 @@ package com.Khorn.PTMBukkit;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Set;
 
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
 
 
 public class PTMPlugin extends JavaPlugin
 {
 
-    private static HashMap<String,ChunkProviderPTM> loadedWorlds = new HashMap<String,ChunkProviderPTM>();
+    private final HashMap<String, ChunkProviderPTM> loadedWorlds = new HashMap<String, ChunkProviderPTM>();
+    public final HashMap<String,Settings> worldsSettings = new HashMap<String, Settings>();
 
 
     public void onDisable()
@@ -21,6 +26,7 @@ public class PTMPlugin extends JavaPlugin
 
     public void onEnable()
     {
+        this.getCommand("ptm").setExecutor(new PTMCommand(this));
 
         System.out.println(getDescription().getFullName() + " is now enabled");
 
@@ -29,30 +35,42 @@ public class PTMPlugin extends JavaPlugin
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
     {
-        if(loadedWorlds.containsKey(worldName))
+        if (loadedWorlds.containsKey(worldName))
         {
-            System.out.println("PhoenixTerrainMod: enabled for world '" + worldName + "'");
+            System.out.println("PhoenixTerrainMod: enabled for '" + worldName + "'");
             return loadedWorlds.get(worldName);
         }
 
 
-        File baseFolder = new File(this.getDataFolder(), "worlds/" + worldName);
-        if(!baseFolder.exists())
-        {
-            if(!baseFolder.mkdirs())
-                System.out.println("PhoenixTerrainMod: error create directory, working with defaults");
 
-        }
 
-        Settings worker = new Settings(baseFolder,this);
-        ChunkProviderPTM prov = new ChunkProviderPTM(worker);
+        ChunkProviderPTM prov = new ChunkProviderPTM(this.GetSettings(worldName));
 
-        loadedWorlds.put(worldName,prov);
+        loadedWorlds.put(worldName, prov);
 
-        System.out.println("PhoenixTerrainMod: loaded and enabled for world '" + worldName + "'");
+        System.out.println("PhoenixTerrainMod: enabled for '" + worldName + "'");
         return prov;
 
 
     }
+
+    public Settings GetSettings(String worldName)
+    {
+       File baseFolder = new File(this.getDataFolder(), "worlds/" + worldName);
+        if (!baseFolder.exists())
+        {
+            if (!baseFolder.mkdirs())
+                System.out.println("PhoenixTerrainMod: error create directory, working with defaults");
+
+        }
+
+        Settings worker = new Settings(baseFolder, this);
+
+        worldsSettings.put(worldName,worker);
+
+        System.out.println("PhoenixTerrainMod: settings for '" + worldName + "' loaded");
+        return  worker;
+    }
+
 }
 

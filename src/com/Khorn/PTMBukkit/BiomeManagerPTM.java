@@ -61,6 +61,8 @@ class BiomeManagerPTM extends WorldChunkManager
             }
 
         }
+        if (this.localWrk.isDeprecated)
+            this.localWrk = this.localWrk.newSettings;
 
         return paramArrayOfDouble;
     }
@@ -109,6 +111,9 @@ class BiomeManagerPTM extends WorldChunkManager
             }
 
         }
+
+        if (this.localWrk.isDeprecated)
+            this.localWrk = this.localWrk.newSettings;
 
         return paramArrayOfBiomeBase;
     }

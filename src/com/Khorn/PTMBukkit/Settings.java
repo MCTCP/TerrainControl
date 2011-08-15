@@ -2,16 +2,19 @@ package com.Khorn.PTMBukkit;
 
 import net.minecraft.server.Block;
 
+import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Time;
+import java.text.DateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class Settings
+public  class Settings
 {
     private BufferedWriter SettingsWriter;
     private HashMap<String, String> ReadedSettings = new HashMap<String, String>();
@@ -365,6 +368,8 @@ public class Settings
     public PTMPlugin plugin;
 
     public boolean isInit = false;
+    public boolean isDeprecated = false;
+    public Settings newSettings = null;
 
 
     public Settings(File settingsDir, PTMPlugin plug)
@@ -1893,6 +1898,26 @@ public class Settings
     public byte getadminium()
     {
         return (byte) (this.bedrockobsidian ? Block.OBSIDIAN.id : Block.BEDROCK.id);
+    }
+
+    public void DebugLog(String str)
+    {
+        File f = new File(SettingsDir, "Debug.log");
+        try
+        {
+            FileWriter writer = new FileWriter(f,true);
+
+
+            writer.write(DateFormat.getTimeInstance().format(new Date())+ ":"+ str + System.getProperty("line.separator"));
+
+
+            writer.close();
+
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+
+        }
     }
 
 

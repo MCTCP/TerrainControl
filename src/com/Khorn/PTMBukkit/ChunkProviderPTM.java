@@ -10,6 +10,7 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.util.*;
 
+
 @SuppressWarnings({"PointlessArithmeticExpression"})
 class ChunkProviderPTM extends ChunkGenerator
 {
@@ -73,7 +74,7 @@ class ChunkProviderPTM extends ChunkGenerator
 
         this.CaveGen = new MapGenCavesPTM(this.WorldSettings);
         this.isInit = true;
-        //System.out.println("World seed here: " + wrld.getSeed());
+        System.out.println("PhoenixTerrainMod: world seed - " + wrld.getSeed());
 
     }
 
@@ -449,6 +450,9 @@ class ChunkProviderPTM extends ChunkGenerator
         this.CaveGen.a(this.localWorld, x, z, arrayOfByte);
 
         this.processChunkBlocks(arrayOfByte, this.BiomeArray);   // Todo need optimise.
+
+        if (this.WorldSettings.isDeprecated)
+            this.WorldSettings = this.WorldSettings.newSettings;
 
         return arrayOfByte;
 

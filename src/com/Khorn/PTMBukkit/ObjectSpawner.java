@@ -411,7 +411,6 @@ public class ObjectSpawner extends BlockPopulator
         double temp = this.treeNoise.a(x * d1, z * d1);
         int treeDensityVariation = (int) ((temp / 8.0D + this.rand.nextDouble() * 4.0D + 4.0D) / 3.0D);
 
-
         if (this.rand.nextInt(10) == 0)
             treeDensity++;
 
@@ -753,6 +752,8 @@ public class ObjectSpawner extends BlockPopulator
         this.rand.setSeed(chunk_x * l1 + chunk_z * l2 ^ world.getSeed());
 
 
+        //ToDo create custom WorldGen objects
+
         this.processUndergroundDeposits(x, z);
         //System.out.println("Under ground debug: " + x  + " " + z + " " + rand.nextDouble());
         // ToDo add lavaLevelMin and lavaLevelMax here
@@ -831,6 +832,9 @@ public class ObjectSpawner extends BlockPopulator
 
 
         BlockSand.instaFall = true;
+
+        if(this.WorldSettings.isDeprecated)
+            this.WorldSettings = this.WorldSettings.newSettings;
     }
 
 }
