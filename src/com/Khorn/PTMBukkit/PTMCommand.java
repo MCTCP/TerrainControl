@@ -93,7 +93,7 @@ public class PTMCommand implements CommandExecutor
 
         player.sendMessage(ChatColor.AQUA.toString() + "You are in: ");
 
-        player.sendMessage(ChatColor.DARK_GREEN.toString() + player.getWorld().getBiome(chunk.getX()*16 +16,chunk.getZ()*16 + 16).name() + ChatColor.GREEN.toString() + " chunk biome");
+        player.sendMessage(ChatColor.DARK_GREEN.toString() + player.getWorld().getBiome(chunk.getX()*16 +16,chunk.getZ()*16 + 16).name() + ChatColor.GREEN.toString() + " chunk biome!");
 
         if(strings.length == 2 && strings[1].equals("-f"))
         {
@@ -102,11 +102,11 @@ public class PTMCommand implements CommandExecutor
             biomeManager.a(biome, (int)player.getLocation().getX(), (int)player.getLocation().getZ(), 1, 1);
 
 
-            player.sendMessage(ChatColor.DARK_GREEN.toString() + biome[0].n + ChatColor.GREEN.toString() + " block biome");
-            player.sendMessage(ChatColor.DARK_GREEN.toString() + biomeManager.rain[0] +  ChatColor.GREEN.toString() + " block humidity");
+            player.sendMessage(ChatColor.DARK_GREEN.toString() + biome[0].n + ChatColor.GREEN.toString() + " block biome!");
+            player.sendMessage(ChatColor.DARK_GREEN.toString() + biomeManager.rain[0] +  ChatColor.GREEN.toString() + " block humidity!");
             double notchTemp = biomeManager.temperature[0] - (((CraftWorld)player.getLocation().getWorld()).getHandle().e((int)player.getLocation().getX(), (int)player.getLocation().getZ()) - 64) / 64.0D * 0.3D;
-            player.sendMessage(ChatColor.DARK_GREEN.toString() + biomeManager.temperature[0] +   ChatColor.GREEN.toString() +" block temperature");
-            player.sendMessage(ChatColor.DARK_GREEN.toString() +notchTemp +  ChatColor.GREEN.toString() + " block temperature with height constant");
+            player.sendMessage(ChatColor.DARK_GREEN.toString() + biomeManager.temperature[0] +   ChatColor.GREEN.toString() +" block temperature!");
+            player.sendMessage(ChatColor.DARK_GREEN.toString() +notchTemp +  ChatColor.GREEN.toString() + " block temperature with height constant!");
         }
 
 

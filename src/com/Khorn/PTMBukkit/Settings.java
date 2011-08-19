@@ -2,15 +2,12 @@ package com.Khorn.PTMBukkit;
 
 import net.minecraft.server.Block;
 
-import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Time;
-import java.text.DateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -19,7 +16,8 @@ public  class Settings
     private BufferedWriter SettingsWriter;
     private HashMap<String, String> ReadedSettings = new HashMap<String, String>();
     
-    public HashMap<Byte, Byte> replaceBlocks = new HashMap<Byte, Byte>();
+    public HashMap<Integer, Byte> replaceBlocks = new HashMap<Integer, Byte>();
+    public byte[] ReplaceBlocksMatrix = new byte[256];
 
 
     public ArrayList<CustomObject> Objects = new ArrayList<CustomObject>();
@@ -291,32 +289,7 @@ public  class Settings
     public int lapislazuliDepositSize4;
     public int lapislazuliDepositMinAltitude4;
     public int lapislazuliDepositMaxAltitude4;
-    // public boolean evenFireHellDepositDistribution;
-    // public boolean evenLightstoneHellDepositDistribution;
-    public int lavaSourceHellDepositRarity;
-    public int lavaSourceHellDepositFrequency;
-    public int lavaSourceHellDepositMinAltitude;
-    public int lavaSourceHellDepositMaxAltitude;
-    public int fireHellDepositRarity;
-    public int fireHellDepositFrequency;
-    public int fireHellDepositMinAltitude;
-    public int fireHellDepositMaxAltitude;
-    public int lightstoneHellDepositRarity1;
-    public int lightstoneHellDepositFrequency1;
-    public int lightstoneHellDepositMinAltitude1;
-    public int lightstoneHellDepositMaxAltitude1;
-    public int lightstoneHellDepositRarity2;
-    public int lightstoneHellDepositFrequency2;
-    public int lightstoneHellDepositMinAltitude2;
-    public int lightstoneHellDepositMaxAltitude2;
-    public int brownMushroomHellDepositRarity;
-    public int brownMushroomHellDepositFrequency;
-    public int brownMushroomHellDepositMinAltitude;
-    public int brownMushroomHellDepositMaxAltitude;
-    public int redMushroomHellDepositRarity;
-    public int redMushroomHellDepositFrequency;
-    public int redMushroomHellDepositMinAltitude;
-    public int redMushroomHellDepositMaxAltitude;
+
     // End Materials
 
     public boolean disableNotchPonds;
@@ -364,7 +337,7 @@ public  class Settings
 
 
 
-    public File SettingsDir;
+    private File SettingsDir;
     public PTMPlugin plugin;
 
     public boolean isInit = false;
@@ -379,6 +352,7 @@ public  class Settings
         ReadSettings();
         CorrectSettings();
         WriteSettings();
+        BuildReplaceMatrix();
         this.RegisterBOBPlugins();
         this.plugin = plug;
     }
@@ -621,31 +595,6 @@ public  class Settings
         this.lapislazuliDepositSize4 = (this.lapislazuliDepositSize4 < 0 ? 0 : this.lapislazuliDepositSize4);
         this.lapislazuliDepositMinAltitude4 = (this.lapislazuliDepositMinAltitude4 < 0 ? 0 : this.lapislazuliDepositMinAltitude4 > BiomeTerrainValues.yLimit.intValue() - 1 ? BiomeTerrainValues.yLimit.intValue() - 1 : this.lapislazuliDepositMinAltitude4);
         this.lapislazuliDepositMaxAltitude4 = (this.lapislazuliDepositMaxAltitude4 > BiomeTerrainValues.yLimit.intValue() ? BiomeTerrainValues.yLimit.intValue() : this.lapislazuliDepositMaxAltitude4 <= this.lapislazuliDepositMinAltitude4 ? this.lapislazuliDepositMinAltitude4 + 1 : this.lapislazuliDepositMaxAltitude4);
-
-        this.lavaSourceHellDepositRarity = (this.lavaSourceHellDepositRarity < 0 ? 0 : this.lavaSourceHellDepositRarity > 100 ? 100 : this.lavaSourceHellDepositRarity);
-        this.lavaSourceHellDepositFrequency = (this.lavaSourceHellDepositFrequency < 0 ? 0 : this.lavaSourceHellDepositFrequency);
-        this.lavaSourceHellDepositMinAltitude = (this.lavaSourceHellDepositMinAltitude < 0 ? 0 : this.lavaSourceHellDepositMinAltitude > BiomeTerrainValues.yLimit.intValue() - 1 ? BiomeTerrainValues.yLimit.intValue() - 1 : this.lavaSourceHellDepositMinAltitude);
-        this.lavaSourceHellDepositMaxAltitude = (this.lavaSourceHellDepositMaxAltitude > BiomeTerrainValues.yLimit.intValue() ? BiomeTerrainValues.yLimit.intValue() : this.lavaSourceHellDepositMaxAltitude <= this.lavaSourceHellDepositMinAltitude ? this.lavaSourceHellDepositMinAltitude + 1 : this.lavaSourceHellDepositMaxAltitude);
-        this.fireHellDepositRarity = (this.fireHellDepositRarity < 0 ? 0 : this.fireHellDepositRarity > 100 ? 100 : this.fireHellDepositRarity);
-        this.fireHellDepositFrequency = (this.fireHellDepositFrequency < 0 ? 0 : this.fireHellDepositFrequency);
-        this.fireHellDepositMinAltitude = (this.fireHellDepositMinAltitude < 0 ? 0 : this.fireHellDepositMinAltitude > BiomeTerrainValues.yLimit.intValue() - 1 ? BiomeTerrainValues.yLimit.intValue() - 1 : this.fireHellDepositMinAltitude);
-        this.fireHellDepositMaxAltitude = (this.fireHellDepositMaxAltitude > BiomeTerrainValues.yLimit.intValue() ? BiomeTerrainValues.yLimit.intValue() : this.fireHellDepositMaxAltitude <= this.fireHellDepositMinAltitude ? this.fireHellDepositMinAltitude + 1 : this.fireHellDepositMaxAltitude);
-        this.lightstoneHellDepositRarity1 = (this.lightstoneHellDepositRarity1 < 0 ? 0 : this.lightstoneHellDepositRarity1 > 100 ? 100 : this.lightstoneHellDepositRarity1);
-        this.lightstoneHellDepositFrequency1 = (this.lightstoneHellDepositFrequency1 < 0 ? 0 : this.lightstoneHellDepositFrequency1);
-        this.lightstoneHellDepositMinAltitude1 = (this.lightstoneHellDepositMinAltitude1 < 0 ? 0 : this.lightstoneHellDepositMinAltitude1 > BiomeTerrainValues.yLimit.intValue() - 1 ? BiomeTerrainValues.yLimit.intValue() - 1 : this.lightstoneHellDepositMinAltitude1);
-        this.lightstoneHellDepositMaxAltitude1 = (this.lightstoneHellDepositMaxAltitude1 > BiomeTerrainValues.yLimit.intValue() ? BiomeTerrainValues.yLimit.intValue() : this.lightstoneHellDepositMaxAltitude1 <= this.lightstoneHellDepositMinAltitude1 ? this.lightstoneHellDepositMinAltitude1 + 1 : this.lightstoneHellDepositMaxAltitude1);
-        this.lightstoneHellDepositRarity2 = (this.lightstoneHellDepositRarity2 < 0 ? 0 : this.lightstoneHellDepositRarity2 > 100 ? 100 : this.lightstoneHellDepositRarity2);
-        this.lightstoneHellDepositFrequency2 = (this.lightstoneHellDepositFrequency2 < 0 ? 0 : this.lightstoneHellDepositFrequency2);
-        this.lightstoneHellDepositMinAltitude2 = (this.lightstoneHellDepositMinAltitude2 < 0 ? 0 : this.lightstoneHellDepositMinAltitude2 > BiomeTerrainValues.yLimit.intValue() - 1 ? BiomeTerrainValues.yLimit.intValue() - 1 : this.lightstoneHellDepositMinAltitude2);
-        this.lightstoneHellDepositMaxAltitude2 = (this.lightstoneHellDepositMaxAltitude2 > BiomeTerrainValues.yLimit.intValue() ? BiomeTerrainValues.yLimit.intValue() : this.lightstoneHellDepositMaxAltitude2 <= this.lightstoneHellDepositMinAltitude2 ? this.lightstoneHellDepositMinAltitude2 + 1 : this.lightstoneHellDepositMaxAltitude2);
-        this.brownMushroomHellDepositRarity = (this.brownMushroomHellDepositRarity < 0 ? 0 : this.brownMushroomHellDepositRarity > 100 ? 100 : this.brownMushroomHellDepositRarity);
-        this.brownMushroomHellDepositFrequency = (this.brownMushroomHellDepositFrequency < 0 ? 0 : this.brownMushroomHellDepositFrequency);
-        this.brownMushroomHellDepositMinAltitude = (this.brownMushroomHellDepositMinAltitude < 0 ? 0 : this.brownMushroomHellDepositMinAltitude > BiomeTerrainValues.yLimit.intValue() - 1 ? BiomeTerrainValues.yLimit.intValue() - 1 : this.brownMushroomHellDepositMinAltitude);
-        this.brownMushroomHellDepositMaxAltitude = (this.brownMushroomHellDepositMaxAltitude > BiomeTerrainValues.yLimit.intValue() ? BiomeTerrainValues.yLimit.intValue() : this.brownMushroomHellDepositMaxAltitude <= this.brownMushroomHellDepositMinAltitude ? this.brownMushroomHellDepositMinAltitude + 1 : this.brownMushroomHellDepositMaxAltitude);
-        this.redMushroomHellDepositRarity = (this.redMushroomHellDepositRarity < 0 ? 0 : this.redMushroomHellDepositRarity > 100 ? 100 : this.redMushroomHellDepositRarity);
-        this.redMushroomHellDepositFrequency = (this.redMushroomHellDepositFrequency < 0 ? 0 : this.redMushroomHellDepositFrequency);
-        this.redMushroomHellDepositMinAltitude = (this.redMushroomHellDepositMinAltitude < 0 ? 0 : this.redMushroomHellDepositMinAltitude > BiomeTerrainValues.yLimit.intValue() - 1 ? BiomeTerrainValues.yLimit.intValue() - 1 : this.redMushroomHellDepositMinAltitude);
-        this.redMushroomHellDepositMaxAltitude = (this.redMushroomHellDepositMaxAltitude > BiomeTerrainValues.yLimit.intValue() ? BiomeTerrainValues.yLimit.intValue() : this.redMushroomHellDepositMaxAltitude <= this.redMushroomHellDepositMinAltitude ? this.redMushroomHellDepositMinAltitude + 1 : this.redMushroomHellDepositMaxAltitude);
 
         this.dungeonRarity = (this.dungeonRarity < 0 ? 0 : this.dungeonRarity > 100 ? 100 : this.dungeonRarity);
         this.dungeonFrequency = (this.dungeonFrequency < 0 ? 0 : this.dungeonFrequency);
@@ -987,31 +936,6 @@ public  class Settings
         this.lapislazuliDepositMaxAltitude4 = this.ReadModSettins(BiomeTerrainValues.lapislazuliDepositMaxAltitude4.name(), BiomeTerrainValues.lapislazuliDepositMaxAltitude4.intValue());
 
 
-        this.lavaSourceHellDepositRarity = this.ReadModSettins(BiomeTerrainValues.lavaSourceHellDepositRarity.name(), BiomeTerrainValues.lavaSourceHellDepositRarity.intValue());
-        this.lavaSourceHellDepositFrequency = this.ReadModSettins(BiomeTerrainValues.lavaSourceHellDepositFrequency.name(), BiomeTerrainValues.lavaSourceHellDepositFrequency.intValue());
-        this.lavaSourceHellDepositMinAltitude = this.ReadModSettins(BiomeTerrainValues.lavaSourceHellDepositMinAltitude.name(), BiomeTerrainValues.lavaSourceHellDepositMinAltitude.intValue());
-        this.lavaSourceHellDepositMaxAltitude = this.ReadModSettins(BiomeTerrainValues.lavaSourceHellDepositMaxAltitude.name(), BiomeTerrainValues.lavaSourceHellDepositMaxAltitude.intValue());
-        this.fireHellDepositRarity = this.ReadModSettins(BiomeTerrainValues.fireHellDepositRarity.name(), BiomeTerrainValues.fireHellDepositRarity.intValue());
-        this.fireHellDepositFrequency = this.ReadModSettins(BiomeTerrainValues.fireHellDepositFrequency.name(), BiomeTerrainValues.fireHellDepositFrequency.intValue());
-        this.fireHellDepositMinAltitude = this.ReadModSettins(BiomeTerrainValues.fireHellDepositMinAltitude.name(), BiomeTerrainValues.fireHellDepositMinAltitude.intValue());
-        this.fireHellDepositMaxAltitude = this.ReadModSettins(BiomeTerrainValues.fireHellDepositMaxAltitude.name(), BiomeTerrainValues.fireHellDepositMaxAltitude.intValue());
-        this.lightstoneHellDepositRarity1 = this.ReadModSettins(BiomeTerrainValues.lightstoneHellDepositRarity1.name(), BiomeTerrainValues.lightstoneHellDepositRarity1.intValue());
-        this.lightstoneHellDepositFrequency1 = this.ReadModSettins(BiomeTerrainValues.lightstoneHellDepositFrequency1.name(), BiomeTerrainValues.lightstoneHellDepositFrequency1.intValue());
-        this.lightstoneHellDepositMinAltitude1 = this.ReadModSettins(BiomeTerrainValues.lightstoneHellDepositMinAltitude1.name(), BiomeTerrainValues.lightstoneHellDepositMinAltitude1.intValue());
-        this.lightstoneHellDepositMaxAltitude1 = this.ReadModSettins(BiomeTerrainValues.lightstoneHellDepositMaxAltitude1.name(), BiomeTerrainValues.lightstoneHellDepositMaxAltitude1.intValue());
-        this.lightstoneHellDepositRarity2 = this.ReadModSettins(BiomeTerrainValues.lightstoneHellDepositRarity2.name(), BiomeTerrainValues.lightstoneHellDepositRarity2.intValue());
-        this.lightstoneHellDepositFrequency2 = this.ReadModSettins(BiomeTerrainValues.lightstoneHellDepositFrequency2.name(), BiomeTerrainValues.lightstoneHellDepositFrequency2.intValue());
-        this.lightstoneHellDepositMinAltitude2 = this.ReadModSettins(BiomeTerrainValues.lightstoneHellDepositMinAltitude2.name(), BiomeTerrainValues.lightstoneHellDepositMinAltitude2.intValue());
-        this.lightstoneHellDepositMaxAltitude2 = this.ReadModSettins(BiomeTerrainValues.lightstoneHellDepositMaxAltitude2.name(), BiomeTerrainValues.lightstoneHellDepositMaxAltitude2.intValue());
-        this.brownMushroomHellDepositRarity = this.ReadModSettins(BiomeTerrainValues.brownMushroomHellDepositRarity.name(), BiomeTerrainValues.brownMushroomHellDepositRarity.intValue());
-        this.brownMushroomHellDepositFrequency = this.ReadModSettins(BiomeTerrainValues.brownMushroomHellDepositFrequency.name(), BiomeTerrainValues.brownMushroomHellDepositFrequency.intValue());
-        this.brownMushroomHellDepositMinAltitude = this.ReadModSettins(BiomeTerrainValues.brownMushroomHellDepositMinAltitude.name(), BiomeTerrainValues.brownMushroomHellDepositMinAltitude.intValue());
-        this.brownMushroomHellDepositMaxAltitude = this.ReadModSettins(BiomeTerrainValues.brownMushroomHellDepositMaxAltitude.name(), BiomeTerrainValues.brownMushroomHellDepositMaxAltitude.intValue());
-        this.redMushroomHellDepositRarity = this.ReadModSettins(BiomeTerrainValues.redMushroomHellDepositRarity.name(), BiomeTerrainValues.redMushroomHellDepositRarity.intValue());
-        this.redMushroomHellDepositFrequency = this.ReadModSettins(BiomeTerrainValues.redMushroomHellDepositFrequency.name(), BiomeTerrainValues.redMushroomHellDepositFrequency.intValue());
-        this.redMushroomHellDepositMinAltitude = this.ReadModSettins(BiomeTerrainValues.redMushroomHellDepositMinAltitude.name(), BiomeTerrainValues.redMushroomHellDepositMinAltitude.intValue());
-        this.redMushroomHellDepositMaxAltitude = this.ReadModSettins(BiomeTerrainValues.redMushroomHellDepositMaxAltitude.name(), BiomeTerrainValues.redMushroomHellDepositMaxAltitude.intValue());
-
         this.disableNotchPonds = this.ReadModSettins(BiomeTerrainValues.disableNotchPonds.name(), BiomeTerrainValues.disableNotchPonds.booleanValue());
 
         this.customObjects = this.ReadModSettins(BiomeTerrainValues.customObjects.name(), BiomeTerrainValues.customObjects.booleanValue());
@@ -1061,7 +985,7 @@ public  class Settings
     }
 
 
-    public int ReadModSettins(String settingsName, int defaultValue)
+    private int ReadModSettins(String settingsName, int defaultValue)
     {
         if (this.ReadedSettings.containsKey(settingsName))
         {
@@ -1070,7 +994,7 @@ public  class Settings
         return defaultValue;
     }
 
-    double ReadModSettins(String settingsName, double defaultValue)
+    private double ReadModSettins(String settingsName, double defaultValue)
     {
         if (this.ReadedSettings.containsKey(settingsName))
         {
@@ -1079,7 +1003,7 @@ public  class Settings
         return defaultValue;
     }
 
-    public boolean ReadModSettins(String settingsName, boolean defaultValue)
+    private boolean ReadModSettins(String settingsName, boolean defaultValue)
     {
         if (this.ReadedSettings.containsKey(settingsName))
         {
@@ -1102,7 +1026,7 @@ public  class Settings
 
                     String[] blocks = key.split("=");
 
-                    this.replaceBlocks.put(Byte.valueOf(blocks[0]), Byte.valueOf(blocks[1]));
+                    this.replaceBlocks.put(Integer.valueOf(blocks[0]), Byte.valueOf(blocks[1]));
 
                 }
 
@@ -1114,6 +1038,17 @@ public  class Settings
         }
 
 
+    }
+    private void BuildReplaceMatrix()
+    {
+        for(int i = 0; i<this.ReplaceBlocksMatrix.length;i++)
+        {
+            if(this.replaceBlocks.containsKey(i))
+                this.ReplaceBlocksMatrix[i] = this.replaceBlocks.get(i);
+            else
+                this.ReplaceBlocksMatrix[i] = (byte)i;
+
+        }
     }
 
     void WriteSettings()
@@ -1473,31 +1408,31 @@ public  class Settings
         this.WriteModSettings(BiomeTerrainValues.lapislazuliDepositMaxAltitude4.name(), this.lapislazuliDepositMaxAltitude4);
     }
 
-    public void WriteModSettings(String settingsName, int settingsValue) throws IOException
+    private void WriteModSettings(String settingsName, int settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + Integer.toString(settingsValue));
         this.SettingsWriter.newLine();
     }
 
-    void WriteModSettings(String settingsName, double settingsValue) throws IOException
+    private void WriteModSettings(String settingsName, double settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + Double.toString(settingsValue));
         this.SettingsWriter.newLine();
     }
 
-    public void WriteModSettings(String settingsName, boolean settingsValue) throws IOException
+    private void WriteModSettings(String settingsName, boolean settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + Boolean.toString(settingsValue));
         this.SettingsWriter.newLine();
     }
 
-    void WriteModSettings(String settingsName, String settingsValue) throws IOException
+    private void WriteModSettings(String settingsName, String settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + settingsValue);
         this.SettingsWriter.newLine();
     }
 
-    public void WriteModTitleSettings(String title) throws IOException
+    private void WriteModTitleSettings(String title) throws IOException
     {
         this.SettingsWriter.newLine();
         this.SettingsWriter.write("<" + title + ">");
@@ -1513,10 +1448,10 @@ public  class Settings
             return;
         }
         String output = "";
-        Iterator<Entry<Byte, Byte>> i = this.replaceBlocks.entrySet().iterator();
+        Iterator<Entry<Integer, Byte>> i = this.replaceBlocks.entrySet().iterator();
         while (i.hasNext())
         {
-            Map.Entry<Byte, Byte> me = i.next();
+            Map.Entry<Integer, Byte> me = i.next();
 
             output += me.getKey().toString() + "=" + me.getValue().toString();
             if (i.hasNext())
@@ -1526,7 +1461,7 @@ public  class Settings
     }
 
 
-    public void RegisterBOBPlugins()
+    private void RegisterBOBPlugins()
     {
         if (this.customObjects)
         {
@@ -1900,25 +1835,7 @@ public  class Settings
         return (byte) (this.bedrockobsidian ? Block.OBSIDIAN.id : Block.BEDROCK.id);
     }
 
-    public void DebugLog(String str)
-    {
-        File f = new File(SettingsDir, "Debug.log");
-        try
-        {
-            FileWriter writer = new FileWriter(f,true);
 
-
-            writer.write(DateFormat.getTimeInstance().format(new Date())+ ":"+ str + System.getProperty("line.separator"));
-
-
-            writer.close();
-
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-
-        }
-    }
 
 
 }

@@ -49,7 +49,7 @@ class ChunkProviderPTM extends ChunkGenerator
 
     }
 
-    public void Init(World wrld)
+    private void Init(World wrld)
     {
 
         this.localWorld = wrld;
@@ -78,7 +78,7 @@ class ChunkProviderPTM extends ChunkGenerator
 
     }
 
-    void generateTerrain(int paramInt1, int paramInt2, byte[] paramArrayOfByte, double[] paramArrayOfDouble)
+    private void generateTerrain(int paramInt1, int paramInt2, byte[] paramArrayOfByte, double[] paramArrayOfDouble)
     {
         int i1 = 4;
         int i2 = this.WorldSettings.getWaterLevel();
@@ -345,7 +345,7 @@ class ChunkProviderPTM extends ChunkGenerator
     }
 
 
-    public void processChunkBlocks(byte[] blocks, BiomeBase[] biomes)
+    void processChunkBlocks(byte[] blocks, BiomeBase[] biomes)
     {
 
         for (int x = 0; x < BiomeTerrainValues.xLimit.intValue(); x++)
