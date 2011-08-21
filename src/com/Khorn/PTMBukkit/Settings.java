@@ -56,9 +56,10 @@ public  class Settings
     public boolean evenCaveDistribution;
 
 
-    private int waterLevel;
-    private double maxAverageHeight;
-    private double maxAverageDepth;
+    public int waterLevel;
+    public int waterBlock;
+    public double maxAverageHeight;
+    public double maxAverageDepth;
     private double fractureHorizontal;
     private double fractureVertical;
     private double volatility1;
@@ -67,9 +68,12 @@ public  class Settings
     private double volatilityWeight2;
     private boolean disableBedrock;
     private boolean flatBedrock;
+    public boolean ceilingBedrock;
     private boolean bedrockobsidian;
 
     public boolean removeSurfaceStone;
+    public boolean disableNotchHeightControl;
+    public double[] heightMatrix = new double[17];
 
 
 
@@ -698,6 +702,7 @@ public  class Settings
 
 
         this.waterLevel = ReadModSettins(BiomeTerrainValues.waterLevel.name(), BiomeTerrainValues.waterLevel.intValue());
+        this.waterBlock = ReadModSettins(BiomeTerrainValues.waterBlock.name(), BiomeTerrainValues.waterBlock.intValue());
         this.maxAverageHeight = ReadModSettins(BiomeTerrainValues.maxAverageHeight.name(), BiomeTerrainValues.maxAverageHeight.doubleValue());
         this.maxAverageDepth = ReadModSettins(BiomeTerrainValues.maxAverageDepth.name(), BiomeTerrainValues.maxAverageDepth.doubleValue());
         this.fractureHorizontal = ReadModSettins(BiomeTerrainValues.fractureHorizontal.name(), BiomeTerrainValues.fractureHorizontal.doubleValue());
@@ -706,10 +711,14 @@ public  class Settings
         this.volatility2 = ReadModSettins(BiomeTerrainValues.volatility2.name(), BiomeTerrainValues.volatility2.doubleValue());
         this.volatilityWeight1 = ReadModSettins(BiomeTerrainValues.volatilityWeight1.name(), BiomeTerrainValues.volatilityWeight1.doubleValue());
         this.volatilityWeight2 = ReadModSettins(BiomeTerrainValues.volatilityWeight2.name(), BiomeTerrainValues.volatilityWeight2.doubleValue());
+        this.disableNotchHeightControl = ReadModSettins(BiomeTerrainValues.disableNotchHeightControl.name(),BiomeTerrainValues.disableNotchHeightControl.booleanValue());
 
         this.disableBedrock = ReadModSettins(BiomeTerrainValues.disableBedrock.name(), BiomeTerrainValues.disableBedrock.booleanValue());
+        this.ceilingBedrock = ReadModSettins(BiomeTerrainValues.ceilingBedrock.name(), BiomeTerrainValues.ceilingBedrock.booleanValue());
         this.flatBedrock = ReadModSettins(BiomeTerrainValues.flatBedrock.name(), BiomeTerrainValues.flatBedrock.booleanValue());
         this.bedrockobsidian = ReadModSettins(BiomeTerrainValues.bedrockobsidian.name(), BiomeTerrainValues.bedrockobsidian.booleanValue());
+
+        ReadHeightSettings();
 
 
         this.removeSurfaceStone = ReadModSettins(BiomeTerrainValues.removeSurfaceStone.name(), BiomeTerrainValues.removeSurfaceStone.booleanValue());
@@ -1039,6 +1048,29 @@ public  class Settings
 
 
     }
+    private void ReadHeightSettings()
+    {
+        if (this.ReadedSettings.containsKey("CustomHeightControl"))
+        {
+            if (this.ReadedSettings.get("CustomHeightControl").trim().equals("") )
+                return;
+            String[] keys = this.ReadedSettings.get("CustomHeightControl").split(",");
+            try
+            {
+                if(keys.length != 17)
+                    return;
+                for(int i = 0; i < 17; i++)
+                    this.heightMatrix[i] = Double.valueOf(keys[i]);
+
+            } catch (NumberFormatException e)
+            {
+                System.out.println("Wrong replace settings: '" + this.ReadedSettings.get("ReplacedBlocks") + "'");
+            }
+
+        }
+
+
+    }
     private void BuildReplaceMatrix()
     {
         for(int i = 0; i<this.ReplaceBlocksMatrix.length;i++)
@@ -1125,6 +1157,7 @@ public  class Settings
 
         WriteModTitleSettings("Start Terrain Variables :");
         WriteModSettings(BiomeTerrainValues.waterLevel.name(), this.waterLevel);
+        WriteModSettings(BiomeTerrainValues.waterBlock.name(), this.waterBlock);
         WriteModSettings(BiomeTerrainValues.maxAverageHeight.name(), this.maxAverageHeight);
         WriteModSettings(BiomeTerrainValues.maxAverageDepth.name(), this.maxAverageDepth);
         WriteModSettings(BiomeTerrainValues.fractureHorizontal.name(), this.fractureHorizontal);
@@ -1134,8 +1167,11 @@ public  class Settings
         WriteModSettings(BiomeTerrainValues.volatilityWeight1.name(), this.volatilityWeight1);
         WriteModSettings(BiomeTerrainValues.volatilityWeight2.name(), this.volatilityWeight2);
         WriteModSettings(BiomeTerrainValues.disableBedrock.name(), this.disableBedrock);
+        WriteModSettings(BiomeTerrainValues.ceilingBedrock.name(), this.ceilingBedrock);
         WriteModSettings(BiomeTerrainValues.flatBedrock.name(), this.flatBedrock);
         WriteModSettings(BiomeTerrainValues.bedrockobsidian.name(), this.bedrockobsidian);
+        WriteModSettings(BiomeTerrainValues.disableNotchHeightControl.name(),this.disableNotchHeightControl);
+        WriteHeightSettings();
 
 
         WriteModTitleSettings("Replace Variables");
@@ -1226,6 +1262,11 @@ public  class Settings
         this.WriteModSettings(BiomeTerrainValues.disableNotchPonds.name(), this.disableNotchPonds);
 
         this.WriteModTitleSettings("Below Ground Variables");
+        this.WriteModSettings(BiomeTerrainValues.dungeonRarity.name(), this.dungeonRarity);
+        this.WriteModSettings(BiomeTerrainValues.dungeonFrequency.name(), this.dungeonFrequency);
+        this.WriteModSettings(BiomeTerrainValues.dungeonMinAltitude.name(), this.dungeonMinAltitude);
+        this.WriteModSettings(BiomeTerrainValues.dungeonMaxAltitude.name(), this.dungeonMaxAltitude);
+
         this.WriteModSettings(BiomeTerrainValues.dirtDepositRarity1.name(), this.dirtDepositRarity1);
         this.WriteModSettings(BiomeTerrainValues.dirtDepositFrequency1.name(), this.dirtDepositFrequency1);
         this.WriteModSettings(BiomeTerrainValues.dirtDepositSize1.name(), this.dirtDepositSize1);
@@ -1458,6 +1499,15 @@ public  class Settings
                 output += ",";
         }
         this.WriteModSettings("ReplacedBlocks", output);
+    }
+    private void WriteHeightSettings() throws IOException
+    {
+
+        String output = Double.toString(this.heightMatrix[0]);
+        for(int i = 1; i< this.heightMatrix.length;i ++)
+            output = output + "," + Double.toString(this.heightMatrix[i]);
+
+        this.WriteModSettings("CustomHeightControl", output);
     }
 
 
@@ -1780,20 +1830,6 @@ public  class Settings
     }
 
 
-    public int getWaterLevel()
-    {
-        return this.waterLevel;
-    }
-
-    public double getMaxAverageHeight()
-    {
-        return this.maxAverageHeight;
-    }
-
-    public double getMaxAverageDepth()
-    {
-        return this.maxAverageDepth;
-    }
 
     public double getFractureHorizontal()
     {

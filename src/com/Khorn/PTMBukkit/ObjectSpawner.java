@@ -761,7 +761,7 @@ public class ObjectSpawner extends BlockPopulator
             if (this.rand.nextInt(4) == 0)
             {
                 int i3 = x + this.rand.nextInt(16);
-                int i4 = this.rand.nextInt(128);
+                int i4 = this.rand.nextInt(127);
                 int i5 = z + this.rand.nextInt(16);
                 //if (i4 <= this.world.getHighestBlockYAt(i3, i5))
                 new WorldGenLakes(Block.STATIONARY_WATER.id).a(this.world, this.rand, i3, i4, i5);
@@ -771,7 +771,7 @@ public class ObjectSpawner extends BlockPopulator
             if (this.rand.nextInt(8) == 0)
             {
                 int i3 = x + this.rand.nextInt(16);
-                int i4 = this.rand.nextInt(this.rand.nextInt(120) + 8);
+                int i4 = this.rand.nextInt(this.rand.nextInt(119) + 8);
                 int i5 = z + this.rand.nextInt(16);
                 if ((i4 < 64) || (this.rand.nextInt(10) == 0))
                     new WorldGenLakes(Block.STATIONARY_LAVA.id).a(this.world, this.rand, i3, i4, i5);
@@ -822,6 +822,8 @@ public class ObjectSpawner extends BlockPopulator
                     blocks[i] = this.WorldSettings.ReplaceBlocksMatrix[blocks[i]];
             }
         }
+
+        ((CraftChunk) chunk).getHandle().initLighting();
 
 
         BlockSand.instaFall = true;

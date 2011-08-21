@@ -23,6 +23,7 @@ public enum BiomeTerrainValues
     removeSurfaceDirtFromDesert(false),
 
     waterLevel(64),
+    waterBlock(9),
     maxAverageHeight(0.0D),
     maxAverageDepth(0.0D),
     fractureHorizontal(0.0D),
@@ -35,6 +36,7 @@ public enum BiomeTerrainValues
     // --Commented out by Inspection (17.07.11 1:05):replaceWaterWithLava(false),
     // --Commented out by Inspection (17.07.11 1:05):replaceIceWithLava(false),
     disableBedrock(false),
+    ceilingBedrock(false),
     flatBedrock(false),
     bedrockobsidian(false),
     disableNotchPonds(false),
@@ -56,6 +58,7 @@ public enum BiomeTerrainValues
     dungeonMaxAltitude(128),
     lavaLevelMin(0),
     lavaLevelMax(10),
+    disableNotchHeightControl(false),
 
     undergroundLakeFrequency(2),
     undergroundLakeRarity(5),

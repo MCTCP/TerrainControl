@@ -39,8 +39,10 @@ public class PTMCommand implements CommandExecutor
 
             if (strings[0].equals("reload"))
                 return this.ReloadCommand(commandSender, strings, isConsole);
-            if(strings[0].equals("biome"))
-                return this.BiomeCommand(commandSender,strings,isConsole);
+            if (strings[0].equals("biome"))
+                return this.BiomeCommand(commandSender, strings, isConsole);
+            if(strings[0].equals("check"))
+                return this.CheckCommand(commandSender,strings,isConsole);
 
             return this.SendUsage(commandSender);
         }
@@ -82,31 +84,31 @@ public class PTMCommand implements CommandExecutor
 
     private boolean BiomeCommand(CommandSender commandSender, String[] strings, boolean isConsole)
     {
-        if(isConsole)
+        if (isConsole)
         {
-           commandSender.sendMessage(ChatColor.RED.toString() + "You can't do it with console");
+            commandSender.sendMessage(ChatColor.RED.toString() + "You can't do it with console");
             return true;
         }
-        Player player = (Player)commandSender;
+        Player player = (Player) commandSender;
 
         Chunk chunk = player.getWorld().getChunkAt(player.getLocation());
 
         player.sendMessage(ChatColor.AQUA.toString() + "You are in: ");
 
-        player.sendMessage(ChatColor.DARK_GREEN.toString() + player.getWorld().getBiome(chunk.getX()*16 +16,chunk.getZ()*16 + 16).name() + ChatColor.GREEN.toString() + " chunk biome!");
+        player.sendMessage(ChatColor.DARK_GREEN.toString() + player.getWorld().getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16).name() + ChatColor.GREEN.toString() + " chunk biome!");
 
-        if(strings.length == 2 && strings[1].equals("-f"))
+        if (strings.length == 2 && strings[1].equals("-f"))
         {
             BiomeBase[] biome = new BiomeBase[1];
-            WorldChunkManager biomeManager = ((CraftWorld)player.getLocation().getWorld()).getHandle().getWorldChunkManager();
-            biomeManager.a(biome, (int)player.getLocation().getX(), (int)player.getLocation().getZ(), 1, 1);
+            WorldChunkManager biomeManager = ((CraftWorld) player.getLocation().getWorld()).getHandle().getWorldChunkManager();
+            biomeManager.a(biome, (int) player.getLocation().getX(), (int) player.getLocation().getZ(), 1, 1);
 
 
             player.sendMessage(ChatColor.DARK_GREEN.toString() + biome[0].n + ChatColor.GREEN.toString() + " block biome!");
-            player.sendMessage(ChatColor.DARK_GREEN.toString() + biomeManager.rain[0] +  ChatColor.GREEN.toString() + " block humidity!");
-            double notchTemp = biomeManager.temperature[0] - (((CraftWorld)player.getLocation().getWorld()).getHandle().e((int)player.getLocation().getX(), (int)player.getLocation().getZ()) - 64) / 64.0D * 0.3D;
-            player.sendMessage(ChatColor.DARK_GREEN.toString() + biomeManager.temperature[0] +   ChatColor.GREEN.toString() +" block temperature!");
-            player.sendMessage(ChatColor.DARK_GREEN.toString() +notchTemp +  ChatColor.GREEN.toString() + " block temperature with height constant!");
+            player.sendMessage(ChatColor.DARK_GREEN.toString() + biomeManager.rain[0] + ChatColor.GREEN.toString() + " block humidity!");
+            double notchTemp = biomeManager.temperature[0] - (((CraftWorld) player.getLocation().getWorld()).getHandle().e((int) player.getLocation().getX(), (int) player.getLocation().getZ()) - 64) / 64.0D * 0.3D;
+            player.sendMessage(ChatColor.DARK_GREEN.toString() + biomeManager.temperature[0] + ChatColor.GREEN.toString() + " block temperature!");
+            player.sendMessage(ChatColor.DARK_GREEN.toString() + notchTemp + ChatColor.GREEN.toString() + " block temperature with height constant!");
         }
 
 
@@ -114,11 +116,35 @@ public class PTMCommand implements CommandExecutor
 
     }
 
+    private boolean CheckCommand(CommandSender commandSender, String[] strings, boolean isConsole)
+    {
+        String worldName;
+
+        if (strings.length == 1)
+        {
+            if (isConsole)
+            {
+                commandSender.sendMessage(ChatColor.RED.toString() + "You need to select world");
+                return true;
+            }
+
+            worldName = ((Player) commandSender).getWorld().getName();
+        } else
+            worldName = strings[1];
+
+        if (this.plugin.worldsSettings.containsKey(worldName))
+            commandSender.sendMessage(ChatColor.GREEN.toString() + "Ptm is enabled for " + worldName);
+        else
+            commandSender.sendMessage(ChatColor.GREEN.toString() + "Ptm is disabled for " + worldName);
+        return true;
+    }
+
     private boolean SendUsage(CommandSender commandSender)
     {
         commandSender.sendMessage(ChatColor.AQUA.toString() + "Available command:");
-        commandSender.sendMessage(ChatColor.GREEN.toString() + "/ptm reload [World] - Reload world settings");
+        commandSender.sendMessage(ChatColor.GREEN.toString() + "/ptm check [World] - Checks PTM is enable for this world");
         commandSender.sendMessage(ChatColor.GREEN.toString() + "/ptm biome [-f] - Show current chunk biome and block stats");
+        commandSender.sendMessage(ChatColor.GREEN.toString() + "/ptm reload [World] - Reload world settings");
         return true;
     }
 }
