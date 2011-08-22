@@ -142,8 +142,8 @@ public class ObjectSpawner extends BlockPopulator
 
             while (randomRoll < ObjectRarity)
             {
-                int x = chunk_x + this.rand.nextInt(16) + 8;
-                int z = chunk_z + this.rand.nextInt(16) + 8;
+                int x = chunk_x + this.rand.nextInt(16);
+                int z = chunk_z + this.rand.nextInt(16);
                 int y = this.world.getHighestBlockYAt(x, z);
                 ObjectRarity -= 100;
 

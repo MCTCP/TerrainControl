@@ -41,8 +41,8 @@ public class PTMCommand implements CommandExecutor
                 return this.ReloadCommand(commandSender, strings, isConsole);
             if (strings[0].equals("biome"))
                 return this.BiomeCommand(commandSender, strings, isConsole);
-            if(strings[0].equals("check"))
-                return this.CheckCommand(commandSender,strings,isConsole);
+            if (strings[0].equals("check"))
+                return this.CheckCommand(commandSender, strings, isConsole);
 
             return this.SendUsage(commandSender);
         }

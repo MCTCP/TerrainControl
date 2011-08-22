@@ -11,11 +11,11 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
-public  class Settings
+public class Settings
 {
     private BufferedWriter SettingsWriter;
     private HashMap<String, String> ReadedSettings = new HashMap<String, String>();
-    
+
     public HashMap<Integer, Byte> replaceBlocks = new HashMap<Integer, Byte>();
     public byte[] ReplaceBlocksMatrix = new byte[256];
 
@@ -74,7 +74,6 @@ public  class Settings
     public boolean removeSurfaceStone;
     public boolean disableNotchHeightControl;
     public double[] heightMatrix = new double[17];
-
 
 
     public boolean evenWaterSourceDistribution;
@@ -338,7 +337,6 @@ public  class Settings
 
     public int lavaLevelMin;
     public int lavaLevelMax;
-
 
 
     private File SettingsDir;
@@ -711,7 +709,7 @@ public  class Settings
         this.volatility2 = ReadModSettins(BiomeTerrainValues.volatility2.name(), BiomeTerrainValues.volatility2.doubleValue());
         this.volatilityWeight1 = ReadModSettins(BiomeTerrainValues.volatilityWeight1.name(), BiomeTerrainValues.volatilityWeight1.doubleValue());
         this.volatilityWeight2 = ReadModSettins(BiomeTerrainValues.volatilityWeight2.name(), BiomeTerrainValues.volatilityWeight2.doubleValue());
-        this.disableNotchHeightControl = ReadModSettins(BiomeTerrainValues.disableNotchHeightControl.name(),BiomeTerrainValues.disableNotchHeightControl.booleanValue());
+        this.disableNotchHeightControl = ReadModSettins(BiomeTerrainValues.disableNotchHeightControl.name(), BiomeTerrainValues.disableNotchHeightControl.booleanValue());
 
         this.disableBedrock = ReadModSettins(BiomeTerrainValues.disableBedrock.name(), BiomeTerrainValues.disableBedrock.booleanValue());
         this.ceilingBedrock = ReadModSettins(BiomeTerrainValues.ceilingBedrock.name(), BiomeTerrainValues.ceilingBedrock.booleanValue());
@@ -1048,18 +1046,19 @@ public  class Settings
 
 
     }
+
     private void ReadHeightSettings()
     {
         if (this.ReadedSettings.containsKey("CustomHeightControl"))
         {
-            if (this.ReadedSettings.get("CustomHeightControl").trim().equals("") )
+            if (this.ReadedSettings.get("CustomHeightControl").trim().equals(""))
                 return;
             String[] keys = this.ReadedSettings.get("CustomHeightControl").split(",");
             try
             {
-                if(keys.length != 17)
+                if (keys.length != 17)
                     return;
-                for(int i = 0; i < 17; i++)
+                for (int i = 0; i < 17; i++)
                     this.heightMatrix[i] = Double.valueOf(keys[i]);
 
             } catch (NumberFormatException e)
@@ -1071,14 +1070,15 @@ public  class Settings
 
 
     }
+
     private void BuildReplaceMatrix()
     {
-        for(int i = 0; i<this.ReplaceBlocksMatrix.length;i++)
+        for (int i = 0; i < this.ReplaceBlocksMatrix.length; i++)
         {
-            if(this.replaceBlocks.containsKey(i))
+            if (this.replaceBlocks.containsKey(i))
                 this.ReplaceBlocksMatrix[i] = this.replaceBlocks.get(i);
             else
-                this.ReplaceBlocksMatrix[i] = (byte)i;
+                this.ReplaceBlocksMatrix[i] = (byte) i;
 
         }
     }
@@ -1170,7 +1170,7 @@ public  class Settings
         WriteModSettings(BiomeTerrainValues.ceilingBedrock.name(), this.ceilingBedrock);
         WriteModSettings(BiomeTerrainValues.flatBedrock.name(), this.flatBedrock);
         WriteModSettings(BiomeTerrainValues.bedrockobsidian.name(), this.bedrockobsidian);
-        WriteModSettings(BiomeTerrainValues.disableNotchHeightControl.name(),this.disableNotchHeightControl);
+        WriteModSettings(BiomeTerrainValues.disableNotchHeightControl.name(), this.disableNotchHeightControl);
         WriteHeightSettings();
 
 
@@ -1500,11 +1500,12 @@ public  class Settings
         }
         this.WriteModSettings("ReplacedBlocks", output);
     }
+
     private void WriteHeightSettings() throws IOException
     {
 
         String output = Double.toString(this.heightMatrix[0]);
-        for(int i = 1; i< this.heightMatrix.length;i ++)
+        for (int i = 1; i < this.heightMatrix.length; i++)
             output = output + "," + Double.toString(this.heightMatrix[i]);
 
         this.WriteModSettings("CustomHeightControl", output);
@@ -1729,10 +1730,12 @@ public  class Settings
                             {
                                 stringSet = stringSet[1].split(",");
                                 int counter = 0;
-                                while (counter < WorkingCustomObject.spawnInBiome.size())
+                                while (counter < stringSet.length)
                                 {
                                     if (stringSet[counter].equals("Icedesert"))
                                         WorkingCustomObject.spawnInBiome.add("ice desert");
+                                    if (stringSet[counter].equals("Rain Forest"))
+                                        WorkingCustomObject.spawnInBiome.add("rainforest");
                                     else if (stringSet[counter].equals("Seasonalforest"))
                                         WorkingCustomObject.spawnInBiome.add("seasonal forest");
                                     else
@@ -1830,7 +1833,6 @@ public  class Settings
     }
 
 
-
     public double getFractureHorizontal()
     {
         return this.fractureHorizontal < 0.0D ? 1.0D / (Math.abs(this.fractureHorizontal) + 1.0D) : this.fractureHorizontal + 1.0D;
@@ -1870,8 +1872,6 @@ public  class Settings
     {
         return (byte) (this.bedrockobsidian ? Block.OBSIDIAN.id : Block.BEDROCK.id);
     }
-
-
 
 
 }
