@@ -1,5 +1,9 @@
-package com.Khorn.PTMBukkit;
+package com.Khorn.PTMBukkit.Generator;
 
+import com.Khorn.PTMBukkit.CustomObjects.Coordinate;
+import com.Khorn.PTMBukkit.CustomObjects.CustomObject;
+import com.Khorn.PTMBukkit.CustomObjects.CustomObjectLegacy;
+import com.Khorn.PTMBukkit.Settings;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;
@@ -24,6 +28,7 @@ public class ObjectSpawner extends BlockPopulator
     {
         this.WorldSettings = wrk;
         this.rand = new Random();
+        this.WorldSettings.objectSpawner = this;
 
 
     }
@@ -191,29 +196,34 @@ public class ObjectSpawner extends BlockPopulator
         return objectSpawned;
     }
 
-    /*
-    public boolean SpawnCustomTrees(int x, int y, int z)
+
+    public void SpawnCustomTrees(int x, int y, int z)
     {
 
         if (!this.WorldSettings.HasCustomTrees)
-            return false;
+            return;
+        if(this.world.getTypeId(x,y,z) != Block.SAPLING.id)
+            return;
 
-        BiomeBase localBiomeBase = this.world.getWorldChunkManager().getBiome(x, z);
+        int oldData = this.world.getData(x,y,z) & 0x3;
+        this.world.setRawTypeId(x,y,z,0);
+
+        Chunk chunk = this.world.getWorld().getChunkAt(x >> 4,z >> 4);
+
+        BiomeBase localBiomeBase = this.world.getWorldChunkManager().getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16);
 
         boolean objectSpawned = false;
         int spawnattemps = 0;
-        while (!objectSpawned)
+        while (!objectSpawned && spawnattemps < this.WorldSettings.objectSpawnRatio)
         {
-            if (spawnattemps > this.WorldSettings.objectSpawnRatio)
-                return false;
-
-
             CustomObject SelectedObject = this.WorldSettings.Objects.get(this.rand.nextInt(this.WorldSettings.Objects.size()));
+
+            spawnattemps++;
 
             if (ObjectCantSpawn(SelectedObject, localBiomeBase, true))
                 continue;
 
-            spawnattemps++;
+
 
             int randomRoll = this.rand.nextInt(100);
 
@@ -224,8 +234,9 @@ public class ObjectSpawner extends BlockPopulator
             }
 
         }
-        return objectSpawned;
-    }  */
+        if (!objectSpawned)
+            this.world.setRawTypeIdAndData(x,y,z,Block.SAPLING.id,oldData);
+    }
 
     private boolean GenerateCustomObject(int x, int y, int z, CustomObject workObject, boolean notify)
     {
@@ -726,14 +737,16 @@ public class ObjectSpawner extends BlockPopulator
 
         this.world = ((CraftWorld) wrld).getHandle();
 
-        if (!this.WorldSettings.isInit)
-        {
-            this.world.worldProvider.b = new BiomeManagerPTM(this.world, this.WorldSettings);
-            this.WorldSettings.isInit = true;
-        }
 
         if (this.treeNoise == null)
+        {
             this.treeNoise = new NoiseGeneratorOctaves(new Random(wrld.getSeed()), 8);
+            if (!this.WorldSettings.isInit)
+            {
+                this.world.worldProvider.b = new BiomeManagerPTM(this.world, this.WorldSettings);
+                this.WorldSettings.isInit = true;
+            }
+        }
         int chunk_x = chunk.getX();
         int chunk_z = chunk.getZ();
 
@@ -818,7 +831,7 @@ public class ObjectSpawner extends BlockPopulator
 
             for (i = 0; i < blocks.length; i++)
             {
-                if(blocks[i] != this.WorldSettings.ReplaceBlocksMatrix[blocks[i]])
+                if (blocks[i] != this.WorldSettings.ReplaceBlocksMatrix[blocks[i]])
                     blocks[i] = this.WorldSettings.ReplaceBlocksMatrix[blocks[i]];
             }
         }

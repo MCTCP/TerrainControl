@@ -1,5 +1,6 @@
-package com.Khorn.PTMBukkit;
+package com.Khorn.PTMBukkit.Generator;
 
+import com.Khorn.PTMBukkit.Settings;
 import net.minecraft.server.Block;
 import net.minecraft.server.MathHelper;
 import org.bukkit.World;

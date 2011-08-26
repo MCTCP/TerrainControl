@@ -1,4 +1,4 @@
-package com.Khorn.PTMBukkit;
+package com.Khorn.PTMBukkit.CustomObjects;
 
 public class Coordinate
 {

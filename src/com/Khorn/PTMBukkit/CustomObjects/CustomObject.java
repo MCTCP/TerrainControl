@@ -1,9 +1,9 @@
-package com.Khorn.PTMBukkit;
+package com.Khorn.PTMBukkit.CustomObjects;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 
-class CustomObject
+public class CustomObject
 {
 
 

@@ -1,5 +1,7 @@
-package com.Khorn.PTMBukkit;
+package com.Khorn.PTMBukkit.Generator;
 
+import com.Khorn.PTMBukkit.PTMDefaultValues;
+import com.Khorn.PTMBukkit.Settings;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.Block;
 import net.minecraft.server.NoiseGeneratorOctaves;
@@ -12,7 +14,7 @@ import java.util.*;
 
 
 @SuppressWarnings({"PointlessArithmeticExpression"})
-class ChunkProviderPTM extends ChunkGenerator
+public class ChunkProviderPTM extends ChunkGenerator
 {
     private Random rnd;
     private NoiseGeneratorOctaves k;
@@ -43,6 +45,7 @@ class ChunkProviderPTM extends ChunkGenerator
     public ChunkProviderPTM(Settings worker)
     {
         this.WorldSettings = worker;
+        this.WorldSettings.ChunkProvider = this;
         populatorList = new ArrayList<BlockPopulator>();
         populatorList.add(new ObjectSpawner(this.WorldSettings));
 
@@ -226,7 +229,7 @@ class ChunkProviderPTM extends ChunkGenerator
                                     if ((this.WorldSettings.removeSurfaceDirtFromDesert) && ((paramArrayOfByte[i11] == Block.GRASS.id) || (paramArrayOfByte[i11] == Block.DIRT.id)))
                                         paramArrayOfByte[i11] = (byte) Block.SAND.id; // Duno maybe it is wrong
 
-                                    if ((this.WorldSettings.desertDirt) && (this.WorldSettings.desertDirtFrequency > 0) && (this.rnd.nextInt(this.WorldSettings.desertDirtFrequency * BiomeTerrainValues.xLimit.intValue() * BiomeTerrainValues.zLimit.intValue()) == 0) && (paramArrayOfByte[i11] == Block.SAND.id))
+                                    if ((this.WorldSettings.desertDirt) && (this.WorldSettings.desertDirtFrequency > 0) && (this.rnd.nextInt(this.WorldSettings.desertDirtFrequency * PTMDefaultValues.xLimit.intValue() * PTMDefaultValues.zLimit.intValue()) == 0) && (paramArrayOfByte[i11] == Block.SAND.id))
                                         paramArrayOfByte[i11] = (byte) Block.DIRT.id;
 
                                     if ((this.WorldSettings.waterlessDeserts) && ((paramArrayOfByte[i11] == Block.STATIONARY_WATER.id) || (paramArrayOfByte[i11] == Block.ICE.id)))
@@ -390,8 +393,8 @@ class ChunkProviderPTM extends ChunkGenerator
         for (int x = swampSize * -1; x < swampSize + 1; x++)
             for (int z = swampSize * -1; z < swampSize + 1; z++)
             {
-                int newBlock = block + z * BiomeTerrainValues.yLimit.intValue() + x * BiomeTerrainValues.yLimit.intValue() * BiomeTerrainValues.zLimit.intValue();
-                if ((newBlock < 0) || (newBlock > BiomeTerrainValues.maxChunkBlockValue.intValue() - 1))
+                int newBlock = block + z * PTMDefaultValues.yLimit.intValue() + x * PTMDefaultValues.yLimit.intValue() * PTMDefaultValues.zLimit.intValue();
+                if ((newBlock < 0) || (newBlock > PTMDefaultValues.maxChunkBlockValue.intValue() - 1))
                     continue;
                 if (blocks[newBlock] != Block.STATIONARY_WATER.id)
                     continue;

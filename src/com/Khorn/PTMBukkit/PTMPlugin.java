@@ -1,28 +1,21 @@
 package com.Khorn.PTMBukkit;
 
 import java.io.*;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Set;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import com.Khorn.PTMBukkit.Generator.ChunkProviderPTM;
+import com.Khorn.PTMBukkit.Listeners.PTMBlockListener;
+import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import sun.management.FileSystem;
-
-import javax.jnlp.FileSaveService;
-import javax.naming.spi.DirectoryManager;
 
 
 public class PTMPlugin extends JavaPlugin
 {
 
-    private final HashMap<String, ChunkProviderPTM> loadedWorlds = new HashMap<String, ChunkProviderPTM>();
     public final HashMap<String, Settings> worldsSettings = new HashMap<String, Settings>();
+    private final PTMBlockListener blockListener = new PTMBlockListener(this);
 
 
     public void onDisable()
@@ -33,6 +26,8 @@ public class PTMPlugin extends JavaPlugin
     public void onEnable()
     {
         this.getCommand("ptm").setExecutor(new PTMCommand(this));
+        PluginManager pm = this.getServer().getPluginManager();
+        pm.registerEvent(Event.Type.BLOCK_PLACE,blockListener,Event.Priority.Monitor,this);
 
         System.out.println(getDescription().getFullName() + " is now enabled");
 
@@ -41,16 +36,15 @@ public class PTMPlugin extends JavaPlugin
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
     {
-        if (loadedWorlds.containsKey(worldName))
+        if (worldsSettings.containsKey(worldName))
         {
             System.out.println("PhoenixTerrainMod: enabled for '" + worldName + "'");
-            return loadedWorlds.get(worldName);
+            return worldsSettings.get(worldName).ChunkProvider;
         }
 
 
         ChunkProviderPTM prov = new ChunkProviderPTM(this.GetSettings(worldName));
 
-        loadedWorlds.put(worldName, prov);
 
         System.out.println("PhoenixTerrainMod: enabled for '" + worldName + "'");
         return prov;

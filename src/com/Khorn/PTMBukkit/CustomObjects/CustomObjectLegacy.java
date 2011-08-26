@@ -1,6 +1,6 @@
-package com.Khorn.PTMBukkit;
+package com.Khorn.PTMBukkit.CustomObjects;
 
-class CustomObjectLegacy
+public class CustomObjectLegacy
 {
     public double[][][] DataValues = new double[16][16][101];
     public boolean underwater = false;

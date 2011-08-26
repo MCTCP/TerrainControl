@@ -1,6 +1,7 @@
-package com.Khorn.PTMBukkit;
+package com.Khorn.PTMBukkit.Generator;
 
 
+import com.Khorn.PTMBukkit.Settings;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.NoiseGeneratorOctaves2;
 import net.minecraft.server.World;

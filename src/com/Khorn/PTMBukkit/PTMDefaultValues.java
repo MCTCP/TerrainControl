@@ -1,6 +1,6 @@
 package com.Khorn.PTMBukkit;
 
-public enum BiomeTerrainValues
+public enum PTMDefaultValues
 {
     biomeTerrainSettingsName("PhoenixTerrainModSettings.ini"),
     xLimit(16),
@@ -33,14 +33,11 @@ public enum BiomeTerrainValues
     volatilityWeight1(0.5D),
     volatilityWeight2(0.45D),
     removeSurfaceStone(false),
-    // --Commented out by Inspection (17.07.11 1:05):replaceWaterWithLava(false),
-    // --Commented out by Inspection (17.07.11 1:05):replaceIceWithLava(false),
     disableBedrock(false),
     ceilingBedrock(false),
     flatBedrock(false),
     bedrockobsidian(false),
     disableNotchPonds(false),
-    denyObjectsUnderFill(false),
 
     caveRarity(7),
     caveFrequency(40),
@@ -71,6 +68,10 @@ public enum BiomeTerrainValues
 
     customObjects(true),
     objectSpawnRatio(2),
+    denyObjectsUnderFill(false),
+    customTreeMinTime(60),
+    customTreeMaxTime(600),
+
     notchBiomeTrees(true),
     globalTreeDensity(0),
     rainforestTreeDensity(5),
@@ -313,22 +314,22 @@ public enum BiomeTerrainValues
     private String sValue;
     private boolean bValue;
 
-    private BiomeTerrainValues(int i)
+    private PTMDefaultValues(int i)
     {
         this.iValue = i;
     }
 
-    private BiomeTerrainValues(double d)
+    private PTMDefaultValues(double d)
     {
         this.dValue = d;
     }
 
-    private BiomeTerrainValues(String s)
+    private PTMDefaultValues(String s)
     {
         this.sValue = s;
     }
 
-    private BiomeTerrainValues(Boolean b)
+    private PTMDefaultValues(Boolean b)
     {
         this.bValue = b;
     }
