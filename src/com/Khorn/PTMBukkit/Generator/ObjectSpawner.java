@@ -29,8 +29,12 @@ public class ObjectSpawner extends BlockPopulator
         this.WorldSettings = wrk;
         this.rand = new Random();
         this.WorldSettings.objectSpawner = this;
+    }
 
-
+    public void Init(World world)
+    {
+        this.world = world;
+        this.treeNoise = new NoiseGeneratorOctaves(new Random(world.getSeed()), 8);
     }
 
 
@@ -197,18 +201,18 @@ public class ObjectSpawner extends BlockPopulator
     }
 
 
-    public void SpawnCustomTrees(int x, int y, int z)
+    public boolean SpawnCustomTrees(int x, int y, int z)
     {
 
         if (!this.WorldSettings.HasCustomTrees)
-            return;
-        if(this.world.getTypeId(x,y,z) != Block.SAPLING.id)
-            return;
+            return false;
+        if (this.world.getTypeId(x, y, z) != Block.SAPLING.id)
+            return false;
 
-        int oldData = this.world.getData(x,y,z) & 0x3;
-        this.world.setRawTypeId(x,y,z,0);
+        int oldData = this.world.getData(x, y, z) & 0x3;
+        this.world.setRawTypeId(x, y, z, 0);
 
-        Chunk chunk = this.world.getWorld().getChunkAt(x >> 4,z >> 4);
+        Chunk chunk = this.world.getWorld().getChunkAt(x >> 4, z >> 4);
 
         BiomeBase localBiomeBase = this.world.getWorldChunkManager().getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16);
 
@@ -224,7 +228,6 @@ public class ObjectSpawner extends BlockPopulator
                 continue;
 
 
-
             int randomRoll = this.rand.nextInt(100);
 
             if (randomRoll < SelectedObject.rarity)
@@ -235,7 +238,8 @@ public class ObjectSpawner extends BlockPopulator
 
         }
         if (!objectSpawned)
-            this.world.setRawTypeIdAndData(x,y,z,Block.SAPLING.id,oldData);
+            this.world.setRawTypeIdAndData(x, y, z, Block.SAPLING.id, oldData);
+        return objectSpawned;
     }
 
     private boolean GenerateCustomObject(int x, int y, int z, CustomObject workObject, boolean notify)
@@ -735,18 +739,6 @@ public class ObjectSpawner extends BlockPopulator
     {
         BlockSand.instaFall = false;
 
-        this.world = ((CraftWorld) wrld).getHandle();
-
-
-        if (this.treeNoise == null)
-        {
-            this.treeNoise = new NoiseGeneratorOctaves(new Random(wrld.getSeed()), 8);
-            if (!this.WorldSettings.isInit)
-            {
-                this.world.worldProvider.b = new BiomeManagerPTM(this.world, this.WorldSettings);
-                this.WorldSettings.isInit = true;
-            }
-        }
         int chunk_x = chunk.getX();
         int chunk_z = chunk.getZ();
 

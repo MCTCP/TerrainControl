@@ -3,8 +3,14 @@ package com.Khorn.PTMBukkit;
 import java.io.*;
 import java.util.HashMap;
 
+import com.Khorn.PTMBukkit.Generator.BiomeManagerPTM;
 import com.Khorn.PTMBukkit.Generator.ChunkProviderPTM;
 import com.Khorn.PTMBukkit.Listeners.PTMBlockListener;
+import com.Khorn.PTMBukkit.Listeners.PTMPlayerListener;
+import com.Khorn.PTMBukkit.Listeners.PTMWorldListener;
+import com.Khorn.PTMBukkit.Util.FileSystemManager;
+import org.bukkit.World;
+import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
@@ -16,6 +22,8 @@ public class PTMPlugin extends JavaPlugin
 
     public final HashMap<String, Settings> worldsSettings = new HashMap<String, Settings>();
     private final PTMBlockListener blockListener = new PTMBlockListener(this);
+    private final PTMWorldListener worldListener = new PTMWorldListener(this);
+    private final PTMPlayerListener playerListener = new PTMPlayerListener(this);
 
 
     public void onDisable()
@@ -26,10 +34,21 @@ public class PTMPlugin extends JavaPlugin
     public void onEnable()
     {
         this.getCommand("ptm").setExecutor(new PTMCommand(this));
-        PluginManager pm = this.getServer().getPluginManager();
-        pm.registerEvent(Event.Type.BLOCK_PLACE,blockListener,Event.Priority.Monitor,this);
+        this.RegisterEvents();
 
         System.out.println(getDescription().getFullName() + " is now enabled");
+
+    }
+
+    private void RegisterEvents()
+    {
+        PluginManager pm = this.getServer().getPluginManager();
+        pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Event.Priority.Monitor, this);
+
+        pm.registerEvent(Event.Type.WORLD_INIT, worldListener, Event.Priority.High, this);
+
+        pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
+
 
     }
 
@@ -62,17 +81,16 @@ public class PTMPlugin extends JavaPlugin
             {
                 try
                 {
-                    PTMPlugin.copyFolder(oldFolder, baseFolder);
+                    FileSystemManager.copyFolder(oldFolder, baseFolder);
                     System.out.println("PhoenixTerrainMod: config files copied to new folder");
-                    PTMPlugin.deleteFile(oldFolder);
+                    FileSystemManager.deleteFile(oldFolder);
                 } catch (IOException e)
                 {
                     System.out.println("PhoenixTerrainMod: error copying old directory, working with defaults");
                 }
 
 
-            }else
-            if (!baseFolder.mkdirs())
+            } else if (!baseFolder.mkdirs())
                 System.out.println("PhoenixTerrainMod: error create directory, working with defaults");
 
         }
@@ -85,94 +103,49 @@ public class PTMPlugin extends JavaPlugin
         return worker;
     }
 
-    private static void copyFolder(File src, File dest) throws IOException
+
+    public void WorldInit(World world)
     {
-
-        if (src.isDirectory())
+        if (this.worldsSettings.containsKey(world.getName()))
         {
+            Settings worldSetting = this.worldsSettings.get(world.getName());
+            if (worldSetting.isInit)
+                return;
 
-            //if directory not exists, create it
-            if (!dest.exists())
-            {
-                //noinspection ResultOfMethodCallIgnored
-                dest.mkdirs();
+            net.minecraft.server.World workWorld = ((CraftWorld) world).getHandle();
 
-            }
+            workWorld.worldProvider.b = new BiomeManagerPTM(workWorld, worldSetting);
 
-            //list all the directory contents
-            String files[] = src.list();
+            worldSetting.objectSpawner.Init(workWorld);
+            worldSetting.ChunkProvider.Init(world);
+            worldSetting.isInit = true;
 
-            for (String file : files)
-            {
-                //construct the src and dest file structure
-                File srcFile = new File(src, file);
-                File destFile = new File(dest, file);
-                //recursive copy
-                copyFolder(srcFile, destFile);
-            }
+            System.out.println("PhoenixTerrainMod: world seed is " + workWorld.getSeed());
 
-        } else
-        {
-            //if file, then copy it
-            //Use bytes stream to support all file types
-            InputStream in = new FileInputStream(src);
-            OutputStream out = new FileOutputStream(dest);
-
-            byte[] buffer = new byte[1024];
-
-            int length;
-            //copy the file content in bytes
-            while ((length = in.read(buffer)) > 0)
-            {
-                out.write(buffer, 0, length);
-            }
-
-            in.close();
-            out.close();
         }
     }
-    private static void deleteFile(File src) {
 
-    // Make sure the file or directory exists and isn't write protected
-    if (!src.exists())
-      return;
-    if (!src.canWrite())
-      return;
-
-    // If it is a directory, make sure it is empty
-    if (src.isDirectory()) {
-      String[] files = src.list();
-        for(String file : files)
-        {
-            deleteFile(new File(file));
-        }
-
-    }
-    if(!src.delete())
-       System.out.println("PhoenixTerrainMod: can't delete " + src.getName());
-
-  }
 
     /*
-    public void DebugLog(String str)
-    {
-        File f = new File(SettingsDir, "Debug.log");
-        try
-        {
-            FileWriter writer = new FileWriter(f,true);
+   public void DebugLog(String str)
+   {
+       File f = new File(SettingsDir, "Debug.log");
+       try
+       {
+           FileWriter writer = new FileWriter(f,true);
 
 
-            writer.write(DateFormat.getTimeInstance().format(new Date())+ ":"+ str + System.getProperty("line.separator"));
+           writer.write(DateFormat.getTimeInstance().format(new Date())+ ":"+ str + System.getProperty("line.separator"));
 
 
-            writer.close();
+           writer.close();
 
-        } catch (IOException e)
-        {
-            e.printStackTrace();
+       } catch (IOException e)
+       {
+           e.printStackTrace();
 
-        }
-    } */
+       }
+   } */
 
 }
 

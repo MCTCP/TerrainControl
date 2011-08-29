@@ -9,7 +9,7 @@ import net.minecraft.server.WorldChunkManager;
 
 import java.util.Random;
 
-class BiomeManagerPTM extends WorldChunkManager
+public class BiomeManagerPTM extends WorldChunkManager
 {
 
     private Settings localWrk;

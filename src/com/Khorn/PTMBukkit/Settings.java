@@ -353,6 +353,7 @@ public class Settings
     public ObjectSpawner objectSpawner;
 
     public boolean isInit = false;
+
     public boolean isDeprecated = false;
     public Settings newSettings = null;
 
@@ -624,6 +625,8 @@ public class Settings
         this.undergroundLakeMinAltitude = (this.undergroundLakeMinAltitude < 0 ? 0 : this.undergroundLakeMinAltitude > PTMDefaultValues.yLimit.intValue() - 1 ? PTMDefaultValues.yLimit.intValue() - 1 : this.undergroundLakeMinAltitude);
         this.undergroundLakeMaxAltitude = (this.undergroundLakeMaxAltitude > PTMDefaultValues.yLimit.intValue() ? PTMDefaultValues.yLimit.intValue() : this.undergroundLakeMaxAltitude <= this.undergroundLakeMinAltitude ? this.undergroundLakeMinAltitude + 1 : this.undergroundLakeMaxAltitude);
 
+        this.customTreeMinTime = (this.customTreeMinTime < 1 ? 1 : this.customTreeMinTime );
+        this.customTreeMaxTime = ((this.customTreeMaxTime - this.customTreeMinTime) < 1 ? (this.customTreeMinTime+1):this.customTreeMaxTime);
 
     }
 
@@ -957,8 +960,12 @@ public class Settings
 
         this.customObjects = this.ReadModSettins(PTMDefaultValues.customObjects.name(), PTMDefaultValues.customObjects.booleanValue());
         this.objectSpawnRatio = this.ReadModSettins(PTMDefaultValues.objectSpawnRatio.name(), PTMDefaultValues.objectSpawnRatio.intValue());
-        this.notchBiomeTrees = this.ReadModSettins(PTMDefaultValues.notchBiomeTrees.name(), PTMDefaultValues.notchBiomeTrees.booleanValue());
         this.denyObjectsUnderFill = this.ReadModSettins(PTMDefaultValues.denyObjectsUnderFill.name(), PTMDefaultValues.denyObjectsUnderFill.booleanValue());
+        this.customTreeMinTime = this.ReadModSettins(PTMDefaultValues.customTreeMinTime.name(), PTMDefaultValues.customTreeMinTime.intValue());
+        this.customTreeMaxTime = this.ReadModSettins(PTMDefaultValues.customTreeMaxTime.name(), PTMDefaultValues.customTreeMaxTime.intValue());
+
+
+        this.notchBiomeTrees = this.ReadModSettins(PTMDefaultValues.notchBiomeTrees.name(), PTMDefaultValues.notchBiomeTrees.booleanValue());
         this.globalTreeDensity = this.ReadModSettins(PTMDefaultValues.globalTreeDensity.name(), PTMDefaultValues.globalTreeDensity.intValue());
         this.rainforestTreeDensity = this.ReadModSettins(PTMDefaultValues.rainforestTreeDensity.name(), PTMDefaultValues.rainforestTreeDensity.intValue());
         this.swamplandTreeDensity = this.ReadModSettins(PTMDefaultValues.swamplandTreeDensity.name(), PTMDefaultValues.swamplandTreeDensity.intValue());
@@ -1194,6 +1201,8 @@ public class Settings
         this.WriteModSettings(PTMDefaultValues.customObjects.name(), this.customObjects);
         this.WriteModSettings(PTMDefaultValues.objectSpawnRatio.name(), Integer.valueOf(this.objectSpawnRatio).intValue());
         this.WriteModSettings(PTMDefaultValues.denyObjectsUnderFill.name(), this.denyObjectsUnderFill);
+        this.WriteModSettings(PTMDefaultValues.customTreeMinTime.name(), Integer.valueOf(this.customTreeMinTime).intValue());
+        this.WriteModSettings(PTMDefaultValues.customTreeMaxTime.name(), Integer.valueOf(this.customTreeMaxTime).intValue());
 
         this.WriteModTitleSettings("Start Cactus&Tree Variables :");
         this.WriteModSettings(PTMDefaultValues.notchBiomeTrees.name(), this.notchBiomeTrees);

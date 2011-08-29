@@ -39,7 +39,6 @@ public class ChunkProviderPTM extends ChunkGenerator
     private double[] g;
     private double[] h;
 
-    private boolean isInit = false;
     private ArrayList<BlockPopulator> populatorList;
 
     public ChunkProviderPTM(Settings worker)
@@ -52,18 +51,12 @@ public class ChunkProviderPTM extends ChunkGenerator
 
     }
 
-    private void Init(World wrld)
+    public void Init(World world)
     {
 
-        this.localWorld = wrld;
+        this.localWorld = world;
 
-        if (!this.WorldSettings.isInit)
-        {
-            ((CraftWorld) this.localWorld).getHandle().worldProvider.b = new BiomeManagerPTM(((CraftWorld) this.localWorld).getHandle(), this.WorldSettings);
-            this.WorldSettings.isInit = true;
-        }
-
-        this.rnd = new Random(wrld.getSeed());
+        this.rnd = new Random(world.getSeed());
 
         this.k = new NoiseGeneratorOctaves(this.rnd, 16);
         this.l = new NoiseGeneratorOctaves(this.rnd, 16);
@@ -76,8 +69,7 @@ public class ChunkProviderPTM extends ChunkGenerator
 
 
         this.CaveGen = new MapGenCavesPTM(this.WorldSettings);
-        this.isInit = true;
-        System.out.println("PhoenixTerrainMod: world seed is " + wrld.getSeed());
+
 
     }
 
@@ -408,9 +400,6 @@ public class ChunkProviderPTM extends ChunkGenerator
     public byte[] generate(World world, Random random, int x, int z)
     {
 
-        if (!this.isInit)
-            this.Init(world);
-
         this.rnd.setSeed(x * 341873128712L + z * 132897987541L);
 
         byte[] arrayOfByte = new byte[32768];
@@ -434,6 +423,8 @@ public class ChunkProviderPTM extends ChunkGenerator
     @Override
     public boolean canSpawn(World world, int x, int z)
     {
+        this.WorldSettings.plugin.WorldInit(world);
+
         int i = ((CraftWorld) world).getHandle().a(x, z);
         return i != 0 && Block.byId[i].material.isSolid();
 
