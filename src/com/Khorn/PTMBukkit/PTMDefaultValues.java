@@ -2,7 +2,10 @@ package com.Khorn.PTMBukkit;
 
 public enum PTMDefaultValues
 {
-    biomeTerrainSettingsName("PhoenixTerrainModSettings.ini"),
+    WorldSettingsName("PhoenixTerrainModSettings.ini"),
+    WorldBOBDirectoryName("BOBPlugins"),
+    DefaultSettingsName("DefaultSettings.ini"),
+    DefaultBOBDirectoryName("DefaultBOBPlugins"),
     xLimit(16),
     zLimit(16),
     yLimit(128),

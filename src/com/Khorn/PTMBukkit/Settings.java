@@ -1,8 +1,6 @@
 package com.Khorn.PTMBukkit;
 
-import com.Khorn.PTMBukkit.CustomObjects.Coordinate;
 import com.Khorn.PTMBukkit.CustomObjects.CustomObject;
-import com.Khorn.PTMBukkit.CustomObjects.CustomObjectLegacy;
 import com.Khorn.PTMBukkit.Generator.ChunkProviderPTM;
 import com.Khorn.PTMBukkit.Generator.ObjectSpawner;
 import net.minecraft.server.Block;
@@ -26,7 +24,6 @@ public class Settings
 
 
     public ArrayList<CustomObject> Objects = new ArrayList<CustomObject>();
-    public ArrayList<CustomObjectLegacy> LegacyObjects = new ArrayList<CustomObjectLegacy>();
     public HashMap<String, ArrayList<CustomObject>> ObjectGroups = new HashMap<String, ArrayList<CustomObject>>();
     public HashMap<String, ArrayList<CustomObject>> BranchGroups = new HashMap<String, ArrayList<CustomObject>>();
     public boolean HasCustomTrees = false;
@@ -370,6 +367,16 @@ public class Settings
         this.plugin = plug;
     }
 
+    public Settings()
+    {}
+
+    public void CreateDefaultSettings(File settingsDir)
+    {
+        this.ReadWorldSettings();
+        this.CorrectSettings();
+        this.WriteSettings(settingsDir);
+
+    }
 
     void CorrectSettings()
     {
@@ -625,8 +632,8 @@ public class Settings
         this.undergroundLakeMinAltitude = (this.undergroundLakeMinAltitude < 0 ? 0 : this.undergroundLakeMinAltitude > PTMDefaultValues.yLimit.intValue() - 1 ? PTMDefaultValues.yLimit.intValue() - 1 : this.undergroundLakeMinAltitude);
         this.undergroundLakeMaxAltitude = (this.undergroundLakeMaxAltitude > PTMDefaultValues.yLimit.intValue() ? PTMDefaultValues.yLimit.intValue() : this.undergroundLakeMaxAltitude <= this.undergroundLakeMinAltitude ? this.undergroundLakeMinAltitude + 1 : this.undergroundLakeMaxAltitude);
 
-        this.customTreeMinTime = (this.customTreeMinTime < 1 ? 1 : this.customTreeMinTime );
-        this.customTreeMaxTime = ((this.customTreeMaxTime - this.customTreeMinTime) < 1 ? (this.customTreeMinTime+1):this.customTreeMaxTime);
+        this.customTreeMinTime = (this.customTreeMinTime < 1 ? 1 : this.customTreeMinTime);
+        this.customTreeMaxTime = ((this.customTreeMaxTime - this.customTreeMinTime) < 1 ? (this.customTreeMinTime + 1) : this.customTreeMaxTime);
 
     }
 
@@ -634,8 +641,8 @@ public class Settings
     {
         BufferedReader SettingsReader = null;
 
-        // f = new File(this.worldSaveFolder, PTMDefaultValues.biomeTerrainSettingsName.stringValue());
-        File f = new File(SettingsDir, PTMDefaultValues.biomeTerrainSettingsName.stringValue());
+        // f = new File(this.worldSaveFolder, PTMDefaultValues.WorldSettingsName.stringValue());
+        File f = new File(SettingsDir, PTMDefaultValues.WorldSettingsName.stringValue());
         if (f.exists())
         {
 
@@ -1080,7 +1087,7 @@ public class Settings
 
             } catch (NumberFormatException e)
             {
-                System.out.println("Wrong replace settings: '" + this.ReadedSettings.get("ReplacedBlocks") + "'");
+                System.out.println("Wrong height settings: '" + this.ReadedSettings.get("CustomHeightControl") + "'");
             }
 
         }
@@ -1102,11 +1109,14 @@ public class Settings
 
     void WriteSettings()
     {
-        //File f = new File(this.worldSaveFolder, PTMDefaultValues.biomeTerrainSettingsName.stringValue());
-        File f = new File(SettingsDir, PTMDefaultValues.biomeTerrainSettingsName.stringValue());
+      this.WriteSettings(new File(this.SettingsDir, PTMDefaultValues.WorldSettingsName.stringValue()));
+    }
+
+    void WriteSettings(File settingsFile)
+    {
         try
         {
-            this.SettingsWriter = new BufferedWriter(new FileWriter(f, false));
+            this.SettingsWriter = new BufferedWriter(new FileWriter(settingsFile, false));
 
             WriteWorldSettings();
         } catch (IOException e)
@@ -1537,7 +1547,7 @@ public class Settings
         {
             try
             {
-                File BOBFolder = new File(SettingsDir, "BOBPlugins");
+                File BOBFolder = new File(SettingsDir, PTMDefaultValues.WorldBOBDirectoryName.stringValue());
                 if (!BOBFolder.exists())
                 {
                     if (!BOBFolder.mkdir())
@@ -1551,7 +1561,45 @@ public class Settings
                 while (i < BOBFolderArray.length)
                 {
                     File BOBFile = new File(BOBFolder, BOBFolderArray[i]);
-                    this.RegisterBOBPlugins(BOBFile);
+                    if ((BOBFile.getName().endsWith(".bo2")) || (BOBFile.getName().endsWith(".BO2")))
+                    {
+                        CustomObject WorkingCustomObject = new CustomObject(BOBFile);
+                        if (WorkingCustomObject.IsValid)
+                        {
+
+                            if (!WorkingCustomObject.groupId.equals(""))
+                            {
+                                if (WorkingCustomObject.branch)
+                                {
+                                    if (BranchGroups.containsKey(WorkingCustomObject.groupId))
+                                        BranchGroups.get(WorkingCustomObject.groupId).add(WorkingCustomObject);
+                                    else
+                                    {
+                                        ArrayList<CustomObject> groupList = new ArrayList<CustomObject>();
+                                        groupList.add(WorkingCustomObject);
+                                        BranchGroups.put(WorkingCustomObject.groupId, groupList);
+                                    }
+
+                                } else
+                                {
+                                    if (ObjectGroups.containsKey(WorkingCustomObject.groupId))
+                                        ObjectGroups.get(WorkingCustomObject.groupId).add(WorkingCustomObject);
+                                    else
+                                    {
+                                        ArrayList<CustomObject> groupList = new ArrayList<CustomObject>();
+                                        groupList.add(WorkingCustomObject);
+                                        ObjectGroups.put(WorkingCustomObject.groupId, groupList);
+                                    }
+                                }
+
+                            }
+
+                            this.Objects.add(WorkingCustomObject);
+
+                            System.out.println("BOB Plugin Registered: " + BOBFile.getName());
+
+                        }
+                    }
                     i++;
                 }
             } catch (Exception e)
@@ -1566,291 +1614,6 @@ public class Settings
             }
         }
     }
-
-    private void RegisterBOBPlugins(File ObjectPlugin)
-    {
-        try
-        {
-
-            BufferedReader ObjectProps = new BufferedReader(new FileReader(ObjectPlugin));
-            // Legacy BOB Loader
-            if ((ObjectPlugin.getName().endsWith(".bob")) || (ObjectPlugin.getName().endsWith(".BOB")))
-            {
-
-                CustomObjectLegacy workObject = new CustomObjectLegacy();
-                String workingString = "";
-
-                while (!((workingString.equals("METBEGIN")) || (workingString.equals("METABEGIN"))))
-                {
-                    workingString = ObjectProps.readLine();
-                    if (!((workingString.equals("METBEGIN") || (workingString.equals("METABEGIN")))))
-                    {
-                        String[] stringSet = workingString.split(",");
-                        int X = Integer.parseInt(stringSet[0]);
-                        int Y = Integer.parseInt(stringSet[1]);
-                        double Data = Double.valueOf(stringSet[2].split(":")[1]);
-                        int Z = Integer.parseInt(stringSet[2].split(":")[0]);
-                        workObject.DataValues[X][Y][Z] = Data;
-                    }
-                }
-                workObject.spawnID = Integer.parseInt(ObjectProps.readLine());
-
-                if (ObjectProps.readLine().equals("true"))
-                {
-                    workObject.underwater = true;
-                }
-                this.LegacyObjects.add(workObject);
-
-                System.out.println("BOB Plugin Registered: " + ObjectPlugin.getName());
-                ObjectProps.close();
-                return;
-
-            }
-            // BO2 Loader
-            if ((ObjectPlugin.getName().endsWith(".bo2")) || (ObjectPlugin.getName().endsWith(".BO2")))
-            {
-                CustomObject WorkingCustomObject = new CustomObject();
-
-                String workingString = ObjectProps.readLine();
-
-                if (!workingString.equals("[META]"))
-                {
-                    System.out.println("Invalid BOB Plugin: " + ObjectPlugin.getName());
-                    ObjectProps.close();
-                    return;
-                }
-
-                boolean dataReached = false;
-                while ((workingString = ObjectProps.readLine()) != null)
-                {
-
-                    if (!dataReached)
-                    {
-                        if (workingString.contains("="))
-                        {
-                            String[] stringSet = workingString.split("=");
-                            if (stringSet[0].equals("spawnOnBlockType"))
-                            {
-                                String[] blocks = stringSet[1].split(",");
-                                int counter = 0;
-                                while (counter < blocks.length)
-                                {
-                                    WorkingCustomObject.spawnOnBlockType.add(Integer.parseInt(blocks[counter]));
-                                    counter++;
-                                }
-                            }
-                            if (stringSet[0].equals("spawnSunlight"))
-                            {
-                                if (stringSet[1].toLowerCase().equals("false"))
-                                {
-                                    WorkingCustomObject.spawnSunlight = false;
-                                }
-                            }
-                            if (stringSet[0].equals("spawnDarkness"))
-                            {
-                                if (stringSet[1].toLowerCase().equals("true"))
-                                {
-                                    WorkingCustomObject.spawnDarkness = true;
-                                }
-                            }
-                            if (stringSet[0].equals("spawnWater"))
-                            {
-                                if (stringSet[1].toLowerCase().equals("true"))
-                                {
-                                    WorkingCustomObject.spawnWater = true;
-                                }
-                            }
-                            if (stringSet[0].equals("spawnLava"))
-                            {
-                                if (stringSet[1].toLowerCase().equals("true"))
-                                {
-                                    WorkingCustomObject.spawnLava = true;
-                                }
-                            }
-                            if (stringSet[0].equals("underFill"))
-                            {
-                                if (stringSet[1].toLowerCase().equals("false"))
-                                {
-                                    WorkingCustomObject.underFill = false;
-                                }
-                            }
-                            if (stringSet[0].equals("randomRotation"))
-                            {
-                                if (stringSet[1].toLowerCase().equals("false"))
-                                {
-                                    WorkingCustomObject.randomRotation = false;
-                                }
-                            }
-                            if (stringSet[0].equals("dig"))
-                            {
-                                if (stringSet[1].toLowerCase().equals("true"))
-                                {
-                                    WorkingCustomObject.dig = true;
-                                }
-                            }
-                            if (stringSet[0].equals("rarity"))
-                            {
-                                WorkingCustomObject.rarity = Integer.parseInt(stringSet[1]);
-                            }
-                            if (stringSet[0].equals("spawnElevationMin"))
-                            {
-                                WorkingCustomObject.spawnElevationMin = Integer.parseInt(stringSet[1]);
-                            }
-                            if (stringSet[0].equals("spawnElevationMax"))
-                            {
-                                WorkingCustomObject.spawnElevationMax = Integer.parseInt(stringSet[1]);
-                            }
-                            if (stringSet[0].equals("groupId"))
-                            {
-                                WorkingCustomObject.groupId = stringSet[1];
-                            }
-                            if (stringSet[0].equals("tree"))
-                            {
-                                if (stringSet[1].toLowerCase().equals("true"))
-                                {
-                                    WorkingCustomObject.tree = true;
-                                }
-                            }
-                            if (stringSet[0].equals("branch"))
-                            {
-                                if (stringSet[1].toLowerCase().equals("true"))
-                                {
-                                    WorkingCustomObject.branch = true;
-                                }
-                            }
-                            if (stringSet[0].equals("diggingBranch"))
-                            {
-                                if (stringSet[1].toLowerCase().equals("true"))
-                                {
-                                    WorkingCustomObject.diggingBranch = true;
-                                }
-                            }
-                            if (stringSet[0].equals("groupFrequencyMin"))
-                            {
-                                WorkingCustomObject.groupFrequencyMin = Integer.parseInt(stringSet[1]);
-                            }
-                            if (stringSet[0].equals("groupFrequencyMax"))
-                            {
-                                WorkingCustomObject.groupFrequencyMax = Integer.parseInt(stringSet[1]);
-                            }
-                            if (stringSet[0].equals("groupSeperationMin"))
-                            {
-                                WorkingCustomObject.groupSeperationMin = Integer.parseInt(stringSet[1]);
-                            }
-                            if (stringSet[0].equals("groupSeperationMax"))
-                            {
-                                WorkingCustomObject.groupSeperationMax = Integer.parseInt(stringSet[1]);
-                            }
-                            if (stringSet[0].equals("collisionPercentage"))
-                            {
-                                WorkingCustomObject.collisionPercentage = (Integer.parseInt(stringSet[1]) / 100);
-                            }
-                            if (stringSet[0].equals("spawnInBiome"))
-                            {
-                                stringSet = stringSet[1].split(",");
-                                int counter = 0;
-                                while (counter < stringSet.length)
-                                {
-                                    if (stringSet[counter].equals("Icedesert"))
-                                        WorkingCustomObject.spawnInBiome.add("ice desert");
-                                    if (stringSet[counter].equals("Rain Forest"))
-                                        WorkingCustomObject.spawnInBiome.add("rainforest");
-                                    else if (stringSet[counter].equals("Seasonalforest"))
-                                        WorkingCustomObject.spawnInBiome.add("seasonal forest");
-                                    else
-                                        WorkingCustomObject.spawnInBiome.add(stringSet[counter].toLowerCase());
-                                    counter++;
-                                }
-                            }
-                            if (stringSet[0].equals("branchLimit"))
-                            {
-                                WorkingCustomObject.branchLimit = (Integer.parseInt(stringSet[1]));
-                            }
-                            if (stringSet[0].equals("needsFoundation"))
-                            {
-                                if (stringSet[1].toLowerCase().equals("false"))
-                                {
-                                    WorkingCustomObject.needsFoundation = false;
-                                }
-                            }
-                            if (stringSet[0].equals("version"))
-                            {
-                                WorkingCustomObject.version = stringSet[1].toLowerCase();
-                            }
-
-                        } else if (workingString.equals("[DATA]"))
-                            dataReached = true;
-                        continue;
-                    }
-
-                    String[] CoordinateSet = workingString.split(":")[0].split(",");
-                    String BlockString = workingString.split(":")[1];
-                    Coordinate Coordinates;
-                    if (WorkingCustomObject.dig)
-                    {
-                        Coordinates = new Coordinate(Integer.parseInt(CoordinateSet[0]), Integer.parseInt(CoordinateSet[2]), Integer.parseInt(CoordinateSet[1]), BlockString, true);
-                    } else
-                    {
-                        Coordinates = new Coordinate(Integer.parseInt(CoordinateSet[0]), Integer.parseInt(CoordinateSet[2]), Integer.parseInt(CoordinateSet[1]), BlockString, false);
-
-                    }
-                    Coordinates.RegisterData();
-                    WorkingCustomObject.Data.add(Coordinates);
-
-                }
-
-                if (!dataReached)
-                {
-                    System.out.println("Invalid BOB Plugin: " + ObjectPlugin.getName());
-                    ObjectProps.close();
-                    return;
-                }
-
-                WorkingCustomObject.CorrectSettings();
-
-                WorkingCustomObject.name = ObjectPlugin.getName();
-
-                if (!WorkingCustomObject.groupId.equals(""))
-                {
-                    if (WorkingCustomObject.branch)
-                    {
-                        if (BranchGroups.containsKey(WorkingCustomObject.groupId))
-                            BranchGroups.get(WorkingCustomObject.groupId).add(WorkingCustomObject);
-                        else
-                        {
-                            ArrayList<CustomObject> groupList = new ArrayList<CustomObject>();
-                            groupList.add(WorkingCustomObject);
-                            BranchGroups.put(WorkingCustomObject.groupId, groupList);
-                        }
-
-                    } else
-                    {
-                        if (ObjectGroups.containsKey(WorkingCustomObject.groupId))
-                            ObjectGroups.get(WorkingCustomObject.groupId).add(WorkingCustomObject);
-                        else
-                        {
-                            ArrayList<CustomObject> groupList = new ArrayList<CustomObject>();
-                            groupList.add(WorkingCustomObject);
-                            ObjectGroups.put(WorkingCustomObject.groupId, groupList);
-                        }
-                    }
-
-                }
-
-                this.Objects.add(WorkingCustomObject);
-
-                System.out.println("BOB Plugin Registered: " + ObjectPlugin.getName());
-                ObjectProps.close();
-
-            }
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            System.out.println("Invalid BOB Plugin: " + ObjectPlugin.getName());
-        }
-
-    }
-
 
     public double getFractureHorizontal()
     {

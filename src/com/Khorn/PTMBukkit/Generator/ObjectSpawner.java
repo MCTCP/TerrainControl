@@ -2,12 +2,10 @@ package com.Khorn.PTMBukkit.Generator;
 
 import com.Khorn.PTMBukkit.CustomObjects.Coordinate;
 import com.Khorn.PTMBukkit.CustomObjects.CustomObject;
-import com.Khorn.PTMBukkit.CustomObjects.CustomObjectLegacy;
 import com.Khorn.PTMBukkit.Settings;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
 
 import java.util.ArrayList;
@@ -51,83 +49,8 @@ public class ObjectSpawner extends BlockPopulator
         return obj.branch || !attemptSpawn || (isTree && !obj.tree);
     }
 
-    private void SpawnLegacyObject(int x, int y, int z)
-    {
-
-        int SelectedObject = this.rand.nextInt(this.WorldSettings.LegacyObjects.size());
-        CustomObjectLegacy legacyObject = this.WorldSettings.LegacyObjects.get(SelectedObject);
-
-        int i1 = world.getTypeId(x, y - 1, z);
-        if ((y < 128 - 1))
-        {
-
-            if ((i1 == Block.GRASS.id))
-            {
-                this.world.setRawTypeId(x, y - 1, z, Block.DIRT.id);
-            }
-            if ((world.getTypeId(x, y + 2, z) != Block.WATER.id) || (legacyObject.underwater))
-            {
-
-                int j1 = world.getTypeId(x, y - 1, z);
-                if ((j1 == legacyObject.spawnID))
-                {
-                    int DataX = 0;
-                    int DataY = 0;
-                    int DataZ = 0;
-                    while (DataZ <= 100)
-                    {
-                        while (DataY <= 14)
-                        {
-                            while (DataX <= 14)
-                            {
-                                if (legacyObject.DataValues[DataX][DataY][DataZ] != 0)
-                                {
-
-                                    int Data;
-                                    Data = (int) legacyObject.DataValues[DataX][DataY][DataZ];
-                                    int eData = (int) Math.round(((legacyObject.DataValues[DataX][DataY][DataZ] - Data) * 100));
-                                    if (!(Data == 0))
-                                    {
-                                        ChangeWorld(false, x + (DataX - 4), (y - 1) + (DataZ), z + (DataY - 4), Data, eData);
-                                        if (DataZ == 0)
-                                        {
-                                            int DownChecker = 1;
-                                            while (world.getTypeId(x + (DataX - 4), (y - DownChecker), z + (DataY - 4)) == 0)
-                                            {
-                                                this.world.setRawTypeId(x + (DataX - 4), (y - DownChecker), z + (DataY - 4), (byte) legacyObject.spawnID);
-                                            }
-                                        }
-                                    }
-                                }
-                                DataX = DataX + 1;
-                            }
-                            DataX = 0;
-                            DataY = DataY + 1;
-                        }
-                        DataY = 0;
-                        DataZ = DataZ + 1;
-                    }
-                }
-
-            }
-
-        }
-
-    }
-
-
     boolean SpawnCustomObjects(int chunk_x, int chunk_z, BiomeBase localBiomeBase)
     {
-
-
-        if (this.WorldSettings.LegacyObjects.size() > 0 && this.rand.nextInt(2) == 1)
-        {
-            int x = chunk_x + this.rand.nextInt(16) + 8;
-            int z = chunk_z + this.rand.nextInt(16) + 8;
-            int y = this.world.getHighestBlockYAt(x, z);
-            SpawnLegacyObject(x, y, z);
-            return true;
-        }
 
         if (this.WorldSettings.Objects.size() == 0)
             return false;

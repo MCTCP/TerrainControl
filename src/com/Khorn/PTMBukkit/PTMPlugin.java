@@ -35,6 +35,7 @@ public class PTMPlugin extends JavaPlugin
     {
         this.getCommand("ptm").setExecutor(new PTMCommand(this));
         this.RegisterEvents();
+        CheckDefaultSettingsFolder();
 
         System.out.println(getDescription().getFullName() + " is now enabled");
 
@@ -74,26 +75,45 @@ public class PTMPlugin extends JavaPlugin
     public Settings GetSettings(String worldName)
     {
         File baseFolder = new File(this.getDataFolder(), "worlds/" + worldName);
-        if (!baseFolder.exists())
+
+        File oldFolder = new File(this.getDataFolder(), worldName);
+        if (oldFolder.exists() && oldFolder.isDirectory())
         {
-            File oldFolder = new File(this.getDataFolder(), worldName);
-            if (oldFolder.exists() && oldFolder.isDirectory())
+            try
             {
-                try
-                {
-                    FileSystemManager.copyFolder(oldFolder, baseFolder);
-                    System.out.println("PhoenixTerrainMod: config files copied to new folder");
-                    FileSystemManager.deleteFile(oldFolder);
-                } catch (IOException e)
-                {
-                    System.out.println("PhoenixTerrainMod: error copying old directory, working with defaults");
-                }
+                FileSystemManager.CopyFileOrDirectory(oldFolder, baseFolder);
+                System.out.println("PhoenixTerrainMod: config files copied to new folder");
+                FileSystemManager.DeleteFileOrDirectory(oldFolder);
+            } catch (IOException e)
+            {
+                System.out.println("PhoenixTerrainMod: error copying old directory, working with defaults");
+            }
 
-
-            } else if (!baseFolder.mkdirs())
-                System.out.println("PhoenixTerrainMod: error create directory, working with defaults");
 
         }
+
+        if (!baseFolder.exists())
+        {
+            try
+            {
+                File BOBDirectory = new File(baseFolder, PTMDefaultValues.WorldBOBDirectoryName.stringValue());
+                File defaultBOBDirectory = new File(this.getDataFolder(), PTMDefaultValues.DefaultBOBDirectoryName.stringValue());
+                FileSystemManager.CopyFileOrDirectory(defaultBOBDirectory, BOBDirectory);
+
+                File settingsFile = new File(baseFolder, PTMDefaultValues.WorldSettingsName.stringValue());
+                File defaultSettingsFile = new File(this.getDataFolder(), PTMDefaultValues.DefaultSettingsName.stringValue());
+                FileSystemManager.CopyFileOrDirectory(defaultSettingsFile, settingsFile);
+
+                System.out.println("PhoenixTerrainMod: config files copied from defaults");
+
+            } catch (IOException e)
+            {
+                System.out.println("PhoenixTerrainMod: error copying old directory, working with defaults");
+            }
+
+
+        }
+
 
         Settings worker = new Settings(baseFolder, this);
 
@@ -126,26 +146,31 @@ public class PTMPlugin extends JavaPlugin
     }
 
 
-    /*
-   public void DebugLog(String str)
-   {
-       File f = new File(SettingsDir, "Debug.log");
-       try
-       {
-           FileWriter writer = new FileWriter(f,true);
+    private void CheckDefaultSettingsFolder()
+    {
+        /*
+           /worlds
+           /DefaultBOBPlugins
+           /DefaultSettings.ini
+         */
+        if (!this.getDataFolder().exists())
+            if (this.getDataFolder().mkdir())
+                System.out.println("PhoenixTerrainMod: error create plugin directory");
 
+        File temp = new File(this.getDataFolder(), "worlds");
+        if (!temp.exists())
+            if (temp.mkdir())
+                System.out.println("PhoenixTerrainMod: error create worlds directory");
 
-           writer.write(DateFormat.getTimeInstance().format(new Date())+ ":"+ str + System.getProperty("line.separator"));
+        temp = new File(this.getDataFolder(), PTMDefaultValues.DefaultBOBDirectoryName.stringValue());
+        if (!temp.exists())
+            if (temp.mkdir())
+                System.out.println("PhoenixTerrainMod: error create DefaultBOBPlugins directory");
+        temp = new File(this.getDataFolder(), PTMDefaultValues.DefaultSettingsName.stringValue());
+        if (!temp.exists())
+            (new Settings()).CreateDefaultSettings(temp);
 
-
-           writer.close();
-
-       } catch (IOException e)
-       {
-           e.printStackTrace();
-
-       }
-   } */
+    }
 
 }
 

@@ -29,6 +29,8 @@ public class PTMPlayerListener extends PlayerListener
     @Override
     public void onPlayerInteract(PlayerInteractEvent event)
     {
+        if(!event.hasItem())
+            return;
         MaterialData data = event.getItem().getData();
 
         if (data instanceof Dye && ((Dye) data).getColor() == DyeColor.WHITE)

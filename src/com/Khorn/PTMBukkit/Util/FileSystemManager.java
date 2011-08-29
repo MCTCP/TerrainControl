@@ -5,7 +5,7 @@ import java.io.*;
 
 public class FileSystemManager
 {
-    public static void copyFolder(File src, File dest) throws IOException
+    public static void CopyFileOrDirectory(File src, File dest) throws IOException
     {
 
         if (src.isDirectory())
@@ -28,7 +28,7 @@ public class FileSystemManager
                 File srcFile = new File(src, file);
                 File destFile = new File(dest, file);
                 //recursive copy
-                copyFolder(srcFile, destFile);
+                CopyFileOrDirectory(srcFile, destFile);
             }
 
         } else
@@ -51,7 +51,7 @@ public class FileSystemManager
             out.close();
         }
     }
-    public static void deleteFile(File src) {
+    public static void DeleteFileOrDirectory(File src) {
 
     // Make sure the file or directory exists and isn't write protected
     if (!src.exists())
@@ -64,7 +64,7 @@ public class FileSystemManager
       String[] files = src.list();
         for(String file : files)
         {
-            deleteFile(new File(file));
+            DeleteFileOrDirectory(new File(file));
         }
 
     }
