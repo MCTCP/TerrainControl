@@ -3,6 +3,7 @@ package com.Khorn.PTMBukkit.Generator;
 import com.Khorn.PTMBukkit.CustomObjects.Coordinate;
 import com.Khorn.PTMBukkit.CustomObjects.CustomObject;
 import com.Khorn.PTMBukkit.Settings;
+import com.sun.org.apache.bcel.internal.generic.Select;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;
@@ -36,17 +37,31 @@ public class ObjectSpawner extends BlockPopulator
     }
 
 
-    private boolean ObjectCantSpawn(CustomObject obj, BiomeBase localBiomeBase, boolean isTree)
+    private boolean ObjectCanSpawn(int x, int y, int z, CustomObject obj)
     {
-        boolean attemptSpawn = false;
+        if ((world.getTypeId(x, y - 5, z) == 0) && (obj.needsFoundation))
+            return false;
 
-        if ((obj.spawnInBiome.size() == 0) || (obj.spawnInBiome.contains("All")))
-        {
-            attemptSpawn = true;
-        } else if (obj.spawnInBiome.contains(localBiomeBase.n.toLowerCase()))
-            attemptSpawn = true;
+        boolean abort = false;
+        int checkBlock = world.getTypeId(x, y + 2, z);
+        if (!obj.spawnWater)
+            abort = ((checkBlock == Block.WATER.id) || (checkBlock == Block.STATIONARY_WATER.id));
+        if (!obj.spawnLava)
+            abort = ((checkBlock == Block.LAVA.id) || (checkBlock == Block.STATIONARY_LAVA.id));
 
-        return obj.branch || !attemptSpawn || (isTree && !obj.tree);
+        checkBlock = world.getLightLevel(x, y + 2, z);
+        if (!obj.spawnSunlight)
+            abort = (checkBlock > 8);
+        if (!obj.spawnDarkness)
+            abort = (checkBlock < 9);
+
+        if ((y < obj.spawnElevationMin) || (y > obj.spawnElevationMax))
+            abort = true;
+
+        if (!obj.spawnOnBlockType.contains(world.getTypeId(x, y - 1, z)))
+            abort = true;
+
+        return !abort;
     }
 
     boolean SpawnCustomObjects(int chunk_x, int chunk_z, BiomeBase localBiomeBase)
@@ -66,7 +81,7 @@ public class ObjectSpawner extends BlockPopulator
 
             CustomObject SelectedObject = this.WorldSettings.Objects.get(this.rand.nextInt(this.WorldSettings.Objects.size()));
 
-            if (ObjectCantSpawn(SelectedObject, localBiomeBase, false))
+            if (SelectedObject.branch || !SelectedObject.canSpawnInBiome(localBiomeBase))
                 continue;
 
             int randomRoll = this.rand.nextInt(100);
@@ -78,6 +93,9 @@ public class ObjectSpawner extends BlockPopulator
                 int z = chunk_z + this.rand.nextInt(16);
                 int y = this.world.getHighestBlockYAt(x, z);
                 ObjectRarity -= 100;
+
+                if (!this.ObjectCanSpawn(x, y, z, SelectedObject))
+                    continue;
 
                 objectSpawned = GenerateCustomObject(x, y, z, SelectedObject, false);
                 // Checked Biome, Branch, Tree - soo try to generate.
@@ -99,10 +117,10 @@ public class ObjectSpawner extends BlockPopulator
                         attempts--;
 
                         int objIndex = this.rand.nextInt(groupList.size());
-                        CustomObject ObjectfromGroup = groupList.get(objIndex);
+                        CustomObject ObjectFromGroup = groupList.get(objIndex);
 
                         // duno about this check, but maybe it is correct
-                        if (ObjectCantSpawn(ObjectfromGroup, localBiomeBase, false))
+                        if (ObjectFromGroup.branch || !ObjectFromGroup.canSpawnInBiome(localBiomeBase))
                             continue;
 
                         x = x + this.rand.nextInt(SelectedObject.groupSeperationMax - SelectedObject.groupSeperationMin) + SelectedObject.groupSeperationMin;
@@ -110,7 +128,10 @@ public class ObjectSpawner extends BlockPopulator
                         int _y = this.world.getHighestBlockYAt(x, z);
                         if ((y - _y) > 10 || (_y - y) > 10)
                             continue;
-                        GenerateCustomObject(x, _y, z, ObjectfromGroup, false);
+
+                        if (!this.ObjectCanSpawn(x, y, z, ObjectFromGroup))
+                            continue;
+                        GenerateCustomObject(x, _y, z, ObjectFromGroup, false);
 
 
                     }
@@ -147,7 +168,7 @@ public class ObjectSpawner extends BlockPopulator
 
             spawnattemps++;
 
-            if (ObjectCantSpawn(SelectedObject, localBiomeBase, true))
+            if (SelectedObject.branch || !SelectedObject.canSpawnInBiome(localBiomeBase) || !SelectedObject.tree)
                 continue;
 
 
@@ -155,8 +176,8 @@ public class ObjectSpawner extends BlockPopulator
 
             if (randomRoll < SelectedObject.rarity)
             {
-
-                objectSpawned = GenerateCustomObject(x, y, z, SelectedObject, true);
+                if (this.ObjectCanSpawn(x, y, z, SelectedObject))
+                    objectSpawned = GenerateCustomObject(x, y, z, SelectedObject, true);
             }
 
         }
@@ -168,37 +189,14 @@ public class ObjectSpawner extends BlockPopulator
     private boolean GenerateCustomObject(int x, int y, int z, CustomObject workObject, boolean notify)
     {
         /*
-         * 1) ground check 
+         * 1) ground check (moved to ObjectCanSpawn)
          * 2) add branches and copy all data to work array (dont change default CustomObject object) 
          * 3) collision check and rotation 
          * 4) spawn
          */
 
         // 1)
-        if ((world.getTypeId(x, y - 5, z) == 0) && (workObject.needsFoundation))
-            return false;
 
-        boolean abort = false;
-        int checkblock = world.getTypeId(x, y + 2, z);
-        if (!workObject.spawnWater)
-            abort = ((checkblock == Block.WATER.id) || (checkblock == Block.STATIONARY_WATER.id));
-        if (!workObject.spawnLava)
-            abort = ((checkblock == Block.LAVA.id) || (checkblock == Block.STATIONARY_LAVA.id));
-
-        checkblock = world.getLightLevel(x, y + 2, z);
-        if (!workObject.spawnSunlight)
-            abort = (checkblock > 8);
-        if (!workObject.spawnDarkness)
-            abort = (checkblock < 9);
-
-        if ((y < workObject.spawnElevationMin) || (y > workObject.spawnElevationMax))
-            abort = true;
-
-        if (!workObject.spawnOnBlockType.contains(world.getTypeId(x, y - 1, z)))
-            abort = true;
-
-        if (abort)
-            return false;
 
         // 2)
 

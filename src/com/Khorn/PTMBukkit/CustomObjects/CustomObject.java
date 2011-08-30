@@ -1,8 +1,11 @@
 package com.Khorn.PTMBukkit.CustomObjects;
 
+import net.minecraft.server.BiomeBase;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -39,7 +42,8 @@ public class CustomObject
     public boolean IsValid = false;
 
     public CustomObject()
-    {}
+    {
+    }
 
     public CustomObject(File objectFile)
     {
@@ -264,7 +268,10 @@ public class CustomObject
         }
 
         if (spawnOnBlockType.size() == 0)
+        {
             spawnOnBlockType.add(2);
+            spawnOnBlockType.add(3);
+        }
 
 
         if (rarity == 0 || rarity > 1000)
@@ -312,4 +319,16 @@ public class CustomObject
             spawnInBiome.add("All");
 
     }
+
+    public boolean canSpawnInBiome(BiomeBase localBiome)
+    {
+        if (!this.spawnInBiome.contains("All"))
+        {
+            if (!this.spawnInBiome.contains(localBiome.n.toLowerCase()))
+                return false;
+        }
+        return true;
+    }
+
+
 }

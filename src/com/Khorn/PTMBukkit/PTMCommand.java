@@ -1,5 +1,6 @@
 package com.Khorn.PTMBukkit;
 
+import com.Khorn.PTMBukkit.CustomObjects.CustomObject;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.WorldChunkManager;
 import org.bukkit.ChatColor;
@@ -43,6 +44,8 @@ public class PTMCommand implements CommandExecutor
                 return this.BiomeCommand(commandSender, strings, isConsole);
             if (strings[0].equals("check"))
                 return this.CheckCommand(commandSender, strings, isConsole);
+            if (strings[0].equals("list"))
+                return this.ObjectListCommand(commandSender, strings, isConsole);
 
             return this.SendUsage(commandSender);
         }
@@ -136,6 +139,42 @@ public class PTMCommand implements CommandExecutor
             commandSender.sendMessage(ChatColor.GREEN.toString() + "Ptm is enabled for " + worldName);
         else
             commandSender.sendMessage(ChatColor.GREEN.toString() + "Ptm is disabled for " + worldName);
+        return true;
+    }
+
+    private boolean ObjectListCommand(CommandSender commandSender, String[] strings, boolean isConsole)
+    {
+        String worldName;
+
+        if (strings.length == 1)
+        {
+            if (isConsole)
+            {
+                commandSender.sendMessage(ChatColor.RED.toString() + "You need to select world");
+                return true;
+            }
+
+            worldName = ((Player) commandSender).getWorld().getName();
+        } else
+            worldName = strings[1];
+
+        if (this.plugin.worldsSettings.containsKey(worldName))
+        {
+            Settings worldSetting = this.plugin.worldsSettings.get(worldName);
+            if(worldSetting.Objects.size() == 0)
+                 commandSender.sendMessage(ChatColor.GREEN.toString() + "This world does not have custom objects");
+
+            for(CustomObject object : worldSetting.Objects)
+            {
+                commandSender.sendMessage(ChatColor.GREEN.toString() + object.name);
+            }
+
+        } else
+        {
+            commandSender.sendMessage(ChatColor.RED.toString() + "PTM is not enabled for this world");
+            return true;
+        }
+
         return true;
     }
 
