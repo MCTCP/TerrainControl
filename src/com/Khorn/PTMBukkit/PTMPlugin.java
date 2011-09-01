@@ -3,6 +3,7 @@ package com.Khorn.PTMBukkit;
 import java.io.*;
 import java.util.HashMap;
 
+import com.Khorn.PTMBukkit.Commands.PTMCommandExecutor;
 import com.Khorn.PTMBukkit.Generator.BiomeManagerPTM;
 import com.Khorn.PTMBukkit.Generator.ChunkProviderPTM;
 import com.Khorn.PTMBukkit.Listeners.PTMBlockListener;
@@ -33,7 +34,7 @@ public class PTMPlugin extends JavaPlugin
 
     public void onEnable()
     {
-        this.getCommand("ptm").setExecutor(new PTMCommand(this));
+        this.getCommand("ptm").setExecutor(new PTMCommandExecutor(this));
         this.RegisterEvents();
         CheckDefaultSettingsFolder();
 
@@ -115,7 +116,7 @@ public class PTMPlugin extends JavaPlugin
         }
 
 
-        Settings worker = new Settings(baseFolder, this);
+        Settings worker = new Settings(baseFolder, this,worldName);
 
         worldsSettings.put(worldName, worker);
 

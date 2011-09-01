@@ -354,10 +354,13 @@ public class Settings
     public boolean isDeprecated = false;
     public Settings newSettings = null;
 
+    public String WorldName;
 
-    public Settings(File settingsDir, PTMPlugin plug)
+
+    public Settings(File settingsDir, PTMPlugin plug,String worldName)
     {
         this.SettingsDir = settingsDir;
+        this.WorldName = worldName;
 
         ReadSettings();
         CorrectSettings();
