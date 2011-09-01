@@ -39,8 +39,8 @@ public class ListCommand extends BaseCommand
             {
                 try
                 {
-                    page = Integer.getInteger(args.get(0));
-                } catch (NullPointerException e)
+                    page = Integer.parseInt(args.get(0));
+                } catch (Exception e)
                 {
                      sender.sendMessage(ErrorColor + "Wrong page number " + args.get(0));
                 }

@@ -55,7 +55,7 @@ public abstract class BaseCommand
     }
 
 
-    protected final String ErrorColor = ChatColor.RED.toString();
-    protected final String MessageColor = ChatColor.GREEN.toString();
-    protected final String ValueColor = ChatColor.DARK_GREEN.toString();
+    public static final String ErrorColor = ChatColor.RED.toString();
+    public static final String MessageColor = ChatColor.GREEN.toString();
+    public static final String ValueColor = ChatColor.DARK_GREEN.toString();
 }

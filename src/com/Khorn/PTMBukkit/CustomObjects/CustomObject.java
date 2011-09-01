@@ -247,7 +247,7 @@ public class CustomObject
                 return;
             }
 
-            this.name = objectFile.getName();
+            this.name = objectFile.getName().substring(0,objectFile.getName().length()-4);
             this.CorrectSettings();
             this.IsValid = true;
 

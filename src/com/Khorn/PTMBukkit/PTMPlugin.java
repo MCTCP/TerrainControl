@@ -12,6 +12,7 @@ import com.Khorn.PTMBukkit.Listeners.PTMWorldListener;
 import com.Khorn.PTMBukkit.Util.FileSystemManager;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
@@ -25,6 +26,7 @@ public class PTMPlugin extends JavaPlugin
     private final PTMBlockListener blockListener = new PTMBlockListener(this);
     private final PTMWorldListener worldListener = new PTMWorldListener(this);
     private final PTMPlayerListener playerListener = new PTMPlayerListener(this);
+    private final HashMap<String,PTMPlayer> sessions = new HashMap<String, PTMPlayer>();
 
 
     public void onDisable()
@@ -42,17 +44,20 @@ public class PTMPlugin extends JavaPlugin
 
     }
 
-    private void RegisterEvents()
+    public PTMPlayer GetPlayer(Player bukkitPlayer)
     {
-        PluginManager pm = this.getServer().getPluginManager();
-        pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Event.Priority.Monitor, this);
-
-        pm.registerEvent(Event.Type.WORLD_INIT, worldListener, Event.Priority.High, this);
-
-        pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
-
+        PTMPlayer player;
+        synchronized (this.sessions)
+        {
+            if(this.sessions.containsKey(bukkitPlayer.getName()))
+                return  this.sessions.get(bukkitPlayer.getName());
+            player = new PTMPlayer(bukkitPlayer);
+            this.sessions.put(bukkitPlayer.getName(),player);
+        }
+        return  player;
 
     }
+
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
@@ -146,6 +151,17 @@ public class PTMPlugin extends JavaPlugin
         }
     }
 
+    private void RegisterEvents()
+        {
+            PluginManager pm = this.getServer().getPluginManager();
+            pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Event.Priority.Monitor, this);
+
+            pm.registerEvent(Event.Type.WORLD_INIT, worldListener, Event.Priority.High, this);
+
+            pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
+
+
+        }
 
     private void CheckDefaultSettingsFolder()
     {

@@ -186,7 +186,7 @@ public class ObjectSpawner extends BlockPopulator
         return objectSpawned;
     }
 
-    private boolean GenerateCustomObject(int x, int y, int z, CustomObject workObject, boolean notify)
+    public boolean GenerateCustomObject(int x, int y, int z, CustomObject workObject, boolean notify)
     {
         /*
          * 1) ground check (moved to ObjectCanSpawn)

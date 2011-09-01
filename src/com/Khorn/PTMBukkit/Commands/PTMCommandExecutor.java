@@ -61,6 +61,7 @@ public class PTMCommandExecutor implements CommandExecutor
         this.AddCommand(new ListCommand(plugin));
         this.AddCommand(new CheckCommand(plugin));
         this.AddCommand(new BiomeCommand(plugin));
+        this.AddCommand(new SpawnCommand(plugin));
         this.AddCommand(this.helpCommand);
     }
 

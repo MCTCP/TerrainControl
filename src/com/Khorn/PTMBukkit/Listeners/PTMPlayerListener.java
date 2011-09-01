@@ -1,6 +1,8 @@
 package com.Khorn.PTMBukkit.Listeners;
 
 
+import com.Khorn.PTMBukkit.Commands.BaseCommand;
+import com.Khorn.PTMBukkit.PTMPlayer;
 import com.Khorn.PTMBukkit.PTMPlugin;
 import com.Khorn.PTMBukkit.Settings;
 import org.bukkit.DyeColor;
@@ -13,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
 
+import java.awt.*;
 import java.util.Random;
 
 public class PTMPlayerListener extends PlayerListener
@@ -29,6 +32,24 @@ public class PTMPlayerListener extends PlayerListener
     @Override
     public void onPlayerInteract(PlayerInteractEvent event)
     {
+        PTMPlayer player = ptmPlugin.GetPlayer(event.getPlayer());
+        if(player.hasObjectToSpawn)
+        {
+            Block block = event.getClickedBlock();
+            if (this.ptmPlugin.worldsSettings.containsKey(block.getWorld().getName()))
+                {
+                    Settings worldSettings = this.ptmPlugin.worldsSettings.get(block.getWorld().getName());
+                    if(worldSettings.objectSpawner.GenerateCustomObject(block.getX(),block.getY(),block.getZ(),player.object,true))
+                        event.getPlayer().sendMessage(BaseCommand.MessageColor + player.object.name + " spawned");
+                    else
+                        event.getPlayer().sendMessage(BaseCommand.ErrorColor + "This object cant spawn here");
+                    player.hasObjectToSpawn = false;
+                    event.setCancelled(true);
+                    return;
+                }
+
+        }
+
         if(!event.hasItem())
             return;
         MaterialData data = event.getItem().getData();
