@@ -5,6 +5,7 @@ import com.Khorn.PTMBukkit.Settings;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.Block;
 import net.minecraft.server.NoiseGeneratorOctaves;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
@@ -434,5 +435,13 @@ public class ChunkProviderPTM extends ChunkGenerator
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
         return populatorList;
+    }
+
+    @Override
+    public Location getFixedSpawnLocation(World world, Random random)
+    {
+        this.WorldSettings.plugin.WorldInit(world);
+        int i = ((CraftWorld) world).getHandle().a(0, 0);
+        return new Location(world,0,100,0);
     }
 }

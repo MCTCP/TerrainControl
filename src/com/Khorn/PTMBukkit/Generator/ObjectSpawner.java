@@ -3,7 +3,6 @@ package com.Khorn.PTMBukkit.Generator;
 import com.Khorn.PTMBukkit.CustomObjects.Coordinate;
 import com.Khorn.PTMBukkit.CustomObjects.CustomObject;
 import com.Khorn.PTMBukkit.Settings;
-import com.sun.org.apache.bcel.internal.generic.Select;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;
@@ -240,18 +239,34 @@ public class ObjectSpawner extends BlockPopulator
         {
             RotationAmount = this.rand.nextInt(3);
         }
+        ChunkProviderServer chunkServer = (ChunkProviderServer) this.world.chunkProvider;
+        net.minecraft.server.Chunk workChunk = chunkServer.chunks.get(workingData.get(0).getChunkX(), workingData.get(0).getChunkZ());
+        if (workChunk == null)
+            return false;
 
         while (index < workingData.size())
         {
             int counter = 0;
+            Coordinate point = workingData.get(index);
             while (counter < RotationAmount)
             {
-                workingData.get(index).rotateSliceC();
+                point.rotateSliceC();
                 counter++;
             }
+            if (workChunk.x != point.getChunkX() || workChunk.z != point.getChunkZ())
+                workChunk = chunkServer.chunks.get(point.getChunkX(), point.getChunkZ());
+
+            if (workChunk == null)
+                return false;
+
+            if ((y + point.getY() > 127) || (y + point.getY() < 1))
+            {
+                return false;
+            }
+
             if (!workObject.dig)
             {
-                if (world.getTypeId(x + workingData.get(index).getX(), y + workingData.get(index).getY(), z + workingData.get(index).getZ()) > 0)
+                if (workChunk.getTypeId((x + point.getX()) & 0xF, (y + point.getY()) & 0xF, (z + point.getZ()) & 0xF) > 0)
                 {
                     faultCounter++;
                     if (faultCounter > (workingData.size() * (workObject.collisionPercentage / 100)))
@@ -259,10 +274,6 @@ public class ObjectSpawner extends BlockPopulator
                         return false;
                     }
                 }
-            }
-            if ((y + workingData.get(index).getY() > 127) || (y + workingData.get(index).getY() < 1))
-            {
-                return false;
             }
             index++;
         }

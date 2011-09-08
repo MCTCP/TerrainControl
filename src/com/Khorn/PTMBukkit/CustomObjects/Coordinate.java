@@ -36,6 +36,14 @@ public class Coordinate
     {
         return z;
     }
+    public int getChunkX()
+    {
+        return x>>4;
+    }
+    public  int getChunkZ()
+    {
+        return z>>4;
+    }
 
     public void rotateSliceC()
     {

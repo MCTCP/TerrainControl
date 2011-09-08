@@ -316,13 +316,13 @@ public class CustomObject
         }
 
         if (spawnInBiome.size() == 0)
-            spawnInBiome.add("All");
+            spawnInBiome.add("all");
 
     }
 
     public boolean canSpawnInBiome(BiomeBase localBiome)
     {
-        if (!this.spawnInBiome.contains("All"))
+        if (!this.spawnInBiome.contains("all"))
         {
             if (!this.spawnInBiome.contains(localBiome.n.toLowerCase()))
                 return false;
