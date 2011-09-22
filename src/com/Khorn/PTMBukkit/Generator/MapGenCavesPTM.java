@@ -3,14 +3,15 @@ package com.Khorn.PTMBukkit.Generator;
 import com.Khorn.PTMBukkit.Settings;
 import net.minecraft.server.Block;
 import net.minecraft.server.MathHelper;
-import org.bukkit.World;
+import net.minecraft.server.World;
 
 import java.util.Random;
 
 class MapGenCavesPTM
 {
-    private int a = 8;
-    private Random b = new Random();
+    protected int b = 8;
+    protected Random c = new Random();
+    protected World d;
 
     private Settings WorldSettings;
 
@@ -19,12 +20,12 @@ class MapGenCavesPTM
         this.WorldSettings = wrk;
     }
 
-    void a(int paramInt1, int paramInt2, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3)
+    protected void a(long paramLong, int paramInt1, int paramInt2, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3)
     {
-        a(paramInt1, paramInt2, paramArrayOfByte, paramDouble1, paramDouble2, paramDouble3, 1.0F + this.b.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
+        a(paramLong, paramInt1, paramInt2, paramArrayOfByte, paramDouble1, paramDouble2, paramDouble3, 1.0F + this.c.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
     }
 
-    void a(int paramInt1, int paramInt2, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int paramInt3, int paramInt4, double paramDouble4)
+    protected void a(long paramLong, int paramInt1, int paramInt2, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int paramInt3, int paramInt4, double paramDouble4)
     {
         double d1 = paramInt1 * 16 + 8;
         double d2 = paramInt2 * 16 + 8;
@@ -32,11 +33,11 @@ class MapGenCavesPTM
         float f1 = 0.0F;
         float f2 = 0.0F;
 
-        Random localRandom = new Random(this.b.nextLong());
+        Random localRandom = new Random(paramLong);
 
         if (paramInt4 <= 0)
         {
-            int i = this.a * 16 - 16;
+            int i = this.b * 16 - 16;
             paramInt4 = i - localRandom.nextInt(i / 4);
         }
         int i = 0;
@@ -75,10 +76,10 @@ class MapGenCavesPTM
             f2 += (localRandom.nextFloat() - localRandom.nextFloat()) * localRandom.nextFloat() * 2.0F;
             f1 += (localRandom.nextFloat() - localRandom.nextFloat()) * localRandom.nextFloat() * 4.0F;
 
-            if ((i == 0) && (paramInt3 == j) && (paramFloat1 > 1.0F))
+            if ((i == 0) && (paramInt3 == j) && (paramFloat1 > 1.0F) && (paramInt4 > 0))
             {
-                a(paramInt1, paramInt2, paramArrayOfByte, paramDouble1, paramDouble2, paramDouble3, localRandom.nextFloat() * 0.5F + 0.5F, paramFloat2 - 1.570796F, paramFloat3 / 3.0F, paramInt3, paramInt4, 1.0D);
-                a(paramInt1, paramInt2, paramArrayOfByte, paramDouble1, paramDouble2, paramDouble3, localRandom.nextFloat() * 0.5F + 0.5F, paramFloat2 + 1.570796F, paramFloat3 / 3.0F, paramInt3, paramInt4, 1.0D);
+                a(localRandom.nextLong(), paramInt1, paramInt2, paramArrayOfByte, paramDouble1, paramDouble2, paramDouble3, localRandom.nextFloat() * 0.5F + 0.5F, paramFloat2 - 1.570796F, paramFloat3 / 3.0F, paramInt3, paramInt4, 1.0D);
+                a(localRandom.nextLong(), paramInt1, paramInt2, paramArrayOfByte, paramDouble1, paramDouble2, paramDouble3, localRandom.nextFloat() * 0.5F + 0.5F, paramFloat2 + 1.570796F, paramFloat3 / 3.0F, paramInt3, paramInt4, 1.0D);
                 return;
             }
             if ((i == 0) && (localRandom.nextInt(4) == 0))
@@ -112,9 +113,12 @@ class MapGenCavesPTM
 
             if (i1 < 1)
                 i1 = 1;
-            if (i2 > 120)
-                i2 = 120;
-
+            this.d.getClass();
+            if (i2 > '' - 8)
+            {
+                this.d.getClass();
+                i2 = '' - 8;
+            }
             if (i3 < 0)
                 i3 = 0;
             if (i4 > 16)
@@ -128,8 +132,12 @@ class MapGenCavesPTM
                 {
                     for (int i8 = i2 + 1; (i5 == 0) && (i8 >= i1 - 1); i8--)
                     {
+                        this.d.getClass();
                         i9 = (i6 * 16 + i7) * 128 + i8;
-                        if ((i8 >= 0) && (i8 < 128))
+                        if (i8 < 0)
+                            continue;
+                        this.d.getClass();
+                        if (i8 < 128)
                         {
                             if ((paramArrayOfByte[i9] == Block.WATER.id) || (paramArrayOfByte[i9] == Block.STATIONARY_WATER.id))
                             {
@@ -149,6 +157,7 @@ class MapGenCavesPTM
                 for (i9 = i3; i9 < i4; i9++)
                 {
                     double d10 = (i9 + paramInt2 * 16 + 0.5D - paramDouble3) / d3;
+                    this.d.getClass();
                     int i10 = (i6 * 16 + i9) * 128 + i2;
                     int i11 = 0;
                     if (d9 * d9 + d10 * d10 < 1.0D)
@@ -184,60 +193,66 @@ class MapGenCavesPTM
         }
     }
 
-    void a( int paramInt1, int paramInt2, int paramInt3, int paramInt4, byte[] paramArrayOfByte)
+    protected void a( int paramInt1, int paramInt2, int paramInt3, int paramInt4, byte[] paramArrayOfByte)
     {
-        int i = this.b.nextInt(this.b.nextInt(this.b.nextInt(this.WorldSettings.caveFrequency) + 1) + 1);
+        int i = this.c.nextInt(this.c.nextInt(this.c.nextInt(this.WorldSettings.caveFrequency) + 1) + 1);
         if (this.WorldSettings.evenCaveDistribution)
             i = this.WorldSettings.caveFrequency;
-        if (this.b.nextInt(100) > this.WorldSettings.caveRarity)
+        if (this.c.nextInt(100) > this.WorldSettings.caveRarity)
             i = 0;
 
         for (int j = 0; j < i; j++)
         {
-            double d1 = paramInt1 * 16 + this.b.nextInt(16);
+            double d1 = paramInt1 * 16 + this.c.nextInt(16);
 
             double d2;
 
             if (this.WorldSettings.evenCaveDistribution)
-                d2 = this.b.nextInt(this.WorldSettings.caveMaxAltitude - this.WorldSettings.caveMinAltitude) + this.WorldSettings.caveMinAltitude;
+                d2 = this.c.nextInt(this.WorldSettings.caveMaxAltitude - this.WorldSettings.caveMinAltitude) + this.WorldSettings.caveMinAltitude;
             else
-                d2 = this.b.nextInt(this.b.nextInt(this.WorldSettings.caveMaxAltitude - this.WorldSettings.caveMinAltitude) + this.WorldSettings.caveMinAltitude + 1);
-            double d3 = paramInt2 * 16 + this.b.nextInt(16);
+                d2 = this.c.nextInt(this.c.nextInt(this.WorldSettings.caveMaxAltitude - this.WorldSettings.caveMinAltitude) + this.WorldSettings.caveMinAltitude + 1);
+            double d3 = paramInt2 * 16 + this.c.nextInt(16);
 
             int k = this.WorldSettings.caveSystemFrequency;
             boolean l = false;
-            if (this.b.nextInt(100) <= this.WorldSettings.individualCaveRarity)
+            if (this.c.nextInt(100) <= this.WorldSettings.individualCaveRarity)
             {
-                a(paramInt3, paramInt4, paramArrayOfByte, d1, d2, d3);
+                a(this.c.nextLong(), paramInt3, paramInt4, paramArrayOfByte, d1, d2, d3);
                 l = true;
             }
 
-            if ((l) || (this.b.nextInt(100) <= this.WorldSettings.caveSystemPocketChance - 1))
+            if ((l) || (this.c.nextInt(100) <= this.WorldSettings.caveSystemPocketChance - 1))
             {
-                k += this.b.nextInt(this.WorldSettings.caveSystemPocketMaxSize - this.WorldSettings.caveSystemPocketMinSize) + this.WorldSettings.caveSystemPocketMinSize;
+                k += this.c.nextInt(this.WorldSettings.caveSystemPocketMaxSize - this.WorldSettings.caveSystemPocketMinSize) + this.WorldSettings.caveSystemPocketMinSize;
             }
             for (int m = 0; m < k; m++)
             {
-                float f1 = this.b.nextFloat() * 3.141593F * 2.0F;
-                float f2 = (this.b.nextFloat() - 0.5F) * 2.0F / 8.0F;
-                float f3 = this.b.nextFloat() * 2.0F + this.b.nextFloat();
+                float f1 = this.c.nextFloat() * 3.141593F * 2.0F;
+                float f2 = (this.c.nextFloat() - 0.5F) * 2.0F / 8.0F;
+                float f3 = this.c.nextFloat() * 2.0F + this.c.nextFloat();
 
-                a(paramInt3, paramInt4, paramArrayOfByte, d1, d2, d3, f3, f1, f2, 0, 0, 1.0D);
+                a(this.c.nextLong(), paramInt3, paramInt4, paramArrayOfByte, d1, d2, d3, f3, f1, f2, 0, 0, 1.0D);
             }
         }
     }
 
-    public void a(World paramWorld, int paramInt1, int paramInt2, byte[] paramArrayOfByte) {
-    int i = this.a;
+    public void a(World paramWorld, int paramInt1, int paramInt2, byte[] paramArrayOfByte)
+    {
+        int i = this.b;
+        this.d = paramWorld;
 
-    this.b.setSeed(paramWorld.getSeed());
-    long l1 = this.b.nextLong() / 2L * 2L + 1L;
-    long l2 = this.b.nextLong() / 2L * 2L + 1L;
+        this.c.setSeed(paramWorld.getSeed());
+        long l1 = this.c.nextLong();
+        long l2 = this.c.nextLong();
 
-    for (int j = paramInt1 - i; j <= paramInt1 + i; j++)
-      for (int k = paramInt2 - i; k <= paramInt2 + i; k++) {
-        this.b.setSeed(j * l1 + k * l2 ^ paramWorld.getSeed());
-        a( j, k, paramInt1, paramInt2, paramArrayOfByte);
-      }
-  }
+        for (int j = paramInt1 - i; j <= paramInt1 + i; j++)
+            for (int k = paramInt2 - i; k <= paramInt2 + i; k++)
+            {
+                long l3 = j * l1;
+                long l4 = k * l2;
+                this.c.setSeed(l3 ^ l4 ^ paramWorld.getSeed());
+                this.a( j, k, paramInt1, paramInt2, paramArrayOfByte);
+            }
+    }
+
 }

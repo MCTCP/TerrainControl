@@ -2,11 +2,7 @@ package com.Khorn.PTMBukkit.Generator;
 
 import com.Khorn.PTMBukkit.PTMDefaultValues;
 import com.Khorn.PTMBukkit.Settings;
-import net.minecraft.server.BiomeBase;
-import net.minecraft.server.Block;
-import net.minecraft.server.NoiseGeneratorOctaves;
-import org.bukkit.Location;
-import org.bukkit.World;
+import net.minecraft.server.*;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
@@ -18,27 +14,43 @@ import java.util.*;
 public class ChunkProviderPTM extends ChunkGenerator
 {
     private Random rnd;
-    private NoiseGeneratorOctaves k;
-    private NoiseGeneratorOctaves l;
-    private NoiseGeneratorOctaves m;
-    private NoiseGeneratorOctaves n;
     private NoiseGeneratorOctaves o;
-    private NoiseGeneratorOctaves a;
-    private NoiseGeneratorOctaves b;
+    private NoiseGeneratorOctaves p;
+    private NoiseGeneratorOctaves q;
+    private NoiseGeneratorOctaves r;
+    public NoiseGeneratorOctaves a;
+    public NoiseGeneratorOctaves b;
+    public NoiseGeneratorOctaves c;
+    private double[] u;
+    private double[] v = new double[256];
+
+    double[] g;
+    double[] h;
+    double[] i;
+    double[] j;
+    double[] k;
+    float[] l;
+    int[][] m = new int[32][32];
+
+    private static int ChunkMaxY = 128;
+    private static int ChunkMaxX = 16;
+    private static int ChunkMaxZ = 16;
+
 
     private World localWorld;
-    private double[] q;
-    private double[] r = new double[256];
-    private double[] s = new double[256];
-    private double[] t = new double[256];
+
     private Settings WorldSettings;
     private MapGenCavesPTM CaveGen;
+
+    /*
+    public WorldGenStronghold StrongholdGen = new WorldGenStronghold();
+    public WorldGenVillage VillageGen = new WorldGenVillage();
+    public WorldGenMineshaft MineshaftGen = new WorldGenMineshaft();
+
+    private MapGenBase CanyonGen = new WorldGenCanyon();
+     */
     private BiomeBase[] BiomeArray;
-    private double[] d;
-    private double[] e;
-    private double[] f;
-    private double[] g;
-    private double[] h;
+
 
     private ArrayList<BlockPopulator> populatorList;
 
@@ -52,54 +64,69 @@ public class ChunkProviderPTM extends ChunkGenerator
 
     }
 
-    public void Init(World world)
+    public void Init(org.bukkit.World world)
     {
 
-        this.localWorld = world;
+        this.localWorld = ((CraftWorld) world).getHandle();
 
         this.rnd = new Random(world.getSeed());
 
-        this.k = new NoiseGeneratorOctaves(this.rnd, 16);
-        this.l = new NoiseGeneratorOctaves(this.rnd, 16);
-        this.m = new NoiseGeneratorOctaves(this.rnd, 8);
-        this.n = new NoiseGeneratorOctaves(this.rnd, 4);
-        this.o = new NoiseGeneratorOctaves(this.rnd, 4);
+        this.o = new NoiseGeneratorOctaves(this.rnd, 16);
+        this.p = new NoiseGeneratorOctaves(this.rnd, 16);
+        this.q = new NoiseGeneratorOctaves(this.rnd, 8);
+        this.r = new NoiseGeneratorOctaves(this.rnd, 4);
 
         this.a = new NoiseGeneratorOctaves(this.rnd, 10);
         this.b = new NoiseGeneratorOctaves(this.rnd, 16);
 
+        this.c = new NoiseGeneratorOctaves(this.rnd, 8);
+
 
         this.CaveGen = new MapGenCavesPTM(this.WorldSettings);
+
+        this.l = new float[25];
+        for (int i1 = -2; i1 <= 2; i1++)
+        {
+            for (int i2 = -2; i2 <= 2; i2++)
+            {
+                float f1 = 10.0F / MathHelper.c(i1 * i1 + i2 * i2 + 0.2F);
+                this.l[(i1 + 2 + (i2 + 2) * 5)] = f1;
+            }
+        }
 
 
     }
 
-    private void generateTerrain(int paramInt1, int paramInt2, byte[] paramArrayOfByte, double[] paramArrayOfDouble)
+    private void generateTerrain(int paramInt1, int paramInt2, byte[] paramArrayOfByte)
     {
         int i1 = 4;
-        int i2 = this.WorldSettings.waterLevel;
+        int i2 = ChunkMaxY / 8;
+        int i3 = this.WorldSettings.waterLevel;
 
-        int i3 = i1 + 1;
-        int i4 = 17;
-        int i5 = i1 + 1;
-        this.q = a(this.q, paramInt1 * i1, 0, paramInt2 * i1, i3, i4, i5);
+        int i4 = i1 + 1;
+        int i5 = ChunkMaxY / 8 + 1;
+        int i6 = i1 + 1;
 
-        for (int i6 = 0; i6 < i1; i6++)
-            for (int i7 = 0; i7 < i1; i7++)
-                for (int i8 = 0; i8 < 16; i8++)
+        this.BiomeArray = this.localWorld.getWorldChunkManager().b(this.BiomeArray, paramInt1 * 4 - 2, paramInt2 * 4 - 2, i4 + 5, i6 + 5);
+
+        this.u = a(this.u, paramInt1 * i1, 0, paramInt2 * i1, i4, i5, i6);
+
+        for (int i7 = 0; i7 < i1; i7++)
+            for (int i8 = 0; i8 < i1; i8++)
+                for (int i9 = 0; i9 < i2; i9++)
                 {
                     double d1 = 0.125D;
-                    double d2 = this.q[(((i6 + 0) * i5 + (i7 + 0)) * i4 + (i8 + 0))];
-                    double d3 = this.q[(((i6 + 0) * i5 + (i7 + 1)) * i4 + (i8 + 0))];
-                    double d4 = this.q[(((i6 + 1) * i5 + (i7 + 0)) * i4 + (i8 + 0))];
-                    double d5 = this.q[(((i6 + 1) * i5 + (i7 + 1)) * i4 + (i8 + 0))];
+                    double d2 = this.u[(((i7 + 0) * i6 + (i8 + 0)) * i5 + (i9 + 0))];
+                    double d3 = this.u[(((i7 + 0) * i6 + (i8 + 1)) * i5 + (i9 + 0))];
+                    double d4 = this.u[(((i7 + 1) * i6 + (i8 + 0)) * i5 + (i9 + 0))];
+                    double d5 = this.u[(((i7 + 1) * i6 + (i8 + 1)) * i5 + (i9 + 0))];
 
-                    double d6 = (this.q[(((i6 + 0) * i5 + (i7 + 0)) * i4 + (i8 + 1))] - d2) * d1;
-                    double d7 = (this.q[(((i6 + 0) * i5 + (i7 + 1)) * i4 + (i8 + 1))] - d3) * d1;
-                    double d8 = (this.q[(((i6 + 1) * i5 + (i7 + 0)) * i4 + (i8 + 1))] - d4) * d1;
-                    double d9 = (this.q[(((i6 + 1) * i5 + (i7 + 1)) * i4 + (i8 + 1))] - d5) * d1;
+                    double d6 = (this.u[(((i7 + 0) * i6 + (i8 + 0)) * i5 + (i9 + 1))] - d2) * d1;
+                    double d7 = (this.u[(((i7 + 0) * i6 + (i8 + 1)) * i5 + (i9 + 1))] - d3) * d1;
+                    double d8 = (this.u[(((i7 + 1) * i6 + (i8 + 0)) * i5 + (i9 + 1))] - d4) * d1;
+                    double d9 = (this.u[(((i7 + 1) * i6 + (i8 + 1)) * i5 + (i9 + 1))] - d5) * d1;
 
-                    for (int i9 = 0; i9 < 8; i9++)
+                    for (int i10 = 0; i10 < 8; i10++)
                     {
                         double d10 = 0.25D;
 
@@ -108,34 +135,31 @@ public class ChunkProviderPTM extends ChunkGenerator
                         double d13 = (d4 - d2) * d10;
                         double d14 = (d5 - d3) * d10;
 
-                        for (int i10 = 0; i10 < 4; i10++)
+                        for (int i11 = 0; i11 < 4; i11++)
                         {
-                            int i11 = i10 + i6 * 4 << 11 | 0 + i7 * 4 << 7 | i8 * 8 + i9;
-                            int i12 = 128;
+                            int i12 = i11 + i7 * 4 << 11 | 0 + i8 * 4 << 7 | i9 * 8 + i10;
+                            int i13 = 1 << 7;
                             double d15 = 0.25D;
 
                             double d16 = d11;
                             double d17 = (d12 - d11) * d15;
-                            for (int i13 = 0; i13 < 4; i13++)
+                            for (int i14 = 0; i14 < 4; i14++)
                             {
-                                double d18 = paramArrayOfDouble[((i6 * 4 + i10) * 16 + (i7 * 4 + i13))];
-                                int i14 = 0;
-                                if (i8 * 8 + i9 < i2)
+                                // TODO Add ice replace
+
+                                int i15 = 0;
+                                if (i9 * 8 + i10 < i3)
                                 {
-                                    if ((d18 < this.WorldSettings.iceThreshold) && (i8 * 8 + i9 >= i2 - 1))
-                                        i14 = (this.WorldSettings.waterBlock != Block.STATIONARY_WATER.id)?this.WorldSettings.waterBlock:Block.ICE.id;
-                                    else
-                                    {
-                                        i14 = this.WorldSettings.waterBlock;
-                                    }
-                                }
-                                if (d16 > 0.0D)
-                                {
-                                    i14 = Block.STONE.id;
+                                    i15 = this.WorldSettings.waterBlock;
                                 }
 
-                                paramArrayOfByte[i11] = (byte) i14;
-                                i11 += i12;
+                                if (d16 > 0.0D)
+                                {
+                                    i15 = Block.STONE.id;
+                                }
+
+                                paramArrayOfByte[i12] = (byte) i15;
+                                i12 += i13;
                                 d16 += d17;
                             }
                             d11 += d13;
@@ -148,109 +172,98 @@ public class ChunkProviderPTM extends ChunkGenerator
                         d5 += d9;
                     }
                 }
+
     }
 
     void replaceBlocksForBiome(int paramInt1, int paramInt2, byte[] paramArrayOfByte, BiomeBase[] paramArrayOfBiomeBase)
     {
-
         int waterLevel = this.WorldSettings.waterLevel;
-        double d1 = 0.03125D;
 
-        this.r = this.n.a(this.r, paramInt1 * 16, paramInt2 * 16, 0.0D, 16, 16, 1, d1, d1, 1.0D);
-        this.s = this.n.a(this.s, paramInt1 * 16, 109.0134D, paramInt2 * 16, 16, 1, 16, d1, 1.0D, d1);
-        this.t = this.o.a(this.t, paramInt1 * 16, paramInt2 * 16, 0.0D, 16, 16, 1, d1 * 2.0D, d1 * 2.0D, d1 * 2.0D);
+        double d1 = 0.03125D;
+        this.v = this.r.a(this.v, paramInt1 * 16, paramInt2 * 16, 0, 16, 16, 1, d1 * 2.0D, d1 * 2.0D, d1 * 2.0D);
 
         for (int x = 0; x < 16; x++)
             for (int z = 0; z < 16; z++)
             {
-                BiomeBase localBiomeBase = paramArrayOfBiomeBase[(x + z * 16)];
-                int i4 = this.r[(x + z * 16)] + this.rnd.nextDouble() * 0.2D > 0.0D ? 1 : 0;
-                int i5 = this.s[(x + z * 16)] + this.rnd.nextDouble() * 0.2D > 3.0D ? 1 : 0;
-                int i6 = (int) (this.t[(x + z * 16)] / 3.0D + 3.0D + this.rnd.nextDouble() * 0.25D);
+                BiomeBase localBiomeBase = paramArrayOfBiomeBase[(z + x * 16)];
+                int i4 = (int) (this.v[(x + z * 16)] / 3.0D + 3.0D + this.rnd.nextDouble() * 0.25D);
 
-                int i7 = -1;
+                int i5 = -1;
 
-                byte i8 = localBiomeBase.p;
-                byte i9 = localBiomeBase.q;
-                if(this.WorldSettings.ceilingBedrock)
+                int i6 = localBiomeBase.n;
+                int i7 = localBiomeBase.o;
+
+                if (this.WorldSettings.ceilingBedrock)
                     paramArrayOfByte[(z * 16 + x) * 128 + 127] = this.WorldSettings.getadminium();
+
                 for (int y = 127; y >= 0; y--)
                 {
-                    int i11 = (z * 16 + x) * 128 + y;
+                    int i9 = (z * 16 + x) * 128 + y;
 
-                    if ((y <= 0 + this.rnd.nextInt(5)) && (WorldSettings.createadminium(y)))
+                    if (y <= this.rnd.nextInt(5) && (WorldSettings.createadminium(y)))
                     {
-                        paramArrayOfByte[i11] = this.WorldSettings.getadminium();
+                        paramArrayOfByte[i9] = this.WorldSettings.getadminium();
                     } else
                     {
-                        int i12 = paramArrayOfByte[i11];
+                        int i10 = paramArrayOfByte[i9];
 
-                        if (i12 == 0)
-                            i7 = -1;
-                        else if (i12 == Block.STONE.id)
-                            if (i7 == -1)
+                        if (i10 == 0)
+                            i5 = -1;
+                        else if (i10 == Block.STONE.id)
+                            if (i5 == -1)
                             {
-                                if (i6 <= 0)
+                                if (i4 <= 0)
                                 {
-                                    i8 = 0;
-                                    i9 = (byte) Block.STONE.id;
+                                    i6 = 0;
+                                    i7 = (byte) Block.STONE.id;
                                 } else if ((y >= waterLevel - 4) && (y <= waterLevel + 1))
                                 {
-                                    i8 = localBiomeBase.p;
-                                    i9 = localBiomeBase.q;
-                                    if (i5 != 0)
-                                        i8 = 0;
-                                    if (i5 != 0)
-                                        i9 = (byte) Block.GRAVEL.id;
-                                    if (i4 != 0)
-                                        i8 = (byte) Block.SAND.id;
-                                    if (i4 != 0)
-                                        i9 = (byte) Block.SAND.id;
+                                    i6 = localBiomeBase.n;
+                                    i7 = localBiomeBase.o;
                                 }
 
-                                if ((y < waterLevel) && (i8 == 0))
-                                    i8 = (byte) this.WorldSettings.waterBlock;
+                                if ((y < waterLevel) && (i6 == 0))
+                                    i6 = (byte) this.WorldSettings.waterBlock;
 
-                                i7 = i6;
+                                i5 = i4;
                                 if (y >= waterLevel - 1)
-                                    paramArrayOfByte[i11] = i8;
+                                    paramArrayOfByte[i9] = (byte) i6;
                                 else
-                                    paramArrayOfByte[i11] = i9;
+                                    paramArrayOfByte[i9] = (byte) i7;
 
                                 if (localBiomeBase == BiomeBase.DESERT)
                                 {
-                                    if ((this.WorldSettings.removeSurfaceDirtFromDesert) && ((paramArrayOfByte[i11] == Block.GRASS.id) || (paramArrayOfByte[i11] == Block.DIRT.id)))
-                                        paramArrayOfByte[i11] = (byte) Block.SAND.id; // Duno maybe it is wrong
+                                    if ((this.WorldSettings.removeSurfaceDirtFromDesert) && ((paramArrayOfByte[i9] == Block.GRASS.id) || (paramArrayOfByte[i9] == Block.DIRT.id)))
+                                        paramArrayOfByte[i9] = (byte) Block.SAND.id;
 
-                                    if ((this.WorldSettings.desertDirt) && (this.WorldSettings.desertDirtFrequency > 0) && (this.rnd.nextInt(this.WorldSettings.desertDirtFrequency * PTMDefaultValues.xLimit.intValue() * PTMDefaultValues.zLimit.intValue()) == 0) && (paramArrayOfByte[i11] == Block.SAND.id))
-                                        paramArrayOfByte[i11] = (byte) Block.DIRT.id;
+                                    if ((this.WorldSettings.desertDirt) && (this.WorldSettings.desertDirtFrequency > 0) && (this.rnd.nextInt(this.WorldSettings.desertDirtFrequency * ChunkMaxX * ChunkMaxZ) == 0) && (paramArrayOfByte[i9] == Block.SAND.id))
+                                        paramArrayOfByte[i9] = (byte) Block.DIRT.id;
 
-                                    if ((this.WorldSettings.waterlessDeserts) && ((paramArrayOfByte[i11] == Block.STATIONARY_WATER.id) || (paramArrayOfByte[i11] == Block.ICE.id)))
-                                        paramArrayOfByte[i11] = (byte) Block.SAND.id;
+                                    if ((this.WorldSettings.waterlessDeserts) && ((paramArrayOfByte[i9] == Block.STATIONARY_WATER.id) || (paramArrayOfByte[i9] == Block.ICE.id)))
+                                        paramArrayOfByte[i9] = (byte) Block.SAND.id;
                                 }
 
-                                if (((this.WorldSettings.muddySwamps) || (this.WorldSettings.claySwamps)) && (localBiomeBase == BiomeBase.SWAMPLAND) && ((paramArrayOfByte[i11] == Block.SAND.id) || (paramArrayOfByte[i11] == Block.DIRT.id) || (paramArrayOfByte[i11] == Block.SAND.id)))
-                                    createSwamps(paramArrayOfByte, i11);
+                                if (((this.WorldSettings.muddySwamps) || (this.WorldSettings.claySwamps)) && (localBiomeBase == BiomeBase.SWAMPLAND) && ((paramArrayOfByte[i9] == Block.SAND.id) || (paramArrayOfByte[i9] == Block.DIRT.id) || (paramArrayOfByte[i9] == Block.SAND.id)))
+                                    createSwamps(paramArrayOfByte, i9);
 
-                                if ((this.WorldSettings.removeSurfaceStone) && (paramArrayOfByte[i11] == Block.STONE.id))
-                                    paramArrayOfByte[i11] = (byte) ((localBiomeBase == BiomeBase.DESERT) || (localBiomeBase == BiomeBase.ICE_DESERT) ? Block.SAND.id : Block.GRASS.id);
+                                if ((this.WorldSettings.removeSurfaceStone) && (paramArrayOfByte[i9] == Block.STONE.id))
+                                    paramArrayOfByte[i9] = (byte) ((localBiomeBase == BiomeBase.DESERT) ? Block.SAND.id : Block.GRASS.id);
 
 
-                            } else if (i7 > 0)
+                            } else if (i5 > 0)
                             {
-                                i7--;
-                                paramArrayOfByte[i11] = i9;
-                                if ((i7 == 0) && (i9 == Block.SAND.id))
+                                i5--;
+                                paramArrayOfByte[i9] = (byte) i7;
+
+                                if ((i5 == 0) && (i7 == Block.SAND.id))
                                 {
-                                    i7 = this.rnd.nextInt(4);
-                                    i9 = (byte) Block.SANDSTONE.id;
+                                    i5 = this.rnd.nextInt(4);
+                                    i7 = (byte) Block.SANDSTONE.id;
                                 }
                             }
                     }
                 }
             }
-
-
     }
 
 
@@ -261,108 +274,124 @@ public class ChunkProviderPTM extends ChunkGenerator
             paramArrayOfDouble = new double[paramInt4 * paramInt5 * paramInt6];
         }
 
+
         double d1 = 684.41200000000003D * this.WorldSettings.getFractureHorizontal();
         double d2 = 684.41200000000003D * this.WorldSettings.getFractureVertical();
 
-        double[] arrayOfDouble1 = ((CraftWorld) this.localWorld).getHandle().getWorldChunkManager().temperature;
-        double[] arrayOfDouble2 = ((CraftWorld) this.localWorld).getHandle().getWorldChunkManager().rain;
-        this.g = this.a.a(this.g, paramInt1, paramInt3, paramInt4, paramInt6, 1.121D, 1.121D, 0.5D);
-        this.h = this.b.a(this.h, paramInt1, paramInt3, paramInt4, paramInt6, 200.0D, 200.0D, 0.5D);
+        this.j = this.a.a(this.j, paramInt1, paramInt3, paramInt4, paramInt6, 1.121D, 1.121D, 0.5D);
+        this.k = this.b.a(this.k, paramInt1, paramInt3, paramInt4, paramInt6, 200.0D, 200.0D, 0.5D);
 
-        this.d = this.m.a(this.d, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1 / 80.0D, d2 / 160.0D, d1 / 80.0D);
-        this.e = this.k.a(this.e, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1, d2, d1);
-        this.f = this.l.a(this.f, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1, d2, d1);
+        this.g = this.q.a(this.g, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1 / 80.0D, d2 / 160.0D, d1 / 80.0D);
+        this.h = this.o.a(this.h, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1, d2, d1);
+        this.i = this.p.a(this.i, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1, d2, d1);
+        paramInt1 = paramInt3 = 0;
 
-        int i1 = 0;
-        int i2 = 0;
+        int i3 = 0;
+        int i4 = 0;
 
-        int i3 = 16 / paramInt4;
-        for (int i4 = 0; i4 < paramInt4; i4++)
+        for (int i5 = 0; i5 < paramInt4; i5++)
         {
-            int i5 = i4 * i3 + i3 / 2;
-
             for (int i6 = 0; i6 < paramInt6; i6++)
             {
-                int i7 = i6 * i3 + i3 / 2;
-                double d3 = arrayOfDouble1[(i5 * 16 + i7)];
-                double d4 = arrayOfDouble2[(i5 * 16 + i7)] * d3;
-                double d5 = 1.0D - d4;
-                d5 *= d5;
-                d5 *= d5;
-                d5 = 1.0D - d5;
+                float f2 = 0.0F;
+                float f3 = 0.0F;
+                float f4 = 0.0F;
 
-                double d6 = (this.g[i2] + 256.0D) / 512.0D;
-                d6 *= d5;
-                if (d6 > 1.0D)
-                    d6 = 1.0D;
+                int i7 = 2;
 
-                double d7 = this.h[i2] / 8000.0D;
-                if (d7 < 0.0D)
-                    d7 = -d7 * 0.3D;
-                d7 = d7 * 3.0D - 2.0D;
-
-                if (d7 < 0.0D)
+                BiomeBase localBiomeBase1 = this.BiomeArray[(i5 + 2 + (i6 + 2) * (paramInt4 + 5))];
+                for (int i8 = -i7; i8 <= i7; i8++)
                 {
-                    d7 /= 2.0D;
-                    if (d7 < -1.0D)
-                        d7 = -1.0D;
-                    d7 -= this.WorldSettings.maxAverageDepth;
-                    d7 /= 1.4D;
-                    d7 /= 2.0D;
-                    d6 = 0.0D;
+                    for (int i9 = -i7; i9 <= i7; i9++)
+                    {
+                        BiomeBase localBiomeBase2 = this.BiomeArray[(i5 + i8 + 2 + (i6 + i9 + 2) * (paramInt4 + 5))];
+                        float f5 = this.l[(i8 + 2 + (i9 + 2) * 5)] / (localBiomeBase2.q + 2.0F);
+                        if (localBiomeBase2.q > localBiomeBase1.q)
+                        {
+                            f5 /= 2.0F;
+                        }
+                        f2 += localBiomeBase2.r * f5;
+                        f3 += localBiomeBase2.q * f5;
+                        f4 += f5;
+                    }
+                }
+                f2 /= f4;
+                f3 /= f4;
+
+                f2 = f2 * 0.9F + 0.1F;
+                f3 = (f3 * 4.0F - 1.0F) / 8.0F;
+
+                double d3 = this.k[i4] / 8000.0D;
+                if (d3 < 0.0D)
+                    d3 = -d3 * 0.3D;
+                d3 = d3 * 3.0D - 2.0D;
+
+                if (d3 < 0.0D)
+                {
+                    d3 /= 2.0D;
+                    if (d3 < -1.0D)
+                        d3 = -1.0D;
+                    d3 -= this.WorldSettings.maxAverageDepth;
+                    d3 /= 1.4D;
+                    d3 /= 2.0D;
                 } else
                 {
-                    if (d7 > 1.0D)
-                        d7 = 1.0D;
-                    d7 += this.WorldSettings.maxAverageHeight;
-                    d7 /= 8.0D;
+                    if (d3 > 1.0D)
+                        d3 = 1.0D;
+                    d3 += this.WorldSettings.maxAverageHeight;
+                    d3 /= 8.0D;
                 }
 
-                if (d6 < 0.0D)
-                    d6 = 0.0D;
-                d6 += 0.5D;
-                d7 = d7 * paramInt5 / 16.0D;
+                i4++;
 
-                double d8 = paramInt5 / 2.0D + d7 * 4.0D;
-
-                i2++;
-
-                for (int i8 = 0; i8 < paramInt5; i8++)
+                for (int i10 = 0; i10 < paramInt5; i10++)
                 {
-                    double d9;
+                    double d4 = f3;
+                    double d5 = f2;
 
-                    double d10 = (i8 - d8) * 12.0D / d6;
-                    if (d10 < 0.0D)
-                        d10 *= 4.0D;
+                    d4 += d3 * 0.2D;
+                    d4 = d4 * paramInt5 / 16.0D;
 
-                    double d11 = this.e[i1] / 512.0D * this.WorldSettings.getVolatility1();
-                    double d12 = this.f[i1] / 512.0D * this.WorldSettings.getVolatility2();
+                    double d6 = paramInt5 / 2.0D + d4 * 4.0D;
 
-                    double d13 = (this.d[i1] / 10.0D + 1.0D) / 2.0D;
-                    if (d13 < this.WorldSettings.getVolatilityWeight1())
-                        d9 = d11;
-                    else if (d13 > this.WorldSettings.getVolatilityWeight2())
-                        d9 = d12;
+                    double d7 = 0.0D;
+
+                    double d8 = (i10 - d6) * 12.0D * 128.0D / 128.0D / d5;
+
+                    if (d8 < 0.0D)
+                        d8 *= 4.0D;
+
+                    double d9 = this.h[i3] / 512.0D * this.WorldSettings.getVolatility1();
+                    double d10 = this.i[i3] / 512.0D * this.WorldSettings.getVolatility2();
+
+                    double d11 = (this.g[i3] / 10.0D + 1.0D) / 2.0D;
+                    if (d11 < this.WorldSettings.getVolatilityWeight1())
+                        d7 = d9;
+                    else if (d11 > this.WorldSettings.getVolatilityWeight2())
+                        d7 = d10;
                     else
-                        d9 = d11 + (d12 - d11) * d13;
+                        d7 = d9 + (d10 - d9) * d11;
 
                     if (!this.WorldSettings.disableNotchHeightControl)
                     {
-                        d9 -= d10;
-                        if (i8 > paramInt5 - 4)
-                        {
-                            double d14 = (i8 - (paramInt5 - 4)) / 3.0F;
-                            d9 = d9 * (1.0D - d14) + -10.0D * d14;
-                        }
-                    }
-                    d9 += this.WorldSettings.heightMatrix[i8];
+                        d7 -= d8;
 
-                    paramArrayOfDouble[i1] = d9;
-                    i1++;
+                        if (i10 > paramInt5 - 4)
+                        {
+                            double d12 = (i10 - (paramInt5 - 4)) / 3.0F;
+                            d7 = d7 * (1.0D - d12) + -10.0D * d12;
+                        }
+
+                    }
+                    d7 += this.WorldSettings.heightMatrix[i10];
+
+                    paramArrayOfDouble[i3] = d7;
+                    i3++;
                 }
             }
         }
         return paramArrayOfDouble;
+
     }
 
 
@@ -386,7 +415,7 @@ public class ChunkProviderPTM extends ChunkGenerator
         for (int x = swampSize * -1; x < swampSize + 1; x++)
             for (int z = swampSize * -1; z < swampSize + 1; z++)
             {
-                int newBlock = block + z * PTMDefaultValues.yLimit.intValue() + x * PTMDefaultValues.yLimit.intValue() * PTMDefaultValues.zLimit.intValue();
+                int newBlock = block + z * ChunkMaxY + x * ChunkMaxY * ChunkMaxZ;
                 if ((newBlock < 0) || (newBlock > PTMDefaultValues.maxChunkBlockValue.intValue() - 1))
                     continue;
                 if (blocks[newBlock] != Block.STATIONARY_WATER.id)
@@ -398,21 +427,22 @@ public class ChunkProviderPTM extends ChunkGenerator
 
 
     @Override
-    public byte[] generate(World world, Random random, int x, int z)
+    public byte[] generate(org.bukkit.World world, Random random, int x, int z)
     {
 
         this.rnd.setSeed(x * 341873128712L + z * 132897987541L);
 
-        byte[] arrayOfByte = new byte[32768];
+        byte[] arrayOfByte = new byte[ChunkMaxX * ChunkMaxY * ChunkMaxZ];
 
-        this.BiomeArray = ((CraftWorld) this.localWorld).getHandle().getWorldChunkManager().a(this.BiomeArray, x * 16, z * 16, 16, 16);
-        double[] TempArray = ((CraftWorld) this.localWorld).getHandle().getWorldChunkManager().temperature; // was .a
 
-        generateTerrain(x, z, arrayOfByte, TempArray);
+        generateTerrain(x, z, arrayOfByte);
+
+        this.BiomeArray = this.localWorld.getWorldChunkManager().a(this.BiomeArray, x * 16, z * 16, ChunkMaxX, ChunkMaxZ);
         replaceBlocksForBiome(x, z, arrayOfByte, this.BiomeArray);
 
         this.CaveGen.a(this.localWorld, x, z, arrayOfByte);
 
+        //TODO Add new objects gen
 
         if (this.WorldSettings.isDeprecated)
             this.WorldSettings = this.WorldSettings.newSettings;
@@ -422,7 +452,7 @@ public class ChunkProviderPTM extends ChunkGenerator
     }
 
     @Override
-    public boolean canSpawn(World world, int x, int z)
+    public boolean canSpawn(org.bukkit.World world, int x, int z)
     {
         this.WorldSettings.plugin.WorldInit(world);
 
@@ -432,16 +462,9 @@ public class ChunkProviderPTM extends ChunkGenerator
     }
 
     @Override
-    public List<BlockPopulator> getDefaultPopulators(World world)
+    public List<BlockPopulator> getDefaultPopulators(org.bukkit.World world)
     {
         return populatorList;
     }
 
-    @Override
-    public Location getFixedSpawnLocation(World world, Random random)
-    {
-        this.WorldSettings.plugin.WorldInit(world);
-        int i = ((CraftWorld) world).getHandle().a(0, 0);
-        return new Location(world,0,100,0);
-    }
 }

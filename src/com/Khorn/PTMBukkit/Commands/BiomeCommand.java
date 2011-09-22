@@ -41,12 +41,13 @@ public class BiomeCommand extends BaseCommand
             WorldChunkManager biomeManager = ((CraftWorld) player.getLocation().getWorld()).getHandle().getWorldChunkManager();
             biomeManager.a(biome, (int) player.getLocation().getX(), (int) player.getLocation().getZ(), 1, 1);
 
-
+            /*
             player.sendMessage(ValueColor + biome[0].n + MessageColor + " block biome!");
             player.sendMessage(ValueColor + biomeManager.rain[0] + MessageColor + " block humidity!");
             double notchTemp = biomeManager.temperature[0] - (((CraftWorld) player.getLocation().getWorld()).getHandle().e((int) player.getLocation().getX(), (int) player.getLocation().getZ()) - 64) / 64.0D * 0.3D;
             player.sendMessage(ValueColor + biomeManager.temperature[0] + MessageColor + " block temperature!");
             player.sendMessage(ValueColor + notchTemp + MessageColor + " block temperature with height constant!");
+            */
         }
 
 

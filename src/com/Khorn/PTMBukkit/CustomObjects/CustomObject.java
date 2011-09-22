@@ -324,7 +324,7 @@ public class CustomObject
     {
         if (!this.spawnInBiome.contains("all"))
         {
-            if (!this.spawnInBiome.contains(localBiome.n.toLowerCase()))
+            if (!this.spawnInBiome.contains(localBiome.l.toLowerCase()))
                 return false;
         }
         return true;

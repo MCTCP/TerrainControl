@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.HashMap;
 
 import com.Khorn.PTMBukkit.Commands.PTMCommandExecutor;
-import com.Khorn.PTMBukkit.Generator.BiomeManagerPTM;
+import com.Khorn.PTMBukkit.Generator.BiomeManagerOld;
 import com.Khorn.PTMBukkit.Generator.ChunkProviderPTM;
 import com.Khorn.PTMBukkit.Listeners.PTMBlockListener;
 import com.Khorn.PTMBukkit.Listeners.PTMPlayerListener;
@@ -36,6 +36,8 @@ public class PTMPlugin extends JavaPlugin
 
     public void onEnable()
     {
+        BiomeManagerOld.GenBiomeDiagram();
+
         this.getCommand("ptm").setExecutor(new PTMCommandExecutor(this));
         this.RegisterEvents();
         CheckDefaultSettingsFolder();
@@ -140,7 +142,7 @@ public class PTMPlugin extends JavaPlugin
 
             net.minecraft.server.World workWorld = ((CraftWorld) world).getHandle();
 
-            workWorld.worldProvider.b = new BiomeManagerPTM(workWorld, worldSetting);
+            workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
 
             worldSetting.objectSpawner.Init(workWorld);
             worldSetting.ChunkProvider.Init(world);
@@ -190,4 +192,12 @@ public class PTMPlugin extends JavaPlugin
     }
 
 }
+//TODO Update chunk provider to new version
+//TODO Split old object spawner to ObjectGens
+//TODO Add new object gens
+//TODO Add new biome generator
+//TODO Add new general settings file
+//TODO Add new biome settings file
+//TODO Set block replace per biome
+//
 

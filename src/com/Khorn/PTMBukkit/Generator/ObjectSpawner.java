@@ -359,28 +359,16 @@ public class ObjectSpawner extends BlockPopulator
         if (this.rand.nextInt(10) == 0)
             treeDensity++;
 
-        if (currentBiome == BiomeBase.RAINFOREST)
-            treeDensity += treeDensityVariation + this.WorldSettings.rainforestTreeDensity;
         if (currentBiome == BiomeBase.SWAMPLAND)
             treeDensity += treeDensityVariation + this.WorldSettings.swamplandTreeDensity;
-        if (currentBiome == BiomeBase.SEASONAL_FOREST)
-            treeDensity += treeDensityVariation + this.WorldSettings.seasonalforestTreeDensity;
         if (currentBiome == BiomeBase.FOREST)
             treeDensity += treeDensityVariation + this.WorldSettings.forestTreeDensity;
-        if (currentBiome == BiomeBase.SAVANNA)
-            treeDensity += treeDensityVariation + this.WorldSettings.savannaTreeDensity;
-        if (currentBiome == BiomeBase.SHRUBLAND)
-            treeDensity += treeDensityVariation + this.WorldSettings.shrublandTreeDensity;
         if (currentBiome == BiomeBase.TAIGA)
             treeDensity += treeDensityVariation + this.WorldSettings.taigaTreeDensity;
         if (currentBiome == BiomeBase.DESERT)
             treeDensity += treeDensityVariation + this.WorldSettings.desertTreeDensity;
         if (currentBiome == BiomeBase.PLAINS)
             treeDensity += treeDensityVariation + this.WorldSettings.plainsTreeDensity;
-        if (currentBiome == BiomeBase.ICE_DESERT)
-            treeDensity += treeDensityVariation + this.WorldSettings.iceDesertTreeDensity;
-        if (currentBiome == BiomeBase.TUNDRA)
-            treeDensity += treeDensityVariation + this.WorldSettings.tundraTreeDensity;
 
 
         for (int i = 0; i < treeDensity; i++)
@@ -447,10 +435,6 @@ public class ObjectSpawner extends BlockPopulator
         int grassDensity = 0;
         if (currentBiome == BiomeBase.FOREST)
             grassDensity = 2;
-        if (currentBiome == BiomeBase.RAINFOREST)
-            grassDensity = 10;
-        if (currentBiome == BiomeBase.SEASONAL_FOREST)
-            grassDensity = 2;
         if (currentBiome == BiomeBase.TAIGA)
             grassDensity = 1;
         if (currentBiome == BiomeBase.PLAINS)
@@ -463,9 +447,6 @@ public class ObjectSpawner extends BlockPopulator
         for (int i = 0; i < grassDensity; i++)
         {
             int grassType = 1;
-
-            if ((currentBiome == BiomeBase.RAINFOREST) && (this.rand.nextInt(3) != 0))
-                grassType = 2;
 
             _x = x + this.rand.nextInt(16);
             _y = this.rand.nextInt(128);
@@ -729,7 +710,7 @@ public class ObjectSpawner extends BlockPopulator
 
         int i = 0;
 
-
+        /*
         double[] TemperatureArray = new double[256];
         TemperatureArray = this.world.getWorldChunkManager().a(TemperatureArray, x, z, 16, 16);
         for (int _x = x; _x < x + 16; _x++)
@@ -747,7 +728,7 @@ public class ObjectSpawner extends BlockPopulator
 
             }
             i = 0;
-        }
+        } */
 
         if (this.WorldSettings.replaceBlocks.size() != 0)
         {
