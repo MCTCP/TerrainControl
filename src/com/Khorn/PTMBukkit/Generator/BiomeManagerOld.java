@@ -1,7 +1,7 @@
 package com.Khorn.PTMBukkit.Generator;
 
 
-import com.Khorn.PTMBukkit.Settings;
+import com.Khorn.PTMBukkit.WorldConfig;
 import com.Khorn.PTMBukkit.Util.NoiseGeneratorOctaves2;
 import net.minecraft.server.*;
 
@@ -11,7 +11,7 @@ import java.util.Random;
 public class BiomeManagerOld extends WorldChunkManager
 {
 
-    private Settings localWrk;
+    private WorldConfig localWrk;
 
     private NoiseGeneratorOctaves2 TempGen;
     private NoiseGeneratorOctaves2 RainGen;
@@ -19,12 +19,13 @@ public class BiomeManagerOld extends WorldChunkManager
     private double[] old_temperature;
     private double[] old_rain;
     private double[] old_temperature2;
+    private BiomeBase[] temp_biomeBases;
     private BiomeCache Cache = new BiomeCache(this);
 
 
     private static BiomeBase[] BiomeDiagram = new BiomeBase[4096];
 
-    public BiomeManagerOld(World paramWorld, Settings worker)
+    public BiomeManagerOld(World paramWorld, WorldConfig worker)
     {
         super();
         this.localWrk = worker;
@@ -90,9 +91,11 @@ public class BiomeManagerOld extends WorldChunkManager
         {
             temp_out = new float[x_size * z_size];
         }
-        this.a(null, x, z, x_size, z_size, false);
+        this.temp_biomeBases = this.a(this.temp_biomeBases, x, z, x_size, z_size, false);
 
-        System.arraycopy(this.old_rain, 0, temp_out, 0, x_size * z_size);
+        for(int i = 0; i < temp_out.length;i++)
+             temp_out[i] = (float)this.old_rain[i];
+
         return temp_out;
 
     }
@@ -112,7 +115,7 @@ public class BiomeManagerOld extends WorldChunkManager
         }
         if ((useCache) && (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
-            Object localObject = this.Cache.b(x, z);
+            BiomeBase[] localObject = this.Cache.b(x, z);
             System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, x_size * z_size);
             return paramArrayOfBiomeBase;
         }

@@ -1,6 +1,6 @@
 package com.Khorn.PTMBukkit.CustomObjects;
 
-import com.Khorn.PTMBukkit.Settings;
+import com.Khorn.PTMBukkit.WorldConfig;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 
@@ -9,16 +9,8 @@ import java.util.Random;
 
 public class CustomObjectGen
 {
-    private Settings WorldSettings;
-    private World world;
 
-    public CustomObjectGen(Settings settings, World _world)
-    {
-        this.world = _world;
-        this.WorldSettings = settings;
-    }
-
-    private boolean ObjectCanSpawn(int x, int y, int z, CustomObject obj)
+    private static boolean ObjectCanSpawn(World world, int x, int y, int z, CustomObject obj)
     {
         if ((world.getTypeId(x, y - 5, z) == 0) && (obj.needsFoundation))
             return false;
@@ -45,22 +37,22 @@ public class CustomObjectGen
         return !abort;
     }
 
-    boolean SpawnCustomObjects(Random rand, int chunk_x, int chunk_z, BiomeBase localBiomeBase)
+    public static boolean SpawnCustomObjects(World world, Random rand, WorldConfig worldSettings, int chunk_x, int chunk_z, BiomeBase localBiomeBase)
     {
 
-        if (this.WorldSettings.Objects.size() == 0)
+        if (worldSettings.Objects.size() == 0)
             return false;
 
         boolean objectSpawned = false;
         int spawnattemps = 0;
         while (!objectSpawned)
         {
-            if (spawnattemps > this.WorldSettings.objectSpawnRatio)
+            if (spawnattemps > worldSettings.objectSpawnRatio)
                 return false;
 
             spawnattemps++;
 
-            CustomObject SelectedObject = this.WorldSettings.Objects.get(rand.nextInt(this.WorldSettings.Objects.size()));
+            CustomObject SelectedObject = worldSettings.Objects.get(rand.nextInt(worldSettings.Objects.size()));
 
             if (SelectedObject.branch || !SelectedObject.canSpawnInBiome(localBiomeBase))
                 continue;
@@ -72,20 +64,20 @@ public class CustomObjectGen
             {
                 int x = chunk_x + rand.nextInt(16);
                 int z = chunk_z + rand.nextInt(16);
-                int y = this.world.getHighestBlockYAt(x, z);
+                int y = world.getHighestBlockYAt(x, z);
                 ObjectRarity -= 100;
 
-                if (!this.ObjectCanSpawn(x, y, z, SelectedObject))
+                if (!ObjectCanSpawn(world,x, y, z, SelectedObject))
                     continue;
 
-                objectSpawned = GenerateCustomObject(world,rand,WorldSettings,x, y, z, SelectedObject, false);
+                objectSpawned = GenerateCustomObject(world,rand, worldSettings,x, y, z, SelectedObject, false);
                 // Checked Biome, Branch, Tree - soo try to generate.
 
                 // here we spawn object and check group spawning
 
                 if (objectSpawned && !SelectedObject.groupId.endsWith(""))
                 {
-                    ArrayList<CustomObject> groupList = this.WorldSettings.ObjectGroups.get(SelectedObject.groupId);
+                    ArrayList<CustomObject> groupList = worldSettings.ObjectGroups.get(SelectedObject.groupId);
                     if (groupList == null)
                         return objectSpawned;
 
@@ -106,13 +98,13 @@ public class CustomObjectGen
 
                         x = x + rand.nextInt(SelectedObject.groupSeperationMax - SelectedObject.groupSeperationMin) + SelectedObject.groupSeperationMin;
                         z = z + rand.nextInt(SelectedObject.groupSeperationMax - SelectedObject.groupSeperationMin) + SelectedObject.groupSeperationMin;
-                        int _y = this.world.getHighestBlockYAt(x, z);
+                        int _y = world.getHighestBlockYAt(x, z);
                         if ((y - _y) > 10 || (_y - y) > 10)
                             continue;
 
-                        if (!this.ObjectCanSpawn(x, y, z, ObjectFromGroup))
+                        if (!ObjectCanSpawn(world,x, y, z, ObjectFromGroup))
                             continue;
-                        GenerateCustomObject(world,rand,WorldSettings,x, _y, z, ObjectFromGroup, false);
+                        GenerateCustomObject(world,rand, worldSettings,x, _y, z, ObjectFromGroup, false);
 
 
                     }
@@ -126,26 +118,26 @@ public class CustomObjectGen
     }
 
 
-    public boolean SpawnCustomTrees(Random rand, int x, int y, int z)
+    public static boolean SpawnCustomTrees(World world, Random rand, WorldConfig worldSettings, int x, int y, int z)
     {
 
-        if (!this.WorldSettings.HasCustomTrees)
+        if (!worldSettings.HasCustomTrees)
             return false;
-        if (this.world.getTypeId(x, y, z) != Block.SAPLING.id)
+        if (world.getTypeId(x, y, z) != Block.SAPLING.id)
             return false;
 
-        int oldData = this.world.getData(x, y, z) & 0x3;
-        this.world.setRawTypeId(x, y, z, 0);
+        int oldData = world.getData(x, y, z) & 0x3;
+        world.setRawTypeId(x, y, z, 0);
 
-        Chunk chunk = this.world.getWorld().getChunkAt(x >> 4, z >> 4);
+        Chunk chunk = world.getWorld().getChunkAt(x >> 4, z >> 4);
 
-        BiomeBase localBiomeBase = this.world.getWorldChunkManager().getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16);
+        BiomeBase localBiomeBase = world.getWorldChunkManager().getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16);
 
         boolean objectSpawned = false;
         int spawnattemps = 0;
-        while (!objectSpawned && spawnattemps < this.WorldSettings.objectSpawnRatio)
+        while (!objectSpawned && spawnattemps < worldSettings.objectSpawnRatio)
         {
-            CustomObject SelectedObject = this.WorldSettings.Objects.get(rand.nextInt(this.WorldSettings.Objects.size()));
+            CustomObject SelectedObject = worldSettings.Objects.get(rand.nextInt(worldSettings.Objects.size()));
 
             spawnattemps++;
 
@@ -157,17 +149,17 @@ public class CustomObjectGen
 
             if (randomRoll < SelectedObject.rarity)
             {
-                if (this.ObjectCanSpawn(x, y, z, SelectedObject))
-                    objectSpawned = GenerateCustomObject(world,rand,WorldSettings,x, y, z, SelectedObject, true);
+                if (CustomObjectGen.ObjectCanSpawn(world, x, y, z, SelectedObject))
+                    objectSpawned = GenerateCustomObject(world,rand, worldSettings,x, y, z, SelectedObject, true);
             }
 
         }
         if (!objectSpawned)
-            this.world.setRawTypeIdAndData(x, y, z, Block.SAPLING.id, oldData);
+            world.setRawTypeIdAndData(x, y, z, Block.SAPLING.id, oldData);
         return objectSpawned;
     }
 
-    public static boolean GenerateCustomObject(World world, Random rand, Settings WorldSettings, int x, int y, int z, CustomObject workObject, boolean notify)
+    public static boolean GenerateCustomObject(World world, Random rand, WorldConfig worldSettings, int x, int y, int z, CustomObject workObject, boolean notify)
     {
         /*
          * 1) ground check (moved to ObjectCanSpawn)
@@ -183,7 +175,7 @@ public class CustomObjectGen
 
         int index = 0;
         int branchLimit = 0;
-        ArrayList<CustomObject> branchGroup = WorldSettings.BranchGroups.get(workObject.groupId);
+        ArrayList<CustomObject> branchGroup = worldSettings.BranchGroups.get(workObject.groupId);
         ArrayList<Coordinate> workingData = new ArrayList<Coordinate>();
         while (index < workObject.Data.size())
         {
@@ -273,7 +265,7 @@ public class CustomObjectGen
             {
                 ChangeWorld(world,notify, (x + DataPoint.getX()), y + DataPoint.getY(), z + DataPoint.getZ(), DataPoint.workingData, DataPoint.workingExtra);
             }
-            if ((!WorldSettings.denyObjectsUnderFill) && (workObject.underFill) && (world.getTypeId(x + DataPoint.getX(), y, z + DataPoint.getZ()) > 0))
+            if ((!worldSettings.denyObjectsUnderFill) && (workObject.underFill) && (world.getTypeId(x + DataPoint.getX(), y, z + DataPoint.getZ()) > 0))
             {
                 int depthScanner = 0;
                 int blockForFill = world.getTypeId(x, y - 1, z);

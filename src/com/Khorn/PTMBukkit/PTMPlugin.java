@@ -22,7 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PTMPlugin extends JavaPlugin
 {
 
-    public final HashMap<String, Settings> worldsSettings = new HashMap<String, Settings>();
+    public final HashMap<String, WorldConfig> worldsSettings = new HashMap<String, WorldConfig>();
     private final PTMBlockListener blockListener = new PTMBlockListener(this);
     private final PTMWorldListener worldListener = new PTMWorldListener(this);
     private final PTMPlayerListener playerListener = new PTMPlayerListener(this);
@@ -80,7 +80,7 @@ public class PTMPlugin extends JavaPlugin
 
     }
 
-    public Settings GetSettings(String worldName)
+    public WorldConfig GetSettings(String worldName)
     {
         File baseFolder = new File(this.getDataFolder(), "worlds/" + worldName);
 
@@ -123,7 +123,7 @@ public class PTMPlugin extends JavaPlugin
         }
 
 
-        Settings worker = new Settings(baseFolder, this,worldName);
+        WorldConfig worker = new WorldConfig(baseFolder, this,worldName);
 
         worldsSettings.put(worldName, worker);
 
@@ -136,7 +136,7 @@ public class PTMPlugin extends JavaPlugin
     {
         if (this.worldsSettings.containsKey(world.getName()))
         {
-            Settings worldSetting = this.worldsSettings.get(world.getName());
+            WorldConfig worldSetting = this.worldsSettings.get(world.getName());
             if (worldSetting.isInit)
                 return;
 
@@ -187,7 +187,7 @@ public class PTMPlugin extends JavaPlugin
                 System.out.println("PhoenixTerrainMod: error create DefaultBOBPlugins directory");
         temp = new File(this.getDataFolder(), PTMDefaultValues.DefaultSettingsName.stringValue());
         if (!temp.exists())
-            (new Settings()).CreateDefaultSettings(temp);
+            (new WorldConfig()).CreateDefaultSettings(temp);
 
     }
 

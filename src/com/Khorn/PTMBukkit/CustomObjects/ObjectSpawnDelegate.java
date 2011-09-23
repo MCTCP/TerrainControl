@@ -1,18 +1,23 @@
 package com.Khorn.PTMBukkit.CustomObjects;
 
-import com.Khorn.PTMBukkit.Generator.ObjectSpawner;
+import com.Khorn.PTMBukkit.WorldConfig;
+import net.minecraft.server.World;
 import org.bukkit.block.Block;
+
+import java.util.Random;
 
 public class ObjectSpawnDelegate implements Runnable
 {
-    private ObjectSpawner objectSpawner;
+    private World world;
+    private WorldConfig worldSettings;
     private int x;
     private  int y;
     private int z;
 
-    public  ObjectSpawnDelegate(ObjectSpawner spawner, Block block)
+    public  ObjectSpawnDelegate(World _world, WorldConfig _worldSettings, Block block)
     {
-        objectSpawner = spawner;
+        world = _world;
+        worldSettings = _worldSettings;
         x = block.getX();
         y = block.getY();
         z = block.getZ();
@@ -21,6 +26,6 @@ public class ObjectSpawnDelegate implements Runnable
 
     public void run()
     {
-        this.objectSpawner.SpawnCustomTrees(x,y,z);
+        CustomObjectGen.SpawnCustomTrees(world, new Random(), this.worldSettings, x, y, z);
     }
 }

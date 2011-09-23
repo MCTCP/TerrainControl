@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class Settings
+public class WorldConfig
 {
     private BufferedWriter SettingsWriter;
     private HashMap<String, String> ReadedSettings = new HashMap<String, String>();
@@ -352,12 +352,12 @@ public class Settings
     public boolean isInit = false;
 
     public boolean isDeprecated = false;
-    public Settings newSettings = null;
+    public WorldConfig newSettings = null;
 
     public String WorldName;
 
 
-    public Settings(File settingsDir, PTMPlugin plug,String worldName)
+    public WorldConfig(File settingsDir, PTMPlugin plug, String worldName)
     {
         this.SettingsDir = settingsDir;
         this.WorldName = worldName;
@@ -370,7 +370,7 @@ public class Settings
         this.plugin = plug;
     }
 
-    public Settings()
+    public WorldConfig()
     {}
 
     public void CreateDefaultSettings(File settingsDir)

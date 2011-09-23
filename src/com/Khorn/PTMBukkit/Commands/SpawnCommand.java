@@ -4,7 +4,7 @@ package com.Khorn.PTMBukkit.Commands;
 import com.Khorn.PTMBukkit.CustomObjects.CustomObject;
 import com.Khorn.PTMBukkit.PTMPlayer;
 import com.Khorn.PTMBukkit.PTMPlugin;
-import com.Khorn.PTMBukkit.Settings;
+import com.Khorn.PTMBukkit.WorldConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -24,7 +24,7 @@ public class SpawnCommand extends BaseCommand
     @Override
     public boolean onCommand(CommandSender sender, List<String> args)
     {
-        Settings worldSettings = this.getSettings(sender, "");
+        WorldConfig worldSettings = this.getSettings(sender, "");
 
         if (worldSettings == null)
         {

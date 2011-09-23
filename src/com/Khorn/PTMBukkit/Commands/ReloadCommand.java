@@ -1,7 +1,7 @@
 package com.Khorn.PTMBukkit.Commands;
 
 import com.Khorn.PTMBukkit.PTMPlugin;
-import com.Khorn.PTMBukkit.Settings;
+import com.Khorn.PTMBukkit.WorldConfig;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -21,10 +21,10 @@ public class ReloadCommand extends BaseCommand
     @Override
     public boolean onCommand(CommandSender sender, List<String> args)
     {
-        Settings worldSettings = this.getSettings(sender, args.size() > 0 ? args.get(0) : "");
+        WorldConfig worldSettings = this.getSettings(sender, args.size() > 0 ? args.get(0) : "");
         if (worldSettings == null)
         {
-            sender.sendMessage(this.ErrorColor + "You need to select world");
+            sender.sendMessage(ErrorColor + "You need to select world");
             return true;
         }
         String worldName = worldSettings.WorldName;
@@ -34,7 +34,7 @@ public class ReloadCommand extends BaseCommand
         worldSettings.newSettings = this.plugin.GetSettings(worldName);
         worldSettings.isDeprecated = true;
 
-        sender.sendMessage(this.MessageColor + "Settings for world " + worldName + " reloaded");
+        sender.sendMessage(MessageColor + "WorldConfig for world " + worldName + " reloaded");
         return true;
     }
 }

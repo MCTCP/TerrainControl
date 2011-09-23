@@ -1,23 +1,14 @@
 package com.Khorn.PTMBukkit.Commands;
 
-import com.Khorn.PTMBukkit.CustomObjects.CustomObject;
 import com.Khorn.PTMBukkit.PTMPlugin;
-import com.Khorn.PTMBukkit.Settings;
-import net.minecraft.server.BiomeBase;
-import net.minecraft.server.WorldChunkManager;
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 public class PTMCommandExecutor implements CommandExecutor
 {

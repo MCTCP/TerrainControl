@@ -1,7 +1,7 @@
 package com.Khorn.PTMBukkit.Commands;
 
 import com.Khorn.PTMBukkit.PTMPlugin;
-import com.Khorn.PTMBukkit.Settings;
+import com.Khorn.PTMBukkit.WorldConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -26,7 +26,7 @@ public abstract class BaseCommand
     public abstract boolean onCommand(CommandSender sender, List<String> args);
 
 
-    protected Settings getSettings(CommandSender sender, String arg)
+    protected WorldConfig getSettings(CommandSender sender, String arg)
     {
         if (arg.equals(""))
         {
