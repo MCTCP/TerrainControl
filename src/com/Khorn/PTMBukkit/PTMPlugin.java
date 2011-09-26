@@ -26,7 +26,7 @@ public class PTMPlugin extends JavaPlugin
     private final PTMBlockListener blockListener = new PTMBlockListener(this);
     private final PTMWorldListener worldListener = new PTMWorldListener(this);
     private final PTMPlayerListener playerListener = new PTMPlayerListener(this);
-    private final HashMap<String,PTMPlayer> sessions = new HashMap<String, PTMPlayer>();
+    private final HashMap<String, PTMPlayer> sessions = new HashMap<String, PTMPlayer>();
 
 
     public void onDisable()
@@ -51,12 +51,12 @@ public class PTMPlugin extends JavaPlugin
         PTMPlayer player;
         synchronized (this.sessions)
         {
-            if(this.sessions.containsKey(bukkitPlayer.getName()))
-                return  this.sessions.get(bukkitPlayer.getName());
+            if (this.sessions.containsKey(bukkitPlayer.getName()))
+                return this.sessions.get(bukkitPlayer.getName());
             player = new PTMPlayer(bukkitPlayer);
-            this.sessions.put(bukkitPlayer.getName(),player);
+            this.sessions.put(bukkitPlayer.getName(), player);
         }
-        return  player;
+        return player;
 
     }
 
@@ -84,22 +84,6 @@ public class PTMPlugin extends JavaPlugin
     {
         File baseFolder = new File(this.getDataFolder(), "worlds/" + worldName);
 
-        File oldFolder = new File(this.getDataFolder(), worldName);
-        if (oldFolder.exists() && oldFolder.isDirectory())
-        {
-            try
-            {
-                FileSystemManager.CopyFileOrDirectory(oldFolder, baseFolder);
-                System.out.println("PhoenixTerrainMod: config files copied to new folder");
-                FileSystemManager.DeleteFileOrDirectory(oldFolder);
-            } catch (IOException e)
-            {
-                System.out.println("PhoenixTerrainMod: error copying old directory, working with defaults");
-            }
-
-
-        }
-
         if (!baseFolder.exists())
         {
             try
@@ -107,6 +91,10 @@ public class PTMPlugin extends JavaPlugin
                 File BOBDirectory = new File(baseFolder, PTMDefaultValues.WorldBOBDirectoryName.stringValue());
                 File defaultBOBDirectory = new File(this.getDataFolder(), PTMDefaultValues.DefaultBOBDirectoryName.stringValue());
                 FileSystemManager.CopyFileOrDirectory(defaultBOBDirectory, BOBDirectory);
+
+                File BiomeConfigsDirectory = new File(baseFolder, PTMDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
+                File DefaultBiomeConfigsDirectory = new File(this.getDataFolder(), PTMDefaultValues.DefaultBiomeConfigDirectoryName.stringValue());
+                FileSystemManager.CopyFileOrDirectory(DefaultBiomeConfigsDirectory, BiomeConfigsDirectory);
 
                 File settingsFile = new File(baseFolder, PTMDefaultValues.WorldSettingsName.stringValue());
                 File defaultSettingsFile = new File(this.getDataFolder(), PTMDefaultValues.DefaultSettingsName.stringValue());
@@ -123,7 +111,7 @@ public class PTMPlugin extends JavaPlugin
         }
 
 
-        WorldConfig worker = new WorldConfig(baseFolder, this,worldName);
+        WorldConfig worker = new WorldConfig(baseFolder, this, worldName);
 
         worldsSettings.put(worldName, worker);
 
@@ -154,22 +142,23 @@ public class PTMPlugin extends JavaPlugin
     }
 
     private void RegisterEvents()
-        {
-            PluginManager pm = this.getServer().getPluginManager();
-            pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Event.Priority.Monitor, this);
+    {
+        PluginManager pm = this.getServer().getPluginManager();
+        pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Event.Priority.Monitor, this);
 
-            pm.registerEvent(Event.Type.WORLD_INIT, worldListener, Event.Priority.High, this);
+        pm.registerEvent(Event.Type.WORLD_INIT, worldListener, Event.Priority.High, this);
 
-            pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
 
 
-        }
+    }
 
     private void CheckDefaultSettingsFolder()
     {
         /*
            /worlds
            /DefaultBOBPlugins
+           /DefaultBiomeConfigs
            /DefaultSettings.ini
          */
         if (!this.getDataFolder().exists())
@@ -185,9 +174,15 @@ public class PTMPlugin extends JavaPlugin
         if (!temp.exists())
             if (temp.mkdir())
                 System.out.println("PhoenixTerrainMod: error create DefaultBOBPlugins directory");
+
+        temp = new File(this.getDataFolder(), PTMDefaultValues.DefaultBiomeConfigDirectoryName.stringValue());
+        if (!temp.exists())
+            if (temp.mkdir())
+                System.out.println("PhoenixTerrainMod: error create DefaultBiomeConfigs directory");
+
         temp = new File(this.getDataFolder(), PTMDefaultValues.DefaultSettingsName.stringValue());
         if (!temp.exists())
-            (new WorldConfig()).CreateDefaultSettings(temp);
+            (new WorldConfig()).CreateDefaultSettings(this.getDataFolder());
 
     }
 

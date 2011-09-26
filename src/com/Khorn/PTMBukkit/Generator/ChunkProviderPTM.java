@@ -31,7 +31,6 @@ public class ChunkProviderPTM extends ChunkGenerator
     double[] j;
     double[] k;
     float[] l;
-    int[][] m = new int[32][32];
 
     private static int ChunkMaxY = 128;
     private static int ChunkMaxX = 16;
@@ -108,7 +107,7 @@ public class ChunkProviderPTM extends ChunkGenerator
         int i5 = ChunkMaxY / 8 + 1;
         int i6 = i1 + 1;
 
-        this.BiomeArray = this.localWorld.getWorldChunkManager().b(this.BiomeArray, paramInt1 * 4 - 2, paramInt2 * 4 - 2, i4 + 5, i6 + 5);
+        this.BiomeArray = this.localWorld.getWorldChunkManager().getBiomes(this.BiomeArray, paramInt1 * 4 - 2, paramInt2 * 4 - 2, i4 + 5, i6 + 5);
 
         this.u = a(this.u, paramInt1 * i1, 0, paramInt2 * i1, i4, i5, i6);
 
@@ -186,7 +185,7 @@ public class ChunkProviderPTM extends ChunkGenerator
         for (int x = 0; x < 16; x++)
             for (int z = 0; z < 16; z++)
             {
-                BiomeBase localBiomeBase = paramArrayOfBiomeBase[(z + x * 16)];
+                BiomeBase localBiomeBase = paramArrayOfBiomeBase[(x + z * 16)];
                 int i4 = (int) (this.v[(x + z * 16)] / 3.0D + 3.0D + this.rnd.nextDouble() * 0.25D);
 
                 int i5 = -1;
@@ -234,10 +233,7 @@ public class ChunkProviderPTM extends ChunkGenerator
 
                                 if (localBiomeBase == BiomeBase.DESERT)
                                 {
-                                    if ((this.worldSettings.removeSurfaceDirtFromDesert) && ((paramArrayOfByte[i9] == Block.GRASS.id) || (paramArrayOfByte[i9] == Block.DIRT.id)))
-                                        paramArrayOfByte[i9] = (byte) Block.SAND.id;
-
-                                    if ((this.worldSettings.desertDirt) && (this.worldSettings.desertDirtFrequency > 0) && (this.rnd.nextInt(this.worldSettings.desertDirtFrequency * ChunkMaxX * ChunkMaxZ) == 0) && (paramArrayOfByte[i9] == Block.SAND.id))
+                                     if ((this.worldSettings.desertDirt) && (this.worldSettings.desertDirtFrequency > 0) && (this.rnd.nextInt(this.worldSettings.desertDirtFrequency * ChunkMaxX * ChunkMaxZ) == 0) && (paramArrayOfByte[i9] == Block.SAND.id))
                                         paramArrayOfByte[i9] = (byte) Block.DIRT.id;
 
                                     if ((this.worldSettings.waterlessDeserts) && ((paramArrayOfByte[i9] == Block.STATIONARY_WATER.id) || (paramArrayOfByte[i9] == Block.ICE.id)))
@@ -354,7 +350,7 @@ public class ChunkProviderPTM extends ChunkGenerator
 
                     double d6 = paramInt5 / 2.0D + d4 * 4.0D;
 
-                    double d7 = 0.0D;
+                    double d7;
 
                     double d8 = (i10 - d6) * 12.0D * 128.0D / 128.0D / d5;
 

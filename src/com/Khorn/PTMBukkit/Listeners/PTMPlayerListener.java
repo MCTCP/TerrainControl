@@ -59,6 +59,8 @@ public class PTMPlayerListener extends PlayerListener
         {
 
             Block block = event.getClickedBlock();
+            if(block == null)
+                return;
             if (block.getType() == Material.SAPLING)
                 if (this.ptmPlugin.worldsSettings.containsKey(block.getWorld().getName()))
                 {

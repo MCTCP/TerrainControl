@@ -4,13 +4,16 @@ public enum PTMDefaultValues
 {
     WorldSettingsName("PhoenixTerrainModSettings.ini"),
     WorldBOBDirectoryName("BOBPlugins"),
+    WorldBiomeConfigDirectoryName("BiomeConfigs"),
+    WorldBiomeConfigName("BiomeConfig.ini"),
     DefaultSettingsName("DefaultSettings.ini"),
     DefaultBOBDirectoryName("DefaultBOBPlugins"),
+    DefaultBiomeConfigDirectoryName("DefaultBiomeConfigs"),
     xLimit(16),
     zLimit(16),
     yLimit(128),
     maxChunkBlockValue(32768),
-    biomeSize(1.5D),
+    biomeSize(4),
     minMoisture(0.0D),
     maxMoisture(1.0D),
     minTemperature(0.0D),
@@ -23,7 +26,8 @@ public enum PTMDefaultValues
     claySwamps(false),
     waterlessDeserts(false),
     desertDirt(false),
-    removeSurfaceDirtFromDesert(false),
+
+    biomeOldSize(1.5D),
 
     waterLevel(64),
     waterBlock(9),
@@ -52,12 +56,12 @@ public enum PTMDefaultValues
     caveSystemPocketMinSize(0),
     caveSystemPocketMaxSize(4),
     evenCaveDistribution(false),
+
     dungeonRarity(100),
     dungeonFrequency(8),
     dungeonMinAltitude(0),
     dungeonMaxAltitude(128),
-    lavaLevelMin(0),
-    lavaLevelMax(10),
+
     disableNotchHeightControl(false),
 
     undergroundLakeFrequency(2),
@@ -76,55 +80,76 @@ public enum PTMDefaultValues
     customTreeMaxTime(600),
 
     notchBiomeTrees(true),
-    globalTreeDensity(0),
-    rainforestTreeDensity(5),
-    swamplandTreeDensity(0),
-    seasonalforestTreeDensity(2),
-    forestTreeDensity(5),
-    savannaTreeDensity(0),
-    shrublandTreeDensity(0),
-    taigaTreeDensity(5),
-    desertTreeDensity(-20),
-    plainsTreeDensity(-20),
-    iceDesertTreeDensity(-20),
-    tundraTreeDensity(-20),
-    globalCactusDensity(0),
-    desertCactusDensity(10),
+    TreeDensity(0),
+
     cactusDepositRarity(100),
+    cactusDepositFrequency(2),
     cactusDepositMinAltitude(0),
     cactusDepositMaxAltitude(128),
+
     flowerDepositRarity(100),
     flowerDepositFrequency(2),
     flowerDepositMinAltitude(0),
     flowerDepositMaxAltitude(128),
-    roseDepositRarity(50),
-    roseDepositFrequency(1),
+
+    roseDepositRarity(100),
+    roseDepositFrequency(2),
     roseDepositMinAltitude(0),
     roseDepositMaxAltitude(128),
-    brownMushroomDepositRarity(25),
-    brownMushroomDepositFrequency(1),
+
+    brownMushroomDepositRarity(100),
+    brownMushroomDepositFrequency(0),
     brownMushroomDepositMinAltitude(0),
     brownMushroomDepositMaxAltitude(128),
-    redMushroomDepositRarity(13),
-    redMushroomDepositFrequency(1),
+
+    redMushroomDepositRarity(100),
+    redMushroomDepositFrequency(0),
     redMushroomDepositMinAltitude(0),
     redMushroomDepositMaxAltitude(128),
+
     reedDepositRarity(100),
-    reedDepositFrequency(10),
+    reedDepositFrequency(0),
     reedDepositMinAltitude(0),
     reedDepositMaxAltitude(128),
+
     pumpkinDepositRarity(3),
     pumpkinDepositFrequency(1),
     pumpkinDepositMinAltitude(0),
     pumpkinDepositMaxAltitude(128),
+
+    longGrassDepositRarity(100),
+    longGrassDepositFrequency(1),
+    longGrassDepositMinAltitude(0),
+    longGrassDepositMaxAltitude(128),
+
+    deadBushDepositRarity(100),
+    deadBushDepositFrequency(0),
+    deadBushDepositMinAltitude(0),
+    deadBushDepositMaxAltitude(128),
+
+
     waterSourceDepositRarity(100),
     waterSourceDepositFrequency(50),
     waterSourceDepositMinAltitude(8),
     waterSourceDepositMaxAltitude(128),
+
     lavaSourceDepositRarity(100),
     lavaSourceDepositFrequency(20),
     lavaSourceDepositMinAltitude(8),
     lavaSourceDepositMaxAltitude(128),
+
+    waterClayDepositRarity(100),
+    waterClayDepositFrequency(1),
+    waterClayDepositSize(4),
+
+    waterSandDepositRarity(100),
+    waterSandDepositFrequency(3),
+    waterSandDepositSize(7),
+
+    waterGravelDepositRarity(100),
+    waterGravelDepositFrequency(1),
+    waterGravelDepositSize(6),
+
     dirtDepositRarity1(100),
     dirtDepositFrequency1(20),
     dirtDepositSize1(32),
@@ -145,6 +170,7 @@ public enum PTMDefaultValues
     dirtDepositSize4(0),
     dirtDepositMinAltitude4(0),
     dirtDepositMaxAltitude4(0),
+
     gravelDepositRarity1(100),
     gravelDepositFrequency1(10),
     gravelDepositSize1(32),
@@ -165,8 +191,9 @@ public enum PTMDefaultValues
     gravelDepositSize4(0),
     gravelDepositMinAltitude4(0),
     gravelDepositMaxAltitude4(0),
+
     clayDepositRarity1(100),
-    clayDepositFrequency1(10),
+    clayDepositFrequency1(1),
     clayDepositSize1(32),
     clayDepositMinAltitude1(0),
     clayDepositMaxAltitude1(128),
@@ -185,6 +212,7 @@ public enum PTMDefaultValues
     clayDepositSize4(0),
     clayDepositMinAltitude4(0),
     clayDepositMaxAltitude4(0),
+
     coalDepositRarity1(100),
     coalDepositFrequency1(20),
     coalDepositSize1(16),
@@ -205,6 +233,7 @@ public enum PTMDefaultValues
     coalDepositSize4(0),
     coalDepositMinAltitude4(0),
     coalDepositMaxAltitude4(0),
+
     ironDepositRarity1(100),
     ironDepositFrequency1(20),
     ironDepositSize1(8),
@@ -225,6 +254,7 @@ public enum PTMDefaultValues
     ironDepositSize4(0),
     ironDepositMinAltitude4(0),
     ironDepositMaxAltitude4(0),
+
     goldDepositRarity1(100),
     goldDepositFrequency1(2),
     goldDepositSize1(8),
@@ -245,6 +275,7 @@ public enum PTMDefaultValues
     goldDepositSize4(0),
     goldDepositMinAltitude4(0),
     goldDepositMaxAltitude4(0),
+
     redstoneDepositRarity1(100),
     redstoneDepositFrequency1(8),
     redstoneDepositSize1(7),
@@ -265,6 +296,7 @@ public enum PTMDefaultValues
     redstoneDepositSize4(0),
     redstoneDepositMinAltitude4(0),
     redstoneDepositMaxAltitude4(0),
+
     diamondDepositRarity1(100),
     diamondDepositFrequency1(1),
     diamondDepositSize1(7),
@@ -285,6 +317,7 @@ public enum PTMDefaultValues
     diamondDepositSize4(0),
     diamondDepositMinAltitude4(0),
     diamondDepositMaxAltitude4(0),
+
     lapislazuliDepositRarity1(100),
     lapislazuliDepositFrequency1(1),
     lapislazuliDepositSize1(7),
@@ -310,7 +343,6 @@ public enum PTMDefaultValues
     evenWaterSourceDistribution(false),
     evenLavaSourceDistribution(false);
 
-    
 
     private int iValue;
     private double dValue;

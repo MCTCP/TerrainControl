@@ -44,7 +44,7 @@ public class BiomeManagerOld extends WorldChunkManager
 
     // Temperature
     @Override
-    public float[] a(float[] temp_out, int x, int z, int x_size, int z_size)
+    public float[] getTemperatures(float[] temp_out, int x, int z, int x_size, int z_size)
     {
         if ((temp_out == null) || (temp_out.length < x_size * z_size))
         {
@@ -85,7 +85,7 @@ public class BiomeManagerOld extends WorldChunkManager
 
     // Rain
     @Override
-    public float[] b(float[] temp_out, int x, int z, int x_size, int z_size)
+    public float[] getWetness(float[] temp_out, int x, int z, int x_size, int z_size)
     {
         if ((temp_out == null) || (temp_out.length < x_size * z_size))
         {
@@ -101,9 +101,9 @@ public class BiomeManagerOld extends WorldChunkManager
     }
 
     @Override
-    public BiomeBase[] b(BiomeBase[] biomeBases, int x, int z, int x_size, int z_size)
+    public BiomeBase[] getBiomes(BiomeBase[] biomeBases, int x, int z, int x_size, int z_size)
     {
-        return this.a(biomeBases, x, z, x_size, z_size, true);
+        return this.a(biomeBases, x, z, x_size, z_size, false);
     }
 
     @Override
