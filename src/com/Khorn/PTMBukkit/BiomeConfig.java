@@ -18,8 +18,8 @@ public class BiomeConfig extends ConfigFile
 
 
     //Surface config
-    public double a;
-    public double b;
+    public float TerrainFactor;
+    public float TerrainFactor2;
 
     //Todo height control. !!!
 
@@ -326,7 +326,8 @@ public class BiomeConfig extends ConfigFile
         this.evenWaterSourceDistribution = this.ReadModSettings(PTMDefaultValues.evenWaterSourceDistribution.name(), PTMDefaultValues.evenWaterSourceDistribution.booleanValue());
         this.evenLavaSourceDistribution = this.ReadModSettings(PTMDefaultValues.evenLavaSourceDistribution.name(), PTMDefaultValues.evenLavaSourceDistribution.booleanValue());
 
-
+        this.TerrainFactor = this.ReadModSettings(PTMDefaultValues.TerrainFactor.name(), this.DefaultTerrainFactor);
+        this.TerrainFactor2 = this.ReadModSettings(PTMDefaultValues.TerrainFactor2.name(), this.DefaultTerrainFactor2);
         //Todo Add height control
         //ReadHeightSettings();
 
@@ -657,7 +658,8 @@ public class BiomeConfig extends ConfigFile
 
         WriteModSettings(PTMDefaultValues.biomeSize.name(), this.biomeSize);
 
-
+        WriteModSettings(PTMDefaultValues.TerrainFactor.name(), this.TerrainFactor);
+        WriteModSettings(PTMDefaultValues.TerrainFactor2.name(), this.TerrainFactor2);
         // Todo height control
         //WriteHeightSettings();
 
@@ -1198,9 +1200,16 @@ public class BiomeConfig extends ConfigFile
     private int DefaultSand = 1;
     private int DefaultGravel = 3;
     private int DefaultClay = 1;
+    private float DefaultTerrainFactor = 0.1F;
+    private float DefaultTerrainFactor2 = 0.3F;
+
+
 
     private void InitDefaults()
     {
+        this.DefaultTerrainFactor = this.Biome.q;
+        this.DefaultTerrainFactor2 = this.Biome.r;
+
         switch (this.Biome.y)
         {
             case 1:

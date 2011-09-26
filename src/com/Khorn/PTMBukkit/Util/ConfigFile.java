@@ -74,6 +74,15 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
+    protected float ReadModSettings(String settingsName, float defaultValue)
+    {
+        if (this.SettingsCache.containsKey(settingsName))
+        {
+            return Float.valueOf(this.SettingsCache.get(settingsName));
+        }
+        return defaultValue;
+    }
+
     protected boolean ReadModSettings(String settingsName, boolean defaultValue)
     {
         if (this.SettingsCache.containsKey(settingsName))

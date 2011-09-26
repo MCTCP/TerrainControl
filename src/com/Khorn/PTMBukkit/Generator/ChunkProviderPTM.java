@@ -233,7 +233,7 @@ public class ChunkProviderPTM extends ChunkGenerator
 
                                 if (localBiomeBase == BiomeBase.DESERT)
                                 {
-                                     if ((this.worldSettings.desertDirt) && (this.worldSettings.desertDirtFrequency > 0) && (this.rnd.nextInt(this.worldSettings.desertDirtFrequency * ChunkMaxX * ChunkMaxZ) == 0) && (paramArrayOfByte[i9] == Block.SAND.id))
+                                    if ((this.worldSettings.desertDirt) && (this.worldSettings.desertDirtFrequency > 0) && (this.rnd.nextInt(this.worldSettings.desertDirtFrequency * ChunkMaxX * ChunkMaxZ) == 0) && (paramArrayOfByte[i9] == Block.SAND.id))
                                         paramArrayOfByte[i9] = (byte) Block.DIRT.id;
 
                                     if ((this.worldSettings.waterlessDeserts) && ((paramArrayOfByte[i9] == Block.STATIONARY_WATER.id) || (paramArrayOfByte[i9] == Block.ICE.id)))
@@ -289,33 +289,10 @@ public class ChunkProviderPTM extends ChunkGenerator
         {
             for (int i6 = 0; i6 < paramInt6; i6++)
             {
-                float f2 = 0.0F;
-                float f3 = 0.0F;
-                float f4 = 0.0F;
 
-                int i7 = 2;
+                double biomeFactor;
+                double biomeFactor2;
 
-                BiomeBase localBiomeBase1 = this.BiomeArray[(i5 + 2 + (i6 + 2) * (paramInt4 + 5))];
-                for (int i8 = -i7; i8 <= i7; i8++)
-                {
-                    for (int i9 = -i7; i9 <= i7; i9++)
-                    {
-                        BiomeBase localBiomeBase2 = this.BiomeArray[(i5 + i8 + 2 + (i6 + i9 + 2) * (paramInt4 + 5))];
-                        float f5 = this.l[(i8 + 2 + (i9 + 2) * 5)] / (localBiomeBase2.q + 2.0F);
-                        if (localBiomeBase2.q > localBiomeBase1.q)
-                        {
-                            f5 /= 2.0F;
-                        }
-                        f2 += localBiomeBase2.r * f5;
-                        f3 += localBiomeBase2.q * f5;
-                        f4 += f5;
-                    }
-                }
-                f2 /= f4;
-                f3 /= f4;
-
-                f2 = f2 * 0.9F + 0.1F;
-                f3 = (f3 * 4.0F - 1.0F) / 8.0F;
 
                 double d3 = this.k[i4] / 8000.0D;
                 if (d3 < 0.0D)
@@ -338,21 +315,74 @@ public class ChunkProviderPTM extends ChunkGenerator
                     d3 /= 8.0D;
                 }
 
-                i4++;
-
-                for (int i10 = 0; i10 < paramInt5; i10++)
+                if (!this.worldSettings.oldBiomeTerrainGenerator)
                 {
+                    float f2 = 0.0F;
+                    float f3 = 0.0F;
+                    float f4 = 0.0F;
+
+                    int i7 = 2;
+
+                    BiomeBase localBiomeBase1 = this.BiomeArray[(i5 + 2 + (i6 + 2) * (paramInt4 + 5))];
+                    for (int i8 = -i7; i8 <= i7; i8++)
+                    {
+                        for (int i9 = -i7; i9 <= i7; i9++)
+                        {
+                            BiomeBase localBiomeBase2 = this.BiomeArray[(i5 + i8 + 2 + (i6 + i9 + 2) * (paramInt4 + 5))];
+                            float f5 = this.l[(i8 + 2 + (i9 + 2) * 5)] / (localBiomeBase2.q + 2.0F);
+                            if (localBiomeBase2.q > localBiomeBase1.q)
+                            {
+                                f5 /= 2.0F;
+                            }
+                            f2 += localBiomeBase2.r * f5;
+                            f3 += localBiomeBase2.q * f5;
+                            f4 += f5;
+                        }
+                    }
+                    f2 /= f4;
+                    f3 /= f4;
+
+                    f2 = f2 * 0.9F + 0.1F;
+                    f3 = (f3 * 4.0F - 1.0F) / 8.0F;
+
                     double d4 = f3;
-                    double d5 = f2;
+                    biomeFactor = f2;
 
                     d4 += d3 * 0.2D;
                     d4 = d4 * paramInt5 / 16.0D;
 
-                    double d6 = paramInt5 / 2.0D + d4 * 4.0D;
+                    biomeFactor2 = paramInt5 / 2.0D + d4 * 4.0D;
 
+
+                } else
+                {
+                    BiomeBase localBiomeBase1 = this.BiomeArray[(i5 + 2 + (i6 + 2) * (paramInt4 + 5))];
+                    biomeFactor = (1.0D - localBiomeBase1.s * localBiomeBase1.t);
+                    biomeFactor *= biomeFactor;
+                    biomeFactor = 1.0D - biomeFactor * biomeFactor;
+
+                    biomeFactor = (this.g[i4] + 256.0D) / 512.0D * biomeFactor;
+                    if (biomeFactor > 1.0D)
+                        biomeFactor = 1.0D;
+                    if (biomeFactor < 0.0D || d3 < 0.0D)
+                        biomeFactor = 0.0D;
+
+                    biomeFactor += 0.5D;
+
+                    d3 = d3 * paramInt5 / 16.0D;
+
+                    biomeFactor2 = paramInt5 / 2.0D + d3 * 4.0D;
+                }
+
+
+                i4++;
+
+
+                for (int i10 = 0; i10 < paramInt5; i10++)
+                {
                     double d7;
 
-                    double d8 = (i10 - d6) * 12.0D * 128.0D / 128.0D / d5;
+                    double d8 = (i10 - biomeFactor2) * 12.0D * 128.0D / 128.0D / biomeFactor;
 
                     if (d8 < 0.0D)
                         d8 *= 4.0D;

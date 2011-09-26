@@ -73,6 +73,11 @@ public enum PTMDefaultValues
     undergroundLakes(true),
     undergroundLakesInAir(true),
 
+    oldBiomeTerrainGenerator(false),
+
+    TerrainFactor(0.1D),
+    TerrainFactor2(0.3D),
+
     customObjects(true),
     objectSpawnRatio(2),
     denyObjectsUnderFill(false),
@@ -378,6 +383,11 @@ public enum PTMDefaultValues
     public double doubleValue()
     {
         return this.dValue;
+    }
+
+    public float floatValue()
+    {
+        return (float)this.dValue;
     }
 
     public String stringValue()

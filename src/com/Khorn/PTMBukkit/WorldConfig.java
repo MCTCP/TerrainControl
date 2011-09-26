@@ -59,6 +59,7 @@ public class WorldConfig extends ConfigFile
 
     //Terrain
     public int biomeSize;
+    public boolean oldBiomeTerrainGenerator;
 
     public int waterLevel;
     public int waterBlock;
@@ -113,7 +114,7 @@ public class WorldConfig extends ConfigFile
 
     public String WorldName;
 
-    private final int BiomesCount = 8;
+    public static int BiomesCount = 8;
 
     public BiomeConfig[] biomeConfigs = new BiomeConfig[BiomesCount];
 
@@ -255,7 +256,7 @@ public class WorldConfig extends ConfigFile
 
         ReadHeightSettings();
 
-
+        this.oldBiomeTerrainGenerator = ReadModSettings(PTMDefaultValues.oldBiomeTerrainGenerator.name(), PTMDefaultValues.oldBiomeTerrainGenerator.booleanValue());
         this.removeSurfaceStone = ReadModSettings(PTMDefaultValues.removeSurfaceStone.name(), PTMDefaultValues.removeSurfaceStone.booleanValue());
 
 
@@ -401,7 +402,7 @@ public class WorldConfig extends ConfigFile
         WriteModSettings(PTMDefaultValues.bedrockobsidian.name(), this.bedrockObsidian);
         WriteModSettings(PTMDefaultValues.disableNotchHeightControl.name(), this.disableNotchHeightControl);
         WriteHeightSettings();
-
+        WriteModSettings(PTMDefaultValues.oldBiomeTerrainGenerator.name(), this.oldBiomeTerrainGenerator);
 
         WriteModTitleSettings("Replace Variables");
         WriteModSettings(PTMDefaultValues.removeSurfaceStone.name(), this.removeSurfaceStone);
