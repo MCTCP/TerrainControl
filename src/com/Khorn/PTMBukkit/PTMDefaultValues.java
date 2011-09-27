@@ -13,6 +13,9 @@ public enum PTMDefaultValues
     zLimit(16),
     yLimit(128),
     maxChunkBlockValue(32768),
+
+    oldBiomeGenerator(false),
+    oldBiomeSize(1.5D),
     biomeSize(4),
     minMoisture(0.0D),
     maxMoisture(1.0D),
@@ -27,8 +30,7 @@ public enum PTMDefaultValues
     waterlessDeserts(false),
     desertDirt(false),
 
-    biomeOldSize(1.5D),
-
+    oldTerrainGenerator(false),
     waterLevel(64),
     waterBlock(9),
     maxAverageHeight(0.0D),
@@ -73,7 +75,6 @@ public enum PTMDefaultValues
     undergroundLakes(true),
     undergroundLakesInAir(true),
 
-    oldBiomeTerrainGenerator(false),
 
     TerrainFactor(0.1D),
     TerrainFactor2(0.3D),
@@ -387,7 +388,7 @@ public enum PTMDefaultValues
 
     public float floatValue()
     {
-        return (float)this.dValue;
+        return (float) this.dValue;
     }
 
     public String stringValue()

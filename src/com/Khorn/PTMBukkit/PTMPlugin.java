@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.HashMap;
 
 import com.Khorn.PTMBukkit.Commands.PTMCommandExecutor;
+import com.Khorn.PTMBukkit.Generator.BiomeManager;
 import com.Khorn.PTMBukkit.Generator.BiomeManagerOld;
 import com.Khorn.PTMBukkit.Generator.ChunkProviderPTM;
 import com.Khorn.PTMBukkit.Listeners.PTMBlockListener;
@@ -130,7 +131,10 @@ public class PTMPlugin extends JavaPlugin
 
             net.minecraft.server.World workWorld = ((CraftWorld) world).getHandle();
 
-            workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
+            if(worldSetting.oldBiomeGenerator)
+                workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
+            else
+                workWorld.worldProvider.b = new BiomeManager(workWorld, worldSetting);
 
             worldSetting.objectSpawner.Init(workWorld);
             worldSetting.ChunkProvider.Init(world);

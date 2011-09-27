@@ -136,6 +136,12 @@ public abstract class ConfigFile
         this.SettingsWriter.newLine();
     }
 
+    protected void WriteModSettings(String settingsName, float settingsValue) throws IOException
+    {
+        this.SettingsWriter.write(settingsName + ":" + Float.toString(settingsValue));
+        this.SettingsWriter.newLine();
+    }
+
     protected void WriteModSettings(String settingsName, boolean settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + Boolean.toString(settingsValue));

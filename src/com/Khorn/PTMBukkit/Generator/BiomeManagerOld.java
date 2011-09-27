@@ -16,8 +16,8 @@ public class BiomeManagerOld extends WorldChunkManager
     private NoiseGeneratorOctaves2 TempGen;
     private NoiseGeneratorOctaves2 RainGen;
     private NoiseGeneratorOctaves2 TempGen2;
-    private double[] old_temperature;
-    private double[] old_rain;
+    public double[] old_temperature;
+    public double[] old_rain;
     private double[] old_temperature2;
     private BiomeBase[] temp_biomeBases;
     private BiomeCache Cache = new BiomeCache(this);
@@ -51,8 +51,8 @@ public class BiomeManagerOld extends WorldChunkManager
             temp_out = new float[x_size * z_size];
         }
 
-        this.old_temperature = this.TempGen.a(this.old_temperature, x, z, x_size, z_size, 0.025000000372529D / this.localWrk.biomeSize, 0.025000000372529D / this.localWrk.biomeSize, 0.25D);
-        this.old_temperature2 = this.TempGen2.a(this.old_temperature2, x, z, x_size, z_size, 0.25D / this.localWrk.biomeSize, 0.25D / this.localWrk.biomeSize, 0.5882352941176471D);
+        this.old_temperature = this.TempGen.a(this.old_temperature, x, z, x_size, z_size, 0.025000000372529D / this.localWrk.oldBiomeSize, 0.025000000372529D / this.localWrk.oldBiomeSize, 0.25D);
+        this.old_temperature2 = this.TempGen2.a(this.old_temperature2, x, z, x_size, z_size, 0.25D / this.localWrk.oldBiomeSize, 0.25D / this.localWrk.oldBiomeSize, 0.5882352941176471D);
 
         int i = 0;
         for (int j = 0; j < x_size; j++)
@@ -121,9 +121,9 @@ public class BiomeManagerOld extends WorldChunkManager
         }
 
 
-        this.old_temperature = this.TempGen.a(this.old_temperature, x, z, x_size, x_size, 0.025000000372529D / this.localWrk.biomeSize, 0.025000000372529D / this.localWrk.biomeSize, 0.25D);
-        this.old_rain = this.RainGen.a(this.old_rain, x, z, x_size, x_size, 0.0500000007450581D / this.localWrk.biomeSize, 0.0500000007450581D / this.localWrk.biomeSize, 0.3333333333333333D);
-        this.old_temperature2 = this.TempGen2.a(this.old_temperature2, x, z, x_size, x_size, 0.25D / this.localWrk.biomeSize, 0.25D / this.localWrk.biomeSize, 0.5882352941176471D);
+        this.old_temperature = this.TempGen.a(this.old_temperature, x, z, x_size, x_size, 0.025000000372529D / this.localWrk.oldBiomeSize, 0.025000000372529D / this.localWrk.oldBiomeSize, 0.25D);
+        this.old_rain = this.RainGen.a(this.old_rain, x, z, x_size, x_size, 0.0500000007450581D / this.localWrk.oldBiomeSize, 0.0500000007450581D / this.localWrk.oldBiomeSize, 0.3333333333333333D);
+        this.old_temperature2 = this.TempGen2.a(this.old_temperature2, x, z, x_size, x_size, 0.25D / this.localWrk.oldBiomeSize, 0.25D / this.localWrk.oldBiomeSize, 0.5882352941176471D);
 
         int i = 0;
         for (int j = 0; j < x_size; j++)

@@ -45,9 +45,9 @@ public class NoiseGenerator2
   {
     int i = 0;
     for (int j = 0; j < paramInt1; j++) {
-      double d1 = (paramDouble1 + j) * paramDouble3 + this.a;
+      double d2 = (paramDouble2 + j) * paramDouble4 + this.b;
       for (int k = 0; k < paramInt2; k++) {
-        double d2 = (paramDouble2 + k) * paramDouble4 + this.b;
+        double d1 = (paramDouble1 + k) * paramDouble3 + this.a;
 
         double d3 = (d1 + d2) * f;
         int m = a(d1 + d3);

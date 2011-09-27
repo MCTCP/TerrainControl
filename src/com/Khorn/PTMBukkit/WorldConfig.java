@@ -28,7 +28,7 @@ public class WorldConfig extends ConfigFile
 
 
     // For old biome generator
-    public boolean useOldBiomeGenerator;
+    public boolean oldBiomeGenerator;
     public double oldBiomeSize;
     public double minMoisture;
     public double maxMoisture;
@@ -59,7 +59,7 @@ public class WorldConfig extends ConfigFile
 
     //Terrain
     public int biomeSize;
-    public boolean oldBiomeTerrainGenerator;
+    public boolean oldTerrainGenerator;
 
     public int waterLevel;
     public int waterBlock;
@@ -135,9 +135,19 @@ public class WorldConfig extends ConfigFile
 
         BuildReplaceMatrix();
 
+        File BiomeFolder = new File(SettingsDir, PTMDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
+        if (!BiomeFolder.exists())
+        {
+            if (!BiomeFolder.mkdir())
+            {
+                System.out.println("PhoenixTerrainMod: error create biome configs directory, working with defaults");
+                return;
+            }
+        }
+
         for (int i = 0; i < BiomesCount; i++)
         {
-            this.biomeConfigs[i] = new BiomeConfig(new File(this.SettingsDir, PTMDefaultValues.WorldBiomeConfigDirectoryName.stringValue()), BiomeBase.a[i]);
+            this.biomeConfigs[i] = new BiomeConfig(BiomeFolder, BiomeBase.a[i]);
         }
 
         this.RegisterBOBPlugins();
@@ -170,7 +180,7 @@ public class WorldConfig extends ConfigFile
     {
         this.biomeSize = CheckValue(this.biomeSize, 1, 15);
 
-        this.oldBiomeSize = (this.oldBiomeSize <= 0.0D ? 4.9E-324D : this.oldBiomeSize);
+        this.oldBiomeSize = (this.oldBiomeSize <= 0.0D ? 1.5D : this.oldBiomeSize);
 
         this.minMoisture = (this.minMoisture < 0.0D ? 0.0D : this.minMoisture > 1.0D ? 1.0D : this.minMoisture);
         this.minTemperature = (this.minTemperature < 0.0D ? 0.0D : this.minTemperature > 1.0D ? 1.0D : this.minTemperature);
@@ -202,13 +212,22 @@ public class WorldConfig extends ConfigFile
         this.customTreeMinTime = (this.customTreeMinTime < 1 ? 1 : this.customTreeMinTime);
         this.customTreeMaxTime = ((this.customTreeMaxTime - this.customTreeMinTime) < 1 ? (this.customTreeMinTime + 1) : this.customTreeMaxTime);
 
+        if (this.oldBiomeGenerator && !this.oldTerrainGenerator)
+        {
+            System.out.println("PhoenixTerrainMod: Old biome generator works only with old terrain generator!");
+            this.oldBiomeGenerator = false;
+
+        }
+
+
     }
 
 
     protected void ReadConfigSettings()
     {
 
-
+        this.oldBiomeGenerator = ReadModSettings(PTMDefaultValues.oldBiomeGenerator.name(), PTMDefaultValues.oldBiomeGenerator.booleanValue());
+        this.oldBiomeSize = ReadModSettings(PTMDefaultValues.oldBiomeSize.name(), PTMDefaultValues.oldBiomeSize.doubleValue());
         this.biomeSize = ReadModSettings(PTMDefaultValues.biomeSize.name(), PTMDefaultValues.biomeSize.intValue());
         this.minMoisture = ReadModSettings(PTMDefaultValues.minMoisture.name(), PTMDefaultValues.minMoisture.doubleValue());
         this.maxMoisture = ReadModSettings(PTMDefaultValues.maxMoisture.name(), PTMDefaultValues.maxMoisture.doubleValue());
@@ -256,7 +275,7 @@ public class WorldConfig extends ConfigFile
 
         ReadHeightSettings();
 
-        this.oldBiomeTerrainGenerator = ReadModSettings(PTMDefaultValues.oldBiomeTerrainGenerator.name(), PTMDefaultValues.oldBiomeTerrainGenerator.booleanValue());
+        this.oldTerrainGenerator = ReadModSettings(PTMDefaultValues.oldTerrainGenerator.name(), PTMDefaultValues.oldTerrainGenerator.booleanValue());
         this.removeSurfaceStone = ReadModSettings(PTMDefaultValues.removeSurfaceStone.name(), PTMDefaultValues.removeSurfaceStone.booleanValue());
 
 
@@ -351,8 +370,9 @@ public class WorldConfig extends ConfigFile
     protected void WriteConfigSettings() throws IOException
     {
         WriteModTitleSettings("Start Biome Variables :");
-        WriteModTitleSettings("All Biome Variables");
-
+        WriteModTitleSettings("Old biome generator works only with old terrain generator!");
+        WriteModSettings(PTMDefaultValues.oldBiomeGenerator.name(), this.oldBiomeGenerator);
+        WriteModSettings(PTMDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
         WriteModSettings(PTMDefaultValues.biomeSize.name(), this.biomeSize);
         WriteModSettings(PTMDefaultValues.minMoisture.name(), this.minMoisture);
         WriteModSettings(PTMDefaultValues.maxMoisture.name(), this.maxMoisture);
@@ -371,21 +391,8 @@ public class WorldConfig extends ConfigFile
         WriteModSettings(PTMDefaultValues.desertDirt.name(), this.desertDirt);
         WriteModSettings(PTMDefaultValues.desertDirtFrequency.name(), this.desertDirtFrequency);
 
-        WriteModTitleSettings("Start Underground Variables :");
-        WriteModTitleSettings("Cave Variables");
-        WriteModSettings(PTMDefaultValues.caveRarity.name(), this.caveRarity);
-        WriteModSettings(PTMDefaultValues.caveFrequency.name(), this.caveFrequency);
-        WriteModSettings(PTMDefaultValues.caveMinAltitude.name(), this.caveMinAltitude);
-        WriteModSettings(PTMDefaultValues.caveMaxAltitude.name(), this.caveMaxAltitude);
-        WriteModSettings(PTMDefaultValues.individualCaveRarity.name(), this.individualCaveRarity);
-        WriteModSettings(PTMDefaultValues.caveSystemFrequency.name(), this.caveSystemFrequency);
-        WriteModSettings(PTMDefaultValues.caveSystemPocketChance.name(), this.caveSystemPocketChance);
-        WriteModSettings(PTMDefaultValues.caveSystemPocketMinSize.name(), this.caveSystemPocketMinSize);
-        WriteModSettings(PTMDefaultValues.caveSystemPocketMaxSize.name(), this.caveSystemPocketMaxSize);
-        WriteModSettings(PTMDefaultValues.evenCaveDistribution.name(), this.evenCaveDistribution);
-
-
         WriteModTitleSettings("Start Terrain Variables :");
+        WriteModSettings(PTMDefaultValues.oldTerrainGenerator.name(), this.oldTerrainGenerator);
         WriteModSettings(PTMDefaultValues.waterLevel.name(), this.waterLevel);
         WriteModSettings(PTMDefaultValues.waterBlock.name(), this.waterBlock);
         WriteModSettings(PTMDefaultValues.maxAverageHeight.name(), this.maxAverageHeight);
@@ -402,7 +409,6 @@ public class WorldConfig extends ConfigFile
         WriteModSettings(PTMDefaultValues.bedrockobsidian.name(), this.bedrockObsidian);
         WriteModSettings(PTMDefaultValues.disableNotchHeightControl.name(), this.disableNotchHeightControl);
         WriteHeightSettings();
-        WriteModSettings(PTMDefaultValues.oldBiomeTerrainGenerator.name(), this.oldBiomeTerrainGenerator);
 
         WriteModTitleSettings("Replace Variables");
         WriteModSettings(PTMDefaultValues.removeSurfaceStone.name(), this.removeSurfaceStone);
@@ -427,7 +433,17 @@ public class WorldConfig extends ConfigFile
         this.WriteModSettings(PTMDefaultValues.undergroundLakeMinAltitude.name(), this.undergroundLakeMinAltitude);
         this.WriteModSettings(PTMDefaultValues.undergroundLakeMaxAltitude.name(), this.undergroundLakeMaxAltitude);
 
-
+        WriteModTitleSettings("Cave Variables");
+        WriteModSettings(PTMDefaultValues.caveRarity.name(), this.caveRarity);
+        WriteModSettings(PTMDefaultValues.caveFrequency.name(), this.caveFrequency);
+        WriteModSettings(PTMDefaultValues.caveMinAltitude.name(), this.caveMinAltitude);
+        WriteModSettings(PTMDefaultValues.caveMaxAltitude.name(), this.caveMaxAltitude);
+        WriteModSettings(PTMDefaultValues.individualCaveRarity.name(), this.individualCaveRarity);
+        WriteModSettings(PTMDefaultValues.caveSystemFrequency.name(), this.caveSystemFrequency);
+        WriteModSettings(PTMDefaultValues.caveSystemPocketChance.name(), this.caveSystemPocketChance);
+        WriteModSettings(PTMDefaultValues.caveSystemPocketMinSize.name(), this.caveSystemPocketMinSize);
+        WriteModSettings(PTMDefaultValues.caveSystemPocketMaxSize.name(), this.caveSystemPocketMaxSize);
+        WriteModSettings(PTMDefaultValues.evenCaveDistribution.name(), this.evenCaveDistribution);
     }
 
     private void WriteModReplaceSettings() throws IOException
