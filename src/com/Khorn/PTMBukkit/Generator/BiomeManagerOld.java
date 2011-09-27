@@ -69,9 +69,7 @@ public class BiomeManagerOld extends WorldChunkManager
                 if (d4 < this.localWrk.minTemperature)
                     d4 = this.localWrk.minTemperature;
                 if (d4 > this.localWrk.maxTemperature)
-                {
                     d4 = this.localWrk.maxTemperature;
-                }
                 temp_out[i] = (float) d4;
                 i++;
             }

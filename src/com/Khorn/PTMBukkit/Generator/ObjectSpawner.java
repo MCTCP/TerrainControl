@@ -74,42 +74,7 @@ public class ObjectSpawner extends BlockPopulator
     }*/
 
 
-    void processGrass(int x, int z, BiomeBase currentBiome)
-    {
-        int grassDensity = 0;
-        if (currentBiome == BiomeBase.FOREST)
-            grassDensity = 2;
-        if (currentBiome == BiomeBase.TAIGA)
-            grassDensity = 1;
-        if (currentBiome == BiomeBase.PLAINS)
-            grassDensity = 10;
 
-        int _x;
-        int _y;
-        int _z;
-
-        for (int i = 0; i < grassDensity; i++)
-        {
-            int grassType = 1;
-
-            _x = x + this.rand.nextInt(16);
-            _y = this.rand.nextInt(128);
-            _z = z + this.rand.nextInt(16);
-            new WorldGenGrass(Block.LONG_GRASS.id, grassType).a(this.world, this.rand, _x, _y, _z);
-        }
-
-        if (currentBiome == BiomeBase.DESERT)
-        {
-
-            for (int i = 0; i < 2; i++)
-            {
-                _x = x + this.rand.nextInt(16);
-                _y = this.rand.nextInt(128);
-                _z = z + this.rand.nextInt(16);
-                new WorldGenDeadBush(Block.DEAD_BUSH.id).a(this.world, this.rand, _x, _y, _z);
-            }
-        }
-    }
 
 
     void processUndergroundLakes(int x, int z)
@@ -246,7 +211,7 @@ public class ObjectSpawner extends BlockPopulator
 
         //this.processTrees(x, z, localBiomeBase);
 
-        this.processGrass(x, z, localBiomeBase);
+
 
 
         /*

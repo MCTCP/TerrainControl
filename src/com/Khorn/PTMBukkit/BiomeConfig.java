@@ -14,12 +14,12 @@ public class BiomeConfig extends ConfigFile
     public HashMap<Integer, Byte> replaceBlocks = new HashMap<Integer, Byte>();
     public byte[] ReplaceBlocksMatrix = new byte[256];
 
-    public int biomeSize;
+    public int BiomeChance;
 
 
     //Surface config
-    public float TerrainFactor;
-    public float TerrainFactor2;
+    public float BiomeSurface;
+    public float BiomeVolatility;
 
     //Todo height control. !!!
 
@@ -321,13 +321,13 @@ public class BiomeConfig extends ConfigFile
     {
 
 
-        this.biomeSize = ReadModSettings(PTMDefaultValues.biomeSize.name(), PTMDefaultValues.biomeSize.intValue());
+        this.BiomeChance = ReadModSettings(PTMDefaultValues.biomeChance.name(), PTMDefaultValues.biomeChance.intValue());
 
         this.evenWaterSourceDistribution = this.ReadModSettings(PTMDefaultValues.evenWaterSourceDistribution.name(), PTMDefaultValues.evenWaterSourceDistribution.booleanValue());
         this.evenLavaSourceDistribution = this.ReadModSettings(PTMDefaultValues.evenLavaSourceDistribution.name(), PTMDefaultValues.evenLavaSourceDistribution.booleanValue());
 
-        this.TerrainFactor = this.ReadModSettings(PTMDefaultValues.TerrainFactor.name(), this.DefaultTerrainFactor);
-        this.TerrainFactor2 = this.ReadModSettings(PTMDefaultValues.TerrainFactor2.name(), this.DefaultTerrainFactor2);
+        this.BiomeSurface = this.ReadModSettings(PTMDefaultValues.BiomeSurfaceAdd.name(), this.DefaultBiomeSurface);
+        this.BiomeVolatility = this.ReadModSettings(PTMDefaultValues.BiomeVolatilityAdd.name(), this.DefaultBiomeVolatility);
         //Todo Add height control
         //ReadHeightSettings();
 
@@ -609,7 +609,6 @@ public class BiomeConfig extends ConfigFile
     }
 
 
-
     private void ReadModReplaceSettings()
     {
         if (this.SettingsCache.containsKey("ReplacedBlocks"))
@@ -655,11 +654,11 @@ public class BiomeConfig extends ConfigFile
     {
         WriteModTitleSettings(this.Biome.l + " biome config :");
 
+        this.WriteModTitleSettings("Biome chance doe not work on river and ocean biome!");
+        WriteModSettings(PTMDefaultValues.biomeChance.name(), this.BiomeChance);
 
-        WriteModSettings(PTMDefaultValues.biomeSize.name(), this.biomeSize);
-
-        WriteModSettings(PTMDefaultValues.TerrainFactor.name(), this.TerrainFactor);
-        WriteModSettings(PTMDefaultValues.TerrainFactor2.name(), this.TerrainFactor2);
+        WriteModSettings(PTMDefaultValues.BiomeSurfaceAdd.name(), this.BiomeSurface);
+        WriteModSettings(PTMDefaultValues.BiomeVolatilityAdd.name(), this.BiomeVolatility);
         // Todo height control
         //WriteHeightSettings();
 
@@ -937,7 +936,6 @@ public class BiomeConfig extends ConfigFile
     }
 
 
-
     private void WriteModReplaceSettings() throws IOException
     {
 
@@ -961,7 +959,9 @@ public class BiomeConfig extends ConfigFile
 
     protected void CorrectSettings()
     {
-        this.biomeSize = CheckValue(this.biomeSize, 1, 15, 4);
+        this.BiomeChance = CheckValue(this.BiomeChance, 0, 20);
+        if (this.Biome == BiomeBase.OCEAN || this.Biome == BiomeBase.RIVER)
+            this.BiomeChance = 0;
 
         this.dungeonRarity = CheckValue(this.dungeonRarity, 0, 100);
         this.dungeonFrequency = CheckValue(this.dungeonFrequency, 0, 200);
@@ -1200,15 +1200,14 @@ public class BiomeConfig extends ConfigFile
     private int DefaultSand = 1;
     private int DefaultGravel = 3;
     private int DefaultClay = 1;
-    private float DefaultTerrainFactor = 0.1F;
-    private float DefaultTerrainFactor2 = 0.3F;
-
+    private float DefaultBiomeSurface = 0.1F;
+    private float DefaultBiomeVolatility = 0.3F;
 
 
     private void InitDefaults()
     {
-        this.DefaultTerrainFactor = this.Biome.q;
-        this.DefaultTerrainFactor2 = this.Biome.r;
+        this.DefaultBiomeSurface = this.Biome.q;
+        this.DefaultBiomeVolatility = this.Biome.r;
 
         switch (this.Biome.y)
         {

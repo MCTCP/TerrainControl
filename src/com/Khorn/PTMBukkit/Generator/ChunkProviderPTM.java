@@ -283,7 +283,8 @@ public class ChunkProviderPTM extends ChunkGenerator
         double d1 = 684.41200000000003D * this.worldSettings.getFractureHorizontal();
         double d2 = 684.41200000000003D * this.worldSettings.getFractureVertical();
 
-        this.j = this.a.a(this.j, paramInt1, paramInt3, paramInt4, paramInt6, 1.121D, 1.121D, 0.5D);
+        if (this.worldSettings.oldTerrainGenerator)
+            this.j = this.a.a(this.j, paramInt1, paramInt3, paramInt4, paramInt6, 1.121D, 1.121D, 0.5D);
         this.k = this.b.a(this.k, paramInt1, paramInt3, paramInt4, paramInt6, 200.0D, 200.0D, 0.5D);
 
         this.g = this.q.a(this.g, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1 / 80.0D, d2 / 160.0D, d1 / 80.0D);
@@ -375,7 +376,6 @@ public class ChunkProviderPTM extends ChunkGenerator
     {
         if (this.worldSettings.oldBiomeGenerator)
         {
-            BiomeManagerOld old_wcm = (BiomeManagerOld) this.localWorld.getWorldChunkManager();
             this.biomeFactor = (1.0D - old_wcm.old_temperature[z * 48 + 17 + x * 3] * old_wcm.old_rain[z * 48 + 17 + x * 3]);
 
         } else
@@ -413,13 +413,13 @@ public class ChunkProviderPTM extends ChunkGenerator
             for (int i9 = -i7; i9 <= i7; i9++)
             {
                 BiomeBase localBiomeBase2 = this.BiomeArray[(x + i8 + 2 + (z + i9 + 2) * (paramInt4 + 5))];
-                float f5 = this.l[(i8 + 2 + (i9 + 2) * 5)] / (this.worldSettings.biomeConfigs[localBiomeBase2.y].TerrainFactor + 2.0F);
-                if (this.worldSettings.biomeConfigs[localBiomeBase2.y].TerrainFactor > this.worldSettings.biomeConfigs[localBiomeBase1.y].TerrainFactor)
+                float f5 = this.l[(i8 + 2 + (i9 + 2) * 5)] / (this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeSurface + 2.0F);
+                if (this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeSurface > this.worldSettings.biomeConfigs[localBiomeBase1.y].BiomeSurface)
                 {
                     f5 /= 2.0F;
                 }
-                f2 += this.worldSettings.biomeConfigs[localBiomeBase2.y].TerrainFactor2 * f5;
-                f3 += this.worldSettings.biomeConfigs[localBiomeBase2.y].TerrainFactor * f5;
+                f2 += this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeVolatility * f5;
+                f3 += this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeSurface * f5;
                 f4 += f5;
             }
         }

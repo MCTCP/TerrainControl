@@ -30,10 +30,17 @@ public class WorldConfig extends ConfigFile
     // For old biome generator
     public boolean oldBiomeGenerator;
     public double oldBiomeSize;
-    public double minMoisture;
-    public double maxMoisture;
-    public double minTemperature;
-    public double maxTemperature;
+
+    public int biomeSize;
+    public int landSize;
+    public boolean riversEnabled;
+
+    public float minMoisture;
+    public float maxMoisture;
+    public float minTemperature;
+    public float maxTemperature;
+
+    // For 1.9
     public double snowThreshold;
     public double iceThreshold;
 
@@ -58,7 +65,7 @@ public class WorldConfig extends ConfigFile
     public boolean evenCaveDistribution;
 
     //Terrain
-    public int biomeSize;
+
     public boolean oldTerrainGenerator;
 
     public int waterLevel;
@@ -179,13 +186,16 @@ public class WorldConfig extends ConfigFile
     protected void CorrectSettings()
     {
         this.biomeSize = CheckValue(this.biomeSize, 1, 15);
+        this.landSize = CheckValue(this.landSize, 1, 10);
 
         this.oldBiomeSize = (this.oldBiomeSize <= 0.0D ? 1.5D : this.oldBiomeSize);
 
-        this.minMoisture = (this.minMoisture < 0.0D ? 0.0D : this.minMoisture > 1.0D ? 1.0D : this.minMoisture);
-        this.minTemperature = (this.minTemperature < 0.0D ? 0.0D : this.minTemperature > 1.0D ? 1.0D : this.minTemperature);
-        this.maxMoisture = (this.maxMoisture > 1.0D ? 1.0D : this.maxMoisture < this.minMoisture ? this.minMoisture : this.maxMoisture);
-        this.maxTemperature = (this.maxTemperature > 1.0D ? 1.0D : this.maxTemperature < this.minTemperature ? this.minTemperature : this.maxTemperature);
+        this.minMoisture = (this.minMoisture < 0.0F ? 0.0F : this.minMoisture > 1.0F ? 1.0F : this.minMoisture);
+        this.minTemperature = (this.minTemperature < 0.0F ? 0.0F : this.minTemperature > 1.0F ? 1.0F : this.minTemperature);
+        this.maxMoisture = (this.maxMoisture > 1.0F ? 1.0F : this.maxMoisture < this.minMoisture ? this.minMoisture : this.maxMoisture);
+        this.maxTemperature = (this.maxTemperature > 1.0F ? 1.0F : this.maxTemperature < this.minTemperature ? this.minTemperature : this.maxTemperature);
+
+
         this.snowThreshold = (this.snowThreshold < 0.0D ? 0.0D : this.snowThreshold > 1.0D ? 1.0D : this.snowThreshold);
         this.iceThreshold = (this.iceThreshold < -1.0D ? -1.0D : this.iceThreshold > 1.0D ? 1.0D : this.iceThreshold);
 
@@ -229,10 +239,12 @@ public class WorldConfig extends ConfigFile
         this.oldBiomeGenerator = ReadModSettings(PTMDefaultValues.oldBiomeGenerator.name(), PTMDefaultValues.oldBiomeGenerator.booleanValue());
         this.oldBiomeSize = ReadModSettings(PTMDefaultValues.oldBiomeSize.name(), PTMDefaultValues.oldBiomeSize.doubleValue());
         this.biomeSize = ReadModSettings(PTMDefaultValues.biomeSize.name(), PTMDefaultValues.biomeSize.intValue());
-        this.minMoisture = ReadModSettings(PTMDefaultValues.minMoisture.name(), PTMDefaultValues.minMoisture.doubleValue());
-        this.maxMoisture = ReadModSettings(PTMDefaultValues.maxMoisture.name(), PTMDefaultValues.maxMoisture.doubleValue());
-        this.minTemperature = ReadModSettings(PTMDefaultValues.minTemperature.name(), PTMDefaultValues.minTemperature.doubleValue());
-        this.maxTemperature = ReadModSettings(PTMDefaultValues.maxTemperature.name(), PTMDefaultValues.maxTemperature.doubleValue());
+        this.landSize = ReadModSettings(PTMDefaultValues.landSize.name(), PTMDefaultValues.landSize.intValue());
+        this.riversEnabled = ReadModSettings(PTMDefaultValues.riversEnabled.name(), PTMDefaultValues.riversEnabled.booleanValue());
+        this.minMoisture = ReadModSettings(PTMDefaultValues.minMoisture.name(), PTMDefaultValues.minMoisture.floatValue());
+        this.maxMoisture = ReadModSettings(PTMDefaultValues.maxMoisture.name(), PTMDefaultValues.maxMoisture.floatValue());
+        this.minTemperature = ReadModSettings(PTMDefaultValues.minTemperature.name(), PTMDefaultValues.minTemperature.floatValue());
+        this.maxTemperature = ReadModSettings(PTMDefaultValues.maxTemperature.name(), PTMDefaultValues.maxTemperature.floatValue());
         this.snowThreshold = ReadModSettings(PTMDefaultValues.snowThreshold.name(), PTMDefaultValues.snowThreshold.doubleValue());
         this.iceThreshold = ReadModSettings(PTMDefaultValues.iceThreshold.name(), PTMDefaultValues.iceThreshold.doubleValue());
 
@@ -374,6 +386,8 @@ public class WorldConfig extends ConfigFile
         WriteModSettings(PTMDefaultValues.oldBiomeGenerator.name(), this.oldBiomeGenerator);
         WriteModSettings(PTMDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
         WriteModSettings(PTMDefaultValues.biomeSize.name(), this.biomeSize);
+         WriteModSettings(PTMDefaultValues.landSize.name(), this.landSize);
+        WriteModSettings(PTMDefaultValues.riversEnabled.name(), this.riversEnabled);
         WriteModSettings(PTMDefaultValues.minMoisture.name(), this.minMoisture);
         WriteModSettings(PTMDefaultValues.maxMoisture.name(), this.maxMoisture);
         WriteModSettings(PTMDefaultValues.minTemperature.name(), this.minTemperature);

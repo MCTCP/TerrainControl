@@ -17,10 +17,16 @@ public enum PTMDefaultValues
     oldBiomeGenerator(false),
     oldBiomeSize(1.5D),
     biomeSize(4),
+    landSize(5),
+    riversEnabled(true),
+    biomeChance(1),
+
+
     minMoisture(0.0D),
     maxMoisture(1.0D),
     minTemperature(0.0D),
     maxTemperature(1.0D),
+
     snowThreshold(0.5D),
     iceThreshold(0.5D),
     swampSize(2),
@@ -76,8 +82,8 @@ public enum PTMDefaultValues
     undergroundLakesInAir(true),
 
 
-    TerrainFactor(0.1D),
-    TerrainFactor2(0.3D),
+    BiomeSurfaceAdd(0.1D),
+    BiomeVolatilityAdd(0.3D),
 
     customObjects(true),
     objectSpawnRatio(2),
