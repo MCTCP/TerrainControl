@@ -9,10 +9,10 @@ public enum PTMDefaultValues
     DefaultSettingsName("DefaultSettings.ini"),
     DefaultBOBDirectoryName("DefaultBOBPlugins"),
     DefaultBiomeConfigDirectoryName("DefaultBiomeConfigs"),
-    xLimit(16),
-    zLimit(16),
     yLimit(128),
     maxChunkBlockValue(32768),
+
+    Mode("Normal"),
 
     oldBiomeGenerator(false),
     oldBiomeSize(1.5D),
@@ -21,6 +21,8 @@ public enum PTMDefaultValues
     riversEnabled(true),
     biomeChance(1),
 
+    SurfaceBlock(2),
+    GroundBlock(3),
 
     minMoisture(0.0D),
     maxMoisture(1.0D),
@@ -53,6 +55,8 @@ public enum PTMDefaultValues
     flatBedrock(false),
     bedrockobsidian(false),
     disableNotchPonds(false),
+
+    ObjectsEnabled(true),
 
     caveRarity(7),
     caveFrequency(40),

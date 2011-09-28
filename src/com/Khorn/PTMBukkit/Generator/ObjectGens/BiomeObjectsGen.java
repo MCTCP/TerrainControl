@@ -77,11 +77,14 @@ public class BiomeObjectsGen
     private World world;
     private BiomeConfig biomeConfig;
     private Random rand;
+    private BiomeBase Biome;
 
-    public BiomeObjectsGen(World _world, BiomeConfig config)
+    public BiomeObjectsGen(World _world, BiomeConfig config,BiomeBase _biome)
     {
         world = _world;
+        Biome = _biome;
         biomeConfig = config;
+        this.InitGenerators();
 
     }
 
@@ -323,6 +326,25 @@ public class BiomeObjectsGen
         placeMaterial(x, z, this.biomeConfig.lapislazuliDepositRarity3, this.biomeConfig.lapislazuliDepositFrequency3, this.biomeConfig.lapislazuliDepositMinAltitude3, this.biomeConfig.lapislazuliDepositMaxAltitude3, this.genLapis3);
 
         placeMaterial(x, z, this.biomeConfig.lapislazuliDepositRarity4, this.biomeConfig.lapislazuliDepositFrequency4, this.biomeConfig.lapislazuliDepositMinAltitude4, this.biomeConfig.lapislazuliDepositMaxAltitude4, this.genLapis4);
+
+    }
+
+    public void ProcessTrees(int x, int z,Random rnd)
+    {
+        int localDensity = this.biomeConfig.TreeDensity;
+        if(rnd.nextInt(10) == 0) localDensity++;
+         for (int i = 0; i < localDensity; i++)
+        {
+
+            int _x = x + this.rand.nextInt(16);
+            int _z = z + this.rand.nextInt(16);
+
+            WorldGenerator localWorldGenerator = this.Biome.a(this.rand);
+            localWorldGenerator.a(1.0D, 1.0D, 1.0D);
+            localWorldGenerator.a(this.world, this.rand, _x, this.world.getHighestBlockYAt(_x, _z), _z);
+
+
+        }
 
     }
 }

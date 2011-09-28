@@ -2,6 +2,7 @@ package com.Khorn.PTMBukkit.Generator;
 
 import com.Khorn.PTMBukkit.BiomeConfig;
 import com.Khorn.PTMBukkit.CustomObjects.CustomObjectGen;
+import com.Khorn.PTMBukkit.Generator.ObjectGens.BiomeObjectsGen;
 import com.Khorn.PTMBukkit.WorldConfig;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
@@ -14,10 +15,12 @@ public class ObjectSpawner extends BlockPopulator
 {
 
 
-
     private WorldConfig worldSettings;
     private Random rand;
     private World world;
+    private BiomeBase[] BiomeArray;
+
+    private BiomeObjectsGen[] BiomeGenerators;
 
     public ObjectSpawner(WorldConfig wrk)
     {
@@ -29,11 +32,18 @@ public class ObjectSpawner extends BlockPopulator
     public void Init(World world)
     {
         this.world = world;
+        InitGenerators();
+    }
+
+    private void InitGenerators()
+    {
+        this.BiomeGenerators = new BiomeObjectsGen[this.worldSettings.biomeConfigs.length];
+        for (int i = 0; i < this.worldSettings.biomeConfigs.length; i++)
+            this.BiomeGenerators[i] = new BiomeObjectsGen(this.world, this.worldSettings.biomeConfigs[i], BiomeBase.a[i]);
     }
 
 
-
-   /*
+    /*
     void processTrees(int x, int z, BiomeBase currentBiome)
     {
         if (!this.worldSettings.notchBiomeTrees)
@@ -72,9 +82,6 @@ public class ObjectSpawner extends BlockPopulator
         }
 
     }*/
-
-
-
 
 
     void processUndergroundLakes(int x, int z)
@@ -134,46 +141,6 @@ public class ObjectSpawner extends BlockPopulator
         }
     }
 
-    private boolean SpawnLiquid(int x, int y, int z, int type)
-    {
-
-        if (this.world.getTypeId(x, y + 1, z) != Block.STONE.id)
-            return false;
-        if (this.world.getTypeId(x, y - 1, z) != Block.STONE.id)
-            return false;
-
-        if ((this.world.getTypeId(x, y, z) != 0) && (this.world.getTypeId(x, y, z) != Block.STONE.id))
-            return false;
-
-        int i = 0;
-        if (this.world.getTypeId(x - 1, y, z) == Block.STONE.id)
-            i++;
-        if (this.world.getTypeId(x + 1, y, z) == Block.STONE.id)
-            i++;
-        if (this.world.getTypeId(x, y, z - 1) == Block.STONE.id)
-            i++;
-        if (this.world.getTypeId(x, y, z + 1) == Block.STONE.id)
-            i++;
-
-        int j = 0;
-        if (this.world.isEmpty(x - 1, y, z))
-            j++;
-        if (this.world.isEmpty(x + 1, y, z))
-            j++;
-        if (this.world.isEmpty(x, y, z - 1))
-            j++;
-        if (this.world.isEmpty(x, y, z + 1))
-            j++;
-
-        if ((i == 3) && (j == 1))
-        {
-            this.world.setRawTypeId(x, y, z, type);
-
-        }
-
-        return true;
-    }
-
     @Override
     public void populate(org.bukkit.World _world, Random random, Chunk chunk)
     {
@@ -193,48 +160,52 @@ public class ObjectSpawner extends BlockPopulator
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
         this.rand.setSeed(chunk_x * l1 + chunk_z * l2 ^ world.getSeed());
 
-
         //ToDo create custom WorldGen objects
-        //Todo use world.f for sand and clay
-        //this.processUndergroundDeposits(x, z);
-        //System.out.println("Under ground debug: " + x  + " " + z + " " + rand.nextDouble());
-        // ToDo add lavaLevelMin and lavaLevelMax here
 
+        if(this.worldSettings.ObjectsEnabled)
+        {
+            this.worldSettings.ChunkProvider.strongholdGen.a(this.world,this.rand,chunk_x,chunk_z);
+            this.worldSettings.ChunkProvider.MineshaftGen.a(this.world,this.rand,chunk_x,chunk_z);
+            this.worldSettings.ChunkProvider.VillageGen.a(this.world,this.rand,chunk_x,chunk_z);
+        }
 
+        BiomeObjectsGen biomeGen = this.BiomeGenerators[localBiomeBase.y];
 
+        biomeGen.ProcessUndergroundObjects(x, z, this.rand);
 
-        //this.processAboveGroundMaterials(x, z, localBiomeBase);
+        if (this.worldSettings.undergroundLakes)
+            this.processUndergroundLakes(x, z);
 
-        //System.out.println("Above ground debug: " + x  + " " + z + " " + rand.nextDouble());
+        biomeGen.ProcessOres(x, z, this.rand);
 
         CustomObjectGen.SpawnCustomObjects(this.world, this.rand, this.worldSettings, x, z, localBiomeBase);
 
-        //this.processTrees(x, z, localBiomeBase);
+        biomeGen.ProcessTrees(x, z, this.rand);
 
-
+        biomeGen.ProcessAboveGround(x, z, this.rand);
 
 
         /*
-        int i = 0;
+       int i = 0;
 
-        double[] TemperatureArray = new double[256];
-        TemperatureArray = this.world.getWorldChunkManager().a(TemperatureArray, x, z, 16, 16);
-        for (int _x = x; _x < x + 16; _x++)
-        {
-            for (int _z = z; _z < z + 16; _z++)
-            {
-
-
-                int _y = this.world.e(_x, _z);
-                double d2 = TemperatureArray[i] - (_y - 64) / 64.0D * 0.3D;
-                i++;
-                if (!((d2 >= this.worldSettings.snowThreshold) || (_y <= 0) || (_y >= 128) || (!this.world.isEmpty(_x, _y, _z)) || (!this.world.getMaterial(_x, _y - 1, _z).isSolid()) || (this.world.getMaterial(_x, _y - 1, _z) == Material.ICE)))
-                    this.world.setRawTypeId(_x, _y, _z, Block.SNOW.id);
+       double[] TemperatureArray = new double[256];
+       TemperatureArray = this.world.getWorldChunkManager().a(TemperatureArray, x, z, 16, 16);
+       for (int _x = x; _x < x + 16; _x++)
+       {
+           for (int _z = z; _z < z + 16; _z++)
+           {
 
 
-            }
-            i = 0;
-        } */
+               int _y = this.world.e(_x, _z);
+               double d2 = TemperatureArray[i] - (_y - 64) / 64.0D * 0.3D;
+               i++;
+               if (!((d2 >= this.worldSettings.snowThreshold) || (_y <= 0) || (_y >= 128) || (!this.world.isEmpty(_x, _y, _z)) || (!this.world.getMaterial(_x, _y - 1, _z).isSolid()) || (this.world.getMaterial(_x, _y - 1, _z) == Material.ICE)))
+                   this.world.setRawTypeId(_x, _y, _z, Block.SNOW.id);
+
+
+           }
+           i = 0;
+       } */
         if (this.worldSettings.replaceBlocks.size() != 0)
         {
             byte[] blocks = ((CraftChunk) chunk).getHandle().b;
@@ -245,6 +216,27 @@ public class ObjectSpawner extends BlockPopulator
                     blocks[i] = this.worldSettings.ReplaceBlocksMatrix[blocks[i]];
             }
         }
+        if (this.worldSettings.BiomeConfigsHaveReplacement)
+        {
+            byte[] blocks = ((CraftChunk) chunk).getHandle().b;
+
+            for (int _x = 0; _x < 16; _x++)
+                for (int _z = 0; _z < 16; _z++)
+                {
+                    this.BiomeArray = this.world.getWorldChunkManager().a(this.BiomeArray, chunk_x * 16, chunk_z * 16, 16, 16);
+                    BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.BiomeArray[(_z + _x * 16)].y];
+                    if (biomeConfig.replaceBlocks.size() > 0)
+                    {
+                        for (int _y = 127; _y >= 0; _y--)
+                        {
+                            int i = (_z * 16 + _x) * 128 + _y;
+                            if (blocks[i] != biomeConfig.ReplaceBlocksMatrix[blocks[i]])
+                                blocks[i] = biomeConfig.ReplaceBlocksMatrix[blocks[i]];
+
+                        }
+                    }
+                }
+        }
 
         ((CraftChunk) chunk).getHandle().initLighting();
 
@@ -252,7 +244,10 @@ public class ObjectSpawner extends BlockPopulator
         BlockSand.instaFall = true;
 
         if (this.worldSettings.isDeprecated)
+        {
             this.worldSettings = this.worldSettings.newSettings;
+            InitGenerators();
+        }
     }
 
 }

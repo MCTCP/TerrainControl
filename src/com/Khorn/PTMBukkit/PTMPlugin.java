@@ -7,6 +7,7 @@ import com.Khorn.PTMBukkit.Commands.PTMCommandExecutor;
 import com.Khorn.PTMBukkit.Generator.BiomeManager;
 import com.Khorn.PTMBukkit.Generator.BiomeManagerOld;
 import com.Khorn.PTMBukkit.Generator.ChunkProviderPTM;
+import com.Khorn.PTMBukkit.Generator.ChunkProviderTest;
 import com.Khorn.PTMBukkit.Listeners.PTMBlockListener;
 import com.Khorn.PTMBukkit.Listeners.PTMPlayerListener;
 import com.Khorn.PTMBukkit.Listeners.PTMWorldListener;
@@ -72,7 +73,12 @@ public class PTMPlugin extends JavaPlugin
         }
 
 
-        ChunkProviderPTM prov = new ChunkProviderPTM(this.GetSettings(worldName));
+        WorldConfig conf = this.GetSettings(worldName);
+        ChunkGenerator prov;
+        if (conf.Mode == WorldConfig.GenMode.Normal || conf.Mode == WorldConfig.GenMode.TerrainTest)
+            prov = new ChunkProviderPTM(conf);
+        else
+            prov = new ChunkProviderTest(conf);
 
 
         System.out.println("PhoenixTerrainMod: enabled for '" + worldName + "'");
@@ -131,13 +137,18 @@ public class PTMPlugin extends JavaPlugin
 
             net.minecraft.server.World workWorld = ((CraftWorld) world).getHandle();
 
-            if(worldSetting.oldBiomeGenerator)
+            if (worldSetting.oldBiomeGenerator)
                 workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
             else
                 workWorld.worldProvider.b = new BiomeManager(workWorld, worldSetting);
 
-            worldSetting.objectSpawner.Init(workWorld);
-            worldSetting.ChunkProvider.Init(world);
+            if (worldSetting.Mode == WorldConfig.GenMode.Normal)
+            {
+                worldSetting.objectSpawner.Init(workWorld);
+                worldSetting.ChunkProvider.Init(world);
+            } else if (worldSetting.Mode == WorldConfig.GenMode.TerrainTest)
+                worldSetting.ChunkProvider.Init(world);
+
             worldSetting.isInit = true;
 
             System.out.println("PhoenixTerrainMod: world seed is " + workWorld.getSeed());

@@ -2,6 +2,7 @@ package com.Khorn.PTMBukkit;
 
 import com.Khorn.PTMBukkit.Util.ConfigFile;
 import net.minecraft.server.BiomeBase;
+import net.minecraft.server.Block;
 
 import java.io.*;
 import java.util.HashMap;
@@ -21,8 +22,8 @@ public class BiomeConfig extends ConfigFile
     public float BiomeSurface;
     public float BiomeVolatility;
 
-    //Todo height control. !!!
-
+    public byte SurfaceBlock;
+    public byte GroundBlock;
 
     public boolean evenWaterSourceDistribution;
     public boolean evenLavaSourceDistribution;
@@ -328,8 +329,9 @@ public class BiomeConfig extends ConfigFile
 
         this.BiomeSurface = this.ReadModSettings(PTMDefaultValues.BiomeSurfaceAdd.name(), this.DefaultBiomeSurface);
         this.BiomeVolatility = this.ReadModSettings(PTMDefaultValues.BiomeVolatilityAdd.name(), this.DefaultBiomeVolatility);
-        //Todo Add height control
-        //ReadHeightSettings();
+
+        this.SurfaceBlock = this.ReadModSettings(PTMDefaultValues.SurfaceBlock.name(), this.DefaultSurfaceBlock);
+        this.GroundBlock = this.ReadModSettings(PTMDefaultValues.GroundBlock.name(), this.DefaultGroundBlock);
 
 
         this.flowerDepositRarity = this.ReadModSettings(PTMDefaultValues.flowerDepositRarity.name(), PTMDefaultValues.flowerDepositRarity.intValue());
@@ -659,8 +661,10 @@ public class BiomeConfig extends ConfigFile
 
         WriteModSettings(PTMDefaultValues.BiomeSurfaceAdd.name(), this.BiomeSurface);
         WriteModSettings(PTMDefaultValues.BiomeVolatilityAdd.name(), this.BiomeVolatility);
-        // Todo height control
-        //WriteHeightSettings();
+
+        WriteModSettings(PTMDefaultValues.SurfaceBlock.name(), this.SurfaceBlock);
+        WriteModSettings(PTMDefaultValues.GroundBlock.name(), this.GroundBlock);
+
 
 
         WriteModTitleSettings("Replace Variables :");
@@ -965,62 +969,62 @@ public class BiomeConfig extends ConfigFile
 
         this.dungeonRarity = CheckValue(this.dungeonRarity, 0, 100);
         this.dungeonFrequency = CheckValue(this.dungeonFrequency, 0, 200);
-        this.dungeonMinAltitude = CheckValue(this.dungeonMaxAltitude, 0, ChunkMaxY - 1);
+        this.dungeonMinAltitude = CheckValue(this.dungeonMinAltitude, 0, ChunkMaxY - 1);
         this.dungeonMaxAltitude = CheckValue(this.dungeonMaxAltitude, 1, ChunkMaxY, this.dungeonMinAltitude);
 
         this.flowerDepositRarity = CheckValue(this.flowerDepositRarity, 0, 100);
         this.flowerDepositFrequency = CheckValue(this.flowerDepositFrequency, 0, 200);
-        this.flowerDepositMinAltitude = CheckValue(this.flowerDepositMaxAltitude, 0, ChunkMaxY - 1);
+        this.flowerDepositMinAltitude = CheckValue(this.flowerDepositMinAltitude, 0, ChunkMaxY - 1);
         this.flowerDepositMaxAltitude = CheckValue(this.flowerDepositMaxAltitude, 1, ChunkMaxY, this.flowerDepositMinAltitude);
 
         this.roseDepositRarity = CheckValue(this.roseDepositRarity, 0, 100);
         this.roseDepositFrequency = CheckValue(this.roseDepositFrequency, 0, 200);
-        this.roseDepositMinAltitude = CheckValue(this.roseDepositMaxAltitude, 0, ChunkMaxY - 1);
+        this.roseDepositMinAltitude = CheckValue(this.roseDepositMinAltitude, 0, ChunkMaxY - 1);
         this.roseDepositMaxAltitude = CheckValue(this.roseDepositMaxAltitude, 1, ChunkMaxY, this.roseDepositMinAltitude);
 
         this.brownMushroomDepositRarity = CheckValue(this.brownMushroomDepositRarity, 0, 100);
         this.brownMushroomDepositFrequency = CheckValue(this.brownMushroomDepositFrequency, 0, 200);
-        this.brownMushroomDepositMinAltitude = CheckValue(this.brownMushroomDepositMaxAltitude, 0, ChunkMaxY - 1);
+        this.brownMushroomDepositMinAltitude = CheckValue(this.brownMushroomDepositMinAltitude, 0, ChunkMaxY - 1);
         this.brownMushroomDepositMaxAltitude = CheckValue(this.brownMushroomDepositMaxAltitude, 1, ChunkMaxY, this.brownMushroomDepositMinAltitude);
 
         this.redMushroomDepositRarity = CheckValue(this.redMushroomDepositRarity, 0, 100);
         this.redMushroomDepositFrequency = CheckValue(this.redMushroomDepositFrequency, 0, 200);
-        this.redMushroomDepositMinAltitude = CheckValue(this.redMushroomDepositMaxAltitude, 0, ChunkMaxY - 1);
+        this.redMushroomDepositMinAltitude = CheckValue(this.redMushroomDepositMinAltitude, 0, ChunkMaxY - 1);
         this.redMushroomDepositMaxAltitude = CheckValue(this.redMushroomDepositMaxAltitude, 1, ChunkMaxY, this.redMushroomDepositMinAltitude);
 
         this.reedDepositRarity = CheckValue(this.reedDepositRarity, 0, 100);
         this.reedDepositFrequency = CheckValue(this.reedDepositFrequency, 0, 200);
-        this.reedDepositMinAltitude = CheckValue(this.reedDepositMaxAltitude, 0, ChunkMaxY - 1);
+        this.reedDepositMinAltitude = CheckValue(this.reedDepositMinAltitude, 0, ChunkMaxY - 1);
         this.reedDepositMaxAltitude = CheckValue(this.reedDepositMaxAltitude, 1, ChunkMaxY, this.reedDepositMinAltitude);
 
         this.pumpkinDepositRarity = CheckValue(this.pumpkinDepositRarity, 0, 100);
         this.pumpkinDepositFrequency = CheckValue(this.pumpkinDepositFrequency, 0, 200);
-        this.pumpkinDepositMinAltitude = CheckValue(this.pumpkinDepositMaxAltitude, 0, ChunkMaxY - 1);
+        this.pumpkinDepositMinAltitude = CheckValue(this.pumpkinDepositMinAltitude, 0, ChunkMaxY - 1);
         this.pumpkinDepositMaxAltitude = CheckValue(this.pumpkinDepositMaxAltitude, 1, ChunkMaxY, this.pumpkinDepositMinAltitude);
 
         this.cactusDepositRarity = CheckValue(this.cactusDepositRarity, 0, 100);
         this.cactusDepositFrequency = CheckValue(this.cactusDepositFrequency, 0, 200);
-        this.cactusDepositMinAltitude = CheckValue(this.cactusDepositMaxAltitude, 0, ChunkMaxY - 1);
+        this.cactusDepositMinAltitude = CheckValue(this.cactusDepositMinAltitude, 0, ChunkMaxY - 1);
         this.cactusDepositMaxAltitude = CheckValue(this.cactusDepositMaxAltitude, 1, ChunkMaxY, this.cactusDepositMinAltitude);
 
         this.longGrassDepositRarity = CheckValue(this.longGrassDepositRarity, 0, 100);
         this.longGrassDepositFrequency = CheckValue(this.longGrassDepositFrequency, 0, 200);
-        this.longGrassDepositMinAltitude = CheckValue(this.longGrassDepositMaxAltitude, 0, ChunkMaxY - 1);
+        this.longGrassDepositMinAltitude = CheckValue(this.longGrassDepositMinAltitude, 0, ChunkMaxY - 1);
         this.longGrassDepositMaxAltitude = CheckValue(this.longGrassDepositMaxAltitude, 1, ChunkMaxY, this.longGrassDepositMinAltitude);
 
         this.deadBushDepositRarity = CheckValue(this.deadBushDepositRarity, 0, 100);
         this.deadBushDepositFrequency = CheckValue(this.deadBushDepositFrequency, 0, 200);
-        this.deadBushDepositMinAltitude = CheckValue(this.deadBushDepositMaxAltitude, 0, ChunkMaxY - 1);
+        this.deadBushDepositMinAltitude = CheckValue(this.deadBushDepositMinAltitude, 0, ChunkMaxY - 1);
         this.deadBushDepositMaxAltitude = CheckValue(this.deadBushDepositMaxAltitude, 1, ChunkMaxY, this.deadBushDepositMinAltitude);
 
         this.waterSourceDepositRarity = CheckValue(this.waterSourceDepositRarity, 0, 100);
         this.waterSourceDepositFrequency = CheckValue(this.waterSourceDepositFrequency, 0, 200);
-        this.waterSourceDepositMinAltitude = CheckValue(this.waterSourceDepositMaxAltitude, 0, ChunkMaxY - 1);
+        this.waterSourceDepositMinAltitude = CheckValue(this.waterSourceDepositMinAltitude, 0, ChunkMaxY - 1);
         this.waterSourceDepositMaxAltitude = CheckValue(this.waterSourceDepositMaxAltitude, 1, ChunkMaxY, this.waterSourceDepositMinAltitude);
 
         this.lavaSourceDepositRarity = CheckValue(this.lavaSourceDepositRarity, 0, 100);
         this.lavaSourceDepositFrequency = CheckValue(this.lavaSourceDepositFrequency, 0, 200);
-        this.lavaSourceDepositMinAltitude = CheckValue(this.lavaSourceDepositMaxAltitude, 0, ChunkMaxY - 1);
+        this.lavaSourceDepositMinAltitude = CheckValue(this.lavaSourceDepositMinAltitude, 0, ChunkMaxY - 1);
         this.lavaSourceDepositMaxAltitude = CheckValue(this.lavaSourceDepositMaxAltitude, 1, ChunkMaxY, this.lavaSourceDepositMinAltitude);
 
         this.waterClayDepositRarity = CheckValue(this.waterClayDepositRarity, 0, 100);
@@ -1035,155 +1039,155 @@ public class BiomeConfig extends ConfigFile
 
         this.dirtDepositRarity1 = CheckValue(this.dirtDepositRarity1, 0, 100);
         this.dirtDepositFrequency1 = CheckValue(this.dirtDepositFrequency1, 0, 200);
-        this.dirtDepositMinAltitude1 = CheckValue(this.dirtDepositMaxAltitude1, 0, ChunkMaxY - 1);
+        this.dirtDepositMinAltitude1 = CheckValue(this.dirtDepositMinAltitude1, 0, ChunkMaxY - 1);
         this.dirtDepositMaxAltitude1 = CheckValue(this.dirtDepositMaxAltitude1, 1, ChunkMaxY, this.dirtDepositMinAltitude1);
         this.dirtDepositRarity2 = CheckValue(this.dirtDepositRarity2, 0, 100);
         this.dirtDepositFrequency2 = CheckValue(this.dirtDepositFrequency2, 0, 200);
-        this.dirtDepositMinAltitude2 = CheckValue(this.dirtDepositMaxAltitude2, 0, ChunkMaxY - 1);
+        this.dirtDepositMinAltitude2 = CheckValue(this.dirtDepositMinAltitude2, 0, ChunkMaxY - 1);
         this.dirtDepositMaxAltitude2 = CheckValue(this.dirtDepositMaxAltitude2, 1, ChunkMaxY, this.dirtDepositMinAltitude2);
         this.dirtDepositRarity3 = CheckValue(this.dirtDepositRarity3, 0, 100);
         this.dirtDepositFrequency3 = CheckValue(this.dirtDepositFrequency3, 0, 200);
-        this.dirtDepositMinAltitude3 = CheckValue(this.dirtDepositMaxAltitude3, 0, ChunkMaxY - 1);
+        this.dirtDepositMinAltitude3 = CheckValue(this.dirtDepositMinAltitude3, 0, ChunkMaxY - 1);
         this.dirtDepositMaxAltitude3 = CheckValue(this.dirtDepositMaxAltitude3, 1, ChunkMaxY, this.dirtDepositMinAltitude3);
         this.dirtDepositRarity4 = CheckValue(this.dirtDepositRarity4, 0, 100);
         this.dirtDepositFrequency4 = CheckValue(this.dirtDepositFrequency4, 0, 200);
-        this.dirtDepositMinAltitude4 = CheckValue(this.dirtDepositMaxAltitude4, 0, ChunkMaxY - 1);
+        this.dirtDepositMinAltitude4 = CheckValue(this.dirtDepositMinAltitude4, 0, ChunkMaxY - 1);
         this.dirtDepositMaxAltitude4 = CheckValue(this.dirtDepositMaxAltitude4, 1, ChunkMaxY, this.dirtDepositMinAltitude4);
 
         this.gravelDepositRarity1 = CheckValue(this.gravelDepositRarity1, 0, 100);
         this.gravelDepositFrequency1 = CheckValue(this.gravelDepositFrequency1, 0, 200);
-        this.gravelDepositMinAltitude1 = CheckValue(this.gravelDepositMaxAltitude1, 0, ChunkMaxY - 1);
+        this.gravelDepositMinAltitude1 = CheckValue(this.gravelDepositMinAltitude1, 0, ChunkMaxY - 1);
         this.gravelDepositMaxAltitude1 = CheckValue(this.gravelDepositMaxAltitude1, 1, ChunkMaxY, this.gravelDepositMinAltitude1);
         this.gravelDepositRarity2 = CheckValue(this.gravelDepositRarity2, 0, 100);
         this.gravelDepositFrequency2 = CheckValue(this.gravelDepositFrequency2, 0, 200);
-        this.gravelDepositMinAltitude2 = CheckValue(this.gravelDepositMaxAltitude2, 0, ChunkMaxY - 1);
+        this.gravelDepositMinAltitude2 = CheckValue(this.gravelDepositMinAltitude2, 0, ChunkMaxY - 1);
         this.gravelDepositMaxAltitude2 = CheckValue(this.gravelDepositMaxAltitude2, 1, ChunkMaxY, this.gravelDepositMinAltitude2);
         this.gravelDepositRarity3 = CheckValue(this.gravelDepositRarity3, 0, 100);
         this.gravelDepositFrequency3 = CheckValue(this.gravelDepositFrequency3, 0, 200);
-        this.gravelDepositMinAltitude3 = CheckValue(this.gravelDepositMaxAltitude3, 0, ChunkMaxY - 1);
+        this.gravelDepositMinAltitude3 = CheckValue(this.gravelDepositMinAltitude3, 0, ChunkMaxY - 1);
         this.gravelDepositMaxAltitude3 = CheckValue(this.gravelDepositMaxAltitude3, 1, ChunkMaxY, this.gravelDepositMinAltitude3);
         this.gravelDepositRarity4 = CheckValue(this.gravelDepositRarity4, 0, 100);
         this.gravelDepositFrequency4 = CheckValue(this.gravelDepositFrequency4, 0, 200);
-        this.gravelDepositMinAltitude4 = CheckValue(this.gravelDepositMaxAltitude4, 0, ChunkMaxY - 1);
+        this.gravelDepositMinAltitude4 = CheckValue(this.gravelDepositMinAltitude4, 0, ChunkMaxY - 1);
         this.gravelDepositMaxAltitude4 = CheckValue(this.gravelDepositMaxAltitude4, 1, ChunkMaxY, this.gravelDepositMinAltitude4);
 
         this.clayDepositRarity1 = CheckValue(this.clayDepositRarity1, 0, 100);
         this.clayDepositFrequency1 = CheckValue(this.clayDepositFrequency1, 0, 200);
-        this.clayDepositMinAltitude1 = CheckValue(this.clayDepositMaxAltitude1, 0, ChunkMaxY - 1);
+        this.clayDepositMinAltitude1 = CheckValue(this.clayDepositMinAltitude1, 0, ChunkMaxY - 1);
         this.clayDepositMaxAltitude1 = CheckValue(this.clayDepositMaxAltitude1, 1, ChunkMaxY, this.clayDepositMinAltitude1);
         this.clayDepositRarity2 = CheckValue(this.clayDepositRarity2, 0, 100);
         this.clayDepositFrequency2 = CheckValue(this.clayDepositFrequency2, 0, 200);
-        this.clayDepositMinAltitude2 = CheckValue(this.clayDepositMaxAltitude2, 0, ChunkMaxY - 1);
+        this.clayDepositMinAltitude2 = CheckValue(this.clayDepositMinAltitude2, 0, ChunkMaxY - 1);
         this.clayDepositMaxAltitude2 = CheckValue(this.clayDepositMaxAltitude2, 1, ChunkMaxY, this.clayDepositMinAltitude2);
         this.clayDepositRarity3 = CheckValue(this.clayDepositRarity3, 0, 100);
         this.clayDepositFrequency3 = CheckValue(this.clayDepositFrequency3, 0, 200);
-        this.clayDepositMinAltitude3 = CheckValue(this.clayDepositMaxAltitude3, 0, ChunkMaxY - 1);
+        this.clayDepositMinAltitude3 = CheckValue(this.clayDepositMinAltitude3, 0, ChunkMaxY - 1);
         this.clayDepositMaxAltitude3 = CheckValue(this.clayDepositMaxAltitude3, 1, ChunkMaxY, this.clayDepositMinAltitude3);
         this.clayDepositRarity4 = CheckValue(this.clayDepositRarity4, 0, 100);
         this.clayDepositFrequency4 = CheckValue(this.clayDepositFrequency4, 0, 200);
-        this.clayDepositMinAltitude4 = CheckValue(this.clayDepositMaxAltitude4, 0, ChunkMaxY - 1);
+        this.clayDepositMinAltitude4 = CheckValue(this.clayDepositMinAltitude4, 0, ChunkMaxY - 1);
         this.clayDepositMaxAltitude4 = CheckValue(this.clayDepositMaxAltitude4, 1, ChunkMaxY, this.clayDepositMinAltitude4);
 
         this.coalDepositRarity1 = CheckValue(this.coalDepositRarity1, 0, 100);
         this.coalDepositFrequency1 = CheckValue(this.coalDepositFrequency1, 0, 200);
-        this.coalDepositMinAltitude1 = CheckValue(this.coalDepositMaxAltitude1, 0, ChunkMaxY - 1);
+        this.coalDepositMinAltitude1 = CheckValue(this.coalDepositMinAltitude1, 0, ChunkMaxY - 1);
         this.coalDepositMaxAltitude1 = CheckValue(this.coalDepositMaxAltitude1, 1, ChunkMaxY, this.coalDepositMinAltitude1);
         this.coalDepositRarity2 = CheckValue(this.coalDepositRarity2, 0, 100);
         this.coalDepositFrequency2 = CheckValue(this.coalDepositFrequency2, 0, 200);
-        this.coalDepositMinAltitude2 = CheckValue(this.coalDepositMaxAltitude2, 0, ChunkMaxY - 1);
+        this.coalDepositMinAltitude2 = CheckValue(this.coalDepositMinAltitude2, 0, ChunkMaxY - 1);
         this.coalDepositMaxAltitude2 = CheckValue(this.coalDepositMaxAltitude2, 1, ChunkMaxY, this.coalDepositMinAltitude2);
         this.coalDepositRarity3 = CheckValue(this.coalDepositRarity3, 0, 100);
         this.coalDepositFrequency3 = CheckValue(this.coalDepositFrequency3, 0, 200);
-        this.coalDepositMinAltitude3 = CheckValue(this.coalDepositMaxAltitude3, 0, ChunkMaxY - 1);
+        this.coalDepositMinAltitude3 = CheckValue(this.coalDepositMinAltitude3, 0, ChunkMaxY - 1);
         this.coalDepositMaxAltitude3 = CheckValue(this.coalDepositMaxAltitude3, 1, ChunkMaxY, this.coalDepositMinAltitude3);
         this.coalDepositRarity4 = CheckValue(this.coalDepositRarity4, 0, 100);
         this.coalDepositFrequency4 = CheckValue(this.coalDepositFrequency4, 0, 200);
-        this.coalDepositMinAltitude4 = CheckValue(this.coalDepositMaxAltitude4, 0, ChunkMaxY - 1);
+        this.coalDepositMinAltitude4 = CheckValue(this.coalDepositMinAltitude4, 0, ChunkMaxY - 1);
         this.coalDepositMaxAltitude4 = CheckValue(this.coalDepositMaxAltitude4, 1, ChunkMaxY, this.coalDepositMinAltitude4);
 
         this.ironDepositRarity1 = CheckValue(this.ironDepositRarity1, 0, 100);
         this.ironDepositFrequency1 = CheckValue(this.ironDepositFrequency1, 0, 200);
-        this.ironDepositMinAltitude1 = CheckValue(this.ironDepositMaxAltitude1, 0, ChunkMaxY - 1);
+        this.ironDepositMinAltitude1 = CheckValue(this.ironDepositMinAltitude1, 0, ChunkMaxY - 1);
         this.ironDepositMaxAltitude1 = CheckValue(this.ironDepositMaxAltitude1, 1, ChunkMaxY, this.ironDepositMinAltitude1);
         this.ironDepositRarity2 = CheckValue(this.ironDepositRarity2, 0, 100);
         this.ironDepositFrequency2 = CheckValue(this.ironDepositFrequency2, 0, 200);
-        this.ironDepositMinAltitude2 = CheckValue(this.ironDepositMaxAltitude2, 0, ChunkMaxY - 1);
+        this.ironDepositMinAltitude2 = CheckValue(this.ironDepositMinAltitude2, 0, ChunkMaxY - 1);
         this.ironDepositMaxAltitude2 = CheckValue(this.ironDepositMaxAltitude2, 1, ChunkMaxY, this.ironDepositMinAltitude2);
         this.ironDepositRarity3 = CheckValue(this.ironDepositRarity3, 0, 100);
         this.ironDepositFrequency3 = CheckValue(this.ironDepositFrequency3, 0, 200);
-        this.ironDepositMinAltitude3 = CheckValue(this.ironDepositMaxAltitude3, 0, ChunkMaxY - 1);
+        this.ironDepositMinAltitude3 = CheckValue(this.ironDepositMinAltitude3, 0, ChunkMaxY - 1);
         this.ironDepositMaxAltitude3 = CheckValue(this.ironDepositMaxAltitude3, 1, ChunkMaxY, this.ironDepositMinAltitude3);
         this.ironDepositRarity4 = CheckValue(this.ironDepositRarity4, 0, 100);
         this.ironDepositFrequency4 = CheckValue(this.ironDepositFrequency4, 0, 200);
-        this.ironDepositMinAltitude4 = CheckValue(this.ironDepositMaxAltitude4, 0, ChunkMaxY - 1);
+        this.ironDepositMinAltitude4 = CheckValue(this.ironDepositMinAltitude4, 0, ChunkMaxY - 1);
         this.ironDepositMaxAltitude4 = CheckValue(this.ironDepositMaxAltitude4, 1, ChunkMaxY, this.ironDepositMinAltitude4);
 
         this.goldDepositRarity1 = CheckValue(this.goldDepositRarity1, 0, 100);
         this.goldDepositFrequency1 = CheckValue(this.goldDepositFrequency1, 0, 200);
-        this.goldDepositMinAltitude1 = CheckValue(this.goldDepositMaxAltitude1, 0, ChunkMaxY - 1);
+        this.goldDepositMinAltitude1 = CheckValue(this.goldDepositMinAltitude1, 0, ChunkMaxY - 1);
         this.goldDepositMaxAltitude1 = CheckValue(this.goldDepositMaxAltitude1, 1, ChunkMaxY, this.goldDepositMinAltitude1);
         this.goldDepositRarity2 = CheckValue(this.goldDepositRarity2, 0, 100);
         this.goldDepositFrequency2 = CheckValue(this.goldDepositFrequency2, 0, 200);
-        this.goldDepositMinAltitude2 = CheckValue(this.goldDepositMaxAltitude2, 0, ChunkMaxY - 1);
+        this.goldDepositMinAltitude2 = CheckValue(this.goldDepositMinAltitude2, 0, ChunkMaxY - 1);
         this.goldDepositMaxAltitude2 = CheckValue(this.goldDepositMaxAltitude2, 1, ChunkMaxY, this.goldDepositMinAltitude2);
         this.goldDepositRarity3 = CheckValue(this.goldDepositRarity3, 0, 100);
         this.goldDepositFrequency3 = CheckValue(this.goldDepositFrequency3, 0, 200);
-        this.goldDepositMinAltitude3 = CheckValue(this.goldDepositMaxAltitude3, 0, ChunkMaxY - 1);
+        this.goldDepositMinAltitude3 = CheckValue(this.goldDepositMinAltitude3, 0, ChunkMaxY - 1);
         this.goldDepositMaxAltitude3 = CheckValue(this.goldDepositMaxAltitude3, 1, ChunkMaxY, this.goldDepositMinAltitude3);
         this.goldDepositRarity4 = CheckValue(this.goldDepositRarity4, 0, 100);
         this.goldDepositFrequency4 = CheckValue(this.goldDepositFrequency4, 0, 200);
-        this.goldDepositMinAltitude4 = CheckValue(this.goldDepositMaxAltitude4, 0, ChunkMaxY - 1);
+        this.goldDepositMinAltitude4 = CheckValue(this.goldDepositMinAltitude4, 0, ChunkMaxY - 1);
         this.goldDepositMaxAltitude4 = CheckValue(this.goldDepositMaxAltitude4, 1, ChunkMaxY, this.goldDepositMinAltitude4);
 
         this.redstoneDepositRarity1 = CheckValue(this.redstoneDepositRarity1, 0, 100);
         this.redstoneDepositFrequency1 = CheckValue(this.redstoneDepositFrequency1, 0, 200);
-        this.redstoneDepositMinAltitude1 = CheckValue(this.redstoneDepositMaxAltitude1, 0, ChunkMaxY - 1);
+        this.redstoneDepositMinAltitude1 = CheckValue(this.redstoneDepositMinAltitude1, 0, ChunkMaxY - 1);
         this.redstoneDepositMaxAltitude1 = CheckValue(this.redstoneDepositMaxAltitude1, 1, ChunkMaxY, this.redstoneDepositMinAltitude1);
         this.redstoneDepositRarity2 = CheckValue(this.redstoneDepositRarity2, 0, 100);
         this.redstoneDepositFrequency2 = CheckValue(this.redstoneDepositFrequency2, 0, 200);
-        this.redstoneDepositMinAltitude2 = CheckValue(this.redstoneDepositMaxAltitude2, 0, ChunkMaxY - 1);
+        this.redstoneDepositMinAltitude2 = CheckValue(this.redstoneDepositMinAltitude2, 0, ChunkMaxY - 1);
         this.redstoneDepositMaxAltitude2 = CheckValue(this.redstoneDepositMaxAltitude2, 1, ChunkMaxY, this.redstoneDepositMinAltitude2);
         this.redstoneDepositRarity3 = CheckValue(this.redstoneDepositRarity3, 0, 100);
         this.redstoneDepositFrequency3 = CheckValue(this.redstoneDepositFrequency3, 0, 200);
-        this.redstoneDepositMinAltitude3 = CheckValue(this.redstoneDepositMaxAltitude3, 0, ChunkMaxY - 1);
+        this.redstoneDepositMinAltitude3 = CheckValue(this.redstoneDepositMinAltitude3, 0, ChunkMaxY - 1);
         this.redstoneDepositMaxAltitude3 = CheckValue(this.redstoneDepositMaxAltitude3, 1, ChunkMaxY, this.redstoneDepositMinAltitude3);
         this.redstoneDepositRarity4 = CheckValue(this.redstoneDepositRarity4, 0, 100);
         this.redstoneDepositFrequency4 = CheckValue(this.redstoneDepositFrequency4, 0, 200);
-        this.redstoneDepositMinAltitude4 = CheckValue(this.redstoneDepositMaxAltitude4, 0, ChunkMaxY - 1);
+        this.redstoneDepositMinAltitude4 = CheckValue(this.redstoneDepositMinAltitude4, 0, ChunkMaxY - 1);
         this.redstoneDepositMaxAltitude4 = CheckValue(this.redstoneDepositMaxAltitude4, 1, ChunkMaxY, this.redstoneDepositMinAltitude4);
 
         this.diamondDepositRarity1 = CheckValue(this.diamondDepositRarity1, 0, 100);
         this.diamondDepositFrequency1 = CheckValue(this.diamondDepositFrequency1, 0, 200);
-        this.diamondDepositMinAltitude1 = CheckValue(this.diamondDepositMaxAltitude1, 0, ChunkMaxY - 1);
+        this.diamondDepositMinAltitude1 = CheckValue(this.diamondDepositMinAltitude1, 0, ChunkMaxY - 1);
         this.diamondDepositMaxAltitude1 = CheckValue(this.diamondDepositMaxAltitude1, 1, ChunkMaxY, this.diamondDepositMinAltitude1);
         this.diamondDepositRarity2 = CheckValue(this.diamondDepositRarity2, 0, 100);
         this.diamondDepositFrequency2 = CheckValue(this.diamondDepositFrequency2, 0, 200);
-        this.diamondDepositMinAltitude2 = CheckValue(this.diamondDepositMaxAltitude2, 0, ChunkMaxY - 1);
+        this.diamondDepositMinAltitude2 = CheckValue(this.diamondDepositMinAltitude2, 0, ChunkMaxY - 1);
         this.diamondDepositMaxAltitude2 = CheckValue(this.diamondDepositMaxAltitude2, 1, ChunkMaxY, this.diamondDepositMinAltitude2);
         this.diamondDepositRarity3 = CheckValue(this.diamondDepositRarity3, 0, 100);
         this.diamondDepositFrequency3 = CheckValue(this.diamondDepositFrequency3, 0, 200);
-        this.diamondDepositMinAltitude3 = CheckValue(this.diamondDepositMaxAltitude3, 0, ChunkMaxY - 1);
+        this.diamondDepositMinAltitude3 = CheckValue(this.diamondDepositMinAltitude3, 0, ChunkMaxY - 1);
         this.diamondDepositMaxAltitude3 = CheckValue(this.diamondDepositMaxAltitude3, 1, ChunkMaxY, this.diamondDepositMinAltitude3);
         this.diamondDepositRarity4 = CheckValue(this.diamondDepositRarity4, 0, 100);
         this.diamondDepositFrequency4 = CheckValue(this.diamondDepositFrequency4, 0, 200);
-        this.diamondDepositMinAltitude4 = CheckValue(this.diamondDepositMaxAltitude4, 0, ChunkMaxY - 1);
+        this.diamondDepositMinAltitude4 = CheckValue(this.diamondDepositMinAltitude4, 0, ChunkMaxY - 1);
         this.diamondDepositMaxAltitude4 = CheckValue(this.diamondDepositMaxAltitude4, 1, ChunkMaxY, this.diamondDepositMinAltitude4);
 
         this.lapislazuliDepositRarity1 = CheckValue(this.lapislazuliDepositRarity1, 0, 100);
         this.lapislazuliDepositFrequency1 = CheckValue(this.lapislazuliDepositFrequency1, 0, 200);
-        this.lapislazuliDepositMinAltitude1 = CheckValue(this.lapislazuliDepositMaxAltitude1, 0, ChunkMaxY - 1);
+        this.lapislazuliDepositMinAltitude1 = CheckValue(this.lapislazuliDepositMinAltitude1, 0, ChunkMaxY - 1);
         this.lapislazuliDepositMaxAltitude1 = CheckValue(this.lapislazuliDepositMaxAltitude1, 1, ChunkMaxY, this.lapislazuliDepositMinAltitude1);
         this.lapislazuliDepositRarity2 = CheckValue(this.lapislazuliDepositRarity2, 0, 100);
         this.lapislazuliDepositFrequency2 = CheckValue(this.lapislazuliDepositFrequency2, 0, 200);
-        this.lapislazuliDepositMinAltitude2 = CheckValue(this.lapislazuliDepositMaxAltitude2, 0, ChunkMaxY - 1);
+        this.lapislazuliDepositMinAltitude2 = CheckValue(this.lapislazuliDepositMinAltitude2, 0, ChunkMaxY - 1);
         this.lapislazuliDepositMaxAltitude2 = CheckValue(this.lapislazuliDepositMaxAltitude2, 1, ChunkMaxY, this.lapislazuliDepositMinAltitude2);
         this.lapislazuliDepositRarity3 = CheckValue(this.lapislazuliDepositRarity3, 0, 100);
         this.lapislazuliDepositFrequency3 = CheckValue(this.lapislazuliDepositFrequency3, 0, 200);
-        this.lapislazuliDepositMinAltitude3 = CheckValue(this.lapislazuliDepositMaxAltitude3, 0, ChunkMaxY - 1);
+        this.lapislazuliDepositMinAltitude3 = CheckValue(this.lapislazuliDepositMinAltitude3, 0, ChunkMaxY - 1);
         this.lapislazuliDepositMaxAltitude3 = CheckValue(this.lapislazuliDepositMaxAltitude3, 1, ChunkMaxY, this.lapislazuliDepositMinAltitude3);
         this.lapislazuliDepositRarity4 = CheckValue(this.lapislazuliDepositRarity4, 0, 100);
         this.lapislazuliDepositFrequency4 = CheckValue(this.lapislazuliDepositFrequency4, 0, 200);
-        this.lapislazuliDepositMinAltitude4 = CheckValue(this.lapislazuliDepositMaxAltitude4, 0, ChunkMaxY - 1);
+        this.lapislazuliDepositMinAltitude4 = CheckValue(this.lapislazuliDepositMinAltitude4, 0, ChunkMaxY - 1);
         this.lapislazuliDepositMaxAltitude4 = CheckValue(this.lapislazuliDepositMaxAltitude4, 1, ChunkMaxY, this.lapislazuliDepositMinAltitude4);
 
 
@@ -1202,12 +1206,16 @@ public class BiomeConfig extends ConfigFile
     private int DefaultClay = 1;
     private float DefaultBiomeSurface = 0.1F;
     private float DefaultBiomeVolatility = 0.3F;
+    private byte DefaultSurfaceBlock = (byte) Block.GRASS.id;
+    private byte DefaultGroundBlock = (byte) Block.DIRT.id;
 
 
     private void InitDefaults()
     {
         this.DefaultBiomeSurface = this.Biome.q;
         this.DefaultBiomeVolatility = this.Biome.r;
+        this.DefaultSurfaceBlock = this.Biome.n;
+        this.DefaultGroundBlock = this.Biome.o;
 
         switch (this.Biome.y)
         {

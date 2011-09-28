@@ -120,10 +120,13 @@ public class WorldConfig extends ConfigFile
     public WorldConfig newSettings = null;
 
     public String WorldName;
+    public GenMode Mode;
 
     public static int BiomesCount = 8;
 
     public BiomeConfig[] biomeConfigs = new BiomeConfig[BiomesCount];
+    public boolean BiomeConfigsHaveReplacement = false;
+    public boolean ObjectsEnabled ;
 
 
     public WorldConfig(File settingsDir, PTMPlugin plug, String worldName)
@@ -154,7 +157,10 @@ public class WorldConfig extends ConfigFile
 
         for (int i = 0; i < BiomesCount; i++)
         {
-            this.biomeConfigs[i] = new BiomeConfig(BiomeFolder, BiomeBase.a[i]);
+            BiomeConfig config =new BiomeConfig(BiomeFolder, BiomeBase.a[i]);
+            this.biomeConfigs[i] = config;
+            if (!this.BiomeConfigsHaveReplacement)
+                this.BiomeConfigsHaveReplacement = config.replaceBlocks.size() > 0;
         }
 
         this.RegisterBOBPlugins();
@@ -235,6 +241,13 @@ public class WorldConfig extends ConfigFile
 
     protected void ReadConfigSettings()
     {
+        try
+        {
+            this.Mode = GenMode.valueOf(ReadModSettings(PTMDefaultValues.Mode.name(), PTMDefaultValues.Mode.stringValue()));
+        } catch (IllegalArgumentException e)
+        {
+            this.Mode = GenMode.Normal;
+        }
 
         this.oldBiomeGenerator = ReadModSettings(PTMDefaultValues.oldBiomeGenerator.name(), PTMDefaultValues.oldBiomeGenerator.booleanValue());
         this.oldBiomeSize = ReadModSettings(PTMDefaultValues.oldBiomeSize.name(), PTMDefaultValues.oldBiomeSize.doubleValue());
@@ -255,6 +268,8 @@ public class WorldConfig extends ConfigFile
         this.waterlessDeserts = ReadModSettings(PTMDefaultValues.waterlessDeserts.name(), PTMDefaultValues.waterlessDeserts.booleanValue());
         this.desertDirt = ReadModSettings(PTMDefaultValues.desertDirt.name(), PTMDefaultValues.desertDirt.booleanValue());
         this.desertDirtFrequency = ReadModSettings(PTMDefaultValues.desertDirtFrequency.name(), PTMDefaultValues.desertDirtFrequency.intValue());
+
+        this.ObjectsEnabled = ReadModSettings(PTMDefaultValues.ObjectsEnabled.name(), PTMDefaultValues.ObjectsEnabled.booleanValue());
 
         this.caveRarity = ReadModSettings(PTMDefaultValues.caveRarity.name(), PTMDefaultValues.caveRarity.intValue());
         this.caveFrequency = ReadModSettings(PTMDefaultValues.caveFrequency.name(), PTMDefaultValues.caveFrequency.intValue());
@@ -381,12 +396,15 @@ public class WorldConfig extends ConfigFile
 
     protected void WriteConfigSettings() throws IOException
     {
+        WriteModTitleSettings("Possible modes : Normal, TerrainTest, NotGenerate");
+        WriteModSettings(PTMDefaultValues.Mode.name(), this.Mode.name());
+
         WriteModTitleSettings("Start Biome Variables :");
         WriteModTitleSettings("Old biome generator works only with old terrain generator!");
         WriteModSettings(PTMDefaultValues.oldBiomeGenerator.name(), this.oldBiomeGenerator);
         WriteModSettings(PTMDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
         WriteModSettings(PTMDefaultValues.biomeSize.name(), this.biomeSize);
-         WriteModSettings(PTMDefaultValues.landSize.name(), this.landSize);
+        WriteModSettings(PTMDefaultValues.landSize.name(), this.landSize);
         WriteModSettings(PTMDefaultValues.riversEnabled.name(), this.riversEnabled);
         WriteModSettings(PTMDefaultValues.minMoisture.name(), this.minMoisture);
         WriteModSettings(PTMDefaultValues.maxMoisture.name(), this.maxMoisture);
@@ -423,6 +441,9 @@ public class WorldConfig extends ConfigFile
         WriteModSettings(PTMDefaultValues.bedrockobsidian.name(), this.bedrockObsidian);
         WriteModSettings(PTMDefaultValues.disableNotchHeightControl.name(), this.disableNotchHeightControl);
         WriteHeightSettings();
+
+        WriteModTitleSettings("Map objects (Strongholds, Villages, Mineshafts:");
+        WriteModSettings(PTMDefaultValues.ObjectsEnabled.name(), this.ObjectsEnabled);
 
         WriteModTitleSettings("Replace Variables");
         WriteModSettings(PTMDefaultValues.removeSurfaceStone.name(), this.removeSurfaceStone);
@@ -606,5 +627,12 @@ public class WorldConfig extends ConfigFile
         return (byte) (this.bedrockObsidian ? Block.OBSIDIAN.id : Block.BEDROCK.id);
     }
 
+    public enum GenMode
+    {
+        Normal,
+        TerrainTest,
+        BiomeTest,
+        NotGenerate
+    }
 
 }

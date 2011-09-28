@@ -45,24 +45,26 @@ public class ChunkProviderPTM extends ChunkGenerator
     private WorldConfig worldSettings;
     private CavesGen CaveGen;
 
-    /*
-    public WorldGenStronghold StrongholdGen = new WorldGenStronghold();
+
+    public WorldGenStronghold strongholdGen = new WorldGenStronghold();
+
     public WorldGenVillage VillageGen = new WorldGenVillage();
     public WorldGenMineshaft MineshaftGen = new WorldGenMineshaft();
 
     private MapGenBase CanyonGen = new WorldGenCanyon();
-     */
+
     private BiomeBase[] BiomeArray;
 
 
     private ArrayList<BlockPopulator> populatorList;
 
-    public ChunkProviderPTM(WorldConfig worker)
+    public ChunkProviderPTM(WorldConfig config)
     {
-        this.worldSettings = worker;
+        this.worldSettings = config;
         this.worldSettings.ChunkProvider = this;
         populatorList = new ArrayList<BlockPopulator>();
-        populatorList.add(new ObjectSpawner(this.worldSettings));
+        if (this.worldSettings.Mode == WorldConfig.GenMode.Normal)
+            populatorList.add(new ObjectSpawner(this.worldSettings));
 
 
     }
@@ -198,8 +200,8 @@ public class ChunkProviderPTM extends ChunkGenerator
 
                 int i5 = -1;
 
-                int i6 = localBiomeBase.n;
-                int i7 = localBiomeBase.o;
+                int i6 = this.worldSettings.biomeConfigs[localBiomeBase.y].SurfaceBlock;
+                int i7 = this.worldSettings.biomeConfigs[localBiomeBase.y].GroundBlock;
 
                 if (this.worldSettings.ceilingBedrock)
                     paramArrayOfByte[(z * 16 + x) * 128 + 127] = this.worldSettings.getadminium();
@@ -226,8 +228,8 @@ public class ChunkProviderPTM extends ChunkGenerator
                                     i7 = (byte) Block.STONE.id;
                                 } else if ((y >= waterLevel - 4) && (y <= waterLevel + 1))
                                 {
-                                    i6 = localBiomeBase.n;
-                                    i7 = localBiomeBase.o;
+                                    i6 = this.worldSettings.biomeConfigs[localBiomeBase.y].SurfaceBlock;
+                                    i7 = this.worldSettings.biomeConfigs[localBiomeBase.y].GroundBlock;
                                 }
 
                                 if ((y < waterLevel) && (i6 == 0))
@@ -324,7 +326,7 @@ public class ChunkProviderPTM extends ChunkGenerator
                 if (this.worldSettings.oldTerrainGenerator)
                     this.oldTerrainNoise(x, z, i4, paramInt4, paramInt5, d3);
                 else
-                    this.newTerrainNoise(x, z, i4, paramInt4, paramInt5, d3);
+                    this.newTerrainNoise(x, z,  paramInt4, paramInt5, d3);
 
 
                 i4++;
@@ -399,7 +401,7 @@ public class ChunkProviderPTM extends ChunkGenerator
         this.biomeFactor2 = paramInt5 / 2.0D + d3 * 4.0D;
     }
 
-    private void newTerrainNoise(int x, int z, int i4, int paramInt4, int paramInt5, double d3)
+    private void newTerrainNoise(int x, int z, int paramInt4, int paramInt5, double d3)
     {
         float f2 = 0.0F;
         float f3 = 0.0F;
@@ -485,6 +487,15 @@ public class ChunkProviderPTM extends ChunkGenerator
         replaceBlocksForBiome(x, z, arrayOfByte, this.BiomeArray);
 
         this.CaveGen.a(this.localWorld, x, z, arrayOfByte);
+
+        if (this.worldSettings.ObjectsEnabled)
+        {
+            this.strongholdGen.a(null, this.localWorld, x, z, arrayOfByte);
+            this.VillageGen.a(null, this.localWorld, x, z, arrayOfByte);
+            this.MineshaftGen.a(null, this.localWorld, x, z, arrayOfByte);
+        }
+
+        this.CanyonGen.a(null, this.localWorld, x, z, arrayOfByte);
 
         //TODO Add new objects gen
 
