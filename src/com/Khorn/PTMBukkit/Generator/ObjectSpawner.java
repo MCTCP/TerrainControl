@@ -238,8 +238,6 @@ public class ObjectSpawner extends BlockPopulator
                 }
         }
 
-        ((CraftChunk) chunk).getHandle().initLighting();
-
 
         BlockSand.instaFall = true;
 

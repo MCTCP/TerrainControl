@@ -145,12 +145,12 @@ public enum PTMDefaultValues
 
 
     waterSourceDepositRarity(100),
-    waterSourceDepositFrequency(50),
+    waterSourceDepositFrequency(20),
     waterSourceDepositMinAltitude(8),
     waterSourceDepositMaxAltitude(128),
 
     lavaSourceDepositRarity(100),
-    lavaSourceDepositFrequency(20),
+    lavaSourceDepositFrequency(10),
     lavaSourceDepositMinAltitude(8),
     lavaSourceDepositMaxAltitude(128),
 

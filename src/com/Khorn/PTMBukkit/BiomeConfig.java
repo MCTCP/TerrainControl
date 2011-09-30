@@ -1201,8 +1201,8 @@ public class BiomeConfig extends ConfigFile
     private int DefaultMushroom = 0;
     private int DefaultReed = 0;
     private int DefaultCactus = 0;
-    private int DefaultSand = 1;
-    private int DefaultGravel = 3;
+    private int DefaultSand = 4;
+    private int DefaultGravel = 0;
     private int DefaultClay = 1;
     private float DefaultBiomeSurface = 0.1F;
     private float DefaultBiomeVolatility = 0.3F;

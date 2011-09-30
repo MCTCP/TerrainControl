@@ -497,7 +497,6 @@ public class ChunkProviderPTM extends ChunkGenerator
 
         this.CanyonGen.a(null, this.localWorld, x, z, arrayOfByte);
 
-        //TODO Add new objects gen
 
         if (this.worldSettings.isDeprecated)
             this.worldSettings = this.worldSettings.newSettings;

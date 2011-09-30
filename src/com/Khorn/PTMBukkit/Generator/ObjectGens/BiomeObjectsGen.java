@@ -2,7 +2,6 @@ package com.Khorn.PTMBukkit.Generator.ObjectGens;
 
 import com.Khorn.PTMBukkit.BiomeConfig;
 import net.minecraft.server.*;
-import sun.security.krb5.Config;
 
 import java.util.Random;
 
@@ -331,6 +330,7 @@ public class BiomeObjectsGen
 
     public void ProcessTrees(int x, int z,Random rnd)
     {
+        this.rand = rnd;
         int localDensity = this.biomeConfig.TreeDensity;
         if(rnd.nextInt(10) == 0) localDensity++;
          for (int i = 0; i < localDensity; i++)
