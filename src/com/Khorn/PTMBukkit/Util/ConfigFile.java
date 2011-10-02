@@ -195,6 +195,16 @@ public abstract class ConfigFile
             return value;
     }
 
+    protected double CheckValue(double value, double min, double max)
+    {
+        if (value > max)
+            return max;
+        else if (value < min)
+            return min;
+        else
+            return value;
+    }
+
     protected int CheckValue(int value, int min, int max, int minValue)
     {
         value = CheckValue(value, min, max);

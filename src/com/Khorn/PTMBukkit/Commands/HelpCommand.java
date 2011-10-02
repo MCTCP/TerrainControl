@@ -28,7 +28,7 @@ public class HelpCommand extends BaseCommand
             try
             {
                 page = Integer.parseInt(args.get(0));
-            } catch (NullPointerException e)
+            } catch (NumberFormatException  e)
             {
                 sender.sendMessage(ErrorColor + "Wrong page number " + args.get(0));
             }

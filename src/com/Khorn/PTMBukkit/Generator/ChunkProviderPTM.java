@@ -1,6 +1,8 @@
 package com.Khorn.PTMBukkit.Generator;
 
+import com.Khorn.PTMBukkit.Generator.ObjectGens.CanyonsGen;
 import com.Khorn.PTMBukkit.Generator.ObjectGens.CavesGen;
+import com.Khorn.PTMBukkit.Generator.ObjectGens.GenBase;
 import com.Khorn.PTMBukkit.PTMDefaultValues;
 import com.Khorn.PTMBukkit.WorldConfig;
 import net.minecraft.server.*;
@@ -43,7 +45,7 @@ public class ChunkProviderPTM extends ChunkGenerator
     private double biomeFactor2;
 
     private WorldConfig worldSettings;
-    private CavesGen CaveGen;
+    private GenBase CaveGen;
 
 
     public WorldGenStronghold strongholdGen = new WorldGenStronghold();
@@ -51,7 +53,7 @@ public class ChunkProviderPTM extends ChunkGenerator
     public WorldGenVillage VillageGen = new WorldGenVillage();
     public WorldGenMineshaft MineshaftGen = new WorldGenMineshaft();
 
-    private MapGenBase CanyonGen = new WorldGenCanyon();
+    private GenBase CanyonGen;
 
     private BiomeBase[] BiomeArray;
 
@@ -89,7 +91,8 @@ public class ChunkProviderPTM extends ChunkGenerator
             old_wcm = (BiomeManagerOld) this.localWorld.getWorldChunkManager();
 
 
-        this.CaveGen = new CavesGen(this.worldSettings);
+        this.CaveGen = new CavesGen(this.worldSettings, this.localWorld);
+        this.CanyonGen = new CanyonsGen(this.worldSettings, this.localWorld);
 
         this.l = new float[25];
         for (int i1 = -2; i1 <= 2; i1++)
@@ -185,9 +188,10 @@ public class ChunkProviderPTM extends ChunkGenerator
 
     }
 
-    void replaceBlocksForBiome(int paramInt1, int paramInt2, byte[] paramArrayOfByte, BiomeBase[] paramArrayOfBiomeBase)
+    boolean ReplaceForBiomeAndReturnWaterless(int paramInt1, int paramInt2, byte[] paramArrayOfByte, BiomeBase[] paramArrayOfBiomeBase)
     {
         int waterLevel = this.worldSettings.waterLevel;
+        int dryBlock = 256;
 
         double d1 = 0.03125D;
         this.v = this.r.a(this.v, paramInt1 * 16, paramInt2 * 16, 0, 16, 16, 1, d1 * 2.0D, d1 * 2.0D, d1 * 2.0D);
@@ -204,15 +208,15 @@ public class ChunkProviderPTM extends ChunkGenerator
                 int i7 = this.worldSettings.biomeConfigs[localBiomeBase.y].GroundBlock;
 
                 if (this.worldSettings.ceilingBedrock)
-                    paramArrayOfByte[(z * 16 + x) * 128 + 127] = this.worldSettings.getadminium();
+                    paramArrayOfByte[(z * 16 + x) * 128 + 127] = this.worldSettings.getAdminium();
 
                 for (int y = 127; y >= 0; y--)
                 {
                     int i9 = (z * 16 + x) * 128 + y;
 
-                    if (y <= this.rnd.nextInt(5) && (worldSettings.createadminium(y)))
+                    if (y < 5 && (worldSettings.createAdminium(y)) && y <= this.rnd.nextInt(5))
                     {
-                        paramArrayOfByte[i9] = this.worldSettings.getadminium();
+                        paramArrayOfByte[i9] = this.worldSettings.getAdminium();
                     } else
                     {
                         int i10 = paramArrayOfByte[i9];
@@ -270,7 +274,13 @@ public class ChunkProviderPTM extends ChunkGenerator
                             }
                     }
                 }
+                if(paramArrayOfByte[(z * 16 + x) * 128 + this.worldSettings.waterLevel] == this.worldSettings.waterBlock)
+                    dryBlock--;
+
+
             }
+
+        return dryBlock>250;
     }
 
 
@@ -326,7 +336,7 @@ public class ChunkProviderPTM extends ChunkGenerator
                 if (this.worldSettings.oldTerrainGenerator)
                     this.oldTerrainNoise(x, z, i4, paramInt4, paramInt5, d3);
                 else
-                    this.newTerrainNoise(x, z,  paramInt4, paramInt5, d3);
+                    this.newTerrainNoise(x, z, paramInt4, paramInt5, d3);
 
 
                 i4++;
@@ -484,18 +494,19 @@ public class ChunkProviderPTM extends ChunkGenerator
         generateTerrain(x, z, arrayOfByte);
 
         this.BiomeArray = this.localWorld.getWorldChunkManager().a(this.BiomeArray, x * 16, z * 16, ChunkMaxX, ChunkMaxZ);
-        replaceBlocksForBiome(x, z, arrayOfByte, this.BiomeArray);
+        boolean dry = ReplaceForBiomeAndReturnWaterless(x, z, arrayOfByte, this.BiomeArray);
 
-        this.CaveGen.a(this.localWorld, x, z, arrayOfByte);
+        this.CaveGen.a(x, z, arrayOfByte);
 
-        if (this.worldSettings.ObjectsEnabled)
-        {
+        if (this.worldSettings.StrongholdsEnabled)
             this.strongholdGen.a(null, this.localWorld, x, z, arrayOfByte);
-            this.VillageGen.a(null, this.localWorld, x, z, arrayOfByte);
-            this.MineshaftGen.a(null, this.localWorld, x, z, arrayOfByte);
-        }
 
-        this.CanyonGen.a(null, this.localWorld, x, z, arrayOfByte);
+        if (this.worldSettings.MineshaftsEnabled)
+            this.MineshaftGen.a(null, this.localWorld, x, z, arrayOfByte);
+        if (this.worldSettings.VillagesEnabled && dry)
+            this.VillageGen.a(null, this.localWorld, x, z, arrayOfByte);
+
+        this.CanyonGen.a(x, z, arrayOfByte);
 
 
         if (this.worldSettings.isDeprecated)

@@ -7,16 +7,14 @@ import net.minecraft.server.World;
 
 import java.util.Random;
 
-public class CavesGen
+public class CavesGen extends GenBase
 {
-    protected int b = 8;
-    protected Random c = new Random();
-    protected World d;
 
     private WorldConfig worldSettings;
 
-    public CavesGen(WorldConfig wrk)
+    public CavesGen(WorldConfig wrk,World world)
     {
+        super(world);
         this.worldSettings = wrk;
     }
 
@@ -113,11 +111,9 @@ public class CavesGen
 
             if (i1 < 1)
                 i1 = 1;
-            this.d.getClass();
-            if (i2 > '' - 8)
+            if (i2 > this.worldSettings.ChunkMaxY - 8)
             {
-                this.d.getClass();
-                i2 = '' - 8;
+                i2 = this.worldSettings.ChunkMaxY  - 8;
             }
             if (i3 < 0)
                 i3 = 0;
@@ -132,12 +128,11 @@ public class CavesGen
                 {
                     for (int i8 = i2 + 1; (i5 == 0) && (i8 >= i1 - 1); i8--)
                     {
-                        this.d.getClass();
-                        i9 = (i6 * 16 + i7) * 128 + i8;
+                        i9 = (i6 * 16 + i7) * this.worldSettings.ChunkMaxY  + i8;
                         if (i8 < 0)
                             continue;
-                        this.d.getClass();
-                        if (i8 < 128)
+
+                        if (i8 < this.worldSettings.ChunkMaxY )
                         {
                             if ((paramArrayOfByte[i9] == Block.WATER.id) || (paramArrayOfByte[i9] == Block.STATIONARY_WATER.id))
                             {
@@ -157,8 +152,8 @@ public class CavesGen
                 for (i9 = i3; i9 < i4; i9++)
                 {
                     double d10 = (i9 + paramInt2 * 16 + 0.5D - paramDouble3) / d3;
-                    this.d.getClass();
-                    int i10 = (i6 * 16 + i9) * 128 + i2;
+
+                    int i10 = (i6 * 16 + i9) * this.worldSettings.ChunkMaxY  + i2;
                     int i11 = 0;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
@@ -234,25 +229,6 @@ public class CavesGen
                 a(this.c.nextLong(), paramInt3, paramInt4, paramArrayOfByte, d1, d2, d3, f3, f1, f2, 0, 0, 1.0D);
             }
         }
-    }
-
-    public void a(World paramWorld, int paramInt1, int paramInt2, byte[] paramArrayOfByte)
-    {
-        int i = this.b;
-        this.d = paramWorld;
-
-        this.c.setSeed(paramWorld.getSeed());
-        long l1 = this.c.nextLong();
-        long l2 = this.c.nextLong();
-
-        for (int j = paramInt1 - i; j <= paramInt1 + i; j++)
-            for (int k = paramInt2 - i; k <= paramInt2 + i; k++)
-            {
-                long l3 = j * l1;
-                long l4 = k * l2;
-                this.c.setSeed(l3 ^ l4 ^ paramWorld.getSeed());
-                this.a( j, k, paramInt1, paramInt2, paramArrayOfByte);
-            }
     }
 
 }

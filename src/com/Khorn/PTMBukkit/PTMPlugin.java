@@ -202,12 +202,6 @@ public class PTMPlugin extends JavaPlugin
     }
 
 }
-//TODO Update chunk provider to new version
-//TODO Split old object spawner to ObjectGens
 //TODO Add new object gens
-//TODO Add new biome generator
-//TODO Add new general settings file
-//TODO Add new biome settings file
 //TODO Set block replace per biome
-//
 

@@ -64,6 +64,15 @@ public class WorldConfig extends ConfigFile
     public int caveSystemPocketMaxSize;
     public boolean evenCaveDistribution;
 
+    //Canyons
+
+    public int canyonRarity;
+    public int canyonMinAltitude;
+    public int canyonMaxAltitude;
+    public int canyonMinLength;
+    public int canyonMaxLength;
+    public double canyonDepth;
+
     //Terrain
 
     public boolean oldTerrainGenerator;
@@ -84,7 +93,6 @@ public class WorldConfig extends ConfigFile
     private boolean bedrockObsidian;
 
 
-    public boolean useWorldBlockReplacement;
     public boolean removeSurfaceStone;
 
 
@@ -97,6 +105,10 @@ public class WorldConfig extends ConfigFile
     public boolean denyObjectsUnderFill;
     public int customTreeMinTime;
     public int customTreeMaxTime;
+
+    public boolean StrongholdsEnabled;
+    public boolean MineshaftsEnabled;
+    public boolean VillagesEnabled;
 
 
     public boolean undergroundLakes;
@@ -126,7 +138,9 @@ public class WorldConfig extends ConfigFile
 
     public BiomeConfig[] biomeConfigs = new BiomeConfig[BiomesCount];
     public boolean BiomeConfigsHaveReplacement = false;
-    public boolean ObjectsEnabled ;
+
+
+    public int ChunkMaxY = 128;
 
 
     public WorldConfig(File settingsDir, PTMPlugin plug, String worldName)
@@ -157,7 +171,7 @@ public class WorldConfig extends ConfigFile
 
         for (int i = 0; i < BiomesCount; i++)
         {
-            BiomeConfig config =new BiomeConfig(BiomeFolder, BiomeBase.a[i]);
+            BiomeConfig config = new BiomeConfig(BiomeFolder, BiomeBase.a[i], this);
             this.biomeConfigs[i] = config;
             if (!this.BiomeConfigsHaveReplacement)
                 this.BiomeConfigsHaveReplacement = config.replaceBlocks.size() > 0;
@@ -183,7 +197,7 @@ public class WorldConfig extends ConfigFile
 
         for (int i = 0; i < BiomesCount; i++)
         {
-            this.biomeConfigs[i] = new BiomeConfig(new File(pluginDir, PTMDefaultValues.DefaultBiomeConfigDirectoryName.stringValue()), BiomeBase.a[i]);
+            this.biomeConfigs[i] = new BiomeConfig(new File(pluginDir, PTMDefaultValues.DefaultBiomeConfigDirectoryName.stringValue()), BiomeBase.a[i], this);
         }
 
 
@@ -214,6 +228,14 @@ public class WorldConfig extends ConfigFile
         this.caveSystemPocketChance = (this.caveSystemPocketChance < 0 ? 0 : this.caveSystemPocketChance > 100 ? 100 : this.caveSystemPocketChance);
         this.caveSystemPocketMinSize = (this.caveSystemPocketMinSize < 0 ? 0 : this.caveSystemPocketMinSize);
         this.caveSystemPocketMaxSize = (this.caveSystemPocketMaxSize <= this.caveSystemPocketMinSize ? this.caveSystemPocketMinSize + 1 : this.caveSystemPocketMaxSize);
+
+
+        this.canyonRarity = CheckValue(this.canyonRarity, 0, 100);
+        this.canyonMinAltitude = CheckValue(this.canyonMinAltitude, 0, this.ChunkMaxY);
+        this.canyonMaxAltitude = CheckValue(this.canyonMaxAltitude, 0, this.ChunkMaxY, this.canyonMinAltitude);
+        this.canyonMinLength = CheckValue(this.canyonMinLength, 1, 500);
+        this.canyonMaxLength = CheckValue(this.canyonMaxLength, 1, 500, this.canyonMinLength);
+        this.canyonDepth = CheckValue(this.canyonDepth, 0.1D, 15D);
 
 
         this.waterLevel = (this.waterLevel < 0 ? 0 : this.waterLevel > PTMDefaultValues.yLimit.intValue() - 1 ? PTMDefaultValues.yLimit.intValue() - 1 : this.waterLevel);
@@ -269,7 +291,11 @@ public class WorldConfig extends ConfigFile
         this.desertDirt = ReadModSettings(PTMDefaultValues.desertDirt.name(), PTMDefaultValues.desertDirt.booleanValue());
         this.desertDirtFrequency = ReadModSettings(PTMDefaultValues.desertDirtFrequency.name(), PTMDefaultValues.desertDirtFrequency.intValue());
 
-        this.ObjectsEnabled = ReadModSettings(PTMDefaultValues.ObjectsEnabled.name(), PTMDefaultValues.ObjectsEnabled.booleanValue());
+
+        this.StrongholdsEnabled = ReadModSettings(PTMDefaultValues.StrongholdsEnabled.name(), PTMDefaultValues.StrongholdsEnabled.booleanValue());
+        this.VillagesEnabled = ReadModSettings(PTMDefaultValues.VillagesEnabled.name(), PTMDefaultValues.VillagesEnabled.booleanValue());
+        this.MineshaftsEnabled = ReadModSettings(PTMDefaultValues.MineshaftsEnabled.name(), PTMDefaultValues.MineshaftsEnabled.booleanValue());
+
 
         this.caveRarity = ReadModSettings(PTMDefaultValues.caveRarity.name(), PTMDefaultValues.caveRarity.intValue());
         this.caveFrequency = ReadModSettings(PTMDefaultValues.caveFrequency.name(), PTMDefaultValues.caveFrequency.intValue());
@@ -281,6 +307,13 @@ public class WorldConfig extends ConfigFile
         this.caveSystemPocketMinSize = ReadModSettings(PTMDefaultValues.caveSystemPocketMinSize.name(), PTMDefaultValues.caveSystemPocketMinSize.intValue());
         this.caveSystemPocketMaxSize = ReadModSettings(PTMDefaultValues.caveSystemPocketMaxSize.name(), PTMDefaultValues.caveSystemPocketMaxSize.intValue());
         this.evenCaveDistribution = ReadModSettings(PTMDefaultValues.evenCaveDistribution.name(), PTMDefaultValues.evenCaveDistribution.booleanValue());
+
+        this.canyonRarity = ReadModSettings(PTMDefaultValues.canyonRarity.name(), PTMDefaultValues.canyonRarity.intValue());
+        this.canyonMinAltitude = ReadModSettings(PTMDefaultValues.canyonMinAltitude.name(), PTMDefaultValues.canyonMinAltitude.intValue());
+        this.canyonMaxAltitude = ReadModSettings(PTMDefaultValues.canyonMaxAltitude.name(), PTMDefaultValues.canyonMaxAltitude.intValue());
+        this.canyonMinLength = ReadModSettings(PTMDefaultValues.canyonMinLength.name(), PTMDefaultValues.canyonMinLength.intValue());
+        this.canyonMinLength = ReadModSettings(PTMDefaultValues.canyonMinLength.name(), PTMDefaultValues.canyonMinLength.intValue());
+        this.canyonDepth = ReadModSettings(PTMDefaultValues.canyonDepth.name(), PTMDefaultValues.canyonDepth.doubleValue());
 
 
         this.waterLevel = ReadModSettings(PTMDefaultValues.waterLevel.name(), PTMDefaultValues.waterLevel.intValue());
@@ -399,7 +432,7 @@ public class WorldConfig extends ConfigFile
         WriteModTitleSettings("Possible modes : Normal, TerrainTest, NotGenerate");
         WriteModSettings(PTMDefaultValues.Mode.name(), this.Mode.name());
 
-        WriteModTitleSettings("Start Biome Variables :");
+        WriteModTitleSettings("Biome Generator Variables");
         WriteModTitleSettings("Old biome generator works only with old terrain generator!");
         WriteModSettings(PTMDefaultValues.oldBiomeGenerator.name(), this.oldBiomeGenerator);
         WriteModSettings(PTMDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
@@ -423,7 +456,7 @@ public class WorldConfig extends ConfigFile
         WriteModSettings(PTMDefaultValues.desertDirt.name(), this.desertDirt);
         WriteModSettings(PTMDefaultValues.desertDirtFrequency.name(), this.desertDirtFrequency);
 
-        WriteModTitleSettings("Start Terrain Variables :");
+        WriteModTitleSettings("Terrain Generator Variables");
         WriteModSettings(PTMDefaultValues.oldTerrainGenerator.name(), this.oldTerrainGenerator);
         WriteModSettings(PTMDefaultValues.waterLevel.name(), this.waterLevel);
         WriteModSettings(PTMDefaultValues.waterBlock.name(), this.waterBlock);
@@ -442,8 +475,10 @@ public class WorldConfig extends ConfigFile
         WriteModSettings(PTMDefaultValues.disableNotchHeightControl.name(), this.disableNotchHeightControl);
         WriteHeightSettings();
 
-        WriteModTitleSettings("Map objects (Strongholds, Villages, Mineshafts:");
-        WriteModSettings(PTMDefaultValues.ObjectsEnabled.name(), this.ObjectsEnabled);
+        WriteModTitleSettings("Map objects");
+        WriteModSettings(PTMDefaultValues.StrongholdsEnabled.name(), this.StrongholdsEnabled);
+        WriteModSettings(PTMDefaultValues.VillagesEnabled.name(), this.VillagesEnabled);
+        WriteModSettings(PTMDefaultValues.MineshaftsEnabled.name(), this.MineshaftsEnabled);
 
         WriteModTitleSettings("Replace Variables");
         WriteModSettings(PTMDefaultValues.removeSurfaceStone.name(), this.removeSurfaceStone);
@@ -451,7 +486,7 @@ public class WorldConfig extends ConfigFile
         WriteModReplaceSettings();
 
 
-        this.WriteModTitleSettings("Start BOB Objects Variables :");
+        this.WriteModTitleSettings("BOB Objects Variables");
         this.WriteModSettings(PTMDefaultValues.customObjects.name(), this.customObjects);
         this.WriteModSettings(PTMDefaultValues.objectSpawnRatio.name(), Integer.valueOf(this.objectSpawnRatio).intValue());
         this.WriteModSettings(PTMDefaultValues.denyObjectsUnderFill.name(), this.denyObjectsUnderFill);
@@ -479,6 +514,16 @@ public class WorldConfig extends ConfigFile
         WriteModSettings(PTMDefaultValues.caveSystemPocketMinSize.name(), this.caveSystemPocketMinSize);
         WriteModSettings(PTMDefaultValues.caveSystemPocketMaxSize.name(), this.caveSystemPocketMaxSize);
         WriteModSettings(PTMDefaultValues.evenCaveDistribution.name(), this.evenCaveDistribution);
+
+
+        WriteModTitleSettings("Canyon Variables");
+        WriteModSettings(PTMDefaultValues.canyonRarity.name(), this.canyonRarity);
+        WriteModSettings(PTMDefaultValues.canyonMinAltitude.name(), this.canyonMinAltitude);
+        WriteModSettings(PTMDefaultValues.canyonMaxAltitude.name(), this.canyonMaxAltitude);
+        WriteModSettings(PTMDefaultValues.canyonMinLength.name(), this.canyonMinLength);
+        WriteModSettings(PTMDefaultValues.canyonMaxLength.name(), this.canyonMaxLength);
+        WriteModSettings(PTMDefaultValues.canyonDepth.name(), this.canyonDepth);
+
     }
 
     private void WriteModReplaceSettings() throws IOException
@@ -617,12 +662,12 @@ public class WorldConfig extends ConfigFile
         return (0.5D - this.volatilityWeight2) * 24.0D;
     }
 
-    public boolean createadminium(int y)
+    public boolean createAdminium(int y)
     {
         return (!this.disableBedrock) && ((!this.flatBedrock) || (y == 0));
     }
 
-    public byte getadminium()
+    public byte getAdminium()
     {
         return (byte) (this.bedrockObsidian ? Block.OBSIDIAN.id : Block.BEDROCK.id);
     }

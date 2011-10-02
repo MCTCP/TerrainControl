@@ -144,7 +144,6 @@ public class ObjectSpawner extends BlockPopulator
     @Override
     public void populate(org.bukkit.World _world, Random random, Chunk chunk)
     {
-        BlockSand.instaFall = false;
 
         int chunk_x = chunk.getX();
         int chunk_z = chunk.getZ();
@@ -160,18 +159,21 @@ public class ObjectSpawner extends BlockPopulator
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
         this.rand.setSeed(chunk_x * l1 + chunk_z * l2 ^ world.getSeed());
 
-        //ToDo create custom WorldGen objects
 
-        if(this.worldSettings.ObjectsEnabled)
-        {
-            this.worldSettings.ChunkProvider.strongholdGen.a(this.world,this.rand,chunk_x,chunk_z);
-            this.worldSettings.ChunkProvider.MineshaftGen.a(this.world,this.rand,chunk_x,chunk_z);
-            this.worldSettings.ChunkProvider.VillageGen.a(this.world,this.rand,chunk_x,chunk_z);
-        }
+        boolean Village = false;
+        if (this.worldSettings.StrongholdsEnabled)
+            this.worldSettings.ChunkProvider.strongholdGen.a(this.world, this.rand, chunk_x, chunk_z);
+        if (this.worldSettings.MineshaftsEnabled)
+            this.worldSettings.ChunkProvider.MineshaftGen.a(this.world, this.rand, chunk_x, chunk_z);
+        if (this.worldSettings.VillagesEnabled)
+            Village = this.worldSettings.ChunkProvider.VillageGen.a(this.world, this.rand, chunk_x, chunk_z);
+
 
         BiomeObjectsGen biomeGen = this.BiomeGenerators[localBiomeBase.y];
+        biomeGen.SetChunk(((CraftChunk) chunk).getHandle());
 
-        biomeGen.ProcessUndergroundObjects(x, z, this.rand);
+        if (!Village)
+            biomeGen.ProcessUndergroundObjects(x, z, this.rand);
 
         if (this.worldSettings.undergroundLakes)
             this.processUndergroundLakes(x, z);
@@ -238,8 +240,8 @@ public class ObjectSpawner extends BlockPopulator
                 }
         }
 
+        SpawnerCreature.a(this.world, localBiomeBase, x + 8, z + 8, 16, 16, this.rand);
 
-        BlockSand.instaFall = true;
 
         if (this.worldSettings.isDeprecated)
         {

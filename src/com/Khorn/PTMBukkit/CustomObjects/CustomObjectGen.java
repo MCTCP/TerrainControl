@@ -240,7 +240,7 @@ public class CustomObjectGen
 
             if (!workObject.dig)
             {
-                if (workChunk.getTypeId((x + point.getX()) & 0xF, (y + point.getY()) & 0xF, (z + point.getZ()) & 0xF) > 0)
+                if (workChunk.getTypeId((x + point.getX()) & 0xF, (y + point.getY()), (z + point.getZ()) & 0xF) > 0)
                 {
                     faultCounter++;
                     if (faultCounter > (workingData.size() * (workObject.collisionPercentage / 100)))

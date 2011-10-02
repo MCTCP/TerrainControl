@@ -57,6 +57,16 @@ public enum PTMDefaultValues
     disableNotchPonds(false),
 
     ObjectsEnabled(true),
+    StrongholdsEnabled(true),
+    MineshaftsEnabled(true),
+    VillagesEnabled(true),
+
+    canyonRarity(2),
+    canyonMinAltitude(20),
+    canyonMaxAltitude(68),
+    canyonMinLength(84),
+    canyonMaxLength(112),
+    canyonDepth(3.0D),
 
     caveRarity(7),
     caveFrequency(40),
@@ -159,11 +169,11 @@ public enum PTMDefaultValues
     waterClayDepositSize(4),
 
     waterSandDepositRarity(100),
-    waterSandDepositFrequency(3),
+    waterSandDepositFrequency(4),
     waterSandDepositSize(7),
 
     waterGravelDepositRarity(100),
-    waterGravelDepositFrequency(1),
+    waterGravelDepositFrequency(0),
     waterGravelDepositSize(6),
 
     dirtDepositRarity1(100),
