@@ -1,0 +1,31 @@
+0.9 features:
+- Updated to 1.8.1 Minecraft.
+- Split settings file to per biome. Some settings remain in the old file
+- All deposit settings now in biome configuration files.
+- Added 1.7.3 terrain generator.
+- Added 1.7.3 biome generator.
+- Added test generation mods. Will be more mods in future.
+- New settings added in main configuration file:
+     Mode - generation  mode.
+     oldBiomeGenerator - Enable 1.7.3 biome generator. Work only with old terrain generator.
+     oldBiomeSize - Biome size for 1.7.3 generator.
+     landSize - Regulate land size. Smaller value - island mode, bigger - no ocean.
+     riversEnabled - Enable or disable rives in biome generator.
+     oldTerrainGenerator - Enable 1.7.3 terrain generator.
+     StrongholdsEnabled - Enable or disable strongholds.
+     VillagesEnabled - Enable or disable villages.
+     MineshaftsEnabled - Enable or disable mineshafts.
+
+- New settings in biome configuration file:
+     biomeChance - Does not work on river and ocean biomes. Default value 1 mean this biome place chance is 1/6. For example value 2 - mean 2/7 chance for this biome and 1/7 for others (except rivers and ocean)
+     BiomeSurfaceAdd
+     BiomeVolatilityAdd
+     SurfaceBlock
+     GroundBlock
+     ReplacedBlocks
+     notchBiomeTrees
+     TreeDensity
+     waterClayDeposit
+     waterSandDeposit
+     waterGravelDeposit
+

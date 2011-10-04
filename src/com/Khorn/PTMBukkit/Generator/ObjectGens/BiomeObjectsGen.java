@@ -282,12 +282,12 @@ public class BiomeObjectsGen
             int y = this.rand.nextInt(maxAltitude - minAltitude) + minAltitude;
 
             if (this.world.getTypeId(x, y + 1, z) != Block.STONE.id)
-                return;
+                continue;
             if (this.world.getTypeId(x, y - 1, z) != Block.STONE.id)
-                return;
+                continue;
 
             if ((this.world.getTypeId(x, y, z) != 0) && (this.world.getTypeId(x, y, z) != Block.STONE.id))
-                return;
+                continue;
 
 
             int i = 0;
