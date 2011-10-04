@@ -33,7 +33,7 @@ public class BiomeObjectsGen
     private Random rand;
     private BiomeBase Biome;
 
-    private Chunk workingChunk;
+    private Chunk cacheChunk;
 
     private BlockChangeDelegate WorldDelegate;
     protected WorldGenTrees Tree = new WorldGenTrees();
@@ -75,9 +75,9 @@ public class BiomeObjectsGen
 
     }
 
-    public void SetChunk(Chunk chunk)
+    public void SetChunk(Chunk _chunk)
     {
-        this.workingChunk = chunk;
+        this.cacheChunk = _chunk;
     }
 
     public void ProcessUndergroundObjects(int x, int z, Random rnd)
@@ -325,20 +325,25 @@ public class BiomeObjectsGen
 
     private void SetRawBlock(int x, int y, int z, int BlockId)
     {
+        if (cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
+            this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
         if (y >= 128 || y < 0)
             return;
 
-        this.workingChunk.b[((z & 0xF) * 16 + (x & 0xF)) * 128 + y] = (byte) BlockId;
+        this.cacheChunk.b[((z & 0xF) * 16 + (x & 0xF)) * 128 + y] = (byte) BlockId;
     }
 
     private int GetRawBlock(int x, int y, int z)
     {
+        if (cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
+            this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
+
         z = z & 0xF;
         x = x & 0xF;
         if (y >= 128 || y < 0)
             return 0;
 
-        return (int) this.workingChunk.b[(z * 16 + x) * 128 + y];
+        return (int) this.cacheChunk.b[(z * 16 + x) * 128 + y];
     }
 
     private void SpawnMinable(int _x, int _z, int rarity, int frequency, int minAltitude, int maxAltitude, int size, int BlockId)

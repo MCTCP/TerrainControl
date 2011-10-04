@@ -60,7 +60,13 @@ public abstract class ConfigFile
     {
         if (this.SettingsCache.containsKey(settingsName))
         {
-            return Integer.valueOf(this.SettingsCache.get(settingsName));
+            try
+            {
+                return Integer.valueOf(this.SettingsCache.get(settingsName));
+            } catch (NumberFormatException e)
+            {
+                System.out.println("PhoenixTerrainMod: " + settingsName + " had wrong value");
+            }
         }
         return defaultValue;
     }
@@ -69,7 +75,13 @@ public abstract class ConfigFile
     {
         if (this.SettingsCache.containsKey(settingsName))
         {
-            return Byte.valueOf(this.SettingsCache.get(settingsName));
+            try
+            {
+                return Byte.valueOf(this.SettingsCache.get(settingsName));
+            } catch (NumberFormatException e)
+            {
+                System.out.println("PhoenixTerrainMod: " + settingsName + " had wrong value");
+            }
         }
         return defaultValue;
     }
@@ -87,7 +99,13 @@ public abstract class ConfigFile
     {
         if (this.SettingsCache.containsKey(settingsName))
         {
-            return Double.valueOf(this.SettingsCache.get(settingsName));
+            try
+            {
+                return Double.valueOf(this.SettingsCache.get(settingsName));
+            } catch (NumberFormatException e)
+            {
+                System.out.println("PhoenixTerrainMod: " + settingsName + " had wrong value");
+            }
         }
         return defaultValue;
     }
@@ -96,7 +114,13 @@ public abstract class ConfigFile
     {
         if (this.SettingsCache.containsKey(settingsName))
         {
-            return Float.valueOf(this.SettingsCache.get(settingsName));
+            try
+            {
+                return Float.valueOf(this.SettingsCache.get(settingsName));
+            } catch (NumberFormatException e)
+            {
+                System.out.println("PhoenixTerrainMod: " + settingsName + " had wrong value");
+            }
         }
         return defaultValue;
     }

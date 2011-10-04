@@ -1,5 +1,5 @@
 name: PhoenixTerrainMod
-version: 0.9.2
+version: 0.9.3
 description: Generates a worlds.
 authors: ['Khorn', 'R-T-B']
 main: com.Khorn.PTMBukkit.PTMPlugin

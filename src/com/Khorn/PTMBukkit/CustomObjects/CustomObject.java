@@ -5,7 +5,6 @@ import net.minecraft.server.BiomeBase;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -41,9 +40,6 @@ public class CustomObject
     public String version = "1";
     public boolean IsValid = false;
 
-    public CustomObject()
-    {
-    }
 
     public CustomObject(File objectFile)
     {
