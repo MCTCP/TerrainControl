@@ -4,6 +4,7 @@ import com.Khorn.PTMBukkit.BiomeConfig;
 import com.Khorn.PTMBukkit.Util.WorldWithChunkCheck;
 import net.minecraft.server.*;
 import org.bukkit.BlockChangeDelegate;
+import org.yaml.snakeyaml.Yaml;
 
 import java.util.Random;
 
@@ -293,22 +294,22 @@ public class BiomeObjectsGen
             int i = 0;
             int j = 0;
 
-            int tempBlock = this.GetRawBlock(x - 1, y, z);
+            int tempBlock = this.GetRawBlockId(x - 1, y, z);
 
             i = (tempBlock == Block.STONE.id) ? i + 1 : i;
             j = (tempBlock == 0) ? j + 1 : j;
 
-            tempBlock = this.GetRawBlock(x + 1, y, z);
+            tempBlock = this.GetRawBlockId(x + 1, y, z);
 
             i = (tempBlock == Block.STONE.id) ? i + 1 : i;
             j = (tempBlock == 0) ? j + 1 : j;
 
-            tempBlock = this.GetRawBlock(x, y, z - 1);
+            tempBlock = this.GetRawBlockId(x, y, z - 1);
 
             i = (tempBlock == Block.STONE.id) ? i + 1 : i;
             j = (tempBlock == 0) ? j + 1 : j;
 
-            tempBlock = this.GetRawBlock(x, y, z + 1);
+            tempBlock = this.GetRawBlockId(x, y, z + 1);
 
             i = (tempBlock == Block.STONE.id) ? i + 1 : i;
             j = (tempBlock == 0) ? j + 1 : j;
@@ -323,7 +324,8 @@ public class BiomeObjectsGen
 
     }
 
-    private void SetRawBlock(int x, int y, int z, int BlockId)
+
+    private void SetRawBlockId(int x, int y, int z, int BlockId)
     {
         if (cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
             this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
@@ -333,7 +335,20 @@ public class BiomeObjectsGen
         this.cacheChunk.b[((z & 0xF) * 16 + (x & 0xF)) * 128 + y] = (byte) BlockId;
     }
 
-    private int GetRawBlock(int x, int y, int z)
+    private void SetRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
+    {
+        if (cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
+            this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
+        z = z & 0xF;
+        x = x & 0xF;
+        if (y >= 128 || y < 0)
+            return;
+        this.cacheChunk.g.a(x,y,z,Data);
+
+        this.cacheChunk.b[(z * 16 + x) * 128 + y] = (byte) BlockId;
+    }
+
+    private int GetRawBlockId(int x, int y, int z)
     {
         if (cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
             this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
@@ -344,6 +359,18 @@ public class BiomeObjectsGen
             return 0;
 
         return (int) this.cacheChunk.b[(z * 16 + x) * 128 + y];
+    }
+    private int GetRawBlockData(int x, int y, int z)
+    {
+        if (cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
+            this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
+
+        z = z & 0xF;
+        x = x & 0xF;
+        if (y >= 128 || y < 0)
+            return 0;
+
+        return this.cacheChunk.g.a(x,y,z);
     }
 
     private void SpawnMinable(int _x, int _z, int rarity, int frequency, int minAltitude, int maxAltitude, int size, int BlockId)
@@ -398,8 +425,8 @@ public class BiomeObjectsGen
                                 for (int i5 = m; i5 <= i2; i5++)
                                 {
                                     double d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);
-                                    if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && (this.GetRawBlock(i3, i4, i5) == Block.STONE.id))
-                                        this.SetRawBlock(i3, i4, i5, BlockId);
+                                    if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && (this.GetRawBlockId(i3, i4, i5) == Block.STONE.id))
+                                        this.SetRawBlockId(i3, i4, i5, BlockId);
                                 }
                             }
                         }

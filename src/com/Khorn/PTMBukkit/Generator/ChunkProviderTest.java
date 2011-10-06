@@ -32,7 +32,7 @@ public class ChunkProviderTest extends ChunkGenerator
     @Override
     public byte[] generate(World world, Random random, int i, int i1)
     {
-        if(worldSettings.Mode == WorldConfig.GenMode.BiomeTest || worldSettings.Mode == WorldConfig.GenMode.NotGenerate)
+        if( worldSettings.Mode == WorldConfig.GenMode.NotGenerate)
             return new byte[ChunkMaxX * ChunkMaxY * ChunkMaxZ];
         return new byte[0];
     }

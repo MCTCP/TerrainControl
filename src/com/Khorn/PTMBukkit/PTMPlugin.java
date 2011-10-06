@@ -73,15 +73,19 @@ public class PTMPlugin extends JavaPlugin
         }
 
 
+        ChunkGenerator prov = null;
         WorldConfig conf = this.GetSettings(worldName);
-        ChunkGenerator prov;
-        if (conf.Mode == WorldConfig.GenMode.Normal || conf.Mode == WorldConfig.GenMode.TerrainTest)
-            prov = new ChunkProviderPTM(conf);
-        else
-            prov = new ChunkProviderTest(conf);
+        if (conf.Mode != WorldConfig.GenMode.OnlyBiome)
+        {
 
+            if (conf.Mode == WorldConfig.GenMode.Normal || conf.Mode == WorldConfig.GenMode.TerrainTest)
+                prov = new ChunkProviderPTM(conf);
+            else
+                prov = new ChunkProviderTest(conf);
+            return prov;
+        }
 
-        System.out.println("PhoenixTerrainMod: enabled for '" + worldName + "'");
+        System.out.println("PhoenixTerrainMod: mode " + conf.Mode.name() + " enabled for '" + worldName + "'");
         return prov;
 
 
@@ -136,18 +140,31 @@ public class PTMPlugin extends JavaPlugin
                 return;
 
             net.minecraft.server.World workWorld = ((CraftWorld) world).getHandle();
+            switch (worldSetting.Mode)
+            {
+
+                case Normal:
+                {
+                    worldSetting.objectSpawner.Init(workWorld);
+                    worldSetting.ChunkProvider.Init(world);
+                    break;
+                }
+                case TerrainTest:
+                {
+                    worldSetting.ChunkProvider.Init(world);
+                    break;
+                }
+                case OnlyBiome:
+                    break;
+                case NotGenerate:
+                    break;
+            }
 
             if (worldSetting.oldBiomeGenerator)
                 workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
             else
                 workWorld.worldProvider.b = new BiomeManager(workWorld, worldSetting);
 
-            if (worldSetting.Mode == WorldConfig.GenMode.Normal)
-            {
-                worldSetting.objectSpawner.Init(workWorld);
-                worldSetting.ChunkProvider.Init(world);
-            } else if (worldSetting.Mode == WorldConfig.GenMode.TerrainTest)
-                worldSetting.ChunkProvider.Init(world);
 
             worldSetting.isInit = true;
 

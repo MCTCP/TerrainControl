@@ -206,7 +206,7 @@ public class WorldConfig extends ConfigFile
     protected void CorrectSettings()
     {
         this.biomeSize = CheckValue(this.biomeSize, 1, 15);
-        this.landSize = CheckValue(this.landSize, 1, 10);
+        this.landSize = CheckValue(this.landSize, 0, 10);
 
         this.oldBiomeSize = (this.oldBiomeSize <= 0.0D ? 1.5D : this.oldBiomeSize);
 
@@ -429,7 +429,7 @@ public class WorldConfig extends ConfigFile
 
     protected void WriteConfigSettings() throws IOException
     {
-        WriteModTitleSettings("Possible modes : Normal, TerrainTest, NotGenerate");
+        WriteModTitleSettings("Possible modes : Normal, TerrainTest, NotGenerate, OnlyBiome");
         WriteModSettings(PTMDefaultValues.Mode.name(), this.Mode.name());
 
         WriteModTitleSettings("Biome Generator Variables");
@@ -676,8 +676,9 @@ public class WorldConfig extends ConfigFile
     {
         Normal,
         TerrainTest,
-        BiomeTest,
-        NotGenerate
+        OnlyBiome,
+        NotGenerate,
+
     }
 
 }

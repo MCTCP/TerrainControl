@@ -23,6 +23,14 @@ public class GenLayerBiomePTM extends GenLayer
         for (BiomeConfig cfg : config.biomeConfigs)
             length += cfg.BiomeChance;
 
+        if(length == 0)
+        {
+            System.out.println("PhoenixTerrainMod: all biomes turned off, all will be ocean");
+            this.BiomeTable = new BiomeBase[1];
+            this.BiomeTable[0] = BiomeBase.OCEAN;
+            return;
+        }
+
         this.BiomeTable = new BiomeBase[length];
 
         int i = 0;

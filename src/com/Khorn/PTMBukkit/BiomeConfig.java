@@ -323,7 +323,7 @@ public class BiomeConfig extends ConfigFile
     {
 
 
-        this.BiomeChance = ReadModSettings(PTMDefaultValues.biomeChance.name(), PTMDefaultValues.biomeChance.intValue());
+        this.BiomeChance = ReadModSettings(PTMDefaultValues.biomeChance.name(), (this.Biome == BiomeBase.OCEAN  || this.Biome == BiomeBase.RIVER)? 0 : PTMDefaultValues.biomeChance.intValue());
 
         this.evenWaterSourceDistribution = this.ReadModSettings(PTMDefaultValues.evenWaterSourceDistribution.name(), PTMDefaultValues.evenWaterSourceDistribution.booleanValue());
         this.evenLavaSourceDistribution = this.ReadModSettings(PTMDefaultValues.evenLavaSourceDistribution.name(), PTMDefaultValues.evenLavaSourceDistribution.booleanValue());
@@ -656,7 +656,6 @@ public class BiomeConfig extends ConfigFile
     {
         WriteModTitleSettings(this.Biome.l + " biome config");
 
-        this.WriteModTitleSettings("Biome chance does not work on river and ocean biome!");
         WriteModSettings(PTMDefaultValues.biomeChance.name(), this.BiomeChance);
 
         WriteModSettings(PTMDefaultValues.BiomeSurfaceAdd.name(), this.BiomeSurface);
@@ -964,8 +963,6 @@ public class BiomeConfig extends ConfigFile
     protected void CorrectSettings()
     {
         this.BiomeChance = CheckValue(this.BiomeChance, 0, 20);
-        if (this.Biome == BiomeBase.OCEAN || this.Biome == BiomeBase.RIVER)
-            this.BiomeChance = 0;
 
         this.dungeonRarity = CheckValue(this.dungeonRarity, 0, 100);
         this.dungeonFrequency = CheckValue(this.dungeonFrequency, 0, 200);
