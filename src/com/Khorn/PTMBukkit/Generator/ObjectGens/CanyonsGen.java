@@ -177,7 +177,7 @@ public class CanyonsGen extends GenBase
 
     protected void a(int paramInt1, int paramInt2, int paramInt3, int paramInt4, byte[] paramArrayOfByte)
     {
-        if (this.c.nextInt(100) > this.worldSettings.canyonRarity)
+        if (this.c.nextInt(100) >= this.worldSettings.canyonRarity)
             return;
         double d1 = paramInt1 * 16 + this.c.nextInt(16);
         double d2 = this.c.nextInt(this.worldSettings.canyonMaxAltitude - this.worldSettings.canyonMinAltitude) + this.worldSettings.canyonMinAltitude;

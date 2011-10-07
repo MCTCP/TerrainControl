@@ -193,7 +193,7 @@ public class CavesGen extends GenBase
         int i = this.c.nextInt(this.c.nextInt(this.c.nextInt(this.worldSettings.caveFrequency) + 1) + 1);
         if (this.worldSettings.evenCaveDistribution)
             i = this.worldSettings.caveFrequency;
-        if (this.c.nextInt(100) > this.worldSettings.caveRarity)
+        if (this.c.nextInt(100) >= this.worldSettings.caveRarity)
             i = 0;
 
         for (int j = 0; j < i; j++)
