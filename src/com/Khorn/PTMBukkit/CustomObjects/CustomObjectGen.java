@@ -214,7 +214,7 @@ public class CustomObjectGen
             RotationAmount = rand.nextInt(3);
         }
         ChunkProviderServer chunkServer = (ChunkProviderServer) world.chunkProvider;
-        net.minecraft.server.Chunk workChunk = chunkServer.chunks.get(workingData.get(0).getChunkX(), workingData.get(0).getChunkZ());
+        net.minecraft.server.Chunk workChunk = chunkServer.chunks.get(workingData.get(0).getChunkX(x), workingData.get(0).getChunkZ(z));
         if (workChunk == null)
             return false;
 
@@ -227,8 +227,8 @@ public class CustomObjectGen
                 point.rotateSliceC();
                 counter++;
             }
-            if (workChunk.x != point.getChunkX() || workChunk.z != point.getChunkZ())
-                workChunk = chunkServer.chunks.get(point.getChunkX(), point.getChunkZ());
+            if (workChunk.x != point.getChunkX(x) || workChunk.z != point.getChunkZ(z))
+                workChunk = chunkServer.chunks.get(point.getChunkX(x), point.getChunkZ(z));
 
             if (workChunk == null)
                 return false;

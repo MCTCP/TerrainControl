@@ -32,13 +32,14 @@ public class BiomeCommand extends BaseCommand
         Chunk chunk = player.getWorld().getChunkAt(player.getLocation());
 
         player.sendMessage(ChatColor.AQUA.toString() + "You are in: ");
+        WorldChunkManager biomeManager = ((CraftWorld) player.getLocation().getWorld()).getHandle().getWorldChunkManager();
 
-        player.sendMessage(ValueColor + player.getWorld().getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16).name() + MessageColor + " chunk biome!");
+        player.sendMessage(ValueColor + biomeManager.getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16).l + MessageColor + " chunk biome!");
 
         if (args.size() == 1 && args.get(0).equals("-f"))
         {
             BiomeBase[] biome = new BiomeBase[1];
-            WorldChunkManager biomeManager = ((CraftWorld) player.getLocation().getWorld()).getHandle().getWorldChunkManager();
+
             biomeManager.a(biome, (int) player.getLocation().getX(), (int) player.getLocation().getZ(), 1, 1);
 
             /*

@@ -82,7 +82,6 @@ public class PTMPlugin extends JavaPlugin
                 prov = new ChunkProviderPTM(conf);
             else
                 prov = new ChunkProviderTest(conf);
-            return prov;
         }
 
         System.out.println("PhoenixTerrainMod: mode " + conf.Mode.name() + " enabled for '" + worldName + "'");
@@ -140,6 +139,12 @@ public class PTMPlugin extends JavaPlugin
                 return;
 
             net.minecraft.server.World workWorld = ((CraftWorld) world).getHandle();
+
+            if (worldSetting.oldBiomeGenerator)
+                workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
+            else
+                workWorld.worldProvider.b = new BiomeManager(workWorld, worldSetting);
+
             switch (worldSetting.Mode)
             {
 
@@ -159,11 +164,6 @@ public class PTMPlugin extends JavaPlugin
                 case NotGenerate:
                     break;
             }
-
-            if (worldSetting.oldBiomeGenerator)
-                workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
-            else
-                workWorld.worldProvider.b = new BiomeManager(workWorld, worldSetting);
 
 
             worldSetting.isInit = true;

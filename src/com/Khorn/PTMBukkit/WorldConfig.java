@@ -17,6 +17,7 @@ public class WorldConfig extends ConfigFile
     public HashMap<Integer, Byte> replaceBlocks = new HashMap<Integer, Byte>();
     public byte[] ReplaceBlocksMatrix = new byte[256];
 
+    public ArrayList<String> CustomBiomes = new ArrayList<String>();
 
     public ArrayList<CustomObject> Objects = new ArrayList<CustomObject>();
     public HashMap<String, ArrayList<CustomObject>> ObjectGroups = new HashMap<String, ArrayList<CustomObject>>();
@@ -134,10 +135,11 @@ public class WorldConfig extends ConfigFile
     public String WorldName;
     public GenMode Mode;
 
-    public static int BiomesCount = 8;
 
-    public BiomeConfig[] biomeConfigs = new BiomeConfig[BiomesCount];
+    public BiomeConfig[] biomeConfigs;
     public boolean BiomeConfigsHaveReplacement = false;
+
+    public static final int DefaultBiomesCount = 10;
 
 
     public int ChunkMaxY = 128;
@@ -168,13 +170,25 @@ public class WorldConfig extends ConfigFile
                 return;
             }
         }
+        this.biomeConfigs = new BiomeConfig[DefaultBiomesCount + this.CustomBiomes.size()];
 
-        for (int i = 0; i < BiomesCount; i++)
+        int i = 0;
+        while (i < DefaultBiomesCount)
         {
+
             BiomeConfig config = new BiomeConfig(BiomeFolder, BiomeBase.a[i], this);
             this.biomeConfigs[i] = config;
             if (!this.BiomeConfigsHaveReplacement)
                 this.BiomeConfigsHaveReplacement = config.replaceBlocks.size() > 0;
+            i++;
+        }
+        for (String biomeName : this.CustomBiomes)
+        {
+            BiomeConfig config = new BiomeConfig(BiomeFolder, biomeName, i, this);
+            this.biomeConfigs[i] = config;
+            if (!this.BiomeConfigsHaveReplacement)
+                this.BiomeConfigsHaveReplacement = config.replaceBlocks.size() > 0;
+            i++;
         }
 
         this.RegisterBOBPlugins();
@@ -195,9 +209,16 @@ public class WorldConfig extends ConfigFile
 
         this.WriteSettingsFile(settingsFile);
 
-        for (int i = 0; i < BiomesCount; i++)
+        int i = 0;
+        while (i < DefaultBiomesCount)
         {
-            this.biomeConfigs[i] = new BiomeConfig(new File(pluginDir, PTMDefaultValues.DefaultBiomeConfigDirectoryName.stringValue()), BiomeBase.a[i], this);
+            new BiomeConfig(new File(pluginDir, PTMDefaultValues.DefaultBiomeConfigDirectoryName.stringValue()), BiomeBase.a[i], this);
+            i++;
+        }
+        for (String biomeName : this.CustomBiomes)
+        {
+            new BiomeConfig(new File(pluginDir, PTMDefaultValues.DefaultBiomeConfigDirectoryName.stringValue()), biomeName, i, this);
+            i++;
         }
 
 
@@ -357,6 +378,7 @@ public class WorldConfig extends ConfigFile
 
 
         this.ReadModReplaceSettings();
+        this.ReadCustomBiomes();
 
 
     }
@@ -426,25 +448,41 @@ public class WorldConfig extends ConfigFile
         }
     }
 
+    private void ReadCustomBiomes()
+    {
+        if (this.SettingsCache.containsKey("CustomBiomes"))
+        {
+            if (this.SettingsCache.get("CustomBiomes").trim().equals(""))
+                return;
+            String[] keys = this.SettingsCache.get("CustomBiomes").split(",");
+
+            Collections.addAll(this.CustomBiomes, keys);
+        }
+    }
+
 
     protected void WriteConfigSettings() throws IOException
     {
         WriteModTitleSettings("Possible modes : Normal, TerrainTest, NotGenerate, OnlyBiome");
         WriteModSettings(PTMDefaultValues.Mode.name(), this.Mode.name());
 
-        WriteModTitleSettings("Biome Generator Variables");
-        WriteModTitleSettings("Old biome generator works only with old terrain generator!");
+        WriteModTitleSettings("Old Biome Generator Variables");
+        WriteModTitleSettings("This generator works only with old terrain generator!");
         WriteModSettings(PTMDefaultValues.oldBiomeGenerator.name(), this.oldBiomeGenerator);
         WriteModSettings(PTMDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
-        WriteModSettings(PTMDefaultValues.biomeSize.name(), this.biomeSize);
-        WriteModSettings(PTMDefaultValues.landSize.name(), this.landSize);
-        WriteModSettings(PTMDefaultValues.riversEnabled.name(), this.riversEnabled);
         WriteModSettings(PTMDefaultValues.minMoisture.name(), this.minMoisture);
         WriteModSettings(PTMDefaultValues.maxMoisture.name(), this.maxMoisture);
         WriteModSettings(PTMDefaultValues.minTemperature.name(), this.minTemperature);
         WriteModSettings(PTMDefaultValues.maxTemperature.name(), this.maxTemperature);
         WriteModSettings(PTMDefaultValues.snowThreshold.name(), this.snowThreshold);
         WriteModSettings(PTMDefaultValues.iceThreshold.name(), this.iceThreshold);
+
+        WriteModTitleSettings("Biome Generator Variables");
+        WriteModSettings(PTMDefaultValues.biomeSize.name(), this.biomeSize);
+        WriteModSettings(PTMDefaultValues.landSize.name(), this.landSize);
+        WriteModSettings(PTMDefaultValues.riversEnabled.name(), this.riversEnabled);
+
+        this.WriteCustomBiomesSettings();
 
         WriteModTitleSettings("Swamp Biome Variables");
         WriteModSettings(PTMDefaultValues.muddySwamps.name(), this.muddySwamps);
@@ -555,6 +593,21 @@ public class WorldConfig extends ConfigFile
             output = output + "," + Double.toString(this.heightMatrix[i]);
 
         this.WriteModSettings("CustomHeightControl", output);
+    }
+
+    private void WriteCustomBiomesSettings() throws IOException
+    {
+
+        if (this.CustomBiomes.size() == 0)
+        {
+            this.WriteModSettings("CustomBiomes", "");
+            return;
+        }
+        String output = this.CustomBiomes.get(0);
+        for (int i = 1; i < this.CustomBiomes.size(); i++)
+            output = output + "," + this.CustomBiomes.get(i);
+
+        this.WriteModSettings("CustomBiomes", output);
     }
 
 

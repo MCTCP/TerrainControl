@@ -1,6 +1,7 @@
 package com.Khorn.PTMBukkit;
 
 import com.Khorn.PTMBukkit.Util.ConfigFile;
+import com.Khorn.PTMBukkit.Util.CustomBiome;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.Block;
 
@@ -297,7 +298,6 @@ public class BiomeConfig extends ConfigFile
     private WorldConfig worldConfig;
 
 
-
     public BiomeConfig(File settingsDir, BiomeBase biome, WorldConfig config)
     {
 
@@ -318,12 +318,35 @@ public class BiomeConfig extends ConfigFile
 
     }
 
+    public BiomeConfig(File settingsDir, String biomeName, int biomeId, WorldConfig config)
+    {
+
+
+        worldConfig = config;
+        CustomBiome cBiome = new CustomBiome(biomeId, biomeName);
+        this.Biome = cBiome;
+
+        File settingsFile = new File(settingsDir, biomeName + PTMDefaultValues.WorldBiomeConfigName.stringValue());
+        this.ReadSettingsFile(settingsFile);
+        this.ReadConfigSettings();
+
+        this.CorrectSettings();
+
+
+        this.WriteSettingsFile(settingsFile);
+
+        BuildReplaceMatrix();
+        cBiome.SetTerrainGen(this.BiomeSurface, this.BiomeVolatility);
+
+
+    }
+
 
     protected void ReadConfigSettings()
     {
 
 
-        this.BiomeChance = ReadModSettings(PTMDefaultValues.biomeChance.name(), (this.Biome == BiomeBase.OCEAN  || this.Biome == BiomeBase.RIVER)? 0 : PTMDefaultValues.biomeChance.intValue());
+        this.BiomeChance = ReadModSettings(PTMDefaultValues.biomeChance.name(), this.DefaultBiomeChance);
 
         this.evenWaterSourceDistribution = this.ReadModSettings(PTMDefaultValues.evenWaterSourceDistribution.name(), PTMDefaultValues.evenWaterSourceDistribution.booleanValue());
         this.evenLavaSourceDistribution = this.ReadModSettings(PTMDefaultValues.evenLavaSourceDistribution.name(), PTMDefaultValues.evenLavaSourceDistribution.booleanValue());
@@ -663,7 +686,6 @@ public class BiomeConfig extends ConfigFile
 
         WriteModSettings(PTMDefaultValues.SurfaceBlock.name(), this.SurfaceBlock);
         WriteModSettings(PTMDefaultValues.GroundBlock.name(), this.GroundBlock);
-
 
 
         WriteModTitleSettings("Replace Variables");
@@ -1203,6 +1225,7 @@ public class BiomeConfig extends ConfigFile
     private float DefaultBiomeVolatility = 0.3F;
     private byte DefaultSurfaceBlock = (byte) Block.GRASS.id;
     private byte DefaultGroundBlock = (byte) Block.DIRT.id;
+    private int DefaultBiomeChance = 1;
 
 
     private void InitDefaults()
@@ -1251,6 +1274,15 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultClay = 1;
                 break;
             }
+            case 7:
+            case 8:
+            case 9:
+            case 0:
+            {
+                this.DefaultBiomeChance = 0;
+                break;
+            }
+
         }
 
     }

@@ -36,13 +36,13 @@ public class Coordinate
     {
         return z;
     }
-    public int getChunkX()
+    public int getChunkX(int _x )
     {
-        return x>>4;
+        return (_x + x )>>4;
     }
-    public  int getChunkZ()
+    public  int getChunkZ(int _z)
     {
-        return z>>4;
+        return (_z + z )>>4;
     }
 
     public void rotateSliceC()
