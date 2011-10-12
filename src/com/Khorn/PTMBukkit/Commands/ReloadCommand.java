@@ -31,7 +31,7 @@ public class ReloadCommand extends BaseCommand
 
         this.plugin.worldsSettings.remove(worldName);
 
-        worldSettings.newSettings = this.plugin.GetSettings(worldName);
+        worldSettings.newSettings = this.plugin.GetSettings(worldName,false);
         worldSettings.isDeprecated = true;
 
         sender.sendMessage(MessageColor + "WorldConfig for world " + worldName + " reloaded");

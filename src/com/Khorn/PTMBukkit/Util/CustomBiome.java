@@ -1,6 +1,7 @@
 package com.Khorn.PTMBukkit.Util;
 
 
+import com.Khorn.PTMBukkit.BiomeConfig;
 import net.minecraft.server.BiomeBase;
 
 public class CustomBiome extends BiomeBase
@@ -10,10 +11,15 @@ public class CustomBiome extends BiomeBase
         super(id);
         this.a(name);
     }
-    public void SetTerrainGen(float surfaceAdd,float volatility)
+    public void SetBiome(BiomeConfig config)
     {
-        this.q = surfaceAdd;
-        this.r = volatility;
+
+        this.q = config.BiomeSurface;
+        this.r = config.BiomeVolatility;
+        this.n = config.SurfaceBlock;
+        this.o = config.GroundBlock;
+
+
     }
 
 }

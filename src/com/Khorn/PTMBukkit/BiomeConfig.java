@@ -336,7 +336,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteSettingsFile(settingsFile);
 
         BuildReplaceMatrix();
-        cBiome.SetTerrainGen(this.BiomeSurface, this.BiomeVolatility);
+        cBiome.SetBiome(this);
 
 
     }

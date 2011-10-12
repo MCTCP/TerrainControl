@@ -456,7 +456,16 @@ public class WorldConfig extends ConfigFile
                 return;
             String[] keys = this.SettingsCache.get("CustomBiomes").split(",");
 
-            Collections.addAll(this.CustomBiomes, keys);
+            for(String key : keys)
+            {
+                boolean isUnique = true;
+                for(int i = 0; i< DefaultBiomesCount;i++)
+                      if(BiomeBase.a[i].l.equals(key))
+                          isUnique= false;
+
+                if(isUnique && !this.CustomBiomes.contains(key))
+                    this.CustomBiomes.add(key);
+            }
         }
     }
 

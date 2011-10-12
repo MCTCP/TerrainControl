@@ -14,25 +14,22 @@ public class CheckCommand extends BaseCommand
         super(_plugin);
         name = "check";
         usage = "/ptm check [World]";
-        help = "Checks PTM is enable for this world";
+        help = "Checks or create PTM settings for world ";
         workOnConsole = true;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, List<String> args)
     {
-        if ((sender instanceof ConsoleCommandSender) && args.size() == 0)
+        if (args.size() == 0)
         {
             sender.sendMessage(ErrorColor + "You need to select world");
             return true;
         }
 
-        WorldConfig worldSettings = this.getSettings(sender, args.size() > 0 ? args.get(0) : "");
+        WorldConfig worldSettings = plugin.GetSettings(args.get(0), true);
 
-        if (worldSettings != null)
-            sender.sendMessage(MessageColor + "Ptm is enabled for " + worldSettings.WorldName);
-        else
-            sender.sendMessage(MessageColor + "Ptm is disabled for this world");
+        sender.sendMessage(MessageColor + "Done!");
         return true;
     }
 }

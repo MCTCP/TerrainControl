@@ -74,7 +74,7 @@ public class PTMPlugin extends JavaPlugin
 
 
         ChunkGenerator prov = null;
-        WorldConfig conf = this.GetSettings(worldName);
+        WorldConfig conf = this.GetSettings(worldName,false);
         if (conf.Mode != WorldConfig.GenMode.OnlyBiome)
         {
 
@@ -90,7 +90,7 @@ public class PTMPlugin extends JavaPlugin
 
     }
 
-    public WorldConfig GetSettings(String worldName)
+    public WorldConfig GetSettings(String worldName, boolean onlyCheck)
     {
         File baseFolder = new File(this.getDataFolder(), "worlds/" + worldName);
 
@@ -123,7 +123,8 @@ public class PTMPlugin extends JavaPlugin
 
         WorldConfig worker = new WorldConfig(baseFolder, this, worldName);
 
-        worldsSettings.put(worldName, worker);
+        if (!onlyCheck)
+            worldsSettings.put(worldName, worker);
 
         System.out.println("PhoenixTerrainMod: settings for '" + worldName + "' loaded");
         return worker;
@@ -194,22 +195,22 @@ public class PTMPlugin extends JavaPlugin
            /DefaultSettings.ini
          */
         if (!this.getDataFolder().exists())
-            if (this.getDataFolder().mkdir())
+            if (!this.getDataFolder().mkdir())
                 System.out.println("PhoenixTerrainMod: error create plugin directory");
 
         File temp = new File(this.getDataFolder(), "worlds");
         if (!temp.exists())
-            if (temp.mkdir())
+            if (!temp.mkdir())
                 System.out.println("PhoenixTerrainMod: error create worlds directory");
 
         temp = new File(this.getDataFolder(), PTMDefaultValues.DefaultBOBDirectoryName.stringValue());
         if (!temp.exists())
-            if (temp.mkdir())
+            if (!temp.mkdir())
                 System.out.println("PhoenixTerrainMod: error create DefaultBOBPlugins directory");
 
         temp = new File(this.getDataFolder(), PTMDefaultValues.DefaultBiomeConfigDirectoryName.stringValue());
         if (!temp.exists())
-            if (temp.mkdir())
+            if (!temp.mkdir())
                 System.out.println("PhoenixTerrainMod: error create DefaultBiomeConfigs directory");
 
         temp = new File(this.getDataFolder(), PTMDefaultValues.DefaultSettingsName.stringValue());

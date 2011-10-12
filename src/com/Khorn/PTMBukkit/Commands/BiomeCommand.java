@@ -39,16 +39,20 @@ public class BiomeCommand extends BaseCommand
         if (args.size() == 1 && args.get(0).equals("-f"))
         {
             BiomeBase[] biome = new BiomeBase[1];
+            float[] temp = new float[1];
+            float[] humidity = new float[1];
 
             biomeManager.a(biome, (int) player.getLocation().getX(), (int) player.getLocation().getZ(), 1, 1);
+            biomeManager.getTemperatures(temp, (int) player.getLocation().getX(), (int) player.getLocation().getZ(), 1, 1);
+            biomeManager.getWetness(humidity, (int) player.getLocation().getX(), (int) player.getLocation().getZ(), 1, 1);
 
-            /*
-            player.sendMessage(ValueColor + biome[0].n + MessageColor + " block biome!");
-            player.sendMessage(ValueColor + biomeManager.rain[0] + MessageColor + " block humidity!");
-            double notchTemp = biomeManager.temperature[0] - (((CraftWorld) player.getLocation().getWorld()).getHandle().e((int) player.getLocation().getX(), (int) player.getLocation().getZ()) - 64) / 64.0D * 0.3D;
-            player.sendMessage(ValueColor + biomeManager.temperature[0] + MessageColor + " block temperature!");
-            player.sendMessage(ValueColor + notchTemp + MessageColor + " block temperature with height constant!");
-            */
+
+            player.sendMessage(ValueColor + biome[0].l + MessageColor + " block biome!");
+            player.sendMessage(ValueColor + humidity[0] + MessageColor + " block humidity!");
+            //double notchTemp = biomeManager.temperature[0] - (((CraftWorld) player.getLocation().getWorld()).getHandle().e((int) player.getLocation().getX(), (int) player.getLocation().getZ()) - 64) / 64.0D * 0.3D;
+            player.sendMessage(ValueColor + temp[0] + MessageColor + " block temperature!");
+            //player.sendMessage(ValueColor + notchTemp + MessageColor + " block temperature with height constant!");
+
         }
 
 
