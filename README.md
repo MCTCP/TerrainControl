@@ -1,1 +1,1 @@
-Phoenix Terrain Mod  basically allows you to customize Minecrafts terrain generation to control ore spawns, terrain types, biome size, basically everything.
+Terrain control  basically allows you to customize Minecrafts terrain generation to control ore spawns, terrain types, biome size, basically everything.

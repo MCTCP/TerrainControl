@@ -1,13 +1,13 @@
-name: PhoenixTerrainMod
+name: TerrainControl
 version: 0.9.6
 description: Generates a worlds.
-authors: ['Khorn', 'R-T-B']
-main: com.Khorn.PTMBukkit.PTMPlugin
+authors: ['Khorn']
+main: com.Khorn.TerrainControl.TCPlugin
 load: startup
 commands:
-    ptm:
-        description: Phoenix Terrain Mod commands
+    tc:
+        description: TerrainControl commands
         usage: |
-              /<command> <check> [world] - Checks PTM is enable for this world.
+              /<command> <check> [world] - Checks TC is enable for this world.
               /<command> <reload> [world] - Reload config
               /<command> <biome> [-f] - Show current chunk biome and block stats
