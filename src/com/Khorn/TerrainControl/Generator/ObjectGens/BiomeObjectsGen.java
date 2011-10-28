@@ -60,7 +60,7 @@ public class BiomeObjectsGen
         genWaterGravel = new WorldGenSand(biomeConfig.waterGravelDepositSize, Block.GRAVEL.id);
 
         genYFlower = new WorldGenFlowers(Block.YELLOW_FLOWER.id);
-        genRFlower = new WorldGenFlowers(Block.YELLOW_FLOWER.id);
+        genRFlower = new WorldGenFlowers(Block.RED_ROSE.id);
         genBMushroom = new WorldGenFlowers(Block.BROWN_MUSHROOM.id);
         genRMushroom = new WorldGenFlowers(Block.RED_MUSHROOM.id);
         genReed = new WorldGenReed();

@@ -11,7 +11,6 @@ import com.Khorn.TerrainControl.Generator.ChunkProviderTest;
 import com.Khorn.TerrainControl.Listeners.TCBlockListener;
 import com.Khorn.TerrainControl.Listeners.TCPlayerListener;
 import com.Khorn.TerrainControl.Listeners.TCWorldListener;
-import com.Khorn.TerrainControl.Util.FileSystemManager;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
@@ -42,7 +41,6 @@ public class TCPlugin extends JavaPlugin
 
         this.getCommand("tc").setExecutor(new TCCommandExecutor(this));
         this.RegisterEvents();
-        CheckDefaultSettingsFolder();
 
         System.out.println(getDescription().getFullName() + " is now enabled");
 
@@ -74,7 +72,7 @@ public class TCPlugin extends JavaPlugin
 
 
         ChunkGenerator prov = null;
-        WorldConfig conf = this.GetSettings(worldName,false);
+        WorldConfig conf = this.GetSettings(worldName, false);
         if (conf.Mode != WorldConfig.GenMode.OnlyBiome)
         {
 
@@ -92,32 +90,14 @@ public class TCPlugin extends JavaPlugin
 
     public WorldConfig GetSettings(String worldName, boolean onlyCheck)
     {
-        File baseFolder = new File(this.getDataFolder(), "worlds/" + worldName);
+        File baseFolder = new File(this.getDataFolder(), "worlds" + System.getProperty("file.separator") + worldName);
 
         if (!baseFolder.exists())
         {
-            try
-            {
-                File BOBDirectory = new File(baseFolder, TCDefaultValues.WorldBOBDirectoryName.stringValue());
-                File defaultBOBDirectory = new File(this.getDataFolder(), TCDefaultValues.DefaultBOBDirectoryName.stringValue());
-                FileSystemManager.CopyFileOrDirectory(defaultBOBDirectory, BOBDirectory);
+            System.out.println("TerrainControl: settings does not exist, creating defaults");
 
-                File BiomeConfigsDirectory = new File(baseFolder, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
-                File DefaultBiomeConfigsDirectory = new File(this.getDataFolder(), TCDefaultValues.DefaultBiomeConfigDirectoryName.stringValue());
-                FileSystemManager.CopyFileOrDirectory(DefaultBiomeConfigsDirectory, BiomeConfigsDirectory);
-
-                File settingsFile = new File(baseFolder, TCDefaultValues.WorldSettingsName.stringValue());
-                File defaultSettingsFile = new File(this.getDataFolder(), TCDefaultValues.DefaultSettingsName.stringValue());
-                FileSystemManager.CopyFileOrDirectory(defaultSettingsFile, settingsFile);
-
-                System.out.println("TerrainControl: config files copied from defaults");
-
-            } catch (IOException e)
-            {
-                System.out.println("TerrainControl: error copying old directory, working with defaults");
-            }
-
-
+            if(!baseFolder.mkdirs())
+                System.out.println("TerrainControl: cant create folder " + baseFolder.getName());
         }
 
 
@@ -183,39 +163,6 @@ public class TCPlugin extends JavaPlugin
 
         pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
 
-
-    }
-
-    private void CheckDefaultSettingsFolder()
-    {
-        /*
-           /worlds
-           /DefaultBOBPlugins
-           /DefaultBiomeConfigs
-           /DefaultSettings.ini
-         */
-        if (!this.getDataFolder().exists())
-            if (!this.getDataFolder().mkdir())
-                System.out.println("TerrainControl: error create plugin directory");
-
-        File temp = new File(this.getDataFolder(), "worlds");
-        if (!temp.exists())
-            if (!temp.mkdir())
-                System.out.println("TerrainControl: error create worlds directory");
-
-        temp = new File(this.getDataFolder(), TCDefaultValues.DefaultBOBDirectoryName.stringValue());
-        if (!temp.exists())
-            if (!temp.mkdir())
-                System.out.println("TerrainControl: error create DefaultBOBPlugins directory");
-
-        temp = new File(this.getDataFolder(), TCDefaultValues.DefaultBiomeConfigDirectoryName.stringValue());
-        if (!temp.exists())
-            if (!temp.mkdir())
-                System.out.println("TerrainControl: error create DefaultBiomeConfigs directory");
-
-        temp = new File(this.getDataFolder(), TCDefaultValues.DefaultSettingsName.stringValue());
-        if (!temp.exists())
-            (new WorldConfig()).CreateDefaultSettings(this.getDataFolder());
 
     }
 

@@ -195,35 +195,6 @@ public class WorldConfig extends ConfigFile
         this.plugin = plug;
     }
 
-    public WorldConfig()
-    {
-    }
-
-    public void CreateDefaultSettings(File pluginDir)
-    {
-        File settingsFile = new File(pluginDir, TCDefaultValues.DefaultSettingsName.stringValue());
-        this.ReadSettingsFile(settingsFile);
-        this.ReadConfigSettings();
-
-        this.CorrectSettings();
-
-        this.WriteSettingsFile(settingsFile);
-
-        int i = 0;
-        while (i < DefaultBiomesCount)
-        {
-            new BiomeConfig(new File(pluginDir, TCDefaultValues.DefaultBiomeConfigDirectoryName.stringValue()), BiomeBase.a[i], this);
-            i++;
-        }
-        for (String biomeName : this.CustomBiomes)
-        {
-            new BiomeConfig(new File(pluginDir, TCDefaultValues.DefaultBiomeConfigDirectoryName.stringValue()), biomeName, i, this);
-            i++;
-        }
-
-
-    }
-
     protected void CorrectSettings()
     {
         this.biomeSize = CheckValue(this.biomeSize, 1, 15);
