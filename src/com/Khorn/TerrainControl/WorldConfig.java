@@ -91,7 +91,7 @@ public class WorldConfig extends ConfigFile
     private boolean disableBedrock;
     private boolean flatBedrock;
     public boolean ceilingBedrock;
-    private boolean bedrockObsidian;
+    public int bedrockBlock;
 
 
     public boolean removeSurfaceStone;
@@ -323,7 +323,7 @@ public class WorldConfig extends ConfigFile
         this.disableBedrock = ReadModSettings(TCDefaultValues.disableBedrock.name(), TCDefaultValues.disableBedrock.booleanValue());
         this.ceilingBedrock = ReadModSettings(TCDefaultValues.ceilingBedrock.name(), TCDefaultValues.ceilingBedrock.booleanValue());
         this.flatBedrock = ReadModSettings(TCDefaultValues.flatBedrock.name(), TCDefaultValues.flatBedrock.booleanValue());
-        this.bedrockObsidian = ReadModSettings(TCDefaultValues.bedrockobsidian.name(), TCDefaultValues.bedrockobsidian.booleanValue());
+        this.bedrockBlock = ReadModSettings(TCDefaultValues.BedrockobBlock.name(), TCDefaultValues.BedrockobBlock.intValue());
 
         ReadHeightSettings();
 
@@ -489,7 +489,7 @@ public class WorldConfig extends ConfigFile
         WriteModSettings(TCDefaultValues.disableBedrock.name(), this.disableBedrock);
         WriteModSettings(TCDefaultValues.ceilingBedrock.name(), this.ceilingBedrock);
         WriteModSettings(TCDefaultValues.flatBedrock.name(), this.flatBedrock);
-        WriteModSettings(TCDefaultValues.bedrockobsidian.name(), this.bedrockObsidian);
+        WriteModSettings(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
         WriteModSettings(TCDefaultValues.disableNotchHeightControl.name(), this.disableNotchHeightControl);
         WriteHeightSettings();
 
@@ -700,10 +700,6 @@ public class WorldConfig extends ConfigFile
         return (!this.disableBedrock) && ((!this.flatBedrock) || (y == 0));
     }
 
-    public byte getAdminium()
-    {
-        return (byte) (this.bedrockObsidian ? Block.OBSIDIAN.id : Block.BEDROCK.id);
-    }
 
     public enum GenMode
     {

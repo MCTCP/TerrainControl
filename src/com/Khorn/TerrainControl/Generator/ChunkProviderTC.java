@@ -208,7 +208,7 @@ public class ChunkProviderTC extends ChunkGenerator
                 int i7 = this.worldSettings.biomeConfigs[localBiomeBase.y].GroundBlock;
 
                 if (this.worldSettings.ceilingBedrock)
-                    paramArrayOfByte[(z * 16 + x) * 128 + 127] = this.worldSettings.getAdminium();
+                    paramArrayOfByte[(z * 16 + x) * 128 + 127] = (byte)this.worldSettings.bedrockBlock;
 
                 for (int y = 127; y >= 0; y--)
                 {
@@ -216,7 +216,7 @@ public class ChunkProviderTC extends ChunkGenerator
 
                     if (y < 5 && (worldSettings.createAdminium(y)) && y <= this.rnd.nextInt(5))
                     {
-                        paramArrayOfByte[i9] = this.worldSettings.getAdminium();
+                        paramArrayOfByte[i9] = (byte)this.worldSettings.bedrockBlock;
                     } else
                     {
                         int i10 = paramArrayOfByte[i9];
@@ -346,7 +346,7 @@ public class ChunkProviderTC extends ChunkGenerator
                 {
                     double d7;
 
-                    double d8 = (i10 - biomeFactor2) * 12.0D * 128.0D / 128.0D / biomeFactor;
+                    double d8 = (i10 - biomeFactor2) * 12.0D / biomeFactor;
 
                     if (d8 < 0.0D)
                         d8 *= 4.0D;

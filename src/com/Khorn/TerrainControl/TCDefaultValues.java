@@ -53,10 +53,9 @@ public enum TCDefaultValues
     disableBedrock(false),
     ceilingBedrock(false),
     flatBedrock(false),
-    bedrockobsidian(false),
+    BedrockobBlock(7),
     disableNotchPonds(false),
 
-    ObjectsEnabled(true),
     StrongholdsEnabled(true),
     MineshaftsEnabled(true),
     VillagesEnabled(true),
