@@ -5,17 +5,14 @@ import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import com.Khorn.TerrainControl.Generator.ObjectSpawner;
 import com.Khorn.TerrainControl.Util.ConfigFile;
 import net.minecraft.server.BiomeBase;
-import net.minecraft.server.Block;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.Map.Entry;
+
 
 public class WorldConfig extends ConfigFile
 {
-    public HashMap<Integer, Byte> replaceBlocks = new HashMap<Integer, Byte>();
-    public byte[] ReplaceBlocksMatrix = new byte[256];
 
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
 
@@ -159,7 +156,6 @@ public class WorldConfig extends ConfigFile
 
         this.WriteSettingsFile(settingsFile);
 
-        BuildReplaceMatrix();
 
         File BiomeFolder = new File(SettingsDir, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
         if (!BiomeFolder.exists())
@@ -348,40 +344,14 @@ public class WorldConfig extends ConfigFile
         this.undergroundLakeMaxAltitude = this.ReadModSettings(TCDefaultValues.undergroundLakeMaxAltitude.name(), TCDefaultValues.undergroundLakeMaxAltitude.intValue());
 
 
-        this.ReadModReplaceSettings();
+
         this.ReadCustomBiomes();
 
 
     }
 
 
-    private void ReadModReplaceSettings()
-    {
-        if (this.SettingsCache.containsKey("ReplacedBlocks"))
-        {
-            if (this.SettingsCache.get("ReplacedBlocks").trim().equals("") || this.SettingsCache.get("ReplacedBlocks").equals("None"))
-                return;
-            String[] keys = this.SettingsCache.get("ReplacedBlocks").split(",");
-            try
-            {
-                for (String key : keys)
-                {
 
-                    String[] blocks = key.split("=");
-
-                    this.replaceBlocks.put(Integer.valueOf(blocks[0]), Byte.valueOf(blocks[1]));
-
-                }
-
-            } catch (NumberFormatException e)
-            {
-                System.out.println("Wrong replace settings: '" + this.SettingsCache.get("ReplacedBlocks") + "'");
-            }
-
-        }
-
-
-    }
 
     private void ReadHeightSettings()
     {
@@ -407,17 +377,7 @@ public class WorldConfig extends ConfigFile
 
     }
 
-    private void BuildReplaceMatrix()
-    {
-        for (int i = 0; i < this.ReplaceBlocksMatrix.length; i++)
-        {
-            if (this.replaceBlocks.containsKey(i))
-                this.ReplaceBlocksMatrix[i] = this.replaceBlocks.get(i);
-            else
-                this.ReplaceBlocksMatrix[i] = (byte) i;
 
-        }
-    }
 
     private void ReadCustomBiomes()
     {
@@ -427,14 +387,14 @@ public class WorldConfig extends ConfigFile
                 return;
             String[] keys = this.SettingsCache.get("CustomBiomes").split(",");
 
-            for(String key : keys)
+            for (String key : keys)
             {
                 boolean isUnique = true;
-                for(int i = 0; i< DefaultBiomesCount;i++)
-                      if(BiomeBase.a[i].l.equals(key))
-                          isUnique= false;
+                for (int i = 0; i < DefaultBiomesCount; i++)
+                    if (BiomeBase.a[i].l.equals(key))
+                        isUnique = false;
 
-                if(isUnique && !this.CustomBiomes.contains(key))
+                if (isUnique && !this.CustomBiomes.contains(key))
                     this.CustomBiomes.add(key);
             }
         }
@@ -478,6 +438,7 @@ public class WorldConfig extends ConfigFile
         WriteModSettings(TCDefaultValues.oldTerrainGenerator.name(), this.oldTerrainGenerator);
         WriteModSettings(TCDefaultValues.waterLevel.name(), this.waterLevel);
         WriteModSettings(TCDefaultValues.waterBlock.name(), this.waterBlock);
+        WriteModSettings(TCDefaultValues.removeSurfaceStone.name(), this.removeSurfaceStone);
         WriteModSettings(TCDefaultValues.maxAverageHeight.name(), this.maxAverageHeight);
         WriteModSettings(TCDefaultValues.maxAverageDepth.name(), this.maxAverageDepth);
         WriteModSettings(TCDefaultValues.fractureHorizontal.name(), this.fractureHorizontal);
@@ -497,11 +458,6 @@ public class WorldConfig extends ConfigFile
         WriteModSettings(TCDefaultValues.StrongholdsEnabled.name(), this.StrongholdsEnabled);
         WriteModSettings(TCDefaultValues.VillagesEnabled.name(), this.VillagesEnabled);
         WriteModSettings(TCDefaultValues.MineshaftsEnabled.name(), this.MineshaftsEnabled);
-
-        WriteModTitleSettings("Replace Variables");
-        WriteModSettings(TCDefaultValues.removeSurfaceStone.name(), this.removeSurfaceStone);
-
-        WriteModReplaceSettings();
 
 
         this.WriteModTitleSettings("BOB Objects Variables");
@@ -544,26 +500,6 @@ public class WorldConfig extends ConfigFile
 
     }
 
-    private void WriteModReplaceSettings() throws IOException
-    {
-
-        if (this.replaceBlocks.size() == 0)
-        {
-            this.WriteModSettings("ReplacedBlocks", "None");
-            return;
-        }
-        String output = "";
-        Iterator<Entry<Integer, Byte>> i = this.replaceBlocks.entrySet().iterator();
-        while (i.hasNext())
-        {
-            Map.Entry<Integer, Byte> me = i.next();
-
-            output += me.getKey().toString() + "=" + me.getValue().toString();
-            if (i.hasNext())
-                output += ",";
-        }
-        this.WriteModSettings("ReplacedBlocks", output);
-    }
 
     private void WriteHeightSettings() throws IOException
     {

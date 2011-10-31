@@ -14,7 +14,12 @@ public class BiomeConfig extends ConfigFile
 {
 
     public HashMap<Integer, Byte> replaceBlocks = new HashMap<Integer, Byte>();
-    public byte[] ReplaceBlocksMatrix = new byte[256];
+    public HashMap<Integer, Integer> replaceHeightMin = new HashMap<Integer, Integer>();
+    public HashMap<Integer, Integer> replaceHeightMax = new HashMap<Integer, Integer>();
+    public byte[] ReplaceMatrixBlocks = new byte[256];
+    public int[] ReplaceMatrixHeightMin = new int[256];
+    public int[] ReplaceMatrixHeightMax = new int[256];
+
 
     public int BiomeChance;
 
@@ -647,7 +652,31 @@ public class BiomeConfig extends ConfigFile
                 {
 
                     String[] blocks = key.split("=");
+                    if (blocks.length != 2)
+                        continue;
 
+
+                    int start = blocks[1].indexOf("(");
+                    int end = blocks[1].indexOf(")");
+                    if (start != -1 && end != -1)
+                    {
+                        String[] ranges = blocks[1].substring(start + 1, end).split("-");
+                        if (ranges.length != 2)
+                            continue;
+
+                        int min = Integer.valueOf(ranges[0]);
+                        int max = Integer.valueOf(ranges[1]);
+                        min = CheckValue(min, 0, 128);
+                        max = CheckValue(max, 0, 128, min);
+                        this.replaceHeightMin.put(Integer.valueOf(blocks[0]), min);
+                        this.replaceHeightMax.put(Integer.valueOf(blocks[0]), max);
+                        this.replaceBlocks.put(Integer.valueOf(blocks[0]), Byte.valueOf(blocks[1].substring(0, start)));
+                        continue;
+
+
+                    }
+                    this.replaceHeightMin.put(Integer.valueOf(blocks[0]), 0);
+                    this.replaceHeightMax.put(Integer.valueOf(blocks[0]), 128);
                     this.replaceBlocks.put(Integer.valueOf(blocks[0]), Byte.valueOf(blocks[1]));
 
                 }
@@ -664,12 +693,15 @@ public class BiomeConfig extends ConfigFile
 
     private void BuildReplaceMatrix()
     {
-        for (int i = 0; i < this.ReplaceBlocksMatrix.length; i++)
+        for (int i = 0; i < this.ReplaceMatrixBlocks.length; i++)
         {
             if (this.replaceBlocks.containsKey(i))
-                this.ReplaceBlocksMatrix[i] = this.replaceBlocks.get(i);
-            else
-                this.ReplaceBlocksMatrix[i] = (byte) i;
+            {
+                this.ReplaceMatrixBlocks[i] = this.replaceBlocks.get(i);
+                this.ReplaceMatrixHeightMin[i] = this.replaceHeightMin.get(i);
+                this.ReplaceMatrixHeightMax[i] = this.replaceHeightMax.get(i);
+            } else
+                this.ReplaceMatrixBlocks[i] = (byte) i;
 
         }
     }
@@ -688,8 +720,7 @@ public class BiomeConfig extends ConfigFile
         WriteModSettings(TCDefaultValues.GroundBlock.name(), this.GroundBlock);
 
 
-        WriteModTitleSettings("Replace Variables");
-
+        WriteModTitleSettings("Replace Variable: BlockIdFrom=BlockIdTo(minHeight-maxHeight)");
         WriteModReplaceSettings();
 
 
@@ -976,9 +1007,15 @@ public class BiomeConfig extends ConfigFile
             Map.Entry<Integer, Byte> me = i.next();
 
             output += me.getKey().toString() + "=" + me.getValue().toString();
+            int min = this.replaceHeightMin.get(me.getKey());
+            int max = this.replaceHeightMax.get(me.getKey());
+            if (min != 0 || max != 128)
+                output += "(" + min + "-" + max + ")";
+
             if (i.hasNext())
                 output += ",";
         }
+
         this.WriteModSettings("ReplacedBlocks", output);
     }
 

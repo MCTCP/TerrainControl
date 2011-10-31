@@ -180,7 +180,7 @@ public class ObjectSpawner extends BlockPopulator
 
         biomeGen.ProcessOres(x, z, this.rand);
 
-        CustomObjectGen.SpawnCustomObjects(this.world, this.rand, this.worldSettings, x +8 , z +8, localBiomeBase);
+        CustomObjectGen.SpawnCustomObjects(this.world, this.rand, this.worldSettings, x + 8, z + 8, localBiomeBase);
 
         biomeGen.ProcessTrees(x, z, this.rand);
 
@@ -208,16 +208,7 @@ public class ObjectSpawner extends BlockPopulator
            }
            i = 0;
        } */
-        if (this.worldSettings.replaceBlocks.size() != 0)
-        {
-            byte[] blocks = ((CraftChunk) chunk).getHandle().b;
 
-            for (int i = 0; i < blocks.length; i++)
-            {
-                if (blocks[i] != this.worldSettings.ReplaceBlocksMatrix[blocks[i]])
-                    blocks[i] = this.worldSettings.ReplaceBlocksMatrix[blocks[i]];
-            }
-        }
         if (this.worldSettings.BiomeConfigsHaveReplacement)
         {
             byte[] blocks = ((CraftChunk) chunk).getHandle().b;
@@ -232,8 +223,9 @@ public class ObjectSpawner extends BlockPopulator
                         for (int _y = 127; _y >= 0; _y--)
                         {
                             int i = (_z * 16 + _x) * 128 + _y;
-                            if (blocks[i] != biomeConfig.ReplaceBlocksMatrix[blocks[i]])
-                                blocks[i] = biomeConfig.ReplaceBlocksMatrix[blocks[i]];
+                            if (blocks[i] != biomeConfig.ReplaceMatrixBlocks[blocks[i]])
+                                if (_y >= biomeConfig.ReplaceMatrixHeightMin[i] && _y <= biomeConfig.ReplaceMatrixHeightMax[i])
+                                    blocks[i] = biomeConfig.ReplaceMatrixBlocks[blocks[i]];
 
                         }
                     }
