@@ -2,10 +2,10 @@ package com.Khorn.TerrainControl.Listeners;
 
 
 import com.Khorn.TerrainControl.Commands.BaseCommand;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObjectGen;
 import com.Khorn.TerrainControl.TCPlayer;
 import com.Khorn.TerrainControl.TCPlugin;
-import com.Khorn.TerrainControl.WorldConfig;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

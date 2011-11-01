@@ -1,9 +1,9 @@
 package com.Khorn.TerrainControl.Listeners;
 
 
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.ObjectSpawnDelegate;
 import com.Khorn.TerrainControl.TCPlugin;
-import com.Khorn.TerrainControl.WorldConfig;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;

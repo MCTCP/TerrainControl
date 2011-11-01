@@ -1,17 +1,17 @@
-package com.Khorn.TerrainControl.Generator.ObjectGens;
+package com.Khorn.TerrainControl.Generator.TerrainsGens;
 
 import net.minecraft.server.World;
 
 import java.util.Random;
 
-public class GenBase
+public class TerrainGenBase
 {
 
     protected int b = 8;
     protected Random c = new Random();
     protected World d;
 
-    public GenBase(World world)
+    public TerrainGenBase(World world)
     {
         this.d = world;
     }

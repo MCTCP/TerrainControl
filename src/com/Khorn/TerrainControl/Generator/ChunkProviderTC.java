@@ -1,10 +1,10 @@
 package com.Khorn.TerrainControl.Generator;
 
-import com.Khorn.TerrainControl.Generator.ObjectGens.CanyonsGen;
-import com.Khorn.TerrainControl.Generator.ObjectGens.CavesGen;
-import com.Khorn.TerrainControl.Generator.ObjectGens.GenBase;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.Khorn.TerrainControl.Generator.TerrainsGens.CanyonsGen;
+import com.Khorn.TerrainControl.Generator.TerrainsGens.CavesGen;
+import com.Khorn.TerrainControl.Generator.TerrainsGens.TerrainGenBase;
 import com.Khorn.TerrainControl.TCDefaultValues;
-import com.Khorn.TerrainControl.WorldConfig;
 import net.minecraft.server.*;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
@@ -45,7 +45,7 @@ public class ChunkProviderTC extends ChunkGenerator
     private double biomeFactor2;
 
     private WorldConfig worldSettings;
-    private GenBase CaveGen;
+    private TerrainGenBase CaveGen;
 
 
     public WorldGenStronghold strongholdGen = new WorldGenStronghold();
@@ -53,7 +53,7 @@ public class ChunkProviderTC extends ChunkGenerator
     public WorldGenVillage VillageGen = new WorldGenVillage();
     public WorldGenMineshaft MineshaftGen = new WorldGenMineshaft();
 
-    private GenBase CanyonGen;
+    private TerrainGenBase CanyonGen;
 
     private BiomeBase[] BiomeArray;
 

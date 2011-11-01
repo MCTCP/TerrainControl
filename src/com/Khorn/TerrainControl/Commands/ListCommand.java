@@ -1,8 +1,8 @@
 package com.Khorn.TerrainControl.Commands;
 
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObject;
 import com.Khorn.TerrainControl.TCPlugin;
-import com.Khorn.TerrainControl.WorldConfig;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;

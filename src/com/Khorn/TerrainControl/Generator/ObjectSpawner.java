@@ -1,9 +1,9 @@
 package com.Khorn.TerrainControl.Generator;
 
-import com.Khorn.TerrainControl.BiomeConfig;
+import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObjectGen;
-import com.Khorn.TerrainControl.Generator.ObjectGens.BiomeObjectsGen;
-import com.Khorn.TerrainControl.WorldConfig;
+import com.Khorn.TerrainControl.Generator.TerrainsGens.BiomeObjectsGen;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;

@@ -1,9 +1,10 @@
-package com.Khorn.TerrainControl;
+package com.Khorn.TerrainControl.Configuration;
 
 import com.Khorn.TerrainControl.CustomObjects.CustomObject;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import com.Khorn.TerrainControl.Generator.ObjectSpawner;
-import com.Khorn.TerrainControl.Util.ConfigFile;
+import com.Khorn.TerrainControl.TCDefaultValues;
+import com.Khorn.TerrainControl.TCPlugin;
 import net.minecraft.server.BiomeBase;
 
 import java.io.File;

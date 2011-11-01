@@ -1,7 +1,7 @@
 package com.Khorn.TerrainControl.Util;
 
 
-import com.Khorn.TerrainControl.BiomeConfig;
+import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import net.minecraft.server.BiomeBase;
 
 public class CustomBiome extends BiomeBase

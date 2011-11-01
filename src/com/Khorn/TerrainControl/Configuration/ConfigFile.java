@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.Util;
+package com.Khorn.TerrainControl.Configuration;
 
 import java.io.*;
 import java.util.HashMap;
@@ -23,12 +23,17 @@ public abstract class ConfigFile
                 String thisLine;
                 while ((thisLine = SettingsReader.readLine()) != null)
                 {
+                    if(thisLine.trim().equals(""))
+                        continue;
                     if (thisLine.toLowerCase().contains(":"))
                     {
                         String[] splitSettings = thisLine.split(":");
                         if (splitSettings.length == 2)
                             this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
-                    }
+                    }else
+                        if(!thisLine.toLowerCase().contains("<"))
+                            this.SettingsCache.put(thisLine.trim(), "");
+
                 }
             } catch (IOException e)
             {
@@ -193,6 +198,11 @@ public abstract class ConfigFile
     protected void WriteModSettings(String settingsName, String settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + settingsValue);
+        this.SettingsWriter.newLine();
+    }
+    protected void WriteModSettings(String settingsName) throws IOException
+    {
+        this.SettingsWriter.write(settingsName);
         this.SettingsWriter.newLine();
     }
 

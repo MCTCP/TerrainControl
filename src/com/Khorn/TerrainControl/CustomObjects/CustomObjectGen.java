@@ -1,6 +1,6 @@
 package com.Khorn.TerrainControl.CustomObjects;
 
-import com.Khorn.TerrainControl.WorldConfig;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 

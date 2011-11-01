@@ -1,13 +1,13 @@
-package com.Khorn.TerrainControl.Generator.ObjectGens;
+package com.Khorn.TerrainControl.Generator.TerrainsGens;
 
-import com.Khorn.TerrainControl.WorldConfig;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import net.minecraft.server.Block;
 import net.minecraft.server.MathHelper;
 import net.minecraft.server.World;
 
 import java.util.Random;
 
-public class CanyonsGen extends GenBase
+public class CanyonsGen extends TerrainGenBase
 {
     private float[] a = new float[1024];
     private WorldConfig worldSettings;

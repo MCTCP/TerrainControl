@@ -1,7 +1,7 @@
 package com.Khorn.TerrainControl.Generator;
 
-import com.Khorn.TerrainControl.BiomeConfig;
-import com.Khorn.TerrainControl.WorldConfig;
+import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.GenLayer;
 import net.minecraft.server.IntCache;

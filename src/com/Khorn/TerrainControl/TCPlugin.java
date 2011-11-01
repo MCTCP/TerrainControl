@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.HashMap;
 
 import com.Khorn.TerrainControl.Commands.TCCommandExecutor;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Generator.BiomeManager;
 import com.Khorn.TerrainControl.Generator.BiomeManagerOld;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;

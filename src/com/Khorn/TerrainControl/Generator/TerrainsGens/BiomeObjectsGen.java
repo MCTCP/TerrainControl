@@ -1,6 +1,6 @@
-package com.Khorn.TerrainControl.Generator.ObjectGens;
+package com.Khorn.TerrainControl.Generator.TerrainsGens;
 
-import com.Khorn.TerrainControl.BiomeConfig;
+import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import com.Khorn.TerrainControl.Util.WorldWithChunkCheck;
 import net.minecraft.server.*;
 import org.bukkit.BlockChangeDelegate;

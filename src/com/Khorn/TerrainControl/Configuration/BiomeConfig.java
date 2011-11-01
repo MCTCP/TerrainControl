@@ -1,7 +1,8 @@
-package com.Khorn.TerrainControl;
+package com.Khorn.TerrainControl.Configuration;
 
-import com.Khorn.TerrainControl.Util.ConfigFile;
+import com.Khorn.TerrainControl.TCDefaultValues;
 import com.Khorn.TerrainControl.Util.CustomBiome;
+import com.Khorn.TerrainControl.Util.ResourceType;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.Block;
 
@@ -35,6 +36,13 @@ public class BiomeConfig extends ConfigFile
     public boolean evenLavaSourceDistribution;
 
     public boolean disableNotchPonds;
+
+    public Resource[] FirstResourceSequence = new Resource[256];
+    public Resource[] SecondResourceSequence = new Resource[256];
+
+
+    public int FirstResourceCount = 0;
+    public int SecondResourceCount = 0;
 
 
     // Materials
@@ -634,6 +642,7 @@ public class BiomeConfig extends ConfigFile
 
 
         this.ReadModReplaceSettings();
+        this.ReadResourceSettings();
 
 
     }
@@ -706,6 +715,37 @@ public class BiomeConfig extends ConfigFile
         }
     }
 
+    private void ReadResourceSettings()
+    {
+
+        for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
+        {
+            String key = entry.getKey();
+            for (ResourceType type : ResourceType.values())
+            {
+                if (key.startsWith(type.name()))
+                {
+                    int start = key.indexOf("(");
+                    int end = key.indexOf(")");
+                    if (start != -1 && end != -1)
+                    {
+                        Resource res = new Resource(type);
+                        res.ReadFromString(key.substring(start + 1, end));
+
+                        if (res.Done)
+                            if (res.First)
+                                this.FirstResourceSequence[this.FirstResourceCount++] = res;
+                            else
+                                this.SecondResourceSequence[this.SecondResourceCount++] = res;
+
+                    }
+                }
+
+
+            }
+
+        }
+    }
 
     protected void WriteConfigSettings() throws IOException
     {
@@ -728,6 +768,11 @@ public class BiomeConfig extends ConfigFile
         this.WriteModSettings(TCDefaultValues.notchBiomeTrees.name(), this.notchBiomeTrees);
         this.WriteModSettings(TCDefaultValues.TreeDensity.name(), this.TreeDensity);
 
+        this.WriteModTitleSettings("ResourceSection");
+        this.WriteModTitleSettings("Ore(BlockId,BlockIdSource,Size,Frequency,Rarity,MinAltitude,MaxAltitude");
+        this.WriteModTitleSettings("UnderWaterOre(BlockId,BlockIdSource,Size,Frequency,Rarity,MinAltitude,MaxAltitude");
+        this.WriteModTitleSettings("Flower(BlockId,BlockIdSource,Frequency,Rarity,MinAltitude,MaxAltitude");
+        this.WriteResources();
 
         this.WriteModTitleSettings("Start Deposit Variables :");
         this.WriteModTitleSettings("Above Ground Variables");
@@ -1019,6 +1064,14 @@ public class BiomeConfig extends ConfigFile
         this.WriteModSettings("ReplacedBlocks", output);
     }
 
+    private void WriteResources() throws IOException
+    {
+        for( int i = 0; i< this.FirstResourceCount; i++)
+           this.WriteModSettings(this.FirstResourceSequence[i].WriteToString());
+        for( int i = 0; i< this.SecondResourceCount; i++)
+           this.WriteModSettings(this.SecondResourceSequence[i].WriteToString());
+
+    }
     protected void CorrectSettings()
     {
         this.BiomeChance = CheckValue(this.BiomeChance, 0, 20);

@@ -1,7 +1,7 @@
 package com.Khorn.TerrainControl.Generator;
 
 
-import com.Khorn.TerrainControl.WorldConfig;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;

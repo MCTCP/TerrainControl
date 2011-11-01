@@ -1,13 +1,13 @@
-package com.Khorn.TerrainControl.Generator.ObjectGens;
+package com.Khorn.TerrainControl.Generator.TerrainsGens;
 
-import com.Khorn.TerrainControl.WorldConfig;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import net.minecraft.server.Block;
 import net.minecraft.server.MathHelper;
 import net.minecraft.server.World;
 
 import java.util.Random;
 
-public class CavesGen extends GenBase
+public class CavesGen extends TerrainGenBase
 {
 
     private WorldConfig worldSettings;

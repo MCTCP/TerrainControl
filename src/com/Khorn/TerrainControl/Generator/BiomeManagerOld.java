@@ -1,7 +1,7 @@
 package com.Khorn.TerrainControl.Generator;
 
 
-import com.Khorn.TerrainControl.WorldConfig;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Util.NoiseGeneratorOctaves2;
 import net.minecraft.server.*;
 
