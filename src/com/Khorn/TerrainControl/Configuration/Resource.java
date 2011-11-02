@@ -30,18 +30,6 @@ public class Resource
             switch (this.Type)
             {
                 case Ore:
-                {
-                    if (Props.length != 7)
-                        return;
-                    this.BlockId = Integer.valueOf(Props[0]);
-                    this.SourceBlockId = Integer.valueOf(Props[1]);
-                    this.Size = Integer.valueOf(Props[2]);
-                    this.Frequency = Integer.valueOf(Props[3]);
-                    this.Rarity = Integer.valueOf(Props[4]);
-                    this.MinAltitude = Integer.valueOf(Props[5]);
-                    this.MaxAltitude = Integer.valueOf(Props[6]);
-                    break;
-                }
                 case UnderWaterOre:
                 {
                     if (Props.length != 7)
@@ -55,7 +43,23 @@ public class Resource
                     this.MaxAltitude = Integer.valueOf(Props[6]);
                     break;
                 }
+                case Liquid:
+                {
+                    if (Props.length != 6)
+                        return;
+                    this.BlockId = Integer.valueOf(Props[0]);
+                    this.SourceBlockId = Integer.valueOf(Props[1]);
+                    this.Frequency = Integer.valueOf(Props[2]);
+                    this.Rarity = Integer.valueOf(Props[3]);
+                    this.MinAltitude = Integer.valueOf(Props[4]);
+                    this.MaxAltitude = Integer.valueOf(Props[5]);
+                    break;
+                }
                 case Flower:
+                case Grass:
+                case Reed:
+                case Cactus:
+                case Pumpkin:
                 {
                     if (Props.length != 6)
                         return;
@@ -67,18 +71,6 @@ public class Resource
                     this.MaxAltitude = Integer.valueOf(Props[5]);
                     this.First = false;
 
-                    break;
-                }
-                case Liquid:
-                {
-                    if (Props.length != 6)
-                        return;
-                    this.BlockId = Integer.valueOf(Props[0]);
-                    this.SourceBlockId = Integer.valueOf(Props[1]);
-                    this.Frequency = Integer.valueOf(Props[2]);
-                    this.Rarity = Integer.valueOf(Props[3]);
-                    this.MinAltitude = Integer.valueOf(Props[4]);
-                    this.MaxAltitude = Integer.valueOf(Props[5]);
                     break;
                 }
             }
@@ -99,15 +91,15 @@ public class Resource
         switch (this.Type)
         {
             case Ore:
-                output += this.BlockId + "," + this.SourceBlockId + "," + this.Size + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
-                break;
             case UnderWaterOre:
                 output += this.BlockId + "," + this.SourceBlockId + "," + this.Size + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
                 break;
             case Flower:
-                output += this.BlockId + "," + this.SourceBlockId + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
-                break;
             case Liquid:
+            case Grass:
+            case Reed:
+            case Cactus:
+            case Pumpkin:
                 output += this.BlockId + "," + this.SourceBlockId + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
                 break;
         }

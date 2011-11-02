@@ -5,5 +5,9 @@ public enum ResourceType
     Ore,
     UnderWaterOre,
     Flower,
-    Liquid
+    Liquid,
+    Grass,
+    Reed,
+    Cactus,
+    Pumpkin,
 }

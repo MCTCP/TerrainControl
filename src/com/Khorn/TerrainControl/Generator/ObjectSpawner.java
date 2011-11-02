@@ -1,8 +1,11 @@
 package com.Khorn.TerrainControl.Generator;
 
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.Khorn.TerrainControl.Configuration.Resource;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObjectGen;
+import com.Khorn.TerrainControl.Generator.ResourceGens.LiquidGen;
+import com.Khorn.TerrainControl.Generator.ResourceGens.OreGen;
 import com.Khorn.TerrainControl.Generator.TerrainsGens.BiomeObjectsGen;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
@@ -20,6 +23,9 @@ public class ObjectSpawner extends BlockPopulator
     private World world;
     private BiomeBase[] BiomeArray;
 
+    private OreGen oreGen;
+    private LiquidGen liquidGen;
+
     private BiomeObjectsGen[] BiomeGenerators;
 
     public ObjectSpawner(WorldConfig wrk)
@@ -32,6 +38,8 @@ public class ObjectSpawner extends BlockPopulator
     public void Init(World world)
     {
         this.world = world;
+        this.oreGen = new OreGen(this.world);
+        this.liquidGen = new LiquidGen(this.world);
         InitGenerators();
     }
 
@@ -41,47 +49,6 @@ public class ObjectSpawner extends BlockPopulator
         for (int i = 0; i < this.worldSettings.biomeConfigs.length; i++)
             this.BiomeGenerators[i] = new BiomeObjectsGen(this.world, this.worldSettings.biomeConfigs[i], BiomeBase.a[i]);
     }
-
-
-    /*
-    void processTrees(int x, int z, BiomeBase currentBiome)
-    {
-        if (!this.worldSettings.notchBiomeTrees)
-            return;
-        double d1 = 0.5D;
-        int treeDensity = 0;
-        double temp = this.treeNoise.a(x * d1, z * d1);
-        int treeDensityVariation = (int) ((temp / 8.0D + this.rand.nextDouble() * 4.0D + 4.0D) / 3.0D);
-
-        if (this.rand.nextInt(10) == 0)
-            treeDensity++;
-
-        if (currentBiome == BiomeBase.SWAMPLAND)
-            treeDensity += treeDensityVariation + this.worldSettings.swamplandTreeDensity;
-        if (currentBiome == BiomeBase.FOREST)
-            treeDensity += treeDensityVariation + this.worldSettings.forestTreeDensity;
-        if (currentBiome == BiomeBase.TAIGA)
-            treeDensity += treeDensityVariation + this.worldSettings.taigaTreeDensity;
-        if (currentBiome == BiomeBase.DESERT)
-            treeDensity += treeDensityVariation + this.worldSettings.desertTreeDensity;
-        if (currentBiome == BiomeBase.PLAINS)
-            treeDensity += treeDensityVariation + this.worldSettings.plainsTreeDensity;
-
-
-        for (int i = 0; i < treeDensity; i++)
-        {
-
-            int _x = x + this.rand.nextInt(16);
-            int _z = z + this.rand.nextInt(16);
-
-            WorldGenerator localWorldGenerator = currentBiome.a(this.rand);
-            localWorldGenerator.a(1.0D, 1.0D, 1.0D);
-            localWorldGenerator.a(this.world, this.rand, _x, this.world.getHighestBlockYAt(_x, _z), _z);
-
-
-        }
-
-    }*/
 
 
     void processUndergroundLakes(int x, int z)
@@ -141,6 +108,24 @@ public class ObjectSpawner extends BlockPopulator
         }
     }
 
+    private void ProcessResource(Resource res, int x,int z)
+    {
+        switch (res.Type)
+        {
+            case Ore:
+                this.oreGen.Process(this.rand,res,x,z);
+                break;
+            case UnderWaterOre:
+                break;
+            case Flower:
+                break;
+            case Liquid:
+                this.liquidGen.Process(this.rand,res,x,z);
+                break;
+        }
+
+    }
+
     @Override
     public void populate(org.bukkit.World _world, Random random, Chunk chunk)
     {
@@ -178,6 +163,13 @@ public class ObjectSpawner extends BlockPopulator
         if (this.worldSettings.undergroundLakes)
             this.processUndergroundLakes(x, z);
 
+        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[localBiomeBase.y];
+
+
+        //First resource sequence
+        for(int i = 0; i<localBiomeConfig.FirstResourceCount; i++)
+            this.ProcessResource(localBiomeConfig.FirstResourceSequence[i],x,z);
+
         biomeGen.ProcessOres(x, z, this.rand);
 
         CustomObjectGen.SpawnCustomObjects(this.world, this.rand, this.worldSettings, x + 8, z + 8, localBiomeBase);
@@ -186,28 +178,6 @@ public class ObjectSpawner extends BlockPopulator
 
         biomeGen.ProcessAboveGround(x, z, this.rand);
 
-
-        /*
-       int i = 0;
-
-       double[] TemperatureArray = new double[256];
-       TemperatureArray = this.world.getWorldChunkManager().a(TemperatureArray, x, z, 16, 16);
-       for (int _x = x; _x < x + 16; _x++)
-       {
-           for (int _z = z; _z < z + 16; _z++)
-           {
-
-
-               int _y = this.world.e(_x, _z);
-               double d2 = TemperatureArray[i] - (_y - 64) / 64.0D * 0.3D;
-               i++;
-               if (!((d2 >= this.worldSettings.snowThreshold) || (_y <= 0) || (_y >= 128) || (!this.world.isEmpty(_x, _y, _z)) || (!this.world.getMaterial(_x, _y - 1, _z).isSolid()) || (this.world.getMaterial(_x, _y - 1, _z) == Material.ICE)))
-                   this.world.setRawTypeId(_x, _y, _z, Block.SNOW.id);
-
-
-           }
-           i = 0;
-       } */
 
         if (this.worldSettings.BiomeConfigsHaveReplacement)
         {
