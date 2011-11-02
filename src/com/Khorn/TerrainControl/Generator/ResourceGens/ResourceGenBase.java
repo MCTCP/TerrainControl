@@ -1,7 +1,9 @@
 package com.Khorn.TerrainControl.Generator.ResourceGens;
 
 import com.Khorn.TerrainControl.Configuration.Resource;
+import net.minecraft.server.Block;
 import net.minecraft.server.Chunk;
+import net.minecraft.server.Material;
 import net.minecraft.server.World;
 
 import java.util.Random;
@@ -17,10 +19,19 @@ public abstract class ResourceGenBase
         this.world = world;
     }
 
-    public void Process( Random _rand, Resource res, int x, int z)
+    public void Process( Random _rand, Resource res, int _x, int _z)
     {
         this.rand = _rand;
-        this.SpawnResource(res, x, z);
+
+
+        for (int t = 0; t < res.Frequency; t++)
+        {
+            if (this.rand.nextInt(100) >= res.Rarity)
+                continue;
+            int x = _x + this.rand.nextInt(16) + 8;
+            int z = _z + this.rand.nextInt(16) + 8;
+            this.SpawnResource(res, x, z);
+        }
 
     }
 
@@ -73,5 +84,17 @@ public abstract class ResourceGenBase
             return 0;
 
         return this.cacheChunk.g.a(x, y, z);
+    }
+
+    protected  boolean isEmpty(int x, int y, int z)
+    {
+        return this.GetRawBlockId(x,y,z) == 0;
+
+    }
+
+    protected Material getMaterial(int x,int y, int z)
+    {
+        return Block.byId[this.GetRawBlockId(x,y,z)].material;
+
     }
 }

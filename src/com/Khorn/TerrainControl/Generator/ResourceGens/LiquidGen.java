@@ -23,12 +23,12 @@ public class LiquidGen extends ResourceGenBase
             int z = _z + this.rand.nextInt(16)+8;
             int y = this.rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
 
-            if (this.GetRawBlockId(x, y + 1, z) != res.SourceBlockId)
+            if (res.CheckSourceId(this.GetRawBlockId(x, y + 1, z)))
                 continue;
-            if (this.GetRawBlockId(x, y - 1, z) != res.SourceBlockId)
+            if (res.CheckSourceId(this.GetRawBlockId(x, y - 1, z)))
                 continue;
 
-            if ((this.GetRawBlockId(x, y, z) != 0) && (this.GetRawBlockId(x, y, z) != res.SourceBlockId))
+            if ((this.GetRawBlockId(x, y, z) != 0) && (res.CheckSourceId(this.GetRawBlockId(x, y, z))))
                 continue;
 
 
@@ -37,22 +37,22 @@ public class LiquidGen extends ResourceGenBase
 
             int tempBlock = this.GetRawBlockId(x - 1, y, z);
 
-            i = (tempBlock == res.SourceBlockId) ? i + 1 : i;
+            i = (res.CheckSourceId(tempBlock)) ? i + 1 : i;
             j = (tempBlock == 0) ? j + 1 : j;
 
             tempBlock = this.GetRawBlockId(x + 1, y, z);
 
-            i = (tempBlock == res.SourceBlockId) ? i + 1 : i;
+            i = (res.CheckSourceId(tempBlock)) ? i + 1 : i;
             j = (tempBlock == 0) ? j + 1 : j;
 
             tempBlock = this.GetRawBlockId(x, y, z - 1);
 
-            i = (tempBlock == res.SourceBlockId) ? i + 1 : i;
+            i = (res.CheckSourceId(tempBlock)) ? i + 1 : i;
             j = (tempBlock == 0) ? j + 1 : j;
 
             tempBlock = this.GetRawBlockId(x, y, z + 1);
 
-            i = (tempBlock == res.SourceBlockId) ? i + 1 : i;
+            i = (res.CheckSourceId(tempBlock)) ? i + 1 : i;
             j = (tempBlock == 0) ? j + 1 : j;
 
 

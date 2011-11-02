@@ -4,8 +4,7 @@ import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import com.Khorn.TerrainControl.Configuration.Resource;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObjectGen;
-import com.Khorn.TerrainControl.Generator.ResourceGens.LiquidGen;
-import com.Khorn.TerrainControl.Generator.ResourceGens.OreGen;
+import com.Khorn.TerrainControl.Generator.ResourceGens.*;
 import com.Khorn.TerrainControl.Generator.TerrainsGens.BiomeObjectsGen;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
@@ -25,6 +24,12 @@ public class ObjectSpawner extends BlockPopulator
 
     private OreGen oreGen;
     private LiquidGen liquidGen;
+    private UnderWaterOreGen underWaterOreGen;
+    private FlowerGen flowerGen;
+    private GrassGen grassGen;
+    private ReedGen reedGen;
+    private CactusGen cactusGen;
+    private PumpkinGen pumpkinGen;
 
     private BiomeObjectsGen[] BiomeGenerators;
 
@@ -40,6 +45,12 @@ public class ObjectSpawner extends BlockPopulator
         this.world = world;
         this.oreGen = new OreGen(this.world);
         this.liquidGen = new LiquidGen(this.world);
+        this.underWaterOreGen = new UnderWaterOreGen(this.world);
+        this.flowerGen = new FlowerGen(this.world);
+        this.grassGen = new GrassGen(this.world);
+        this.reedGen = new ReedGen(this.world);
+        this.cactusGen = new CactusGen(this.world);
+        this.pumpkinGen = new PumpkinGen(this.world);
         InitGenerators();
     }
 
@@ -113,14 +124,28 @@ public class ObjectSpawner extends BlockPopulator
         switch (res.Type)
         {
             case Ore:
-                this.oreGen.Process(this.rand,res,x,z);
+                this.oreGen.Process(this.rand, res, x, z);
                 break;
             case UnderWaterOre:
+                this.underWaterOreGen.Process(this.rand, res, x, z);
                 break;
             case Flower:
+                this.flowerGen.Process(this.rand, res, x, z);
                 break;
             case Liquid:
-                this.liquidGen.Process(this.rand,res,x,z);
+                this.liquidGen.Process(this.rand, res, x, z);
+                break;
+            case Grass:
+                this.grassGen.Process(this.rand,res,x,z);
+                break;
+            case Reed:
+                this.reedGen.Process(this.rand,res,x,z);
+                break;
+            case Cactus:
+                this.cactusGen.Process(this.rand,res,x,z);
+                break;
+            case Pumpkin:
+                this.pumpkinGen.Process(this.rand,res,x,z);
                 break;
         }
 
