@@ -5,7 +5,6 @@ import com.Khorn.TerrainControl.Configuration.Resource;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObjectGen;
 import com.Khorn.TerrainControl.Generator.ResourceGens.*;
-import com.Khorn.TerrainControl.Generator.TerrainsGens.BiomeObjectsGen;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;
@@ -25,13 +24,11 @@ public class ObjectSpawner extends BlockPopulator
     private OreGen oreGen;
     private LiquidGen liquidGen;
     private UnderWaterOreGen underWaterOreGen;
-    private FlowerGen flowerGen;
+    private PlantGen plantGen;
     private GrassGen grassGen;
     private ReedGen reedGen;
     private CactusGen cactusGen;
-    private PumpkinGen pumpkinGen;
 
-    private BiomeObjectsGen[] BiomeGenerators;
 
     public ObjectSpawner(WorldConfig wrk)
     {
@@ -46,19 +43,10 @@ public class ObjectSpawner extends BlockPopulator
         this.oreGen = new OreGen(this.world);
         this.liquidGen = new LiquidGen(this.world);
         this.underWaterOreGen = new UnderWaterOreGen(this.world);
-        this.flowerGen = new FlowerGen(this.world);
+        this.plantGen = new PlantGen(this.world);
         this.grassGen = new GrassGen(this.world);
         this.reedGen = new ReedGen(this.world);
         this.cactusGen = new CactusGen(this.world);
-        this.pumpkinGen = new PumpkinGen(this.world);
-        InitGenerators();
-    }
-
-    private void InitGenerators()
-    {
-        this.BiomeGenerators = new BiomeObjectsGen[this.worldSettings.biomeConfigs.length];
-        for (int i = 0; i < this.worldSettings.biomeConfigs.length; i++)
-            this.BiomeGenerators[i] = new BiomeObjectsGen(this.world, this.worldSettings.biomeConfigs[i], BiomeBase.a[i]);
     }
 
 
@@ -119,7 +107,7 @@ public class ObjectSpawner extends BlockPopulator
         }
     }
 
-    private void ProcessResource(Resource res, int x,int z)
+    private void ProcessResource(Resource res, int x, int z)
     {
         switch (res.Type)
         {
@@ -129,27 +117,25 @@ public class ObjectSpawner extends BlockPopulator
             case UnderWaterOre:
                 this.underWaterOreGen.Process(this.rand, res, x, z);
                 break;
-            case Flower:
-                this.flowerGen.Process(this.rand, res, x, z);
+            case Plant:
+                this.plantGen.Process(this.rand, res, x, z);
                 break;
             case Liquid:
                 this.liquidGen.Process(this.rand, res, x, z);
                 break;
             case Grass:
-                this.grassGen.Process(this.rand,res,x,z);
+                this.grassGen.Process(this.rand, res, x, z);
                 break;
             case Reed:
-                this.reedGen.Process(this.rand,res,x,z);
+                this.reedGen.Process(this.rand, res, x, z);
                 break;
             case Cactus:
-                this.cactusGen.Process(this.rand,res,x,z);
-                break;
-            case Pumpkin:
-                this.pumpkinGen.Process(this.rand,res,x,z);
+                this.cactusGen.Process(this.rand, res, x, z);
                 break;
         }
 
     }
+
 
     @Override
     public void populate(org.bukkit.World _world, Random random, Chunk chunk)
@@ -162,6 +148,7 @@ public class ObjectSpawner extends BlockPopulator
         int z = chunk_z * 16;
 
         BiomeBase localBiomeBase = world.getWorldChunkManager().getBiome(x + 16, z + 16);
+        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[localBiomeBase.y];
 
 
         this.rand.setSeed(world.getSeed());
@@ -179,29 +166,68 @@ public class ObjectSpawner extends BlockPopulator
             Village = this.worldSettings.ChunkProvider.VillageGen.a(this.world, this.rand, chunk_x, chunk_z);
 
 
-        BiomeObjectsGen biomeGen = this.BiomeGenerators[localBiomeBase.y];
-        biomeGen.SetChunk(((CraftChunk) chunk).getHandle());
-
         if (!Village)
-            biomeGen.ProcessUndergroundObjects(x, z, this.rand);
+        {
+            if (!localBiomeConfig.disableNotchPonds)
+            {
+
+                if (this.rand.nextInt(4) == 0)
+                {
+                    int _x = x + this.rand.nextInt(16);
+                    int _y = this.rand.nextInt(127);
+                    int _z = z + this.rand.nextInt(16);
+                    new WorldGenLakes(Block.STATIONARY_WATER.id).a(this.world, this.rand, _x, _y, _z);
+                }
+
+                if (this.rand.nextInt(8) == 0)
+                {
+                    int _x = x + this.rand.nextInt(16);
+                    int _y = this.rand.nextInt(this.rand.nextInt(119) + 8);
+                    int _z = z + this.rand.nextInt(16);
+                    if ((_y < this.worldSettings.waterLevel) || (this.rand.nextInt(10) == 0))
+                        new WorldGenLakes(Block.STATIONARY_LAVA.id).a(this.world, this.rand, _x, _y, _z);
+                }
+            }
+        }
 
         if (this.worldSettings.undergroundLakes)
             this.processUndergroundLakes(x, z);
 
-        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[localBiomeBase.y];
-
+        for (int i = 0; i < localBiomeConfig.dungeonFrequency; i++)
+        {
+            if (this.rand.nextInt(100) >= localBiomeConfig.dungeonRarity)
+                continue;
+            int _x = x + this.rand.nextInt(16) + 8;
+            int _z = z + this.rand.nextInt(16) + 8;
+            int _y = this.rand.nextInt(localBiomeConfig.dungeonMaxAltitude - localBiomeConfig.dungeonMinAltitude) + localBiomeConfig.dungeonMinAltitude;
+            new WorldGenDungeons().a(this.world, this.rand, _x, _y, _z);
+        }
 
         //First resource sequence
-        for(int i = 0; i<localBiomeConfig.FirstResourceCount; i++)
-            this.ProcessResource(localBiomeConfig.FirstResourceSequence[i],x,z);
+        for (int i = 0; i < localBiomeConfig.FirstResourceCount; i++)
+            this.ProcessResource(localBiomeConfig.FirstResourceSequence[i], x, z);
 
-        biomeGen.ProcessOres(x, z, this.rand);
 
         CustomObjectGen.SpawnCustomObjects(this.world, this.rand, this.worldSettings, x + 8, z + 8, localBiomeBase);
 
-        biomeGen.ProcessTrees(x, z, this.rand);
+        int localDensity = localBiomeConfig.TreeDensity;
+        if (this.rand.nextInt(10) == 0)
+            localDensity++;
+        for (int i = 0; i < localDensity; i++)
+        {
 
-        biomeGen.ProcessAboveGround(x, z, this.rand);
+            int _x = x + this.rand.nextInt(16) + 8;
+            int _z = z + this.rand.nextInt(16) + 8;
+
+            WorldGenerator localWorldGenerator = localBiomeBase.a(this.rand);
+            localWorldGenerator.a(1.0D, 1.0D, 1.0D);
+            localWorldGenerator.a(this.world, this.rand,_x, this.world.getHighestBlockYAt(_x, _z), _z);
+
+        }
+
+        //Second resource sequence
+        for (int i = 0; i < localBiomeConfig.SecondResourceCount; i++)
+            this.ProcessResource(localBiomeConfig.SecondResourceSequence[i], x, z);
 
 
         if (this.worldSettings.BiomeConfigsHaveReplacement)
@@ -231,10 +257,7 @@ public class ObjectSpawner extends BlockPopulator
 
 
         if (this.worldSettings.isDeprecated)
-        {
             this.worldSettings = this.worldSettings.newSettings;
-            InitGenerators();
-        }
     }
 
 }

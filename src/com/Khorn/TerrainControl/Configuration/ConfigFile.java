@@ -21,6 +21,7 @@ public abstract class ConfigFile
             {
                 SettingsReader = new BufferedReader(new FileReader(f));
                 String thisLine;
+                int lineNumber = 0;
                 while ((thisLine = SettingsReader.readLine()) != null)
                 {
                     if(thisLine.trim().equals(""))
@@ -32,7 +33,9 @@ public abstract class ConfigFile
                             this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
                     }else
                         if(!thisLine.toLowerCase().contains("<"))
-                            this.SettingsCache.put(thisLine.trim(), "");
+                            this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber) );
+                    lineNumber++;
+
 
                 }
             } catch (IOException e)

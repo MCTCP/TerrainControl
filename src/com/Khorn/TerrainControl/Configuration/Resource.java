@@ -23,6 +23,23 @@ public class Resource
         Type = type;
     }
 
+    public Resource(ResourceType type, int blockId, int blockData, int size, int frequency, int rarity, int minAltitude, int maxAltitude, int[] sourceBlockIds)
+    {
+        this.Type = type;
+        this.BlockId = blockId;
+        this.BlockData = blockData;
+        this.Size = size;
+        this.Frequency = frequency;
+        this.Rarity = rarity;
+        this.MinAltitude = minAltitude;
+        this.MaxAltitude = maxAltitude;
+        this.SourceBlockId = sourceBlockIds;
+        this.Done = true;
+        if (this.Type != ResourceType.Ore)
+            this.First = false;
+
+    }
+
     public boolean CheckSourceId(int blockId)
     {
         for (int id : this.SourceBlockId)
@@ -80,7 +97,6 @@ public class Resource
                         this.SourceBlockId[i - 5] = Integer.valueOf(Props[i]);
                     break;
                 }
-                case Flower:
                 case Grass:
                     if (Props.length < 7)
                         return;
@@ -95,13 +111,11 @@ public class Resource
                     for (int i = 6; i < Props.length; i++)
                         this.SourceBlockId[i - 6] = Integer.valueOf(Props[i]);
 
-                    this.First = false;
-
                     break;
 
                 case Reed:
                 case Cactus:
-                case Pumpkin:
+                case Plant:
                 {
                     if (Props.length < 6)
                         return;
@@ -115,8 +129,6 @@ public class Resource
                     for (int i = 5; i < Props.length; i++)
                         this.SourceBlockId[i - 5] = Integer.valueOf(Props[i]);
 
-                    this.First = false;
-
                     break;
                 }
             }
@@ -124,6 +136,9 @@ public class Resource
         {
             System.out.println("TerrainControl: wrong resource " + this.Type.name() + "(" + line + ")");
         }
+        if (this.Type != ResourceType.Ore)
+            this.First = false;
+
 
         this.Done = true;
 
@@ -140,17 +155,21 @@ public class Resource
         switch (this.Type)
         {
             case Ore:
-            case UnderWaterOre:
-                output += this.BlockId + "," + "," + this.Size + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
+                output += this.BlockId + "," + this.Size + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
                 break;
-            case Flower:
+            case UnderWaterOre:
+                output += this.BlockId + "," + this.Size + "," + this.Frequency + "," + this.Rarity +  sources + ")";
+                break;
+            case Plant:
             case Liquid:
-            case Grass:
             case Reed:
             case Cactus:
-            case Pumpkin:
-                output += this.BlockId + "," + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
+                output += this.BlockId + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
                 break;
+            case Grass:
+                output += this.BlockId + "," + this.BlockData + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
+                break;
+
         }
         return output;
 

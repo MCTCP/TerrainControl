@@ -26,8 +26,8 @@ public class CactusGen extends ResourceGenBase
                 int n = 1 + this.rand.nextInt(this.rand.nextInt(3) + 1);
                 for (int i1 = 0; i1 < n; i1++)
                 {
-                    int id =  this.GetRawBlockId( j, k + i1, m);
-                    if (res.CheckSourceId(i) || id == res.BlockId )
+                    int id =  this.GetRawBlockId( j, k + i1 - 1, m);
+                    if (res.CheckSourceId(id) || id == res.BlockId )
                     {
                         this.SetRawBlockId(j, k + i1, m, res.BlockId);
                     }

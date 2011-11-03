@@ -29,7 +29,9 @@ public class ReedGen extends ResourceGenBase
             int n = 2 + this.rand.nextInt(this.rand.nextInt(3) + 1);
             for (int i1 = 0; i1 < n; i1++)
             {
-                if (res.CheckSourceId(this.GetRawBlockId(j, y + i1, m)))
+
+                int id = this.GetRawBlockId(j, y + i1 - 1, m);
+                if (res.CheckSourceId(id) || id == res.BlockId)
                 {
                     this.SetRawBlockId(j, y + i1, m, res.BlockId);
                 }

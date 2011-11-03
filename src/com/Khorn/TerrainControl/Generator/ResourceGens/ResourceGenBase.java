@@ -1,10 +1,7 @@
 package com.Khorn.TerrainControl.Generator.ResourceGens;
 
 import com.Khorn.TerrainControl.Configuration.Resource;
-import net.minecraft.server.Block;
-import net.minecraft.server.Chunk;
-import net.minecraft.server.Material;
-import net.minecraft.server.World;
+import net.minecraft.server.*;
 
 import java.util.Random;
 
@@ -17,9 +14,10 @@ public abstract class ResourceGenBase
     public ResourceGenBase(World world)
     {
         this.world = world;
+        this.cacheChunk = ((ChunkProviderServer) this.world.chunkProvider).emptyChunk;
     }
 
-    public void Process( Random _rand, Resource res, int _x, int _z)
+    public void Process(Random _rand, Resource res, int _x, int _z)
     {
         this.rand = _rand;
 
@@ -37,10 +35,15 @@ public abstract class ResourceGenBase
 
     protected abstract void SpawnResource(Resource res, int x, int z);
 
+    private void CheckChunk(int x, int z)
+    {
+        if (cacheChunk == null || cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
+            this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
+    }
+
     protected void SetRawBlockId(int x, int y, int z, int BlockId)
     {
-        if (cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
-            this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
+        CheckChunk(x, z);
         if (y >= 128 || y < 0)
             return;
 
@@ -49,21 +52,19 @@ public abstract class ResourceGenBase
 
     protected void SetRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
     {
-        if (cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
-            this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
+        CheckChunk(x, z);
         z = z & 0xF;
         x = x & 0xF;
         if (y >= 128 || y < 0)
             return;
-        this.cacheChunk.g.a(x, y, z, Data);
 
         this.cacheChunk.b[(z * 16 + x) * 128 + y] = (byte) BlockId;
+        this.world.setRawData(x,y,z,Data);
     }
 
     protected int GetRawBlockId(int x, int y, int z)
     {
-        if (cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
-            this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
+        CheckChunk(x, z);
 
         z = z & 0xF;
         x = x & 0xF;
@@ -73,28 +74,17 @@ public abstract class ResourceGenBase
         return (int) this.cacheChunk.b[(z * 16 + x) * 128 + y];
     }
 
-    protected int GetRawBlockData(int x, int y, int z)
+
+    protected boolean isEmpty(int x, int y, int z)
     {
-        if (cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
-            this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
-
-        z = z & 0xF;
-        x = x & 0xF;
-        if (y >= 128 || y < 0)
-            return 0;
-
-        return this.cacheChunk.g.a(x, y, z);
-    }
-
-    protected  boolean isEmpty(int x, int y, int z)
-    {
-        return this.GetRawBlockId(x,y,z) == 0;
+        return this.GetRawBlockId(x, y, z) == 0;
 
     }
 
-    protected Material getMaterial(int x,int y, int z)
+    protected Material getMaterial(int x, int y, int z)
     {
-        return Block.byId[this.GetRawBlockId(x,y,z)].material;
+        int id = this.GetRawBlockId(x, y, z);
+        return id == 0 ? Material.AIR : Block.byId[id].material;
 
     }
 }

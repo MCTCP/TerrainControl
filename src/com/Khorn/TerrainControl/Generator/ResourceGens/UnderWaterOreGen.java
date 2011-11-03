@@ -33,7 +33,7 @@ public class UnderWaterOreGen extends ResourceGenBase
                 {
                     for (int i2 = y - j; i2 <= y + j; i2++)
                     {
-                        int i3 = this.GetRawBlockData(k, i2, m);
+                        int i3 = this.GetRawBlockId(k, i2, m);
                         if (res.CheckSourceId(i3))
                         {
                             this.SetRawBlockId(k, i2, m, res.BlockId);

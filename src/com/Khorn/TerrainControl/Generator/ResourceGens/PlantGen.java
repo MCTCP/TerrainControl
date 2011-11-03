@@ -3,9 +3,9 @@ package com.Khorn.TerrainControl.Generator.ResourceGens;
 import com.Khorn.TerrainControl.Configuration.Resource;
 import net.minecraft.server.World;
 
-public class PumpkinGen extends ResourceGenBase
+public class PlantGen extends ResourceGenBase
 {
-    public PumpkinGen(World world)
+    public PlantGen(World world)
     {
         super(world);
     }
@@ -13,6 +13,7 @@ public class PumpkinGen extends ResourceGenBase
     @Override
     protected void SpawnResource(Resource res, int x, int z)
     {
+
         int y = this.rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
 
         for (int i = 0; i < 64; i++)
@@ -20,9 +21,11 @@ public class PumpkinGen extends ResourceGenBase
             int j = x + this.rand.nextInt(8) - this.rand.nextInt(8);
             int k = y + this.rand.nextInt(4) - this.rand.nextInt(4);
             int m = z + this.rand.nextInt(8) - this.rand.nextInt(8);
-            if ((!this.isEmpty(j, k, m)) || !res.CheckSourceId(this.GetRawBlockId(j,k,m)))
+            if ((!this.isEmpty(j, k, m)) || (!res.CheckSourceId(this.GetRawBlockId(j, k - 1, m))))
                 continue;
-            this.SetRawBlockIdAndData(j, k, m, res.BlockId, this.rand.nextInt(4));
+            this.SetRawBlockId(j, k, m, res.BlockId);
         }
     }
+
+
 }
