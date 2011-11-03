@@ -4,6 +4,8 @@ import com.Khorn.TerrainControl.Configuration.Resource;
 import net.minecraft.server.Block;
 import net.minecraft.server.World;
 
+import java.util.Random;
+
 public class GrassGen extends ResourceGenBase
 {
     public GrassGen(World world)
@@ -14,25 +16,29 @@ public class GrassGen extends ResourceGenBase
     @Override
     protected void SpawnResource(Resource res, int x, int z)
     {
-
-        int y = this.rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
-
-        int i;
-        while ((((i = this.GetRawBlockId(x, y, z)) == 0) || (i == Block.LEAVES.id)) && (y > 0))
-        {
-            y--;
-        }
-        for (int j = 0; j < 128; j++)
-        {
-            int k = x + this.rand.nextInt(8) - this.rand.nextInt(8);
-            int m = y + this.rand.nextInt(4) - this.rand.nextInt(4);
-            int n = z + this.rand.nextInt(8) - this.rand.nextInt(8);
-            if ((!this.isEmpty(k, m, n)) || (!res.CheckSourceId(this.GetRawBlockId(k, m - 1, n))))
-                continue;
-            this.SetRawBlockIdAndData(k, m, n, res.BlockId, res.BlockData);
-        }
-
     }
 
+    @Override
+    public void Process(Random _rand, Resource res, int _x, int _z)
+    {
+        this.rand = _rand;
 
+
+        for (int t = 0; t < res.Frequency; t++)
+        {
+            if (this.rand.nextInt(100) >= res.Rarity)
+                continue;
+            int x = _x + this.rand.nextInt(16) + 8;
+            int y = 128;
+            int z = _z + this.rand.nextInt(16) + 8;
+
+            int i;
+            while ((((i = this.GetRawBlockId(x, y, z)) == 0) || (i == Block.LEAVES.id)) && (y > 0))
+                y--;
+
+            if ((!this.isEmpty(x, y + 1, z)) || (!res.CheckSourceId(this.GetRawBlockId(x, y , z))))
+                continue;
+            this.SetRawBlockIdAndData(x, y +1, z, res.BlockId, res.BlockData);
+        }
+    }
 }

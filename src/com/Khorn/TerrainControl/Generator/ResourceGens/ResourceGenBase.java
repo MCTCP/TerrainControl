@@ -44,10 +44,12 @@ public abstract class ResourceGenBase
     protected void SetRawBlockId(int x, int y, int z, int BlockId)
     {
         CheckChunk(x, z);
+        z = z & 0xF;
+        x = x & 0xF;
         if (y >= 128 || y < 0)
             return;
 
-        this.cacheChunk.b[((z & 0xF) * 16 + (x & 0xF)) * 128 + y] = (byte) BlockId;
+        this.cacheChunk.b[x << 11 | z << 7 | y] = (byte) BlockId;
     }
 
     protected void SetRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
@@ -58,8 +60,9 @@ public abstract class ResourceGenBase
         if (y >= 128 || y < 0)
             return;
 
-        this.cacheChunk.b[(z * 16 + x) * 128 + y] = (byte) BlockId;
-        this.world.setRawData(x,y,z,Data);
+        this.cacheChunk.b[x << 11 | z << 7 | y] = (byte) BlockId;
+        this.cacheChunk.g.a(x,y,z,Data);
+
     }
 
     protected int GetRawBlockId(int x, int y, int z)
@@ -71,7 +74,7 @@ public abstract class ResourceGenBase
         if (y >= 128 || y < 0)
             return 0;
 
-        return (int) this.cacheChunk.b[(z * 16 + x) * 128 + y];
+        return (int) this.cacheChunk.b[x << 11 | z << 7 | y];
     }
 
 

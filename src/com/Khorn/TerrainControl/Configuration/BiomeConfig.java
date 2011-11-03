@@ -185,14 +185,14 @@ public class BiomeConfig extends ConfigFile
         if (this.DefaultGrass > 0)
         {
             //Grass
-            resource = new Resource(ResourceType.Grass, Block.LONG_GRASS.id, 1, 0, this.DefaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), TCDefaultValues.longGrassDepositMinAltitude.intValue(), TCDefaultValues.longGrassDepositMaxAltitude.intValue(), new int[]{Block.GRASS.id, Block.DIRT.id});
+            resource = new Resource(ResourceType.Grass, Block.LONG_GRASS.id, 1, 0, this.DefaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), 0, 0, new int[]{Block.GRASS.id, Block.DIRT.id});
             this.SecondResourceSequence[this.SecondResourceCount++] = resource;
         }
 
         if (this.DefaultDeadBrush > 0)
         {
             //Dead Bush
-            resource = new Resource(ResourceType.Grass, Block.DEAD_BUSH.id, 0, 0, this.DefaultDeadBrush, TCDefaultValues.deadBushDepositRarity.intValue(), TCDefaultValues.deadBushDepositMinAltitude.intValue(), TCDefaultValues.deadBushDepositMaxAltitude.intValue(), new int[]{Block.SAND.id});
+            resource = new Resource(ResourceType.Grass, Block.DEAD_BUSH.id, 0, 0, this.DefaultDeadBrush, TCDefaultValues.deadBushDepositRarity.intValue(), 0, 0, new int[]{Block.SAND.id});
             this.SecondResourceSequence[this.SecondResourceCount++] = resource;
         }
 
@@ -497,7 +497,7 @@ public class BiomeConfig extends ConfigFile
 
     private int DefaultTrees = 0;
     private int DefaultFlowers = 2;
-    private int DefaultGrass = 1;
+    private int DefaultGrass = 10;
     private int DefaultDeadBrush = 0;
     private int DefaultMushroom = 0;
     private int DefaultReed = 0;
@@ -523,13 +523,14 @@ public class BiomeConfig extends ConfigFile
             {
                 this.DefaultTrees = -999;
                 this.DefaultFlowers = 4;
-                this.DefaultGrass = 10;
+                this.DefaultGrass = 20;
                 break;
             }
             case 2:
             {
                 this.DefaultTrees = -999;
-                this.DefaultDeadBrush = 2;
+                this.DefaultDeadBrush = 4;
+                this.DefaultGrass = 0;
                 this.DefaultReed = 50;
                 this.DefaultCactus = 10;
                 break;
@@ -537,13 +538,13 @@ public class BiomeConfig extends ConfigFile
             case 4:
             {
                 this.DefaultTrees = 10;
-                this.DefaultGrass = 2;
+                this.DefaultGrass = 15;
                 break;
             }
             case 5:
             {
                 this.DefaultTrees = 10;
-                this.DefaultGrass = 1;
+                this.DefaultGrass = 10;
                 break;
             }
             case 6:

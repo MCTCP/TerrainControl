@@ -173,17 +173,17 @@ public class ObjectSpawner extends BlockPopulator
 
                 if (this.rand.nextInt(4) == 0)
                 {
-                    int _x = x + this.rand.nextInt(16);
+                    int _x = x + this.rand.nextInt(16) + 8;
                     int _y = this.rand.nextInt(127);
-                    int _z = z + this.rand.nextInt(16);
+                    int _z = z + this.rand.nextInt(16) + 8;
                     new WorldGenLakes(Block.STATIONARY_WATER.id).a(this.world, this.rand, _x, _y, _z);
                 }
 
                 if (this.rand.nextInt(8) == 0)
                 {
-                    int _x = x + this.rand.nextInt(16);
+                    int _x = x + this.rand.nextInt(16) + 8;
                     int _y = this.rand.nextInt(this.rand.nextInt(119) + 8);
-                    int _z = z + this.rand.nextInt(16);
+                    int _z = z + this.rand.nextInt(16) + 8;
                     if ((_y < this.worldSettings.waterLevel) || (this.rand.nextInt(10) == 0))
                         new WorldGenLakes(Block.STATIONARY_LAVA.id).a(this.world, this.rand, _x, _y, _z);
                 }
@@ -221,7 +221,7 @@ public class ObjectSpawner extends BlockPopulator
 
             WorldGenerator localWorldGenerator = localBiomeBase.a(this.rand);
             localWorldGenerator.a(1.0D, 1.0D, 1.0D);
-            localWorldGenerator.a(this.world, this.rand,_x, this.world.getHighestBlockYAt(_x, _z), _z);
+            localWorldGenerator.a(this.world, this.rand, _x, this.world.getHighestBlockYAt(_x, _z), _z);
 
         }
 
