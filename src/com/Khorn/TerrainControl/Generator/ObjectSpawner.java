@@ -28,6 +28,8 @@ public class ObjectSpawner extends BlockPopulator
     private GrassGen grassGen;
     private ReedGen reedGen;
     private CactusGen cactusGen;
+    private DungeonGen dungeonGen;
+    private TreeGen treeGen;
 
 
     public ObjectSpawner(WorldConfig wrk)
@@ -47,6 +49,8 @@ public class ObjectSpawner extends BlockPopulator
         this.grassGen = new GrassGen(this.world);
         this.reedGen = new ReedGen(this.world);
         this.cactusGen = new CactusGen(this.world);
+        this.dungeonGen = new DungeonGen(this.world);
+        this.treeGen = new TreeGen(this.world);
     }
 
 
@@ -107,7 +111,7 @@ public class ObjectSpawner extends BlockPopulator
         }
     }
 
-    private void ProcessResource(Resource res, int x, int z)
+    private void ProcessResource(Resource res, int x, int z, BiomeBase localBiomeBase)
     {
         switch (res.Type)
         {
@@ -131,6 +135,15 @@ public class ObjectSpawner extends BlockPopulator
                 break;
             case Cactus:
                 this.cactusGen.Process(this.rand, res, x, z);
+                break;
+            case Dungeon:
+                this.dungeonGen.Process(this.rand, res, x, z);
+                break;
+            case Tree:
+                this.treeGen.Process(this.rand, res, x, z);
+                break;
+            case CustomObject:
+                CustomObjectGen.SpawnCustomObjects(this.world, this.rand, this.worldSettings, x + 8, z + 8, localBiomeBase);
                 break;
         }
 
@@ -193,41 +206,11 @@ public class ObjectSpawner extends BlockPopulator
         if (this.worldSettings.undergroundLakes)
             this.processUndergroundLakes(x, z);
 
-        for (int i = 0; i < localBiomeConfig.dungeonFrequency; i++)
-        {
-            if (this.rand.nextInt(100) >= localBiomeConfig.dungeonRarity)
-                continue;
-            int _x = x + this.rand.nextInt(16) + 8;
-            int _z = z + this.rand.nextInt(16) + 8;
-            int _y = this.rand.nextInt(localBiomeConfig.dungeonMaxAltitude - localBiomeConfig.dungeonMinAltitude) + localBiomeConfig.dungeonMinAltitude;
-            new WorldGenDungeons().a(this.world, this.rand, _x, _y, _z);
-        }
 
-        //First resource sequence
-        for (int i = 0; i < localBiomeConfig.FirstResourceCount; i++)
-            this.ProcessResource(localBiomeConfig.FirstResourceSequence[i], x, z);
+        //Resource sequence
+        for (int i = 0; i < localBiomeConfig.ResourceCount; i++)
+            this.ProcessResource(localBiomeConfig.ResourceSequence[i], x, z,localBiomeBase);
 
-
-        CustomObjectGen.SpawnCustomObjects(this.world, this.rand, this.worldSettings, x + 8, z + 8, localBiomeBase);
-
-        int localDensity = localBiomeConfig.TreeDensity;
-        if (this.rand.nextInt(10) == 0)
-            localDensity++;
-        for (int i = 0; i < localDensity; i++)
-        {
-
-            int _x = x + this.rand.nextInt(16) + 8;
-            int _z = z + this.rand.nextInt(16) + 8;
-
-            WorldGenerator localWorldGenerator = localBiomeBase.a(this.rand);
-            localWorldGenerator.a(1.0D, 1.0D, 1.0D);
-            localWorldGenerator.a(this.world, this.rand, _x, this.world.getHighestBlockYAt(_x, _z), _z);
-
-        }
-
-        //Second resource sequence
-        for (int i = 0; i < localBiomeConfig.SecondResourceCount; i++)
-            this.ProcessResource(localBiomeConfig.SecondResourceSequence[i], x, z);
 
 
         if (this.worldSettings.BiomeConfigsHaveReplacement)

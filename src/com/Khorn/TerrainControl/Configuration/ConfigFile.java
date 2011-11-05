@@ -24,16 +24,17 @@ public abstract class ConfigFile
                 int lineNumber = 0;
                 while ((thisLine = SettingsReader.readLine()) != null)
                 {
-                    if(thisLine.trim().equals(""))
+                    if (thisLine.trim().equals(""))
+                        continue;
+                    if (thisLine.startsWith("//") || thisLine.startsWith("<"))
                         continue;
                     if (thisLine.toLowerCase().contains(":"))
                     {
                         String[] splitSettings = thisLine.split(":");
                         if (splitSettings.length == 2)
                             this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
-                    }else
-                        if(!thisLine.toLowerCase().contains("<"))
-                            this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber) );
+                    } else
+                        this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
                     lineNumber++;
 
 
@@ -174,45 +175,57 @@ public abstract class ConfigFile
         }
     }
 
-    protected void WriteModSettings(String settingsName, int settingsValue) throws IOException
+    protected void WriteValue(String settingsName, int settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + Integer.toString(settingsValue));
         this.SettingsWriter.newLine();
     }
 
-    protected void WriteModSettings(String settingsName, double settingsValue) throws IOException
+    protected void WriteValue(String settingsName, double settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + Double.toString(settingsValue));
         this.SettingsWriter.newLine();
     }
 
-    protected void WriteModSettings(String settingsName, float settingsValue) throws IOException
+    protected void WriteValue(String settingsName, float settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + Float.toString(settingsValue));
         this.SettingsWriter.newLine();
     }
 
-    protected void WriteModSettings(String settingsName, boolean settingsValue) throws IOException
+    protected void WriteValue(String settingsName, boolean settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + Boolean.toString(settingsValue));
         this.SettingsWriter.newLine();
     }
 
-    protected void WriteModSettings(String settingsName, String settingsValue) throws IOException
+    protected void WriteValue(String settingsName, String settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + settingsValue);
         this.SettingsWriter.newLine();
     }
-    protected void WriteModSettings(String settingsName) throws IOException
+
+    protected void WriteValue(String settingsName) throws IOException
     {
         this.SettingsWriter.write(settingsName);
         this.SettingsWriter.newLine();
     }
 
-    protected void WriteModTitleSettings(String title) throws IOException
+    protected void WriteTitle(String title) throws IOException
     {
         this.SettingsWriter.newLine();
         this.SettingsWriter.write("<" + title + ">");
+        this.SettingsWriter.newLine();
+    }
+
+    protected void WriteComment(String comment) throws IOException
+    {
+        this.SettingsWriter.write("//   " + comment);
+        this.SettingsWriter.newLine();
+    }
+
+    protected void WriteNewLine() throws IOException
+    {
         this.SettingsWriter.newLine();
     }
 

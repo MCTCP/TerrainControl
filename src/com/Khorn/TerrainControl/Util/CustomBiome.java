@@ -14,7 +14,7 @@ public class CustomBiome extends BiomeBase
     public void SetBiome(BiomeConfig config)
     {
 
-        this.q = config.BiomeSurface;
+        this.q = config.BiomeHeight;
         this.r = config.BiomeVolatility;
         this.n = config.SurfaceBlock;
         this.o = config.GroundBlock;

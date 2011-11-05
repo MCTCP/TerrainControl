@@ -19,7 +19,7 @@ public enum TCDefaultValues
     biomeSize(4),
     landSize(5),
     riversEnabled(true),
-    biomeChance(1),
+    BiomeChance(1),
 
     SurfaceBlock(2),
     GroundBlock(3),
@@ -95,8 +95,8 @@ public enum TCDefaultValues
     undergroundLakesInAir(true),
 
 
-    BiomeSurfaceAdd(0.1D),
-    BiomeVolatilityAdd(0.3D),
+    BiomeHeight(0.1D),
+    BiomeVolatility(0.3D),
 
     customObjects(true),
     objectSpawnRatio(2),

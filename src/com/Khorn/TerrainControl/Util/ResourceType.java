@@ -8,5 +8,8 @@ public enum ResourceType
     Liquid,
     Grass,
     Reed,
-    Cactus
+    Cactus,
+    Dungeon,
+    Tree,
+    CustomObject
 }

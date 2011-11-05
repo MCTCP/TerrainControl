@@ -53,7 +53,7 @@ public class LiquidGen extends ResourceGenBase
         if ((i == 3) && (j == 1))
         {
 
-            this.world.setTypeId(x, y, z, res.BlockId);
+            this.world.setRawTypeId(x, y, z, res.BlockId);
             //this.world.f = true;
             //Block.byId[res.BlockId].a(this.world, x, y, z, this.rand);
             //this.world.f = false;

@@ -404,100 +404,100 @@ public class WorldConfig extends ConfigFile
 
     protected void WriteConfigSettings() throws IOException
     {
-        WriteModTitleSettings("Possible modes : Normal, TerrainTest, NotGenerate, OnlyBiome");
-        WriteModSettings(TCDefaultValues.Mode.name(), this.Mode.name());
+        WriteTitle("Possible modes : Normal, TerrainTest, NotGenerate, OnlyBiome");
+        WriteValue(TCDefaultValues.Mode.name(), this.Mode.name());
 
-        WriteModTitleSettings("Old Biome Generator Variables");
-        WriteModTitleSettings("This generator works only with old terrain generator!");
-        WriteModSettings(TCDefaultValues.oldBiomeGenerator.name(), this.oldBiomeGenerator);
-        WriteModSettings(TCDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
-        WriteModSettings(TCDefaultValues.minMoisture.name(), this.minMoisture);
-        WriteModSettings(TCDefaultValues.maxMoisture.name(), this.maxMoisture);
-        WriteModSettings(TCDefaultValues.minTemperature.name(), this.minTemperature);
-        WriteModSettings(TCDefaultValues.maxTemperature.name(), this.maxTemperature);
-        WriteModSettings(TCDefaultValues.snowThreshold.name(), this.snowThreshold);
-        WriteModSettings(TCDefaultValues.iceThreshold.name(), this.iceThreshold);
+        WriteTitle("Old Biome Generator Variables");
+        WriteTitle("This generator works only with old terrain generator!");
+        WriteValue(TCDefaultValues.oldBiomeGenerator.name(), this.oldBiomeGenerator);
+        WriteValue(TCDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
+        WriteValue(TCDefaultValues.minMoisture.name(), this.minMoisture);
+        WriteValue(TCDefaultValues.maxMoisture.name(), this.maxMoisture);
+        WriteValue(TCDefaultValues.minTemperature.name(), this.minTemperature);
+        WriteValue(TCDefaultValues.maxTemperature.name(), this.maxTemperature);
+        WriteValue(TCDefaultValues.snowThreshold.name(), this.snowThreshold);
+        WriteValue(TCDefaultValues.iceThreshold.name(), this.iceThreshold);
 
-        WriteModTitleSettings("Biome Generator Variables");
-        WriteModSettings(TCDefaultValues.biomeSize.name(), this.biomeSize);
-        WriteModSettings(TCDefaultValues.landSize.name(), this.landSize);
-        WriteModSettings(TCDefaultValues.riversEnabled.name(), this.riversEnabled);
+        WriteTitle("Biome Generator Variables");
+        WriteValue(TCDefaultValues.biomeSize.name(), this.biomeSize);
+        WriteValue(TCDefaultValues.landSize.name(), this.landSize);
+        WriteValue(TCDefaultValues.riversEnabled.name(), this.riversEnabled);
 
         this.WriteCustomBiomesSettings();
 
-        WriteModTitleSettings("Swamp Biome Variables");
-        WriteModSettings(TCDefaultValues.muddySwamps.name(), this.muddySwamps);
-        WriteModSettings(TCDefaultValues.claySwamps.name(), this.claySwamps);
-        WriteModSettings(TCDefaultValues.swampSize.name(), this.swampSize);
+        WriteTitle("Swamp Biome Variables");
+        WriteValue(TCDefaultValues.muddySwamps.name(), this.muddySwamps);
+        WriteValue(TCDefaultValues.claySwamps.name(), this.claySwamps);
+        WriteValue(TCDefaultValues.swampSize.name(), this.swampSize);
 
-        WriteModTitleSettings("Desert Biome Variables");
-        WriteModSettings(TCDefaultValues.waterlessDeserts.name(), this.waterlessDeserts);
-        WriteModSettings(TCDefaultValues.desertDirt.name(), this.desertDirt);
-        WriteModSettings(TCDefaultValues.desertDirtFrequency.name(), this.desertDirtFrequency);
+        WriteTitle("Desert Biome Variables");
+        WriteValue(TCDefaultValues.waterlessDeserts.name(), this.waterlessDeserts);
+        WriteValue(TCDefaultValues.desertDirt.name(), this.desertDirt);
+        WriteValue(TCDefaultValues.desertDirtFrequency.name(), this.desertDirtFrequency);
 
-        WriteModTitleSettings("Terrain Generator Variables");
-        WriteModSettings(TCDefaultValues.oldTerrainGenerator.name(), this.oldTerrainGenerator);
-        WriteModSettings(TCDefaultValues.waterLevel.name(), this.waterLevel);
-        WriteModSettings(TCDefaultValues.waterBlock.name(), this.waterBlock);
-        WriteModSettings(TCDefaultValues.removeSurfaceStone.name(), this.removeSurfaceStone);
-        WriteModSettings(TCDefaultValues.maxAverageHeight.name(), this.maxAverageHeight);
-        WriteModSettings(TCDefaultValues.maxAverageDepth.name(), this.maxAverageDepth);
-        WriteModSettings(TCDefaultValues.fractureHorizontal.name(), this.fractureHorizontal);
-        WriteModSettings(TCDefaultValues.fractureVertical.name(), this.fractureVertical);
-        WriteModSettings(TCDefaultValues.volatility1.name(), this.volatility1);
-        WriteModSettings(TCDefaultValues.volatility2.name(), this.volatility2);
-        WriteModSettings(TCDefaultValues.volatilityWeight1.name(), this.volatilityWeight1);
-        WriteModSettings(TCDefaultValues.volatilityWeight2.name(), this.volatilityWeight2);
-        WriteModSettings(TCDefaultValues.disableBedrock.name(), this.disableBedrock);
-        WriteModSettings(TCDefaultValues.ceilingBedrock.name(), this.ceilingBedrock);
-        WriteModSettings(TCDefaultValues.flatBedrock.name(), this.flatBedrock);
-        WriteModSettings(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
-        WriteModSettings(TCDefaultValues.disableNotchHeightControl.name(), this.disableNotchHeightControl);
+        WriteTitle("Terrain Generator Variables");
+        WriteValue(TCDefaultValues.oldTerrainGenerator.name(), this.oldTerrainGenerator);
+        WriteValue(TCDefaultValues.waterLevel.name(), this.waterLevel);
+        WriteValue(TCDefaultValues.waterBlock.name(), this.waterBlock);
+        WriteValue(TCDefaultValues.removeSurfaceStone.name(), this.removeSurfaceStone);
+        WriteValue(TCDefaultValues.maxAverageHeight.name(), this.maxAverageHeight);
+        WriteValue(TCDefaultValues.maxAverageDepth.name(), this.maxAverageDepth);
+        WriteValue(TCDefaultValues.fractureHorizontal.name(), this.fractureHorizontal);
+        WriteValue(TCDefaultValues.fractureVertical.name(), this.fractureVertical);
+        WriteValue(TCDefaultValues.volatility1.name(), this.volatility1);
+        WriteValue(TCDefaultValues.volatility2.name(), this.volatility2);
+        WriteValue(TCDefaultValues.volatilityWeight1.name(), this.volatilityWeight1);
+        WriteValue(TCDefaultValues.volatilityWeight2.name(), this.volatilityWeight2);
+        WriteValue(TCDefaultValues.disableBedrock.name(), this.disableBedrock);
+        WriteValue(TCDefaultValues.ceilingBedrock.name(), this.ceilingBedrock);
+        WriteValue(TCDefaultValues.flatBedrock.name(), this.flatBedrock);
+        WriteValue(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
+        WriteValue(TCDefaultValues.disableNotchHeightControl.name(), this.disableNotchHeightControl);
         WriteHeightSettings();
 
-        WriteModTitleSettings("Map objects");
-        WriteModSettings(TCDefaultValues.StrongholdsEnabled.name(), this.StrongholdsEnabled);
-        WriteModSettings(TCDefaultValues.VillagesEnabled.name(), this.VillagesEnabled);
-        WriteModSettings(TCDefaultValues.MineshaftsEnabled.name(), this.MineshaftsEnabled);
+        WriteTitle("Map objects");
+        WriteValue(TCDefaultValues.StrongholdsEnabled.name(), this.StrongholdsEnabled);
+        WriteValue(TCDefaultValues.VillagesEnabled.name(), this.VillagesEnabled);
+        WriteValue(TCDefaultValues.MineshaftsEnabled.name(), this.MineshaftsEnabled);
 
 
-        this.WriteModTitleSettings("BOB Objects Variables");
-        this.WriteModSettings(TCDefaultValues.customObjects.name(), this.customObjects);
-        this.WriteModSettings(TCDefaultValues.objectSpawnRatio.name(), Integer.valueOf(this.objectSpawnRatio).intValue());
-        this.WriteModSettings(TCDefaultValues.denyObjectsUnderFill.name(), this.denyObjectsUnderFill);
-        this.WriteModSettings(TCDefaultValues.customTreeMinTime.name(), Integer.valueOf(this.customTreeMinTime).intValue());
-        this.WriteModSettings(TCDefaultValues.customTreeMaxTime.name(), Integer.valueOf(this.customTreeMaxTime).intValue());
+        this.WriteTitle("BOB Objects Variables");
+        this.WriteValue(TCDefaultValues.customObjects.name(), this.customObjects);
+        this.WriteValue(TCDefaultValues.objectSpawnRatio.name(), Integer.valueOf(this.objectSpawnRatio).intValue());
+        this.WriteValue(TCDefaultValues.denyObjectsUnderFill.name(), this.denyObjectsUnderFill);
+        this.WriteValue(TCDefaultValues.customTreeMinTime.name(), Integer.valueOf(this.customTreeMinTime).intValue());
+        this.WriteValue(TCDefaultValues.customTreeMaxTime.name(), Integer.valueOf(this.customTreeMaxTime).intValue());
 
-        this.WriteModTitleSettings("Underground Lake Variables");
-        this.WriteModSettings(TCDefaultValues.undergroundLakes.name(), this.undergroundLakes);
-        this.WriteModSettings(TCDefaultValues.undergroundLakesInAir.name(), this.undergroundLakesInAir);
-        this.WriteModSettings(TCDefaultValues.undergroundLakeFrequency.name(), this.undergroundLakeFrequency);
-        this.WriteModSettings(TCDefaultValues.undergroundLakeRarity.name(), this.undergroundLakeRarity);
-        this.WriteModSettings(TCDefaultValues.undergroundLakeMinSize.name(), this.undergroundLakeMinSize);
-        this.WriteModSettings(TCDefaultValues.undergroundLakeMaxSize.name(), this.undergroundLakeMaxSize);
-        this.WriteModSettings(TCDefaultValues.undergroundLakeMinAltitude.name(), this.undergroundLakeMinAltitude);
-        this.WriteModSettings(TCDefaultValues.undergroundLakeMaxAltitude.name(), this.undergroundLakeMaxAltitude);
+        this.WriteTitle("Underground Lake Variables");
+        this.WriteValue(TCDefaultValues.undergroundLakes.name(), this.undergroundLakes);
+        this.WriteValue(TCDefaultValues.undergroundLakesInAir.name(), this.undergroundLakesInAir);
+        this.WriteValue(TCDefaultValues.undergroundLakeFrequency.name(), this.undergroundLakeFrequency);
+        this.WriteValue(TCDefaultValues.undergroundLakeRarity.name(), this.undergroundLakeRarity);
+        this.WriteValue(TCDefaultValues.undergroundLakeMinSize.name(), this.undergroundLakeMinSize);
+        this.WriteValue(TCDefaultValues.undergroundLakeMaxSize.name(), this.undergroundLakeMaxSize);
+        this.WriteValue(TCDefaultValues.undergroundLakeMinAltitude.name(), this.undergroundLakeMinAltitude);
+        this.WriteValue(TCDefaultValues.undergroundLakeMaxAltitude.name(), this.undergroundLakeMaxAltitude);
 
-        WriteModTitleSettings("Cave Variables");
-        WriteModSettings(TCDefaultValues.caveRarity.name(), this.caveRarity);
-        WriteModSettings(TCDefaultValues.caveFrequency.name(), this.caveFrequency);
-        WriteModSettings(TCDefaultValues.caveMinAltitude.name(), this.caveMinAltitude);
-        WriteModSettings(TCDefaultValues.caveMaxAltitude.name(), this.caveMaxAltitude);
-        WriteModSettings(TCDefaultValues.individualCaveRarity.name(), this.individualCaveRarity);
-        WriteModSettings(TCDefaultValues.caveSystemFrequency.name(), this.caveSystemFrequency);
-        WriteModSettings(TCDefaultValues.caveSystemPocketChance.name(), this.caveSystemPocketChance);
-        WriteModSettings(TCDefaultValues.caveSystemPocketMinSize.name(), this.caveSystemPocketMinSize);
-        WriteModSettings(TCDefaultValues.caveSystemPocketMaxSize.name(), this.caveSystemPocketMaxSize);
-        WriteModSettings(TCDefaultValues.evenCaveDistribution.name(), this.evenCaveDistribution);
+        WriteTitle("Cave Variables");
+        WriteValue(TCDefaultValues.caveRarity.name(), this.caveRarity);
+        WriteValue(TCDefaultValues.caveFrequency.name(), this.caveFrequency);
+        WriteValue(TCDefaultValues.caveMinAltitude.name(), this.caveMinAltitude);
+        WriteValue(TCDefaultValues.caveMaxAltitude.name(), this.caveMaxAltitude);
+        WriteValue(TCDefaultValues.individualCaveRarity.name(), this.individualCaveRarity);
+        WriteValue(TCDefaultValues.caveSystemFrequency.name(), this.caveSystemFrequency);
+        WriteValue(TCDefaultValues.caveSystemPocketChance.name(), this.caveSystemPocketChance);
+        WriteValue(TCDefaultValues.caveSystemPocketMinSize.name(), this.caveSystemPocketMinSize);
+        WriteValue(TCDefaultValues.caveSystemPocketMaxSize.name(), this.caveSystemPocketMaxSize);
+        WriteValue(TCDefaultValues.evenCaveDistribution.name(), this.evenCaveDistribution);
 
 
-        WriteModTitleSettings("Canyon Variables");
-        WriteModSettings(TCDefaultValues.canyonRarity.name(), this.canyonRarity);
-        WriteModSettings(TCDefaultValues.canyonMinAltitude.name(), this.canyonMinAltitude);
-        WriteModSettings(TCDefaultValues.canyonMaxAltitude.name(), this.canyonMaxAltitude);
-        WriteModSettings(TCDefaultValues.canyonMinLength.name(), this.canyonMinLength);
-        WriteModSettings(TCDefaultValues.canyonMaxLength.name(), this.canyonMaxLength);
-        WriteModSettings(TCDefaultValues.canyonDepth.name(), this.canyonDepth);
+        WriteTitle("Canyon Variables");
+        WriteValue(TCDefaultValues.canyonRarity.name(), this.canyonRarity);
+        WriteValue(TCDefaultValues.canyonMinAltitude.name(), this.canyonMinAltitude);
+        WriteValue(TCDefaultValues.canyonMaxAltitude.name(), this.canyonMaxAltitude);
+        WriteValue(TCDefaultValues.canyonMinLength.name(), this.canyonMinLength);
+        WriteValue(TCDefaultValues.canyonMaxLength.name(), this.canyonMaxLength);
+        WriteValue(TCDefaultValues.canyonDepth.name(), this.canyonDepth);
 
     }
 
@@ -509,7 +509,7 @@ public class WorldConfig extends ConfigFile
         for (int i = 1; i < this.heightMatrix.length; i++)
             output = output + "," + Double.toString(this.heightMatrix[i]);
 
-        this.WriteModSettings("CustomHeightControl", output);
+        this.WriteValue("CustomHeightControl", output);
     }
 
     private void WriteCustomBiomesSettings() throws IOException
@@ -517,14 +517,14 @@ public class WorldConfig extends ConfigFile
 
         if (this.CustomBiomes.size() == 0)
         {
-            this.WriteModSettings("CustomBiomes", "");
+            this.WriteValue("CustomBiomes", "");
             return;
         }
         String output = this.CustomBiomes.get(0);
         for (int i = 1; i < this.CustomBiomes.size(); i++)
             output = output + "," + this.CustomBiomes.get(i);
 
-        this.WriteModSettings("CustomBiomes", output);
+        this.WriteValue("CustomBiomes", output);
     }
 
 

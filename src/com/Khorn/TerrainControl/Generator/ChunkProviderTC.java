@@ -425,13 +425,13 @@ public class ChunkProviderTC extends ChunkGenerator
             for (int i9 = -i7; i9 <= i7; i9++)
             {
                 BiomeBase localBiomeBase2 = this.BiomeArray[(x + i8 + 2 + (z + i9 + 2) * (paramInt4 + 5))];
-                float f5 = this.l[(i8 + 2 + (i9 + 2) * 5)] / (this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeSurface + 2.0F);
-                if (this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeSurface > this.worldSettings.biomeConfigs[localBiomeBase1.y].BiomeSurface)
+                float f5 = this.l[(i8 + 2 + (i9 + 2) * 5)] / (this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeHeight + 2.0F);
+                if (this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeHeight > this.worldSettings.biomeConfigs[localBiomeBase1.y].BiomeHeight)
                 {
                     f5 /= 2.0F;
                 }
                 f2 += this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeVolatility * f5;
-                f3 += this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeSurface * f5;
+                f3 += this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeHeight * f5;
                 f4 += f5;
             }
         }

@@ -24,7 +24,7 @@ public abstract class ResourceGenBase
 
         for (int t = 0; t < res.Frequency; t++)
         {
-            if (this.rand.nextInt(100) >= res.Rarity)
+            if (this.rand.nextInt(100) > res.Rarity)
                 continue;
             int x = _x + this.rand.nextInt(16) + 8;
             int z = _z + this.rand.nextInt(16) + 8;
@@ -61,7 +61,7 @@ public abstract class ResourceGenBase
             return;
 
         this.cacheChunk.b[x << 11 | z << 7 | y] = (byte) BlockId;
-        this.cacheChunk.g.a(x,y,z,Data);
+        this.cacheChunk.g.a(x, y, z, Data);
 
     }
 
