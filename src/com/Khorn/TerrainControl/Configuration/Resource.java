@@ -5,7 +5,6 @@ import com.Khorn.TerrainControl.Util.ResourceType;
 import com.Khorn.TerrainControl.Util.TreeType;
 import org.bukkit.Material;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Resource
@@ -13,7 +12,8 @@ public class Resource
     public ResourceType Type;
     public int MinAltitude;
     public int MaxAltitude;
-    public int Size;
+    public int MinSize;
+    public int MaxSize;
     public int BlockId;
     public int BlockData;
     private int[] SourceBlockId = new int[0];
@@ -34,12 +34,25 @@ public class Resource
         this.Type = type;
         this.BlockId = blockId;
         this.BlockData = blockData;
-        this.Size = size;
+        this.MaxSize = size;
         this.Frequency = frequency;
         this.Rarity = rarity;
         this.MinAltitude = minAltitude;
         this.MaxAltitude = maxAltitude;
         this.SourceBlockId = sourceBlockIds;
+        this.Done = true;
+
+    }
+
+    public Resource(ResourceType type, int minSize, int maxSize, int frequency, int rarity, int minAltitude, int maxAltitude)
+    {
+        this.Type = type;
+        this.MaxSize = maxSize;
+        this.MinSize = minSize;
+        this.Frequency = frequency;
+        this.Rarity = rarity;
+        this.MinAltitude = minAltitude;
+        this.MaxAltitude = maxAltitude;
         this.Done = true;
 
     }
@@ -107,7 +120,7 @@ public class Resource
                     if (Props.length < 7)
                         return;
                     this.BlockId = CheckBlock(Props[0]);
-                    this.Size = CheckValue(Props[1], 1, 32);
+                    this.MaxSize = CheckValue(Props[1], 1, 32);
                     this.Frequency = CheckValue(Props[2], 1, 100);
                     this.Rarity = CheckValue(Props[3], 0, 100);
                     this.MinAltitude = CheckValue(Props[4], 0, 128);
@@ -121,7 +134,7 @@ public class Resource
                     if (Props.length < 5)
                         return;
                     this.BlockId = CheckBlock(Props[0]);
-                    this.Size = CheckValue(Props[1], 1, 8);
+                    this.MaxSize = CheckValue(Props[1], 1, 8);
                     this.Frequency = CheckValue(Props[2], 1, 100);
                     this.Rarity = CheckValue(Props[3], 0, 100);
 
@@ -200,7 +213,7 @@ public class Resource
                             if (type.name().equals(tree))
                             {
                                 treeTypes.add(type);
-                                treeChances.add( CheckValue(Props[i + 1],0,100));
+                                treeChances.add(CheckValue(Props[i + 1], 0, 100));
                             }
                     }
                     if (treeChances.size() > 0)
@@ -222,6 +235,16 @@ public class Resource
                 case CustomObject:
                     if (Props.length != 1)
                         return;
+                    break;
+                case UnderGroundLake:
+                    if (Props.length < 6)
+                        return;
+                    this.MinSize = CheckValue(Props[0], 1, 25);
+                    this.MaxSize = CheckValue(Props[1], 1, 60,this.MinSize);
+                    this.Frequency = CheckValue(Props[2], 1, 100);
+                    this.Rarity = CheckValue(Props[3], 0, 100);
+                    this.MinAltitude = CheckValue(Props[4], 0, 128);
+                    this.MaxAltitude = CheckValue(Props[5], 0, 128, this.MinAltitude);
                     break;
             }
         } catch (NumberFormatException e)
@@ -245,10 +268,10 @@ public class Resource
         switch (this.Type)
         {
             case Ore:
-                output += Material.getMaterial(this.BlockId).name() + "," + this.Size + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
+                output += Material.getMaterial(this.BlockId).name() + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
                 break;
             case UnderWaterOre:
-                output += Material.getMaterial(this.BlockId).name() + "," + this.Size + "," + this.Frequency + "," + this.Rarity + sources + ")";
+                output += Material.getMaterial(this.BlockId).name() + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + sources + ")";
                 break;
             case Plant:
             case Liquid:
@@ -263,13 +286,16 @@ public class Resource
                 output += this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
                 break;
             case Tree:
-                output += this.Frequency ;
+                output += this.Frequency;
                 for (int i = 0; i < this.TreeChances.length; i++)
                     output += "," + this.TreeTypes[i].name() + "," + this.TreeChances[i];
                 output += ")";
                 break;
             case CustomObject:
                 output += ")";
+                break;
+            case UnderGroundLake:
+                output += this.MinSize + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
                 break;
         }
         return output;

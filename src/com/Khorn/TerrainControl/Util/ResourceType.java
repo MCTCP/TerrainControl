@@ -11,5 +11,6 @@ public enum ResourceType
     Cactus,
     Dungeon,
     Tree,
-    CustomObject
+    CustomObject,
+    UnderGroundLake
 }

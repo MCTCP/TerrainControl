@@ -316,14 +316,11 @@ public class CustomObject
 
     }
 
+    @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
     public boolean canSpawnInBiome(BiomeBase localBiome)
     {
-        if (!this.spawnInBiome.contains("all"))
-        {
-            if (!this.spawnInBiome.contains(localBiome.l.toLowerCase()))
-                return false;
-        }
-        return true;
+        return this.spawnInBiome.contains("all") || this.spawnInBiome.contains(localBiome.l.toLowerCase());
+
     }
 
 

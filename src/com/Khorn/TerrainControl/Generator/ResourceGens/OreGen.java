@@ -21,23 +21,23 @@ public class OreGen extends ResourceGenBase
 
         float f = this.rand.nextFloat() * 3.141593F;
 
-        double d1 = x + 8 + MathHelper.sin(f) * res.Size / 8.0F;
-        double d2 = x + 8 - MathHelper.sin(f) * res.Size / 8.0F;
-        double d3 = z + 8 + MathHelper.cos(f) * res.Size / 8.0F;
-        double d4 = z + 8 - MathHelper.cos(f) * res.Size / 8.0F;
+        double d1 = x + 8 + MathHelper.sin(f) * res.MaxSize / 8.0F;
+        double d2 = x + 8 - MathHelper.sin(f) * res.MaxSize / 8.0F;
+        double d3 = z + 8 + MathHelper.cos(f) * res.MaxSize / 8.0F;
+        double d4 = z + 8 - MathHelper.cos(f) * res.MaxSize / 8.0F;
 
         double d5 = y + this.rand.nextInt(3) - 2;
         double d6 = y + this.rand.nextInt(3) - 2;
 
-        for (int i = 0; i <= res.Size; i++)
+        for (int i = 0; i <= res.MaxSize; i++)
         {
-            double d7 = d1 + (d2 - d1) * i / res.Size;
-            double d8 = d5 + (d6 - d5) * i / res.Size;
-            double d9 = d3 + (d4 - d3) * i / res.Size;
+            double d7 = d1 + (d2 - d1) * i / res.MaxSize;
+            double d8 = d5 + (d6 - d5) * i / res.MaxSize;
+            double d9 = d3 + (d4 - d3) * i / res.MaxSize;
 
-            double d10 = this.rand.nextDouble() * res.Size / 16.0D;
-            double d11 = (MathHelper.sin(i * 3.141593F / res.Size) + 1.0F) * d10 + 1.0D;
-            double d12 = (MathHelper.sin(i * 3.141593F / res.Size) + 1.0F) * d10 + 1.0D;
+            double d10 = this.rand.nextDouble() * res.MaxSize / 16.0D;
+            double d11 = (MathHelper.sin(i * 3.141593F / res.MaxSize) + 1.0F) * d10 + 1.0D;
+            double d12 = (MathHelper.sin(i * 3.141593F / res.MaxSize) + 1.0F) * d10 + 1.0D;
 
             int j = MathHelper.floor(d7 - d11 / 2.0D);
             int k = MathHelper.floor(d8 - d12 / 2.0D);

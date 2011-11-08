@@ -110,16 +110,6 @@ public class WorldConfig extends ConfigFile
     public boolean VillagesEnabled;
 
 
-    public boolean undergroundLakes;
-    public boolean undergroundLakesInAir;
-    public int undergroundLakeFrequency;
-    public int undergroundLakeRarity;
-    public int undergroundLakeMinSize;
-    public int undergroundLakeMaxSize;
-    public int undergroundLakeMinAltitude;
-    public int undergroundLakeMaxAltitude;
-
-
     private File SettingsDir;
     public TCPlugin plugin;
     public ChunkProviderTC ChunkProvider;
@@ -229,13 +219,6 @@ public class WorldConfig extends ConfigFile
 
         this.waterLevel = (this.waterLevel < 0 ? 0 : this.waterLevel > TCDefaultValues.yLimit.intValue() - 1 ? TCDefaultValues.yLimit.intValue() - 1 : this.waterLevel);
 
-        this.undergroundLakeRarity = (this.undergroundLakeRarity < 0 ? 0 : this.undergroundLakeRarity > 100 ? 100 : this.undergroundLakeRarity);
-        this.undergroundLakeFrequency = (this.undergroundLakeFrequency < 0 ? 0 : this.undergroundLakeFrequency);
-        this.undergroundLakeMinSize = (this.undergroundLakeMinSize < 25 ? 25 : this.undergroundLakeMinSize);
-        this.undergroundLakeMaxSize = (this.undergroundLakeMaxSize <= this.undergroundLakeMinSize ? this.undergroundLakeMinSize + 1 : this.undergroundLakeMaxSize);
-        this.undergroundLakeMinAltitude = (this.undergroundLakeMinAltitude < 0 ? 0 : this.undergroundLakeMinAltitude > TCDefaultValues.yLimit.intValue() - 1 ? TCDefaultValues.yLimit.intValue() - 1 : this.undergroundLakeMinAltitude);
-        this.undergroundLakeMaxAltitude = (this.undergroundLakeMaxAltitude > TCDefaultValues.yLimit.intValue() ? TCDefaultValues.yLimit.intValue() : this.undergroundLakeMaxAltitude <= this.undergroundLakeMinAltitude ? this.undergroundLakeMinAltitude + 1 : this.undergroundLakeMaxAltitude);
-
         this.customTreeMinTime = (this.customTreeMinTime < 1 ? 1 : this.customTreeMinTime);
         this.customTreeMaxTime = ((this.customTreeMaxTime - this.customTreeMinTime) < 1 ? (this.customTreeMinTime + 1) : this.customTreeMaxTime);
 
@@ -262,9 +245,9 @@ public class WorldConfig extends ConfigFile
 
         this.oldBiomeGenerator = ReadModSettings(TCDefaultValues.oldBiomeGenerator.name(), TCDefaultValues.oldBiomeGenerator.booleanValue());
         this.oldBiomeSize = ReadModSettings(TCDefaultValues.oldBiomeSize.name(), TCDefaultValues.oldBiomeSize.doubleValue());
-        this.biomeSize = ReadModSettings(TCDefaultValues.biomeSize.name(), TCDefaultValues.biomeSize.intValue());
-        this.landSize = ReadModSettings(TCDefaultValues.landSize.name(), TCDefaultValues.landSize.intValue());
-        this.riversEnabled = ReadModSettings(TCDefaultValues.riversEnabled.name(), TCDefaultValues.riversEnabled.booleanValue());
+        this.biomeSize = ReadModSettings(TCDefaultValues.BiomeSize.name(), TCDefaultValues.BiomeSize.intValue());
+        this.landSize = ReadModSettings(TCDefaultValues.LandSize.name(), TCDefaultValues.LandSize.intValue());
+        this.riversEnabled = ReadModSettings(TCDefaultValues.RiversEnabled.name(), TCDefaultValues.RiversEnabled.booleanValue());
         this.minMoisture = ReadModSettings(TCDefaultValues.minMoisture.name(), TCDefaultValues.minMoisture.floatValue());
         this.maxMoisture = ReadModSettings(TCDefaultValues.maxMoisture.name(), TCDefaultValues.maxMoisture.floatValue());
         this.minTemperature = ReadModSettings(TCDefaultValues.minTemperature.name(), TCDefaultValues.minTemperature.floatValue());
@@ -335,23 +318,10 @@ public class WorldConfig extends ConfigFile
         this.customTreeMaxTime = this.ReadModSettings(TCDefaultValues.customTreeMaxTime.name(), TCDefaultValues.customTreeMaxTime.intValue());
 
 
-        this.undergroundLakes = this.ReadModSettings(TCDefaultValues.undergroundLakes.name(), TCDefaultValues.undergroundLakes.booleanValue());
-        this.undergroundLakesInAir = this.ReadModSettings(TCDefaultValues.undergroundLakesInAir.name(), TCDefaultValues.undergroundLakesInAir.booleanValue());
-        this.undergroundLakeFrequency = this.ReadModSettings(TCDefaultValues.undergroundLakeFrequency.name(), TCDefaultValues.undergroundLakeFrequency.intValue());
-        this.undergroundLakeRarity = this.ReadModSettings(TCDefaultValues.undergroundLakeRarity.name(), TCDefaultValues.undergroundLakeRarity.intValue());
-        this.undergroundLakeMinSize = this.ReadModSettings(TCDefaultValues.undergroundLakeMinSize.name(), TCDefaultValues.undergroundLakeMinSize.intValue());
-        this.undergroundLakeMaxSize = this.ReadModSettings(TCDefaultValues.undergroundLakeMaxSize.name(), TCDefaultValues.undergroundLakeMaxSize.intValue());
-        this.undergroundLakeMinAltitude = this.ReadModSettings(TCDefaultValues.undergroundLakeMinAltitude.name(), TCDefaultValues.undergroundLakeMinAltitude.intValue());
-        this.undergroundLakeMaxAltitude = this.ReadModSettings(TCDefaultValues.undergroundLakeMaxAltitude.name(), TCDefaultValues.undergroundLakeMaxAltitude.intValue());
-
-
-
         this.ReadCustomBiomes();
 
 
     }
-
-
 
 
     private void ReadHeightSettings()
@@ -379,7 +349,6 @@ public class WorldConfig extends ConfigFile
     }
 
 
-
     private void ReadCustomBiomes()
     {
         if (this.SettingsCache.containsKey("CustomBiomes"))
@@ -404,27 +373,34 @@ public class WorldConfig extends ConfigFile
 
     protected void WriteConfigSettings() throws IOException
     {
-        WriteTitle("Possible modes : Normal, TerrainTest, NotGenerate, OnlyBiome");
+        WriteComment("Possible modes : Normal, TerrainTest, NotGenerate, OnlyBiome");
+        WriteComment("   Normal - use all features");
+        WriteComment("   TerrainTest - generate only terrain without any resources");
+        WriteComment("   NotGenerate - generate empty chunks");
+        WriteComment("   OnlyBiome - use only TerrainControl biome generator");
         WriteValue(TCDefaultValues.Mode.name(), this.Mode.name());
 
-        WriteTitle("Old Biome Generator Variables");
-        WriteTitle("This generator works only with old terrain generator!");
-        WriteValue(TCDefaultValues.oldBiomeGenerator.name(), this.oldBiomeGenerator);
-        WriteValue(TCDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
-        WriteValue(TCDefaultValues.minMoisture.name(), this.minMoisture);
-        WriteValue(TCDefaultValues.maxMoisture.name(), this.maxMoisture);
-        WriteValue(TCDefaultValues.minTemperature.name(), this.minTemperature);
-        WriteValue(TCDefaultValues.maxTemperature.name(), this.maxTemperature);
+        /* Disabled for 1.9
         WriteValue(TCDefaultValues.snowThreshold.name(), this.snowThreshold);
-        WriteValue(TCDefaultValues.iceThreshold.name(), this.iceThreshold);
+        WriteValue(TCDefaultValues.iceThreshold.name(), this.iceThreshold);    */
 
         WriteTitle("Biome Generator Variables");
-        WriteValue(TCDefaultValues.biomeSize.name(), this.biomeSize);
-        WriteValue(TCDefaultValues.landSize.name(), this.landSize);
-        WriteValue(TCDefaultValues.riversEnabled.name(), this.riversEnabled);
+        WriteComment("Integer value from 1 to 15. Affect all biomes except ocean and river");
+        WriteValue(TCDefaultValues.BiomeSize.name(), this.biomeSize);
+        WriteNewLine();
+        WriteComment("Integer value from 0 to 10. This affect how much lands will be generated. LandSize:0 - mean generates only ocean.");
+        WriteValue(TCDefaultValues.LandSize.name(), this.landSize);
+        WriteNewLine();
+        WriteValue(TCDefaultValues.RiversEnabled.name(), this.riversEnabled);
 
+        WriteNewLine();
+        WriteComment("List of custom biomes.");
+        WriteComment("Example: ");
+        WriteComment("  CustomBiomes:TestBiome1, BiomeTest2");
+        WriteComment("This will add two biomes and generate biome config files");
         this.WriteCustomBiomesSettings();
 
+        /* Removed .. not sure this need someone
         WriteTitle("Swamp Biome Variables");
         WriteValue(TCDefaultValues.muddySwamps.name(), this.muddySwamps);
         WriteValue(TCDefaultValues.claySwamps.name(), this.claySwamps);
@@ -434,9 +410,15 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.waterlessDeserts.name(), this.waterlessDeserts);
         WriteValue(TCDefaultValues.desertDirt.name(), this.desertDirt);
         WriteValue(TCDefaultValues.desertDirtFrequency.name(), this.desertDirtFrequency);
+        */
+
 
         WriteTitle("Terrain Generator Variables");
+        WriteComment("Enable old 1.7.3 terrain generator.");
         WriteValue(TCDefaultValues.oldTerrainGenerator.name(), this.oldTerrainGenerator);
+        WriteNewLine();
+        WriteComment("List of custom biomes.");
+
         WriteValue(TCDefaultValues.waterLevel.name(), this.waterLevel);
         WriteValue(TCDefaultValues.waterBlock.name(), this.waterBlock);
         WriteValue(TCDefaultValues.removeSurfaceStone.name(), this.removeSurfaceStone);
@@ -468,16 +450,6 @@ public class WorldConfig extends ConfigFile
         this.WriteValue(TCDefaultValues.customTreeMinTime.name(), Integer.valueOf(this.customTreeMinTime).intValue());
         this.WriteValue(TCDefaultValues.customTreeMaxTime.name(), Integer.valueOf(this.customTreeMaxTime).intValue());
 
-        this.WriteTitle("Underground Lake Variables");
-        this.WriteValue(TCDefaultValues.undergroundLakes.name(), this.undergroundLakes);
-        this.WriteValue(TCDefaultValues.undergroundLakesInAir.name(), this.undergroundLakesInAir);
-        this.WriteValue(TCDefaultValues.undergroundLakeFrequency.name(), this.undergroundLakeFrequency);
-        this.WriteValue(TCDefaultValues.undergroundLakeRarity.name(), this.undergroundLakeRarity);
-        this.WriteValue(TCDefaultValues.undergroundLakeMinSize.name(), this.undergroundLakeMinSize);
-        this.WriteValue(TCDefaultValues.undergroundLakeMaxSize.name(), this.undergroundLakeMaxSize);
-        this.WriteValue(TCDefaultValues.undergroundLakeMinAltitude.name(), this.undergroundLakeMinAltitude);
-        this.WriteValue(TCDefaultValues.undergroundLakeMaxAltitude.name(), this.undergroundLakeMaxAltitude);
-
         WriteTitle("Cave Variables");
         WriteValue(TCDefaultValues.caveRarity.name(), this.caveRarity);
         WriteValue(TCDefaultValues.caveFrequency.name(), this.caveFrequency);
@@ -498,6 +470,17 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.canyonMinLength.name(), this.canyonMinLength);
         WriteValue(TCDefaultValues.canyonMaxLength.name(), this.canyonMaxLength);
         WriteValue(TCDefaultValues.canyonDepth.name(), this.canyonDepth);
+
+        WriteNewLine();
+        WriteTitle("Old Biome Generator Variables");
+        WriteComment("This generator works only with old terrain generator!");
+        //WriteComment("Since 1.8.3 notch take temperature from biomes, so changing this you can`t affect new biome generation ");
+        WriteValue(TCDefaultValues.oldBiomeGenerator.name(), this.oldBiomeGenerator);
+        WriteValue(TCDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
+        WriteValue(TCDefaultValues.minMoisture.name(), this.minMoisture);
+        WriteValue(TCDefaultValues.maxMoisture.name(), this.maxMoisture);
+        WriteValue(TCDefaultValues.minTemperature.name(), this.minTemperature);
+        WriteValue(TCDefaultValues.maxTemperature.name(), this.maxTemperature);
 
     }
 

@@ -99,45 +99,49 @@ public class BiomeConfig extends ConfigFile
     {
         Resource resource;
 
+        //Underground lakes
+        resource = new Resource(ResourceType.UnderGroundLake, TCDefaultValues.undergroundLakeMinSize.intValue(), TCDefaultValues.undergroundLakeMaxSize.intValue(), TCDefaultValues.undergroundLakeFrequency.intValue(), TCDefaultValues.undergroundLakeRarity.intValue(), TCDefaultValues.undergroundLakeMinAltitude.intValue(), TCDefaultValues.undergroundLakeMaxAltitude.intValue());
+        this.ResourceSequence[this.ResourceCount++] = resource;
+
         //Dungeon
         resource = new Resource(ResourceType.Dungeon, 0, 0, 0, TCDefaultValues.dungeonFrequency.intValue(), TCDefaultValues.dungeonRarity.intValue(), TCDefaultValues.dungeonMinAltitude.intValue(), TCDefaultValues.dungeonMaxAltitude.intValue(), new int[]{Block.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Resource(ResourceType type,int blockId, int blockData, int size,int frequency, int rarity, int minAltitude,int maxAltitude,int[] sourceBlockIds)
         //Dirt
-        resource = new Resource(ResourceType.Ore, Block.DIRT.id, 0, TCDefaultValues.dirtDepositSize1.intValue(), TCDefaultValues.dirtDepositFrequency1.intValue(), TCDefaultValues.dirtDepositRarity1.intValue(), TCDefaultValues.dirtDepositMinAltitude1.intValue(), TCDefaultValues.dirtDepositMaxAltitude1.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, Block.DIRT.id, 0, TCDefaultValues.dirtDepositSize.intValue(), TCDefaultValues.dirtDepositFrequency.intValue(), TCDefaultValues.dirtDepositRarity.intValue(), TCDefaultValues.dirtDepositMinAltitude.intValue(), TCDefaultValues.dirtDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Gravel
-        resource = new Resource(ResourceType.Ore, Block.GRAVEL.id, 0, TCDefaultValues.gravelDepositSize1.intValue(), TCDefaultValues.gravelDepositFrequency1.intValue(), TCDefaultValues.gravelDepositRarity1.intValue(), TCDefaultValues.gravelDepositMinAltitude1.intValue(), TCDefaultValues.gravelDepositMaxAltitude1.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, Block.GRAVEL.id, 0, TCDefaultValues.gravelDepositSize.intValue(), TCDefaultValues.gravelDepositFrequency.intValue(), TCDefaultValues.gravelDepositRarity.intValue(), TCDefaultValues.gravelDepositMinAltitude.intValue(), TCDefaultValues.gravelDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Clay
-        resource = new Resource(ResourceType.Ore, Block.CLAY.id, 0, TCDefaultValues.clayDepositSize1.intValue(), TCDefaultValues.clayDepositFrequency1.intValue(), TCDefaultValues.clayDepositRarity1.intValue(), TCDefaultValues.clayDepositMinAltitude1.intValue(), TCDefaultValues.clayDepositMaxAltitude1.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, Block.CLAY.id, 0, TCDefaultValues.clayDepositSize.intValue(), TCDefaultValues.clayDepositFrequency.intValue(), TCDefaultValues.clayDepositRarity.intValue(), TCDefaultValues.clayDepositMinAltitude.intValue(), TCDefaultValues.clayDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Coal
-        resource = new Resource(ResourceType.Ore, Block.COAL_ORE.id, 0, TCDefaultValues.coalDepositSize1.intValue(), TCDefaultValues.coalDepositFrequency1.intValue(), TCDefaultValues.coalDepositRarity1.intValue(), TCDefaultValues.coalDepositMinAltitude1.intValue(), TCDefaultValues.coalDepositMaxAltitude1.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, Block.COAL_ORE.id, 0, TCDefaultValues.coalDepositSize.intValue(), TCDefaultValues.coalDepositFrequency.intValue(), TCDefaultValues.coalDepositRarity.intValue(), TCDefaultValues.coalDepositMinAltitude.intValue(), TCDefaultValues.coalDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Iron
-        resource = new Resource(ResourceType.Ore, Block.IRON_ORE.id, 0, TCDefaultValues.ironDepositSize1.intValue(), TCDefaultValues.ironDepositFrequency1.intValue(), TCDefaultValues.ironDepositRarity1.intValue(), TCDefaultValues.ironDepositMinAltitude1.intValue(), TCDefaultValues.ironDepositMaxAltitude1.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, Block.IRON_ORE.id, 0, TCDefaultValues.ironDepositSize.intValue(), TCDefaultValues.ironDepositFrequency.intValue(), TCDefaultValues.ironDepositRarity.intValue(), TCDefaultValues.ironDepositMinAltitude.intValue(), TCDefaultValues.ironDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Gold
-        resource = new Resource(ResourceType.Ore, Block.GOLD_ORE.id, 0, TCDefaultValues.goldDepositSize1.intValue(), TCDefaultValues.goldDepositFrequency1.intValue(), TCDefaultValues.goldDepositRarity1.intValue(), TCDefaultValues.goldDepositMinAltitude1.intValue(), TCDefaultValues.goldDepositMaxAltitude1.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, Block.GOLD_ORE.id, 0, TCDefaultValues.goldDepositSize.intValue(), TCDefaultValues.goldDepositFrequency.intValue(), TCDefaultValues.goldDepositRarity.intValue(), TCDefaultValues.goldDepositMinAltitude.intValue(), TCDefaultValues.goldDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Redstone
-        resource = new Resource(ResourceType.Ore, Block.REDSTONE_ORE.id, 0, TCDefaultValues.redstoneDepositSize1.intValue(), TCDefaultValues.redstoneDepositFrequency1.intValue(), TCDefaultValues.redstoneDepositRarity1.intValue(), TCDefaultValues.redstoneDepositMinAltitude1.intValue(), TCDefaultValues.redstoneDepositMaxAltitude1.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, Block.REDSTONE_ORE.id, 0, TCDefaultValues.redstoneDepositSize.intValue(), TCDefaultValues.redstoneDepositFrequency.intValue(), TCDefaultValues.redstoneDepositRarity.intValue(), TCDefaultValues.redstoneDepositMinAltitude.intValue(), TCDefaultValues.redstoneDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Diamond
-        resource = new Resource(ResourceType.Ore, Block.DIAMOND_ORE.id, 0, TCDefaultValues.diamondDepositSize1.intValue(), TCDefaultValues.diamondDepositFrequency1.intValue(), TCDefaultValues.diamondDepositRarity1.intValue(), TCDefaultValues.diamondDepositMinAltitude1.intValue(), TCDefaultValues.diamondDepositMaxAltitude1.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, Block.DIAMOND_ORE.id, 0, TCDefaultValues.diamondDepositSize.intValue(), TCDefaultValues.diamondDepositFrequency.intValue(), TCDefaultValues.diamondDepositRarity.intValue(), TCDefaultValues.diamondDepositMinAltitude.intValue(), TCDefaultValues.diamondDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Lapislazuli
-        resource = new Resource(ResourceType.Ore, Block.LAPIS_ORE.id, 0, TCDefaultValues.lapislazuliDepositSize1.intValue(), TCDefaultValues.lapislazuliDepositFrequency1.intValue(), TCDefaultValues.lapislazuliDepositRarity1.intValue(), TCDefaultValues.lapislazuliDepositMinAltitude1.intValue(), TCDefaultValues.lapislazuliDepositMaxAltitude1.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, Block.LAPIS_ORE.id, 0, TCDefaultValues.lapislazuliDepositSize.intValue(), TCDefaultValues.lapislazuliDepositFrequency.intValue(), TCDefaultValues.lapislazuliDepositRarity.intValue(), TCDefaultValues.lapislazuliDepositMinAltitude.intValue(), TCDefaultValues.lapislazuliDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
 

@@ -26,7 +26,7 @@ public abstract class ConfigFile
                 {
                     if (thisLine.trim().equals(""))
                         continue;
-                    if (thisLine.startsWith("//") || thisLine.startsWith("<"))
+                    if (thisLine.startsWith("#") || thisLine.startsWith("<"))
                         continue;
                     if (thisLine.toLowerCase().contains(":"))
                     {
@@ -214,13 +214,32 @@ public abstract class ConfigFile
     protected void WriteTitle(String title) throws IOException
     {
         this.SettingsWriter.newLine();
-        this.SettingsWriter.write("<" + title + ">");
+        this.SettingsWriter.write("#######################################################################");
+        this.SettingsWriter.newLine();
+        this.SettingsWriter.write("# +-----------------------------------------------------------------+ #");
+        this.SettingsWriter.newLine();
+        title = "  " + title + "  ";
+        boolean flag = true;
+        while (title.length() < 65)
+        {
+            if (flag)
+                title = " " + title;
+            else
+                title = title + " ";
+            flag = !flag;
+        }
+        this.SettingsWriter.write("# |" + title + "| #");
+        this.SettingsWriter.newLine();
+        this.SettingsWriter.write("# +-----------------------------------------------------------------+ #");
+        this.SettingsWriter.newLine();
+        this.SettingsWriter.write("#######################################################################");
+        this.SettingsWriter.newLine();
         this.SettingsWriter.newLine();
     }
 
     protected void WriteComment(String comment) throws IOException
     {
-        this.SettingsWriter.write("//   " + comment);
+        this.SettingsWriter.write("# " + comment);
         this.SettingsWriter.newLine();
     }
 

@@ -1,7 +1,6 @@
 package com.Khorn.TerrainControl.Generator.ResourceGens;
 
 import com.Khorn.TerrainControl.Configuration.Resource;
-import net.minecraft.server.Block;
 import net.minecraft.server.Material;
 import net.minecraft.server.World;
 
@@ -21,7 +20,7 @@ public class UnderWaterOreGen extends ResourceGenBase
 
         if (this.getMaterial(x, y, z) != Material.WATER)
             return;
-        int i = this.rand.nextInt(res.Size - 2) + 2;
+        int i = this.rand.nextInt(res.MaxSize - 2) + 2;
         int j = 2;
         for (int k = x - i; k <= x + i; k++)
         {
