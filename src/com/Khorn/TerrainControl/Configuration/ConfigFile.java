@@ -32,7 +32,7 @@ public abstract class ConfigFile
                     {
                         String[] splitSettings = thisLine.split(":");
                         if (splitSettings.length == 2)
-                            this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
+                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                     } else
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
                     lineNumber++;
@@ -67,6 +67,7 @@ public abstract class ConfigFile
 
     protected int ReadModSettings(String settingsName, int defaultValue)
     {
+        settingsName = settingsName.toLowerCase();
         if (this.SettingsCache.containsKey(settingsName))
         {
             try
@@ -82,6 +83,7 @@ public abstract class ConfigFile
 
     protected byte ReadModSettings(String settingsName, byte defaultValue)
     {
+        settingsName = settingsName.toLowerCase();
         if (this.SettingsCache.containsKey(settingsName))
         {
             try
@@ -97,6 +99,7 @@ public abstract class ConfigFile
 
     protected String ReadModSettings(String settingsName, String defaultValue)
     {
+        settingsName = settingsName.toLowerCase();
         if (this.SettingsCache.containsKey(settingsName))
         {
             return this.SettingsCache.get(settingsName);
@@ -106,6 +109,7 @@ public abstract class ConfigFile
 
     protected double ReadModSettings(String settingsName, double defaultValue)
     {
+        settingsName = settingsName.toLowerCase();
         if (this.SettingsCache.containsKey(settingsName))
         {
             try
@@ -121,6 +125,7 @@ public abstract class ConfigFile
 
     protected float ReadModSettings(String settingsName, float defaultValue)
     {
+        settingsName = settingsName.toLowerCase();
         if (this.SettingsCache.containsKey(settingsName))
         {
             try
@@ -136,6 +141,7 @@ public abstract class ConfigFile
 
     protected boolean ReadModSettings(String settingsName, boolean defaultValue)
     {
+        settingsName = settingsName.toLowerCase();
         if (this.SettingsCache.containsKey(settingsName))
         {
             return Boolean.valueOf(this.SettingsCache.get(settingsName));

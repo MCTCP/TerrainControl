@@ -1,5 +1,5 @@
 name: TerrainControl
-version: 1.0.0
+version: 1.1.0
 description: Generates a worlds.
 authors: ['Khorn']
 main: com.Khorn.TerrainControl.TCPlugin

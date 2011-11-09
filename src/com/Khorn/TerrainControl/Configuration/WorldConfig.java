@@ -288,34 +288,34 @@ public class WorldConfig extends ConfigFile
         this.canyonDepth = ReadModSettings(TCDefaultValues.canyonDepth.name(), TCDefaultValues.canyonDepth.doubleValue());
 
 
-        this.waterLevel = ReadModSettings(TCDefaultValues.waterLevel.name(), TCDefaultValues.waterLevel.intValue());
-        this.waterBlock = ReadModSettings(TCDefaultValues.waterBlock.name(), TCDefaultValues.waterBlock.intValue());
-        this.maxAverageHeight = ReadModSettings(TCDefaultValues.maxAverageHeight.name(), TCDefaultValues.maxAverageHeight.doubleValue());
-        this.maxAverageDepth = ReadModSettings(TCDefaultValues.maxAverageDepth.name(), TCDefaultValues.maxAverageDepth.doubleValue());
-        this.fractureHorizontal = ReadModSettings(TCDefaultValues.fractureHorizontal.name(), TCDefaultValues.fractureHorizontal.doubleValue());
-        this.fractureVertical = ReadModSettings(TCDefaultValues.fractureVertical.name(), TCDefaultValues.fractureVertical.doubleValue());
-        this.volatility1 = ReadModSettings(TCDefaultValues.volatility1.name(), TCDefaultValues.volatility1.doubleValue());
-        this.volatility2 = ReadModSettings(TCDefaultValues.volatility2.name(), TCDefaultValues.volatility2.doubleValue());
-        this.volatilityWeight1 = ReadModSettings(TCDefaultValues.volatilityWeight1.name(), TCDefaultValues.volatilityWeight1.doubleValue());
-        this.volatilityWeight2 = ReadModSettings(TCDefaultValues.volatilityWeight2.name(), TCDefaultValues.volatilityWeight2.doubleValue());
-        this.disableNotchHeightControl = ReadModSettings(TCDefaultValues.disableNotchHeightControl.name(), TCDefaultValues.disableNotchHeightControl.booleanValue());
+        this.waterLevel = ReadModSettings(TCDefaultValues.WaterLevel.name(), TCDefaultValues.WaterLevel.intValue());
+        this.waterBlock = ReadModSettings(TCDefaultValues.WaterBlock.name(), TCDefaultValues.WaterBlock.intValue());
+        this.maxAverageHeight = ReadModSettings(TCDefaultValues.MaxAverageHeight.name(), TCDefaultValues.MaxAverageHeight.doubleValue());
+        this.maxAverageDepth = ReadModSettings(TCDefaultValues.MaxAverageDepth.name(), TCDefaultValues.MaxAverageDepth.doubleValue());
+        this.fractureHorizontal = ReadModSettings(TCDefaultValues.FractureHorizontal.name(), TCDefaultValues.FractureHorizontal.doubleValue());
+        this.fractureVertical = ReadModSettings(TCDefaultValues.FractureVertical.name(), TCDefaultValues.FractureVertical.doubleValue());
+        this.volatility1 = ReadModSettings(TCDefaultValues.Volatility1.name(), TCDefaultValues.Volatility1.doubleValue());
+        this.volatility2 = ReadModSettings(TCDefaultValues.Volatility2.name(), TCDefaultValues.Volatility2.doubleValue());
+        this.volatilityWeight1 = ReadModSettings(TCDefaultValues.VolatilityWeight1.name(), TCDefaultValues.VolatilityWeight1.doubleValue());
+        this.volatilityWeight2 = ReadModSettings(TCDefaultValues.VolatilityWeight2.name(), TCDefaultValues.VolatilityWeight2.doubleValue());
+        this.disableNotchHeightControl = ReadModSettings(TCDefaultValues.DisableBiomeHeight.name(), TCDefaultValues.DisableBiomeHeight.booleanValue());
 
-        this.disableBedrock = ReadModSettings(TCDefaultValues.disableBedrock.name(), TCDefaultValues.disableBedrock.booleanValue());
-        this.ceilingBedrock = ReadModSettings(TCDefaultValues.ceilingBedrock.name(), TCDefaultValues.ceilingBedrock.booleanValue());
-        this.flatBedrock = ReadModSettings(TCDefaultValues.flatBedrock.name(), TCDefaultValues.flatBedrock.booleanValue());
+        this.disableBedrock = ReadModSettings(TCDefaultValues.DisableBedrock.name(), TCDefaultValues.DisableBedrock.booleanValue());
+        this.ceilingBedrock = ReadModSettings(TCDefaultValues.CeilingBedrock.name(), TCDefaultValues.CeilingBedrock.booleanValue());
+        this.flatBedrock = ReadModSettings(TCDefaultValues.FlatBedrock.name(), TCDefaultValues.FlatBedrock.booleanValue());
         this.bedrockBlock = ReadModSettings(TCDefaultValues.BedrockobBlock.name(), TCDefaultValues.BedrockobBlock.intValue());
 
         ReadHeightSettings();
 
-        this.oldTerrainGenerator = ReadModSettings(TCDefaultValues.oldTerrainGenerator.name(), TCDefaultValues.oldTerrainGenerator.booleanValue());
-        this.removeSurfaceStone = ReadModSettings(TCDefaultValues.removeSurfaceStone.name(), TCDefaultValues.removeSurfaceStone.booleanValue());
+        this.oldTerrainGenerator = ReadModSettings(TCDefaultValues.OldTerrainGenerator.name(), TCDefaultValues.OldTerrainGenerator.booleanValue());
+        this.removeSurfaceStone = ReadModSettings(TCDefaultValues.RemoveSurfaceStone.name(), TCDefaultValues.RemoveSurfaceStone.booleanValue());
 
 
-        this.customObjects = this.ReadModSettings(TCDefaultValues.customObjects.name(), TCDefaultValues.customObjects.booleanValue());
+        this.customObjects = this.ReadModSettings(TCDefaultValues.CustomObjects.name(), TCDefaultValues.CustomObjects.booleanValue());
         this.objectSpawnRatio = this.ReadModSettings(TCDefaultValues.objectSpawnRatio.name(), TCDefaultValues.objectSpawnRatio.intValue());
-        this.denyObjectsUnderFill = this.ReadModSettings(TCDefaultValues.denyObjectsUnderFill.name(), TCDefaultValues.denyObjectsUnderFill.booleanValue());
-        this.customTreeMinTime = this.ReadModSettings(TCDefaultValues.customTreeMinTime.name(), TCDefaultValues.customTreeMinTime.intValue());
-        this.customTreeMaxTime = this.ReadModSettings(TCDefaultValues.customTreeMaxTime.name(), TCDefaultValues.customTreeMaxTime.intValue());
+        this.denyObjectsUnderFill = this.ReadModSettings(TCDefaultValues.DenyObjectsUnderFill.name(), TCDefaultValues.DenyObjectsUnderFill.booleanValue());
+        this.customTreeMinTime = this.ReadModSettings(TCDefaultValues.CustomTreeMinTime.name(), TCDefaultValues.CustomTreeMinTime.intValue());
+        this.customTreeMaxTime = this.ReadModSettings(TCDefaultValues.CustomTreeMaxTime.name(), TCDefaultValues.CustomTreeMaxTime.intValue());
 
 
         this.ReadCustomBiomes();
@@ -415,27 +415,73 @@ public class WorldConfig extends ConfigFile
 
         WriteTitle("Terrain Generator Variables");
         WriteComment("Enable old 1.7.3 terrain generator.");
-        WriteValue(TCDefaultValues.oldTerrainGenerator.name(), this.oldTerrainGenerator);
+        WriteValue(TCDefaultValues.OldTerrainGenerator.name(), this.oldTerrainGenerator);
         WriteNewLine();
-        WriteComment("List of custom biomes.");
+        WriteComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
+        WriteValue(TCDefaultValues.WaterLevel.name(), this.waterLevel);
+        WriteNewLine();
+        WriteComment("BlockId used as water in WaterLevel");
+        WriteValue(TCDefaultValues.WaterBlock.name(), this.waterBlock);
+        WriteNewLine();
+        WriteComment("If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.");
+        WriteComment("If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.");
+        WriteValue(TCDefaultValues.MaxAverageHeight.name(), this.maxAverageHeight);
 
-        WriteValue(TCDefaultValues.waterLevel.name(), this.waterLevel);
-        WriteValue(TCDefaultValues.waterBlock.name(), this.waterBlock);
-        WriteValue(TCDefaultValues.removeSurfaceStone.name(), this.removeSurfaceStone);
-        WriteValue(TCDefaultValues.maxAverageHeight.name(), this.maxAverageHeight);
-        WriteValue(TCDefaultValues.maxAverageDepth.name(), this.maxAverageDepth);
-        WriteValue(TCDefaultValues.fractureHorizontal.name(), this.fractureHorizontal);
-        WriteValue(TCDefaultValues.fractureVertical.name(), this.fractureVertical);
-        WriteValue(TCDefaultValues.volatility1.name(), this.volatility1);
-        WriteValue(TCDefaultValues.volatility2.name(), this.volatility2);
-        WriteValue(TCDefaultValues.volatilityWeight1.name(), this.volatilityWeight1);
-        WriteValue(TCDefaultValues.volatilityWeight2.name(), this.volatilityWeight2);
-        WriteValue(TCDefaultValues.disableBedrock.name(), this.disableBedrock);
-        WriteValue(TCDefaultValues.ceilingBedrock.name(), this.ceilingBedrock);
-        WriteValue(TCDefaultValues.flatBedrock.name(), this.flatBedrock);
-        WriteValue(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
-        WriteValue(TCDefaultValues.disableNotchHeightControl.name(), this.disableNotchHeightControl);
+        WriteNewLine();
+        WriteComment("If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the ottom of the ocean) will fall before leveling off when it begins to decrease in elevation. ");
+        WriteComment("If the value is less than 0, then it will cause the terrain to either fall to a lesser depth before leveling out or increase in height if the value is a large enough negative.");
+        WriteValue(TCDefaultValues.MaxAverageDepth.name(), this.maxAverageDepth);
+
+        WriteNewLine();
+        WriteComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured horizontally.");
+        WriteValue(TCDefaultValues.FractureHorizontal.name(), this.fractureHorizontal);
+
+        WriteNewLine();
+        WriteComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured vertically.");
+        WriteComment("Positive values will lead to large cliffs/overhangs, floating islands, and/or a cavern world depending on other settings.");
+        WriteValue(TCDefaultValues.FractureVertical.name(), this.fractureVertical);
+
+        WriteNewLine();
+        WriteComment("Another type of noise. This noise is independent from biomes. The larger the values the more chaotic/volatile landscape generation becomes.");
+        WriteComment("Setting the values to negative will have the opposite effect and make landscape generation calmer/gentler.");
+        WriteValue(TCDefaultValues.Volatility1.name(), this.volatility1);
+        WriteValue(TCDefaultValues.Volatility2.name(), this.volatility2);
+
+        WriteNewLine();
+        WriteComment("Adjust the weight of the corresponding volatility settings. This allows you to change how prevalent you want either of the volatility settings to be in the terrain.");
+        WriteValue(TCDefaultValues.VolatilityWeight1.name(), this.volatilityWeight1);
+        WriteValue(TCDefaultValues.VolatilityWeight2.name(), this.volatilityWeight2);
+
+        WriteNewLine();
+        WriteComment("Disable all noises except Volatility1 and Volatility2. Also disable default block chance from height.");
+        WriteValue(TCDefaultValues.DisableBiomeHeight.name(), this.disableNotchHeightControl);
+        WriteNewLine();
+        WriteComment("List of custom height factor, 17 double entries, each entire control of about 7 blocks height from down. Positive entry - better chance of spawn blocks, negative - smaller");
+        WriteComment("Values which affect your configuration may be found only experimental. That may be very big, like ~3000.0 depends from height");
+        WriteComment("Example:");
+        WriteComment("  CustomHeightControl:0.0,-2500.0,0.0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0");
+        WriteComment("Make empty layer above bedrock layer. ");
         WriteHeightSettings();
+
+        WriteNewLine();
+        WriteComment("Attempts to replace all surface stone with biome surface block");
+        WriteValue(TCDefaultValues.RemoveSurfaceStone.name(), this.removeSurfaceStone);
+
+        WriteNewLine();
+        WriteComment("Disable bottom of map bedrock generation");
+        WriteValue(TCDefaultValues.DisableBedrock.name(), this.disableBedrock);
+
+        WriteNewLine();
+        WriteComment("Enable ceiling of map bedrock generation");
+        WriteValue(TCDefaultValues.CeilingBedrock.name(), this.ceilingBedrock);
+
+        WriteNewLine();
+        WriteComment("Make bottom layer of bedrock flat");
+        WriteValue(TCDefaultValues.FlatBedrock.name(), this.flatBedrock);
+
+        WriteNewLine();
+        WriteComment("BlockId used as bedrock");
+        WriteValue(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
 
         WriteTitle("Map objects");
         WriteValue(TCDefaultValues.StrongholdsEnabled.name(), this.StrongholdsEnabled);
@@ -444,11 +490,22 @@ public class WorldConfig extends ConfigFile
 
 
         this.WriteTitle("BOB Objects Variables");
-        this.WriteValue(TCDefaultValues.customObjects.name(), this.customObjects);
+
+        WriteNewLine();
+        WriteComment("Enable/disable custom objects");
+        this.WriteValue(TCDefaultValues.CustomObjects.name(), this.customObjects);
+
+        WriteNewLine();
+        WriteComment("Number of attempts for place rep chunk");
         this.WriteValue(TCDefaultValues.objectSpawnRatio.name(), Integer.valueOf(this.objectSpawnRatio).intValue());
-        this.WriteValue(TCDefaultValues.denyObjectsUnderFill.name(), this.denyObjectsUnderFill);
-        this.WriteValue(TCDefaultValues.customTreeMinTime.name(), Integer.valueOf(this.customTreeMinTime).intValue());
-        this.WriteValue(TCDefaultValues.customTreeMaxTime.name(), Integer.valueOf(this.customTreeMaxTime).intValue());
+
+        WriteNewLine();
+        WriteComment("Deny custom objects underFill even it enabled in objects ");
+        this.WriteValue(TCDefaultValues.DenyObjectsUnderFill.name(), this.denyObjectsUnderFill);
+        WriteNewLine();
+        WriteComment("Minimum and maximum time in seconds for growing custom tree from sapling./");
+        this.WriteValue(TCDefaultValues.CustomTreeMinTime.name(), Integer.valueOf(this.customTreeMinTime).intValue());
+        this.WriteValue(TCDefaultValues.CustomTreeMaxTime.name(), Integer.valueOf(this.customTreeMaxTime).intValue());
 
         WriteTitle("Cave Variables");
         WriteValue(TCDefaultValues.caveRarity.name(), this.caveRarity);
