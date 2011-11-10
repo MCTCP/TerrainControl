@@ -32,7 +32,10 @@ public abstract class ConfigFile
                     {
                         String[] splitSettings = thisLine.split(":");
                         if (splitSettings.length == 2)
+                        {
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
+                            this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
+                        }
                     } else
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
                     lineNumber++;
