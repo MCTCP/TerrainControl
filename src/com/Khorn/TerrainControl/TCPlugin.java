@@ -134,6 +134,7 @@ public class TCPlugin extends JavaPlugin
                 {
                     worldSetting.objectSpawner.Init(workWorld);
                     worldSetting.ChunkProvider.Init(world);
+                    workWorld.worldProvider.e = true;
                     break;
                 }
                 case TerrainTest:
@@ -168,6 +169,5 @@ public class TCPlugin extends JavaPlugin
     }
 
 }
-//TODO Add new object gens
-//TODO Set block replace per biome
+//TODO Fix lighting
 

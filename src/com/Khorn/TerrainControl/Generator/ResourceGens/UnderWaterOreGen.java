@@ -20,7 +20,7 @@ public class UnderWaterOreGen extends ResourceGenBase
 
         if (this.getMaterial(x, y, z) != Material.WATER)
             return;
-        int i = this.rand.nextInt(res.MaxSize - 2) + 2;
+        int i = this.rand.nextInt(res.MaxSize);
         int j = 2;
         for (int k = x - i; k <= x + i; k++)
         {
