@@ -109,7 +109,7 @@ public class ObjectSpawner extends BlockPopulator
         int z = chunk_z * 16;
 
         BiomeBase localBiomeBase = world.getWorldChunkManager().getBiome(x + 16, z + 16);
-        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[localBiomeBase.y];
+        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[localBiomeBase.F];
 
 
         this.rand.setSeed(world.getSeed());
@@ -165,7 +165,7 @@ public class ObjectSpawner extends BlockPopulator
                 for (int _z = 0; _z < 16; _z++)
                 {
                     this.BiomeArray = this.world.getWorldChunkManager().a(this.BiomeArray, chunk_x * 16, chunk_z * 16, 16, 16);
-                    BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.BiomeArray[(_z + _x * 16)].y];
+                    BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.BiomeArray[(_z + _x * 16)].F];
                     if (biomeConfig.replaceBlocks.size() > 0)
                     {
                         for (int _y = 127; _y >= 0; _y--)

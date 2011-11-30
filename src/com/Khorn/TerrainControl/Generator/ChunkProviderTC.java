@@ -1,5 +1,6 @@
 package com.Khorn.TerrainControl.Generator;
 
+import com.Khorn.TerrainControl.BiomeManager.BiomeManagerOld;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Generator.TerrainsGens.CanyonsGen;
 import com.Khorn.TerrainControl.Generator.TerrainsGens.CavesGen;
@@ -34,7 +35,6 @@ public class ChunkProviderTC extends ChunkGenerator
     double[] k;
     float[] l;
 
-    private static int ChunkMaxY = 128;
     private static int ChunkMaxX = 16;
     private static int ChunkMaxZ = 16;
 
@@ -110,11 +110,10 @@ public class ChunkProviderTC extends ChunkGenerator
     private void generateTerrain(int paramInt1, int paramInt2, byte[] paramArrayOfByte)
     {
         int i1 = 4;
-        int i2 = ChunkMaxY / 8;
-        int i3 = this.worldSettings.waterLevel;
+        int i2 = this.localWorld.height / 8;
 
         int i4 = i1 + 1;
-        int i5 = ChunkMaxY / 8 + 1;
+        int i5 = this.localWorld.height / 8 + 1;
         int i6 = i1 + 1;
         if (this.worldSettings.oldBiomeGenerator)
         {
@@ -124,22 +123,22 @@ public class ChunkProviderTC extends ChunkGenerator
 
         this.u = a(this.u, paramInt1 * i1, 0, paramInt2 * i1, i4, i5, i6);
 
-        for (int i7 = 0; i7 < i1; i7++)
-            for (int i8 = 0; i8 < i1; i8++)
-                for (int i9 = 0; i9 < i2; i9++)
+        for (int x = 0; x < i1; x++)
+            for (int z = 0; z < i1; z++)
+                for (int y = 0; y < i2; y++)
                 {
                     double d1 = 0.125D;
-                    double d2 = this.u[(((i7 + 0) * i6 + (i8 + 0)) * i5 + (i9 + 0))];
-                    double d3 = this.u[(((i7 + 0) * i6 + (i8 + 1)) * i5 + (i9 + 0))];
-                    double d4 = this.u[(((i7 + 1) * i6 + (i8 + 0)) * i5 + (i9 + 0))];
-                    double d5 = this.u[(((i7 + 1) * i6 + (i8 + 1)) * i5 + (i9 + 0))];
+                    double d2 = this.u[(((x + 0) * i6 + (z + 0)) * i5 + (y + 0))];
+                    double d3 = this.u[(((x + 0) * i6 + (z + 1)) * i5 + (y + 0))];
+                    double d4 = this.u[(((x + 1) * i6 + (z + 0)) * i5 + (y + 0))];
+                    double d5 = this.u[(((x + 1) * i6 + (z + 1)) * i5 + (y + 0))];
 
-                    double d6 = (this.u[(((i7 + 0) * i6 + (i8 + 0)) * i5 + (i9 + 1))] - d2) * d1;
-                    double d7 = (this.u[(((i7 + 0) * i6 + (i8 + 1)) * i5 + (i9 + 1))] - d3) * d1;
-                    double d8 = (this.u[(((i7 + 1) * i6 + (i8 + 0)) * i5 + (i9 + 1))] - d4) * d1;
-                    double d9 = (this.u[(((i7 + 1) * i6 + (i8 + 1)) * i5 + (i9 + 1))] - d5) * d1;
+                    double d6 = (this.u[(((x + 0) * i6 + (z + 0)) * i5 + (y + 1))] - d2) * d1;
+                    double d7 = (this.u[(((x + 0) * i6 + (z + 1)) * i5 + (y + 1))] - d3) * d1;
+                    double d8 = (this.u[(((x + 1) * i6 + (z + 0)) * i5 + (y + 1))] - d4) * d1;
+                    double d9 = (this.u[(((x + 1) * i6 + (z + 1)) * i5 + (y + 1))] - d5) * d1;
 
-                    for (int i10 = 0; i10 < 8; i10++)
+                    for (int piece_y = 0; piece_y < 8; piece_y++)
                     {
                         double d10 = 0.25D;
 
@@ -150,8 +149,8 @@ public class ChunkProviderTC extends ChunkGenerator
 
                         for (int i11 = 0; i11 < 4; i11++)
                         {
-                            int i12 = i11 + i7 * 4 << 11 | 0 + i8 * 4 << 7 | i9 * 8 + i10;
-                            int i13 = 1 << 7;
+                            int position = i11 + x * 4 << this.localWorld.heightBitsPlusFour | 0 + z * 4 << this.localWorld.heightBits | y * 8 + piece_y;
+                            int step = 1 << this.localWorld.heightBits;
                             double d15 = 0.25D;
 
                             double d16 = d11;
@@ -161,7 +160,7 @@ public class ChunkProviderTC extends ChunkGenerator
                                 // TODO Add ice replace
 
                                 int i15 = 0;
-                                if (i9 * 8 + i10 < i3)
+                                if (y * 8 + piece_y < this.localWorld.seaLevel)
                                 {
                                     i15 = this.worldSettings.waterBlock;
                                 }
@@ -171,8 +170,8 @@ public class ChunkProviderTC extends ChunkGenerator
                                     i15 = Block.STONE.id;
                                 }
 
-                                paramArrayOfByte[i12] = (byte) i15;
-                                i12 += i13;
+                                paramArrayOfByte[position] = (byte) i15;
+                                position += step;
                                 d16 += d17;
                             }
                             d11 += d13;
@@ -190,33 +189,37 @@ public class ChunkProviderTC extends ChunkGenerator
 
     boolean ReplaceForBiomeAndReturnWaterless(int paramInt1, int paramInt2, byte[] paramArrayOfByte, BiomeBase[] paramArrayOfBiomeBase)
     {
-        int waterLevel = this.worldSettings.waterLevel;
+        int waterLevel = this.localWorld.seaLevel;
         int dryBlock = 256;
 
         double d1 = 0.03125D;
         this.v = this.r.a(this.v, paramInt1 * 16, paramInt2 * 16, 0, 16, 16, 1, d1 * 2.0D, d1 * 2.0D, d1 * 2.0D);
+        float[] arrayOfFloat = this.localWorld.getWorldChunkManager().a(paramInt1 * 16, paramInt2 * 16, 16, 16);
+
 
         for (int x = 0; x < 16; x++)
             for (int z = 0; z < 16; z++)
             {
+                float f1 = arrayOfFloat[(x + z * 16)];
+
                 BiomeBase localBiomeBase = paramArrayOfBiomeBase[(z + x * 16)];
                 int i4 = (int) (this.v[(x + z * 16)] / 3.0D + 3.0D + this.rnd.nextDouble() * 0.25D);
 
                 int i5 = -1;
 
-                int i6 = this.worldSettings.biomeConfigs[localBiomeBase.y].SurfaceBlock;
-                int i7 = this.worldSettings.biomeConfigs[localBiomeBase.y].GroundBlock;
+                int i6 = this.worldSettings.biomeConfigs[localBiomeBase.F].SurfaceBlock;
+                int i7 = this.worldSettings.biomeConfigs[localBiomeBase.F].GroundBlock;
 
                 if (this.worldSettings.ceilingBedrock)
-                    paramArrayOfByte[(z * 16 + x) * 128 + 127] = (byte)this.worldSettings.bedrockBlock;
+                    paramArrayOfByte[(z * 16 + x) * 128 + 127] = (byte) this.worldSettings.bedrockBlock;
 
-                for (int y = 127; y >= 0; y--)
+                for (int y = this.localWorld.heightMinusOne; y >= 0; y--)
                 {
-                    int i9 = (z * 16 + x) * 128 + y;
+                    int i9 = (z * 16 + x) * this.localWorld.height + y;
 
                     if (y < 5 && (worldSettings.createAdminium(y)) && y <= this.rnd.nextInt(5))
                     {
-                        paramArrayOfByte[i9] = (byte)this.worldSettings.bedrockBlock;
+                        paramArrayOfByte[i9] = (byte) this.worldSettings.bedrockBlock;
                     } else
                     {
                         int i10 = paramArrayOfByte[i9];
@@ -232,12 +235,17 @@ public class ChunkProviderTC extends ChunkGenerator
                                     i7 = (byte) Block.STONE.id;
                                 } else if ((y >= waterLevel - 4) && (y <= waterLevel + 1))
                                 {
-                                    i6 = this.worldSettings.biomeConfigs[localBiomeBase.y].SurfaceBlock;
-                                    i7 = this.worldSettings.biomeConfigs[localBiomeBase.y].GroundBlock;
+                                    i6 = this.worldSettings.biomeConfigs[localBiomeBase.F].SurfaceBlock;
+                                    i7 = this.worldSettings.biomeConfigs[localBiomeBase.F].GroundBlock;
                                 }
 
                                 if ((y < waterLevel) && (i6 == 0))
-                                    i6 = (byte) this.worldSettings.waterBlock;
+                                {
+                                    if (f1 < 0.15F)
+                                        i6 = (byte) this.worldSettings.iceBlock;
+                                    else
+                                        i6 = (byte) this.worldSettings.waterBlock;
+                                }
 
                                 i5 = i4;
                                 if (y >= waterLevel - 1)
@@ -274,13 +282,13 @@ public class ChunkProviderTC extends ChunkGenerator
                             }
                     }
                 }
-                if(paramArrayOfByte[(z * 16 + x) * 128 + this.worldSettings.waterLevel] == this.worldSettings.waterBlock)
+                if (paramArrayOfByte[(z * 16 + x) * 128 + this.worldSettings.waterLevel] == this.worldSettings.waterBlock)
                     dryBlock--;
 
 
             }
 
-        return dryBlock>250;
+        return dryBlock > 250;
     }
 
 
@@ -346,7 +354,7 @@ public class ChunkProviderTC extends ChunkGenerator
                 {
                     double d7;
 
-                    double d8 = (i10 - biomeFactor2) * 12.0D / biomeFactor;
+                    double d8 = (i10 - biomeFactor2) * 12.0D * 128.0D / this.localWorld.height / biomeFactor;
 
                     if (d8 < 0.0D)
                         d8 *= 4.0D;
@@ -393,7 +401,7 @@ public class ChunkProviderTC extends ChunkGenerator
         } else
         {
             BiomeBase localBiomeBase1 = this.BiomeArray[(x + 2 + (z + 2) * (paramInt4 + 5))];
-            this.biomeFactor = (1.0D - localBiomeBase1.r * localBiomeBase1.t);
+            this.biomeFactor = (1.0D - localBiomeBase1.y * localBiomeBase1.z);
         }
         this.biomeFactor *= this.biomeFactor;
         this.biomeFactor = 1.0D - this.biomeFactor * this.biomeFactor;
@@ -425,13 +433,13 @@ public class ChunkProviderTC extends ChunkGenerator
             for (int i9 = -i7; i9 <= i7; i9++)
             {
                 BiomeBase localBiomeBase2 = this.BiomeArray[(x + i8 + 2 + (z + i9 + 2) * (paramInt4 + 5))];
-                float f5 = this.l[(i8 + 2 + (i9 + 2) * 5)] / (this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeHeight + 2.0F);
-                if (this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeHeight > this.worldSettings.biomeConfigs[localBiomeBase1.y].BiomeHeight)
+                float f5 = this.l[(i8 + 2 + (i9 + 2) * 5)] / (this.worldSettings.biomeConfigs[localBiomeBase2.F].BiomeHeight + 2.0F);
+                if (this.worldSettings.biomeConfigs[localBiomeBase2.F].BiomeHeight > this.worldSettings.biomeConfigs[localBiomeBase1.F].BiomeHeight)
                 {
                     f5 /= 2.0F;
                 }
-                f2 += this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeVolatility * f5;
-                f3 += this.worldSettings.biomeConfigs[localBiomeBase2.y].BiomeHeight * f5;
+                f2 += this.worldSettings.biomeConfigs[localBiomeBase2.F].BiomeVolatility * f5;
+                f3 += this.worldSettings.biomeConfigs[localBiomeBase2.F].BiomeHeight * f5;
                 f4 += f5;
             }
         }
@@ -471,7 +479,7 @@ public class ChunkProviderTC extends ChunkGenerator
         for (int x = swampSize * -1; x < swampSize + 1; x++)
             for (int z = swampSize * -1; z < swampSize + 1; z++)
             {
-                int newBlock = block + z * ChunkMaxY + x * ChunkMaxY * ChunkMaxZ;
+                int newBlock = block + z * this.localWorld.height + x * this.localWorld.height * ChunkMaxZ;
                 if ((newBlock < 0) || (newBlock > TCDefaultValues.maxChunkBlockValue.intValue() - 1))
                     continue;
                 if (blocks[newBlock] != Block.STATIONARY_WATER.id)
@@ -488,7 +496,7 @@ public class ChunkProviderTC extends ChunkGenerator
 
         this.rnd.setSeed(x * 341873128712L + z * 132897987541L);
 
-        byte[] arrayOfByte = new byte[ChunkMaxX * ChunkMaxY * ChunkMaxZ];
+        byte[] arrayOfByte = new byte[ChunkMaxX * this.localWorld.height * ChunkMaxZ];
 
 
         generateTerrain(x, z, arrayOfByte);
@@ -497,6 +505,7 @@ public class ChunkProviderTC extends ChunkGenerator
         boolean dry = ReplaceForBiomeAndReturnWaterless(x, z, arrayOfByte, this.BiomeArray);
 
         this.CaveGen.a(x, z, arrayOfByte);
+        this.CanyonGen.a(x, z, arrayOfByte);
 
         if (this.worldSettings.StrongholdsEnabled)
             this.strongholdGen.a(null, this.localWorld, x, z, arrayOfByte);
@@ -505,8 +514,6 @@ public class ChunkProviderTC extends ChunkGenerator
             this.MineshaftGen.a(null, this.localWorld, x, z, arrayOfByte);
         if (this.worldSettings.VillagesEnabled && dry)
             this.VillageGen.a(null, this.localWorld, x, z, arrayOfByte);
-
-        this.CanyonGen.a(x, z, arrayOfByte);
 
 
         if (this.worldSettings.isDeprecated)

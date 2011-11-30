@@ -3,10 +3,10 @@ package com.Khorn.TerrainControl;
 import java.io.*;
 import java.util.HashMap;
 
+import com.Khorn.TerrainControl.BiomeManager.BiomeManager;
+import com.Khorn.TerrainControl.BiomeManager.BiomeManagerOld;
 import com.Khorn.TerrainControl.Commands.TCCommandExecutor;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.Generator.BiomeManager;
-import com.Khorn.TerrainControl.Generator.BiomeManagerOld;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTest;
 import com.Khorn.TerrainControl.Listeners.TCBlockListener;

@@ -1,6 +1,7 @@
-package com.Khorn.TerrainControl.Generator;
+package com.Khorn.TerrainControl.BiomeManager;
 
 
+import com.Khorn.TerrainControl.BiomeManager.Layers.Layer;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import net.minecraft.server.*;
 
@@ -10,12 +11,13 @@ import java.util.Random;
 
 public class BiomeManager extends WorldChunkManager
 {
-    private GenLayer RiverLayer;
-    private GenLayer VoronoiAlgoritmLayer;
-    private GenLayer TemperatureLayer;
-    private GenLayer DownfallLayer;
+    private Layer ZoomedLayer;
+    private Layer BiomeLayer;
+    private Layer TemperatureLayer;
+    private Layer DownfallLayer;
     private BiomeCache Cache = new BiomeCache(this);
     private ArrayList<BiomeBase> f = new ArrayList<BiomeBase>();
+    private float[] buffer;
 
     private WorldConfig worldConfig;
 
@@ -27,80 +29,19 @@ public class BiomeManager extends WorldChunkManager
         this.f.add(BiomeBase.TAIGA);
         this.worldConfig = config;
 
-        this.InitLayers(paramWorld.getSeed());
+        Layer[] layers = Layer.a(paramWorld.getSeed(),config);
 
-    }
+        this.ZoomedLayer = layers[0];
+        this.BiomeLayer = layers[1];
+        this.TemperatureLayer = layers[2];
+        this.DownfallLayer = layers[3];
 
-    private void InitLayers(long paramLong)
-    {
-        GenLayer LandLayer = new LayerIsland(1L);
-        LandLayer = new GenLayerZoomFuzzy(2000L, LandLayer);
-
-        for (int s = 1; s < this.worldConfig.landSize; s++)
-        {
-            LandLayer = new GenLayerIsland(s, LandLayer);
-            LandLayer = new GenLayerZoom(2000 + s, LandLayer);
-        }
-
-
-        int i = this.worldConfig.biomeSize;
-
-        GenLayer RiverLayer = LandLayer;
-        if (this.worldConfig.riversEnabled)
-        {
-
-            RiverLayer = GenLayerZoom.a(1000L, RiverLayer, 0);
-            RiverLayer = new GenLayerRiverInit(100L, RiverLayer);
-            RiverLayer = GenLayerZoom.a(1000L, RiverLayer, i + 2);
-            RiverLayer = new GenLayerRiver(1L, RiverLayer);
-            RiverLayer = new GenLayerSmooth(1000L, RiverLayer);
-        }
-
-        GenLayer BiomeLayer = LandLayer;
-        BiomeLayer = GenLayerZoom.a(1000L, BiomeLayer, 0);
-        BiomeLayer = new GenLayerBiomeTC(200L, BiomeLayer, this.worldConfig);
-        BiomeLayer = GenLayerZoom.a(1000L, BiomeLayer, 2);
-
-        GenLayer TemperatureLayer = new GenLayerTemperature(BiomeLayer);
-        GenLayer DownfallLayer = new GenLayerDownfall(BiomeLayer);
-
-        for (int j = 0; j < i; j++)
-        {
-            BiomeLayer = new GenLayerZoom(1000 + j, BiomeLayer);
-            if (j == 0)
-                BiomeLayer = new GenLayerIsland(3L, BiomeLayer);
-            TemperatureLayer = new GenLayerSmoothZoom(1000 + j, TemperatureLayer);
-            TemperatureLayer = new GenLayerTemperatureMix(TemperatureLayer, BiomeLayer, j);
-            DownfallLayer = new GenLayerSmoothZoom(1000 + j, DownfallLayer);
-            DownfallLayer = new GenLayerDownfallMix(DownfallLayer, BiomeLayer, j);
-        }
-
-        BiomeLayer = new GenLayerSmooth(1000L, BiomeLayer);
-
-        if (this.worldConfig.riversEnabled)
-            BiomeLayer = new GenLayerRiverMix(100L, BiomeLayer, RiverLayer);
-
-        TemperatureLayer = GenLayerSmoothZoom.a(1000L, TemperatureLayer, 2);
-        DownfallLayer = GenLayerSmoothZoom.a(1000L, DownfallLayer, 2);
-
-        GenLayerZoomVoronoi ZoomVoronoiLayer = new GenLayerZoomVoronoi(10L, BiomeLayer);
-
-        BiomeLayer.b(paramLong);
-        TemperatureLayer.b(paramLong);
-        DownfallLayer.b(paramLong);
-
-        ZoomVoronoiLayer.b(paramLong);
-
-        this.RiverLayer = BiomeLayer;
-        this.VoronoiAlgoritmLayer = ZoomVoronoiLayer;
-        this.TemperatureLayer = TemperatureLayer;
-        this.DownfallLayer = DownfallLayer;
     }
 
 
     public List a()
     {
-            return this.f;
+        return this.f;
     }
 
     public BiomeBase a(ChunkCoordIntPair paramChunkCoordIntPair)
@@ -110,7 +51,7 @@ public class BiomeManager extends WorldChunkManager
 
     public BiomeBase getBiome(int paramInt1, int paramInt2)
     {
-        return this.Cache.a(paramInt1, paramInt2);
+        return this.Cache.b(paramInt1, paramInt2);
     }
 
 
@@ -134,6 +75,19 @@ public class BiomeManager extends WorldChunkManager
         }
 
         return paramArrayOfFloat;
+    }
+
+    @Override
+    public float a(int i, int i1, int i2)
+    {
+        return a(this.Cache.c(i, i1), i2);
+    }
+
+    @Override
+    public float[] a(int i, int i1, int i2, int i3)
+    {
+        this.buffer = getTemperatures(this.buffer, i, i1, i2, i3);
+        return this.buffer;
     }
 
     public float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
@@ -166,7 +120,7 @@ public class BiomeManager extends WorldChunkManager
             paramArrayOfBiomeBase = new BiomeBase[paramInt3 * paramInt4];
         }
 
-        int[] arrayOfInt = this.RiverLayer.a(paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt = this.ZoomedLayer.a(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
             paramArrayOfBiomeBase[i] = BiomeBase.a[arrayOfInt[i]];
@@ -190,12 +144,12 @@ public class BiomeManager extends WorldChunkManager
 
         if ((paramBoolean) && (paramInt3 == 16) && (paramInt4 == 16) && ((paramInt1 & 0xF) == 0) && ((paramInt2 & 0xF) == 0))
         {
-            BiomeBase[] localObject = this.Cache.b(paramInt1, paramInt2);
+            BiomeBase[] localObject = this.Cache.d(paramInt1, paramInt2);
             System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, paramInt3 * paramInt4);
             return paramArrayOfBiomeBase;
         }
 
-        int[] localObject = this.VoronoiAlgoritmLayer.a(paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] localObject = this.BiomeLayer.a(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
             paramArrayOfBiomeBase[i] = BiomeBase.a[localObject[i]];
@@ -214,7 +168,7 @@ public class BiomeManager extends WorldChunkManager
         int n = k - i + 1;
         int i1 = m - j + 1;
 
-        int[] arrayOfInt = this.RiverLayer.a(i, j, n, i1);
+        int[] arrayOfInt = this.ZoomedLayer.a(i, j, n, i1);
         for (int i2 = 0; i2 < n * i1; i2++)
         {
             BiomeBase localBiomeBase = BiomeBase.a[arrayOfInt[i2]];
@@ -234,7 +188,7 @@ public class BiomeManager extends WorldChunkManager
 
         int n = k - i + 1;
         int i1 = m - j + 1;
-        int[] arrayOfInt = this.RiverLayer.a(i, j, n, i1);
+        int[] arrayOfInt = this.ZoomedLayer.a(i, j, n, i1);
         ChunkPosition localChunkPosition = null;
         int i2 = 0;
         for (int i3 = 0; i3 < arrayOfInt.length; i3++)

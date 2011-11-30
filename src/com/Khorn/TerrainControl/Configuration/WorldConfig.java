@@ -17,6 +17,8 @@ public class WorldConfig extends ConfigFile
 
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
 
+    public ArrayList<String> NormalBiomes = new ArrayList<String>();
+
     public ArrayList<CustomObject> Objects = new ArrayList<CustomObject>();
     public HashMap<String, ArrayList<CustomObject>> ObjectGroups = new HashMap<String, ArrayList<CustomObject>>();
     public HashMap<String, ArrayList<CustomObject>> BranchGroups = new HashMap<String, ArrayList<CustomObject>>();
@@ -42,6 +44,20 @@ public class WorldConfig extends ConfigFile
     // For 1.9
     public double snowThreshold;
     public double iceThreshold;
+
+    // Biome generator
+    public int GenerationDepth;
+
+    public int LandRarity;
+    public int LandSize;
+    public int LandFuzzy;
+
+    public int IceRarity;
+    public int IceSize;
+
+    public int RiverRarity;
+    public int RiverSize;
+
 
     //Specific biome settings
     public boolean muddySwamps;
@@ -78,6 +94,7 @@ public class WorldConfig extends ConfigFile
 
     public int waterLevel;
     public int waterBlock;
+    public int iceBlock;
     public double maxAverageHeight;
     public double maxAverageDepth;
     private double fractureHorizontal;
@@ -361,7 +378,7 @@ public class WorldConfig extends ConfigFile
             {
                 boolean isUnique = true;
                 for (int i = 0; i < DefaultBiomesCount; i++)
-                    if (BiomeBase.a[i].l.equals(key))
+                    if (BiomeBase.a[i].r.equals(key))
                         isUnique = false;
 
                 if (isUnique && !this.CustomBiomes.contains(key))
