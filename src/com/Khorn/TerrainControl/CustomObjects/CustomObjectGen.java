@@ -192,7 +192,7 @@ public class CustomObjectGen
                     int directionCounter = 0;
                     while (directionCounter < (DataPoint.branchDirection))
                     {
-                        untranslatedCoordinate.rotateSliceC();
+                        untranslatedCoordinate.Rotate();
                         directionCounter++;
                     }
 
@@ -221,7 +221,7 @@ public class CustomObjectGen
             Coordinate point = workingData.get(index);
             while (counter < RotationAmount)
             {
-                point.rotateSliceC();
+                point.Rotate();
                 counter++;
             }
             if(!world.isLoaded(point.getX() + x, point.getY() + y,point.getZ() + z))

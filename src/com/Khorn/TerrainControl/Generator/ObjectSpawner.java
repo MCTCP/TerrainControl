@@ -164,6 +164,7 @@ public class ObjectSpawner extends BlockPopulator
             {
                 int i5 = this.world.e(i1 + _x, i2 + _z);
 
+                float f1 = this.world.getWorldChunkManager().a(_x + i1, i5 - 1, _z + i2);
                 if (this.world.p(_x + i1, i5 - 1, _z + i2))
                 {
                     this.world.setTypeId(_x + i1, i5 - 1, _z + i2, Block.ICE.id);

@@ -441,19 +441,38 @@ public class WorldConfig extends ConfigFile
         WriteNewLine();
         WriteValue(TCDefaultValues.RiversEnabled.name(), this.riversEnabled);  */
 
+        WriteComment("Main value for generation.Bigger value increase zoom. All sizes must be smaller than this.");
+        WriteComment("So if you want big biome object you must set size of object near 0 ");
+        WriteComment("If you want small object you must set size of object near  GenerationDepth");
+        WriteComment("Also small values (about 1-2) and big values (about 20) may affect generator performance");
         WriteValue(TCDefaultValues.GenerationDepth.name(), this.GenerationDepth);
+        WriteNewLine();
 
+        WriteComment("Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
         WriteValue(TCDefaultValues.LandRarity.name(), this.LandRarity);
+        WriteNewLine();
+        WriteComment("Land size from 0 to GenerationDepth.");
         WriteValue(TCDefaultValues.LandSize.name(), this.LandSize);
+        WriteNewLine();
+        WriteComment("Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
         WriteValue(TCDefaultValues.LandFuzzy.name(), this.LandFuzzy);
+        WriteNewLine();
 
+        WriteComment("Ice areas rarity from 100 to 1. If you set smaller than 90 and IceSize near 0 beware ice world");
         WriteValue(TCDefaultValues.IceRarity.name(), this.IceRarity);
+        WriteNewLine();
+        WriteComment("Ice area size from 0 to GenerationDepth.");
         WriteValue(TCDefaultValues.IceSize.name(), this.IceSize);
+        WriteNewLine();
 
+        WriteComment("River rarity.Must be from 0 to GenerationDepth.");
         WriteValue(TCDefaultValues.RiverRarity.name(), this.RiverRarity);
+        WriteNewLine();
+        WriteComment("River size from 0 to GenerationDepth - RiverRarity");
         WriteValue(TCDefaultValues.RiverSize.name(), this.RiverSize);
+        WriteNewLine();
 
-
+        WriteComment("Biomes which used in normal biome algorithm. Include ice biomes. Biome name is case sensitive.");
         WriteNormalBiomesSettings();
 
 

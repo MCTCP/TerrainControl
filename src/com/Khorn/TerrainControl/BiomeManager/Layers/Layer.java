@@ -204,7 +204,8 @@ public abstract class Layer
         Layer TemperatureLayer = new LayerTemperature(MainLayer, config);
         TemperatureLayer = LayerSmoothZoom.a(1000L, TemperatureLayer, 2);
 
-        Layer DownfallLayer = MainLayer;
+        Layer DownfallLayer = new LayerDownfall(MainLayer, config);
+        DownfallLayer = LayerSmoothZoom.a(1000L, DownfallLayer, 2);
 
 
         Layer ZoomedLayer = new LayerZoomVoronoi(10L, MainLayer);
@@ -213,6 +214,7 @@ public abstract class Layer
 
         ZoomedLayer.b(paramLong);
         TemperatureLayer.b(paramLong);
+        DownfallLayer.b(paramLong);
 
         return new Layer[]{MainLayer, ZoomedLayer, TemperatureLayer, DownfallLayer};
     }

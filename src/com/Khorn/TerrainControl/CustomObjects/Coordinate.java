@@ -1,5 +1,9 @@
 package com.Khorn.TerrainControl.CustomObjects;
 
+import net.minecraft.server.Block;
+import org.bukkit.Material;
+
+@SuppressWarnings({"PointlessBitwiseExpression"})
 public class Coordinate
 {
 
@@ -36,251 +40,218 @@ public class Coordinate
     {
         return z;
     }
-    public int getChunkX(int _x )
+
+    public int getChunkX(int _x)
     {
-        return (_x + x )>>4;
-    }
-    public  int getChunkZ(int _z)
-    {
-        return (_z + z )>>4;
+        return (_x + x) >> 4;
     }
 
-    public void rotateSliceC()
+    public int getChunkZ(int _z)
     {
-        // torches
-        if ((workingData == 50) || (workingData == 75) || (workingData == 76))
+        return (_z + z) >> 4;
+    }
+
+    public static int RotateData(int type, int data)
+    {
+
+        switch (type)
         {
-            if (workingExtra == 1)
-            {
-                workingExtra = 3;
-            } else if (workingExtra == 2)
-            {
-                workingExtra = 4;
-            } else if (workingExtra == 3)
-            {
-                workingExtra = 2;
-            } else if (workingExtra == 4)
-            {
-                workingExtra = 1;
-            }
-        }
-        // rails
-        else if ((workingData == 66) || (workingData == 27) || (workingData == 28))
-        {
-            if (workingExtra < 2)
-            {
-                if (workingExtra == 1)
+            case 50:
+            case 75:
+            case 76:
+                switch (data)
                 {
-                    workingExtra = 0;
-                } else
-                {
-                    workingExtra = 1;
+                    case 1:
+                        return 3;
+                    case 2:
+                        return 4;
+                    case 3:
+                        return 2;
+                    case 4:
+                        return 1;
                 }
-            } else
-            {
-                if (workingExtra == 2)
+                break;
+            case 66:
+                switch (data)
                 {
-                    workingExtra = 4;
-                } else if (workingExtra == 3)
-                {
-                    workingExtra = 5;
-                } else if (workingExtra == 4)
-                {
-                    workingExtra = 3;
-                } else if (workingExtra == 5)
-                {
-                    workingExtra = 2;
+                    case 6:
+                        return 7;
+                    case 7:
+                        return 8;
+                    case 8:
+                        return 9;
+                    case 9:
+                        return 6;
                 }
-            }
-        }
-        // ladder
-        else if (workingData == 65)
-        {
-            if (workingExtra == 2)
-            {
-                workingExtra = 5;
-            } else if (workingExtra == 3)
-            {
-                workingExtra = 4;
-            } else if (workingExtra == 4)
-            {
-                workingExtra = 2;
-            } else if (workingExtra == 5)
-            {
-                workingExtra = 3;
-            }
-        }
-        // stairs
-        else if ((workingData == 53) || (workingData == 67))
-        {
-            if (workingExtra == 0)
-            {
-                workingExtra = 2;
-            } else if (workingExtra == 1)
-            {
-                workingExtra = 3;
-            } else if (workingExtra == 2)
-            {
-                workingExtra = 1;
-            } else if (workingExtra == 3)
-            {
-                workingExtra = 0;
-            }
-        }
-        // levers
-        else if (workingData == 69)
-        {
-            if (workingExtra > 8)
-            {
-                if (workingExtra == 9)
+
+            case 27:
+            case 28:
+                switch (data & 0x7)
                 {
-                    workingExtra = 11;
-                } else if (workingExtra == 2)
-                {
-                    workingExtra = 12;
-                } else if (workingExtra == 3)
-                {
-                    workingExtra = 10;
-                } else if (workingExtra == 4)
-                {
-                    workingExtra = 9;
+                    case 0:
+                        return 0x1 | data & 0xFFFFFFF8;
+                    case 1:
+                        return 0x0 | data & 0xFFFFFFF8;
+                    case 2:
+                        return 0x5 | data & 0xFFFFFFF8;
+                    case 3:
+                        return 0x4 | data & 0xFFFFFFF8;
+                    case 4:
+                        return 0x2 | data & 0xFFFFFFF8;
+                    case 5:
+                        return 0x3 | data & 0xFFFFFFF8;
                 }
-            } else
-            {
-                if (workingExtra == 1)
+                break;
+            case 53:
+            case 67:
+            case 108:
+            case 109:
+            case 114:
+                switch (data)
                 {
-                    workingExtra = 3;
-                } else if (workingExtra == 2)
-                {
-                    workingExtra = 4;
-                } else if (workingExtra == 3)
-                {
-                    workingExtra = 2;
-                } else if (workingExtra == 4)
-                {
-                    workingExtra = 1;
+                    case 0:
+                        return 2;
+                    case 1:
+                        return 3;
+                    case 2:
+                        return 1;
+                    case 3:
+                        return 0;
                 }
-            }
+                break;
+            case 69:
+            case 77:
+                int thrown = data & 0x8;
+                int withoutThrown = data & 0xFFFFFFF7;
+                switch (withoutThrown)
+                {
+                    case 1:
+                        return 0x3 | thrown;
+                    case 2:
+                        return 0x4 | thrown;
+                    case 3:
+                        return 0x2 | thrown;
+                    case 4:
+                        return 0x1 | thrown;
+                }
+                break;
+            case 64:
+            case 71:
+                int topHalf = data & 0x8;
+                int swung = data & 0x4;
+                int withoutFlags = data & 0xFFFFFFF3;
+                switch (withoutFlags)
+                {
+                    case 0:
+                        return 0x1 | topHalf | swung;
+                    case 1:
+                        return 0x2 | topHalf | swung;
+                    case 2:
+                        return 0x3 | topHalf | swung;
+                    case 3:
+                        return 0x0 | topHalf | swung;
+                }
+                break;
+            case 63:
+                return (data + 4) % 16;
+            case 23:
+            case 54:
+            case 61:
+            case 62:
+            case 65:
+            case 68:
+                switch (data)
+                {
+                    case 2:
+                        return 5;
+                    case 3:
+                        return 4;
+                    case 4:
+                        return 2;
+                    case 5:
+                        return 3;
+                }
+                break;
+            case 86:
+            case 91:
+                switch (data)
+                {
+                    case 0:
+                        return 1;
+                    case 1:
+                        return 2;
+                    case 2:
+                        return 3;
+                    case 3:
+                        return 0;
+                }
+                break;
+            case 93:
+            case 94:
+                int dir = data & 0x3;
+                int delay = data - dir;
+                switch (dir)
+                {
+                    case 0:
+                        return 0x1 | delay;
+                    case 1:
+                        return 0x2 | delay;
+                    case 2:
+                        return 0x3 | delay;
+                    case 3:
+                        return 0x0 | delay;
+                }
+                break;
+            case 96:
+                int withoutOrientation = data & 0xFFFFFFFC;
+                int orientation = data & 0x3;
+                switch (orientation)
+                {
+                    case 0:
+                        return 0x3 | withoutOrientation;
+                    case 1:
+                        return 0x2 | withoutOrientation;
+                    case 2:
+                        return 0x0 | withoutOrientation;
+                    case 3:
+                        return 0x1 | withoutOrientation;
+                }
+                break;
+            case 29:
+            case 33:
+            case 34:
+                int rest = data & 0xFFFFFFF8;
+                switch (data & 0x7)
+                {
+                    case 2:
+                        return 0x5 | rest;
+                    case 3:
+                        return 0x4 | rest;
+                    case 4:
+                        return 0x2 | rest;
+                    case 5:
+                        return 0x3 | rest;
+                }
+                break;
+            case 99:
+            case 100:
+                if (data >= 10)
+                    return data;
+                return data * 3 % 10;
+            case 106:
+                return (data << 1 | data >> 3) & 0xF;
+            case 107:
+                return data + 1 & 0x3 | data & 0xFFFFFFFC;
+
         }
-        // doors
-        else if ((workingData == 64) || (workingData == 71))
-        {
-            if (workingExtra < 8)
-            {
-                workingExtra = workingExtra + 1;
-                if (workingExtra > 3)
-                {
-                    workingExtra = 0;
-                }
-            } else
-            {
-                workingExtra = workingExtra + 1;
-                if (workingExtra > 11)
-                {
-                    workingExtra = 8;
-                }
-            }
-        }
-        // sign post
-        else if (workingData == 63)
-        {
-            workingExtra = workingExtra + 1;
-            if (workingExtra > 15)
-            {
-                workingExtra = 0;
-            }
-        }
-        // wall signs
-        else if (workingData == 68)
-        {
-            if (workingExtra == 2)
-            {
-                workingExtra = 5;
-            } else if (workingExtra == 3)
-            {
-                workingExtra = 4;
-            } else if (workingExtra == 4)
-            {
-                workingExtra = 2;
-            } else if (workingExtra == 5)
-            {
-                workingExtra = 3;
-            }
-        }
-        // furnaces and dispensrs
-        else if ((workingData == 61) || (workingData == 62) || (workingData == 23))
-        {
-            if (workingExtra == 2)
-            {
-                workingExtra = 5;
-            } else if (workingExtra == 3)
-            {
-                workingExtra = 4;
-            } else if (workingExtra == 4)
-            {
-                workingExtra = 2;
-            } else if (workingExtra == 5)
-            {
-                workingExtra = 3;
-            }
-        }
-        // pumpkins and JOLs
-        else if ((workingData == 86) || (workingData == 91))
-        {
-            workingExtra = workingExtra + 1;
-        }
-        // beds
-        else if (workingData == 26)
-        {
-            if (workingExtra > 7)
-            {
-                workingExtra = workingExtra + 1;
-                if (workingExtra > 11)
-                {
-                    workingExtra = 8;
-                }
-            } else
-            {
-                workingExtra = workingExtra + 1;
-                if (workingExtra > 3)
-                {
-                    workingExtra = 0;
-                }
-            }
-        }
-        // redstone repeater/delayer
-        else if ((workingData == 93) || (workingData == 94))
-        {
-            if ((workingExtra < 4) && (workingExtra > -1))
-            {
-                workingExtra = workingExtra + 1;
-                if (workingExtra > 3)
-                {
-                    workingExtra = 0;
-                }
-            } else if ((workingExtra < 8) && (workingExtra > 3))
-            {
-                workingExtra = workingExtra + 1;
-                if (workingExtra > 7)
-                {
-                    workingExtra = 4;
-                }
-            } else if ((workingExtra < 12) && (workingExtra > 7))
-            {
-                workingExtra = workingExtra + 1;
-                if (workingExtra > 11)
-                {
-                    workingExtra = 8;
-                }
-            } else if ((workingExtra < 16) && (workingExtra > 11))
-            {
-                workingExtra = workingExtra + 1;
-                if (workingExtra > 15)
-                {
-                    workingExtra = 12;
-                }
-            }
-        }
+
+        return data;
+    }
+
+
+    public void Rotate()
+    {
+        this.workingExtra = RotateData(this.workingData,this.workingExtra);
         if (branchDirection != -1)
         {
             branchDirection = branchDirection + 1;
@@ -332,15 +303,16 @@ public class Coordinate
         copy.branchOdds = this.branchOdds;
         return copy;
     }
-    
+
     public Coordinate GetCopy()
     {
         return this.GetCopy(x, y, z, dataString, Digs);
 
     }
+
     public Coordinate GetSumm(Coordinate workCoord)
     {
         return this.GetCopy(x + workCoord.getX(), y + workCoord.getY(), z + workCoord.getZ(), dataString, Digs);
-        
+
     }
 }

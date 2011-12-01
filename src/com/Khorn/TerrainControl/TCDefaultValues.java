@@ -16,7 +16,7 @@ public enum TCDefaultValues
     Mode("Normal"),
 
     GenerationDepth(10),
-    LandRarity(97),
+    LandRarity(94),
     LandSize(1),
     LandFuzzy(6),
     IceRarity(90),

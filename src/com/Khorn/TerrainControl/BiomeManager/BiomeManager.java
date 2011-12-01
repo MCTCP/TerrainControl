@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class BiomeManager extends WorldChunkManager
 {
-    private Layer ZoomedLayer;
+    private Layer UnZoomedLayer;
     private Layer BiomeLayer;
     private Layer TemperatureLayer;
     private Layer DownfallLayer;
@@ -31,7 +31,7 @@ public class BiomeManager extends WorldChunkManager
 
         Layer[] layers = Layer.a(paramWorld.getSeed(),config);
 
-        this.ZoomedLayer = layers[0];
+        this.UnZoomedLayer = layers[0];
         this.BiomeLayer = layers[1];
         this.TemperatureLayer = layers[2];
         this.DownfallLayer = layers[3];
@@ -80,7 +80,7 @@ public class BiomeManager extends WorldChunkManager
     @Override
     public float a(int i, int i1, int i2)
     {
-        return a(this.Cache.c(i, i1), i2);
+        return a(this.Cache.c(i, i2), i1);
     }
 
     @Override
@@ -120,7 +120,7 @@ public class BiomeManager extends WorldChunkManager
             paramArrayOfBiomeBase = new BiomeBase[paramInt3 * paramInt4];
         }
 
-        int[] arrayOfInt = this.ZoomedLayer.a(paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt = this.UnZoomedLayer.a(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
             paramArrayOfBiomeBase[i] = BiomeBase.a[arrayOfInt[i]];
@@ -168,7 +168,7 @@ public class BiomeManager extends WorldChunkManager
         int n = k - i + 1;
         int i1 = m - j + 1;
 
-        int[] arrayOfInt = this.ZoomedLayer.a(i, j, n, i1);
+        int[] arrayOfInt = this.UnZoomedLayer.a(i, j, n, i1);
         for (int i2 = 0; i2 < n * i1; i2++)
         {
             BiomeBase localBiomeBase = BiomeBase.a[arrayOfInt[i2]];
@@ -188,7 +188,7 @@ public class BiomeManager extends WorldChunkManager
 
         int n = k - i + 1;
         int i1 = m - j + 1;
-        int[] arrayOfInt = this.ZoomedLayer.a(i, j, n, i1);
+        int[] arrayOfInt = this.UnZoomedLayer.a(i, j, n, i1);
         ChunkPosition localChunkPosition = null;
         int i2 = 0;
         for (int i3 = 0; i3 < arrayOfInt.length; i3++)

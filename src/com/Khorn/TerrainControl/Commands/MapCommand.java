@@ -25,9 +25,9 @@ public class MapCommand extends BaseCommand
     public boolean onCommand(CommandSender sender, List<String> args)
     {
 
-        World world = ((CraftWorld)((Player) sender).getWorld()).getHandle();
+        World world = ((CraftWorld) ((Player) sender).getWorld()).getHandle();
 
-        MapWriter.GenerateMaps(world, 200, 200);
+        MapWriter.GenerateMaps(this.plugin, world, 200, 200);
 
         sender.sendMessage(MessageColor + "Done!");
         return true;

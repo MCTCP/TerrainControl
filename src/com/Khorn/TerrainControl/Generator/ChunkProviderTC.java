@@ -200,7 +200,7 @@ public class ChunkProviderTC extends ChunkGenerator
         for (int x = 0; x < 16; x++)
             for (int z = 0; z < 16; z++)
             {
-                float f1 = arrayOfFloat[(x + z * 16)];
+                float f1 = arrayOfFloat[(z + x * 16)];
 
                 BiomeBase localBiomeBase = paramArrayOfBiomeBase[(z + x * 16)];
                 int i4 = (int) (this.v[(x + z * 16)] / 3.0D + 3.0D + this.rnd.nextDouble() * 0.25D);
@@ -211,7 +211,7 @@ public class ChunkProviderTC extends ChunkGenerator
                 int i7 = this.worldSettings.biomeConfigs[localBiomeBase.F].GroundBlock;
 
                 if (this.worldSettings.ceilingBedrock)
-                    paramArrayOfByte[(z * 16 + x) * 128 + 127] = (byte) this.worldSettings.bedrockBlock;
+                    paramArrayOfByte[(z * 16 + x) * this.localWorld.height + this.localWorld.heightMinusOne] = (byte) this.worldSettings.bedrockBlock;
 
                 for (int y = this.localWorld.heightMinusOne; y >= 0; y--)
                 {
