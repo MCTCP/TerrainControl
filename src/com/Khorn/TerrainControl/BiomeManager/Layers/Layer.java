@@ -8,10 +8,10 @@ import java.util.ArrayList;
 
 public abstract class Layer
 {
-    private long b;
+    protected long b;
     protected Layer a;
     private long c;
-    private long d;
+    protected long d;
 
 
     /*
@@ -71,9 +71,11 @@ public abstract class Layer
 
         for (BiomeConfig biomeConfig : config.biomeConfigs)
         {
+            if (biomeConfig == null)
+                continue;
             if (biomeConfig.IsNormalBiome)
             {
-                if (biomeConfig.IceBiome)
+                if (!biomeConfig.IceBiome)
                     BiomeMap.add(biomeConfig);
                 else
                     BiomeIceMap.add(biomeConfig);
@@ -86,8 +88,9 @@ public abstract class Layer
         Layer MainLayer = new LayerEmpty(1L);
 
 
-        for (int depth = 0; depth < config.GenerationDepth; depth++)
+        for (int depth = 0; depth <= config.GenerationDepth; depth++)
         {
+
             MainLayer = new LayerZoom(2001 + depth, MainLayer);
 
             if (config.LandSize == depth)
@@ -98,6 +101,7 @@ public abstract class Layer
 
             if (depth < (config.LandSize + config.LandFuzzy))
                 MainLayer = new LayerLandRandom(depth, MainLayer);
+
 
             ArrayList<BiomeBase> biomes = new ArrayList<BiomeBase>();
             ArrayList<BiomeBase> iceBiomes = new ArrayList<BiomeBase>();
@@ -130,7 +134,7 @@ public abstract class Layer
                     for (int t = 0; t < biomeConfig.BiomeRarity; t++)
                         iceBiomes.add(biomeConfig.Biome);
 
-                    BiomeMap.remove(biomeConfig);
+                    BiomeIceMap.remove(biomeConfig);
                     continue;
 
                 }
@@ -148,40 +152,57 @@ public abstract class Layer
                 BiomeBase[] biomesArray = new BiomeBase[biomes.size()];
                 LayerBiome layerBiome = new LayerBiome(200, MainLayer);
                 layerBiome.biomes = biomes.toArray(biomesArray);
+                biomesArray = new BiomeBase[iceBiomes.size()];
                 layerBiome.ice_biomes = iceBiomes.toArray(biomesArray);
                 MainLayer = layerBiome;
             }
 
 
-
             if (config.IceSize == depth)
-                MainLayer = new LayerIce(depth, MainLayer,config.IceRarity);
+                MainLayer = new LayerIce(depth, MainLayer, config.IceRarity);
 
             if (config.RiverRarity == depth)
-                MainLayer = new LayerRiverInit(100, MainLayer);
+                MainLayer = new LayerRiverInit(155, MainLayer);
 
-            if ((config.GenerationDepth-config.RiverRarity) == depth)
-                MainLayer = new LayerRiver(1 + depth, MainLayer);
+            if ((config.GenerationDepth - config.RiverSize) == depth)
+                MainLayer = new LayerRiver(5 + depth, MainLayer);
 
-            for(BiomeConfig biomeConfig : config.biomeConfigs)
+            LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, MainLayer);
+            boolean haveBorder = false;
+            for (BiomeConfig biomeConfig : config.biomeConfigs)
             {
+                if (biomeConfig.IsleInBiome != null && biomeConfig.BiomeSize == depth)
+                {
 
+                    LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + depth, MainLayer);
+                    layerBiome.biome = biomeConfig.Biome;
+                    if (biomeConfig.IsleInBiome == BiomeBase.OCEAN)
+                        layerBiome.inOcean = true;
+                    else
+                        layerBiome.inBiome = biomeConfig.IsleInBiome.F;
+                    layerBiome.chance = 101 - biomeConfig.BiomeRarity;
+                    MainLayer = layerBiome;
+                }
 
-
+                if (biomeConfig.BiomeIsBorder != null && biomeConfig.BiomeSize == depth)
+                {
+                    haveBorder = true;
+                    layerBiomeBorder.BiomeBorders[biomeConfig.BiomeIsBorder.F] = biomeConfig.Biome.F;
+                }
             }
-            if (depth == 5)
-                MainLayer = new LayerBiomeInBiome(4000 + depth, MainLayer);
 
-            if (depth == 8)
-                MainLayer = new LayerBiomeBorder(3000 + depth, MainLayer);
+
+            if (haveBorder)
+                MainLayer = layerBiomeBorder;
+
 
         }
-        MainLayer = new LayerMix(1L, MainLayer);
+        MainLayer = new LayerMix(1L, MainLayer, config);
 
         MainLayer = new LayerSmooth(400L, MainLayer);
 
-        Layer TemperatureLayer = new LayerTemperature(MainLayer);
-        TemperatureLayer = new LayerTemperatureMix(TemperatureLayer, MainLayer, 1);
+        Layer TemperatureLayer = new LayerTemperature(MainLayer, config);
+        TemperatureLayer = new LayerTemperatureMix(TemperatureLayer, MainLayer, 1, config);
         TemperatureLayer = LayerSmoothZoom.a(1000L, TemperatureLayer, 2);
 
         Layer DownfallLayer = MainLayer;

@@ -5,7 +5,9 @@ import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import com.Khorn.TerrainControl.Generator.ObjectSpawner;
 import com.Khorn.TerrainControl.TCDefaultValues;
 import com.Khorn.TerrainControl.TCPlugin;
+import com.Khorn.TerrainControl.Util.CustomBiome;
 import net.minecraft.server.BiomeBase;
+import org.bukkit.block.Biome;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,18 +34,12 @@ public class WorldConfig extends ConfigFile
     public boolean oldBiomeGenerator;
     public double oldBiomeSize;
 
-    public int biomeSize;
-    public int landSize;
-    public boolean riversEnabled;
 
     public float minMoisture;
     public float maxMoisture;
     public float minTemperature;
     public float maxTemperature;
 
-    // For 1.9
-    public double snowThreshold;
-    public double iceThreshold;
 
     // Biome generator
     public int GenerationDepth;
@@ -144,7 +140,8 @@ public class WorldConfig extends ConfigFile
     public BiomeConfig[] biomeConfigs;
     public boolean BiomeConfigsHaveReplacement = false;
 
-    public static final int DefaultBiomesCount = 10;
+    public static final int DefaultBiomesCount = 16;
+    public static int ExtendedBiomesCount = 0;
 
 
     public int ChunkMaxY = 128;
@@ -176,24 +173,37 @@ public class WorldConfig extends ConfigFile
         }
         this.biomeConfigs = new BiomeConfig[DefaultBiomesCount + this.CustomBiomes.size()];
 
-        int i = 0;
-        while (i < DefaultBiomesCount)
-        {
+        ArrayList<BiomeBase> biomes = new ArrayList<BiomeBase>();
 
-            BiomeConfig config = new BiomeConfig(BiomeFolder, BiomeBase.a[i], this);
-            this.biomeConfigs[i] = config;
-            if (!this.BiomeConfigsHaveReplacement)
-                this.BiomeConfigsHaveReplacement = config.replaceBlocks.size() > 0;
-            i++;
-        }
+        biomes.addAll(Arrays.asList(BiomeBase.a).subList(0, DefaultBiomesCount));
+
         for (String biomeName : this.CustomBiomes)
         {
-            BiomeConfig config = new BiomeConfig(BiomeFolder, biomeName, i, this);
-            this.biomeConfigs[i] = config;
+            boolean isNew = true;
+            for (int i = DefaultBiomesCount; i < ExtendedBiomesCount; i++)
+                if (BiomeBase.a[i].r.equals(biomeName))
+                    isNew = false;
+            if (isNew)
+                new CustomBiome(ExtendedBiomesCount++, biomeName);
+        }
+
+        for (int i = DefaultBiomesCount; i < ExtendedBiomesCount; i++)
+            if (this.CustomBiomes.contains(BiomeBase.a[i].r))
+                biomes.add(BiomeBase.a[i]);
+
+
+        for (BiomeBase biome : biomes)
+        {
+            BiomeConfig config = new BiomeConfig(BiomeFolder, biome, this);
+            if (this.NormalBiomes.contains(biome.r))
+                config.IsNormalBiome = true;
+            this.biomeConfigs[biome.F] = config;
             if (!this.BiomeConfigsHaveReplacement)
                 this.BiomeConfigsHaveReplacement = config.replaceBlocks.size() > 0;
-            i++;
+
+
         }
+
 
         this.RegisterBOBPlugins();
         this.plugin = plug;
@@ -201,10 +211,23 @@ public class WorldConfig extends ConfigFile
 
     protected void CorrectSettings()
     {
-        this.biomeSize = CheckValue(this.biomeSize, 1, 15);
-        this.landSize = CheckValue(this.landSize, 0, 10);
 
-        this.oldBiomeSize = (this.oldBiomeSize <= 0.0D ? 1.5D : this.oldBiomeSize);
+        this.oldBiomeSize = CheckValue(this.oldBiomeSize, 0.1D, 10.0D);
+
+        this.GenerationDepth = CheckValue(this.GenerationDepth, 1, 20);
+
+
+        this.LandRarity = CheckValue(this.LandRarity, 1, 100);
+        this.LandSize = CheckValue(this.LandSize, 0, this.GenerationDepth);
+        this.LandFuzzy = CheckValue(this.LandFuzzy, 0, this.GenerationDepth - this.LandSize);
+
+
+        this.IceRarity = CheckValue(this.IceRarity, 1, 100);
+        this.IceSize = CheckValue(this.IceSize, 0, this.GenerationDepth);
+
+        this.RiverRarity = CheckValue(this.RiverRarity, 0, this.GenerationDepth);
+        this.RiverSize = CheckValue(this.RiverSize, 0, this.GenerationDepth - this.RiverRarity);
+
 
         this.minMoisture = (this.minMoisture < 0.0F ? 0.0F : this.minMoisture > 1.0F ? 1.0F : this.minMoisture);
         this.minTemperature = (this.minTemperature < 0.0F ? 0.0F : this.minTemperature > 1.0F ? 1.0F : this.minTemperature);
@@ -212,13 +235,10 @@ public class WorldConfig extends ConfigFile
         this.maxTemperature = (this.maxTemperature > 1.0F ? 1.0F : this.maxTemperature < this.minTemperature ? this.minTemperature : this.maxTemperature);
 
 
-        this.snowThreshold = (this.snowThreshold < 0.0D ? 0.0D : this.snowThreshold > 1.0D ? 1.0D : this.snowThreshold);
-        this.iceThreshold = (this.iceThreshold < -1.0D ? -1.0D : this.iceThreshold > 1.0D ? 1.0D : this.iceThreshold);
-
         this.caveRarity = (this.caveRarity < 0 ? 0 : this.caveRarity > 100 ? 100 : this.caveRarity);
         this.caveFrequency = (this.caveFrequency < 0 ? 0 : this.caveFrequency);
-        this.caveMinAltitude = (this.caveMinAltitude < 0 ? 0 : this.caveMinAltitude > TCDefaultValues.yLimit.intValue() - 1 ? TCDefaultValues.yLimit.intValue() - 1 : this.caveMinAltitude);
-        this.caveMaxAltitude = (this.caveMaxAltitude > TCDefaultValues.yLimit.intValue() ? TCDefaultValues.yLimit.intValue() : this.caveMaxAltitude <= this.caveMinAltitude ? this.caveMinAltitude + 1 : this.caveMaxAltitude);
+        this.caveMinAltitude = (this.caveMinAltitude < 0 ? 0 : this.caveMinAltitude > this.ChunkMaxY - 1 ? this.ChunkMaxY - 1 : this.caveMinAltitude);
+        this.caveMaxAltitude = (this.caveMaxAltitude > this.ChunkMaxY ? this.ChunkMaxY : this.caveMaxAltitude <= this.caveMinAltitude ? this.caveMinAltitude + 1 : this.caveMaxAltitude);
         this.individualCaveRarity = (this.individualCaveRarity < 0 ? 0 : this.individualCaveRarity);
         this.caveSystemFrequency = (this.caveSystemFrequency < 0 ? 0 : this.caveSystemFrequency);
         this.caveSystemPocketChance = (this.caveSystemPocketChance < 0 ? 0 : this.caveSystemPocketChance > 100 ? 100 : this.caveSystemPocketChance);
@@ -234,7 +254,7 @@ public class WorldConfig extends ConfigFile
         this.canyonDepth = CheckValue(this.canyonDepth, 0.1D, 15D);
 
 
-        this.waterLevel = (this.waterLevel < 0 ? 0 : this.waterLevel > TCDefaultValues.yLimit.intValue() - 1 ? TCDefaultValues.yLimit.intValue() - 1 : this.waterLevel);
+        this.waterLevel = (this.waterLevel < 0 ? 0 : this.waterLevel > this.ChunkMaxY - 1 ? this.ChunkMaxY - 1 : this.waterLevel);
 
         this.customTreeMinTime = (this.customTreeMinTime < 1 ? 1 : this.customTreeMinTime);
         this.customTreeMaxTime = ((this.customTreeMaxTime - this.customTreeMinTime) < 1 ? (this.customTreeMinTime + 1) : this.customTreeMaxTime);
@@ -262,15 +282,26 @@ public class WorldConfig extends ConfigFile
 
         this.oldBiomeGenerator = ReadModSettings(TCDefaultValues.oldBiomeGenerator.name(), TCDefaultValues.oldBiomeGenerator.booleanValue());
         this.oldBiomeSize = ReadModSettings(TCDefaultValues.oldBiomeSize.name(), TCDefaultValues.oldBiomeSize.doubleValue());
-        this.biomeSize = ReadModSettings(TCDefaultValues.BiomeSize.name(), TCDefaultValues.BiomeSize.intValue());
-        this.landSize = ReadModSettings(TCDefaultValues.LandSize.name(), TCDefaultValues.LandSize.intValue());
-        this.riversEnabled = ReadModSettings(TCDefaultValues.RiversEnabled.name(), TCDefaultValues.RiversEnabled.booleanValue());
+
+
+        this.GenerationDepth = ReadModSettings(TCDefaultValues.GenerationDepth.name(), TCDefaultValues.GenerationDepth.intValue());
+
+        this.LandRarity = ReadModSettings(TCDefaultValues.LandRarity.name(), TCDefaultValues.LandRarity.intValue());
+        this.LandSize = ReadModSettings(TCDefaultValues.LandSize.name(), TCDefaultValues.LandSize.intValue());
+        this.LandFuzzy = ReadModSettings(TCDefaultValues.LandFuzzy.name(), TCDefaultValues.LandFuzzy.intValue());
+
+        this.IceRarity = ReadModSettings(TCDefaultValues.IceRarity.name(), TCDefaultValues.IceRarity.intValue());
+        this.IceSize = ReadModSettings(TCDefaultValues.IceSize.name(), TCDefaultValues.IceSize.intValue());
+
+        this.RiverRarity = ReadModSettings(TCDefaultValues.RiverRarity.name(), TCDefaultValues.RiverRarity.intValue());
+        this.RiverSize = ReadModSettings(TCDefaultValues.RiverSize.name(), TCDefaultValues.RiverSize.intValue());
+
+
         this.minMoisture = ReadModSettings(TCDefaultValues.minMoisture.name(), TCDefaultValues.minMoisture.floatValue());
         this.maxMoisture = ReadModSettings(TCDefaultValues.maxMoisture.name(), TCDefaultValues.maxMoisture.floatValue());
         this.minTemperature = ReadModSettings(TCDefaultValues.minTemperature.name(), TCDefaultValues.minTemperature.floatValue());
         this.maxTemperature = ReadModSettings(TCDefaultValues.maxTemperature.name(), TCDefaultValues.maxTemperature.floatValue());
-        this.snowThreshold = ReadModSettings(TCDefaultValues.snowThreshold.name(), TCDefaultValues.snowThreshold.doubleValue());
-        this.iceThreshold = ReadModSettings(TCDefaultValues.iceThreshold.name(), TCDefaultValues.iceThreshold.doubleValue());
+
 
         this.muddySwamps = ReadModSettings(TCDefaultValues.muddySwamps.name(), TCDefaultValues.muddySwamps.booleanValue());
         this.claySwamps = ReadModSettings(TCDefaultValues.claySwamps.name(), TCDefaultValues.claySwamps.booleanValue());
@@ -307,6 +338,7 @@ public class WorldConfig extends ConfigFile
 
         this.waterLevel = ReadModSettings(TCDefaultValues.WaterLevel.name(), TCDefaultValues.WaterLevel.intValue());
         this.waterBlock = ReadModSettings(TCDefaultValues.WaterBlock.name(), TCDefaultValues.WaterBlock.intValue());
+        this.iceBlock = ReadModSettings(TCDefaultValues.IceBlock.name(), TCDefaultValues.IceBlock.intValue());
         this.maxAverageHeight = ReadModSettings(TCDefaultValues.MaxAverageHeight.name(), TCDefaultValues.MaxAverageHeight.doubleValue());
         this.maxAverageDepth = ReadModSettings(TCDefaultValues.MaxAverageDepth.name(), TCDefaultValues.MaxAverageDepth.doubleValue());
         this.fractureHorizontal = ReadModSettings(TCDefaultValues.FractureHorizontal.name(), TCDefaultValues.FractureHorizontal.doubleValue());
@@ -322,11 +354,9 @@ public class WorldConfig extends ConfigFile
         this.flatBedrock = ReadModSettings(TCDefaultValues.FlatBedrock.name(), TCDefaultValues.FlatBedrock.booleanValue());
         this.bedrockBlock = ReadModSettings(TCDefaultValues.BedrockobBlock.name(), TCDefaultValues.BedrockobBlock.intValue());
 
-        ReadHeightSettings();
-
-        this.oldTerrainGenerator = ReadModSettings(TCDefaultValues.OldTerrainGenerator.name(), TCDefaultValues.OldTerrainGenerator.booleanValue());
         this.removeSurfaceStone = ReadModSettings(TCDefaultValues.RemoveSurfaceStone.name(), TCDefaultValues.RemoveSurfaceStone.booleanValue());
 
+        this.oldTerrainGenerator = ReadModSettings(TCDefaultValues.OldTerrainGenerator.name(), TCDefaultValues.OldTerrainGenerator.booleanValue());
 
         this.customObjects = this.ReadModSettings(TCDefaultValues.CustomObjects.name(), TCDefaultValues.CustomObjects.booleanValue());
         this.objectSpawnRatio = this.ReadModSettings(TCDefaultValues.objectSpawnRatio.name(), TCDefaultValues.objectSpawnRatio.intValue());
@@ -334,32 +364,36 @@ public class WorldConfig extends ConfigFile
         this.customTreeMinTime = this.ReadModSettings(TCDefaultValues.CustomTreeMinTime.name(), TCDefaultValues.CustomTreeMinTime.intValue());
         this.customTreeMaxTime = this.ReadModSettings(TCDefaultValues.CustomTreeMaxTime.name(), TCDefaultValues.CustomTreeMaxTime.intValue());
 
-
+        this.ReadHeightSettings();
         this.ReadCustomBiomes();
+        this.ReadNormalBiomesSettings();
 
 
     }
 
+    private void ReadNormalBiomesSettings()
+    {
+        String[] keys = this.ReadModSettings(TCDefaultValues.NormalBiomes.name(), TCDefaultValues.NormalBiomes.stringArrayValue());
+
+        Collections.addAll(this.NormalBiomes, keys);
+
+
+    }
 
     private void ReadHeightSettings()
     {
-        if (this.SettingsCache.containsKey("CustomHeightControl"))
+
+        String[] keys = this.ReadModSettings(TCDefaultValues.CustomHeightControl.name(), TCDefaultValues.CustomHeightControl.stringArrayValue());
+        try
         {
-            if (this.SettingsCache.get("CustomHeightControl").trim().equals(""))
+            if (keys.length != 17)
                 return;
-            String[] keys = this.SettingsCache.get("CustomHeightControl").split(",");
-            try
-            {
-                if (keys.length != 17)
-                    return;
-                for (int i = 0; i < 17; i++)
-                    this.heightMatrix[i] = Double.valueOf(keys[i]);
+            for (int i = 0; i < 17; i++)
+                this.heightMatrix[i] = Double.valueOf(keys[i]);
 
-            } catch (NumberFormatException e)
-            {
-                System.out.println("Wrong height settings: '" + this.SettingsCache.get("CustomHeightControl") + "'");
-            }
-
+        } catch (NumberFormatException e)
+        {
+            System.out.println("Wrong height settings: '" + this.SettingsCache.get(TCDefaultValues.CustomHeightControl.name()) + "'");
         }
 
 
@@ -368,22 +402,18 @@ public class WorldConfig extends ConfigFile
 
     private void ReadCustomBiomes()
     {
-        if (this.SettingsCache.containsKey("CustomBiomes"))
+
+        String[] keys = this.ReadModSettings(TCDefaultValues.CustomBiomes.name(), TCDefaultValues.CustomBiomes.stringArrayValue());
+
+        for (String key : keys)
         {
-            if (this.SettingsCache.get("CustomBiomes").trim().equals(""))
-                return;
-            String[] keys = this.SettingsCache.get("CustomBiomes").split(",");
+            boolean isUnique = true;
+            for (int i = 0; i < DefaultBiomesCount; i++)
+                if (BiomeBase.a[i].r.equals(key))
+                    isUnique = false;
 
-            for (String key : keys)
-            {
-                boolean isUnique = true;
-                for (int i = 0; i < DefaultBiomesCount; i++)
-                    if (BiomeBase.a[i].r.equals(key))
-                        isUnique = false;
-
-                if (isUnique && !this.CustomBiomes.contains(key))
-                    this.CustomBiomes.add(key);
-            }
+            if (isUnique && !this.CustomBiomes.contains(key))
+                this.CustomBiomes.add(key);
         }
     }
 
@@ -402,13 +432,30 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.iceThreshold.name(), this.iceThreshold);    */
 
         WriteTitle("Biome Generator Variables");
-        WriteComment("Integer value from 1 to 15. Affect all biomes except ocean and river");
+
+        /*WriteComment("Integer value from 1 to 15. Affect all biomes except ocean and river");
         WriteValue(TCDefaultValues.BiomeSize.name(), this.biomeSize);
         WriteNewLine();
         WriteComment("Integer value from 0 to 10. This affect how much lands will be generated. LandSize:0 - mean generates only ocean.");
         WriteValue(TCDefaultValues.LandSize.name(), this.landSize);
         WriteNewLine();
-        WriteValue(TCDefaultValues.RiversEnabled.name(), this.riversEnabled);
+        WriteValue(TCDefaultValues.RiversEnabled.name(), this.riversEnabled);  */
+
+        WriteValue(TCDefaultValues.GenerationDepth.name(), this.GenerationDepth);
+
+        WriteValue(TCDefaultValues.LandRarity.name(), this.LandRarity);
+        WriteValue(TCDefaultValues.LandSize.name(), this.LandSize);
+        WriteValue(TCDefaultValues.LandFuzzy.name(), this.LandFuzzy);
+
+        WriteValue(TCDefaultValues.IceRarity.name(), this.IceRarity);
+        WriteValue(TCDefaultValues.IceSize.name(), this.IceSize);
+
+        WriteValue(TCDefaultValues.RiverRarity.name(), this.RiverRarity);
+        WriteValue(TCDefaultValues.RiverSize.name(), this.RiverSize);
+
+
+        WriteNormalBiomesSettings();
+
 
         WriteNewLine();
         WriteComment("List of custom biomes.");
@@ -439,6 +486,9 @@ public class WorldConfig extends ConfigFile
         WriteNewLine();
         WriteComment("BlockId used as water in WaterLevel");
         WriteValue(TCDefaultValues.WaterBlock.name(), this.waterBlock);
+        WriteNewLine();
+        WriteComment("BlockId used as ice");
+        WriteValue(TCDefaultValues.IceBlock.name(), this.iceBlock);
         WriteNewLine();
         WriteComment("If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.");
         WriteComment("If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.");
@@ -566,7 +616,7 @@ public class WorldConfig extends ConfigFile
         for (int i = 1; i < this.heightMatrix.length; i++)
             output = output + "," + Double.toString(this.heightMatrix[i]);
 
-        this.WriteValue("CustomHeightControl", output);
+        this.WriteValue(TCDefaultValues.CustomHeightControl.name(), output);
     }
 
     private void WriteCustomBiomesSettings() throws IOException
@@ -574,14 +624,29 @@ public class WorldConfig extends ConfigFile
 
         if (this.CustomBiomes.size() == 0)
         {
-            this.WriteValue("CustomBiomes", "");
+            this.WriteValue(TCDefaultValues.CustomBiomes.name(), "");
             return;
         }
         String output = this.CustomBiomes.get(0);
         for (int i = 1; i < this.CustomBiomes.size(); i++)
             output = output + "," + this.CustomBiomes.get(i);
 
-        this.WriteValue("CustomBiomes", output);
+        this.WriteValue(TCDefaultValues.CustomBiomes.name(), output);
+    }
+
+    private void WriteNormalBiomesSettings() throws IOException
+    {
+
+        if (this.NormalBiomes.size() == 0)
+        {
+            this.WriteValue(TCDefaultValues.NormalBiomes.name(), "");
+            return;
+        }
+        String output = this.NormalBiomes.get(0);
+        for (int i = 1; i < this.NormalBiomes.size(); i++)
+            output = output + "," + this.NormalBiomes.get(i);
+
+        this.WriteValue(TCDefaultValues.NormalBiomes.name(), output);
     }
 
 

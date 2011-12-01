@@ -7,17 +7,38 @@ public enum TCDefaultValues
     WorldBiomeConfigDirectoryName("BiomeConfigs"),
     WorldBiomeConfigName("BiomeConfig.ini"),
 
-    yLimit(128),
     maxChunkBlockValue(32768),
+
+    CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0"),
+    CustomBiomes(""),
+    NormalBiomes("Desert,Forest,Extreme Hills,Swampland,Plains,Taiga,Ice Plains,Ice Mountains"),
 
     Mode("Normal"),
 
+    GenerationDepth(10),
+    LandRarity(97),
+    LandSize(1),
+    LandFuzzy(6),
+    IceRarity(90),
+    IceSize(3),
+    RiverRarity(4),
+    RiverSize(0),
+
     oldBiomeGenerator(false),
     oldBiomeSize(1.5D),
-    BiomeSize(4),
-    LandSize(5),
-    RiversEnabled(true),
-    BiomeChance(1),
+
+
+    BiomeSize(5),
+    BiomeRarity(100),
+    BiomeColor(""),
+    BiomeRivers(true),
+    IceBiome(false),
+    IsleInBiome(""),
+    BiomeIsBorder(""),
+
+    BiomeTemperature(0.5F),
+    BiomeWetness(0.5F),
+
 
     SurfaceBlock(2),
     GroundBlock(3),
@@ -39,6 +60,7 @@ public enum TCDefaultValues
     OldTerrainGenerator(false),
     WaterLevel(64),
     WaterBlock(9),
+    IceBlock(79),
     MaxAverageHeight(0.0D),
     MaxAverageDepth(0.0D),
     FractureHorizontal(0.0D),
@@ -89,7 +111,6 @@ public enum TCDefaultValues
     undergroundLakeMaxSize(60),
     undergroundLakeMinAltitude(0),
     undergroundLakeMaxAltitude(50),
-
 
 
     BiomeHeight(0.1D),
@@ -256,6 +277,14 @@ public enum TCDefaultValues
     public String stringValue()
     {
         return this.sValue;
+    }
+
+    public String[] stringArrayValue()
+    {
+        if(this.sValue.contains(","))
+            return this.sValue.split(",");
+        else
+            return new String[0];
     }
 
 

@@ -134,12 +134,13 @@ public class TCPlugin extends JavaPlugin
                 {
                     worldSetting.objectSpawner.Init(workWorld);
                     worldSetting.ChunkProvider.Init(world);
-                    workWorld.worldProvider.e = true;
+                    workWorld.seaLevel = worldSetting.waterLevel;
                     break;
                 }
                 case TerrainTest:
                 {
                     worldSetting.ChunkProvider.Init(world);
+                    workWorld.seaLevel = worldSetting.waterLevel;
                     break;
                 }
                 case OnlyBiome:

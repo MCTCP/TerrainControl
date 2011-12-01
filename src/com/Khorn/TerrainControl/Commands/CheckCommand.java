@@ -12,7 +12,7 @@ public class CheckCommand extends BaseCommand
     {
         super(_plugin);
         name = "check";
-        usage = "/tc check [World]";
+        usage = "/tc check World_Name";
         help = "Checks or create TC settings for world ";
         workOnConsole = true;
     }

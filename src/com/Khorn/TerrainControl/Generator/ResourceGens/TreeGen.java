@@ -1,19 +1,18 @@
 package com.Khorn.TerrainControl.Generator.ResourceGens;
 
 import com.Khorn.TerrainControl.Configuration.Resource;
-import com.Khorn.TerrainControl.Util.TreeType;
 import net.minecraft.server.*;
 
 import java.util.Random;
 
 public class TreeGen extends ResourceGenBase
 {
-    private WorldGenTrees Tree = new WorldGenTrees();
-    private WorldGenBigTree BigTree = new WorldGenBigTree();
-    private WorldGenForest Forest = new WorldGenForest();
+    private WorldGenTrees Tree = new WorldGenTrees(false);
+    private WorldGenBigTree BigTree = new WorldGenBigTree(false);
+    private WorldGenForest Forest = new WorldGenForest(false);
     private WorldGenSwampTree SwampTree = new WorldGenSwampTree();
     private WorldGenTaiga1 TaigaTree1 = new WorldGenTaiga1();
-    private WorldGenTaiga2 TaigaTree2 = new WorldGenTaiga2();
+    private WorldGenTaiga2 TaigaTree2 = new WorldGenTaiga2(false);
     private WorldGenHugeMushroom HugeMushroom = new WorldGenHugeMushroom();
 
 

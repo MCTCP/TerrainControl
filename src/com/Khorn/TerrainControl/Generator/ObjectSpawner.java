@@ -156,6 +156,26 @@ public class ObjectSpawner extends BlockPopulator
         for (int i = 0; i < localBiomeConfig.ResourceCount; i++)
             this.ProcessResource(localBiomeConfig.ResourceSequence[i], x, z, localBiomeBase);
 
+        int i1 = x + 8;
+        int i2 = z + 8;
+        for (int _x = 0; _x < 16; _x++)
+        {
+            for (int _z = 0; _z < 16; _z++)
+            {
+                int i5 = this.world.e(i1 + _x, i2 + _z);
+
+                if (this.world.p(_x + i1, i5 - 1, _z + i2))
+                {
+                    this.world.setTypeId(_x + i1, i5 - 1, _z + i2, Block.ICE.id);
+                }
+                if (this.world.r(_x + i1, i5, _z + i2))
+                {
+                    this.world.setTypeId(_x + i1, i5, _z + i2, Block.SNOW.id);
+                }
+            }
+
+        }
+
 
         if (this.worldSettings.BiomeConfigsHaveReplacement)
         {
@@ -183,7 +203,7 @@ public class ObjectSpawner extends BlockPopulator
         SpawnerCreature.a(this.world, localBiomeBase, x + 8, z + 8, 16, 16, this.rand);
 
         // Light hack O.o
-        byte[] blocks = ((CraftChunk) chunk).getHandle().b;
+        /*byte[] blocks = ((CraftChunk) chunk).getHandle().b;
         for (int _x = 0; _x < 16; _x++)
             for (int _z = 0; _z < 16; _z++)
             {
@@ -195,7 +215,7 @@ public class ObjectSpawner extends BlockPopulator
                 this.world.b(EnumSkyBlock.SKY, x + _x, _y, z + _z);
 
 
-            }
+            } */
 
         if (this.worldSettings.isDeprecated)
             this.worldSettings = this.worldSettings.newSettings;

@@ -1,9 +1,9 @@
 package com.Khorn.TerrainControl.Configuration;
 
+import com.Khorn.TerrainControl.Generator.ResourceGens.ResourceType;
+import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
 import com.Khorn.TerrainControl.TCDefaultValues;
 import com.Khorn.TerrainControl.Util.CustomBiome;
-import com.Khorn.TerrainControl.Util.ResourceType;
-import com.Khorn.TerrainControl.Util.TreeType;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.Block;
 
@@ -27,10 +27,10 @@ public class BiomeConfig extends ConfigFile
     public int BiomeSize;
     public int BiomeRarity;
 
-    public int BiomeColor;
+    public String BiomeColor;
 
-    public int BiomeIsBorder;
-
+    public BiomeBase BiomeIsBorder;
+    public BiomeBase IsleInBiome;
 
 
     //Surface config
@@ -40,11 +40,10 @@ public class BiomeConfig extends ConfigFile
     public float BiomeTemperature;
     public float BiomeWetness;
 
-    public boolean BiomeIsIsle;
     public boolean IceBiome;
     public boolean BiomeRivers;
 
-    public boolean IsNormalBiome;
+    public boolean IsNormalBiome = false;
 
 
     public byte SurfaceBlock;
@@ -84,31 +83,16 @@ public class BiomeConfig extends ConfigFile
 
         BuildReplaceMatrix();
 
+        if (this.Biome.F > WorldConfig.DefaultBiomesCount)
+            ((CustomBiome) this.Biome).SetBiome(this);
+
 
     }
 
-    public BiomeConfig(File settingsDir, String biomeName, int biomeId, WorldConfig config)
+
+    public int getTemperature()
     {
-
-
-        worldConfig = config;
-        CustomBiome cBiome = new CustomBiome(biomeId, biomeName);
-        this.Biome = cBiome;
-
-        File settingsFile = new File(settingsDir, biomeName + TCDefaultValues.WorldBiomeConfigName.stringValue());
-        this.ReadSettingsFile(settingsFile);
-        this.ReadConfigSettings();
-
-        this.CorrectSettings();
-        if (!settingsFile.exists())
-            this.CreateDefaultResources();
-
-        this.WriteSettingsFile(settingsFile);
-
-        BuildReplaceMatrix();
-        cBiome.SetBiome(this);
-
-
+        return (int) (this.BiomeTemperature * 65536.0F);
     }
 
     private void CreateDefaultResources()
@@ -199,6 +183,10 @@ public class BiomeConfig extends ConfigFile
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.SwampTree}, new int[]{100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
+            case 14: // Mushroom island
+                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.HugeMushroom}, new int[]{100});
+                this.ResourceSequence[this.ResourceCount++] = resource;
+                break;
 
 
         }
@@ -275,7 +263,21 @@ public class BiomeConfig extends ConfigFile
     {
 
 
-        this.BiomeSize = ReadModSettings(TCDefaultValues.BiomeChance.name(), this.DefaultBiomeChance);
+        this.BiomeSize = ReadModSettings(TCDefaultValues.BiomeSize.name(), this.DefaultSize);
+        this.BiomeRarity = ReadModSettings(TCDefaultValues.BiomeRarity.name(), this.DefaultRarity);
+
+        this.BiomeColor = ReadModSettings(TCDefaultValues.BiomeColor.name(), TCDefaultValues.BiomeColor.stringValue());
+
+        this.BiomeRivers = ReadModSettings(TCDefaultValues.BiomeRivers.name(), this.DefaultRiver);
+
+        this.IceBiome = ReadModSettings(TCDefaultValues.IceBiome.name(), this.DefaultIce);
+
+        this.IsleInBiome = ReadModSettings(TCDefaultValues.IsleInBiome.name(), this.DefaultIsle);
+        this.BiomeIsBorder = ReadModSettings(TCDefaultValues.BiomeIsBorder.name(), this.DefaultBorder);
+
+        this.BiomeTemperature = this.ReadModSettings(TCDefaultValues.BiomeTemperature.name(), this.DefaultBiomeTemperature);
+        this.BiomeWetness = this.ReadModSettings(TCDefaultValues.BiomeWetness.name(), this.DefaultBiomeWetness);
+
 
         this.evenWaterSourceDistribution = this.ReadModSettings(TCDefaultValues.evenWaterSourceDistribution.name(), TCDefaultValues.evenWaterSourceDistribution.booleanValue());
         this.evenLavaSourceDistribution = this.ReadModSettings(TCDefaultValues.evenLavaSourceDistribution.name(), TCDefaultValues.evenLavaSourceDistribution.booleanValue());
@@ -289,14 +291,14 @@ public class BiomeConfig extends ConfigFile
         this.disableNotchPonds = this.ReadModSettings(TCDefaultValues.disableNotchPonds.name(), TCDefaultValues.disableNotchPonds.booleanValue());
 
 
-        this.ReadModReplaceSettings();
+        this.ReadReplaceSettings();
         this.ReadResourceSettings();
 
 
     }
 
 
-    private void ReadModReplaceSettings()
+    private void ReadReplaceSettings()
     {
         if (this.SettingsCache.containsKey("ReplacedBlocks"))
         {
@@ -431,7 +433,20 @@ public class BiomeConfig extends ConfigFile
         WriteComment("So spawn biome chance is BiomeSize/sum_all_other_BiomeChances");
         WriteComment("This is not good setting, but better than nothing");
 
-        WriteValue(TCDefaultValues.BiomeChance.name(), this.BiomeSize);
+        WriteValue(TCDefaultValues.BiomeSize.name(), this.BiomeSize);
+        WriteValue(TCDefaultValues.BiomeRarity.name(), this.BiomeRarity);
+
+        WriteValue(TCDefaultValues.BiomeColor.name(), this.BiomeColor);
+
+        WriteValue(TCDefaultValues.BiomeRivers.name(), this.BiomeRivers);
+
+        WriteValue(TCDefaultValues.IceBiome.name(), this.IceBiome);
+
+        WriteValue(TCDefaultValues.IsleInBiome.name(), this.IsleInBiome);
+        WriteValue(TCDefaultValues.BiomeIsBorder.name(), this.BiomeIsBorder);
+
+        WriteValue(TCDefaultValues.BiomeTemperature.name(), this.BiomeTemperature);
+        WriteValue(TCDefaultValues.BiomeWetness.name(), this.BiomeWetness);
 
 
         this.WriteNewLine();
@@ -541,8 +556,12 @@ public class BiomeConfig extends ConfigFile
 
     protected void CorrectSettings()
     {
-        this.BiomeSize = CheckValue(this.BiomeSize, 0, 20);
+        this.BiomeSize = CheckValue(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
         this.BiomeHeight = (float) CheckValue(this.BiomeHeight, -10.0, 10.0);
+        this.BiomeRarity = CheckValue(this.BiomeRarity, 1, 100);
+
+        this.BiomeTemperature = CheckValue(this.BiomeTemperature, 0.0F, 1.0F);
+        this.BiomeWetness = CheckValue(this.BiomeWetness, 0.0F, 1.0F);
 
 
     }
@@ -560,7 +579,14 @@ public class BiomeConfig extends ConfigFile
     private float DefaultBiomeVolatility = 0.3F;
     private byte DefaultSurfaceBlock = (byte) Block.GRASS.id;
     private byte DefaultGroundBlock = (byte) Block.DIRT.id;
-    private int DefaultBiomeChance = 1;
+    private float DefaultBiomeTemperature = 0.5F;
+    private float DefaultBiomeWetness = 0.5F;
+    private BiomeBase DefaultIsle = null;
+    private BiomeBase DefaultBorder = null;
+    private boolean DefaultIce = false;
+    private boolean DefaultRiver = true;
+    private int DefaultSize = 4;
+    private int DefaultRarity = 100;
 
 
     private void InitDefaults()
@@ -569,6 +595,9 @@ public class BiomeConfig extends ConfigFile
         this.DefaultBiomeVolatility = this.Biome.x;
         this.DefaultSurfaceBlock = this.Biome.t;
         this.DefaultGroundBlock = this.Biome.u;
+        this.DefaultBiomeTemperature = this.Biome.y;
+        this.DefaultBiomeWetness = this.Biome.z;
+
 
         switch (this.Biome.F)
         {
@@ -615,7 +644,34 @@ public class BiomeConfig extends ConfigFile
             case 9:
             case 0:
             {
-                this.DefaultBiomeChance = 0;
+                break;
+            }
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            {
+                this.DefaultIce = true;
+                break;
+            }
+            case 14:
+            {
+                this.DefaultSurfaceBlock = (byte) Block.MYCEL.id;
+                this.DefaultMushroom = 1;
+                this.DefaultGrass = 0;
+                this.DefaultFlowers = 0;
+                this.DefaultTrees = 0;
+                this.DefaultRarity = 1;
+                this.DefaultRiver = false;
+                this.DefaultSize = 6;
+                this.DefaultIsle = BiomeBase.OCEAN;
+                break;
+            }
+            case 15:
+            {
+                this.DefaultRiver = false;
+                this.DefaultSize = 9;
+                this.DefaultBorder = BiomeBase.MUSHROOM_ISLAND;
                 break;
             }
 

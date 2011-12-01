@@ -9,9 +9,11 @@ public class LayerBiomeBorder extends Layer
     {
         super(paramLong);
         this.a = paramGenLayer;
+        for(int i = 0; i< BiomeBorders.length;i++)
+            BiomeBorders[i] = -1;
     }
 
-    public int[] BiomeBorders = new int[]{-1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 15, -1, -1, -1, -1, -1};
+    public int[] BiomeBorders = new int[64];
 
     @Override
     public int[] a(int paramInt1, int paramInt2, int paramInt3, int paramInt4)

@@ -19,7 +19,7 @@ public class LayerRiverInit extends Layer
         {
             for (int j = 0; j < paramInt3; j++)
             {
-                a(j + paramInt1, i + paramInt2);
+                a(i + paramInt2,j + paramInt1);           // reversed
                 int currentPiece = arrayOfInt1[(j + i * paramInt3)];
                 if (a(2) == 0)
                     currentPiece |= 256;

@@ -1,5 +1,7 @@
 package com.Khorn.TerrainControl.Configuration;
 
+import net.minecraft.server.BiomeBase;
+
 import java.io.*;
 import java.util.HashMap;
 
@@ -66,6 +68,34 @@ public abstract class ConfigFile
                     }
             }
         }
+    }
+
+    protected BiomeBase ReadModSettings(String settingsName, BiomeBase defaultValue)
+    {
+        if (this.SettingsCache.containsKey(settingsName))
+        {
+            String biome = this.SettingsCache.get(settingsName);
+            for (int i = 0; i < WorldConfig.DefaultBiomesCount + WorldConfig.ExtendedBiomesCount; i++)
+                if (BiomeBase.a[i].r.equals(biome))
+                    return BiomeBase.a[i];
+        }
+        return defaultValue;
+
+    }
+
+    protected String[] ReadModSettings(String settingsName, String[] defaultValue)
+    {
+
+        if (this.SettingsCache.containsKey(settingsName))
+        {
+            if (this.SettingsCache.get(settingsName).trim().equals("") || this.SettingsCache.get(settingsName).equals("None"))
+                return defaultValue;
+            return this.SettingsCache.get(settingsName).split(",");
+
+        }
+        return defaultValue;
+
+
     }
 
     protected int ReadModSettings(String settingsName, int defaultValue)
@@ -184,6 +214,13 @@ public abstract class ConfigFile
         }
     }
 
+    protected void WriteValue(String settingsName, BiomeBase settingsValue) throws IOException
+    {
+
+        this.SettingsWriter.write(settingsName + ":" + ((settingsValue != null)?settingsValue.r:""));
+        this.SettingsWriter.newLine();
+    }
+
     protected void WriteValue(String settingsName, int settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + Integer.toString(settingsValue));
@@ -274,6 +311,16 @@ public abstract class ConfigFile
     }
 
     protected double CheckValue(double value, double min, double max)
+    {
+        if (value > max)
+            return max;
+        else if (value < min)
+            return min;
+        else
+            return value;
+    }
+
+    protected float CheckValue(float value, float min, float max)
     {
         if (value > max)
             return max;

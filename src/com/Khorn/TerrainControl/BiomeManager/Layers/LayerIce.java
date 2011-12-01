@@ -9,7 +9,7 @@ public class LayerIce extends Layer
     {
         super(paramLong);
         this.a = paramGenLayer;
-        this.rarity = _rarity;
+        this.rarity = 101 - _rarity;
     }
 
 
@@ -25,7 +25,7 @@ public class LayerIce extends Layer
         {
             for (int j = 0; j < x_size; j++)
             {
-                a(x + j, z + i);
+                a(z + i,x + j);      // reversed
                 arrayOfInt2[(j + i * x_size)] = (a(rarity) == 0 ? (arrayOfInt1[(j + i * x_size)] | IceBit) : arrayOfInt1[(j + i * x_size)]);
             }
         }

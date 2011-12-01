@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.Util;
+package com.Khorn.TerrainControl.Generator.ResourceGens;
 
 public enum ResourceType
 {

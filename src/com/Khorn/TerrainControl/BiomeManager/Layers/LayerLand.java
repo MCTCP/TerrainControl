@@ -9,7 +9,7 @@ public class LayerLand extends Layer
     {
         super(paramLong);
         this.a = paramGenLayer;
-        this.chance = _chance;
+        this.chance = 101 - _chance;
     }
 
     public int chance = 5;

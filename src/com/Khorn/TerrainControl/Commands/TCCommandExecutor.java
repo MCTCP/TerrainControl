@@ -34,25 +34,26 @@ public class TCCommandExecutor implements CommandExecutor
         }
         ArrayList<String> arg = new ArrayList<String>(Arrays.asList(strings));
 
-        if(arg.size() == 0)
+        if (arg.size() == 0)
         {
-            return helpCommand.onCommand(commandSender,arg);
+            return helpCommand.onCommand(commandSender, arg);
         }
         BaseCommand baseCommand = commandHashMap.get(arg.get(0));
-        if(baseCommand == null)
-             return helpCommand.onCommand(commandSender,arg);
+        if (baseCommand == null)
+            return helpCommand.onCommand(commandSender, arg);
         arg.remove(0);
 
-        return baseCommand.onCommand(commandSender,arg);
+        return baseCommand.onCommand(commandSender, arg);
     }
 
     private void RegisterCommands()
     {
-       this.AddCommand(new ReloadCommand(plugin));
+        this.AddCommand(new ReloadCommand(plugin));
         this.AddCommand(new ListCommand(plugin));
         this.AddCommand(new CheckCommand(plugin));
         this.AddCommand(new BiomeCommand(plugin));
         this.AddCommand(new SpawnCommand(plugin));
+        this.AddCommand(new MapCommand(plugin));
         this.AddCommand(this.helpCommand);
     }
 

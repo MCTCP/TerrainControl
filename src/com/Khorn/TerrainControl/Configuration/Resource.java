@@ -1,8 +1,8 @@
 package com.Khorn.TerrainControl.Configuration;
 
 
-import com.Khorn.TerrainControl.Util.ResourceType;
-import com.Khorn.TerrainControl.Util.TreeType;
+import com.Khorn.TerrainControl.Generator.ResourceGens.ResourceType;
+import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
 import org.bukkit.Material;
 
 import java.util.ArrayList;

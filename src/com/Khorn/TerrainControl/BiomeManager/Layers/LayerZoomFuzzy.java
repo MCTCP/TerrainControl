@@ -10,6 +10,7 @@ public class LayerZoomFuzzy extends Layer
     this.a = paramGenLayer;
   }
 
+  @SuppressWarnings({"PointlessArithmeticExpression"})
   public int[] a(int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
     int i = paramInt1 >> 1;
     int j = paramInt2 >> 1;
@@ -25,13 +26,13 @@ public class LayerZoomFuzzy extends Layer
       int i4 = arrayOfInt1[(0 + (i1 + 0) * k)];
       int i5 = arrayOfInt1[(0 + (i1 + 1) * k)];
       for (int i6 = 0; i6 < k - 1; i6++) {
-        a(i6 + i << 1, i1 + j << 1);
+        a((long)(i6 + i << 1), (long)(i1 + j << 1));
         int i7 = arrayOfInt1[(i6 + 1 + (i1 + 0) * k)];
         int i8 = arrayOfInt1[(i6 + 1 + (i1 + 1) * k)];
 
         arrayOfInt2[i3] = i4;
-        arrayOfInt2[(i3++ + n)] = a(i4, i5);
-        arrayOfInt2[i3] = a(i4, i7);
+        arrayOfInt2[(i3++ + n)] = RndParam(i4, i5);
+        arrayOfInt2[i3] = RndParam(i4, i7);
         arrayOfInt2[(i3++ + n)] = b(i4, i7, i5, i8);
 
         i4 = i7;
@@ -45,7 +46,7 @@ public class LayerZoomFuzzy extends Layer
     return arrayOfInt3;
   }
 
-  protected int a(int paramInt1, int paramInt2) {
+  protected int RndParam(int paramInt1, int paramInt2) {
     return a(2) == 0 ? paramInt1 : paramInt2;
   }
 
