@@ -11,6 +11,7 @@ public class LayerSmoothZoom extends Layer
     this.a = paramGenLayer;
   }
 
+  @SuppressWarnings({"PointlessArithmeticExpression"})
   public int[] a(int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
     int i = paramInt1 >> 1;
     int j = paramInt2 >> 1;
@@ -26,7 +27,7 @@ public class LayerSmoothZoom extends Layer
       int i4 = arrayOfInt1[(0 + (i1 + 0) * k)];
       int i5 = arrayOfInt1[(0 + (i1 + 1) * k)];
       for (int i6 = 0; i6 < k - 1; i6++) {
-        a(i6 + i << 1, i1 + j << 1);
+        a((long)(i6 + i << 1), (long)(i1 + j << 1));
 
         int i7 = arrayOfInt1[(i6 + 1 + (i1 + 0) * k)];
         int i8 = arrayOfInt1[(i6 + 1 + (i1 + 1) * k)];

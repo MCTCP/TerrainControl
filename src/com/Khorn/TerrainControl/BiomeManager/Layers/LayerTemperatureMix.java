@@ -28,7 +28,7 @@ public class LayerTemperatureMix extends Layer
         int[] arrayOfInt3 = IntCache.a(paramInt3 * paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            arrayOfInt2[i] += (this.worldConfig.biomeConfigs[arrayOfInt1[i]].getTemperature() - arrayOfInt2[i]) / (this.c * 2 + 1);
+            arrayOfInt3[i] += (this.worldConfig.biomeConfigs[arrayOfInt1[i]].getTemperature() - arrayOfInt2[i]) / (this.c * 2 + 1);
         }
 
         return arrayOfInt3;

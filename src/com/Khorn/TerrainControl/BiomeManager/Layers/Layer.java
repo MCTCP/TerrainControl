@@ -202,13 +202,14 @@ public abstract class Layer
         MainLayer = new LayerSmooth(400L, MainLayer);
 
         Layer TemperatureLayer = new LayerTemperature(MainLayer, config);
-        TemperatureLayer = new LayerTemperatureMix(TemperatureLayer, MainLayer, 1, config);
         TemperatureLayer = LayerSmoothZoom.a(1000L, TemperatureLayer, 2);
 
         Layer DownfallLayer = MainLayer;
 
 
         Layer ZoomedLayer = new LayerZoomVoronoi(10L, MainLayer);
+
+        //TemperatureLayer = new LayerTemperatureMix(TemperatureLayer, ZoomedLayer, 0, config);
 
         ZoomedLayer.b(paramLong);
         TemperatureLayer.b(paramLong);
