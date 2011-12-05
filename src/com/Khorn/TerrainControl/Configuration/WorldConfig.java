@@ -180,14 +180,14 @@ public class WorldConfig extends ConfigFile
         for (String biomeName : this.CustomBiomes)
         {
             boolean isNew = true;
-            for (int i = DefaultBiomesCount; i < ExtendedBiomesCount; i++)
+            for (int i = DefaultBiomesCount; i < DefaultBiomesCount + ExtendedBiomesCount; i++)
                 if (BiomeBase.a[i].r.equals(biomeName))
                     isNew = false;
             if (isNew)
-                new CustomBiome(ExtendedBiomesCount++, biomeName);
+                new CustomBiome(DefaultBiomesCount + ExtendedBiomesCount++, biomeName);
         }
 
-        for (int i = DefaultBiomesCount; i < ExtendedBiomesCount; i++)
+        for (int i = DefaultBiomesCount; i <DefaultBiomesCount + ExtendedBiomesCount; i++)
             if (this.CustomBiomes.contains(BiomeBase.a[i].r))
                 biomes.add(BiomeBase.a[i]);
 
