@@ -5,6 +5,7 @@ import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import net.minecraft.server.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public abstract class Layer
 {
@@ -65,22 +66,36 @@ public abstract class Layer
         int ChanceToIncreaseLand = 6; //default 4
         int MaxDepth = 10;     */
 
-        ArrayList<BiomeConfig> BiomeMap = new ArrayList<BiomeConfig>();
-        ArrayList<BiomeConfig> BiomeIceMap = new ArrayList<BiomeConfig>();
+
+        BiomeBase[][] NormalBiomeMap = new BiomeBase[config.GenerationDepth + 1][];
+        BiomeBase[][] IceBiomeMap = new BiomeBase[config.GenerationDepth + 1][];
 
 
-        for (BiomeConfig biomeConfig : config.biomeConfigs)
+        for (int i = 0; i < config.GenerationDepth + 1; i++)
         {
-            if (biomeConfig == null)
-                continue;
-            if (biomeConfig.IsNormalBiome)
+            ArrayList<BiomeBase> normalBiomes = new ArrayList<BiomeBase>(config.normalBiomesRarity);
+            ArrayList<BiomeBase> iceBiomes = new ArrayList<BiomeBase>(config.iceBiomesRarity);
+            for (BiomeConfig biomeConfig : config.biomeConfigs)
             {
-                if (!biomeConfig.IceBiome)
-                    BiomeMap.add(biomeConfig);
-                else
-                    BiomeIceMap.add(biomeConfig);
+                if (biomeConfig.BiomeSize != i)
+                    continue;
+                if (config.NormalBiomes.contains(biomeConfig.Name))
+                {
+                    for (int t = 0; t < biomeConfig.BiomeRarity; t++)
+                        normalBiomes.add(biomeConfig.Biome);
+                    config.normalBiomesRarity -= biomeConfig.BiomeRarity;
+                }
+
+                if (config.IceBiomes.contains(biomeConfig.Name))
+                {
+                    for (int t = 0; t < biomeConfig.BiomeRarity; t++)
+                        iceBiomes.add(biomeConfig.Biome);
+                    config.iceBiomesRarity -= biomeConfig.BiomeRarity;
+                }
 
             }
+            NormalBiomeMap[i] = normalBiomes.toArray(new BiomeBase[normalBiomes.size()]);
+            IceBiomeMap[i] = iceBiomes.toArray(new BiomeBase[iceBiomes.size()]);
 
         }
 
@@ -103,57 +118,12 @@ public abstract class Layer
                 MainLayer = new LayerLandRandom(depth, MainLayer);
 
 
-            ArrayList<BiomeBase> biomes = new ArrayList<BiomeBase>();
-            ArrayList<BiomeBase> iceBiomes = new ArrayList<BiomeBase>();
-
-            int i = 0;
-            while (i < BiomeMap.size())
-            {
-                BiomeConfig biomeConfig = BiomeMap.get(i);
-                if (biomeConfig.BiomeSize == depth)
-                {
-                    for (int t = 0; t < biomeConfig.BiomeRarity; t++)
-                        biomes.add(biomeConfig.Biome);
-
-                    BiomeMap.remove(biomeConfig);
-                    continue;
-
-                }
-
-                for (int t = 0; t < biomeConfig.BiomeRarity; t++)
-                    biomes.add(null);
-                i++;
-
-            }
-            i = 0;
-            while (i < BiomeIceMap.size())
-            {
-                BiomeConfig biomeConfig = BiomeIceMap.get(i);
-                if (biomeConfig.BiomeSize == depth)
-                {
-                    for (int t = 0; t < biomeConfig.BiomeRarity; t++)
-                        iceBiomes.add(biomeConfig.Biome);
-
-                    BiomeIceMap.remove(biomeConfig);
-                    continue;
-
-                }
-
-                for (int t = 0; t < biomeConfig.BiomeRarity; t++)
-                    iceBiomes.add(null);
-                i++;
-
-            }
-
-
-            if (biomes.size() != 0 || iceBiomes.size() != 0)
+            if (NormalBiomeMap[depth].length != 0 || IceBiomeMap[depth].length != 0)
             {
 
-                BiomeBase[] biomesArray = new BiomeBase[biomes.size()];
                 LayerBiome layerBiome = new LayerBiome(200, MainLayer);
-                layerBiome.biomes = biomes.toArray(biomesArray);
-                biomesArray = new BiomeBase[iceBiomes.size()];
-                layerBiome.ice_biomes = iceBiomes.toArray(biomesArray);
+                layerBiome.biomes = NormalBiomeMap[depth];
+                layerBiome.ice_biomes = IceBiomeMap[depth];
                 MainLayer = layerBiome;
             }
 
@@ -171,7 +141,9 @@ public abstract class Layer
             boolean haveBorder = false;
             for (BiomeConfig biomeConfig : config.biomeConfigs)
             {
-                if (biomeConfig.IsleInBiome != null && biomeConfig.BiomeSize == depth)
+                if (biomeConfig.BiomeSize != depth)
+                    continue;
+                if (config.IsleBiomes.contains(biomeConfig.Name) && biomeConfig.IsleInBiome != null)
                 {
 
                     LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + depth, MainLayer);
@@ -184,7 +156,7 @@ public abstract class Layer
                     MainLayer = layerBiome;
                 }
 
-                if (biomeConfig.BiomeIsBorder != null && biomeConfig.BiomeSize == depth)
+                if (config.BorderBiomes.contains(biomeConfig.Name) && biomeConfig.BiomeIsBorder != null)
                 {
                     haveBorder = true;
                     layerBiomeBorder.BiomeBorders[biomeConfig.BiomeIsBorder.F] = biomeConfig.Biome.F;

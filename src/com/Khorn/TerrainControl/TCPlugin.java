@@ -74,16 +74,22 @@ public class TCPlugin extends JavaPlugin
 
         ChunkGenerator prov = null;
         WorldConfig conf = this.GetSettings(worldName, false);
-        if (conf.Mode != WorldConfig.GenMode.OnlyBiome)
+        switch (conf.ModeTerrain)
         {
-
-            if (conf.Mode == WorldConfig.GenMode.Normal || conf.Mode == WorldConfig.GenMode.TerrainTest)
+            case Normal:
+            case TerrainTest:
+            case OldGenerator:
                 prov = new ChunkProviderTC(conf);
-            else
+                break;
+            case NotGenerate:
                 prov = new ChunkProviderTest(conf);
+                break;
+            case Default:
+                break;
+
         }
 
-        System.out.println("TerrainControl: mode " + conf.Mode.name() + " enabled for '" + worldName + "'");
+        System.out.println("TerrainControl: mode " + conf.ModeTerrain.name() + " enabled for '" + worldName + "'");
         return prov;
 
 
@@ -97,7 +103,7 @@ public class TCPlugin extends JavaPlugin
         {
             System.out.println("TerrainControl: settings does not exist, creating defaults");
 
-            if(!baseFolder.mkdirs())
+            if (!baseFolder.mkdirs())
                 System.out.println("TerrainControl: cant create folder " + baseFolder.getName());
         }
 
@@ -122,14 +128,21 @@ public class TCPlugin extends JavaPlugin
 
             net.minecraft.server.World workWorld = ((CraftWorld) world).getHandle();
 
-            if (worldSetting.oldBiomeGenerator)
-                workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
-            else
-                workWorld.worldProvider.b = new BiomeManager(workWorld, worldSetting);
-
-            switch (worldSetting.Mode)
+            switch (worldSetting.ModeBiome)
             {
+                case Normal:
+                    workWorld.worldProvider.b = new BiomeManager(workWorld, worldSetting);
+                    break;
+                case OldGenerator:
+                    workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
+                    break;
+                case Default:
+                    break;
+            }
 
+            switch (worldSetting.ModeTerrain)
+            {
+                case OldGenerator:
                 case Normal:
                 {
                     worldSetting.objectSpawner.Init(workWorld);
@@ -143,9 +156,10 @@ public class TCPlugin extends JavaPlugin
                     workWorld.seaLevel = worldSetting.waterLevel;
                     break;
                 }
-                case OnlyBiome:
-                    break;
                 case NotGenerate:
+                    break;
+
+                case Default:
                     break;
             }
 

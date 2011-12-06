@@ -65,7 +65,7 @@ public class ChunkProviderTC extends ChunkGenerator
         this.worldSettings = config;
         this.worldSettings.ChunkProvider = this;
         populatorList = new ArrayList<BlockPopulator>();
-        if (this.worldSettings.Mode == WorldConfig.GenMode.Normal)
+        if (this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.Normal)
             populatorList.add(new ObjectSpawner(this.worldSettings));
 
 
@@ -87,7 +87,7 @@ public class ChunkProviderTC extends ChunkGenerator
         this.b = new NoiseGeneratorOctaves(this.rnd, 16);
 
         this.c = new NoiseGeneratorOctaves(this.rnd, 8);
-        if (this.worldSettings.oldBiomeGenerator)
+        if (this.worldSettings.ModeBiome == WorldConfig.BiomeMode.OldGenerator)
             old_wcm = (BiomeManagerOld) this.localWorld.getWorldChunkManager();
 
 
@@ -115,7 +115,7 @@ public class ChunkProviderTC extends ChunkGenerator
         int i4 = i1 + 1;
         int i5 = this.localWorld.height / 8 + 1;
         int i6 = i1 + 1;
-        if (this.worldSettings.oldBiomeGenerator)
+        if (this.worldSettings.ModeBiome == WorldConfig.BiomeMode.OldGenerator)
         {
             this.BiomeArray = this.localWorld.getWorldChunkManager().getBiomes(this.BiomeArray, paramInt1 * 16, paramInt2 * 16, 16, 16);
         } else
@@ -394,7 +394,7 @@ public class ChunkProviderTC extends ChunkGenerator
 
     private void oldTerrainNoise(int x, int z, int i4, int paramInt4, int paramInt5, double d3)
     {
-        if (this.worldSettings.oldBiomeGenerator)
+        if (this.worldSettings.ModeBiome == WorldConfig.BiomeMode.OldGenerator)
         {
             this.biomeFactor = (1.0D - old_wcm.old_temperature[z * 48 + 17 + x * 3] * old_wcm.old_rain[z * 48 + 17 + x * 3]);
 

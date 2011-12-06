@@ -1,8 +1,11 @@
 package com.Khorn.TerrainControl.Configuration;
 
 import net.minecraft.server.BiomeBase;
+import sun.plugin.javascript.navig.Array;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public abstract class ConfigFile
@@ -83,15 +86,16 @@ public abstract class ConfigFile
 
     }
 
-    protected String[] ReadModSettings(String settingsName, String[] defaultValue)
+    protected ArrayList<String> ReadModSettings(String settingsName, ArrayList<String> defaultValue)
     {
 
         if (this.SettingsCache.containsKey(settingsName))
         {
+            ArrayList<String> out = new ArrayList<String>();
             if (this.SettingsCache.get(settingsName).trim().equals("") || this.SettingsCache.get(settingsName).equals("None"))
-                return defaultValue;
-            return this.SettingsCache.get(settingsName).split(",");
-
+                return out;
+            Collections.addAll(out, this.SettingsCache.get(settingsName).split(","));
+            return out;
         }
         return defaultValue;
 
@@ -214,10 +218,26 @@ public abstract class ConfigFile
         }
     }
 
+    protected void WriteValue(String settingsName, ArrayList<String> settingsValue) throws IOException
+    {
+        String out = "";
+        for (String key : settingsValue)
+        {
+            if (out.equals(""))
+                out += key;
+            else
+                out += "," + key;
+        }
+
+        this.SettingsWriter.write(settingsName + ":" + out);
+        this.SettingsWriter.newLine();
+    }
+
+
     protected void WriteValue(String settingsName, BiomeBase settingsValue) throws IOException
     {
 
-        this.SettingsWriter.write(settingsName + ":" + ((settingsValue != null)?settingsValue.r:""));
+        this.SettingsWriter.write(settingsName + ":" + ((settingsValue != null) ? settingsValue.r : ""));
         this.SettingsWriter.newLine();
     }
 
@@ -338,6 +358,30 @@ public abstract class ConfigFile
             return minValue + 1;
         else
             return value;
+    }
+
+    protected ArrayList<String> CheckValue(ArrayList<String> biomes, ArrayList<String> customBiomes)
+    {
+        ArrayList<String> output = new ArrayList<String>();
+
+        for(String key: biomes)
+        {
+            if(customBiomes.contains(key))
+            {
+                output.add(key);
+                continue;
+            }
+
+            for(int i =0; i < WorldConfig.DefaultBiomesCount;i++)
+                if(BiomeBase.a[i].r.equals(key))
+                {
+                    output.add(key);
+                    break;
+                }
+
+        }
+        return output;
+
     }
 
 }

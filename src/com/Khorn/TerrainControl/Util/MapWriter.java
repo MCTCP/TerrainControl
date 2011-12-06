@@ -44,7 +44,7 @@ public class MapWriter
                                 Colors[biomeConfig.Biome.F] = color;
                         } catch (NumberFormatException ex)
                         {
-                            System.out.println("TerrainControl: wrong color in " + biomeConfig.Biome.r);
+                            System.out.println("Normal: wrong color in " + biomeConfig.Biome.r);
                         }
                     }
                 }

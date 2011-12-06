@@ -15,7 +15,7 @@ public class UndergroundLakeGen extends ResourceGenBase
     @Override
     protected void SpawnResource(Resource res, int x, int z)
     {
-        int y = this.rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MaxAltitude;
+        int y = this.rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
 
         if (y >= this.world.getHighestBlockYAt(x, z))
             return;

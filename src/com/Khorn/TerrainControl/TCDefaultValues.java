@@ -1,5 +1,10 @@
 package com.Khorn.TerrainControl;
 
+import sun.plugin.javascript.navig.Array;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
 public enum TCDefaultValues
 {
     WorldSettingsName("WorldConfig.ini"),
@@ -11,20 +16,27 @@ public enum TCDefaultValues
 
     CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0"),
     CustomBiomes(""),
-    NormalBiomes("Desert,Forest,Extreme Hills,Swampland,Plains,Taiga,Ice Plains,Ice Mountains"),
+    NormalBiomes("Desert,Forest,Extreme Hills,Swampland,Plains,Taiga"),
+    IceBiomes("Ice Plains,Ice Mountains"),
+    IsleBiomes("MushroomIsland"),
+    BorderBiomes("MushroomIslandShore"),
 
-    Mode("Normal"),
+    ModeTerrain("Normal"),
+    ModeBiome("Normal"),
 
     GenerationDepth(10),
     LandRarity(94),
-    LandSize(1),
+    LandSize(0),
     LandFuzzy(6),
     IceRarity(90),
     IceSize(3),
     RiverRarity(4),
     RiverSize(0),
+    RiversEnabled(true),
 
-    oldBiomeGenerator(false),
+    FrozenRivers(true),
+    FrozenOcean(true),
+
     oldBiomeSize(1.5D),
 
 
@@ -32,8 +44,7 @@ public enum TCDefaultValues
     BiomeRarity(100),
     BiomeColor(""),
     BiomeRivers(true),
-    IceBiome(false),
-    IsleInBiome(""),
+    IsleInBiome("Ocean"),
     BiomeIsBorder(""),
 
     BiomeTemperature(0.5F),
@@ -57,7 +68,6 @@ public enum TCDefaultValues
     waterlessDeserts(false),
     desertDirt(false),
 
-    OldTerrainGenerator(false),
     WaterLevel(64),
     WaterBlock(9),
     IceBlock(79),
@@ -279,12 +289,14 @@ public enum TCDefaultValues
         return this.sValue;
     }
 
-    public String[] stringArrayValue()
+    public ArrayList<String> StringArrayListValue()
     {
-        if(this.sValue.contains(","))
-            return this.sValue.split(",");
-        else
-            return new String[0];
+        ArrayList<String> out = new ArrayList<String>();
+        if (this.sValue.contains(","))
+            Collections.addAll(out, this.sValue.split(","));
+        else if (!this.sValue.equals(""))
+            out.add(this.sValue);
+        return out;
     }
 
 

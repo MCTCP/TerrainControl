@@ -7,7 +7,6 @@ import com.Khorn.TerrainControl.TCDefaultValues;
 import com.Khorn.TerrainControl.TCPlugin;
 import com.Khorn.TerrainControl.Util.CustomBiome;
 import net.minecraft.server.BiomeBase;
-import org.bukkit.block.Biome;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +19,9 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
 
     public ArrayList<String> NormalBiomes = new ArrayList<String>();
+    public ArrayList<String> IceBiomes = new ArrayList<String>();
+    public ArrayList<String> IsleBiomes = new ArrayList<String>();
+    public ArrayList<String> BorderBiomes = new ArrayList<String>();
 
     public ArrayList<CustomObject> Objects = new ArrayList<CustomObject>();
     public HashMap<String, ArrayList<CustomObject>> ObjectGroups = new HashMap<String, ArrayList<CustomObject>>();
@@ -31,7 +33,6 @@ public class WorldConfig extends ConfigFile
 
 
     // For old biome generator
-    public boolean oldBiomeGenerator;
     public double oldBiomeSize;
 
 
@@ -53,6 +54,10 @@ public class WorldConfig extends ConfigFile
 
     public int RiverRarity;
     public int RiverSize;
+    public boolean RiversEnabled;
+
+    public boolean FrozenRivers;
+    public boolean FrozenOcean;
 
 
     //Specific biome settings
@@ -134,7 +139,8 @@ public class WorldConfig extends ConfigFile
     public WorldConfig newSettings = null;
 
     public String WorldName;
-    public GenMode Mode;
+    public TerrainMode ModeTerrain;
+    public BiomeMode ModeBiome;
 
 
     public BiomeConfig[] biomeConfigs;
@@ -142,6 +148,9 @@ public class WorldConfig extends ConfigFile
 
     public static final int DefaultBiomesCount = 16;
     public static int ExtendedBiomesCount = 0;
+
+    public int normalBiomesRarity;
+    public int iceBiomesRarity;
 
 
     public int ChunkMaxY = 128;
@@ -187,7 +196,7 @@ public class WorldConfig extends ConfigFile
                 new CustomBiome(DefaultBiomesCount + ExtendedBiomesCount++, biomeName);
         }
 
-        for (int i = DefaultBiomesCount; i <DefaultBiomesCount + ExtendedBiomesCount; i++)
+        for (int i = DefaultBiomesCount; i < DefaultBiomesCount + ExtendedBiomesCount; i++)
             if (this.CustomBiomes.contains(BiomeBase.a[i].r))
                 biomes.add(BiomeBase.a[i]);
 
@@ -195,8 +204,12 @@ public class WorldConfig extends ConfigFile
         for (BiomeBase biome : biomes)
         {
             BiomeConfig config = new BiomeConfig(BiomeFolder, biome, this);
-            if (this.NormalBiomes.contains(biome.r))
-                config.IsNormalBiome = true;
+
+            if(this.NormalBiomes.contains(config.Name))
+                this.normalBiomesRarity += config.BiomeRarity;
+            if(this.IceBiomes.contains(config.Name))
+                this.iceBiomesRarity += config.BiomeRarity;
+
             this.biomeConfigs[biome.F] = config;
             if (!this.BiomeConfigsHaveReplacement)
                 this.BiomeConfigsHaveReplacement = config.replaceBlocks.size() > 0;
@@ -227,6 +240,11 @@ public class WorldConfig extends ConfigFile
 
         this.RiverRarity = CheckValue(this.RiverRarity, 0, this.GenerationDepth);
         this.RiverSize = CheckValue(this.RiverSize, 0, this.GenerationDepth - this.RiverRarity);
+
+        this.NormalBiomes = CheckValue(this.NormalBiomes, this.CustomBiomes);
+        this.IceBiomes = CheckValue(this.IceBiomes, this.CustomBiomes);
+        this.IsleBiomes = CheckValue(this.IsleBiomes, this.CustomBiomes);
+        this.BorderBiomes = CheckValue(this.BorderBiomes, this.CustomBiomes);
 
 
         this.minMoisture = (this.minMoisture < 0.0F ? 0.0F : this.minMoisture > 1.0F ? 1.0F : this.minMoisture);
@@ -259,10 +277,10 @@ public class WorldConfig extends ConfigFile
         this.customTreeMinTime = (this.customTreeMinTime < 1 ? 1 : this.customTreeMinTime);
         this.customTreeMaxTime = ((this.customTreeMaxTime - this.customTreeMinTime) < 1 ? (this.customTreeMinTime + 1) : this.customTreeMaxTime);
 
-        if (this.oldBiomeGenerator && !this.oldTerrainGenerator)
+        if (this.ModeBiome == BiomeMode.OldGenerator && this.ModeTerrain != TerrainMode.OldGenerator)
         {
             System.out.println("TerrainControl: Old biome generator works only with old terrain generator!");
-            this.oldBiomeGenerator = false;
+            this.ModeBiome = BiomeMode.Normal;
 
         }
 
@@ -274,13 +292,21 @@ public class WorldConfig extends ConfigFile
     {
         try
         {
-            this.Mode = GenMode.valueOf(ReadModSettings(TCDefaultValues.Mode.name(), TCDefaultValues.Mode.stringValue()));
+            this.ModeTerrain = TerrainMode.valueOf(ReadModSettings(TCDefaultValues.ModeTerrain.name(), TCDefaultValues.ModeTerrain.stringValue()));
         } catch (IllegalArgumentException e)
         {
-            this.Mode = GenMode.Normal;
+            this.ModeTerrain = TerrainMode.Normal;
         }
 
-        this.oldBiomeGenerator = ReadModSettings(TCDefaultValues.oldBiomeGenerator.name(), TCDefaultValues.oldBiomeGenerator.booleanValue());
+        try
+        {
+            this.ModeBiome = BiomeMode.valueOf(ReadModSettings(TCDefaultValues.ModeBiome.name(), TCDefaultValues.ModeBiome.stringValue()));
+        } catch (IllegalArgumentException e)
+        {
+            this.ModeBiome = BiomeMode.Normal;
+        }
+
+
         this.oldBiomeSize = ReadModSettings(TCDefaultValues.oldBiomeSize.name(), TCDefaultValues.oldBiomeSize.doubleValue());
 
 
@@ -295,7 +321,16 @@ public class WorldConfig extends ConfigFile
 
         this.RiverRarity = ReadModSettings(TCDefaultValues.RiverRarity.name(), TCDefaultValues.RiverRarity.intValue());
         this.RiverSize = ReadModSettings(TCDefaultValues.RiverSize.name(), TCDefaultValues.RiverSize.intValue());
+        this.RiversEnabled = ReadModSettings(TCDefaultValues.RiversEnabled.name(), TCDefaultValues.RiversEnabled.booleanValue());
 
+        this.FrozenRivers = ReadModSettings(TCDefaultValues.FrozenRivers.name(), TCDefaultValues.FrozenRivers.booleanValue());
+        this.FrozenOcean = ReadModSettings(TCDefaultValues.FrozenOcean.name(), TCDefaultValues.FrozenOcean.booleanValue());
+
+
+        this.NormalBiomes = this.ReadModSettings(TCDefaultValues.NormalBiomes.name(), TCDefaultValues.NormalBiomes.StringArrayListValue());
+        this.IceBiomes = this.ReadModSettings(TCDefaultValues.IceBiomes.name(), TCDefaultValues.IceBiomes.StringArrayListValue());
+        this.IsleBiomes = this.ReadModSettings(TCDefaultValues.IsleBiomes.name(), TCDefaultValues.IsleBiomes.StringArrayListValue());
+        this.BorderBiomes = this.ReadModSettings(TCDefaultValues.BorderBiomes.name(), TCDefaultValues.BorderBiomes.StringArrayListValue());
 
         this.minMoisture = ReadModSettings(TCDefaultValues.minMoisture.name(), TCDefaultValues.minMoisture.floatValue());
         this.maxMoisture = ReadModSettings(TCDefaultValues.maxMoisture.name(), TCDefaultValues.maxMoisture.floatValue());
@@ -356,7 +391,7 @@ public class WorldConfig extends ConfigFile
 
         this.removeSurfaceStone = ReadModSettings(TCDefaultValues.RemoveSurfaceStone.name(), TCDefaultValues.RemoveSurfaceStone.booleanValue());
 
-        this.oldTerrainGenerator = ReadModSettings(TCDefaultValues.OldTerrainGenerator.name(), TCDefaultValues.OldTerrainGenerator.booleanValue());
+        this.oldTerrainGenerator = this.ModeTerrain == TerrainMode.OldGenerator;
 
         this.customObjects = this.ReadModSettings(TCDefaultValues.CustomObjects.name(), TCDefaultValues.CustomObjects.booleanValue());
         this.objectSpawnRatio = this.ReadModSettings(TCDefaultValues.objectSpawnRatio.name(), TCDefaultValues.objectSpawnRatio.intValue());
@@ -366,30 +401,21 @@ public class WorldConfig extends ConfigFile
 
         this.ReadHeightSettings();
         this.ReadCustomBiomes();
-        this.ReadNormalBiomesSettings();
 
 
     }
 
-    private void ReadNormalBiomesSettings()
-    {
-        String[] keys = this.ReadModSettings(TCDefaultValues.NormalBiomes.name(), TCDefaultValues.NormalBiomes.stringArrayValue());
-
-        Collections.addAll(this.NormalBiomes, keys);
-
-
-    }
 
     private void ReadHeightSettings()
     {
 
-        String[] keys = this.ReadModSettings(TCDefaultValues.CustomHeightControl.name(), TCDefaultValues.CustomHeightControl.stringArrayValue());
+        ArrayList<String> keys = this.ReadModSettings(TCDefaultValues.CustomHeightControl.name(), TCDefaultValues.CustomHeightControl.StringArrayListValue());
         try
         {
-            if (keys.length != 17)
+            if (keys.size() != 17)
                 return;
             for (int i = 0; i < 17; i++)
-                this.heightMatrix[i] = Double.valueOf(keys[i]);
+                this.heightMatrix[i] = Double.valueOf(keys.get(i));
 
         } catch (NumberFormatException e)
         {
@@ -403,7 +429,7 @@ public class WorldConfig extends ConfigFile
     private void ReadCustomBiomes()
     {
 
-        String[] keys = this.ReadModSettings(TCDefaultValues.CustomBiomes.name(), TCDefaultValues.CustomBiomes.stringArrayValue());
+        ArrayList<String> keys = this.ReadModSettings(TCDefaultValues.CustomBiomes.name(), TCDefaultValues.CustomBiomes.StringArrayListValue());
 
         for (String key : keys)
         {
@@ -420,12 +446,19 @@ public class WorldConfig extends ConfigFile
 
     protected void WriteConfigSettings() throws IOException
     {
-        WriteComment("Possible modes : Normal, TerrainTest, NotGenerate, OnlyBiome");
+        WriteComment("Possible terrain modes : Normal, OldGenerator, TerrainTest, NotGenerate, Default");
         WriteComment("   Normal - use all features");
+        WriteComment("   OldGenerator - generate land like 1.7.3 generator");
         WriteComment("   TerrainTest - generate only terrain without any resources");
         WriteComment("   NotGenerate - generate empty chunks");
-        WriteComment("   OnlyBiome - use only TerrainControl biome generator");
-        WriteValue(TCDefaultValues.Mode.name(), this.Mode.name());
+        WriteComment("   Default - use default Notch terrain generator");
+        WriteValue(TCDefaultValues.ModeTerrain.name(), this.ModeTerrain.name());
+        WriteNewLine();
+        WriteComment("Possible biome modes : Normal, OldGenerator, Default");
+        WriteComment("   Normal - use all features");
+        WriteComment("   OldGenerator - generate biome like 1.7.3 generator");
+        WriteComment("   Default - use default Notch biome generator");
+        WriteValue(TCDefaultValues.ModeBiome.name(), this.ModeBiome.name());
 
         /* Disabled for 1.9
         WriteValue(TCDefaultValues.snowThreshold.name(), this.snowThreshold);
@@ -465,23 +498,31 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.IceSize.name(), this.IceSize);
         WriteNewLine();
 
+        WriteValue(TCDefaultValues.FrozenRivers.name(), this.FrozenRivers);
+        WriteValue(TCDefaultValues.FrozenOcean.name(), this.FrozenOcean);
+
         WriteComment("River rarity.Must be from 0 to GenerationDepth.");
         WriteValue(TCDefaultValues.RiverRarity.name(), this.RiverRarity);
         WriteNewLine();
         WriteComment("River size from 0 to GenerationDepth - RiverRarity");
         WriteValue(TCDefaultValues.RiverSize.name(), this.RiverSize);
         WriteNewLine();
+        WriteValue(TCDefaultValues.RiversEnabled.name(), this.RiversEnabled);
 
         WriteComment("Biomes which used in normal biome algorithm. Include ice biomes. Biome name is case sensitive.");
-        WriteNormalBiomesSettings();
+        WriteValue(TCDefaultValues.NormalBiomes.name(), this.NormalBiomes);
 
+        WriteValue(TCDefaultValues.IceBiomes.name(), this.IceBiomes);
+        WriteValue(TCDefaultValues.IsleBiomes.name(), this.IsleBiomes);
+        WriteValue(TCDefaultValues.BorderBiomes.name(), this.BorderBiomes);
 
         WriteNewLine();
         WriteComment("List of custom biomes.");
         WriteComment("Example: ");
         WriteComment("  CustomBiomes:TestBiome1, BiomeTest2");
         WriteComment("This will add two biomes and generate biome config files");
-        this.WriteCustomBiomesSettings();
+        WriteValue(TCDefaultValues.CustomBiomes.name(), this.CustomBiomes);
+
 
         /* Removed .. not sure this need someone
         WriteTitle("Swamp Biome Variables");
@@ -497,9 +538,6 @@ public class WorldConfig extends ConfigFile
 
 
         WriteTitle("Terrain Generator Variables");
-        WriteComment("Enable old 1.7.3 terrain generator.");
-        WriteValue(TCDefaultValues.OldTerrainGenerator.name(), this.oldTerrainGenerator);
-        WriteNewLine();
         WriteComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
         WriteValue(TCDefaultValues.WaterLevel.name(), this.waterLevel);
         WriteNewLine();
@@ -618,7 +656,6 @@ public class WorldConfig extends ConfigFile
         WriteTitle("Old Biome Generator Variables");
         WriteComment("This generator works only with old terrain generator!");
         //WriteComment("Since 1.8.3 notch take temperature from biomes, so changing this you can`t affect new biome generation ");
-        WriteValue(TCDefaultValues.oldBiomeGenerator.name(), this.oldBiomeGenerator);
         WriteValue(TCDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
         WriteValue(TCDefaultValues.minMoisture.name(), this.minMoisture);
         WriteValue(TCDefaultValues.maxMoisture.name(), this.maxMoisture);
@@ -636,36 +673,6 @@ public class WorldConfig extends ConfigFile
             output = output + "," + Double.toString(this.heightMatrix[i]);
 
         this.WriteValue(TCDefaultValues.CustomHeightControl.name(), output);
-    }
-
-    private void WriteCustomBiomesSettings() throws IOException
-    {
-
-        if (this.CustomBiomes.size() == 0)
-        {
-            this.WriteValue(TCDefaultValues.CustomBiomes.name(), "");
-            return;
-        }
-        String output = this.CustomBiomes.get(0);
-        for (int i = 1; i < this.CustomBiomes.size(); i++)
-            output = output + "," + this.CustomBiomes.get(i);
-
-        this.WriteValue(TCDefaultValues.CustomBiomes.name(), output);
-    }
-
-    private void WriteNormalBiomesSettings() throws IOException
-    {
-
-        if (this.NormalBiomes.size() == 0)
-        {
-            this.WriteValue(TCDefaultValues.NormalBiomes.name(), "");
-            return;
-        }
-        String output = this.NormalBiomes.get(0);
-        for (int i = 1; i < this.NormalBiomes.size(); i++)
-            output = output + "," + this.NormalBiomes.get(i);
-
-        this.WriteValue(TCDefaultValues.NormalBiomes.name(), output);
     }
 
 
@@ -779,13 +786,20 @@ public class WorldConfig extends ConfigFile
     }
 
 
-    public enum GenMode
+    public enum TerrainMode
     {
         Normal,
+        OldGenerator,
         TerrainTest,
-        OnlyBiome,
         NotGenerate,
+        Default
+    }
 
+    public enum BiomeMode
+    {
+        Normal,
+        OldGenerator,
+        Default
     }
 
 }

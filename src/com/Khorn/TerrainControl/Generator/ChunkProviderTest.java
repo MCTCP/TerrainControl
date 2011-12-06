@@ -30,7 +30,7 @@ public class ChunkProviderTest extends ChunkGenerator
         int chunkMaxY = 128;
         int chunkMaxX = 16;
         int chunkMaxZ = 16;
-        if( worldSettings.Mode == WorldConfig.GenMode.NotGenerate)
+        if( worldSettings.ModeTerrain == WorldConfig.TerrainMode.NotGenerate)
             return new byte[chunkMaxX * chunkMaxY * chunkMaxZ];
         return new byte[0];
     }

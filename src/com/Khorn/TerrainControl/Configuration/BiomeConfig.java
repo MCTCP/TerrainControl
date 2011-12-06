@@ -40,10 +40,7 @@ public class BiomeConfig extends ConfigFile
     public float BiomeTemperature;
     public float BiomeWetness;
 
-    public boolean IceBiome;
     public boolean BiomeRivers;
-
-    public boolean IsNormalBiome = false;
 
 
     public byte SurfaceBlock;
@@ -62,12 +59,14 @@ public class BiomeConfig extends ConfigFile
 
     public BiomeBase Biome;
     private WorldConfig worldConfig;
+    public String Name;
 
 
     public BiomeConfig(File settingsDir, BiomeBase biome, WorldConfig config)
     {
 
         this.Biome = biome;
+        this.Name = biome.r;
         worldConfig = config;
         InitDefaults();
 
@@ -275,7 +274,6 @@ public class BiomeConfig extends ConfigFile
 
         this.BiomeRivers = ReadModSettings(TCDefaultValues.BiomeRivers.name(), this.DefaultRiver);
 
-        this.IceBiome = ReadModSettings(TCDefaultValues.IceBiome.name(), this.DefaultIce);
 
         this.IsleInBiome = ReadModSettings(TCDefaultValues.IsleInBiome.name(), this.DefaultIsle);
         this.BiomeIsBorder = ReadModSettings(TCDefaultValues.BiomeIsBorder.name(), this.DefaultBorder);
@@ -447,9 +445,6 @@ public class BiomeConfig extends ConfigFile
         WriteValue(TCDefaultValues.BiomeRivers.name(), this.BiomeRivers);
         this.WriteNewLine();
 
-        WriteComment("True if biome is ice biome.");
-        WriteValue(TCDefaultValues.IceBiome.name(), this.IceBiome);
-        this.WriteNewLine();
 
         WriteComment("Biome name where this biome will be spawned as isle. Like Mushroom isle in Ocean. You can use this biome as normal spawn biome and isle in one time.");
         WriteValue(TCDefaultValues.IsleInBiome.name(), this.IsleInBiome);
@@ -601,7 +596,6 @@ public class BiomeConfig extends ConfigFile
     private float DefaultBiomeWetness = 0.5F;
     private BiomeBase DefaultIsle = null;
     private BiomeBase DefaultBorder = null;
-    private boolean DefaultIce = false;
     private boolean DefaultRiver = true;
     private int DefaultSize = 4;
     private int DefaultRarity = 100;
@@ -677,19 +671,15 @@ public class BiomeConfig extends ConfigFile
                 break;
             case 10:
                 this.DefaultColor = "0xFFFFFF";
-                this.DefaultIce = true;
                 break;
             case 11:
                 this.DefaultColor = "0x66FFFF";
-                this.DefaultIce = true;
                 break;
             case 12:
                 this.DefaultColor = "0xCCCCCC";
-                this.DefaultIce = true;
                 break;
             case 13:
                 this.DefaultColor = "0xCC9966";
-                this.DefaultIce = true;
                 break;
             case 14:
             {

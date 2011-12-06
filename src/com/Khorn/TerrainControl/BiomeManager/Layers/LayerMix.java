@@ -29,18 +29,18 @@ public class LayerMix extends Layer
                 int currentPiece = arrayOfInt1[(j + i * paramInt3)];
                 if ((currentPiece & LandBit) != 0)
                 {
-                    if ((currentPiece & RiverBits) != 0 && this.worldConfig.biomeConfigs[currentPiece&BiomeBits].BiomeRivers)
-                        if ((currentPiece & IceBit) != 0)
+                    if (this.worldConfig.RiversEnabled && (currentPiece & RiverBits) != 0 && this.worldConfig.biomeConfigs[currentPiece&BiomeBits].BiomeRivers)
+                        if (this.worldConfig.FrozenRivers && (currentPiece & IceBit) != 0)
                             currentPiece = BiomeBase.FROZEN_RIVER.F;
                         else
                             currentPiece = BiomeBase.RIVER.F;
                     else
                         currentPiece = currentPiece & BiomeBits;
 
-                } else if ((currentPiece & IceBit) != 0 && this.worldConfig.biomeConfigs[0].BiomeRivers)
+                } else if (this.worldConfig.FrozenOcean && (currentPiece & IceBit) != 0 )
                     currentPiece = BiomeBase.FROZEN_OCEAN.F;
                 else
-                    currentPiece = 0;
+                    currentPiece = BiomeBase.OCEAN.F;
                 arrayOfInt2[(j + i * paramInt3)] = currentPiece;
             }
         }
