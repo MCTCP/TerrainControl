@@ -27,7 +27,7 @@ public class MapCommand extends BaseCommand
 
         World world = ((CraftWorld) ((Player) sender).getWorld()).getHandle();
 
-        MapWriter.GenerateMaps(this.plugin, world, 200, 200);
+        MapWriter.GenerateMaps(this.plugin, world, 400, 400);
 
         sender.sendMessage(MessageColor + "Done!");
         return true;

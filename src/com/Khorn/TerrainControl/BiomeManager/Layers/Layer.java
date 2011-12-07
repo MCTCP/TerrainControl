@@ -73,8 +73,8 @@ public abstract class Layer
 
         for (int i = 0; i < config.GenerationDepth + 1; i++)
         {
-            ArrayList<BiomeBase> normalBiomes = new ArrayList<BiomeBase>(config.normalBiomesRarity);
-            ArrayList<BiomeBase> iceBiomes = new ArrayList<BiomeBase>(config.iceBiomesRarity);
+            ArrayList<BiomeBase> normalBiomes = new ArrayList<BiomeBase>();
+            ArrayList<BiomeBase> iceBiomes = new ArrayList<BiomeBase>();
             for (BiomeConfig biomeConfig : config.biomeConfigs)
             {
                 if (biomeConfig.BiomeSize != i)
@@ -94,8 +94,12 @@ public abstract class Layer
                 }
 
             }
-            NormalBiomeMap[i] = normalBiomes.toArray(new BiomeBase[normalBiomes.size()]);
-            IceBiomeMap[i] = iceBiomes.toArray(new BiomeBase[iceBiomes.size()]);
+            if (normalBiomes.size() != 0)
+                NormalBiomeMap[i] = normalBiomes.toArray(new BiomeBase[normalBiomes.size() + config.normalBiomesRarity]);
+
+            if (iceBiomes.size() != 0)
+                IceBiomeMap[i] = iceBiomes.toArray(new BiomeBase[iceBiomes.size() + config.iceBiomesRarity]);
+
 
         }
 
@@ -118,7 +122,7 @@ public abstract class Layer
                 MainLayer = new LayerLandRandom(depth, MainLayer);
 
 
-            if (NormalBiomeMap[depth].length != 0 || IceBiomeMap[depth].length != 0)
+            if (NormalBiomeMap[depth] != null || IceBiomeMap[depth] != null)
             {
 
                 LayerBiome layerBiome = new LayerBiome(200, MainLayer);
