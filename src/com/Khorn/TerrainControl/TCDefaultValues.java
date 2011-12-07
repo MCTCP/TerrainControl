@@ -25,7 +25,7 @@ public enum TCDefaultValues
     ModeBiome("Normal"),
 
     GenerationDepth(10),
-    LandRarity(94),
+    LandRarity(97),
     LandSize(0),
     LandFuzzy(6),
     IceRarity(90),

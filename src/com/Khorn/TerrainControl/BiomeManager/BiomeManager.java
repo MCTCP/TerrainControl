@@ -27,15 +27,22 @@ public class BiomeManager extends WorldChunkManager
         this.f.add(BiomeBase.FOREST);
         this.f.add(BiomeBase.SWAMPLAND);
         this.f.add(BiomeBase.TAIGA);
-        this.worldConfig = config;
 
-        Layer[] layers = Layer.a(paramWorld.getSeed(),config);
+        this.Init(paramWorld,config);
+
+    }
+
+    public void Init(World paramWorld, WorldConfig config)
+    {
+        this.worldConfig = config;
+        this.Cache = new BiomeCache(this);
+
+        Layer[] layers = Layer.a(paramWorld.getSeed(), config);
 
         this.UnZoomedLayer = layers[0];
         this.BiomeLayer = layers[1];
         this.TemperatureLayer = layers[2];
         this.DownfallLayer = layers[3];
-
     }
 
 

@@ -429,15 +429,16 @@ public class BiomeConfig extends ConfigFile
 
         this.WriteNewLine();
 
-        WriteComment("Biome size from 0 to GenerationDepth.");
+        WriteComment("Biome size from 0 to GenerationDepth. Show in what zoom level biome will be generated ( see GenerationDepth)");
         WriteValue(TCDefaultValues.BiomeSize.name(), this.BiomeSize);
         this.WriteNewLine();
 
-        WriteComment("Biome rarity from 100 to 1. Like LandSize.");
+        WriteComment("Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.");
+        WriteComment("So 100 rarity mean 1/6 chance for normal biomes ( by 6 default normal biomes). 50 rarity mean 1/11 chance for this biome");
         WriteValue(TCDefaultValues.BiomeRarity.name(), this.BiomeRarity);
         this.WriteNewLine();
 
-        WriteComment("Biome color in hex value. Used by /tc map command");
+        WriteComment("Biome color in hex value. Biome color in /tc map command");
         WriteValue(TCDefaultValues.BiomeColor.name(), this.BiomeColor);
         this.WriteNewLine();
 
@@ -446,7 +447,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteNewLine();
 
 
-        WriteComment("Biome name where this biome will be spawned as isle. Like Mushroom isle in Ocean. You can use this biome as normal spawn biome and isle in one time.");
+        WriteComment("Biome name where this biome will be spawned as isle. Like Mushroom isle in Ocean.  This work only if this biome is in IsleBiomes in world config");
         WriteValue(TCDefaultValues.IsleInBiome.name(), this.IsleInBiome);
         this.WriteNewLine();
 

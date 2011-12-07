@@ -1,8 +1,11 @@
 package com.Khorn.TerrainControl.Commands;
 
+import com.Khorn.TerrainControl.BiomeManager.BiomeManager;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.TCPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.CraftWorld;
 
 import java.util.List;
 
@@ -29,10 +32,17 @@ public class ReloadCommand extends BaseCommand
         }
         String worldName = worldSettings.WorldName;
 
+
         this.plugin.worldsSettings.remove(worldName);
 
-        worldSettings.newSettings = this.plugin.GetSettings(worldName,false);
+        worldSettings.newSettings = this.plugin.GetSettings(worldName, false);
         worldSettings.isDeprecated = true;
+
+        if (worldSettings.ModeBiome == WorldConfig.BiomeMode.Normal)
+        {
+            net.minecraft.server.World world = ((CraftWorld) Bukkit.getWorld(worldName)).getHandle();
+            ((BiomeManager) world.worldProvider.b).Init(world, worldSettings.newSettings);
+        }
 
         sender.sendMessage(MessageColor + "WorldConfig for world " + worldName + " reloaded");
         return true;

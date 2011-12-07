@@ -40,6 +40,10 @@ public abstract class ConfigFile
                         {
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                             this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
+                        } else if (splitSettings.length == 1)
+                        {
+                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
+                            this.SettingsCache.put(splitSettings[0].trim(), "");
                         }
                     } else
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
@@ -364,16 +368,16 @@ public abstract class ConfigFile
     {
         ArrayList<String> output = new ArrayList<String>();
 
-        for(String key: biomes)
+        for (String key : biomes)
         {
-            if(customBiomes.contains(key))
+            if (customBiomes.contains(key))
             {
                 output.add(key);
                 continue;
             }
 
-            for(int i =0; i < WorldConfig.DefaultBiomesCount;i++)
-                if(BiomeBase.a[i].r.equals(key))
+            for (int i = 0; i < WorldConfig.DefaultBiomesCount; i++)
+                if (BiomeBase.a[i].r.equals(key))
                 {
                     output.add(key);
                     break;

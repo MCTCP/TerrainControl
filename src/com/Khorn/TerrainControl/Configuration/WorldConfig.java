@@ -205,9 +205,9 @@ public class WorldConfig extends ConfigFile
         {
             BiomeConfig config = new BiomeConfig(BiomeFolder, biome, this);
 
-            if(this.NormalBiomes.contains(config.Name))
+            if (this.NormalBiomes.contains(config.Name))
                 this.normalBiomesRarity += config.BiomeRarity;
-            if(this.IceBiomes.contains(config.Name))
+            if (this.IceBiomes.contains(config.Name))
                 this.iceBiomesRarity += config.BiomeRarity;
 
             this.biomeConfigs[biome.F] = config;
@@ -499,7 +499,9 @@ public class WorldConfig extends ConfigFile
         WriteNewLine();
 
         WriteValue(TCDefaultValues.FrozenRivers.name(), this.FrozenRivers);
+        WriteNewLine();
         WriteValue(TCDefaultValues.FrozenOcean.name(), this.FrozenOcean);
+        WriteNewLine();
 
         WriteComment("River rarity.Must be from 0 to GenerationDepth.");
         WriteValue(TCDefaultValues.RiverRarity.name(), this.RiverRarity);
@@ -508,12 +510,18 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.RiverSize.name(), this.RiverSize);
         WriteNewLine();
         WriteValue(TCDefaultValues.RiversEnabled.name(), this.RiversEnabled);
+        WriteNewLine();
 
-        WriteComment("Biomes which used in normal biome algorithm. Include ice biomes. Biome name is case sensitive.");
+        WriteComment("Biomes which used in normal biome algorithm. Biome name is case sensitive.");
         WriteValue(TCDefaultValues.NormalBiomes.name(), this.NormalBiomes);
-
+        WriteNewLine();
+        WriteComment("Biomes which used in ice biome algorithm. Biome name is case sensitive.");
         WriteValue(TCDefaultValues.IceBiomes.name(), this.IceBiomes);
+        WriteNewLine();
+        WriteComment("Biomes which used as isles. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.");
         WriteValue(TCDefaultValues.IsleBiomes.name(), this.IsleBiomes);
+        WriteNewLine();
+        WriteComment("Biomes which used as borders. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
         WriteValue(TCDefaultValues.BorderBiomes.name(), this.BorderBiomes);
 
         WriteNewLine();
