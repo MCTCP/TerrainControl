@@ -370,6 +370,7 @@ public abstract class ConfigFile
 
         for (String key : biomes)
         {
+            key = key.trim();
             if (customBiomes.contains(key))
             {
                 output.add(key);
