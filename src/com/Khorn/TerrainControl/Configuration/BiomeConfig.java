@@ -194,7 +194,11 @@ public class BiomeConfig extends ConfigFile
 
 
         }
-
+        if (this.DefaultWaterLily > 0)
+        {
+            resource = new Resource(ResourceType.AboveWaterRes, Block.WATER_LILY.id, 0, 0, this.DefaultWaterLily, 100, 0, 0, new int[0]);
+            this.ResourceSequence[this.ResourceCount++] = resource;
+        }
 
         if (this.DefaultFlowers > 0)
         {
@@ -499,8 +503,9 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("");
         this.WriteComment("Possible resources:");
         this.WriteComment("Dungeon(Frequency,Rarity,MinAltitude,MaxAltitude)");
+        this.WriteComment("UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.WriteComment("Ore(Block,Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.WriteComment("UnderWaterOre(Block,Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.WriteComment("UnderWaterOre(Block,Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("CustomObject()");
         this.WriteComment("Tree(Frequency,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
         this.WriteComment("Plant(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
@@ -508,6 +513,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Reed(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Cactus(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Liquid(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.WriteComment("AboveWaterRes(Block,Frequency,Rarity,MinAltitude)");
         this.WriteComment("");
         this.WriteComment("Some comments:  ");
         this.WriteComment("Block and BlockSource - can be id or name, Frequency - is count of attempts for place resource");
@@ -601,6 +607,7 @@ public class BiomeConfig extends ConfigFile
     private int DefaultSize = 4;
     private int DefaultRarity = 100;
     private String DefaultColor = "0x000000";
+    private int DefaultWaterLily = 0;
 
 
     private void InitDefaults()
@@ -694,6 +701,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultSize = 6;
                 this.DefaultIsle = BiomeBase.OCEAN;
                 this.DefaultColor = "0xFF33CC";
+                this.DefaultWaterLily = 1;
                 break;
             }
             case 15:

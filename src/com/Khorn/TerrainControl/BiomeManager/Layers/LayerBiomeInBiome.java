@@ -6,7 +6,7 @@ public class LayerBiomeInBiome extends Layer
 {
     public BiomeBase biome = BiomeBase.MUSHROOM_ISLAND;
     public int chance = 10;
-    public boolean inOcean = true;
+    public boolean inOcean = false;
     public int inBiome = BiomeBase.PLAINS.F;
 
 
@@ -17,6 +17,7 @@ public class LayerBiomeInBiome extends Layer
 
     }
 
+    @SuppressWarnings({"PointlessArithmeticExpression"})
     @Override
     public int[] a(int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {

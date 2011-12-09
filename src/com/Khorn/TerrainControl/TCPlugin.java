@@ -65,6 +65,12 @@ public class TCPlugin extends JavaPlugin
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
     {
+        if (worldName.trim().equals(""))
+        {
+            System.out.println("TerrainControl: world name is empty string !!");
+            return null;
+        }
+
         if (worldsSettings.containsKey(worldName))
         {
             System.out.println("TerrainControl: enabled for '" + worldName + "'");

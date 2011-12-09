@@ -240,11 +240,19 @@ public class Resource
                     if (Props.length < 6)
                         return;
                     this.MinSize = CheckValue(Props[0], 1, 25);
-                    this.MaxSize = CheckValue(Props[1], 1, 60,this.MinSize);
+                    this.MaxSize = CheckValue(Props[1], 1, 60, this.MinSize);
                     this.Frequency = CheckValue(Props[2], 1, 100);
                     this.Rarity = CheckValue(Props[3], 0, 100);
                     this.MinAltitude = CheckValue(Props[4], 0, 128);
                     this.MaxAltitude = CheckValue(Props[5], 0, 128, this.MinAltitude);
+                    break;
+                case AboveWaterRes:
+                    if (Props.length < 3)
+                        return;
+                    this.BlockId = CheckBlock(Props[0]);
+                    this.Frequency = CheckValue(Props[1], 1, 100);
+                    this.Rarity = CheckValue(Props[2], 0, 100);
+
                     break;
             }
         } catch (NumberFormatException e)
@@ -296,6 +304,9 @@ public class Resource
                 break;
             case UnderGroundLake:
                 output += this.MinSize + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
+                break;
+            case AboveWaterRes:
+                output += Material.getMaterial(this.BlockId).name() + "," + this.Frequency + "," + this.Rarity + ")";
                 break;
         }
         return output;

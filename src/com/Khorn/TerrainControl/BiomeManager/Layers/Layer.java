@@ -96,9 +96,13 @@ public abstract class Layer
             }
             if (normalBiomes.size() != 0)
                 NormalBiomeMap[i] = normalBiomes.toArray(new BiomeBase[normalBiomes.size() + config.normalBiomesRarity]);
+            else
+                NormalBiomeMap[i] = new BiomeBase[0];
 
             if (iceBiomes.size() != 0)
                 IceBiomeMap[i] = iceBiomes.toArray(new BiomeBase[iceBiomes.size() + config.iceBiomesRarity]);
+            else
+                IceBiomeMap[i] = new BiomeBase[0];
 
 
         }
@@ -122,7 +126,7 @@ public abstract class Layer
                 MainLayer = new LayerLandRandom(depth, MainLayer);
 
 
-            if (NormalBiomeMap[depth] != null || IceBiomeMap[depth] != null)
+            if (NormalBiomeMap[depth].length != 0 || IceBiomeMap[depth].length != 0)
             {
 
                 LayerBiome layerBiome = new LayerBiome(200, MainLayer);
@@ -150,7 +154,7 @@ public abstract class Layer
                 if (config.IsleBiomes.contains(biomeConfig.Name) && biomeConfig.IsleInBiome != null)
                 {
 
-                    LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + depth, MainLayer);
+                    LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + biomeConfig.Biome.F, MainLayer);
                     layerBiome.biome = biomeConfig.Biome;
                     if (biomeConfig.IsleInBiome == BiomeBase.OCEAN)
                         layerBiome.inOcean = true;

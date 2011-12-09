@@ -12,5 +12,6 @@ public enum ResourceType
     Dungeon,
     Tree,
     CustomObject,
-    UnderGroundLake
+    UnderGroundLake,
+    AboveWaterRes
 }

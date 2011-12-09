@@ -31,6 +31,7 @@ public class ObjectSpawner extends BlockPopulator
     private DungeonGen dungeonGen;
     private TreeGen treeGen;
     private UndergroundLakeGen undergroundLakeGen;
+    private AboveWaterGen aboveWaterGen;
 
 
     public ObjectSpawner(WorldConfig wrk)
@@ -53,6 +54,7 @@ public class ObjectSpawner extends BlockPopulator
         this.dungeonGen = new DungeonGen(this.world);
         this.treeGen = new TreeGen(this.world);
         this.undergroundLakeGen = new UndergroundLakeGen(this.world);
+        this.aboveWaterGen = new AboveWaterGen(this.world);
     }
 
 
@@ -92,6 +94,9 @@ public class ObjectSpawner extends BlockPopulator
                 break;
             case UnderGroundLake:
                 this.undergroundLakeGen.Process(this.rand, res, x, z);
+                break;
+            case AboveWaterRes:
+                this.aboveWaterGen.Process(this.rand, res, x, z);
                 break;
         }
 
@@ -164,7 +169,6 @@ public class ObjectSpawner extends BlockPopulator
             {
                 int i5 = this.world.e(i1 + _x, i2 + _z);
 
-                float f1 = this.world.getWorldChunkManager().a(_x + i1, i5 - 1, _z + i2);
                 if (this.world.p(_x + i1, i5 - 1, _z + i2))
                 {
                     this.world.setTypeId(_x + i1, i5 - 1, _z + i2, Block.ICE.id);
@@ -181,11 +185,11 @@ public class ObjectSpawner extends BlockPopulator
         if (this.worldSettings.BiomeConfigsHaveReplacement)
         {
             byte[] blocks = ((CraftChunk) chunk).getHandle().b;
+            this.BiomeArray = this.world.getWorldChunkManager().a(this.BiomeArray, chunk_x * 16, chunk_z * 16, 16, 16);
 
             for (int _x = 0; _x < 16; _x++)
                 for (int _z = 0; _z < 16; _z++)
                 {
-                    this.BiomeArray = this.world.getWorldChunkManager().a(this.BiomeArray, chunk_x * 16, chunk_z * 16, 16, 16);
                     BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.BiomeArray[(_z + _x * 16)].F];
                     if (biomeConfig.replaceBlocks.size() > 0)
                     {

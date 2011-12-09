@@ -19,6 +19,7 @@ public class BiomeManager extends WorldChunkManager
     private ArrayList<BiomeBase> f = new ArrayList<BiomeBase>();
     private float[] buffer;
 
+
     private WorldConfig worldConfig;
 
 
@@ -28,7 +29,7 @@ public class BiomeManager extends WorldChunkManager
         this.f.add(BiomeBase.SWAMPLAND);
         this.f.add(BiomeBase.TAIGA);
 
-        this.Init(paramWorld,config);
+        this.Init(paramWorld, config);
 
     }
 
@@ -62,7 +63,7 @@ public class BiomeManager extends WorldChunkManager
     }
 
 
-    public float[] getWetness(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public synchronized float[] getWetness(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         IntCache.a();
         if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < paramInt3 * paramInt4))
@@ -97,7 +98,7 @@ public class BiomeManager extends WorldChunkManager
         return this.buffer;
     }
 
-    public float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public synchronized float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         IntCache.a();
         if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < paramInt3 * paramInt4))
@@ -141,7 +142,7 @@ public class BiomeManager extends WorldChunkManager
         return a(paramArrayOfBiomeBase, paramInt1, paramInt2, paramInt3, paramInt4, true);
     }
 
-    public BiomeBase[] a(BiomeBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
+    public synchronized BiomeBase[] a(BiomeBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
     {
         IntCache.a();
         if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < paramInt3 * paramInt4))
@@ -212,7 +213,7 @@ public class BiomeManager extends WorldChunkManager
         return localChunkPosition;
     }
 
-    public void b()
+    public synchronized void b()
     {
         this.Cache.a();
     }
