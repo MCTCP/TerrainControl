@@ -156,10 +156,15 @@ public abstract class Layer
 
                     LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + biomeConfig.Biome.F, MainLayer);
                     layerBiome.biome = biomeConfig.Biome;
-                    if (biomeConfig.IsleInBiome == BiomeBase.OCEAN)
-                        layerBiome.inOcean = true;
-                    else
-                        layerBiome.inBiome = biomeConfig.IsleInBiome.F;
+                    for(String biomeName : biomeConfig.IsleInBiome)
+                    {
+                        BiomeBase biome = config.GetBiomeByName(biomeName);
+                        if(biome == BiomeBase.OCEAN)
+                            layerBiome.inOcean = true;
+                        else
+                            layerBiome.BiomeIsles[biome.F] = true;
+                    }
+
                     layerBiome.chance = 101 - biomeConfig.BiomeRarity;
                     MainLayer = layerBiome;
                 }
@@ -167,7 +172,16 @@ public abstract class Layer
                 if (config.BorderBiomes.contains(biomeConfig.Name) && biomeConfig.BiomeIsBorder != null)
                 {
                     haveBorder = true;
-                    layerBiomeBorder.BiomeBorders[biomeConfig.BiomeIsBorder.F] = biomeConfig.Biome.F;
+
+                    for(String biomeName : biomeConfig.BiomeIsBorder)
+                    {
+                        BiomeBase biome = config.GetBiomeByName(biomeName);
+                        if(biome == BiomeBase.OCEAN)
+                            layerBiomeBorder.OceanBorder = biomeConfig.Biome.F;
+                        else
+                            layerBiomeBorder.BiomeBorders[biome.F] = biomeConfig.Biome.F;
+                    }
+
                 }
             }
 

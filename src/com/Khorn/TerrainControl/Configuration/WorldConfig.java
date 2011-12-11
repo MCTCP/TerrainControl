@@ -525,7 +525,7 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.BorderBiomes.name(), this.BorderBiomes);
 
         WriteNewLine();
-        WriteComment("List of custom biomes.");
+        WriteComment("List of ALL custom biomes.");
         WriteComment("Example: ");
         WriteComment("  CustomBiomes:TestBiome1, BiomeTest2");
         WriteComment("This will add two biomes and generate biome config files");
@@ -791,6 +791,14 @@ public class WorldConfig extends ConfigFile
     public boolean createAdminium(int y)
     {
         return (!this.disableBedrock) && ((!this.flatBedrock) || (y == 0));
+    }
+
+    public BiomeBase GetBiomeByName(String name)
+    {
+        for (int i = 0; i < WorldConfig.DefaultBiomesCount + WorldConfig.ExtendedBiomesCount; i++)
+            if (BiomeBase.a[i].r.equals(name))
+                return BiomeBase.a[i];
+        return null;
     }
 
 

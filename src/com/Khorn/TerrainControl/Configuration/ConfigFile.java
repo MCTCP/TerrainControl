@@ -77,19 +77,6 @@ public abstract class ConfigFile
         }
     }
 
-    protected BiomeBase ReadModSettings(String settingsName, BiomeBase defaultValue)
-    {
-        if (this.SettingsCache.containsKey(settingsName))
-        {
-            String biome = this.SettingsCache.get(settingsName);
-            for (int i = 0; i < WorldConfig.DefaultBiomesCount + WorldConfig.ExtendedBiomesCount; i++)
-                if (BiomeBase.a[i].r.equals(biome))
-                    return BiomeBase.a[i];
-        }
-        return defaultValue;
-
-    }
-
     protected ArrayList<String> ReadModSettings(String settingsName, ArrayList<String> defaultValue)
     {
 

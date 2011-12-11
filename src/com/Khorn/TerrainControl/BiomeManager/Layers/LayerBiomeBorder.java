@@ -9,10 +9,11 @@ public class LayerBiomeBorder extends Layer
     {
         super(paramLong);
         this.a = paramGenLayer;
-        for(int i = 0; i< BiomeBorders.length;i++)
+        for (int i = 0; i < BiomeBorders.length; i++)
             BiomeBorders[i] = -1;
     }
 
+    public int OceanBorder = -1;
     public int[] BiomeBorders = new int[64];
 
     @Override
@@ -27,7 +28,7 @@ public class LayerBiomeBorder extends Layer
             {
                 a(j + paramInt1, i + paramInt2);
                 int currentPiece = arrayOfInt1[(j + 1 + (i + 1) * (paramInt3 + 2))];
-                if ((currentPiece&LandBit)!= 0 && BiomeBorders[currentPiece & BiomeBits] != -1)
+                if ((currentPiece & LandBit) != 0 && BiomeBorders[currentPiece & BiomeBits] != -1)
                 {
                     int i1 = arrayOfInt1[(j + 1 + (i + 1 - 1) * (paramInt3 + 2))] & (LandBit | BiomeBits);
                     int i2 = arrayOfInt1[(j + 1 + 1 + (i + 1) * (paramInt3 + 2))] & (LandBit | BiomeBits);
@@ -37,6 +38,17 @@ public class LayerBiomeBorder extends Layer
                     if ((i1 != i5) || (i2 != i5) || (i3 != i5) || (i4 != i5))
                         currentPiece = (currentPiece & (IslandBit | RiverBits | IceBit)) | LandBit | BiomeBorders[currentPiece & BiomeBits];
                 }
+                if ((currentPiece & LandBit) == 0 && OceanBorder != -1)
+                {
+                    int i1 = arrayOfInt1[(j + 1 + (i + 1 - 1) * (paramInt3 + 2))] & LandBit;
+                    int i2 = arrayOfInt1[(j + 1 + 1 + (i + 1) * (paramInt3 + 2))] & LandBit;
+                    int i3 = arrayOfInt1[(j + 1 - 1 + (i + 1) * (paramInt3 + 2))] & LandBit;
+                    int i4 = arrayOfInt1[(j + 1 + (i + 1 + 1) * (paramInt3 + 2))] & LandBit;
+                    int i5 = currentPiece & LandBit;
+                    if ((i1 != i5) || (i2 != i5) || (i3 != i5) || (i4 != i5))
+                        currentPiece = (currentPiece & (IslandBit | RiverBits | IceBit)) | LandBit | OceanBorder;
+                }
+
                 arrayOfInt2[(j + i * paramInt3)] = currentPiece;
 
             }

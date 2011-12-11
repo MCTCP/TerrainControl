@@ -65,7 +65,7 @@ public class ChunkProviderTC extends ChunkGenerator
         this.worldSettings = config;
         this.worldSettings.ChunkProvider = this;
         populatorList = new ArrayList<BlockPopulator>();
-        if (this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.Normal)
+        if (this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.Normal || this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
             populatorList.add(new ObjectSpawner(this.worldSettings));
 
 

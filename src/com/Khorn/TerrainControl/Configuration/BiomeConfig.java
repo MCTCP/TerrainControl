@@ -29,8 +29,8 @@ public class BiomeConfig extends ConfigFile
 
     public String BiomeColor;
 
-    public BiomeBase BiomeIsBorder;
-    public BiomeBase IsleInBiome;
+    public ArrayList<String> BiomeIsBorder;
+    public ArrayList<String> IsleInBiome;
 
 
     //Surface config
@@ -434,11 +434,17 @@ public class BiomeConfig extends ConfigFile
         this.WriteNewLine();
 
         WriteComment("Biome size from 0 to GenerationDepth. Show in what zoom level biome will be generated ( see GenerationDepth)");
+        WriteComment("Higher numbers = less zoom this biome, lower numbers = more zoom");
+        WriteComment("Don`t work on Ocean and River (frozen versions too) biomes until not added as normal biome.");
         WriteValue(TCDefaultValues.BiomeSize.name(), this.BiomeSize);
         this.WriteNewLine();
 
         WriteComment("Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.");
-        WriteComment("So 100 rarity mean 1/6 chance for normal biomes ( by 6 default normal biomes). 50 rarity mean 1/11 chance for this biome");
+        WriteComment("Example for normal biome :");
+        WriteComment("  100 rarity mean 1/6 chance than other ( with 6 default normal biomes).");
+        WriteComment("  50 rarity mean 1/11 chance than other");
+        WriteComment("For isle biome this is chance to spawn isle in good place.");
+        WriteComment("Don`t work on Ocean and River (frozen versions too) biomes until not added as normal biome.");
         WriteValue(TCDefaultValues.BiomeRarity.name(), this.BiomeRarity);
         this.WriteNewLine();
 
@@ -451,11 +457,11 @@ public class BiomeConfig extends ConfigFile
         this.WriteNewLine();
 
 
-        WriteComment("Biome name where this biome will be spawned as isle. Like Mushroom isle in Ocean.  This work only if this biome is in IsleBiomes in world config");
+        WriteComment("Biome name list where this biome will be spawned as isle. Like Mushroom isle in Ocean.  This work only if this biome is in IsleBiomes in world config");
         WriteValue(TCDefaultValues.IsleInBiome.name(), this.IsleInBiome);
         this.WriteNewLine();
 
-        WriteComment("Biome name where this biome will be border.Like Mushroom isle shore. Use is compared as IsleInBiome");
+        WriteComment("Biome name list where this biome will be border.Like Mushroom isle shore. Use is compared as IsleInBiome");
         WriteValue(TCDefaultValues.BiomeIsBorder.name(), this.BiomeIsBorder);
         this.WriteNewLine();
 
@@ -583,6 +589,9 @@ public class BiomeConfig extends ConfigFile
         this.BiomeTemperature = CheckValue(this.BiomeTemperature, 0.0F, 1.0F);
         this.BiomeWetness = CheckValue(this.BiomeWetness, 0.0F, 1.0F);
 
+        this.IsleInBiome = CheckValue(this.IsleInBiome, this.worldConfig.CustomBiomes);
+        this.BiomeIsBorder = CheckValue(this.BiomeIsBorder, this.worldConfig.CustomBiomes);
+
 
     }
 
@@ -601,8 +610,8 @@ public class BiomeConfig extends ConfigFile
     private byte DefaultGroundBlock = (byte) Block.DIRT.id;
     private float DefaultBiomeTemperature = 0.5F;
     private float DefaultBiomeWetness = 0.5F;
-    private BiomeBase DefaultIsle = null;
-    private BiomeBase DefaultBorder = null;
+    private ArrayList<String> DefaultIsle = new ArrayList<String>();
+    private ArrayList<String> DefaultBorder = new ArrayList<String>();
     private boolean DefaultRiver = true;
     private int DefaultSize = 4;
     private int DefaultRarity = 100;
@@ -699,7 +708,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultRarity = 1;
                 this.DefaultRiver = false;
                 this.DefaultSize = 6;
-                this.DefaultIsle = BiomeBase.OCEAN;
+                this.DefaultIsle.add(BiomeBase.OCEAN.r);
                 this.DefaultColor = "0xFF33CC";
                 this.DefaultWaterLily = 1;
                 break;
@@ -708,7 +717,7 @@ public class BiomeConfig extends ConfigFile
             {
                 this.DefaultRiver = false;
                 this.DefaultSize = 9;
-                this.DefaultBorder = BiomeBase.MUSHROOM_ISLAND;
+                this.DefaultBorder.add(BiomeBase.MUSHROOM_ISLAND.r);
                 this.DefaultColor = "0xFF9999";
                 break;
             }

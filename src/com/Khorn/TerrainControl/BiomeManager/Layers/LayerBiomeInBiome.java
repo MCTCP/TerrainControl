@@ -7,13 +7,16 @@ public class LayerBiomeInBiome extends Layer
     public BiomeBase biome = BiomeBase.MUSHROOM_ISLAND;
     public int chance = 10;
     public boolean inOcean = false;
-    public int inBiome = BiomeBase.PLAINS.F;
+
+    public boolean[] BiomeIsles = new boolean[128];
 
 
     public LayerBiomeInBiome(long paramLong, Layer paramGenLayer)
     {
         super(paramLong);
         this.a = paramGenLayer;
+        for (int i = 0; i < BiomeIsles.length; i++)
+            BiomeIsles[i] = false;
 
     }
 
@@ -36,6 +39,7 @@ public class LayerBiomeInBiome extends Layer
                 a(i1 + paramInt1, n + paramInt2);
                 int currentPiece = arrayOfInt1[(i1 + 1 + (n + 1) * k)];
 
+                boolean spawn = false;
                 if (inOcean)
                 {
                     int i2 = arrayOfInt1[(i1 + 0 + (n + 0) * k)] & LandBit;
@@ -44,13 +48,13 @@ public class LayerBiomeInBiome extends Layer
                     int i5 = arrayOfInt1[(i1 + 2 + (n + 2) * k)] & LandBit;
 
 
-                    if (((currentPiece & LandBit) == 0) && (i2 == 0) && (i3 == 0) && (i4 == 0) && (i5 == 0))
+                    if (((currentPiece & LandBit) == 0) && (i2 == 0) && (i3 == 0) && (i4 == 0) && (i5 == 0) && a(chance) == 0)
                     {
-                        if (a(chance) == 0)
-                            currentPiece = (currentPiece & IceBit) | (currentPiece & RiverBits) | LandBit | biome.F | IslandBit;
-
+                        currentPiece = (currentPiece & IceBit) | (currentPiece & RiverBits) | LandBit | biome.F | IslandBit;
+                        spawn = true;
                     }
-                } else
+                }
+                if (!spawn)
                 {
                     int i2 = arrayOfInt1[(i1 + 0 + (n + 0) * k)] & BiomeBits;
                     int i3 = arrayOfInt1[(i1 + 2 + (n + 0) * k)] & BiomeBits;
@@ -58,13 +62,11 @@ public class LayerBiomeInBiome extends Layer
                     int i5 = arrayOfInt1[(i1 + 2 + (n + 2) * k)] & BiomeBits;
 
 
-                    if (((currentPiece & BiomeBits) == inBiome) && (i2 == inBiome) && (i3 == inBiome) && (i4 == inBiome) && (i5 == inBiome))
-                    {
-                        if (a(chance) == 0)
-                            currentPiece = (currentPiece & LandBit) | (currentPiece & IceBit) | (currentPiece & RiverBits) | biome.F | IslandBit;
+                    if (BiomeIsles[(currentPiece & BiomeBits)] && BiomeIsles[i2] && BiomeIsles[i3] && BiomeIsles[i4] && BiomeIsles[i5] && a(chance) == 0)
+                        currentPiece = (currentPiece & LandBit) | (currentPiece & IceBit) | (currentPiece & RiverBits) | biome.F | IslandBit;
 
-                    }
                 }
+
                 arrayOfInt2[(i1 + n * paramInt3)] = currentPiece;
             }
         }
