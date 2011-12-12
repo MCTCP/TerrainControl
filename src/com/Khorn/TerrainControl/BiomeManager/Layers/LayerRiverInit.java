@@ -1,27 +1,27 @@
 package com.Khorn.TerrainControl.BiomeManager.Layers;
 
-import net.minecraft.server.*;
+import com.Khorn.TerrainControl.BiomeManager.ArraysCache;
 
 public class LayerRiverInit extends Layer
 {
     public LayerRiverInit(long paramLong, Layer paramGenLayer)
     {
         super(paramLong);
-        this.a = paramGenLayer;
+        this.child = paramGenLayer;
     }
 
-    public int[] a(int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
-        int[] arrayOfInt1 = this.a.a(paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt1 = this.child.GetBiomes(cacheId, paramInt1, paramInt2, paramInt3, paramInt4);
 
-        int[] arrayOfInt2 = IntCache.a(paramInt3 * paramInt4);
+        int[] arrayOfInt2 = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
         for (int i = 0; i < paramInt4; i++)
         {
             for (int j = 0; j < paramInt3; j++)
             {
-                a(i + paramInt2,j + paramInt1);           // reversed
+                SetSeed(i + paramInt2, j + paramInt1);           // reversed
                 int currentPiece = arrayOfInt1[(j + i * paramInt3)];
-                if (a(2) == 0)
+                if (nextInt(2) == 0)
                     currentPiece |= 256;
                 else
                     currentPiece |= 512;

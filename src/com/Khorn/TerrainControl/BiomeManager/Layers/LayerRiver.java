@@ -1,24 +1,25 @@
 package com.Khorn.TerrainControl.BiomeManager.Layers;
 
-import net.minecraft.server.*;
+import com.Khorn.TerrainControl.BiomeManager.ArraysCache;
 
 public class LayerRiver extends Layer
 {
     public LayerRiver(long paramLong, Layer paramGenLayer)
     {
         super(paramLong);
-        this.a = paramGenLayer;
+        this.child = paramGenLayer;
     }
 
-    public int[] a(int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    @SuppressWarnings({"PointlessArithmeticExpression"})
+    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         int i = paramInt1 - 1;
         int j = paramInt2 - 1;
         int k = paramInt3 + 2;
         int m = paramInt4 + 2;
-        int[] arrayOfInt1 = this.a.a(i, j, k, m);
+        int[] arrayOfInt1 = this.child.GetBiomes(cacheId, i, j, k, m);
 
-        int[] arrayOfInt2 = IntCache.a(paramInt3 * paramInt4);
+        int[] arrayOfInt2 = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
         for (int n = 0; n < paramInt4; n++)
         {
             for (int i1 = 0; i1 < paramInt3; i1++)
@@ -34,7 +35,8 @@ public class LayerRiver extends Layer
                 else if ((i6 != i2) || (i6 != i4) || (i6 != i3) || (i6 != i5))
                     currentPiece |= RiverBits;
                 else
-                {   currentPiece |= RiverBits;
+                {
+                    currentPiece |= RiverBits;
                     currentPiece ^= RiverBits;
                 }
                 arrayOfInt2[(i1 + n * paramInt3)] = currentPiece;

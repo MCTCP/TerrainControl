@@ -1,14 +1,14 @@
 package com.Khorn.TerrainControl.BiomeManager.Layers;
 
 
-import net.minecraft.server.*;
+import com.Khorn.TerrainControl.BiomeManager.ArraysCache;
 
 public class LayerBiomeBorder extends Layer
 {
     public LayerBiomeBorder(long paramLong, Layer paramGenLayer)
     {
         super(paramLong);
-        this.a = paramGenLayer;
+        this.child = paramGenLayer;
         for (int i = 0; i < BiomeBorders.length; i++)
             BiomeBorders[i] = -1;
     }
@@ -17,16 +17,16 @@ public class LayerBiomeBorder extends Layer
     public int[] BiomeBorders = new int[64];
 
     @Override
-    public int[] a(int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
-        int[] arrayOfInt1 = this.a.a(paramInt1 - 1, paramInt2 - 1, paramInt3 + 2, paramInt4 + 2);
+        int[] arrayOfInt1 = this.child.GetBiomes(cacheId, paramInt1 - 1, paramInt2 - 1, paramInt3 + 2, paramInt4 + 2);
 
-        int[] arrayOfInt2 = IntCache.a(paramInt3 * paramInt4);
+        int[] arrayOfInt2 = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
         for (int i = 0; i < paramInt4; i++)
         {
             for (int j = 0; j < paramInt3; j++)
             {
-                a(j + paramInt1, i + paramInt2);
+                SetSeed(j + paramInt1, i + paramInt2);
                 int currentPiece = arrayOfInt1[(j + 1 + (i + 1) * (paramInt3 + 2))];
                 if ((currentPiece & LandBit) != 0 && BiomeBorders[currentPiece & BiomeBits] != -1)
                 {

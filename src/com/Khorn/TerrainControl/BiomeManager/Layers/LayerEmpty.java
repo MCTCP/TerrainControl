@@ -1,6 +1,6 @@
 package com.Khorn.TerrainControl.BiomeManager.Layers;
 
-import net.minecraft.server.*;
+import com.Khorn.TerrainControl.BiomeManager.ArraysCache;
 
 public class LayerEmpty extends Layer
 {
@@ -10,9 +10,9 @@ public class LayerEmpty extends Layer
     }
 
     @Override
-    public int[] a(int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
-        int[] arrayOfInt = IntCache.a(paramInt3 * paramInt4);
+        int[] arrayOfInt = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
         for (int i = 0; i < arrayOfInt.length; i++)
             arrayOfInt[i] = 0;
         return arrayOfInt;

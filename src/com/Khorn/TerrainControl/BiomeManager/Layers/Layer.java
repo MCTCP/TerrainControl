@@ -5,12 +5,11 @@ import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import net.minecraft.server.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public abstract class Layer
 {
     protected long b;
-    protected Layer a;
+    protected Layer child;
     private long c;
     protected long d;
 
@@ -156,10 +155,10 @@ public abstract class Layer
 
                     LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + biomeConfig.Biome.F, MainLayer);
                     layerBiome.biome = biomeConfig.Biome;
-                    for(String biomeName : biomeConfig.IsleInBiome)
+                    for (String biomeName : biomeConfig.IsleInBiome)
                     {
                         BiomeBase biome = config.GetBiomeByName(biomeName);
-                        if(biome == BiomeBase.OCEAN)
+                        if (biome == BiomeBase.OCEAN)
                             layerBiome.inOcean = true;
                         else
                             layerBiome.BiomeIsles[biome.F] = true;
@@ -173,10 +172,10 @@ public abstract class Layer
                 {
                     haveBorder = true;
 
-                    for(String biomeName : biomeConfig.BiomeIsBorder)
+                    for (String biomeName : biomeConfig.BiomeIsBorder)
                     {
                         BiomeBase biome = config.GetBiomeByName(biomeName);
-                        if(biome == BiomeBase.OCEAN)
+                        if (biome == BiomeBase.OCEAN)
                             layerBiomeBorder.OceanBorder = biomeConfig.Biome.F;
                         else
                             layerBiomeBorder.BiomeBorders[biome.F] = biomeConfig.Biome.F;
@@ -210,6 +209,11 @@ public abstract class Layer
         TemperatureLayer.b(paramLong);
         DownfallLayer.b(paramLong);
 
+        MainLayer = new LayerCacheInit(1, MainLayer);
+        ZoomedLayer = new LayerCacheInit(1, ZoomedLayer);
+        TemperatureLayer = new LayerCacheInit(1, TemperatureLayer);
+        DownfallLayer = new LayerCacheInit(1, DownfallLayer);
+
         return new Layer[]{MainLayer, ZoomedLayer, TemperatureLayer, DownfallLayer};
     }
 
@@ -227,8 +231,8 @@ public abstract class Layer
     public void b(long paramLong)
     {
         this.b = paramLong;
-        if (this.a != null)
-            this.a.b(paramLong);
+        if (this.child != null)
+            this.child.b(paramLong);
         this.b *= (this.b * 6364136223846793005L + 1442695040888963407L);
         this.b += this.d;
         this.b *= (this.b * 6364136223846793005L + 1442695040888963407L);
@@ -237,7 +241,7 @@ public abstract class Layer
         this.b += this.d;
     }
 
-    public void a(long paramLong1, long paramLong2)
+    protected void SetSeed(long paramLong1, long paramLong2)
     {
         this.c = this.b;
         this.c *= (this.c * 6364136223846793005L + 1442695040888963407L);
@@ -250,7 +254,7 @@ public abstract class Layer
         this.c += paramLong2;
     }
 
-    protected int a(int paramInt)
+    protected int nextInt(int paramInt)
     {
         int i = (int) ((this.c >> 24) % paramInt);
         if (i < 0)
@@ -260,5 +264,11 @@ public abstract class Layer
         return i;
     }
 
-    public abstract int[] a(int paramInt1, int paramInt2, int paramInt3, int paramInt4);
+    protected abstract int[] GetBiomes(int cacheId, int x, int z, int x_size, int z_size);
+
+    public int[] Calculate(int x, int z, int x_size, int z_size)
+    {
+        return new int[0];
+    }
+
 }
