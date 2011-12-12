@@ -10,6 +10,7 @@ public abstract class ResourceGenBase
     protected Chunk cacheChunk;
     protected World world;
     protected Random rand;
+    protected boolean CreateNewChunks = true;
 
     public ResourceGenBase(World world)
     {
@@ -35,15 +36,23 @@ public abstract class ResourceGenBase
 
     protected abstract void SpawnResource(Resource res, int x, int z);
 
-    private void CheckChunk(int x, int z)
+    private boolean CheckChunk(int x, int z)
     {
         if (cacheChunk == null || cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
-            this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
+        {
+            if (CreateNewChunks && !this.world.chunkProvider.isChunkLoaded(x >> 4, z >> 4))
+                this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
+            else
+                return false;
+
+        }
+        return true;
     }
 
     protected void SetRawBlockId(int x, int y, int z, int BlockId)
     {
-        CheckChunk(x, z);
+        if(!CheckChunk(x, z))
+            return;
         z = z & 0xF;
         x = x & 0xF;
         if (y >= 128 || y < 0)
@@ -54,7 +63,8 @@ public abstract class ResourceGenBase
 
     protected void SetRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
     {
-        CheckChunk(x, z);
+        if(!CheckChunk(x, z))
+            return;
         z = z & 0xF;
         x = x & 0xF;
         if (y >= 128 || y < 0)
@@ -67,7 +77,8 @@ public abstract class ResourceGenBase
 
     protected int GetRawBlockId(int x, int y, int z)
     {
-        CheckChunk(x, z);
+        if(!CheckChunk(x, z))
+            return 0;
 
         z = z & 0xF;
         x = x & 0xF;
