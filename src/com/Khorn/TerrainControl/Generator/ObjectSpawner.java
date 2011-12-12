@@ -198,7 +198,10 @@ public class ObjectSpawner extends BlockPopulator
                             int i = (_z * 16 + _x) * 128 + _y;
                             if (blocks[i] != biomeConfig.ReplaceMatrixBlocks[blocks[i]])
                                 if (_y >= biomeConfig.ReplaceMatrixHeightMin[blocks[i]] && _y <= biomeConfig.ReplaceMatrixHeightMax[blocks[i]])
+                                {
                                     blocks[i] = biomeConfig.ReplaceMatrixBlocks[blocks[i]];
+                                    world.notify(x + _x, _y, z + _z);
+                                }
 
                         }
                     }
@@ -207,20 +210,6 @@ public class ObjectSpawner extends BlockPopulator
 
         SpawnerCreature.a(this.world, localBiomeBase, x + 8, z + 8, 16, 16, this.rand);
 
-        // Light hack O.o
-        /*byte[] blocks = ((CraftChunk) chunk).getHandle().b;
-        for (int _x = 0; _x < 16; _x++)
-            for (int _z = 0; _z < 16; _z++)
-            {
-                int _y = 127;
-                while (_y >= 0 && (blocks[(_z * 16 + _x) * 128 + _y] == 0))
-                    _y--;
-
-
-                this.world.b(EnumSkyBlock.SKY, x + _x, _y, z + _z);
-
-
-            } */
 
         if (this.worldSettings.isDeprecated)
             this.worldSettings = this.worldSettings.newSettings;
