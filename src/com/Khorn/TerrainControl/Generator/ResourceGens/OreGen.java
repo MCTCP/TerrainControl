@@ -11,6 +11,7 @@ public class OreGen extends ResourceGenBase
     public OreGen(World world)
     {
         super(world);
+        this.CreateNewChunks = false;
     }
 
     @Override
