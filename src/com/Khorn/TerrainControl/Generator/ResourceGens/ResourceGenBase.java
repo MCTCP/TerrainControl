@@ -40,7 +40,7 @@ public abstract class ResourceGenBase
     {
         if (cacheChunk == null || cacheChunk.x != x >> 4 || cacheChunk.z != z >> 4)
         {
-            if (CreateNewChunks && !this.world.chunkProvider.isChunkLoaded(x >> 4, z >> 4))
+            if (CreateNewChunks || this.world.chunkProvider.isChunkLoaded(x >> 4, z >> 4))
                 this.cacheChunk = this.world.getChunkAt(x >> 4, z >> 4);
             else
                 return false;

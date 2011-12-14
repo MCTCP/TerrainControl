@@ -10,9 +10,6 @@ public class ArraysCache
     private static final int[] BigArraysNext = new int[4];
     private static final boolean[] ArraysInUse = new boolean[4];
 
-    private static int minsize = 0;
-
-
     public static int GetCacheId()
     {
         synchronized (ArraysInUse)
@@ -58,11 +55,6 @@ public class ArraysCache
             }
             SmallArraysNext[cacheId]++;
 
-            if (SmallArraysNext[cacheId] > minsize)
-            {
-                minsize = SmallArraysNext[cacheId];
-                System.out.println("New min size " + minsize);
-            }
             return array;
         }
         int[] array;
@@ -70,13 +62,11 @@ public class ArraysCache
         {
             array = new int[size];
             BigArrays[cacheId].add(array);
-            System.out.println("New big array size " + BigArrays[cacheId].size());
         } else
         {
             array = (int[]) BigArrays[cacheId].get(BigArraysNext[cacheId]);
             if (array.length < size)
             {
-                System.out.println("New size " + size);
                 array = new int[size];
                 BigArrays[cacheId].set(BigArraysNext[cacheId], array);
             }
