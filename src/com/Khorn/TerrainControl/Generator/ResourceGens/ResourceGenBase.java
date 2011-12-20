@@ -51,7 +51,7 @@ public abstract class ResourceGenBase
 
     protected void SetRawBlockId(int x, int y, int z, int BlockId)
     {
-        if(!CheckChunk(x, z))
+        if (!CheckChunk(x, z))
             return;
         z = z & 0xF;
         x = x & 0xF;
@@ -63,7 +63,7 @@ public abstract class ResourceGenBase
 
     protected void SetRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
     {
-        if(!CheckChunk(x, z))
+        if (!CheckChunk(x, z))
             return;
         z = z & 0xF;
         x = x & 0xF;
@@ -77,7 +77,7 @@ public abstract class ResourceGenBase
 
     protected int GetRawBlockId(int x, int y, int z)
     {
-        if(!CheckChunk(x, z))
+        if (!CheckChunk(x, z))
             return 0;
 
         z = z & 0xF;
@@ -100,5 +100,20 @@ public abstract class ResourceGenBase
         int id = this.GetRawBlockId(x, y, z);
         return id == 0 ? Material.AIR : Block.byId[id].material;
 
+    }
+
+    protected int getLiquidHeight(int x, int z)
+    {
+        if (!CheckChunk(x, z))
+            return -1;
+        z = z & 0xF;
+        x = x & 0xF;
+        for(int y = world.heightMinusOne; y > 0; y--)
+        {
+            int blockId = this.cacheChunk.b[x << 11 | z << 7 | y];
+            if(blockId != 0 && Block.byId[blockId].material.isLiquid())
+                return y;
+        }
+        return  -1;
     }
 }

@@ -17,10 +17,8 @@ public class UnderWaterOreGen extends ResourceGenBase
     protected void SpawnResource(Resource res, int x, int z)
     {
 
-        int y = this.world.f(x, z);  //ToDo custom check.
+        int y = this.getLiquidHeight(x, z);
 
-        if (this.getMaterial(x, y, z) != Material.WATER)
-            return;
         int i = this.rand.nextInt(res.MaxSize);
         int j = 2;
         for (int k = x - i; k <= x + i; k++)
