@@ -266,29 +266,38 @@ public class Resource
 
     }
 
+    private String BlockIdToName(int id)
+    {
+        Material material = Material.getMaterial(id);
+        if (material != null)
+            return material.name();
+        else
+            return Integer.toString(id);
+    }
+
     public String WriteToString()
     {
         String sources = "";
         for (int id : this.SourceBlockId)
-            sources += "," + Material.getMaterial(id).name();
+            sources += "," + BlockIdToName(id);
         String output = this.Type.name() + "(";
 
         switch (this.Type)
         {
             case Ore:
-                output += Material.getMaterial(this.BlockId).name() + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
+                output += BlockIdToName(this.BlockId) + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
                 break;
             case UnderWaterOre:
-                output += Material.getMaterial(this.BlockId).name() + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + sources + ")";
+                output += BlockIdToName(this.BlockId) + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + sources + ")";
                 break;
             case Plant:
             case Liquid:
             case Reed:
             case Cactus:
-                output += Material.getMaterial(this.BlockId).name() + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
+                output += BlockIdToName(this.BlockId) + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
                 break;
             case Grass:
-                output += Material.getMaterial(this.BlockId).name() + "," + this.BlockData + "," + this.Frequency + "," + this.Rarity + sources + ")";
+                output += BlockIdToName(this.BlockId) + "," + this.BlockData + "," + this.Frequency + "," + this.Rarity + sources + ")";
                 break;
             case Dungeon:
                 output += this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
@@ -306,7 +315,7 @@ public class Resource
                 output += this.MinSize + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
                 break;
             case AboveWaterRes:
-                output += Material.getMaterial(this.BlockId).name() + "," + this.Frequency + "," + this.Rarity + ")";
+                output += BlockIdToName(this.BlockId) + "," + this.Frequency + "," + this.Rarity + ")";
                 break;
         }
         return output;

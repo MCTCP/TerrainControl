@@ -36,6 +36,8 @@ public class ReloadCommand extends BaseCommand
         this.plugin.worldsSettings.remove(worldName);
 
         worldSettings.newSettings = this.plugin.GetSettings(worldName, false);
+        worldSettings.newSettings.ChunkProvider = worldSettings.ChunkProvider;
+        worldSettings.newSettings.ObjectGroups = worldSettings.ObjectGroups;
         worldSettings.isDeprecated = true;
 
         if (worldSettings.ModeBiome == WorldConfig.BiomeMode.Normal)

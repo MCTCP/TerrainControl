@@ -1,6 +1,7 @@
 package com.Khorn.TerrainControl.Generator.ResourceGens;
 
 import com.Khorn.TerrainControl.Configuration.Resource;
+import net.minecraft.server.Block;
 import net.minecraft.server.Material;
 import net.minecraft.server.World;
 
@@ -16,7 +17,7 @@ public class UnderWaterOreGen extends ResourceGenBase
     protected void SpawnResource(Resource res, int x, int z)
     {
 
-        int y = this.world.f(x, z);
+        int y = this.world.f(x, z);  //ToDo custom check.
 
         if (this.getMaterial(x, y, z) != Material.WATER)
             return;

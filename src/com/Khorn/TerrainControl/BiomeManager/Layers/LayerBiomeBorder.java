@@ -5,10 +5,9 @@ import com.Khorn.TerrainControl.BiomeManager.ArraysCache;
 
 public class LayerBiomeBorder extends Layer
 {
-    public LayerBiomeBorder(long paramLong, Layer paramGenLayer)
+    public LayerBiomeBorder(long paramLong)
     {
         super(paramLong);
-        this.child = paramGenLayer;
         for (int i = 0; i < BiomeBorders.length; i++)
             BiomeBorders[i] = -1;
     }

@@ -33,7 +33,7 @@ public class TCPlugin extends JavaPlugin
 
     public void onDisable()
     {
-        System.out.println(getDescription().getFullName() + " is now disabled");
+        System.out.println(getDescription().getFullName() + " can`t be disabled");
     }
 
     public void onEnable()

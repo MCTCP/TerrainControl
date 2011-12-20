@@ -144,7 +144,7 @@ public abstract class Layer
             if ((config.GenerationDepth - config.RiverSize) == depth)
                 MainLayer = new LayerRiver(5 + depth, MainLayer);
 
-            LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, MainLayer);
+            LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth);
             boolean haveBorder = false;
             for (BiomeConfig biomeConfig : config.biomeConfigs)
             {
@@ -186,7 +186,11 @@ public abstract class Layer
 
 
             if (haveBorder)
+            {
+                layerBiomeBorder.child = MainLayer;
                 MainLayer = layerBiomeBorder;
+            }
+
 
 
         }

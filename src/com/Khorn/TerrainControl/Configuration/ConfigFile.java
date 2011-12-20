@@ -1,7 +1,7 @@
 package com.Khorn.TerrainControl.Configuration;
 
+import com.Khorn.TerrainControl.TCPlugin;
 import net.minecraft.server.BiomeBase;
-import sun.plugin.javascript.navig.Array;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -224,13 +224,6 @@ public abstract class ConfigFile
         this.SettingsWriter.newLine();
     }
 
-
-    protected void WriteValue(String settingsName, BiomeBase settingsValue) throws IOException
-    {
-
-        this.SettingsWriter.write(settingsName + ":" + ((settingsValue != null) ? settingsValue.r : ""));
-        this.SettingsWriter.newLine();
-    }
 
     protected void WriteValue(String settingsName, int settingsValue) throws IOException
     {

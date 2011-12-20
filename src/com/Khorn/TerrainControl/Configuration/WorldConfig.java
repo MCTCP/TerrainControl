@@ -529,6 +529,7 @@ public class WorldConfig extends ConfigFile
         WriteComment("Example: ");
         WriteComment("  CustomBiomes:TestBiome1, BiomeTest2");
         WriteComment("This will add two biomes and generate biome config files");
+        WriteComment("Any changes here need server restart.");
         WriteValue(TCDefaultValues.CustomBiomes.name(), this.CustomBiomes);
 
 

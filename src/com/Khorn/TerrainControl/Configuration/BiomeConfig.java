@@ -16,10 +16,10 @@ import java.util.Map;
 public class BiomeConfig extends ConfigFile
 {
 
-    public HashMap<Integer, Byte> replaceBlocks = new HashMap<Integer, Byte>();
+    public HashMap<Integer, Integer> replaceBlocks = new HashMap<Integer, Integer>();
     public HashMap<Integer, Integer> replaceHeightMin = new HashMap<Integer, Integer>();
     public HashMap<Integer, Integer> replaceHeightMax = new HashMap<Integer, Integer>();
-    public byte[] ReplaceMatrixBlocks = new byte[256];
+    public int[] ReplaceMatrixBlocks = new int[256];
     public int[] ReplaceMatrixHeightMin = new int[256];
     public int[] ReplaceMatrixHeightMax = new int[256];
 
@@ -336,14 +336,14 @@ public class BiomeConfig extends ConfigFile
                         max = CheckValue(max, 0, 128, min);
                         this.replaceHeightMin.put(Integer.valueOf(blocks[0]), min);
                         this.replaceHeightMax.put(Integer.valueOf(blocks[0]), max);
-                        this.replaceBlocks.put(Integer.valueOf(blocks[0]), Byte.valueOf(blocks[1].substring(0, start)));
+                        this.replaceBlocks.put(Integer.valueOf(blocks[0]), Integer.valueOf(blocks[1].substring(0, start)));
                         continue;
 
 
                     }
                     this.replaceHeightMin.put(Integer.valueOf(blocks[0]), 0);
                     this.replaceHeightMax.put(Integer.valueOf(blocks[0]), 128);
-                    this.replaceBlocks.put(Integer.valueOf(blocks[0]), Byte.valueOf(blocks[1]));
+                    this.replaceBlocks.put(Integer.valueOf(blocks[0]), Integer.valueOf(blocks[1]));
 
                 }
 
@@ -363,7 +363,7 @@ public class BiomeConfig extends ConfigFile
         {
             if (this.replaceBlocks.containsKey(i))
             {
-                this.ReplaceMatrixBlocks[i] = this.replaceBlocks.get(i);
+                this.ReplaceMatrixBlocks[i] = replaceBlocks.get(i);
                 this.ReplaceMatrixHeightMin[i] = this.replaceHeightMin.get(i);
                 this.ReplaceMatrixHeightMax[i] = this.replaceHeightMax.get(i);
             } else
@@ -555,10 +555,10 @@ public class BiomeConfig extends ConfigFile
             return;
         }
         String output = "";
-        Iterator<Map.Entry<Integer, Byte>> i = this.replaceBlocks.entrySet().iterator();
+        Iterator<Map.Entry<Integer, Integer>> i = this.replaceBlocks.entrySet().iterator();
         while (i.hasNext())
         {
-            Map.Entry<Integer, Byte> me = i.next();
+            Map.Entry<Integer, Integer> me = i.next();
 
             output += me.getKey().toString() + "=" + me.getValue().toString();
             int min = this.replaceHeightMin.get(me.getKey());
