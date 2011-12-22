@@ -196,10 +196,11 @@ public class ObjectSpawner extends BlockPopulator
                         for (int _y = 127; _y >= 0; _y--)
                         {
                             int i = (_z * 16 + _x) * 128 + _y;
-                            if (blocks[i] != biomeConfig.ReplaceMatrixBlocks[blocks[i]])
-                                if (_y >= biomeConfig.ReplaceMatrixHeightMin[blocks[i]] && _y <= biomeConfig.ReplaceMatrixHeightMax[blocks[i]])
+                            int blockId = blocks[i] & 0xFF;  // Fuck java with signed bytes;
+                            if (blockId != biomeConfig.ReplaceMatrixBlocks[blockId])
+                                if (_y >= biomeConfig.ReplaceMatrixHeightMin[blockId] && _y <= biomeConfig.ReplaceMatrixHeightMax[blockId])
                                 {
-                                    blocks[i] = (byte)biomeConfig.ReplaceMatrixBlocks[blocks[i]];
+                                    blocks[i] = (byte)biomeConfig.ReplaceMatrixBlocks[blockId];
                                     world.notify(x + _x, _y, z + _z);
                                 }
 

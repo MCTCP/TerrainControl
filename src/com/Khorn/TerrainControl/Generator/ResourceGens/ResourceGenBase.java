@@ -85,7 +85,7 @@ public abstract class ResourceGenBase
         if (y >= 128 || y < 0)
             return 0;
 
-        return (int) this.cacheChunk.b[x << 11 | z << 7 | y];
+        return this.cacheChunk.b[x << 11 | z << 7 | y] & 0xFF;  //Fuck java !!
     }
 
 
@@ -110,7 +110,7 @@ public abstract class ResourceGenBase
         x = x & 0xF;
         for(int y = world.heightMinusOne; y > 0; y--)
         {
-            int blockId = this.cacheChunk.b[x << 11 | z << 7 | y];
+            int blockId = this.cacheChunk.b[x << 11 | z << 7 | y] & 0xFF;
             if(blockId != 0 && Block.byId[blockId].material.isLiquid())
                 return y;
         }
