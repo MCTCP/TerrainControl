@@ -68,7 +68,8 @@ public enum TCDefaultValues
     waterlessDeserts(false),
     desertDirt(false),
 
-    WaterLevel(64),
+    WaterLevelMax(64),
+    WaterLevelMin(0),
     WaterBlock(9),
     IceBlock(79),
     MaxAverageHeight(0.0D),

@@ -160,7 +160,7 @@ public class ChunkProviderTC extends ChunkGenerator
                                 // TODO Add ice replace
 
                                 int i15 = 0;
-                                if (y * 8 + piece_y < this.localWorld.seaLevel)
+                                if (y * 8 + piece_y < this.worldSettings.waterLevelMax && y * 8 + piece_y > this.worldSettings.waterLevelMin)
                                 {
                                     i15 = this.worldSettings.waterBlock;
                                 }
@@ -189,7 +189,7 @@ public class ChunkProviderTC extends ChunkGenerator
 
     boolean ReplaceForBiomeAndReturnWaterless(int paramInt1, int paramInt2, byte[] paramArrayOfByte, BiomeBase[] paramArrayOfBiomeBase)
     {
-        int waterLevel = this.localWorld.seaLevel;
+        int waterLevel = this.worldSettings.waterLevelMax;
         int dryBlock = 256;
 
         double d1 = 0.03125D;
@@ -239,7 +239,7 @@ public class ChunkProviderTC extends ChunkGenerator
                                     i7 = this.worldSettings.biomeConfigs[localBiomeBase.F].GroundBlock;
                                 }
 
-                                if ((y < waterLevel) && (i6 == 0))
+                                if ((y < waterLevel) && ( y > this.worldSettings.waterLevelMin) && (i6 == 0))
                                 {
                                     if (f1 < 0.15F)
                                         i6 = (byte) this.worldSettings.iceBlock;
@@ -282,7 +282,7 @@ public class ChunkProviderTC extends ChunkGenerator
                             }
                     }
                 }
-                if (paramArrayOfByte[(z * 16 + x) * 128 + this.worldSettings.waterLevel] == this.worldSettings.waterBlock)
+                if (paramArrayOfByte[(z * 16 + x) * 128 + this.worldSettings.waterLevelMax] == this.worldSettings.waterBlock)
                     dryBlock--;
 
 

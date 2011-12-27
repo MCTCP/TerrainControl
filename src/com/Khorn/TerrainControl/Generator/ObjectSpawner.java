@@ -150,7 +150,7 @@ public class ObjectSpawner extends BlockPopulator
                     int _x = x + this.rand.nextInt(16) + 8;
                     int _y = this.rand.nextInt(this.rand.nextInt(119) + 8);
                     int _z = z + this.rand.nextInt(16) + 8;
-                    if ((_y < this.worldSettings.waterLevel) || (this.rand.nextInt(10) == 0))
+                    if ((_y < this.worldSettings.waterLevelMax) || (this.rand.nextInt(10) == 0))
                         new WorldGenLakes(Block.STATIONARY_LAVA.id).a(this.world, this.rand, _x, _y, _z);
                 }
             }

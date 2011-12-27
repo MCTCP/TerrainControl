@@ -93,7 +93,8 @@ public class WorldConfig extends ConfigFile
 
     public boolean oldTerrainGenerator;
 
-    public int waterLevel;
+    public int waterLevelMax;
+    public int waterLevelMin;
     public int waterBlock;
     public int iceBlock;
     public double maxAverageHeight;
@@ -272,7 +273,8 @@ public class WorldConfig extends ConfigFile
         this.canyonDepth = CheckValue(this.canyonDepth, 0.1D, 15D);
 
 
-        this.waterLevel = (this.waterLevel < 0 ? 0 : this.waterLevel > this.ChunkMaxY - 1 ? this.ChunkMaxY - 1 : this.waterLevel);
+        this.waterLevelMin = CheckValue(this.waterLevelMin, 0, 128);
+        this.waterLevelMax = CheckValue(this.waterLevelMax, 0, 128, this.waterLevelMin);
 
         this.customTreeMinTime = (this.customTreeMinTime < 1 ? 1 : this.customTreeMinTime);
         this.customTreeMaxTime = ((this.customTreeMaxTime - this.customTreeMinTime) < 1 ? (this.customTreeMinTime + 1) : this.customTreeMaxTime);
@@ -371,7 +373,8 @@ public class WorldConfig extends ConfigFile
         this.canyonDepth = ReadModSettings(TCDefaultValues.canyonDepth.name(), TCDefaultValues.canyonDepth.doubleValue());
 
 
-        this.waterLevel = ReadModSettings(TCDefaultValues.WaterLevel.name(), TCDefaultValues.WaterLevel.intValue());
+        this.waterLevelMax = ReadModSettings(TCDefaultValues.WaterLevelMax.name(), TCDefaultValues.WaterLevelMax.intValue());
+        this.waterLevelMin = ReadModSettings(TCDefaultValues.WaterLevelMin.name(), TCDefaultValues.WaterLevelMin.intValue());
         this.waterBlock = ReadModSettings(TCDefaultValues.WaterBlock.name(), TCDefaultValues.WaterBlock.intValue());
         this.iceBlock = ReadModSettings(TCDefaultValues.IceBlock.name(), TCDefaultValues.IceBlock.intValue());
         this.maxAverageHeight = ReadModSettings(TCDefaultValues.MaxAverageHeight.name(), TCDefaultValues.MaxAverageHeight.doubleValue());
@@ -548,7 +551,8 @@ public class WorldConfig extends ConfigFile
 
         WriteTitle("Terrain Generator Variables");
         WriteComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
-        WriteValue(TCDefaultValues.WaterLevel.name(), this.waterLevel);
+        WriteValue(TCDefaultValues.WaterLevelMax.name(), this.waterLevelMax);
+        WriteValue(TCDefaultValues.WaterLevelMin.name(), this.waterLevelMin);
         WriteNewLine();
         WriteComment("BlockId used as water in WaterLevel");
         WriteValue(TCDefaultValues.WaterBlock.name(), this.waterBlock);
