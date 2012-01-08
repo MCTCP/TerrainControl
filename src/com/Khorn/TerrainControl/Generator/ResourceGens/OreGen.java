@@ -61,8 +61,13 @@ public class OreGen extends ResourceGenBase
                             for (int i5 = m; i5 <= i2; i5++)
                             {
                                 double d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);
-                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && res.CheckSourceId(this.GetRawBlockId(i3, i4, i5)))
-                                    this.SetRawBlockId(i3, i4, i5, res.BlockId);
+                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && res.CheckSourceId(this.GetRawBlockId(i3, i4, i5))) {
+                                	if (res.BlockData > 0) {
+                                		this.SetRawBlockIdAndData(i3, i4, i5, res.BlockId, res.BlockData);
+                                	} else {
+                                		this.SetRawBlockId(i3, i4, i5, res.BlockId);
+                                	}
+                                }
                             }
                         }
                     }
