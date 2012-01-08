@@ -119,7 +119,15 @@ public class Resource
                 case Ore:
                     if (Props.length < 7)
                         return;
-                    this.BlockId = CheckBlock(Props[0]);
+                    
+                    if (Props[0].indexOf(".") > -1) {
+                    	String[] block = Props[0].split("\\.");
+                    	this.BlockId = CheckBlock(block[0]);
+                    	this.BlockData = CheckValue(block[1], 0, 16);
+                    } else {
+                    	this.BlockId = CheckBlock(Props[0]);
+                    }
+                    
                     this.MaxSize = CheckValue(Props[1], 1, 32);
                     this.Frequency = CheckValue(Props[2], 1, 100);
                     this.Rarity = CheckValue(Props[3], 0, 100);
@@ -285,7 +293,11 @@ public class Resource
         switch (this.Type)
         {
             case Ore:
-                output += BlockIdToName(this.BlockId) + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
+            	String blockId = BlockIdToName(this.BlockId);
+            	if (this.BlockData > 0) {
+            		blockId += "." + this.BlockData;
+            	}
+                output += blockId + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
                 break;
             case UnderWaterOre:
                 output += BlockIdToName(this.BlockId) + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + sources + ")";
