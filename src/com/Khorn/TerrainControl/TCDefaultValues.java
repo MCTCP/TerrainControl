@@ -1,7 +1,5 @@
 package com.Khorn.TerrainControl;
 
-import sun.plugin.javascript.navig.Array;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
