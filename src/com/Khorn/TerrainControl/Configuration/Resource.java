@@ -186,7 +186,15 @@ public class Resource
                 {
                     if (Props.length < 6)
                         return;
-                    this.BlockId = CheckBlock(Props[0]);
+                    
+                    if (Props[0].indexOf(".") > -1) {
+                    	String[] block = Props[0].split("\\.");
+                    	this.BlockId = CheckBlock(block[0]);
+                    	this.BlockData = CheckValue(block[1], 0, 16);
+                    } else {
+                    	this.BlockId = CheckBlock(Props[0]);
+                    }
+                    
                     this.Frequency = CheckValue(Props[1], 1, 100);
                     this.Rarity = CheckValue(Props[2], 0, 100);
                     this.MinAltitude = CheckValue(Props[3], 0, 128);
@@ -288,12 +296,13 @@ public class Resource
         String sources = "";
         for (int id : this.SourceBlockId)
             sources += "," + BlockIdToName(id);
+        String blockId;
         String output = this.Type.name() + "(";
 
         switch (this.Type)
         {
             case Ore:
-            	String blockId = BlockIdToName(this.BlockId);
+            	blockId = BlockIdToName(this.BlockId);
             	if (this.BlockData > 0) {
             		blockId += "." + this.BlockData;
             	}
@@ -306,7 +315,11 @@ public class Resource
             case Liquid:
             case Reed:
             case Cactus:
-                output += BlockIdToName(this.BlockId) + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
+            	blockId = BlockIdToName(this.BlockId);
+            	if (this.BlockData > 0) {
+            		blockId += "." + this.BlockData;
+            	}
+                output += blockId + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
                 break;
             case Grass:
                 output += BlockIdToName(this.BlockId) + "," + this.BlockData + "," + this.Frequency + "," + this.Rarity + sources + ")";
