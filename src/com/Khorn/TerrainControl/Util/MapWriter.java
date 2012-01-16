@@ -22,7 +22,7 @@ public class MapWriter implements Runnable
 {
 
 
-    private static int[] Default_Colors = {0x3333FF, 0x999900, 0xFFCC33, 0x666600, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0, 0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999};
+    private static int[] Default_Colors = {0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0, 0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999,0xFFFF00,0x996600,0x009900,0x003300,0x666600};
     @SuppressWarnings({"FieldCanBeLocal"})
     private static boolean isWork = false;
 
@@ -72,11 +72,11 @@ public class MapWriter implements Runnable
                         {
                             int color = Integer.decode(biomeConfig.BiomeColor);
                             if (color <= 0xFFFFFF)
-                                Colors[biomeConfig.Biome.F] = color;
+                                Colors[biomeConfig.Biome.getId()] = color;
                         } catch (NumberFormatException ex)
                         {
-                            System.out.println("TerrainControl: wrong color in " + biomeConfig.Biome.r);
-                            sender.sendMessage(BaseCommand.ErrorColor + "Wrong color in " + biomeConfig.Biome.r);
+                            System.out.println("TerrainControl: wrong color in " + biomeConfig.Biome.getName());
+                            sender.sendMessage(BaseCommand.ErrorColor + "Wrong color in " + biomeConfig.Biome.getName());
                         }
                     }
                 }
@@ -109,7 +109,7 @@ public class MapWriter implements Runnable
                         time = time2;
                     }
 
-                    BiomeBuffer = world.getWorldChunkManager().a(BiomeBuffer, x * 16, z * 16, 16, 16);
+                    BiomeBuffer = world.getWorldChunkManager().getBiomeBlock(BiomeBuffer, x * 16, z * 16, 16, 16);
                     tempArray = world.getWorldChunkManager().getTemperatures(tempArray, x * 16, z * 16, 16, 16);
                     for (int x1 = 0; x1 < 16; x1++)
                         for (int z1 = 0; z1 < 16; z1++)
@@ -135,7 +135,7 @@ public class MapWriter implements Runnable
                                     break;
                             }
 
-                            biomeImage.setRGB(image_x, image_y, Colors[BiomeBuffer[x1 + 16 * z1].F]);
+                            biomeImage.setRGB(image_x, image_y, Colors[BiomeBuffer[x1 + 16 * z1].K]);
 
                             Color tempColor = Color.getHSBColor(0.7f - tempArray[x1 + 16 * z1] * 0.7f, 0.9f, tempArray[x1 + 16 * z1] * 0.7f + 0.3f);
 

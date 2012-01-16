@@ -1,8 +1,10 @@
 package com.Khorn.TerrainControl.BiomeManager.Layers;
 
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.Khorn.TerrainControl.Configuration.DefaultBiomes;
+import com.Khorn.TerrainControl.Configuration.LocalBiome;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import net.minecraft.server.*;
+
 
 import java.util.ArrayList;
 
@@ -57,6 +59,12 @@ public abstract class Layer
     protected static final int RiverBits = 768;
     protected static final int IceBit = 128;
     protected static final int IslandBit = 1024;
+    protected static int GetBiomeFromLayer(int BiomeAndLand)
+    {
+        if ((BiomeAndLand & LandBit) != 0)
+            return (BiomeAndLand & BiomeBits);
+        return 0;
+    }
 
     public static Layer[] a(long paramLong, WorldConfig config)
     {
@@ -66,14 +74,14 @@ public abstract class Layer
         int MaxDepth = 10;     */
 
 
-        BiomeBase[][] NormalBiomeMap = new BiomeBase[config.GenerationDepth + 1][];
-        BiomeBase[][] IceBiomeMap = new BiomeBase[config.GenerationDepth + 1][];
+        LocalBiome[][] NormalBiomeMap = new LocalBiome[config.GenerationDepth + 1][];
+        LocalBiome[][] IceBiomeMap = new LocalBiome[config.GenerationDepth + 1][];
 
 
         for (int i = 0; i < config.GenerationDepth + 1; i++)
         {
-            ArrayList<BiomeBase> normalBiomes = new ArrayList<BiomeBase>();
-            ArrayList<BiomeBase> iceBiomes = new ArrayList<BiomeBase>();
+            ArrayList<LocalBiome> normalBiomes = new ArrayList<LocalBiome>();
+            ArrayList<LocalBiome> iceBiomes = new ArrayList<LocalBiome>();
             for (BiomeConfig biomeConfig : config.biomeConfigs)
             {
                 if (biomeConfig.BiomeSize != i)
@@ -94,14 +102,14 @@ public abstract class Layer
 
             }
             if (normalBiomes.size() != 0)
-                NormalBiomeMap[i] = normalBiomes.toArray(new BiomeBase[normalBiomes.size() + config.normalBiomesRarity]);
+                NormalBiomeMap[i] = normalBiomes.toArray(new LocalBiome[normalBiomes.size() + config.normalBiomesRarity]);
             else
-                NormalBiomeMap[i] = new BiomeBase[0];
+                NormalBiomeMap[i] = new LocalBiome[0];
 
             if (iceBiomes.size() != 0)
-                IceBiomeMap[i] = iceBiomes.toArray(new BiomeBase[iceBiomes.size() + config.iceBiomesRarity]);
+                IceBiomeMap[i] = iceBiomes.toArray(new LocalBiome[iceBiomes.size() + config.iceBiomesRarity]);
             else
-                IceBiomeMap[i] = new BiomeBase[0];
+                IceBiomeMap[i] = new LocalBiome[0];
 
 
         }
@@ -153,15 +161,15 @@ public abstract class Layer
                 if (config.IsleBiomes.contains(biomeConfig.Name) && biomeConfig.IsleInBiome != null)
                 {
 
-                    LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + biomeConfig.Biome.F, MainLayer);
+                    LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + biomeConfig.Biome.getId(), MainLayer);
                     layerBiome.biome = biomeConfig.Biome;
                     for (String biomeName : biomeConfig.IsleInBiome)
                     {
-                        BiomeBase biome = config.GetBiomeByName(biomeName);
-                        if (biome == BiomeBase.OCEAN)
+                        LocalBiome biome = config.GetBiomeByName(biomeName);
+                        if (biome.getId() == DefaultBiomes.OCEAN.Id)
                             layerBiome.inOcean = true;
                         else
-                            layerBiome.BiomeIsles[biome.F] = true;
+                            layerBiome.BiomeIsles[biome.getId()] = true;
                     }
 
                     layerBiome.chance = 101 - biomeConfig.BiomeRarity;
@@ -174,11 +182,9 @@ public abstract class Layer
 
                     for (String biomeName : biomeConfig.BiomeIsBorder)
                     {
-                        BiomeBase biome = config.GetBiomeByName(biomeName);
-                        if (biome == BiomeBase.OCEAN)
-                            layerBiomeBorder.OceanBorder = biomeConfig.Biome.F;
-                        else
-                            layerBiomeBorder.BiomeBorders[biome.F] = biomeConfig.Biome.F;
+                        LocalBiome biome = config.GetBiomeByName(biomeName);
+                        layerBiomeBorder.AddBiome(biomeConfig,biome.getId());
+
                     }
 
                 }

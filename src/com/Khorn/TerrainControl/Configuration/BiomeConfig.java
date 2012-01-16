@@ -3,8 +3,6 @@ package com.Khorn.TerrainControl.Configuration;
 import com.Khorn.TerrainControl.Generator.ResourceGens.ResourceType;
 import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
 import com.Khorn.TerrainControl.TCDefaultValues;
-import com.Khorn.TerrainControl.Util.CustomBiome;
-import net.minecraft.server.BiomeBase;
 import net.minecraft.server.Block;
 
 import java.io.*;
@@ -31,6 +29,7 @@ public class BiomeConfig extends ConfigFile
 
     public ArrayList<String> BiomeIsBorder;
     public ArrayList<String> IsleInBiome;
+    public ArrayList<String> NotBorderNear;
 
 
     //Surface config
@@ -57,20 +56,20 @@ public class BiomeConfig extends ConfigFile
     public int ResourceCount = 0;
 
 
-    public BiomeBase Biome;
+    public LocalBiome Biome;
     private WorldConfig worldConfig;
     public String Name;
 
 
-    public BiomeConfig(File settingsDir, BiomeBase biome, WorldConfig config)
+    public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
 
         this.Biome = biome;
-        this.Name = biome.r;
+        this.Name = biome.getName();
         worldConfig = config;
         InitDefaults();
 
-        File settingsFile = new File(settingsDir, this.Biome.r + TCDefaultValues.WorldBiomeConfigName.stringValue());
+        File settingsFile = new File(settingsDir, this.Name + TCDefaultValues.WorldBiomeConfigName.stringValue());
 
         this.ReadSettingsFile(settingsFile);
         this.ReadConfigSettings();
@@ -82,8 +81,8 @@ public class BiomeConfig extends ConfigFile
 
         BuildReplaceMatrix();
 
-        if (this.Biome.F > WorldConfig.DefaultBiomesCount)
-            ((CustomBiome) this.Biome).SetBiome(this);
+        if (biome.isCustom())
+            biome.setCustom(this);
 
 
     }
@@ -163,22 +162,25 @@ public class BiomeConfig extends ConfigFile
         resource = new Resource(ResourceType.CustomObject);
         this.ResourceSequence[this.ResourceCount++] = resource;
 
-        switch (this.Biome.F)
+        switch (this.Biome.getId())
         {
             case 0: // Ocean - default
             case 3: // BigHills - default
             case 7: // River - default
+            case 20: // SmallHills
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.Tree}, new int[]{1, 9});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
             case 1: // Plains - no tree
             case 2: // Desert - no tree
+            case 17: //HillsDesert
                 break;
-
+            case 18: // HillsForest
             case 4: // Forest - forest
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.Forest, TreeType.BigTree, TreeType.Tree}, new int[]{20, 10, 100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
+            case 19: //HillsTaiga
             case 5: // Taiga - taiga
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.Taiga1, TreeType.Taiga2}, new int[]{35, 100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
@@ -281,6 +283,7 @@ public class BiomeConfig extends ConfigFile
 
         this.IsleInBiome = ReadModSettings(TCDefaultValues.IsleInBiome.name(), this.DefaultIsle);
         this.BiomeIsBorder = ReadModSettings(TCDefaultValues.BiomeIsBorder.name(), this.DefaultBorder);
+        this.NotBorderNear = ReadModSettings(TCDefaultValues.NotBorderNear.name(), this.DefaultNotBorderNear);
 
         this.BiomeTemperature = this.ReadModSettings(TCDefaultValues.BiomeTemperature.name(), this.DefaultBiomeTemperature);
         this.BiomeWetness = this.ReadModSettings(TCDefaultValues.BiomeWetness.name(), this.DefaultBiomeWetness);
@@ -429,7 +432,7 @@ public class BiomeConfig extends ConfigFile
 
     protected void WriteConfigSettings() throws IOException
     {
-        WriteTitle(this.Biome.r + " biome config");
+        WriteTitle(this.Name + " biome config");
 
         this.WriteNewLine();
 
@@ -463,6 +466,10 @@ public class BiomeConfig extends ConfigFile
 
         WriteComment("Biome name list where this biome will be border.Like Mushroom isle shore. Use is compared as IsleInBiome");
         WriteValue(TCDefaultValues.BiomeIsBorder.name(), this.BiomeIsBorder);
+        this.WriteNewLine();
+
+        WriteComment("Biome name list near border is not applied. ");
+        WriteValue(TCDefaultValues.NotBorderNear.name(), this.NotBorderNear);
         this.WriteNewLine();
 
         WriteComment("Biome temperature. Float value from 0.0 to 1.0");
@@ -510,11 +517,11 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Possible resources:");
         this.WriteComment("Dungeon(Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.WriteComment("UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)");
-        this.WriteComment("Ore(Block,Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.WriteComment("Ore(Block[.BlockData],Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("UnderWaterOre(Block,Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("CustomObject()");
         this.WriteComment("Tree(Frequency,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
-        this.WriteComment("Plant(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.WriteComment("Plant(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Grass(Block,BlockData,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Reed(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Cactus(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
@@ -591,7 +598,13 @@ public class BiomeConfig extends ConfigFile
 
         this.IsleInBiome = CheckValue(this.IsleInBiome, this.worldConfig.CustomBiomes);
         this.BiomeIsBorder = CheckValue(this.BiomeIsBorder, this.worldConfig.CustomBiomes);
+        this.NotBorderNear = CheckValue(this.NotBorderNear, this.worldConfig.CustomBiomes);
 
+
+    }
+
+    protected void RenameOldSettings()
+    {
 
     }
 
@@ -612,6 +625,7 @@ public class BiomeConfig extends ConfigFile
     private float DefaultBiomeWetness = 0.5F;
     private ArrayList<String> DefaultIsle = new ArrayList<String>();
     private ArrayList<String> DefaultBorder = new ArrayList<String>();
+    private ArrayList<String> DefaultNotBorderNear = new ArrayList<String>();
     private boolean DefaultRiver = true;
     private int DefaultSize = 4;
     private int DefaultRarity = 100;
@@ -621,15 +635,15 @@ public class BiomeConfig extends ConfigFile
 
     private void InitDefaults()
     {
-        this.DefaultBiomeSurface = this.Biome.w;
-        this.DefaultBiomeVolatility = this.Biome.x;
-        this.DefaultSurfaceBlock = this.Biome.t;
-        this.DefaultGroundBlock = this.Biome.u;
-        this.DefaultBiomeTemperature = this.Biome.y;
-        this.DefaultBiomeWetness = this.Biome.z;
+        this.DefaultBiomeSurface = this.Biome.getSurfaceHeight();
+        this.DefaultBiomeVolatility = this.Biome.getSurfaceVolatility();
+        this.DefaultSurfaceBlock = this.Biome.getSurfaceBlock();
+        this.DefaultGroundBlock = this.Biome.getGroundBlock();
+        this.DefaultBiomeTemperature = this.Biome.getTemperature();
+        this.DefaultBiomeWetness = this.Biome.getWetness();
 
 
-        switch (this.Biome.F)
+        switch (this.Biome.getId())
         {
             case 0:
                 this.DefaultColor = "0x3333FF";
@@ -653,7 +667,7 @@ public class BiomeConfig extends ConfigFile
                 break;
             }
             case 3:
-                this.DefaultColor = "0x666600";
+                this.DefaultColor = "0x333300";
                 break;
             case 4:
             {
@@ -681,6 +695,9 @@ public class BiomeConfig extends ConfigFile
                 break;
             }
             case 7:
+                this.DefaultSize = 8;
+                this.DefaultRarity = 95;
+                this.DefaultIsle.add(DefaultBiomes.SWAMPLAND.Name);
                 this.DefaultColor = "0x00CCCC";
             case 8:
             case 9:
@@ -708,7 +725,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultRarity = 1;
                 this.DefaultRiver = false;
                 this.DefaultSize = 6;
-                this.DefaultIsle.add(BiomeBase.OCEAN.r);
+                this.DefaultIsle.add(DefaultBiomes.OCEAN.Name);
                 this.DefaultColor = "0xFF33CC";
                 this.DefaultWaterLily = 1;
                 break;
@@ -717,10 +734,52 @@ public class BiomeConfig extends ConfigFile
             {
                 this.DefaultRiver = false;
                 this.DefaultSize = 9;
-                this.DefaultBorder.add(BiomeBase.MUSHROOM_ISLAND.r);
+                this.DefaultBorder.add(DefaultBiomes.MUSHROOM_ISLAND.Name);
                 this.DefaultColor = "0xFF9999";
                 break;
             }
+            case 16:
+                this.DefaultTrees = 0;
+                this.DefaultSize = 8;
+                this.DefaultBorder.add(DefaultBiomes.OCEAN.Name);
+                this.DefaultNotBorderNear.add(DefaultBiomes.RIVER.Name);
+                this.DefaultNotBorderNear.add(DefaultBiomes.SWAMPLAND.Name);
+                this.DefaultNotBorderNear.add(DefaultBiomes.EXTREME_HILLS.Name);
+                this.DefaultNotBorderNear.add(DefaultBiomes.MUSHROOM_ISLAND.Name);
+                this.DefaultColor = "0xFFFF00";
+                break;
+            case 17:
+                this.DefaultSize = 6;
+                this.DefaultRarity = 97;
+                this.DefaultIsle.add(DefaultBiomes.DESERT.Name);
+                this.DefaultTrees = 0;
+                this.DefaultDeadBrush = 4;
+                this.DefaultGrass = 0;
+                this.DefaultReed = 50;
+                this.DefaultCactus = 10;
+                this.DefaultColor = "0x996600";
+                break;
+            case 18:
+                this.DefaultSize = 6;
+                this.DefaultRarity = 97;
+                this.DefaultIsle.add(DefaultBiomes.FOREST.Name);
+                this.DefaultTrees = 10;
+                this.DefaultGrass = 15;
+                this.DefaultColor = "0x009900";
+                break;
+            case 19:
+                this.DefaultSize = 6;
+                this.DefaultRarity = 97;
+                this.DefaultIsle.add(DefaultBiomes.TAIGA.Name);
+                this.DefaultTrees = 10;
+                this.DefaultGrass = 10;
+                this.DefaultColor = "0x003300";
+                break;
+            case 20:
+                this.DefaultSize = 8;
+                this.DefaultBorder.add(DefaultBiomes.EXTREME_HILLS.Name);
+                this.DefaultColor = "0x666600";
+                break;
 
         }
 

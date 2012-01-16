@@ -119,15 +119,17 @@ public class Resource
                 case Ore:
                     if (Props.length < 7)
                         return;
-                    
-                    if (Props[0].indexOf(".") > -1) {
-                    	String[] block = Props[0].split("\\.");
-                    	this.BlockId = CheckBlock(block[0]);
-                    	this.BlockData = CheckValue(block[1], 0, 16);
-                    } else {
-                    	this.BlockId = CheckBlock(Props[0]);
+
+                    if (Props[0].contains("."))
+                    {
+                        String[] block = Props[0].split("\\.");
+                        this.BlockId = CheckBlock(block[0]);
+                        this.BlockData = CheckValue(block[1], 0, 16);
+                    } else
+                    {
+                        this.BlockId = CheckBlock(Props[0]);
                     }
-                    
+
                     this.MaxSize = CheckValue(Props[1], 1, 32);
                     this.Frequency = CheckValue(Props[2], 1, 100);
                     this.Rarity = CheckValue(Props[3], 0, 100);
@@ -186,15 +188,17 @@ public class Resource
                 {
                     if (Props.length < 6)
                         return;
-                    
-                    if (Props[0].indexOf(".") > -1) {
-                    	String[] block = Props[0].split("\\.");
-                    	this.BlockId = CheckBlock(block[0]);
-                    	this.BlockData = CheckValue(block[1], 0, 16);
-                    } else {
-                    	this.BlockId = CheckBlock(Props[0]);
+
+                    if (Props[0].contains("."))
+                    {
+                        String[] block = Props[0].split("\\.");
+                        this.BlockId = CheckBlock(block[0]);
+                        this.BlockData = CheckValue(block[1], 0, 16);
+                    } else
+                    {
+                        this.BlockId = CheckBlock(Props[0]);
                     }
-                    
+
                     this.Frequency = CheckValue(Props[1], 1, 100);
                     this.Rarity = CheckValue(Props[2], 0, 100);
                     this.MinAltitude = CheckValue(Props[3], 0, 128);
@@ -302,10 +306,11 @@ public class Resource
         switch (this.Type)
         {
             case Ore:
-            	blockId = BlockIdToName(this.BlockId);
-            	if (this.BlockData > 0) {
-            		blockId += "." + this.BlockData;
-            	}
+                blockId = BlockIdToName(this.BlockId);
+                if (this.BlockData > 0)
+                {
+                    blockId += "." + this.BlockData;
+                }
                 output += blockId + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
                 break;
             case UnderWaterOre:
@@ -315,10 +320,11 @@ public class Resource
             case Liquid:
             case Reed:
             case Cactus:
-            	blockId = BlockIdToName(this.BlockId);
-            	if (this.BlockData > 0) {
-            		blockId += "." + this.BlockData;
-            	}
+                blockId = BlockIdToName(this.BlockId);
+                if (this.BlockData > 0)
+                {
+                    blockId += "." + this.BlockData;
+                }
                 output += blockId + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
                 break;
             case Grass:

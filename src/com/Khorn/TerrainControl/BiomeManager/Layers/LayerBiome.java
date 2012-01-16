@@ -1,12 +1,12 @@
 package com.Khorn.TerrainControl.BiomeManager.Layers;
 
 import com.Khorn.TerrainControl.BiomeManager.ArraysCache;
-import net.minecraft.server.*;
+import com.Khorn.TerrainControl.Configuration.LocalBiome;
 
 public class LayerBiome extends Layer
 {
-    public BiomeBase[] biomes = {BiomeBase.DESERT, BiomeBase.FOREST, BiomeBase.EXTREME_HILLS, BiomeBase.SWAMPLAND, BiomeBase.PLAINS, BiomeBase.TAIGA};
-    public BiomeBase[] ice_biomes = {BiomeBase.ICE_PLAINS, BiomeBase.ICE_MOUNTAINS};
+    public LocalBiome[] biomes;
+    public LocalBiome[] ice_biomes;
 
 
     public LayerBiome(long paramLong, Layer paramGenLayer)
@@ -32,14 +32,14 @@ public class LayerBiome extends Layer
                 {
                     if (this.biomes.length > 0 && (currentPiece & IceBit) == 0) // Normal Biome
                     {
-                        BiomeBase biome = this.biomes[nextInt(this.biomes.length)];
+                        LocalBiome biome = this.biomes[nextInt(this.biomes.length)];
                         if (biome != null)
-                            currentPiece = currentPiece | biome.F;
+                            currentPiece = currentPiece | biome.getId();
                     } else if (this.ice_biomes.length > 0 && (currentPiece & IceBit) != 0)
                     {
-                        BiomeBase biome = this.ice_biomes[nextInt(this.ice_biomes.length)];
+                        LocalBiome biome = this.ice_biomes[nextInt(this.ice_biomes.length)];
                         if (biome != null)
-                            currentPiece = currentPiece | biome.F;
+                            currentPiece = currentPiece | biome.getId();
                     }
                 }
 

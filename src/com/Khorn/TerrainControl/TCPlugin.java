@@ -9,7 +9,6 @@ import com.Khorn.TerrainControl.Commands.TCCommandExecutor;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTest;
-import com.Khorn.TerrainControl.Listeners.TCBlockListener;
 import com.Khorn.TerrainControl.Listeners.TCPlayerListener;
 import com.Khorn.TerrainControl.Listeners.TCWorldListener;
 import org.bukkit.World;
@@ -25,7 +24,7 @@ public class TCPlugin extends JavaPlugin
 {
 
     public final HashMap<String, WorldConfig> worldsSettings = new HashMap<String, WorldConfig>();
-    private final TCBlockListener blockListener = new TCBlockListener(this);
+
     private final TCWorldListener worldListener = new TCWorldListener(this);
     private final TCPlayerListener playerListener = new TCPlayerListener(this);
     private final HashMap<String, TCPlayer> sessions = new HashMap<String, TCPlayer>();
@@ -137,10 +136,10 @@ public class TCPlugin extends JavaPlugin
             switch (worldSetting.ModeBiome)
             {
                 case Normal:
-                    workWorld.worldProvider.b = new BiomeManager(workWorld, worldSetting);
+                    workWorld.worldProvider.c = new BiomeManager(workWorld, worldSetting);
                     break;
                 case OldGenerator:
-                    workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
+                    workWorld.worldProvider.c = new BiomeManagerOld(workWorld, worldSetting);
                     break;
                 case Default:
                     break;
@@ -180,9 +179,9 @@ public class TCPlugin extends JavaPlugin
     private void RegisterEvents()
     {
         PluginManager pm = this.getServer().getPluginManager();
-        pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Event.Priority.Monitor, this);
 
         pm.registerEvent(Event.Type.WORLD_INIT, worldListener, Event.Priority.High, this);
+        pm.registerEvent(Event.Type.STRUCTURE_GROW, worldListener, Event.Priority.Normal, this);
 
         pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
 

@@ -13,7 +13,7 @@ public class LayerCacheInit extends Layer
     @Override
     public int[] GetBiomes(int cacheId, int x, int z, int x_size, int z_size)
     {
-        return new int[0];  //To change body of implemented methods use File | Settings | File Templates.
+        return new int[0];
     }
 
     @Override

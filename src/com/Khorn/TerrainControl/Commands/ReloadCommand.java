@@ -43,7 +43,7 @@ public class ReloadCommand extends BaseCommand
         if (worldSettings.ModeBiome == WorldConfig.BiomeMode.Normal)
         {
             net.minecraft.server.World world = ((CraftWorld) Bukkit.getWorld(worldName)).getHandle();
-            ((BiomeManager) world.worldProvider.b).Init(world, worldSettings.newSettings);
+            ((BiomeManager) world.worldProvider.c).Init(world, worldSettings.newSettings);
         }
 
         sender.sendMessage(MessageColor + "WorldConfig for world " + worldName + " reloaded");

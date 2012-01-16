@@ -2,18 +2,34 @@ package com.Khorn.TerrainControl.BiomeManager.Layers;
 
 
 import com.Khorn.TerrainControl.BiomeManager.ArraysCache;
+import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import net.minecraft.server.BiomeBase;
+
 
 public class LayerBiomeBorder extends Layer
 {
     public LayerBiomeBorder(long paramLong)
     {
         super(paramLong);
-        for (int i = 0; i < BiomeBorders.length; i++)
-            BiomeBorders[i] = -1;
+        BordersFrom = new boolean[WorldConfig.DefaultBiomesCount + WorldConfig.ExtendedBiomesCount][];
+        this.BordersTo = new int[WorldConfig.DefaultBiomesCount + WorldConfig.ExtendedBiomesCount];
     }
 
-    public int OceanBorder = -1;
-    public int[] BiomeBorders = new int[64];
+    private boolean[][] BordersFrom;
+    private int[] BordersTo;
+
+    public void AddBiome(BiomeConfig ReplaceTo, int ReplaceFrom)
+    {
+        this.BordersFrom[ReplaceFrom] = new boolean[WorldConfig.DefaultBiomesCount + WorldConfig.ExtendedBiomesCount];
+
+        for (int i = 0; i < this.BordersFrom[ReplaceFrom].length; i++)
+        {
+            this.BordersFrom[ReplaceFrom][i] = !ReplaceTo.NotBorderNear.contains(BiomeBase.a[i].w);  //ToDO remove BiomeBase from this.
+        }
+        this.BordersTo[ReplaceFrom] = ReplaceTo.Biome.getId();
+
+    }
 
     @Override
     public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
@@ -27,25 +43,18 @@ public class LayerBiomeBorder extends Layer
             {
                 SetSeed(j + paramInt1, i + paramInt2);
                 int currentPiece = arrayOfInt1[(j + 1 + (i + 1) * (paramInt3 + 2))];
-                if ((currentPiece & LandBit) != 0 && BiomeBorders[currentPiece & BiomeBits] != -1)
+
+                int biomeId = GetBiomeFromLayer(currentPiece);
+                if (BordersFrom[biomeId] != null)
                 {
-                    int i1 = arrayOfInt1[(j + 1 + (i + 1 - 1) * (paramInt3 + 2))] & (LandBit | BiomeBits);
-                    int i2 = arrayOfInt1[(j + 1 + 1 + (i + 1) * (paramInt3 + 2))] & (LandBit | BiomeBits);
-                    int i3 = arrayOfInt1[(j + 1 - 1 + (i + 1) * (paramInt3 + 2))] & (LandBit | BiomeBits);
-                    int i4 = arrayOfInt1[(j + 1 + (i + 1 + 1) * (paramInt3 + 2))] & (LandBit | BiomeBits);
-                    int i5 = currentPiece & (LandBit | BiomeBits);
-                    if ((i1 != i5) || (i2 != i5) || (i3 != i5) || (i4 != i5))
-                        currentPiece = (currentPiece & (IslandBit | RiverBits | IceBit)) | LandBit | BiomeBorders[currentPiece & BiomeBits];
-                }
-                if ((currentPiece & LandBit) == 0 && OceanBorder != -1)
-                {
-                    int i1 = arrayOfInt1[(j + 1 + (i + 1 - 1) * (paramInt3 + 2))] & LandBit;
-                    int i2 = arrayOfInt1[(j + 1 + 1 + (i + 1) * (paramInt3 + 2))] & LandBit;
-                    int i3 = arrayOfInt1[(j + 1 - 1 + (i + 1) * (paramInt3 + 2))] & LandBit;
-                    int i4 = arrayOfInt1[(j + 1 + (i + 1 + 1) * (paramInt3 + 2))] & LandBit;
-                    int i5 = currentPiece & LandBit;
-                    if ((i1 != i5) || (i2 != i5) || (i3 != i5) || (i4 != i5))
-                        currentPiece = (currentPiece & (IslandBit | RiverBits | IceBit)) | LandBit | OceanBorder;
+                    int i1 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + (i + 1 - 1) * (paramInt3 + 2))] );
+                    int i2 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + 1 + (i + 1) * (paramInt3 + 2))] );
+                    int i3 = GetBiomeFromLayer(arrayOfInt1[(j + 1 - 1 + (i + 1) * (paramInt3 + 2))] );
+                    int i4 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + (i + 1 + 1) * (paramInt3 + 2))] );
+                    boolean[] biomeFrom = BordersFrom[biomeId];
+                    if (biomeFrom[i1] && biomeFrom[i2] && biomeFrom[i3] && biomeFrom[i4])
+                        if ((i1 != biomeId) || (i2 != biomeId) || (i3 != biomeId) || (i4 != biomeId))
+                            currentPiece = (currentPiece & (IslandBit | RiverBits | IceBit)) | LandBit | BordersTo[biomeId];
                 }
 
                 arrayOfInt2[(j + i * paramInt3)] = currentPiece;
