@@ -23,7 +23,12 @@ public class PlantGen extends ResourceGenBase
             int m = z + this.rand.nextInt(8) - this.rand.nextInt(8);
             if ((!this.isEmpty(j, k, m)) || (!res.CheckSourceId(this.GetRawBlockId(j, k - 1, m))))
                 continue;
-            this.SetRawBlockId(j, k, m, res.BlockId);
+            
+            if (res.BlockData > 0) {
+        		this.SetRawBlockIdAndData(j, k, m, res.BlockId, res.BlockData);
+        	} else {
+        		this.SetRawBlockId(j, k, m, res.BlockId);
+        	}
         }
     }
 

@@ -2,8 +2,7 @@ package com.Khorn.TerrainControl.Configuration;
 
 import com.Khorn.TerrainControl.Generator.ResourceGens.ResourceType;
 import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
-import com.Khorn.TerrainControl.Util.CustomBiome;
-import net.minecraft.server.BiomeBase;
+import com.Khorn.TerrainControl.TCDefaultValues;
 import net.minecraft.server.Block;
 
 import java.io.*;

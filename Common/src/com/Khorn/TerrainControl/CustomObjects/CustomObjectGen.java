@@ -123,11 +123,6 @@ public class CustomObjectGen
 
         if (!worldSettings.HasCustomTrees)
             return false;
-        if (world.getTypeId(x, y, z) != Block.SAPLING.id)
-            return false;
-
-        int oldData = world.getData(x, y, z) & 0x3;
-        world.setRawTypeId(x, y, z, 0);
 
         Chunk chunk = world.getWorld().getChunkAt(x >> 4, z >> 4);
 
@@ -154,8 +149,6 @@ public class CustomObjectGen
             }
 
         }
-        if (!objectSpawned)
-            world.setRawTypeIdAndData(x, y, z, Block.SAPLING.id, oldData);
         return objectSpawned;
     }
 

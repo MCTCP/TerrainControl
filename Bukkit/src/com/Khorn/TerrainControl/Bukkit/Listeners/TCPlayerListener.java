@@ -50,39 +50,6 @@ public class TCPlayerListener extends PlayerListener
             }
 
         }
-
-        if (!event.hasItem())
-            return;
-        MaterialData data = event.getItem().getData();
-
-        if (data instanceof Dye && ((Dye) data).getColor() == DyeColor.WHITE)
-        {
-
-            Block block = event.getClickedBlock();
-            if(block == null)
-                return;
-            if (block.getType() == Material.SAPLING)
-                if (this.tcPlugin.worldsSettings.containsKey(block.getWorld().getName()))
-                {
-                    Random rnd = new Random();
-                    if (rnd.nextBoolean())
-                    {
-                        WorldConfig worldSettings = this.tcPlugin.worldsSettings.get(block.getWorld().getName());
-                        net.minecraft.server.World world = ((CraftWorld) block.getWorld()).getHandle();
-                        if (CustomObjectGen.SpawnCustomTrees(world,new Random(),worldSettings, block.getX(), block.getY(), block.getZ()))
-                        {
-                            int amount = event.getItem().getAmount() - 1;
-                            if (amount == 0)
-                                event.getPlayer().getInventory().remove(event.getItem());
-                            else
-                                event.getItem().setAmount(amount);
-                            event.setCancelled(true);
-                        }
-                    }
-
-                }
-
-        }
     }
 
 

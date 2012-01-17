@@ -1,6 +1,7 @@
-package com.Khorn.TerrainControl.BiomeLayers.Layers;
+package com.Khorn.TerrainControl.BiomeManager.Layers;
 
-import com.Khorn.TerrainControl.Bukkit.BiomeManager.ArraysCache;
+import com.Khorn.TerrainControl.BiomeManager.ArraysCache;
+import com.Khorn.TerrainControl.Configuration.LocalBiome;
 
 public class LayerBiomeInBiome extends Layer
 {

@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.BiomeLayers.Layers;
+package com.Khorn.TerrainControl.BiomeManager.Layers;
 
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;

@@ -1,15 +1,14 @@
-package com.Khorn.TerrainControl.Bukkit;
+package com.Khorn.TerrainControl;
 
 import java.io.*;
 import java.util.HashMap;
 
-import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManager;
-import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManagerOld;
-import com.Khorn.TerrainControl.Bukkit.Commands.TCCommandExecutor;
+import com.Khorn.TerrainControl.BiomeManager.BiomeManager;
+import com.Khorn.TerrainControl.BiomeManager.BiomeManagerOld;
+import com.Khorn.TerrainControl.Commands.TCCommandExecutor;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTest;
-import com.Khorn.TerrainControl.Bukkit.Listeners.TCBlockListener;
 import com.Khorn.TerrainControl.Bukkit.Listeners.TCPlayerListener;
 import com.Khorn.TerrainControl.Bukkit.Listeners.TCWorldListener;
 import org.bukkit.World;
@@ -142,30 +141,30 @@ public class TCPlugin extends JavaPlugin
                 case BiomeMode.OldGenerator:
                     workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
                     break;
-                case BiomeMode.Default:
+                case Default:
                     break;
             }
 
             switch (worldSetting.ModeTerrain)
             {
-                case TerrainMode.OldGenerator:
-                case TerrainMode.Normal:
+                case OldGenerator:
+                case Normal:
                 {
                     worldSetting.objectSpawner.Init(workWorld);
                     worldSetting.ChunkProvider.Init(world);
                     workWorld.seaLevel = worldSetting.waterLevelMax;
                     break;
                 }
-                case TerrainMode.TerrainTest:
+                case TerrainTest:
                 {
                     worldSetting.ChunkProvider.Init(world);
                     workWorld.seaLevel = worldSetting.waterLevelMax;
                     break;
                 }
-                case TerrainMode.NotGenerate:
+                case NotGenerate:
                     break;
 
-                case TerrainMode.Default:
+                case Default:
                     break;
             }
 
