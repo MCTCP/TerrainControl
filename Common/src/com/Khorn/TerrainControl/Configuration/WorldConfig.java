@@ -3,9 +3,9 @@ package com.Khorn.TerrainControl.Configuration;
 import com.Khorn.TerrainControl.CustomObjects.CustomObject;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import com.Khorn.TerrainControl.Generator.ObjectSpawner;
-import com.Khorn.TerrainControl.TCPlugin;
-import com.Khorn.TerrainControl.Util.CustomBiome;
-import net.minecraft.server.BiomeBase;
+import com.Khorn.TerrainControl.LocalBiome;
+import com.Khorn.TerrainControl.LocalWorld;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -144,8 +144,6 @@ public class WorldConfig extends ConfigFile
     public BiomeConfig[] biomeConfigs;
     public boolean BiomeConfigsHaveReplacement = false;
 
-    public static final int DefaultBiomesCount = 21;
-    public static int ExtendedBiomesCount = 0;
 
     public int normalBiomesRarity;
     public int iceBiomesRarity;
@@ -154,10 +152,10 @@ public class WorldConfig extends ConfigFile
     public int ChunkMaxY = 128;
 
 
-    public WorldConfig(File settingsDir,  String worldName)
+    public WorldConfig(File settingsDir, LocalWorld world)
     {
         this.SettingsDir = settingsDir;
-        this.WorldName = worldName;
+        this.WorldName = world.getName();
 
         File settingsFile = new File(this.SettingsDir, TCDefaultValues.WorldSettingsName.stringValue());
 
@@ -179,54 +177,38 @@ public class WorldConfig extends ConfigFile
                 return;
             }
         }
-        this.biomeConfigs = new BiomeConfig[DefaultBiomesCount + this.CustomBiomes.size()];
 
-        ArrayList<BiomeBase> biomes = new ArrayList<BiomeBase>();
-
-        biomes.addAll(Arrays.asList(BiomeBase.a).subList(0, DefaultBiomesCount));
+        ArrayList<LocalBiome> biomes = world.getDefaultBiomes();
 
         for (String biomeName : this.CustomBiomes)
+            biomes.add(world.AddBiome(biomeName));
+
+        this.biomeConfigs = new BiomeConfig[world.getBiomesCount()];
+
+        for (LocalBiome localBiome : biomes)
         {
-            boolean isNew = true;
-            for (int i = DefaultBiomesCount; i < DefaultBiomesCount + ExtendedBiomesCount; i++)
-                if (BiomeBase.a[i].w.equals(biomeName))
-                    isNew = false;
-            if (isNew)
-                new CustomBiome(DefaultBiomesCount + ExtendedBiomesCount++, biomeName);
-        }
-
-        for (int i = DefaultBiomesCount; i < DefaultBiomesCount + ExtendedBiomesCount; i++)
-            if (this.CustomBiomes.contains(BiomeBase.a[i].w))
-                biomes.add(BiomeBase.a[i]);
-
-
-        for (BiomeBase biome : biomes)
-        {
-            BukkitBiome bukkitBiome = new BukkitBiome(biome);
-            BiomeConfig config = new BiomeConfig(BiomeFolder, bukkitBiome, this);
+            BiomeConfig config = new BiomeConfig(BiomeFolder, localBiome, this);
 
             if (this.NormalBiomes.contains(config.Name))
                 this.normalBiomesRarity += config.BiomeRarity;
             if (this.IceBiomes.contains(config.Name))
                 this.iceBiomesRarity += config.BiomeRarity;
 
-            this.biomeConfigs[biome.K] = config;
+            this.biomeConfigs[localBiome.getId()] = config;
             if (!this.BiomeConfigsHaveReplacement)
                 this.BiomeConfigsHaveReplacement = config.replaceBlocks.size() > 0;
 
-
         }
-
 
         this.RegisterBOBPlugins();
-        }
+    }
 
-    protected  void RenameOldSettings()
+    protected void RenameOldSettings()
     {
 
-        if(this.SettingsCache.containsKey("WaterLevel"))
+        if (this.SettingsCache.containsKey("WaterLevel"))
         {
-            this.SettingsCache.put("WaterLevelMax".toLowerCase(),this.SettingsCache.get("WaterLevel"));
+            this.SettingsCache.put("WaterLevelMax".toLowerCase(), this.SettingsCache.get("WaterLevel"));
         }
 
     }
@@ -284,7 +266,7 @@ public class WorldConfig extends ConfigFile
         this.waterLevelMin = CheckValue(this.waterLevelMin, 0, 128);
         this.waterLevelMax = CheckValue(this.waterLevelMax, 0, 128, this.waterLevelMin);
 
-        this.customTreeChance = CheckValue(this.customTreeChance,0,100);
+        this.customTreeChance = CheckValue(this.customTreeChance, 0, 100);
 
         if (this.ModeBiome == BiomeMode.OldGenerator && this.ModeTerrain != TerrainMode.OldGenerator)
         {
@@ -340,6 +322,7 @@ public class WorldConfig extends ConfigFile
         this.IceBiomes = this.ReadModSettings(TCDefaultValues.IceBiomes.name(), TCDefaultValues.IceBiomes.StringArrayListValue());
         this.IsleBiomes = this.ReadModSettings(TCDefaultValues.IsleBiomes.name(), TCDefaultValues.IsleBiomes.StringArrayListValue());
         this.BorderBiomes = this.ReadModSettings(TCDefaultValues.BorderBiomes.name(), TCDefaultValues.BorderBiomes.StringArrayListValue());
+        this.CustomBiomes = this.ReadModSettings(TCDefaultValues.CustomBiomes.name(), TCDefaultValues.CustomBiomes.StringArrayListValue());
 
         this.minMoisture = ReadModSettings(TCDefaultValues.minMoisture.name(), TCDefaultValues.minMoisture.floatValue());
         this.maxMoisture = ReadModSettings(TCDefaultValues.maxMoisture.name(), TCDefaultValues.maxMoisture.floatValue());
@@ -409,8 +392,6 @@ public class WorldConfig extends ConfigFile
         this.customTreeChance = this.ReadModSettings(TCDefaultValues.customTreeChance.name(), TCDefaultValues.customTreeChance.intValue());
 
         this.ReadHeightSettings();
-        this.ReadCustomBiomes();
-
 
     }
 
@@ -434,23 +415,6 @@ public class WorldConfig extends ConfigFile
 
     }
 
-
-    private void ReadCustomBiomes()
-    {
-
-        ArrayList<String> keys = this.ReadModSettings(TCDefaultValues.CustomBiomes.name(), TCDefaultValues.CustomBiomes.StringArrayListValue());
-
-        for (String key : keys)
-        {
-            boolean isUnique = true;
-            for (int i = 0; i < DefaultBiomesCount; i++)
-                if (BiomeBase.a[i].w.equals(key))
-                    isUnique = false;
-
-            if (isUnique && !this.CustomBiomes.contains(key))
-                this.CustomBiomes.add(key);
-        }
-    }
 
 
     protected void WriteConfigSettings() throws IOException
@@ -802,14 +766,6 @@ public class WorldConfig extends ConfigFile
     public boolean createAdminium(int y)
     {
         return (!this.disableBedrock) && ((!this.flatBedrock) || (y == 0));
-    }
-
-    public LocalBiome GetBiomeByName(String name)
-    {
-        for (int i = 0; i < WorldConfig.DefaultBiomesCount + WorldConfig.ExtendedBiomesCount; i++)
-            if (BiomeBase.a[i].w.equals(name))
-                return new BukkitBiome(BiomeBase.a[i]);
-        return null;
     }
 
 

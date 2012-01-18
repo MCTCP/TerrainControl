@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Bukkit;
 
-import com.Khorn.TerrainControl.Util.CustomBiome;
 import net.minecraft.server.BiomeBase;
 
 public class BukkitBiome implements LocalBiome

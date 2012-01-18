@@ -1,6 +1,6 @@
 package com.Khorn.TerrainControl.BiomeLayers.Layers;
 
-import com.Khorn.TerrainControl.Bukkit.BiomeManager.ArraysCache;
+import com.Khorn.TerrainControl.BiomeLayers.ArraysCache;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 
 public class LayerTemperature extends Layer

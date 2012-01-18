@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.CustomObjects;
 
-import net.minecraft.server.BiomeBase;
 
 import java.io.BufferedReader;
 import java.io.File;

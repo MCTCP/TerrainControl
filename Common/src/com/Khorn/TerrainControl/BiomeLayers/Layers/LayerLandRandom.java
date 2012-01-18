@@ -1,6 +1,7 @@
 package com.Khorn.TerrainControl.BiomeLayers.Layers;
 
-import com.Khorn.TerrainControl.Bukkit.BiomeManager.ArraysCache;
+
+import com.Khorn.TerrainControl.BiomeLayers.ArraysCache;
 
 public class LayerLandRandom extends Layer
 {

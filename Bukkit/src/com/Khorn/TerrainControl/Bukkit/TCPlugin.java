@@ -1,11 +1,12 @@
-package com.Khorn.TerrainControl;
+package com.Khorn.TerrainControl.Bukkit;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 
-import com.Khorn.TerrainControl.BiomeManager.BiomeManager;
-import com.Khorn.TerrainControl.BiomeManager.BiomeManagerOld;
-import com.Khorn.TerrainControl.Commands.TCCommandExecutor;
+
+import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManagerOld;
+import com.Khorn.TerrainControl.Bukkit.Commands.TCCommandExecutor;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTest;
@@ -13,6 +14,7 @@ import com.Khorn.TerrainControl.Bukkit.Listeners.TCPlayerListener;
 import com.Khorn.TerrainControl.Bukkit.Listeners.TCWorldListener;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
@@ -24,7 +26,6 @@ public class TCPlugin extends JavaPlugin
 {
 
     public final HashMap<String, WorldConfig> worldsSettings = new HashMap<String, WorldConfig>();
-    private final TCBlockListener blockListener = new TCBlockListener(this);
     private final TCWorldListener worldListener = new TCWorldListener(this);
     private final TCPlayerListener playerListener = new TCPlayerListener(this);
     private final HashMap<String, TCPlayer> sessions = new HashMap<String, TCPlayer>();

@@ -1,9 +1,9 @@
 package com.Khorn.TerrainControl.Configuration;
 
 
+import com.Khorn.TerrainControl.DefaultMaterial;
 import com.Khorn.TerrainControl.Generator.ResourceGens.ResourceType;
 import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
-import org.bukkit.Material;
 
 import java.util.ArrayList;
 
@@ -101,9 +101,9 @@ public class Resource
 
     private int CheckBlock(String block) throws NumberFormatException
     {
-        Material mat = Material.getMaterial(block);
-        if (mat != null && mat.isBlock())
-            return mat.getId();
+        DefaultMaterial mat = DefaultMaterial.getMaterial(block);
+        if (mat != null)
+            return mat.id;
 
         return CheckValue(block, 0, 256);
 
@@ -288,7 +288,7 @@ public class Resource
 
     private String BlockIdToName(int id)
     {
-        Material material = Material.getMaterial(id);
+        DefaultMaterial material = DefaultMaterial.getMaterial(id);
         if (material != null)
             return material.name();
         else

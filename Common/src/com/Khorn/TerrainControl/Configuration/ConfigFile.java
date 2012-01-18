@@ -1,6 +1,8 @@
 package com.Khorn.TerrainControl.Configuration;
 
 
+import com.Khorn.TerrainControl.DefaultBiome;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -357,7 +359,7 @@ public abstract class ConfigFile
                 continue;
             }
 
-            if(DefaultBiomes.Contain(key))
+            if(DefaultBiome.Contain(key))
                 output.add(key);
 
         }

@@ -1,10 +1,8 @@
 package com.Khorn.TerrainControl.Util;
 
-import net.minecraft.server.NoiseGenerator;
-
 import java.util.Random;
 
-public class NoiseGeneratorOctaves2 extends NoiseGenerator
+public class NoiseGeneratorOctaves2
 {
   private NoiseGenerator2[] a;
   private int b;

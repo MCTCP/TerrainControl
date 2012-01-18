@@ -1,9 +1,12 @@
 package com.Khorn.TerrainControl.Configuration;
 
+import com.Khorn.TerrainControl.DefaultBiome;
+import com.Khorn.TerrainControl.DefaultMaterial;
 import com.Khorn.TerrainControl.Generator.ResourceGens.ResourceType;
 import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
-import com.Khorn.TerrainControl.TCDefaultValues;
-import net.minecraft.server.Block;
+
+import com.Khorn.TerrainControl.LocalBiome;
+
 
 import java.io.*;
 import java.util.ArrayList;
@@ -29,6 +32,7 @@ public class BiomeConfig extends ConfigFile
 
     public ArrayList<String> BiomeIsBorder;
     public ArrayList<String> IsleInBiome;
+    public ArrayList<String> NotBorderNear;
 
 
     //Surface config
@@ -55,20 +59,20 @@ public class BiomeConfig extends ConfigFile
     public int ResourceCount = 0;
 
 
-    public BiomeBase Biome;
+    public LocalBiome Biome;
     private WorldConfig worldConfig;
     public String Name;
 
 
-    public BiomeConfig(File settingsDir, BiomeBase biome, WorldConfig config)
+    public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
 
         this.Biome = biome;
-        this.Name = biome.r;
+        this.Name = biome.getName();
         worldConfig = config;
         InitDefaults();
 
-        File settingsFile = new File(settingsDir, this.Biome.r + TCDefaultValues.WorldBiomeConfigName.stringValue());
+        File settingsFile = new File(settingsDir, this.Name + TCDefaultValues.WorldBiomeConfigName.stringValue());
 
         this.ReadSettingsFile(settingsFile);
         this.ReadConfigSettings();
@@ -80,8 +84,8 @@ public class BiomeConfig extends ConfigFile
 
         BuildReplaceMatrix();
 
-        if (this.Biome.F > WorldConfig.DefaultBiomesCount)
-            ((CustomBiome) this.Biome).SetBiome(this);
+        if (biome.isCustom())
+            biome.setCustom(this);
 
 
     }
@@ -106,77 +110,80 @@ public class BiomeConfig extends ConfigFile
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Dungeon
-        resource = new Resource(ResourceType.Dungeon, 0, 0, 0, TCDefaultValues.dungeonFrequency.intValue(), TCDefaultValues.dungeonRarity.intValue(), TCDefaultValues.dungeonMinAltitude.intValue(), TCDefaultValues.dungeonMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Dungeon, 0, 0, 0, TCDefaultValues.dungeonFrequency.intValue(), TCDefaultValues.dungeonRarity.intValue(), TCDefaultValues.dungeonMinAltitude.intValue(), TCDefaultValues.dungeonMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Resource(ResourceType type,int blockId, int blockData, int size,int frequency, int rarity, int minAltitude,int maxAltitude,int[] sourceBlockIds)
         //Dirt
-        resource = new Resource(ResourceType.Ore, Block.DIRT.id, 0, TCDefaultValues.dirtDepositSize.intValue(), TCDefaultValues.dirtDepositFrequency.intValue(), TCDefaultValues.dirtDepositRarity.intValue(), TCDefaultValues.dirtDepositMinAltitude.intValue(), TCDefaultValues.dirtDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.DIRT.id, 0, TCDefaultValues.dirtDepositSize.intValue(), TCDefaultValues.dirtDepositFrequency.intValue(), TCDefaultValues.dirtDepositRarity.intValue(), TCDefaultValues.dirtDepositMinAltitude.intValue(), TCDefaultValues.dirtDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Gravel
-        resource = new Resource(ResourceType.Ore, Block.GRAVEL.id, 0, TCDefaultValues.gravelDepositSize.intValue(), TCDefaultValues.gravelDepositFrequency.intValue(), TCDefaultValues.gravelDepositRarity.intValue(), TCDefaultValues.gravelDepositMinAltitude.intValue(), TCDefaultValues.gravelDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.GRAVEL.id, 0, TCDefaultValues.gravelDepositSize.intValue(), TCDefaultValues.gravelDepositFrequency.intValue(), TCDefaultValues.gravelDepositRarity.intValue(), TCDefaultValues.gravelDepositMinAltitude.intValue(), TCDefaultValues.gravelDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Clay
-        resource = new Resource(ResourceType.Ore, Block.CLAY.id, 0, TCDefaultValues.clayDepositSize.intValue(), TCDefaultValues.clayDepositFrequency.intValue(), TCDefaultValues.clayDepositRarity.intValue(), TCDefaultValues.clayDepositMinAltitude.intValue(), TCDefaultValues.clayDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.CLAY.id, 0, TCDefaultValues.clayDepositSize.intValue(), TCDefaultValues.clayDepositFrequency.intValue(), TCDefaultValues.clayDepositRarity.intValue(), TCDefaultValues.clayDepositMinAltitude.intValue(), TCDefaultValues.clayDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Coal
-        resource = new Resource(ResourceType.Ore, Block.COAL_ORE.id, 0, TCDefaultValues.coalDepositSize.intValue(), TCDefaultValues.coalDepositFrequency.intValue(), TCDefaultValues.coalDepositRarity.intValue(), TCDefaultValues.coalDepositMinAltitude.intValue(), TCDefaultValues.coalDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.COAL_ORE.id, 0, TCDefaultValues.coalDepositSize.intValue(), TCDefaultValues.coalDepositFrequency.intValue(), TCDefaultValues.coalDepositRarity.intValue(), TCDefaultValues.coalDepositMinAltitude.intValue(), TCDefaultValues.coalDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Iron
-        resource = new Resource(ResourceType.Ore, Block.IRON_ORE.id, 0, TCDefaultValues.ironDepositSize.intValue(), TCDefaultValues.ironDepositFrequency.intValue(), TCDefaultValues.ironDepositRarity.intValue(), TCDefaultValues.ironDepositMinAltitude.intValue(), TCDefaultValues.ironDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.IRON_ORE.id, 0, TCDefaultValues.ironDepositSize.intValue(), TCDefaultValues.ironDepositFrequency.intValue(), TCDefaultValues.ironDepositRarity.intValue(), TCDefaultValues.ironDepositMinAltitude.intValue(), TCDefaultValues.ironDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Gold
-        resource = new Resource(ResourceType.Ore, Block.GOLD_ORE.id, 0, TCDefaultValues.goldDepositSize.intValue(), TCDefaultValues.goldDepositFrequency.intValue(), TCDefaultValues.goldDepositRarity.intValue(), TCDefaultValues.goldDepositMinAltitude.intValue(), TCDefaultValues.goldDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.GOLD_ORE.id, 0, TCDefaultValues.goldDepositSize.intValue(), TCDefaultValues.goldDepositFrequency.intValue(), TCDefaultValues.goldDepositRarity.intValue(), TCDefaultValues.goldDepositMinAltitude.intValue(), TCDefaultValues.goldDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Redstone
-        resource = new Resource(ResourceType.Ore, Block.REDSTONE_ORE.id, 0, TCDefaultValues.redstoneDepositSize.intValue(), TCDefaultValues.redstoneDepositFrequency.intValue(), TCDefaultValues.redstoneDepositRarity.intValue(), TCDefaultValues.redstoneDepositMinAltitude.intValue(), TCDefaultValues.redstoneDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.REDSTONE_ORE.id, 0, TCDefaultValues.redstoneDepositSize.intValue(), TCDefaultValues.redstoneDepositFrequency.intValue(), TCDefaultValues.redstoneDepositRarity.intValue(), TCDefaultValues.redstoneDepositMinAltitude.intValue(), TCDefaultValues.redstoneDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Diamond
-        resource = new Resource(ResourceType.Ore, Block.DIAMOND_ORE.id, 0, TCDefaultValues.diamondDepositSize.intValue(), TCDefaultValues.diamondDepositFrequency.intValue(), TCDefaultValues.diamondDepositRarity.intValue(), TCDefaultValues.diamondDepositMinAltitude.intValue(), TCDefaultValues.diamondDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.DIAMOND_ORE.id, 0, TCDefaultValues.diamondDepositSize.intValue(), TCDefaultValues.diamondDepositFrequency.intValue(), TCDefaultValues.diamondDepositRarity.intValue(), TCDefaultValues.diamondDepositMinAltitude.intValue(), TCDefaultValues.diamondDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Lapislazuli
-        resource = new Resource(ResourceType.Ore, Block.LAPIS_ORE.id, 0, TCDefaultValues.lapislazuliDepositSize.intValue(), TCDefaultValues.lapislazuliDepositFrequency.intValue(), TCDefaultValues.lapislazuliDepositRarity.intValue(), TCDefaultValues.lapislazuliDepositMinAltitude.intValue(), TCDefaultValues.lapislazuliDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.LAPIS_ORE.id, 0, TCDefaultValues.lapislazuliDepositSize.intValue(), TCDefaultValues.lapislazuliDepositFrequency.intValue(), TCDefaultValues.lapislazuliDepositRarity.intValue(), TCDefaultValues.lapislazuliDepositMinAltitude.intValue(), TCDefaultValues.lapislazuliDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
 
         //Under water sand
-        resource = new Resource(ResourceType.UnderWaterOre, Block.SAND.id, 0, TCDefaultValues.waterSandDepositSize.intValue(), TCDefaultValues.waterSandDepositFrequency.intValue(), TCDefaultValues.waterSandDepositRarity.intValue(), 0, 0, new int[]{Block.DIRT.id, Block.GRASS.id});
+        resource = new Resource(ResourceType.UnderWaterOre, DefaultMaterial.SAND.id, 0, TCDefaultValues.waterSandDepositSize.intValue(), TCDefaultValues.waterSandDepositFrequency.intValue(), TCDefaultValues.waterSandDepositRarity.intValue(), 0, 0, new int[]{DefaultMaterial.DIRT.id, DefaultMaterial.GRASS.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Under water clay
         if (this.DefaultClay > 0)
         {
-            resource = new Resource(ResourceType.UnderWaterOre, Block.CLAY.id, 0, TCDefaultValues.waterClayDepositSize.intValue(), this.DefaultClay, TCDefaultValues.waterClayDepositRarity.intValue(), 0, 0, new int[]{Block.DIRT.id, Block.CLAY.id});
+            resource = new Resource(ResourceType.UnderWaterOre, DefaultMaterial.CLAY.id, 0, TCDefaultValues.waterClayDepositSize.intValue(), this.DefaultClay, TCDefaultValues.waterClayDepositRarity.intValue(), 0, 0, new int[]{DefaultMaterial.DIRT.id, DefaultMaterial.CLAY.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
         //Custom objects
         resource = new Resource(ResourceType.CustomObject);
         this.ResourceSequence[this.ResourceCount++] = resource;
 
-        switch (this.Biome.F)
+        switch (this.Biome.getId())
         {
             case 0: // Ocean - default
             case 3: // BigHills - default
             case 7: // River - default
+            case 20: // SmallHills
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.Tree}, new int[]{1, 9});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
             case 1: // Plains - no tree
             case 2: // Desert - no tree
+            case 17: //HillsDesert
                 break;
-
+            case 18: // HillsForest
             case 4: // Forest - forest
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.Forest, TreeType.BigTree, TreeType.Tree}, new int[]{20, 10, 100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
+            case 19: //HillsTaiga
             case 5: // Taiga - taiga
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.Taiga1, TreeType.Taiga2}, new int[]{35, 100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
@@ -194,55 +201,55 @@ public class BiomeConfig extends ConfigFile
         }
         if (this.DefaultWaterLily > 0)
         {
-            resource = new Resource(ResourceType.AboveWaterRes, Block.WATER_LILY.id, 0, 0, this.DefaultWaterLily, 100, 0, 0, new int[0]);
+            resource = new Resource(ResourceType.AboveWaterRes, DefaultMaterial.WATER_LILY.id, 0, 0, this.DefaultWaterLily, 100, 0, 0, new int[0]);
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
         if (this.DefaultFlowers > 0)
         {
             //Red flower
-            resource = new Resource(ResourceType.Plant, Block.RED_ROSE.id, 0, 0, this.DefaultFlowers, TCDefaultValues.roseDepositRarity.intValue(), TCDefaultValues.roseDepositMinAltitude.intValue(), TCDefaultValues.roseDepositMaxAltitude.intValue(), new int[]{Block.GRASS.id, Block.DIRT.id, Block.SOIL.id});
+            resource = new Resource(ResourceType.Plant, DefaultMaterial.RED_ROSE.id, 0, 0, this.DefaultFlowers, TCDefaultValues.roseDepositRarity.intValue(), TCDefaultValues.roseDepositMinAltitude.intValue(), TCDefaultValues.roseDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
 
             //Yellow flower
-            resource = new Resource(ResourceType.Plant, Block.YELLOW_FLOWER.id, 0, 0, this.DefaultFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), TCDefaultValues.flowerDepositMaxAltitude.intValue(), new int[]{Block.GRASS.id, Block.DIRT.id, Block.SOIL.id});
+            resource = new Resource(ResourceType.Plant, DefaultMaterial.YELLOW_FLOWER.id, 0, 0, this.DefaultFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), TCDefaultValues.flowerDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
         if (this.DefaultMushroom > 0)
         {
             //Red mushroom
-            resource = new Resource(ResourceType.Plant, Block.RED_MUSHROOM.id, 0, 0, this.DefaultMushroom, TCDefaultValues.redMushroomDepositRarity.intValue(), TCDefaultValues.redMushroomDepositMinAltitude.intValue(), TCDefaultValues.redMushroomDepositMaxAltitude.intValue(), new int[]{Block.GRASS.id, Block.DIRT.id});
+            resource = new Resource(ResourceType.Plant, DefaultMaterial.RED_MUSHROOM.id, 0, 0, this.DefaultMushroom, TCDefaultValues.redMushroomDepositRarity.intValue(), TCDefaultValues.redMushroomDepositMinAltitude.intValue(), TCDefaultValues.redMushroomDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
 
             //Brown mushroom
-            resource = new Resource(ResourceType.Plant, Block.BROWN_MUSHROOM.id, 0, 0, this.DefaultMushroom, TCDefaultValues.brownMushroomDepositRarity.intValue(), TCDefaultValues.brownMushroomDepositMinAltitude.intValue(), TCDefaultValues.brownMushroomDepositMaxAltitude.intValue(), new int[]{Block.GRASS.id, Block.DIRT.id});
+            resource = new Resource(ResourceType.Plant, DefaultMaterial.BROWN_MUSHROOM.id, 0, 0, this.DefaultMushroom, TCDefaultValues.brownMushroomDepositRarity.intValue(), TCDefaultValues.brownMushroomDepositMinAltitude.intValue(), TCDefaultValues.brownMushroomDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
         if (this.DefaultGrass > 0)
         {
             //Grass
-            resource = new Resource(ResourceType.Grass, Block.LONG_GRASS.id, 1, 0, this.DefaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), 0, 0, new int[]{Block.GRASS.id, Block.DIRT.id});
+            resource = new Resource(ResourceType.Grass, DefaultMaterial.LONG_GRASS.id, 1, 0, this.DefaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), 0, 0, new int[]{DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
         if (this.DefaultDeadBrush > 0)
         {
             //Dead Bush
-            resource = new Resource(ResourceType.Grass, Block.DEAD_BUSH.id, 0, 0, this.DefaultDeadBrush, TCDefaultValues.deadBushDepositRarity.intValue(), 0, 0, new int[]{Block.SAND.id});
+            resource = new Resource(ResourceType.Grass, DefaultMaterial.DEAD_BUSH.id, 0, 0, this.DefaultDeadBrush, TCDefaultValues.deadBushDepositRarity.intValue(), 0, 0, new int[]{DefaultMaterial.SAND.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
         //Pumpkin
-        resource = new Resource(ResourceType.Plant, Block.PUMPKIN.id, 0, 0, TCDefaultValues.pumpkinDepositFrequency.intValue(), TCDefaultValues.pumpkinDepositRarity.intValue(), TCDefaultValues.pumpkinDepositMinAltitude.intValue(), TCDefaultValues.pumpkinDepositMaxAltitude.intValue(), new int[]{Block.GRASS.id});
+        resource = new Resource(ResourceType.Plant, DefaultMaterial.PUMPKIN.id, 0, 0, TCDefaultValues.pumpkinDepositFrequency.intValue(), TCDefaultValues.pumpkinDepositRarity.intValue(), TCDefaultValues.pumpkinDepositMinAltitude.intValue(), TCDefaultValues.pumpkinDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.GRASS.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
 
         if (this.DefaultReed > 0)
         {
             //Reed
-            resource = new Resource(ResourceType.Reed, Block.SUGAR_CANE_BLOCK.id, 0, 0, this.DefaultReed, TCDefaultValues.reedDepositRarity.intValue(), TCDefaultValues.reedDepositMinAltitude.intValue(), TCDefaultValues.reedDepositMaxAltitude.intValue(), new int[]{Block.GRASS.id, Block.DIRT.id, Block.SAND.id});
+            resource = new Resource(ResourceType.Reed, DefaultMaterial.SUGAR_CANE_BLOCK.id, 0, 0, this.DefaultReed, TCDefaultValues.reedDepositRarity.intValue(), TCDefaultValues.reedDepositMinAltitude.intValue(), TCDefaultValues.reedDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SAND.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
@@ -250,16 +257,16 @@ public class BiomeConfig extends ConfigFile
         if (this.DefaultCactus > 0)
         {
             //Cactus
-            resource = new Resource(ResourceType.Cactus, Block.CACTUS.id, 0, 0, this.DefaultCactus, TCDefaultValues.cactusDepositRarity.intValue(), TCDefaultValues.cactusDepositMinAltitude.intValue(), TCDefaultValues.cactusDepositMaxAltitude.intValue(), new int[]{Block.SAND.id});
+            resource = new Resource(ResourceType.Cactus, DefaultMaterial.CACTUS.id, 0, 0, this.DefaultCactus, TCDefaultValues.cactusDepositRarity.intValue(), TCDefaultValues.cactusDepositMinAltitude.intValue(), TCDefaultValues.cactusDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.SAND.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
         //Water source
-        resource = new Resource(ResourceType.Liquid, Block.WATER.id, 0, 0, TCDefaultValues.waterSourceDepositFrequency.intValue(), TCDefaultValues.waterSourceDepositRarity.intValue(), TCDefaultValues.waterSourceDepositMinAltitude.intValue(), TCDefaultValues.waterSourceDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Liquid, DefaultMaterial.WATER.id, 0, 0, TCDefaultValues.waterSourceDepositFrequency.intValue(), TCDefaultValues.waterSourceDepositRarity.intValue(), TCDefaultValues.waterSourceDepositMinAltitude.intValue(), TCDefaultValues.waterSourceDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Lava source
-        resource = new Resource(ResourceType.Liquid, Block.LAVA.id, 0, 0, TCDefaultValues.lavaSourceDepositFrequency.intValue(), TCDefaultValues.lavaSourceDepositRarity.intValue(), TCDefaultValues.lavaSourceDepositMinAltitude.intValue(), TCDefaultValues.lavaSourceDepositMaxAltitude.intValue(), new int[]{Block.STONE.id});
+        resource = new Resource(ResourceType.Liquid, DefaultMaterial.LAVA.id, 0, 0, TCDefaultValues.lavaSourceDepositFrequency.intValue(), TCDefaultValues.lavaSourceDepositRarity.intValue(), TCDefaultValues.lavaSourceDepositMinAltitude.intValue(), TCDefaultValues.lavaSourceDepositMaxAltitude.intValue(), new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
 
@@ -279,6 +286,7 @@ public class BiomeConfig extends ConfigFile
 
         this.IsleInBiome = ReadModSettings(TCDefaultValues.IsleInBiome.name(), this.DefaultIsle);
         this.BiomeIsBorder = ReadModSettings(TCDefaultValues.BiomeIsBorder.name(), this.DefaultBorder);
+        this.NotBorderNear = ReadModSettings(TCDefaultValues.NotBorderNear.name(), this.DefaultNotBorderNear);
 
         this.BiomeTemperature = this.ReadModSettings(TCDefaultValues.BiomeTemperature.name(), this.DefaultBiomeTemperature);
         this.BiomeWetness = this.ReadModSettings(TCDefaultValues.BiomeWetness.name(), this.DefaultBiomeWetness);
@@ -427,7 +435,7 @@ public class BiomeConfig extends ConfigFile
 
     protected void WriteConfigSettings() throws IOException
     {
-        WriteTitle(this.Biome.r + " biome config");
+        WriteTitle(this.Name + " biome config");
 
         this.WriteNewLine();
 
@@ -461,6 +469,10 @@ public class BiomeConfig extends ConfigFile
 
         WriteComment("Biome name list where this biome will be border.Like Mushroom isle shore. Use is compared as IsleInBiome");
         WriteValue(TCDefaultValues.BiomeIsBorder.name(), this.BiomeIsBorder);
+        this.WriteNewLine();
+
+        WriteComment("Biome name list near border is not applied. ");
+        WriteValue(TCDefaultValues.NotBorderNear.name(), this.NotBorderNear);
         this.WriteNewLine();
 
         WriteComment("Biome temperature. Float value from 0.0 to 1.0");
@@ -508,11 +520,11 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Possible resources:");
         this.WriteComment("Dungeon(Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.WriteComment("UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)");
-        this.WriteComment("Ore(Block,Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.WriteComment("Ore(Block[.BlockData],Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("UnderWaterOre(Block,Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("CustomObject()");
         this.WriteComment("Tree(Frequency,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
-        this.WriteComment("Plant(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.WriteComment("Plant(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Grass(Block,BlockData,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Reed(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Cactus(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
@@ -589,7 +601,13 @@ public class BiomeConfig extends ConfigFile
 
         this.IsleInBiome = CheckValue(this.IsleInBiome, this.worldConfig.CustomBiomes);
         this.BiomeIsBorder = CheckValue(this.BiomeIsBorder, this.worldConfig.CustomBiomes);
+        this.NotBorderNear = CheckValue(this.NotBorderNear, this.worldConfig.CustomBiomes);
 
+
+    }
+
+    protected void RenameOldSettings()
+    {
 
     }
 
@@ -604,12 +622,13 @@ public class BiomeConfig extends ConfigFile
     private int DefaultClay = 1;
     private float DefaultBiomeSurface = 0.1F;
     private float DefaultBiomeVolatility = 0.3F;
-    private byte DefaultSurfaceBlock = (byte) Block.GRASS.id;
-    private byte DefaultGroundBlock = (byte) Block.DIRT.id;
+    private byte DefaultSurfaceBlock = (byte) DefaultMaterial.GRASS.id;
+    private byte DefaultGroundBlock = (byte) DefaultMaterial.DIRT.id;
     private float DefaultBiomeTemperature = 0.5F;
     private float DefaultBiomeWetness = 0.5F;
     private ArrayList<String> DefaultIsle = new ArrayList<String>();
     private ArrayList<String> DefaultBorder = new ArrayList<String>();
+    private ArrayList<String> DefaultNotBorderNear = new ArrayList<String>();
     private boolean DefaultRiver = true;
     private int DefaultSize = 4;
     private int DefaultRarity = 100;
@@ -619,15 +638,15 @@ public class BiomeConfig extends ConfigFile
 
     private void InitDefaults()
     {
-        this.DefaultBiomeSurface = this.Biome.w;
-        this.DefaultBiomeVolatility = this.Biome.x;
-        this.DefaultSurfaceBlock = this.Biome.t;
-        this.DefaultGroundBlock = this.Biome.u;
-        this.DefaultBiomeTemperature = this.Biome.y;
-        this.DefaultBiomeWetness = this.Biome.z;
+        this.DefaultBiomeSurface = this.Biome.getSurfaceHeight();
+        this.DefaultBiomeVolatility = this.Biome.getSurfaceVolatility();
+        this.DefaultSurfaceBlock = this.Biome.getSurfaceBlock();
+        this.DefaultGroundBlock = this.Biome.getGroundBlock();
+        this.DefaultBiomeTemperature = this.Biome.getTemperature();
+        this.DefaultBiomeWetness = this.Biome.getWetness();
 
 
-        switch (this.Biome.F)
+        switch (this.Biome.getId())
         {
             case 0:
                 this.DefaultColor = "0x3333FF";
@@ -651,7 +670,7 @@ public class BiomeConfig extends ConfigFile
                 break;
             }
             case 3:
-                this.DefaultColor = "0x666600";
+                this.DefaultColor = "0x333300";
                 break;
             case 4:
             {
@@ -679,6 +698,9 @@ public class BiomeConfig extends ConfigFile
                 break;
             }
             case 7:
+                this.DefaultSize = 8;
+                this.DefaultRarity = 95;
+                this.DefaultIsle.add(DefaultBiome.SWAMPLAND.Name);
                 this.DefaultColor = "0x00CCCC";
             case 8:
             case 9:
@@ -698,7 +720,7 @@ public class BiomeConfig extends ConfigFile
                 break;
             case 14:
             {
-                this.DefaultSurfaceBlock = (byte) Block.MYCEL.id;
+                this.DefaultSurfaceBlock = (byte) DefaultMaterial.MYCEL.id;
                 this.DefaultMushroom = 1;
                 this.DefaultGrass = 0;
                 this.DefaultFlowers = 0;
@@ -706,7 +728,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultRarity = 1;
                 this.DefaultRiver = false;
                 this.DefaultSize = 6;
-                this.DefaultIsle.add(BiomeBase.OCEAN.r);
+                this.DefaultIsle.add(DefaultBiome.OCEAN.Name);
                 this.DefaultColor = "0xFF33CC";
                 this.DefaultWaterLily = 1;
                 break;
@@ -715,10 +737,52 @@ public class BiomeConfig extends ConfigFile
             {
                 this.DefaultRiver = false;
                 this.DefaultSize = 9;
-                this.DefaultBorder.add(BiomeBase.MUSHROOM_ISLAND.r);
+                this.DefaultBorder.add(DefaultBiome.MUSHROOM_ISLAND.Name);
                 this.DefaultColor = "0xFF9999";
                 break;
             }
+            case 16:
+                this.DefaultTrees = 0;
+                this.DefaultSize = 8;
+                this.DefaultBorder.add(DefaultBiome.OCEAN.Name);
+                this.DefaultNotBorderNear.add(DefaultBiome.RIVER.Name);
+                this.DefaultNotBorderNear.add(DefaultBiome.SWAMPLAND.Name);
+                this.DefaultNotBorderNear.add(DefaultBiome.EXTREME_HILLS.Name);
+                this.DefaultNotBorderNear.add(DefaultBiome.MUSHROOM_ISLAND.Name);
+                this.DefaultColor = "0xFFFF00";
+                break;
+            case 17:
+                this.DefaultSize = 6;
+                this.DefaultRarity = 97;
+                this.DefaultIsle.add(DefaultBiome.DESERT.Name);
+                this.DefaultTrees = 0;
+                this.DefaultDeadBrush = 4;
+                this.DefaultGrass = 0;
+                this.DefaultReed = 50;
+                this.DefaultCactus = 10;
+                this.DefaultColor = "0x996600";
+                break;
+            case 18:
+                this.DefaultSize = 6;
+                this.DefaultRarity = 97;
+                this.DefaultIsle.add(DefaultBiome.FOREST.Name);
+                this.DefaultTrees = 10;
+                this.DefaultGrass = 15;
+                this.DefaultColor = "0x009900";
+                break;
+            case 19:
+                this.DefaultSize = 6;
+                this.DefaultRarity = 97;
+                this.DefaultIsle.add(DefaultBiome.TAIGA.Name);
+                this.DefaultTrees = 10;
+                this.DefaultGrass = 10;
+                this.DefaultColor = "0x003300";
+                break;
+            case 20:
+                this.DefaultSize = 8;
+                this.DefaultBorder.add(DefaultBiome.EXTREME_HILLS.Name);
+                this.DefaultColor = "0x666600";
+                break;
 
         }
 

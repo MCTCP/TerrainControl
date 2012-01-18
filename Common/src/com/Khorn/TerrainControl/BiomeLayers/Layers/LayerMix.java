@@ -1,8 +1,8 @@
-package com.Khorn.TerrainControl.BiomeManager.Layers;
+package com.Khorn.TerrainControl.BiomeLayers.Layers;
 
 
-import com.Khorn.TerrainControl.BiomeManager.ArraysCache;
-import com.Khorn.TerrainControl.Configuration.DefaultBiomes;
+import com.Khorn.TerrainControl.BiomeLayers.ArraysCache;
+import com.Khorn.TerrainControl.DefaultBiome;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 
 public class LayerMix extends Layer
@@ -32,16 +32,16 @@ public class LayerMix extends Layer
                 {
                     if (this.worldConfig.RiversEnabled && (currentPiece & RiverBits) != 0 && this.worldConfig.biomeConfigs[currentPiece & BiomeBits].BiomeRivers)
                         if (this.worldConfig.FrozenRivers && (currentPiece & IceBit) != 0)
-                            currentPiece = BiomeBase.FROZEN_RIVER.F;
+                            currentPiece = DefaultBiome.FROZEN_RIVER.Id;
                         else
-                            currentPiece = BiomeBase.RIVER.F;
+                            currentPiece = DefaultBiome.RIVER.Id;
                     else
                         currentPiece = currentPiece & BiomeBits;
 
                 } else if (this.worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
-                    currentPiece = BiomeBase.FROZEN_OCEAN.F;
+                    currentPiece = DefaultBiome.FROZEN_OCEAN.Id;
                 else
-                    currentPiece = BiomeBase.OCEAN.F;
+                    currentPiece = DefaultBiome.OCEAN.Id;
                 arrayOfInt2[(j + i * paramInt3)] = currentPiece;
             }
         }

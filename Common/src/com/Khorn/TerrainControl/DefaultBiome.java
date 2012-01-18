@@ -1,7 +1,7 @@
 package com.Khorn.TerrainControl;
 
 
-public enum DefaultBiomes
+public enum DefaultBiome
 {
     OCEAN(0,"Ocean"),
     PLAINS(1,"Plains"),
@@ -28,10 +28,10 @@ public enum DefaultBiomes
 
 
 
-    public int Id;
-    public String Name;
+    public final int Id;
+    public final String Name;
 
-    private DefaultBiomes(int i,String name)
+    private DefaultBiome(int i, String name)
     {
         this.Id = i;
         this.Name = name;
@@ -39,7 +39,7 @@ public enum DefaultBiomes
 
     public static boolean Contain(String name)
     {
-        for(DefaultBiomes biome : DefaultBiomes.values())
+        for(DefaultBiome biome : DefaultBiome.values())
             if(biome.Name.equals(name))
                 return true;
 
