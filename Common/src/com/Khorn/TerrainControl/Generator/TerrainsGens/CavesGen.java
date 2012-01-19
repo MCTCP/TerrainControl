@@ -1,9 +1,9 @@
 package com.Khorn.TerrainControl.Generator.TerrainsGens;
 
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import net.minecraft.server.Block;
-import net.minecraft.server.MathHelper;
-import net.minecraft.server.World;
+import com.Khorn.TerrainControl.DefaultMaterial;
+import com.Khorn.TerrainControl.LocalWorld;
+import com.Khorn.TerrainControl.Util.MathHelper;
 
 import java.util.Random;
 
@@ -12,7 +12,7 @@ public class CavesGen extends TerrainGenBase
 
     private WorldConfig worldSettings;
 
-    public CavesGen(WorldConfig wrk,World world)
+    public CavesGen(WorldConfig wrk,LocalWorld world)
     {
         super(world);
         this.worldSettings = wrk;
@@ -134,7 +134,7 @@ public class CavesGen extends TerrainGenBase
 
                         if (i8 < this.worldSettings.ChunkMaxY )
                         {
-                            if ((paramArrayOfByte[i9] == Block.WATER.id) || (paramArrayOfByte[i9] == Block.STATIONARY_WATER.id))
+                            if ((paramArrayOfByte[i9] == DefaultMaterial.WATER.id) || (paramArrayOfByte[i9] == DefaultMaterial.STATIONARY_WATER.id))
                             {
                                 i5 = 1;
                             }
@@ -163,18 +163,18 @@ public class CavesGen extends TerrainGenBase
                             if ((d11 > -0.7D) && (d9 * d9 + d11 * d11 + d10 * d10 < 1.0D))
                             {
                                 int i13 = paramArrayOfByte[i10];
-                                if (i13 == Block.GRASS.id)
+                                if (i13 == DefaultMaterial.GRASS.id)
                                     i11 = 1;
-                                if ((i13 == Block.STONE.id) || (i13 == Block.DIRT.id) || (i13 == Block.GRASS.id))
+                                if ((i13 == DefaultMaterial.STONE.id) || (i13 == DefaultMaterial.DIRT.id) || (i13 == DefaultMaterial.GRASS.id))
                                 {
                                     if (i12 < 10)
                                     {
-                                        paramArrayOfByte[i10] = (byte) Block.LAVA.id;
+                                        paramArrayOfByte[i10] = (byte) DefaultMaterial.LAVA.id;
                                     } else
                                     {
                                         paramArrayOfByte[i10] = 0;
-                                        if ((i11 != 0) && (paramArrayOfByte[(i10 - 1)] == Block.DIRT.id))
-                                            paramArrayOfByte[(i10 - 1)] = (byte) Block.GRASS.id;
+                                        if ((i11 != 0) && (paramArrayOfByte[(i10 - 1)] == DefaultMaterial.DIRT.id))
+                                            paramArrayOfByte[(i10 - 1)] = (byte) DefaultMaterial.GRASS.id;
                                     }
                                 }
                             }

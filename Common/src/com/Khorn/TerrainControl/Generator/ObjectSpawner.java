@@ -5,6 +5,7 @@ import com.Khorn.TerrainControl.Configuration.Resource;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObjectGen;
 import com.Khorn.TerrainControl.Generator.ResourceGens.*;
+import com.Khorn.TerrainControl.LocalWorld;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;
@@ -18,7 +19,7 @@ public class ObjectSpawner extends BlockPopulator
 
     private WorldConfig worldSettings;
     private Random rand;
-    private World world;
+    private LocalWorld world;
     private BiomeBase[] BiomeArray;
 
     private OreGen oreGen;

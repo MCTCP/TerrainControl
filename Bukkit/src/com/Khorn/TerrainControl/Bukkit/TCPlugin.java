@@ -1,7 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 
 
@@ -9,12 +8,11 @@ import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManagerOld;
 import com.Khorn.TerrainControl.Bukkit.Commands.TCCommandExecutor;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
-import com.Khorn.TerrainControl.Generator.ChunkProviderTest;
+import com.Khorn.TerrainControl.Generator.ChunkProviderNull;
 import com.Khorn.TerrainControl.Bukkit.Listeners.TCPlayerListener;
 import com.Khorn.TerrainControl.Bukkit.Listeners.TCWorldListener;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
@@ -88,7 +86,7 @@ public class TCPlugin extends JavaPlugin
                 prov = new ChunkProviderTC(conf);
                 break;
             case NotGenerate:
-                prov = new ChunkProviderTest(conf);
+                prov = new ChunkProviderNull(conf);
                 break;
             case Default:
                 break;

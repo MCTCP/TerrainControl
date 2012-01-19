@@ -1,6 +1,7 @@
 package com.Khorn.TerrainControl.Bukkit.BiomeManager;
 
 
+import com.Khorn.TerrainControl.BiomeLayers.Layers.Layer;
 import com.Khorn.TerrainControl.BiomeManager.Layers.Layer;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import net.minecraft.server.*;
