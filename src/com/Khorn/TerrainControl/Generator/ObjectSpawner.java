@@ -200,8 +200,8 @@ public class ObjectSpawner extends BlockPopulator
                             if (blockId != biomeConfig.ReplaceMatrixBlocks[blockId])
                                 if (_y >= biomeConfig.ReplaceMatrixHeightMin[blockId] && _y <= biomeConfig.ReplaceMatrixHeightMax[blockId])
                                 {
-                                    blocks[i] = (byte)biomeConfig.ReplaceMatrixBlocks[blockId];
-                                    world.notify(x + _x, _y, z + _z);
+                                	world.setRawTypeIdAndData((x + _z), _y, (z + _x), biomeConfig.ReplaceMatrixBlocks[blockId], 0);
+                                	world.notify((x + _x), _y, (z + _z));
                                 }
 
                         }
