@@ -607,7 +607,7 @@ public class BiomeConfig extends ConfigFile
     {
         this.BiomeSize = CheckValue(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
         this.BiomeHeight = (float) CheckValue(this.BiomeHeight, -10.0, 10.0);
-        this.BiomeRarity = CheckValue(this.BiomeRarity, 1, 100);
+        this.BiomeRarity = CheckValue(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
 
         this.BiomeTemperature = CheckValue(this.BiomeTemperature, 0.0F, 1.0F);
         this.BiomeWetness = CheckValue(this.BiomeWetness, 0.0F, 1.0F);

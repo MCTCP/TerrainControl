@@ -1,10 +1,11 @@
 package com.Khorn.TerrainControl.BiomeManager.Layers;
 
+import java.util.ArrayList;
+
+import net.minecraft.server.BiomeBase;
+
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import net.minecraft.server.*;
-
-import java.util.ArrayList;
 
 public abstract class Layer
 {
@@ -164,7 +165,7 @@ public abstract class Layer
                             layerBiome.BiomeIsles[biome.F] = true;
                     }
 
-                    layerBiome.chance = 101 - biomeConfig.BiomeRarity;
+                    layerBiome.chance = (config.BiomeRarityScale + 1) - biomeConfig.BiomeRarity;
                     MainLayer = layerBiome;
                 }
 
