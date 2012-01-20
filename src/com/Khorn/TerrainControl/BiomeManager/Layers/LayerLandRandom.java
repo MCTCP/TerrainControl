@@ -10,7 +10,6 @@ public class LayerLandRandom extends Layer
         this.child = paramGenLayer;
     }
 
-    @SuppressWarnings({"PointlessArithmeticExpression"})
     public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         int i = paramInt1 - 1;

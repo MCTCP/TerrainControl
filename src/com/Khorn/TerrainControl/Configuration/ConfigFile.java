@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Configuration;
 
-import com.Khorn.TerrainControl.TCPlugin;
 import net.minecraft.server.BiomeBase;
 
 import java.io.*;

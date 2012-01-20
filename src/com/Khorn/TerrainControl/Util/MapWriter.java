@@ -1,29 +1,30 @@
 package com.Khorn.TerrainControl.Util;
 
 
-import com.Khorn.TerrainControl.Commands.BaseCommand;
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.TCPlugin;
-import com.sun.imageio.plugins.png.PNGImageWriter;
-import com.sun.imageio.plugins.png.PNGImageWriterSpi;
-import net.minecraft.server.BiomeBase;
-import net.minecraft.server.IntCache;
-import net.minecraft.server.World;
-import org.bukkit.command.CommandSender;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
 
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
+
+import net.minecraft.server.BiomeBase;
+import net.minecraft.server.World;
+
+import org.bukkit.command.CommandSender;
+
+import com.Khorn.TerrainControl.TCPlugin;
+import com.Khorn.TerrainControl.Commands.BaseCommand;
+import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.sun.imageio.plugins.png.PNGImageWriter;
+import com.sun.imageio.plugins.png.PNGImageWriterSpi;
 
 public class MapWriter implements Runnable
 {
 
 
     private static int[] Default_Colors = {0x3333FF, 0x999900, 0xFFCC33, 0x666600, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0, 0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999};
-    @SuppressWarnings({"FieldCanBeLocal"})
     private static boolean isWork = false;
 
     private TCPlugin plugin;

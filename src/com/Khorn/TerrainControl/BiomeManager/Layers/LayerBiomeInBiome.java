@@ -21,7 +21,6 @@ public class LayerBiomeInBiome extends Layer
 
     }
 
-    @SuppressWarnings({"PointlessArithmeticExpression"})
     @Override
     public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {

@@ -1,9 +1,5 @@
 package com.Khorn.TerrainControl.CustomObjects;
 
-import net.minecraft.server.Block;
-import org.bukkit.Material;
-
-@SuppressWarnings({"PointlessBitwiseExpression"})
 public class Coordinate
 {
 

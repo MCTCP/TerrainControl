@@ -178,6 +178,7 @@ public class BiomeManagerOld extends WorldChunkManager
 
     // Check biomes list
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean a(int paramInt1, int paramInt2, int paramInt3, List paramList)
     {
         int i = paramInt1 - paramInt3 >> 2;
@@ -202,6 +203,7 @@ public class BiomeManagerOld extends WorldChunkManager
 
     //StrongholdPosition
     @Override
+    @SuppressWarnings("rawtypes")
     public ChunkPosition a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
     {
         int i = paramInt1 - paramInt3 >> 2;

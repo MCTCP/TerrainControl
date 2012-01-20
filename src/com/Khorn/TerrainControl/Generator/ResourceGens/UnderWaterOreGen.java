@@ -1,9 +1,8 @@
 package com.Khorn.TerrainControl.Generator.ResourceGens;
 
-import com.Khorn.TerrainControl.Configuration.Resource;
-import net.minecraft.server.Block;
-import net.minecraft.server.Material;
 import net.minecraft.server.World;
+
+import com.Khorn.TerrainControl.Configuration.Resource;
 
 
 public class UnderWaterOreGen extends ResourceGenBase
