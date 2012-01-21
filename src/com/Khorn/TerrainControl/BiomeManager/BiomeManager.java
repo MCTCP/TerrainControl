@@ -50,7 +50,7 @@ public class BiomeManager extends WorldChunkManager
         this.DownfallLayer = layers[3];
     }
 
-
+    @SuppressWarnings("rawtypes")
     public List a()
     {
         return this.f;
@@ -174,6 +174,7 @@ public class BiomeManager extends WorldChunkManager
         return paramArrayOfBiomeBase;
     }
 
+    @SuppressWarnings("rawtypes")
     public boolean a(int paramInt1, int paramInt2, int paramInt3, List paramList)
     {
         int i = paramInt1 - paramInt3 >> 2;
@@ -196,6 +197,7 @@ public class BiomeManager extends WorldChunkManager
         return true;
     }
 
+    @SuppressWarnings("rawtypes")
     public ChunkPosition a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
     {
         int i = paramInt1 - paramInt3 >> 2;

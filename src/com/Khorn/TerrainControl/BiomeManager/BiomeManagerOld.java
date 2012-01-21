@@ -178,6 +178,7 @@ public class BiomeManagerOld extends WorldChunkManager
 
     // Check biomes list
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean a(int paramInt1, int paramInt2, int paramInt3, List paramList)
     {
         int i = paramInt1 - paramInt3 >> 2;
@@ -190,7 +191,7 @@ public class BiomeManagerOld extends WorldChunkManager
 
         BiomeBase[] biomeArray = null;
 
-        biomeArray = this.a(biomeArray, i, j, n, i1);
+        biomeArray = this.getBiomes(biomeArray, i, j, n, i1);
         for (int i2 = 0; i2 < n * i1; i2++)
         {
             if (!paramList.contains(biomeArray[i2]))
@@ -202,6 +203,7 @@ public class BiomeManagerOld extends WorldChunkManager
 
     //StrongholdPosition
     @Override
+    @SuppressWarnings("rawtypes")
     public ChunkPosition a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
     {
         int i = paramInt1 - paramInt3 >> 2;
@@ -213,7 +215,7 @@ public class BiomeManagerOld extends WorldChunkManager
         int i1 = m - j + 1;
         BiomeBase[] biomeArray = null;
 
-        biomeArray = this.a(biomeArray, i, j, n, i1);
+        biomeArray = this.getBiomes(biomeArray, i, j, n, i1);
         ChunkPosition localChunkPosition = null;
         int i2 = 0;
         for (int i3 = 0; i3 < biomeArray.length; i3++)

@@ -347,7 +347,7 @@ public class BiomeConfig extends ConfigFile
                     }
                     this.replaceHeightMin.put(Integer.valueOf(blocks[0]), 0);
                     this.replaceHeightMax.put(Integer.valueOf(blocks[0]), 128);
-                    
+
                     int[] block = blockIdAndDataFromString(blocks[1]);
                     this.replaceBlocks.put(Integer.valueOf(blocks[0]), block);
                 }
@@ -361,20 +361,23 @@ public class BiomeConfig extends ConfigFile
 
 
     }
-    
-    private int[] blockIdAndDataFromString(String input) {
-    	int[] block = new int[2]; // [block ID, block data]
-    	
-    	if (input.indexOf(".") > -1) {
-    		String[] parts = input.split("\\.");
-    		block[0] = Integer.valueOf(parts[0]); // Block ID
-    		block[1] = Integer.valueOf(parts[1]); // Block data
-    	} else {
-    		block[0] = Integer.valueOf(input); // Block ID
-    		block[1] = 0; // Block data
-    	}
-    	
-    	return block;
+
+    private int[] blockIdAndDataFromString(String input)
+    {
+        int[] block = new int[2]; // [block ID, block data]
+
+        if (input.contains("."))
+        {
+            String[] parts = input.split("\\.");
+            block[0] = Integer.valueOf(parts[0]); // Block ID
+            block[1] = Integer.valueOf(parts[1]); // Block data
+        } else
+        {
+            block[0] = Integer.valueOf(input); // Block ID
+            block[1] = 0; // Block data
+        }
+
+        return block;
     }
 
     private void BuildReplaceMatrix()
@@ -386,10 +389,11 @@ public class BiomeConfig extends ConfigFile
                 this.ReplaceMatrixBlocks[i] = replaceBlocks.get(i);
                 this.ReplaceMatrixHeightMin[i] = this.replaceHeightMin.get(i);
                 this.ReplaceMatrixHeightMax[i] = this.replaceHeightMax.get(i);
-            } else {
-            	int[] block = {i, 0};
+            } else
+            {
+                int[] block = {i, 0};
                 this.ReplaceMatrixBlocks[i] = block;
-        	}
+            }
         }
     }
 
@@ -584,12 +588,13 @@ public class BiomeConfig extends ConfigFile
         while (i.hasNext())
         {
             Map.Entry<Integer, int[]> me = i.next();
-            
+
             value = String.valueOf(me.getValue()[0]);
-            if (me.getValue()[1] > 0) {
-            	value += "." + String.valueOf(me.getValue()[1]);
+            if (me.getValue()[1] > 0)
+            {
+                value += "." + String.valueOf(me.getValue()[1]);
             }
-            
+
             output += me.getKey().toString() + "=" + value;
             int min = this.replaceHeightMin.get(me.getKey());
             int max = this.replaceHeightMax.get(me.getKey());
@@ -614,7 +619,7 @@ public class BiomeConfig extends ConfigFile
     {
         this.BiomeSize = CheckValue(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
         this.BiomeHeight = (float) CheckValue(this.BiomeHeight, -10.0, 10.0);
-        this.BiomeRarity = CheckValue(this.BiomeRarity, 1, 100);
+        this.BiomeRarity = CheckValue(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
 
         this.BiomeTemperature = CheckValue(this.BiomeTemperature, 0.0F, 1.0F);
         this.BiomeWetness = CheckValue(this.BiomeWetness, 0.0F, 1.0F);

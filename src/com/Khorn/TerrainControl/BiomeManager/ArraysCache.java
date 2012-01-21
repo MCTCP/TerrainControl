@@ -2,11 +2,12 @@ package com.Khorn.TerrainControl.BiomeManager;
 
 import java.util.ArrayList;
 
+@SuppressWarnings("rawtypes")
 public class ArraysCache
 {
     private static final int[][][] SmallArrays = new int[4][][];
     private static final int[] SmallArraysNext = new int[4];
-    private static final ArrayList[] BigArrays = new ArrayList[4];
+	private static final ArrayList[] BigArrays = new ArrayList[4];
     private static final int[] BigArraysNext = new int[4];
     private static final boolean[] ArraysInUse = new boolean[4];
 

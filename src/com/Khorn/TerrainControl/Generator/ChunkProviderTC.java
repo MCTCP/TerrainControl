@@ -14,7 +14,6 @@ import org.bukkit.generator.ChunkGenerator;
 import java.util.*;
 
 
-@SuppressWarnings({"PointlessArithmeticExpression"})
 public class ChunkProviderTC extends ChunkGenerator
 {
     private Random rnd;

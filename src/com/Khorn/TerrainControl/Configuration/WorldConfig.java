@@ -44,6 +44,7 @@ public class WorldConfig extends ConfigFile
 
     // Biome generator
     public int GenerationDepth;
+    public int BiomeRarityScale;
 
     public int LandRarity;
     public int LandSize;
@@ -240,7 +241,7 @@ public class WorldConfig extends ConfigFile
         this.oldBiomeSize = CheckValue(this.oldBiomeSize, 0.1D, 10.0D);
 
         this.GenerationDepth = CheckValue(this.GenerationDepth, 1, 20);
-
+        this.BiomeRarityScale = CheckValue(this.BiomeRarityScale, 1, Integer.MAX_VALUE);
 
         this.LandRarity = CheckValue(this.LandRarity, 1, 100);
         this.LandSize = CheckValue(this.LandSize, 0, this.GenerationDepth);
@@ -321,9 +322,9 @@ public class WorldConfig extends ConfigFile
 
         this.oldBiomeSize = ReadModSettings(TCDefaultValues.oldBiomeSize.name(), TCDefaultValues.oldBiomeSize.doubleValue());
 
-
         this.GenerationDepth = ReadModSettings(TCDefaultValues.GenerationDepth.name(), TCDefaultValues.GenerationDepth.intValue());
-
+        
+        this.BiomeRarityScale = ReadModSettings(TCDefaultValues.BiomeRarityScale.name(), TCDefaultValues.BiomeRarityScale.intValue());
         this.LandRarity = ReadModSettings(TCDefaultValues.LandRarity.name(), TCDefaultValues.LandRarity.intValue());
         this.LandSize = ReadModSettings(TCDefaultValues.LandSize.name(), TCDefaultValues.LandSize.intValue());
         this.LandFuzzy = ReadModSettings(TCDefaultValues.LandFuzzy.name(), TCDefaultValues.LandFuzzy.intValue());
@@ -493,6 +494,10 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.GenerationDepth.name(), this.GenerationDepth);
         WriteNewLine();
 
+        WriteComment("Max biome rarity from 1 to infinity. By default this is 100, but you can raise it for");
+        WriteComment("fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
+        WriteValue(TCDefaultValues.BiomeRarityScale.name(), this.BiomeRarityScale);
+        WriteNewLine();
         WriteComment("Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
         WriteValue(TCDefaultValues.LandRarity.name(), this.LandRarity);
         WriteNewLine();

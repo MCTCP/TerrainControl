@@ -1,9 +1,5 @@
 package com.Khorn.TerrainControl.CustomObjects;
 
-import net.minecraft.server.Block;
-import org.bukkit.Material;
-
-@SuppressWarnings({"PointlessBitwiseExpression"})
 public class Coordinate
 {
 
@@ -41,16 +37,8 @@ public class Coordinate
         return z;
     }
 
-    public int getChunkX(int _x)
-    {
-        return (_x + x) >> 4;
-    }
 
-    public int getChunkZ(int _z)
-    {
-        return (_z + z) >> 4;
-    }
-
+    @SuppressWarnings("PointlessBitwiseExpression")
     public static int RotateData(int type, int data)
     {
 
