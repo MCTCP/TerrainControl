@@ -192,15 +192,15 @@ public class ObjectSpawner extends BlockPopulator
             for (int _x = 0; _x < 16; _x++)
                 for (int _z = 0; _z < 16; _z++)
                 {
-                    BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.BiomeArray[(_z + _x * 16)].K];
+                    BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.BiomeArray[(_x + _z * 16)].K];
                     if (biomeConfig.replaceBlocks.size() > 0)
                     {
                         for (int _y = 127; _y >= 0; _y--)
                         {
-                            int i = (_z * 16 + _x) * 128 + _y;
+                            int i = _x << 11 | _z << 7 | _y;
                             int blockId = blocks[i] & 0xFF;  // Fuck java with signed bytes;
                             int[] replacement = biomeConfig.ReplaceMatrixBlocks[blockId]; // [block ID, block data]
-                            if (blockId != replacement[0])
+                            if (blockId != replacement[0] || (blockId == replacement[0] && rawChunk.g.a(_x,_y,_z) != replacement[1]))
                                 if (_y >= biomeConfig.ReplaceMatrixHeightMin[blockId] && _y <= biomeConfig.ReplaceMatrixHeightMax[blockId])
                                 {
                                     blocks[i] = (byte) replacement[0];

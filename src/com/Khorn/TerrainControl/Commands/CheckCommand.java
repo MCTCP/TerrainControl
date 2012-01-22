@@ -1,10 +1,11 @@
 package com.Khorn.TerrainControl.Commands;
 
-import java.util.List;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.Khorn.TerrainControl.TCPlugin;
 
 import org.bukkit.command.CommandSender;
 
-import com.Khorn.TerrainControl.TCPlugin;
+import java.util.List;
 
 public class CheckCommand extends BaseCommand
 {
@@ -25,6 +26,8 @@ public class CheckCommand extends BaseCommand
             sender.sendMessage(ErrorColor + "You need to select world");
             return true;
         }
+
+        plugin.GetSettings(args.get(0), true);
 
         sender.sendMessage(MessageColor + "Done!");
         return true;
