@@ -11,8 +11,10 @@ import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import com.Khorn.TerrainControl.Generator.ChunkProviderNull;
 import com.Khorn.TerrainControl.Bukkit.Listeners.TCPlayerListener;
 import com.Khorn.TerrainControl.Bukkit.Listeners.TCWorldListener;
+import net.minecraft.server.BiomeBase;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
@@ -24,8 +26,7 @@ public class TCPlugin extends JavaPlugin
 {
 
     public final HashMap<String, WorldConfig> worldsSettings = new HashMap<String, WorldConfig>();
-    private final TCWorldListener worldListener = new TCWorldListener(this);
-    private final TCPlayerListener playerListener = new TCPlayerListener(this);
+    private TCListener listener;
     private final HashMap<String, TCPlayer> sessions = new HashMap<String, TCPlayer>();
 
 
@@ -38,8 +39,10 @@ public class TCPlugin extends JavaPlugin
     {
         BiomeManagerOld.GenBiomeDiagram();
 
-        this.getCommand("tc").setExecutor(new TCCommandExecutor(this));
-        this.RegisterEvents();
+        if (this.getCommand("tc") != null)
+            this.getCommand("tc").setExecutor(new TCCommandExecutor(this));
+        this.getCommand("terraincontrol").setExecutor(new TCCommandExecutor(this));
+        this.listener = new TCListener(this);
 
         System.out.println(getDescription().getFullName() + " is now enabled");
 
@@ -110,7 +113,8 @@ public class TCPlugin extends JavaPlugin
             if (!baseFolder.mkdirs())
                 System.out.println("TerrainControl: cant create folder " + baseFolder.getName());
         }
-
+        // Get for init BiomeMapping
+        CraftBlock.biomeBaseToBiome(BiomeBase.OCEAN);
 
         WorldConfig worker = new WorldConfig(baseFolder, this, worldName);
 
@@ -173,18 +177,6 @@ public class TCPlugin extends JavaPlugin
             System.out.println("TerrainControl: world seed is " + workWorld.getSeed());
 
         }
-    }
-
-    private void RegisterEvents()
-    {
-        PluginManager pm = this.getServer().getPluginManager();
-        pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Event.Priority.Monitor, this);
-
-        pm.registerEvent(Event.Type.WORLD_INIT, worldListener, Event.Priority.High, this);
-
-        pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
-
-
     }
 
 }

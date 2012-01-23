@@ -1,16 +1,25 @@
 package com.Khorn.TerrainControl.CustomObjects;
 
+import com.Khorn.TerrainControl.Configuration.Resource;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.Khorn.TerrainControl.Generator.ResourceGens.ResourceGenBase;
+import com.Khorn.TerrainControl.LocalWorld;
 import net.minecraft.server.*;
 import org.bukkit.Chunk;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class CustomObjectGen
+public class CustomObjectGen extends ResourceGenBase
 {
 
-    private static boolean ObjectCanSpawn(World world, int x, int y, int z, CustomObject obj)
+    @Override
+    public void Process(LocalWorld world, Random rand, Resource res, int _x, int _z, int biomeId)
+    {
+        SpawnCustomObjects(world, rand, world.getSettings(), _x + 8, _z + 8, biomeId);
+    }
+
+    private static boolean ObjectCanSpawn(LocalWorld world, int x, int y, int z, CustomObject obj)
     {
         if ((world.getTypeId(x, y - 5, z) == 0) && (obj.needsFoundation))
             return false;
@@ -37,7 +46,7 @@ public class CustomObjectGen
         return !abort;
     }
 
-    public static boolean SpawnCustomObjects(World world, Random rand, WorldConfig worldSettings, int chunk_x, int chunk_z, BiomeBase localBiomeBase)
+    public static boolean SpawnCustomObjects(LocalWorld world, Random rand, WorldConfig worldSettings, int chunk_x, int chunk_z, int biomeId)
     {
 
         if (worldSettings.Objects.size() == 0)
@@ -54,7 +63,7 @@ public class CustomObjectGen
 
             CustomObject SelectedObject = worldSettings.Objects.get(rand.nextInt(worldSettings.Objects.size()));
 
-            if (SelectedObject.branch || !SelectedObject.canSpawnInBiome(localBiomeBase))
+            if (SelectedObject.branch || !SelectedObject.canSpawnInBiome(biomeId))
                 continue;
 
             int randomRoll = rand.nextInt(100);
@@ -93,7 +102,7 @@ public class CustomObjectGen
                         CustomObject ObjectFromGroup = groupList.get(objIndex);
 
                         // duno about this check, but maybe it is correct
-                        if (ObjectFromGroup.branch || !ObjectFromGroup.canSpawnInBiome(localBiomeBase))
+                        if (ObjectFromGroup.branch || !ObjectFromGroup.canSpawnInBiome(biomeId))
                             continue;
 
                         x = x + rand.nextInt(SelectedObject.groupSeperationMax - SelectedObject.groupSeperationMin) + SelectedObject.groupSeperationMin;
@@ -118,7 +127,7 @@ public class CustomObjectGen
     }
 
 
-    public static boolean SpawnCustomTrees(World world, Random rand, WorldConfig worldSettings, int x, int y, int z)
+    public static boolean SpawnCustomTrees(LocalWorld world, Random rand, WorldConfig worldSettings, int x, int y, int z)
     {
 
         if (!worldSettings.HasCustomTrees)
@@ -152,7 +161,7 @@ public class CustomObjectGen
         return objectSpawned;
     }
 
-    public static boolean GenerateCustomObject(World world, Random rand, WorldConfig worldSettings, int x, int y, int z, CustomObject workObject, boolean notify)
+    public static boolean GenerateCustomObject(LocalWorld world, Random rand, WorldConfig worldSettings, int x, int y, int z, CustomObject workObject, boolean notify)
     {
         /*
          * 1) ground check (moved to ObjectCanSpawn)
@@ -283,5 +292,9 @@ public class CustomObjectGen
     }
 
 
+    @Override
+    protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
+    {
 
+    }
 }

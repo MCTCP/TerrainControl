@@ -1,24 +1,22 @@
 package com.Khorn.TerrainControl.Generator.ResourceGens;
 
-import net.minecraft.server.World;
-
+import com.Khorn.TerrainControl.LocalWorld;
 import com.Khorn.TerrainControl.Configuration.Resource;
+
+import java.util.Random;
 
 
 public class UnderWaterOreGen extends ResourceGenBase
 {
-    public UnderWaterOreGen(World world)
-    {
-        super(world);
-    }
+
 
     @Override
-    protected void SpawnResource(Resource res, int x, int z)
+    protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
     {
 
-        int y = this.getLiquidHeight(x, z);
+        int y = world.getLiquidHeight(x, z);
 
-        int i = this.rand.nextInt(res.MaxSize);
+        int i = rand.nextInt(res.MaxSize);
         int j = 2;
         for (int k = x - i; k <= x + i; k++)
         {
@@ -30,10 +28,10 @@ public class UnderWaterOreGen extends ResourceGenBase
                 {
                     for (int i2 = y - j; i2 <= y + j; i2++)
                     {
-                        int i3 = this.GetRawBlockId(k, i2, m);
+                        int i3 = world.GetRawBlockId(k, i2, m);
                         if (res.CheckSourceId(i3))
                         {
-                            this.SetRawBlockId(k, i2, m, res.BlockId);
+                            world.SetRawBlockId(k, i2, m, res.BlockId);
                         }
                     }
                 }

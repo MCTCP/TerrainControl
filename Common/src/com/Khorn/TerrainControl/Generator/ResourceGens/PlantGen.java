@@ -1,34 +1,33 @@
 package com.Khorn.TerrainControl.Generator.ResourceGens;
 
 import com.Khorn.TerrainControl.Configuration.Resource;
-import net.minecraft.server.World;
+import com.Khorn.TerrainControl.LocalWorld;
+
+import java.util.Random;
 
 public class PlantGen extends ResourceGenBase
 {
-    public PlantGen(World world)
-    {
-        super(world);
-    }
-
     @Override
-    protected void SpawnResource(Resource res, int x, int z)
+    protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
     {
 
-        int y = this.rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
+        int y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
 
         for (int i = 0; i < 64; i++)
         {
-            int j = x + this.rand.nextInt(8) - this.rand.nextInt(8);
-            int k = y + this.rand.nextInt(4) - this.rand.nextInt(4);
-            int m = z + this.rand.nextInt(8) - this.rand.nextInt(8);
-            if ((!this.isEmpty(j, k, m)) || (!res.CheckSourceId(this.GetRawBlockId(j, k - 1, m))))
+            int j = x + rand.nextInt(8) - rand.nextInt(8);
+            int k = y + rand.nextInt(4) - rand.nextInt(4);
+            int m = z + rand.nextInt(8) - rand.nextInt(8);
+            if ((!world.isEmpty(j, k, m)) || (!res.CheckSourceId(world.GetRawBlockId(j, k - 1, m))))
                 continue;
-            
-            if (res.BlockData > 0) {
-        		this.SetRawBlockIdAndData(j, k, m, res.BlockId, res.BlockData);
-        	} else {
-        		this.SetRawBlockId(j, k, m, res.BlockId);
-        	}
+
+            if (res.BlockData > 0)
+            {
+                world.SetRawBlockIdAndData(j, k, m, res.BlockId, res.BlockData);
+            } else
+            {
+                world.SetRawBlockId(j, k, m, res.BlockId);
+            }
         }
     }
 

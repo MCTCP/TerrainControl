@@ -1,6 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit;
 
-import com.Khorn.TerrainControl.Bukkit.Commands.BaseCommand;
+import com.Khorn.TerrainControl.Commands.BaseCommand;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObjectGen;
 import org.bukkit.Bukkit;

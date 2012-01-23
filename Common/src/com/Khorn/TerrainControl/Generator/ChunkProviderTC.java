@@ -499,7 +499,7 @@ public class ChunkProviderTC
         this.CaveGen.a(x, z, arrayOfByte);
         this.CanyonGen.a(x, z, arrayOfByte);
 
-        this.localWorld.PlaceTerrainObjects(x,z,arrayOfByte);
+        this.localWorld.PrepareTerrainObjects(x, z, arrayOfByte);
 
         if (this.worldSettings.isDeprecated)
             this.worldSettings = this.worldSettings.newSettings;
