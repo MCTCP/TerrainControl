@@ -1,21 +1,24 @@
-package com.Khorn.TerrainControl.Bukkit;
+package com.Khorn.TerrainControl.Util;
 
 
-import com.Khorn.TerrainControl.Bukkit.Commands.BaseCommand;
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.TCPlugin;
-import com.sun.imageio.plugins.png.PNGImageWriter;
-import com.sun.imageio.plugins.png.PNGImageWriterSpi;
-import net.minecraft.server.BiomeBase;
-import net.minecraft.server.World;
-import org.bukkit.command.CommandSender;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
 
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
+
+import net.minecraft.server.BiomeBase;
+import net.minecraft.server.World;
+
+import org.bukkit.command.CommandSender;
+
+import com.Khorn.TerrainControl.TCPlugin;
+import com.Khorn.TerrainControl.Commands.BaseCommand;
+import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.sun.imageio.plugins.png.PNGImageWriter;
+import com.sun.imageio.plugins.png.PNGImageWriterSpi;
 
 public class MapWriter implements Runnable
 {

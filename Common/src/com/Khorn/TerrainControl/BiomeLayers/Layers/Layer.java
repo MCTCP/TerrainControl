@@ -1,13 +1,12 @@
 package com.Khorn.TerrainControl.BiomeLayers.Layers;
 
+import java.util.ArrayList;
+
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import com.Khorn.TerrainControl.DefaultBiome;
 import com.Khorn.TerrainControl.LocalBiome;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.LocalWorld;
-
-
-import java.util.ArrayList;
 
 public abstract class Layer
 {
@@ -173,7 +172,7 @@ public abstract class Layer
                             layerBiome.BiomeIsles[islandIn] = true;
                     }
 
-                    layerBiome.chance = 101 - biomeConfig.BiomeRarity;
+                    layerBiome.chance = (config.BiomeRarityScale + 1) - biomeConfig.BiomeRarity;
                     MainLayer = layerBiome;
                 }
 

@@ -1,7 +1,5 @@
 package com.Khorn.TerrainControl.CustomObjects;
 
-
-@SuppressWarnings({"PointlessBitwiseExpression"})
 public class Coordinate
 {
 
@@ -40,6 +38,7 @@ public class Coordinate
     }
 
 
+    @SuppressWarnings("PointlessBitwiseExpression")
     public static int RotateData(int type, int data)
     {
 
