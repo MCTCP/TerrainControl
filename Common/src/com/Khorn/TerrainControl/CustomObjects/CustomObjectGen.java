@@ -2,10 +2,9 @@ package com.Khorn.TerrainControl.CustomObjects;
 
 import com.Khorn.TerrainControl.Configuration.Resource;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.Khorn.TerrainControl.DefaultMaterial;
 import com.Khorn.TerrainControl.Generator.ResourceGens.ResourceGenBase;
 import com.Khorn.TerrainControl.LocalWorld;
-import net.minecraft.server.*;
-import org.bukkit.Chunk;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -21,15 +20,15 @@ public class CustomObjectGen extends ResourceGenBase
 
     private static boolean ObjectCanSpawn(LocalWorld world, int x, int y, int z, CustomObject obj)
     {
-        if ((world.getTypeId(x, y - 5, z) == 0) && (obj.needsFoundation))
+        if ((world.getRawBlockId(x, y - 5, z) == 0) && (obj.needsFoundation))
             return false;
 
         boolean abort = false;
-        int checkBlock = world.getTypeId(x, y + 2, z);
+        int checkBlock = world.getRawBlockId(x, y + 2, z);
         if (!obj.spawnWater)
-            abort = ((checkBlock == Block.WATER.id) || (checkBlock == Block.STATIONARY_WATER.id));
+            abort = ((checkBlock == DefaultMaterial.WATER.id) || (checkBlock == DefaultMaterial.STATIONARY_WATER.id));
         if (!obj.spawnLava)
-            abort = ((checkBlock == Block.LAVA.id) || (checkBlock == Block.STATIONARY_LAVA.id));
+            abort = ((checkBlock == DefaultMaterial.LAVA.id) || (checkBlock == DefaultMaterial.STATIONARY_LAVA.id));
 
         checkBlock = world.getLightLevel(x, y + 2, z);
         if (!obj.spawnSunlight)
@@ -40,7 +39,7 @@ public class CustomObjectGen extends ResourceGenBase
         if ((y < obj.spawnElevationMin) || (y > obj.spawnElevationMax))
             abort = true;
 
-        if (!obj.spawnOnBlockType.contains(world.getTypeId(x, y - 1, z)))
+        if (!obj.spawnOnBlockType.contains(world.getRawBlockId(x, y - 1, z)))
             abort = true;
 
         return !abort;
@@ -63,7 +62,7 @@ public class CustomObjectGen extends ResourceGenBase
 
             CustomObject SelectedObject = worldSettings.Objects.get(rand.nextInt(worldSettings.Objects.size()));
 
-            if (SelectedObject.branch || !SelectedObject.canSpawnInBiome(biomeId))
+            if (SelectedObject.branch || !SelectedObject.canSpawnInBiome(world.getBiomeById(biomeId).getName()))
                 continue;
 
             int randomRoll = rand.nextInt(100);
@@ -76,10 +75,10 @@ public class CustomObjectGen extends ResourceGenBase
                 int y = world.getHighestBlockYAt(x, z);
                 ObjectRarity -= 100;
 
-                if (!ObjectCanSpawn(world,x, y, z, SelectedObject))
+                if (!ObjectCanSpawn(world, x, y, z, SelectedObject))
                     continue;
 
-                objectSpawned = GenerateCustomObject(world,rand, worldSettings,x, y, z, SelectedObject, false);
+                objectSpawned = GenerateCustomObject(world, rand, worldSettings, x, y, z, SelectedObject, false);
                 // Checked Biome, Branch, Tree - soo try to generate.
 
                 // here we spawn object and check group spawning
@@ -102,7 +101,7 @@ public class CustomObjectGen extends ResourceGenBase
                         CustomObject ObjectFromGroup = groupList.get(objIndex);
 
                         // duno about this check, but maybe it is correct
-                        if (ObjectFromGroup.branch || !ObjectFromGroup.canSpawnInBiome(biomeId))
+                        if (ObjectFromGroup.branch || !ObjectFromGroup.canSpawnInBiome(world.getBiomeById(biomeId).getName()))
                             continue;
 
                         x = x + rand.nextInt(SelectedObject.groupSeperationMax - SelectedObject.groupSeperationMin) + SelectedObject.groupSeperationMin;
@@ -111,9 +110,9 @@ public class CustomObjectGen extends ResourceGenBase
                         if ((y - _y) > 10 || (_y - y) > 10)
                             continue;
 
-                        if (!ObjectCanSpawn(world,x, y, z, ObjectFromGroup))
+                        if (!ObjectCanSpawn(world, x, y, z, ObjectFromGroup))
                             continue;
-                        GenerateCustomObject(world,rand, worldSettings,x, _y, z, ObjectFromGroup, false);
+                        GenerateCustomObject(world, rand, worldSettings, x, _y, z, ObjectFromGroup, false);
 
 
                     }
@@ -133,9 +132,8 @@ public class CustomObjectGen extends ResourceGenBase
         if (!worldSettings.HasCustomTrees)
             return false;
 
-        Chunk chunk = world.getWorld().getChunkAt(x >> 4, z >> 4);
 
-        BiomeBase localBiomeBase = world.getWorldChunkManager().getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16);
+        String biomeName = world.getLocalBiome(x | 0xF, z | 0xF).getName();
 
         boolean objectSpawned = false;
         int spawnattemps = 0;
@@ -145,7 +143,7 @@ public class CustomObjectGen extends ResourceGenBase
 
             spawnattemps++;
 
-            if (SelectedObject.branch || !SelectedObject.canSpawnInBiome(localBiomeBase) || !SelectedObject.tree)
+            if (SelectedObject.branch || !SelectedObject.canSpawnInBiome(biomeName) || !SelectedObject.tree)
                 continue;
 
 
@@ -154,7 +152,7 @@ public class CustomObjectGen extends ResourceGenBase
             if (randomRoll < SelectedObject.rarity)
             {
                 if (CustomObjectGen.ObjectCanSpawn(world, x, y, z, SelectedObject))
-                    objectSpawned = GenerateCustomObject(world,rand, worldSettings,x, y, z, SelectedObject, true);
+                    objectSpawned = GenerateCustomObject(world, rand, worldSettings, x, y, z, SelectedObject, true);
             }
 
         }
@@ -226,13 +224,13 @@ public class CustomObjectGen extends ResourceGenBase
                 point.Rotate();
                 counter++;
             }
-            if(!world.isLoaded(point.getX() + x, point.getY() + y,point.getZ() + z))
+            if (!world.isLoaded(point.getX() + x, point.getZ() + z))
                 return false;
 
 
             if (!workObject.dig)
             {
-                if (world.getTypeId((x + point.getX()), (y + point.getY()), (z + point.getZ())) > 0)
+                if (world.getRawBlockId((x + point.getX()), (y + point.getY()), (z + point.getZ())) > 0)
                 {
                     faultCounter++;
                     if (faultCounter > (workingData.size() * (workObject.collisionPercentage / 100)))
@@ -250,25 +248,25 @@ public class CustomObjectGen extends ResourceGenBase
         while (index < workingData.size())
         {
             Coordinate DataPoint = workingData.get(index);
-            if (world.getTypeId(x + DataPoint.getX(), y + DataPoint.getY(), z + DataPoint.getZ()) == 0)
+            if (world.getRawBlockId(x + DataPoint.getX(), y + DataPoint.getY(), z + DataPoint.getZ()) == 0)
             {
-                ChangeWorld(world,notify, (x + DataPoint.getX()), y + DataPoint.getY(), z + DataPoint.getZ(), DataPoint.workingData, DataPoint.workingExtra);
+                ChangeWorld(world, notify, (x + DataPoint.getX()), y + DataPoint.getY(), z + DataPoint.getZ(), DataPoint.workingData, DataPoint.workingExtra);
             } else if (DataPoint.Digs)
             {
-                ChangeWorld(world,notify, (x + DataPoint.getX()), y + DataPoint.getY(), z + DataPoint.getZ(), DataPoint.workingData, DataPoint.workingExtra);
+                ChangeWorld(world, notify, (x + DataPoint.getX()), y + DataPoint.getY(), z + DataPoint.getZ(), DataPoint.workingData, DataPoint.workingExtra);
             }
-            if ((!worldSettings.denyObjectsUnderFill) && (workObject.underFill) && (world.getTypeId(x + DataPoint.getX(), y, z + DataPoint.getZ()) > 0))
+            if ((!worldSettings.denyObjectsUnderFill) && (workObject.underFill) && (world.getRawBlockId(x + DataPoint.getX(), y, z + DataPoint.getZ()) > 0))
             {
                 int depthScanner = 0;
-                int blockForFill = world.getTypeId(x, y - 1, z);
+                int blockForFill = world.getRawBlockId(x, y - 1, z);
                 while (depthScanner < 64)
                 {
                     if (DataPoint.getY() < depthScanner)
                     {
                         int countdown = depthScanner;
-                        while ((world.getTypeId(x + DataPoint.getX(), y + DataPoint.getY() - countdown, z + DataPoint.getZ()) == 0) && (countdown < 64))
+                        while ((world.getRawBlockId(x + DataPoint.getX(), y + DataPoint.getY() - countdown, z + DataPoint.getZ()) == 0) && (countdown < 64))
                         {
-                            ChangeWorld(world,notify, (x + DataPoint.getX()), y + DataPoint.getY() - countdown, z + DataPoint.getZ(), blockForFill, 0);
+                            ChangeWorld(world, notify, (x + DataPoint.getX()), y + DataPoint.getY() - countdown, z + DataPoint.getZ(), blockForFill, 0);
                             countdown++;
                         }
                     }
@@ -282,12 +280,12 @@ public class CustomObjectGen extends ResourceGenBase
     }
 
 
-    private  static  boolean ChangeWorld(World world, boolean notify, int x, int y, int z, int type, int data)
+    private static void ChangeWorld(LocalWorld world, boolean notify, int x, int y, int z, int type, int data)
     {
         if (notify)
-            return world.setTypeIdAndData(x, y, z, type, data);
+            world.setBlockIdAndData(x, y, z, type, data);
         else
-            return world.setRawTypeIdAndData(x, y, z, type, data);
+            world.setRawBlockIdAndData(x, y, z, type, data);
 
     }
 

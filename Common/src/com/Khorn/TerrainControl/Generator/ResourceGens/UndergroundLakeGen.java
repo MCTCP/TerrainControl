@@ -43,18 +43,18 @@ public class UndergroundLakeGen extends ResourceGenBase
                 for (int yLake = (int) (yAdjusted - verticalSize / 2.0D); yLake <= (int) (yAdjusted + verticalSize / 2.0D); yLake++)
                     for (int zLake = (int) (zAdjusted - horizontalSize / 2.0D); zLake <= (int) (zAdjusted + horizontalSize / 2.0D); zLake++)
                     {
-                        if (world.GetRawBlockId(xLake, yLake, zLake) == 0)
+                        if (world.getRawBlockId(xLake, yLake, zLake) == 0)
                             continue;
                         double xBounds = (xLake + 0.5D - xAdjusted) / (horizontalSize / 2.0D);
                         double yBounds = (yLake + 0.5D - yAdjusted) / (verticalSize / 2.0D);
                         double zBounds = (zLake + 0.5D - zAdjusted) / (horizontalSize / 2.0D);
                         if (xBounds * xBounds + yBounds * yBounds + zBounds * zBounds >= 1.0D)
                             continue;
-                        int uBlock = world.GetRawBlockId(xLake, yLake - 1, zLake);
+                        int uBlock = world.getRawBlockId(xLake, yLake - 1, zLake);
                         if (uBlock != 0) // not air
-                            world.SetRawBlockId(xLake, yLake, zLake, DefaultMaterial.WATER.id);
+                            world.setRawBlockId(xLake, yLake, zLake, DefaultMaterial.WATER.id);
                         else
-                            world.SetRawBlockId(xLake, yLake, zLake, 0); // Air block
+                            world.setRawBlockId(xLake, yLake, zLake, 0); // Air block
                     }
         }
     }

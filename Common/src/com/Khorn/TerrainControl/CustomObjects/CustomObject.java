@@ -315,9 +315,9 @@ public class CustomObject
 
     }
 
-    public boolean canSpawnInBiome(BiomeBase localBiome)
+    public boolean canSpawnInBiome(String localBiome)
     {
-        return this.spawnInBiome.contains("all") || this.spawnInBiome.contains(localBiome.w.toLowerCase());
+        return this.spawnInBiome.contains("all") || this.spawnInBiome.contains(localBiome.toLowerCase());
 
     }
 

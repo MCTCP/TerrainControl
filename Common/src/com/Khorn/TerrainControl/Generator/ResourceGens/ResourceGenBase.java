@@ -2,7 +2,6 @@ package com.Khorn.TerrainControl.Generator.ResourceGens;
 
 import com.Khorn.TerrainControl.Configuration.Resource;
 import com.Khorn.TerrainControl.LocalWorld;
-import net.minecraft.server.*;
 
 import java.util.Random;
 

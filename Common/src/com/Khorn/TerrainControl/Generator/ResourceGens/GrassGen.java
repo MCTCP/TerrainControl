@@ -21,12 +21,12 @@ public class GrassGen extends ResourceGenBase
             int z = _z + rand.nextInt(16) + 8;
 
             int i;
-            while ((((i = world.GetRawBlockId(x, y, z)) == 0) || (i == DefaultMaterial.LEAVES.id)) && (y > 0))
+            while ((((i = world.getRawBlockId(x, y, z)) == 0) || (i == DefaultMaterial.LEAVES.id)) && (y > 0))
                 y--;
 
-            if ((!world.isEmpty(x, y + 1, z)) || (!res.CheckSourceId(world.GetRawBlockId(x, y, z))))
+            if ((!world.isEmpty(x, y + 1, z)) || (!res.CheckSourceId(world.getRawBlockId(x, y, z))))
                 continue;
-            world.SetRawBlockIdAndData(x, y + 1, z, res.BlockId, res.BlockData);
+            world.setRawBlockIdAndData(x, y + 1, z, res.BlockId, res.BlockData);
         }
     }
 

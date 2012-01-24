@@ -18,15 +18,15 @@ public class PlantGen extends ResourceGenBase
             int j = x + rand.nextInt(8) - rand.nextInt(8);
             int k = y + rand.nextInt(4) - rand.nextInt(4);
             int m = z + rand.nextInt(8) - rand.nextInt(8);
-            if ((!world.isEmpty(j, k, m)) || (!res.CheckSourceId(world.GetRawBlockId(j, k - 1, m))))
+            if ((!world.isEmpty(j, k, m)) || (!res.CheckSourceId(world.getRawBlockId(j, k - 1, m))))
                 continue;
 
             if (res.BlockData > 0)
             {
-                world.SetRawBlockIdAndData(j, k, m, res.BlockId, res.BlockData);
+                world.setRawBlockIdAndData(j, k, m, res.BlockId, res.BlockData);
             } else
             {
-                world.SetRawBlockId(j, k, m, res.BlockId);
+                world.setRawBlockId(j, k, m, res.BlockId);
             }
         }
     }
