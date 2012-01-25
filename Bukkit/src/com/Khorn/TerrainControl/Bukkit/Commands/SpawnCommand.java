@@ -1,10 +1,10 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
 
+import com.Khorn.TerrainControl.Bukkit.TCPlayer;
+import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObject;
-import com.Khorn.TerrainControl.TCPlayer;
-import com.Khorn.TerrainControl.TCPlugin;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

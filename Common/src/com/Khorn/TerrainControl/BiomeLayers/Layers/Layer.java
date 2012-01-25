@@ -66,13 +66,14 @@ public abstract class Layer
         return 0;
     }
 
-    public static Layer[] a(long paramLong, WorldConfig config, LocalWorld world)
+    public static Layer[] Init(long paramLong, LocalWorld world)
     {
 
         /*int BigLandSize = 2;  //default 0, more - smaller
         int ChanceToIncreaseLand = 6; //default 4
         int MaxDepth = 10;     */
 
+        WorldConfig config = world.getSettings();
 
         LocalBiome[][] NormalBiomeMap = new LocalBiome[config.GenerationDepth + 1][];
         LocalBiome[][] IceBiomeMap = new LocalBiome[config.GenerationDepth + 1][];

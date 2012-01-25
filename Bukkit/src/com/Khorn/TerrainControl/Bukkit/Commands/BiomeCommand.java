@@ -1,6 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
-import com.Khorn.TerrainControl.TCPlugin;
+import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.WorldChunkManager;
 import org.bukkit.ChatColor;

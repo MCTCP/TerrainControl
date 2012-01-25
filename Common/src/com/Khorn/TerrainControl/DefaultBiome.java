@@ -30,11 +30,32 @@ public enum DefaultBiome
 
     public final int Id;
     public final String Name;
+    private static DefaultBiome[] lookupID;
 
     private DefaultBiome(int i, String name)
     {
         this.Id = i;
         this.Name = name;
+    }
+
+    static
+    {
+        lookupID = new DefaultBiome[21];
+
+        for(DefaultBiome biome : DefaultBiome.values())
+        {
+            lookupID[biome.Id] = biome;
+            
+        }
+    }
+
+    public static DefaultBiome getBiome( int id)
+    {
+        if( id < lookupID.length)
+            return lookupID[id];
+        else
+            return null;
+
     }
 
     public static boolean Contain(String name)

@@ -2,15 +2,16 @@ package com.Khorn.TerrainControl.Bukkit.BiomeManager;
 
 
 import com.Khorn.TerrainControl.BiomeLayers.Layers.Layer;
-import com.Khorn.TerrainControl.BiomeManager.Layers.Layer;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.Khorn.TerrainControl.DefaultBiome;
+import com.Khorn.TerrainControl.LocalWorld;
 import net.minecraft.server.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class BiomeManager extends WorldChunkManager
+public class BiomeManager extends WorldChunkManager implements IBiomeManager
 {
     private Layer UnZoomedLayer;
     private Layer BiomeLayer;
@@ -25,25 +26,25 @@ public class BiomeManager extends WorldChunkManager
     private WorldConfig worldConfig;
 
 
-    public BiomeManager(World paramWorld, WorldConfig config)
+    public BiomeManager(LocalWorld world)
     {
         this.f.add(BiomeBase.FOREST);
         this.f.add(BiomeBase.SWAMPLAND);
         this.f.add(BiomeBase.TAIGA);
 
-        this.Init(paramWorld, config);
+        this.Init(world);
 
     }
 
-    public void Init(World paramWorld, WorldConfig config)
+    public void Init(LocalWorld world)
     {
-        this.worldConfig = config;
+        this.worldConfig = world.getSettings();
         synchronized (this.LockObject)
         {
             this.Cache = new BiomeCache(this);
         }
 
-        Layer[] layers = Layer.a(paramWorld.getSeed(), config);
+        Layer[] layers = Layer.Init(world.getSeed(), world);
 
         this.UnZoomedLayer = layers[0];
         this.BiomeLayer = layers[1];
@@ -56,6 +57,7 @@ public class BiomeManager extends WorldChunkManager
     {
         return this.f;
     }
+
 
     public BiomeBase a(ChunkCoordIntPair paramChunkCoordIntPair)
     {
@@ -145,11 +147,6 @@ public class BiomeManager extends WorldChunkManager
         return paramArrayOfBiomeBase;
     }
 
-    public BiomeBase[] a(BiomeBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
-    {
-        return a(paramArrayOfBiomeBase, paramInt1, paramInt2, paramInt3, paramInt4, true);
-    }
-
     public BiomeBase[] a(BiomeBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
     {
         if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < paramInt3 * paramInt4))
@@ -188,7 +185,7 @@ public class BiomeManager extends WorldChunkManager
         int[] arrayOfInt = this.UnZoomedLayer.Calculate(i, j, n, i1);
         for (int i2 = 0; i2 < n * i1; i2++)
         {
-            if (arrayOfInt[i2] >= WorldConfig.DefaultBiomesCount)
+            if (arrayOfInt[i2] >= DefaultBiome.values().length)
                 return false;
             BiomeBase localBiomeBase = BiomeBase.a[arrayOfInt[i2]];
             if (!paramList.contains(localBiomeBase))
@@ -213,7 +210,7 @@ public class BiomeManager extends WorldChunkManager
         int i2 = 0;
         for (int i3 = 0; i3 < arrayOfInt.length; i3++)
         {
-            if (arrayOfInt[i3] >= WorldConfig.DefaultBiomesCount)
+            if (arrayOfInt[i3] >= DefaultBiome.values().length)
                 continue;
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
@@ -233,6 +230,57 @@ public class BiomeManager extends WorldChunkManager
         {
             this.Cache.a();
         }
+    }
+
+    public int[] getBiomesUnZoomedTC(int[] biomeArray, int x, int z, int x_size, int z_size)
+    {
+        if ((biomeArray == null) || (biomeArray.length < x_size * z_size))
+        {
+            biomeArray = new int[x_size * z_size];
+        }
+
+        int[] arrayOfInt = this.UnZoomedLayer.Calculate(x,  z,  x_size,  z_size);
+
+        System.arraycopy(arrayOfInt,0,arrayOfInt,0,x_size * z_size);
+
+        return biomeArray;
+    }
+
+    public float[] getTemperaturesTC(int x, int z, int x_size, int z_size)
+    {
+        return this.getTemperatures(null,x,z,x_size,z_size);
+    }
+
+    public int[] getBiomesTC(int[] biomeArray, int x, int z, int x_size, int z_size)
+    {
+        if ((biomeArray == null) || (biomeArray.length < x_size * z_size))
+        {
+            biomeArray = new int[x_size * z_size];
+        }
+
+        if ((x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
+        {
+            synchronized (this.LockObject)
+            {
+                BiomeBase[] localObject = this.Cache.d(x, z);
+                for(int i= 0; i< x_size*z_size;i++)
+                    biomeArray[i] = localObject[i].K;
+
+            }
+            return biomeArray;
+        }
+
+        int[] arrayOfInt = this.BiomeLayer.Calculate(x,  z,  x_size,  z_size);
+
+        System.arraycopy(arrayOfInt,0,arrayOfInt,0,x_size * z_size);
+
+        return biomeArray;
+
+    }
+
+    public int getBiomeTC(int x, int z)
+    {
+        return this.getBiome(x,z).K;
     }
 }
 

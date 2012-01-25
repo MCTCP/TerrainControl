@@ -2,7 +2,13 @@ package com.Khorn.TerrainControl.Bukkit.BiomeManager;
 
 
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.Khorn.TerrainControl.LocalWorld;
 import com.Khorn.TerrainControl.Util.NoiseGeneratorOctaves2;
+import net.minecraft.server.BiomeBase;
+import net.minecraft.server.BiomeCache;
+import net.minecraft.server.ChunkPosition;
+import net.minecraft.server.WorldChunkManager;
+import org.bukkit.World;
 
 import java.util.List;
 import java.util.Random;
@@ -25,13 +31,13 @@ public class BiomeManagerOld extends WorldChunkManager
 
     private static BiomeBase[] BiomeDiagram = new BiomeBase[4096];
 
-    public BiomeManagerOld(World paramWorld, WorldConfig worker)
+    public BiomeManagerOld(LocalWorld world)
     {
         super();
-        this.localWrk = worker;
-        this.TempGen = new NoiseGeneratorOctaves2(new Random(paramWorld.getSeed() * 9871L), 4);
-        this.RainGen = new NoiseGeneratorOctaves2(new Random(paramWorld.getSeed() * 39811L), 4);
-        this.TempGen2 = new NoiseGeneratorOctaves2(new Random(paramWorld.getSeed() * 543321L), 2);
+        this.localWrk = world.getSettings();
+        this.TempGen = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 9871L), 4);
+        this.RainGen = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 39811L), 4);
+        this.TempGen2 = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 543321L), 2);
 
 
     }

@@ -1,6 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
-import com.Khorn.TerrainControl.TCPlugin;
+import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;

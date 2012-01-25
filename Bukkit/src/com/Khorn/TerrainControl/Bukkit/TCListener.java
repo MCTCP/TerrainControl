@@ -1,7 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit;
 
-import com.Khorn.TerrainControl.Commands.BaseCommand;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.Khorn.TerrainControl.Bukkit.Commands.BaseCommand;
 import com.Khorn.TerrainControl.CustomObjects.CustomObjectGen;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -39,12 +38,12 @@ public class TCListener implements Listener
     @EventHandler(event = StructureGrowEvent.class, priority = EventPriority.NORMAL)
     public void onStructureGrow(StructureGrowEvent event)
     {
-        WorldConfig config = this.tcPlugin.worldsSettings.get(event.getWorld().getName());  //Todo too long!
-        if (config != null && config.HasCustomTrees)
+        BukkitWorld bukkitWorld = this.tcPlugin.worlds.get(event.getWorld().getUID());
+        if (bukkitWorld != null && bukkitWorld.getSettings().HasCustomTrees)
         {
-            if (this.random.nextInt(100) < config.customTreeChance)
+            if (this.random.nextInt(100) < bukkitWorld.getSettings().customTreeChance)
             {
-                CustomObjectGen.SpawnCustomTrees(((CraftWorld) event.getWorld()).getHandle(), this.random, config, event.getLocation().getBlockX(), event.getLocation().getBlockY(), event.getLocation().getBlockZ());
+                CustomObjectGen.SpawnCustomTrees(bukkitWorld, this.random, bukkitWorld.getSettings(), event.getLocation().getBlockX(), event.getLocation().getBlockY(), event.getLocation().getBlockZ());
                 event.getBlocks().clear();
             }
 
@@ -59,12 +58,12 @@ public class TCListener implements Listener
         if (player.hasObjectToSpawn)
         {
             Block block = event.getClickedBlock();
-            WorldConfig worldSettings = this.tcPlugin.worldsSettings.get(block.getWorld().getName());
-            if (worldSettings != null)
+            BukkitWorld bukkitWorld = this.tcPlugin.worlds.get(block.getWorld().getUID());
+            if (bukkitWorld != null)
             {
                 net.minecraft.server.World world = ((CraftWorld) block.getWorld()).getHandle();
 
-                if (CustomObjectGen.GenerateCustomObject(world, new Random(), worldSettings, block.getX(), block.getY(), block.getZ(), player.object, true))
+                if (CustomObjectGen.GenerateCustomObject(bukkitWorld, new Random(), bukkitWorld.getSettings(), block.getX(), block.getY(), block.getZ(), player.object, true))
                     event.getPlayer().sendMessage(BaseCommand.MessageColor + player.object.name + " spawned");
                 else
                     event.getPlayer().sendMessage(BaseCommand.ErrorColor + "This object cant spawn here");

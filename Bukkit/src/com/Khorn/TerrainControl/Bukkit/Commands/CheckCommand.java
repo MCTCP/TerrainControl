@@ -1,8 +1,7 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.TCPlugin;
 
+import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -27,7 +26,7 @@ public class CheckCommand extends BaseCommand
             return true;
         }
 
-        plugin.GetSettings(args.get(0), true);
+        plugin.CreateSettings(args.get(0), null);
 
         sender.sendMessage(MessageColor + "Done!");
         return true;

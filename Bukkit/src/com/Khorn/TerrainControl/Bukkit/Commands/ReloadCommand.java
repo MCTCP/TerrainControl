@@ -1,8 +1,8 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
-import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManager.BiomeManager;
+import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManager;
+import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.TCPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftWorld;
@@ -32,10 +32,10 @@ public class ReloadCommand extends BaseCommand
         }
         String worldName = worldSettings.WorldName;
 
-
+        /*
         this.plugin.worldsSettings.remove(worldName);
 
-        worldSettings.newSettings = this.plugin.GetSettings(worldName, false);
+        worldSettings.newSettings = this.plugin.CreateSettings(worldName, false);
         worldSettings.newSettings.ChunkProvider = worldSettings.ChunkProvider;
         worldSettings.newSettings.ObjectGroups = worldSettings.ObjectGroups;
         worldSettings.isDeprecated = true;
@@ -46,7 +46,8 @@ public class ReloadCommand extends BaseCommand
             ((BiomeManager) world.worldProvider.c).Init(world, worldSettings.newSettings);
         }
 
-        sender.sendMessage(MessageColor + "WorldConfig for world " + worldName + " reloaded");
+        sender.sendMessage(MessageColor + "WorldConfig for world " + worldName + " reloaded");   */
+        //Todo update this.
         return true;
     }
 }

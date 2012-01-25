@@ -129,8 +129,6 @@ public class WorldConfig extends ConfigFile
 
 
     private File SettingsDir;
-    public ChunkProviderTC ChunkProvider;
-    public ObjectSpawner objectSpawner;
 
     public boolean isInit = false;
 
@@ -153,7 +151,7 @@ public class WorldConfig extends ConfigFile
     public int ChunkMaxY = 128;
 
 
-    public WorldConfig(File settingsDir, LocalWorld world)
+    public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
     {
         this.SettingsDir = settingsDir;
         this.WorldName = world.getName();
@@ -182,13 +180,18 @@ public class WorldConfig extends ConfigFile
         ArrayList<LocalBiome> biomes = world.getDefaultBiomes();
 
         for (String biomeName : this.CustomBiomes)
-            biomes.add(world.AddBiome(biomeName));
+        {
+            if (checkOnly)
+                biomes.add(world.getNullBiome(biomeName));
+            else
+                biomes.add(world.AddBiome(biomeName));
+        }
 
         this.biomeConfigs = new BiomeConfig[world.getBiomesCount()];
 
         for (LocalBiome localBiome : biomes)
         {
-            BiomeConfig config = new BiomeConfig(BiomeFolder, localBiome, this);
+            BiomeConfig config = new BiomeConfig(BiomeFolder, localBiome, this, checkOnly);
 
             if (this.NormalBiomes.contains(config.Name))
                 this.normalBiomesRarity += config.BiomeRarity;
@@ -302,7 +305,7 @@ public class WorldConfig extends ConfigFile
         this.oldBiomeSize = ReadModSettings(TCDefaultValues.oldBiomeSize.name(), TCDefaultValues.oldBiomeSize.doubleValue());
 
         this.GenerationDepth = ReadModSettings(TCDefaultValues.GenerationDepth.name(), TCDefaultValues.GenerationDepth.intValue());
-        
+
         this.BiomeRarityScale = ReadModSettings(TCDefaultValues.BiomeRarityScale.name(), TCDefaultValues.BiomeRarityScale.intValue());
         this.LandRarity = ReadModSettings(TCDefaultValues.LandRarity.name(), TCDefaultValues.LandRarity.intValue());
         this.LandSize = ReadModSettings(TCDefaultValues.LandSize.name(), TCDefaultValues.LandSize.intValue());
@@ -415,7 +418,6 @@ public class WorldConfig extends ConfigFile
 
 
     }
-
 
 
     protected void WriteConfigSettings() throws IOException

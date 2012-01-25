@@ -10,6 +10,7 @@ public interface LocalWorld
 {
     //Biome init
     public LocalBiome AddBiome(String name);
+    public LocalBiome getNullBiome(String name);
 
     public int getBiomesCount();
 

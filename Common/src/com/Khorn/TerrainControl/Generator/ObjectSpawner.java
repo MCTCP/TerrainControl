@@ -19,17 +19,13 @@ public class ObjectSpawner
 
 
 
-    public ObjectSpawner(WorldConfig wrk)
+    public ObjectSpawner(WorldConfig wrk,LocalWorld localWorld)
     {
         this.worldSettings = wrk;
         this.rand = new Random();
-        this.worldSettings.objectSpawner = this;
-    }
-
-    public void Init(LocalWorld localWorld)
-    {
         this.world = localWorld;
     }
+
 
 
     public void populate(int chunk_x, int chunk_z)

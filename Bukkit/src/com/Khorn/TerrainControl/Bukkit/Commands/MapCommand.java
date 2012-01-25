@@ -1,7 +1,8 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
-import com.Khorn.TerrainControl.TCPlugin;
-import com.Khorn.TerrainControl.Util.MapWriter;
+
+import com.Khorn.TerrainControl.Bukkit.MapWriter;
+import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;

@@ -2,33 +2,30 @@ package com.Khorn.TerrainControl.Bukkit;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.UUID;
 
 
+import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManager;
 import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManagerOld;
 import com.Khorn.TerrainControl.Bukkit.Commands.TCCommandExecutor;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
-import com.Khorn.TerrainControl.Generator.ChunkProviderNull;
-import com.Khorn.TerrainControl.Bukkit.Listeners.TCPlayerListener;
-import com.Khorn.TerrainControl.Bukkit.Listeners.TCWorldListener;
 import net.minecraft.server.BiomeBase;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
 public class TCPlugin extends JavaPlugin
 {
 
-    public final HashMap<String, WorldConfig> worldsSettings = new HashMap<String, WorldConfig>();
+    private final HashMap<String, BukkitWorld> NotInitedWorlds = new HashMap<String, BukkitWorld>();
     private TCListener listener;
     private final HashMap<String, TCPlayer> sessions = new HashMap<String, TCPlayer>();
 
+    public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
 
     public void onDisable()
     {
@@ -72,29 +69,31 @@ public class TCPlugin extends JavaPlugin
             return null;
         }
 
-        if (worldsSettings.containsKey(worldName))
-        {
-            System.out.println("TerrainControl: enabled for '" + worldName + "'");
-            return worldsSettings.get(worldName).ChunkProvider;
-        }
+        for (BukkitWorld world : worlds.values())
+            if (world.getName().equals(worldName))
+            {
+                System.out.println("TerrainControl: enabled for '" + worldName + "'");
+                return world.getChunkGenerator();
+            }
 
+        TCChunkGenerator prov = null;
+        BukkitWorld world = new BukkitWorld(worldName);
+        WorldConfig conf = this.CreateSettings(worldName, world);
 
-        ChunkGenerator prov = null;
-        WorldConfig conf = this.GetSettings(worldName, false);
         switch (conf.ModeTerrain)
         {
             case Normal:
             case TerrainTest:
             case OldGenerator:
-                prov = new ChunkProviderTC(conf);
-                break;
             case NotGenerate:
-                prov = new ChunkProviderNull(conf);
+                prov = new TCChunkGenerator();
                 break;
             case Default:
                 break;
 
         }
+
+        world.setChunkGenerator(prov);
 
         System.out.println("TerrainControl: mode " + conf.ModeTerrain.name() + " enabled for '" + worldName + "'");
         return prov;
@@ -102,7 +101,7 @@ public class TCPlugin extends JavaPlugin
 
     }
 
-    public WorldConfig GetSettings(String worldName, boolean onlyCheck)
+    public WorldConfig CreateSettings(String worldName, BukkitWorld bukkitWorld)
     {
         File baseFolder = new File(this.getDataFolder(), "worlds" + System.getProperty("file.separator") + worldName);
 
@@ -115,64 +114,48 @@ public class TCPlugin extends JavaPlugin
         }
         // Get for init BiomeMapping
         CraftBlock.biomeBaseToBiome(BiomeBase.OCEAN);
+        WorldConfig worldConfig;
+        if (bukkitWorld == null)
+        {
+            bukkitWorld = new BukkitWorld(worldName);
+            worldConfig = new WorldConfig(baseFolder, bukkitWorld, true);
 
-        WorldConfig worker = new WorldConfig(baseFolder, this, worldName);
-
-        if (!onlyCheck)
-            worldsSettings.put(worldName, worker);
+        } else
+        {
+            worldConfig = new WorldConfig(baseFolder, bukkitWorld, false);
+            bukkitWorld.setSettings(worldConfig);
+            this.NotInitedWorlds.put(worldName,bukkitWorld);
+        }
 
         System.out.println("TerrainControl: settings for '" + worldName + "' loaded");
-        return worker;
+        return worldConfig;
     }
 
 
     public void WorldInit(World world)
     {
-        if (this.worldsSettings.containsKey(world.getName()))
+        if (this.NotInitedWorlds.containsKey(world.getName()))
         {
-            WorldConfig worldSetting = this.worldsSettings.get(world.getName());
-            if (worldSetting.isInit)
-                return;
+
+            BukkitWorld bukkitWorld = this.NotInitedWorlds.remove(world.getName());
 
             net.minecraft.server.World workWorld = ((CraftWorld) world).getHandle();
 
-            switch (worldSetting.ModeBiome)
-            {
-                case BiomeMode.Normal:
-                    workWorld.worldProvider.b = new BiomeManager(workWorld, worldSetting);
-                    break;
-                case BiomeMode.OldGenerator:
-                    workWorld.worldProvider.b = new BiomeManagerOld(workWorld, worldSetting);
-                    break;
-                case Default:
-                    break;
-            }
 
-            switch (worldSetting.ModeTerrain)
+
+            switch (bukkitWorld.getSettings().ModeBiome)
             {
-                case OldGenerator:
                 case Normal:
-                {
-                    worldSetting.objectSpawner.Init(workWorld);
-                    worldSetting.ChunkProvider.Init(world);
-                    workWorld.seaLevel = worldSetting.waterLevelMax;
+                    workWorld.worldProvider.c = new BiomeManager( bukkitWorld);
                     break;
-                }
-                case TerrainTest:
-                {
-                    worldSetting.ChunkProvider.Init(world);
-                    workWorld.seaLevel = worldSetting.waterLevelMax;
+                case OldGenerator:
+                    workWorld.worldProvider.c = new BiomeManagerOld(bukkitWorld);
                     break;
-                }
-                case NotGenerate:
-                    break;
-
                 case Default:
                     break;
             }
 
-
-            worldSetting.isInit = true;
+            bukkitWorld.Init(workWorld);
 
             System.out.println("TerrainControl: world seed is " + workWorld.getSeed());
 
@@ -180,5 +163,5 @@ public class TCPlugin extends JavaPlugin
     }
 
 }
-//TODO Fix lighting
+
 

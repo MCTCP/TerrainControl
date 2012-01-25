@@ -1,5 +1,8 @@
 package com.Khorn.TerrainControl.Bukkit;
 
+import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.Khorn.TerrainControl.DefaultBiome;
+import com.Khorn.TerrainControl.LocalBiome;
 import net.minecraft.server.BiomeBase;
 
 public class BukkitBiome implements LocalBiome
@@ -10,7 +13,7 @@ public class BukkitBiome implements LocalBiome
     public BukkitBiome(BiomeBase biome)
     {
         this.biomeBase = biome;
-        if(biome.K >= WorldConfig.DefaultBiomesCount)
+        if(DefaultBiome.getBiome(biome.K) == null )
             this.isCustom =true;
     }
 

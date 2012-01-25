@@ -56,16 +56,9 @@ public class ChunkProviderTC
     private int heightMinusOne;
 
 
-    public ChunkProviderTC(WorldConfig config)
+    public ChunkProviderTC(WorldConfig config, LocalWorld world)
     {
         this.worldSettings = config;
-        this.worldSettings.ChunkProvider = this;
-
-    }
-
-    public void Init(LocalWorld world)
-    {
-
         this.localWorld = world;
         this.height = world.getHeight();
         this.heightBits = world.getHeightBits();

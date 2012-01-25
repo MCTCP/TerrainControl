@@ -1,8 +1,11 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
+import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.TCPlugin;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -32,11 +35,15 @@ public abstract class BaseCommand
         {
             if (sender instanceof ConsoleCommandSender)
                 return null;
-            if (sender instanceof Player)
-                return plugin.worldsSettings.get(((Player) sender).getWorld().getName());
+            if (sender instanceof Player && plugin.worlds.containsKey(((Player) sender).getWorld().getUID()))
+                return plugin.worlds.get(((Player) sender).getWorld().getUID()).getSettings();
             return null;
         }
-        return plugin.worldsSettings.get(arg);
+        World world = Bukkit.getWorld(name);
+        if( world != null && plugin.worlds.containsKey(world.getUID()))
+            return plugin.worlds.get(world.getUID()).getSettings();
+        else
+            return null;
     }
 
     protected void ListMessage(CommandSender sender, List<String> lines, int page, String listName)

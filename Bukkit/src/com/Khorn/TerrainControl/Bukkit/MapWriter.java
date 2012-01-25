@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.Util;
+package com.Khorn.TerrainControl.Bukkit;
 
 
 import java.awt.Color;
@@ -8,13 +8,12 @@ import java.io.FileOutputStream;
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 
+import com.Khorn.TerrainControl.Bukkit.Commands.BaseCommand;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.World;
 
 import org.bukkit.command.CommandSender;
 
-import com.Khorn.TerrainControl.TCPlugin;
-import com.Khorn.TerrainControl.Commands.BaseCommand;
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.sun.imageio.plugins.png.PNGImageWriter;
@@ -62,11 +61,11 @@ public class MapWriter implements Runnable
         {
             int[] Colors = Default_Colors;
 
-            WorldConfig config = plugin.worldsSettings.get(world.worldData.name);
-            if (config != null)
+            BukkitWorld bukkitWorld = plugin.worlds.get(world.getUUID());
+            if (bukkitWorld != null)
             {
-                Colors = new int[config.biomeConfigs.length];
-                for (BiomeConfig biomeConfig : config.biomeConfigs)
+                Colors = new int[bukkitWorld.getSettings().biomeConfigs.length];
+                for (BiomeConfig biomeConfig : bukkitWorld.getSettings().biomeConfigs)
                 {
                     if (biomeConfig != null)
                     {
