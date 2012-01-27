@@ -13,7 +13,7 @@ import org.bukkit.World;
 import java.util.List;
 import java.util.Random;
 
-public class BiomeManagerOld extends WorldChunkManager
+public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
 {
 
     private WorldConfig localWrk;
@@ -300,4 +300,76 @@ public class BiomeManagerOld extends WorldChunkManager
         return BiomeBase.FOREST;
     }
 
+    public int[] getBiomesUnZoomedTC(int[] biomeArray, int x, int z, int x_size, int z_size)
+    {
+        if ((biomeArray == null) || (biomeArray.length < x_size * z_size))
+        {
+            biomeArray = new int[x_size * z_size];
+        }
+        if ( (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
+        {
+            BiomeBase[] localObject = this.Cache.d(x, z);
+            for(int i= 0; i< x_size*z_size;i++)
+                biomeArray[i] = localObject[i].K;
+            return biomeArray;
+        }
+
+
+        this.old_temperature = this.TempGen.a(this.old_temperature, x, z, x_size, x_size, 0.025000000372529D / this.localWrk.oldBiomeSize, 0.025000000372529D / this.localWrk.oldBiomeSize, 0.25D);
+        this.old_rain = this.RainGen.a(this.old_rain, x, z, x_size, x_size, 0.0500000007450581D / this.localWrk.oldBiomeSize, 0.0500000007450581D / this.localWrk.oldBiomeSize, 0.3333333333333333D);
+        this.old_temperature2 = this.TempGen2.a(this.old_temperature2, x, z, x_size, x_size, 0.25D / this.localWrk.oldBiomeSize, 0.25D / this.localWrk.oldBiomeSize, 0.5882352941176471D);
+
+        int i = 0;
+        for (int j = 0; j < x_size; j++)
+        {
+            for (int k = 0; k < z_size; k++)
+            {
+                double d1 = this.old_temperature2[i] * 1.1D + 0.5D;
+
+                double d2 = 0.01D;
+                double d3 = 1.0D - d2;
+                double d4 = (this.old_temperature[i] * 0.15D + 0.7D) * d3 + d1 * d2;
+                d2 = 0.002D;
+                d3 = 1.0D - d2;
+                double d5 = (this.old_rain[i] * 0.15D + 0.5D) * d3 + d1 * d2;
+                d4 = 1.0D - (1.0D - d4) * (1.0D - d4);
+
+                if (d4 < this.localWrk.minTemperature)
+                    d4 = this.localWrk.minTemperature;
+                if (d5 < this.localWrk.minMoisture)
+                    d5 = this.localWrk.minMoisture;
+                if (d4 > this.localWrk.maxTemperature)
+                    d4 = this.localWrk.maxTemperature;
+                if (d5 > this.localWrk.maxMoisture)
+                {
+                    d5 = this.localWrk.maxMoisture;
+                }
+                this.old_temperature[i] = d4;
+                this.old_rain[i] = d5;
+
+                biomeArray[(i++)] = BiomeManagerOld.getBiomeFromDiagram(d4, d5).K;
+            }
+
+        }
+
+        if (this.localWrk.isDeprecated)
+            this.localWrk = this.localWrk.newSettings;
+
+        return biomeArray;
+    }
+
+    public float[] getTemperaturesTC(int x, int z, int x_size, int z_size)
+    {
+        return this.getTemperatures(null,x,z,x_size,z_size);
+    }
+
+    public int[] getBiomesTC(int[] biomeArray, int x, int z, int x_size, int z_size)
+    {
+        return this.getBiomesUnZoomedTC(biomeArray,x,z,x_size,z_size);
+    }
+
+    public int getBiomeTC(int x, int z)
+    {
+        return this.getBiome(x,z).K;
+    }
 }

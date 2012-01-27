@@ -4,6 +4,7 @@ package com.Khorn.TerrainControl.Bukkit;
 import com.Khorn.TerrainControl.Generator.ObjectSpawner;
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.generator.BlockPopulator;
 
 import java.util.Random;
@@ -26,8 +27,8 @@ public class TCBlockPopulator extends BlockPopulator
     @Override
     public void populate(World world, Random random, Chunk chunk)
     {
+        this.world.LoadChunk(((CraftChunk) chunk).getHandle());
 
-        // ToDo do something here
         this.spawner.populate(chunk.getX(),chunk.getZ());
 
     }

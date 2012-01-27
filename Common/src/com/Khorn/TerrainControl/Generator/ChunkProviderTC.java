@@ -15,7 +15,7 @@ import java.util.*;
 
 
 @SuppressWarnings({"PointlessArithmeticExpression"})
-public class ChunkProviderTC 
+public class ChunkProviderTC
 {
     private Random rnd;
     private NoiseGeneratorOctaves o;
@@ -63,7 +63,7 @@ public class ChunkProviderTC
         this.height = world.getHeight();
         this.heightBits = world.getHeightBits();
         this.heightBitsPlusFour = this.heightBits + 4;
-        this.heightMinusOne = this.heightBits -1;
+        this.heightMinusOne = this.heightBits - 1;
 
 
         this.rnd = new Random(world.getSeed());
@@ -75,7 +75,6 @@ public class ChunkProviderTC
 
         this.a = new NoiseGeneratorOctaves(this.rnd, 10);
         this.b = new NoiseGeneratorOctaves(this.rnd, 16);
-
 
 
         this.CaveGen = new CavesGen(this.worldSettings, this.localWorld);
@@ -225,7 +224,7 @@ public class ChunkProviderTC
                                     i7 = this.worldSettings.biomeConfigs[biomeId].GroundBlock;
                                 }
 
-                                if ((y < waterLevel) && ( y > this.worldSettings.waterLevelMin) && (i6 == 0))
+                                if ((y < waterLevel) && (y > this.worldSettings.waterLevelMin) && (i6 == 0))
                                 {
                                     if (temperature < 0.15F)
                                         i6 = (byte) this.worldSettings.iceBlock;
@@ -387,7 +386,7 @@ public class ChunkProviderTC
         } else
         {
             int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (paramInt4 + 5))];
-            this.biomeFactor = (1.0D - worldSettings.biomeConfigs[biomeId].BiomeTemperature* worldSettings.biomeConfigs[biomeId].BiomeWetness);
+            this.biomeFactor = (1.0D - worldSettings.biomeConfigs[biomeId].BiomeTemperature * worldSettings.biomeConfigs[biomeId].BiomeWetness);
         }
         this.biomeFactor *= this.biomeFactor;
         this.biomeFactor = 1.0D - this.biomeFactor * this.biomeFactor;
@@ -476,7 +475,7 @@ public class ChunkProviderTC
     }
 
 
-    public byte[] generate( int x, int z)
+    public byte[] generate(int x, int z)
     {
 
         this.rnd.setSeed(x * 341873128712L + z * 132897987541L);
@@ -492,7 +491,7 @@ public class ChunkProviderTC
         this.CaveGen.a(x, z, arrayOfByte);
         this.CanyonGen.a(x, z, arrayOfByte);
 
-        this.localWorld.PrepareTerrainObjects(x, z, arrayOfByte);
+        this.localWorld.PrepareTerrainObjects(x, z, arrayOfByte, dry);
 
         if (this.worldSettings.isDeprecated)
             this.worldSettings = this.worldSettings.newSettings;

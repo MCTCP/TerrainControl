@@ -10,6 +10,7 @@ public interface LocalWorld
 {
     //Biome init
     public LocalBiome AddBiome(String name);
+
     public LocalBiome getNullBiome(String name);
 
     public int getBiomesCount();
@@ -36,7 +37,7 @@ public interface LocalWorld
 
     // Default generators
 
-    public void PrepareTerrainObjects(int x, int z, byte[] chunkArray);
+    public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry);
 
     public void PlaceDungeons(Random rand, int x, int y, int z);
 
