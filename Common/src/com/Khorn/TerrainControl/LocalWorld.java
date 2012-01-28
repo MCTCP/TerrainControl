@@ -77,7 +77,7 @@ public interface LocalWorld
 
     public int getLightLevel(int x, int y, int z);
 
-    public boolean isLoaded(int x, int z);
+    public boolean isLoaded(int x, int y, int z);
 
 
     public WorldConfig getSettings();

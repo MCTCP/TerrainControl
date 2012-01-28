@@ -39,8 +39,8 @@ public class NoiseGeneratorOctaves
             double d4 = (double) i * d3 * d0;
             double d5 = (double) j * d3 * d1;
             double d6 = (double) k * d3 * d2;
-            long i2 = MathHelper.c(d4);
-            long j2 = MathHelper.c(d6);
+            long i2 = MathHelper.floor_double_long(d4);
+            long j2 = MathHelper.floor_double_long(d6);
 
             d4 -= (double) i2;
             d6 -= (double) j2;
@@ -56,7 +56,7 @@ public class NoiseGeneratorOctaves
     }
 
 
-    public double[] a(double[] adouble, int i, int j, int k, int l, double d0, double d1, double d2)
+    public double[] a(double[] adouble, int i, int j, int k, int l, double d0, double d1)
     {
         return this.a(adouble, i, 10, j, k, 1, l, d0, 1.0D, d1);
     }

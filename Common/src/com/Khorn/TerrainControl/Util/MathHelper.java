@@ -4,9 +4,8 @@ public class MathHelper
 {
     private static float[] a = new float[65536];
 
-    public static long c(double paramDouble) {
-        long l = (long)paramDouble;
-        return paramDouble < l ? l - 1L : l;
+    public static float sqrt(float paramFloat) {
+        return (float) Math.sqrt(paramFloat);
     }
 
     public static float sin(float paramFloat)
@@ -21,6 +20,12 @@ public class MathHelper
         int i = (int) d0;
 
         return d0 < (double) i ? i - 1 : i;
+    }
+
+    public static long floor_double_long(double d)
+    {
+        long l = (long)d;
+        return d >= (double)l ? l : l - 1L;
     }
 
 

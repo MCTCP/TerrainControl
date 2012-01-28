@@ -21,6 +21,7 @@ public class BukkitWorld implements LocalWorld
     private World world;
     private WorldConfig settings;
     private String name;
+    private long Seed;
     private IBiomeManager biomeManager;
     private BiomeManagerOld old_biomeManager;
 
@@ -45,6 +46,8 @@ public class BukkitWorld implements LocalWorld
 
     private boolean CreateNewChunks;
     private Chunk[] ChunkCache;
+    private Chunk CachedChunk;
+    
     private int CurrentChunkX;
     private int CurrentChunkZ;
 
@@ -274,11 +277,13 @@ public class BukkitWorld implements LocalWorld
 
         x = x >> 4;
         z = z >> 4;
+        if(this.CachedChunk != null && this.CachedChunk.x == x && this.CachedChunk.z == z)
+            return this.CachedChunk;
         int index = x - this.CurrentChunkX + 2 * (z - this.CurrentChunkZ);
-        if (index >= 0 || index < 4)
-            return this.ChunkCache[index];
+        if (index >= 0 && index < 4)
+            return CachedChunk = this.ChunkCache[index];
         else if (this.CreateNewChunks || this.world.chunkProvider.isChunkLoaded(x, z))
-            return this.world.getChunkAt(x, z);
+            return CachedChunk = this.world.getChunkAt(x, z);
         else
             return null;
 
@@ -380,9 +385,9 @@ public class BukkitWorld implements LocalWorld
         return world.getLightLevel(x, y, z);
     }
 
-    public boolean isLoaded(int x, int z)
+    public boolean isLoaded(int x, int y, int z)
     {
-        return world.isLoaded(x, 0, z);
+        return world.isLoaded(x, y, z);
     }
 
     public WorldConfig getSettings()
@@ -397,7 +402,7 @@ public class BukkitWorld implements LocalWorld
 
     public long getSeed()
     {
-        return this.world.getSeed();
+        return this.Seed;
     }
 
     public int getHeight()
@@ -423,13 +428,8 @@ public class BukkitWorld implements LocalWorld
     public void Init(World _world)
     {
         this.world = _world;
+        this.Seed = world.getSeed();
         this.world.seaLevel = this.settings.waterLevelMax;
-
-        if (this.settings.ModeBiome != WorldConfig.BiomeMode.Default)
-            this.biomeManager = (IBiomeManager) world.getWorldChunkManager();
-
-        if (this.settings.ModeBiome == WorldConfig.BiomeMode.OldGenerator)
-            this.old_biomeManager = (BiomeManagerOld) world.getWorldChunkManager();
 
         this.generator.Init(this);
 
@@ -451,5 +451,16 @@ public class BukkitWorld implements LocalWorld
     public void setChunkGenerator(TCChunkGenerator _generator)
     {
         this.generator = _generator;
+    }
+
+    public void setBiomeManager(IBiomeManager manager)
+    {
+        this.biomeManager = manager;
+    }
+
+    public void setOldBiomeManager(BiomeManagerOld manager)
+    {
+        this.old_biomeManager = manager;
+        this.biomeManager = manager;
     }
 }

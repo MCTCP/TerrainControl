@@ -3,8 +3,9 @@ package com.Khorn.TerrainControl.Bukkit;
 
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
-import com.Khorn.TerrainControl.LocalWorld;
+import net.minecraft.server.Block;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 
@@ -18,17 +19,23 @@ public class TCChunkGenerator extends ChunkGenerator
     private ChunkProviderTC chunkProviderTC;
     private ArrayList<BlockPopulator> BlockPopulator = new ArrayList<BlockPopulator>();
     private boolean NotGenerate = false;
+    private TCPlugin plugin;
 
+    public TCChunkGenerator(TCPlugin _plugin)
+    {
+        this.plugin = _plugin;
+    }
 
     public void Init(BukkitWorld _world)
     {
         this.world = _world;
         this.chunkProviderTC = new ChunkProviderTC(_world.getSettings(), _world);
 
-        if (this.world.getSettings().ModeTerrain == WorldConfig.TerrainMode.TerrainTest)
-            this.NotGenerate = true;
-        else
+        if (this.world.getSettings().ModeTerrain == WorldConfig.TerrainMode.Normal)
             this.BlockPopulator.add(new TCBlockPopulator(_world));
+
+        if (this.world.getSettings().ModeTerrain == WorldConfig.TerrainMode.NotGenerate)
+            this.NotGenerate = true;
 
 
     }
@@ -36,14 +43,18 @@ public class TCChunkGenerator extends ChunkGenerator
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
+        this.plugin.WorldInit(world);
+
         return this.BlockPopulator;
     }
 
     @Override
     public boolean canSpawn(World world, int x, int z)
     {
+        this.plugin.WorldInit(world);
 
-        return super.canSpawn(world, x, z);    //To change body of overridden methods use File | Settings | File Templates.
+        int i = ((CraftWorld) world).getHandle().a(x, z);
+        return i != 0 && Block.byId[i].material.isSolid();
     }
 
     @Override

@@ -224,7 +224,7 @@ public class CustomObjectGen extends ResourceGenBase
                 point.Rotate();
                 counter++;
             }
-            if (!world.isLoaded(point.getX() + x, point.getZ() + z))
+            if (!world.isLoaded(point.getX() + x,point.getY() + y, point.getZ() + z))
                 return false;
 
 

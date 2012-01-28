@@ -4,13 +4,13 @@ import com.Khorn.TerrainControl.Bukkit.Commands.BaseCommand;
 import com.Khorn.TerrainControl.CustomObjects.CustomObjectGen;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldInitEvent;
+
 
 
 import java.util.Random;
@@ -30,9 +30,7 @@ public class TCListener implements Listener
     @EventHandler(event = WorldInitEvent.class, priority = EventPriority.HIGH)
     public void onWorldInit(WorldInitEvent event)
     {
-
         this.tcPlugin.WorldInit(event.getWorld());
-
     }
 
     @EventHandler(event = StructureGrowEvent.class, priority = EventPriority.NORMAL)
@@ -61,7 +59,6 @@ public class TCListener implements Listener
             BukkitWorld bukkitWorld = this.tcPlugin.worlds.get(block.getWorld().getUID());
             if (bukkitWorld != null)
             {
-                net.minecraft.server.World world = ((CraftWorld) block.getWorld()).getHandle();
 
                 if (CustomObjectGen.GenerateCustomObject(bukkitWorld, new Random(), bukkitWorld.getSettings(), block.getX(), block.getY(), block.getZ(), player.object, true))
                     event.getPlayer().sendMessage(BaseCommand.MessageColor + player.object.name + " spawned");

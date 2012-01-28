@@ -63,7 +63,7 @@ public class ChunkProviderTC
         this.height = world.getHeight();
         this.heightBits = world.getHeightBits();
         this.heightBitsPlusFour = this.heightBits + 4;
-        this.heightMinusOne = this.heightBits - 1;
+        this.heightMinusOne = this.height - 1;
 
 
         this.rnd = new Random(world.getSeed());
@@ -85,7 +85,7 @@ public class ChunkProviderTC
         {
             for (int i2 = -2; i2 <= 2; i2++)
             {
-                float f1 = 10.0F / MathHelper.c(i1 * i1 + i2 * i2 + 0.2F);
+                float f1 = 10.0F / MathHelper.sqrt((float)(i1 * i1 + i2 * i2) + 0.2F);
                 this.l[(i1 + 2 + (i2 + 2) * 5)] = f1;
             }
         }
@@ -188,12 +188,12 @@ public class ChunkProviderTC
                 float temperature = TemperatureArray[(z + x * 16)];
 
                 int biomeId = BiomeArray[(z + x * 16)];
-                int i4 = (int) (this.v[(x + z * 16)] / 3.0D + 3.0D + this.rnd.nextDouble() * 0.25D);
+                int stone_noise = (int) (this.v[(x + z * 16)] / 3.0D + 3.0D + this.rnd.nextDouble() * 0.25D);
 
                 int i5 = -1;
 
-                int i6 = this.worldSettings.biomeConfigs[biomeId].SurfaceBlock;
-                int i7 = this.worldSettings.biomeConfigs[biomeId].GroundBlock;
+                int surfaceBlock = this.worldSettings.biomeConfigs[biomeId].SurfaceBlock;
+                int groundBlock = this.worldSettings.biomeConfigs[biomeId].GroundBlock;
 
                 if (this.worldSettings.ceilingBedrock)
                     paramArrayOfByte[(z * 16 + x) * this.height + this.heightMinusOne] = (byte) this.worldSettings.bedrockBlock;
@@ -214,29 +214,29 @@ public class ChunkProviderTC
                         else if (i10 == DefaultMaterial.STONE.id)
                             if (i5 == -1)
                             {
-                                if (i4 <= 0)
+                                if (stone_noise <= 0)
                                 {
-                                    i6 = 0;
-                                    i7 = (byte) DefaultMaterial.STONE.id;
+                                    surfaceBlock = 0;
+                                    groundBlock = (byte) DefaultMaterial.STONE.id;
                                 } else if ((y >= waterLevel - 4) && (y <= waterLevel + 1))
                                 {
-                                    i6 = this.worldSettings.biomeConfigs[biomeId].SurfaceBlock;
-                                    i7 = this.worldSettings.biomeConfigs[biomeId].GroundBlock;
+                                    surfaceBlock = this.worldSettings.biomeConfigs[biomeId].SurfaceBlock;
+                                    groundBlock = this.worldSettings.biomeConfigs[biomeId].GroundBlock;
                                 }
 
-                                if ((y < waterLevel) && (y > this.worldSettings.waterLevelMin) && (i6 == 0))
+                                if ((y < waterLevel) && (y > this.worldSettings.waterLevelMin) && (surfaceBlock == 0))
                                 {
                                     if (temperature < 0.15F)
-                                        i6 = (byte) this.worldSettings.iceBlock;
+                                        surfaceBlock = (byte) this.worldSettings.iceBlock;
                                     else
-                                        i6 = (byte) this.worldSettings.waterBlock;
+                                        surfaceBlock = (byte) this.worldSettings.waterBlock;
                                 }
 
-                                i5 = i4;
+                                i5 = stone_noise;
                                 if (y >= waterLevel - 1)
-                                    paramArrayOfByte[i9] = (byte) i6;
+                                    paramArrayOfByte[i9] = (byte) surfaceBlock;
                                 else
-                                    paramArrayOfByte[i9] = (byte) i7;
+                                    paramArrayOfByte[i9] = (byte) groundBlock;
 
                                 if (biomeId == DefaultBiome.DESERT.Id)
                                 {
@@ -257,12 +257,12 @@ public class ChunkProviderTC
                             } else if (i5 > 0)
                             {
                                 i5--;
-                                paramArrayOfByte[i9] = (byte) i7;
+                                paramArrayOfByte[i9] = (byte) groundBlock;
 
-                                if ((i5 == 0) && (i7 == DefaultMaterial.SAND.id))
+                                if ((i5 == 0) && (groundBlock == DefaultMaterial.SAND.id))
                                 {
                                     i5 = this.rnd.nextInt(4);
-                                    i7 = (byte) DefaultMaterial.SANDSTONE.id;
+                                    groundBlock = (byte) DefaultMaterial.SANDSTONE.id;
                                 }
                             }
                     }
@@ -289,8 +289,8 @@ public class ChunkProviderTC
         double d2 = 684.41200000000003D * this.worldSettings.getFractureVertical();
 
         if (this.worldSettings.oldTerrainGenerator)
-            this.j = this.a.a(this.j, paramInt1, paramInt3, paramInt4, paramInt6, 1.121D, 1.121D, 0.5D);
-        this.k = this.b.a(this.k, paramInt1, paramInt3, paramInt4, paramInt6, 200.0D, 200.0D, 0.5D);
+            this.j = this.a.a(this.j, paramInt1, paramInt3, paramInt4, paramInt6, 1.121D, 1.121D);
+        this.k = this.b.a(this.k, paramInt1, paramInt3, paramInt4, paramInt6, 200.0D, 200.0D);
 
         this.g = this.q.a(this.g, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1 / 80.0D, d2 / 160.0D, d1 / 80.0D);
         this.h = this.o.a(this.h, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1, d2, d1);

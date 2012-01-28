@@ -29,8 +29,10 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     public BiomeManager(LocalWorld world)
     {
         this.f.add(BiomeBase.FOREST);
-        this.f.add(BiomeBase.SWAMPLAND);
+        this.f.add(BiomeBase.PLAINS);
         this.f.add(BiomeBase.TAIGA);
+        this.f.add(BiomeBase.TAIGA_HILLS);
+        this.f.add(BiomeBase.FOREST_HILLS);
 
         this.Init(world);
 
@@ -58,11 +60,6 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         return this.f;
     }
 
-
-    public BiomeBase a(ChunkCoordIntPair paramChunkCoordIntPair)
-    {
-        return getBiome(paramChunkCoordIntPair.x << 4, paramChunkCoordIntPair.z << 4);
-    }
 
     public BiomeBase getBiome(int paramInt1, int paramInt2)
     {
@@ -241,7 +238,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
 
         int[] arrayOfInt = this.UnZoomedLayer.Calculate(x,  z,  x_size,  z_size);
 
-        System.arraycopy(arrayOfInt,0,arrayOfInt,0,x_size * z_size);
+        System.arraycopy(arrayOfInt,0,biomeArray,0,x_size * z_size);
 
         return biomeArray;
     }
@@ -272,7 +269,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
 
         int[] arrayOfInt = this.BiomeLayer.Calculate(x,  z,  x_size,  z_size);
 
-        System.arraycopy(arrayOfInt,0,arrayOfInt,0,x_size * z_size);
+        System.arraycopy(arrayOfInt,0,biomeArray,0,x_size * z_size);
 
         return biomeArray;
 

@@ -4,174 +4,156 @@ import java.util.Random;
 
 public class NoiseGeneratorPerlin
 {
-    private int[] d = new int[512];
-    public double a;
-    public double b;
-    public double c;
+    private int permutations[];
+    public double xCoord;
+    public double yCoord;
+    public double zCoord;
 
-    public NoiseGeneratorPerlin()
-    {
-        this(new Random());
-    }
 
-    public NoiseGeneratorPerlin(Random paramRandom)
+    public NoiseGeneratorPerlin(Random random)
     {
-        this.a = (paramRandom.nextDouble() * 256.0D);
-        this.b = (paramRandom.nextDouble() * 256.0D);
-        this.c = (paramRandom.nextDouble() * 256.0D);
+        permutations = new int[512];
+        xCoord = random.nextDouble() * 256D;
+        yCoord = random.nextDouble() * 256D;
+        zCoord = random.nextDouble() * 256D;
         for (int i = 0; i < 256; i++)
         {
-            this.d[i] = i;
+            permutations[i] = i;
         }
 
-        for (int i = 0; i < 256; i++)
+        for (int j = 0; j < 256; j++)
         {
-            int j = paramRandom.nextInt(256 - i) + i;
-            int k = this.d[i];
-            this.d[i] = this.d[j];
-            this.d[j] = k;
-
-            this.d[(i + 256)] = this.d[i];
+            int k = random.nextInt(256 - j) + j;
+            int l = permutations[j];
+            permutations[j] = permutations[k];
+            permutations[k] = l;
+            permutations[j + 256] = permutations[j];
         }
     }
 
-    public final double a(double paramDouble1, double paramDouble2, double paramDouble3)
+    public final double lerp(double d, double d1, double d2)
     {
-        return paramDouble2 + paramDouble1 * (paramDouble3 - paramDouble2);
+        return d1 + d * (d2 - d1);
     }
 
-    public final double a(int paramInt, double paramDouble1, double paramDouble2)
+    public final double func_4110_a(int i, double d, double d1)
     {
-        int i = paramInt & 0xF;
-
-        double d1 = (1 - ((i & 0x8) >> 3)) * paramDouble1;
-        double d2 = (i == 12) || (i == 14) ? paramDouble1 : i < 4 ? 0.0D : paramDouble2;
-
-        return ((i & 0x1) == 0 ? d1 : -d1) + ((i & 0x2) == 0 ? d2 : -d2);
+        int j = i & 0xf;
+        double d2 = (double)(1 - ((j & 8) >> 3)) * d;
+        double d3 = j >= 4 ? j != 12 && j != 14 ? d1 : d : 0.0D;
+        return ((j & 1) != 0 ? -d2 : d2) + ((j & 2) != 0 ? -d3 : d3);
     }
 
-    public final double a(int paramInt, double paramDouble1, double paramDouble2, double paramDouble3)
+    public final double grad(int i, double d, double d1, double d2)
     {
-        int i = paramInt & 0xF;
-
-        double d1 = i < 8 ? paramDouble1 : paramDouble2;
-        double d2 = (i == 12) || (i == 14) ? paramDouble1 : i < 4 ? paramDouble2 : paramDouble3;
-
-        return ((i & 0x1) == 0 ? d1 : -d1) + ((i & 0x2) == 0 ? d2 : -d2);
+        int j = i & 0xf;
+        double d3 = j >= 8 ? d1 : d;
+        double d4 = j >= 4 ? j != 12 && j != 14 ? d2 : d : d1;
+        return ((j & 1) != 0 ? -d3 : d3) + ((j & 2) != 0 ? -d4 : d4);
     }
 
-    public void a(double[] paramArrayOfDouble, double paramDouble1, double paramDouble2, double paramDouble3, int paramInt1, int paramInt2, int paramInt3, double paramDouble4, double paramDouble5, double paramDouble6, double paramDouble7)
+    public void a(double ad[], double d, double d1, double d2,
+            int i, int j, int k, double d3, double d4,
+            double d5, double d6)
     {
-        double d6;
-        int i5;
-        int i6;
-        int i;
-        int m;
-        double d7;
-        int n;
-        if (paramInt2 == 1)
+        if (j == 1)
         {
-            n = 0;
-            double d1;
-            double d2;
-            double d3 = 1.0D / paramDouble7;
-            for (int i1 = 0; i1 < paramInt1; i1++)
+
+            int j3 = 0;
+            double d12 = 1.0D / d6;
+            for (int i4 = 0; i4 < i; i4++)
             {
-                double d4 = paramDouble1 + i1 * paramDouble4 + this.a;
-                int i2 = (int) d4;
-                if (d4 < i2)
-                    i2--;
-                int i3 = i2 & 0xFF;
-                d4 -= i2;
-                double d5 = d4 * d4 * d4 * (d4 * (d4 * 6.0D - 15.0D) + 10.0D);
-
-                for (int i4 = 0; i4 < paramInt3; i4++)
+                double d14 = d + (double)i4 * d3 + xCoord;
+                int j4 = (int)d14;
+                if (d14 < (double)j4)
                 {
-                    d6 = paramDouble3 + i4 * paramDouble6 + this.c;
-                    i5 = (int) d6;
-                    if (d6 < i5)
-                        i5--;
-                    i6 = i5 & 0xFF;
-                    d6 -= i5;
-                    d7 = d6 * d6 * d6 * (d6 * (d6 * 6.0D - 15.0D) + 10.0D);
-
-                    i = this.d[i3];
-                    int j = this.d[i] + i6;
-                    int k = this.d[(i3 + 1)];
-                    m = this.d[k] + i6;
-                    d1 = a(d5, a(this.d[j], d4, d6), a(this.d[m], d4 - 1.0D, 0.0D, d6));
-                    d2 = a(d5, a(this.d[(j + 1)], d4, 0.0D, d6 - 1.0D), a(this.d[(m + 1)], d4 - 1.0D, 0.0D, d6 - 1.0D));
-
-                    double d8 = a(d7, d1, d2);
-
-                    paramArrayOfDouble[(n++)] += d8 * d3;
+                    j4--;
+                }
+                int k4 = j4 & 0xff;
+                d14 -= j4;
+                double d17 = d14 * d14 * d14 * (d14 * (d14 * 6D - 15D) + 10D);
+                for (int l4 = 0; l4 < k; l4++)
+                {
+                    double d19 = d2 + (double)l4 * d5 + zCoord;
+                    int j5 = (int)d19;
+                    if (d19 < (double)j5)
+                    {
+                        j5--;
+                    }
+                    int l5 = j5 & 0xff;
+                    d19 -= j5;
+                    double d21 = d19 * d19 * d19 * (d19 * (d19 * 6D - 15D) + 10D);
+                    int l = permutations[k4] + 0;
+                    int j1 = permutations[l] + l5;
+                    int k1 = permutations[k4 + 1] + 0;
+                    int l1 = permutations[k1] + l5;
+                    double d9 = lerp(d17, func_4110_a(permutations[j1], d14, d19), grad(permutations[l1], d14 - 1.0D, 0.0D, d19));
+                    double d11 = lerp(d17, grad(permutations[j1 + 1], d14, 0.0D, d19 - 1.0D), grad(permutations[l1 + 1], d14 - 1.0D, 0.0D, d19 - 1.0D));
+                    double d23 = lerp(d21, d9, d11);
+                    ad[j3++] += d23 * d12;
                 }
             }
+
             return;
         }
-        i = 0;
-        double d9 = 1.0D / paramDouble7;
-        m = -1;
-        int i7;
-        int i8;
-        int i9;
-        int i10;
-        int i11;
-        double d10 = 0.0D;
-        double d4 = 0.0D;
-        double d11 = 0.0D;
-        double d5 = 0.0D;
-
-        for (int i4 = 0; i4 < paramInt1; i4++)
+        int i1 = 0;
+        double d7 = 1.0D / d6;
+        int i2 = -1;
+        double d13 = 0.0D;
+        double d15 = 0.0D;
+        double d16 = 0.0D;
+        double d18 = 0.0D;
+        for (int i5 = 0; i5 < i; i5++)
         {
-            d6 = paramDouble1 + i4 * paramDouble4 + this.a;
-            i5 = (int) d6;
-            if (d6 < i5)
-                i5--;
-            i6 = i5 & 0xFF;
-            d6 -= i5;
-            d7 = d6 * d6 * d6 * (d6 * (d6 * 6.0D - 15.0D) + 10.0D);
-
-            for (int i12 = 0; i12 < paramInt3; i12++)
+            double d20 = d + (double)i5 * d3 + xCoord;
+            int k5 = (int)d20;
+            if (d20 < (double)k5)
             {
-                double d12 = paramDouble3 + i12 * paramDouble6 + this.c;
-                int i13 = (int) d12;
-                if (d12 < i13)
-                    i13--;
-                int i14 = i13 & 0xFF;
-                d12 -= i13;
-                double d13 = d12 * d12 * d12 * (d12 * (d12 * 6.0D - 15.0D) + 10.0D);
-
-                for (int i15 = 0; i15 < paramInt2; i15++)
+                k5--;
+            }
+            int i6 = k5 & 0xff;
+            d20 -= k5;
+            double d22 = d20 * d20 * d20 * (d20 * (d20 * 6D - 15D) + 10D);
+            for (int j6 = 0; j6 < k; j6++)
+            {
+                double d24 = d2 + (double)j6 * d5 + zCoord;
+                int k6 = (int)d24;
+                if (d24 < (double)k6)
                 {
-                    double d14 = paramDouble2 + i15 * paramDouble5 + this.b;
-                    int i16 = (int) d14;
-                    if (d14 < i16)
-                        i16--;
-                    int i17 = i16 & 0xFF;
-                    d14 -= i16;
-                    double d15 = d14 * d14 * d14 * (d14 * (d14 * 6.0D - 15.0D) + 10.0D);
-
-                    if ((i15 == 0) || (i17 != m))
+                    k6--;
+                }
+                int l6 = k6 & 0xff;
+                d24 -= k6;
+                double d25 = d24 * d24 * d24 * (d24 * (d24 * 6D - 15D) + 10D);
+                for (int i7 = 0; i7 < j; i7++)
+                {
+                    double d26 = d1 + (double)i7 * d4 + yCoord;
+                    int j7 = (int)d26;
+                    if (d26 < (double)j7)
                     {
-                        m = i17;
-                        i7 = this.d[i6] + i17;
-                        i8 = this.d[i7] + i14;
-                        i9 = this.d[(i7 + 1)] + i14;
-                        i10 = this.d[(i6 + 1)] + i17;
-                        n = this.d[i10] + i14;
-                        i11 = this.d[(i10 + 1)] + i14;
-                        d10 = a(d7, a(this.d[i8], d6, d14, d12), a(this.d[n], d6 - 1.0D, d14, d12));
-                        d4 = a(d7, a(this.d[i9], d6, d14 - 1.0D, d12), a(this.d[i11], d6 - 1.0D, d14 - 1.0D, d12));
-                        d11 = a(d7, a(this.d[(i8 + 1)], d6, d14, d12 - 1.0D), a(this.d[(n + 1)], d6 - 1.0D, d14, d12 - 1.0D));
-                        d5 = a(d7, a(this.d[(i9 + 1)], d6, d14 - 1.0D, d12 - 1.0D), a(this.d[(i11 + 1)], d6 - 1.0D, d14 - 1.0D, d12 - 1.0D));
+                        j7--;
                     }
-
-                    double d16 = a(d15, d10, d4);
-                    double d17 = a(d15, d11, d5);
-                    double d18 = a(d13, d16, d17);
-
-                    paramArrayOfDouble[(i++)] += d18 * d9;
+                    int k7 = j7 & 0xff;
+                    d26 -= j7;
+                    double d27 = d26 * d26 * d26 * (d26 * (d26 * 6D - 15D) + 10D);
+                    if (i7 == 0 || k7 != i2)
+                    {
+                        i2 = k7;
+                        int j2 = permutations[i6] + k7;
+                        int k2 = permutations[j2] + l6;
+                        int l2 = permutations[j2 + 1] + l6;
+                        int i3 = permutations[i6 + 1] + k7;
+                        int k3 = permutations[i3] + l6;
+                        int l3 = permutations[i3 + 1] + l6;
+                        d13 = lerp(d22, grad(permutations[k2], d20, d26, d24), grad(permutations[k3], d20 - 1.0D, d26, d24));
+                        d15 = lerp(d22, grad(permutations[l2], d20, d26 - 1.0D, d24), grad(permutations[l3], d20 - 1.0D, d26 - 1.0D, d24));
+                        d16 = lerp(d22, grad(permutations[k2 + 1], d20, d26, d24 - 1.0D), grad(permutations[k3 + 1], d20 - 1.0D, d26, d24 - 1.0D));
+                        d18 = lerp(d22, grad(permutations[l2 + 1], d20, d26 - 1.0D, d24 - 1.0D), grad(permutations[l3 + 1], d20 - 1.0D, d26 - 1.0D, d24 - 1.0D));
+                    }
+                    double d28 = lerp(d27, d13, d15);
+                    double d29 = lerp(d27, d16, d18);
+                    double d30 = lerp(d25, d28, d29);
+                    ad[i1++] += d30 * d7;
                 }
             }
         }
