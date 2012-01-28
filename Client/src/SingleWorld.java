@@ -1,21 +1,16 @@
-package com.Khorn.TerrainControl.Bukkit;
-
 import com.Khorn.TerrainControl.*;
-import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManagerOld;
-import com.Khorn.TerrainControl.IBiomeManager;
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
-import net.minecraft.server.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-public class BukkitWorld implements LocalWorld
+public class SingleWorld implements LocalWorld
 {
-    private TCChunkGenerator generator;
-    private World world;
+    private ChunkProvider generator;
+    private vq world;
     private WorldConfig settings;
     private String name;
     private long Seed;
@@ -28,38 +23,38 @@ public class BukkitWorld implements LocalWorld
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 
 
-    private WorldGenStronghold strongholdGen;
-    private WorldGenVillage VillageGen;
-    private WorldGenMineshaft MineshaftGen;
+    private wa strongholdGen;
+    private al VillageGen;
+    private ajb MineshaftGen;
 
-    private WorldGenTrees Tree;
-    private WorldGenBigTree BigTree;
-    private WorldGenForest Forest;
-    private WorldGenSwampTree SwampTree;
-    private WorldGenTaiga1 TaigaTree1;
-    private WorldGenTaiga2 TaigaTree2;
-    private WorldGenHugeMushroom HugeMushroom;
+    private re Tree;
+    private yd BigTree;
+    private j Forest;
+    private bc SwampTree;
+    private kw TaigaTree1;
+    private qe TaigaTree2;
+    private pp HugeMushroom;
 
 
     private boolean CreateNewChunks;
-    private Chunk[] ChunkCache;
-    private Chunk CachedChunk;
-    
+    private aal[] ChunkCache;
+    private aal CachedChunk;
+
     private int CurrentChunkX;
     private int CurrentChunkZ;
 
-    private BiomeBase[] BiomeArray;
+    private zp[] BiomeArray;
 
     static
     {
         for (int i = 0; i < DefaultBiome.values().length; i++)
         {
-            Biomes[i] = new BukkitBiome(BiomeBase.a[i]);
+            Biomes[i] = new Biome(zp.a[i]);
             DefaultBiomes.add(Biomes[i]);
         }
     }
 
-    public BukkitWorld(String _name)
+    public SingleWorld(String _name)
     {
         this.name = _name;
         for (LocalBiome biome : DefaultBiomes)
@@ -70,12 +65,12 @@ public class BukkitWorld implements LocalWorld
 
     public LocalBiome getNullBiome(String name)
     {
-        return new NullBiome(name);
+        return null;
     }
 
     public LocalBiome AddBiome(String name)
     {
-        LocalBiome biome = new BukkitBiome(new CustomBiome(NextBiomeId++, name));
+        LocalBiome biome = new Biome(new CustomBiome(NextBiomeId++, name));
         Biomes[biome.getId()] = biome;
         this.BiomeNames.put(biome.getName(), biome);
         return biome;
@@ -145,7 +140,7 @@ public class BukkitWorld implements LocalWorld
 
     public void PlaceDungeons(Random rand, int x, int y, int z)
     {
-        new WorldGenDungeons().a(this.world, rand, x, y, z);
+        new dl().a(this.world, rand, x, y, z);
     }
 
     public void PlaceTree(TreeType type, Random rand, int x, int y, int z)
@@ -180,7 +175,7 @@ public class BukkitWorld implements LocalWorld
 
     public void PlacePonds(int BlockId, Random rand, int x, int y, int z)
     {
-        new WorldGenLakes(BlockId).a(this.world, rand, x, y, z);
+        new cl(BlockId).a(this.world, rand, x, y, z);
     }
 
     public void PlaceIce(int x, int z)
@@ -195,11 +190,11 @@ public class BukkitWorld implements LocalWorld
 
                 if (this.world.p(_x + i1, i5 - 1, _z + i2))
                 {
-                    this.world.setTypeId(_x + i1, i5 - 1, _z + i2, Block.ICE.id);
+                    this.world.g(_x + i1, i5 - 1, _z + i2, DefaultMaterial.ICE.id);
                 }
                 if (this.world.r(_x + i1, i5, _z + i2))
                 {
-                    this.world.setTypeId(_x + i1, i5, _z + i2, Block.SNOW.id);
+                    this.world.g(_x + i1, i5, _z + i2, DefaultMaterial.SNOW.id);
                 }
             }
 
@@ -224,9 +219,9 @@ public class BukkitWorld implements LocalWorld
         if (this.settings.BiomeConfigsHaveReplacement)
         {
 
-            Chunk rawChunk = this.ChunkCache[0];
-            byte[] blocks = rawChunk.b;
-            this.BiomeArray = this.world.getWorldChunkManager().getBiomeBlock(this.BiomeArray, this.CurrentChunkX * 16, this.CurrentChunkZ * 16, 16, 16);
+            aal rawaal = this.ChunkCache[0];
+            byte[] blocks = rawaal.b;
+            this.BiomeArray = this.world.a().b(this.BiomeArray, this.CurrentChunkX * 16, this.CurrentChunkZ * 16, 16, 16);
 
             int x = this.CurrentChunkX * 16;
             int z = this.CurrentChunkZ * 16;
@@ -242,12 +237,12 @@ public class BukkitWorld implements LocalWorld
                             int i = _x << 11 | _z << 7 | _y;
                             int blockId = blocks[i] & 0xFF;  // Fuck java with signed bytes;
                             int[] replacement = biomeConfig.ReplaceMatrixBlocks[blockId]; // [block ID, block data]
-                            if (blockId != replacement[0] || (blockId == replacement[0] && rawChunk.g.a(_x, _y, _z) != replacement[1]))
+                            if (blockId != replacement[0] || (blockId == replacement[0] && rawaal.g.a(_x, _y, _z) != replacement[1]))
                                 if (_y >= biomeConfig.ReplaceMatrixHeightMin[blockId] && _y <= biomeConfig.ReplaceMatrixHeightMax[blockId])
                                 {
                                     blocks[i] = (byte) replacement[0];
-                                    rawChunk.g.a(_x, _y, _z, replacement[1]);
-                                    world.notify((x + _x), _y, (z + _z));
+                                    rawaal.g.a(_x, _y, _z, replacement[1]);
+                                    world.j((x + _x), _y, (z + _z));
                                 }
 
                         }
@@ -256,31 +251,31 @@ public class BukkitWorld implements LocalWorld
         }
     }
 
-    public void LoadChunk(Chunk chunk)
+    public void LoadChunk(int x, int z)
     {
-        this.CurrentChunkX = chunk.x;
-        this.CurrentChunkZ = chunk.z;
-        this.ChunkCache[0] = chunk;
-        this.ChunkCache[1] = this.world.getChunkAt(chunk.x + 1, chunk.z);
-        this.ChunkCache[2] = this.world.getChunkAt(chunk.x, chunk.z + 1);
-        this.ChunkCache[3] = this.world.getChunkAt(chunk.x + 1, chunk.z + 1);
+        this.CurrentChunkX = x;
+        this.CurrentChunkZ = z;
+        this.ChunkCache[0] = this.world.c(x, z);
+        this.ChunkCache[1] = this.world.c(x + 1, z);
+        this.ChunkCache[2] = this.world.c(x, z + 1);
+        this.ChunkCache[3] = this.world.c(x + 1, z + 1);
         this.CreateNewChunks = true;
     }
 
-    private Chunk getChunk(int x, int y, int z)
+    private aal getaal(int x, int y, int z)
     {
-        if (y < 0 || y >= world.height)
+        if (y < 0 || y >= this.world.c)
             return null;
 
         x = x >> 4;
         z = z >> 4;
-        if(this.CachedChunk != null && this.CachedChunk.x == x && this.CachedChunk.z == z)
+        if (this.CachedChunk != null && this.CachedChunk.l == x && this.CachedChunk.m == z)
             return this.CachedChunk;
         int index = x - this.CurrentChunkX + 2 * (z - this.CurrentChunkZ);
         if (index >= 0 && index < 4)
             return CachedChunk = this.ChunkCache[index];
-        else if (this.CreateNewChunks || this.world.chunkProvider.isChunkLoaded(x, z))
-            return CachedChunk = this.world.getChunkAt(x, z);
+        else if (this.CreateNewChunks || this.world.A.a(x, z))
+            return CachedChunk = this.world.c(x, z);
         else
             return null;
 
@@ -289,15 +284,15 @@ public class BukkitWorld implements LocalWorld
 
     public int getLiquidHeight(int x, int z)
     {
-        Chunk chunk = this.getChunk(x, 0, z);
+        aal chunk = this.getaal(x, 0, z);
         if (chunk == null)
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = world.heightMinusOne; y > 0; y--)
+        for (int y = world.d; y > 0; y--)
         {
             int blockId = chunk.b[x << 11 | z << 7 | y] & 0xFF;
-            if (blockId != 0 && Block.byId[blockId].material.isLiquid())
+            if (blockId != 0 && oe.m[blockId].cb.d())
                 return y;
         }
         return -1;
@@ -310,7 +305,7 @@ public class BukkitWorld implements LocalWorld
 
     public int getRawBlockId(int x, int y, int z)
     {
-        Chunk chunk = this.getChunk(x, y, z);
+        aal chunk = this.getaal(x, y, z);
         if (chunk == null)
             return 0;
 
@@ -323,7 +318,7 @@ public class BukkitWorld implements LocalWorld
     public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
     {
 
-        Chunk chunk = this.getChunk(x, y, z);
+        aal chunk = this.getaal(x, y, z);
         if (chunk == null)
             return;
         z = z & 0xF;
@@ -336,7 +331,7 @@ public class BukkitWorld implements LocalWorld
 
     public void setRawBlockId(int x, int y, int z, int BlockId)
     {
-        Chunk chunk = this.getChunk(x, y, z);
+        aal chunk = this.getaal(x, y, z);
         if (chunk == null)
             return;
         z = z & 0xF;
@@ -348,17 +343,17 @@ public class BukkitWorld implements LocalWorld
 
     public void setBlockId(int x, int y, int z, int BlockId)
     {
-        this.world.setTypeId(x, y, z, BlockId);
+        this.world.d(x, y, z, BlockId);
     }
 
     public void setBlockIdAndData(int x, int y, int z, int BlockId, int Data)
     {
-        this.world.setTypeIdAndData(x, y, z, BlockId, Data);
+        this.world.b(x, y, z, BlockId, Data);
     }
 
     public int getHighestBlockYAt(int x, int z)
     {
-        Chunk chunk = this.getChunk(x, 0, z);
+        aal chunk = this.getaal(x, 0, z);
         if (chunk == null)
             return -1;
         z = z & 0xF;
@@ -379,12 +374,17 @@ public class BukkitWorld implements LocalWorld
 
     public int getLightLevel(int x, int y, int z)
     {
-        return world.getLightLevel(x, y, z);
+        return world.n(x, y, z);
     }
 
     public boolean isLoaded(int x, int y, int z)
     {
-        return world.isLoaded(x, y, z);
+        if (y < 0 || y >= this.world.c)
+            return false;
+        x = x >> 4;
+        z = z >> 4;
+
+        return world.A.a(x, z);
     }
 
     public WorldConfig getSettings()
@@ -404,15 +404,15 @@ public class BukkitWorld implements LocalWorld
 
     public int getHeight()
     {
-        return world.height;
+        return world.c;
     }
 
     public int getHeightBits()
     {
-        return world.heightBits;
+        return world.a;
     }
 
-    public TCChunkGenerator getChunkGenerator()
+    public ChunkProvider getChunkGenerator()
     {
         return this.generator;
     }
@@ -422,33 +422,29 @@ public class BukkitWorld implements LocalWorld
         this.settings = worldConfig;
     }
 
-    public void Init(World _world)
+    public void Init(vq _world)
     {
         this.world = _world;
-        this.Seed = world.getSeed();
-        this.world.seaLevel = this.settings.waterLevelMax;
+        this.Seed = world.t();
+        this.world.e = this.settings.waterLevelMax;
 
-        this.generator.Init(this);
 
-        this.strongholdGen = new WorldGenStronghold();
-        this.VillageGen = new WorldGenVillage(0);
-        this.MineshaftGen = new WorldGenMineshaft();
+        this.strongholdGen = new wa();
+        this.VillageGen = new al(0);
+        this.MineshaftGen = new ajb();
 
-        this.Tree = new WorldGenTrees(false);
-        this.BigTree = new WorldGenBigTree(false);
-        this.Forest = new WorldGenForest(false);
-        this.SwampTree = new WorldGenSwampTree();
-        this.TaigaTree1 = new WorldGenTaiga1();
-        this.TaigaTree2 = new WorldGenTaiga2(false);
-        this.HugeMushroom = new WorldGenHugeMushroom();
+        this.Tree = new re(false);
+        this.BigTree = new yd(false);
+        this.Forest = new j(false);
+        this.SwampTree = new bc();
+        this.TaigaTree1 = new kw();
+        this.TaigaTree2 = new qe(false);
+        this.HugeMushroom = new pp();
 
-        this.ChunkCache = new Chunk[4];
+        this.ChunkCache = new aal[4];
+        this.generator = new ChunkProvider(this);
     }
 
-    public void setChunkGenerator(TCChunkGenerator _generator)
-    {
-        this.generator = _generator;
-    }
 
     public void setBiomeManager(IBiomeManager manager)
     {
@@ -460,4 +456,15 @@ public class BukkitWorld implements LocalWorld
         this.old_biomeManager = manager;
         this.biomeManager = manager;
     }
+
+    public vq getWorld()
+    {
+        return this.world;
+    }
+
+    public wa getStrongholdGen()
+    {
+        return this.strongholdGen;
+    }
+
 }
