@@ -8,8 +8,10 @@ import java.util.UUID;
 import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManager;
 import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManagerOld;
 import com.Khorn.TerrainControl.Bukkit.Commands.TCCommandExecutor;
+import com.Khorn.TerrainControl.Configuration.TCDefaultValues;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import net.minecraft.server.BiomeBase;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
@@ -42,6 +44,10 @@ public class TCPlugin extends JavaPlugin
             this.getCommand("tc").setExecutor(new TCCommandExecutor(this));
         this.getCommand("terraincontrol").setExecutor(new TCCommandExecutor(this));
         this.listener = new TCListener(this);
+
+        Bukkit.getMessenger().registerIncomingPluginChannel(this, TCDefaultValues.ChannelName.stringValue(),this.listener);
+        Bukkit.getMessenger().registerOutgoingPluginChannel(this,TCDefaultValues.ChannelName.stringValue());
+        
 
         System.out.println(getDescription().getFullName() + " is now enabled");
 

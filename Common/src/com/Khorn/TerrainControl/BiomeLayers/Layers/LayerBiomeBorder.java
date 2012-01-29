@@ -3,6 +3,7 @@ package com.Khorn.TerrainControl.BiomeLayers.Layers;
 
 import com.Khorn.TerrainControl.BiomeLayers.ArraysCache;
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.Khorn.TerrainControl.LocalBiome;
 import com.Khorn.TerrainControl.LocalWorld;
 
 
@@ -24,7 +25,8 @@ public class LayerBiomeBorder extends Layer
 
         for (int i = 0; i < this.BordersFrom[ReplaceFrom].length; i++)
         {
-            this.BordersFrom[ReplaceFrom][i] = !ReplaceTo.NotBorderNear.contains(world.getBiomeById(i).getName());
+            LocalBiome biome = world.getBiomeById(i);
+            this.BordersFrom[ReplaceFrom][i] = biome == null || !ReplaceTo.NotBorderNear.contains(biome.getName());
         }
         this.BordersTo[ReplaceFrom] = ReplaceTo.Biome.getId();
 

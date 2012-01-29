@@ -18,7 +18,7 @@ public class CustomObject
     public boolean spawnWater = false;
     public boolean spawnLava = false;
     public boolean underFill = true;
-    public boolean dig = true;
+    public boolean dig = false;
     public int rarity = 10;
     public int spawnElevationMin = 0;
     public int spawnElevationMax = 128;
@@ -179,7 +179,7 @@ public class CustomObject
                         }
                         if (stringSet[0].equals("collisionPercentage"))
                         {
-                            this.collisionPercentage = (Integer.parseInt(stringSet[1]) / 100);
+                            this.collisionPercentage = (Integer.parseInt(stringSet[1]) );
                         }
                         if (stringSet[0].equals("spawnInBiome"))
                         {

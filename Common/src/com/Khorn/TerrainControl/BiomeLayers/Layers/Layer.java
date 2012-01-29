@@ -59,6 +59,7 @@ public abstract class Layer
     protected static final int RiverBits = 768;
     protected static final int IceBit = 128;
     protected static final int IslandBit = 1024;
+
     protected static int GetBiomeFromLayer(int BiomeAndLand)
     {
         if ((BiomeAndLand & LandBit) != 0)
@@ -85,6 +86,9 @@ public abstract class Layer
             ArrayList<LocalBiome> iceBiomes = new ArrayList<LocalBiome>();
             for (BiomeConfig biomeConfig : config.biomeConfigs)
             {
+                if (biomeConfig == null)
+                    continue;
+
                 if (biomeConfig.BiomeSize != i)
                     continue;
                 if (config.NormalBiomes.contains(biomeConfig.Name))
@@ -153,11 +157,11 @@ public abstract class Layer
             if ((config.GenerationDepth - config.RiverSize) == depth)
                 MainLayer = new LayerRiver(5 + depth, MainLayer);
 
-            LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth,world);
+            LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
             boolean haveBorder = false;
             for (BiomeConfig biomeConfig : config.biomeConfigs)
             {
-                if (biomeConfig.BiomeSize != depth)
+                if (biomeConfig == null || biomeConfig.BiomeSize != depth)
                     continue;
                 if (config.IsleBiomes.contains(biomeConfig.Name) && biomeConfig.IsleInBiome != null)
                 {
@@ -197,7 +201,6 @@ public abstract class Layer
                 layerBiomeBorder.child = MainLayer;
                 MainLayer = layerBiomeBorder;
             }
-
 
 
         }

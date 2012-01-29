@@ -17,6 +17,8 @@ public interface LocalWorld
 
     public LocalBiome getBiomeById(int id);
 
+    public LocalBiome getBiomeByName(String name);
+
     public int getBiomeIdByName(String name);
 
     public ArrayList<LocalBiome> getDefaultBiomes();

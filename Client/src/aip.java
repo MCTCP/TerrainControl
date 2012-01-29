@@ -1,6 +1,6 @@
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 
-import java.io.File;
+import java.io.*;
 import java.lang.reflect.Field;
 
 @SuppressWarnings("ALL")
@@ -25,6 +25,10 @@ public abstract class aip
     {
         this.a = paramvq;
         this.b = paramvq.z().t();
+        SingleWorld.RestoreBiomes();
+
+        TCClient.CheckWorld(this);
+
         if (this.b == um.TerrainControl)
         {
 
@@ -65,6 +69,29 @@ public abstract class aip
 
         a();
         h();
+    }
+
+    public void InitTCBiomeManager(ChannelPacket packet)
+    {
+
+
+        this.world = new SingleWorld(this.a.C.j());
+        try
+        {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(packet.c);
+            DataInputStream stream = new DataInputStream(inputStream);
+            WorldConfig config = new WorldConfig(stream,this.world);
+
+            this.world.setSettings( config);
+            this.world.InitM(this.a);
+
+            this.c = new BiomeManager(this.world);
+
+        } catch (IOException e1)
+        {
+            e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
     }
 
     protected void h()

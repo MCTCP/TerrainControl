@@ -17,8 +17,9 @@ public class SingleWorld implements LocalWorld
     private IBiomeManager biomeManager;
     private BiomeManagerOld old_biomeManager;
 
-    private static int NextBiomeId = DefaultBiome.values().length;
+    private static int NextBiomeId = 0;
     private static LocalBiome[] Biomes = new LocalBiome[64];
+    private static zp[] BiomesToRestore = new zp[64];
     private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 
@@ -45,20 +46,38 @@ public class SingleWorld implements LocalWorld
 
     private zp[] BiomeArray;
 
-    static
+
+    public static void RestoreBiomes()
     {
-        for (int i = 0; i < DefaultBiome.values().length; i++)
+        for (zp oldBiome : BiomesToRestore)
         {
-            Biomes[i] = new Biome(zp.a[i]);
-            DefaultBiomes.add(Biomes[i]);
+            if (oldBiome == null)
+                continue;
+            zp.a[oldBiome.K] = oldBiome;
         }
+        NextBiomeId = 0;
+        DefaultBiomes.clear();
+
     }
+
 
     public SingleWorld(String _name)
     {
         this.name = _name;
-        for (LocalBiome biome : DefaultBiomes)
+
+        for (int i = 0; i < DefaultBiome.values().length; i++)
+        {
+            zp oldBiome = zp.a[i];
+            BiomesToRestore[i] = oldBiome;
+            CustomBiome custom = new CustomBiome(NextBiomeId++, oldBiome.w);
+            custom.CopyEntities(oldBiome);
+            Biome biome = new Biome(custom);
+            Biomes[biome.getId()] = biome;
+            DefaultBiomes.add(biome);
             this.BiomeNames.put(biome.getName(), biome);
+        }
+
+
 
 
     }
@@ -80,10 +99,16 @@ public class SingleWorld implements LocalWorld
     {
         return NextBiomeId;
     }
+    
 
     public LocalBiome getBiomeById(int id)
     {
         return Biomes[id];
+    }
+
+    public LocalBiome getBiomeByName(String name)
+    {
+        return this.BiomeNames.get(name);
     }
 
     public int getBiomeIdByName(String name)
@@ -262,7 +287,7 @@ public class SingleWorld implements LocalWorld
         this.CreateNewChunks = true;
     }
 
-    private aal getaal(int x, int y, int z)
+    private aal getChunk(int x, int y, int z)
     {
         if (y < 0 || y >= this.world.c)
             return null;
@@ -284,7 +309,7 @@ public class SingleWorld implements LocalWorld
 
     public int getLiquidHeight(int x, int z)
     {
-        aal chunk = this.getaal(x, 0, z);
+        aal chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
         z = z & 0xF;
@@ -305,7 +330,7 @@ public class SingleWorld implements LocalWorld
 
     public int getRawBlockId(int x, int y, int z)
     {
-        aal chunk = this.getaal(x, y, z);
+        aal chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return 0;
 
@@ -318,7 +343,7 @@ public class SingleWorld implements LocalWorld
     public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
     {
 
-        aal chunk = this.getaal(x, y, z);
+        aal chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return;
         z = z & 0xF;
@@ -331,7 +356,7 @@ public class SingleWorld implements LocalWorld
 
     public void setRawBlockId(int x, int y, int z, int BlockId)
     {
-        aal chunk = this.getaal(x, y, z);
+        aal chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return;
         z = z & 0xF;
@@ -343,17 +368,17 @@ public class SingleWorld implements LocalWorld
 
     public void setBlockId(int x, int y, int z, int BlockId)
     {
-        this.world.d(x, y, z, BlockId);
+        this.world.g(x, y, z, BlockId);
     }
 
     public void setBlockIdAndData(int x, int y, int z, int BlockId, int Data)
     {
-        this.world.b(x, y, z, BlockId, Data);
+        this.world.d(x, y, z, BlockId, Data);
     }
 
     public int getHighestBlockYAt(int x, int z)
     {
-        aal chunk = this.getaal(x, 0, z);
+        aal chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
         z = z & 0xF;
@@ -420,6 +445,13 @@ public class SingleWorld implements LocalWorld
     public void setSettings(WorldConfig worldConfig)
     {
         this.settings = worldConfig;
+    }
+    public void InitM(vq _world)
+    {
+        this.world = _world;
+        this.Seed = world.t();
+        this.world.e = this.settings.waterLevelMax;
+
     }
 
     public void Init(vq _world)

@@ -9,6 +9,8 @@ public enum TCDefaultValues
     WorldBOBDirectoryName("BOBPlugins"),
     WorldBiomeConfigDirectoryName("BiomeConfigs"),
     WorldBiomeConfigName("BiomeConfig.ini"),
+    ChannelName("TerrainControl"),
+    ProtocolVersion(1),
 
     maxChunkBlockValue(32768),
 

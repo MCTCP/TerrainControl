@@ -817,4 +817,58 @@ public class BiomeConfig extends ConfigFile
 
     }
 
+    public void Serialize(DataOutputStream stream) throws IOException
+    {
+        stream.writeUTF(this.Name);
+
+        stream.writeInt(this.BiomeSize);
+        stream.writeInt(this.BiomeRarity);
+        stream.writeBoolean(this.BiomeRivers);
+
+        stream.writeInt(this.IsleInBiome.size());
+        for (String biome : this.IsleInBiome)
+            stream.writeUTF(biome);
+
+        stream.writeInt(this.BiomeIsBorder.size());
+        for (String biome : this.BiomeIsBorder)
+            stream.writeUTF(biome);
+
+        stream.writeInt(this.NotBorderNear.size());
+        for (String biome : this.NotBorderNear)
+            stream.writeUTF(biome);
+
+        stream.writeFloat(this.BiomeTemperature);
+        stream.writeFloat(this.BiomeWetness);
+
+    }
+
+    public BiomeConfig(DataInputStream stream, WorldConfig config, LocalBiome biome) throws IOException
+    {
+        this.Name = stream.readUTF();
+        this.Biome = biome;
+        this.worldConfig = config;
+
+        this.BiomeSize = stream.readInt();
+        this.BiomeRarity = stream.readInt();
+        this.BiomeRivers = stream.readBoolean();
+
+        int count = stream.readInt();
+        this.IsleInBiome = new ArrayList<String>();
+        while (count-- > 0)
+            this.IsleInBiome.add(stream.readUTF());
+
+        count = stream.readInt();
+        this.BiomeIsBorder = new ArrayList<String>();
+        while (count-- > 0)
+            this.BiomeIsBorder.add(stream.readUTF());
+
+        count = stream.readInt();
+        this.NotBorderNear = new ArrayList<String>();
+        while (count-- > 0)
+            this.NotBorderNear.add(stream.readUTF());
+        this.BiomeTemperature = stream.readFloat();
+        this.BiomeWetness = stream.readFloat();
+
+    }
+
 }

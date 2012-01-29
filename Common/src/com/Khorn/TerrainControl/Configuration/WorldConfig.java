@@ -1,12 +1,13 @@
 package com.Khorn.TerrainControl.Configuration;
 
 import com.Khorn.TerrainControl.CustomObjects.CustomObject;
-import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
-import com.Khorn.TerrainControl.Generator.ObjectSpawner;
+import com.Khorn.TerrainControl.DefaultBiome;
 import com.Khorn.TerrainControl.LocalBiome;
 import com.Khorn.TerrainControl.LocalWorld;
 
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -130,7 +131,6 @@ public class WorldConfig extends ConfigFile
 
     private File SettingsDir;
 
-    public boolean isInit = false;
 
     public boolean isDeprecated = false;
     public WorldConfig newSettings = null;
@@ -790,6 +790,204 @@ public class WorldConfig extends ConfigFile
         Normal,
         OldGenerator,
         Default
+    }
+
+    public void Serialize(DataOutputStream stream) throws IOException
+    {
+        stream.writeInt(TCDefaultValues.ProtocolVersion.intValue());
+
+        stream.writeUTF(this.WorldName);
+
+        stream.writeInt(this.GenerationDepth);
+        stream.writeInt(this.BiomeRarityScale);
+        stream.writeInt(this.LandRarity);
+        stream.writeInt(this.LandSize);
+        stream.writeInt(this.LandFuzzy);
+        stream.writeInt(this.IceRarity);
+        stream.writeInt(this.IceSize);
+        stream.writeBoolean(this.FrozenOcean);
+        stream.writeBoolean(this.FrozenRivers);
+        stream.writeInt(this.RiverRarity);
+        stream.writeInt(this.RiverSize);
+        stream.writeBoolean(this.RiversEnabled);
+
+        stream.writeDouble(this.oldBiomeSize);
+
+        stream.writeFloat(this.minTemperature);
+        stream.writeFloat(this.maxTemperature);
+        stream.writeFloat(this.minMoisture);
+        stream.writeFloat(this.maxMoisture);
+
+
+
+        stream.writeInt(this.CustomBiomes.size());
+        for (String name : this.CustomBiomes)
+            stream.writeUTF(name);
+
+        BiomeConfig config = this.getConfigByName(DefaultBiome.OCEAN.Name);
+        stream.writeUTF(config.Name);
+        config.Serialize(stream);
+
+        config = this.getConfigByName(DefaultBiome.RIVER.Name);
+        stream.writeUTF(config.Name);
+        config.Serialize(stream);
+
+        config = this.getConfigByName(DefaultBiome.FROZEN_OCEAN.Name);
+        stream.writeUTF(config.Name);
+        config.Serialize(stream);
+
+        config = this.getConfigByName(DefaultBiome.FROZEN_RIVER.Name);
+        stream.writeUTF(config.Name);
+        config.Serialize(stream);
+
+
+        stream.writeInt(this.NormalBiomes.size());
+        for (String biome : this.NormalBiomes)
+        {
+            config = this.getConfigByName(biome);
+            stream.writeUTF(config.Name);
+            config.Serialize(stream);
+        }
+
+        stream.writeInt(this.IceBiomes.size());
+        for (String biome : this.IceBiomes)
+        {
+            config = this.getConfigByName(biome);
+            stream.writeUTF(config.Name);
+            config.Serialize(stream);
+        }
+
+        stream.writeInt(this.IsleBiomes.size());
+        for (String biome : this.IsleBiomes)
+        {
+            config = this.getConfigByName(biome);
+            stream.writeUTF(config.Name);
+            config.Serialize(stream);
+        }
+
+        stream.writeInt(this.BorderBiomes.size());
+        for (String biome : this.BorderBiomes)
+        {
+            config = this.getConfigByName(biome);
+            stream.writeUTF(config.Name);
+            config.Serialize(stream);
+        }
+
+
+    }
+
+    public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
+    {
+        // Protocol version
+        stream.readInt();
+
+        this.WorldName = stream.readUTF();
+
+        this.GenerationDepth = stream.readInt();
+        this.BiomeRarityScale = stream.readInt();
+        this.LandRarity = stream.readInt();
+        this.LandSize = stream.readInt();
+        this.LandFuzzy = stream.readInt();
+        this.IceRarity = stream.readInt();
+        this.IceSize = stream.readInt();
+        this.FrozenOcean = stream.readBoolean();
+        this.FrozenRivers = stream.readBoolean();
+        this.RiverRarity = stream.readInt();
+        this.RiverSize = stream.readInt();
+        this.RiversEnabled = stream.readBoolean();
+
+        this.oldBiomeSize = stream.readDouble();
+        
+        this.minTemperature = stream.readFloat();
+        this.maxTemperature = stream.readFloat();
+        
+        this.minMoisture = stream.readFloat();
+        this.maxMoisture = stream.readFloat();
+
+
+
+        int count = stream.readInt();
+        while (count-- > 0)
+        {
+            String name = stream.readUTF();
+            world.AddBiome(name);
+            this.CustomBiomes.add(name);
+        }
+
+        this.biomeConfigs = new BiomeConfig[world.getBiomesCount()];
+
+        String name = stream.readUTF();
+        BiomeConfig config = new BiomeConfig(stream, this, world.getBiomeByName(name));
+        this.biomeConfigs[config.Biome.getId()] = config;
+
+        name = stream.readUTF();
+        config = new BiomeConfig(stream, this, world.getBiomeByName(name));
+        this.biomeConfigs[config.Biome.getId()] = config;
+
+        name = stream.readUTF();
+        config = new BiomeConfig(stream, this, world.getBiomeByName(name));
+        this.biomeConfigs[config.Biome.getId()] = config;
+
+        name = stream.readUTF();
+        config = new BiomeConfig(stream, this, world.getBiomeByName(name));
+        this.biomeConfigs[config.Biome.getId()] = config;
+
+        count = stream.readInt();
+        while (count-- > 0)
+        {
+            name = stream.readUTF();
+            this.NormalBiomes.add(name);
+            config = new BiomeConfig(stream, this, world.getBiomeByName(name));
+            this.biomeConfigs[config.Biome.getId()] = config;
+
+        }
+
+        count = stream.readInt();
+        while (count-- > 0)
+        {
+            name = stream.readUTF();
+            this.IceBiomes.add(name);
+            config = new BiomeConfig(stream, this, world.getBiomeByName(name));
+            this.biomeConfigs[config.Biome.getId()] = config;
+
+        }
+
+        count = stream.readInt();
+        while (count-- > 0)
+        {
+            name = stream.readUTF();
+            this.IsleBiomes.add(name);
+            config = new BiomeConfig(stream, this, world.getBiomeByName(name));
+            this.biomeConfigs[config.Biome.getId()] = config;
+
+        }
+
+        count = stream.readInt();
+        while (count-- > 0)
+        {
+            name = stream.readUTF();
+            this.BorderBiomes.add(name);
+            config = new BiomeConfig(stream, this, world.getBiomeByName(name));
+            this.biomeConfigs[config.Biome.getId()] = config;
+
+        }
+
+        for (BiomeConfig biomeConfig : this.biomeConfigs)
+            if (biomeConfig != null && biomeConfig.Biome.isCustom())
+                biomeConfig.Biome.setCustom(biomeConfig);
+
+
+    }
+
+
+    private BiomeConfig getConfigByName(String name)
+    {
+        for (BiomeConfig biome : this.biomeConfigs)
+        {
+            if (biome.Name.equals(name))
+                return biome;
+        }
+        return null;
     }
 
 }

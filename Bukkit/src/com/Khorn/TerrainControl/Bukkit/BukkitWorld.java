@@ -91,6 +91,11 @@ public class BukkitWorld implements LocalWorld
         return Biomes[id];
     }
 
+    public LocalBiome getBiomeByName(String name)
+    {
+        return this.BiomeNames.get(name);
+    }
+
     public int getBiomeIdByName(String name)
     {
         return this.BiomeNames.get(name).getId();

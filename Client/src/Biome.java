@@ -1,22 +1,18 @@
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
-import com.Khorn.TerrainControl.DefaultBiome;
 import com.Khorn.TerrainControl.LocalBiome;
 
 public class Biome implements LocalBiome
 {
     private zp biomeBase;
-    private boolean isCustom;
 
     public Biome(zp biome)
     {
         this.biomeBase = biome;
-        if(DefaultBiome.getBiome(biome.K) == null )
-            this.isCustom =true;
     }
 
     public boolean isCustom()
     {
-        return this.isCustom;
+        return true;
     }
 
     public void setCustom(BiomeConfig config)
