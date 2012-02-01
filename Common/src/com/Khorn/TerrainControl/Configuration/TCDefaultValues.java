@@ -89,6 +89,15 @@ public enum TCDefaultValues
     BedrockobBlock(7),
     disableNotchPonds(false),
 
+
+    WorldFog("0xC0D8FF"),
+    WorldNightFog("0x0B0D17"),
+    SkyColor("0x7BA5FF"),
+    WaterColor("0xFFFFFF"),
+    GrassColor("0x000000"),
+    FoliageColor("0x000000"),
+
+
     StrongholdsEnabled(true),
     MineshaftsEnabled(true),
     VillagesEnabled(true),

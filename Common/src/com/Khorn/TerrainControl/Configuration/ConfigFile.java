@@ -3,6 +3,7 @@ package com.Khorn.TerrainControl.Configuration;
 
 import com.Khorn.TerrainControl.DefaultBiome;
 
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -151,6 +152,23 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
+    protected int ReadModSettingsColor(String settingsName, String defaultValue)
+    {
+        settingsName = settingsName.toLowerCase();
+        Color color = Color.decode(defaultValue);
+        if (this.SettingsCache.containsKey(settingsName))
+        {
+            try
+            {
+                color = Color.decode(this.SettingsCache.get(settingsName));
+            } catch (NumberFormatException ex)
+            {
+                System.out.println("TerrainControl: " + settingsName + " had wrong value");
+            }
+        }
+        return color.getRGB() & 0xFFFFFF;
+    }
+
     protected float ReadModSettings(String settingsName, float defaultValue)
     {
         settingsName = settingsName.toLowerCase();
@@ -261,6 +279,12 @@ public abstract class ConfigFile
         this.SettingsWriter.newLine();
     }
 
+    protected void WriteColorValue(String settingsName, int RGB) throws IOException
+    {
+        this.SettingsWriter.write(settingsName + ":0x" + Integer.toHexString((0xFFFFFF & RGB) | 0x1000000).substring(1));
+        this.SettingsWriter.newLine();
+    }
+
     protected void WriteTitle(String title) throws IOException
     {
         this.SettingsWriter.newLine();
@@ -359,7 +383,7 @@ public abstract class ConfigFile
                 continue;
             }
 
-            if(DefaultBiome.Contain(key))
+            if (DefaultBiome.Contain(key))
                 output.add(key);
 
         }

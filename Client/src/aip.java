@@ -1,3 +1,4 @@
+import com.Khorn.TerrainControl.Configuration.TCDefaultValues;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 
 import java.io.*;
@@ -13,7 +14,7 @@ public abstract class aip
     public qu c;
     public boolean d = false;
     public boolean e = false;
-    public boolean f = false;
+    public boolean f = false;    // nosky ?
     public float[] g = new float[16];
     public int h = 0;
 
@@ -51,8 +52,8 @@ public abstract class aip
             {
                 e.printStackTrace();
             }
-            File configDir = new File(worldDir,"TerrainControl");
-            
+            File configDir = new File(worldDir, "TerrainControl");
+
             if (!configDir.exists())
             {
                 System.out.println("TerrainControl: settings does not exist, creating defaults");
@@ -74,15 +75,17 @@ public abstract class aip
     public void InitTCBiomeManager(ChannelPacket packet)
     {
 
+        if (!packet.a.equals(TCDefaultValues.ChannelName.stringValue()))
+            return;
 
         this.world = new SingleWorld(this.a.C.j());
         try
         {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(packet.c);
             DataInputStream stream = new DataInputStream(inputStream);
-            WorldConfig config = new WorldConfig(stream,this.world);
+            WorldConfig config = new WorldConfig(stream, this.world);
 
-            this.world.setSettings( config);
+            this.world.setSettings(config);
             this.world.InitM(this.a);
 
             this.c = new BiomeManager(this.world);
@@ -138,10 +141,10 @@ public abstract class aip
             return new wo(this.a, this.a.t(), this.a.z().r());
         } else if (this.b == um.TerrainControl)
         {
-            if(this.world.getSettings().ModeTerrain != WorldConfig.TerrainMode.Default)
+            if (this.world.getSettings().ModeTerrain != WorldConfig.TerrainMode.Default)
             {
                 return this.world.getChunkGenerator();
-            }else
+            } else
                 return new aji(this.a, this.a.t(), this.a.z().r());
         } else
             return new aji(this.a, this.a.t(), this.a.z().r());
@@ -201,14 +204,31 @@ public abstract class aip
         if (f1 > 1.0F)
             f1 = 1.0F;
 
-        float f2 = 0.7529412F;
-        float f3 = 0.8470588F;
-        float f4 = 1.0F;
-        f2 *= (f1 * 0.94F + 0.06F);
-        f3 *= (f1 * 0.94F + 0.06F);
-        f4 *= (f1 * 0.91F + 0.09F);
+        if (this.world == null)
+        {
 
-        return bk.b(f2, f3, f4);
+            float f2 = 0.7529412F;    //r
+            float f3 = 0.8470588F;    //g
+            float f4 = 1.0F;          //b
+
+            f2 *= (f1 * 0.94F + 0.06F);
+            f3 *= (f1 * 0.94F + 0.06F);
+            f4 *= (f1 * 0.91F + 0.09F);
+            return bk.b(f2, f3, f4);
+        } else
+        {
+
+            WorldConfig config = this.world.getSettings();
+
+            float red = (config.WorldFogR*f1 + config.WorldNightFogR*(1-f1));
+            float green = (config.WorldFogG*f1 + config.WorldNightFogG*(1-f1));
+            float blue = (config.WorldFogB*f1 + config.WorldNightFogB*(1-f1));
+
+            return bk.b(red, green, blue);
+
+        }
+
+
     }
 
     public boolean d()

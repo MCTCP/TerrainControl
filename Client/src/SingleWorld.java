@@ -70,7 +70,7 @@ public class SingleWorld implements LocalWorld
             zp oldBiome = zp.a[i];
             BiomesToRestore[i] = oldBiome;
             CustomBiome custom = new CustomBiome(NextBiomeId++, oldBiome.w);
-            custom.CopyEntities(oldBiome);
+            custom.CopyBiome(oldBiome);
             Biome biome = new Biome(custom);
             Biomes[biome.getId()] = biome;
             DefaultBiomes.add(biome);

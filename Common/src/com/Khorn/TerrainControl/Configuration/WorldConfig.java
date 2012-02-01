@@ -60,6 +60,18 @@ public class WorldConfig extends ConfigFile
     public boolean FrozenRivers;
     public boolean FrozenOcean;
 
+    // Look settings
+
+    public int WorldFog;
+    public float WorldFogR;
+    public float WorldFogG;
+    public float WorldFogB;
+
+    public int WorldNightFog;
+    public float WorldNightFogR;
+    public float WorldNightFogG;
+    public float WorldNightFogB;
+
 
     //Specific biome settings
     public boolean muddySwamps;
@@ -343,6 +355,17 @@ public class WorldConfig extends ConfigFile
         this.desertDirtFrequency = ReadModSettings(TCDefaultValues.desertDirtFrequency.name(), TCDefaultValues.desertDirtFrequency.intValue());
 
 
+        this.WorldFog = ReadModSettingsColor(TCDefaultValues.WorldFog.name(), TCDefaultValues.WorldFog.stringValue());
+        this.WorldNightFog = ReadModSettingsColor(TCDefaultValues.WorldNightFog.name(), TCDefaultValues.WorldNightFog.stringValue());
+
+        this.WorldFogR = ((WorldFog & 0xFF0000) >> 16) / 255F;
+        this.WorldFogG = ((WorldFog & 0xFF00) >> 8) / 255F;
+        this.WorldFogB = (WorldFog & 0xFF) / 255F;
+
+        this.WorldNightFogR = ((WorldNightFog & 0xFF0000) >> 16) / 255F;
+        this.WorldNightFogG = ((WorldNightFog & 0xFF00) >> 8) / 255F;
+        this.WorldNightFogB = (WorldNightFog & 0xFF) / 255F;
+
         this.StrongholdsEnabled = ReadModSettings(TCDefaultValues.StrongholdsEnabled.name(), TCDefaultValues.StrongholdsEnabled.booleanValue());
         this.VillagesEnabled = ReadModSettings(TCDefaultValues.VillagesEnabled.name(), TCDefaultValues.VillagesEnabled.booleanValue());
         this.MineshaftsEnabled = ReadModSettings(TCDefaultValues.MineshaftsEnabled.name(), TCDefaultValues.MineshaftsEnabled.booleanValue());
@@ -602,6 +625,16 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.VillagesEnabled.name(), this.VillagesEnabled);
         WriteValue(TCDefaultValues.MineshaftsEnabled.name(), this.MineshaftsEnabled);
 
+        this.WriteTitle("World visual settings");
+        this.WriteComment("Warning this section will work only for clients with single version of TerrainControl");
+
+        WriteComment("World fog color");
+        WriteColorValue(TCDefaultValues.WorldFog.name(), this.WorldFog);
+        this.WriteNewLine();
+
+        WriteComment("World night fog color");
+        WriteColorValue(TCDefaultValues.WorldNightFog.name(), this.WorldNightFog);
+        this.WriteNewLine();
 
         this.WriteTitle("BOB Objects Variables");
 
@@ -818,6 +851,8 @@ public class WorldConfig extends ConfigFile
         stream.writeFloat(this.minMoisture);
         stream.writeFloat(this.maxMoisture);
 
+        stream.writeInt(this.WorldFog);
+        stream.writeInt(this.WorldNightFog);
 
 
         stream.writeInt(this.CustomBiomes.size());
@@ -897,13 +932,23 @@ public class WorldConfig extends ConfigFile
         this.RiversEnabled = stream.readBoolean();
 
         this.oldBiomeSize = stream.readDouble();
-        
+
         this.minTemperature = stream.readFloat();
         this.maxTemperature = stream.readFloat();
-        
+
         this.minMoisture = stream.readFloat();
         this.maxMoisture = stream.readFloat();
 
+        this.WorldFog = stream.readInt();
+        this.WorldNightFog = stream.readInt();
+
+        this.WorldFogR = ((WorldFog & 0xFF0000) >> 16) / 255F;
+        this.WorldFogG = ((WorldFog & 0xFF00) >> 8) / 255F;
+        this.WorldFogB = (WorldFog & 0xFF) / 255F;
+
+        this.WorldNightFogR = ((WorldNightFog & 0xFF0000) >> 16) / 255F;
+        this.WorldNightFogG = ((WorldNightFog & 0xFF00) >> 8) / 255F;
+        this.WorldNightFogB = (WorldNightFog & 0xFF) / 255F;
 
 
         int count = stream.readInt();

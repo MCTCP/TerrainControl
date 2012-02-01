@@ -5,5 +5,7 @@ public class ChannelPacket extends dz
     public void a(nh nh)
     {
         TCClient.ReceiveConfig(this);
+
+        super.a(nh);
     }
 }

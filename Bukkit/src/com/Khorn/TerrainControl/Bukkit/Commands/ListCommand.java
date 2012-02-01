@@ -1,7 +1,7 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
+import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObject;
 import org.bukkit.command.CommandSender;
 
@@ -22,15 +22,15 @@ public class ListCommand extends BaseCommand
     @Override
     public boolean onCommand(CommandSender sender, List<String> args)
     {
-        WorldConfig worldSettings = this.getSettings(sender, "");
+        BukkitWorld world = this.getWorld(sender, "");
 
-        if (worldSettings != null)
+        if (world != null)
         {
-            if (worldSettings.Objects.size() == 0)
+            if (world.getSettings().Objects.size() == 0)
                 sender.sendMessage(MessageColor + "This world does not have custom objects");
 
             List<String> pluginList = new ArrayList<String>();
-            for (CustomObject object : worldSettings.Objects)
+            for (CustomObject object : world.getSettings().Objects)
             {
                 pluginList.add(ValueColor + object.name);
             }

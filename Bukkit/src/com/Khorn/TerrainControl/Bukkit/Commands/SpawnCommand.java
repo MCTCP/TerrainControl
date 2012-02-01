@@ -1,9 +1,9 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
 
+import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
 import com.Khorn.TerrainControl.Bukkit.TCPlayer;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObject;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -24,9 +24,9 @@ public class SpawnCommand extends BaseCommand
     @Override
     public boolean onCommand(CommandSender sender, List<String> args)
     {
-        WorldConfig worldSettings = this.getSettings(sender, "");
+        BukkitWorld world = this.getWorld(sender, "");
 
-        if (worldSettings == null)
+        if (world == null)
         {
             sender.sendMessage(ErrorColor + "TC is not enabled for this world");
             return true;
@@ -37,7 +37,7 @@ public class SpawnCommand extends BaseCommand
             return true;
         }
         CustomObject spawnObject = null;
-        for (CustomObject object : worldSettings.Objects)
+        for (CustomObject object : world.getSettings().Objects)
         {
             if (object.name.equals(args.get(0)))
                 spawnObject = object;

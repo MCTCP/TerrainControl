@@ -1,6 +1,7 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
 import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManager;
+import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import org.bukkit.Bukkit;
@@ -24,30 +25,31 @@ public class ReloadCommand extends BaseCommand
     @Override
     public boolean onCommand(CommandSender sender, List<String> args)
     {
-        WorldConfig worldSettings = this.getSettings(sender, args.size() > 0 ? args.get(0) : "");
-        if (worldSettings == null)
+        BukkitWorld world = this.getWorld(sender, args.size() > 0 ? args.get(0) : "");
+        if (world == null)
         {
             sender.sendMessage(ErrorColor + "You need to select world");
             return true;
         }
-        String worldName = worldSettings.WorldName;
 
-        /*
-        this.plugin.worldsSettings.remove(worldName);
 
-        worldSettings.newSettings = this.plugin.CreateSettings(worldName, false);
-        worldSettings.newSettings.ChunkProvider = worldSettings.ChunkProvider;
-        worldSettings.newSettings.ObjectGroups = worldSettings.ObjectGroups;
-        worldSettings.isDeprecated = true;
+        WorldConfig oldSettings = world.getSettings();
 
-        if (worldSettings.ModeBiome == WorldConfig.BiomeMode.Normal)
+        this.plugin.CreateSettings(world.getName(),world);
+
+        oldSettings.isDeprecated = true;
+        oldSettings.newSettings = world.getSettings();
+
+
+
+
+        if (world.getSettings().ModeBiome == WorldConfig.BiomeMode.Normal)
         {
-            net.minecraft.server.World world = ((CraftWorld) Bukkit.getWorld(worldName)).getHandle();
-            ((BiomeManager) world.worldProvider.c).Init(world, worldSettings.newSettings);
+            net.minecraft.server.World worldServer = ((CraftWorld) Bukkit.getWorld(world.getName())).getHandle();
+            ((BiomeManager) worldServer.worldProvider.c).Init(world);
         }
 
-        sender.sendMessage(MessageColor + "WorldConfig for world " + worldName + " reloaded");   */
-        //Todo update this.
+        sender.sendMessage(MessageColor + "WorldConfig for world " + world.getName() + " reloaded");
         return true;
     }
 }

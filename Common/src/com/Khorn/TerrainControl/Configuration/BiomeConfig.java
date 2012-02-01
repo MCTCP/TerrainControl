@@ -53,6 +53,12 @@ public class BiomeConfig extends ConfigFile
 
     public boolean disableNotchPonds;
 
+    public int SkyColor;
+    public int WaterColor;
+
+    public int GrassColor;
+    public int FoliageColor;
+
     public Resource[] ResourceSequence = new Resource[256];
 
 
@@ -304,6 +310,10 @@ public class BiomeConfig extends ConfigFile
 
         this.disableNotchPonds = this.ReadModSettings(TCDefaultValues.disableNotchPonds.name(), TCDefaultValues.disableNotchPonds.booleanValue());
 
+        this.SkyColor = this.ReadModSettingsColor(TCDefaultValues.SkyColor.name(), TCDefaultValues.SkyColor.stringValue());
+        this.WaterColor = this.ReadModSettingsColor(TCDefaultValues.WaterColor.name(), this.DefaultWaterColorMultiplier);
+        this.GrassColor = this.ReadModSettingsColor(TCDefaultValues.GrassColor.name(), TCDefaultValues.GrassColor.stringValue());
+        this.FoliageColor = this.ReadModSettingsColor(TCDefaultValues.FoliageColor.name(), TCDefaultValues.FoliageColor.stringValue());
 
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
@@ -535,6 +545,27 @@ public class BiomeConfig extends ConfigFile
         WriteComment("Disable or enable small lava and water lakes on surface");
         this.WriteValue(TCDefaultValues.disableNotchPonds.name(), this.disableNotchPonds);
 
+        this.WriteTitle("Biome visual settings");
+        this.WriteComment("Warning this section will work only for clients with single version of TerrainControl");
+
+        this.WriteNewLine();
+        this.WriteComment("Biome sky color");
+        this.WriteColorValue(TCDefaultValues.SkyColor.name(), this.SkyColor);
+
+        this.WriteNewLine();
+        this.WriteComment("Biome water color multiplier ");
+        this.WriteColorValue(TCDefaultValues.WaterColor.name(), this.WaterColor);
+
+        this.WriteNewLine();
+        this.WriteComment("Biome grass color");
+        this.WriteColorValue(TCDefaultValues.GrassColor.name(), this.GrassColor);
+
+        this.WriteNewLine();
+        this.WriteComment("Biome foliage color");
+        this.WriteColorValue(TCDefaultValues.FoliageColor.name(), this.FoliageColor);
+
+
+        this.WriteNewLine();
         this.WriteTitle("Resource queue");
         this.WriteComment("This section control all resources spawning after terrain generation");
         this.WriteComment("So first line is first resource which will be placed. Second line - second resource.");
@@ -663,6 +694,7 @@ public class BiomeConfig extends ConfigFile
     private int DefaultRarity = 100;
     private String DefaultColor = "0x000000";
     private int DefaultWaterLily = 0;
+    private String DefaultWaterColorMultiplier = "0xFFFFFF";
 
 
     private void InitDefaults()
@@ -724,6 +756,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultReed = 10;
                 this.DefaultClay = 1;
                 this.DefaultColor = "0x99CC66";
+                this.DefaultWaterColorMultiplier = "0xe0ffae";
                 break;
             }
             case 7:
@@ -839,6 +872,10 @@ public class BiomeConfig extends ConfigFile
 
         stream.writeFloat(this.BiomeTemperature);
         stream.writeFloat(this.BiomeWetness);
+        stream.writeInt(this.SkyColor);
+        stream.writeInt(this.WaterColor);
+        stream.writeInt(this.GrassColor);
+        stream.writeInt(this.FoliageColor);
 
     }
 
@@ -868,6 +905,11 @@ public class BiomeConfig extends ConfigFile
             this.NotBorderNear.add(stream.readUTF());
         this.BiomeTemperature = stream.readFloat();
         this.BiomeWetness = stream.readFloat();
+
+        this.SkyColor = stream.readInt();
+        this.WaterColor = stream.readInt();
+        this.GrassColor = stream.readInt();
+        this.FoliageColor = stream.readInt();
 
     }
 

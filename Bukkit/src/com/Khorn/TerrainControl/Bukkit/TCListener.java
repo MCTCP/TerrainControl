@@ -80,12 +80,14 @@ public class TCListener implements Listener,PluginMessageListener
     {
         if(bytes.length == 1 && bytes[0] == TCDefaultValues.ProtocolVersion.intValue())
         {
+
             World world = player.getWorld();
 
             if(this.tcPlugin.worlds.containsKey(world.getUID()))
             {
                 WorldConfig config = this.tcPlugin.worlds.get(world.getUID()).getSettings();
 
+                System.out.println("TerrainControl: client config requested for world " + config.WorldName);
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 DataOutputStream stream = new DataOutputStream(outputStream);
 

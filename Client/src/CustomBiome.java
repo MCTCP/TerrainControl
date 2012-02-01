@@ -3,6 +3,7 @@ import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 
 public class CustomBiome extends zp
 {
+    private int skyColor;
     public CustomBiome(int id, String name)
     {
         super(id);
@@ -19,6 +20,8 @@ public class CustomBiome extends zp
         this.z = config.GroundBlock;
         this.D = config.BiomeTemperature;
         this.E = config.BiomeWetness;
+        this.F = config.WaterColor;
+        this.skyColor = config.SkyColor;
 
         // color ?
         this.x = 522674;
@@ -31,9 +34,18 @@ public class CustomBiome extends zp
 
     }
 
-    public void CopyEntities(zp baseBiome)
+    public void CopyBiome(zp baseBiome)
     {
+        this.B = baseBiome.B;
+        this.C = baseBiome.C;
+        this.y = baseBiome.y;
+        this.z = baseBiome.z;
+        this.D = baseBiome.D;
+        this.E = baseBiome.E;
         this.F = baseBiome.F;
+        
+        
+        
         this.I = baseBiome.I;
         this.H = baseBiome.H;
         this.J = baseBiome.J;
@@ -46,14 +58,15 @@ public class CustomBiome extends zp
     @Override
     public int a(float v)
     {
-        return 0xFF0000;
+        return this.skyColor;
     }
+    /*
     // getGrassColorAtCoords
     public int a(aiw paramaiw, int paramInt1, int paramInt2, int paramInt3) {
         double d1 = paramaiw.a().a(paramInt1, paramInt2, paramInt3);
         double d2 = paramaiw.a().b(paramInt1, paramInt3);
 
-        return ((xy.a(d1, d2) & 0xFEFE00) + 5115470) / 2;
+        return ((xy.a(d1, d2) & 0xFEFEFE) + 5115470) / 2;
     }
 
     // getFoliageColorAtCoords
@@ -61,6 +74,6 @@ public class CustomBiome extends zp
         double d1 = paramaiw.a().a(paramInt1, paramInt2, paramInt3);
         double d2 = paramaiw.a().b(paramInt1, paramInt3);
 
-        return ((gk.a(d1, d2) & 0xFEFE00) + 5115470) / 2;
-    }
+        return ((gk.a(d1, d2) & 0xFEFEFE) + 5115470) / 2;
+    } */
 }

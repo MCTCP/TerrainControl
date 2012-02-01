@@ -1,7 +1,7 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
+import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -29,19 +29,19 @@ public abstract class BaseCommand
     public abstract boolean onCommand(CommandSender sender, List<String> args);
 
 
-    protected WorldConfig getSettings(CommandSender sender, String arg)
+    protected BukkitWorld getWorld(CommandSender sender, String arg)
     {
         if (arg.equals(""))
         {
             if (sender instanceof ConsoleCommandSender)
                 return null;
             if (sender instanceof Player && plugin.worlds.containsKey(((Player) sender).getWorld().getUID()))
-                return plugin.worlds.get(((Player) sender).getWorld().getUID()).getSettings();
+                return plugin.worlds.get(((Player) sender).getWorld().getUID());
             return null;
         }
         World world = Bukkit.getWorld(name);
         if( world != null && plugin.worlds.containsKey(world.getUID()))
-            return plugin.worlds.get(world.getUID()).getSettings();
+            return plugin.worlds.get(world.getUID());
         else
             return null;
     }
