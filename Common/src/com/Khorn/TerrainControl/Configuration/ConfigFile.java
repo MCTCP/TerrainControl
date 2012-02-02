@@ -391,4 +391,20 @@ public abstract class ConfigFile
 
     }
 
+    protected static void WriteStringToStream(DataOutputStream stream, String value) throws IOException
+    {
+        byte[] bytes = value.getBytes();
+        stream.writeShort(bytes.length);
+        stream.write(bytes);
+
+    }
+
+    protected static String ReadStringFromStream(DataInputStream stream) throws IOException
+    {
+        byte[] chars = new byte[stream.readShort()];
+        stream.read(chars, 0, chars.length);
+
+        return new String(chars);
+    }
+
 }

@@ -852,7 +852,7 @@ public class BiomeConfig extends ConfigFile
 
     public void Serialize(DataOutputStream stream) throws IOException
     {
-        stream.writeUTF(this.Name);
+        WriteStringToStream(stream,this.Name);
 
         stream.writeInt(this.BiomeSize);
         stream.writeInt(this.BiomeRarity);
@@ -860,15 +860,15 @@ public class BiomeConfig extends ConfigFile
 
         stream.writeInt(this.IsleInBiome.size());
         for (String biome : this.IsleInBiome)
-            stream.writeUTF(biome);
+            WriteStringToStream(stream,biome);
 
         stream.writeInt(this.BiomeIsBorder.size());
         for (String biome : this.BiomeIsBorder)
-            stream.writeUTF(biome);
+            WriteStringToStream(stream,biome);
 
         stream.writeInt(this.NotBorderNear.size());
         for (String biome : this.NotBorderNear)
-            stream.writeUTF(biome);
+            WriteStringToStream(stream,biome);
 
         stream.writeFloat(this.BiomeTemperature);
         stream.writeFloat(this.BiomeWetness);
@@ -881,7 +881,7 @@ public class BiomeConfig extends ConfigFile
 
     public BiomeConfig(DataInputStream stream, WorldConfig config, LocalBiome biome) throws IOException
     {
-        this.Name = stream.readUTF();
+        this.Name = ReadStringFromStream(stream);
         this.Biome = biome;
         this.worldConfig = config;
 
@@ -892,17 +892,17 @@ public class BiomeConfig extends ConfigFile
         int count = stream.readInt();
         this.IsleInBiome = new ArrayList<String>();
         while (count-- > 0)
-            this.IsleInBiome.add(stream.readUTF());
+            this.IsleInBiome.add(ReadStringFromStream(stream));
 
         count = stream.readInt();
         this.BiomeIsBorder = new ArrayList<String>();
         while (count-- > 0)
-            this.BiomeIsBorder.add(stream.readUTF());
+            this.BiomeIsBorder.add(ReadStringFromStream(stream));
 
         count = stream.readInt();
         this.NotBorderNear = new ArrayList<String>();
         while (count-- > 0)
-            this.NotBorderNear.add(stream.readUTF());
+            this.NotBorderNear.add(ReadStringFromStream(stream));
         this.BiomeTemperature = stream.readFloat();
         this.BiomeWetness = stream.readFloat();
 

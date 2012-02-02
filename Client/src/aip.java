@@ -89,6 +89,7 @@ public abstract class aip
             this.world.InitM(this.a);
 
             this.c = new BiomeManager(this.world);
+            System.out.println("TerrainControl: config received");
 
         } catch (IOException e1)
         {
