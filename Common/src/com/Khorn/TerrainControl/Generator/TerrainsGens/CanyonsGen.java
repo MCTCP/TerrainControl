@@ -99,8 +99,8 @@ public class CanyonsGen extends TerrainGenBase
 
             if (n < 1)
                 n = 1;
-            if (i1 > worldSettings.ChunkMaxY - 8)
-                i1 = worldSettings.ChunkMaxY - 8;
+            if (i1 > worldSettings.WorldHeight - 8)
+                i1 = worldSettings.WorldHeight - 8;
 
             if (i2 < 0)
                 i2 = 0;

@@ -409,7 +409,7 @@ public class BukkitWorld implements LocalWorld
 
     public int getHeight()
     {
-        return world.height;
+        return 128; //TODO do something with that when bukkit allow custom world height.
     }
 
     public int getHeightBits()

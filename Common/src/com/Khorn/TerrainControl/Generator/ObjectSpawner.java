@@ -18,14 +18,12 @@ public class ObjectSpawner
     private LocalWorld world;
 
 
-
-    public ObjectSpawner(WorldConfig wrk,LocalWorld localWorld)
+    public ObjectSpawner(WorldConfig wrk, LocalWorld localWorld)
     {
         this.worldSettings = wrk;
         this.rand = new Random();
         this.world = localWorld;
     }
-
 
 
     public void populate(int chunk_x, int chunk_z)
@@ -44,7 +42,7 @@ public class ObjectSpawner
         this.rand.setSeed(chunk_x * l1 + chunk_z * l2 ^ world.getSeed());
 
 
-        boolean Village = world.PlaceTerrainObjects(rand,chunk_x,chunk_z);
+        boolean Village = world.PlaceTerrainObjects(rand, chunk_x, chunk_z);
 
 
         if (!Village)
@@ -55,7 +53,7 @@ public class ObjectSpawner
                 if (this.rand.nextInt(4) == 0)
                 {
                     int _x = x + this.rand.nextInt(16) + 8;
-                    int _y = this.rand.nextInt(127);
+                    int _y = this.rand.nextInt(this.worldSettings.WorldHeight - 1);
                     int _z = z + this.rand.nextInt(16) + 8;
                     world.PlacePonds(DefaultMaterial.STATIONARY_WATER.id, this.rand, _x, _y, _z);
                 }
@@ -63,7 +61,7 @@ public class ObjectSpawner
                 if (this.rand.nextInt(8) == 0)
                 {
                     int _x = x + this.rand.nextInt(16) + 8;
-                    int _y = this.rand.nextInt(this.rand.nextInt(119) + 8);
+                    int _y = this.rand.nextInt(this.rand.nextInt(this.worldSettings.WorldHeight - 9) + 8);
                     int _z = z + this.rand.nextInt(16) + 8;
                     if ((_y < this.worldSettings.waterLevelMax) || (this.rand.nextInt(10) == 0))
                         world.PlacePonds(DefaultMaterial.STATIONARY_LAVA.id, this.rand, _x, _y, _z);
@@ -77,16 +75,14 @@ public class ObjectSpawner
         {
             Resource res = localBiomeConfig.ResourceSequence[i];
             world.setChunksCreations(res.Type.CreateNewChunks);
-            res.Type.Generator.Process(world,rand,res,x,z,biomeId);
+            res.Type.Generator.Process(world, rand, res, x, z, biomeId);
         }
 
         // Ice
-        world.PlaceIce(x,z);
+        world.PlaceIce(x, z);
 
 
         world.DoReplace();
-
-
 
 
         if (this.worldSettings.isDeprecated)

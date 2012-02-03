@@ -45,6 +45,8 @@ public class SingleWorld implements LocalWorld
     private int CurrentChunkZ;
 
     private zp[] BiomeArray;
+    
+    private int height;
 
 
     public static void RestoreBiomes()
@@ -429,7 +431,7 @@ public class SingleWorld implements LocalWorld
 
     public int getHeight()
     {
-        return world.c;
+        return this.height;
     }
 
     public int getHeightBits()
@@ -497,6 +499,11 @@ public class SingleWorld implements LocalWorld
     public wa getStrongholdGen()
     {
         return this.strongholdGen;
+    }
+    
+    public void setHeight(int _height)
+    {
+        this.height = _height;
     }
 
 }

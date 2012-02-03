@@ -312,8 +312,8 @@ public class BiomeConfig extends ConfigFile
 
         this.SkyColor = this.ReadModSettingsColor(TCDefaultValues.SkyColor.name(), TCDefaultValues.SkyColor.stringValue());
         this.WaterColor = this.ReadModSettingsColor(TCDefaultValues.WaterColor.name(), this.DefaultWaterColorMultiplier);
-        this.GrassColor = this.ReadModSettingsColor(TCDefaultValues.GrassColor.name(), TCDefaultValues.GrassColor.stringValue());
-        this.FoliageColor = this.ReadModSettingsColor(TCDefaultValues.FoliageColor.name(), TCDefaultValues.FoliageColor.stringValue());
+        this.GrassColor = this.ReadModSettingsColor(TCDefaultValues.GrassColor.name(), this.DefaultGrassColor);
+        this.FoliageColor = this.ReadModSettingsColor(TCDefaultValues.FoliageColor.name(), this.DefaultFoliageColor);
 
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
@@ -427,7 +427,7 @@ public class BiomeConfig extends ConfigFile
                     if (start != -1 && end != -1)
                     {
                         Resource res = new Resource(type);
-                        res.ReadFromString(key.substring(start + 1, end));
+                        res.ReadFromString(key.substring(start + 1, end),this.worldConfig.WorldHeight);
 
                         if (res.Done)
                         {
@@ -519,7 +519,8 @@ public class BiomeConfig extends ConfigFile
         this.WriteNewLine();
         WriteComment("BiomeHeight mean how much height will be added in terrain generation");
         WriteComment("It is double value from -10.0 to 10.0");
-        WriteComment("BiomeHeight:0.0 - mean height controlled only by world config and near 64 if it default");
+        WriteComment("Each 1.0 add or remove about 16 blocks height from 64 height with all other values set default.");
+        WriteComment("So 0.0 = 64 height, -1.0 = 48 height. Terrain settings from world config may affect how much this works.");
         WriteValue(TCDefaultValues.BiomeHeight.name(), this.BiomeHeight);
 
         this.WriteNewLine();
@@ -695,6 +696,8 @@ public class BiomeConfig extends ConfigFile
     private String DefaultColor = "0x000000";
     private int DefaultWaterLily = 0;
     private String DefaultWaterColorMultiplier = "0xFFFFFF";
+    private String DefaultGrassColor = "0xFFFFFF";
+    private String DefaultFoliageColor = "0xFFFFFF";
 
 
     private void InitDefaults()
@@ -757,6 +760,8 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultClay = 1;
                 this.DefaultColor = "0x99CC66";
                 this.DefaultWaterColorMultiplier = "0xe0ffae";
+                this.DefaultGrassColor = "0x7E6E7E";
+                this.DefaultFoliageColor = "0x7E6E7E";
                 break;
             }
             case 7:

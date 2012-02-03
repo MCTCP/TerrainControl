@@ -107,7 +107,7 @@ public class ChunkProviderTC
         } else
             this.BiomeArray = this.localWorld.getBiomesUnZoomed(this.BiomeArray, paramInt1 * 4 - 2, paramInt2 * 4 - 2, i4 + 5, i6 + 5);
 
-        this.u = a(this.u, paramInt1 * i1, 0, paramInt2 * i1, i4, i5, i6);
+        this.u = GenerateTerrainNoise(this.u, paramInt1 * i1, 0, paramInt2 * i1, i4, i5, i6);
 
         for (int x = 0; x < i1; x++)
             for (int z = 0; z < i1; z++)
@@ -277,7 +277,7 @@ public class ChunkProviderTC
     }
 
 
-    private double[] a(double[] paramArrayOfDouble, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6)
+    private double[] GenerateTerrainNoise(double[] paramArrayOfDouble, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6)
     {
         if (paramArrayOfDouble == null)
         {

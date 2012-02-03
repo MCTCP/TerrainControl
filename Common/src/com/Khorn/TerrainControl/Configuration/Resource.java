@@ -109,7 +109,7 @@ public class Resource
 
     }
 
-    public void ReadFromString(String line)
+    public void ReadFromString(String line, int worldHeight)
     {
         try
         {
@@ -133,8 +133,8 @@ public class Resource
                     this.MaxSize = CheckValue(Props[1], 1, 32);
                     this.Frequency = CheckValue(Props[2], 1, 100);
                     this.Rarity = CheckValue(Props[3], 0, 100);
-                    this.MinAltitude = CheckValue(Props[4], 0, 128);
-                    this.MaxAltitude = CheckValue(Props[5], 0, 128, this.MinAltitude);
+                    this.MinAltitude = CheckValue(Props[4], 0, worldHeight);
+                    this.MaxAltitude = CheckValue(Props[5], 0, worldHeight, this.MinAltitude);
 
                     this.SourceBlockId = new int[Props.length - 6];
                     for (int i = 6; i < Props.length; i++)
@@ -160,8 +160,8 @@ public class Resource
                     this.BlockId = CheckBlock(Props[0]);
                     this.Frequency = CheckValue(Props[1], 1, 100);
                     this.Rarity = CheckValue(Props[2], 0, 100);
-                    this.MinAltitude = CheckValue(Props[3], 0, 128);
-                    this.MaxAltitude = CheckValue(Props[4], 0, 128, this.MinAltitude);
+                    this.MinAltitude = CheckValue(Props[3], 0, worldHeight);
+                    this.MaxAltitude = CheckValue(Props[4], 0, worldHeight, this.MinAltitude);
 
                     this.SourceBlockId = new int[Props.length - 5];
                     for (int i = 5; i < Props.length; i++)
@@ -201,8 +201,8 @@ public class Resource
 
                     this.Frequency = CheckValue(Props[1], 1, 100);
                     this.Rarity = CheckValue(Props[2], 0, 100);
-                    this.MinAltitude = CheckValue(Props[3], 0, 128);
-                    this.MaxAltitude = CheckValue(Props[4], 0, 128, this.MinAltitude);
+                    this.MinAltitude = CheckValue(Props[3], 0, worldHeight);
+                    this.MaxAltitude = CheckValue(Props[4], 0, worldHeight, this.MinAltitude);
 
                     this.SourceBlockId = new int[Props.length - 5];
                     for (int i = 5; i < Props.length; i++)
@@ -215,8 +215,8 @@ public class Resource
                         return;
                     this.Frequency = CheckValue(Props[0], 1, 100);
                     this.Rarity = CheckValue(Props[1], 0, 100);
-                    this.MinAltitude = CheckValue(Props[2], 0, 128);
-                    this.MaxAltitude = CheckValue(Props[3], 0, 128, this.MinAltitude);
+                    this.MinAltitude = CheckValue(Props[2], 0, worldHeight);
+                    this.MaxAltitude = CheckValue(Props[3], 0, worldHeight, this.MinAltitude);
                     break;
                 case Tree:
                     if (Props.length < 3)
@@ -263,8 +263,8 @@ public class Resource
                     this.MaxSize = CheckValue(Props[1], 1, 60, this.MinSize);
                     this.Frequency = CheckValue(Props[2], 1, 100);
                     this.Rarity = CheckValue(Props[3], 0, 100);
-                    this.MinAltitude = CheckValue(Props[4], 0, 128);
-                    this.MaxAltitude = CheckValue(Props[5], 0, 128, this.MinAltitude);
+                    this.MinAltitude = CheckValue(Props[4], 0, worldHeight);
+                    this.MaxAltitude = CheckValue(Props[5], 0, worldHeight, this.MinAltitude);
                     break;
                 case AboveWaterRes:
                     if (Props.length < 3)

@@ -359,6 +359,15 @@ public abstract class ConfigFile
         else
             return value;
     }
+    protected float CheckValue(float value, float min, float max, float minValue)
+    {
+        value = CheckValue(value, min, max);
+
+        if (value < minValue)
+            return minValue + 1;
+        else
+            return value;
+    }
 
     protected int CheckValue(int value, int min, int max, int minValue)
     {
@@ -402,7 +411,8 @@ public abstract class ConfigFile
     protected static String ReadStringFromStream(DataInputStream stream) throws IOException
     {
         byte[] chars = new byte[stream.readShort()];
-        stream.read(chars, 0, chars.length);
+        if (stream.read(chars, 0, chars.length) != chars.length)
+            throw new EOFException();
 
         return new String(chars);
     }

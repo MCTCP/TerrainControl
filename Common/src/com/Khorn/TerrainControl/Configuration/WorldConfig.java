@@ -128,7 +128,7 @@ public class WorldConfig extends ConfigFile
 
 
     public boolean disableNotchHeightControl;
-    public double[] heightMatrix = new double[17];
+    public double[] heightMatrix;
 
 
     public boolean customObjects;
@@ -160,13 +160,14 @@ public class WorldConfig extends ConfigFile
     public int iceBiomesRarity;
 
 
-    public int ChunkMaxY = 128;
-
+    public int WorldHeight;
 
     public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
     {
         this.SettingsDir = settingsDir;
         this.WorldName = world.getName();
+        this.WorldHeight = world.getHeight();
+        this.heightMatrix = new double[this.WorldHeight / 8 + 1];
 
         File settingsFile = new File(this.SettingsDir, TCDefaultValues.WorldSettingsName.stringValue());
 
@@ -254,33 +255,34 @@ public class WorldConfig extends ConfigFile
         this.BorderBiomes = CheckValue(this.BorderBiomes, this.CustomBiomes);
 
 
-        this.minMoisture = (this.minMoisture < 0.0F ? 0.0F : this.minMoisture > 1.0F ? 1.0F : this.minMoisture);
-        this.minTemperature = (this.minTemperature < 0.0F ? 0.0F : this.minTemperature > 1.0F ? 1.0F : this.minTemperature);
-        this.maxMoisture = (this.maxMoisture > 1.0F ? 1.0F : this.maxMoisture < this.minMoisture ? this.minMoisture : this.maxMoisture);
-        this.maxTemperature = (this.maxTemperature > 1.0F ? 1.0F : this.maxTemperature < this.minTemperature ? this.minTemperature : this.maxTemperature);
+        this.minMoisture = CheckValue(this.minMoisture, 0, 1.0F);
+        this.maxMoisture = CheckValue(this.maxMoisture, 0, 1.0F, this.minMoisture);
+
+        this.minTemperature = CheckValue(this.minTemperature, 0, 1.0F);
+        this.maxTemperature = CheckValue(this.maxTemperature, 0, 1.0F, this.minTemperature);
 
 
-        this.caveRarity = (this.caveRarity < 0 ? 0 : this.caveRarity > 100 ? 100 : this.caveRarity);
-        this.caveFrequency = (this.caveFrequency < 0 ? 0 : this.caveFrequency);
-        this.caveMinAltitude = (this.caveMinAltitude < 0 ? 0 : this.caveMinAltitude > this.ChunkMaxY - 1 ? this.ChunkMaxY - 1 : this.caveMinAltitude);
-        this.caveMaxAltitude = (this.caveMaxAltitude > this.ChunkMaxY ? this.ChunkMaxY : this.caveMaxAltitude <= this.caveMinAltitude ? this.caveMinAltitude + 1 : this.caveMaxAltitude);
-        this.individualCaveRarity = (this.individualCaveRarity < 0 ? 0 : this.individualCaveRarity);
-        this.caveSystemFrequency = (this.caveSystemFrequency < 0 ? 0 : this.caveSystemFrequency);
-        this.caveSystemPocketChance = (this.caveSystemPocketChance < 0 ? 0 : this.caveSystemPocketChance > 100 ? 100 : this.caveSystemPocketChance);
-        this.caveSystemPocketMinSize = (this.caveSystemPocketMinSize < 0 ? 0 : this.caveSystemPocketMinSize);
-        this.caveSystemPocketMaxSize = (this.caveSystemPocketMaxSize <= this.caveSystemPocketMinSize ? this.caveSystemPocketMinSize + 1 : this.caveSystemPocketMaxSize);
+        this.caveRarity = CheckValue(this.caveRarity, 0, 100);
+        this.caveFrequency = CheckValue(this.caveFrequency, 0, 200);
+        this.caveMinAltitude = CheckValue(this.caveMinAltitude, 0, WorldHeight);
+        this.caveMaxAltitude = CheckValue(this.caveMaxAltitude, 0, WorldHeight, this.caveMinAltitude);
+        this.individualCaveRarity = CheckValue(this.individualCaveRarity, 0, 100);
+        this.caveSystemFrequency = CheckValue(this.caveSystemFrequency, 0, 200);
+        this.caveSystemPocketChance = CheckValue(this.caveSystemPocketChance, 0, 100);
+        this.caveSystemPocketMinSize = CheckValue(this.caveSystemPocketMinSize, 0, 100);
+        this.caveSystemPocketMaxSize = CheckValue(this.caveSystemPocketMaxSize, 0, 100, this.caveSystemPocketMinSize);
 
 
         this.canyonRarity = CheckValue(this.canyonRarity, 0, 100);
-        this.canyonMinAltitude = CheckValue(this.canyonMinAltitude, 0, this.ChunkMaxY);
-        this.canyonMaxAltitude = CheckValue(this.canyonMaxAltitude, 0, this.ChunkMaxY, this.canyonMinAltitude);
+        this.canyonMinAltitude = CheckValue(this.canyonMinAltitude, 0, WorldHeight);
+        this.canyonMaxAltitude = CheckValue(this.canyonMaxAltitude, 0, WorldHeight, this.canyonMinAltitude);
         this.canyonMinLength = CheckValue(this.canyonMinLength, 1, 500);
         this.canyonMaxLength = CheckValue(this.canyonMaxLength, 1, 500, this.canyonMinLength);
         this.canyonDepth = CheckValue(this.canyonDepth, 0.1D, 15D);
 
 
-        this.waterLevelMin = CheckValue(this.waterLevelMin, 0, 128);
-        this.waterLevelMax = CheckValue(this.waterLevelMax, 0, 128, this.waterLevelMin);
+        this.waterLevelMin = CheckValue(this.waterLevelMin, 0, WorldHeight);
+        this.waterLevelMax = CheckValue(this.waterLevelMax, 0, WorldHeight, this.waterLevelMin);
 
         this.customTreeChance = CheckValue(this.customTreeChance, 0, 100);
 
@@ -429,9 +431,9 @@ public class WorldConfig extends ConfigFile
         ArrayList<String> keys = this.ReadModSettings(TCDefaultValues.CustomHeightControl.name(), TCDefaultValues.CustomHeightControl.StringArrayListValue());
         try
         {
-            if (keys.size() != 17)
+            if (keys.size() != (this.WorldHeight / 8 + 1))
                 return;
-            for (int i = 0; i < 17; i++)
+            for (int i = 0; i < this.WorldHeight / 8 + 1; i++)
                 this.heightMatrix[i] = Double.valueOf(keys.get(i));
 
         } catch (NumberFormatException e)
@@ -829,7 +831,7 @@ public class WorldConfig extends ConfigFile
     {
         stream.writeInt(TCDefaultValues.ProtocolVersion.intValue());
 
-        WriteStringToStream(stream,this.WorldName);
+        WriteStringToStream(stream, this.WorldName);
 
         stream.writeInt(this.GenerationDepth);
         stream.writeInt(this.BiomeRarityScale);
@@ -857,22 +859,22 @@ public class WorldConfig extends ConfigFile
 
         stream.writeInt(this.CustomBiomes.size());
         for (String name : this.CustomBiomes)
-            WriteStringToStream(stream,name);
+            WriteStringToStream(stream, name);
 
         BiomeConfig config = this.getConfigByName(DefaultBiome.OCEAN.Name);
-        WriteStringToStream(stream,config.Name);
+        WriteStringToStream(stream, config.Name);
         config.Serialize(stream);
 
         config = this.getConfigByName(DefaultBiome.RIVER.Name);
-        WriteStringToStream(stream,config.Name);
+        WriteStringToStream(stream, config.Name);
         config.Serialize(stream);
 
         config = this.getConfigByName(DefaultBiome.FROZEN_OCEAN.Name);
-        WriteStringToStream(stream,config.Name);
+        WriteStringToStream(stream, config.Name);
         config.Serialize(stream);
 
         config = this.getConfigByName(DefaultBiome.FROZEN_RIVER.Name);
-        WriteStringToStream(stream,config.Name);
+        WriteStringToStream(stream, config.Name);
         config.Serialize(stream);
 
 
@@ -880,7 +882,7 @@ public class WorldConfig extends ConfigFile
         for (String biome : this.NormalBiomes)
         {
             config = this.getConfigByName(biome);
-            WriteStringToStream(stream,config.Name);
+            WriteStringToStream(stream, config.Name);
             config.Serialize(stream);
         }
 
@@ -888,7 +890,7 @@ public class WorldConfig extends ConfigFile
         for (String biome : this.IceBiomes)
         {
             config = this.getConfigByName(biome);
-            WriteStringToStream(stream,config.Name);
+            WriteStringToStream(stream, config.Name);
             config.Serialize(stream);
         }
 
@@ -896,7 +898,7 @@ public class WorldConfig extends ConfigFile
         for (String biome : this.IsleBiomes)
         {
             config = this.getConfigByName(biome);
-            WriteStringToStream(stream,config.Name);
+            WriteStringToStream(stream, config.Name);
             config.Serialize(stream);
         }
 
@@ -904,7 +906,7 @@ public class WorldConfig extends ConfigFile
         for (String biome : this.BorderBiomes)
         {
             config = this.getConfigByName(biome);
-            WriteStringToStream(stream,config.Name);
+            WriteStringToStream(stream, config.Name);
             config.Serialize(stream);
         }
 

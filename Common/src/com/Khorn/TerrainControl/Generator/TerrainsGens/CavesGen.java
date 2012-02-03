@@ -111,9 +111,9 @@ public class CavesGen extends TerrainGenBase
 
             if (i1 < 1)
                 i1 = 1;
-            if (i2 > this.worldSettings.ChunkMaxY - 8)
+            if (i2 > this.worldSettings.WorldHeight - 8)
             {
-                i2 = this.worldSettings.ChunkMaxY  - 8;
+                i2 = this.worldSettings.WorldHeight - 8;
             }
             if (i3 < 0)
                 i3 = 0;
@@ -128,11 +128,11 @@ public class CavesGen extends TerrainGenBase
                 {
                     for (int i8 = i2 + 1; (i5 == 0) && (i8 >= i1 - 1); i8--)
                     {
-                        i9 = (i6 * 16 + i7) * this.worldSettings.ChunkMaxY  + i8;
+                        i9 = (i6 * 16 + i7) * this.worldSettings.WorldHeight + i8;
                         if (i8 < 0)
                             continue;
 
-                        if (i8 < this.worldSettings.ChunkMaxY )
+                        if (i8 < this.worldSettings.WorldHeight)
                         {
                             if ((paramArrayOfByte[i9] == DefaultMaterial.WATER.id) || (paramArrayOfByte[i9] == DefaultMaterial.STATIONARY_WATER.id))
                             {
@@ -153,7 +153,7 @@ public class CavesGen extends TerrainGenBase
                 {
                     double d10 = (i9 + paramInt2 * 16 + 0.5D - paramDouble3) / d3;
 
-                    int i10 = (i6 * 16 + i9) * this.worldSettings.ChunkMaxY  + i2;
+                    int i10 = (i6 * 16 + i9) * this.worldSettings.WorldHeight + i2;
                     int i11 = 0;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {

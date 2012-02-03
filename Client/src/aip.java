@@ -34,6 +34,7 @@ public abstract class aip
         {
 
             this.world = new SingleWorld(paramvq.C.j());
+            this.world.setHeight(paramvq.c);
 
             File worldDir = null;
             try
