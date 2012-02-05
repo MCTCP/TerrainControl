@@ -21,7 +21,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import java.io.*;
 import java.util.Random;
 
-public class TCListener implements Listener,PluginMessageListener
+public class TCListener implements Listener, PluginMessageListener
 {
     private TCPlugin tcPlugin;
     private Random random;
@@ -79,34 +79,36 @@ public class TCListener implements Listener,PluginMessageListener
 
     public void onPluginMessageReceived(String s, Player player, byte[] bytes)
     {
-        if(bytes.length == 1 && bytes[0] == TCDefaultValues.ProtocolVersion.intValue())
+        if (bytes.length == 1)
         {
-
-            World world = player.getWorld();
-
-            if(this.tcPlugin.worlds.containsKey(world.getUID()))
+            if (bytes[0] == TCDefaultValues.ProtocolVersion.intValue())
             {
-                WorldConfig config = this.tcPlugin.worlds.get(world.getUID()).getSettings();
+                World world = player.getWorld();
 
-                System.out.println("TerrainControl: client config requested for world " + config.WorldName);
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                DataOutputStream stream = new DataOutputStream(outputStream);
-
-                try
+                if (this.tcPlugin.worlds.containsKey(world.getUID()))
                 {
-                    config.Serialize(stream);
-                    stream.flush();
+                    WorldConfig config = this.tcPlugin.worlds.get(world.getUID()).getSettings();
 
-                } catch (IOException e)
-                {
-                    e.printStackTrace();
+                    System.out.println("TerrainControl: client config requested for world " + config.WorldName);
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    DataOutputStream stream = new DataOutputStream(outputStream);
+
+                    try
+                    {
+                        config.Serialize(stream);
+                        stream.flush();
+
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    byte[] data = outputStream.toByteArray();
+
+                    player.sendPluginMessage(this.tcPlugin, TCDefaultValues.ChannelName.stringValue(), data);
                 }
-
-                byte[] data = outputStream.toByteArray();
-
-                player.sendPluginMessage(this.tcPlugin,TCDefaultValues.ChannelName.stringValue(),data);
-            }
-
+            }else
+                System.out.println("TerrainControl: client have old TC version");
 
         }
     }

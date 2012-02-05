@@ -91,6 +91,8 @@ public interface LocalWorld
 
     public int getHeight();
 
+    public int getWaterLevel();
+
     public int getHeightBits();
 
 

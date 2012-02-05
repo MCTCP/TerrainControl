@@ -35,6 +35,7 @@ public abstract class aip
 
             this.world = new SingleWorld(paramvq.C.j());
             this.world.setHeight(paramvq.c);
+            this.world.setWaterLevel(paramvq.e);
 
             File worldDir = null;
             try

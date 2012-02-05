@@ -214,7 +214,7 @@ public class ChunkProviderTC
                         else if (i10 == DefaultMaterial.STONE.id)
                             if (i5 == -1)
                             {
-                                if (stone_noise <= 0)
+                                if (stone_noise <= 0 && !this.worldSettings.removeSurfaceStone)
                                 {
                                     surfaceBlock = 0;
                                     groundBlock = (byte) DefaultMaterial.STONE.id;
@@ -249,9 +249,6 @@ public class ChunkProviderTC
 
                                 if (((this.worldSettings.muddySwamps) || (this.worldSettings.claySwamps)) && (biomeId == DefaultBiome.SWAMPLAND.Id) && ((paramArrayOfByte[i9] == DefaultMaterial.SAND.id) || (paramArrayOfByte[i9] == DefaultMaterial.DIRT.id) || (paramArrayOfByte[i9] == DefaultMaterial.SAND.id)))
                                     createSwamps(paramArrayOfByte, i9);
-
-                                if ((this.worldSettings.removeSurfaceStone) && (paramArrayOfByte[i9] == DefaultMaterial.STONE.id))
-                                    paramArrayOfByte[i9] = (byte) ((biomeId == DefaultBiome.DESERT.Id) ? DefaultMaterial.SAND.id : DefaultMaterial.GRASS.id);
 
 
                             } else if (i5 > 0)

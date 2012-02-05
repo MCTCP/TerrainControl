@@ -17,7 +17,7 @@ public class GrassGen extends ResourceGenBase
             if (rand.nextInt(100) >= res.Rarity)
                 continue;
             int x = _x + rand.nextInt(16) + 8;
-            int y = 128;
+            int y = world.getHeight();
             int z = _z + rand.nextInt(16) + 8;
 
             int i;

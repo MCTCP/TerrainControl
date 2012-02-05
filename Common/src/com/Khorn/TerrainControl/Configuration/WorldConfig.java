@@ -167,6 +167,7 @@ public class WorldConfig extends ConfigFile
         this.SettingsDir = settingsDir;
         this.WorldName = world.getName();
         this.WorldHeight = world.getHeight();
+        this.waterLevelMax = world.getWaterLevel();
         this.heightMatrix = new double[this.WorldHeight / 8 + 1];
 
         File settingsFile = new File(this.SettingsDir, TCDefaultValues.WorldSettingsName.stringValue());
@@ -376,7 +377,7 @@ public class WorldConfig extends ConfigFile
         this.caveRarity = ReadModSettings(TCDefaultValues.caveRarity.name(), TCDefaultValues.caveRarity.intValue());
         this.caveFrequency = ReadModSettings(TCDefaultValues.caveFrequency.name(), TCDefaultValues.caveFrequency.intValue());
         this.caveMinAltitude = ReadModSettings(TCDefaultValues.caveMinAltitude.name(), TCDefaultValues.caveMinAltitude.intValue());
-        this.caveMaxAltitude = ReadModSettings(TCDefaultValues.caveMaxAltitude.name(), TCDefaultValues.caveMaxAltitude.intValue());
+        this.caveMaxAltitude = ReadModSettings(TCDefaultValues.caveMaxAltitude.name(), this.WorldHeight);
         this.individualCaveRarity = ReadModSettings(TCDefaultValues.individualCaveRarity.name(), TCDefaultValues.individualCaveRarity.intValue());
         this.caveSystemFrequency = ReadModSettings(TCDefaultValues.caveSystemFrequency.name(), TCDefaultValues.caveSystemFrequency.intValue());
         this.caveSystemPocketChance = ReadModSettings(TCDefaultValues.caveSystemPocketChance.name(), TCDefaultValues.caveSystemPocketChance.intValue());
@@ -386,13 +387,13 @@ public class WorldConfig extends ConfigFile
 
         this.canyonRarity = ReadModSettings(TCDefaultValues.canyonRarity.name(), TCDefaultValues.canyonRarity.intValue());
         this.canyonMinAltitude = ReadModSettings(TCDefaultValues.canyonMinAltitude.name(), TCDefaultValues.canyonMinAltitude.intValue());
-        this.canyonMaxAltitude = ReadModSettings(TCDefaultValues.canyonMaxAltitude.name(), TCDefaultValues.canyonMaxAltitude.intValue());
+        this.canyonMaxAltitude = ReadModSettings(TCDefaultValues.canyonMaxAltitude.name(), this.WorldHeight/2);
         this.canyonMinLength = ReadModSettings(TCDefaultValues.canyonMinLength.name(), TCDefaultValues.canyonMinLength.intValue());
         this.canyonMaxLength = ReadModSettings(TCDefaultValues.canyonMaxLength.name(), TCDefaultValues.canyonMaxLength.intValue());
         this.canyonDepth = ReadModSettings(TCDefaultValues.canyonDepth.name(), TCDefaultValues.canyonDepth.doubleValue());
 
 
-        this.waterLevelMax = ReadModSettings(TCDefaultValues.WaterLevelMax.name(), TCDefaultValues.WaterLevelMax.intValue());
+        this.waterLevelMax = ReadModSettings(TCDefaultValues.WaterLevelMax.name(), this.waterLevelMax);
         this.waterLevelMin = ReadModSettings(TCDefaultValues.WaterLevelMin.name(), TCDefaultValues.WaterLevelMin.intValue());
         this.waterBlock = ReadModSettings(TCDefaultValues.WaterBlock.name(), TCDefaultValues.WaterBlock.intValue());
         this.iceBlock = ReadModSettings(TCDefaultValues.IceBlock.name(), TCDefaultValues.IceBlock.intValue());

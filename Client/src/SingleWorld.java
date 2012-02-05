@@ -45,8 +45,9 @@ public class SingleWorld implements LocalWorld
     private int CurrentChunkZ;
 
     private zp[] BiomeArray;
-    
+
     private int height;
+    private int DefaultWaterLevel;
 
 
     public static void RestoreBiomes()
@@ -80,8 +81,6 @@ public class SingleWorld implements LocalWorld
         }
 
 
-
-
     }
 
     public LocalBiome getNullBiome(String name)
@@ -101,7 +100,7 @@ public class SingleWorld implements LocalWorld
     {
         return NextBiomeId;
     }
-    
+
 
     public LocalBiome getBiomeById(int id)
     {
@@ -339,7 +338,7 @@ public class SingleWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
 
-        return chunk.b[x << 11 | z << 7 | y] & 0xFF;  //Fuck java !!
+        return chunk.b[x << world.b | z << world.a | y] & 0xFF;  //Fuck java !!
     }
 
     public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
@@ -352,7 +351,7 @@ public class SingleWorld implements LocalWorld
         x = x & 0xF;
 
 
-        chunk.b[x << 11 | z << 7 | y] = (byte) BlockId;
+        chunk.b[x << world.b | z << world.a | y] = (byte) BlockId;
         chunk.g.a(x, y, z, Data);
     }
 
@@ -365,7 +364,7 @@ public class SingleWorld implements LocalWorld
         x = x & 0xF;
 
 
-        chunk.b[x << 11 | z << 7 | y] = (byte) BlockId;
+        chunk.b[x << world.b | z << world.a | y] = (byte) BlockId;
     }
 
     public void setBlockId(int x, int y, int z, int BlockId)
@@ -434,6 +433,11 @@ public class SingleWorld implements LocalWorld
         return this.height;
     }
 
+    public int getWaterLevel()
+    {
+        return this.DefaultWaterLevel;
+    }
+
     public int getHeightBits()
     {
         return world.a;
@@ -448,6 +452,7 @@ public class SingleWorld implements LocalWorld
     {
         this.settings = worldConfig;
     }
+
     public void InitM(vq _world)
     {
         this.world = _world;
@@ -461,6 +466,7 @@ public class SingleWorld implements LocalWorld
         this.world = _world;
         this.Seed = world.t();
         this.world.e = this.settings.waterLevelMax;
+        this.DefaultWaterLevel = this.settings.waterLevelMax;
 
 
         this.strongholdGen = new wa();
@@ -500,10 +506,14 @@ public class SingleWorld implements LocalWorld
     {
         return this.strongholdGen;
     }
-    
+
     public void setHeight(int _height)
     {
         this.height = _height;
     }
 
+    public void setWaterLevel(int waterLevel)
+    {
+        this.DefaultWaterLevel = waterLevel;
+    }
 }
