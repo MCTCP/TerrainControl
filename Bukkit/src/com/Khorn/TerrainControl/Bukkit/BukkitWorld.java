@@ -459,7 +459,9 @@ public class BukkitWorld implements LocalWorld
     {
         this.world = _world;
         this.Seed = world.getSeed();
-        this.world.seaLevel = this.settings.waterLevelMax; // TODO - Fix obfuscation
+        
+        // TODO: Should WorldProviderTC extend even more? For example for spawn point etc?
+        this.world.worldProvider = new WorldProviderTC().setSeaLevel(this.settings.waterLevelMax);
 
         this.generator.Init(this);
 
