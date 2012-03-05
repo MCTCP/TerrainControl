@@ -24,7 +24,7 @@ public class WorldProviderTC extends WorldProvider
         }
         else if (value > 256)
         {
-            this.seaLevel = value;
+            this.seaLevel = 256;
         }
         else
         {
