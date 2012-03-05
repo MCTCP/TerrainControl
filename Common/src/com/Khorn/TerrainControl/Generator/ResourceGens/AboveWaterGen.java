@@ -6,10 +6,8 @@ import com.Khorn.TerrainControl.LocalWorld;
 
 import java.util.Random;
 
-
 public class AboveWaterGen extends ResourceGenBase
 {
-
     @Override
     protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
     {

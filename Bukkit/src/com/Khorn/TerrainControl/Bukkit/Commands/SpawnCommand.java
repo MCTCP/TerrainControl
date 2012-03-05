@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
-
 import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
 import com.Khorn.TerrainControl.Bukkit.TCPlayer;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
@@ -31,17 +30,22 @@ public class SpawnCommand extends BaseCommand
             sender.sendMessage(ErrorColor + "TC is not enabled for this world");
             return true;
         }
+        
         if (args.size() == 0)
         {
             sender.sendMessage(ErrorColor + "Type BOB file name");
             return true;
         }
+        
         CustomObject spawnObject = null;
         for (CustomObject object : world.getSettings().Objects)
         {
             if (object.name.equals(args.get(0)))
+            {
                 spawnObject = object;
+            }
         }
+        
         if (spawnObject == null)
         {
             sender.sendMessage(ErrorColor + "BOB plugin not found, use '/tc list' for search");
@@ -53,7 +57,5 @@ public class SpawnCommand extends BaseCommand
         player.object = spawnObject;
         sender.sendMessage(MessageColor + "Click to block for object spawn");
         return true;
-
-
     }
 }

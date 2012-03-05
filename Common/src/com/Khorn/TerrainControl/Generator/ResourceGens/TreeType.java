@@ -8,6 +8,7 @@ public enum TreeType
     HugeMushroom,
     SwampTree,
     Taiga1,
-    Taiga2
-
+    Taiga2,
+    ;
+    // TODO: Are types missing here since 1.2?
 }

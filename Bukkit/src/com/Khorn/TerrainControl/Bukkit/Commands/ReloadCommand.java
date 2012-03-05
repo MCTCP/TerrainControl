@@ -10,7 +10,6 @@ import org.bukkit.craftbukkit.CraftWorld;
 
 import java.util.List;
 
-
 public class ReloadCommand extends BaseCommand
 {
     public ReloadCommand(TCPlugin _plugin)
@@ -32,16 +31,12 @@ public class ReloadCommand extends BaseCommand
             return true;
         }
 
-
         WorldConfig oldSettings = world.getSettings();
 
         this.plugin.CreateSettings(world.getName(),world);
 
         oldSettings.isDeprecated = true;
         oldSettings.newSettings = world.getSettings();
-
-
-
 
         if (world.getSettings().ModeBiome == WorldConfig.BiomeMode.Normal)
         {

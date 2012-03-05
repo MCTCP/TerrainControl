@@ -8,11 +8,9 @@ import java.util.Random;
 
 public class LiquidGen extends ResourceGenBase
 {
-
     @Override
     protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
     {
-
         int y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
 
         if (res.CheckSourceId(world.getRawBlockId(x, y + 1, z)))
@@ -55,8 +53,6 @@ public class LiquidGen extends ResourceGenBase
             //this.world.f = true;
             //Block.byId[res.BlockId].a(this.world, x, y, z, this.rand);
             //this.world.f = false;
-
-
         }
     }
 }

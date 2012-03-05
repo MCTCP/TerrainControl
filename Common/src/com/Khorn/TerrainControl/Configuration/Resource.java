@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Configuration;
 
-
 import com.Khorn.TerrainControl.DefaultMaterial;
 import com.Khorn.TerrainControl.Generator.ResourceGens.ResourceType;
 import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
@@ -41,7 +40,6 @@ public class Resource
         this.MaxAltitude = maxAltitude;
         this.SourceBlockId = sourceBlockIds;
         this.Done = true;
-
     }
 
     public Resource(ResourceType type, int minSize, int maxSize, int frequency, int rarity, int minAltitude, int maxAltitude)
@@ -54,7 +52,6 @@ public class Resource
         this.MinAltitude = minAltitude;
         this.MaxAltitude = maxAltitude;
         this.Done = true;
-
     }
 
     public Resource(ResourceType type, int frequency, TreeType[] types, int[] treeChances)
@@ -67,7 +64,6 @@ public class Resource
             this.TreeChances = treeChances;
         }
         this.Done = true;
-
     }
 
     public boolean CheckSourceId(int blockId)
@@ -106,7 +102,6 @@ public class Resource
             return mat.id;
 
         return CheckValue(block, 0, 256);
-
     }
 
     public void ReadFromString(String line, int worldHeight)
@@ -312,10 +307,10 @@ public class Resource
                     blockId += "." + this.BlockData;
                 }
                 output += blockId + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
-                break;
+            break;
             case UnderWaterOre:
                 output += BlockIdToName(this.BlockId) + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + sources + ")";
-                break;
+            break;
             case Plant:
             case Liquid:
             case Reed:
@@ -326,31 +321,30 @@ public class Resource
                     blockId += "." + this.BlockData;
                 }
                 output += blockId + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
-                break;
+            break;
             case Grass:
                 output += BlockIdToName(this.BlockId) + "," + this.BlockData + "," + this.Frequency + "," + this.Rarity + sources + ")";
                 break;
             case Dungeon:
                 output += this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
-                break;
+            break;
             case Tree:
                 output += this.Frequency;
                 for (int i = 0; i < this.TreeChances.length; i++)
                     output += "," + this.TreeTypes[i].name() + "," + this.TreeChances[i];
                 output += ")";
-                break;
+            break;
             case CustomObject:
                 output += ")";
-                break;
+            break;
             case UnderGroundLake:
                 output += this.MinSize + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
-                break;
+            break;
             case AboveWaterRes:
                 output += BlockIdToName(this.BlockId) + "," + this.Frequency + "," + this.Rarity + ")";
-                break;
+            break;
         }
+        
         return output;
-
-
     }
 }

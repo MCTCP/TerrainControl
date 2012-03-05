@@ -28,9 +28,7 @@ public class CanyonsGen extends TerrainGenBase
         float f1 = 0.0F;
         float f2 = 0.0F;
 
-
         int i = 0;
-
 
         float f3 = 1.0F;
         for (int j = 0; ; j++)

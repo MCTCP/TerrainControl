@@ -136,7 +136,7 @@ public class MapWriter implements Runnable
                                     break;
                             }
 
-                            biomeImage.setRGB(image_x, image_y, Colors[BiomeBuffer[x1 + 16 * z1].K]);
+                            biomeImage.setRGB(image_x, image_y, Colors[BiomeBuffer[x1 + 16 * z1].id]);
 
                             Color tempColor = Color.getHSBColor(0.7f - tempArray[x1 + 16 * z1] * 0.7f, 0.9f, tempArray[x1 + 16 * z1] * 0.7f + 0.3f);
 

@@ -13,8 +13,10 @@ public class BukkitBiome implements LocalBiome
     public BukkitBiome(BiomeBase biome)
     {
         this.biomeBase = biome;
-        if(DefaultBiome.getBiome(biome.K) == null )
+        if(DefaultBiome.getBiome(biome.id) == null)
+        {
             this.isCustom =true;
+        }
     }
 
     public boolean isCustom()
@@ -29,41 +31,41 @@ public class BukkitBiome implements LocalBiome
 
     public String getName()
     {
-        return this.biomeBase.w;
+        return this.biomeBase.y;
     }
 
     public int getId()
     {
-        return this.biomeBase.K;
+        return this.biomeBase.id;
     }
 
     public float getTemperature()
     {
-        return this.biomeBase.D;
+        return this.biomeBase.F;
     }
 
     public float getWetness()
     {
-        return this.biomeBase.E;
+        return this.biomeBase.G;
     }
 
     public float getSurfaceHeight()
     {
-        return this.biomeBase.B;
+        return this.biomeBase.D;
     }
 
     public float getSurfaceVolatility()
     {
-        return this.biomeBase.C;
+        return this.biomeBase.E;
     }
 
     public byte getSurfaceBlock()
     {
-        return this.biomeBase.y;
+        return this.biomeBase.A;
     }
 
     public byte getGroundBlock()
     {
-        return this.biomeBase.z;
+        return this.biomeBase.B;
     }
 }

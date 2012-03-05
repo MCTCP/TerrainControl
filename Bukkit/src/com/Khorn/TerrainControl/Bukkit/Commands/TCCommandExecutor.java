@@ -21,7 +21,6 @@ public class TCCommandExecutor implements CommandExecutor
         this.plugin = plugin;
         this.helpCommand = new HelpCommand(plugin);
         this.RegisterCommands();
-
     }
 
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings)
@@ -32,15 +31,20 @@ public class TCCommandExecutor implements CommandExecutor
             commandSender.sendMessage(ChatColor.RED.toString() + "You do not have permission to use this command!");
             return true;
         }
+        
         ArrayList<String> arg = new ArrayList<String>(Arrays.asList(strings));
 
         if (arg.size() == 0)
         {
             return helpCommand.onCommand(commandSender, arg);
         }
+        
         BaseCommand baseCommand = commandHashMap.get(arg.get(0));
         if (baseCommand == null)
+        {
             return helpCommand.onCommand(commandSender, arg);
+        }
+        
         arg.remove(0);
 
         return baseCommand.onCommand(commandSender, arg);

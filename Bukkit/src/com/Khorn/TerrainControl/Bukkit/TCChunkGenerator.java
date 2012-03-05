@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Bukkit;
 
-
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import net.minecraft.server.Block;
@@ -36,15 +35,12 @@ public class TCChunkGenerator extends ChunkGenerator
 
         if (this.world.getSettings().ModeTerrain == WorldConfig.TerrainMode.NotGenerate)
             this.NotGenerate = true;
-
-
     }
 
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
         this.plugin.WorldInit(world);
-
         return this.BlockPopulator;
     }
 
@@ -53,7 +49,8 @@ public class TCChunkGenerator extends ChunkGenerator
     {
         this.plugin.WorldInit(world);
 
-        int i = ((CraftWorld) world).getHandle().a(x, z);
+        //int i = ((CraftWorld) world).getHandle().a(x, z); // TODO - Fix obfuscation
+        int i = ((CraftWorld) world).getHighestBlockAt(x, z).getTypeId(); // TODO: valid fix? - I am just guessing here...
         return i != 0 && Block.byId[i].material.isSolid();
     }
 
@@ -65,6 +62,4 @@ public class TCChunkGenerator extends ChunkGenerator
         else
             return this.chunkProviderTC.generate(x, z);
     }
-
-
 }
