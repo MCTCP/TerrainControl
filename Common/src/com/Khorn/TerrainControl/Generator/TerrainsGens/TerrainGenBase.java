@@ -6,7 +6,6 @@ import java.util.Random;
 
 public class TerrainGenBase
 {
-
     protected int b = 8;
     protected Random c = new Random();
     protected LocalWorld d;

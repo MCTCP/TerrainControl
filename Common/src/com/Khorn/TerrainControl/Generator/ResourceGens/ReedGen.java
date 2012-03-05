@@ -34,11 +34,7 @@ public class ReedGen extends ResourceGenBase
                 {
                     world.setRawBlockId(j, y + i1, m, res.BlockId);
                 }
-
             }
-
         }
-
-
     }
 }

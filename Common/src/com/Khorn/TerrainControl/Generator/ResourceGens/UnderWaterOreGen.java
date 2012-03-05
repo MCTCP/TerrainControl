@@ -5,11 +5,8 @@ import com.Khorn.TerrainControl.Configuration.Resource;
 
 import java.util.Random;
 
-
 public class UnderWaterOreGen extends ResourceGenBase
 {
-
-
     @Override
     protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
     {
@@ -36,8 +33,6 @@ public class UnderWaterOreGen extends ResourceGenBase
                     }
                 }
             }
-
         }
-
     }
 }

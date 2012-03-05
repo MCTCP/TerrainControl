@@ -16,7 +16,6 @@ public class TreeGen extends ResourceGenBase
     @Override
     public void Process(LocalWorld world, Random rand, Resource res, int x, int z, int biomeId)
     {
-
         for (int i = 0; i < res.Frequency; i++)
         {
 

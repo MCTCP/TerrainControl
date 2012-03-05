@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.CustomObjects;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -9,8 +8,6 @@ import java.util.HashSet;
 
 public class CustomObject
 {
-
-
     public ArrayList<Coordinate> Data = new ArrayList<Coordinate>();
     public HashSet<Integer> spawnOnBlockType = (new HashSet<Integer>());
     public boolean spawnSunlight = true;
@@ -42,10 +39,8 @@ public class CustomObject
 
     public CustomObject(File objectFile)
     {
-
         try
         {
-
             BufferedReader ObjectProps = new BufferedReader(new FileReader(objectFile));
 
             String workingString = ObjectProps.readLine();
@@ -59,7 +54,6 @@ public class CustomObject
             boolean dataReached = false;
             while ((workingString = ObjectProps.readLine()) != null)
             {
-
                 if (!dataReached)
                 {
                     if (workingString.contains("="))
@@ -246,7 +240,8 @@ public class CustomObject
             this.CorrectSettings();
             this.IsValid = true;
 
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
             System.out.println("Invalid BOB Plugin: " + objectFile.getName());
@@ -312,14 +307,10 @@ public class CustomObject
 
         if (spawnInBiome.size() == 0)
             spawnInBiome.add("all");
-
     }
 
     public boolean canSpawnInBiome(String localBiome)
     {
         return this.spawnInBiome.contains("all") || this.spawnInBiome.contains(localBiome.toLowerCase());
-
     }
-
-
 }

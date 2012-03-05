@@ -11,12 +11,9 @@ import java.util.Random;
 
 public class ObjectSpawner
 {
-
-
     private WorldConfig worldSettings;
     private Random rand;
     private LocalWorld world;
-
 
     public ObjectSpawner(WorldConfig wrk, LocalWorld localWorld)
     {
@@ -25,25 +22,20 @@ public class ObjectSpawner
         this.world = localWorld;
     }
 
-
     public void populate(int chunk_x, int chunk_z)
     {
-
         int x = chunk_x * 16;
         int z = chunk_z * 16;
 
         int biomeId = world.getBiome(x + 16, z + 16);
         BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
-
         this.rand.setSeed(world.getSeed());
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
         this.rand.setSeed(chunk_x * l1 + chunk_z * l2 ^ world.getSeed());
 
-
         boolean Village = world.PlaceTerrainObjects(rand, chunk_x, chunk_z);
-
 
         if (!Village)
         {
@@ -88,5 +80,4 @@ public class ObjectSpawner
         if (this.worldSettings.isDeprecated)
             this.worldSettings = this.worldSettings.newSettings;
     }
-
 }

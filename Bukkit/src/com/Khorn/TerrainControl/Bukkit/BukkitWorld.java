@@ -336,13 +336,11 @@ public class BukkitWorld implements LocalWorld
 
     public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
     {
-
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return;
         z = z & 0xF;
         x = x & 0xF;
-
 
         chunk.b[x << 11 | z << 7 | y] = (byte) BlockId; // TODO - Fix obfuscation
         chunk.g.a(x, y, z, Data); // TODO - Fix obfuscation
@@ -355,7 +353,6 @@ public class BukkitWorld implements LocalWorld
             return;
         z = z & 0xF;
         x = x & 0xF;
-
 
         chunk.b[x << 11 | z << 7 | y] = (byte) BlockId; // TODO - Fix obfuscation
     }
