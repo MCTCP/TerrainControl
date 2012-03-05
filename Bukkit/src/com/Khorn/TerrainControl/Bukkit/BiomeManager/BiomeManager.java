@@ -17,8 +17,6 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
 {
     private Layer UnZoomedLayer;
     private Layer BiomeLayer;
-    private Layer TemperatureLayer;
-    private Layer DownfallLayer;
     private BiomeCache Cache = new BiomeCache(this);
     private final Object LockObject = new Object();
     private float[] buffer;
@@ -43,8 +41,6 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
 
         this.UnZoomedLayer = layers[0];
         this.BiomeLayer = layers[1];
-        this.TemperatureLayer = layers[2];
-        this.DownfallLayer = layers[3];
     }
 
     public BiomeBase getBiome(int paramInt1, int paramInt2)
@@ -62,10 +58,10 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
             paramArrayOfFloat = new float[paramInt3 * paramInt4];
         }
 
-        int[] arrayOfInt = this.DownfallLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt = this.BiomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            float f1 = arrayOfInt[i] / 65536.0F;
+            float f1 = BiomeBase.biomes[arrayOfInt[i]].f() / 65536.0F;
             if (f1 < this.worldConfig.minMoisture)
                 f1 = this.worldConfig.minMoisture;
             if (f1 > this.worldConfig.maxMoisture)
@@ -99,10 +95,10 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
             paramArrayOfFloat = new float[paramInt3 * paramInt4];
         }
 
-        int[] arrayOfInt = this.TemperatureLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt = this.BiomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            float f1 = arrayOfInt[i] / 65536.0F;
+            float f1 = BiomeBase.biomes[arrayOfInt[i]].g() / 65536.0F;
             if (f1 < this.worldConfig.minTemperature)
                 f1 = this.worldConfig.minTemperature;
             if (f1 > this.worldConfig.maxTemperature)
