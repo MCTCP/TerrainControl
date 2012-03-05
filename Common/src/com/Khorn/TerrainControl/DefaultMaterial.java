@@ -134,14 +134,13 @@ public enum DefaultMaterial
     ;
 
     public final int id;
-    private static DefaultMaterial[] lookupID;
-    private static Map<String, DefaultMaterial> lookupName;
-
     private DefaultMaterial(int Id)
     {
         this.id = Id;
     }
-
+    
+    private static DefaultMaterial[] lookupID;
+    private static Map<String, DefaultMaterial> lookupName;
     static
     {
         lookupID = new DefaultMaterial[256];
@@ -152,8 +151,8 @@ public enum DefaultMaterial
             lookupID[material.id] = material;
             lookupName.put(material.name(),material);
         }
-
     }
+    
     public static DefaultMaterial getMaterial(String name)
     {
         return lookupName.get(name);
@@ -162,10 +161,9 @@ public enum DefaultMaterial
     public static DefaultMaterial getMaterial(int id)
     {
         if(id < 256 && lookupID[id]!= null)
+        {
             return lookupID[id];
+        }
         return null;
-
     }
-
-
 }
