@@ -5,6 +5,8 @@ import net.minecraft.server.WorldProvider;
 /**
  * We extend this file to be able to set the sea level.
  * In minecraft 1.2.3 this is used in a few places such as spawning algorithms for villages.
+ * The value seem to be hardcoded in CraftWorld and we are a bit unsure about if that matters.
+ * At least it should be a good thing that we set the value here.
  */
 public class WorldProviderTC extends WorldProvider
 {
@@ -30,7 +32,6 @@ public class WorldProviderTC extends WorldProvider
         {
             this.seaLevel = value;
         }
-        
         return this;
     }
 }

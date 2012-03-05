@@ -8,6 +8,7 @@ import com.Khorn.TerrainControl.IBiomeManager;
 import com.Khorn.TerrainControl.LocalWorld;
 import net.minecraft.server.*;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,24 +21,16 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     private Layer DownfallLayer;
     private BiomeCache Cache = new BiomeCache(this);
     private final Object LockObject = new Object();
-    private ArrayList<BiomeBase> f = new ArrayList<BiomeBase>();  // TODO - Fix obfuscation??? should this be ".d" now? Or should we remove this completely?
     private float[] buffer;
 
     private WorldConfig worldConfig;
-
+    
     public BiomeManager(LocalWorld world)
     {
-        this.f.add(BiomeBase.FOREST);
-        this.f.add(BiomeBase.PLAINS);
-        this.f.add(BiomeBase.TAIGA);
-        this.f.add(BiomeBase.TAIGA_HILLS);
-        this.f.add(BiomeBase.FOREST_HILLS);
-        this.f.add(BiomeBase.JUNGLE);
-        this.f.add(BiomeBase.JUNGLE_HILLS);
-
+        super();
         this.Init(world);
     }
-
+    
     public void Init(LocalWorld world)
     {
         this.worldConfig = world.getSettings();
@@ -52,12 +45,6 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         this.BiomeLayer = layers[1];
         this.TemperatureLayer = layers[2];
         this.DownfallLayer = layers[3];
-    }
-
-    @SuppressWarnings("rawtypes")
-    public List a()  // TODO - Fix obfuscation - Is there any point in overriding? here?
-    {
-        return this.f;  // TODO - Fix obfuscation - Why not get rid of this method alltogether and use .d instead?.
     }
 
     public BiomeBase getBiome(int paramInt1, int paramInt2)
