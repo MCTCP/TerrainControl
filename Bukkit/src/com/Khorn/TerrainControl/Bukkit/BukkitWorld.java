@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.bukkit.craftbukkit.CraftWorld;
+
 public class BukkitWorld implements LocalWorld
 {
     private TCChunkGenerator generator;
@@ -322,6 +324,8 @@ public class BukkitWorld implements LocalWorld
 
     public int getRawBlockId(int x, int y, int z)
     {
+        return this.world.getTypeId(x, y, z); // Would this be ok?
+        /*
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
         {
@@ -332,10 +336,13 @@ public class BukkitWorld implements LocalWorld
         x = x & 0xF;
 
         return chunk.b[x << 11 | z << 7 | y] & 0xFF;  //Fuck java !! // TODO - Fix obfuscation - Could also be ".heightMap"
+        */
     }
 
     public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
     {
+        this.world.setRawTypeIdAndData(x, y, z, BlockId, Data); // Would this be ok? - Note it will check light! Do we want that?
+        /*
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return;
@@ -344,10 +351,13 @@ public class BukkitWorld implements LocalWorld
 
         chunk.b[x << 11 | z << 7 | y] = (byte) BlockId; // TODO - Fix obfuscation
         chunk.g.a(x, y, z, Data); // TODO - Fix obfuscation
+        */
     }
 
     public void setRawBlockId(int x, int y, int z, int BlockId)
     {
+        this.world.setRawTypeId(x, y, z, BlockId); // Would this be ok? - Note it will check light! Do we want that?
+        /*
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return;
@@ -355,6 +365,7 @@ public class BukkitWorld implements LocalWorld
         x = x & 0xF;
 
         chunk.b[x << 11 | z << 7 | y] = (byte) BlockId; // TODO - Fix obfuscation
+        */
     }
 
     public void setBlockId(int x, int y, int z, int BlockId)
