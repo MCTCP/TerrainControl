@@ -53,7 +53,7 @@ public class TCChunkGenerator extends ChunkGenerator
     {
         this.plugin.WorldInit(world);
 
-        int i = ((CraftWorld) world).getHandle().a(x, z);
+        int i = ((CraftWorld) world).getHandle().a(x, z); // TODO - Fix obfuscation
         return i != 0 && Block.byId[i].material.isSolid();
     }
 

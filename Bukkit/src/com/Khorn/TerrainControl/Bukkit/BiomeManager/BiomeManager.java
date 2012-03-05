@@ -20,7 +20,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     private Layer DownfallLayer;
     private BiomeCache Cache = new BiomeCache(this);
     private final Object LockObject = new Object();
-    private ArrayList<BiomeBase> f = new ArrayList<BiomeBase>();
+    private ArrayList<BiomeBase> f = new ArrayList<BiomeBase>();  // TODO - Fix obfuscation???
     private float[] buffer;
 
 
@@ -56,9 +56,9 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     }
 
     @SuppressWarnings("rawtypes")
-    public List a()
+    public List a()  // TODO - Fix obfuscation
     {
-        return this.f;
+        return this.f;  // TODO - Fix obfuscation
     }
 
 
@@ -66,12 +66,12 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     {
         synchronized (this.LockObject)
         {
-            return this.Cache.b(paramInt1, paramInt2);
+            return this.Cache.b(paramInt1, paramInt2);  // TODO - Fix obfuscation
         }
     }
 
 
-    public float[] getWetness(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public float[] getWetness(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)  // TODO - Fix obfuscation
     {
         if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < paramInt3 * paramInt4))
         {
@@ -93,7 +93,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     }
 
     @Override
-    public float a(int i, int i1, int i2)
+    public float a(int i, int i1, int i2)  // TODO - Fix obfuscation
     {
         synchronized (this.LockObject)
         {
@@ -102,13 +102,13 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     }
 
     @Override
-    public float[] a(int i, int i1, int i2, int i3)
+    public float[] a(int i, int i1, int i2, int i3)  // TODO - Fix obfuscation
     {
         this.buffer = getTemperatures(this.buffer, i, i1, i2, i3);
         return this.buffer;
     }
 
-    public float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4) // TODO - Fix obfuscation
     {
         if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < paramInt3 * paramInt4))
         {
@@ -139,13 +139,13 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         int[] arrayOfInt = this.UnZoomedLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = BiomeBase.a[arrayOfInt[i]];
+            paramArrayOfBiomeBase[i] = BiomeBase.a[arrayOfInt[i]];  // TODO - Fix obfuscation
         }
 
         return paramArrayOfBiomeBase;
     }
 
-    public BiomeBase[] a(BiomeBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
+    public BiomeBase[] a(BiomeBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)  // TODO - Fix obfuscation
     {
         if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < paramInt3 * paramInt4))
         {
@@ -156,7 +156,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         {
             synchronized (this.LockObject)
             {
-                BiomeBase[] localObject = this.Cache.d(paramInt1, paramInt2);
+                BiomeBase[] localObject = this.Cache.d(paramInt1, paramInt2);  // TODO - Fix obfuscation
                 System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, paramInt3 * paramInt4);
             }
             return paramArrayOfBiomeBase;
@@ -164,14 +164,14 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         int[] localObject = this.BiomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = BiomeBase.a[localObject[i]];
+            paramArrayOfBiomeBase[i] = BiomeBase.a[localObject[i]];  // TODO - Fix obfuscation
         }
 
         return paramArrayOfBiomeBase;
     }
 
     @SuppressWarnings("rawtypes")
-    public boolean a(int paramInt1, int paramInt2, int paramInt3, List paramList)
+    public boolean a(int paramInt1, int paramInt2, int paramInt3, List paramList)  // TODO - Fix obfuscation
     {
         int i = paramInt1 - paramInt3 >> 2;
         int j = paramInt2 - paramInt3 >> 2;
@@ -185,7 +185,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         {
             if (arrayOfInt[i2] >= DefaultBiome.values().length)
                 return false;
-            BiomeBase localBiomeBase = BiomeBase.a[arrayOfInt[i2]];
+            BiomeBase localBiomeBase = BiomeBase.a[arrayOfInt[i2]];  // TODO - Fix obfuscation
             if (!paramList.contains(localBiomeBase))
                 return false;
         }
@@ -194,7 +194,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     }
 
     @SuppressWarnings("rawtypes")
-    public ChunkPosition a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
+    public ChunkPosition a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom) // TODO - Fix obfuscation
     {
         int i = paramInt1 - paramInt3 >> 2;
         int j = paramInt2 - paramInt3 >> 2;
@@ -212,7 +212,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
                 continue;
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            BiomeBase localBiomeBase = BiomeBase.a[arrayOfInt[i3]];
+            BiomeBase localBiomeBase = BiomeBase.a[arrayOfInt[i3]]; // TODO - Fix obfuscation
             if ((!paramList.contains(localBiomeBase)) || ((localChunkPosition != null) && (paramRandom.nextInt(i2 + 1) != 0)))
                 continue;
             localChunkPosition = new ChunkPosition(i4, 0, i5);
@@ -222,11 +222,11 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         return localChunkPosition;
     }
 
-    public void b()
+    public void b()  // TODO - Fix obfuscation
     {
         synchronized (this.LockObject)
         {
-            this.Cache.a();
+            this.Cache.a();  // TODO - Fix obfuscation
         }
     }
 
@@ -260,9 +260,9 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         {
             synchronized (this.LockObject)
             {
-                BiomeBase[] localObject = this.Cache.d(x, z);
+                BiomeBase[] localObject = this.Cache.d(x, z);  // TODO - Fix obfuscation
                 for(int i= 0; i< x_size*z_size;i++)
-                    biomeArray[i] = localObject[i].K;
+                    biomeArray[i] = localObject[i].K;  // TODO - Fix obfuscation to id
 
             }
             return biomeArray;
@@ -278,7 +278,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
 
     public int getBiomeTC(int x, int z)
     {
-        return this.getBiome(x,z).K;
+        return this.getBiome(x,z).K;  // TODO - Fix obfuscation to id
     }
 }
 
