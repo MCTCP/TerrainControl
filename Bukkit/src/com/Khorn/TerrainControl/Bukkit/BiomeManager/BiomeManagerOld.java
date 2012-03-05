@@ -26,7 +26,6 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
     private double[] old_temperature2;
     private BiomeBase[] temp_biomeBases;
     private BiomeCache Cache = new BiomeCache(this);
-    private float[] buffer;
 
 
     private static BiomeBase[] BiomeDiagram = new BiomeBase[4096];
@@ -44,19 +43,6 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
     public BiomeBase getBiome(int i, int i1)
     {
         return this.Cache.b(i, i1);
-    }
-
-    @Override
-    public float a(int i, int i1, int i2)
-    {
-        return a(this.Cache.c(i, i1), i2);
-    }
-
-    @Override
-    public float[] a(int i, int i1, int i2, int i3)
-    {
-        this.buffer = getTemperatures(this.buffer, i, i1, i2, i3);
-        return this.buffer;
     }
 
     // Temperature
