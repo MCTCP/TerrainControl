@@ -417,7 +417,7 @@ public class BukkitWorld implements LocalWorld
 
     public int getHeight()
     {
-        return 128; //TODO do something with that when bukkit allow custom world height.
+        return 256; //TODO do something with that when bukkit allow custom world height.
     }
     public int getWaterLevel()
     {

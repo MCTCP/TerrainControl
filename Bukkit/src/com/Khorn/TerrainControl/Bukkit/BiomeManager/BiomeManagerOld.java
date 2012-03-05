@@ -38,8 +38,6 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
         this.TempGen = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 9871L), 4);
         this.RainGen = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 39811L), 4);
         this.TempGen2 = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 543321L), 2);
-
-
     }
 
     @Override
@@ -310,7 +308,7 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
         {
             BiomeBase[] localObject = this.Cache.d(x, z);
             for(int i= 0; i< x_size*z_size;i++)
-                biomeArray[i] = localObject[i].K;
+                biomeArray[i] = localObject[i].id;
             return biomeArray;
         }
 
@@ -347,7 +345,7 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
                 this.old_temperature[i] = d4;
                 this.old_rain[i] = d5;
 
-                biomeArray[(i++)] = BiomeManagerOld.getBiomeFromDiagram(d4, d5).K;
+                biomeArray[(i++)] = BiomeManagerOld.getBiomeFromDiagram(d4, d5).id;
             }
 
         }
@@ -370,6 +368,6 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
 
     public int getBiomeTC(int x, int z)
     {
-        return this.getBiome(x,z).K;
+        return this.getBiome(x,z).id;
     }
 }
