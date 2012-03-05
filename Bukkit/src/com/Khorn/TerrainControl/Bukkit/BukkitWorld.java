@@ -52,6 +52,11 @@ public class BukkitWorld implements LocalWorld
 
     private BiomeBase[] BiomeArray;
 
+    //TODO do something with that when bukkit allow custom world height.
+    private int worldHeight = 128;
+    private int worldHeightMinusOne = 127;
+    private int heightBits = 7;
+
     static
     {
         for (int i = 0; i < DefaultBiome.values().length; i++)
@@ -224,11 +229,11 @@ public class BukkitWorld implements LocalWorld
     {
         boolean Village = false;
         if (this.settings.StrongholdsEnabled)
-            this.strongholdGen.a(this.world, rand, chunk_x, chunk_z); // TODO - Fix obfuscation
+            this.strongholdGen.a(this.world, rand, chunk_x, chunk_z); 
         if (this.settings.MineshaftsEnabled)
-            this.MineshaftGen.a(this.world, rand, chunk_x, chunk_z); // TODO - Fix obfuscation
+            this.MineshaftGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.VillagesEnabled)
-            Village = this.VillageGen.a(this.world, rand, chunk_x, chunk_z); // TODO - Fix obfuscation
+            Village = this.VillageGen.a(this.world, rand, chunk_x, chunk_z); 
 
         return Village;
     }
@@ -294,7 +299,7 @@ public class BukkitWorld implements LocalWorld
 
     private Chunk getChunk(int x, int y, int z)
     {
-        if (y < 0 || y >= 256) // TODO: Fix after bukkit will support custom height.
+        if (y < 0 || y >= worldHeight)
             return null;
 
         x = x >> 4;
@@ -318,9 +323,9 @@ public class BukkitWorld implements LocalWorld
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = 255; y > 0; y--) // TODO: Fix after bukkit will support custom height
+        for (int y = worldHeightMinusOne ; y > 0; y--)
         {
-            int blockId = chunk.getTypeId(x,y,z); // TODO - Fix obfuscation - Could also be ".heightMap"
+            int blockId = chunk.getTypeId(x,y,z);
             if (blockId != 0 && Block.byId[blockId].material.isLiquid())
                 return y;
         }
@@ -390,7 +395,7 @@ public class BukkitWorld implements LocalWorld
         }
         z = z & 0xF;
         x = x & 0xF;
-        return chunk.b(x, z); // TODO - Fix obfuscation
+        return chunk.b(x, z);
     }
 
     public DefaultMaterial getMaterial(int x, int y, int z)
@@ -431,7 +436,7 @@ public class BukkitWorld implements LocalWorld
 
     public int getHeight()
     {
-        return 256; //TODO do something with that when bukkit allow custom world height.
+        return worldHeight;
     }
 
     public int getWaterLevel()
@@ -441,8 +446,7 @@ public class BukkitWorld implements LocalWorld
 
     public int getHeightBits()
     {
-        return 8; // TODO same as height
-        // TODO: Hopefully this will work out ok with old worlds as well
+        return heightBits;
     }
 
     public TCChunkGenerator getChunkGenerator()
