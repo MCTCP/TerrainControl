@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Configuration;
 
-
 import com.Khorn.TerrainControl.DefaultBiome;
 
 import java.awt.*;
@@ -11,10 +10,8 @@ import java.util.HashMap;
 
 public abstract class ConfigFile
 {
-
     private BufferedWriter SettingsWriter;
     protected HashMap<String, String> SettingsCache = new HashMap<String, String>();
-
 
     protected void ReadSettingsFile(File f)
     {
@@ -22,7 +19,6 @@ public abstract class ConfigFile
 
         if (f.exists())
         {
-
             try
             {
                 SettingsReader = new BufferedReader(new FileReader(f));
@@ -52,7 +48,8 @@ public abstract class ConfigFile
 
 
                 }
-            } catch (IOException e)
+            }
+            catch (IOException e)
             {
                 e.printStackTrace();
 
@@ -64,7 +61,8 @@ public abstract class ConfigFile
                     {
                         localIOException1.printStackTrace();
                     }
-            } finally
+            }
+            finally
             {
                 if (SettingsReader != null)
                     try
@@ -80,7 +78,6 @@ public abstract class ConfigFile
 
     protected ArrayList<String> ReadModSettings(String settingsName, ArrayList<String> defaultValue)
     {
-
         if (this.SettingsCache.containsKey(settingsName))
         {
             ArrayList<String> out = new ArrayList<String>();
@@ -90,8 +87,6 @@ public abstract class ConfigFile
             return out;
         }
         return defaultValue;
-
-
     }
 
     protected int ReadModSettings(String settingsName, int defaultValue)
@@ -102,7 +97,8 @@ public abstract class ConfigFile
             try
             {
                 return Integer.valueOf(this.SettingsCache.get(settingsName));
-            } catch (NumberFormatException e)
+            }
+            catch (NumberFormatException e)
             {
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
@@ -118,7 +114,8 @@ public abstract class ConfigFile
             try
             {
                 return Byte.valueOf(this.SettingsCache.get(settingsName));
-            } catch (NumberFormatException e)
+            }
+            catch (NumberFormatException e)
             {
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
@@ -144,7 +141,8 @@ public abstract class ConfigFile
             try
             {
                 return Double.valueOf(this.SettingsCache.get(settingsName));
-            } catch (NumberFormatException e)
+            }
+            catch (NumberFormatException e)
             {
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
@@ -161,7 +159,8 @@ public abstract class ConfigFile
             try
             {
                 color = Color.decode(this.SettingsCache.get(settingsName));
-            } catch (NumberFormatException ex)
+            }
+            catch (NumberFormatException ex)
             {
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
@@ -177,7 +176,8 @@ public abstract class ConfigFile
             try
             {
                 return Float.valueOf(this.SettingsCache.get(settingsName));
-            } catch (NumberFormatException e)
+            }
+            catch (NumberFormatException e)
             {
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
@@ -202,7 +202,8 @@ public abstract class ConfigFile
             this.SettingsWriter = new BufferedWriter(new FileWriter(settingsFile, false));
 
             this.WriteConfigSettings();
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             e.printStackTrace();
 
@@ -214,7 +215,8 @@ public abstract class ConfigFile
                 {
                     localIOException1.printStackTrace();
                 }
-        } finally
+        }
+        finally
         {
             if (this.SettingsWriter != null)
                 try
@@ -416,5 +418,4 @@ public abstract class ConfigFile
 
         return new String(chars);
     }
-
 }

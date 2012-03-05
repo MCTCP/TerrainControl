@@ -95,5 +95,4 @@ public interface LocalWorld
 
     public int getHeightBits();
 
-
 }

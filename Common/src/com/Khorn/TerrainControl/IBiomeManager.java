@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl;
 
-
 public interface IBiomeManager
 {
     public int[] getBiomesUnZoomedTC(int[] biomeArray, int x, int z, int x_size, int z_size);
@@ -10,5 +9,4 @@ public interface IBiomeManager
     public int[] getBiomesTC(int[] biomeArray, int x, int z, int x_size, int z_size);
 
     public int getBiomeTC(int x, int z);
-
 }

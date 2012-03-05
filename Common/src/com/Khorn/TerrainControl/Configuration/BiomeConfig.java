@@ -16,7 +16,6 @@ import java.util.Map;
 
 public class BiomeConfig extends ConfigFile
 {
-
     public HashMap<Integer, int[]> replaceBlocks = new HashMap<Integer, int[]>();
     public HashMap<Integer, Integer> replaceHeightMin = new HashMap<Integer, Integer>();
     public HashMap<Integer, Integer> replaceHeightMax = new HashMap<Integer, Integer>();
@@ -281,8 +280,6 @@ public class BiomeConfig extends ConfigFile
 
     protected void ReadConfigSettings()
     {
-
-
         this.BiomeSize = ReadModSettings(TCDefaultValues.BiomeSize.name(), this.DefaultSize);
         this.BiomeRarity = ReadModSettings(TCDefaultValues.BiomeRarity.name(), this.DefaultRarity);
 
@@ -317,8 +314,6 @@ public class BiomeConfig extends ConfigFile
 
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
-
-
     }
 
 
@@ -917,5 +912,4 @@ public class BiomeConfig extends ConfigFile
         this.FoliageColor = stream.readInt();
 
     }
-
 }

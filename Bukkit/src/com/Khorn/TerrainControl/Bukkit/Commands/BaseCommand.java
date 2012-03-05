@@ -20,7 +20,6 @@ public abstract class BaseCommand
     public boolean workOnConsole;
     protected TCPlugin plugin;
 
-
     public BaseCommand(TCPlugin _plugin)
     {
         this.plugin = _plugin;

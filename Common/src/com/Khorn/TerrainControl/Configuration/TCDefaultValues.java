@@ -315,5 +315,4 @@ public enum TCDefaultValues
     {
         return this.bValue;
     }
-
 }

@@ -9,7 +9,6 @@ import java.util.Random;
 
 public class CavesGen extends TerrainGenBase
 {
-
     private WorldConfig worldSettings;
 
     public CavesGen(WorldConfig wrk,LocalWorld world)
