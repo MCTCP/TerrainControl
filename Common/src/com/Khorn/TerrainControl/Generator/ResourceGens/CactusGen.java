@@ -7,12 +7,9 @@ import java.util.Random;
 
 public class CactusGen extends ResourceGenBase
 {
-
-
     @Override
     protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
     {
-
         int y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
 
         for (int i = 0; i < 10; i++)
@@ -33,7 +30,5 @@ public class CactusGen extends ResourceGenBase
                 }
             }
         }
-
     }
-
 }

@@ -17,7 +17,6 @@ public enum ResourceType
     UnderGroundLake(UndergroundLakeGen.class),
     AboveWaterRes(AboveWaterGen.class);
 
-
     public ResourceGenBase Generator;
     public final boolean CreateNewChunks;
 
@@ -41,6 +40,5 @@ public enum ResourceType
         {
             e.printStackTrace();
         }
-
     }
 }

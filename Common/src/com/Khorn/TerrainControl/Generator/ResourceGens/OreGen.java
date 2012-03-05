@@ -8,12 +8,9 @@ import java.util.Random;
 
 public class OreGen extends ResourceGenBase
 {
-
-
     @Override
     protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
     {
-
         int y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
 
         float f = rand.nextFloat() * 3.141593F;
@@ -71,11 +68,7 @@ public class OreGen extends ResourceGenBase
                         }
                     }
                 }
-
             }
-
         }
     }
-
-
 }

@@ -76,5 +76,4 @@ public class ArraysCache
         BigArraysNext[cacheId]++;
         return array;
     }
-
 }

@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Bukkit;
 
-
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import net.minecraft.server.BiomeBase;
 import org.bukkit.block.Biome;
@@ -38,14 +37,11 @@ public class CustomBiome extends BiomeBase
     public void SetBiome(BiomeConfig config)
     {
 
-        this.B = config.BiomeHeight;
-        this.C = config.BiomeVolatility;
-        this.y = config.SurfaceBlock;
-        this.z = config.GroundBlock;
-        this.D = config.BiomeTemperature;
-        this.E = config.BiomeWetness;
-
-
+        this.D = config.BiomeHeight;
+        this.E = config.BiomeVolatility;
+        this.A = config.SurfaceBlock;
+        this.B = config.GroundBlock;
+        this.F = config.BiomeTemperature;
+        this.G = config.BiomeWetness;
     }
-
 }

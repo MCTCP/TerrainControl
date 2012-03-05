@@ -7,7 +7,6 @@ import java.util.Random;
 
 public abstract class ResourceGenBase
 {
-
     public void Process(LocalWorld world, Random rand, Resource res, int _x, int _z, int biomeId)
     {
         for (int t = 0; t < res.Frequency; t++)
@@ -22,6 +21,4 @@ public abstract class ResourceGenBase
     }
 
     protected abstract void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z);
-
-
 }

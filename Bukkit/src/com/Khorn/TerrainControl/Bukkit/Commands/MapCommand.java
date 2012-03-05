@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
-
 import com.Khorn.TerrainControl.Bukkit.MapWriter;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import org.bukkit.Bukkit;
@@ -39,25 +38,34 @@ public class MapCommand extends BaseCommand
                 return true;
             }
         }
+        
         if (world == null)
+        {
             if (sender instanceof ConsoleCommandSender)
             {
                 sender.sendMessage(ErrorColor + "You need to select world");
                 return true;
-            } else
-                world = (CraftWorld) ((Player) sender).getWorld();
+            }
+            world = (CraftWorld) ((Player) sender).getWorld();
+        }
+            
 
         if (args.size() == 2 && args.get(0).equals("-s"))
+        {
             try
             {
                 size = Integer.parseInt(args.get(1));
                 args.remove(0);
                 args.remove(0);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 sender.sendMessage(ErrorColor + "Wrong size " + args.get(1));
             }
+        }
+            
         if (args.size() == 2 && args.get(0).equals("-r"))
+        {
             try
             {
                 int degrees = Integer.parseInt(args.get(1));
@@ -67,22 +75,25 @@ public class MapCommand extends BaseCommand
                     {
                         case 90:
                             angle = MapWriter.Angle.d90;
-                            break;
+                        break;
                         case 180:
                             angle = MapWriter.Angle.d180;
-                            break;
+                        break;
                         case 270:
                             angle = MapWriter.Angle.d270;
-                            break;
+                        break;
                     }
-                } else
+                }
+                else
+                {
                     sender.sendMessage(ErrorColor + "Angles must be divisible by 90 degrees");
-
-            } catch (Exception e)
+                }
+            }
+            catch (Exception e)
             {
                 sender.sendMessage(ErrorColor + "Wrong angle " + args.get(1));
             }
-
+        }
 
         MapWriter map = new MapWriter(this.plugin, world.getHandle(), size, angle, sender);
 

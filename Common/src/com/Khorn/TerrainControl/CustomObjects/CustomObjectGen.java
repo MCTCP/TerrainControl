@@ -11,7 +11,6 @@ import java.util.Random;
 
 public class CustomObjectGen extends ResourceGenBase
 {
-
     @Override
     public void Process(LocalWorld world, Random rand, Resource res, int _x, int _z, int biomeId)
     {
@@ -47,7 +46,6 @@ public class CustomObjectGen extends ResourceGenBase
 
     public static boolean SpawnCustomObjects(LocalWorld world, Random rand, WorldConfig worldSettings, int chunk_x, int chunk_z, int biomeId)
     {
-
         if (worldSettings.Objects.size() == 0)
             return false;
 
@@ -286,7 +284,6 @@ public class CustomObjectGen extends ResourceGenBase
             world.setBlockIdAndData(x, y, z, type, data);
         else
             world.setRawBlockIdAndData(x, y, z, type, data);
-
     }
 
 
