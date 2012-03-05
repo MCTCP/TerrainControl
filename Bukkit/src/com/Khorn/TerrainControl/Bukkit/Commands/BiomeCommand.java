@@ -21,7 +21,6 @@ public class BiomeCommand extends BaseCommand
         usage = "/tc biome [-f]";
         help = "Show current chunk biome and block stats";
         workOnConsole = false;
-
     }
 
     @Override
@@ -52,9 +51,7 @@ public class BiomeCommand extends BaseCommand
             //double notchTemp = biomeManager.temperature[0] - (((CraftWorld) player.getLocation().getWorld()).getHandle().e((int) player.getLocation().getX(), (int) player.getLocation().getZ()) - 64) / 64.0D * 0.3D;
             player.sendMessage(ValueColor + temp[0] + MessageColor + " block temperature!");
             //player.sendMessage(ValueColor + notchTemp + MessageColor + " block temperature with height constant!");
-
         }
-
 
         return true;
     }

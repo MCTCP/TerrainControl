@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.UUID;
 
-
 import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManager;
 import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManagerOld;
 import com.Khorn.TerrainControl.Bukkit.Commands.TCCommandExecutor;
@@ -19,10 +18,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-
 public class TCPlugin extends JavaPlugin
 {
-
     private final HashMap<String, BukkitWorld> NotInitedWorlds = new HashMap<String, BukkitWorld>();
 
     @SuppressWarnings("UnusedDeclaration")
@@ -50,7 +47,6 @@ public class TCPlugin extends JavaPlugin
         
 
         System.out.println(getDescription().getFullName() + " is now enabled");
-
     }
 
     public TCPlayer GetPlayer(Player bukkitPlayer)
@@ -64,9 +60,7 @@ public class TCPlugin extends JavaPlugin
             this.sessions.put(bukkitPlayer.getName(), player);
         }
         return player;
-
     }
-
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
@@ -78,11 +72,13 @@ public class TCPlugin extends JavaPlugin
         }
 
         for (BukkitWorld world : worlds.values())
+        {
             if (world.getName().equals(worldName))
             {
                 System.out.println("TerrainControl: enabled for '" + worldName + "'");
                 return world.getChunkGenerator();
             }
+        }
 
         TCChunkGenerator prov = null;
         BukkitWorld world = new BukkitWorld(worldName);
@@ -98,15 +94,12 @@ public class TCPlugin extends JavaPlugin
                 break;
             case Default:
                 break;
-
         }
 
         world.setChunkGenerator(prov);
 
         System.out.println("TerrainControl: mode " + conf.ModeTerrain.name() + " enabled for '" + worldName + "'");
         return prov;
-
-
     }
 
     public WorldConfig CreateSettings(String worldName, BukkitWorld bukkitWorld)
@@ -128,7 +121,8 @@ public class TCPlugin extends JavaPlugin
             bukkitWorld = new BukkitWorld(worldName);
             worldConfig = new WorldConfig(baseFolder, bukkitWorld, true);
 
-        } else
+        }
+        else
         {
             worldConfig = new WorldConfig(baseFolder, bukkitWorld, false);
             bukkitWorld.setSettings(worldConfig);
@@ -173,7 +167,4 @@ public class TCPlugin extends JavaPlugin
 
         }
     }
-
 }
-
-

@@ -50,9 +50,7 @@ public class TCListener implements Listener, PluginMessageListener
                 CustomObjectGen.SpawnCustomTrees(bukkitWorld, this.random, bukkitWorld.getSettings(), event.getLocation().getBlockX(), event.getLocation().getBlockY(), event.getLocation().getBlockZ());
                 event.getBlocks().clear();
             }
-
         }
-
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -73,7 +71,6 @@ public class TCListener implements Listener, PluginMessageListener
                 player.hasObjectToSpawn = false;
                 event.setCancelled(true);
             }
-
         }
     }
 
@@ -98,7 +95,8 @@ public class TCListener implements Listener, PluginMessageListener
                         config.Serialize(stream);
                         stream.flush();
 
-                    } catch (IOException e)
+                    }
+                    catch (IOException e)
                     {
                         e.printStackTrace();
                     }
@@ -107,9 +105,11 @@ public class TCListener implements Listener, PluginMessageListener
 
                     player.sendPluginMessage(this.tcPlugin, TCDefaultValues.ChannelName.stringValue(), data);
                 }
-            }else
-                System.out.println("TerrainControl: client have old TC version");
-
+            }
+            else
+            {
+            	System.out.println("TerrainControl: client have old TC version");
+            }
         }
     }
 }

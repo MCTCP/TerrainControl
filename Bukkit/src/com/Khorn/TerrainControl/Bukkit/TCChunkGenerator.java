@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Bukkit;
 
-
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import net.minecraft.server.Block;
@@ -36,15 +35,12 @@ public class TCChunkGenerator extends ChunkGenerator
 
         if (this.world.getSettings().ModeTerrain == WorldConfig.TerrainMode.NotGenerate)
             this.NotGenerate = true;
-
-
     }
 
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
         this.plugin.WorldInit(world);
-
         return this.BlockPopulator;
     }
 
@@ -65,6 +61,4 @@ public class TCChunkGenerator extends ChunkGenerator
         else
             return this.chunkProviderTC.generate(x, z);
     }
-
-
 }
