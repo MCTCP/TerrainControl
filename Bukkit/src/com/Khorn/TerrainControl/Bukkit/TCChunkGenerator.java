@@ -49,7 +49,8 @@ public class TCChunkGenerator extends ChunkGenerator
     {
         this.plugin.WorldInit(world);
 
-        int i = ((CraftWorld) world).getHandle().a(x, z); // TODO - Fix obfuscation
+        //int i = ((CraftWorld) world).getHandle().a(x, z); // TODO - Fix obfuscation
+        int i = ((CraftWorld) world).getHighestBlockAt(x, z).getTypeId(); // TODO: valid fix? - I am just guessing here...
         return i != 0 && Block.byId[i].material.isSolid();
     }
 

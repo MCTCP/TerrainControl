@@ -23,9 +23,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     private ArrayList<BiomeBase> f = new ArrayList<BiomeBase>();  // TODO - Fix obfuscation??? should this be ".d" now?
     private float[] buffer;
 
-
     private WorldConfig worldConfig;
-
 
     public BiomeManager(LocalWorld world)
     {
@@ -36,7 +34,6 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         this.f.add(BiomeBase.FOREST_HILLS);
 
         this.Init(world);
-
     }
 
     public void Init(LocalWorld world)
@@ -61,7 +58,6 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         return this.f;  // TODO - Fix obfuscation
     }
 
-
     public BiomeBase getBiome(int paramInt1, int paramInt2)
     {
         synchronized (this.LockObject)
@@ -69,7 +65,6 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
             return this.Cache.b(paramInt1, paramInt2);  // TODO - Fix obfuscation
         }
     }
-
 
     public float[] getWetness(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)  // TODO - Fix obfuscation
     {
@@ -281,4 +276,3 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         return this.getBiome(x,z).id;
     }
 }
-
