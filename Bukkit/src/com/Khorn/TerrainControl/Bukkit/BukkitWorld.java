@@ -46,7 +46,7 @@ public class BukkitWorld implements LocalWorld
     private boolean CreateNewChunks;
     private Chunk[] ChunkCache;
     private Chunk CachedChunk;
-    
+
     private int CurrentChunkX;
     private int CurrentChunkZ;
 
@@ -149,7 +149,7 @@ public class BukkitWorld implements LocalWorld
         {
             this.MineshaftGen.a(null, this.world, x, z, chunkArray);
         }
-            
+
         if (this.settings.VillagesEnabled && dry)
         {
             this.VillageGen.a(null, this.world, x, z, chunkArray);
@@ -196,7 +196,8 @@ public class BukkitWorld implements LocalWorld
         new WorldGenLakes(BlockId).a(this.world, rand, x, y, z);
     }
 
-    // TODO: Some comments here would be nice. is this chunk or block coordinates?
+    // There is raw code from ChunkProviderGenerate, check each x,z coordinate in chunk  i5 - some thing like getHighestBlockYAt
+    // TODO: I think we may optimise this.
     public void PlaceIce(int x, int z)
     {
         int i1 = x + 8;
@@ -205,13 +206,13 @@ public class BukkitWorld implements LocalWorld
         {
             for (int _z = 0; _z < 16; _z++)
             {
-                int i5 = this.world.e(i1 + _x, i2 + _z); // TODO - Fix obfuscation
+                int i5 = this.world.f(i1 + _x, i2 + _z);
 
-                if (this.world.p(_x + i1, i5 - 1, _z + i2)) // TODO - Fix obfuscation
+                if (this.world.s(_x + i1, i5 - 1, _z + i2))
                 {
                     this.world.setTypeId(_x + i1, i5 - 1, _z + i2, Block.ICE.id);
                 }
-                if (this.world.r(_x + i1, i5, _z + i2)) // TODO - Fix obfuscation
+                if (this.world.r(_x + i1, i5, _z + i2))
                 {
                     this.world.setTypeId(_x + i1, i5, _z + i2, Block.SNOW.id);
                 }
@@ -232,37 +233,45 @@ public class BukkitWorld implements LocalWorld
         return Village;
     }
 
-    // TODO: Do replace what with what????
+    // This part work with ReplacedBlocks after all spawns
+    // TODO: check how its work.
     public void DoReplace()
     {
         if (this.settings.BiomeConfigsHaveReplacement)
         {
             Chunk rawChunk = this.ChunkCache[0];
-            byte[] blocks = rawChunk.b; // TODO - Fix obfuscation
+
+            ChunkSection[] sectionsArray = rawChunk.h();
+
             this.BiomeArray = this.world.getWorldChunkManager().getBiomeBlock(this.BiomeArray, this.CurrentChunkX * 16, this.CurrentChunkZ * 16, 16, 16);
 
             int x = this.CurrentChunkX * 16;
             int z = this.CurrentChunkZ * 16;
 
-            for (int _x = 0; _x < 16; _x++)
+            for (ChunkSection section : sectionsArray)
             {
-                for (int _z = 0; _z < 16; _z++)
+                if (section == null)
+                    continue;
+
+                for (int _x = 0; _x < 16; _x++)
                 {
-                    BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(_x + _z * 16)].id];
-                    if (biomeConfig.replaceBlocks.size() > 0)
+                    for (int _z = 0; _z < 16; _z++)
                     {
-                        for (int _y = 127; _y >= 0; _y--)
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(_x + _z * 16)].id];
+                        if (biomeConfig.replaceBlocks.size() > 0)
                         {
-                            int i = _x << 11 | _z << 7 | _y;
-                            int blockId = blocks[i] & 0xFF;  // Fuck java with signed bytes;
-                            int[] replacement = biomeConfig.ReplaceMatrixBlocks[blockId]; // [block ID, block data]
-                            if (blockId != replacement[0] || (blockId == replacement[0] && rawChunk.g.a(_x, _y, _z) != replacement[1])) // TODO - Fix obfuscation
+                            for (int _y = 0; _y < 16; _y++)
                             {
-                                if (_y >= biomeConfig.ReplaceMatrixHeightMin[blockId] && _y <= biomeConfig.ReplaceMatrixHeightMax[blockId])
+                                int blockId = section.a(x, _y, z);
+                                int[] replacement = biomeConfig.ReplaceMatrixBlocks[blockId]; // [block ID, block data]
+                                if (blockId != replacement[0] || (blockId == replacement[0] && section.b(_x, _y, _z) != replacement[1]))
                                 {
-                                    blocks[i] = (byte) replacement[0];
-                                    rawChunk.g.a(_x, _y, _z, replacement[1]); // TODO - Fix obfuscation
-                                    world.notify((x + _x), _y, (z + _z));
+                                    if (_y >= biomeConfig.ReplaceMatrixHeightMin[blockId] && _y <= biomeConfig.ReplaceMatrixHeightMax[blockId])
+                                    {
+                                        section.a(_x, _y, _z, replacement[0]);
+                                        section.b(_x, _y, _z, replacement[1]);
+                                        world.notify((x + _x), _y, (z + _z));
+                                    }
                                 }
                             }
                         }
@@ -285,12 +294,12 @@ public class BukkitWorld implements LocalWorld
 
     private Chunk getChunk(int x, int y, int z)
     {
-        if (y < 0 || y >= 256) // TODO: Should this be hard-coded like this?
+        if (y < 0 || y >= 256) // TODO: Fix after bukkit will support custom height.
             return null;
 
         x = x >> 4;
         z = z >> 4;
-        if(this.CachedChunk != null && this.CachedChunk.x == x && this.CachedChunk.z == z)
+        if (this.CachedChunk != null && this.CachedChunk.x == x && this.CachedChunk.z == z)
             return this.CachedChunk;
         int index = x - this.CurrentChunkX + 2 * (z - this.CurrentChunkZ);
         if (index >= 0 && index < 4)
@@ -309,9 +318,9 @@ public class BukkitWorld implements LocalWorld
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = 255; y > 0; y--) // TODO: Should this be hard-coded like this?
+        for (int y = 255; y > 0; y--) // TODO: Fix after bukkit will support custom height
         {
-            int blockId = chunk.b[x << 11 | z << 7 | y] & 0xFF; // TODO - Fix obfuscation - Could also be ".heightMap"
+            int blockId = chunk.getTypeId(x,y,z); // TODO - Fix obfuscation - Could also be ".heightMap"
             if (blockId != 0 && Block.byId[blockId].material.isLiquid())
                 return y;
         }
@@ -325,9 +334,7 @@ public class BukkitWorld implements LocalWorld
 
     public int getRawBlockId(int x, int y, int z)
     {
-        return this.world.getTypeId(x, y, z); // Would this be ok?
-        /*
-        Chunk chunk = this.getChunk(x, y, z);
+         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
         {
             return 0;
@@ -336,37 +343,32 @@ public class BukkitWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
 
-        return chunk.b[x << 11 | z << 7 | y] & 0xFF;  //Fuck java !! // TODO - Fix obfuscation - Could also be ".heightMap"
-        */
+        return chunk.getTypeId(x,y,z);
+
     }
 
     public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
     {
-        this.world.setRawTypeIdAndData(x, y, z, BlockId, Data); // Would this be ok? - Note it will check light! Do we want that?
-        /*
+
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return;
         z = z & 0xF;
         x = x & 0xF;
 
-        chunk.b[x << 11 | z << 7 | y] = (byte) BlockId; // TODO - Fix obfuscation
-        chunk.g.a(x, y, z, Data); // TODO - Fix obfuscation
-        */
+        chunk.a(x,y,z,BlockId,Data);
+
     }
 
     public void setRawBlockId(int x, int y, int z, int BlockId)
     {
-        this.world.setRawTypeId(x, y, z, BlockId); // Would this be ok? - Note it will check light! Do we want that?
-        /*
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return;
         z = z & 0xF;
         x = x & 0xF;
 
-        chunk.b[x << 11 | z << 7 | y] = (byte) BlockId; // TODO - Fix obfuscation
-        */
+        chunk.a(x,y,z,BlockId,0);
     }
 
     public void setBlockId(int x, int y, int z, int BlockId)
@@ -431,6 +433,7 @@ public class BukkitWorld implements LocalWorld
     {
         return 256; //TODO do something with that when bukkit allow custom world height.
     }
+
     public int getWaterLevel()
     {
         return 63; // TODO same as height
