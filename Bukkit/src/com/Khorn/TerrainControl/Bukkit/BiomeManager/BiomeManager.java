@@ -20,7 +20,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     private Layer DownfallLayer;
     private BiomeCache Cache = new BiomeCache(this);
     private final Object LockObject = new Object();
-    private ArrayList<BiomeBase> f = new ArrayList<BiomeBase>();  // TODO - Fix obfuscation??? should this be ".d" now?
+    private ArrayList<BiomeBase> f = new ArrayList<BiomeBase>();  // TODO - Fix obfuscation??? should this be ".d" now? Or should we remove this completely?
     private float[] buffer;
 
     private WorldConfig worldConfig;
@@ -32,6 +32,8 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         this.f.add(BiomeBase.TAIGA);
         this.f.add(BiomeBase.TAIGA_HILLS);
         this.f.add(BiomeBase.FOREST_HILLS);
+        this.f.add(BiomeBase.JUNGLE);
+        this.f.add(BiomeBase.JUNGLE_HILLS);
 
         this.Init(world);
     }
@@ -55,14 +57,14 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     @SuppressWarnings("rawtypes")
     public List a()  // TODO - Fix obfuscation - Is there any point in overriding? here?
     {
-        return this.f;  // TODO - Fix obfuscation
+        return this.f;  // TODO - Fix obfuscation - Why not get rid of this method alltogether and use .d instead?.
     }
 
     public BiomeBase getBiome(int paramInt1, int paramInt2)
     {
         synchronized (this.LockObject)
         {
-            return this.Cache.b(paramInt1, paramInt2);  // TODO - Fix obfuscation
+            return this.Cache.b(paramInt1, paramInt2);
         }
     }
 
@@ -134,7 +136,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         int[] arrayOfInt = this.UnZoomedLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = BiomeBase.a[arrayOfInt[i]];  // TODO - Fix obfuscation
+            paramArrayOfBiomeBase[i] = BiomeBase.biomes[arrayOfInt[i]];  // TODO - Fix obfuscation
         }
 
         return paramArrayOfBiomeBase;
@@ -151,7 +153,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         {
             synchronized (this.LockObject)
             {
-                BiomeBase[] localObject = this.Cache.d(paramInt1, paramInt2);  // TODO - Fix obfuscation
+                BiomeBase[] localObject = this.Cache.c(paramInt1, paramInt2);  // TODO d -> c... is that correct?
                 System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, paramInt3 * paramInt4);
             }
             return paramArrayOfBiomeBase;
@@ -159,7 +161,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         int[] localObject = this.BiomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = BiomeBase.a[localObject[i]];  // TODO - Fix obfuscation
+            paramArrayOfBiomeBase[i] = BiomeBase.biomes[localObject[i]];  // TODO - Fix obfuscation
         }
 
         return paramArrayOfBiomeBase;
@@ -180,7 +182,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         {
             if (arrayOfInt[i2] >= DefaultBiome.values().length)
                 return false;
-            BiomeBase localBiomeBase = BiomeBase.a[arrayOfInt[i2]];  // TODO - Fix obfuscation
+            BiomeBase localBiomeBase = BiomeBase.biomes[arrayOfInt[i2]];  // TODO - Fix obfuscation
             if (!paramList.contains(localBiomeBase))
                 return false;
         }
@@ -207,7 +209,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
                 continue;
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            BiomeBase localBiomeBase = BiomeBase.a[arrayOfInt[i3]]; // TODO - Fix obfuscation
+            BiomeBase localBiomeBase = BiomeBase.biomes[arrayOfInt[i3]];
             if ((!paramList.contains(localBiomeBase)) || ((localChunkPosition != null) && (paramRandom.nextInt(i2 + 1) != 0)))
                 continue;
             localChunkPosition = new ChunkPosition(i4, 0, i5);
@@ -255,7 +257,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
         {
             synchronized (this.LockObject)
             {
-                BiomeBase[] localObject = this.Cache.d(x, z);  // TODO - Fix obfuscation
+                BiomeBase[] localObject = this.Cache.c(x, z);  // TODO d -> c... is that correct?
                 for(int i= 0; i< x_size*z_size;i++)
                     biomeArray[i] = localObject[i].id;
 
