@@ -253,12 +253,10 @@ public class Coordinate
     public Coordinate GetCopy()
     {
         return this.GetCopy(x, y, z, dataString, Digs);
-
     }
 
     public Coordinate GetSumm(Coordinate workCoord)
     {
         return this.GetCopy(x + workCoord.getX(), y + workCoord.getY(), z + workCoord.getZ(), dataString, Digs);
-
     }
 }
