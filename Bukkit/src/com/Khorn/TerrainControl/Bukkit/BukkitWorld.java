@@ -63,9 +63,9 @@ public class BukkitWorld implements LocalWorld
     {
         this.name = _name;
         for (LocalBiome biome : DefaultBiomes)
+        {
             this.BiomeNames.put(biome.getName(), biome);
-
-
+        }
     }
 
     public LocalBiome getNullBiome(String name)
@@ -207,7 +207,6 @@ public class BukkitWorld implements LocalWorld
                     this.world.setTypeId(_x + i1, i5, _z + i2, Block.SNOW.id);
                 }
             }
-
         }
     }
 
@@ -228,7 +227,6 @@ public class BukkitWorld implements LocalWorld
     {
         if (this.settings.BiomeConfigsHaveReplacement)
         {
-
             Chunk rawChunk = this.ChunkCache[0];
             byte[] blocks = rawChunk.b; // TODO - Fix obfuscation
             this.BiomeArray = this.world.getWorldChunkManager().getBiomeBlock(this.BiomeArray, this.CurrentChunkX * 16, this.CurrentChunkZ * 16, 16, 16);
@@ -237,6 +235,7 @@ public class BukkitWorld implements LocalWorld
             int z = this.CurrentChunkZ * 16;
 
             for (int _x = 0; _x < 16; _x++)
+            {
                 for (int _z = 0; _z < 16; _z++)
                 {
                     BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(_x + _z * 16)].K]; // TODO - Fix obfuscation
@@ -258,6 +257,7 @@ public class BukkitWorld implements LocalWorld
                         }
                     }
                 }
+            }
         }
     }
 
@@ -289,7 +289,6 @@ public class BukkitWorld implements LocalWorld
         else
             return null;
 
-
     }
 
     public int getLiquidHeight(int x, int z)
@@ -317,7 +316,9 @@ public class BukkitWorld implements LocalWorld
     {
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
+        {
             return 0;
+        }
 
         z = z & 0xF;
         x = x & 0xF;
@@ -365,7 +366,9 @@ public class BukkitWorld implements LocalWorld
     {
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
+        {
             return -1;
+        }
         z = z & 0xF;
         x = x & 0xF;
         return chunk.b(x, z); // TODO - Fix obfuscation

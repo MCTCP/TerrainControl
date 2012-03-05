@@ -37,14 +37,18 @@ public class TCPlugin extends JavaPlugin
     {
         BiomeManagerOld.GenBiomeDiagram();
 
+        // TODO: Why create two instances of TCCommandExecutor?
+        // TODO: Why the "!= null"-check? In fact: couldn't this lead to the "this" var getting out of sync on a server reload?
         if (this.getCommand("tc") != null)
+        {
             this.getCommand("tc").setExecutor(new TCCommandExecutor(this));
+        }
         this.getCommand("terraincontrol").setExecutor(new TCCommandExecutor(this));
+        
         this.listener = new TCListener(this);
 
         Bukkit.getMessenger().registerIncomingPluginChannel(this, TCDefaultValues.ChannelName.stringValue(),this.listener);
         Bukkit.getMessenger().registerOutgoingPluginChannel(this,TCDefaultValues.ChannelName.stringValue());
-        
 
         System.out.println(getDescription().getFullName() + " is now enabled");
     }
@@ -55,7 +59,10 @@ public class TCPlugin extends JavaPlugin
         synchronized (this.sessions)
         {
             if (this.sessions.containsKey(bukkitPlayer.getName()))
+            {
                 return this.sessions.get(bukkitPlayer.getName());
+            }
+                
             player = new TCPlayer(bukkitPlayer);
             this.sessions.put(bukkitPlayer.getName(), player);
         }
@@ -67,7 +74,7 @@ public class TCPlugin extends JavaPlugin
     {
         if (worldName.trim().equals(""))
         {
-            System.out.println("TerrainControl: world name is empty string !!");
+            System.out.println("TerrainControl: world name is empty string !!"); // TODO: use minecraft logger instead
             return null;
         }
 
@@ -75,12 +82,12 @@ public class TCPlugin extends JavaPlugin
         {
             if (world.getName().equals(worldName))
             {
-                System.out.println("TerrainControl: enabled for '" + worldName + "'");
+                System.out.println("TerrainControl: enabled for '" + worldName + "'"); // TODO: use minecraft logger instead
                 return world.getChunkGenerator();
             }
         }
 
-        TCChunkGenerator prov = null;
+        TCChunkGenerator generator = null;
         BukkitWorld world = new BukkitWorld(worldName);
         WorldConfig conf = this.CreateSettings(worldName, world);
 
@@ -90,16 +97,16 @@ public class TCPlugin extends JavaPlugin
             case TerrainTest:
             case OldGenerator:
             case NotGenerate:
-                prov = new TCChunkGenerator(this);
+                generator = new TCChunkGenerator(this);
                 break;
             case Default:
                 break;
         }
 
-        world.setChunkGenerator(prov);
+        world.setChunkGenerator(generator);
 
         System.out.println("TerrainControl: mode " + conf.ModeTerrain.name() + " enabled for '" + worldName + "'");
-        return prov;
+        return generator;
     }
 
     public WorldConfig CreateSettings(String worldName, BukkitWorld bukkitWorld)
@@ -133,12 +140,10 @@ public class TCPlugin extends JavaPlugin
         return worldConfig;
     }
 
-
     public void WorldInit(World world)
     {
         if (this.NotInitedWorlds.containsKey(world.getName()))
         {
-
             BukkitWorld bukkitWorld = this.NotInitedWorlds.remove(world.getName());
 
             net.minecraft.server.World workWorld = ((CraftWorld) world).getHandle();
@@ -149,16 +154,16 @@ public class TCPlugin extends JavaPlugin
             {
                 case Normal:
                     BiomeManager manager = new BiomeManager(bukkitWorld);
-                    workWorld.worldProvider.c = manager;
+                    workWorld.worldProvider.c = manager; // TODO: Correct obfuscation??
                     bukkitWorld.setBiomeManager(manager);
-                    break;
+                break;
                 case OldGenerator:
                     BiomeManagerOld managerOld = new BiomeManagerOld(bukkitWorld);
-                    workWorld.worldProvider.c = managerOld;
+                    workWorld.worldProvider.c = managerOld; // TODO: Correct obfuscation??
                     bukkitWorld.setOldBiomeManager(managerOld);
-                    break;
+                break;
                 case Default:
-                    break;
+                break;
             }
 
             this.worlds.put(workWorld.getUUID(),bukkitWorld);
