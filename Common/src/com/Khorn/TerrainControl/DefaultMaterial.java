@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,11 +128,14 @@ public enum DefaultMaterial
     ENDER_PORTAL(119),
     ENDER_PORTAL_FRAME(120),
     ENDER_STONE(121),
-    DRAGON_EGG(122);
+    DRAGON_EGG(122),
+    REDSTONE_LAMP_OFF(123),
+    REDSTONE_LAMP_ON(124),
+    ;
 
     public final int id;
     private static DefaultMaterial[] lookupID;
-    private static Map<String, DefaultMaterial> lookupName ;
+    private static Map<String, DefaultMaterial> lookupName;
 
     private DefaultMaterial(int Id)
     {
