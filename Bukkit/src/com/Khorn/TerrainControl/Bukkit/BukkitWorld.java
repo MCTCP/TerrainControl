@@ -54,7 +54,7 @@ public class BukkitWorld implements LocalWorld
     {
         for (int i = 0; i < DefaultBiome.values().length; i++)
         {
-            Biomes[i] = new BukkitBiome(BiomeBase.a[i]); // TODO - Fix obfuscation
+            Biomes[i] = new BukkitBiome(BiomeBase.biomes[i]);
             DefaultBiomes.add(Biomes[i]);
         }
     }
@@ -139,18 +139,24 @@ public class BukkitWorld implements LocalWorld
     public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry)
     {
         if (this.settings.StrongholdsEnabled)
-            this.strongholdGen.a(null, this.world, x, z, chunkArray); // TODO - Fix obfuscation
+        {
+            this.strongholdGen.a(null, this.world, x, z, chunkArray);
+        }
 
         if (this.settings.MineshaftsEnabled)
-            this.MineshaftGen.a(null, this.world, x, z, chunkArray); // TODO - Fix obfuscation
+        {
+            this.MineshaftGen.a(null, this.world, x, z, chunkArray);
+        }
+            
         if (this.settings.VillagesEnabled && dry)
-            this.VillageGen.a(null, this.world, x, z, chunkArray); // TODO - Fix obfuscation
-
+        {
+            this.VillageGen.a(null, this.world, x, z, chunkArray);
+        }
     }
 
     public void PlaceDungeons(Random rand, int x, int y, int z)
     {
-        new WorldGenDungeons().a(this.world, rand, x, y, z); // TODO - Fix obfuscation
+        new WorldGenDungeons().a(this.world, rand, x, y, z);
     }
 
     public void PlaceTree(TreeType type, Random rand, int x, int y, int z)
@@ -158,36 +164,37 @@ public class BukkitWorld implements LocalWorld
         switch (type)
         {
             case Tree:
-                Tree.a(this.world, rand, x, y, z); // TODO - Fix obfuscation
+                Tree.a(this.world, rand, x, y, z);
                 break;
             case BigTree:
-                BigTree.a(1.0D, 1.0D, 1.0D); // TODO - Fix obfuscation
-                BigTree.a(this.world, rand, x, y, z); // TODO - Fix obfuscation
+                BigTree.a(1.0D, 1.0D, 1.0D);
+                BigTree.a(this.world, rand, x, y, z);
                 break;
             case Forest:
-                Forest.a(this.world, rand, x, y, z); // TODO - Fix obfuscation
+                Forest.a(this.world, rand, x, y, z);
                 break;
             case HugeMushroom:
-                HugeMushroom.a(1.0D, 1.0D, 1.0D); // TODO - Fix obfuscation
-                HugeMushroom.a(this.world, rand, x, y, z); // TODO - Fix obfuscation
+                HugeMushroom.a(1.0D, 1.0D, 1.0D);
+                HugeMushroom.a(this.world, rand, x, y, z);
                 break;
             case SwampTree:
-                SwampTree.a(this.world, rand, x, y, z); // TODO - Fix obfuscation
+                SwampTree.a(this.world, rand, x, y, z);
                 break;
             case Taiga1:
-                TaigaTree1.a(this.world, rand, x, y, z); // TODO - Fix obfuscation
+                TaigaTree1.a(this.world, rand, x, y, z);
                 break;
             case Taiga2:
-                TaigaTree2.a(this.world, rand, x, y, z); // TODO - Fix obfuscation
+                TaigaTree2.a(this.world, rand, x, y, z);
                 break;
         }
     }
 
     public void PlacePonds(int BlockId, Random rand, int x, int y, int z)
     {
-        new WorldGenLakes(BlockId).a(this.world, rand, x, y, z); // TODO - Fix obfuscation
+        new WorldGenLakes(BlockId).a(this.world, rand, x, y, z);
     }
 
+    // TODO: Some comments here would be nice. is this chunk or block coordinates?
     public void PlaceIce(int x, int z)
     {
         int i1 = x + 8;
@@ -238,7 +245,7 @@ public class BukkitWorld implements LocalWorld
             {
                 for (int _z = 0; _z < 16; _z++)
                 {
-                    BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(_x + _z * 16)].K]; // TODO - Fix obfuscation
+                    BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(_x + _z * 16)].id];
                     if (biomeConfig.replaceBlocks.size() > 0)
                     {
                         for (int _y = 127; _y >= 0; _y--)
@@ -247,13 +254,14 @@ public class BukkitWorld implements LocalWorld
                             int blockId = blocks[i] & 0xFF;  // Fuck java with signed bytes;
                             int[] replacement = biomeConfig.ReplaceMatrixBlocks[blockId]; // [block ID, block data]
                             if (blockId != replacement[0] || (blockId == replacement[0] && rawChunk.g.a(_x, _y, _z) != replacement[1])) // TODO - Fix obfuscation
+                            {
                                 if (_y >= biomeConfig.ReplaceMatrixHeightMin[blockId] && _y <= biomeConfig.ReplaceMatrixHeightMax[blockId])
                                 {
                                     blocks[i] = (byte) replacement[0];
                                     rawChunk.g.a(_x, _y, _z, replacement[1]); // TODO - Fix obfuscation
                                     world.notify((x + _x), _y, (z + _z));
                                 }
-
+                            }
                         }
                     }
                 }
@@ -274,7 +282,7 @@ public class BukkitWorld implements LocalWorld
 
     private Chunk getChunk(int x, int y, int z)
     {
-        if (y < 0 || y >= world.height) // TODO - Fix obfuscation
+        if (y < 0 || y >= 256) // TODO: Should this be hard-coded like this?
             return null;
 
         x = x >> 4;
@@ -298,9 +306,9 @@ public class BukkitWorld implements LocalWorld
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = world.heightMinusOne; y > 0; y--) // TODO - Fix obfuscation
+        for (int y = 255; y > 0; y--) // TODO: Should this be hard-coded like this?
         {
-            int blockId = chunk.b[x << 11 | z << 7 | y] & 0xFF; // TODO - Fix obfuscation
+            int blockId = chunk.b[x << 11 | z << 7 | y] & 0xFF; // TODO - Fix obfuscation - Could also be ".heightMap"
             if (blockId != 0 && Block.byId[blockId].material.isLiquid())
                 return y;
         }
@@ -323,7 +331,7 @@ public class BukkitWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
 
-        return chunk.b[x << 11 | z << 7 | y] & 0xFF;  //Fuck java !!  // TODO - Fix obfuscation
+        return chunk.b[x << 11 | z << 7 | y] & 0xFF;  //Fuck java !! // TODO - Fix obfuscation - Could also be ".heightMap"
     }
 
     public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)

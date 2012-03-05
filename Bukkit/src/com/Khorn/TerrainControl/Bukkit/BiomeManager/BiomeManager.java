@@ -20,7 +20,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     private Layer DownfallLayer;
     private BiomeCache Cache = new BiomeCache(this);
     private final Object LockObject = new Object();
-    private ArrayList<BiomeBase> f = new ArrayList<BiomeBase>();  // TODO - Fix obfuscation???
+    private ArrayList<BiomeBase> f = new ArrayList<BiomeBase>();  // TODO - Fix obfuscation??? should this be ".d" now?
     private float[] buffer;
 
 
@@ -56,7 +56,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     }
 
     @SuppressWarnings("rawtypes")
-    public List a()  // TODO - Fix obfuscation
+    public List a()  // TODO - Fix obfuscation - Is there any point in overriding? here?
     {
         return this.f;  // TODO - Fix obfuscation
     }
@@ -262,7 +262,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
             {
                 BiomeBase[] localObject = this.Cache.d(x, z);  // TODO - Fix obfuscation
                 for(int i= 0; i< x_size*z_size;i++)
-                    biomeArray[i] = localObject[i].K;  // TODO - Fix obfuscation to id
+                    biomeArray[i] = localObject[i].id;
 
             }
             return biomeArray;
@@ -278,7 +278,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
 
     public int getBiomeTC(int x, int z)
     {
-        return this.getBiome(x,z).K;  // TODO - Fix obfuscation to id
+        return this.getBiome(x,z).id;
     }
 }
 

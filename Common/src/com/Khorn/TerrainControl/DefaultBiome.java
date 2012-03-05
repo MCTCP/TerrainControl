@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl;
 
-
 public enum DefaultBiome
 {
     OCEAN(0,"Ocean"),
@@ -23,10 +22,10 @@ public enum DefaultBiome
     DESERT_HILLS(17,"DesertHills"),
     FOREST_HILLS(18,"ForestHills"),
     TAIGA_HILLS(19,"TaigaHills"),
-    SMALL_MOUNTAINS(20,"Extreme Hills Edge");
-
-
-
+    SMALL_MOUNTAINS(20,"Extreme Hills Edge"),
+    JUNGLE(21, "Jungle"),
+    JUNGLE_HILLS(22, "JungleHills"),
+    ;
 
     public final int Id;
     public final String Name;
@@ -41,34 +40,33 @@ public enum DefaultBiome
     static
     {
         lookupID = new DefaultBiome[21];
-
         for(DefaultBiome biome : DefaultBiome.values())
         {
             lookupID[biome.Id] = biome;
-            
         }
     }
 
     public static DefaultBiome getBiome( int id)
     {
         if( id < lookupID.length)
+        {
             return lookupID[id];
+        }
         else
+        {
             return null;
-
+        }
     }
 
     public static boolean Contain(String name)
     {
         for(DefaultBiome biome : DefaultBiome.values())
+        {
             if(biome.Name.equals(name))
+            {
                 return true;
-
+            }
+        }
         return false;
-
     }
-
-
-
-
 }
