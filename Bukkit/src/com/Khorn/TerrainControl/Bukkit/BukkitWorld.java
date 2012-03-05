@@ -441,7 +441,8 @@ public class BukkitWorld implements LocalWorld
 
     public int getHeightBits()
     {
-        return world.heightBits; // TODO - Fix obfuscation
+        return 8; // TODO same as height
+        // TODO: Hopefully this will work out ok with old worlds as well
     }
 
     public TCChunkGenerator getChunkGenerator()
