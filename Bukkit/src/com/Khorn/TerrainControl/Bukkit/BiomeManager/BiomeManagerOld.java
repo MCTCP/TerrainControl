@@ -130,7 +130,7 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
         }
         if ((useCache) && (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
-            BiomeBase[] localObject = this.Cache.d(x, z);
+            BiomeBase[] localObject = this.Cache.c(x, z);
             System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, x_size * z_size);
             return paramArrayOfBiomeBase;
         }
@@ -306,7 +306,7 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
         }
         if ( (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
-            BiomeBase[] localObject = this.Cache.d(x, z);
+            BiomeBase[] localObject = this.Cache.c(x, z);
             for(int i= 0; i< x_size*z_size;i++)
                 biomeArray[i] = localObject[i].id;
             return biomeArray;
