@@ -39,7 +39,7 @@ public enum DefaultBiome
 
     static
     {
-        lookupID = new DefaultBiome[DefaultBiome.values().length];
+        lookupID = new DefaultBiome[DefaultBiome.values().length+1];
         for(DefaultBiome biome : DefaultBiome.values())
         {
             lookupID[biome.Id] = biome;
