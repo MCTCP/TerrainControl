@@ -18,3 +18,6 @@
 
 # Mac filesystem dust
 .DS_Store
+
+# Windows filesystem dust
+desktop.ini
