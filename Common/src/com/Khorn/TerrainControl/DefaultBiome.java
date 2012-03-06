@@ -24,7 +24,7 @@ public enum DefaultBiome
     TAIGA_HILLS(19,"TaigaHills"),
     SMALL_MOUNTAINS(20,"Extreme Hills Edge"),
     JUNGLE(21, "Jungle"),
-    JUNGLE_HILLS(22, "JungleHills"),
+    JUNGLE_HILLS(22, "JungleHills")
     ;
 
     public final int Id;
@@ -39,7 +39,7 @@ public enum DefaultBiome
 
     static
     {
-        lookupID = new DefaultBiome[21];
+        lookupID = new DefaultBiome[DefaultBiome.values().length];
         for(DefaultBiome biome : DefaultBiome.values())
         {
             lookupID[biome.Id] = biome;
