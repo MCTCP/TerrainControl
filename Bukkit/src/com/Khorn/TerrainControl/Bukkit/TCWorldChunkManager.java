@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Bukkit;
 
-
 import com.Khorn.TerrainControl.BiomeLayers.Layers.Layer;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.DefaultBiome;

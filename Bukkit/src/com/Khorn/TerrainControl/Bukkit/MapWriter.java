@@ -19,11 +19,9 @@ import com.sun.imageio.plugins.png.PNGImageWriterSpi;
 
 public class MapWriter implements Runnable
 {
-
-
-    private static int[] Default_Colors = {0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0, 0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999,0xFFFF00,0x996600,0x009900,0x003300,0x666600};
+    private static int[] Default_Colors = {0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0, 0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999, 0xFFFF00, 0x996600, 0x009900, 0x003300, 0x666600};
     @SuppressWarnings({"FieldCanBeLocal"})
-    private static boolean isWork = false;
+    private static boolean isWork = false; // TODO: Rename this to something better, perhaps isWorking?
 
     private TCPlugin plugin;
     private World world;
@@ -52,9 +50,11 @@ public class MapWriter implements Runnable
             sender.sendMessage(BaseCommand.ErrorColor + "Another instance of map writer is running");
             return;
         }
+        
         MapWriter.isWork = true;
         int height = size;
         int width = size;
+        
         try
         {
             int[] Colors = Default_Colors;
@@ -95,12 +95,15 @@ public class MapWriter implements Runnable
             int image_y = 0;
 
             for (int x = -height / 2; x < height / 2; x++)
+            {
                 for (int z = -width / 2; z < width / 2; z++)
                 {
                     long time2 = System.currentTimeMillis();
 
                     if (time2 < time)
+                    {
                         time = time2;
+                    }
 
                     if (time2 > time + 2000L)
                     {
@@ -111,6 +114,7 @@ public class MapWriter implements Runnable
                     BiomeBuffer = world.getWorldChunkManager().getBiomeBlock(BiomeBuffer, x * 16, z * 16, 16, 16);
                     tempArray = world.getWorldChunkManager().getTemperatures(tempArray, x * 16, z * 16, 16, 16);
                     for (int x1 = 0; x1 < 16; x1++)
+                    {
                         for (int z1 = 0; z1 < 16; z1++)
                         {
 
@@ -119,30 +123,30 @@ public class MapWriter implements Runnable
                                 case d0:
                                     image_x = width * 16 - ((z + width / 2) * 16 + z1 + 1);
                                     image_y = (x + height / 2) * 16 + x1;
-                                    break;
+                                break;
                                 case d90:
                                     image_x = height * 16 - ((x + height / 2) * 16 + x1 + 1);
                                     image_y = (z + width / 2) * 16 + z1;
-                                    break;
+                                break;
                                 case d180:
                                     image_x = width * 16 - ((z + width / 2) * 16 + z1 + 1);
                                     image_y = height * 16 - ((x + height / 2) * 16 + x1 + 1);
-                                    break;
+                                break;
                                 case d270:
                                     image_x = (x + height / 2) * 16 + x1;
                                     image_y = (z + width / 2) * 16 + z1;
-                                    break;
+                                break;
                             }
 
                             biomeImage.setRGB(image_x, image_y, Colors[BiomeBuffer[x1 + 16 * z1].id]);
 
                             Color tempColor = Color.getHSBColor(0.7f - tempArray[x1 + 16 * z1] * 0.7f, 0.9f, tempArray[x1 + 16 * z1] * 0.7f + 0.3f);
 
-
                             tempImage.setRGB(image_x, image_y, tempColor.getRGB());
-
                         }
+                    }
                 }
+            }
 
             sender.sendMessage(BaseCommand.MessageColor + "Writing images...");
             PNGImageWriter PngEncoder = new PNGImageWriter(new PNGImageWriterSpi());
@@ -158,12 +162,11 @@ public class MapWriter implements Runnable
 
             sender.sendMessage(BaseCommand.MessageColor + "Done");
 
-        } catch (Exception e1)
+        }
+        catch (Exception e1)
         {
             e1.printStackTrace();
         }
         MapWriter.isWork = false;
     }
-
-
 }

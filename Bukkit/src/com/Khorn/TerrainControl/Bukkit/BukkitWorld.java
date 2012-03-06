@@ -169,27 +169,27 @@ public class BukkitWorld implements LocalWorld
         {
             case Tree:
                 Tree.a(this.world, rand, x, y, z);
-                break;
+            break;
             case BigTree:
                 BigTree.a(1.0D, 1.0D, 1.0D);
                 BigTree.a(this.world, rand, x, y, z);
-                break;
+            break;
             case Forest:
                 Forest.a(this.world, rand, x, y, z);
-                break;
+            break;
             case HugeMushroom:
                 HugeMushroom.a(1.0D, 1.0D, 1.0D);
                 HugeMushroom.a(this.world, rand, x, y, z);
-                break;
+            break;
             case SwampTree:
                 SwampTree.a(this.world, rand, x, y, z);
-                break;
+            break;
             case Taiga1:
                 TaigaTree1.a(this.world, rand, x, y, z);
-                break;
+            break;
             case Taiga2:
                 TaigaTree2.a(this.world, rand, x, y, z);
-                break;
+            break;
         }
     }
 
@@ -346,7 +346,6 @@ public class BukkitWorld implements LocalWorld
         x = x & 0xF;
 
         return chunk.getTypeId(x,y,z);
-
     }
 
     public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
@@ -359,7 +358,6 @@ public class BukkitWorld implements LocalWorld
         x = x & 0xF;
 
         chunk.a(x,y,z,BlockId,Data);
-
     }
 
     public void setRawBlockId(int x, int y, int z, int BlockId)

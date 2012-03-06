@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Bukkit;
 
-
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.IBiomeManager;
 import com.Khorn.TerrainControl.LocalWorld;
@@ -15,7 +14,6 @@ import java.util.Random;
 
 public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeManager
 {
-
     private WorldConfig localWrk;
 
     private NoiseGeneratorOctaves2 TempGen;
@@ -276,11 +274,15 @@ public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeM
         }
 
         if (paramFloat2 < 0.45F)
+        {
             return BiomeBase.PLAINS;
+        }
+        
         if (paramFloat2 < 0.9F)
         {
             return BiomeBase.FOREST;
         }
+        
         return BiomeBase.FOREST;
     }
 

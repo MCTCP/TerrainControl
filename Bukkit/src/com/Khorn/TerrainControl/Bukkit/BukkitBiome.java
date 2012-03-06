@@ -15,7 +15,7 @@ public class BukkitBiome implements LocalBiome
         this.biomeBase = biome;
         if(DefaultBiome.getBiome(biome.id) == null)
         {
-            this.isCustom =true;
+            this.isCustom = true;
         }
     }
 

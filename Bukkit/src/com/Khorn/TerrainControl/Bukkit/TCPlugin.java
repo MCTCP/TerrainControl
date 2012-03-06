@@ -25,7 +25,6 @@ public class TCPlugin extends JavaPlugin
     public TCListener listener;
     public TCCommandExecutor commandExecutor;
     
-    
     public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
 
     public void onDisable()
@@ -153,7 +152,6 @@ public class TCPlugin extends JavaPlugin
             this.worlds.put(workWorld.getUUID(),bukkitWorld);
 
             System.out.println("TerrainControl: world initialized with seed is " + workWorld.getSeed());
-
         }
     }
 }

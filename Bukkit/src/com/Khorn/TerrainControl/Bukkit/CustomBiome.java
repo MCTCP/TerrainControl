@@ -24,10 +24,12 @@ public class CustomBiome extends BiomeBase
             Biome[] mappingArray = (Biome[]) biomeMapping.get(null);
             mappingArray[id] = Biome.OCEAN;
 
-        } catch (NoSuchFieldException e)
+        }
+        catch (NoSuchFieldException e)
         {
             e.printStackTrace();  
-        } catch (IllegalAccessException e)
+        }
+        catch (IllegalAccessException e)
         {
             e.printStackTrace();
         }
@@ -36,7 +38,6 @@ public class CustomBiome extends BiomeBase
 
     public void SetBiome(BiomeConfig config)
     {
-
         this.D = config.BiomeHeight;
         this.E = config.BiomeVolatility;
         this.A = config.SurfaceBlock;

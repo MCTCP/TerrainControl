@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Bukkit;
 
-
 import net.minecraft.server.BiomeBase;
 
 public class NullBiome extends BukkitBiome
