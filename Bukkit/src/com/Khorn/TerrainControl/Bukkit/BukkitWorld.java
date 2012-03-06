@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import org.bukkit.craftbukkit.CraftWorld;
-
 public class BukkitWorld implements LocalWorld
 {
     private TCChunkGenerator generator;

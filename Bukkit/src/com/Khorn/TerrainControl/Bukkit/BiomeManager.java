@@ -8,8 +8,6 @@ import com.Khorn.TerrainControl.IBiomeManager;
 import com.Khorn.TerrainControl.LocalWorld;
 import net.minecraft.server.*;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 

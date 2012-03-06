@@ -138,12 +138,12 @@ public class TCPlugin extends JavaPlugin
             {
                 case Normal:
                     BiomeManager manager = new BiomeManager(bukkitWorld);
-                    workWorld.worldProvider.c = manager; // TODO: Correct obfuscation??
+                    workWorld.worldProvider.c = manager;
                     bukkitWorld.setBiomeManager(manager);
                 break;
                 case OldGenerator:
                     BiomeManagerOld managerOld = new BiomeManagerOld(bukkitWorld);
-                    workWorld.worldProvider.c = managerOld; // TODO: Correct obfuscation??
+                    workWorld.worldProvider.c = managerOld;
                     bukkitWorld.setOldBiomeManager(managerOld);
                 break;
                 case Default:

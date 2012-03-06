@@ -1,6 +1,5 @@
 package com.Khorn.TerrainControl.Bukkit;
 
-
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
@@ -15,7 +14,6 @@ import net.minecraft.server.World;
 import org.bukkit.command.CommandSender;
 
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.sun.imageio.plugins.png.PNGImageWriter;
 import com.sun.imageio.plugins.png.PNGImageWriterSpi;
 
