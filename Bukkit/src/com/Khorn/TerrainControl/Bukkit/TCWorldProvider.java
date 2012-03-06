@@ -8,7 +8,7 @@ import net.minecraft.server.WorldProvider;
  * The value seem to be hardcoded in CraftWorld and we are a bit unsure about if that matters.
  * At least it should be a good thing that we set the value here.
  */
-public class WorldProviderTC extends WorldProvider
+public class TCWorldProvider extends WorldProvider
 {
     protected int seaLevel = 64;
     
@@ -18,7 +18,7 @@ public class WorldProviderTC extends WorldProvider
         return this.seaLevel;
     }
     
-    public WorldProviderTC setSeaLevel(int value)
+    public TCWorldProvider setSeaLevel(int value)
     {
         if (value < 1)
         {
