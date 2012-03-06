@@ -16,7 +16,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
-import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,7 +25,6 @@ public class TCPlugin extends JavaPlugin
 
     @SuppressWarnings("UnusedDeclaration")
     public TCListener listener;
-    public final HashMap<String, TCPlayer> sessions = new HashMap<String, TCPlayer>();
     public TCCommandExecutor commandExecutor;
     
     
@@ -55,22 +53,6 @@ public class TCPlugin extends JavaPlugin
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
     {
         return this.commandExecutor.onCommand(sender, command, label, args);
-    }
-
-    public TCPlayer GetPlayer(Player bukkitPlayer)
-    {
-        TCPlayer player;
-        synchronized (this.sessions)
-        {
-            if (this.sessions.containsKey(bukkitPlayer.getName()))
-            {
-                return this.sessions.get(bukkitPlayer.getName());
-            }
-                
-            player = new TCPlayer(bukkitPlayer);
-            this.sessions.put(bukkitPlayer.getName(), player);
-        }
-        return player;
     }
 
     @Override

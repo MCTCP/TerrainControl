@@ -38,7 +38,7 @@ permissions:
         description: show help
     tc.cmd.list:
         default: op
-        description: list bob plugins for this world
+        description: list BOB plugins for this world
     tc.cmd.map:
         default: op
         description: generate biome map image
@@ -47,4 +47,4 @@ permissions:
         description: reload world settings
     tc.cmd.spawn:
         default: op
-        description: spawn BOB to specified place
+        description: spawn BOB where you look

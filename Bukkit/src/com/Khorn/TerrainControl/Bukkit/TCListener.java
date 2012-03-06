@@ -1,18 +1,15 @@
 package com.Khorn.TerrainControl.Bukkit;
 
-import com.Khorn.TerrainControl.Bukkit.Commands.BaseCommand;
 import com.Khorn.TerrainControl.Configuration.TCDefaultValues;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.CustomObjects.CustomObjectGen;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -49,27 +46,6 @@ public class TCListener implements Listener, PluginMessageListener
             {
                 CustomObjectGen.SpawnCustomTrees(bukkitWorld, this.random, bukkitWorld.getSettings(), event.getLocation().getBlockX(), event.getLocation().getBlockY(), event.getLocation().getBlockZ());
                 event.getBlocks().clear();
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onPlayerInteract(PlayerInteractEvent event)
-    {
-        TCPlayer player = tcPlugin.GetPlayer(event.getPlayer());
-        if (player.hasObjectToSpawn)
-        {
-            Block block = event.getClickedBlock();
-            BukkitWorld bukkitWorld = this.tcPlugin.worlds.get(block.getWorld().getUID());
-            if (bukkitWorld != null)
-            {
-
-                if (CustomObjectGen.GenerateCustomObject(bukkitWorld, new Random(), bukkitWorld.getSettings(), block.getX(), block.getY(), block.getZ(), player.object, true))
-                    event.getPlayer().sendMessage(BaseCommand.MessageColor + player.object.name + " spawned");
-                else
-                    event.getPlayer().sendMessage(BaseCommand.ErrorColor + "This object cant spawn here");
-                player.hasObjectToSpawn = false;
-                event.setCancelled(true);
             }
         }
     }
