@@ -2,6 +2,7 @@ package com.Khorn.TerrainControl.Bukkit.Commands;
 
 import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManager;
 import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
+import com.Khorn.TerrainControl.Bukkit.TCPerm;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import org.bukkit.Bukkit;
@@ -16,8 +17,8 @@ public class ReloadCommand extends BaseCommand
     {
         super(_plugin);
         name = "reload";
-        usage = "/tc reload [World]";
-        help = "Reload world settings";
+        perm = TCPerm.CMD_RELOAD.node;
+        usage = "reload [World]";
         workOnConsole = true;
     }
 

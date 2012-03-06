@@ -12,3 +12,39 @@ commands:
               /<command> <reload> [world] - Reload config
               /<command> <biome> [-f] - Show current chunk biome and block stats
         aliases: [terraincontrol]
+permissions:
+    tc.*:
+        default: false
+        children:
+            tc.cmd.*: true
+    tc.cmd.*:
+        default: false
+        children:
+            tc.cmd.biome: true
+            tc.cmd.check: true
+            tc.cmd.help: true
+            tc.cmd.list: true
+            tc.cmd.map: true
+            tc.cmd.reload: true
+            tc.cmd.spawn: true
+    tc.cmd.biome:
+        default: op
+        description: show chunk biome and block stats
+    tc.cmd.check:
+        default: op
+        description: check/create TC settings for world
+    tc.cmd.help:
+        default: op
+        description: show help
+    tc.cmd.list:
+        default: op
+        description: list bob plugins for this world
+    tc.cmd.map:
+        default: op
+        description: generate biome map image
+    tc.cmd.reload:
+        default: op
+        description: reload world settings
+    tc.cmd.spawn:
+        default: op
+        description: spawn BOB to specified place

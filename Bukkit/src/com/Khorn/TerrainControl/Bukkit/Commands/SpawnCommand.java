@@ -1,6 +1,7 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
 import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
+import com.Khorn.TerrainControl.Bukkit.TCPerm;
 import com.Khorn.TerrainControl.Bukkit.TCPlayer;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import com.Khorn.TerrainControl.CustomObjects.CustomObject;
@@ -15,8 +16,8 @@ public class SpawnCommand extends BaseCommand
     {
         super(_plugin);
         name = "spawn";
-        usage = "/tc spawn BOBName";
-        help = "Spawn BOB to specified place";
+        perm = TCPerm.CMD_SPAWN.node;
+        usage = "spawn BOBName";
         workOnConsole = false;
     }
 

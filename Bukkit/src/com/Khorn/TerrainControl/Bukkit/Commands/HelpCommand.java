@@ -1,5 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
+import com.Khorn.TerrainControl.Bukkit.TCPerm;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import org.bukkit.command.CommandSender;
 
@@ -8,20 +9,24 @@ import java.util.List;
 
 public class HelpCommand extends BaseCommand
 {
-    private List<String> lines = new ArrayList<String>();
-
     public HelpCommand(TCPlugin _plugin)
     {
         super(_plugin);
         name = "help";
-        usage = "/tc help";
-        help = "Show help";
+        perm = TCPerm.CMD_HELP.node;
+        usage = "help";
         workOnConsole = false;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, List<String> args)
     {
+        List<String> lines = new ArrayList<String>();
+        for (BaseCommand command : plugin.commandExecutor.commandHashMap.values())
+        {
+            lines.add(MessageColor + "/tc " + command.usage + " - " + command.getHelp());
+        }
+        
         int page = 1;
         if (args.size() > 0)
         {
@@ -36,10 +41,5 @@ public class HelpCommand extends BaseCommand
 
         this.ListMessage(sender, lines, page, "Available commands");
         return true;
-    }
-
-    public void AddHelp(BaseCommand command)
-    {
-        this.lines.add(MessageColor + command.usage + " - " + command.help);
     }
 }

@@ -1,5 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
+import com.Khorn.TerrainControl.Bukkit.TCPerm;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.WorldChunkManager;
@@ -18,8 +19,8 @@ public class BiomeCommand extends BaseCommand
     {
         super(_plugin);
         name = "biome";
-        usage = "/tc biome [-f]";
-        help = "Show current chunk biome and block stats";
+        perm = TCPerm.CMD_BIOME.node;
+        usage = "biome [-f]";
         workOnConsole = false;
     }
 

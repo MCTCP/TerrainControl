@@ -1,6 +1,7 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
 import com.Khorn.TerrainControl.Bukkit.MapWriter;
+import com.Khorn.TerrainControl.Bukkit.TCPerm;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -16,8 +17,8 @@ public class MapCommand extends BaseCommand
     {
         super(_plugin);
         name = "map";
-        usage = "/tc map [World] [-s size] [-r rotate_angle]";
-        help = "Create biome map with width and height size in chunks";
+        perm = TCPerm.CMD_MAP.node;
+        usage = "map [World] [-s size] [-r rotate_angle]";
         workOnConsole = true;
     }
 

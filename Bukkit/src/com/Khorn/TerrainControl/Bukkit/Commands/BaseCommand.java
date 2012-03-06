@@ -9,13 +9,14 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 
 import java.util.List;
 
 public abstract class BaseCommand
 {
     public String name;
-    public String help;
+    public String perm;
     public String usage;
     public boolean workOnConsole;
     protected TCPlugin plugin;
@@ -33,23 +34,35 @@ public abstract class BaseCommand
         if (arg.equals(""))
         {
             if (sender instanceof ConsoleCommandSender)
+            {
                 return null;
+            }
+            
             if (sender instanceof Player && plugin.worlds.containsKey(((Player) sender).getWorld().getUID()))
+            {
                 return plugin.worlds.get(((Player) sender).getWorld().getUID());
+            }
+            
             return null;
         }
+        
         World world = Bukkit.getWorld(name);
+        
         if( world != null && plugin.worlds.containsKey(world.getUID()))
+        {
             return plugin.worlds.get(world.getUID());
-        else
-            return null;
+        }
+        
+        return null;
     }
 
     protected void ListMessage(CommandSender sender, List<String> lines, int page, String listName)
     {
         int pageCount = (lines.size() >> 3) +1;
         if (page > pageCount)
+        {
             page = pageCount;
+        }
 
         sender.sendMessage(ChatColor.AQUA.toString() + listName + " page " + page + "/" + pageCount);
         page--;
@@ -59,7 +72,21 @@ public abstract class BaseCommand
             sender.sendMessage(lines.get(i));
         }
     }
-
+    
+    public String getHelp()
+    {
+        String ret = "do that";
+        Permission permission = Bukkit.getPluginManager().getPermission(perm);
+        if (permission != null)
+        {
+            String desc = permission.getDescription();
+            if (desc != null && desc.trim().length() > 0)
+            {
+                ret = desc.trim();
+            }
+        }
+        return ret;
+    }
 
     public static final String ErrorColor = ChatColor.RED.toString();
     public static final String MessageColor = ChatColor.GREEN.toString();

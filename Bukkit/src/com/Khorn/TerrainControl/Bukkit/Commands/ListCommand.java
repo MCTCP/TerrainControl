@@ -1,6 +1,7 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
 import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
+import com.Khorn.TerrainControl.Bukkit.TCPerm;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import com.Khorn.TerrainControl.CustomObjects.CustomObject;
 import org.bukkit.command.CommandSender;
@@ -14,8 +15,8 @@ public class ListCommand extends BaseCommand
     {
         super(_plugin);
         name = "list";
-        usage = "/tc list [page]";
-        help = "List bob plugins for this world";
+        perm = TCPerm.CMD_LIST.node;
+        usage = "list [page]";
         workOnConsole = false;
     }
 

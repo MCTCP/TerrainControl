@@ -12,6 +12,8 @@ import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import net.minecraft.server.BiomeBase;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.entity.Player;
@@ -23,9 +25,11 @@ public class TCPlugin extends JavaPlugin
     private final HashMap<String, BukkitWorld> NotInitedWorlds = new HashMap<String, BukkitWorld>();
 
     @SuppressWarnings("UnusedDeclaration")
-    private TCListener listener;
-    private final HashMap<String, TCPlayer> sessions = new HashMap<String, TCPlayer>();
-
+    public TCListener listener;
+    public final HashMap<String, TCPlayer> sessions = new HashMap<String, TCPlayer>();
+    public TCCommandExecutor commandExecutor;
+    
+    
     public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
 
     public void onDisable()
@@ -37,13 +41,7 @@ public class TCPlugin extends JavaPlugin
     {
         BiomeManagerOld.GenBiomeDiagram();
 
-        // TODO: Why create two instances of TCCommandExecutor?
-        // TODO: Why the "!= null"-check? In fact: couldn't this lead to the "this" var getting out of sync on a server reload?
-        if (this.getCommand("tc") != null)
-        {
-            this.getCommand("tc").setExecutor(new TCCommandExecutor(this));
-        }
-        this.getCommand("terraincontrol").setExecutor(new TCCommandExecutor(this));
+        this.commandExecutor = new TCCommandExecutor(this);
         
         this.listener = new TCListener(this);
 
@@ -51,6 +49,12 @@ public class TCPlugin extends JavaPlugin
         Bukkit.getMessenger().registerOutgoingPluginChannel(this,TCDefaultValues.ChannelName.stringValue());
 
         System.out.println(getDescription().getFullName() + " is now enabled");
+    }
+    
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
+    {
+        return this.commandExecutor.onCommand(sender, command, label, args);
     }
 
     public TCPlayer GetPlayer(Player bukkitPlayer)

@@ -12,9 +12,9 @@ import java.util.HashMap;
 
 public class TCCommandExecutor implements CommandExecutor
 {
-    private final TCPlugin plugin;
-    private HashMap<String, BaseCommand> commandHashMap = new HashMap<String, BaseCommand>();
-    private HelpCommand helpCommand;
+    protected final TCPlugin plugin;
+    protected HashMap<String, BaseCommand> commandHashMap = new HashMap<String, BaseCommand>();
+    protected HelpCommand helpCommand;
 
     public TCCommandExecutor(TCPlugin plugin)
     {
@@ -25,29 +25,31 @@ public class TCCommandExecutor implements CommandExecutor
 
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings)
     {
-
-        if (!commandSender.isOp())
-        {
-            commandSender.sendMessage(ChatColor.RED.toString() + "You do not have permission to use this command!");
-            return true;
-        }
-        
         ArrayList<String> arg = new ArrayList<String>(Arrays.asList(strings));
-
+        
+        BaseCommand cmd = null;
         if (arg.size() == 0)
         {
-            return helpCommand.onCommand(commandSender, arg);
+            cmd = helpCommand;
         }
-        
-        BaseCommand baseCommand = commandHashMap.get(arg.get(0));
-        if (baseCommand == null)
+        else
         {
-            return helpCommand.onCommand(commandSender, arg);
+            cmd = commandHashMap.get(arg.get(0));
+            arg.remove(0);
         }
         
-        arg.remove(0);
+        if (cmd == null)
+        {
+            cmd = helpCommand;
+        }
+        
+        if ( ! commandSender.hasPermission(cmd.perm))
+        {
+            commandSender.sendMessage(ChatColor.RED.toString() + "You don't have permission to "+cmd.getHelp()+"!");
+            return true;
+        }
 
-        return baseCommand.onCommand(commandSender, arg);
+        return cmd.onCommand(commandSender, arg);
     }
 
     private void RegisterCommands()
@@ -64,6 +66,5 @@ public class TCCommandExecutor implements CommandExecutor
     private void AddCommand(BaseCommand command)
     {
         this.commandHashMap.put(command.name, command);
-        this.helpCommand.AddHelp(command);
     }
 }

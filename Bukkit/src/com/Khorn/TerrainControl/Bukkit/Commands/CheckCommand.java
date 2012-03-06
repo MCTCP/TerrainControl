@@ -1,5 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
+import com.Khorn.TerrainControl.Bukkit.TCPerm;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
 import org.bukkit.command.CommandSender;
 
@@ -11,8 +12,8 @@ public class CheckCommand extends BaseCommand
     {
         super(_plugin);
         name = "check";
-        usage = "/tc check World_Name";
-        help = "Checks or create TC settings for world ";
+        perm = TCPerm.CMD_CHECK.node;
+        usage = "check World_Name";
         workOnConsole = true;
     }
 
