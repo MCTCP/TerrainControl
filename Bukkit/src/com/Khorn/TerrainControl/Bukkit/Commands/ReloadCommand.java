@@ -1,6 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
-import com.Khorn.TerrainControl.Bukkit.BiomeManager;
+import com.Khorn.TerrainControl.Bukkit.TCWorldChunkManager;
 import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
 import com.Khorn.TerrainControl.Bukkit.TCPerm;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
@@ -42,7 +42,7 @@ public class ReloadCommand extends BaseCommand
         if (world.getSettings().ModeBiome == WorldConfig.BiomeMode.Normal)
         {
             net.minecraft.server.World worldServer = ((CraftWorld) Bukkit.getWorld(world.getName())).getHandle();
-            ((BiomeManager) worldServer.worldProvider.c).Init(world);
+            ((TCWorldChunkManager) worldServer.worldProvider.c).Init(world);
         }
 
         sender.sendMessage(MessageColor + "WorldConfig for world " + world.getName() + " reloaded");

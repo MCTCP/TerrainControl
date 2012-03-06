@@ -35,7 +35,7 @@ public class TCPlugin extends JavaPlugin
 
     public void onEnable()
     {
-        BiomeManagerOld.GenBiomeDiagram();
+        TCWorldChunkManagerOld.GenBiomeDiagram();
 
         this.commandExecutor = new TCCommandExecutor(this);
         
@@ -137,12 +137,12 @@ public class TCPlugin extends JavaPlugin
             switch (bukkitWorld.getSettings().ModeBiome)
             {
                 case Normal:
-                    BiomeManager manager = new BiomeManager(bukkitWorld);
+                    TCWorldChunkManager manager = new TCWorldChunkManager(bukkitWorld);
                     workWorld.worldProvider.c = manager;
                     bukkitWorld.setBiomeManager(manager);
                 break;
                 case OldGenerator:
-                    BiomeManagerOld managerOld = new BiomeManagerOld(bukkitWorld);
+                    TCWorldChunkManagerOld managerOld = new TCWorldChunkManagerOld(bukkitWorld);
                     workWorld.worldProvider.c = managerOld;
                     bukkitWorld.setOldBiomeManager(managerOld);
                 break;

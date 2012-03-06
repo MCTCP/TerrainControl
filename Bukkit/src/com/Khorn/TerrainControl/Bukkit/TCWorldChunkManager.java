@@ -11,7 +11,7 @@ import net.minecraft.server.*;
 import java.util.List;
 import java.util.Random;
 
-public class BiomeManager extends WorldChunkManager implements IBiomeManager
+public class TCWorldChunkManager extends WorldChunkManager implements IBiomeManager
 {
     private Layer UnZoomedLayer;
     private Layer BiomeLayer;
@@ -21,7 +21,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
 
     private WorldConfig worldConfig;
     
-    public BiomeManager(LocalWorld world)
+    public TCWorldChunkManager(LocalWorld world)
     {
         super();
         this.Init(world);

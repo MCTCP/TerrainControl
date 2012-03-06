@@ -13,7 +13,7 @@ import net.minecraft.server.WorldChunkManager;
 import java.util.List;
 import java.util.Random;
 
-public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
+public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeManager
 {
 
     private WorldConfig localWrk;
@@ -30,7 +30,7 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
 
     private static BiomeBase[] BiomeDiagram = new BiomeBase[4096];
 
-    public BiomeManagerOld(LocalWorld world)
+    public TCWorldChunkManagerOld(LocalWorld world)
     {
         super();
         this.localWrk = world.getSettings();
@@ -154,7 +154,7 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
                 this.old_temperature[i] = d4;
                 this.old_rain[i] = d5;
 
-                paramArrayOfBiomeBase[(i++)] = BiomeManagerOld.getBiomeFromDiagram(d4, d5);
+                paramArrayOfBiomeBase[(i++)] = TCWorldChunkManagerOld.getBiomeFromDiagram(d4, d5);
             }
 
         }
@@ -331,7 +331,7 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
                 this.old_temperature[i] = d4;
                 this.old_rain[i] = d5;
 
-                biomeArray[(i++)] = BiomeManagerOld.getBiomeFromDiagram(d4, d5).id;
+                biomeArray[(i++)] = TCWorldChunkManagerOld.getBiomeFromDiagram(d4, d5).id;
             }
 
         }

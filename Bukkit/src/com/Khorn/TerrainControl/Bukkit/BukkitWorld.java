@@ -19,7 +19,7 @@ public class BukkitWorld implements LocalWorld
     private String name;
     private long Seed;
     private IBiomeManager biomeManager;
-    private BiomeManagerOld old_biomeManager;
+    private TCWorldChunkManagerOld old_biomeManager;
 
     private static int NextBiomeId = DefaultBiome.values().length;
     private static LocalBiome[] Biomes = new LocalBiome[64];
@@ -491,7 +491,7 @@ public class BukkitWorld implements LocalWorld
         this.biomeManager = manager;
     }
 
-    public void setOldBiomeManager(BiomeManagerOld manager)
+    public void setOldBiomeManager(TCWorldChunkManagerOld manager)
     {
         this.old_biomeManager = manager;
         this.biomeManager = manager;
