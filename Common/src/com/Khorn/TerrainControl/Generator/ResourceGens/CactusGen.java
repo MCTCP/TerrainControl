@@ -22,10 +22,10 @@ public class CactusGen extends ResourceGenBase
                 int n = 1 + rand.nextInt(rand.nextInt(3) + 1);
                 for (int i1 = 0; i1 < n; i1++)
                 {
-                    int id = world.getRawBlockId(j, k + i1 - 1, m);
+                    int id = world.getTypeId(j, k + i1 - 1, m);
                     if (res.CheckSourceId(id) || id == res.BlockId)
                     {
-                        world.setRawBlockId(j, k + i1, m, res.BlockId);
+                        world.setBlock(j, k + i1, m, res.BlockId, 0, false, false, false);
                     }
                 }
             }

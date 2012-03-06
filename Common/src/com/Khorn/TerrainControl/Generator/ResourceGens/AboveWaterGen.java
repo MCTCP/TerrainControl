@@ -20,7 +20,7 @@ public class AboveWaterGen extends ResourceGenBase
             int m = z + rand.nextInt(8) - rand.nextInt(8);
             if ((!world.isEmpty(j, k, m)) || (world.getMaterial(j, k - 1, m) != DefaultMaterial.WATER))
                 continue;
-            world.setRawBlockId(j, k, m, res.BlockId);
+            world.setBlock(j, k, m, res.BlockId, 0, false, false, false);
         }
     }
 }

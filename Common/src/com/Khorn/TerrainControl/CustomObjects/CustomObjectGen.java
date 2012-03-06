@@ -19,11 +19,11 @@ public class CustomObjectGen extends ResourceGenBase
 
     private static boolean ObjectCanSpawn(LocalWorld world, int x, int y, int z, CustomObject obj)
     {
-        if ((world.getRawBlockId(x, y - 5, z) == 0) && (obj.needsFoundation))
+        if ((world.getTypeId(x, y - 5, z) == 0) && (obj.needsFoundation))
             return false;
 
         boolean abort = false;
-        int checkBlock = world.getRawBlockId(x, y + 2, z);
+        int checkBlock = world.getTypeId(x, y + 2, z);
         if (!obj.spawnWater)
             abort = ((checkBlock == DefaultMaterial.WATER.id) || (checkBlock == DefaultMaterial.STATIONARY_WATER.id));
         if (!obj.spawnLava)
@@ -38,7 +38,7 @@ public class CustomObjectGen extends ResourceGenBase
         if ((y < obj.spawnElevationMin) || (y > obj.spawnElevationMax))
             abort = true;
 
-        if (!obj.spawnOnBlockType.contains(world.getRawBlockId(x, y - 1, z)))
+        if (!obj.spawnOnBlockType.contains(world.getTypeId(x, y - 1, z)))
             abort = true;
 
         return !abort;
@@ -110,7 +110,7 @@ public class CustomObjectGen extends ResourceGenBase
 
                         if (!ObjectCanSpawn(world, x, y, z, ObjectFromGroup))
                             continue;
-                        GenerateCustomObject(world, rand, worldSettings, x, _y, z, ObjectFromGroup, false);
+                        GenerateCustomObject(world, rand, worldSettings, x, _y, z, ObjectFromGroup, true);
 
 
                     }
@@ -228,7 +228,7 @@ public class CustomObjectGen extends ResourceGenBase
 
             if (!workObject.dig)
             {
-                if (world.getRawBlockId((x + point.getX()), (y + point.getY()), (z + point.getZ())) > 0)
+                if (world.getTypeId((x + point.getX()), (y + point.getY()), (z + point.getZ())) > 0)
                 {
                     faultCounter++;
                     if (faultCounter > (workingData.size() * (workObject.collisionPercentage / 100)))
@@ -246,23 +246,23 @@ public class CustomObjectGen extends ResourceGenBase
         while (index < workingData.size())
         {
             Coordinate DataPoint = workingData.get(index);
-            if (world.getRawBlockId(x + DataPoint.getX(), y + DataPoint.getY(), z + DataPoint.getZ()) == 0)
+            if (world.getTypeId(x + DataPoint.getX(), y + DataPoint.getY(), z + DataPoint.getZ()) == 0)
             {
                 ChangeWorld(world, notify, (x + DataPoint.getX()), y + DataPoint.getY(), z + DataPoint.getZ(), DataPoint.workingData, DataPoint.workingExtra);
             } else if (DataPoint.Digs)
             {
                 ChangeWorld(world, notify, (x + DataPoint.getX()), y + DataPoint.getY(), z + DataPoint.getZ(), DataPoint.workingData, DataPoint.workingExtra);
             }
-            if ((!worldSettings.denyObjectsUnderFill) && (workObject.underFill) && (world.getRawBlockId(x + DataPoint.getX(), y, z + DataPoint.getZ()) > 0))
+            if ((!worldSettings.denyObjectsUnderFill) && (workObject.underFill) && (world.getTypeId(x + DataPoint.getX(), y, z + DataPoint.getZ()) > 0))
             {
                 int depthScanner = 0;
-                int blockForFill = world.getRawBlockId(x, y - 1, z);
+                int blockForFill = world.getTypeId(x, y - 1, z);
                 while (depthScanner < 64)
                 {
                     if (DataPoint.getY() < depthScanner)
                     {
                         int countdown = depthScanner;
-                        while ((world.getRawBlockId(x + DataPoint.getX(), y + DataPoint.getY() - countdown, z + DataPoint.getZ()) == 0) && (countdown < 64))
+                        while ((world.getTypeId(x + DataPoint.getX(), y + DataPoint.getY() - countdown, z + DataPoint.getZ()) == 0) && (countdown < 64))
                         {
                             ChangeWorld(world, notify, (x + DataPoint.getX()), y + DataPoint.getY() - countdown, z + DataPoint.getZ(), blockForFill, 0);
                             countdown++;
@@ -280,10 +280,7 @@ public class CustomObjectGen extends ResourceGenBase
 
     private static void ChangeWorld(LocalWorld world, boolean notify, int x, int y, int z, int type, int data)
     {
-        if (notify)
-            world.setBlockIdAndData(x, y, z, type, data);
-        else
-            world.setRawBlockIdAndData(x, y, z, type, data);
+        world.setBlock(x, y, z, type, data, true, false, notify);
     }
 
 

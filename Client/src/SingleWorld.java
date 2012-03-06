@@ -326,10 +326,10 @@ public class SingleWorld implements LocalWorld
 
     public boolean isEmpty(int x, int y, int z)
     {
-        return this.getRawBlockId(x, y, z) == 0;
+        return this.getTypeId(x, y, z) == 0;
     }
 
-    public int getRawBlockId(int x, int y, int z)
+    public int getTypeId(int x, int y, int z)
     {
         aal chunk = this.getChunk(x, y, z);
         if (chunk == null)
@@ -389,7 +389,7 @@ public class SingleWorld implements LocalWorld
 
     public DefaultMaterial getMaterial(int x, int y, int z)
     {
-        int id = this.getRawBlockId(x, y, z);
+        int id = this.getTypeId(x, y, z);
         return DefaultMaterial.getMaterial(id);
     }
 

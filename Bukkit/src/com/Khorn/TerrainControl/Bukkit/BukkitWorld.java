@@ -1,7 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit;
 
 import com.Khorn.TerrainControl.*;
-import com.Khorn.TerrainControl.IBiomeManager;
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;
 import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
@@ -331,12 +330,12 @@ public class BukkitWorld implements LocalWorld
 
     public boolean isEmpty(int x, int y, int z)
     {
-        return this.getRawBlockId(x, y, z) == 0;
+        return this.getTypeId(x, y, z) == 0;
     }
 
-    public int getRawBlockId(int x, int y, int z)
+    public int getTypeId(int x, int y, int z)
     {
-         Chunk chunk = this.getChunk(x, y, z);
+        Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
         {
             return 0;
@@ -348,37 +347,37 @@ public class BukkitWorld implements LocalWorld
         return chunk.getTypeId(x,y,z);
     }
 
-    public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
+    public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
-
+        // If minecraft was updated and obfuscation is off - take a look at these methods:
+        // this.world.setRawTypeIdAndData(i, j, k, l, i1)
+        // this.world.setTypeIdAndData(i, j, k, l, i1)
+        
+        // We fetch the chunk from a custom cache in order to speed things up.
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
+        {
             return;
-        z = z & 0xF;
-        x = x & 0xF;
+        }
 
-        chunk.a(x,y,z,BlockId,Data);
-    }
-
-    public void setRawBlockId(int x, int y, int z, int BlockId)
-    {
-        Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null)
-            return;
-        z = z & 0xF;
-        x = x & 0xF;
-
-        chunk.a(x,y,z,BlockId,0);
-    }
-
-    public void setBlockId(int x, int y, int z, int BlockId)
-    {
-        this.world.setTypeId(x, y, z, BlockId);
-    }
-
-    public void setBlockIdAndData(int x, int y, int z, int BlockId, int Data)
-    {
-        this.world.setTypeIdAndData(x, y, z, BlockId, Data);
+        // Set typeId and Data
+        chunk.a(x & 15, y, z & 15, typeId, data);
+        
+        if (updateLight)
+        {
+            this.world.b(EnumSkyBlock.SKY, x, y, z);
+        }
+        
+        if (applyPhysics)
+        {
+            int oldTypeId = chunk.getTypeId(x & 15, y, z & 15);
+            this.world.applyPhysics(x, y, z, typeId == 0 ? oldTypeId : typeId);
+        }
+        
+        if (notifyPlayers)
+        {
+            this.world.notify(x, y, z);
+        }
     }
 
     public int getHighestBlockYAt(int x, int z)
@@ -395,7 +394,7 @@ public class BukkitWorld implements LocalWorld
 
     public DefaultMaterial getMaterial(int x, int y, int z)
     {
-        int id = this.getRawBlockId(x, y, z);
+        int id = this.getTypeId(x, y, z);
         return DefaultMaterial.getMaterial(id);
     }
 

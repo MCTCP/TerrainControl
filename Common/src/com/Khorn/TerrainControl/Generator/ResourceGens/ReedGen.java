@@ -29,10 +29,10 @@ public class ReedGen extends ResourceGenBase
             for (int i1 = 0; i1 < n; i1++)
             {
 
-                int id = world.getRawBlockId(j, y + i1 - 1, m);
+                int id = world.getTypeId(j, y + i1 - 1, m);
                 if (res.CheckSourceId(id) || id == res.BlockId)
                 {
-                    world.setRawBlockId(j, y + i1, m, res.BlockId);
+                    world.setBlock(j, y + i1, m, res.BlockId, 0, false, false, false);
                 }
             }
         }

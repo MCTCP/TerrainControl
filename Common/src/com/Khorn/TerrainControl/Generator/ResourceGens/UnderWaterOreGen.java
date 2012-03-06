@@ -25,10 +25,10 @@ public class UnderWaterOreGen extends ResourceGenBase
                 {
                     for (int i2 = y - j; i2 <= y + j; i2++)
                     {
-                        int i3 = world.getRawBlockId(k, i2, m);
+                        int i3 = world.getTypeId(k, i2, m);
                         if (res.CheckSourceId(i3))
                         {
-                            world.setRawBlockId(k, i2, m, res.BlockId);
+                            world.setBlock(k, i2, m, res.BlockId, 0, false, false, false);
                         }
                     }
                 }

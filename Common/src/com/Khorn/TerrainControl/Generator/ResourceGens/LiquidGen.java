@@ -13,34 +13,34 @@ public class LiquidGen extends ResourceGenBase
     {
         int y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
 
-        if (res.CheckSourceId(world.getRawBlockId(x, y + 1, z)))
+        if (res.CheckSourceId(world.getTypeId(x, y + 1, z)))
             return;
-        if (res.CheckSourceId(world.getRawBlockId(x, y - 1, z)))
+        if (res.CheckSourceId(world.getTypeId(x, y - 1, z)))
             return;
 
-        if ((world.getRawBlockId(x, y, z) != 0) && (res.CheckSourceId(world.getRawBlockId(x, y, z))))
+        if ((world.getTypeId(x, y, z) != 0) && (res.CheckSourceId(world.getTypeId(x, y, z))))
             return;
 
 
         int i = 0;
         int j = 0;
 
-        int tempBlock = world.getRawBlockId(x - 1, y, z);
+        int tempBlock = world.getTypeId(x - 1, y, z);
 
         i = (res.CheckSourceId(tempBlock)) ? i + 1 : i;
         j = (tempBlock == 0) ? j + 1 : j;
 
-        tempBlock = world.getRawBlockId(x + 1, y, z);
+        tempBlock = world.getTypeId(x + 1, y, z);
 
         i = (res.CheckSourceId(tempBlock)) ? i + 1 : i;
         j = (tempBlock == 0) ? j + 1 : j;
 
-        tempBlock = world.getRawBlockId(x, y, z - 1);
+        tempBlock = world.getTypeId(x, y, z - 1);
 
         i = (res.CheckSourceId(tempBlock)) ? i + 1 : i;
         j = (tempBlock == 0) ? j + 1 : j;
 
-        tempBlock = world.getRawBlockId(x, y, z + 1);
+        tempBlock = world.getTypeId(x, y, z + 1);
 
         i = (res.CheckSourceId(tempBlock)) ? i + 1 : i;
         j = (tempBlock == 0) ? j + 1 : j;
@@ -48,8 +48,7 @@ public class LiquidGen extends ResourceGenBase
 
         if ((i == 3) && (j == 1))
         {
-
-            world.setBlockId(x, y, z, res.BlockId);
+            world.setBlock(x, y, z, res.BlockId, 0, true, true, true);
             //this.world.f = true;
             //Block.byId[res.BlockId].a(this.world, x, y, z, this.rand);
             //this.world.f = false;
