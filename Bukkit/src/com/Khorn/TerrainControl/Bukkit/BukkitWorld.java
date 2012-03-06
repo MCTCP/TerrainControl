@@ -1,7 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit;
 
 import com.Khorn.TerrainControl.*;
-import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManagerOld;
 import com.Khorn.TerrainControl.IBiomeManager;
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;

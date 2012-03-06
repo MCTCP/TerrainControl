@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.Bukkit.BiomeManager;
+package com.Khorn.TerrainControl.Bukkit;
 
 
 import com.Khorn.TerrainControl.Configuration.WorldConfig;

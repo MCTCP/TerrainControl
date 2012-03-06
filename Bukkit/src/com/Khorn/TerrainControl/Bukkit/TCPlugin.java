@@ -4,8 +4,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.UUID;
 
-import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManager;
-import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManagerOld;
 import com.Khorn.TerrainControl.Bukkit.Commands.TCCommandExecutor;
 import com.Khorn.TerrainControl.Configuration.TCDefaultValues;
 import com.Khorn.TerrainControl.Configuration.WorldConfig;

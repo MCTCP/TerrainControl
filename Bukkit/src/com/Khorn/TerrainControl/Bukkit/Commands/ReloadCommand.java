@@ -1,6 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit.Commands;
 
-import com.Khorn.TerrainControl.Bukkit.BiomeManager.BiomeManager;
+import com.Khorn.TerrainControl.Bukkit.BiomeManager;
 import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
 import com.Khorn.TerrainControl.Bukkit.TCPerm;
 import com.Khorn.TerrainControl.Bukkit.TCPlugin;
