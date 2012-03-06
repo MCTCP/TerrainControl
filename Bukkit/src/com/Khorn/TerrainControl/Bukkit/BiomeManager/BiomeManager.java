@@ -58,7 +58,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
             paramArrayOfFloat = new float[paramInt3 * paramInt4];
         }
 
-        int[] arrayOfInt = this.UnZoomedLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt = this.BiomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
             float f1 =  worldConfig.biomeConfigs[arrayOfInt[i]].getWetness() / 65536.0F;
@@ -80,7 +80,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
             paramArrayOfFloat = new float[paramInt3 * paramInt4];
         }
 
-        int[] arrayOfInt = this.UnZoomedLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt = this.BiomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
             float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getTemperature() / 65536.0F;

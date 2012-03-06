@@ -165,8 +165,11 @@ public abstract class Layer
                     continue;
                 if (config.IsleBiomes.contains(biomeConfig.Name) && biomeConfig.IsleInBiome != null)
                 {
+                    int id = biomeConfig.Biome.getId();
+                    if (biomeConfig.Biome.isCustom())
+                        id = id -2;
 
-                    LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + biomeConfig.Biome.getId(), MainLayer);
+                    LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + id, MainLayer);
                     layerBiome.biome = biomeConfig.Biome;
                     for (String islandInName : biomeConfig.IsleInBiome)
                     {
