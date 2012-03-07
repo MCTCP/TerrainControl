@@ -371,7 +371,7 @@ public class BukkitWorld implements LocalWorld
         
         if (updateLight)
         {
-            this.world.b(EnumSkyBlock.SKY, x, y, z);
+            this.world.v(x, y, z);
         }
         
         if (applyPhysics)
