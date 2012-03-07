@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class BiomeManager extends qu implements IBiomeManager
+public class BiomeManager extends ro implements IBiomeManager
 {
     private Layer UnZoomedLayer;
     private Layer BiomeLayer;

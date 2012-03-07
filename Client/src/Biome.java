@@ -3,9 +3,9 @@ import com.Khorn.TerrainControl.LocalBiome;
 
 public class Biome implements LocalBiome
 {
-    private zp biomeBase;
+    private abi biomeBase;
 
-    public Biome(zp biome)
+    public Biome(abi biome)
     {
         this.biomeBase = biome;
     }
@@ -22,41 +22,41 @@ public class Biome implements LocalBiome
 
     public String getName()
     {
-        return this.biomeBase.w;
+        return this.biomeBase.y;
     }
 
     public int getId()
     {
-        return this.biomeBase.K;
+        return this.biomeBase.M;
     }
 
     public float getTemperature()
     {
-        return this.biomeBase.D;
+        return this.biomeBase.F;
     }
 
     public float getWetness()
     {
-        return this.biomeBase.E;
+        return this.biomeBase.G;
     }
 
     public float getSurfaceHeight()
     {
-        return this.biomeBase.B;
+        return this.biomeBase.D;
     }
 
     public float getSurfaceVolatility()
     {
-        return this.biomeBase.C;
+        return this.biomeBase.E;
     }
 
     public byte getSurfaceBlock()
     {
-        return this.biomeBase.y;
+        return this.biomeBase.A;
     }
 
     public byte getGroundBlock()
     {
-        return this.biomeBase.z;
+        return this.biomeBase.B;
     }
 }

@@ -10,7 +10,7 @@ import java.util.Random;
 public class SingleWorld implements LocalWorld
 {
     private ChunkProvider generator;
-    private vq world;
+    private wz world;
     private WorldConfig settings;
     private String name;
     private long Seed;
@@ -19,7 +19,7 @@ public class SingleWorld implements LocalWorld
 
     private static int NextBiomeId = 0;
     private static LocalBiome[] Biomes = new LocalBiome[64];
-    private static zp[] BiomesToRestore = new zp[64];
+    private static abi[] BiomesToRestore = new abi[64];
     private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 
@@ -52,11 +52,11 @@ public class SingleWorld implements LocalWorld
 
     public static void RestoreBiomes()
     {
-        for (zp oldBiome : BiomesToRestore)
+        for (abi oldBiome : BiomesToRestore)
         {
             if (oldBiome == null)
                 continue;
-            zp.a[oldBiome.K] = oldBiome;
+            abi.a[oldBiome.M] = oldBiome;
         }
         NextBiomeId = 0;
         DefaultBiomes.clear();
@@ -70,9 +70,9 @@ public class SingleWorld implements LocalWorld
 
         for (int i = 0; i < DefaultBiome.values().length; i++)
         {
-            zp oldBiome = zp.a[i];
+            abi oldBiome = abi.a[i];
             BiomesToRestore[i] = oldBiome;
-            CustomBiome custom = new CustomBiome(NextBiomeId++, oldBiome.w);
+            CustomBiome custom = new CustomBiome(NextBiomeId++, oldBiome.y);
             custom.CopyBiome(oldBiome);
             Biome biome = new Biome(custom);
             Biomes[biome.getId()] = biome;
@@ -453,7 +453,7 @@ public class SingleWorld implements LocalWorld
         this.settings = worldConfig;
     }
 
-    public void InitM(vq _world)
+    public void InitM(wz _world)
     {
         this.world = _world;
         this.Seed = world.t();
@@ -461,7 +461,7 @@ public class SingleWorld implements LocalWorld
 
     }
 
-    public void Init(vq _world)
+    public void Init(wz _world)
     {
         this.world = _world;
         this.Seed = world.t();
@@ -497,7 +497,7 @@ public class SingleWorld implements LocalWorld
         this.biomeManager = manager;
     }
 
-    public vq getWorld()
+    public wz getWorld()
     {
         return this.world;
     }

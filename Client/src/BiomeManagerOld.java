@@ -6,7 +6,7 @@ import com.Khorn.TerrainControl.Util.NoiseGeneratorOctaves2;
 import java.util.List;
 import java.util.Random;
 
-public class BiomeManagerOld extends qu implements IBiomeManager
+public class BiomeManagerOld extends ro implements IBiomeManager
 {
 
     private WorldConfig localWrk;

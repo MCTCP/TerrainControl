@@ -5,37 +5,38 @@ import java.io.*;
 import java.lang.reflect.Field;
 
 @SuppressWarnings("ALL")
-public abstract class aip
+public abstract class akv
 {
-    //world
-    public vq a;
-    //world type
-    public um b;
-    public qu c;
+    //wz  - world
+
+
+    public wz a;
+    public vt b;
+    public ro c;
     public boolean d = false;
     public boolean e = false;
-    public boolean f = false;    // nosky ?
-    public float[] g = new float[16];
-    public int h = 0;
+    public float[] f = new float[16];
+    public int g = 0;
 
     private SingleWorld world;
 
-    private float[] i = new float[4];
+    private float[] h = new float[4];
 
-    public final void a(vq paramvq)
+    public final void a(wz paramwz)
     {
-        this.a = paramvq;
-        this.b = paramvq.z().t();
+        this.a = paramwz;
+        this.b = paramwz.B().t();
+
         SingleWorld.RestoreBiomes();
 
         TCClient.CheckWorld(this);
 
-        if (this.b == um.TerrainControl)
+        if (this.b == vt.TerrainControl)
         {
 
-            this.world = new SingleWorld(paramvq.C.j());
-            this.world.setHeight(paramvq.c);
-            this.world.setWaterLevel(paramvq.e);
+            this.world = new SingleWorld(paramwz.C.j());      // TODO
+            this.world.setHeight(paramwz.c);
+            this.world.setWaterLevel(paramwz.e);
 
             File worldDir = null;
             try
@@ -44,7 +45,7 @@ public abstract class aip
 
                 dirField.setAccessible(true);
 
-                worldDir = (File) dirField.get(paramvq.B);
+                worldDir = (File) dirField.get(paramwz.B);      // TODO
 
 
             } catch (NoSuchFieldException e)
@@ -66,12 +67,12 @@ public abstract class aip
 
             WorldConfig config = new WorldConfig(configDir, world, false);
             this.world.setSettings(config);
-            this.world.Init(paramvq);
+            this.world.Init(paramwz);
 
         }
 
         a();
-        h();
+        i();
     }
 
     public void InitTCBiomeManager(ChannelPacket packet)
@@ -100,22 +101,18 @@ public abstract class aip
 
     }
 
-    protected void h()
-    {
+    protected void i() {
         float f1 = 0.0F;
-        for (int j = 0; j <= 15; j++)
-        {
-            float f2 = 1.0F - j / 15.0F;
-            this.g[j] = ((1.0F - f2) / (f2 * 3.0F + 1.0F) * (1.0F - f1) + f1);
+        for (int i = 0; i <= 15; i++) {
+            float f2 = 1.0F - i / 15.0F;
+            this.f[i] = ((1.0F - f2) / (f2 * 3.0F + 1.0F) * (1.0F - f1) + f1);
         }
     }
 
-    // Biome manager
-    protected void a()
-    {
-        if (this.a.z().t() == um.b)
-            this.c = new ff(zp.c, 0.5F, 0.5F);
-        else if (this.b == um.TerrainControl)
+    protected void a() {
+        if (this.a.B().t() == vt.c)
+            this.c = new fj(abi.c, 0.5F, 0.5F);
+        else if (this.b == vt.TerrainControl)
         {
             switch (this.world.getSettings().ModeBiome)
             {
@@ -129,83 +126,79 @@ public abstract class aip
                     this.world.setOldBiomeManager((BiomeManagerOld) this.c);
                     break;
                 case Default:
-                    this.c = new qu(this.a);
+                    this.c = new ro(this.a);
                     break;
             }
         } else
-            this.c = new qu(this.a);
+            this.c = new ro(this.a);
     }
 
-    //Chunk & object manager
-    public bs b()
+    public bx b()
     {
-        if (this.b == um.b)
-        {
-            return new wo(this.a, this.a.t(), this.a.z().r());
-        } else if (this.b == um.TerrainControl)
+        if (this.b == vt.c) {
+            return new yd(this.a, this.a.v(), this.a.B().r());
+        }
+        else if (this.b == vt.TerrainControl)
         {
             if (this.world.getSettings().ModeTerrain != WorldConfig.TerrainMode.Default)
             {
                 return this.world.getChunkGenerator();
             } else
-                return new aji(this.a, this.a.t(), this.a.z().r());
+                return new als(this.a, this.a.v(), this.a.B().r());
         } else
-            return new aji(this.a, this.a.t(), this.a.z().r());
+        return new als(this.a, this.a.v(), this.a.B().r());
     }
 
     public boolean a(int paramInt1, int paramInt2)
     {
-        int j = this.a.a(paramInt1, paramInt2);
+        int i = this.a.b(paramInt1, paramInt2);
 
-        return j == oe.w.bO;
+        return i == ox.u.bO;
     }
 
     public float a(long paramLong, float paramFloat)
     {
-        int j = (int) (paramLong % 24000L);
-        float f1 = (j + paramFloat) / 24000.0F - 0.25F;
-        if (f1 < 0.0F)
-            f1 += 1.0F;
-        if (f1 > 1.0F)
-            f1 -= 1.0F;
+        int i = (int)(paramLong % 24000L);
+        float f1 = (i + paramFloat) / 24000.0F - 0.25F;
+        if (f1 < 0.0F) f1 += 1.0F;
+        if (f1 > 1.0F) f1 -= 1.0F;
         float f2 = f1;
-        f1 = 1.0F - (float) ((Math.cos(f1 * 3.141592653589793D) + 1.0D) / 2.0D);
+        f1 = 1.0F - (float)((Math.cos(f1 * 3.141592653589793D) + 1.0D) / 2.0D);
         f1 = f2 + (f1 - f2) / 3.0F;
         return f1;
     }
 
-    public int b(long paramLong, float paramFloat)
-    {
-        return (int) (paramLong / 24000L) % 8;
+    public int b(long paramLong, float paramFloat) {
+        return (int)(paramLong / 24000L) % 8;
+    }
+
+    public boolean e() {
+        return true;
     }
 
     public float[] a(float paramFloat1, float paramFloat2)
     {
         float f1 = 0.4F;
-        float f2 = ga.b(paramFloat1 * 3.141593F * 2.0F) - 0.0F;
+        float f2 = gh.b(paramFloat1 * 3.141593F * 2.0F) - 0.0F;
         float f3 = -0.0F;
-        if ((f2 >= f3 - f1) && (f2 <= f3 + f1))
-        {
+        if ((f2 >= f3 - f1) && (f2 <= f3 + f1)) {
             float f4 = (f2 - f3) / f1 * 0.5F + 0.5F;
-            float f5 = 1.0F - (1.0F - ga.a(f4 * 3.141593F)) * 0.99F;
+            float f5 = 1.0F - (1.0F - gh.a(f4 * 3.141593F)) * 0.99F;
             f5 *= f5;
-            this.i[0] = (f4 * 0.3F + 0.7F);
-            this.i[1] = (f4 * f4 * 0.7F + 0.2F);
-            this.i[2] = (f4 * f4 * 0.0F + 0.2F);
-            this.i[3] = f5;
-            return this.i;
+            this.h[0] = (f4 * 0.3F + 0.7F);
+            this.h[1] = (f4 * f4 * 0.7F + 0.2F);
+            this.h[2] = (f4 * f4 * 0.0F + 0.2F);
+            this.h[3] = f5;
+            return this.h;
         }
 
         return null;
     }
 
-    public bk b(float paramFloat1, float paramFloat2)
-    {
-        float f1 = ga.b(paramFloat1 * 3.141593F * 2.0F) * 2.0F + 0.5F;
-        if (f1 < 0.0F)
-            f1 = 0.0F;
-        if (f1 > 1.0F)
-            f1 = 1.0F;
+    public bm b(float paramFloat1, float paramFloat2) {
+        float f1 = gh.b(paramFloat1 * 3.141593F * 2.0F) * 2.0F + 0.5F;
+        if (f1 < 0.0F) f1 = 0.0F;
+        if (f1 > 1.0F) f1 = 1.0F;
 
         if (this.world == null)
         {
@@ -217,7 +210,7 @@ public abstract class aip
             f2 *= (f1 * 0.94F + 0.06F);
             f3 *= (f1 * 0.94F + 0.06F);
             f4 *= (f1 * 0.91F + 0.09F);
-            return bk.b(f2, f3, f4);
+            return bm.b(f2, f3, f4);
         } else
         {
 
@@ -227,64 +220,61 @@ public abstract class aip
             float green = (config.WorldFogG*f1 + config.WorldNightFogG*(1-f1));
             float blue = (config.WorldFogB*f1 + config.WorldNightFogB*(1-f1));
 
-            return bk.b(red, green, blue);
+            return bm.b(red, green, blue);
 
         }
-
-
     }
 
-    public boolean d()
-    {
+    public boolean d() {
         return true;
     }
 
-    public static aip a(int paramInt)
-    {
-        if (paramInt == -1)
-            return new ahv();
-        if (paramInt == 0)
-            return new ma();
+    public static akv a(int paramInt) {
+        if (paramInt == -1) return new ajz();
+        if (paramInt == 0) return new mp();
         if (paramInt == 1)
-            return new hv();
+            try
+            {
+                return (akv) Class.forName("if").newInstance();
+            } catch (Exception e1)
+            {
+                e1.printStackTrace();
+            }
         return null;
     }
 
-    public float e()
-    {
-        return this.a.c;
+    public float f() {
+        return 128.0F;
     }
 
-    public boolean c()
-    {
+    public boolean c() {
         return true;
     }
 
-    public td f()
-    {
+    public ud g() {
         return null;
     }
 
-    public int g()
-    {
-        if (this.b == um.b)
-        {
+    public int h() {
+        if (this.b == vt.c) {
             return 4;
         }
-        return this.a.c / 2;
+        return 64;
     }
 
-    public boolean i()
-    {
-        return (this.b != um.b) && (!this.f);
+    public boolean j() {
+        return (this.b != vt.c) && (!this.e);
     }
 
-    public double j()
-    {
-        if (this.b == um.b)
-        {
+    public double k() {
+        if (this.b == vt.c) {
             return 1.0D;
         }
         return 0.03125D;
+    }
+
+    public boolean b(int paramInt1, int paramInt2)
+    {
+        return false;
     }
 }

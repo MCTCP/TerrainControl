@@ -1,7 +1,7 @@
 import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 
 
-public class CustomBiome extends zp
+public class CustomBiome extends abi
 {
     private int skyColor;
     private int grassColor;
@@ -20,13 +20,13 @@ public class CustomBiome extends zp
     public void SetBiome(BiomeConfig config)
     {
 
-        this.B = config.BiomeHeight;
-        this.C = config.BiomeVolatility;
-        this.y = config.SurfaceBlock;
-        this.z = config.GroundBlock;
-        this.D = config.BiomeTemperature;
-        this.E = config.BiomeWetness;
-        this.F = config.WaterColor;
+        this.D = config.BiomeHeight;
+        this.E = config.BiomeVolatility;
+        this.A = config.SurfaceBlock;
+        this.B = config.GroundBlock;
+        this.F = config.BiomeTemperature;
+        this.G = config.BiomeWetness;
+        this.H = config.WaterColor;
         this.skyColor = config.SkyColor;
         this.grassColor = config.GrassColor;
         this.foliageColor = config.FoliageColor;
@@ -38,15 +38,15 @@ public class CustomBiome extends zp
             this.foliageColorSet = true;
 
         // color ?
-        this.x = 522674;
+        //this.x = 522674;
 
         // duno.
-        this.A = 9154376;
+        //this.A = 9154376;
 
 
     }
 
-    public void CopyBiome(zp baseBiome)
+    public void CopyBiome(abi baseBiome)
     {
         this.B = baseBiome.B;
         this.C = baseBiome.C;
@@ -73,24 +73,24 @@ public class CustomBiome extends zp
 
 
     // getGrassColorAtCoords
-    public int a(aiw paramaiw, int paramInt1, int paramInt2, int paramInt3)
+    public int j()
     {
         if (!this.grassColorSet)
-            return super.a(paramaiw, paramInt1, paramInt2, paramInt3);
-        double d1 = paramaiw.a().a(paramInt1, paramInt2, paramInt3);
-        double d2 = paramaiw.a().b(paramInt1, paramInt3);
+            return super.j();
+        double d1 = i();
+        double d2 = h();
 
-        return ((gk.a(d1, d2)& 0xFEFEFE) + this.grassColor) / 2;
+        return ((zq.a(d1, d2)& 0xFEFEFE) + this.grassColor) / 2;
     }
 
     // getFoliageColorAtCoords
-    public int b(aiw paramaiw, int paramInt1, int paramInt2, int paramInt3)
+    public int k()
     {
         if (!this.foliageColorSet)
-            return super.b(paramaiw, paramInt1, paramInt2, paramInt3);
-        double d1 = paramaiw.a().a(paramInt1, paramInt2, paramInt3);
-        double d2 = paramaiw.a().b(paramInt1, paramInt3);
+            return super.k();
+        double d1 = i();
+        double d2 = h();
 
-        return ((gk.a(d1, d2)& 0xFEFEFE)  + this.foliageColor) / 2;
+        return ((zq.a(d1, d2)& 0xFEFEFE)  + this.foliageColor) / 2;
     }
 }

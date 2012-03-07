@@ -1,11 +1,11 @@
 
-public class ChannelPacket extends dz
+public class ChannelPacket extends eb
 {
    @Override
-    public void a(nh nh)
+    public void a(oa oa)
     {
         TCClient.ReceiveConfig(this);
 
-        super.a(nh);
+        super.a(oa);
     }
 }

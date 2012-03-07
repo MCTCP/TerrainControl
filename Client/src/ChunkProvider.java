@@ -1,11 +1,13 @@
 import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
 import com.Khorn.TerrainControl.Generator.ObjectSpawner;
 
-public class ChunkProvider extends aji
+import java.util.List;
+
+public class ChunkProvider implements bx
 {
 
     private SingleWorld world;
-    private vq worldHandle;
+    private wz worldHandle;
 
     private ChunkProviderTC generator;
     private ObjectSpawner spawner;
@@ -13,7 +15,7 @@ public class ChunkProvider extends aji
 
     public ChunkProvider(SingleWorld _world)
     {
-        super(_world.getWorld(), _world.getSeed(), false);
+        //super(_world.getWorld(), _world.getSeed());
 
         this.world = _world;
         this.worldHandle = _world.getWorld();
@@ -25,31 +27,62 @@ public class ChunkProvider extends aji
     }
 
 
-    @Override
-    public aal b(int x, int z)
+    public boolean a(int i, int i1)
     {
-
-        aal localaal = new aal(this.worldHandle, this.generator.generate(x, z), x, z);
-
-        localaal.c();
-        return localaal;
+        return true;
     }
 
-    @Override
-    public void a(bs bs, int x, int z)
+    public acf b(int x, int z)
+    {
+
+        acf chunk = new acf(this.worldHandle, this.generator.generate(x, z), x, z);
+
+        chunk.b();
+        return chunk;
+    }
+
+    public acf c(int i, int i1)
+    {
+        return b(i,i1);
+    }
+
+    public void a(bx bx, int x, int z)
     {
         this.world.LoadChunk(x, z);
         this.spawner.populate(x, z);
     }
 
-
-    @Override
-    public pr a(vq paramvq, String paramString, int paramInt1, int paramInt2, int paramInt3)
+    public boolean a(boolean b, rs rs)
     {
-        if (("Stronghold".equals(paramString)) && (this.world.getStrongholdGen() != null))
-        {
-            return this.world.getStrongholdGen().a(paramvq, paramInt1, paramInt2, paramInt3);
+       return true;
+    }
+
+    public boolean a()
+    {
+        return false;
+    }
+
+    public boolean b()
+    {
+        return  true;
+    }
+
+    public String c()
+    {
+        return "TerrainControlLevelSource";
+    }
+
+    public List a(aca paramaca, int paramInt1, int paramInt2, int paramInt3)
+    {
+        abi localabi = this.worldHandle.a(paramInt1, paramInt3);
+        if (localabi == null) {
+            return null;
         }
+        return localabi.a(paramaca);
+    }
+
+    public qk a(wz wz, String s, int i, int i1, int i2)
+    {
         return null;
     }
 }

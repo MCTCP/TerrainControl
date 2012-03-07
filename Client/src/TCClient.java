@@ -7,12 +7,12 @@ import java.util.HashMap;
 
 public class TCClient
 {
-    private static aip WorldProvider;
+    private static akv WorldProvider;
 
-    public static boolean CheckWorld(aip worldProvider)
+    public static boolean CheckWorld(akv worldProvider)
     {
         WorldProvider = worldProvider;
-        abm netHandler = GetNetworkHandler();
+        adg netHandler = GetNetworkHandler();
 
         if (netHandler != null)
         {
@@ -37,7 +37,7 @@ public class TCClient
     {
         try
         {
-            Field packetsMapF = zu.class.getDeclaredField("a");
+            Field packetsMapF = abn.class.getDeclaredField("a");
 
             packetsMapF.setAccessible(true);
 
@@ -45,9 +45,9 @@ public class TCClient
 
             packetsMap.remove(dz.class);
             packetsMap.put(ChannelPacket.class, 250);
-            
-            zu.k.d(250);
-            zu.k.a(250,ChannelPacket.class);
+
+            abn.k.d(250);
+            abn.k.a(250,ChannelPacket.class);
 
 
         } catch (NoSuchFieldException e)
@@ -62,7 +62,7 @@ public class TCClient
 
     }
 
-    public static void RegisterChanel(abm netHandler)
+    public static void RegisterChanel(adg netHandler)
     {
         ChannelPacket packet = new ChannelPacket();
         packet.a = "REGISTER";
@@ -74,7 +74,7 @@ public class TCClient
 
     }
 
-    public static void SendTCVersion(abm netHandler)
+    public static void SendTCVersion(adg netHandler)
     {
 
         ChannelPacket packet = new ChannelPacket();
@@ -87,7 +87,7 @@ public class TCClient
     }
 
 
-    public static abm GetNetworkHandler()
+    public static adg GetNetworkHandler()
     {
 
         try
@@ -98,14 +98,14 @@ public class TCClient
 
             Minecraft m = (Minecraft) minecraft.get(null);
 
-            if (m.c instanceof qn)
+            if (m.c instanceof rg)
             {
 
-                Field handler = qn.class.getDeclaredField("l");
+                Field handler = rg.class.getDeclaredField("l");
 
                 handler.setAccessible(true);
 
-                return (abm) handler.get(m.c);
+                return (adg) handler.get(m.c);
             }
             return null;
 
