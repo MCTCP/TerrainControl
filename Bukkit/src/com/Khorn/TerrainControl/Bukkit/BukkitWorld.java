@@ -360,6 +360,12 @@ public class BukkitWorld implements LocalWorld
             return;
         }
 
+        int oldTypeId = 0;
+        if (applyPhysics)
+        {
+            oldTypeId = chunk.getTypeId(x & 15, y, z & 15);
+        }
+        
         // Set typeId and Data
         chunk.a(x & 15, y, z & 15, typeId, data);
         
@@ -370,7 +376,6 @@ public class BukkitWorld implements LocalWorld
         
         if (applyPhysics)
         {
-            int oldTypeId = chunk.getTypeId(x & 15, y, z & 15);
             this.world.applyPhysics(x, y, z, typeId == 0 ? oldTypeId : typeId);
         }
         
