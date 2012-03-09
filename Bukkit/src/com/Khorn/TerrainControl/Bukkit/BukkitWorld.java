@@ -37,6 +37,7 @@ public class BukkitWorld implements LocalWorld
     private WorldGenTaiga1 TaigaTree1;
     private WorldGenTaiga2 TaigaTree2;
     private WorldGenHugeMushroom HugeMushroom;
+    private WorldGenMegaTree JungleTree;
 
 
     private boolean CreateNewChunks;
@@ -189,6 +190,9 @@ public class BukkitWorld implements LocalWorld
             case Taiga2:
                 TaigaTree2.a(this.world, rand, x, y, z);
             break;
+            case JungleTree:
+                JungleTree.a(this.world,rand,x,y,z);
+            break;
         }
     }
 
@@ -254,24 +258,24 @@ public class BukkitWorld implements LocalWorld
                 if (section == null)
                     continue;
 
-                for (int _x = 0; _x < 16; _x++)
+                for (int sectionX = 0; sectionX < 16; sectionX++)
                 {
-                    for (int _z = 0; _z < 16; _z++)
+                    for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(_x + _z * 16)].id];
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(sectionX + sectionZ * 16)].id];
                         if (biomeConfig.replaceBlocks.size() > 0)
                         {
-                            for (int _y = 0; _y < 16; _y++)
+                            for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
-                                int blockId = section.a(x, _y, z);
+                                int blockId = section.a(sectionX, sectionY, sectionZ);
                                 int[] replacement = biomeConfig.ReplaceMatrixBlocks[blockId]; // [block ID, block data]
-                                if (blockId != replacement[0] || (blockId == replacement[0] && section.b(_x, _y, _z) != replacement[1]))
+                                if (blockId != replacement[0] || (blockId == replacement[0] && section.b(sectionX, sectionY, sectionZ) != replacement[1]))
                                 {
-                                    if (_y >= biomeConfig.ReplaceMatrixHeightMin[blockId] && _y <= biomeConfig.ReplaceMatrixHeightMax[blockId])
+                                    if (sectionY >= biomeConfig.ReplaceMatrixHeightMin[blockId] && (section.c() + sectionY) <= biomeConfig.ReplaceMatrixHeightMax[blockId])
                                     {
-                                        section.a(_x, _y, _z, replacement[0]);
-                                        section.b(_x, _y, _z, replacement[1]);
-                                        world.notify((x + _x), _y, (z + _z));
+                                        section.a(sectionX, sectionY, sectionZ, replacement[0]);
+                                        section.b(sectionX, sectionY, sectionZ, replacement[1]);
+                                        world.notify((x + sectionX), (section.c() + sectionY), (z + sectionZ));
                                     }
                                 }
                             }

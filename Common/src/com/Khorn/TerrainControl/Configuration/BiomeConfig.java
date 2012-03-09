@@ -202,6 +202,11 @@ public class BiomeConfig extends ConfigFile
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.HugeMushroom}, new int[]{100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
+            case 21:// Jungle
+            case 22:
+                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree,TreeType.JungleTree}, new int[]{100});
+                this.ResourceSequence[this.ResourceCount++] = resource;
+                break;
 
 
         }
@@ -844,6 +849,18 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultSize = 8;
                 this.DefaultBorder.add(DefaultBiome.EXTREME_HILLS.Name);
                 this.DefaultColor = "0x666600";
+                break;
+            case 21:
+                this.DefaultTrees = 50;
+                this.DefaultGrass = 25;
+                this.DefaultFlowers = 4;
+                this.DefaultColor = "0xCC6600";
+                break;
+            case 22:
+                this.DefaultTrees = 50;
+                this.DefaultGrass = 25;
+                this.DefaultFlowers = 4;
+                this.DefaultColor = "0x663300";
                 break;
 
         }
