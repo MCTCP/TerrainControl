@@ -50,8 +50,8 @@ public class BukkitWorld implements LocalWorld
     private BiomeBase[] BiomeArray;
 
     //TODO do something with that when bukkit allow custom world height.
-    private int worldHeight = 128;
-    private int heightBits = 7;
+    private int worldHeight = 256;
+    private int heightBits = 8;
 
     static
     {
@@ -494,5 +494,11 @@ public class BukkitWorld implements LocalWorld
     {
         this.old_biomeManager = manager;
         this.biomeManager = manager;
+    }
+
+    public void setHeightBits(int heightBits)
+    {
+        this.heightBits = heightBits;
+        this.worldHeight = 1 << heightBits;
     }
 }

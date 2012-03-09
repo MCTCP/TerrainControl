@@ -159,6 +159,8 @@ public class WorldConfig extends ConfigFile
     public int normalBiomesRarity;
     public int iceBiomesRarity;
 
+    public int worldHeightBits;
+
 
     public int WorldHeight;
 
@@ -166,9 +168,6 @@ public class WorldConfig extends ConfigFile
     {
         this.SettingsDir = settingsDir;
         this.WorldName = world.getName();
-        this.WorldHeight = world.getHeight();
-        this.waterLevelMax = world.getWaterLevel();
-        this.heightMatrix = new double[this.WorldHeight / 8 + 1];
 
         File settingsFile = new File(this.SettingsDir, TCDefaultValues.WorldSettingsName.stringValue());
 
@@ -179,6 +178,7 @@ public class WorldConfig extends ConfigFile
         this.CorrectSettings();
 
         this.WriteSettingsFile(settingsFile);
+        world.setHeightBits(this.worldHeightBits);
 
 
         File BiomeFolder = new File(SettingsDir, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
@@ -315,6 +315,11 @@ public class WorldConfig extends ConfigFile
         {
             this.ModeBiome = BiomeMode.Normal;
         }
+        this.worldHeightBits = ReadModSettings(TCDefaultValues.WorldHeightBits.name(), TCDefaultValues.WorldHeightBits.intValue());
+        this.worldHeightBits = CheckValue(this.worldHeightBits, 5, 8);
+
+        this.WorldHeight = 1 << worldHeightBits;
+        this.waterLevelMax = WorldHeight / 2;
 
 
         this.oldBiomeSize = ReadModSettings(TCDefaultValues.oldBiomeSize.name(), TCDefaultValues.oldBiomeSize.doubleValue());
@@ -428,6 +433,7 @@ public class WorldConfig extends ConfigFile
 
     private void ReadHeightSettings()
     {
+        this.heightMatrix = new double[this.WorldHeight / 8 + 1];
 
         ArrayList<String> keys = this.ReadModSettings(TCDefaultValues.CustomHeightControl.name(), TCDefaultValues.CustomHeightControl.StringArrayListValue());
         try
@@ -553,6 +559,11 @@ public class WorldConfig extends ConfigFile
 
 
         WriteTitle("Terrain Generator Variables");
+        WriteComment("Height bits determinate generation height. Min 5, max 8");
+        WriteComment("For example 7 = 128 height, 8 = 256 height");
+        WriteValue(TCDefaultValues.WorldHeightBits.name(), this.worldHeightBits);
+        WriteNewLine();
+
         WriteComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
         WriteValue(TCDefaultValues.WaterLevelMax.name(), this.waterLevelMax);
         WriteValue(TCDefaultValues.WaterLevelMin.name(), this.waterLevelMin);

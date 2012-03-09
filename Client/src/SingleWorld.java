@@ -486,6 +486,7 @@ public class SingleWorld implements LocalWorld
             this.DungeonGen = (lf)Class.forName("do").newInstance();
         } catch (Exception e)
         {
+            e.printStackTrace();
         }
 
 
@@ -523,14 +524,9 @@ public class SingleWorld implements LocalWorld
         return this.world;
     }
 
-
-    public void setHeight(int _height)
+    public void setHeightBits(int heightBits)
     {
-        //this.worldHeight = _height;
-    }
-
-    public void setWaterLevel(int waterLevel)
-    {
-        this.DefaultWaterLevel = 64;
+        this.heightBits = heightBits;
+        this.worldHeight = 1 << heightBits;
     }
 }

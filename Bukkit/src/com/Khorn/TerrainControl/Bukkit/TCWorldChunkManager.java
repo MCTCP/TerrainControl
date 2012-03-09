@@ -16,7 +16,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
     private Layer BiomeLayer;
     private BiomeCache Cache = new BiomeCache(this);
     private final Object LockObject = new Object();
-    private float[] buffer;
+    private float[] buffer = new float[256];
 
     private WorldConfig worldConfig;
     
@@ -208,7 +208,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
 
     public float[] getTemperaturesTC(int x, int z, int x_size, int z_size)
     {
-        return this.getTemperatures(null,x,z,x_size,z_size);
+        return this.getTemperatures(buffer,x,z,x_size,z_size);
     }
 
     public int[] getBiomesTC(int[] biomeArray, int x, int z, int x_size, int z_size)

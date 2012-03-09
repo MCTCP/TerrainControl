@@ -88,6 +88,7 @@ public enum TCDefaultValues
     FlatBedrock(false),
     BedrockobBlock(7),
     disableNotchPonds(false),
+    WorldHeightBits(7),
 
 
     WorldFog("0xC0D8FF"),

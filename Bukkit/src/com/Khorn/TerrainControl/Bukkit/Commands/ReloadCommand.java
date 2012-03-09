@@ -36,8 +36,8 @@ public class ReloadCommand extends BaseCommand
 
         this.plugin.CreateSettings(world.getName(),world);
 
-        oldSettings.isDeprecated = true;
         oldSettings.newSettings = world.getSettings();
+        oldSettings.isDeprecated = true;
 
         if (world.getSettings().ModeBiome == WorldConfig.BiomeMode.Normal)
         {

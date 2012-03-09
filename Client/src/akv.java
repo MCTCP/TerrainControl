@@ -35,8 +35,8 @@ public abstract class akv
         {
 
             this.world = new SingleWorld(paramwz.x.j());
-            this.world.setHeight(paramwz.b());
-            this.world.setWaterLevel(paramwz.b()/2);
+            //this.world.setHeight(paramwz.b());
+            //this.world.setWaterLevel(paramwz.b()/2);
 
             File worldDir = null;
             try
@@ -91,7 +91,7 @@ public abstract class akv
             this.world.setSettings(config);
             this.world.InitM(this.a);
 
-            this.c = new BiomeManager(this.world);
+            //this.c = new BiomeManager(this.world);
             System.out.println("TerrainControl: config received");
 
         } catch (IOException e1)
