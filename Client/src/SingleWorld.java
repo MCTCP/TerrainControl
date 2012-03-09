@@ -24,30 +24,35 @@ public class SingleWorld implements LocalWorld
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 
 
-    private wa strongholdGen;
-    private al VillageGen;
-    private ajb MineshaftGen;
+    private xm strongholdGen;
+    private am VillageGen;
+    private ali MineshaftGen;
+    
+    private lf DungeonGen;
 
-    private re Tree;
-    private yd BigTree;
-    private j Forest;
-    private bc SwampTree;
-    private kw TaigaTree1;
-    private qe TaigaTree2;
-    private pp HugeMushroom;
+    private rx Tree;
+    private zu BigTree;
+    private i Forest;
+    private bd SwampTree;
+    private ll TaigaTree1;
+    private qx TaigaTree2;
+    private qi HugeMushroom;
+    private aix JungleTree;
 
 
     private boolean CreateNewChunks;
-    private aal[] ChunkCache;
-    private aal CachedChunk;
+    private acf[] ChunkCache;
+    private acf CachedChunk;
 
     private int CurrentChunkX;
     private int CurrentChunkZ;
 
-    private zp[] BiomeArray;
+    private abi[] BiomeArray;
 
-    private int height;
     private int DefaultWaterLevel;
+
+    private int worldHeight = 128;
+    private int heightBits = 7;
 
 
     public static void RestoreBiomes()
@@ -166,7 +171,7 @@ public class SingleWorld implements LocalWorld
 
     public void PlaceDungeons(Random rand, int x, int y, int z)
     {
-        new dl().a(this.world, rand, x, y, z);
+        DungeonGen.a(this.world, rand, x, y, z);
     }
 
     public void PlaceTree(TreeType type, Random rand, int x, int y, int z)
@@ -196,12 +201,15 @@ public class SingleWorld implements LocalWorld
             case Taiga2:
                 TaigaTree2.a(this.world, rand, x, y, z);
                 break;
+            case JungleTree:
+                JungleTree.a(this.world, rand, x, y, z);
+                break;
         }
     }
 
     public void PlacePonds(int BlockId, Random rand, int x, int y, int z)
     {
-        new cl(BlockId).a(this.world, rand, x, y, z);
+        new cq(BlockId).a(this.world, rand, x, y, z);
     }
 
     public void PlaceIce(int x, int z)
@@ -212,13 +220,13 @@ public class SingleWorld implements LocalWorld
         {
             for (int _z = 0; _z < 16; _z++)
             {
-                int i5 = this.world.e(i1 + _x, i2 + _z);
+                int i5 = this.world.f(i1 + _x, i2 + _z);
 
-                if (this.world.p(_x + i1, i5 - 1, _z + i2))
+                if (this.world.r(_x + i1, i5 - 1, _z + i2))
                 {
                     this.world.g(_x + i1, i5 - 1, _z + i2, DefaultMaterial.ICE.id);
                 }
-                if (this.world.r(_x + i1, i5, _z + i2))
+                if (this.world.t(_x + i1, i5, _z + i2))
                 {
                     this.world.g(_x + i1, i5, _z + i2, DefaultMaterial.SNOW.id);
                 }
@@ -245,35 +253,46 @@ public class SingleWorld implements LocalWorld
         if (this.settings.BiomeConfigsHaveReplacement)
         {
 
-            aal rawaal = this.ChunkCache[0];
-            byte[] blocks = rawaal.b;
-            this.BiomeArray = this.world.a().b(this.BiomeArray, this.CurrentChunkX * 16, this.CurrentChunkZ * 16, 16, 16);
+            acf rawChunk = this.ChunkCache[0];
+
+
+            zb[] sectionsArray = rawChunk.i();
+
+            this.BiomeArray = this.world.i().b(this.BiomeArray, this.CurrentChunkX * 16, this.CurrentChunkZ * 16, 16, 16);
 
             int x = this.CurrentChunkX * 16;
             int z = this.CurrentChunkZ * 16;
 
-            for (int _x = 0; _x < 16; _x++)
-                for (int _z = 0; _z < 16; _z++)
-                {
-                    BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(_x + _z * 16)].K];
-                    if (biomeConfig.replaceBlocks.size() > 0)
-                    {
-                        for (int _y = 127; _y >= 0; _y--)
-                        {
-                            int i = _x << 11 | _z << 7 | _y;
-                            int blockId = blocks[i] & 0xFF;  // Fuck java with signed bytes;
-                            int[] replacement = biomeConfig.ReplaceMatrixBlocks[blockId]; // [block ID, block data]
-                            if (blockId != replacement[0] || (blockId == replacement[0] && rawaal.g.a(_x, _y, _z) != replacement[1]))
-                                if (_y >= biomeConfig.ReplaceMatrixHeightMin[blockId] && _y <= biomeConfig.ReplaceMatrixHeightMax[blockId])
-                                {
-                                    blocks[i] = (byte) replacement[0];
-                                    rawaal.g.a(_x, _y, _z, replacement[1]);
-                                    world.j((x + _x), _y, (z + _z));
-                                }
+            for (zb section : sectionsArray)
+            {
+                if (section == null)
+                    continue;
 
+                for (int sectionX = 0; sectionX < 16; sectionX++)
+                {
+                    for (int sectionZ = 0; sectionZ < 16; sectionZ++)
+                    {
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(sectionX + sectionZ * 16)].M];
+                        if (biomeConfig.replaceBlocks.size() > 0)
+                        {
+                            for (int sectionY = 0; sectionY < 16; sectionY++)
+                            {
+                                int blockId = section.a(sectionX, sectionY, sectionZ);
+                                int[] replacement = biomeConfig.ReplaceMatrixBlocks[blockId]; // [block ID, block data]
+                                if (blockId != replacement[0] || (blockId == replacement[0] && section.b(sectionX, sectionY, sectionZ) != replacement[1]))
+                                {
+                                    if (sectionY >= biomeConfig.ReplaceMatrixHeightMin[blockId] && (section.c() + sectionY) <= biomeConfig.ReplaceMatrixHeightMax[blockId])
+                                    {
+                                        section.a(sectionX, sectionY, sectionZ, replacement[0]);
+                                        section.b(sectionX, sectionY, sectionZ, replacement[1]);
+                                        world.k((x + sectionX), (section.c() + sectionY), (z + sectionZ));
+                                    }
+                                }
+                            }
                         }
                     }
                 }
+            }
         }
     }
 
@@ -281,27 +300,27 @@ public class SingleWorld implements LocalWorld
     {
         this.CurrentChunkX = x;
         this.CurrentChunkZ = z;
-        this.ChunkCache[0] = this.world.c(x, z);
-        this.ChunkCache[1] = this.world.c(x + 1, z);
-        this.ChunkCache[2] = this.world.c(x, z + 1);
-        this.ChunkCache[3] = this.world.c(x + 1, z + 1);
+        this.ChunkCache[0] = this.world.d(x, z);
+        this.ChunkCache[1] = this.world.d(x + 1, z);
+        this.ChunkCache[2] = this.world.d(x, z + 1);
+        this.ChunkCache[3] = this.world.d(x + 1, z + 1);
         this.CreateNewChunks = true;
     }
 
-    private aal getChunk(int x, int y, int z)
+    private acf getChunk(int x, int y, int z)
     {
-        if (y < 0 || y >= this.world.c)
+        if (y < 0 || y >= this.worldHeight)
             return null;
 
         x = x >> 4;
         z = z >> 4;
-        if (this.CachedChunk != null && this.CachedChunk.l == x && this.CachedChunk.m == z)
+        if (this.CachedChunk != null && this.CachedChunk.g == x && this.CachedChunk.h == z)
             return this.CachedChunk;
         int index = x - this.CurrentChunkX + 2 * (z - this.CurrentChunkZ);
         if (index >= 0 && index < 4)
             return CachedChunk = this.ChunkCache[index];
-        else if (this.CreateNewChunks || this.world.A.a(x, z))
-            return CachedChunk = this.world.c(x, z);
+        else if (this.CreateNewChunks || this.world.z().a(x, z))
+            return CachedChunk = this.world.d(x, z);
         else
             return null;
 
@@ -310,15 +329,15 @@ public class SingleWorld implements LocalWorld
 
     public int getLiquidHeight(int x, int z)
     {
-        aal chunk = this.getChunk(x, 0, z);
+        acf chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = world.d; y > 0; y--)
+        for (int y = this.worldHeight -1 ; y > 0; y--)
         {
-            int blockId = chunk.b[x << 11 | z << 7 | y] & 0xFF;
-            if (blockId != 0 && oe.m[blockId].cb.d())
+            int blockId = chunk.a(x,y,z);
+            if (blockId != 0 && ox.m[blockId].cd.d())
                 return y;
         }
         return -1;
@@ -331,55 +350,51 @@ public class SingleWorld implements LocalWorld
 
     public int getTypeId(int x, int y, int z)
     {
-        aal chunk = this.getChunk(x, y, z);
+        acf chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return 0;
 
         z = z & 0xF;
         x = x & 0xF;
 
-        return chunk.b[x << world.b | z << world.a | y] & 0xFF;  //Fuck java !!
+        return chunk.a(x,y,z);
     }
-
-    public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data)
+    public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
+        // If minecraft was updated and obfuscation is off - take a look at these methods:
+        // this.world.setRawTypeIdAndData(i, j, k, l, i1)
+        // this.world.setTypeIdAndData(i, j, k, l, i1)
 
-        aal chunk = this.getChunk(x, y, z);
+        // We fetch the chunk from a custom cache in order to speed things up.
+        acf chunk = this.getChunk(x, y, z);
         if (chunk == null)
+        {
             return;
-        z = z & 0xF;
-        x = x & 0xF;
+        }
+
+        if (applyPhysics)
+        {
+            int oldTypeId = chunk.a(x & 15, y, z & 15);
+            chunk.a(x & 15, y, z & 15, typeId, data);
+            this.world.j(x, y, z, typeId == 0 ? oldTypeId : typeId);
+        }else
+            chunk.a(x & 15, y, z & 15, typeId, data); // Set typeId and Data
 
 
-        chunk.b[x << world.b | z << world.a | y] = (byte) BlockId;
-        chunk.g.a(x, y, z, Data);
-    }
+        if (updateLight)
+        {
+            this.world.v(x, y, z);
+        }
 
-    public void setRawBlockId(int x, int y, int z, int BlockId)
-    {
-        aal chunk = this.getChunk(x, y, z);
-        if (chunk == null)
-            return;
-        z = z & 0xF;
-        x = x & 0xF;
-
-
-        chunk.b[x << world.b | z << world.a | y] = (byte) BlockId;
-    }
-
-    public void setBlockId(int x, int y, int z, int BlockId)
-    {
-        this.world.g(x, y, z, BlockId);
-    }
-
-    public void setBlockIdAndData(int x, int y, int z, int BlockId, int Data)
-    {
-        this.world.d(x, y, z, BlockId, Data);
+        if (notifyPlayers)
+        {
+            this.world.k(x, y, z);
+        }
     }
 
     public int getHighestBlockYAt(int x, int z)
     {
-        aal chunk = this.getChunk(x, 0, z);
+        acf chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
         z = z & 0xF;
@@ -405,12 +420,12 @@ public class SingleWorld implements LocalWorld
 
     public boolean isLoaded(int x, int y, int z)
     {
-        if (y < 0 || y >= this.world.c)
+        if (y < 0 || y >= this.worldHeight)
             return false;
         x = x >> 4;
         z = z >> 4;
 
-        return world.A.a(x, z);
+        return world.z().a(x, z);
     }
 
     public WorldConfig getSettings()
@@ -430,7 +445,7 @@ public class SingleWorld implements LocalWorld
 
     public int getHeight()
     {
-        return this.height;
+        return this.worldHeight;
     }
 
     public int getWaterLevel()
@@ -440,7 +455,7 @@ public class SingleWorld implements LocalWorld
 
     public int getHeightBits()
     {
-        return world.a;
+        return heightBits;
     }
 
     public ChunkProvider getChunkGenerator()
@@ -456,32 +471,38 @@ public class SingleWorld implements LocalWorld
     public void InitM(wz _world)
     {
         this.world = _world;
-        this.Seed = world.t();
-        this.world.e = this.settings.waterLevelMax;
+        this.Seed = world.v();
 
     }
 
     public void Init(wz _world)
     {
         this.world = _world;
-        this.Seed = world.t();
-        this.world.e = this.settings.waterLevelMax;
+        this.Seed = world.v();
+        //this.world.e = this.settings.waterLevelMax;
         this.DefaultWaterLevel = this.settings.waterLevelMax;
+        try
+        {
+            this.DungeonGen = (lf)Class.forName("do").newInstance();
+        } catch (Exception e)
+        {
+        }
 
 
-        this.strongholdGen = new wa();
-        this.VillageGen = new al(0);
-        this.MineshaftGen = new ajb();
+        this.strongholdGen = new xm();
+        this.VillageGen = new am(0);
+        this.MineshaftGen = new ali();
 
-        this.Tree = new re(false);
-        this.BigTree = new yd(false);
-        this.Forest = new j(false);
-        this.SwampTree = new bc();
-        this.TaigaTree1 = new kw();
-        this.TaigaTree2 = new qe(false);
-        this.HugeMushroom = new pp();
+        this.Tree = new rx(false);
+        this.BigTree = new zu(false);
+        this.Forest = new i(false);
+        this.SwampTree = new bd();
+        this.TaigaTree1 = new ll();
+        this.TaigaTree2 = new qx(false);
+        this.HugeMushroom = new qi();
+        this.JungleTree = new aix(false,15,3,3);
 
-        this.ChunkCache = new aal[4];
+        this.ChunkCache = new acf[4];
         this.generator = new ChunkProvider(this);
     }
 
@@ -502,18 +523,14 @@ public class SingleWorld implements LocalWorld
         return this.world;
     }
 
-    public wa getStrongholdGen()
-    {
-        return this.strongholdGen;
-    }
 
     public void setHeight(int _height)
     {
-        this.height = _height;
+        //this.worldHeight = _height;
     }
 
     public void setWaterLevel(int waterLevel)
     {
-        this.DefaultWaterLevel = waterLevel;
+        this.DefaultWaterLevel = 64;
     }
 }

@@ -204,7 +204,7 @@ public class BiomeConfig extends ConfigFile
                 break;
             case 21:// Jungle
             case 22:
-                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree,TreeType.JungleTree}, new int[]{100});
+                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.JungleTree,TreeType.Tree}, new int[]{10, 35, 100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
 
@@ -600,6 +600,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("     SwampTree");
         this.WriteComment("     Taiga1");
         this.WriteComment("     Taiga2");
+        this.WriteComment("     JungleTree");
         this.WriteComment("TreeType_Chance - similar Rarity. Example:");
         this.WriteComment("  Tree(10,Taiga1,35,Taiga2,100) - plugin trying to 10 attempts, in each attempt he try place Taiga1 ( 35% chance ) if not he place Taiga2 (100% chance)");
         this.WriteComment("Plant resource used for place something like flower, small mushrooms, pumpkins");
@@ -861,6 +862,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultGrass = 25;
                 this.DefaultFlowers = 4;
                 this.DefaultColor = "0x663300";
+                this.DefaultIsle.add(DefaultBiome.JUNGLE.Name);
                 break;
 
         }

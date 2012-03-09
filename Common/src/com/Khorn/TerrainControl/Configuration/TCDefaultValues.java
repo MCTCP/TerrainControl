@@ -16,9 +16,9 @@ public enum TCDefaultValues
 
     CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0"),
     CustomBiomes(""),
-    NormalBiomes("Desert,Forest,Extreme Hills,Swampland,Plains,Taiga"),
+    NormalBiomes("Desert,Forest,Extreme Hills,Swampland,Plains,Taiga,Jungle"),
     IceBiomes("Ice Plains"),
-    IsleBiomes("MushroomIsland,Ice Mountains,DesertHills,ForestHills,TaigaHills,River"),
+    IsleBiomes("MushroomIsland,Ice Mountains,DesertHills,ForestHills,TaigaHills,River,JungleHills"),
     BorderBiomes("MushroomIslandShore,Beach,Extreme Hills Edge"),
 
     ModeTerrain("Normal"),

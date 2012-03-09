@@ -34,18 +34,18 @@ public abstract class akv
         if (this.b == vt.TerrainControl)
         {
 
-            this.world = new SingleWorld(paramwz.C.j());      // TODO
-            this.world.setHeight(paramwz.c);
-            this.world.setWaterLevel(paramwz.e);
+            this.world = new SingleWorld(paramwz.x.j());
+            this.world.setHeight(paramwz.b());
+            this.world.setWaterLevel(paramwz.b()/2);
 
             File worldDir = null;
             try
             {
-                Field dirField = eb.class.getDeclaredField("b");
+                Field dirField = ed.class.getDeclaredField("b");  // saveDir in SaveHandler
 
                 dirField.setAccessible(true);
 
-                worldDir = (File) dirField.get(paramwz.B);      // TODO
+                worldDir = (File) dirField.get((ed)paramwz.A());
 
 
             } catch (NoSuchFieldException e)
@@ -81,7 +81,7 @@ public abstract class akv
         if (!packet.a.equals(TCDefaultValues.ChannelName.stringValue()))
             return;
 
-        this.world = new SingleWorld(this.a.C.j());
+        this.world = new SingleWorld(this.a.x.j());
         try
         {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(packet.c);

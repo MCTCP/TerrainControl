@@ -5,7 +5,7 @@ public class vt
 
     public static final vt b = new vt(0, "default", 1).f();
     public static final vt c = new vt(1, "flat");
-    public static final vt TerrainControl = new vt(0,"TerrainControl", 0);
+    public static final vt TerrainControl = new vt(4,"TerrainControl", 0);
     
 
     public static final vt d = new vt(8, "default_1_1", 0).a(false);

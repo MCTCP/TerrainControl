@@ -282,8 +282,8 @@ public class WorldConfig extends ConfigFile
         this.canyonDepth = CheckValue(this.canyonDepth, 0.1D, 15D);
 
 
-        this.waterLevelMin = CheckValue(this.waterLevelMin, 0, WorldHeight);
-        this.waterLevelMax = CheckValue(this.waterLevelMax, 0, WorldHeight, this.waterLevelMin);
+        this.waterLevelMin = CheckValue(this.waterLevelMin, 0, WorldHeight - 1);
+        this.waterLevelMax = CheckValue(this.waterLevelMax, 0, WorldHeight - 1, this.waterLevelMin);
 
         this.customTreeChance = CheckValue(this.customTreeChance, 0, 100);
 
@@ -387,7 +387,7 @@ public class WorldConfig extends ConfigFile
 
         this.canyonRarity = ReadModSettings(TCDefaultValues.canyonRarity.name(), TCDefaultValues.canyonRarity.intValue());
         this.canyonMinAltitude = ReadModSettings(TCDefaultValues.canyonMinAltitude.name(), TCDefaultValues.canyonMinAltitude.intValue());
-        this.canyonMaxAltitude = ReadModSettings(TCDefaultValues.canyonMaxAltitude.name(), this.WorldHeight/2);
+        this.canyonMaxAltitude = ReadModSettings(TCDefaultValues.canyonMaxAltitude.name(), this.WorldHeight / 2);
         this.canyonMinLength = ReadModSettings(TCDefaultValues.canyonMinLength.name(), TCDefaultValues.canyonMinLength.intValue());
         this.canyonMaxLength = ReadModSettings(TCDefaultValues.canyonMaxLength.name(), TCDefaultValues.canyonMaxLength.intValue());
         this.canyonDepth = ReadModSettings(TCDefaultValues.canyonDepth.name(), TCDefaultValues.canyonDepth.doubleValue());

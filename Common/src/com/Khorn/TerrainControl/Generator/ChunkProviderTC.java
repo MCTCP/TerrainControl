@@ -264,7 +264,7 @@ public class ChunkProviderTC
                             }
                     }
                 }
-                if (paramArrayOfByte[(z * 16 + x) * 128 + this.worldSettings.waterLevelMax] == this.worldSettings.waterBlock)
+                if (paramArrayOfByte[(z * 16 + x) * this.height + this.worldSettings.waterLevelMax] == this.worldSettings.waterBlock)
                     dryBlock--;
 
 

@@ -51,7 +51,6 @@ public class BukkitWorld implements LocalWorld
 
     //TODO do something with that when bukkit allow custom world height.
     private int worldHeight = 128;
-    private int worldHeightMinusOne = 127;
     private int heightBits = 7;
 
     static
@@ -323,7 +322,7 @@ public class BukkitWorld implements LocalWorld
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = worldHeightMinusOne ; y > 0; y--)
+        for (int y = worldHeight - 1 ; y > 0; y--)
         {
             int blockId = chunk.getTypeId(x,y,z);
             if (blockId != 0 && Block.byId[blockId].material.isLiquid())
@@ -363,26 +362,19 @@ public class BukkitWorld implements LocalWorld
         {
             return;
         }
-
-        int oldTypeId = 0;
         if (applyPhysics)
         {
-            oldTypeId = chunk.getTypeId(x & 15, y, z & 15);
-        }
-        
-        // Set typeId and Data
-        chunk.a(x & 15, y, z & 15, typeId, data);
-        
+            int oldTypeId = chunk.getTypeId(x & 15, y, z & 15);
+            chunk.a(x & 15, y, z & 15, typeId, data);
+            this.world.applyPhysics(x, y, z, typeId == 0 ? oldTypeId : typeId);
+        } else
+            chunk.a(x & 15, y, z & 15, typeId, data); // Set typeId and Data
+
         if (updateLight)
         {
             this.world.v(x, y, z);
         }
-        
-        if (applyPhysics)
-        {
-            this.world.applyPhysics(x, y, z, typeId == 0 ? oldTypeId : typeId);
-        }
-        
+
         if (notifyPlayers)
         {
             this.world.notify(x, y, z);
@@ -483,6 +475,7 @@ public class BukkitWorld implements LocalWorld
         this.TaigaTree1 = new WorldGenTaiga1();
         this.TaigaTree2 = new WorldGenTaiga2(false);
         this.HugeMushroom = new WorldGenHugeMushroom();
+        this.JungleTree = new WorldGenMegaTree(false,15,3,3);  // TODO Search more about this parameters
 
         this.ChunkCache = new Chunk[4];
     }
