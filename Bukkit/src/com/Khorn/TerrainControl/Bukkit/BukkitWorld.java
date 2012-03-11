@@ -460,7 +460,7 @@ public class BukkitWorld implements LocalWorld
         this.Seed = world.getSeed();
         
         // TODO: Should WorldProviderTC extend even more? For example for spawn point etc?
-        this.world.worldProvider = new TCWorldProvider().setSeaLevel(this.settings.waterLevelMax);
+        // this.world.worldProvider = new TCWorldProvider().setSeaLevel(this.settings.waterLevelMax); // cause errors with entity burn, disabled temporary.
 
         this.generator.Init(this);
 

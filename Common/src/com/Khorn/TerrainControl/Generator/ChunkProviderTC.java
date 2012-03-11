@@ -32,15 +32,15 @@ public class ChunkProviderTC
     double[] i;
     double[] j;
     double[] k;
-    float[] l;
+    float[] NearBiomeWeight;
 
     private static int ChunkMaxX = 16;
     private static int ChunkMaxZ = 16;
 
 
     private LocalWorld localWorld;
-    private double biomeFactor;
-    private double biomeFactor2;
+    private double VolatilityFactor;
+    private double HeightFactor;
 
     private WorldConfig worldSettings;
     private TerrainGenBase CaveGen;
@@ -80,20 +80,20 @@ public class ChunkProviderTC
         this.CaveGen = new CavesGen(this.worldSettings, this.localWorld);
         this.CanyonGen = new CanyonsGen(this.worldSettings, this.localWorld);
 
-        this.l = new float[25];
-        for (int i1 = -2; i1 <= 2; i1++)
+        this.NearBiomeWeight = new float[25];
+        for (int x = -2; x <= 2; x++)
         {
-            for (int i2 = -2; i2 <= 2; i2++)
+            for (int z = -2; z <= 2; z++)
             {
-                float f1 = 10.0F / MathHelper.sqrt((float)(i1 * i1 + i2 * i2) + 0.2F);
-                this.l[(i1 + 2 + (i2 + 2) * 5)] = f1;
+                float f1 = 10.0F / MathHelper.sqrt((float)(x * x + z * z) + 0.2F);
+                this.NearBiomeWeight[(x + 2 + (z + 2) * 5)] = f1;
             }
         }
 
 
     }
 
-    private void generateTerrain(int paramInt1, int paramInt2, byte[] paramArrayOfByte)
+    private void generateTerrain(int chunkX, int chunkZ, byte[] paramArrayOfByte)
     {
         int i1 = 4;
         int i2 = this.height / 8;
@@ -103,11 +103,11 @@ public class ChunkProviderTC
         int i6 = i1 + 1;
         if (this.worldSettings.ModeBiome == WorldConfig.BiomeMode.OldGenerator)
         {
-            this.BiomeArray = this.localWorld.getBiomesUnZoomed(this.BiomeArray, paramInt1 * 16, paramInt2 * 16, 16, 16);
+            this.BiomeArray = this.localWorld.getBiomesUnZoomed(this.BiomeArray, chunkX * 16, chunkZ * 16, 16, 16);
         } else
-            this.BiomeArray = this.localWorld.getBiomesUnZoomed(this.BiomeArray, paramInt1 * 4 - 2, paramInt2 * 4 - 2, i4 + 5, i6 + 5);
+            this.BiomeArray = this.localWorld.getBiomesUnZoomed(this.BiomeArray, chunkX * 4 - 2, chunkZ * 4 - 2, i4 + 5, i6 + 5);
 
-        this.u = GenerateTerrainNoise(this.u, paramInt1 * i1, 0, paramInt2 * i1, i4, i5, i6);
+        this.u = GenerateTerrainNoise(this.u, chunkX * i1, 0, chunkZ * i1, i4, i5, i6);
 
         for (int x = 0; x < i1; x++)
             for (int z = 0; z < i1; z++)
@@ -178,7 +178,7 @@ public class ChunkProviderTC
         int dryBlock = 256;
 
         double d1 = 0.03125D;
-        this.v = this.r.a(this.v, paramInt1 * 16, paramInt2 * 16, 0, 16, 16, 1, d1 * 2.0D, d1 * 2.0D, d1 * 2.0D);
+        this.v = this.r.Noise3D(this.v, paramInt1 * 16, paramInt2 * 16, 0, 16, 16, 1, d1 * 2.0D, d1 * 2.0D, d1 * 2.0D);
         float[] TemperatureArray = this.localWorld.getTemperatures(paramInt1 * 16, paramInt2 * 16, 16, 16);
 
 
@@ -274,11 +274,11 @@ public class ChunkProviderTC
     }
 
 
-    private double[] GenerateTerrainNoise(double[] paramArrayOfDouble, int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6)
+    private double[] GenerateTerrainNoise(double[] outArray, int paramInt1, int paramInt2, int paramInt3, int max_x, int max_y, int max_z)
     {
-        if (paramArrayOfDouble == null)
+        if (outArray == null)
         {
-            paramArrayOfDouble = new double[paramInt4 * paramInt5 * paramInt6];
+            outArray = new double[max_x * max_y * max_z];
         }
 
 
@@ -286,23 +286,23 @@ public class ChunkProviderTC
         double d2 = 684.41200000000003D * this.worldSettings.getFractureVertical();
 
         if (this.worldSettings.oldTerrainGenerator)
-            this.j = this.a.a(this.j, paramInt1, paramInt3, paramInt4, paramInt6, 1.121D, 1.121D);
-        this.k = this.b.a(this.k, paramInt1, paramInt3, paramInt4, paramInt6, 200.0D, 200.0D);
+            this.j = this.a.Noise2D(this.j, paramInt1, paramInt3, max_x, max_z, 1.121D, 1.121D);
+        this.k = this.b.Noise2D(this.k, paramInt1, paramInt3, max_x, max_z, 200.0D, 200.0D);
 
-        this.g = this.q.a(this.g, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1 / 80.0D, d2 / 160.0D, d1 / 80.0D);
-        this.h = this.o.a(this.h, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1, d2, d1);
-        this.i = this.p.a(this.i, paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6, d1, d2, d1);
+        this.g = this.q.Noise3D(this.g, paramInt1, paramInt2, paramInt3, max_x, max_y, max_z, d1 / 80.0D, d2 / 160.0D, d1 / 80.0D);
+        this.h = this.o.Noise3D(this.h, paramInt1, paramInt2, paramInt3, max_x, max_y, max_z, d1, d2, d1);
+        this.i = this.p.Noise3D(this.i, paramInt1, paramInt2, paramInt3, max_x, max_y, max_z, d1, d2, d1);
 
-        int i3 = 0;
-        int i4 = 0;
+        int i3D = 0;
+        int i2D = 0;
 
-        for (int x = 0; x < paramInt4; x++)
+        for (int x = 0; x < max_x; x++)
         {
-            for (int z = 0; z < paramInt6; z++)
+            for (int z = 0; z < max_z; z++)
             {
 
 
-                double d3 = this.k[i4] / 8000.0D;
+                double d3 = this.k[i2D] / 8000.0D;
                 if (d3 < 0.0D)
                     d3 = -d3 * 0.3D;
                 d3 = d3 * 3.0D - 2.0D;
@@ -324,27 +324,27 @@ public class ChunkProviderTC
                 }
 
                 if (this.worldSettings.oldTerrainGenerator)
-                    this.oldTerrainNoise(x, z, i4, paramInt4, paramInt5, d3);
+                    this.oldTerrainNoise(x, z, i2D, max_x, max_y, d3);
                 else
-                    this.newTerrainNoise(x, z, paramInt4, paramInt5, d3);
+                    this.newTerrainNoise(x, z, max_x, max_y, d3);
 
 
-                i4++;
+                i2D++;
 
 
-                for (int i10 = 0; i10 < paramInt5; i10++)
+                for (int y = 0; y < max_y; y++)
                 {
                     double d7;
 
-                    double d8 = (i10 - biomeFactor2) * 12.0D * 128.0D / this.height / biomeFactor;
+                    double d8 = (HeightFactor - y) * 12.0D * 128.0D / this.height / VolatilityFactor;
 
-                    if (d8 < 0.0D)
+                    if (d8 > 0.0D)
                         d8 *= 4.0D;
 
-                    double d9 = this.h[i3] / 512.0D * this.worldSettings.getVolatility1();
-                    double d10 = this.i[i3] / 512.0D * this.worldSettings.getVolatility2();
+                    double d9 = this.h[i3D] / 512.0D * this.worldSettings.getVolatility1();
+                    double d10 = this.i[i3D] / 512.0D * this.worldSettings.getVolatility2();
 
-                    double d11 = (this.g[i3] / 10.0D + 1.0D) / 2.0D;
+                    double d11 = (this.g[i3D] / 10.0D + 1.0D) / 2.0D;
                     if (d11 < this.worldSettings.getVolatilityWeight1())
                         d7 = d9;
                     else if (d11 > this.worldSettings.getVolatilityWeight2())
@@ -354,23 +354,23 @@ public class ChunkProviderTC
 
                     if (!this.worldSettings.disableNotchHeightControl)
                     {
-                        d7 -= d8;
+                        d7 += d8;
 
-                        if (i10 > paramInt5 - 4)
+                        if (y > max_y - 4)
                         {
-                            double d12 = (i10 - (paramInt5 - 4)) / 3.0F;
+                            double d12 = (y - (max_y - 4)) / 3.0F;
                             d7 = d7 * (1.0D - d12) + -10.0D * d12;
                         }
 
                     }
-                    d7 += this.worldSettings.heightMatrix[i10];
+                    d7 += this.worldSettings.heightMatrix[y];
 
-                    paramArrayOfDouble[i3] = d7;
-                    i3++;
+                    outArray[i3D] = d7;
+                    i3D++;
                 }
             }
         }
-        return paramArrayOfDouble;
+        return outArray;
 
     }
 
@@ -378,30 +378,30 @@ public class ChunkProviderTC
     {
         if (this.worldSettings.ModeBiome == WorldConfig.BiomeMode.OldGenerator)
         {
-            this.biomeFactor = (1.0D - localWorld.getBiomeFactorForOldBM(z * 48 + 17 + x * 3));
+            this.VolatilityFactor = (1.0D - localWorld.getBiomeFactorForOldBM(z * 48 + 17 + x * 3));
 
         } else
         {
             int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (paramInt4 + 5))];
-            this.biomeFactor = (1.0D - worldSettings.biomeConfigs[biomeId].BiomeTemperature * worldSettings.biomeConfigs[biomeId].BiomeWetness);
+            this.VolatilityFactor = (1.0D - worldSettings.biomeConfigs[biomeId].BiomeTemperature * worldSettings.biomeConfigs[biomeId].BiomeWetness);
         }
-        this.biomeFactor *= this.biomeFactor;
-        this.biomeFactor = 1.0D - this.biomeFactor * this.biomeFactor;
+        this.VolatilityFactor *= this.VolatilityFactor;
+        this.VolatilityFactor = 1.0D - this.VolatilityFactor * this.VolatilityFactor;
 
-        this.biomeFactor = (this.g[i4] + 256.0D) / 512.0D * this.biomeFactor;
-        if (this.biomeFactor > 1.0D)
-            this.biomeFactor = 1.0D;
-        if (this.biomeFactor < 0.0D || d3 < 0.0D)
-            this.biomeFactor = 0.0D;
+        this.VolatilityFactor = (this.g[i4] + 256.0D) / 512.0D * this.VolatilityFactor;
+        if (this.VolatilityFactor > 1.0D)
+            this.VolatilityFactor = 1.0D;
+        if (this.VolatilityFactor < 0.0D || d3 < 0.0D)
+            this.VolatilityFactor = 0.0D;
 
-        this.biomeFactor += 0.5D;
+        this.VolatilityFactor += 0.5D;
 
         d3 = d3 * paramInt5 / 16.0D;
 
-        this.biomeFactor2 = paramInt5 / 2.0D + d3 * 4.0D;
+        this.HeightFactor = paramInt5 / 2.0D + d3 * 4.0D;
     }
 
-    private void newTerrainNoise(int x, int z, int paramInt4, int paramInt5, double d3)
+    private void newTerrainNoise(int x, int z, int max_X, int max_Y, double d3)
     {
         float f2 = 0.0F;
         float f3 = 0.0F;
@@ -409,19 +409,20 @@ public class ChunkProviderTC
 
         int i7 = 2;
 
-        int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (paramInt4 + 5))];
-        for (int i8 = -i7; i8 <= i7; i8++)
+        int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (max_X + 5))];
+        for (int nextX = -i7; nextX <= i7; nextX++)
         {
-            for (int i9 = -i7; i9 <= i7; i9++)
+            for (int nextZ = -i7; nextZ <= i7; nextZ++)
             {
-                int biomeId2 = this.BiomeArray[(x + i8 + 2 + (z + i9 + 2) * (paramInt4 + 5))];
-                float f5 = this.l[(i8 + 2 + (i9 + 2) * 5)] / (this.worldSettings.biomeConfigs[biomeId2].BiomeHeight + 2.0F);
-                if (this.worldSettings.biomeConfigs[biomeId2].BiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
+                int nextBiomeId = this.BiomeArray[(x + nextX + 2 + (z + nextZ + 2) * (max_X + 5))];
+                float f5 = this.NearBiomeWeight[(nextX + 2 + (nextZ + 2) * 5)] / (this.worldSettings.biomeConfigs[nextBiomeId].BiomeHeight + 2.0F);
+                f5 = Math.abs(f5);
+                if (this.worldSettings.biomeConfigs[nextBiomeId].BiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
                 {
                     f5 /= 2.0F;
                 }
-                f2 += this.worldSettings.biomeConfigs[biomeId2].BiomeVolatility * f5;
-                f3 += this.worldSettings.biomeConfigs[biomeId2].BiomeHeight * f5;
+                f2 += this.worldSettings.biomeConfigs[nextBiomeId].BiomeVolatility * f5;
+                f3 += this.worldSettings.biomeConfigs[nextBiomeId].BiomeHeight * f5;
                 f4 += f5;
             }
         }
@@ -432,12 +433,12 @@ public class ChunkProviderTC
         f3 = (f3 * 4.0F - 1.0F) / 8.0F;
 
         double d4 = f3;
-        this.biomeFactor = f2;
+        this.VolatilityFactor = f2;
 
         d4 += d3 * 0.2D;
-        d4 = d4 * paramInt5 / 16.0D;
+        d4 = d4 * max_Y / 16.0D;
 
-        this.biomeFactor2 = paramInt5 / 2.0D + d4 * 4.0D;
+        this.HeightFactor = max_Y / 2.0D + d4 * 4.0D;
     }
 
 
