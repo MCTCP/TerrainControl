@@ -214,7 +214,7 @@ public class WorldConfig extends ConfigFile
 
             this.biomeConfigs[localBiome.getId()] = config;
             if (!this.BiomeConfigsHaveReplacement)
-                this.BiomeConfigsHaveReplacement = config.replaceBlocks.size() > 0;
+                this.BiomeConfigsHaveReplacement = config.ReplaceCount > 0;
 
         }
 

@@ -273,21 +273,23 @@ public class SingleWorld implements LocalWorld
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
                         BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(sectionX + sectionZ * 16)].M];
-                        if (biomeConfig.replaceBlocks.size() > 0)
+
+                        if (biomeConfig.ReplaceCount > 0)
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
                                 int blockId = section.a(sectionX, sectionY, sectionZ);
-                                int[] replacement = biomeConfig.ReplaceMatrixBlocks[blockId]; // [block ID, block data]
-                                if (blockId != replacement[0] || (blockId == replacement[0] && section.b(sectionX, sectionY, sectionZ) != replacement[1]))
-                                {
-                                    if (sectionY >= biomeConfig.ReplaceMatrixHeightMin[blockId] && (section.c() + sectionY) <= biomeConfig.ReplaceMatrixHeightMax[blockId])
-                                    {
-                                        section.a(sectionX, sectionY, sectionZ, replacement[0]);
-                                        section.b(sectionX, sectionY, sectionZ, replacement[1]);
-                                        world.k((x + sectionX), (section.c() + sectionY), (z + sectionZ));
-                                    }
-                                }
+                                if (biomeConfig.ReplaceMatrixBlocks[blockId] == null)
+                                    continue;
+
+                                int replaceTo = biomeConfig.ReplaceMatrixBlocks[blockId][section.c() + sectionY];
+                                if (replaceTo == -1)
+                                    continue;
+
+                                section.a(sectionX, sectionY, sectionZ, replaceTo >> 4);
+                                section.b(sectionX, sectionY, sectionZ, replaceTo & 0xF);
+                                world.k((x + sectionX), (section.c() + sectionY), (z + sectionZ));
+
                             }
                         }
                     }

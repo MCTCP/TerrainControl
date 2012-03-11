@@ -168,30 +168,30 @@ public class BukkitWorld implements LocalWorld
         {
             case Tree:
                 Tree.a(this.world, rand, x, y, z);
-            break;
+                break;
             case BigTree:
                 BigTree.a(1.0D, 1.0D, 1.0D);
                 BigTree.a(this.world, rand, x, y, z);
-            break;
+                break;
             case Forest:
                 Forest.a(this.world, rand, x, y, z);
-            break;
+                break;
             case HugeMushroom:
                 HugeMushroom.a(1.0D, 1.0D, 1.0D);
                 HugeMushroom.a(this.world, rand, x, y, z);
-            break;
+                break;
             case SwampTree:
                 SwampTree.a(this.world, rand, x, y, z);
-            break;
+                break;
             case Taiga1:
                 TaigaTree1.a(this.world, rand, x, y, z);
-            break;
+                break;
             case Taiga2:
                 TaigaTree2.a(this.world, rand, x, y, z);
-            break;
+                break;
             case JungleTree:
-                JungleTree.a(this.world,rand,x,y,z);
-            break;
+                JungleTree.a(this.world, rand, x, y, z);
+                break;
         }
     }
 
@@ -228,11 +228,11 @@ public class BukkitWorld implements LocalWorld
     {
         boolean Village = false;
         if (this.settings.StrongholdsEnabled)
-            this.strongholdGen.a(this.world, rand, chunk_x, chunk_z); 
+            this.strongholdGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.MineshaftsEnabled)
             this.MineshaftGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.VillagesEnabled)
-            Village = this.VillageGen.a(this.world, rand, chunk_x, chunk_z); 
+            Village = this.VillageGen.a(this.world, rand, chunk_x, chunk_z);
 
         return Village;
     }
@@ -262,21 +262,22 @@ public class BukkitWorld implements LocalWorld
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
                         BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(sectionX + sectionZ * 16)].id];
-                        if (biomeConfig.replaceBlocks.size() > 0)
+                        if (biomeConfig.ReplaceCount > 0)
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
                                 int blockId = section.a(sectionX, sectionY, sectionZ);
-                                int[] replacement = biomeConfig.ReplaceMatrixBlocks[blockId]; // [block ID, block data]
-                                if (blockId != replacement[0] || (blockId == replacement[0] && section.b(sectionX, sectionY, sectionZ) != replacement[1]))
-                                {
-                                    if (sectionY >= biomeConfig.ReplaceMatrixHeightMin[blockId] && (section.c() + sectionY) <= biomeConfig.ReplaceMatrixHeightMax[blockId])
-                                    {
-                                        section.a(sectionX, sectionY, sectionZ, replacement[0]);
-                                        section.b(sectionX, sectionY, sectionZ, replacement[1]);
-                                        world.notify((x + sectionX), (section.c() + sectionY), (z + sectionZ));
-                                    }
-                                }
+                                if (biomeConfig.ReplaceMatrixBlocks[blockId] == null)
+                                    continue;
+
+                                int replaceTo = biomeConfig.ReplaceMatrixBlocks[blockId][section.c() + sectionY];
+                                if (replaceTo == -1)
+                                    continue;
+
+                                section.a(sectionX, sectionY, sectionZ, replaceTo >> 4);
+                                section.b(sectionX, sectionY, sectionZ, replaceTo & 0xF);
+                                world.notify((x + sectionX), (section.c() + sectionY), (z + sectionZ));
+
                             }
                         }
                     }
@@ -322,9 +323,9 @@ public class BukkitWorld implements LocalWorld
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = worldHeight - 1 ; y > 0; y--)
+        for (int y = worldHeight - 1; y > 0; y--)
         {
-            int blockId = chunk.getTypeId(x,y,z);
+            int blockId = chunk.getTypeId(x, y, z);
             if (blockId != 0 && Block.byId[blockId].material.isLiquid())
                 return y;
         }
@@ -347,7 +348,7 @@ public class BukkitWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
 
-        return chunk.getTypeId(x,y,z);
+        return chunk.getTypeId(x, y, z);
     }
 
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
@@ -355,7 +356,7 @@ public class BukkitWorld implements LocalWorld
         // If minecraft was updated and obfuscation is off - take a look at these methods:
         // this.world.setRawTypeIdAndData(i, j, k, l, i1)
         // this.world.setTypeIdAndData(i, j, k, l, i1)
-        
+
         // We fetch the chunk from a custom cache in order to speed things up.
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
@@ -458,7 +459,7 @@ public class BukkitWorld implements LocalWorld
     {
         this.world = _world;
         this.Seed = world.getSeed();
-        
+
         // TODO: Should WorldProviderTC extend even more? For example for spawn point etc?
         // this.world.worldProvider = new TCWorldProvider().setSeaLevel(this.settings.waterLevelMax); // cause errors with entity burn, disabled temporary.
 
@@ -475,7 +476,7 @@ public class BukkitWorld implements LocalWorld
         this.TaigaTree1 = new WorldGenTaiga1();
         this.TaigaTree2 = new WorldGenTaiga2(false);
         this.HugeMushroom = new WorldGenHugeMushroom();
-        this.JungleTree = new WorldGenMegaTree(false,15,3,3);  // TODO Search more about this parameters
+        this.JungleTree = new WorldGenMegaTree(false, 15, 3, 3);  // TODO Search more about this parameters
 
         this.ChunkCache = new Chunk[4];
     }

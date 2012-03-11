@@ -10,18 +10,12 @@ import com.Khorn.TerrainControl.LocalBiome;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class BiomeConfig extends ConfigFile
 {
-    public HashMap<Integer, int[]> replaceBlocks = new HashMap<Integer, int[]>();
-    public HashMap<Integer, Integer> replaceHeightMin = new HashMap<Integer, Integer>();
-    public HashMap<Integer, Integer> replaceHeightMax = new HashMap<Integer, Integer>();
-    public int[][] ReplaceMatrixBlocks = new int[256][2];
-    public int[] ReplaceMatrixHeightMin = new int[256];
-    public int[] ReplaceMatrixHeightMax = new int[256];
+    public short[][] ReplaceMatrixBlocks = new short[256][];
+    public int ReplaceCount = 0;
 
 
     public int BiomeSize;
@@ -87,8 +81,6 @@ public class BiomeConfig extends ConfigFile
         if (!settingsFile.exists())
             this.CreateDefaultResources();
         this.WriteSettingsFile(settingsFile);
-
-        BuildReplaceMatrix();
 
         if (biome.isCustom())
             biome.setCustom(this);
@@ -338,6 +330,8 @@ public class BiomeConfig extends ConfigFile
                     if (blocks.length != 2)
                         continue;
 
+                    int min_y = 0;
+                    int max_y = worldConfig.WorldHeight;
 
                     int start = blocks[1].indexOf("(");
                     int end = blocks[1].indexOf(")");
@@ -347,23 +341,37 @@ public class BiomeConfig extends ConfigFile
                         if (ranges.length != 2)
                             continue;
 
-                        int min = Integer.valueOf(ranges[0]);
-                        int max = Integer.valueOf(ranges[1]);
-                        min = CheckValue(min, 0, 128);
-                        max = CheckValue(max, 0, 128, min);
-                        this.replaceHeightMin.put(Integer.valueOf(blocks[0]), min);
-                        this.replaceHeightMax.put(Integer.valueOf(blocks[0]), max);
-                        int[] block = blockIdAndDataFromString(blocks[1].substring(0, start));
-                        this.replaceBlocks.put(Integer.valueOf(blocks[0]), block);
-                        continue;
-
-
+                        min_y = Integer.valueOf(ranges[0]);
+                        max_y = Integer.valueOf(ranges[1]);
+                        min_y = CheckValue(min_y, 0, worldConfig.WorldHeight);
+                        max_y = CheckValue(max_y, 0, worldConfig.WorldHeight, min_y);
+                        blocks[1] = blocks[1].substring(0,start);
                     }
-                    this.replaceHeightMin.put(Integer.valueOf(blocks[0]), 0);
-                    this.replaceHeightMax.put(Integer.valueOf(blocks[0]), 128);
 
-                    int[] block = blockIdAndDataFromString(blocks[1]);
-                    this.replaceBlocks.put(Integer.valueOf(blocks[0]), block);
+                    short blockId;
+                    short blockData;
+                    short fromBlockId = Short.valueOf(blocks[0]);
+
+                    if (blocks[1].contains("."))
+                    {
+                        String[] parts = blocks[1].split("\\.");
+                        blockId = Short.valueOf(parts[0]); // Block ID
+                        blockData = Short.valueOf(parts[1]); // Block data
+                    } else
+                    {
+                        blockId = Short.valueOf(blocks[1]); // Block ID
+                        blockData = 0; // Block data
+                    }
+                    if (this.ReplaceMatrixBlocks[fromBlockId] == null )
+                    {
+                        this.ReplaceMatrixBlocks[fromBlockId] = new short[worldConfig.WorldHeight];
+                        for(int i = 0; i < worldConfig.WorldHeight; i++)
+                            this.ReplaceMatrixBlocks[fromBlockId][i] = -1;
+                    }
+                    for( int y = min_y; y < max_y; y++)
+                        this.ReplaceMatrixBlocks[fromBlockId][y] = (short)(blockId<<4 | blockData);
+                    ReplaceCount++;
+
                 }
 
             } catch (NumberFormatException e)
@@ -374,41 +382,6 @@ public class BiomeConfig extends ConfigFile
         }
 
 
-    }
-
-    private int[] blockIdAndDataFromString(String input)
-    {
-        int[] block = new int[2]; // [block ID, block data]
-
-        if (input.contains("."))
-        {
-            String[] parts = input.split("\\.");
-            block[0] = Integer.valueOf(parts[0]); // Block ID
-            block[1] = Integer.valueOf(parts[1]); // Block data
-        } else
-        {
-            block[0] = Integer.valueOf(input); // Block ID
-            block[1] = 0; // Block data
-        }
-
-        return block;
-    }
-
-    private void BuildReplaceMatrix()
-    {
-        for (int i = 0; i < this.ReplaceMatrixBlocks.length; i++)
-        {
-            if (this.replaceBlocks.containsKey(i))
-            {
-                this.ReplaceMatrixBlocks[i] = replaceBlocks.get(i);
-                this.ReplaceMatrixHeightMin[i] = this.replaceHeightMin.get(i);
-                this.ReplaceMatrixHeightMax[i] = this.replaceHeightMax.get(i);
-            } else
-            {
-                int[] block = {i, 0};
-                this.ReplaceMatrixBlocks[i] = block;
-            }
-        }
     }
 
     private void ReadResourceSettings()
@@ -615,31 +588,62 @@ public class BiomeConfig extends ConfigFile
     private void WriteModReplaceSettings() throws IOException
     {
 
-        if (this.replaceBlocks.size() == 0)
+        if (this.ReplaceCount == 0)
         {
             this.WriteValue("ReplacedBlocks", "None");
             return;
         }
-        String output = "", value;
-        Iterator<Map.Entry<Integer, int[]>> i = this.replaceBlocks.entrySet().iterator();
-        while (i.hasNext())
-        {
-            Map.Entry<Integer, int[]> me = i.next();
+        String output = "";
+        boolean first = true;
 
-            value = String.valueOf(me.getValue()[0]);
-            if (me.getValue()[1] > 0)
+        
+        for( int id = 0; id < ReplaceMatrixBlocks.length;id ++ )
+        {
+            if( ReplaceMatrixBlocks[id] == null)
+                continue;
+            
+            int replaceTo = -1;
+            int y_start = 0;
+            
+            for( int y = 0; y < ReplaceMatrixBlocks[id].length;y++)
             {
-                value += "." + String.valueOf(me.getValue()[1]);
+                if(ReplaceMatrixBlocks[id][y] == replaceTo)
+                    continue;
+                
+                if( replaceTo == -1)
+                {
+                    y_start = y;
+                    replaceTo = ReplaceMatrixBlocks[id][y];
+                    continue;
+                }
+                if(!first)
+                    output += ",";
+
+                output += id + "=" + (replaceTo>>4);
+                if((replaceTo&0xF) > 0)
+                    output += "." + (replaceTo&0xF);
+                if(y_start != 0 && y != (ReplaceMatrixBlocks[id].length -1))
+                {
+                    output += "(" + y_start + "-" + y + ")";
+                }
+                first = false;
+                replaceTo = -1;
+            }
+            if (replaceTo != -1)
+            {
+                if(!first)
+                    output += ",";
+
+                output += id + "=" + (replaceTo>>4);
+                if((replaceTo&0xF) > 0)
+                    output += "." + (replaceTo&0xF);
+                if(y_start != 0 )
+                {
+                    output += "(" + y_start + "-" + (ReplaceMatrixBlocks[id].length -1) + ")";
+                }
+
             }
 
-            output += me.getKey().toString() + "=" + value;
-            int min = this.replaceHeightMin.get(me.getKey());
-            int max = this.replaceHeightMax.get(me.getKey());
-            if (min != 0 || max != 128)
-                output += "(" + min + "-" + max + ")";
-
-            if (i.hasNext())
-                output += ",";
         }
 
         this.WriteValue("ReplacedBlocks", output);
