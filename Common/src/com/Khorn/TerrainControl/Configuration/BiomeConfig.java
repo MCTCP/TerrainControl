@@ -76,14 +76,13 @@ public class BiomeConfig extends ConfigFile
     public String Name;
 
 
-    public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config, boolean checkOnly)
+    public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
 
         this.Biome = biome;
         this.Name = biome.getName();
         worldConfig = config;
-        if (!checkOnly)
-            InitDefaults();
+        InitDefaults();
 
         File settingsFile = new File(settingsDir, this.Name + TCDefaultValues.WorldBiomeConfigName.stringValue());
 

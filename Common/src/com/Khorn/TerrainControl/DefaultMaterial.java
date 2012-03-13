@@ -138,6 +138,10 @@ public enum DefaultMaterial
     {
         this.id = Id;
     }
+    public boolean isLiquid()
+    {
+        return this == WATER || this == STATIONARY_WATER;
+    }
     
     private static DefaultMaterial[] lookupID;
     private static Map<String, DefaultMaterial> lookupName;

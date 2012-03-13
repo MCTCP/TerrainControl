@@ -186,7 +186,7 @@ public class WorldConfig extends ConfigFile
             }
         }
 
-        ArrayList<LocalBiome> biomes = world.getDefaultBiomes();
+        ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>(world.getDefaultBiomes());
 
         for (String biomeName : this.CustomBiomes)
         {
@@ -200,7 +200,9 @@ public class WorldConfig extends ConfigFile
 
         for (LocalBiome localBiome : biomes)
         {
-            BiomeConfig config = new BiomeConfig(BiomeFolder, localBiome, this, checkOnly);
+            BiomeConfig config = new BiomeConfig(BiomeFolder, localBiome, this);
+            if(checkOnly)
+                continue;
 
             if (this.NormalBiomes.contains(config.Name))
                 this.normalBiomesRarity += config.BiomeRarity;

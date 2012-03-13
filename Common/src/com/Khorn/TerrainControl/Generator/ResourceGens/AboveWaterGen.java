@@ -16,11 +16,11 @@ public class AboveWaterGen extends ResourceGenBase
         for (int i = 0; i < 10; i++)
         {
             int j = x + rand.nextInt(8) - rand.nextInt(8);
-            int k = y + rand.nextInt(4) - rand.nextInt(4);
+            //int k = y + rand.nextInt(4) - rand.nextInt(4);
             int m = z + rand.nextInt(8) - rand.nextInt(8);
-            if ((!world.isEmpty(j, k, m)) || (world.getMaterial(j, k - 1, m) != DefaultMaterial.WATER))
+            if ((!world.isEmpty(j, y, m)) || (!world.getMaterial(j, y - 1, m).isLiquid()))
                 continue;
-            world.setBlock(j, k, m, res.BlockId, 0, false, false, false);
+            world.setBlock(j, y, m, res.BlockId, 0, false, false, false);
         }
     }
 }

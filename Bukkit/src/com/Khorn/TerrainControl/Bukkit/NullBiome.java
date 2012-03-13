@@ -1,5 +1,6 @@
 package com.Khorn.TerrainControl.Bukkit;
 
+import com.Khorn.TerrainControl.Configuration.BiomeConfig;
 import net.minecraft.server.BiomeBase;
 
 public class NullBiome extends BukkitBiome
@@ -28,5 +29,11 @@ public class NullBiome extends BukkitBiome
     public String getName()
     {
        return name;
+    }
+
+    @Override
+    public void setCustom(BiomeConfig config)
+    {
+
     }
 }
