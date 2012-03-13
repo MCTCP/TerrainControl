@@ -463,22 +463,34 @@ public class BukkitWorld implements LocalWorld
         // TODO: Should WorldProviderTC extend even more? For example for spawn point etc?
         // this.world.worldProvider = new TCWorldProvider().setSeaLevel(this.settings.waterLevelMax); // cause errors with entity burn, disabled temporary.
 
-        this.generator.Init(this);
-
-        this.strongholdGen = new WorldGenStronghold();
-        this.VillageGen = new WorldGenVillage(0);
-        this.MineshaftGen = new WorldGenMineshaft();
-
-        this.Tree = new WorldGenTrees(false);
-        this.BigTree = new WorldGenBigTree(false);
-        this.Forest = new WorldGenForest(false);
-        this.SwampTree = new WorldGenSwampTree();
-        this.TaigaTree1 = new WorldGenTaiga1();
-        this.TaigaTree2 = new WorldGenTaiga2(false);
-        this.HugeMushroom = new WorldGenHugeMushroom();
-        this.JungleTree = new WorldGenMegaTree(false, 15, 3, 3);  // TODO Search more about this parameters
 
         this.ChunkCache = new Chunk[4];
+
+        switch (this.settings.ModeTerrain)
+        {
+
+            case Normal:
+            case OldGenerator:
+                this.Tree = new WorldGenTrees(false);
+                this.BigTree = new WorldGenBigTree(false);
+                this.Forest = new WorldGenForest(false);
+                this.SwampTree = new WorldGenSwampTree();
+                this.TaigaTree1 = new WorldGenTaiga1();
+                this.TaigaTree2 = new WorldGenTaiga2(false);
+                this.HugeMushroom = new WorldGenHugeMushroom();
+                this.JungleTree = new WorldGenMegaTree(false, 15, 3, 3);  // TODO Search more about this parameters
+                this.strongholdGen = new WorldGenStronghold();
+                this.VillageGen = new WorldGenVillage(0);
+                this.MineshaftGen = new WorldGenMineshaft();
+            case TerrainTest:
+            case NotGenerate:
+                this.generator.Init(this);
+                break;
+            case Default:
+                break;
+        }
+
+
     }
 
     public void setChunkGenerator(TCChunkGenerator _generator)

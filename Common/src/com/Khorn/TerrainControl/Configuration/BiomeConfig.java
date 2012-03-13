@@ -54,6 +54,19 @@ public class BiomeConfig extends ConfigFile
 
     public Resource[] ResourceSequence = new Resource[256];
 
+    public double maxAverageHeight;
+    public double maxAverageDepth;
+    public double volatility1;
+    public double volatility2;
+    public double volatilityWeight1;
+    public double volatilityWeight2;
+    private double volatilityRaw1;
+    private double volatilityRaw2;
+    private double volatilityWeightRaw1;
+    private double volatilityWeightRaw2;
+    public boolean disableNotchHeightControl;
+    public double[] heightMatrix;
+
 
     public int ResourceCount = 0;
 
@@ -75,6 +88,7 @@ public class BiomeConfig extends ConfigFile
         File settingsFile = new File(settingsDir, this.Name + TCDefaultValues.WorldBiomeConfigName.stringValue());
 
         this.ReadSettingsFile(settingsFile);
+        this.RenameOldSettings();
         this.ReadConfigSettings();
 
         this.CorrectSettings();
@@ -129,23 +143,23 @@ public class BiomeConfig extends ConfigFile
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Iron
-        resource = new Resource(ResourceType.Ore, DefaultMaterial.IRON_ORE.id, 0, TCDefaultValues.ironDepositSize.intValue(), TCDefaultValues.ironDepositFrequency.intValue(), TCDefaultValues.ironDepositRarity.intValue(), TCDefaultValues.ironDepositMinAltitude.intValue(), this.worldConfig.WorldHeight/2, new int[]{DefaultMaterial.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.IRON_ORE.id, 0, TCDefaultValues.ironDepositSize.intValue(), TCDefaultValues.ironDepositFrequency.intValue(), TCDefaultValues.ironDepositRarity.intValue(), TCDefaultValues.ironDepositMinAltitude.intValue(), this.worldConfig.WorldHeight / 2, new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Gold
-        resource = new Resource(ResourceType.Ore, DefaultMaterial.GOLD_ORE.id, 0, TCDefaultValues.goldDepositSize.intValue(), TCDefaultValues.goldDepositFrequency.intValue(), TCDefaultValues.goldDepositRarity.intValue(), TCDefaultValues.goldDepositMinAltitude.intValue(), this.worldConfig.WorldHeight/4, new int[]{DefaultMaterial.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.GOLD_ORE.id, 0, TCDefaultValues.goldDepositSize.intValue(), TCDefaultValues.goldDepositFrequency.intValue(), TCDefaultValues.goldDepositRarity.intValue(), TCDefaultValues.goldDepositMinAltitude.intValue(), this.worldConfig.WorldHeight / 4, new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Redstone
-        resource = new Resource(ResourceType.Ore, DefaultMaterial.REDSTONE_ORE.id, 0, TCDefaultValues.redstoneDepositSize.intValue(), TCDefaultValues.redstoneDepositFrequency.intValue(), TCDefaultValues.redstoneDepositRarity.intValue(), TCDefaultValues.redstoneDepositMinAltitude.intValue(), this.worldConfig.WorldHeight/8, new int[]{DefaultMaterial.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.REDSTONE_ORE.id, 0, TCDefaultValues.redstoneDepositSize.intValue(), TCDefaultValues.redstoneDepositFrequency.intValue(), TCDefaultValues.redstoneDepositRarity.intValue(), TCDefaultValues.redstoneDepositMinAltitude.intValue(), this.worldConfig.WorldHeight / 8, new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Diamond
-        resource = new Resource(ResourceType.Ore, DefaultMaterial.DIAMOND_ORE.id, 0, TCDefaultValues.diamondDepositSize.intValue(), TCDefaultValues.diamondDepositFrequency.intValue(), TCDefaultValues.diamondDepositRarity.intValue(), TCDefaultValues.diamondDepositMinAltitude.intValue(), this.worldConfig.WorldHeight/8, new int[]{DefaultMaterial.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.DIAMOND_ORE.id, 0, TCDefaultValues.diamondDepositSize.intValue(), TCDefaultValues.diamondDepositFrequency.intValue(), TCDefaultValues.diamondDepositRarity.intValue(), TCDefaultValues.diamondDepositMinAltitude.intValue(), this.worldConfig.WorldHeight / 8, new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Lapislazuli
-        resource = new Resource(ResourceType.Ore, DefaultMaterial.LAPIS_ORE.id, 0, TCDefaultValues.lapislazuliDepositSize.intValue(), TCDefaultValues.lapislazuliDepositFrequency.intValue(), TCDefaultValues.lapislazuliDepositRarity.intValue(), TCDefaultValues.lapislazuliDepositMinAltitude.intValue(), this.worldConfig.WorldHeight/8, new int[]{DefaultMaterial.STONE.id});
+        resource = new Resource(ResourceType.Ore, DefaultMaterial.LAPIS_ORE.id, 0, TCDefaultValues.lapislazuliDepositSize.intValue(), TCDefaultValues.lapislazuliDepositFrequency.intValue(), TCDefaultValues.lapislazuliDepositRarity.intValue(), TCDefaultValues.lapislazuliDepositMinAltitude.intValue(), this.worldConfig.WorldHeight / 8, new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
 
@@ -196,7 +210,7 @@ public class BiomeConfig extends ConfigFile
                 break;
             case 21:// Jungle
             case 22:
-                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.JungleTree,TreeType.Tree}, new int[]{10, 35, 100});
+                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.JungleTree, TreeType.Tree}, new int[]{10, 35, 100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
 
@@ -309,8 +323,38 @@ public class BiomeConfig extends ConfigFile
         this.GrassColor = this.ReadModSettingsColor(TCDefaultValues.GrassColor.name(), this.DefaultGrassColor);
         this.FoliageColor = this.ReadModSettingsColor(TCDefaultValues.FoliageColor.name(), this.DefaultFoliageColor);
 
+        this.volatilityRaw1 = ReadModSettings(TCDefaultValues.Volatility1.name(), TCDefaultValues.Volatility1.doubleValue());
+        this.volatilityRaw2 = ReadModSettings(TCDefaultValues.Volatility2.name(), TCDefaultValues.Volatility2.doubleValue());
+        this.volatilityWeightRaw1 = ReadModSettings(TCDefaultValues.VolatilityWeight1.name(), TCDefaultValues.VolatilityWeight1.doubleValue());
+        this.volatilityWeightRaw2 = ReadModSettings(TCDefaultValues.VolatilityWeight2.name(), TCDefaultValues.VolatilityWeight2.doubleValue());
+        this.disableNotchHeightControl = ReadModSettings(TCDefaultValues.DisableBiomeHeight.name(), TCDefaultValues.DisableBiomeHeight.booleanValue());
+        this.maxAverageHeight = ReadModSettings(TCDefaultValues.MaxAverageHeight.name(), TCDefaultValues.MaxAverageHeight.doubleValue());
+        this.maxAverageDepth = ReadModSettings(TCDefaultValues.MaxAverageDepth.name(), TCDefaultValues.MaxAverageDepth.doubleValue());
+
+
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
+        this.ReadHeightSettings();
+    }
+
+    private void ReadHeightSettings()
+    {
+        this.heightMatrix = new double[this.worldConfig.WorldHeight / 8 + 1];
+
+        ArrayList<String> keys = this.ReadModSettings(TCDefaultValues.CustomHeightControl.name(), TCDefaultValues.CustomHeightControl.StringArrayListValue());
+        try
+        {
+            if (keys.size() != (this.worldConfig.WorldHeight / 8 + 1))
+                return;
+            for (int i = 0; i < this.worldConfig.WorldHeight / 8 + 1; i++)
+                this.heightMatrix[i] = Double.valueOf(keys.get(i));
+
+        } catch (NumberFormatException e)
+        {
+            System.out.println("Wrong height settings: '" + this.SettingsCache.get(TCDefaultValues.CustomHeightControl.name()) + "'");
+        }
+
+
     }
 
 
@@ -345,7 +389,7 @@ public class BiomeConfig extends ConfigFile
                         max_y = Integer.valueOf(ranges[1]);
                         min_y = CheckValue(min_y, 0, worldConfig.WorldHeight);
                         max_y = CheckValue(max_y, 0, worldConfig.WorldHeight, min_y);
-                        blocks[1] = blocks[1].substring(0,start);
+                        blocks[1] = blocks[1].substring(0, start);
                     }
 
                     short blockId;
@@ -362,14 +406,14 @@ public class BiomeConfig extends ConfigFile
                         blockId = Short.valueOf(blocks[1]); // Block ID
                         blockData = 0; // Block data
                     }
-                    if (this.ReplaceMatrixBlocks[fromBlockId] == null )
+                    if (this.ReplaceMatrixBlocks[fromBlockId] == null)
                     {
                         this.ReplaceMatrixBlocks[fromBlockId] = new short[worldConfig.WorldHeight];
-                        for(int i = 0; i < worldConfig.WorldHeight; i++)
+                        for (int i = 0; i < worldConfig.WorldHeight; i++)
                             this.ReplaceMatrixBlocks[fromBlockId][i] = -1;
                     }
-                    for( int y = min_y; y < max_y; y++)
-                        this.ReplaceMatrixBlocks[fromBlockId][y] = (short)(blockId<<4 | blockData);
+                    for (int y = min_y; y < max_y; y++)
+                        this.ReplaceMatrixBlocks[fromBlockId][y] = (short) (blockId << 4 | blockData);
                     ReplaceCount++;
 
                 }
@@ -400,7 +444,7 @@ public class BiomeConfig extends ConfigFile
                     if (start != -1 && end != -1)
                     {
                         Resource res = new Resource(type);
-                        res.ReadFromString(key.substring(start + 1, end),this.worldConfig.WorldHeight);
+                        res.ReadFromString(key.substring(start + 1, end), this.worldConfig.WorldHeight);
 
                         if (res.Done)
                         {
@@ -489,16 +533,48 @@ public class BiomeConfig extends ConfigFile
         this.WriteNewLine();
 
 
-        this.WriteNewLine();
+        WriteTitle("Terrain Generator Variables");
         WriteComment("BiomeHeight mean how much height will be added in terrain generation");
         WriteComment("It is double value from -10.0 to 10.0");
-        WriteComment("Each 1.0 add or remove about 16 blocks height from 64 height with all other values set default.");
-        WriteComment("So 0.0 = 64 height, -1.0 = 48 height. Terrain settings from world config may affect how much this works.");
+        WriteComment("Value 0.0 equivalent half of map height with all other default settings");
         WriteValue(TCDefaultValues.BiomeHeight.name(), this.BiomeHeight);
 
         this.WriteNewLine();
-        WriteComment("BiomeVolatility similar BiomeHeight, but it adds volatility. Extreme Hills biome made by it.");
+        WriteComment("Biome volatility.");
         WriteValue(TCDefaultValues.BiomeVolatility.name(), this.BiomeVolatility);
+
+        WriteNewLine();
+        WriteComment("If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.");
+        WriteComment("If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.");
+        WriteValue(TCDefaultValues.MaxAverageHeight.name(), this.maxAverageHeight);
+
+        WriteNewLine();
+        WriteComment("If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the ottom of the ocean) will fall before leveling off when it begins to decrease in elevation. ");
+        WriteComment("If the value is less than 0, then it will cause the terrain to either fall to a lesser depth before leveling out or increase in height if the value is a large enough negative.");
+        WriteValue(TCDefaultValues.MaxAverageDepth.name(), this.maxAverageDepth);
+
+        WriteNewLine();
+        WriteComment("Another type of noise. This noise is independent from biomes. The larger the values the more chaotic/volatile landscape generation becomes.");
+        WriteComment("Setting the values to negative will have the opposite effect and make landscape generation calmer/gentler.");
+        WriteValue(TCDefaultValues.Volatility1.name(), this.volatilityRaw1);
+        WriteValue(TCDefaultValues.Volatility2.name(), this.volatilityRaw2);
+
+        WriteNewLine();
+        WriteComment("Adjust the weight of the corresponding volatility settings. This allows you to change how prevalent you want either of the volatility settings to be in the terrain.");
+        WriteValue(TCDefaultValues.VolatilityWeight1.name(), this.volatilityWeightRaw1);
+        WriteValue(TCDefaultValues.VolatilityWeight2.name(), this.volatilityWeightRaw2);
+
+        WriteNewLine();
+        WriteComment("Disable all noises except Volatility1 and Volatility2. Also disable default block chance from height.");
+        WriteValue(TCDefaultValues.DisableBiomeHeight.name(), this.disableNotchHeightControl);
+        WriteNewLine();
+        WriteComment("List of custom height factor, 17 double entries, each entire control of about 7 blocks height from down. Positive entry - better chance of spawn blocks, negative - smaller");
+        WriteComment("Values which affect your configuration may be found only experimental. That may be very big, like ~3000.0 depends from height");
+        WriteComment("Example:");
+        WriteComment("  CustomHeightControl:0.0,-2500.0,0.0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0");
+        WriteComment("Make empty layer above bedrock layer. ");
+        WriteHeightSettings();
+
 
         this.WriteNewLine();
         WriteComment("Surface block id");
@@ -584,6 +660,16 @@ public class BiomeConfig extends ConfigFile
 
     }
 
+    private void WriteHeightSettings() throws IOException
+    {
+
+        String output = Double.toString(this.heightMatrix[0]);
+        for (int i = 1; i < this.heightMatrix.length; i++)
+            output = output + "," + Double.toString(this.heightMatrix[i]);
+
+        this.WriteValue(TCDefaultValues.CustomHeightControl.name(), output);
+    }
+
 
     private void WriteModReplaceSettings() throws IOException
     {
@@ -596,33 +682,33 @@ public class BiomeConfig extends ConfigFile
         String output = "";
         boolean first = true;
 
-        
-        for( int id = 0; id < ReplaceMatrixBlocks.length;id ++ )
+
+        for (int id = 0; id < ReplaceMatrixBlocks.length; id++)
         {
-            if( ReplaceMatrixBlocks[id] == null)
+            if (ReplaceMatrixBlocks[id] == null)
                 continue;
-            
+
             int replaceTo = -1;
             int y_start = 0;
-            
-            for( int y = 0; y < ReplaceMatrixBlocks[id].length;y++)
+
+            for (int y = 0; y < ReplaceMatrixBlocks[id].length; y++)
             {
-                if(ReplaceMatrixBlocks[id][y] == replaceTo)
+                if (ReplaceMatrixBlocks[id][y] == replaceTo)
                     continue;
-                
-                if( replaceTo == -1)
+
+                if (replaceTo == -1)
                 {
                     y_start = y;
                     replaceTo = ReplaceMatrixBlocks[id][y];
                     continue;
                 }
-                if(!first)
+                if (!first)
                     output += ",";
 
-                output += id + "=" + (replaceTo>>4);
-                if((replaceTo&0xF) > 0)
-                    output += "." + (replaceTo&0xF);
-                if(y_start != 0 && y != (ReplaceMatrixBlocks[id].length -1))
+                output += id + "=" + (replaceTo >> 4);
+                if ((replaceTo & 0xF) > 0)
+                    output += "." + (replaceTo & 0xF);
+                if (y_start != 0 || y != (ReplaceMatrixBlocks[id].length - 1))
                 {
                     output += "(" + y_start + "-" + y + ")";
                 }
@@ -631,16 +717,17 @@ public class BiomeConfig extends ConfigFile
             }
             if (replaceTo != -1)
             {
-                if(!first)
+                if (!first)
                     output += ",";
 
-                output += id + "=" + (replaceTo>>4);
-                if((replaceTo&0xF) > 0)
-                    output += "." + (replaceTo&0xF);
-                if(y_start != 0 )
+                output += id + "=" + (replaceTo >> 4);
+                if ((replaceTo & 0xF) > 0)
+                    output += "." + (replaceTo & 0xF);
+                if (y_start != 0)
                 {
-                    output += "(" + y_start + "-" + (ReplaceMatrixBlocks[id].length -1) + ")";
+                    output += "(" + y_start + "-" + (ReplaceMatrixBlocks[id].length - 1) + ")";
                 }
+                first = false;
 
             }
 
@@ -669,11 +756,20 @@ public class BiomeConfig extends ConfigFile
         this.BiomeIsBorder = CheckValue(this.BiomeIsBorder, this.worldConfig.CustomBiomes);
         this.NotBorderNear = CheckValue(this.NotBorderNear, this.worldConfig.CustomBiomes);
 
+        this.volatility1 = this.volatilityRaw1 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw1) + 1.0D) : this.volatilityRaw1 + 1.0D;
+        this.volatility2 = this.volatilityRaw2 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw2) + 1.0D) : this.volatilityRaw2 + 1.0D;
+
+        this.volatilityWeight1 = (this.volatilityWeightRaw1 - 0.5D) * 24.0D;
+        this.volatilityWeight2 = (0.5D - this.volatilityWeightRaw2) * 24.0D;
 
     }
 
     protected void RenameOldSettings()
     {
+        TCDefaultValues[] copyFromWorld = {TCDefaultValues.MaxAverageHeight,TCDefaultValues.MaxAverageDepth,TCDefaultValues.Volatility1,TCDefaultValues.Volatility2,TCDefaultValues.VolatilityWeight1,TCDefaultValues.VolatilityWeight2,TCDefaultValues.DisableBiomeHeight,TCDefaultValues.CustomHeightControl};
+        for( TCDefaultValues value : copyFromWorld)
+            if(this.worldConfig.SettingsCache.containsKey(value.name()))
+                this.SettingsCache.put(value.name(),this.worldConfig.SettingsCache.get(value.name()));
 
     }
 
@@ -875,7 +971,7 @@ public class BiomeConfig extends ConfigFile
 
     public void Serialize(DataOutputStream stream) throws IOException
     {
-        WriteStringToStream(stream,this.Name);
+        WriteStringToStream(stream, this.Name);
 
         stream.writeInt(this.BiomeSize);
         stream.writeInt(this.BiomeRarity);
@@ -883,15 +979,15 @@ public class BiomeConfig extends ConfigFile
 
         stream.writeInt(this.IsleInBiome.size());
         for (String biome : this.IsleInBiome)
-            WriteStringToStream(stream,biome);
+            WriteStringToStream(stream, biome);
 
         stream.writeInt(this.BiomeIsBorder.size());
         for (String biome : this.BiomeIsBorder)
-            WriteStringToStream(stream,biome);
+            WriteStringToStream(stream, biome);
 
         stream.writeInt(this.NotBorderNear.size());
         for (String biome : this.NotBorderNear)
-            WriteStringToStream(stream,biome);
+            WriteStringToStream(stream, biome);
 
         stream.writeFloat(this.BiomeTemperature);
         stream.writeFloat(this.BiomeWetness);
