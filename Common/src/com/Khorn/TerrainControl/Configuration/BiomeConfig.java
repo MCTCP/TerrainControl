@@ -632,7 +632,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Reed(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Cactus(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Liquid(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.WriteComment("AboveWaterRes(Block,Frequency,Rarity,MinAltitude)");
+        this.WriteComment("AboveWaterRes(Block,Frequency,Rarity)");
         this.WriteComment("");
         this.WriteComment("Some comments:  ");
         this.WriteComment("Block and BlockSource - can be id or name, Frequency - is count of attempts for place resource");
