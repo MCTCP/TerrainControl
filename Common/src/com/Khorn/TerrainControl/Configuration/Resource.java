@@ -267,7 +267,14 @@ public class Resource
                     this.BlockId = CheckBlock(Props[0]);
                     this.Frequency = CheckValue(Props[1], 1, 100);
                     this.Rarity = CheckValue(Props[2], 0, 100);
-
+                    break;
+                case Vines:
+                    if (Props.length != 4)
+                        return;
+                    this.Frequency = CheckValue(Props[0], 1, 100);
+                    this.Rarity = CheckValue(Props[1], 0, 100);
+                    this.MinAltitude = CheckValue(Props[2], 0, worldHeight);
+                    this.MaxAltitude = CheckValue(Props[3], 0, worldHeight, this.MinAltitude);
                     break;
             }
         } catch (NumberFormatException e)
@@ -307,10 +314,10 @@ public class Resource
                     blockId += "." + this.BlockData;
                 }
                 output += blockId + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
-            break;
+                break;
             case UnderWaterOre:
                 output += BlockIdToName(this.BlockId) + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + sources + ")";
-            break;
+                break;
             case Plant:
             case Liquid:
             case Reed:
@@ -321,30 +328,33 @@ public class Resource
                     blockId += "." + this.BlockData;
                 }
                 output += blockId + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + sources + ")";
-            break;
+                break;
             case Grass:
                 output += BlockIdToName(this.BlockId) + "," + this.BlockData + "," + this.Frequency + "," + this.Rarity + sources + ")";
                 break;
             case Dungeon:
                 output += this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
-            break;
+                break;
             case Tree:
                 output += this.Frequency;
                 for (int i = 0; i < this.TreeChances.length; i++)
                     output += "," + this.TreeTypes[i].name() + "," + this.TreeChances[i];
                 output += ")";
-            break;
+                break;
             case CustomObject:
                 output += ")";
-            break;
+                break;
             case UnderGroundLake:
                 output += this.MinSize + "," + this.MaxSize + "," + this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
-            break;
+                break;
             case AboveWaterRes:
                 output += BlockIdToName(this.BlockId) + "," + this.Frequency + "," + this.Rarity + ")";
-            break;
+                break;
+            case Vines:
+                output += this.Frequency + "," + this.Rarity + "," + this.MinAltitude + "," + this.MaxAltitude + ")";
+                break;
         }
-        
+
         return output;
     }
 }

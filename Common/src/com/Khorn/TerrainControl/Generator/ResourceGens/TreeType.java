@@ -10,5 +10,6 @@ public enum TreeType
     Taiga1,
     Taiga2,
     JungleTree,
+    GroundBush,
     ;
 }

@@ -55,12 +55,15 @@ public interface LocalWorld
 
 
     // Blocks
-    
+
     public int getTypeId(int x, int y, int z);
-    
+
     public boolean isEmpty(int x, int y, int z);
 
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers);
+
+    public void setBlock(final int x, final int y, final int z, final int typeId, final int data);
+
     //public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data);
 
     //public void setRawBlockId(int x, int y, int z, int BlockId);
@@ -68,9 +71,8 @@ public interface LocalWorld
     //public void setBlockId(int x, int y, int z, int BlockId);
 
     //public void setBlockIdAndData(int x, int y, int z, int BlockId, int Data);
-    
-    
-    
+
+
     public int getLiquidHeight(int x, int z);
 
     public int getHighestBlockYAt(int x, int z);
@@ -93,7 +95,6 @@ public interface LocalWorld
 
     public int getHeight();
 
-    public int getWaterLevel();
 
     public int getHeightBits();
 

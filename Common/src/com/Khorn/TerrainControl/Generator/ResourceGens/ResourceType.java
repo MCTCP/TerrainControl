@@ -15,7 +15,8 @@ public enum ResourceType
     Tree(TreeGen.class),
     CustomObject(CustomObjectGen.class),
     UnderGroundLake(UndergroundLakeGen.class),
-    AboveWaterRes(AboveWaterGen.class);
+    AboveWaterRes(AboveWaterGen.class),
+    Vines(VinesGen.class);
 
     public ResourceGenBase Generator;
     public final boolean CreateNewChunks;

@@ -38,6 +38,7 @@ public class BukkitWorld implements LocalWorld
     private WorldGenTaiga2 TaigaTree2;
     private WorldGenHugeMushroom HugeMushroom;
     private WorldGenMegaTree JungleTree;
+    private WorldGenGroundBush GroundBush;
 
 
     private boolean CreateNewChunks;
@@ -191,6 +192,9 @@ public class BukkitWorld implements LocalWorld
                 break;
             case JungleTree:
                 JungleTree.a(this.world, rand, x, y, z);
+                break;
+            case GroundBush:
+                GroundBush.a(this.world, rand, x, y, z);
                 break;
         }
     }
@@ -382,6 +386,11 @@ public class BukkitWorld implements LocalWorld
         }
     }
 
+    public void setBlock(final int x, final int y, final int z, final int typeId, final int data)
+    {
+        this.setBlock(x, y, z, typeId, data, false, false, false);
+    }
+
     public int getHighestBlockYAt(int x, int z)
     {
         Chunk chunk = this.getChunk(x, 0, z);
@@ -435,10 +444,6 @@ public class BukkitWorld implements LocalWorld
         return worldHeight;
     }
 
-    public int getWaterLevel()
-    {
-        return 63; // TODO same as height
-    }
 
     public int getHeightBits()
     {
@@ -482,6 +487,7 @@ public class BukkitWorld implements LocalWorld
                 this.strongholdGen = new WorldGenStronghold();
                 this.VillageGen = new WorldGenVillage(0);
                 this.MineshaftGen = new WorldGenMineshaft();
+                this.GroundBush = new WorldGenGroundBush(3, 0);
             case TerrainTest:
             case NotGenerate:
                 this.generator.Init(this);

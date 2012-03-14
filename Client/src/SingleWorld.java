@@ -27,7 +27,7 @@ public class SingleWorld implements LocalWorld
     private xm strongholdGen;
     private am VillageGen;
     private ali MineshaftGen;
-    
+
     private lf DungeonGen;
 
     private rx Tree;
@@ -38,6 +38,7 @@ public class SingleWorld implements LocalWorld
     private qx TaigaTree2;
     private qi HugeMushroom;
     private aix JungleTree;
+    private agg GroundBush;
 
 
     private boolean CreateNewChunks;
@@ -49,7 +50,6 @@ public class SingleWorld implements LocalWorld
 
     private abi[] BiomeArray;
 
-    private int DefaultWaterLevel;
 
     private int worldHeight = 128;
     private int heightBits = 7;
@@ -204,6 +204,9 @@ public class SingleWorld implements LocalWorld
             case JungleTree:
                 JungleTree.a(this.world, rand, x, y, z);
                 break;
+            case GroundBush:
+                GroundBush.a(this.world, rand, x, y, z);
+                break;
         }
     }
 
@@ -336,9 +339,9 @@ public class SingleWorld implements LocalWorld
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = this.worldHeight -1 ; y > 0; y--)
+        for (int y = this.worldHeight - 1; y > 0; y--)
         {
-            int blockId = chunk.a(x,y,z);
+            int blockId = chunk.a(x, y, z);
             if (blockId != 0 && ox.m[blockId].cd.d())
                 return y;
         }
@@ -359,8 +362,9 @@ public class SingleWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
 
-        return chunk.a(x,y,z);
+        return chunk.a(x, y, z);
     }
+
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
         // If minecraft was updated and obfuscation is off - take a look at these methods:
@@ -379,7 +383,7 @@ public class SingleWorld implements LocalWorld
             int oldTypeId = chunk.a(x & 15, y, z & 15);
             chunk.a(x & 15, y, z & 15, typeId, data);
             this.world.j(x, y, z, typeId == 0 ? oldTypeId : typeId);
-        }else
+        } else
             chunk.a(x & 15, y, z & 15, typeId, data); // Set typeId and Data
 
 
@@ -392,6 +396,11 @@ public class SingleWorld implements LocalWorld
         {
             this.world.k(x, y, z);
         }
+    }
+
+    public void setBlock(final int x, final int y, final int z, final int typeId, final int data)
+    {
+        this.setBlock(x, y, z, typeId, data, false, false, false);
     }
 
     public int getHighestBlockYAt(int x, int z)
@@ -450,10 +459,6 @@ public class SingleWorld implements LocalWorld
         return this.worldHeight;
     }
 
-    public int getWaterLevel()
-    {
-        return this.DefaultWaterLevel;
-    }
 
     public int getHeightBits()
     {
@@ -482,10 +487,10 @@ public class SingleWorld implements LocalWorld
         this.world = _world;
         this.Seed = world.v();
         //this.world.e = this.settings.waterLevelMax;
-        this.DefaultWaterLevel = this.settings.waterLevelMax;
+
         try
         {
-            this.DungeonGen = (lf)Class.forName("do").newInstance();
+            this.DungeonGen = (lf) Class.forName("do").newInstance();
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -503,7 +508,8 @@ public class SingleWorld implements LocalWorld
         this.TaigaTree1 = new ll();
         this.TaigaTree2 = new qx(false);
         this.HugeMushroom = new qi();
-        this.JungleTree = new aix(false,15,3,3);
+        this.JungleTree = new aix(false, 15, 3, 3);
+        this.GroundBush = new agg(3, 0);
 
         this.ChunkCache = new acf[4];
         this.generator = new ChunkProvider(this);

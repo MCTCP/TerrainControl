@@ -176,40 +176,42 @@ public class BiomeConfig extends ConfigFile
         resource = new Resource(ResourceType.CustomObject);
         this.ResourceSequence[this.ResourceCount++] = resource;
 
-        switch (this.Biome.getId())
+        DefaultBiome biome = DefaultBiome.getBiome(this.Biome.getId());
+        if ( biome != null)
+        switch (biome)
         {
-            case 0: // Ocean - default
-            case 3: // BigHills - default
-            case 7: // River - default
-            case 20: // SmallHills
+            case OCEAN: // Ocean - default
+            case EXTREME_HILLS: // BigHills - default
+            case RIVER: // River - default
+            case SMALL_MOUNTAINS: // SmallHills
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.Tree}, new int[]{1, 9});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
-            case 1: // Plains - no tree
-            case 2: // Desert - no tree
-            case 17: //HillsDesert
+            case PLAINS: // Plains - no tree
+            case DESERT: // Desert - no tree
+            case DESERT_HILLS: //HillsDesert
                 break;
-            case 18: // HillsForest
-            case 4: // Forest - forest
+            case FOREST_HILLS: // HillsForest
+            case FOREST: // Forest - forest
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.Forest, TreeType.BigTree, TreeType.Tree}, new int[]{20, 10, 100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
-            case 19: //HillsTaiga
-            case 5: // Taiga - taiga
+            case TAIGA_HILLS: //HillsTaiga
+            case TAIGA: // Taiga - taiga
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.Taiga1, TreeType.Taiga2}, new int[]{35, 100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
-            case 6: // Swamp - swamp
+            case SWAMPLAND: // Swamp - swamp
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.SwampTree}, new int[]{100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
-            case 14: // Mushroom island
+            case MUSHROOM_ISLAND: // Mushroom island
                 resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.HugeMushroom}, new int[]{100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
-            case 21:// Jungle
-            case 22:
-                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.JungleTree, TreeType.Tree}, new int[]{10, 35, 100});
+            case JUNGLE:// Jungle
+            case JUNGLE_HILLS:
+                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.GroundBush, TreeType.JungleTree, TreeType.Tree}, new int[]{10, 50, 35, 100});
                 this.ResourceSequence[this.ResourceCount++] = resource;
                 break;
 
@@ -274,6 +276,11 @@ public class BiomeConfig extends ConfigFile
         {
             //Cactus
             resource = new Resource(ResourceType.Cactus, DefaultMaterial.CACTUS.id, 0, 0, this.DefaultCactus, TCDefaultValues.cactusDepositRarity.intValue(), TCDefaultValues.cactusDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, new int[]{DefaultMaterial.SAND.id});
+            this.ResourceSequence[this.ResourceCount++] = resource;
+        }
+        if( biome == DefaultBiome.JUNGLE || biome == DefaultBiome.JUNGLE_HILLS) // Jungle and Jungle Hills
+        {
+            resource = new Resource(ResourceType.Vines, 0, 0, 0, TCDefaultValues.vinesFrequency.intValue(), TCDefaultValues.vinesRarity.intValue(), TCDefaultValues.vinesMinAltitude.intValue(), this.worldConfig.WorldHeight, new int[]{DefaultMaterial.VINE.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
@@ -633,6 +640,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Cactus(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Liquid(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("AboveWaterRes(Block,Frequency,Rarity)");
+        this.WriteComment("Vines(Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.WriteComment("");
         this.WriteComment("Some comments:  ");
         this.WriteComment("Block and BlockSource - can be id or name, Frequency - is count of attempts for place resource");
@@ -649,6 +657,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("     Taiga1");
         this.WriteComment("     Taiga2");
         this.WriteComment("     JungleTree");
+        this.WriteComment("     GroundBush");
         this.WriteComment("TreeType_Chance - similar Rarity. Example:");
         this.WriteComment("  Tree(10,Taiga1,35,Taiga2,100) - plugin trying to 10 attempts, in each attempt he try place Taiga1 ( 35% chance ) if not he place Taiga2 (100% chance)");
         this.WriteComment("Plant resource used for place something like flower, small mushrooms, pumpkins");
@@ -765,10 +774,10 @@ public class BiomeConfig extends ConfigFile
 
     protected void RenameOldSettings()
     {
-        TCDefaultValues[] copyFromWorld = {TCDefaultValues.MaxAverageHeight,TCDefaultValues.MaxAverageDepth,TCDefaultValues.Volatility1,TCDefaultValues.Volatility2,TCDefaultValues.VolatilityWeight1,TCDefaultValues.VolatilityWeight2,TCDefaultValues.DisableBiomeHeight,TCDefaultValues.CustomHeightControl};
-        for( TCDefaultValues value : copyFromWorld)
-            if(this.worldConfig.SettingsCache.containsKey(value.name()))
-                this.SettingsCache.put(value.name(),this.worldConfig.SettingsCache.get(value.name()));
+        TCDefaultValues[] copyFromWorld = {TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl};
+        for (TCDefaultValues value : copyFromWorld)
+            if (this.worldConfig.SettingsCache.containsKey(value.name()))
+                this.SettingsCache.put(value.name(), this.worldConfig.SettingsCache.get(value.name()));
 
     }
 

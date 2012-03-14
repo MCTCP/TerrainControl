@@ -124,7 +124,10 @@ public enum TCDefaultValues
     dungeonRarity(100),
     dungeonFrequency(8),
     dungeonMinAltitude(0),
-    dungeonMaxAltitude(128),
+
+    vinesRarity(100),
+    vinesFrequency(50),
+    vinesMinAltitude(64),
 
     DisableBiomeHeight(false),
 
