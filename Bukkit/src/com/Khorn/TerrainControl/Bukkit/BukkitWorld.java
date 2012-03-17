@@ -21,7 +21,7 @@ public class BukkitWorld implements LocalWorld
     private TCWorldChunkManagerOld old_biomeManager;
 
     private static int NextBiomeId = DefaultBiome.values().length;
-    private static LocalBiome[] Biomes = new LocalBiome[64];
+    private static LocalBiome[] Biomes = new LocalBiome[256];
     private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 

@@ -18,8 +18,8 @@ public class SingleWorld implements LocalWorld
     private BiomeManagerOld old_biomeManager;
 
     private static int NextBiomeId = 0;
-    private static LocalBiome[] Biomes = new LocalBiome[64];
-    private static abi[] BiomesToRestore = new abi[64];
+    private static LocalBiome[] Biomes = new LocalBiome[256];
+    private static abi[] BiomesToRestore = new abi[256];
     private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 

@@ -23,9 +23,9 @@ public class LayerRiverInit extends Layer
                 SetSeed(i + paramInt2, j + paramInt1);           // reversed
                 int currentPiece = arrayOfInt1[(j + i * paramInt3)];
                 if (nextInt(2) == 0)
-                    currentPiece |= 256;
+                    currentPiece |= 1024;
                 else
-                    currentPiece |= 512;
+                    currentPiece |= 2048;
 
                 arrayOfInt2[(j + i * paramInt3)] = currentPiece;
             }
