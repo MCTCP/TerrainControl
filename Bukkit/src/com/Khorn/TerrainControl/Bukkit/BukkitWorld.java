@@ -112,22 +112,42 @@ public class BukkitWorld implements LocalWorld
 
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
-        return this.biomeManager.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
+        if (this.biomeManager != null)
+            return this.biomeManager.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
+
+        BiomeArray = this.world.worldProvider.c.getBiomes(BiomeArray, x, z, x_size, z_size);
+        if (biomeArray == null || biomeArray.length < x_size * z_size)
+            biomeArray = new int[x_size * z_size];
+        for (int i = 0; i < x_size * z_size; i++)
+            biomeArray[i] = BiomeArray[i].id;
+        return biomeArray;
     }
 
     public float[] getTemperatures(int x, int z, int x_size, int z_size)
     {
-        return this.biomeManager.getTemperaturesTC(x, z, x_size, z_size);
+        if (this.biomeManager != null)
+            return this.biomeManager.getTemperaturesTC(x, z, x_size, z_size);
+        return this.world.worldProvider.c.getTemperatures(null, x, z, x_size, z_size);
     }
 
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
-        return this.biomeManager.getBiomesTC(biomeArray, x, z, x_size, z_size);
+        if (this.biomeManager != null)
+            return this.biomeManager.getBiomesTC(biomeArray, x, z, x_size, z_size);
+
+        BiomeArray = this.world.worldProvider.c.a(BiomeArray, x, z, x_size, z_size, true);
+        if (biomeArray == null || biomeArray.length < x_size * z_size)
+            biomeArray = new int[x_size * z_size];
+        for (int i = 0; i < x_size * z_size; i++)
+            biomeArray[i] = BiomeArray[i].id;
+        return biomeArray;
     }
 
     public int getBiome(int x, int z)
     {
-        return this.biomeManager.getBiomeTC(x, z);
+        if (this.biomeManager != null)
+            return this.biomeManager.getBiomeTC(x, z);
+        return this.world.worldProvider.c.getBiome(x, z).id;
     }
 
     public LocalBiome getLocalBiome(int x, int z)
