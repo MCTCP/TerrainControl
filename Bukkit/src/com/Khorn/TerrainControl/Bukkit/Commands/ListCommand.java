@@ -1,9 +1,9 @@
-package com.Khorn.TerrainControl.Bukkit.Commands;
+package com.khorn.terraincontrol.bukkit.commands;
 
-import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
-import com.Khorn.TerrainControl.Bukkit.TCPerm;
-import com.Khorn.TerrainControl.Bukkit.TCPlugin;
-import com.Khorn.TerrainControl.CustomObjects.CustomObject;
+import com.khorn.terraincontrol.bukkit.BukkitWorld;
+import com.khorn.terraincontrol.bukkit.TCPerm;
+import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.customobjects.CustomObject;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;

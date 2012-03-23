@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl;
+package com.khorn.terraincontrol;
 
 public interface IBiomeManager
 {

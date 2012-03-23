@@ -1,5 +1,5 @@
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
-import com.Khorn.TerrainControl.LocalBiome;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.LocalBiome;
 
 public class Biome implements LocalBiome
 {

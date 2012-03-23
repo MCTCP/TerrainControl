@@ -1,12 +1,12 @@
-package com.Khorn.TerrainControl.Bukkit;
+package com.khorn.terraincontrol.bukkit;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.UUID;
 
-import com.Khorn.TerrainControl.Bukkit.Commands.TCCommandExecutor;
-import com.Khorn.TerrainControl.Configuration.TCDefaultValues;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
+import com.khorn.terraincontrol.configuration.TCDefaultValues;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import net.minecraft.server.BiomeBase;
 import org.bukkit.Bukkit;
 import org.bukkit.World;

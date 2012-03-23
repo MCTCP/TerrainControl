@@ -1,5 +1,5 @@
-import com.Khorn.TerrainControl.Generator.ChunkProviderTC;
-import com.Khorn.TerrainControl.Generator.ObjectSpawner;
+import com.khorn.terraincontrol.generator.ChunkProviderTC;
+import com.khorn.terraincontrol.generator.ObjectSpawner;
 
 import java.util.List;
 

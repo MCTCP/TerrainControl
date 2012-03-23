@@ -1,9 +1,9 @@
-package com.Khorn.TerrainControl.Configuration;
+package com.khorn.terraincontrol.configuration;
 
-import com.Khorn.TerrainControl.CustomObjects.CustomObject;
-import com.Khorn.TerrainControl.DefaultBiome;
-import com.Khorn.TerrainControl.LocalBiome;
-import com.Khorn.TerrainControl.LocalWorld;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
 
 
 import java.io.DataInputStream;

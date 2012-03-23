@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.Bukkit;
+package com.khorn.terraincontrol.bukkit;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -7,13 +7,13 @@ import java.io.FileOutputStream;
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 
-import com.Khorn.TerrainControl.Bukkit.Commands.BaseCommand;
+import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.World;
 
 import org.bukkit.command.CommandSender;
 
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.sun.imageio.plugins.png.PNGImageWriter;
 import com.sun.imageio.plugins.png.PNGImageWriterSpi;
 

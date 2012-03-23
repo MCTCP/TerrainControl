@@ -1,9 +1,9 @@
-package com.Khorn.TerrainControl.Bukkit;
+package com.khorn.terraincontrol.bukkit;
 
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.IBiomeManager;
-import com.Khorn.TerrainControl.LocalWorld;
-import com.Khorn.TerrainControl.Util.NoiseGeneratorOctaves2;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.IBiomeManager;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.BiomeCache;
 import net.minecraft.server.ChunkPosition;

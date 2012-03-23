@@ -1,8 +1,8 @@
-package com.Khorn.TerrainControl.Configuration;
+package com.khorn.terraincontrol.configuration;
 
-import com.Khorn.TerrainControl.DefaultMaterial;
-import com.Khorn.TerrainControl.Generator.ResourceGens.ResourceType;
-import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
+import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
 import java.util.ArrayList;
 

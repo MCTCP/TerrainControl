@@ -1,4 +1,4 @@
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 
 
 public class CustomBiome extends abi

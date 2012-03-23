@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.Bukkit;
+package com.khorn.terraincontrol.bukkit;
 
 public enum TCPerm
 { 

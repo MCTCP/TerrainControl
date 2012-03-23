@@ -1,6 +1,6 @@
-package com.Khorn.TerrainControl;
+package com.khorn.terraincontrol;
 
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 
 public interface LocalBiome
 {

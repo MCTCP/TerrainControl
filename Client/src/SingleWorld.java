@@ -1,7 +1,7 @@
-import com.Khorn.TerrainControl.*;
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
+import com.khorn.terraincontrol.*;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

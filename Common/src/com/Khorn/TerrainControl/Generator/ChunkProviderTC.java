@@ -1,15 +1,15 @@
-package com.Khorn.TerrainControl.Generator;
+package com.khorn.terraincontrol.generator;
 
-import com.Khorn.TerrainControl.Configuration.TCDefaultValues;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.DefaultBiome;
-import com.Khorn.TerrainControl.DefaultMaterial;
-import com.Khorn.TerrainControl.Generator.TerrainsGens.CanyonsGen;
-import com.Khorn.TerrainControl.Generator.TerrainsGens.CavesGen;
-import com.Khorn.TerrainControl.Generator.TerrainsGens.TerrainGenBase;
-import com.Khorn.TerrainControl.LocalWorld;
-import com.Khorn.TerrainControl.Util.MathHelper;
-import com.Khorn.TerrainControl.Util.NoiseGeneratorOctaves;
+import com.khorn.terraincontrol.configuration.TCDefaultValues;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.generator.terrainsgens.CanyonsGen;
+import com.khorn.terraincontrol.generator.terrainsgens.CavesGen;
+import com.khorn.terraincontrol.generator.terrainsgens.TerrainGenBase;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.MathHelper;
+import com.khorn.terraincontrol.util.NoiseGeneratorOctaves;
 
 import java.util.*;
 

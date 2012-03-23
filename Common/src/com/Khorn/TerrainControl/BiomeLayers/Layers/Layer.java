@@ -1,12 +1,12 @@
-package com.Khorn.TerrainControl.BiomeLayers.Layers;
+package com.khorn.terraincontrol.biomelayers.layers;
 
 import java.util.ArrayList;
 
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
-import com.Khorn.TerrainControl.DefaultBiome;
-import com.Khorn.TerrainControl.LocalBiome;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.LocalWorld;
 
 public abstract class Layer
 {

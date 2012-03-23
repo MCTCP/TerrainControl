@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.Util;
+package com.khorn.terraincontrol.util;
 
 public class MathHelper
 {

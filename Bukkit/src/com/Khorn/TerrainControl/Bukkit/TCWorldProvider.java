@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.Bukkit;
+package com.khorn.terraincontrol.bukkit;
 
 import net.minecraft.server.WorldProvider;
 

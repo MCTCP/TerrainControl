@@ -1,10 +1,10 @@
-package com.Khorn.TerrainControl.Generator;
+package com.khorn.terraincontrol.generator;
 
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
-import com.Khorn.TerrainControl.Configuration.Resource;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.DefaultMaterial;
-import com.Khorn.TerrainControl.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.LocalWorld;
 
 
 import java.util.Random;

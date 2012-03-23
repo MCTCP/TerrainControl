@@ -1,9 +1,9 @@
-package com.Khorn.TerrainControl.Bukkit;
+package com.khorn.terraincontrol.bukkit;
 
-import com.Khorn.TerrainControl.*;
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.Generator.ResourceGens.TreeType;
+import com.khorn.terraincontrol.*;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 import net.minecraft.server.*;
 
 import java.util.ArrayList;

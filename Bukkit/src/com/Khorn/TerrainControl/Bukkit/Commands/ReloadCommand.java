@@ -1,10 +1,10 @@
-package com.Khorn.TerrainControl.Bukkit.Commands;
+package com.khorn.terraincontrol.bukkit.commands;
 
-import com.Khorn.TerrainControl.Bukkit.TCWorldChunkManager;
-import com.Khorn.TerrainControl.Bukkit.BukkitWorld;
-import com.Khorn.TerrainControl.Bukkit.TCPerm;
-import com.Khorn.TerrainControl.Bukkit.TCPlugin;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.khorn.terraincontrol.bukkit.TCWorldChunkManager;
+import com.khorn.terraincontrol.bukkit.BukkitWorld;
+import com.khorn.terraincontrol.bukkit.TCPerm;
+import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftWorld;

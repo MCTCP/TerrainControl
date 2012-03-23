@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.CustomObjects;
+package com.khorn.terraincontrol.customobjects;
 
 import java.io.BufferedReader;
 import java.io.File;

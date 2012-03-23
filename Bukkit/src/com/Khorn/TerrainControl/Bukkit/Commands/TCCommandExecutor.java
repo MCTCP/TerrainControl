@@ -1,6 +1,6 @@
-package com.Khorn.TerrainControl.Bukkit.Commands;
+package com.khorn.terraincontrol.bukkit.commands;
 
-import com.Khorn.TerrainControl.Bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TCPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

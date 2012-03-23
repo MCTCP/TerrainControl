@@ -1,6 +1,6 @@
-package com.Khorn.TerrainControl.Generator.ResourceGens;
+package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.Khorn.TerrainControl.CustomObjects.CustomObjectGen;
+import com.khorn.terraincontrol.customobjects.CustomObjectGen;
 
 public enum ResourceType
 {

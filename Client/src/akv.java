@@ -1,5 +1,5 @@
-import com.Khorn.TerrainControl.Configuration.TCDefaultValues;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.TCDefaultValues;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 
 import java.io.*;
 import java.lang.reflect.Field;

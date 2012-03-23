@@ -1,6 +1,6 @@
-package com.Khorn.TerrainControl.CustomObjects;
+package com.khorn.terraincontrol.customobjects;
 
-import com.Khorn.TerrainControl.DefaultMaterial;
+import com.khorn.terraincontrol.DefaultMaterial;
 
 public class Coordinate
 {

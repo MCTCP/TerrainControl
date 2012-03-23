@@ -1,9 +1,9 @@
-package com.Khorn.TerrainControl.BiomeLayers.Layers;
+package com.khorn.terraincontrol.biomelayers.layers;
 
 
-import com.Khorn.TerrainControl.BiomeLayers.ArraysCache;
-import com.Khorn.TerrainControl.DefaultBiome;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
+import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 
 public class LayerMix extends Layer
 {

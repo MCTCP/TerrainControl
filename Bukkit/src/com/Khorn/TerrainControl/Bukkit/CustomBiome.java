@@ -1,6 +1,6 @@
-package com.Khorn.TerrainControl.Bukkit;
+package com.khorn.terraincontrol.bukkit;
 
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import net.minecraft.server.BiomeBase;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.block.CraftBlock;

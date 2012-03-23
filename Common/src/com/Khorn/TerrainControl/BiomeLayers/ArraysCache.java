@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.BiomeLayers;
+package com.khorn.terraincontrol.biomelayers;
 
 import java.util.ArrayList;
 

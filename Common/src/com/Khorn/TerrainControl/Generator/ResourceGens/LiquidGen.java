@@ -1,8 +1,8 @@
-package com.Khorn.TerrainControl.Generator.ResourceGens;
+package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.Khorn.TerrainControl.LocalWorld;
+import com.khorn.terraincontrol.LocalWorld;
 
-import com.Khorn.TerrainControl.Configuration.Resource;
+import com.khorn.terraincontrol.configuration.Resource;
 
 import java.util.Random;
 

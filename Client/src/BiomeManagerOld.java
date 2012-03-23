@@ -1,7 +1,7 @@
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.IBiomeManager;
-import com.Khorn.TerrainControl.LocalWorld;
-import com.Khorn.TerrainControl.Util.NoiseGeneratorOctaves2;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.IBiomeManager;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
 
 import java.util.List;
 import java.util.Random;

@@ -1,4 +1,4 @@
-import com.Khorn.TerrainControl.Configuration.TCDefaultValues;
+import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import net.minecraft.client.Minecraft;
 
 

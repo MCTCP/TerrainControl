@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.Generator.ResourceGens;
+package com.khorn.terraincontrol.generator.resourcegens;
 
 public enum TreeType
 {

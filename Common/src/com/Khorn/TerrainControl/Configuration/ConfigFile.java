@@ -1,6 +1,6 @@
-package com.Khorn.TerrainControl.Configuration;
+package com.khorn.terraincontrol.configuration;
 
-import com.Khorn.TerrainControl.DefaultBiome;
+import com.khorn.terraincontrol.DefaultBiome;
 
 import java.awt.*;
 import java.io.*;

@@ -1,4 +1,4 @@
-package com.Khorn.TerrainControl.Configuration;
+package com.khorn.terraincontrol.configuration;
 
 import java.util.ArrayList;
 import java.util.Collections;

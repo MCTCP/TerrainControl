@@ -1,9 +1,9 @@
-package com.Khorn.TerrainControl.Generator.TerrainsGens;
+package com.khorn.terraincontrol.generator.terrainsgens;
 
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.DefaultMaterial;
-import com.Khorn.TerrainControl.LocalWorld;
-import com.Khorn.TerrainControl.Util.MathHelper;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.MathHelper;
 
 import java.util.Random;
 

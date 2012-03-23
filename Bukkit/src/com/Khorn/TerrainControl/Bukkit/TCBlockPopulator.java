@@ -1,7 +1,7 @@
-package com.Khorn.TerrainControl.Bukkit;
+package com.khorn.terraincontrol.bukkit;
 
 
-import com.Khorn.TerrainControl.Generator.ObjectSpawner;
+import com.khorn.terraincontrol.generator.ObjectSpawner;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftChunk;

@@ -1,7 +1,7 @@
-package com.Khorn.TerrainControl.Bukkit.Commands;
+package com.khorn.terraincontrol.bukkit.commands;
 
-import com.Khorn.TerrainControl.Bukkit.TCPerm;
-import com.Khorn.TerrainControl.Bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TCPerm;
+import com.khorn.terraincontrol.bukkit.TCPlugin;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;

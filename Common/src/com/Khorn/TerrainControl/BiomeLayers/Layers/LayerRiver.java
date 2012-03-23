@@ -1,7 +1,7 @@
-package com.Khorn.TerrainControl.BiomeLayers.Layers;
+package com.khorn.terraincontrol.biomelayers.layers;
 
 
-import com.Khorn.TerrainControl.BiomeLayers.ArraysCache;
+import com.khorn.terraincontrol.biomelayers.ArraysCache;
 
 public class LayerRiver extends Layer
 {

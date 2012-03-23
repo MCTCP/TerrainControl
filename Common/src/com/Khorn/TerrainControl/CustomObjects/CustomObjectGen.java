@@ -1,10 +1,10 @@
-package com.Khorn.TerrainControl.CustomObjects;
+package com.khorn.terraincontrol.customobjects;
 
-import com.Khorn.TerrainControl.Configuration.Resource;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.DefaultMaterial;
-import com.Khorn.TerrainControl.Generator.ResourceGens.ResourceGenBase;
-import com.Khorn.TerrainControl.LocalWorld;
+import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.generator.resourcegens.ResourceGenBase;
+import com.khorn.terraincontrol.LocalWorld;
 
 import java.util.ArrayList;
 import java.util.Random;

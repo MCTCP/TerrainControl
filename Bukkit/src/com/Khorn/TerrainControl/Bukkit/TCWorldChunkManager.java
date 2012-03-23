@@ -1,10 +1,10 @@
-package com.Khorn.TerrainControl.Bukkit;
+package com.khorn.terraincontrol.bukkit;
 
-import com.Khorn.TerrainControl.BiomeLayers.Layers.Layer;
-import com.Khorn.TerrainControl.Configuration.WorldConfig;
-import com.Khorn.TerrainControl.DefaultBiome;
-import com.Khorn.TerrainControl.IBiomeManager;
-import com.Khorn.TerrainControl.LocalWorld;
+import com.khorn.terraincontrol.biomelayers.layers.Layer;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.IBiomeManager;
+import com.khorn.terraincontrol.LocalWorld;
 import net.minecraft.server.*;
 
 import java.util.List;

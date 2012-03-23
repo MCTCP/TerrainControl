@@ -1,10 +1,10 @@
-package com.Khorn.TerrainControl.BiomeLayers.Layers;
+package com.khorn.terraincontrol.biomelayers.layers;
 
 
-import com.Khorn.TerrainControl.BiomeLayers.ArraysCache;
-import com.Khorn.TerrainControl.Configuration.BiomeConfig;
-import com.Khorn.TerrainControl.LocalBiome;
-import com.Khorn.TerrainControl.LocalWorld;
+import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
 
 
 public class LayerBiomeBorder extends Layer
