@@ -17,7 +17,6 @@ public class BiomeConfig extends ConfigFile
     public short[][] ReplaceMatrixBlocks = new short[256][];
     public int ReplaceCount = 0;
 
-
     public int BiomeSize;
     public int BiomeRarity;
 
@@ -27,7 +26,6 @@ public class BiomeConfig extends ConfigFile
     public ArrayList<String> IsleInBiome;
     public ArrayList<String> NotBorderNear;
 
-
     //Surface config
     public float BiomeHeight;
     public float BiomeVolatility;
@@ -36,7 +34,6 @@ public class BiomeConfig extends ConfigFile
     public float BiomeWetness;
 
     public boolean BiomeRivers;
-
 
     public byte SurfaceBlock;
     public byte GroundBlock;
@@ -67,9 +64,7 @@ public class BiomeConfig extends ConfigFile
     public boolean disableNotchHeightControl;
     public double[] heightMatrix;
 
-
     public int ResourceCount = 0;
-
 
     public LocalBiome Biome;
     private WorldConfig worldConfig;
@@ -78,7 +73,6 @@ public class BiomeConfig extends ConfigFile
 
     public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
-
         this.Biome = biome;
         this.Name = biome.getName();
         worldConfig = config;
@@ -97,8 +91,6 @@ public class BiomeConfig extends ConfigFile
 
         if (biome.isCustom())
             biome.setCustom(this);
-
-
     }
 
 
@@ -355,14 +347,12 @@ public class BiomeConfig extends ConfigFile
             for (int i = 0; i < this.worldConfig.WorldHeight / 8 + 1; i++)
                 this.heightMatrix[i] = Double.valueOf(keys.get(i));
 
-        } catch (NumberFormatException e)
+        }
+        catch (NumberFormatException e)
         {
             System.out.println("Wrong height settings: '" + this.SettingsCache.get(TCDefaultValues.CustomHeightControl.name()) + "'");
         }
-
-
     }
-
 
     private void ReadReplaceSettings()
     {
@@ -375,7 +365,6 @@ public class BiomeConfig extends ConfigFile
             {
                 for (String key : keys)
                 {
-
                     String[] blocks = key.split("=");
                     if (blocks.length != 2)
                         continue;
@@ -428,10 +417,7 @@ public class BiomeConfig extends ConfigFile
             {
                 System.out.println("Wrong replace settings: '" + this.SettingsCache.get("ReplacedBlocks") + "'");
             }
-
         }
-
-
     }
 
     private void ReadResourceSettings()
@@ -457,17 +443,12 @@ public class BiomeConfig extends ConfigFile
                             LineNumbers.add(Integer.valueOf(entry.getValue()));
                             this.ResourceSequence[this.ResourceCount++] = res;
                         }
-
-
                     }
                 }
-
-
             }
-
         }
+        
         Resource buffer;
-
         for (int i = 0; i < this.ResourceCount; i++)
         {
             buffer = this.ResourceSequence[i];
@@ -484,9 +465,7 @@ public class BiomeConfig extends ConfigFile
             this.ResourceSequence[i] = this.ResourceSequence[minimal];
             this.ResourceSequence[minimal] = buffer;
             LineNumbers.set(minimal, LineNumbers.get(i));
-
         }
-
     }
 
     protected void WriteConfigSettings() throws IOException
@@ -670,7 +649,6 @@ public class BiomeConfig extends ConfigFile
 
     private void WriteHeightSettings() throws IOException
     {
-
         String output = Double.toString(this.heightMatrix[0]);
         for (int i = 1; i < this.heightMatrix.length; i++)
             output = output + "," + Double.toString(this.heightMatrix[i]);
@@ -681,7 +659,6 @@ public class BiomeConfig extends ConfigFile
 
     private void WriteModReplaceSettings() throws IOException
     {
-
         if (this.ReplaceCount == 0)
         {
             this.WriteValue("ReplacedBlocks", "None");
@@ -689,7 +666,6 @@ public class BiomeConfig extends ConfigFile
         }
         String output = "";
         boolean first = true;
-
 
         for (int id = 0; id < ReplaceMatrixBlocks.length; id++)
         {
@@ -736,11 +712,8 @@ public class BiomeConfig extends ConfigFile
                     output += "(" + y_start + "-" + (ReplaceMatrixBlocks[id].length - 1) + ")";
                 }
                 first = false;
-
             }
-
         }
-
         this.WriteValue("ReplacedBlocks", output);
     }
 
@@ -748,7 +721,6 @@ public class BiomeConfig extends ConfigFile
     {
         for (int i = 0; i < this.ResourceCount; i++)
             this.WriteValue(this.ResourceSequence[i].WriteToString());
-
     }
 
     protected void CorrectSettings()
@@ -769,7 +741,6 @@ public class BiomeConfig extends ConfigFile
 
         this.volatilityWeight1 = (this.volatilityWeightRaw1 - 0.5D) * 24.0D;
         this.volatilityWeight2 = (0.5D - this.volatilityWeightRaw2) * 24.0D;
-
     }
 
     protected void RenameOldSettings()
@@ -778,7 +749,6 @@ public class BiomeConfig extends ConfigFile
         for (TCDefaultValues value : copyFromWorld)
             if (this.worldConfig.SettingsCache.containsKey(value.name()))
                 this.SettingsCache.put(value.name(), this.worldConfig.SettingsCache.get(value.name()));
-
     }
 
 
@@ -807,7 +777,6 @@ public class BiomeConfig extends ConfigFile
     private String DefaultWaterColorMultiplier = "0xFFFFFF";
     private String DefaultGrassColor = "0xFFFFFF";
     private String DefaultFoliageColor = "0xFFFFFF";
-
 
     private void InitDefaults()
     {
@@ -972,9 +941,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultColor = "0x663300";
                 this.DefaultIsle.add(DefaultBiome.JUNGLE.Name);
                 break;
-
         }
-
     }
 
     public void Serialize(DataOutputStream stream) throws IOException
@@ -1037,6 +1004,5 @@ public class BiomeConfig extends ConfigFile
         this.WaterColor = stream.readInt();
         this.GrassColor = stream.readInt();
         this.FoliageColor = stream.readInt();
-
     }
 }
