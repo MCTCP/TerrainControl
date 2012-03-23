@@ -215,7 +215,7 @@ public class WorldConfig extends ConfigFile
 
         }
 
-        this.RegisterBOBPlugins();
+        this.RegisterBOBPlugins(world);
     }
 
     protected void RenameOldSettings()
@@ -642,7 +642,7 @@ public class WorldConfig extends ConfigFile
 
 
 
-    private void RegisterBOBPlugins()
+    private void RegisterBOBPlugins(LocalWorld world)
     {
         if (this.customObjects)
         {
@@ -664,7 +664,7 @@ public class WorldConfig extends ConfigFile
                     File BOBFile = new File(BOBFolder, BOBFolderArray[i]);
                     if ((BOBFile.getName().endsWith(".bo2")) || (BOBFile.getName().endsWith(".BO2")))
                     {
-                        CustomObject WorkingCustomObject = new CustomObject(BOBFile);
+                        CustomObject WorkingCustomObject = new CustomObject(BOBFile, world);
                         if (WorkingCustomObject.IsValid)
                         {
 
