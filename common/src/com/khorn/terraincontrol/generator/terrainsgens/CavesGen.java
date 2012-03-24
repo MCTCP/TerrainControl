@@ -155,7 +155,7 @@ public class CavesGen extends TerrainGenBase
                     int i10 = (i6 * 16 + i9) * this.worldSettings.WorldHeight + i2;
                     int i11 = 0;
                     if (d9 * d9 + d10 * d10 < 1.0D)
-                    {
+                     {
                         for (int i12 = i2 - 1; i12 >= i1; i12--)
                         {
                             double d11 = (i12 + 0.5D - paramDouble2) / d4;

@@ -15,7 +15,7 @@ public class TerrainGenBase
         this.d = world;
     }
 
-    public void a(  int paramInt1, int paramInt2, byte[] paramArrayOfByte)
+    public void a(  int chunk_x, int chunk_z, byte[] paramArrayOfByte)
     {
         int i = this.b;
 
@@ -23,17 +23,17 @@ public class TerrainGenBase
         long l1 = this.c.nextLong();
         long l2 = this.c.nextLong();
 
-        for (int j = paramInt1 - i; j <= paramInt1 + i; j++)
-            for (int k = paramInt2 - i; k <= paramInt2 + i; k++)
+        for (int j = chunk_x - i; j <= chunk_x + i; j++)
+            for (int k = chunk_z - i; k <= chunk_z + i; k++)
             {
                 long l3 = j * l1;
                 long l4 = k * l2;
                 this.c.setSeed(l3 ^ l4 ^ this.d.getSeed());
-                a(j, k, paramInt1, paramInt2, paramArrayOfByte);
+                a(j, k, chunk_x, chunk_z, paramArrayOfByte);
             }
     }
 
-    protected void a(int paramInt1, int paramInt2, int paramInt3, int paramInt4, byte[] paramArrayOfByte)
+    protected void a(int paramInt1, int paramInt2, int chunk_x, int chunk_z, byte[] paramArrayOfByte)
     {
     }
 }
