@@ -697,9 +697,9 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("The default mob groups are controlled by vanilla minecraft.");
         this.WriteComment("At 2012-03-24 you could find them here: https://github.com/Bukkit/mc-dev/blob/master/net/minecraft/server/BiomeBase.java#L75");
         this.WriteComment("In simple terms:");
-        this.WriteComment("Default monsters: [{\"Sheep\", 12, 4, 4}, {\"Pig\", 10, 4, 4}, {\"Chicken\", 10, 4, 4}, {\"Cow\", 8, 4, 4}]");
-        this.WriteComment("Default creatures: [{\"Spider\", 10, 4, 4}, {\"Zombie\", 10, 4, 4}, {\"Skeleton\", 10, 4, 4}, {\"Creeper\", 10, 4, 4}, {\"Slime\", 10, 4, 4}, {\"Enderman\", 1, 1, 4}]");
-        this.WriteComment("Default watercreatures: [{\"Squid\", 10, 4, 4}]");
+        this.WriteComment("Default monsters: [{\"mob\": \"Sheep\", \"weight\": 12, \"min\": 4, \"max\": 4}, {\"mob\": \"Pig\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Chicken\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Cow\", \"weight\": 8, \"min\": 4, \"max\": 4}]");
+        this.WriteComment("Default creatures: [{\"mob\": \"Spider\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Zombie\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Skeleton\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Creeper\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Slime\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Enderman\", \"weight\": 1, \"min\": 1, \"max\": 4}]");
+        this.WriteComment("Default watercreatures: [{\"mob\": \"Squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]");
         this.WriteComment("");
         this.WriteComment("So for example ocelots wont spawn unless you add them below.");
         
