@@ -200,6 +200,7 @@ public class WorldConfig extends ConfigFile
 
         for (LocalBiome localBiome : biomes)
         {
+            System.out.println("TerrainControl: Loading biomesettings for "+localBiome.getName());
             BiomeConfig config = new BiomeConfig(BiomeFolder, localBiome, this);
             if(checkOnly)
                 continue;
