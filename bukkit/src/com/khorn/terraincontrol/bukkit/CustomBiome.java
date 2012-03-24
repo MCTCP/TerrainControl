@@ -59,13 +59,6 @@ public class CustomBiome extends BiomeBase
         
         if ( ! config.spawnMonstersAddDefaults) monsters.clear();
         monsters.addAll(monsterMetas);
-        
-        if (monsterMetas.size() > 0)
-        {
-            System.out.println("monsterMetas: "+ monsterMetas.toString());
-            System.out.println("monsters: "+ monsters.toString());
-        }
-        
 
         if ( ! config.spawnCreaturesAddDefaults) creatures.clear();
         creatures.addAll(creatureMetas);
