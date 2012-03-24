@@ -10,7 +10,10 @@ import com.khorn.terraincontrol.LocalBiome;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import net.minecraft.server.BiomeMeta;
 
 public class BiomeConfig extends ConfigFile
 {
@@ -69,7 +72,14 @@ public class BiomeConfig extends ConfigFile
     public LocalBiome Biome;
     private WorldConfig worldConfig;
     public String Name;
-
+    
+    //Spawn Config
+    public boolean spawnMonstersAddDefaults;
+    public List<BiomeMeta> spawnMonsters;
+    public boolean spawnCreaturesAddDefaults;
+    public List<BiomeMeta> spawnCreatures;
+    public boolean spawnWaterCreaturesAddDefaults;
+    public List<BiomeMeta> spawnWaterCreatures;
 
     public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
@@ -328,7 +338,13 @@ public class BiomeConfig extends ConfigFile
         this.disableNotchHeightControl = ReadModSettings(TCDefaultValues.DisableBiomeHeight.name(), TCDefaultValues.DisableBiomeHeight.booleanValue());
         this.maxAverageHeight = ReadModSettings(TCDefaultValues.MaxAverageHeight.name(), TCDefaultValues.MaxAverageHeight.doubleValue());
         this.maxAverageDepth = ReadModSettings(TCDefaultValues.MaxAverageDepth.name(), TCDefaultValues.MaxAverageDepth.doubleValue());
-
+        
+        this.spawnMonstersAddDefaults = ReadModSettings("spawnMonstersAddDefaults", true);
+        this.spawnMonsters = ReadModSettings("spawnMonsters", new ArrayList<BiomeMeta>());
+        this.spawnCreaturesAddDefaults = ReadModSettings("spawnCreaturesAddDefaults", true);
+        this.spawnCreatures = ReadModSettings("spawnCreatures", new ArrayList<BiomeMeta>());
+        this.spawnWaterCreaturesAddDefaults = ReadModSettings("spawnWaterCreaturesAddDefaults", true);
+        this.spawnWaterCreatures = ReadModSettings("spawnWaterCreatures", new ArrayList<BiomeMeta>());
 
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
@@ -642,9 +658,71 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Plant resource used for place something like flower, small mushrooms, pumpkins");
         this.WriteComment("Liquid resource is one block water or lava source");
         this.WriteComment("");
-
+        
         this.WriteResources();
-
+        
+        this.WriteNewLine();
+        this.WriteTitle("MOB SPAWNING");
+        this.WriteComment("========<TUTORIAL>========");
+        this.WriteComment("This is where you configure mob spawning. Changing this section is optional.");
+        this.WriteComment("");
+        this.WriteComment("#STEP1: Understanding what the available mobnames are.");
+        this.WriteComment("The mobnames are case sensitive.");
+        this.WriteComment("These are all valid mobnames as of minecraft version 1.2.4: Blaze, CaveSpider, Chicken, Cow, Creeper, EnderDragon, Enderman, Ghast, IronGolem, MagmaCube, MushroomCow, Ocelot, Pig, PigZombie, Sheep, Silverfish, Skeleton, Slime, Snowman, Spider, Squid, Villager, Wolf, Zombie");
+        this.WriteComment("If this config file is old you may find the mobnames by looking here: https://github.com/Bukkit/mc-dev/tree/master/net/minecraft/server");
+        this.WriteComment("XXXXXX is the mob name if the file is called EntityXXXXXX. Note that only subclasses of the LivingEntity class will work. Egg as in EntityEgg will not work since it does not extend the LivingEntity class.");
+        this.WriteComment("");
+        this.WriteComment("#STEP2: Understanding what a mobgroup is.");
+        this.WriteComment("A mobgroups is made of four parts. They are mob, weight, min and max.");
+        this.WriteComment("The mob is one of the avaliable mobnames, such as Chicken. This is a string.");
+        this.WriteComment("The weight is used for a random selection. This is a positiv integer.");
+        this.WriteComment("The min is the minimum amount of mobs spawning as a group. This is a positive integer.");
+        this.WriteComment("The max is the maximum amount of mobs spawning as a group. This is a positive integer.");
+        this.WriteComment("");
+        this.WriteComment("#STEP4: Understanding how write a mobgroup as JSON as well as lists of them.");
+        this.WriteComment("Json is a tree document format: http://en.wikipedia.org/wiki/JSON");
+        this.WriteComment("Write a mobgroup like this: {\"mob\": \"mobname\", \"weight\": integer, \"min\": integer, \"max\": integer}");
+        this.WriteComment("For example: {\"mob\": \"Ocelot\", \"weight\": 10, \"min\": 2, \"max\": 6}");
+        this.WriteComment("For example: {\"mob\": \"MushroomCow\", \"weight\": 5, \"min\": 2, \"max\": 2}");
+        this.WriteComment("A json list of mobgroups looks like this: [mobgroup, mobgroup, mobgroup...]");
+        this.WriteComment("This would be an ampty list: []");
+        this.WriteComment("You can validate your json here: http://jsonlint.com/");
+        this.WriteComment("");
+        this.WriteComment("#STEP5: Understanding what to do with all this info");
+        this.WriteComment("There are three categories of mobs: monsters, creatures and watercreatures.");
+        this.WriteComment("These list may be populated with default values if thee booleans bellow is set to true");
+        this.WriteComment("You may also add your own mobgroups in the lists below");
+        this.WriteComment("");
+        this.WriteComment("#STEP6: What is in the default mob groups?");
+        this.WriteComment("The default mob groups are controlled by vanilla minecraft.");
+        this.WriteComment("At 2012-03-24 you could find them here: https://github.com/Bukkit/mc-dev/blob/master/net/minecraft/server/BiomeBase.java#L75");
+        this.WriteComment("In simple terms:");
+        this.WriteComment("Default monsters: [{\"Sheep\", 12, 4, 4}, {\"Pig\", 10, 4, 4}, {\"Chicken\", 10, 4, 4}, {\"Cow\", 8, 4, 4}]");
+        this.WriteComment("Default creatures: [{\"Spider\", 10, 4, 4}, {\"Zombie\", 10, 4, 4}, {\"Skeleton\", 10, 4, 4}, {\"Creeper\", 10, 4, 4}, {\"Slime\", 10, 4, 4}, {\"Enderman\", 1, 1, 4}]");
+        this.WriteComment("Default watercreatures: [{\"Squid\", 10, 4, 4}]");
+        this.WriteComment("");
+        this.WriteComment("So for example ocelots wont spawn unless you add them below.");
+        
+        this.WriteNewLine();
+        this.WriteComment("========<CONFIGURATION>========");
+        
+        this.WriteComment("Should we add the default monster spawn groups?");
+        WriteValue("spawnMonstersAddDefaults", this.spawnMonstersAddDefaults);
+        this.WriteComment("Add extra monster spawn groups here");
+        WriteValue("spawnMonsters", this.spawnMonsters);
+        this.WriteNewLine();
+        
+        this.WriteComment("Should we add the default creature spawn groups?");
+        WriteValue("spawnCreaturesAddDefaults", this.spawnCreaturesAddDefaults);
+        this.WriteComment("Add extra creature spawn groups here");
+        WriteValue("spawnCreatures", this.spawnCreatures);
+        this.WriteNewLine();
+        
+        this.WriteComment("Should we add the default watercreature spawn groups?");
+        WriteValue("spawnWaterCreaturesAddDefaults", this.spawnWaterCreaturesAddDefaults);
+        this.WriteComment("Add extra watercreature spawn groups here");
+        WriteValue("spawnWaterCreatures", this.spawnWaterCreatures);
+        this.WriteNewLine();
     }
 
     private void WriteHeightSettings() throws IOException

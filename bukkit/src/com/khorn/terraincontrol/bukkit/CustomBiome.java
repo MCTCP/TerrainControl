@@ -48,14 +48,23 @@ public class CustomBiome extends BiomeBase
         this.F = config.BiomeTemperature;
         this.G = config.BiomeWetness;
         
-        // this.J.add(new BiomeMeta(EntityOcelot.class, 40, 4, 4));
-        // This Is an example approach we could take:
-        // Constructor: BiomeMeta(Class entityClass, int weight, int groupMin, int groupMax)
-        // Default one for jungle is:
-        // this.J.add(new BiomeMeta(EntityOcelot.class, 2, 1, 1));
-        // Since data is stored in the world anvil files we can give users complete control over mob spawning :)
-        // 
-        // But is there issues with storing the custom ids? Will we get it clashes when minecraft adds new ones?
-        // How should we handle this?
+        // This section modifies the BiomeMetas... or "SpawnGroups" as I would like to call them :P
+        if ( ! config.spawnCreaturesAddDefaults)
+        {
+            this.K.clear();
+        }
+        this.K.addAll(config.spawnCreatures);
+        
+        if ( ! config.spawnMonstersAddDefaults)
+        {
+            this.J.clear();
+        }
+        this.J.addAll(config.spawnMonsters);
+        
+        if ( ! config.spawnWaterCreaturesAddDefaults)
+        {
+            this.L.clear();
+        }
+        this.L.addAll(config.spawnWaterCreatures);
     }
 }

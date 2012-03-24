@@ -1,17 +1,35 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.gson.BiomeMetaAdapter;
+import com.khorn.terraincontrol.lib.gson.Gson;
+import com.khorn.terraincontrol.lib.gson.GsonBuilder;
+import com.khorn.terraincontrol.lib.gson.reflect.TypeToken;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+
+import net.minecraft.server.BiomeMeta;
 
 public abstract class ConfigFile
 {
     private BufferedWriter SettingsWriter;
     protected HashMap<String, String> SettingsCache = new HashMap<String, String>();
+    
+    // TODO: We should use GSON only instead of just for a few fields.
+    public static Gson gson = new GsonBuilder().disableHtmlEscaping().registerTypeAdapter(BiomeMeta.class, new BiomeMetaAdapter()).create();
 
     protected void ReadSettingsFile(File f)
     {
@@ -32,7 +50,7 @@ public abstract class ConfigFile
                         continue;
                     if (thisLine.toLowerCase().contains(":"))
                     {
-                        String[] splitSettings = thisLine.split(":");
+                        String[] splitSettings = thisLine.split(":", 2);
                         if (splitSettings.length == 2)
                         {
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
@@ -76,6 +94,13 @@ public abstract class ConfigFile
         }
     }
 
+    protected List<BiomeMeta> ReadModSettings(String settingsName, List<BiomeMeta> defaultValue)
+    {
+        String json = this.SettingsCache.get(settingsName);
+        if (json == null) return defaultValue;
+        return gson.fromJson(json, new TypeToken<List<BiomeMeta>>(){}.getType());
+    }
+    
     protected ArrayList<String> ReadModSettings(String settingsName, ArrayList<String> defaultValue)
     {
         if (this.SettingsCache.containsKey(settingsName))
@@ -243,8 +268,14 @@ public abstract class ConfigFile
         this.SettingsWriter.write(settingsName + ":" + out);
         this.SettingsWriter.newLine();
     }
+    
+    protected void WriteValue(String settingsName, List<BiomeMeta> settingsValue) throws IOException
+    {
+        this.SettingsWriter.write(settingsName + ":" + gson.toJson(settingsValue));
+        this.SettingsWriter.newLine();
+    }
 
-
+    
     protected void WriteValue(String settingsName, int settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + Integer.toString(settingsValue));
