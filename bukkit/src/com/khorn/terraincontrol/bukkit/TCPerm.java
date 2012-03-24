@@ -9,6 +9,7 @@ public enum TCPerm
     CMD_MAP("cmd.map"),
     CMD_RELOAD("cmd.reload"),
     CMD_SPAWN("cmd.spawn"),
+    CMD_REPLACE("cmd.replace"),
     ;
     
     public final String node;
