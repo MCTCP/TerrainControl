@@ -1,14 +1,15 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+
 import net.minecraft.server.BiomeBase;
 import net.minecraft.server.BiomeMeta;
-import net.minecraft.server.EntityOcelot;
 
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.block.CraftBlock;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 public class CustomBiome extends BiomeBase
 {
@@ -38,7 +39,6 @@ public class CustomBiome extends BiomeBase
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void SetBiome(BiomeConfig config)
     {
         this.D = config.BiomeHeight;
@@ -49,22 +49,28 @@ public class CustomBiome extends BiomeBase
         this.G = config.BiomeWetness;
         
         // This section modifies the BiomeMetas... or "SpawnGroups" as I would like to call them :P
-        if ( ! config.spawnCreaturesAddDefaults)
-        {
-            this.K.clear();
-        }
-        this.K.addAll(config.spawnCreatures);
+        List<BiomeMeta> monsters = Obfu.getBiomeBase_MonsterBiomeMetas(this);
+        List<BiomeMeta> creatures = Obfu.getBiomeBase_CreatureBiomeMetas(this);
+        List<BiomeMeta> watercreatures = Obfu.getBiomeBase_WaterCreatureBiomeMetas(this);
         
-        if ( ! config.spawnMonstersAddDefaults)
-        {
-            this.J.clear();
-        }
-        this.J.addAll(config.spawnMonsters);
+        List<BiomeMeta> monsterMetas = Obfu.convertToBiomeMetaList(config.spawnMonsters);
+        List<BiomeMeta> creatureMetas = Obfu.convertToBiomeMetaList(config.spawnCreatures);
+        List<BiomeMeta> waterCreatureMetas = Obfu.convertToBiomeMetaList(config.spawnWaterCreatures);
         
-        if ( ! config.spawnWaterCreaturesAddDefaults)
+        if ( ! config.spawnMonstersAddDefaults) monsters.clear();
+        monsters.addAll(monsterMetas);
+        
+        if (monsterMetas.size() > 0)
         {
-            this.L.clear();
+            System.out.println("monsterMetas: "+ monsterMetas.toString());
+            System.out.println("monsters: "+ monsters.toString());
         }
-        this.L.addAll(config.spawnWaterCreatures);
+        
+
+        if ( ! config.spawnCreaturesAddDefaults) creatures.clear();
+        creatures.addAll(creatureMetas);
+        
+        if ( ! config.spawnWaterCreaturesAddDefaults) watercreatures.clear();
+        watercreatures.addAll(waterCreatureMetas);
     }
 }

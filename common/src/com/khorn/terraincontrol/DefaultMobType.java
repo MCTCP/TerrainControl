@@ -1,14 +1,16 @@
 package com.khorn.terraincontrol;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public enum DefaultCreatureType
+public enum DefaultMobType
 {
     // The first strings MUST match the strings in nms.EntityTypes and are case sensitive.
     CREEPER(50, "Creeper", "creeper"),
@@ -33,7 +35,7 @@ public enum DefaultCreatureType
     WOLF(95, "Wolf", "wolf"),
     MUSHROOM_COW(96, "MushroomCow", "mushroomcow", "shroom", "mooshroom", "moshoom", "mcow", "shroomcow"),
     SNOWMAN(97, "SnowMan", "snowman"),
-    OCELOT(98, "Ozelot", "ozelot"),
+    OCELOT(98, "Ozelot", "ocelot", "ozelot"),
     IRON_GOLEM(99, "VillagerGolem", "irongolem", "iron_golem"),
     VILLAGER(120, "Villager", "villager");
 
@@ -50,25 +52,27 @@ public enum DefaultCreatureType
     protected final Set<String> allNames;
     public Set<String> getAllNames() { return this.allNames; }
 
-    // LOOKUP MAPS
-    private static final Map<Short, DefaultCreatureType> ID_MAP = new HashMap<Short, DefaultCreatureType>();
-    private static final Map<String, DefaultCreatureType> NAME_MAP = new TreeMap<String, DefaultCreatureType>(String.CASE_INSENSITIVE_ORDER);
+    // LOOKUP MAPS AND OTHER PRE COMPUTATIONS
+    protected static final Map<Short, DefaultMobType> ID_MAP = new HashMap<Short, DefaultMobType>();
+    protected static final Map<String, DefaultMobType> NAME_MAP = new TreeMap<String, DefaultMobType>(String.CASE_INSENSITIVE_ORDER);
+    protected static final List<String> PREFERED_NAMES = new ArrayList<String>(); 
 
     static
     {
         // Build the lookup maps
-        for (DefaultCreatureType type : EnumSet.allOf(DefaultCreatureType.class))
+        for (DefaultMobType type : EnumSet.allOf(DefaultMobType.class))
         {
             ID_MAP.put(type.typeId, type);
             for (String name : type.allNames)
             {
                 NAME_MAP.put(name, type);
-            }            
+            }
+            PREFERED_NAMES.add(type.getPreferedName());
         }
     }
 
     // The constructor
-    private DefaultCreatureType(int typeId, String... names)
+    private DefaultMobType(int typeId, String... names)
     {
         this.typeId = (short) typeId;
         this.formalName = names[0];
@@ -77,17 +81,22 @@ public enum DefaultCreatureType
         this.allNames.addAll(Arrays.asList(names));
     }
 
-    public static DefaultCreatureType fromName(String name) 
+    public static DefaultMobType fromName(String name) 
     {
         return NAME_MAP.get(name);
     }
 
-    public static DefaultCreatureType fromId(int id)
+    public static DefaultMobType fromId(int id)
     {
         if (id > Short.MAX_VALUE)
         {
             return null;
         }
         return ID_MAP.get((short) id);
+    }
+    
+    public static List<String> getPreferedNames()
+    {
+        return PREFERED_NAMES;
     }
 }
