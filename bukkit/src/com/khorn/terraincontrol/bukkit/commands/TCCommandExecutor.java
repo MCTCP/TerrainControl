@@ -27,22 +27,13 @@ public class TCCommandExecutor implements CommandExecutor
     {
         ArrayList<String> arg = new ArrayList<String>(Arrays.asList(strings));
         
-        BaseCommand cmd = null;
-        if (arg.size() == 0)
-        {
-            cmd = helpCommand;
-        }
-        else
+        BaseCommand cmd = helpCommand;
+        if (arg.size() != 0)
         {
             cmd = commandHashMap.get(arg.get(0));
             arg.remove(0);
         }
-        
-        if (cmd == null)
-        {
-            cmd = helpCommand;
-        }
-        
+
         if ( ! commandSender.hasPermission(cmd.perm))
         {
             commandSender.sendMessage(ChatColor.RED.toString() + "You don't have permission to "+cmd.getHelp()+"!");
@@ -60,6 +51,7 @@ public class TCCommandExecutor implements CommandExecutor
         this.AddCommand(new BiomeCommand(plugin));
         this.AddCommand(new SpawnCommand(plugin));
         this.AddCommand(new MapCommand(plugin));
+        this.AddCommand(new ReplaceBiomeCommand(plugin));
         this.AddCommand(this.helpCommand);
     }
 
