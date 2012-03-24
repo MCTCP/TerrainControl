@@ -18,12 +18,12 @@ public class CanyonsGen extends TerrainGenBase
         this.worldSettings = wrk;
     }
 
-    protected void a(long paramLong, int paramInt1, int paramInt2, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
+    protected void a(long paramLong, int chunk_x, int chunk_z, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
     {
         Random localRandom = new Random(paramLong);
 
-        double d1 = paramInt1 * 16 + 8;
-        double d2 = paramInt2 * 16 + 8;
+        double d1 = chunk_x * 16 + 8;
+        double d2 = chunk_z * 16 + 8;
 
         float f1 = 0.0F;
         float f2 = 0.0F;
@@ -33,7 +33,7 @@ public class CanyonsGen extends TerrainGenBase
         float f3 = 1.0F;
         for (int j = 0; ; j++)
         {
-            if (j >= 128)
+            if (j >= worldSettings.WorldHeight)
                 break;
             if ((j == 0) || (localRandom.nextInt(3) == 0))
             {
@@ -81,14 +81,14 @@ public class CanyonsGen extends TerrainGenBase
 
             if ((paramDouble1 < d1 - 16.0D - d3 * 2.0D) || (paramDouble3 < d2 - 16.0D - d3 * 2.0D) || (paramDouble1 > d1 + 16.0D + d3 * 2.0D) || (paramDouble3 > d2 + 16.0D + d3 * 2.0D))
                 continue;
-            int k = MathHelper.floor(paramDouble1 - d3) - paramInt1 * 16 - 1;
-            int m = MathHelper.floor(paramDouble1 + d3) - paramInt1 * 16 + 1;
+            int k = MathHelper.floor(paramDouble1 - d3) - chunk_x * 16 - 1;
+            int m = MathHelper.floor(paramDouble1 + d3) - chunk_x * 16 + 1;
 
             int n = MathHelper.floor(paramDouble2 - d4) - 1;
             int i1 = MathHelper.floor(paramDouble2 + d4) + 1;
 
-            int i2 = MathHelper.floor(paramDouble3 - d3) - paramInt2 * 16 - 1;
-            int i3 = MathHelper.floor(paramDouble3 + d3) - paramInt2 * 16 + 1;
+            int i2 = MathHelper.floor(paramDouble3 - d3) - chunk_z * 16 - 1;
+            int i3 = MathHelper.floor(paramDouble3 + d3) - chunk_z * 16 + 1;
 
             if (k < 0)
                 k = 0;
@@ -113,10 +113,10 @@ public class CanyonsGen extends TerrainGenBase
                 {
                     for (int i7 = i1 + 1; (i4 == 0) && (i7 >= n - 1); i7--)
                     {
-                        i8 = (i5 * 16 + i6) * 128 + i7;
+                        i8 = (i5 * 16 + i6) * worldSettings.WorldHeight + i7;
                         if (i7 < 0)
                             continue;
-                        if (i7 < 128)
+                        if (i7 < worldSettings.WorldHeight)
                         {
                             if ((paramArrayOfByte[i8] == DefaultMaterial.WATER.id) || (paramArrayOfByte[i8] == DefaultMaterial.STATIONARY_WATER.id))
                             {
@@ -134,11 +134,11 @@ public class CanyonsGen extends TerrainGenBase
             }
             for (int i5 = k; i5 < m; i5++)
             {
-                double d9 = (i5 + paramInt1 * 16 + 0.5D - paramDouble1) / d3;
+                double d9 = (i5 + chunk_x * 16 + 0.5D - paramDouble1) / d3;
                 for (i8 = i2; i8 < i3; i8++)
                 {
-                    double d10 = (i8 + paramInt2 * 16 + 0.5D - paramDouble3) / d3;
-                    int i9 = (i5 * 16 + i8) * 128 + i1;
+                    double d10 = (i8 + chunk_z * 16 + 0.5D - paramDouble3) / d3;
+                    int i9 = (i5 * 16 + i8) * worldSettings.WorldHeight + i1;
                     int i10 = 0;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
@@ -173,7 +173,7 @@ public class CanyonsGen extends TerrainGenBase
         }
     }
 
-    protected void a(int paramInt1, int paramInt2, int paramInt3, int paramInt4, byte[] paramArrayOfByte)
+    protected void a(int paramInt1, int paramInt2, int chunk_x, int chunk_z, byte[] paramArrayOfByte)
     {
         if (this.c.nextInt(100) >= this.worldSettings.canyonRarity)
             return;
@@ -191,7 +191,7 @@ public class CanyonsGen extends TerrainGenBase
 
             int size = this.c.nextInt(this.worldSettings.canyonMaxLength - this.worldSettings.canyonMinLength) + this.worldSettings.canyonMinLength;
 
-            a(this.c.nextLong(), paramInt3, paramInt4, paramArrayOfByte, d1, d2, d3, f3, f1, f2, size, this.worldSettings.canyonDepth);
+            a(this.c.nextLong(), chunk_x, chunk_z, paramArrayOfByte, d1, d2, d3, f3, f1, f2, size, this.worldSettings.canyonDepth);
         }
     }
 }

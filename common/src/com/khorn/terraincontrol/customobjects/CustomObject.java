@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.customobjects;
 
+import com.khorn.terraincontrol.LocalWorld;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -37,7 +39,7 @@ public class CustomObject
     public boolean IsValid = false;
 
 
-    public CustomObject(File objectFile)
+    public CustomObject(File objectFile, LocalWorld world)
     {
         try
         {
@@ -237,7 +239,7 @@ public class CustomObject
             }
 
             this.name = objectFile.getName().substring(0,objectFile.getName().length()-4);
-            this.CorrectSettings();
+            this.CorrectSettings(world);
             this.IsValid = true;
 
         }
@@ -249,7 +251,7 @@ public class CustomObject
 
     }
 
-    public void CorrectSettings()
+    public void CorrectSettings(LocalWorld world)
     {
         for (int blockid : spawnOnBlockType)
         {
@@ -270,15 +272,15 @@ public class CustomObject
         if (collisionPercentage == 0 || collisionPercentage > 100)
             collisionPercentage = 2;
 
-        if (spawnElevationMin > 128)
+        if (spawnElevationMin > world.getHeight())
             spawnElevationMin = 0;
 
-        if (spawnElevationMax > 128)
-            spawnElevationMax = 128;
+        if (spawnElevationMax > world.getHeight())
+            spawnElevationMax = world.getHeight();
 
         if (spawnElevationMax < spawnElevationMin)
         {
-            spawnElevationMax = 128;
+            spawnElevationMax = world.getHeight();
             spawnElevationMin = 0;
         }
         if (branchLimit == 0 || branchLimit > 16)
