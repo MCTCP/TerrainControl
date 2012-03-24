@@ -3,10 +3,14 @@ package com.khorn.terraincontrol.bukkit;
 import java.io.*;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.util.Txt;
+
 import net.minecraft.server.BiomeBase;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -29,7 +33,7 @@ public class TCPlugin extends JavaPlugin
 
     public void onDisable()
     {
-        System.out.println(getDescription().getFullName() + " can`t be disabled");
+        log("Can not be disabled.");
     }
 
     public void onEnable()
@@ -43,7 +47,7 @@ public class TCPlugin extends JavaPlugin
         Bukkit.getMessenger().registerIncomingPluginChannel(this, TCDefaultValues.ChannelName.stringValue(),this.listener);
         Bukkit.getMessenger().registerOutgoingPluginChannel(this,TCDefaultValues.ChannelName.stringValue());
 
-        System.out.println(getDescription().getFullName() + " is now enabled");
+        log("Enabled");
     }
     
     @Override
@@ -57,7 +61,7 @@ public class TCPlugin extends JavaPlugin
     {
         if (worldName.trim().equals(""))
         {
-            System.out.println("TerrainControl: world name is empty string !!"); // TODO: use minecraft logger instead
+            log("world name is empty string !!");
             return null;
         }
 
@@ -65,7 +69,7 @@ public class TCPlugin extends JavaPlugin
         {
             if (world.getName().equals(worldName))
             {
-                System.out.println("TerrainControl: enabled for '" + worldName + "'"); // TODO: use minecraft logger instead
+                log("enabled for '" + worldName + "'");
                 return world.getChunkGenerator();
             }
         }
@@ -88,7 +92,7 @@ public class TCPlugin extends JavaPlugin
 
         world.setChunkGenerator(generator);
 
-        System.out.println("TerrainControl: mode " + conf.ModeTerrain.name() + " enabled for '" + worldName + "'");
+        log("mode " + conf.ModeTerrain.name() + " enabled for '" + worldName + "'");
         return generator;
     }
 
@@ -96,12 +100,14 @@ public class TCPlugin extends JavaPlugin
     {
         File baseFolder = new File(this.getDataFolder(), "worlds" + System.getProperty("file.separator") + worldName);
 
+        log("Loading settings for "+worldName);
+        
         if (!baseFolder.exists())
         {
-            System.out.println("TerrainControl: settings does not exist, creating defaults");
+            log("settings does not exist, creating defaults");
 
             if (!baseFolder.mkdirs())
-                System.out.println("TerrainControl: cant create folder " + baseFolder.getName());
+                log("cant create folder " + baseFolder.getName());
         }
         // Get for init BiomeMapping
         CraftBlock.biomeBaseToBiome(BiomeBase.OCEAN);
@@ -119,7 +125,7 @@ public class TCPlugin extends JavaPlugin
             this.NotInitedWorlds.put(worldName, bukkitWorld);
         }
 
-        System.out.println("TerrainControl: settings for '" + worldName + "' loaded");
+        log("settings for '" + worldName + "' loaded");
         return worldConfig;
     }
 
@@ -151,7 +157,19 @@ public class TCPlugin extends JavaPlugin
 
             this.worlds.put(workWorld.getUUID(),bukkitWorld);
 
-            System.out.println("TerrainControl: world initialized with seed is " + workWorld.getSeed());
+            log("world initialized with seed is " + workWorld.getSeed());
         }
+    }
+    
+    // -------------------------------------------- //
+    // LOGGING
+    // -------------------------------------------- //
+    public static void log(Object... msg)
+    {
+        log(Level.INFO, msg);
+    }
+    public static void log(Level level, Object... msg)
+    {
+        Logger.getLogger("Minecraft").log(level, "TerrainControl: "+ Txt.implode(msg, " "));
     }
 }
