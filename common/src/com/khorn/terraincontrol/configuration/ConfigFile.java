@@ -423,7 +423,7 @@ public abstract class ConfigFile
             return value;
     }
 
-    protected ArrayList<String> CheckValue(ArrayList<String> biomes, Set<String> customBiomes)
+    protected ArrayList<String> CheckValue(ArrayList<String> biomes, ArrayList<String> customBiomes)
     {
         ArrayList<String> output = new ArrayList<String>();
 

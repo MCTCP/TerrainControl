@@ -13,7 +13,8 @@ import java.util.*;
 
 public class WorldConfig extends ConfigFile
 {
-    public HashMap<String, Integer> CustomBiomes = new HashMap<String, Integer>();
+    public ArrayList<String> CustomBiomes = new ArrayList<String>();
+    public HashMap<String,Integer> CustomBiomeIds = new HashMap<String, Integer>();
 
     public ArrayList<String> NormalBiomes = new ArrayList<String>();
     public ArrayList<String> IceBiomes = new ArrayList<String>();
@@ -156,9 +157,9 @@ public class WorldConfig extends ConfigFile
 
         // Check biome ids
 
-        for( String biomeName : CustomBiomes.keySet())
-            if(CustomBiomes.get(biomeName) == -1)
-                CustomBiomes.put(biomeName,world.getFreeBiomeId());
+        for( String biomeName : CustomBiomes)
+            if(CustomBiomeIds.get(biomeName) == -1)
+                CustomBiomeIds.put(biomeName,world.getFreeBiomeId());
 
         // Need add check to clashes
 
@@ -178,12 +179,12 @@ public class WorldConfig extends ConfigFile
 
         ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>(world.getDefaultBiomes());
 
-        for (String biomeName : this.CustomBiomes.keySet())
+        for (String biomeName : this.CustomBiomes)
         {
             if (checkOnly)
                 biomes.add(world.getNullBiome(biomeName));
             else
-                biomes.add(world.AddBiome(biomeName, this.CustomBiomes.get(biomeName)));
+                biomes.add(world.AddBiome(biomeName, this.CustomBiomeIds.get(biomeName)));
          }
 
         this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
@@ -235,10 +236,10 @@ public class WorldConfig extends ConfigFile
         this.RiverRarity = CheckValue(this.RiverRarity, 0, this.GenerationDepth);
         this.RiverSize = CheckValue(this.RiverSize, 0, this.GenerationDepth - this.RiverRarity);
 
-        this.NormalBiomes = CheckValue(this.NormalBiomes, this.CustomBiomes.keySet());
-        this.IceBiomes = CheckValue(this.IceBiomes, this.CustomBiomes.keySet());
-        this.IsleBiomes = CheckValue(this.IsleBiomes, this.CustomBiomes.keySet());
-        this.BorderBiomes = CheckValue(this.BorderBiomes, this.CustomBiomes.keySet());
+        this.NormalBiomes = CheckValue(this.NormalBiomes, this.CustomBiomes);
+        this.IceBiomes = CheckValue(this.IceBiomes, this.CustomBiomes);
+        this.IsleBiomes = CheckValue(this.IsleBiomes, this.CustomBiomes);
+        this.BorderBiomes = CheckValue(this.BorderBiomes, this.CustomBiomes);
 
 
         this.minMoisture = CheckValue(this.minMoisture, 0, 1.0F);
@@ -412,7 +413,8 @@ public class WorldConfig extends ConfigFile
                 int id = -1;
                 if (keys.length == 2)
                     id = Integer.valueOf(keys[1]);
-                CustomBiomes.put(keys[0], id);
+                CustomBiomes.add(keys[0]);
+                CustomBiomeIds.put(keys[0], id);
 
             } catch (NumberFormatException e)
             {
@@ -652,12 +654,12 @@ public class WorldConfig extends ConfigFile
     {
         String output = "";
         boolean first = true;
-        for (String biome : CustomBiomes.keySet())
+        for (String biome : CustomBiomes)
         {
             if (!first)
                 output += ",";
             first = false;
-            output += biome + ":" + CustomBiomes.get(biome);
+            output += biome + ":" + CustomBiomeIds.get(biome);
         }
         WriteValue(TCDefaultValues.CustomBiomes.name(), output);
 
@@ -800,10 +802,10 @@ public class WorldConfig extends ConfigFile
 
 
         stream.writeInt(this.CustomBiomes.size());
-        for (String name : this.CustomBiomes.keySet())
+        for (String name : this.CustomBiomes)
         {
             WriteStringToStream(stream, name);
-            stream.writeInt(this.CustomBiomes.get(name));
+            stream.writeInt(this.CustomBiomeIds.get(name));
         }
 
         BiomeConfig config = this.getConfigByName(DefaultBiome.OCEAN.Name);
@@ -903,7 +905,8 @@ public class WorldConfig extends ConfigFile
             String name = ReadStringFromStream(stream);
             int id = stream.readInt();
             world.AddBiome(name, id);
-            this.CustomBiomes.put(name, id);
+            this.CustomBiomes.add(name);
+            this.CustomBiomeIds.put(name, id);
         }
 
         this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];

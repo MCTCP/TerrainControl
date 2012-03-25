@@ -805,9 +805,9 @@ public class BiomeConfig extends ConfigFile
         this.BiomeTemperature = CheckValue(this.BiomeTemperature, 0.0F, 1.0F);
         this.BiomeWetness = CheckValue(this.BiomeWetness, 0.0F, 1.0F);
 
-        this.IsleInBiome = CheckValue(this.IsleInBiome, this.worldConfig.CustomBiomes.keySet());
-        this.BiomeIsBorder = CheckValue(this.BiomeIsBorder, this.worldConfig.CustomBiomes.keySet());
-        this.NotBorderNear = CheckValue(this.NotBorderNear, this.worldConfig.CustomBiomes.keySet());
+        this.IsleInBiome = CheckValue(this.IsleInBiome, this.worldConfig.CustomBiomes);
+        this.BiomeIsBorder = CheckValue(this.BiomeIsBorder, this.worldConfig.CustomBiomes);
+        this.NotBorderNear = CheckValue(this.NotBorderNear, this.worldConfig.CustomBiomes);
 
         this.volatility1 = this.volatilityRaw1 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw1) + 1.0D) : this.volatilityRaw1 + 1.0D;
         this.volatility2 = this.volatilityRaw2 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw2) + 1.0D) : this.volatilityRaw2 + 1.0D;

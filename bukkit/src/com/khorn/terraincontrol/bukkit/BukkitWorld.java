@@ -57,7 +57,7 @@ public class BukkitWorld implements LocalWorld
     private int worldHeight = 256;
     private int heightBits = 8;
     
-    private int CustomBiomesCount  = 22;
+    private int CustomBiomesCount  = 21;
 
     static
     {

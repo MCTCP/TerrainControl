@@ -167,7 +167,7 @@ public abstract class Layer
                 {
                     int id = biomeConfig.Biome.getId();
                     if (biomeConfig.Biome.isCustom())
-                        id = id - (DefaultBiome.values().length - 21);  // Must be decreased by count of new biomes since 1.1 for compatible 1.1 maps
+                        id = biomeConfig.Biome.getCustomId();  // Must be decreased by count of new biomes since 1.1 for compatible 1.1 maps
 
                     LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + id, MainLayer);
                     layerBiome.biome = biomeConfig.Biome;
