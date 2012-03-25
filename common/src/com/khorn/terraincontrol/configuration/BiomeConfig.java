@@ -498,7 +498,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteNewLine();
         
         WriteComment("The id of the biome must be unique for all biomes on the server.");
-        WriteComment("The available id's range from "+idMin+" to "+idMax+" and the first 22 is occupied by vanilla minecraft biomes.");
+        WriteComment("The available id's range from "+idMin+" to "+idMax+" and the first 0 to "+(DefaultBiome.values().length-1)+" is occupied by vanilla minecraft biomes.");
         WriteComment("To leave room for future vanilla biomes we suggest your custom biomes start at id "+idSuggestedCustomMin+".");
         WriteComment("The id for the biome will be saved to disc together with the chunk data (new feature since the Anvil map format).");
         WriteComment("This means that if you change the biome id after you generated your map, the ids in the map wont change.");

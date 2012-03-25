@@ -46,9 +46,9 @@ public enum DefaultBiome
         }
     }
 
-    public static DefaultBiome getBiome( int id)
+    public static DefaultBiome getBiome(int id)
     {
-        if( id < lookupID.length)
+        if(id < lookupID.length)
         {
             return lookupID[id];
         }
