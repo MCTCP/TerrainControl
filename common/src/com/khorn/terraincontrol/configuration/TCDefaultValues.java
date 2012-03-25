@@ -40,7 +40,7 @@ public enum TCDefaultValues
 
     oldBiomeSize(1.5D),
 
-
+    id(0),
     BiomeSize(5),
     BiomeRarity(100),
     BiomeColor(""),

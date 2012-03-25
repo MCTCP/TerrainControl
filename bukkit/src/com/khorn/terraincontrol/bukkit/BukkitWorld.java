@@ -20,11 +20,13 @@ public class BukkitWorld implements LocalWorld
     private IBiomeManager biomeManager;
     private TCWorldChunkManagerOld old_biomeManager;
 
+    // TODO: We must refactor so fields start with lowercase chars.
+    // TODO: It is bad practice to use a big char as start of a field name.
+    
     private static int NextBiomeId = DefaultBiome.values().length;
     private static LocalBiome[] Biomes = new LocalBiome[256];
-    private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
+    private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>(); // TODO: Why is this field non static? shouldn't it be static?
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
-
 
     private WorldGenStronghold strongholdGen;
     private WorldGenVillage VillageGen;
@@ -39,7 +41,6 @@ public class BukkitWorld implements LocalWorld
     private WorldGenHugeMushroom HugeMushroom;
     private WorldGenMegaTree JungleTree;
     private WorldGenGroundBush GroundBush;
-
 
     private boolean CreateNewChunks;
     private Chunk[] ChunkCache;
@@ -79,7 +80,8 @@ public class BukkitWorld implements LocalWorld
         return new NullBiome(name);
     }
 
-    public LocalBiome AddBiome(String name)
+    // TODO: Should this method take the id as a parameter?
+    public LocalBiome AddBiome(String name, int id)
     {
         BukkitBiome biome = new BukkitBiome(new CustomBiome(NextBiomeId++, name));
         biome.setCustomID(CustomBiomesCount++);
@@ -88,21 +90,26 @@ public class BukkitWorld implements LocalWorld
         return biome;
     }
 
-    public int getBiomesCount()
+    // TODO: With static id allocation we need to search for non-nulls using a for loop instead.
+   /* public int getBiomesCount()
     {
         return NextBiomeId;
-    }
+    }*/
 
+    // TODO: Why are we fetching values from a static variable from within an instance method?
+    // TODO: This is bad practice.
     public LocalBiome getBiomeById(int id)
     {
         return Biomes[id];
     }
 
+    // TODO: Why is BiomeNames a instance field as opposed to Biomes?
     public LocalBiome getBiomeByName(String name)
     {
         return this.BiomeNames.get(name);
     }
 
+    // TODO: NPE check is missing!
     public int getBiomeIdByName(String name)
     {
         return this.BiomeNames.get(name).getId();
@@ -153,6 +160,7 @@ public class BukkitWorld implements LocalWorld
         return this.world.worldProvider.c.getBiome(x, z).id;
     }
 
+    // TODO: Why reach static var from instance method????
     public LocalBiome getLocalBiome(int x, int z)
     {
         return Biomes[this.getBiome(x, z)];
@@ -192,33 +200,33 @@ public class BukkitWorld implements LocalWorld
         {
             case Tree:
                 Tree.a(this.world, rand, x, y, z);
-                break;
+            break;
             case BigTree:
                 BigTree.a(1.0D, 1.0D, 1.0D);
                 BigTree.a(this.world, rand, x, y, z);
-                break;
+            break;
             case Forest:
                 Forest.a(this.world, rand, x, y, z);
-                break;
+            break;
             case HugeMushroom:
                 HugeMushroom.a(1.0D, 1.0D, 1.0D);
                 HugeMushroom.a(this.world, rand, x, y, z);
-                break;
+            break;
             case SwampTree:
                 SwampTree.a(this.world, rand, x, y, z);
-                break;
+            break;
             case Taiga1:
                 TaigaTree1.a(this.world, rand, x, y, z);
-                break;
+            break;
             case Taiga2:
                 TaigaTree2.a(this.world, rand, x, y, z);
-                break;
+            break;
             case JungleTree:
                 JungleTree.a(this.world, rand, x, y, z);
-                break;
+            break;
             case GroundBush:
                 GroundBush.a(this.world, rand, x, y, z);
-                break;
+            break;
         }
     }
 
@@ -289,7 +297,7 @@ public class BukkitWorld implements LocalWorld
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
                         BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(sectionX + sectionZ * 16)].id];
-                        if (biomeConfig.ReplaceCount > 0)
+                        if (biomeConfig != null && biomeConfig.ReplaceCount > 0)
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
@@ -467,7 +475,6 @@ public class BukkitWorld implements LocalWorld
         return worldHeight;
     }
 
-
     public int getHeightBits()
     {
         return heightBits;
@@ -491,7 +498,6 @@ public class BukkitWorld implements LocalWorld
         // TODO: Should WorldProviderTC extend even more? For example for spawn point etc?
         // this.world.worldProvider = new TCWorldProvider().setSeaLevel(this.settings.waterLevelMax); // cause errors with entity burn, disabled temporary.
 
-
         this.ChunkCache = new Chunk[4];
 
         switch (this.settings.ModeTerrain)
@@ -514,12 +520,10 @@ public class BukkitWorld implements LocalWorld
             case TerrainTest:
             case NotGenerate:
                 this.generator.Init(this);
-                break;
+            break;
             case Default:
-                break;
+            break;
         }
-
-
     }
 
     public void setChunkGenerator(TCChunkGenerator _generator)

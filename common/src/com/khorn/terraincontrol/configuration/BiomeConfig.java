@@ -17,6 +17,13 @@ import java.util.Map;
 
 public class BiomeConfig extends ConfigFile
 {
+	// the biome id must be between 50 and 255
+	public int id;
+	public final static int idMin = 0;
+	public final static int idSuggestedCustomMin = 50;
+	public final static int idMax = 255;
+	public final static int idMaxCount = idMax + 1;  // TODO: Related or duplicate of Layer.BiomeBits?? We need some refactoring to not keep two values saying the same thing.
+	
     public short[][] ReplaceMatrixBlocks = new short[256][];
     public int ReplaceCount = 0;
 
@@ -69,7 +76,9 @@ public class BiomeConfig extends ConfigFile
 
     public int ResourceCount = 0;
 
+    // TODO: A configuration should NOT contain what it is supposed to be configuration for. This is very bad practi
     public LocalBiome Biome;
+    
     private WorldConfig worldConfig;
     public String Name;
     
@@ -299,6 +308,7 @@ public class BiomeConfig extends ConfigFile
 
     protected void ReadConfigSettings()
     {
+    	this.id = ReadModSettings(TCDefaultValues.id.name(), TCDefaultValues.id.intValue());
         this.BiomeSize = ReadModSettings(TCDefaultValues.BiomeSize.name(), this.DefaultSize);
         this.BiomeRarity = ReadModSettings(TCDefaultValues.BiomeRarity.name(), this.DefaultRarity);
 
@@ -487,7 +497,14 @@ public class BiomeConfig extends ConfigFile
     protected void WriteConfigSettings() throws IOException
     {
         WriteTitle(this.Name + " biome config");
-
+        
+        WriteComment("The id of the biome must be unique for all biomes on the server.");
+        WriteComment("The available id's range from "+idMin+" to "+idMax+" and the first 0 to "+(DefaultBiome.values().length-1)+" is occupied by vanilla minecraft biomes.");
+        WriteComment("To leave room for future vanilla biomes we suggest your custom biomes start at id "+idSuggestedCustomMin+".");
+        WriteComment("The id for the biome will be saved to disc together with the chunk data (new feature since the Anvil map format).");
+        WriteComment("This means that if you change the biome id after you generated your map, the ids in the map wont change.");
+        WriteComment("Orphaned ids are interpreted as id 1 = Plains. Example things that depend on the biome id is mob spawning and growth from saplings.");
+        WriteValue(TCDefaultValues.id.name(), this.id);
         this.WriteNewLine();
 
         WriteComment("Biome size from 0 to GenerationDepth. Show in what zoom level biome will be generated ( see GenerationDepth)");
@@ -691,8 +708,8 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("The default mob groups are controlled by vanilla minecraft.");
         this.WriteComment("At 2012-03-24 you could find them here: https://github.com/Bukkit/mc-dev/blob/master/net/minecraft/server/BiomeBase.java#L75");
         this.WriteComment("In simple terms:");
-        this.WriteComment("Default monsters: [{\"mob\": \"Sheep\", \"weight\": 12, \"min\": 4, \"max\": 4}, {\"mob\": \"Pig\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Chicken\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Cow\", \"weight\": 8, \"min\": 4, \"max\": 4}]");
-        this.WriteComment("Default creatures: [{\"mob\": \"Spider\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Zombie\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Skeleton\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Creeper\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Slime\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Enderman\", \"weight\": 1, \"min\": 1, \"max\": 4}]");
+        this.WriteComment("Default creatures: [{\"mob\": \"Sheep\", \"weight\": 12, \"min\": 4, \"max\": 4}, {\"mob\": \"Pig\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Chicken\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Cow\", \"weight\": 8, \"min\": 4, \"max\": 4}]");
+        this.WriteComment("Default monsters: [{\"mob\": \"Spider\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Zombie\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Skeleton\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Creeper\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Slime\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Enderman\", \"weight\": 1, \"min\": 1, \"max\": 4}]");
         this.WriteComment("Default watercreatures: [{\"mob\": \"Squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]");
         this.WriteComment("");
         this.WriteComment("So for example ocelots wont spawn unless you add them below.");

@@ -23,6 +23,9 @@ import java.util.List;
 public abstract class ConfigFile
 {
     private BufferedWriter SettingsWriter;
+    
+    // TODO: This map is populated with lowercase versions as well.
+    // TODO: That is a derped approach. Use TreeSet with CASE_INSENSITIVE_ORDER instead.
     protected HashMap<String, String> SettingsCache = new HashMap<String, String>();
     
     // TODO: We should use GSON only instead of just for a few fields.
@@ -41,10 +44,8 @@ public abstract class ConfigFile
                 int lineNumber = 0;
                 while ((thisLine = SettingsReader.readLine()) != null)
                 {
-                    if (thisLine.trim().equals(""))
-                        continue;
-                    if (thisLine.startsWith("#") || thisLine.startsWith("<"))
-                        continue;
+                    if (thisLine.trim().equals("")) continue;
+                    if (thisLine.startsWith("#") || thisLine.startsWith("<")) continue;
                     if (thisLine.toLowerCase().contains(":"))
                     {
                         String[] splitSettings = thisLine.split(":", 2);
@@ -52,16 +53,18 @@ public abstract class ConfigFile
                         {
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                             this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
-                        } else if (splitSettings.length == 1)
+                        }
+                        else if (splitSettings.length == 1)
                         {
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
                             this.SettingsCache.put(splitSettings[0].trim(), "");
                         }
-                    } else
+                    }
+                    else
+                    {
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
+                    }
                     lineNumber++;
-
-
                 }
             }
             catch (IOException e)
@@ -69,24 +72,30 @@ public abstract class ConfigFile
                 e.printStackTrace();
 
                 if (SettingsReader != null)
+                {
                     try
                     {
                         SettingsReader.close();
-                    } catch (IOException localIOException1)
+                    }
+                    catch (IOException localIOException1)
                     {
                         localIOException1.printStackTrace();
                     }
+                }
             }
             finally
             {
                 if (SettingsReader != null)
+                {
                     try
                     {
                         SettingsReader.close();
-                    } catch (IOException localIOException2)
+                    }
+                    catch (IOException localIOException2)
                     {
                         localIOException2.printStackTrace();
                     }
+                }
             }
         }
     }
@@ -104,7 +113,9 @@ public abstract class ConfigFile
         {
             ArrayList<String> out = new ArrayList<String>();
             if (this.SettingsCache.get(settingsName).trim().equals("") || this.SettingsCache.get(settingsName).equals("None"))
+            {
                 return out;
+            }
             Collections.addAll(out, this.SettingsCache.get(settingsName).split(","));
             return out;
         }
@@ -230,24 +241,30 @@ public abstract class ConfigFile
             e.printStackTrace();
 
             if (this.SettingsWriter != null)
+            {
                 try
                 {
                     this.SettingsWriter.close();
-                } catch (IOException localIOException1)
+                }
+                catch (IOException localIOException1)
                 {
                     localIOException1.printStackTrace();
                 }
+            }
         }
         finally
         {
             if (this.SettingsWriter != null)
+            {
                 try
                 {
                     this.SettingsWriter.close();
-                } catch (IOException localIOException2)
+                }
+                catch (IOException localIOException2)
                 {
                     localIOException2.printStackTrace();
                 }
+            }
         }
     }
 
@@ -427,7 +444,6 @@ public abstract class ConfigFile
 
         }
         return output;
-
     }
 
     protected static void WriteStringToStream(DataOutputStream stream, String value) throws IOException
@@ -435,7 +451,6 @@ public abstract class ConfigFile
         byte[] bytes = value.getBytes();
         stream.writeShort(bytes.length);
         stream.write(bytes);
-
     }
 
     protected static String ReadStringFromStream(DataInputStream stream) throws IOException
