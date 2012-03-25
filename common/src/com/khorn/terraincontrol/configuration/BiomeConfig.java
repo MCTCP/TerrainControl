@@ -19,7 +19,8 @@ public class BiomeConfig extends ConfigFile
 {
 	// the biome id must be between 50 and 255
 	public int id;
-	public final static int idMin = 50;
+	public final static int idMin = 0;
+	public final static int idSuggestedCustomMin = 50;
 	public final static int idMax = 255;
 	
     public short[][] ReplaceMatrixBlocks = new short[256][];
@@ -497,8 +498,8 @@ public class BiomeConfig extends ConfigFile
         this.WriteNewLine();
         
         WriteComment("The id of the biome must be unique for all biomes on the server.");
-        WriteComment("The available id's range from 0 to 255 and the first 22 is occupied by vanilla minecraft biomes.");
-        WriteComment("To leave room for future vanilla biomes we suggest your custom biomes start at id 50.");
+        WriteComment("The available id's range from "+idMin+" to "+idMax+" and the first 22 is occupied by vanilla minecraft biomes.");
+        WriteComment("To leave room for future vanilla biomes we suggest your custom biomes start at id "+idSuggestedCustomMin+".");
         WriteComment("The id for the biome will be saved to disc together with the chunk data (new feature since the Anvil map format).");
         WriteComment("This means that if you change the biome id after you generated your map, the ids in the map wont change.");
         WriteComment("Orphaned ids are interpreted as id 1 = Plains. Example things that depend on the biome id is mob spawning and growth from saplings.");
