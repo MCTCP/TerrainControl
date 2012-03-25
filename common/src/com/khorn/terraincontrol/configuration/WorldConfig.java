@@ -21,6 +21,8 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> IsleBiomes = new ArrayList<String>();
     public ArrayList<String> BorderBiomes = new ArrayList<String>();
 
+    public ArrayList<BiomeConfig> biomes = new ArrayList<BiomeConfig>();
+
     public ArrayList<CustomObject> Objects = new ArrayList<CustomObject>();
     public HashMap<String, ArrayList<CustomObject>> ObjectGroups = new HashMap<String, ArrayList<CustomObject>>();
     public HashMap<String, ArrayList<CustomObject>> BranchGroups = new HashMap<String, ArrayList<CustomObject>>();
@@ -177,19 +179,19 @@ public class WorldConfig extends ConfigFile
             }
         }
 
-        ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>(world.getDefaultBiomes());
+        ArrayList<LocalBiome> localBiomes = new ArrayList<LocalBiome>(world.getDefaultBiomes());
 
         for (String biomeName : this.CustomBiomes)
         {
             if (checkOnly)
-                biomes.add(world.getNullBiome(biomeName));
+                localBiomes.add(world.getNullBiome(biomeName));
             else
-                biomes.add(world.AddBiome(biomeName, this.CustomBiomeIds.get(biomeName)));
+                localBiomes.add(world.AddBiome(biomeName, this.CustomBiomeIds.get(biomeName)));
          }
 
         this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
-        for (LocalBiome localBiome : biomes)
+        for (LocalBiome localBiome : localBiomes)
         {
             System.out.println("TerrainControl: Loading biome settings for " + localBiome.getName());
             BiomeConfig config = new BiomeConfig(BiomeFolder, localBiome, this);
@@ -204,7 +206,7 @@ public class WorldConfig extends ConfigFile
             this.biomeConfigs[localBiome.getId()] = config;
             if (!this.BiomeConfigsHaveReplacement)
                 this.BiomeConfigsHaveReplacement = config.ReplaceCount > 0;
-
+            this.biomes.add(config);
         }
 
         this.RegisterBOBPlugins(world);
