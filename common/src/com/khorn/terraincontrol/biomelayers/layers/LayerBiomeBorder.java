@@ -12,8 +12,8 @@ public class LayerBiomeBorder extends Layer
     public LayerBiomeBorder(long paramLong, LocalWorld world)
     {
         super(paramLong);
-        this.BordersFrom = new boolean[BiomeConfig.idMaxCount][];
-        this.BordersTo = new int[BiomeConfig.idMaxCount];
+        this.BordersFrom = new boolean[world.getMaxBiomesCount()][];
+        this.BordersTo = new int[world.getMaxBiomesCount()];
     }
 
     private boolean[][] BordersFrom;
@@ -22,7 +22,7 @@ public class LayerBiomeBorder extends Layer
     
     public void AddBiome(BiomeConfig ReplaceTo, int ReplaceFrom, LocalWorld world)
     {
-        this.BordersFrom[ReplaceFrom] = new boolean[BiomeConfig.idMaxCount];
+        this.BordersFrom[ReplaceFrom] = new boolean[world.getMaxBiomesCount()];
 
         for (int i = 0; i < this.BordersFrom[ReplaceFrom].length; i++)
         {

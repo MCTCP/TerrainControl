@@ -13,8 +13,10 @@ public interface LocalWorld
 
     public LocalBiome getNullBiome(String name);
 
-    //public int getBiomesCount(); // With static id allocation this is not a required feature.
+    public int getMaxBiomesCount(); // With static id allocation this is not a required feature.
 
+    public int getFreeBiomeId();
+    
     public LocalBiome getBiomeById(int id);
 
     public LocalBiome getBiomeByName(String name);

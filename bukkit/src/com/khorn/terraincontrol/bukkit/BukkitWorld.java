@@ -24,8 +24,10 @@ public class BukkitWorld implements LocalWorld
     // TODO: It is bad practice to use a big char as start of a field name.
     
     private static int NextBiomeId = DefaultBiome.values().length;
-    private static LocalBiome[] Biomes = new LocalBiome[256];
-    private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>(); // TODO: Why is this field non static? shouldn't it be static?
+    private static int maxBiomeCount = 256;
+    private static LocalBiome[] Biomes = new LocalBiome[maxBiomeCount];
+    
+    private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 
     private WorldGenStronghold strongholdGen;
@@ -55,7 +57,7 @@ public class BukkitWorld implements LocalWorld
     private int worldHeight = 256;
     private int heightBits = 8;
     
-    private int CustomBiomesCount  = 21;
+    private int CustomBiomesCount  = 22;
 
     static
     {
@@ -80,30 +82,31 @@ public class BukkitWorld implements LocalWorld
         return new NullBiome(name);
     }
 
-    // TODO: Should this method take the id as a parameter?
     public LocalBiome AddBiome(String name, int id)
     {
-        BukkitBiome biome = new BukkitBiome(new CustomBiome(NextBiomeId++, name));
+        BukkitBiome biome = new BukkitBiome(new CustomBiome(id, name));
         biome.setCustomID(CustomBiomesCount++);
         Biomes[biome.getId()] = biome;
         this.BiomeNames.put(biome.getName(), biome);
         return biome;
     }
 
-    // TODO: With static id allocation we need to search for non-nulls using a for loop instead.
-   /* public int getBiomesCount()
+    public int getMaxBiomesCount()
     {
-        return NextBiomeId;
-    }*/
+        return maxBiomeCount;
+    }
 
-    // TODO: Why are we fetching values from a static variable from within an instance method?
-    // TODO: This is bad practice.
+    public int getFreeBiomeId()
+    {
+        return NextBiomeId++;
+    }
+
+
     public LocalBiome getBiomeById(int id)
     {
         return Biomes[id];
     }
 
-    // TODO: Why is BiomeNames a instance field as opposed to Biomes?
     public LocalBiome getBiomeByName(String name)
     {
         return this.BiomeNames.get(name);
@@ -160,7 +163,6 @@ public class BukkitWorld implements LocalWorld
         return this.world.worldProvider.c.getBiome(x, z).id;
     }
 
-    // TODO: Why reach static var from instance method????
     public LocalBiome getLocalBiome(int x, int z)
     {
         return Biomes[this.getBiome(x, z)];

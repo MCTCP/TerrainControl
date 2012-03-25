@@ -17,13 +17,6 @@ import java.util.Map;
 
 public class BiomeConfig extends ConfigFile
 {
-	// the biome id must be between 50 and 255
-	public int id;
-	public final static int idMin = 0;
-	public final static int idSuggestedCustomMin = 50;
-	public final static int idMax = 255;
-	public final static int idMaxCount = idMax + 1;  // TODO: Related or duplicate of Layer.BiomeBits?? We need some refactoring to not keep two values saying the same thing.
-	
     public short[][] ReplaceMatrixBlocks = new short[256][];
     public int ReplaceCount = 0;
 
@@ -308,7 +301,6 @@ public class BiomeConfig extends ConfigFile
 
     protected void ReadConfigSettings()
     {
-    	this.id = ReadModSettings(TCDefaultValues.id.name(), TCDefaultValues.id.intValue());
         this.BiomeSize = ReadModSettings(TCDefaultValues.BiomeSize.name(), this.DefaultSize);
         this.BiomeRarity = ReadModSettings(TCDefaultValues.BiomeRarity.name(), this.DefaultRarity);
 
@@ -498,14 +490,6 @@ public class BiomeConfig extends ConfigFile
     {
         WriteTitle(this.Name + " biome config");
         
-        WriteComment("The id of the biome must be unique for all biomes on the server.");
-        WriteComment("The available id's range from "+idMin+" to "+idMax+" and the first 0 to "+(DefaultBiome.values().length-1)+" is occupied by vanilla minecraft biomes.");
-        WriteComment("To leave room for future vanilla biomes we suggest your custom biomes start at id "+idSuggestedCustomMin+".");
-        WriteComment("The id for the biome will be saved to disc together with the chunk data (new feature since the Anvil map format).");
-        WriteComment("This means that if you change the biome id after you generated your map, the ids in the map wont change.");
-        WriteComment("Orphaned ids are interpreted as id 1 = Plains. Example things that depend on the biome id is mob spawning and growth from saplings.");
-        WriteValue(TCDefaultValues.id.name(), this.id);
-        this.WriteNewLine();
 
         WriteComment("Biome size from 0 to GenerationDepth. Show in what zoom level biome will be generated ( see GenerationDepth)");
         WriteComment("Higher numbers = less zoom this biome, lower numbers = more zoom");
@@ -821,9 +805,9 @@ public class BiomeConfig extends ConfigFile
         this.BiomeTemperature = CheckValue(this.BiomeTemperature, 0.0F, 1.0F);
         this.BiomeWetness = CheckValue(this.BiomeWetness, 0.0F, 1.0F);
 
-        this.IsleInBiome = CheckValue(this.IsleInBiome, this.worldConfig.CustomBiomes);
-        this.BiomeIsBorder = CheckValue(this.BiomeIsBorder, this.worldConfig.CustomBiomes);
-        this.NotBorderNear = CheckValue(this.NotBorderNear, this.worldConfig.CustomBiomes);
+        this.IsleInBiome = CheckValue(this.IsleInBiome, this.worldConfig.CustomBiomes.keySet());
+        this.BiomeIsBorder = CheckValue(this.BiomeIsBorder, this.worldConfig.CustomBiomes.keySet());
+        this.NotBorderNear = CheckValue(this.NotBorderNear, this.worldConfig.CustomBiomes.keySet());
 
         this.volatility1 = this.volatilityRaw1 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw1) + 1.0D) : this.volatilityRaw1 + 1.0D;
         this.volatility2 = this.volatilityRaw2 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw2) + 1.0D) : this.volatilityRaw2 + 1.0D;

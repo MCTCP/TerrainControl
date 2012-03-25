@@ -18,9 +18,12 @@ public class SingleWorld implements LocalWorld
     private BiomeManagerOld old_biomeManager;
 
     private static int NextBiomeId = 0;
-    private static LocalBiome[] Biomes = new LocalBiome[256];
-    private static abi[] BiomesToRestore = new abi[256];
+    private static int maxBiomeCount = 256;
+    private static LocalBiome[] Biomes = new LocalBiome[maxBiomeCount];
+    private static abi[] BiomesToRestore = new abi[maxBiomeCount];
+
     private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
+
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 
 
@@ -93,17 +96,22 @@ public class SingleWorld implements LocalWorld
         return null;
     }
 
-    public LocalBiome AddBiome(String name)
+    public LocalBiome AddBiome(String name, int id)
     {
-        LocalBiome biome = new Biome(new CustomBiome(NextBiomeId++, name));
+        LocalBiome biome = new Biome(new CustomBiome(id, name));
         Biomes[biome.getId()] = biome;
         this.BiomeNames.put(biome.getName(), biome);
         return biome;
     }
 
-    public int getBiomesCount()
+    public int getMaxBiomesCount()
     {
-        return NextBiomeId;
+        return maxBiomeCount;
+    }
+
+    public int getFreeBiomeId()
+    {
+        return NextBiomeId++;
     }
 
 

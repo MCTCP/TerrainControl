@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +13,7 @@ import java.util.*;
 
 public class WorldConfig extends ConfigFile
 {
-    public ArrayList<String> CustomBiomes = new ArrayList<String>();
+    public HashMap<String, Integer> CustomBiomes = new HashMap<String, Integer>();
 
     public ArrayList<String> NormalBiomes = new ArrayList<String>();
     public ArrayList<String> IceBiomes = new ArrayList<String>();
@@ -153,6 +154,14 @@ public class WorldConfig extends ConfigFile
 
         this.CorrectSettings();
 
+        // Check biome ids
+
+        for( String biomeName : CustomBiomes.keySet())
+            if(CustomBiomes.get(biomeName) == -1)
+                CustomBiomes.put(biomeName,world.getFreeBiomeId());
+
+        // Need add check to clashes
+
         this.WriteSettingsFile(settingsFile);
         world.setHeightBits(this.worldHeightBits);
 
@@ -169,23 +178,21 @@ public class WorldConfig extends ConfigFile
 
         ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>(world.getDefaultBiomes());
 
-        for (String biomeName : this.CustomBiomes)
+        for (String biomeName : this.CustomBiomes.keySet())
         {
             if (checkOnly)
                 biomes.add(world.getNullBiome(biomeName));
             else
-                biomes.add(world.AddBiome(biomeName, 9999999));
-            // TODO: So this is going to be a bit tricky. 
-            // TODO: We may need to fix the order stuff is done. Config-files should be read first and afterwards id's should be allocated not the other way around.
-        }
+                biomes.add(world.AddBiome(biomeName, this.CustomBiomes.get(biomeName)));
+         }
 
-        this.biomeConfigs = new BiomeConfig[BiomeConfig.idMaxCount];
+        this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
         for (LocalBiome localBiome : biomes)
         {
-            System.out.println("TerrainControl: Loading biomesettings for "+localBiome.getName());
+            System.out.println("TerrainControl: Loading biome settings for " + localBiome.getName());
             BiomeConfig config = new BiomeConfig(BiomeFolder, localBiome, this);
-            if(checkOnly)
+            if (checkOnly)
                 continue;
 
             if (this.NormalBiomes.contains(config.Name))
@@ -228,10 +235,10 @@ public class WorldConfig extends ConfigFile
         this.RiverRarity = CheckValue(this.RiverRarity, 0, this.GenerationDepth);
         this.RiverSize = CheckValue(this.RiverSize, 0, this.GenerationDepth - this.RiverRarity);
 
-        this.NormalBiomes = CheckValue(this.NormalBiomes, this.CustomBiomes);
-        this.IceBiomes = CheckValue(this.IceBiomes, this.CustomBiomes);
-        this.IsleBiomes = CheckValue(this.IsleBiomes, this.CustomBiomes);
-        this.BorderBiomes = CheckValue(this.BorderBiomes, this.CustomBiomes);
+        this.NormalBiomes = CheckValue(this.NormalBiomes, this.CustomBiomes.keySet());
+        this.IceBiomes = CheckValue(this.IceBiomes, this.CustomBiomes.keySet());
+        this.IsleBiomes = CheckValue(this.IsleBiomes, this.CustomBiomes.keySet());
+        this.BorderBiomes = CheckValue(this.BorderBiomes, this.CustomBiomes.keySet());
 
 
         this.minMoisture = CheckValue(this.minMoisture, 0, 1.0F);
@@ -279,8 +286,7 @@ public class WorldConfig extends ConfigFile
         try
         {
             this.ModeTerrain = TerrainMode.valueOf(ReadModSettings(TCDefaultValues.ModeTerrain.name(), TCDefaultValues.ModeTerrain.stringValue()));
-        }
-        catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException e)
         {
             this.ModeTerrain = TerrainMode.Normal;
         }
@@ -288,12 +294,11 @@ public class WorldConfig extends ConfigFile
         try
         {
             this.ModeBiome = BiomeMode.valueOf(ReadModSettings(TCDefaultValues.ModeBiome.name(), TCDefaultValues.ModeBiome.stringValue()));
-        }
-        catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException e)
         {
             this.ModeBiome = BiomeMode.Normal;
         }
-        
+
         this.worldHeightBits = ReadModSettings(TCDefaultValues.WorldHeightBits.name(), TCDefaultValues.WorldHeightBits.intValue());
         this.worldHeightBits = CheckValue(this.worldHeightBits, 5, 8);
 
@@ -324,7 +329,7 @@ public class WorldConfig extends ConfigFile
         this.IceBiomes = this.ReadModSettings(TCDefaultValues.IceBiomes.name(), TCDefaultValues.IceBiomes.StringArrayListValue());
         this.IsleBiomes = this.ReadModSettings(TCDefaultValues.IsleBiomes.name(), TCDefaultValues.IsleBiomes.StringArrayListValue());
         this.BorderBiomes = this.ReadModSettings(TCDefaultValues.BorderBiomes.name(), TCDefaultValues.BorderBiomes.StringArrayListValue());
-        this.CustomBiomes = this.ReadModSettings(TCDefaultValues.CustomBiomes.name(), TCDefaultValues.CustomBiomes.StringArrayListValue());
+        ReadCustomBiomes();
 
         this.minMoisture = ReadModSettings(TCDefaultValues.minMoisture.name(), TCDefaultValues.minMoisture.floatValue());
         this.maxMoisture = ReadModSettings(TCDefaultValues.maxMoisture.name(), TCDefaultValues.maxMoisture.floatValue());
@@ -392,6 +397,31 @@ public class WorldConfig extends ConfigFile
         this.objectSpawnRatio = this.ReadModSettings(TCDefaultValues.objectSpawnRatio.name(), TCDefaultValues.objectSpawnRatio.intValue());
         this.denyObjectsUnderFill = this.ReadModSettings(TCDefaultValues.DenyObjectsUnderFill.name(), TCDefaultValues.DenyObjectsUnderFill.booleanValue());
         this.customTreeChance = this.ReadModSettings(TCDefaultValues.customTreeChance.name(), TCDefaultValues.customTreeChance.intValue());
+    }
+
+    private void ReadCustomBiomes()
+    {
+
+        ArrayList<String> biomes = this.ReadModSettings(TCDefaultValues.CustomBiomes.name(), TCDefaultValues.CustomBiomes.StringArrayListValue());
+
+        for (String biome : biomes)
+        {
+            try
+            {
+                String[] keys = biome.split(":");
+                int id = -1;
+                if (keys.length == 2)
+                    id = Integer.valueOf(keys[1]);
+                CustomBiomes.put(keys[0], id);
+
+            } catch (NumberFormatException e)
+            {
+                System.out.println("Wrong custom biome id settings: '" + biome + "'");
+            }
+
+        }
+
+
     }
 
 
@@ -479,13 +509,22 @@ public class WorldConfig extends ConfigFile
         WriteComment("Biomes which used as borders. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
         WriteValue(TCDefaultValues.BorderBiomes.name(), this.BorderBiomes);
 
-        WriteNewLine();
+        WriteNewLine();     // TODO Write correct help
         WriteComment("List of ALL custom biomes.");
         WriteComment("Example: ");
         WriteComment("  CustomBiomes:TestBiome1, BiomeTest2");
         WriteComment("This will add two biomes and generate biome config files");
         WriteComment("Any changes here need server restart.");
-        WriteValue(TCDefaultValues.CustomBiomes.name(), this.CustomBiomes);
+        /*
+               WriteComment("The id of the biome must be unique for all biomes on the server.");
+        WriteComment("The available id's range from "+idMin+" to "+idMax+" and the first 0 to "+(DefaultBiome.values().length-1)+" is occupied by vanilla minecraft biomes.");
+        WriteComment("To leave room for future vanilla biomes we suggest your custom biomes start at id "+idSuggestedCustomMin+".");
+        WriteComment("The id for the biome will be saved to disc together with the chunk data (new feature since the Anvil map format).");
+        WriteComment("This means that if you change the biome id after you generated your map, the ids in the map wont change.");
+        WriteComment("Orphaned ids are interpreted as id 1 = Plains. Example things that depend on the biome id is mob spawning and growth from saplings.");
+
+         */
+        WriteCustomBiomes();
 
         /* Removed .. not sure this need someone
         WriteTitle("Swamp Biome Variables");
@@ -609,6 +648,20 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.maxTemperature.name(), this.maxTemperature);
     }
 
+    private void WriteCustomBiomes() throws IOException
+    {
+        String output = "";
+        boolean first = true;
+        for (String biome : CustomBiomes.keySet())
+        {
+            if (!first)
+                output += ",";
+            first = false;
+            output += biome + ":" + CustomBiomes.get(biome);
+        }
+        WriteValue(TCDefaultValues.CustomBiomes.name(), output);
+
+    }
 
     private void RegisterBOBPlugins(LocalWorld world)
     {
@@ -671,8 +724,7 @@ public class WorldConfig extends ConfigFile
                     }
                     i++;
                 }
-            }
-            catch (Exception e)
+            } catch (Exception e)
             {
                 System.out.println("BOB Plugin system encountered an error, aborting!");
             }
@@ -748,8 +800,11 @@ public class WorldConfig extends ConfigFile
 
 
         stream.writeInt(this.CustomBiomes.size());
-        for (String name : this.CustomBiomes)
+        for (String name : this.CustomBiomes.keySet())
+        {
             WriteStringToStream(stream, name);
+            stream.writeInt(this.CustomBiomes.get(name));
+        }
 
         BiomeConfig config = this.getConfigByName(DefaultBiome.OCEAN.Name);
         WriteStringToStream(stream, config.Name);
@@ -801,11 +856,9 @@ public class WorldConfig extends ConfigFile
         }
     }
 
-    // TODO: Why do we have this constructor AND the one above?
-    // TODO: Only one of them should be used.
-    // TODO: Having this constructor for the client breaks the rule that the code in common should not case about client or server edition specifically.
-    
-    /*public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
+
+    // Need for create world config from network packet
+    public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
     {
         // Protocol version
         stream.readInt();
@@ -848,11 +901,12 @@ public class WorldConfig extends ConfigFile
         while (count-- > 0)
         {
             String name = ReadStringFromStream(stream);
-            world.AddBiome(name);
-            this.CustomBiomes.add(name);
+            int id = stream.readInt();
+            world.AddBiome(name, id);
+            this.CustomBiomes.put(name, id);
         }
 
-        this.biomeConfigs = new BiomeConfig[BiomeConfig.idMaxCount];
+        this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
         String name = ReadStringFromStream(stream);
         BiomeConfig config = new BiomeConfig(stream, this, world.getBiomeByName(name));
@@ -911,7 +965,7 @@ public class WorldConfig extends ConfigFile
             if (biomeConfig != null && biomeConfig.Biome.isCustom())
                 biomeConfig.Biome.setCustom(biomeConfig);
 
-    }*/
+    }
 
 
     private BiomeConfig getConfigByName(String name)

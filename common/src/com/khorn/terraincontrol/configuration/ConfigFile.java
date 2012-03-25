@@ -15,10 +15,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public abstract class ConfigFile
 {
@@ -426,7 +423,7 @@ public abstract class ConfigFile
             return value;
     }
 
-    protected ArrayList<String> CheckValue(ArrayList<String> biomes, ArrayList<String> customBiomes)
+    protected ArrayList<String> CheckValue(ArrayList<String> biomes, Set<String> customBiomes)
     {
         ArrayList<String> output = new ArrayList<String>();
 
