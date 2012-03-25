@@ -14,6 +14,10 @@ public class Biome implements LocalBiome
     {
         return true;
     }
+    public int getCustomId()
+    {
+        return getId();
+    }
 
     public void setCustom(BiomeConfig config)
     {

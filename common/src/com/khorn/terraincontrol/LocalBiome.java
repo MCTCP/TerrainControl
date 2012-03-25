@@ -11,6 +11,7 @@ public interface LocalBiome
     public abstract String getName();
 
     public abstract int getId();
+    public abstract int getCustomId();
 
     public abstract float getTemperature();
 

@@ -9,6 +9,7 @@ public class BukkitBiome implements LocalBiome
 {
     private BiomeBase biomeBase;
     private boolean isCustom;
+    private int customID;
 
     public BukkitBiome(BiomeBase biome)
     {
@@ -17,11 +18,20 @@ public class BukkitBiome implements LocalBiome
         {
             this.isCustom = true;
         }
+        customID = biomeBase.id;
     }
 
     public boolean isCustom()
     {
         return this.isCustom;
+    }
+    public int getCustomId()
+    {
+        return customID;
+    }
+    public void setCustomID(int id)
+    {
+        customID = id;
     }
 
     public void setCustom(BiomeConfig config)

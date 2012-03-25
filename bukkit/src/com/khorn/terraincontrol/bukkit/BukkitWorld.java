@@ -53,6 +53,8 @@ public class BukkitWorld implements LocalWorld
     //TODO do something with that when bukkit allow custom world height.
     private int worldHeight = 256;
     private int heightBits = 8;
+    
+    private int CustomBiomesCount  = 21;
 
     static
     {
@@ -79,7 +81,8 @@ public class BukkitWorld implements LocalWorld
 
     public LocalBiome AddBiome(String name)
     {
-        LocalBiome biome = new BukkitBiome(new CustomBiome(NextBiomeId++, name));
+        BukkitBiome biome = new BukkitBiome(new CustomBiome(NextBiomeId++, name));
+        biome.setCustomID(CustomBiomesCount++);
         Biomes[biome.getId()] = biome;
         this.BiomeNames.put(biome.getName(), biome);
         return biome;
