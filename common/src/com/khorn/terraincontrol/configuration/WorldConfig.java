@@ -221,17 +221,14 @@ public class WorldConfig extends ConfigFile
 
     protected void RenameOldSettings()
     {
-
         if (this.SettingsCache.containsKey("WaterLevel"))
         {
             this.SettingsCache.put("WaterLevelMax".toLowerCase(), this.SettingsCache.get("WaterLevel"));
         }
-
     }
 
     protected void CorrectSettings()
     {
-
         this.oldBiomeSize = CheckValue(this.oldBiomeSize, 0.1D, 10.0D);
 
         this.GenerationDepth = CheckValue(this.GenerationDepth, 1, 20);
@@ -291,8 +288,6 @@ public class WorldConfig extends ConfigFile
             this.ModeBiome = BiomeMode.Normal;
 
         }
-
-
     }
 
 
@@ -301,7 +296,8 @@ public class WorldConfig extends ConfigFile
         try
         {
             this.ModeTerrain = TerrainMode.valueOf(ReadModSettings(TCDefaultValues.ModeTerrain.name(), TCDefaultValues.ModeTerrain.stringValue()));
-        } catch (IllegalArgumentException e)
+        }
+        catch (IllegalArgumentException e)
         {
             this.ModeTerrain = TerrainMode.Normal;
         }
@@ -309,7 +305,8 @@ public class WorldConfig extends ConfigFile
         try
         {
             this.ModeBiome = BiomeMode.valueOf(ReadModSettings(TCDefaultValues.ModeBiome.name(), TCDefaultValues.ModeBiome.stringValue()));
-        } catch (IllegalArgumentException e)
+        }
+        catch (IllegalArgumentException e)
         {
             this.ModeBiome = BiomeMode.Normal;
         }
@@ -416,8 +413,6 @@ public class WorldConfig extends ConfigFile
         this.objectSpawnRatio = this.ReadModSettings(TCDefaultValues.objectSpawnRatio.name(), TCDefaultValues.objectSpawnRatio.intValue());
         this.denyObjectsUnderFill = this.ReadModSettings(TCDefaultValues.DenyObjectsUnderFill.name(), TCDefaultValues.DenyObjectsUnderFill.booleanValue());
         this.customTreeChance = this.ReadModSettings(TCDefaultValues.customTreeChance.name(), TCDefaultValues.customTreeChance.intValue());
-
-
     }
 
 
@@ -637,10 +632,7 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.maxMoisture.name(), this.maxMoisture);
         WriteValue(TCDefaultValues.minTemperature.name(), this.minTemperature);
         WriteValue(TCDefaultValues.maxTemperature.name(), this.maxTemperature);
-
     }
-
-
 
 
     private void RegisterBOBPlugins(LocalWorld world)
@@ -704,7 +696,8 @@ public class WorldConfig extends ConfigFile
                     }
                     i++;
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 System.out.println("BOB Plugin system encountered an error, aborting!");
             }
@@ -732,7 +725,6 @@ public class WorldConfig extends ConfigFile
     {
         return (!this.disableBedrock) && ((!this.flatBedrock) || (y == 0));
     }
-
 
     public enum TerrainMode
     {
@@ -832,8 +824,6 @@ public class WorldConfig extends ConfigFile
             WriteStringToStream(stream, config.Name);
             config.Serialize(stream);
         }
-
-
     }
 
     public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
@@ -874,7 +864,6 @@ public class WorldConfig extends ConfigFile
         this.WorldNightFogR = ((WorldNightFog & 0xFF0000) >> 16) / 255F;
         this.WorldNightFogG = ((WorldNightFog & 0xFF00) >> 8) / 255F;
         this.WorldNightFogB = (WorldNightFog & 0xFF) / 255F;
-
 
         int count = stream.readInt();
         while (count-- > 0)
@@ -919,7 +908,6 @@ public class WorldConfig extends ConfigFile
             this.IceBiomes.add(name);
             config = new BiomeConfig(stream, this, world.getBiomeByName(name));
             this.biomeConfigs[config.Biome.getId()] = config;
-
         }
 
         count = stream.readInt();
@@ -929,7 +917,6 @@ public class WorldConfig extends ConfigFile
             this.IsleBiomes.add(name);
             config = new BiomeConfig(stream, this, world.getBiomeByName(name));
             this.biomeConfigs[config.Biome.getId()] = config;
-
         }
 
         count = stream.readInt();
@@ -939,13 +926,11 @@ public class WorldConfig extends ConfigFile
             this.BorderBiomes.add(name);
             config = new BiomeConfig(stream, this, world.getBiomeByName(name));
             this.biomeConfigs[config.Biome.getId()] = config;
-
         }
 
         for (BiomeConfig biomeConfig : this.biomeConfigs)
             if (biomeConfig != null && biomeConfig.Biome.isCustom())
                 biomeConfig.Biome.setCustom(biomeConfig);
-
 
     }
 
