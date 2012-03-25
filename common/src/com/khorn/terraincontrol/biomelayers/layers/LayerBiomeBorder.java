@@ -19,17 +19,19 @@ public class LayerBiomeBorder extends Layer
     private boolean[][] BordersFrom;
     private int[] BordersTo;
 
+    
     public void AddBiome(BiomeConfig ReplaceTo, int ReplaceFrom, LocalWorld world)
     {
         this.BordersFrom[ReplaceFrom] = new boolean[world.getBiomesCount()];
 
         for (int i = 0; i < this.BordersFrom[ReplaceFrom].length; i++)
         {
+            // TODO: This is as an incorrect assumption when we move to static id allocation.
+            // TODO: This assumes they all come in order which is wrong.
             LocalBiome biome = world.getBiomeById(i);
             this.BordersFrom[ReplaceFrom][i] = biome == null || !ReplaceTo.NotBorderNear.contains(biome.getName());
         }
         this.BordersTo[ReplaceFrom] = ReplaceTo.Biome.getId();
-
     }
 
     @Override

@@ -85,6 +85,7 @@ public class BukkitWorld implements LocalWorld
         return biome;
     }
 
+    // TODO: With static id allocation we need to search for non-nulls using a for loop instead.
     public int getBiomesCount()
     {
         return NextBiomeId;
@@ -189,33 +190,33 @@ public class BukkitWorld implements LocalWorld
         {
             case Tree:
                 Tree.a(this.world, rand, x, y, z);
-                break;
+            break;
             case BigTree:
                 BigTree.a(1.0D, 1.0D, 1.0D);
                 BigTree.a(this.world, rand, x, y, z);
-                break;
+            break;
             case Forest:
                 Forest.a(this.world, rand, x, y, z);
-                break;
+            break;
             case HugeMushroom:
                 HugeMushroom.a(1.0D, 1.0D, 1.0D);
                 HugeMushroom.a(this.world, rand, x, y, z);
-                break;
+            break;
             case SwampTree:
                 SwampTree.a(this.world, rand, x, y, z);
-                break;
+            break;
             case Taiga1:
                 TaigaTree1.a(this.world, rand, x, y, z);
-                break;
+            break;
             case Taiga2:
                 TaigaTree2.a(this.world, rand, x, y, z);
-                break;
+            break;
             case JungleTree:
                 JungleTree.a(this.world, rand, x, y, z);
-                break;
+            break;
             case GroundBush:
                 GroundBush.a(this.world, rand, x, y, z);
-                break;
+            break;
         }
     }
 
@@ -464,7 +465,6 @@ public class BukkitWorld implements LocalWorld
         return worldHeight;
     }
 
-
     public int getHeightBits()
     {
         return heightBits;
@@ -488,7 +488,6 @@ public class BukkitWorld implements LocalWorld
         // TODO: Should WorldProviderTC extend even more? For example for spawn point etc?
         // this.world.worldProvider = new TCWorldProvider().setSeaLevel(this.settings.waterLevelMax); // cause errors with entity burn, disabled temporary.
 
-
         this.ChunkCache = new Chunk[4];
 
         switch (this.settings.ModeTerrain)
@@ -511,12 +510,10 @@ public class BukkitWorld implements LocalWorld
             case TerrainTest:
             case NotGenerate:
                 this.generator.Init(this);
-                break;
+            break;
             case Default:
-                break;
+            break;
         }
-
-
     }
 
     public void setChunkGenerator(TCChunkGenerator _generator)
