@@ -20,11 +20,13 @@ public class BukkitWorld implements LocalWorld
     private IBiomeManager biomeManager;
     private TCWorldChunkManagerOld old_biomeManager;
 
+    // TODO: We must refactor so fields start with lowercase chars.
+    // TODO: It is bad practice to use a big char as start of a field name.
+    
     private static int NextBiomeId = DefaultBiome.values().length;
     private static LocalBiome[] Biomes = new LocalBiome[256];
-    private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
+    private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>(); // TODO: Why is this field non static? shouldn't it be static?
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
-
 
     private WorldGenStronghold strongholdGen;
     private WorldGenVillage VillageGen;
@@ -39,7 +41,6 @@ public class BukkitWorld implements LocalWorld
     private WorldGenHugeMushroom HugeMushroom;
     private WorldGenMegaTree JungleTree;
     private WorldGenGroundBush GroundBush;
-
 
     private boolean CreateNewChunks;
     private Chunk[] ChunkCache;
@@ -77,30 +78,43 @@ public class BukkitWorld implements LocalWorld
         return new NullBiome(name);
     }
 
-    public LocalBiome AddBiome(String name)
+    // TODO: Should this method take the id as a parameter?
+    public LocalBiome AddBiome(String name, int id)
     {
-        LocalBiome biome = new BukkitBiome(new CustomBiome(NextBiomeId++, name));
+        // TODO: Temporary override to previous state:
+        id = NextBiomeId++;
+        
+        // We may not overwrite an existing id?
+        // TODO: But what about the default biomes then? How are they handled?
+        LocalBiome currentBiome = getBiomeById(id);
+        if (currentBiome != null) return null;
+        
+        LocalBiome biome = new BukkitBiome(new CustomBiome(id, name));
         Biomes[biome.getId()] = biome;
         this.BiomeNames.put(biome.getName(), biome);
         return biome;
     }
 
     // TODO: With static id allocation we need to search for non-nulls using a for loop instead.
-    public int getBiomesCount()
+   /* public int getBiomesCount()
     {
         return NextBiomeId;
-    }
+    }*/
 
+    // TODO: Why are we fetching values from a static variable from within an instance method?
+    // TODO: This is bad practice.
     public LocalBiome getBiomeById(int id)
     {
         return Biomes[id];
     }
 
+    // TODO: Why is BiomeNames a instance field as opposed to Biomes?
     public LocalBiome getBiomeByName(String name)
     {
         return this.BiomeNames.get(name);
     }
 
+    // TODO: NPE check is missing!
     public int getBiomeIdByName(String name)
     {
         return this.BiomeNames.get(name).getId();
@@ -151,6 +165,7 @@ public class BukkitWorld implements LocalWorld
         return this.world.worldProvider.c.getBiome(x, z).id;
     }
 
+    // TODO: Why reach static var from instance method????
     public LocalBiome getLocalBiome(int x, int z)
     {
         return Biomes[this.getBiome(x, z)];

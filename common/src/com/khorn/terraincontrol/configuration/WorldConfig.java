@@ -5,17 +5,13 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 
-
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-
 public class WorldConfig extends ConfigFile
 {
-
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
 
     public ArrayList<String> NormalBiomes = new ArrayList<String>();
@@ -35,12 +31,10 @@ public class WorldConfig extends ConfigFile
     // For old biome generator
     public double oldBiomeSize;
 
-
     public float minMoisture;
     public float maxMoisture;
     public float minTemperature;
     public float maxTemperature;
-
 
     // Biome generator
     public int GenerationDepth;
@@ -61,7 +55,6 @@ public class WorldConfig extends ConfigFile
     public boolean FrozenOcean;
 
     // Look settings
-
     public int WorldFog;
     public float WorldFogR;
     public float WorldFogG;
@@ -94,7 +87,6 @@ public class WorldConfig extends ConfigFile
     public boolean evenCaveDistribution;
 
     //Canyons
-
     public int canyonRarity;
     public int canyonMinAltitude;
     public int canyonMaxAltitude;
@@ -103,7 +95,6 @@ public class WorldConfig extends ConfigFile
     public double canyonDepth;
 
     //Terrain
-
     public boolean oldTerrainGenerator;
 
     public int waterLevelMax;
@@ -122,10 +113,6 @@ public class WorldConfig extends ConfigFile
 
     public boolean removeSurfaceStone;
 
-
-
-
-
     public boolean customObjects;
     public int objectSpawnRatio;
     public boolean denyObjectsUnderFill;
@@ -135,9 +122,7 @@ public class WorldConfig extends ConfigFile
     public boolean MineshaftsEnabled;
     public boolean VillagesEnabled;
 
-
     private File SettingsDir;
-
 
     public boolean isDeprecated = false;
     public WorldConfig newSettings = null;
@@ -146,17 +131,13 @@ public class WorldConfig extends ConfigFile
     public TerrainMode ModeTerrain;
     public BiomeMode ModeBiome;
 
-
     public BiomeConfig[] biomeConfigs;
     public boolean BiomeConfigsHaveReplacement = false;
-
 
     public int normalBiomesRarity;
     public int iceBiomesRarity;
 
     public int worldHeightBits;
-
-
     public int WorldHeight;
 
     public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
@@ -193,10 +174,12 @@ public class WorldConfig extends ConfigFile
             if (checkOnly)
                 biomes.add(world.getNullBiome(biomeName));
             else
-                biomes.add(world.AddBiome(biomeName));
+                biomes.add(world.AddBiome(biomeName, 9999999));
+            // TODO: So this is going to be a bit tricky. 
+            // TODO: We may need to fix the order stuff is done. Config-files should be read first and afterwards id's should be allocated not the other way around.
         }
 
-        this.biomeConfigs = new BiomeConfig[world.getBiomesCount()];
+        this.biomeConfigs = new BiomeConfig[BiomeConfig.idMaxCount];
 
         for (LocalBiome localBiome : biomes)
         {
@@ -310,6 +293,7 @@ public class WorldConfig extends ConfigFile
         {
             this.ModeBiome = BiomeMode.Normal;
         }
+        
         this.worldHeightBits = ReadModSettings(TCDefaultValues.WorldHeightBits.name(), TCDefaultValues.WorldHeightBits.intValue());
         this.worldHeightBits = CheckValue(this.worldHeightBits, 5, 8);
 
@@ -336,7 +320,6 @@ public class WorldConfig extends ConfigFile
         this.FrozenRivers = ReadModSettings(TCDefaultValues.FrozenRivers.name(), TCDefaultValues.FrozenRivers.booleanValue());
         this.FrozenOcean = ReadModSettings(TCDefaultValues.FrozenOcean.name(), TCDefaultValues.FrozenOcean.booleanValue());
 
-
         this.NormalBiomes = this.ReadModSettings(TCDefaultValues.NormalBiomes.name(), TCDefaultValues.NormalBiomes.StringArrayListValue());
         this.IceBiomes = this.ReadModSettings(TCDefaultValues.IceBiomes.name(), TCDefaultValues.IceBiomes.StringArrayListValue());
         this.IsleBiomes = this.ReadModSettings(TCDefaultValues.IsleBiomes.name(), TCDefaultValues.IsleBiomes.StringArrayListValue());
@@ -348,7 +331,6 @@ public class WorldConfig extends ConfigFile
         this.minTemperature = ReadModSettings(TCDefaultValues.minTemperature.name(), TCDefaultValues.minTemperature.floatValue());
         this.maxTemperature = ReadModSettings(TCDefaultValues.maxTemperature.name(), TCDefaultValues.maxTemperature.floatValue());
 
-
         this.muddySwamps = ReadModSettings(TCDefaultValues.muddySwamps.name(), TCDefaultValues.muddySwamps.booleanValue());
         this.claySwamps = ReadModSettings(TCDefaultValues.claySwamps.name(), TCDefaultValues.claySwamps.booleanValue());
         this.swampSize = ReadModSettings(TCDefaultValues.swampSize.name(), TCDefaultValues.swampSize.intValue());
@@ -356,7 +338,6 @@ public class WorldConfig extends ConfigFile
         this.waterlessDeserts = ReadModSettings(TCDefaultValues.waterlessDeserts.name(), TCDefaultValues.waterlessDeserts.booleanValue());
         this.desertDirt = ReadModSettings(TCDefaultValues.desertDirt.name(), TCDefaultValues.desertDirt.booleanValue());
         this.desertDirtFrequency = ReadModSettings(TCDefaultValues.desertDirtFrequency.name(), TCDefaultValues.desertDirtFrequency.intValue());
-
 
         this.WorldFog = ReadModSettingsColor(TCDefaultValues.WorldFog.name(), TCDefaultValues.WorldFog.stringValue());
         this.WorldNightFog = ReadModSettingsColor(TCDefaultValues.WorldNightFog.name(), TCDefaultValues.WorldNightFog.stringValue());
@@ -372,7 +353,6 @@ public class WorldConfig extends ConfigFile
         this.StrongholdsEnabled = ReadModSettings(TCDefaultValues.StrongholdsEnabled.name(), TCDefaultValues.StrongholdsEnabled.booleanValue());
         this.VillagesEnabled = ReadModSettings(TCDefaultValues.VillagesEnabled.name(), TCDefaultValues.VillagesEnabled.booleanValue());
         this.MineshaftsEnabled = ReadModSettings(TCDefaultValues.MineshaftsEnabled.name(), TCDefaultValues.MineshaftsEnabled.booleanValue());
-
 
         this.caveRarity = ReadModSettings(TCDefaultValues.caveRarity.name(), TCDefaultValues.caveRarity.intValue());
         this.caveFrequency = ReadModSettings(TCDefaultValues.caveFrequency.name(), TCDefaultValues.caveFrequency.intValue());
@@ -391,7 +371,6 @@ public class WorldConfig extends ConfigFile
         this.canyonMinLength = ReadModSettings(TCDefaultValues.canyonMinLength.name(), TCDefaultValues.canyonMinLength.intValue());
         this.canyonMaxLength = ReadModSettings(TCDefaultValues.canyonMaxLength.name(), TCDefaultValues.canyonMaxLength.intValue());
         this.canyonDepth = ReadModSettings(TCDefaultValues.canyonDepth.name(), TCDefaultValues.canyonDepth.doubleValue());
-
 
         this.waterLevelMax = ReadModSettings(TCDefaultValues.WaterLevelMax.name(), this.waterLevelMax);
         this.waterLevelMin = ReadModSettings(TCDefaultValues.WaterLevelMin.name(), TCDefaultValues.WaterLevelMin.intValue());
@@ -508,7 +487,6 @@ public class WorldConfig extends ConfigFile
         WriteComment("Any changes here need server restart.");
         WriteValue(TCDefaultValues.CustomBiomes.name(), this.CustomBiomes);
 
-
         /* Removed .. not sure this need someone
         WriteTitle("Swamp Biome Variables");
         WriteValue(TCDefaultValues.muddySwamps.name(), this.muddySwamps);
@@ -520,7 +498,6 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.desertDirt.name(), this.desertDirt);
         WriteValue(TCDefaultValues.desertDirtFrequency.name(), this.desertDirtFrequency);
         */
-
 
         WriteTitle("Terrain Generator Variables");
         WriteComment("Height bits determinate generation height. Min 5, max 8");
@@ -546,7 +523,6 @@ public class WorldConfig extends ConfigFile
         WriteComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured vertically.");
         WriteComment("Positive values will lead to large cliffs/overhangs, floating islands, and/or a cavern world depending on other settings.");
         WriteValue(TCDefaultValues.FractureVertical.name(), this.fractureVertical);
-
 
         WriteNewLine();
         WriteComment("Attempts to replace all surface stone with biome surface block");
@@ -613,7 +589,6 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.caveSystemPocketMinSize.name(), this.caveSystemPocketMinSize);
         WriteValue(TCDefaultValues.caveSystemPocketMaxSize.name(), this.caveSystemPocketMaxSize);
         WriteValue(TCDefaultValues.evenCaveDistribution.name(), this.evenCaveDistribution);
-
 
         WriteTitle("Canyon Variables");
         WriteValue(TCDefaultValues.canyonRarity.name(), this.canyonRarity);
@@ -826,7 +801,11 @@ public class WorldConfig extends ConfigFile
         }
     }
 
-    public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
+    // TODO: Why do we have this constructor AND the one above?
+    // TODO: Only one of them should be used.
+    // TODO: Having this constructor for the client breaks the rule that the code in common should not case about client or server edition specifically.
+    
+    /*public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
     {
         // Protocol version
         stream.readInt();
@@ -873,7 +852,7 @@ public class WorldConfig extends ConfigFile
             this.CustomBiomes.add(name);
         }
 
-        this.biomeConfigs = new BiomeConfig[world.getBiomesCount()];
+        this.biomeConfigs = new BiomeConfig[BiomeConfig.idMaxCount];
 
         String name = ReadStringFromStream(stream);
         BiomeConfig config = new BiomeConfig(stream, this, world.getBiomeByName(name));
@@ -932,7 +911,7 @@ public class WorldConfig extends ConfigFile
             if (biomeConfig != null && biomeConfig.Biome.isCustom())
                 biomeConfig.Biome.setCustom(biomeConfig);
 
-    }
+    }*/
 
 
     private BiomeConfig getConfigByName(String name)
@@ -944,5 +923,4 @@ public class WorldConfig extends ConfigFile
         }
         return null;
     }
-
 }

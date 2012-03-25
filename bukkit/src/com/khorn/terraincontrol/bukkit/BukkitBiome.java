@@ -5,6 +5,10 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import net.minecraft.server.BiomeBase;
 
+/**
+ * The BukkitBiome is basically a wrapper for the BiomeBase.
+ * If you look at the constructor and the method you will see that this is the case.
+ */
 public class BukkitBiome implements LocalBiome
 {
     private BiomeBase biomeBase;

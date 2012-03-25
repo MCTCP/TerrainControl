@@ -9,11 +9,11 @@ import java.util.Random;
 public interface LocalWorld
 {
     //Biome init
-    public LocalBiome AddBiome(String name);
+    public LocalBiome AddBiome(String name, int id);
 
     public LocalBiome getNullBiome(String name);
 
-    public int getBiomesCount();
+    //public int getBiomesCount(); // With static id allocation this is not a required feature.
 
     public LocalBiome getBiomeById(int id);
 
