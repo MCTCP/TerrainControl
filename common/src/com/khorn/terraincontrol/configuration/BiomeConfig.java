@@ -17,6 +17,11 @@ import java.util.Map;
 
 public class BiomeConfig extends ConfigFile
 {
+	// the biome id must be between 50 and 255
+	public int id;
+	public final static int idMin = 50;
+	public final static int idMax = 255;
+	
     public short[][] ReplaceMatrixBlocks = new short[256][];
     public int ReplaceCount = 0;
 
@@ -299,6 +304,7 @@ public class BiomeConfig extends ConfigFile
 
     protected void ReadConfigSettings()
     {
+    	this.id = ReadModSettings(TCDefaultValues.id.name(), TCDefaultValues.id.intValue());
         this.BiomeSize = ReadModSettings(TCDefaultValues.BiomeSize.name(), this.DefaultSize);
         this.BiomeRarity = ReadModSettings(TCDefaultValues.BiomeRarity.name(), this.DefaultRarity);
 
@@ -489,6 +495,14 @@ public class BiomeConfig extends ConfigFile
         WriteTitle(this.Name + " biome config");
 
         this.WriteNewLine();
+        
+        WriteComment("The id of the biome must be unique for all biomes on the server.");
+        WriteComment("The available id's range from 0 to 255 and the first 22 is occupied by vanilla minecraft biomes.");
+        WriteComment("To leave room for future vanilla biomes we suggest your custom biomes start at id 50.");
+        WriteComment("The id for the biome will be saved to disc together with the chunk data (new feature since the Anvil map format).");
+        WriteComment("This means that if you change the biome id after you generated your map, the ids in the map wont change.");
+        WriteComment("Orphaned ids are interpreted as id 1 = Plains. Example things that depend on the biome id is mob spawning and growth from saplings.");
+        WriteValue(TCDefaultValues.id.name(), this.id);
 
         WriteComment("Biome size from 0 to GenerationDepth. Show in what zoom level biome will be generated ( see GenerationDepth)");
         WriteComment("Higher numbers = less zoom this biome, lower numbers = more zoom");
