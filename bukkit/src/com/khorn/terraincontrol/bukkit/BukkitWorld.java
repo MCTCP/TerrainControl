@@ -363,7 +363,7 @@ public class BukkitWorld implements LocalWorld
         for (int y = worldHeight - 1; y > 0; y--)
         {
             int blockId = chunk.getTypeId(x, y, z);
-            if (blockId != 0 && Block.byId[blockId].material.isLiquid())
+            if (blockId != 0 && DefaultMaterial.getMaterial(blockId).isLiquid() )
                 return y;
         }
         return -1;

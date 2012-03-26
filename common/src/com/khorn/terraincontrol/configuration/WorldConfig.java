@@ -14,7 +14,7 @@ import java.util.*;
 public class WorldConfig extends ConfigFile
 {
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
-    public HashMap<String,Integer> CustomBiomeIds = new HashMap<String, Integer>();
+    public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
 
     public ArrayList<String> NormalBiomes = new ArrayList<String>();
     public ArrayList<String> IceBiomes = new ArrayList<String>();
@@ -159,9 +159,9 @@ public class WorldConfig extends ConfigFile
 
         // Check biome ids
 
-        for( String biomeName : CustomBiomes)
-            if(CustomBiomeIds.get(biomeName) == -1)
-                CustomBiomeIds.put(biomeName,world.getFreeBiomeId());
+        for (String biomeName : CustomBiomes)
+            if (CustomBiomeIds.get(biomeName) == -1)
+                CustomBiomeIds.put(biomeName, world.getFreeBiomeId());
 
         // Need add check to clashes
 
@@ -187,7 +187,7 @@ public class WorldConfig extends ConfigFile
                 localBiomes.add(world.getNullBiome(biomeName));
             else
                 localBiomes.add(world.AddBiome(biomeName, this.CustomBiomeIds.get(biomeName)));
-         }
+        }
 
         this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
@@ -459,10 +459,11 @@ public class WorldConfig extends ConfigFile
         WriteNewLine();
         WriteValue(TCDefaultValues.RiversEnabled.name(), this.riversEnabled);  */
 
-        WriteComment("Main value for generation.Bigger value increase zoom. All sizes must be smaller than this.");
-        WriteComment("So if you want big biome object you must set size of object near 0 ");
-        WriteComment("If you want small object you must set size of object near  GenerationDepth");
-        WriteComment("Also small values (about 1-2) and big values (about 20) may affect generator performance");
+        WriteComment("IMPORTANT value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.");
+        WriteComment("Large %/total area biomes (Continents) must be set small, (limit=0)");
+        WriteComment("Small %/total area biomes (Oasis,Mountain Peaks) must be larger (limit=GenerationDepth)");
+        WriteComment("This could also represent \"Total number of biome sizes\" ");
+        WriteComment("Small values (about 1-2) and Large values (about 20) may affect generator performance.");
         WriteValue(TCDefaultValues.GenerationDepth.name(), this.GenerationDepth);
         WriteNewLine();
 
@@ -610,7 +611,7 @@ public class WorldConfig extends ConfigFile
         this.WriteValue(TCDefaultValues.CustomObjects.name(), this.customObjects);
 
         WriteNewLine();
-        WriteComment("Number of attempts for place rep chunk");
+        WriteComment("Number of attempts for place per chunk");
         this.WriteValue(TCDefaultValues.objectSpawnRatio.name(), Integer.valueOf(this.objectSpawnRatio).intValue());
 
         WriteNewLine();
@@ -622,15 +623,35 @@ public class WorldConfig extends ConfigFile
 
 
         WriteTitle("Cave Variables");
+
+        WriteComment("TerrainControl attempts once per chunk to create a cave or cave system.");
+        WriteComment("This is chance of success on that attempt.");
         WriteValue(TCDefaultValues.caveRarity.name(), this.caveRarity);
+        WriteNewLine();
+        WriteComment("If successful, It tries to add this many caves in that chunk but trends towards lower results.");
+        WriteComment("Input of 40 tends to result in 5-6 caves or cave systems starting per chunk.");
         WriteValue(TCDefaultValues.caveFrequency.name(), this.caveFrequency);
+        WriteNewLine();
+        WriteComment("Trends towards lower elevations.");
         WriteValue(TCDefaultValues.caveMinAltitude.name(), this.caveMinAltitude);
         WriteValue(TCDefaultValues.caveMaxAltitude.name(), this.caveMaxAltitude);
+        WriteNewLine();
+        WriteComment("Chance that any cave made during \" caveFrequency\" will generate without a connecting cave or system.");
+        WriteComment("Will also attempt to create a pocket - a higher than normal density of cave systems nearby, however no guarantee of connecting to it.");
         WriteValue(TCDefaultValues.individualCaveRarity.name(), this.individualCaveRarity);
+        WriteNewLine();
+        WriteComment("Number of attempts during \" caveFreqency\" to start a system instead of continuing a single cave.");
+        WriteComment("Warning:High values cause extremely slow world generation and lag.");
         WriteValue(TCDefaultValues.caveSystemFrequency.name(), this.caveSystemFrequency);
+        WriteNewLine();
+        WriteComment("Adds additional attempts for cave pocket after \"individualCaveRarity\" attempts.");
         WriteValue(TCDefaultValues.caveSystemPocketChance.name(), this.caveSystemPocketChance);
+        WriteNewLine();
+        WriteComment("When triggered, Overrides \"caveFrequency\"");
         WriteValue(TCDefaultValues.caveSystemPocketMinSize.name(), this.caveSystemPocketMinSize);
         WriteValue(TCDefaultValues.caveSystemPocketMaxSize.name(), this.caveSystemPocketMaxSize);
+        WriteNewLine();
+        WriteComment("Turns off Randomizer = CAVES EVERYWHERE!");
         WriteValue(TCDefaultValues.evenCaveDistribution.name(), this.evenCaveDistribution);
 
         WriteTitle("Canyon Variables");

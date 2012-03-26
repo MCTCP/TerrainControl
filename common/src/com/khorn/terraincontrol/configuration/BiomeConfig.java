@@ -491,8 +491,8 @@ public class BiomeConfig extends ConfigFile
         WriteTitle(this.Name + " biome config");
         
 
-        WriteComment("Biome size from 0 to GenerationDepth. Show in what zoom level biome will be generated ( see GenerationDepth)");
-        WriteComment("Higher numbers = less zoom this biome, lower numbers = more zoom");
+        WriteComment("Biome size from 0 to GenerationDepth. Show in what zoom level biome will be generated (see GenerationDepth)");
+        WriteComment("Higher numbers=Smaller% of world / Lower numbers=Bigger % of world");
         WriteComment("Don`t work on Ocean and River (frozen versions too) biomes until not added as normal biome.");
         WriteValue(TCDefaultValues.BiomeSize.name(), this.BiomeSize);
         this.WriteNewLine();
