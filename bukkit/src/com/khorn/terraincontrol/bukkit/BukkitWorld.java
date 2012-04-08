@@ -22,11 +22,11 @@ public class BukkitWorld implements LocalWorld
 
     // TODO: We must refactor so fields start with lowercase chars.
     // TODO: It is bad practice to use a big char as start of a field name.
-    
+
     private static int NextBiomeId = DefaultBiome.values().length;
     private static int maxBiomeCount = 256;
     private static LocalBiome[] Biomes = new LocalBiome[maxBiomeCount];
-    
+
     private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 
@@ -56,8 +56,8 @@ public class BukkitWorld implements LocalWorld
     //TODO do something with that when bukkit allow custom world height.
     private int worldHeight = 256;
     private int heightBits = 8;
-    
-    private int CustomBiomesCount  = 21;
+
+    private int CustomBiomesCount = 21;
 
     static
     {
@@ -202,33 +202,33 @@ public class BukkitWorld implements LocalWorld
         {
             case Tree:
                 Tree.a(this.world, rand, x, y, z);
-            break;
+                break;
             case BigTree:
                 BigTree.a(1.0D, 1.0D, 1.0D);
                 BigTree.a(this.world, rand, x, y, z);
-            break;
+                break;
             case Forest:
                 Forest.a(this.world, rand, x, y, z);
-            break;
+                break;
             case HugeMushroom:
                 HugeMushroom.a(1.0D, 1.0D, 1.0D);
                 HugeMushroom.a(this.world, rand, x, y, z);
-            break;
+                break;
             case SwampTree:
                 SwampTree.a(this.world, rand, x, y, z);
-            break;
+                break;
             case Taiga1:
                 TaigaTree1.a(this.world, rand, x, y, z);
-            break;
+                break;
             case Taiga2:
                 TaigaTree2.a(this.world, rand, x, y, z);
-            break;
+                break;
             case JungleTree:
                 JungleTree.a(this.world, rand, x, y, z);
-            break;
+                break;
             case GroundBush:
                 GroundBush.a(this.world, rand, x, y, z);
-            break;
+                break;
         }
     }
 
@@ -363,7 +363,7 @@ public class BukkitWorld implements LocalWorld
         for (int y = worldHeight - 1; y > 0; y--)
         {
             int blockId = chunk.getTypeId(x, y, z);
-            if (blockId != 0 && DefaultMaterial.getMaterial(blockId).isLiquid() )
+            if (blockId != 0 && DefaultMaterial.contains(blockId) && DefaultMaterial.getMaterial(blockId).isLiquid())
                 return y;
         }
         return -1;
@@ -522,9 +522,9 @@ public class BukkitWorld implements LocalWorld
             case TerrainTest:
             case NotGenerate:
                 this.generator.Init(this);
-            break;
+                break;
             case Default:
-            break;
+                break;
         }
     }
 

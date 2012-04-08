@@ -173,6 +173,14 @@ public enum DefaultMaterial
     {
         return lookupName.get(name);
     }
+    public static boolean contains(String name)
+    {
+        return lookupName.containsKey(name);
+    }
+    public static boolean contains(int id)
+    {
+        return id < 256 && lookupID[id]!= null;
+    }
 
     public static DefaultMaterial getMaterial(int id)
     {

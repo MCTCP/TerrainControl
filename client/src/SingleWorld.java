@@ -350,7 +350,7 @@ public class SingleWorld implements LocalWorld
         for (int y = worldHeight - 1; y > 0; y--)
         {
             int blockId = chunk.a(x, y, z);
-            if (blockId != 0 && DefaultMaterial.getMaterial(blockId).isLiquid() )
+            if (blockId != 0 && DefaultMaterial.contains(blockId) && DefaultMaterial.getMaterial(blockId).isLiquid())
                 return y;
         }
         return -1;
