@@ -3,9 +3,9 @@ import com.khorn.terraincontrol.LocalBiome;
 
 public class Biome implements LocalBiome
 {
-    private abi biomeBase;
+    private abn biomeBase;
 
-    public Biome(abi biome)
+    public Biome(abn biome)
     {
         this.biomeBase = biome;
     }

@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
 import java.util.List;
 import java.util.Random;
 
-public class BiomeManagerOld extends ro implements IBiomeManager
+public class BiomeManagerOld extends rs implements IBiomeManager
 {
 
     private WorldConfig localWrk;
@@ -17,12 +17,12 @@ public class BiomeManagerOld extends ro implements IBiomeManager
     public double[] old_temperature;
     public double[] old_rain;
     private double[] old_temperature2;
-    private abi[] temp_biomeBases;
-    private pj Cache = new pj(this);
+    private abn[] temp_biomeBases;
+    private pn Cache = new pn(this);
 
 
 
-    private static abi[] BiomeDiagram = new abi[4096];
+    private static abn[] BiomeDiagram = new abn[4096];
 
     public BiomeManagerOld(LocalWorld world)
     {
@@ -36,7 +36,7 @@ public class BiomeManagerOld extends ro implements IBiomeManager
     }
 
     @Override
-    public abi a(int i, int i1)
+    public abn a(int i, int i1)
     {
         return this.Cache.b(i, i1);
     }
@@ -98,22 +98,22 @@ public class BiomeManagerOld extends ro implements IBiomeManager
     }
 
     @Override
-    public abi[] a(abi[] biomeBases, int x, int z, int x_size, int z_size)
+    public abn[] a(abn[] biomeBases, int x, int z, int x_size, int z_size)
     {
         return this.a(biomeBases, x, z, x_size, z_size, false);
     }
 
 
     @Override
-    public abi[] a(abi[] paramArrayOfzp, int x, int z, int x_size, int z_size, boolean useCache)
+    public abn[] a(abn[] paramArrayOfzp, int x, int z, int x_size, int z_size, boolean useCache)
     {
         if ((paramArrayOfzp == null) || (paramArrayOfzp.length < x_size * z_size))
         {
-            paramArrayOfzp = new abi[x_size * z_size];
+            paramArrayOfzp = new abn[x_size * z_size];
         }
         if ((useCache) && (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
-            abi[] localObject = this.Cache.c(x, z);
+            abn[] localObject = this.Cache.c(x, z);
             System.arraycopy(localObject, 0, paramArrayOfzp, 0, x_size * z_size);
             return paramArrayOfzp;
         }
@@ -175,7 +175,7 @@ public class BiomeManagerOld extends ro implements IBiomeManager
         int n = k - i + 1;
         int i1 = m - j + 1;
 
-        abi[] biomeArray = null;
+        abn[] biomeArray = null;
 
         biomeArray = this.a(biomeArray, i, j, n, i1);
         for (int i2 = 0; i2 < n * i1; i2++)
@@ -190,7 +190,7 @@ public class BiomeManagerOld extends ro implements IBiomeManager
     //StrongholdPosition
     @Override
     @SuppressWarnings("rawtypes")
-    public qk a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
+    public qo a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
     {
         int i = paramInt1 - paramInt3 >> 2;
         int j = paramInt2 - paramInt3 >> 2;
@@ -199,10 +199,10 @@ public class BiomeManagerOld extends ro implements IBiomeManager
 
         int n = k - i + 1;
         int i1 = m - j + 1;
-        abi[] biomeArray = null;
+        abn[] biomeArray = null;
 
         biomeArray = this.a(biomeArray, i, j, n, i1);
-        qk localChunkPosition = null;
+        qo localChunkPosition = null;
         int i2 = 0;
         for (int i3 = 0; i3 < biomeArray.length; i3++)
         {
@@ -210,7 +210,7 @@ public class BiomeManagerOld extends ro implements IBiomeManager
             int i5 = j + i3 / n << 2;
             if ((!paramList.contains(biomeArray[i2])) || ((localChunkPosition != null) && (paramRandom.nextInt(i2 + 1) != 0)))
                 continue;
-            localChunkPosition = new qk(i4, 0, i5);
+            localChunkPosition = new qo(i4, 0, i5);
             i2++;
         }
 
@@ -225,7 +225,7 @@ public class BiomeManagerOld extends ro implements IBiomeManager
     }
 
 
-    private static abi getBiomeFromDiagram(double temp, double rain)
+    private static abn getBiomeFromDiagram(double temp, double rain)
     {
         int i = (int) (temp * 63.0D);
         int j = (int) (rain * 63.0D);
@@ -243,42 +243,42 @@ public class BiomeManagerOld extends ro implements IBiomeManager
         }
     }
 
-    private static abi getBiomeDiagram(double paramFloat1, double paramFloat2)
+    private static abn getBiomeDiagram(double paramFloat1, double paramFloat2)
     {
 
         paramFloat2 *= paramFloat1;
         if (paramFloat1 < 0.1F)
-            return abi.c;
+            return abn.c;
         if (paramFloat2 < 0.2F)
         {
             if (paramFloat1 < 0.5F)
-                return abi.c;
+                return abn.c;
             if (paramFloat1 < 0.95F)
             {
-                return abi.c;
+                return abn.c;
             }
-            return abi.d;
+            return abn.d;
         }
         if ((paramFloat2 > 0.5F) && (paramFloat1 < 0.7F))
-            return abi.h;
+            return abn.h;
         if (paramFloat1 < 0.5F)
-            return abi.g;
+            return abn.g;
         if (paramFloat1 < 0.97F)
         {
             if (paramFloat2 < 0.35F)
             {
-                return abi.g;
+                return abn.g;
             }
-            return abi.f;
+            return abn.f;
         }
 
         if (paramFloat2 < 0.45F)
-            return abi.c;
+            return abn.c;
         if (paramFloat2 < 0.9F)
         {
-            return abi.f;
+            return abn.f;
         }
-        return abi.f;
+        return abn.f;
     }
 
     public int[] getBiomesUnZoomedTC(int[] biomeArray, int x, int z, int x_size, int z_size)
@@ -289,7 +289,7 @@ public class BiomeManagerOld extends ro implements IBiomeManager
         }
         if ( (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
-            abi[] localObject = this.Cache.c(x, z);
+            abn[] localObject = this.Cache.c(x, z);
             for(int i= 0; i< x_size*z_size;i++)
                 biomeArray[i] = localObject[i].M;
             return biomeArray;

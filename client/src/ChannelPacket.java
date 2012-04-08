@@ -1,8 +1,8 @@
 
-public class ChannelPacket extends eb
+public class ChannelPacket extends ee
 {
    @Override
-    public void a(oa oa)
+    public void a(oe oa)
     {
         TCClient.ReceiveConfig(this);
 

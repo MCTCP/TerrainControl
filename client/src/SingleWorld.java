@@ -10,7 +10,7 @@ import java.util.Random;
 public class SingleWorld implements LocalWorld
 {
     private ChunkProvider generator;
-    private wz world;
+    private xd world;
     private WorldConfig settings;
     private String name;
     private long Seed;
@@ -20,38 +20,38 @@ public class SingleWorld implements LocalWorld
     private static int NextBiomeId = 0;
     private static int maxBiomeCount = 256;
     private static LocalBiome[] Biomes = new LocalBiome[maxBiomeCount];
-    private static abi[] BiomesToRestore = new abi[maxBiomeCount];
+    private static abn[] BiomesToRestore = new abn[maxBiomeCount];
 
     private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
 
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 
 
-    private xm strongholdGen;
-    private am VillageGen;
-    private ali MineshaftGen;
+    private xq strongholdGen;
+    private an VillageGen;
+    private alo MineshaftGen;
 
-    private lf DungeonGen;
+    private dq DungeonGen;
 
-    private rx Tree;
-    private zu BigTree;
+    private sb Tree;
+    private zz BigTree;
     private i Forest;
-    private bd SwampTree;
-    private ll TaigaTree1;
-    private qx TaigaTree2;
-    private qi HugeMushroom;
-    private aix JungleTree;
-    private agg GroundBush;
+    private bf SwampTree;
+    private lo TaigaTree1;
+    private rb TaigaTree2;
+    private qm HugeMushroom;
+    private ajd JungleTree;
+    private agm GroundBush;
 
 
     private boolean CreateNewChunks;
-    private acf[] ChunkCache;
-    private acf CachedChunk;
+    private ack[] ChunkCache;
+    private ack CachedChunk;
 
     private int CurrentChunkX;
     private int CurrentChunkZ;
 
-    private abi[] BiomeArray;
+    private abn[] BiomeArray;
 
 
     private int worldHeight = 128;
@@ -60,11 +60,11 @@ public class SingleWorld implements LocalWorld
 
     public static void RestoreBiomes()
     {
-        for (abi oldBiome : BiomesToRestore)
+        for (abn oldBiome : BiomesToRestore)
         {
             if (oldBiome == null)
                 continue;
-            abi.a[oldBiome.M] = oldBiome;
+            abn.a[oldBiome.M] = oldBiome;
         }
         NextBiomeId = 0;
         DefaultBiomes.clear();
@@ -78,7 +78,7 @@ public class SingleWorld implements LocalWorld
 
         for (int i = 0; i < DefaultBiome.values().length; i++)
         {
-            abi oldBiome = abi.a[i];
+            abn oldBiome = abn.a[i];
             BiomesToRestore[i] = oldBiome;
             CustomBiome custom = new CustomBiome(NextBiomeId++, oldBiome.y);
             custom.CopyBiome(oldBiome);
@@ -220,7 +220,7 @@ public class SingleWorld implements LocalWorld
 
     public void PlacePonds(int BlockId, Random rand, int x, int y, int z)
     {
-        new cq(BlockId).a(this.world, rand, x, y, z);
+        new cs(BlockId).a(this.world, rand, x, y, z);
     }
 
     public void PlaceIce(int x, int z)
@@ -264,17 +264,17 @@ public class SingleWorld implements LocalWorld
         if (this.settings.BiomeConfigsHaveReplacement)
         {
 
-            acf rawChunk = this.ChunkCache[0];
+            ack rawChunk = this.ChunkCache[0];
 
 
-            zb[] sectionsArray = rawChunk.i();
+            zg[] sectionsArray = rawChunk.i();
 
             this.BiomeArray = this.world.i().b(this.BiomeArray, this.CurrentChunkX * 16, this.CurrentChunkZ * 16, 16, 16);
 
             int x = this.CurrentChunkX * 16;
             int z = this.CurrentChunkZ * 16;
 
-            for (zb section : sectionsArray)
+            for (zg section : sectionsArray)
             {
                 if (section == null)
                     continue;
@@ -320,7 +320,7 @@ public class SingleWorld implements LocalWorld
         this.CreateNewChunks = true;
     }
 
-    private acf getChunk(int x, int y, int z)
+    private ack getChunk(int x, int y, int z)
     {
         if (y < 0 || y >= this.worldHeight)
             return null;
@@ -342,15 +342,15 @@ public class SingleWorld implements LocalWorld
 
     public int getLiquidHeight(int x, int z)
     {
-        acf chunk = this.getChunk(x, 0, z);
+        ack chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = this.worldHeight - 1; y > 0; y--)
+        for (int y = worldHeight - 1; y > 0; y--)
         {
             int blockId = chunk.a(x, y, z);
-            if (blockId != 0 && ox.m[blockId].cd.d())
+            if (blockId != 0 && DefaultMaterial.getMaterial(blockId).isLiquid() )
                 return y;
         }
         return -1;
@@ -363,7 +363,7 @@ public class SingleWorld implements LocalWorld
 
     public int getTypeId(int x, int y, int z)
     {
-        acf chunk = this.getChunk(x, y, z);
+        ack chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return 0;
 
@@ -380,7 +380,7 @@ public class SingleWorld implements LocalWorld
         // this.world.setTypeIdAndData(i, j, k, l, i1)
 
         // We fetch the chunk from a custom cache in order to speed things up.
-        acf chunk = this.getChunk(x, y, z);
+        ack chunk = this.getChunk(x, y, z);
         if (chunk == null)
         {
             return;
@@ -413,7 +413,7 @@ public class SingleWorld implements LocalWorld
 
     public int getHighestBlockYAt(int x, int z)
     {
-        acf chunk = this.getChunk(x, 0, z);
+        ack chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
         z = z & 0xF;
@@ -483,43 +483,37 @@ public class SingleWorld implements LocalWorld
         this.settings = worldConfig;
     }
 
-    public void InitM(wz _world)
+    public void InitM(xd _world)
     {
         this.world = _world;
         this.Seed = world.v();
 
     }
 
-    public void Init(wz _world)
+    public void Init(xd _world)
     {
         this.world = _world;
         this.Seed = world.v();
         //this.world.e = this.settings.waterLevelMax;
 
-        try
-        {
-            this.DungeonGen = (lf) Class.forName("do").newInstance();
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+
+        this.DungeonGen = new dq();
+        this.strongholdGen = new xq();
+        this.VillageGen = new an(0);
+        this.MineshaftGen = new alo();
 
 
-        this.strongholdGen = new xm();
-        this.VillageGen = new am(0);
-        this.MineshaftGen = new ali();
-
-        this.Tree = new rx(false);
-        this.BigTree = new zu(false);
+        this.Tree = new sb(false);
+        this.BigTree = new zz(false);
         this.Forest = new i(false);
-        this.SwampTree = new bd();
-        this.TaigaTree1 = new ll();
-        this.TaigaTree2 = new qx(false);
-        this.HugeMushroom = new qi();
-        this.JungleTree = new aix(false, 15, 3, 3);
-        this.GroundBush = new agg(3, 0);
+        this.SwampTree = new bf();
+        this.TaigaTree1 = new lo();
+        this.TaigaTree2 = new rb(false);
+        this.HugeMushroom = new qm();
+        this.JungleTree = new ajd(false, 15, 3, 3);
+        this.GroundBush = new agm(3, 0);
 
-        this.ChunkCache = new acf[4];
+        this.ChunkCache = new ack[4];
         this.generator = new ChunkProvider(this);
     }
 
@@ -535,7 +529,7 @@ public class SingleWorld implements LocalWorld
         this.biomeManager = manager;
     }
 
-    public wz getWorld()
+    public xd getWorld()
     {
         return this.world;
     }

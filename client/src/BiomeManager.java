@@ -8,14 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class BiomeManager extends ro implements IBiomeManager
+public class BiomeManager extends rs implements IBiomeManager
 {
     private Layer UnZoomedLayer;
     private Layer BiomeLayer;
 
-    private pj Cache = new pj(this);
+    private pn Cache = new pn(this);
 
-    private ArrayList<abi> f = new ArrayList<abi>();
+    private ArrayList<abn> f = new ArrayList<abn>();
 
 
     private WorldConfig worldConfig;
@@ -23,13 +23,13 @@ public class BiomeManager extends ro implements IBiomeManager
 
     public BiomeManager(LocalWorld world)
     {
-        this.f.add(abi.f);
-        this.f.add(abi.c);
-        this.f.add(abi.g);
-        this.f.add(abi.u);
-        this.f.add(abi.t);
-        this.f.add(abi.w);
-        this.f.add(abi.x);
+        this.f.add(abn.f);
+        this.f.add(abn.c);
+        this.f.add(abn.g);
+        this.f.add(abn.u);
+        this.f.add(abn.t);
+        this.f.add(abn.w);
+        this.f.add(abn.x);
 
         this.Init(world);
 
@@ -39,7 +39,7 @@ public class BiomeManager extends ro implements IBiomeManager
     {
         this.worldConfig = world.getSettings();
 
-        this.Cache = new pj(this);
+        this.Cache = new pn(this);
 
 
         Layer[] layers = Layer.Init(world.getSeed(), world);
@@ -56,7 +56,7 @@ public class BiomeManager extends ro implements IBiomeManager
     }
 
     //get biome
-    public abi a(int paramInt1, int paramInt2)
+    public abn a(int paramInt1, int paramInt2)
     {
 
         return this.Cache.b(paramInt1, paramInt2);
@@ -107,40 +107,40 @@ public class BiomeManager extends ro implements IBiomeManager
         return paramArrayOfFloat;
     }
 
-    public abi[] a(abi[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public abn[] a(abn[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < paramInt3 * paramInt4))
         {
-            paramArrayOfBiomeBase = new abi[paramInt3 * paramInt4];
+            paramArrayOfBiomeBase = new abn[paramInt3 * paramInt4];
         }
 
         int[] arrayOfInt = this.UnZoomedLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = abi.a[arrayOfInt[i]];
+            paramArrayOfBiomeBase[i] = abn.a[arrayOfInt[i]];
         }
 
         return paramArrayOfBiomeBase;
     }
 
-    public abi[] a(abi[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
+    public abn[] a(abn[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
     {
         if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < paramInt3 * paramInt4))
         {
-            paramArrayOfBiomeBase = new abi[paramInt3 * paramInt4];
+            paramArrayOfBiomeBase = new abn[paramInt3 * paramInt4];
         }
 
         if ((paramBoolean) && (paramInt3 == 16) && (paramInt4 == 16) && ((paramInt1 & 0xF) == 0) && ((paramInt2 & 0xF) == 0))
         {
 
-            abi[] localObject = this.Cache.c(paramInt1, paramInt2);
+            abn[] localObject = this.Cache.c(paramInt1, paramInt2);
             System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, paramInt3 * paramInt4);
             return paramArrayOfBiomeBase;
         }
         int[] localObject = this.BiomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = abi.a[localObject[i]];
+            paramArrayOfBiomeBase[i] = abn.a[localObject[i]];
         }
 
         return paramArrayOfBiomeBase;
@@ -161,7 +161,7 @@ public class BiomeManager extends ro implements IBiomeManager
         {
             if (arrayOfInt[i2] >= DefaultBiome.values().length)
                 return false;
-            abi localBiomeBase = abi.a[arrayOfInt[i2]];
+            abn localBiomeBase = abn.a[arrayOfInt[i2]];
             if (!paramList.contains(localBiomeBase))
                 return false;
         }
@@ -170,7 +170,7 @@ public class BiomeManager extends ro implements IBiomeManager
     }
 
     @SuppressWarnings("rawtypes")
-    public qk a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
+    public qo a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
     {
         int i = paramInt1 - paramInt3 >> 2;
         int j = paramInt2 - paramInt3 >> 2;
@@ -180,7 +180,7 @@ public class BiomeManager extends ro implements IBiomeManager
         int n = k - i + 1;
         int i1 = m - j + 1;
         int[] arrayOfInt = this.UnZoomedLayer.Calculate(i, j, n, i1);
-        qk localChunkPosition = null;
+        qo localChunkPosition = null;
         int i2 = 0;
         for (int i3 = 0; i3 < arrayOfInt.length; i3++)
         {
@@ -188,10 +188,10 @@ public class BiomeManager extends ro implements IBiomeManager
                 continue;
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            abi localBiomeBase = abi.a[arrayOfInt[i3]];
+            abn localBiomeBase = abn.a[arrayOfInt[i3]];
             if ((!paramList.contains(localBiomeBase)) || ((localChunkPosition != null) && (paramRandom.nextInt(i2 + 1) != 0)))
                 continue;
-            localChunkPosition = new qk(i4, 0, i5);
+            localChunkPosition = new qo(i4, 0, i5);
             i2++;
         }
 
@@ -234,7 +234,7 @@ public class BiomeManager extends ro implements IBiomeManager
         if ((x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
 
-            abi[] localObject = this.Cache.c(x, z);
+            abn[] localObject = this.Cache.c(x, z);
             for (int i = 0; i < x_size * z_size; i++)
                 biomeArray[i] = localObject[i].M;
 

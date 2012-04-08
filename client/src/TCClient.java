@@ -7,12 +7,12 @@ import java.util.HashMap;
 
 public class TCClient
 {
-    private static akv WorldProvider;
+    private static alb WorldProvider;
 
-    public static boolean CheckWorld(akv worldProvider)
+    public static boolean CheckWorld(alb worldProvider)
     {
         WorldProvider = worldProvider;
-        adg netHandler = GetNetworkHandler();
+        adl netHandler = GetNetworkHandler();
 
         if (netHandler != null)
         {
@@ -37,17 +37,17 @@ public class TCClient
     {
         try
         {
-            Field packetsMapF = abn.class.getDeclaredField("a");
+            Field packetsMapF = abs.class.getDeclaredField("a");
 
             packetsMapF.setAccessible(true);
 
             HashMap packetsMap = (HashMap) packetsMapF.get(null);
 
-            packetsMap.remove(dz.class);
+            packetsMap.remove(ee.class);
             packetsMap.put(ChannelPacket.class, 250);
 
-            abn.k.d(250);
-            abn.k.a(250,ChannelPacket.class);
+            abs.k.d(250);
+            abs.k.a(250,ChannelPacket.class);
 
 
         } catch (NoSuchFieldException e)
@@ -62,7 +62,7 @@ public class TCClient
 
     }
 
-    public static void RegisterChanel(adg netHandler)
+    public static void RegisterChanel(adl netHandler)
     {
         ChannelPacket packet = new ChannelPacket();
         packet.a = "REGISTER";
@@ -74,7 +74,7 @@ public class TCClient
 
     }
 
-    public static void SendTCVersion(adg netHandler)
+    public static void SendTCVersion(adl netHandler)
     {
 
         ChannelPacket packet = new ChannelPacket();
@@ -87,7 +87,7 @@ public class TCClient
     }
 
 
-    public static adg GetNetworkHandler()
+    public static adl GetNetworkHandler()
     {
 
         try
@@ -98,14 +98,14 @@ public class TCClient
 
             Minecraft m = (Minecraft) minecraft.get(null);
 
-            if (m.c instanceof rg)
+            if (m.c instanceof rk)
             {
 
-                Field handler = rg.class.getDeclaredField("l");
+                Field handler = rk.class.getDeclaredField("l");
 
                 handler.setAccessible(true);
 
-                return (adg) handler.get(m.c);
+                return (adl) handler.get(m.c);
             }
             return null;
 

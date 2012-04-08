@@ -1,7 +1,7 @@
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 
 
-public class CustomBiome extends abi
+public class CustomBiome extends abn
 {
     private int skyColor;
     private int grassColor;
@@ -46,7 +46,7 @@ public class CustomBiome extends abi
 
     }
 
-    public void CopyBiome(abi baseBiome)
+    public void CopyBiome(abn baseBiome)
     {
         this.B = baseBiome.B;
         this.C = baseBiome.C;
@@ -73,24 +73,26 @@ public class CustomBiome extends abi
 
 
     // getGrassColorAtCoords
-    public int j()
+    @Override
+    public int k()
     {
         if (!this.grassColorSet)
-            return super.j();
-        double d1 = i();
-        double d2 = h();
+            return super.k();
+        double d1 = j();
+        double d2 = i();
 
-        return ((zq.a(d1, d2)& 0xFEFEFE) + this.grassColor) / 2;
+        return ((gu.a(d1, d2)& 0xFEFEFE) + this.grassColor) / 2;
     }
 
     // getFoliageColorAtCoords
-    public int k()
+    @Override
+    public int l()
     {
         if (!this.foliageColorSet)
-            return super.k();
-        double d1 = i();
-        double d2 = h();
+            return super.l();
+        double d1 = j();
+        double d2 = i();
 
-        return ((zq.a(d1, d2)& 0xFEFEFE)  + this.foliageColor) / 2;
+        return ((gu.a(d1, d2)& 0xFEFEFE)  + this.foliageColor) / 2;
     }
 }
