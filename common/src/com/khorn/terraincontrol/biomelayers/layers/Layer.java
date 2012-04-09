@@ -209,6 +209,15 @@ public abstract class Layer
 
         MainLayer = new LayerSmooth(400L, MainLayer);
 
+        if( config.ModeBiome == WorldConfig.BiomeMode.FromImage)
+        {
+
+            if ( config.imageMode == WorldConfig.ImageMode.ContinueNormal)
+                MainLayer = new LayerFromImage(1L,MainLayer,config,world);
+            else
+                MainLayer = new LayerFromImage(1L,null,config,world);
+        }
+
 
         Layer ZoomedLayer = new LayerZoomVoronoi(10L, MainLayer);
 

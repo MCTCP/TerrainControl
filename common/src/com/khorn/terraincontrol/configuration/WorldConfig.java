@@ -58,6 +58,17 @@ public class WorldConfig extends ConfigFile
     public boolean FrozenRivers;
     public boolean FrozenOcean;
 
+    // Biome image
+
+    public String imageFile;
+    public ImageMode imageMode;
+    //public int imageZoom;
+    public String imageFillBiome;
+    public int imageXOffset;
+    public int imageZOffset;
+
+    public HashMap<Integer,Integer> biomeColorMap;
+
     // Look settings
     public int WorldFog;
     public float WorldFogR;
@@ -126,7 +137,7 @@ public class WorldConfig extends ConfigFile
     public boolean MineshaftsEnabled;
     public boolean VillagesEnabled;
 
-    private File SettingsDir;
+    public File SettingsDir;
 
     public boolean isDeprecated = false;
     public WorldConfig newSettings = null;
@@ -207,6 +218,24 @@ public class WorldConfig extends ConfigFile
             if (!this.BiomeConfigsHaveReplacement)
                 this.BiomeConfigsHaveReplacement = config.ReplaceCount > 0;
             this.biomes.add(config);
+
+            if(this.ModeBiome == BiomeMode.FromImage)
+            {
+                if( this.biomeColorMap == null)
+                    this.biomeColorMap = new HashMap<Integer, Integer>();
+
+                try
+                {
+                    int color = Integer.decode(config.BiomeColor);
+                    if (color <= 0xFFFFFF)
+                        this.biomeColorMap.put(color,config.Biome.getId());
+                } catch (NumberFormatException ex)
+                {
+                    System.out.println("TerrainControl: wrong color in " + config.Biome.getName());
+                }
+
+
+            }
         }
 
         this.RegisterBOBPlugins(world);
@@ -242,6 +271,19 @@ public class WorldConfig extends ConfigFile
         this.IceBiomes = CheckValue(this.IceBiomes, this.CustomBiomes);
         this.IsleBiomes = CheckValue(this.IsleBiomes, this.CustomBiomes);
         this.BorderBiomes = CheckValue(this.BorderBiomes, this.CustomBiomes);
+
+        if ( this.ModeBiome == BiomeMode.FromImage)
+        {
+            File mapFile = new File(SettingsDir, imageFile);
+            if(!mapFile.exists())
+            {
+                System.out.println("TerrainControl: Biome map file not found. Switching ModeBiome to Normal");
+                this.ModeBiome = BiomeMode.Normal;
+            }
+        }
+
+        this.imageFillBiome = (DefaultBiome.Contain(imageFillBiome)|| CustomBiomes.contains(imageFillBiome)) ? imageFillBiome : TCDefaultValues.ImageFillBiome.stringValue();
+
 
 
         this.minMoisture = CheckValue(this.minMoisture, 0, 1.0F);
@@ -333,6 +375,19 @@ public class WorldConfig extends ConfigFile
         this.IsleBiomes = this.ReadModSettings(TCDefaultValues.IsleBiomes.name(), TCDefaultValues.IsleBiomes.StringArrayListValue());
         this.BorderBiomes = this.ReadModSettings(TCDefaultValues.BorderBiomes.name(), TCDefaultValues.BorderBiomes.StringArrayListValue());
         ReadCustomBiomes();
+
+        try
+        {
+            this.imageMode = ImageMode.valueOf(ReadModSettings(TCDefaultValues.ImageMode.name(), TCDefaultValues.ImageMode.stringValue()));
+        } catch (IllegalArgumentException e)
+        {
+            this.imageMode = ImageMode.Repeat;
+        }
+
+        this.imageFile = this.ReadModSettings(TCDefaultValues.ImageFile.name(), TCDefaultValues.ImageFile.stringValue());
+        this.imageFillBiome = this.ReadModSettings(TCDefaultValues.ImageFillBiome.name(), TCDefaultValues.ImageFillBiome.stringValue());
+        this.imageXOffset =  this.ReadModSettings(TCDefaultValues.ImageXOffset.name(), TCDefaultValues.ImageXOffset.intValue());
+        this.imageZOffset =  this.ReadModSettings(TCDefaultValues.ImageZOffset.name(), TCDefaultValues.ImageZOffset.intValue());
 
         this.minMoisture = ReadModSettings(TCDefaultValues.minMoisture.name(), TCDefaultValues.minMoisture.floatValue());
         this.maxMoisture = ReadModSettings(TCDefaultValues.maxMoisture.name(), TCDefaultValues.maxMoisture.floatValue());
@@ -441,6 +496,7 @@ public class WorldConfig extends ConfigFile
         WriteNewLine();
         WriteComment("Possible biome modes : Normal, OldGenerator, Default");
         WriteComment("   Normal - use all features");
+        WriteComment("   FromImage - get biomes from image file");
         WriteComment("   OldGenerator - generate biome like 1.7.3 generator");
         WriteComment("   Default - use default Notch biome generator");
         WriteValue(TCDefaultValues.ModeBiome.name(), this.ModeBiome.name());
@@ -542,6 +598,29 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.desertDirt.name(), this.desertDirt);
         WriteValue(TCDefaultValues.desertDirtFrequency.name(), this.desertDirtFrequency);
         */
+
+        WriteTitle("Biome Image Generator Variables");
+
+        WriteNewLine();
+        WriteComment("Possible modes when generator outside image boundaries: Repeat, ContinueNormal, FillEmpty");
+        WriteComment("   Repeat - repeat image");
+        WriteComment("   ContinueNormal - continue normal generation");
+        WriteComment("   FillEmpty - fill by biome in \"ImageFillBiome settings\" ");
+        WriteValue(TCDefaultValues.ImageMode.name(), this.imageMode.name());
+
+        WriteNewLine();
+        WriteComment("Source png file for FromImage biome mode.");
+        WriteValue(TCDefaultValues.ImageFile.name(), this.imageFile);
+
+        WriteNewLine();
+        WriteComment("Biome name for fill outside image boundaries with FillEmpty mode.");
+        WriteValue(TCDefaultValues.ImageFillBiome.name(), this.imageFillBiome);
+
+        WriteNewLine();
+        WriteComment("Shifts map position from x=0 and z=0 coordinates.");
+        WriteValue(TCDefaultValues.ImageXOffset.name(), this.imageXOffset);
+        WriteValue(TCDefaultValues.ImageZOffset.name(), this.imageZOffset);
+
 
         WriteTitle("Terrain Generator Variables");
         WriteComment("Height bits determinate generation height. Min 5, max 8");
@@ -790,8 +869,16 @@ public class WorldConfig extends ConfigFile
     public enum BiomeMode
     {
         Normal,
+        FromImage,
         OldGenerator,
         Default
+    }
+
+    public enum ImageMode
+    {
+        Repeat,
+        ContinueNormal,
+        FillEmpty,
     }
 
     public void Serialize(DataOutputStream stream) throws IOException

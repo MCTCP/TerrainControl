@@ -116,7 +116,7 @@ public abstract class alb
         {
             switch (this.world.getSettings().ModeBiome)
             {
-
+                case FromImage:
                 case Normal:
                     this.c = new BiomeManager(this.world);
                     this.world.setBiomeManager((BiomeManager) this.c);

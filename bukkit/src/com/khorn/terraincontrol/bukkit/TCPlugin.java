@@ -28,7 +28,7 @@ public class TCPlugin extends JavaPlugin
     @SuppressWarnings("UnusedDeclaration")
     public TCListener listener;
     public TCCommandExecutor commandExecutor;
-    
+
     public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
 
     public void onDisable()
@@ -41,15 +41,15 @@ public class TCPlugin extends JavaPlugin
         TCWorldChunkManagerOld.GenBiomeDiagram();
 
         this.commandExecutor = new TCCommandExecutor(this);
-        
+
         this.listener = new TCListener(this);
 
-        Bukkit.getMessenger().registerIncomingPluginChannel(this, TCDefaultValues.ChannelName.stringValue(),this.listener);
-        Bukkit.getMessenger().registerOutgoingPluginChannel(this,TCDefaultValues.ChannelName.stringValue());
+        Bukkit.getMessenger().registerIncomingPluginChannel(this, TCDefaultValues.ChannelName.stringValue(), this.listener);
+        Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
 
         log("Enabled");
     }
-    
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
     {
@@ -100,8 +100,8 @@ public class TCPlugin extends JavaPlugin
     {
         File baseFolder = new File(this.getDataFolder(), "worlds" + System.getProperty("file.separator") + worldName);
 
-        log("Loading settings for "+worldName);
-        
+        log("Loading settings for " + worldName);
+
         if (!baseFolder.exists())
         {
             log("settings does not exist, creating defaults");
@@ -117,8 +117,7 @@ public class TCPlugin extends JavaPlugin
             bukkitWorld = new BukkitWorld(worldName);
             worldConfig = new WorldConfig(baseFolder, bukkitWorld, true);
 
-        }
-        else
+        } else
         {
             worldConfig = new WorldConfig(baseFolder, bukkitWorld, false);
             bukkitWorld.setSettings(worldConfig);
@@ -141,26 +140,27 @@ public class TCPlugin extends JavaPlugin
 
             switch (bukkitWorld.getSettings().ModeBiome)
             {
+                case FromImage:
                 case Normal:
                     TCWorldChunkManager manager = new TCWorldChunkManager(bukkitWorld);
                     workWorld.worldProvider.c = manager;
                     bukkitWorld.setBiomeManager(manager);
-                break;
+                    break;
                 case OldGenerator:
                     TCWorldChunkManagerOld managerOld = new TCWorldChunkManagerOld(bukkitWorld);
                     workWorld.worldProvider.c = managerOld;
                     bukkitWorld.setOldBiomeManager(managerOld);
-                break;
+                    break;
                 case Default:
-                break;
+                    break;
             }
 
-            this.worlds.put(workWorld.getUUID(),bukkitWorld);
+            this.worlds.put(workWorld.getUUID(), bukkitWorld);
 
             log("world initialized with seed is " + workWorld.getSeed());
         }
     }
-    
+
     // -------------------------------------------- //
     // LOGGING
     // -------------------------------------------- //
@@ -168,8 +168,9 @@ public class TCPlugin extends JavaPlugin
     {
         log(Level.INFO, msg);
     }
+
     public static void log(Level level, Object... msg)
     {
-        Logger.getLogger("Minecraft").log(level, "TerrainControl: "+ Txt.implode(msg, " "));
+        Logger.getLogger("Minecraft").log(level, "TerrainControl: " + Txt.implode(msg, " "));
     }
 }

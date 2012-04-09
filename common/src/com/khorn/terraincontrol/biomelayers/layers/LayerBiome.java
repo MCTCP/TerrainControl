@@ -15,17 +15,17 @@ public class LayerBiome extends Layer
         this.child = paramGenLayer;
     }
 
-    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public int[] GetBiomes(int cacheId, int x, int z, int x_size, int z_size)
     {
-        int[] arrayOfInt1 = this.child.GetBiomes(cacheId, paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt1 = this.child.GetBiomes(cacheId, x, z, x_size, z_size);
 
-        int[] arrayOfInt2 = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
-        for (int i = 0; i < paramInt4; i++)
+        int[] arrayOfInt2 = ArraysCache.GetArray(cacheId, x_size * z_size);
+        for (int i = 0; i < z_size; i++)
         {
-            for (int j = 0; j < paramInt3; j++)
+            for (int j = 0; j < x_size; j++)
             {
-                SetSeed(j + paramInt1, i + paramInt2);
-                int currentPiece = arrayOfInt1[(j + i * paramInt3)];
+                SetSeed(j + x, i + z);
+                int currentPiece = arrayOfInt1[(j + i * x_size)];
 
 
                 if ((currentPiece & BiomeBits) == 0)    // without biome
@@ -43,7 +43,7 @@ public class LayerBiome extends Layer
                     }
                 }
 
-                arrayOfInt2[(j + i * paramInt3)] = currentPiece;
+                arrayOfInt2[(j + i * x_size)] = currentPiece;
 
 
             }

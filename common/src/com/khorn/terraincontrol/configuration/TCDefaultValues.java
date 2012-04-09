@@ -38,6 +38,12 @@ public enum TCDefaultValues
     FrozenRivers(true),
     FrozenOcean(true),
 
+    ImageFile("map.png"),
+    ImageMode("Repeat"),
+    ImageFillBiome("Ocean"),
+    ImageXOffset(0),
+    ImageZOffset(0),
+
     oldBiomeSize(1.5D),
 
     id(0),

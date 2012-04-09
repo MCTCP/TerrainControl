@@ -59,7 +59,7 @@ public class VinesGen extends ResourceGenBase
                 id = (world.getTypeId(x + 1, y, z));
                 break;
         }
-        return id != 0 && DefaultMaterial.getMaterial(id).isSolid();
+        return id != 0 && DefaultMaterial.contains(id) && DefaultMaterial.getMaterial(id).isSolid();
     }
 
 
