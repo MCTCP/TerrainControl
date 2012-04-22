@@ -28,21 +28,28 @@ public class MapWriter implements Runnable
     private int size;
     private CommandSender sender;
     private Angle angle;
-
+    private int offsetX;
+    private int offsetZ;
+    private String label;
+      
     public enum Angle
     {
         d0, d90, d180, d270
     }
 
-    public MapWriter(TCPlugin _plugin, World _world, int _size, Angle _angle, CommandSender _sender)
+    public MapWriter(TCPlugin _plugin, World _world, int _size, Angle _angle, CommandSender _sender, int _offsetX, int _offsetZ, String _label)
     {
         this.plugin = _plugin;
         this.world = _world;
         this.size = _size;
         this.sender = _sender;
         this.angle = _angle;
+        this.offsetX = _offsetX;
+        this.offsetZ = _offsetZ; 
+        this.label = _label;
     }
-
+    
+     
     public void run()
     {
         if (MapWriter.isWork)
@@ -93,6 +100,7 @@ public class MapWriter implements Runnable
 
             int image_x = 0;
             int image_y = 0;
+                      
 
             for (int x = -height / 2; x < height / 2; x++)
             {
@@ -111,8 +119,8 @@ public class MapWriter implements Runnable
                         time = time2;
                     }
 
-                    BiomeBuffer = world.getWorldChunkManager().getBiomeBlock(BiomeBuffer, x * 16, z * 16, 16, 16);
-                    tempArray = world.getWorldChunkManager().getTemperatures(tempArray, x * 16, z * 16, 16, 16);
+                    BiomeBuffer = world.getWorldChunkManager().getBiomeBlock(BiomeBuffer,offsetX + x * 16, offsetZ + z * 16, 16, 16);
+                    tempArray = world.getWorldChunkManager().getTemperatures(tempArray, offsetX + x * 16, offsetZ + z * 16, 16, 16);
                     for (int x1 = 0; x1 < 16; x1++)
                     {
                         for (int z1 = 0; z1 < 16; z1++)
@@ -121,20 +129,20 @@ public class MapWriter implements Runnable
                             switch (this.angle)
                             {
                                 case d0:
+                            		image_x = (x + height / 2) * 16 + x1;
+                            		image_y = (z + width / 2) * 16 + z1;
+                            		break;   
+                               case d90:
                                     image_x = width * 16 - ((z + width / 2) * 16 + z1 + 1);
                                     image_y = (x + height / 2) * 16 + x1;
                                 break;
-                                case d90:
-                                    image_x = height * 16 - ((x + height / 2) * 16 + x1 + 1);
-                                    image_y = (z + width / 2) * 16 + z1;
-                                break;
                                 case d180:
-                                    image_x = width * 16 - ((z + width / 2) * 16 + z1 + 1);
-                                    image_y = height * 16 - ((x + height / 2) * 16 + x1 + 1);
+                                    image_x = height * 16 - ((x + height / 2) * 16 + x1 + 1);
+                                    image_y = width * 16 - ((z + width / 2) * 16 + z1 + 1);
                                 break;
                                 case d270:
-                                    image_x = (x + height / 2) * 16 + x1;
-                                    image_y = (z + width / 2) * 16 + z1;
+                                    image_x = (z + width / 2) * 16 + z1;
+                                    image_y = height * 16 - ((x + height / 2) * 16 + x1 + 1);
                                 break;
                             }
 
@@ -150,11 +158,11 @@ public class MapWriter implements Runnable
 
             sender.sendMessage(BaseCommand.MessageColor + "Writing images...");
             PNGImageWriter PngEncoder = new PNGImageWriter(new PNGImageWriterSpi());
-            ImageOutputStream imageOutput = new FileCacheImageOutputStream(new FileOutputStream(world.worldData.name + "_biome.png", false), null);
+            ImageOutputStream imageOutput = new FileCacheImageOutputStream(new FileOutputStream(label + world.worldData.name + "_biome.png", false), null);
             PngEncoder.setOutput(imageOutput);
             PngEncoder.write(biomeImage);
 
-            imageOutput = new FileCacheImageOutputStream(new FileOutputStream(world.worldData.name + "_temperature.png", false), null);
+            imageOutput = new FileCacheImageOutputStream(new FileOutputStream(label + world.worldData.name + "_temperature.png", false), null);
             PngEncoder.setOutput(imageOutput);
             PngEncoder.write(tempImage);
 
