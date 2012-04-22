@@ -129,20 +129,20 @@ public class MapWriter implements Runnable
                             switch (this.angle)
                             {
                                 case d0:
+                            		image_x = (x + height / 2) * 16 + x1;
+                            		image_y = (z + width / 2) * 16 + z1;
+                            		break;   
+                               case d90:
                                     image_x = width * 16 - ((z + width / 2) * 16 + z1 + 1);
                                     image_y = (x + height / 2) * 16 + x1;
                                 break;
-                                case d90:
-                                    image_x = height * 16 - ((x + height / 2) * 16 + x1 + 1);
-                                    image_y = (z + width / 2) * 16 + z1;
-                                break;
                                 case d180:
-                                    image_x = width * 16 - ((z + width / 2) * 16 + z1 + 1);
-                                    image_y = height * 16 - ((x + height / 2) * 16 + x1 + 1);
+                                    image_x = height * 16 - ((x + height / 2) * 16 + x1 + 1);
+                                    image_y = width * 16 - ((z + width / 2) * 16 + z1 + 1);
                                 break;
                                 case d270:
-                                    image_x = (x + height / 2) * 16 + x1;
-                                    image_y = (z + width / 2) * 16 + z1;
+                                    image_x = (z + width / 2) * 16 + z1;
+                                    image_y = height * 16 - ((x + height / 2) * 16 + x1 + 1);
                                 break;
                             }
 
