@@ -30,7 +30,7 @@ public class MapCommand extends BaseCommand
         int size = 200;
         int offsetX = 0;
         int offsetZ = 0;
-        MapWriter.Angle angle = MapWriter.Angle.d270; // now set to North by default
+        MapWriter.Angle angle = MapWriter.Angle.d0;
         String label = "";
       
         if (args.size() != 0 && !args.get(0).startsWith("-"))
