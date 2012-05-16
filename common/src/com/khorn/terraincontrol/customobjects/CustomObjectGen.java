@@ -209,7 +209,7 @@ public class CustomObjectGen extends ResourceGenBase
 
         if (workObject.randomRotation)
         {
-            RotationAmount = rand.nextInt(3);
+            RotationAmount = rand.nextInt(4);
         }
 
 
