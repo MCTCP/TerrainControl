@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -68,6 +69,7 @@ public class SingleWorld implements LocalWorld
         }
         NextBiomeId = 0;
         DefaultBiomes.clear();
+        an.a = Arrays.asList(abn.c, abn.d);
 
     }
 
@@ -87,6 +89,7 @@ public class SingleWorld implements LocalWorld
             DefaultBiomes.add(biome);
             this.BiomeNames.put(biome.getName(), biome);
         }
+        an.a = Arrays.asList(abn.a[DefaultBiome.PLAINS.Id], abn.a[DefaultBiome.DESERT.Id]);
 
 
     }
@@ -499,6 +502,17 @@ public class SingleWorld implements LocalWorld
 
         this.DungeonGen = new dq();
         this.strongholdGen = new xq();
+
+        abn[] StrongholdsBiomes = { abn.a[DefaultBiome.DESERT.Id], abn.a[DefaultBiome.FOREST.Id], abn.a[DefaultBiome.EXTREME_HILLS.Id], abn.a[DefaultBiome.SWAMPLAND.Id], abn.a[DefaultBiome.TAIGA.Id], abn.a[DefaultBiome.ICE_PLAINS.Id], abn.a[DefaultBiome.ICE_MOUNTAINS.Id], abn.a[DefaultBiome.DESERT_HILLS.Id], abn.a[DefaultBiome.FOREST_HILLS.Id], abn.a[DefaultBiome.SMALL_MOUNTAINS.Id], abn.a[DefaultBiome.JUNGLE.Id], abn.a[DefaultBiome.JUNGLE_HILLS.Id] };
+        try
+        {
+            ModLoader.setPrivateValue(xq.class,this.strongholdGen,"a",StrongholdsBiomes);
+
+        } catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        }
+
         this.VillageGen = new an(0);
         this.MineshaftGen = new alo();
 

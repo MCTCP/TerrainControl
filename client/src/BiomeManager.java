@@ -15,7 +15,7 @@ public class BiomeManager extends rs implements IBiomeManager
 
     private pn Cache = new pn(this);
 
-    private ArrayList<abn> f = new ArrayList<abn>();
+    private ArrayList<abn> biomesToSpawnIn = new ArrayList<abn>();
 
 
     private WorldConfig worldConfig;
@@ -23,13 +23,13 @@ public class BiomeManager extends rs implements IBiomeManager
 
     public BiomeManager(LocalWorld world)
     {
-        this.f.add(abn.f);
-        this.f.add(abn.c);
-        this.f.add(abn.g);
-        this.f.add(abn.u);
-        this.f.add(abn.t);
-        this.f.add(abn.w);
-        this.f.add(abn.x);
+        this.biomesToSpawnIn.add(abn.a[DefaultBiome.FOREST.Id]);
+        this.biomesToSpawnIn.add(abn.a[DefaultBiome.PLAINS.Id]);
+        this.biomesToSpawnIn.add(abn.a[DefaultBiome.TAIGA.Id]);
+        this.biomesToSpawnIn.add(abn.a[DefaultBiome.DESERT_HILLS.Id]);
+        this.biomesToSpawnIn.add(abn.a[DefaultBiome.FOREST_HILLS.Id]);
+        this.biomesToSpawnIn.add(abn.a[DefaultBiome.JUNGLE.Id]);
+        this.biomesToSpawnIn.add(abn.a[DefaultBiome.JUNGLE_HILLS.Id]);
 
         this.Init(world);
 
@@ -52,7 +52,7 @@ public class BiomeManager extends rs implements IBiomeManager
     @SuppressWarnings("rawtypes")
     public List a()
     {
-        return this.f;
+        return this.biomesToSpawnIn;
     }
 
     //get biome

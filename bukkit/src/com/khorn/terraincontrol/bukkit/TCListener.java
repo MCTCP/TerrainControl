@@ -71,8 +71,7 @@ public class TCListener implements Listener, PluginMessageListener
                         config.Serialize(stream);
                         stream.flush();
 
-                    }
-                    catch (IOException e)
+                    } catch (IOException e)
                     {
                         e.printStackTrace();
                     }
@@ -81,10 +80,9 @@ public class TCListener implements Listener, PluginMessageListener
 
                     player.sendPluginMessage(this.tcPlugin, TCDefaultValues.ChannelName.stringValue(), data);
                 }
-            }
-            else
+            } else
             {
-            	System.out.println("TerrainControl: client have old TC version");
+                System.out.println("TerrainControl: client have old TC version");
             }
         }
     }

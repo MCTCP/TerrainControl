@@ -46,7 +46,7 @@ public abstract class BaseCommand
             return null;
         }
         
-        World world = Bukkit.getWorld(name);
+        World world = Bukkit.getWorld(arg);
         
         if( world != null && plugin.worlds.containsKey(world.getUID()))
         {

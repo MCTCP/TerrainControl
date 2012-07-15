@@ -1,8 +1,10 @@
+import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.IBiomeManager;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -20,19 +22,27 @@ public class BiomeManagerOld extends rs implements IBiomeManager
     private abn[] temp_biomeBases;
     private pn Cache = new pn(this);
 
-
+    private ArrayList<abn> biomesToSpawnIn = new ArrayList<abn>();
 
     private static abn[] BiomeDiagram = new abn[4096];
 
     public BiomeManagerOld(LocalWorld world)
     {
-        super();
+        this.biomesToSpawnIn.add(abn.a[DefaultBiome.FOREST.Id]);
+        this.biomesToSpawnIn.add(abn.a[DefaultBiome.PLAINS.Id]);
+        this.biomesToSpawnIn.add(abn.a[DefaultBiome.TAIGA.Id]);
+
         this.localWrk = world.getSettings();
         this.TempGen = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 9871L), 4);
         this.RainGen = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 39811L), 4);
         this.TempGen2 = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 543321L), 2);
 
 
+    }
+
+    public List a()
+    {
+        return this.biomesToSpawnIn;
     }
 
     @Override
