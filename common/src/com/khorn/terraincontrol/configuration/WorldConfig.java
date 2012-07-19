@@ -82,12 +82,6 @@ public class WorldConfig extends ConfigFile
 
 
     //Specific biome settings
-    public boolean muddySwamps;
-    public boolean claySwamps;
-    public int swampSize;
-    public boolean waterlessDeserts;
-    public boolean desertDirt;
-    public int desertDirtFrequency;
 
     //Caves
     public int caveRarity;
@@ -394,14 +388,6 @@ public class WorldConfig extends ConfigFile
         this.minTemperature = ReadModSettings(TCDefaultValues.minTemperature.name(), TCDefaultValues.minTemperature.floatValue());
         this.maxTemperature = ReadModSettings(TCDefaultValues.maxTemperature.name(), TCDefaultValues.maxTemperature.floatValue());
 
-        this.muddySwamps = ReadModSettings(TCDefaultValues.muddySwamps.name(), TCDefaultValues.muddySwamps.booleanValue());
-        this.claySwamps = ReadModSettings(TCDefaultValues.claySwamps.name(), TCDefaultValues.claySwamps.booleanValue());
-        this.swampSize = ReadModSettings(TCDefaultValues.swampSize.name(), TCDefaultValues.swampSize.intValue());
-
-        this.waterlessDeserts = ReadModSettings(TCDefaultValues.waterlessDeserts.name(), TCDefaultValues.waterlessDeserts.booleanValue());
-        this.desertDirt = ReadModSettings(TCDefaultValues.desertDirt.name(), TCDefaultValues.desertDirt.booleanValue());
-        this.desertDirtFrequency = ReadModSettings(TCDefaultValues.desertDirtFrequency.name(), TCDefaultValues.desertDirtFrequency.intValue());
-
         this.WorldFog = ReadModSettingsColor(TCDefaultValues.WorldFog.name(), TCDefaultValues.WorldFog.stringValue());
         this.WorldNightFog = ReadModSettingsColor(TCDefaultValues.WorldNightFog.name(), TCDefaultValues.WorldNightFog.stringValue());
 
@@ -501,19 +487,9 @@ public class WorldConfig extends ConfigFile
         WriteComment("   Default - use default Notch biome generator");
         WriteValue(TCDefaultValues.ModeBiome.name(), this.ModeBiome.name());
 
-        /* Disabled for 1.9
-        WriteValue(TCDefaultValues.snowThreshold.name(), this.snowThreshold);
-        WriteValue(TCDefaultValues.iceThreshold.name(), this.iceThreshold);    */
 
         WriteTitle("Biome Generator Variables");
 
-        /*WriteComment("Integer value from 1 to 15. Affect all biomes except ocean and river");
-        WriteValue(TCDefaultValues.BiomeSize.name(), this.biomeSize);
-        WriteNewLine();
-        WriteComment("Integer value from 0 to 10. This affect how much lands will be generated. LandSize:0 - mean generates only ocean.");
-        WriteValue(TCDefaultValues.LandSize.name(), this.landSize);
-        WriteNewLine();
-        WriteValue(TCDefaultValues.RiversEnabled.name(), this.riversEnabled);  */
 
         WriteComment("IMPORTANT value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.");
         WriteComment("Large %/total area biomes (Continents) must be set small, (limit=0)");
@@ -587,17 +563,6 @@ public class WorldConfig extends ConfigFile
          */
         WriteCustomBiomes();
 
-        /* Removed .. not sure this need someone
-        WriteTitle("Swamp Biome Variables");
-        WriteValue(TCDefaultValues.muddySwamps.name(), this.muddySwamps);
-        WriteValue(TCDefaultValues.claySwamps.name(), this.claySwamps);
-        WriteValue(TCDefaultValues.swampSize.name(), this.swampSize);
-
-        WriteTitle("Desert Biome Variables");
-        WriteValue(TCDefaultValues.waterlessDeserts.name(), this.waterlessDeserts);
-        WriteValue(TCDefaultValues.desertDirt.name(), this.desertDirt);
-        WriteValue(TCDefaultValues.desertDirtFrequency.name(), this.desertDirtFrequency);
-        */
 
         WriteTitle("Biome Image Generator Variables");
 

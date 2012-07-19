@@ -46,6 +46,12 @@ public class BiomeConfig extends ConfigFile
 
     public boolean disableNotchPonds;
 
+    public boolean UseWorldWaterLevel;
+    public int waterLevelMax;
+    public int waterLevelMin;
+    public int waterBlock;
+    public int iceBlock;
+
     public int SkyColor;
     public int WaterColor;
 
@@ -71,10 +77,10 @@ public class BiomeConfig extends ConfigFile
 
     // TODO: A configuration should NOT contain what it is supposed to be configuration for. This is very bad practi
     public LocalBiome Biome;
-    
+
     private WorldConfig worldConfig;
     public String Name;
-    
+
     //Spawn Config
     public boolean spawnMonstersAddDefaults;
     public List<WeightedMobSpawnGroup> spawnMonsters;
@@ -100,6 +106,15 @@ public class BiomeConfig extends ConfigFile
         if (!settingsFile.exists())
             this.CreateDefaultResources();
         this.WriteSettingsFile(settingsFile);
+
+        if (this.UseWorldWaterLevel)
+        {
+            this.waterLevelMax = worldConfig.waterLevelMax;
+            this.waterLevelMin = worldConfig.waterLevelMin;
+            this.waterBlock = worldConfig.waterBlock;
+            this.iceBlock = worldConfig.iceBlock;
+        }
+
 
         if (biome.isCustom())
             biome.setCustom(this);
@@ -181,46 +196,46 @@ public class BiomeConfig extends ConfigFile
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         DefaultBiome biome = DefaultBiome.getBiome(this.Biome.getId());
-        if ( biome != null)
-        switch (biome)
-        {
-            case OCEAN: // Ocean - default
-            case EXTREME_HILLS: // BigHills - default
-            case RIVER: // River - default
-            case SMALL_MOUNTAINS: // SmallHills
-                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.Tree}, new int[]{1, 9});
-                this.ResourceSequence[this.ResourceCount++] = resource;
-                break;
-            case PLAINS: // Plains - no tree
-            case DESERT: // Desert - no tree
-            case DESERT_HILLS: //HillsDesert
-                break;
-            case FOREST_HILLS: // HillsForest
-            case FOREST: // Forest - forest
-                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.Forest, TreeType.BigTree, TreeType.Tree}, new int[]{20, 10, 100});
-                this.ResourceSequence[this.ResourceCount++] = resource;
-                break;
-            case TAIGA_HILLS: //HillsTaiga
-            case TAIGA: // Taiga - taiga
-                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.Taiga1, TreeType.Taiga2}, new int[]{35, 100});
-                this.ResourceSequence[this.ResourceCount++] = resource;
-                break;
-            case SWAMPLAND: // Swamp - swamp
-                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.SwampTree}, new int[]{100});
-                this.ResourceSequence[this.ResourceCount++] = resource;
-                break;
-            case MUSHROOM_ISLAND: // Mushroom island
-                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.HugeMushroom}, new int[]{100});
-                this.ResourceSequence[this.ResourceCount++] = resource;
-                break;
-            case JUNGLE:// Jungle
-            case JUNGLE_HILLS:
-                resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.GroundBush, TreeType.JungleTree, TreeType.Tree}, new int[]{10, 50, 35, 100});
-                this.ResourceSequence[this.ResourceCount++] = resource;
-                break;
+        if (biome != null)
+            switch (biome)
+            {
+                case OCEAN: // Ocean - default
+                case EXTREME_HILLS: // BigHills - default
+                case RIVER: // River - default
+                case SMALL_MOUNTAINS: // SmallHills
+                    resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.Tree}, new int[]{1, 9});
+                    this.ResourceSequence[this.ResourceCount++] = resource;
+                    break;
+                case PLAINS: // Plains - no tree
+                case DESERT: // Desert - no tree
+                case DESERT_HILLS: //HillsDesert
+                    break;
+                case FOREST_HILLS: // HillsForest
+                case FOREST: // Forest - forest
+                    resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.Forest, TreeType.BigTree, TreeType.Tree}, new int[]{20, 10, 100});
+                    this.ResourceSequence[this.ResourceCount++] = resource;
+                    break;
+                case TAIGA_HILLS: //HillsTaiga
+                case TAIGA: // Taiga - taiga
+                    resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.Taiga1, TreeType.Taiga2}, new int[]{35, 100});
+                    this.ResourceSequence[this.ResourceCount++] = resource;
+                    break;
+                case SWAMPLAND: // Swamp - swamp
+                    resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.SwampTree}, new int[]{100});
+                    this.ResourceSequence[this.ResourceCount++] = resource;
+                    break;
+                case MUSHROOM_ISLAND: // Mushroom island
+                    resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.HugeMushroom}, new int[]{100});
+                    this.ResourceSequence[this.ResourceCount++] = resource;
+                    break;
+                case JUNGLE:// Jungle
+                case JUNGLE_HILLS:
+                    resource = new Resource(ResourceType.Tree, this.DefaultTrees, new TreeType[]{TreeType.BigTree, TreeType.GroundBush, TreeType.JungleTree, TreeType.Tree}, new int[]{10, 50, 35, 100});
+                    this.ResourceSequence[this.ResourceCount++] = resource;
+                    break;
 
 
-        }
+            }
         if (this.DefaultWaterLily > 0)
         {
             resource = new Resource(ResourceType.AboveWaterRes, DefaultMaterial.WATER_LILY.id, 0, 0, this.DefaultWaterLily, 100, 0, 0, new int[0]);
@@ -282,7 +297,7 @@ public class BiomeConfig extends ConfigFile
             resource = new Resource(ResourceType.Cactus, DefaultMaterial.CACTUS.id, 0, 0, this.DefaultCactus, TCDefaultValues.cactusDepositRarity.intValue(), TCDefaultValues.cactusDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, new int[]{DefaultMaterial.SAND.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
-        if( biome == DefaultBiome.JUNGLE || biome == DefaultBiome.JUNGLE_HILLS) // Jungle and Jungle Hills
+        if (biome == DefaultBiome.JUNGLE || biome == DefaultBiome.JUNGLE_HILLS) // Jungle and Jungle Hills
         {
             resource = new Resource(ResourceType.Vines, 0, 0, 0, TCDefaultValues.vinesFrequency.intValue(), TCDefaultValues.vinesRarity.intValue(), TCDefaultValues.vinesMinAltitude.intValue(), this.worldConfig.WorldHeight, new int[]{DefaultMaterial.VINE.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
@@ -326,6 +341,13 @@ public class BiomeConfig extends ConfigFile
         this.SurfaceBlock = this.ReadModSettings(TCDefaultValues.SurfaceBlock.name(), this.DefaultSurfaceBlock);
         this.GroundBlock = this.ReadModSettings(TCDefaultValues.GroundBlock.name(), this.DefaultGroundBlock);
 
+
+        this.UseWorldWaterLevel = this.ReadModSettings(TCDefaultValues.UseWorldWaterLevel.name(), TCDefaultValues.UseWorldWaterLevel.booleanValue());
+        this.waterLevelMax = ReadModSettings(TCDefaultValues.WaterLevelMax.name(), this.worldConfig.waterLevelMax);
+        this.waterLevelMin = ReadModSettings(TCDefaultValues.WaterLevelMin.name(), TCDefaultValues.WaterLevelMin.intValue());
+        this.waterBlock = ReadModSettings(TCDefaultValues.WaterBlock.name(), TCDefaultValues.WaterBlock.intValue());
+        this.iceBlock = ReadModSettings(TCDefaultValues.IceBlock.name(), TCDefaultValues.IceBlock.intValue());
+
         this.disableNotchPonds = this.ReadModSettings(TCDefaultValues.disableNotchPonds.name(), TCDefaultValues.disableNotchPonds.booleanValue());
 
         this.SkyColor = this.ReadModSettingsColor(TCDefaultValues.SkyColor.name(), TCDefaultValues.SkyColor.stringValue());
@@ -340,7 +362,7 @@ public class BiomeConfig extends ConfigFile
         this.disableNotchHeightControl = ReadModSettings(TCDefaultValues.DisableBiomeHeight.name(), TCDefaultValues.DisableBiomeHeight.booleanValue());
         this.maxAverageHeight = ReadModSettings(TCDefaultValues.MaxAverageHeight.name(), TCDefaultValues.MaxAverageHeight.doubleValue());
         this.maxAverageDepth = ReadModSettings(TCDefaultValues.MaxAverageDepth.name(), TCDefaultValues.MaxAverageDepth.doubleValue());
-        
+
         this.spawnMonstersAddDefaults = ReadModSettings("spawnMonstersAddDefaults", true);
         this.spawnMonsters = ReadModSettings("spawnMonsters", new ArrayList<WeightedMobSpawnGroup>());
         this.spawnCreaturesAddDefaults = ReadModSettings("spawnCreaturesAddDefaults", true);
@@ -365,8 +387,7 @@ public class BiomeConfig extends ConfigFile
             for (int i = 0; i < this.worldConfig.WorldHeight / 8 + 1; i++)
                 this.heightMatrix[i] = Double.valueOf(keys.get(i));
 
-        }
-        catch (NumberFormatException e)
+        } catch (NumberFormatException e)
         {
             System.out.println("Wrong height settings: '" + this.SettingsCache.get(TCDefaultValues.CustomHeightControl.name()) + "'");
         }
@@ -465,7 +486,7 @@ public class BiomeConfig extends ConfigFile
                 }
             }
         }
-        
+
         Resource buffer;
         for (int i = 0; i < this.ResourceCount; i++)
         {
@@ -489,7 +510,7 @@ public class BiomeConfig extends ConfigFile
     protected void WriteConfigSettings() throws IOException
     {
         WriteTitle(this.Name + " biome config");
-        
+
 
         WriteComment("Biome size from 0 to GenerationDepth. Show in what zoom level biome will be generated (see GenerationDepth)");
         WriteComment("Higher numbers=Smaller% of world / Lower numbers=Bigger % of world");
@@ -586,6 +607,21 @@ public class BiomeConfig extends ConfigFile
         WriteComment("Block id from stone to surface, like dirt in plain biome ");
         WriteValue(TCDefaultValues.GroundBlock.name(), this.GroundBlock);
 
+        WriteComment("If disabled use water levels and blocks below for this biome");
+        WriteValue(TCDefaultValues.UseWorldWaterLevel.name(), this.UseWorldWaterLevel);
+        WriteNewLine();
+
+        WriteComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
+        WriteValue(TCDefaultValues.WaterLevelMax.name(), this.waterLevelMax);
+        WriteValue(TCDefaultValues.WaterLevelMin.name(), this.waterLevelMin);
+        WriteNewLine();
+        WriteComment("BlockId used as water in WaterLevel");
+        WriteValue(TCDefaultValues.WaterBlock.name(), this.waterBlock);
+        WriteNewLine();
+        WriteComment("BlockId used as ice");
+        WriteValue(TCDefaultValues.IceBlock.name(), this.iceBlock);
+
+
         this.WriteNewLine();
         WriteComment("Replace Variable: BlockIdFrom=BlockIdTo[(minHeight-maxHeight)]");
         WriteComment("Example :");
@@ -659,9 +695,9 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Plant resource used for place something like flower, small mushrooms, pumpkins");
         this.WriteComment("Liquid resource is one block water or lava source");
         this.WriteComment("");
-        
+
         this.WriteResources();
-        
+
         this.WriteNewLine();
         this.WriteTitle("MOB SPAWNING");
         this.WriteComment("========<TUTORIAL>========");
@@ -669,7 +705,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("");
         this.WriteComment("#STEP1: Understanding what a mobgroup is.");
         this.WriteComment("A mobgroups is made of four parts. They are mob, weight, min and max.");
-        this.WriteComment("The mob is one of the avaliable mobnames: "+Txt.implodeCommaAnd(DefaultMobType.getPreferedNames()));
+        this.WriteComment("The mob is one of the avaliable mobnames: " + Txt.implodeCommaAnd(DefaultMobType.getPreferedNames()));
         this.WriteComment("The weight is used for a random selection. This is a positive integer.");
         this.WriteComment("The min is the minimum amount of mobs spawning as a group. This is a positive integer.");
         this.WriteComment("The max is the maximum amount of mobs spawning as a group. This is a positive integer.");
@@ -697,22 +733,22 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Default watercreatures: [{\"mob\": \"Squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]");
         this.WriteComment("");
         this.WriteComment("So for example ocelots wont spawn unless you add them below.");
-        
+
         this.WriteNewLine();
         this.WriteComment("========<CONFIGURATION>========");
-        
+
         this.WriteComment("Should we add the default monster spawn groups?");
         WriteValue("spawnMonstersAddDefaults", this.spawnMonstersAddDefaults);
         this.WriteComment("Add extra monster spawn groups here");
         WriteValue("spawnMonsters", this.spawnMonsters);
         this.WriteNewLine();
-        
+
         this.WriteComment("Should we add the default creature spawn groups?");
         WriteValue("spawnCreaturesAddDefaults", this.spawnCreaturesAddDefaults);
         this.WriteComment("Add extra creature spawn groups here");
         WriteValue("spawnCreatures", this.spawnCreatures);
         this.WriteNewLine();
-        
+
         this.WriteComment("Should we add the default watercreature spawn groups?");
         WriteValue("spawnWaterCreaturesAddDefaults", this.spawnWaterCreaturesAddDefaults);
         this.WriteComment("Add extra watercreature spawn groups here");

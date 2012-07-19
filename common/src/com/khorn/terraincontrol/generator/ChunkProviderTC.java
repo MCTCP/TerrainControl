@@ -1,17 +1,15 @@
 package com.khorn.terraincontrol.generator;
 
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.terrainsgens.CanyonsGen;
 import com.khorn.terraincontrol.generator.terrainsgens.CavesGen;
 import com.khorn.terraincontrol.generator.terrainsgens.TerrainGenBase;
-import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.util.MathHelper;
 import com.khorn.terraincontrol.util.NoiseGeneratorOctaves;
 
-import java.util.*;
+import java.util.Random;
 
 
 @SuppressWarnings({"PointlessArithmeticExpression"})
@@ -85,7 +83,7 @@ public class ChunkProviderTC
         {
             for (int z = -2; z <= 2; z++)
             {
-                float f1 = 10.0F / MathHelper.sqrt((float)(x * x + z * z) + 0.2F);
+                float f1 = 10.0F / MathHelper.sqrt((float) (x * x + z * z) + 0.2F);
                 this.NearBiomeWeight[(x + 2 + (z + 2) * 5)] = f1;
             }
         }
@@ -109,11 +107,18 @@ public class ChunkProviderTC
 
         this.u = GenerateTerrainNoise(this.u, chunkX * i1, 0, chunkZ * i1, i4, i5, i6);
 
+        this.BiomeArray = this.localWorld.getBiomes(this.BiomeArray, chunkX * 16, chunkZ * 16, ChunkMaxX, ChunkMaxZ);
+
+        double d1 = 0.125D;
+        double d10 = 0.25D;
+        int z_step = 1 << this.heightBits;
+        double d15 = 0.25D;
+
         for (int x = 0; x < i1; x++)
             for (int z = 0; z < i1; z++)
                 for (int y = 0; y < i2; y++)
                 {
-                    double d1 = 0.125D;
+
                     double d2 = this.u[(((x + 0) * i6 + (z + 0)) * i5 + (y + 0))];
                     double d3 = this.u[(((x + 0) * i6 + (z + 1)) * i5 + (y + 0))];
                     double d4 = this.u[(((x + 1) * i6 + (z + 0)) * i5 + (y + 0))];
@@ -126,28 +131,26 @@ public class ChunkProviderTC
 
                     for (int piece_y = 0; piece_y < 8; piece_y++)
                     {
-                        double d10 = 0.25D;
+
 
                         double d11 = d2;
                         double d12 = d3;
                         double d13 = (d4 - d2) * d10;
                         double d14 = (d5 - d3) * d10;
 
-                        for (int i11 = 0; i11 < 4; i11++)
+                        for (int piece_x = 0; piece_x < 4; piece_x++)
                         {
-                            int position = i11 + x * 4 << this.heightBitsPlusFour | 0 + z * 4 << this.heightBits | y * 8 + piece_y;
-                            int step = 1 << this.heightBits;
-                            double d15 = 0.25D;
+                            int position = (piece_x + x * 4) << this.heightBitsPlusFour | (0 + z * 4) << this.heightBits | (y * 8 + piece_y);
 
                             double d16 = d11;
                             double d17 = (d12 - d11) * d15;
-                            for (int i14 = 0; i14 < 4; i14++)
+                            for (int piece_z = 0; piece_z < 4; piece_z++)
                             {
-
+                                int biomeId = BiomeArray[(z * 4 + piece_z)*16 + (piece_x + x * 4) ];
                                 int i15 = 0;
-                                if (y * 8 + piece_y < this.worldSettings.waterLevelMax && y * 8 + piece_y > this.worldSettings.waterLevelMin)
+                                if (y * 8 + piece_y < this.worldSettings.biomeConfigs[biomeId].waterLevelMax && y * 8 + piece_y > this.worldSettings.biomeConfigs[biomeId].waterLevelMin)
                                 {
-                                    i15 = this.worldSettings.waterBlock;
+                                    i15 = this.worldSettings.biomeConfigs[biomeId].waterBlock;
                                 }
 
                                 if (d16 > 0.0D)
@@ -156,7 +159,7 @@ public class ChunkProviderTC
                                 }
 
                                 paramArrayOfByte[position] = (byte) i15;
-                                position += step;
+                                position += z_step;
                                 d16 += d17;
                             }
                             d11 += d13;
@@ -174,7 +177,7 @@ public class ChunkProviderTC
 
     boolean ReplaceForBiomeAndReturnWaterless(int paramInt1, int paramInt2, byte[] paramArrayOfByte)
     {
-        int waterLevel = this.worldSettings.waterLevelMax;
+
         int dryBlock = 256;
 
         double d1 = 0.03125D;
@@ -194,6 +197,7 @@ public class ChunkProviderTC
 
                 int surfaceBlock = this.worldSettings.biomeConfigs[biomeId].SurfaceBlock;
                 int groundBlock = this.worldSettings.biomeConfigs[biomeId].GroundBlock;
+                int waterLevel = this.worldSettings.biomeConfigs[biomeId].waterLevelMax;
 
                 if (this.worldSettings.ceilingBedrock)
                     paramArrayOfByte[(z * 16 + x) * this.height + this.heightMinusOne] = (byte) this.worldSettings.bedrockBlock;
@@ -227,9 +231,9 @@ public class ChunkProviderTC
                                 if ((y < waterLevel) && (y > this.worldSettings.waterLevelMin) && (surfaceBlock == 0))
                                 {
                                     if (temperature < 0.15F)
-                                        surfaceBlock = (byte) this.worldSettings.iceBlock;
+                                        surfaceBlock = (byte) this.worldSettings.biomeConfigs[biomeId].iceBlock;
                                     else
-                                        surfaceBlock = (byte) this.worldSettings.waterBlock;
+                                        surfaceBlock = (byte) this.worldSettings.biomeConfigs[biomeId].waterBlock;
                                 }
 
                                 i5 = stone_noise;
@@ -237,18 +241,6 @@ public class ChunkProviderTC
                                     paramArrayOfByte[i9] = (byte) surfaceBlock;
                                 else
                                     paramArrayOfByte[i9] = (byte) groundBlock;
-
-                                if (biomeId == DefaultBiome.DESERT.Id)
-                                {
-                                    if ((this.worldSettings.desertDirt) && (this.worldSettings.desertDirtFrequency > 0) && (this.rnd.nextInt(this.worldSettings.desertDirtFrequency * ChunkMaxX * ChunkMaxZ) == 0) && (paramArrayOfByte[i9] == DefaultMaterial.SAND.id))
-                                        paramArrayOfByte[i9] = (byte) DefaultMaterial.DIRT.id;
-
-                                    if ((this.worldSettings.waterlessDeserts) && ((paramArrayOfByte[i9] == DefaultMaterial.STATIONARY_WATER.id) || (paramArrayOfByte[i9] == DefaultMaterial.ICE.id)))
-                                        paramArrayOfByte[i9] = (byte) DefaultMaterial.SAND.id;
-                                }
-
-                                if (((this.worldSettings.muddySwamps) || (this.worldSettings.claySwamps)) && (biomeId == DefaultBiome.SWAMPLAND.Id) && ((paramArrayOfByte[i9] == DefaultMaterial.SAND.id) || (paramArrayOfByte[i9] == DefaultMaterial.DIRT.id) || (paramArrayOfByte[i9] == DefaultMaterial.SAND.id)))
-                                    createSwamps(paramArrayOfByte, i9);
 
 
                             } else if (i5 > 0)
@@ -264,7 +256,7 @@ public class ChunkProviderTC
                             }
                     }
                 }
-                if (paramArrayOfByte[(z * 16 + x) * this.height + this.worldSettings.waterLevelMax] == this.worldSettings.waterBlock)
+                if (paramArrayOfByte[(z * 16 + x) * this.height + this.worldSettings.biomeConfigs[biomeId].waterLevelMax] == this.worldSettings.biomeConfigs[biomeId].waterBlock)
                     dryBlock--;
 
 
@@ -396,7 +388,7 @@ public class ChunkProviderTC
             this.VolatilityFactor = 0.0D;
 
         this.VolatilityFactor += 0.5D;
-        this.HeightFactor = max_Y *( 2.0D + d3 )/ 4.0D;
+        this.HeightFactor = max_Y * (2.0D + d3) / 4.0D;
     }
 
     private void newTerrainNoise(int x, int z, int max_X, int max_Y, double d3)
@@ -435,38 +427,7 @@ public class ChunkProviderTC
 
         d4 += d3 * 0.2D;
 
-        this.HeightFactor = max_Y *( 2.0D + d4 )/ 4.0D;
-    }
-
-
-    private void createSwamps(byte[] blocks, int block)
-    {
-        int swampSize = this.worldSettings.swampSize < 0 ? 0 : this.worldSettings.swampSize > 15 ? 15 : this.worldSettings.swampSize;
-        int Swamptype = (this.worldSettings.muddySwamps) ? DefaultMaterial.SOUL_SAND.id : DefaultMaterial.CLAY.id;
-
-        if (this.worldSettings.muddySwamps && this.worldSettings.claySwamps)
-        {
-            Swamptype = (this.rnd.nextBoolean()) ? DefaultMaterial.SOUL_SAND.id : DefaultMaterial.CLAY.id;
-        }
-
-        if (blocks[(block + 1)] == DefaultMaterial.STATIONARY_WATER.id)
-        {
-
-            blocks[block] = (byte) Swamptype;
-            return;
-        }
-
-        for (int x = swampSize * -1; x < swampSize + 1; x++)
-            for (int z = swampSize * -1; z < swampSize + 1; z++)
-            {
-                int newBlock = block + z * this.height + x * this.height * ChunkMaxZ;
-                if ((newBlock < 0) || (newBlock > TCDefaultValues.maxChunkBlockValue.intValue() - 1))
-                    continue;
-                if (blocks[newBlock] != DefaultMaterial.STATIONARY_WATER.id)
-                    continue;
-                blocks[block] = (byte) Swamptype;
-                return;
-            }
+        this.HeightFactor = max_Y * (2.0D + d4) / 4.0D;
     }
 
 
@@ -480,13 +441,14 @@ public class ChunkProviderTC
 
         generateTerrain(x, z, arrayOfByte);
 
-        this.BiomeArray = this.localWorld.getBiomes(this.BiomeArray, x * 16, z * 16, ChunkMaxX, ChunkMaxZ);
+        //this.BiomeArray = this.localWorld.getBiomes(this.BiomeArray, x * 16, z * 16, ChunkMaxX, ChunkMaxZ);  now get it in generateTerrain
+
         boolean dry = ReplaceForBiomeAndReturnWaterless(x, z, arrayOfByte);
 
         this.CaveGen.a(x, z, arrayOfByte);
         this.CanyonGen.a(x, z, arrayOfByte);
 
-        if(this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.Normal || this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
+        if (this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.Normal || this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
             this.localWorld.PrepareTerrainObjects(x, z, arrayOfByte, dry);
 
         if (this.worldSettings.isDeprecated)

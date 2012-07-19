@@ -148,6 +148,8 @@ public enum TCDefaultValues
     BiomeHeight(0.1D),
     BiomeVolatility(0.3D),
 
+    UseWorldWaterLevel(true),
+
     CustomObjects(true),
     objectSpawnRatio(2),
     DenyObjectsUnderFill(false),
