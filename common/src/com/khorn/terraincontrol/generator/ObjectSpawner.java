@@ -74,7 +74,9 @@ public class ObjectSpawner
         world.PlaceIce(x, z);
 
 
-        world.DoReplace();
+        world.DoBlockReplace();
+
+        world.DoBiomeReplace();
 
 
         if (this.worldSettings.isDeprecated)

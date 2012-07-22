@@ -123,10 +123,6 @@ public class SingleWorld implements LocalWorld
         return Biomes[id];
     }
 
-    public LocalBiome getBiomeByName(String name)
-    {
-        return this.BiomeNames.get(name);
-    }
 
     public int getBiomeIdByName(String name)
     {
@@ -262,15 +258,16 @@ public class SingleWorld implements LocalWorld
         return Village;
     }
 
-    public void DoReplace()
+    public void DoBlockReplace()
     {
         if (this.settings.BiomeConfigsHaveReplacement)
         {
 
             ack rawChunk = this.ChunkCache[0];
 
-
             zg[] sectionsArray = rawChunk.i();
+
+            byte[] ChunkBiomes = rawChunk.m();
 
             this.BiomeArray = this.world.i().b(this.BiomeArray, this.CurrentChunkX * 16, this.CurrentChunkZ * 16, 16, 16);
 
@@ -286,7 +283,7 @@ public class SingleWorld implements LocalWorld
                 {
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(sectionX + sectionZ * 16)].M];
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX]];
 
                         if (biomeConfig.ReplaceCount > 0)
                         {
@@ -310,6 +307,18 @@ public class SingleWorld implements LocalWorld
                 }
             }
         }
+    }
+
+    public void DoBiomeReplace()
+    {
+        if (this.settings.HaveBiomeReplace)
+        {
+            byte[] ChunkBiomes = this.ChunkCache[0].m();
+
+            for (int i = 0; i < ChunkBiomes.length; i++)
+                ChunkBiomes[i] = this.settings.ReplaceMatrixBiomes[ChunkBiomes[i]];
+        }
+
     }
 
     public void LoadChunk(int x, int z)

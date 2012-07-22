@@ -41,8 +41,7 @@ public class BiomeConfig extends ConfigFile
     public byte SurfaceBlock;
     public byte GroundBlock;
 
-    public boolean evenWaterSourceDistribution;
-    public boolean evenLavaSourceDistribution;
+    public String ReplaceBiomeName;
 
     public boolean disableNotchPonds;
 
@@ -331,9 +330,7 @@ public class BiomeConfig extends ConfigFile
         this.BiomeTemperature = this.ReadModSettings(TCDefaultValues.BiomeTemperature.name(), this.DefaultBiomeTemperature);
         this.BiomeWetness = this.ReadModSettings(TCDefaultValues.BiomeWetness.name(), this.DefaultBiomeWetness);
 
-
-        this.evenWaterSourceDistribution = this.ReadModSettings(TCDefaultValues.evenWaterSourceDistribution.name(), TCDefaultValues.evenWaterSourceDistribution.booleanValue());
-        this.evenLavaSourceDistribution = this.ReadModSettings(TCDefaultValues.evenLavaSourceDistribution.name(), TCDefaultValues.evenLavaSourceDistribution.booleanValue());
+        this.ReplaceBiomeName = this.ReadModSettings(TCDefaultValues.ReplaceToBiomeName.name(),TCDefaultValues.ReplaceToBiomeName.stringValue());
 
         this.BiomeHeight = this.ReadModSettings(TCDefaultValues.BiomeHeight.name(), this.DefaultBiomeSurface);
         this.BiomeVolatility = this.ReadModSettings(TCDefaultValues.BiomeVolatility.name(), this.DefaultBiomeVolatility);
@@ -553,6 +550,10 @@ public class BiomeConfig extends ConfigFile
         this.WriteNewLine();
         WriteComment("Biome wetness. Float value from 0.0 to 1.0");
         WriteValue(TCDefaultValues.BiomeWetness.name(), this.BiomeWetness);
+        this.WriteNewLine();
+
+        WriteComment("Replace this biome to specified after all generations. Warning this will cause saplings and mob spawning work as in specified biome");
+        WriteValue(TCDefaultValues.ReplaceToBiomeName.name(), this.ReplaceBiomeName);
         this.WriteNewLine();
 
 
@@ -850,6 +851,11 @@ public class BiomeConfig extends ConfigFile
 
         this.volatilityWeight1 = (this.volatilityWeightRaw1 - 0.5D) * 24.0D;
         this.volatilityWeight2 = (0.5D - this.volatilityWeightRaw2) * 24.0D;
+
+        this.waterLevelMin = CheckValue(this.waterLevelMin, 0, this.worldConfig.WorldHeight - 1);
+        this.waterLevelMax = CheckValue(this.waterLevelMax, 0,this.worldConfig.WorldHeight - 1, this.waterLevelMin);
+
+        this.ReplaceBiomeName = ( DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomes.contains(this.ReplaceBiomeName))?this.ReplaceBiomeName:"";
     }
 
     protected void RenameOldSettings()

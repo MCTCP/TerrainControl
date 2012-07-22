@@ -107,12 +107,7 @@ public class BukkitWorld implements LocalWorld
         return Biomes[id];
     }
 
-    public LocalBiome getBiomeByName(String name)
-    {
-        return this.BiomeNames.get(name);
-    }
 
-    // TODO: NPE check is missing!
     public int getBiomeIdByName(String name)
     {
         return this.BiomeNames.get(name).getId();
@@ -276,7 +271,7 @@ public class BukkitWorld implements LocalWorld
 
     // This part work with ReplacedBlocks after all spawns
     // TODO: check how its work.
-    public void DoReplace()
+    public void DoBlockReplace()
     {
         if (this.settings.BiomeConfigsHaveReplacement)
         {
@@ -284,7 +279,7 @@ public class BukkitWorld implements LocalWorld
 
             ChunkSection[] sectionsArray = rawChunk.h();
 
-            this.BiomeArray = this.world.getWorldChunkManager().getBiomeBlock(this.BiomeArray, this.CurrentChunkX * 16, this.CurrentChunkZ * 16, 16, 16);
+            byte[] ChunkBiomes = rawChunk.l();
 
             int x = this.CurrentChunkX * 16;
             int z = this.CurrentChunkZ * 16;
@@ -298,7 +293,7 @@ public class BukkitWorld implements LocalWorld
                 {
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigs[this.BiomeArray[(sectionX + sectionZ * 16)].id];
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX]];
                         if (biomeConfig != null && biomeConfig.ReplaceCount > 0)
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)
@@ -321,6 +316,18 @@ public class BukkitWorld implements LocalWorld
                 }
             }
         }
+    }
+
+    public void DoBiomeReplace()
+    {
+        if (this.settings.HaveBiomeReplace)
+        {
+            byte[] ChunkBiomes = this.ChunkCache[0].l();
+
+            for (int i = 0; i < ChunkBiomes.length; i++)
+                ChunkBiomes[i] = this.settings.ReplaceMatrixBiomes[ChunkBiomes[i]];
+        }
+
     }
 
     public void LoadChunk(Chunk chunk)

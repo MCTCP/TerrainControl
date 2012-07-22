@@ -28,6 +28,9 @@ public class WorldConfig extends ConfigFile
     public HashMap<String, ArrayList<CustomObject>> BranchGroups = new HashMap<String, ArrayList<CustomObject>>();
     public boolean HasCustomTrees = false;
 
+    public byte[] ReplaceMatrixBiomes = new byte[256];
+    public boolean HaveBiomeReplace = false;
+
     // public BiomeBase currentBiome;
     // --Commented out by Inspection (17.07.11 1:49):String seedValue;
 
@@ -186,6 +189,7 @@ public class WorldConfig extends ConfigFile
 
         ArrayList<LocalBiome> localBiomes = new ArrayList<LocalBiome>(world.getDefaultBiomes());
 
+        //Add custom biomes to world
         for (String biomeName : this.CustomBiomes)
         {
             if (checkOnly)
@@ -193,6 +197,10 @@ public class WorldConfig extends ConfigFile
             else
                 localBiomes.add(world.AddBiome(biomeName, this.CustomBiomeIds.get(biomeName)));
         }
+
+        //Build biome replace matrix
+        for(int i = 0; i < this.ReplaceMatrixBiomes.length;i++)
+            this.ReplaceMatrixBiomes[i] = (byte)i;
 
         this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
@@ -202,6 +210,12 @@ public class WorldConfig extends ConfigFile
             BiomeConfig config = new BiomeConfig(BiomeFolder, localBiome, this);
             if (checkOnly)
                 continue;
+
+            if(!config.ReplaceBiomeName.equals(""))
+            {
+                this.HaveBiomeReplace = true;
+                this.ReplaceMatrixBiomes[config.Biome.getId()] = (byte)world.getBiomeIdByName(config.ReplaceBiomeName);
+            }
 
             if (this.NormalBiomes.contains(config.Name))
                 this.normalBiomesRarity += config.BiomeRarity;
@@ -883,54 +897,28 @@ public class WorldConfig extends ConfigFile
             stream.writeInt(this.CustomBiomeIds.get(name));
         }
 
-        BiomeConfig config = this.getConfigByName(DefaultBiome.OCEAN.Name);
-        WriteStringToStream(stream, config.Name);
-        config.Serialize(stream);
-
-        config = this.getConfigByName(DefaultBiome.RIVER.Name);
-        WriteStringToStream(stream, config.Name);
-        config.Serialize(stream);
-
-        config = this.getConfigByName(DefaultBiome.FROZEN_OCEAN.Name);
-        WriteStringToStream(stream, config.Name);
-        config.Serialize(stream);
-
-        config = this.getConfigByName(DefaultBiome.FROZEN_RIVER.Name);
-        WriteStringToStream(stream, config.Name);
-        config.Serialize(stream);
-
+        stream.writeInt(this.biomes.size());
+        for ( BiomeConfig config : this.biomes)
+        {
+            stream.writeInt(config.Biome.getId());
+            config.Serialize(stream);
+        }
 
         stream.writeInt(this.NormalBiomes.size());
         for (String biome : this.NormalBiomes)
-        {
-            config = this.getConfigByName(biome);
-            WriteStringToStream(stream, config.Name);
-            config.Serialize(stream);
-        }
+            WriteStringToStream(stream, biome);
 
         stream.writeInt(this.IceBiomes.size());
         for (String biome : this.IceBiomes)
-        {
-            config = this.getConfigByName(biome);
-            WriteStringToStream(stream, config.Name);
-            config.Serialize(stream);
-        }
+            WriteStringToStream(stream, biome);
 
         stream.writeInt(this.IsleBiomes.size());
         for (String biome : this.IsleBiomes)
-        {
-            config = this.getConfigByName(biome);
-            WriteStringToStream(stream, config.Name);
-            config.Serialize(stream);
-        }
+            WriteStringToStream(stream, biome);
 
         stream.writeInt(this.BorderBiomes.size());
         for (String biome : this.BorderBiomes)
-        {
-            config = this.getConfigByName(biome);
-            WriteStringToStream(stream, config.Name);
-            config.Serialize(stream);
-        }
+            WriteStringToStream(stream, biome);
     }
 
 
@@ -938,7 +926,9 @@ public class WorldConfig extends ConfigFile
     public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
     {
         // Protocol version
-        stream.readInt();
+        int protocolVersion = stream.readInt();
+        if ( protocolVersion != TCDefaultValues.ProtocolVersion.intValue())
+            throw new IOException("Wrong TC protocol version");
 
         this.WorldName = ReadStringFromStream(stream);
 
@@ -986,30 +976,20 @@ public class WorldConfig extends ConfigFile
 
         this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
-        String name = ReadStringFromStream(stream);
-        BiomeConfig config = new BiomeConfig(stream, this, world.getBiomeByName(name));
-        this.biomeConfigs[config.Biome.getId()] = config;
-
-        name = ReadStringFromStream(stream);
-        config = new BiomeConfig(stream, this, world.getBiomeByName(name));
-        this.biomeConfigs[config.Biome.getId()] = config;
-
-        name = ReadStringFromStream(stream);
-        config = new BiomeConfig(stream, this, world.getBiomeByName(name));
-        this.biomeConfigs[config.Biome.getId()] = config;
-
-        name = ReadStringFromStream(stream);
-        config = new BiomeConfig(stream, this, world.getBiomeByName(name));
-        this.biomeConfigs[config.Biome.getId()] = config;
+        count = stream.readInt();
+        while (count-- > 0)
+        {
+            int id = stream.readInt();
+            BiomeConfig config = new BiomeConfig(stream, this, world.getBiomeById(id));
+            this.biomeConfigs[id] = config;
+        }
 
         count = stream.readInt();
+        String name;
         while (count-- > 0)
         {
             name = ReadStringFromStream(stream);
             this.NormalBiomes.add(name);
-            config = new BiomeConfig(stream, this, world.getBiomeByName(name));
-            this.biomeConfigs[config.Biome.getId()] = config;
-
         }
 
         count = stream.readInt();
@@ -1017,8 +997,6 @@ public class WorldConfig extends ConfigFile
         {
             name = ReadStringFromStream(stream);
             this.IceBiomes.add(name);
-            config = new BiomeConfig(stream, this, world.getBiomeByName(name));
-            this.biomeConfigs[config.Biome.getId()] = config;
         }
 
         count = stream.readInt();
@@ -1026,8 +1004,6 @@ public class WorldConfig extends ConfigFile
         {
             name = ReadStringFromStream(stream);
             this.IsleBiomes.add(name);
-            config = new BiomeConfig(stream, this, world.getBiomeByName(name));
-            this.biomeConfigs[config.Biome.getId()] = config;
         }
 
         count = stream.readInt();
@@ -1035,24 +1011,11 @@ public class WorldConfig extends ConfigFile
         {
             name = ReadStringFromStream(stream);
             this.BorderBiomes.add(name);
-            config = new BiomeConfig(stream, this, world.getBiomeByName(name));
-            this.biomeConfigs[config.Biome.getId()] = config;
         }
 
         for (BiomeConfig biomeConfig : this.biomeConfigs)
             if (biomeConfig != null && biomeConfig.Biome.isCustom())
                 biomeConfig.Biome.setCustom(biomeConfig);
 
-    }
-
-
-    private BiomeConfig getConfigByName(String name)
-    {
-        for (BiomeConfig biome : this.biomeConfigs)
-        {
-            if (biome.Name.equals(name))
-                return biome;
-        }
-        return null;
     }
 }

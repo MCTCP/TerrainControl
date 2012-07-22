@@ -10,7 +10,7 @@ public enum TCDefaultValues
     WorldBiomeConfigDirectoryName("BiomeConfigs"),
     WorldBiomeConfigName("BiomeConfig.ini"),
     ChannelName("TerrainControl"),
-    ProtocolVersion(3),
+    ProtocolVersion(4),
 
     maxChunkBlockValue(32768),
 
@@ -147,6 +147,7 @@ public enum TCDefaultValues
 
     BiomeHeight(0.1D),
     BiomeVolatility(0.3D),
+    ReplaceToBiomeName(""),
 
     UseWorldWaterLevel(true),
 

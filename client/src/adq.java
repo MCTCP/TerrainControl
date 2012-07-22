@@ -16,7 +16,7 @@ public class adq
     public adq(xd paramxd)
     {
         this.a = paramxd;
-        mod_TerrainControl.NewWorldCreated();
+        mod_TerrainControl.NewWorldCreated( paramxd);
     }
 
     public void a() {

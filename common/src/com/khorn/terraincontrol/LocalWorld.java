@@ -19,7 +19,6 @@ public interface LocalWorld
     
     public LocalBiome getBiomeById(int id);
 
-    public LocalBiome getBiomeByName(String name);
 
     public int getBiomeIdByName(String name);
 
@@ -53,7 +52,9 @@ public interface LocalWorld
 
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z);
 
-    public void DoReplace();
+    public void DoBlockReplace();
+
+    public void DoBiomeReplace();
 
 
     // Blocks

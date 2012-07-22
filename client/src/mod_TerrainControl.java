@@ -8,13 +8,11 @@ import java.io.IOException;
 public class mod_TerrainControl extends BaseMod
 {
     public static TCPlugin Plugin;
-    private static boolean ServerConnected = false;
-    private static adl NetworkHandler;
 
     @Override
     public String getVersion()
     {
-        return "2.2";
+        return "2.2.2";
     }
 
     @Override
@@ -61,23 +59,14 @@ public class mod_TerrainControl extends BaseMod
     @Override
     public void serverConnect(adl handler)
     {
-        ServerConnected = true;
-        NetworkHandler = handler;
         SendTCPacker();
-
     }
 
-    @Override
-    public void serverDisconnect()
-    {
-        ServerConnected = false;
-        NetworkHandler = null;
-    }
 
-    public static void NewWorldCreated()
+    public static void NewWorldCreated(xd world)
     {
         SingleWorld.RestoreBiomes();
-        if (ServerConnected)
+        if (world instanceof je)
             SendTCPacker();
 
     }
@@ -90,7 +79,7 @@ public class mod_TerrainControl extends BaseMod
 
         packet.c = data;
         packet.b = data.length;
-        NetworkHandler.c(packet);
+        ModLoader.sendPacket(packet);
     }
 
     /*

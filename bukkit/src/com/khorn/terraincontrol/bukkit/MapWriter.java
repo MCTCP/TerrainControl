@@ -31,7 +31,7 @@ public class MapWriter implements Runnable
     private int offsetX;
     private int offsetZ;
     private String label;
-      
+
     public enum Angle
     {
         d0, d90, d180, d270
@@ -45,11 +45,11 @@ public class MapWriter implements Runnable
         this.sender = _sender;
         this.angle = _angle;
         this.offsetX = _offsetX;
-        this.offsetZ = _offsetZ; 
+        this.offsetZ = _offsetZ;
         this.label = _label;
     }
-    
-     
+
+
     public void run()
     {
         if (MapWriter.isWork)
@@ -57,11 +57,11 @@ public class MapWriter implements Runnable
             sender.sendMessage(BaseCommand.ErrorColor + "Another instance of map writer is running");
             return;
         }
-        
+
         MapWriter.isWork = true;
         int height = size;
         int width = size;
-        
+
         try
         {
             int[] Colors = Default_Colors;
@@ -100,7 +100,7 @@ public class MapWriter implements Runnable
 
             int image_x = 0;
             int image_y = 0;
-                      
+
 
             for (int x = -height / 2; x < height / 2; x++)
             {
@@ -119,7 +119,7 @@ public class MapWriter implements Runnable
                         time = time2;
                     }
 
-                    BiomeBuffer = world.getWorldChunkManager().getBiomeBlock(BiomeBuffer,offsetX + x * 16, offsetZ + z * 16, 16, 16);
+                    BiomeBuffer = world.getWorldChunkManager().getBiomeBlock(BiomeBuffer, offsetX + x * 16, offsetZ + z * 16, 16, 16);
                     tempArray = world.getWorldChunkManager().getTemperatures(tempArray, offsetX + x * 16, offsetZ + z * 16, 16, 16);
                     for (int x1 = 0; x1 < 16; x1++)
                     {
@@ -129,21 +129,21 @@ public class MapWriter implements Runnable
                             switch (this.angle)
                             {
                                 case d0:
-                            		image_x = (x + height / 2) * 16 + x1;
-                            		image_y = (z + width / 2) * 16 + z1;
-                            		break;   
-                               case d90:
+                                    image_x = (x + height / 2) * 16 + x1;
+                                    image_y = (z + width / 2) * 16 + z1;
+                                    break;
+                                case d90:
                                     image_x = width * 16 - ((z + width / 2) * 16 + z1 + 1);
                                     image_y = (x + height / 2) * 16 + x1;
-                                break;
+                                    break;
                                 case d180:
                                     image_x = height * 16 - ((x + height / 2) * 16 + x1 + 1);
                                     image_y = width * 16 - ((z + width / 2) * 16 + z1 + 1);
-                                break;
+                                    break;
                                 case d270:
                                     image_x = (z + width / 2) * 16 + z1;
                                     image_y = height * 16 - ((x + height / 2) * 16 + x1 + 1);
-                                break;
+                                    break;
                             }
 
                             biomeImage.setRGB(image_x, image_y, Colors[BiomeBuffer[x1 + 16 * z1].id]);
@@ -170,8 +170,7 @@ public class MapWriter implements Runnable
 
             sender.sendMessage(BaseCommand.MessageColor + "Done");
 
-        }
-        catch (Exception e1)
+        } catch (Exception e1)
         {
             e1.printStackTrace();
         }
