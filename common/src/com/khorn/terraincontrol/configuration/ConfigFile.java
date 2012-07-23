@@ -225,7 +225,7 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
-    protected void WriteSettingsFile(File settingsFile)
+    public void WriteSettingsFile(File settingsFile)
     {
         try
         {

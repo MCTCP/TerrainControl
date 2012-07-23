@@ -624,7 +624,7 @@ public class BiomeConfig extends ConfigFile
 
 
         this.WriteNewLine();
-        WriteComment("Replace Variable: BlockIdFrom=BlockIdTo[(minHeight-maxHeight)]");
+        WriteComment("Replace Variable: BlockIdFrom=BlockIdTo[.BlockData][(minHeight-maxHeight)]");
         WriteComment("Example :");
         WriteComment("  ReplacedBlocks:2=3(100-128),13=20");
         WriteComment("Replace grass block to dirt from 100 to 128 height and replace gravel to glass on all height ");

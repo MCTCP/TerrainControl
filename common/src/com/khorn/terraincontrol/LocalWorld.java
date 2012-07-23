@@ -91,6 +91,8 @@ public interface LocalWorld
 
     public WorldConfig getSettings();
 
+    public void setSettings(WorldConfig settings);
+
     public String getName();
 
     // Terrain init
