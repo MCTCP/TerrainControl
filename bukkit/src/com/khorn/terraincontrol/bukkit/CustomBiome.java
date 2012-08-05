@@ -45,8 +45,8 @@ public class CustomBiome extends BiomeBase
         this.E = config.BiomeVolatility;
         this.A = config.SurfaceBlock;
         this.B = config.GroundBlock;
-        this.F = config.BiomeTemperature;
-        this.G = config.BiomeWetness;
+        this.temperature = config.BiomeTemperature;
+        this.humidity = config.BiomeWetness;
         
         // This section modifies the BiomeMetas... or "SpawnGroups" as I would like to call them :P
         List<BiomeMeta> monsters = Obfu.getBiomeBase_MonsterBiomeMetas(this);

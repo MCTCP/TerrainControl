@@ -238,13 +238,13 @@ public class BukkitWorld implements LocalWorld
         {
             for (int _z = 0; _z < 16; _z++)
             {
-                int i5 = this.world.f(i1 + _x, i2 + _z);
+                int i5 = this.world.g(i1 + _x, i2 + _z);
 
-                if (this.world.s(_x + i1, i5 - 1, _z + i2))
+                if (this.world.u(_x + i1, i5 - 1, _z + i2))
                 {
                     this.world.setTypeId(_x + i1, i5 - 1, _z + i2, Block.ICE.id);
                 }
-                if (this.world.u(_x + i1, i5, _z + i2))
+                if (this.world.w(_x + i1, i5, _z + i2))
                 {
                     this.world.setTypeId(_x + i1, i5, _z + i2, Block.SNOW.id);
                 }
@@ -273,9 +273,9 @@ public class BukkitWorld implements LocalWorld
         {
             Chunk rawChunk = this.ChunkCache[0];
 
-            ChunkSection[] sectionsArray = rawChunk.h();
+            ChunkSection[] sectionsArray = rawChunk.i();
 
-            byte[] ChunkBiomes = rawChunk.l();
+            byte[] ChunkBiomes = rawChunk.m();
 
             int x = this.CurrentChunkX * 16;
             int z = this.CurrentChunkZ * 16;
@@ -298,13 +298,13 @@ public class BukkitWorld implements LocalWorld
                                 if (biomeConfig.ReplaceMatrixBlocks[blockId] == null)
                                     continue;
 
-                                int replaceTo = biomeConfig.ReplaceMatrixBlocks[blockId][section.c() + sectionY];
+                                int replaceTo = biomeConfig.ReplaceMatrixBlocks[blockId][section.d() + sectionY];
                                 if (replaceTo == -1)
                                     continue;
 
                                 section.a(sectionX, sectionY, sectionZ, replaceTo >> 4);
                                 section.b(sectionX, sectionY, sectionZ, replaceTo & 0xF);
-                                world.notify((x + sectionX), (section.c() + sectionY), (z + sectionZ));
+                                world.notify((x + sectionX), (section.d() + sectionY), (z + sectionZ));
 
                             }
                         }
@@ -318,7 +318,7 @@ public class BukkitWorld implements LocalWorld
     {
         if (this.settings.HaveBiomeReplace)
         {
-            byte[] ChunkBiomes = this.ChunkCache[0].l();
+            byte[] ChunkBiomes = this.ChunkCache[0].m();
 
             for (int i = 0; i < ChunkBiomes.length; i++)
                 ChunkBiomes[i] = this.settings.ReplaceMatrixBiomes[ChunkBiomes[i]];

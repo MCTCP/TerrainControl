@@ -118,7 +118,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         {
             synchronized (this.LockObject)
             {
-                BiomeBase[] localObject = this.Cache.c(paramInt1, paramInt2);
+                BiomeBase[] localObject = this.Cache.e(paramInt1, paramInt2);
                 System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, paramInt3 * paramInt4);
             }
             return paramArrayOfBiomeBase;
@@ -222,7 +222,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         {
             synchronized (this.LockObject)
             {
-                BiomeBase[] localObject = this.Cache.c(x, z);
+                BiomeBase[] localObject = this.Cache.e(x, z);
                 for(int i= 0; i< x_size*z_size;i++)
                     biomeArray[i] = localObject[i].id;
 

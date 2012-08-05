@@ -55,12 +55,12 @@ public class BukkitBiome implements LocalBiome
 
     public float getTemperature()
     {
-        return this.biomeBase.F;
+        return this.biomeBase.temperature;
     }
 
     public float getWetness()
     {
-        return this.biomeBase.G;
+        return this.biomeBase.humidity;
     }
 
     public float getSurfaceHeight()

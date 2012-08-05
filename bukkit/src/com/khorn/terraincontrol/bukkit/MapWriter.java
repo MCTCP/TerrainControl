@@ -1,21 +1,18 @@
 package com.khorn.terraincontrol.bukkit;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-
-import javax.imageio.stream.FileCacheImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
-
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
-import net.minecraft.server.BiomeBase;
-import net.minecraft.server.World;
-
-import org.bukkit.command.CommandSender;
-
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.sun.imageio.plugins.png.PNGImageWriter;
 import com.sun.imageio.plugins.png.PNGImageWriterSpi;
+import net.minecraft.server.BiomeBase;
+import net.minecraft.server.World;
+import org.bukkit.command.CommandSender;
+
+import javax.imageio.stream.FileCacheImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
 
 public class MapWriter implements Runnable
 {
@@ -66,7 +63,7 @@ public class MapWriter implements Runnable
         {
             int[] Colors = Default_Colors;
 
-            BukkitWorld bukkitWorld = plugin.worlds.get(world.getUUID());
+            BukkitWorld bukkitWorld = plugin.worlds.get(world.getDataManager().getUUID());
             if (bukkitWorld != null)
             {
                 Colors = new int[bukkitWorld.getSettings().biomeConfigs.length];
@@ -158,11 +155,11 @@ public class MapWriter implements Runnable
 
             sender.sendMessage(BaseCommand.MessageColor + "Writing images...");
             PNGImageWriter PngEncoder = new PNGImageWriter(new PNGImageWriterSpi());
-            ImageOutputStream imageOutput = new FileCacheImageOutputStream(new FileOutputStream(label + world.worldData.name + "_biome.png", false), null);
+            ImageOutputStream imageOutput = new FileCacheImageOutputStream(new FileOutputStream(label + world.worldData.getName() + "_biome.png", false), null);
             PngEncoder.setOutput(imageOutput);
             PngEncoder.write(biomeImage);
 
-            imageOutput = new FileCacheImageOutputStream(new FileOutputStream(label + world.worldData.name + "_temperature.png", false), null);
+            imageOutput = new FileCacheImageOutputStream(new FileOutputStream(label + world.worldData.getName() + "_temperature.png", false), null);
             PngEncoder.setOutput(imageOutput);
             PngEncoder.write(tempImage);
 

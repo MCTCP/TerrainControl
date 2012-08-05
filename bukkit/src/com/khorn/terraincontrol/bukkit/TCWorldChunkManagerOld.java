@@ -114,7 +114,7 @@ public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeM
         }
         if ((useCache) && (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
-            BiomeBase[] localObject = this.Cache.c(x, z);
+            BiomeBase[] localObject = this.Cache.e(x, z);
             System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, x_size * z_size);
             return paramArrayOfBiomeBase;
         }
@@ -294,7 +294,7 @@ public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeM
         }
         if ( (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
-            BiomeBase[] localObject = this.Cache.c(x, z);
+            BiomeBase[] localObject = this.Cache.e(x, z);
             for(int i= 0; i< x_size*z_size;i++)
                 biomeArray[i] = localObject[i].id;
             return biomeArray;

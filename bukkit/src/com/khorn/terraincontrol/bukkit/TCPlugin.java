@@ -1,16 +1,9 @@
 package com.khorn.terraincontrol.bukkit;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.Txt;
-
 import net.minecraft.server.BiomeBase;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -20,6 +13,12 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TCPlugin extends JavaPlugin
 {
@@ -155,7 +154,7 @@ public class TCPlugin extends JavaPlugin
                     break;
             }
 
-            this.worlds.put(workWorld.getUUID(), bukkitWorld);
+            this.worlds.put(workWorld.getDataManager().getUUID(), bukkitWorld);
 
             log("world initialized with seed is " + workWorld.getSeed());
         }

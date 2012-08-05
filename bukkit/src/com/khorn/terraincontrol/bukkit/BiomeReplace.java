@@ -91,7 +91,7 @@ public class BiomeReplace implements Runnable
 
                 sender.sendMessage(BaseCommand.MessageColor + "Unload all chunks");
 
-                chunkProviderServer.c();
+                chunkProviderServer.a();
                 chunkProviderServer.unloadChunks();
 
 
