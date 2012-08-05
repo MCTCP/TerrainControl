@@ -3,15 +3,12 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class SingleWorld implements LocalWorld
 {
     private ChunkProvider generator;
-    private xd world;
+    private uo world;
     private WorldConfig settings;
     private String name;
     private long Seed;
@@ -21,38 +18,41 @@ public class SingleWorld implements LocalWorld
     private static int NextBiomeId = 0;
     private static int maxBiomeCount = 256;
     private static LocalBiome[] Biomes = new LocalBiome[maxBiomeCount];
-    private static abn[] BiomesToRestore = new abn[maxBiomeCount];
+    private static vj[] BiomesToRestore = new vj[maxBiomeCount];
 
     private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
 
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 
 
-    private xq strongholdGen;
-    private an VillageGen;
-    private alo MineshaftGen;
+    public aag strongholdGen;
+    private abh VillageGen;
+    private yx MineshaftGen;
+    private zy PyramidsGen;
 
-    private dq DungeonGen;
 
-    private sb Tree;
-    private zz BigTree;
-    private i Forest;
-    private bf SwampTree;
-    private lo TaigaTree1;
-    private rb TaigaTree2;
-    private qm HugeMushroom;
-    private ajd JungleTree;
-    private agm GroundBush;
+    private yi DungeonGen;
+
+    private yt Tree;
+    private xp BigTree;
+    private xq Forest;
+    private yr SwampTree;
+    private yk TaigaTree1;
+    private yq TaigaTree2;
+    private ye HugeMushroom;
+    private yh JungleTree;
+    private xz GroundBush;
 
 
     private boolean CreateNewChunks;
-    private ack[] ChunkCache;
-    private ack CachedChunk;
+    private wk[] ChunkCache;
+    private wk CachedChunk;
 
     private int CurrentChunkX;
     private int CurrentChunkZ;
 
-    private abn[] BiomeArray;
+    private vj[] BiomeArray;
+    private int[] BiomeIntArray;
 
 
     private int worldHeight = 128;
@@ -61,15 +61,25 @@ public class SingleWorld implements LocalWorld
 
     public static void RestoreBiomes()
     {
-        for (abn oldBiome : BiomesToRestore)
+        for (vj oldBiome : BiomesToRestore)
         {
             if (oldBiome == null)
                 continue;
-            abn.a[oldBiome.M] = oldBiome;
+            vj.a[oldBiome.M] = oldBiome;
         }
         NextBiomeId = 0;
         DefaultBiomes.clear();
-        an.a = Arrays.asList(abn.c, abn.d);
+        abh.e = Arrays.asList(vj.c, vj.d);
+
+        List biomes = Arrays.asList(vj.d, vj.s, vj.w);
+        try
+        {
+            ModLoader.setPrivateValue(zy.class, null, "e", biomes);
+
+        } catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        }
 
     }
 
@@ -80,7 +90,7 @@ public class SingleWorld implements LocalWorld
 
         for (int i = 0; i < DefaultBiome.values().length; i++)
         {
-            abn oldBiome = abn.a[i];
+            vj oldBiome = vj.a[i];
             BiomesToRestore[i] = oldBiome;
             CustomBiome custom = new CustomBiome(NextBiomeId++, oldBiome.y);
             custom.CopyBiome(oldBiome);
@@ -89,8 +99,17 @@ public class SingleWorld implements LocalWorld
             DefaultBiomes.add(biome);
             this.BiomeNames.put(biome.getName(), biome);
         }
-        an.a = Arrays.asList(abn.a[DefaultBiome.PLAINS.Id], abn.a[DefaultBiome.DESERT.Id]);
+        abh.e = Arrays.asList(vj.a[DefaultBiome.PLAINS.Id], vj.a[DefaultBiome.DESERT.Id]);
 
+        List PyramidsBiomes = Arrays.asList(vj.a[DefaultBiome.DESERT.Id], vj.a[DefaultBiome.DESERT_HILLS.Id], vj.a[DefaultBiome.JUNGLE.Id]);
+        try
+        {
+            ModLoader.setPrivateValue(zy.class, null, "e", PyramidsBiomes);
+
+        } catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        }
 
     }
 
@@ -136,22 +155,42 @@ public class SingleWorld implements LocalWorld
 
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
-        return this.biomeManager.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
+        if (this.biomeManager != null)
+            return this.biomeManager.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
+
+        BiomeArray = this.world.w.c.a(BiomeArray, x, z, x_size, z_size);
+        if (biomeArray == null || biomeArray.length < x_size * z_size)
+            biomeArray = new int[x_size * z_size];
+        for (int i = 0; i < x_size * z_size; i++)
+            biomeArray[i] = BiomeArray[i].M;
+        return biomeArray;
     }
 
     public float[] getTemperatures(int x, int z, int x_size, int z_size)
     {
-        return this.biomeManager.getTemperaturesTC(x, z, x_size, z_size);
+        if (this.biomeManager != null)
+            return this.biomeManager.getTemperaturesTC(x, z, x_size, z_size);
+        return this.world.w.c.b(new float[0], x, z, x_size, z_size);
     }
 
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
-        return this.biomeManager.getBiomesTC(biomeArray, x, z, x_size, z_size);
+        if (this.biomeManager != null)
+            return this.biomeManager.getBiomesTC(biomeArray, x, z, x_size, z_size);
+
+        BiomeArray = this.world.w.c.a(BiomeArray, x, z, x_size, z_size, true);
+        if (biomeArray == null || biomeArray.length < x_size * z_size)
+            biomeArray = new int[x_size * z_size];
+        for (int i = 0; i < x_size * z_size; i++)
+            biomeArray[i] = BiomeArray[i].M;
+        return biomeArray;
     }
 
     public int getBiome(int x, int z)
     {
-        return this.biomeManager.getBiomeTC(x, z);
+        if (this.biomeManager != null)
+            return this.biomeManager.getBiomeTC(x, z);
+        return this.world.w.c.a(x, z).M;
     }
 
     public LocalBiome getLocalBiome(int x, int z)
@@ -173,6 +212,9 @@ public class SingleWorld implements LocalWorld
             this.MineshaftGen.a(null, this.world, x, z, chunkArray);
         if (this.settings.VillagesEnabled && dry)
             this.VillageGen.a(null, this.world, x, z, chunkArray);
+        if (this.settings.PyramidsEnabled)
+            this.PyramidsGen.a(null, this.world, x, z, chunkArray);
+
 
     }
 
@@ -226,15 +268,15 @@ public class SingleWorld implements LocalWorld
         {
             for (int _z = 0; _z < 16; _z++)
             {
-                int i5 = this.world.f(i1 + _x, i2 + _z);
+                int i5 = this.world.g(i1 + _x, i2 + _z);
 
-                if (this.world.r(_x + i1, i5 - 1, _z + i2))
+                if (this.world.u(_x + i1, i5 - 1, _z + i2))
                 {
-                    this.world.g(_x + i1, i5 - 1, _z + i2, DefaultMaterial.ICE.id);
+                    this.world.e(_x + i1, i5 - 1, _z + i2, DefaultMaterial.ICE.id);
                 }
-                if (this.world.t(_x + i1, i5, _z + i2))
+                if (this.world.w(_x + i1, i5, _z + i2))
                 {
-                    this.world.g(_x + i1, i5, _z + i2, DefaultMaterial.SNOW.id);
+                    this.world.e(_x + i1, i5, _z + i2, DefaultMaterial.SNOW.id);
                 }
             }
 
@@ -250,6 +292,8 @@ public class SingleWorld implements LocalWorld
             this.MineshaftGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.VillagesEnabled)
             Village = this.VillageGen.a(this.world, rand, chunk_x, chunk_z);
+        if (this.settings.PyramidsEnabled)
+            this.PyramidsGen.a(this.world, rand, chunk_x, chunk_z);
 
         return Village;
     }
@@ -259,18 +303,16 @@ public class SingleWorld implements LocalWorld
         if (this.settings.BiomeConfigsHaveReplacement)
         {
 
-            ack rawChunk = this.ChunkCache[0];
+            wk rawChunk = this.ChunkCache[0];
 
-            zg[] sectionsArray = rawChunk.i();
+            wl[] sectionsArray = rawChunk.i();
 
             byte[] ChunkBiomes = rawChunk.m();
-
-            this.BiomeArray = this.world.i().b(this.BiomeArray, this.CurrentChunkX * 16, this.CurrentChunkZ * 16, 16, 16);
 
             int x = this.CurrentChunkX * 16;
             int z = this.CurrentChunkZ * 16;
 
-            for (zg section : sectionsArray)
+            for (wl section : sectionsArray)
             {
                 if (section == null)
                     continue;
@@ -289,13 +331,13 @@ public class SingleWorld implements LocalWorld
                                 if (biomeConfig.ReplaceMatrixBlocks[blockId] == null)
                                     continue;
 
-                                int replaceTo = biomeConfig.ReplaceMatrixBlocks[blockId][section.c() + sectionY];
+                                int replaceTo = biomeConfig.ReplaceMatrixBlocks[blockId][section.d() + sectionY];
                                 if (replaceTo == -1)
                                     continue;
 
                                 section.a(sectionX, sectionY, sectionZ, replaceTo >> 4);
                                 section.b(sectionX, sectionY, sectionZ, replaceTo & 0xF);
-                                world.k((x + sectionX), (section.c() + sectionY), (z + sectionZ));
+                                world.k((x + sectionX), (section.d() + sectionY), (z + sectionZ));
 
                             }
                         }
@@ -321,14 +363,14 @@ public class SingleWorld implements LocalWorld
     {
         this.CurrentChunkX = x;
         this.CurrentChunkZ = z;
-        this.ChunkCache[0] = this.world.d(x, z);
-        this.ChunkCache[1] = this.world.d(x + 1, z);
-        this.ChunkCache[2] = this.world.d(x, z + 1);
-        this.ChunkCache[3] = this.world.d(x + 1, z + 1);
+        this.ChunkCache[0] = this.world.e(x, z);
+        this.ChunkCache[1] = this.world.e(x + 1, z);
+        this.ChunkCache[2] = this.world.e(x, z + 1);
+        this.ChunkCache[3] = this.world.e(x + 1, z + 1);
         this.CreateNewChunks = true;
     }
 
-    private ack getChunk(int x, int y, int z)
+    private wk getChunk(int x, int y, int z)
     {
         if (y < 0 || y >= this.worldHeight)
             return null;
@@ -340,7 +382,7 @@ public class SingleWorld implements LocalWorld
         int index = x - this.CurrentChunkX + 2 * (z - this.CurrentChunkZ);
         if (index >= 0 && index < 4)
             return CachedChunk = this.ChunkCache[index];
-        else if (this.CreateNewChunks || this.world.z().a(x, z))
+        else if (this.CreateNewChunks || this.world.F().a(x, z))
             return CachedChunk = this.world.d(x, z);
         else
             return null;
@@ -350,7 +392,7 @@ public class SingleWorld implements LocalWorld
 
     public int getLiquidHeight(int x, int z)
     {
-        ack chunk = this.getChunk(x, 0, z);
+        wk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
         z = z & 0xF;
@@ -371,7 +413,7 @@ public class SingleWorld implements LocalWorld
 
     public int getTypeId(int x, int y, int z)
     {
-        ack chunk = this.getChunk(x, y, z);
+        wk chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return 0;
 
@@ -388,7 +430,7 @@ public class SingleWorld implements LocalWorld
         // this.world.setTypeIdAndData(i, j, k, l, i1)
 
         // We fetch the chunk from a custom cache in order to speed things up.
-        ack chunk = this.getChunk(x, y, z);
+        wk chunk = this.getChunk(x, y, z);
         if (chunk == null)
         {
             return;
@@ -398,19 +440,19 @@ public class SingleWorld implements LocalWorld
         {
             int oldTypeId = chunk.a(x & 15, y, z & 15);
             chunk.a(x & 15, y, z & 15, typeId, data);
-            this.world.j(x, y, z, typeId == 0 ? oldTypeId : typeId);
+            this.world.h(x, y, z, typeId == 0 ? oldTypeId : typeId);
         } else
             chunk.a(x & 15, y, z & 15, typeId, data); // Set typeId and Data
 
 
         if (updateLight)
         {
-            this.world.v(x, y, z);
+            this.world.x(x, y, z);
         }
 
         if (notifyPlayers)
         {
-            this.world.k(x, y, z);
+            this.world.h(x, y, z);
         }
     }
 
@@ -421,7 +463,7 @@ public class SingleWorld implements LocalWorld
 
     public int getHighestBlockYAt(int x, int z)
     {
-        ack chunk = this.getChunk(x, 0, z);
+        wk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
         z = z & 0xF;
@@ -442,7 +484,7 @@ public class SingleWorld implements LocalWorld
 
     public int getLightLevel(int x, int y, int z)
     {
-        return world.n(x, y, z);
+        return world.l(x, y, z);
     }
 
     public boolean isLoaded(int x, int y, int z)
@@ -452,7 +494,7 @@ public class SingleWorld implements LocalWorld
         x = x >> 4;
         z = z >> 4;
 
-        return world.z().a(x, z);
+        return world.F().a(x, z);
     }
 
     public WorldConfig getSettings()
@@ -491,48 +533,50 @@ public class SingleWorld implements LocalWorld
         this.settings = worldConfig;
     }
 
-    public void InitM(xd _world)
+    public void InitM(uo _world)
     {
         this.world = _world;
-        this.Seed = world.v();
+        this.Seed = world.C();
 
     }
 
-    public void Init(xd _world)
+    public void Init(uo _world)
     {
         this.world = _world;
-        this.Seed = world.v();
+        this.Seed = world.C();
         //this.world.e = this.settings.waterLevelMax;
 
 
-        this.DungeonGen = new dq();
-        this.strongholdGen = new xq();
+        this.DungeonGen = new yi();
+        this.strongholdGen = new aag();
 
-        abn[] StrongholdsBiomes = { abn.a[DefaultBiome.DESERT.Id], abn.a[DefaultBiome.FOREST.Id], abn.a[DefaultBiome.EXTREME_HILLS.Id], abn.a[DefaultBiome.SWAMPLAND.Id], abn.a[DefaultBiome.TAIGA.Id], abn.a[DefaultBiome.ICE_PLAINS.Id], abn.a[DefaultBiome.ICE_MOUNTAINS.Id], abn.a[DefaultBiome.DESERT_HILLS.Id], abn.a[DefaultBiome.FOREST_HILLS.Id], abn.a[DefaultBiome.SMALL_MOUNTAINS.Id], abn.a[DefaultBiome.JUNGLE.Id], abn.a[DefaultBiome.JUNGLE_HILLS.Id] };
+        vj[] StrongholdsBiomes = {vj.a[DefaultBiome.DESERT.Id], vj.a[DefaultBiome.FOREST.Id], vj.a[DefaultBiome.EXTREME_HILLS.Id], vj.a[DefaultBiome.SWAMPLAND.Id], vj.a[DefaultBiome.TAIGA.Id], vj.a[DefaultBiome.ICE_PLAINS.Id], vj.a[DefaultBiome.ICE_MOUNTAINS.Id], vj.a[DefaultBiome.DESERT_HILLS.Id], vj.a[DefaultBiome.FOREST_HILLS.Id], vj.a[DefaultBiome.SMALL_MOUNTAINS.Id], vj.a[DefaultBiome.JUNGLE.Id], vj.a[DefaultBiome.JUNGLE_HILLS.Id]};
+
         try
         {
-            ModLoader.setPrivateValue(xq.class,this.strongholdGen,"a",StrongholdsBiomes);
+            ModLoader.setPrivateValue(aag.class, this.strongholdGen, "e", StrongholdsBiomes);
 
         } catch (NoSuchFieldException e)
         {
             e.printStackTrace();
         }
 
-        this.VillageGen = new an(0);
-        this.MineshaftGen = new alo();
+        this.VillageGen = new abh(0);
+        this.MineshaftGen = new yx();
+        this.PyramidsGen = new zy();
 
 
-        this.Tree = new sb(false);
-        this.BigTree = new zz(false);
-        this.Forest = new i(false);
-        this.SwampTree = new bf();
-        this.TaigaTree1 = new lo();
-        this.TaigaTree2 = new rb(false);
-        this.HugeMushroom = new qm();
-        this.JungleTree = new ajd(false, 15, 3, 3);
-        this.GroundBush = new agm(3, 0);
+        this.Tree = new yt(false);
+        this.BigTree = new xp(false);
+        this.Forest = new xq(false);
+        this.SwampTree = new yr();
+        this.TaigaTree1 = new yk();
+        this.TaigaTree2 = new yq(false);
+        this.HugeMushroom = new ye();
+        this.JungleTree = new yh(false, 15, 3, 3);
+        this.GroundBush = new xz(3, 0);
 
-        this.ChunkCache = new ack[4];
+        this.ChunkCache = new wk[4];
         this.generator = new ChunkProvider(this);
     }
 
@@ -548,7 +592,7 @@ public class SingleWorld implements LocalWorld
         this.biomeManager = manager;
     }
 
-    public xd getWorld()
+    public uo getWorld()
     {
         return this.world;
     }
@@ -557,5 +601,17 @@ public class SingleWorld implements LocalWorld
     {
         this.heightBits = heightBits;
         this.worldHeight = 1 << heightBits;
+    }
+
+    public void FillChunkForBiomes(wk chunk, int x, int z)
+    {
+
+        byte[] arrayOfByte2 = chunk.m();
+        BiomeIntArray = this.getBiomes(BiomeIntArray, x *16 , z *16 , 16, 16);
+
+        for (int i1 = 0; i1 < arrayOfByte2.length; i1++)
+        {
+            arrayOfByte2[i1] = (byte) BiomeIntArray[i1];
+        }
     }
 }

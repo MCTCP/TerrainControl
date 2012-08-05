@@ -134,11 +134,11 @@ public class BiomeConfig extends ConfigFile
         Resource resource;
 
         //Small lakes
-        resource = new Resource(ResourceType.SmallLake, DefaultMaterial.WATER.id, 0, TCDefaultValues.SmallLakeWaterFrequency.intValue(), TCDefaultValues.SmallLakeWaterRarity.intValue(), TCDefaultValues.SmallLakeMinAltitude.intValue(), TCDefaultValues.SmallLakeMaxAltitude.intValue());
+        resource = new Resource(ResourceType.SmallLake, DefaultMaterial.WATER.id, TCDefaultValues.SmallLakeWaterFrequency.intValue(), TCDefaultValues.SmallLakeWaterRarity.intValue(), TCDefaultValues.SmallLakeMinAltitude.intValue(), TCDefaultValues.SmallLakeMaxAltitude.intValue());
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Small lakes
-        resource = new Resource(ResourceType.SmallLake, DefaultMaterial.LAVA.id, 0, TCDefaultValues.SmallLakeLavaFrequency.intValue(), TCDefaultValues.SmallLakeLavaRarity.intValue(), TCDefaultValues.SmallLakeMinAltitude.intValue(), TCDefaultValues.SmallLakeMaxAltitude.intValue());
+        resource = new Resource(ResourceType.SmallLake, DefaultMaterial.LAVA.id, TCDefaultValues.SmallLakeLavaFrequency.intValue(), TCDefaultValues.SmallLakeLavaRarity.intValue(), TCDefaultValues.SmallLakeMinAltitude.intValue(), TCDefaultValues.SmallLakeMaxAltitude.intValue());
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Underground lakes
@@ -186,6 +186,13 @@ public class BiomeConfig extends ConfigFile
         resource = new Resource(ResourceType.Ore, DefaultMaterial.LAPIS_ORE.id, 0, TCDefaultValues.lapislazuliDepositSize.intValue(), TCDefaultValues.lapislazuliDepositFrequency.intValue(), TCDefaultValues.lapislazuliDepositRarity.intValue(), TCDefaultValues.lapislazuliDepositMinAltitude.intValue(), this.worldConfig.WorldHeight / 8, new int[]{DefaultMaterial.STONE.id});
         this.ResourceSequence[this.ResourceCount++] = resource;
 
+        DefaultBiome biome = DefaultBiome.getBiome(this.Biome.getId());
+
+        if( biome != null &&  ( biome == DefaultBiome.EXTREME_HILLS  || biome == DefaultBiome.SMALL_MOUNTAINS ))
+        {
+            resource = new Resource(ResourceType.Ore, DefaultMaterial.EMERALD_ORE.id, 0, TCDefaultValues.emeraldDepositSize.intValue(), TCDefaultValues.emeraldDepositFrequency.intValue(), TCDefaultValues.emeraldDepositRarity.intValue(), TCDefaultValues.emeraldDepositMinAltitude.intValue(), this.worldConfig.WorldHeight / 4, new int[]{DefaultMaterial.STONE.id});
+            this.ResourceSequence[this.ResourceCount++] = resource;
+        }
 
         //Under water sand
         resource = new Resource(ResourceType.UnderWaterOre, DefaultMaterial.SAND.id, 0, TCDefaultValues.waterSandDepositSize.intValue(), TCDefaultValues.waterSandDepositFrequency.intValue(), TCDefaultValues.waterSandDepositRarity.intValue(), 0, 0, new int[]{DefaultMaterial.DIRT.id, DefaultMaterial.GRASS.id});
@@ -201,7 +208,7 @@ public class BiomeConfig extends ConfigFile
         resource = new Resource(ResourceType.CustomObject);
         this.ResourceSequence[this.ResourceCount++] = resource;
 
-        DefaultBiome biome = DefaultBiome.getBiome(this.Biome.getId());
+
         if (biome != null)
             switch (biome)
             {

@@ -19,13 +19,13 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
     private float[] buffer = new float[256];
 
     private WorldConfig worldConfig;
-    
+
     public TCWorldChunkManager(LocalWorld world)
     {
         super();
         this.Init(world);
     }
-    
+
     public void Init(LocalWorld world)
     {
         this.worldConfig = world.getSettings();
@@ -58,7 +58,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         int[] arrayOfInt = this.BiomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            float f1 =  worldConfig.biomeConfigs[arrayOfInt[i]].getWetness() / 65536.0F;
+            float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getWetness() / 65536.0F;
             if (f1 < this.worldConfig.minMoisture)
                 f1 = this.worldConfig.minMoisture;
             if (f1 > this.worldConfig.maxMoisture)
@@ -199,16 +199,16 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
             biomeArray = new int[x_size * z_size];
         }
 
-        int[] arrayOfInt = this.UnZoomedLayer.Calculate(x,  z,  x_size,  z_size);
+        int[] arrayOfInt = this.UnZoomedLayer.Calculate(x, z, x_size, z_size);
 
-        System.arraycopy(arrayOfInt,0,biomeArray,0,x_size * z_size);
+        System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);
 
         return biomeArray;
     }
 
     public float[] getTemperaturesTC(int x, int z, int x_size, int z_size)
     {
-        return this.getTemperatures(buffer,x,z,x_size,z_size);
+        return this.getTemperatures(buffer, x, z, x_size, z_size);
     }
 
     public int[] getBiomesTC(int[] biomeArray, int x, int z, int x_size, int z_size)
@@ -223,16 +223,16 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
             synchronized (this.LockObject)
             {
                 BiomeBase[] localObject = this.Cache.e(x, z);
-                for(int i= 0; i< x_size*z_size;i++)
+                for (int i = 0; i < x_size * z_size; i++)
                     biomeArray[i] = localObject[i].id;
 
             }
             return biomeArray;
         }
 
-        int[] arrayOfInt = this.BiomeLayer.Calculate(x,  z,  x_size,  z_size);
+        int[] arrayOfInt = this.BiomeLayer.Calculate(x, z, x_size, z_size);
 
-        System.arraycopy(arrayOfInt,0,biomeArray,0,x_size * z_size);
+        System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);
 
         return biomeArray;
 
@@ -240,6 +240,6 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
 
     public int getBiomeTC(int x, int z)
     {
-        return this.getBiome(x,z).id;
+        return this.getBiome(x, z).id;
     }
 }

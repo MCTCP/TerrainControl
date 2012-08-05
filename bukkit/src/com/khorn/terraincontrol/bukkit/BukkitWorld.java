@@ -33,6 +33,7 @@ public class BukkitWorld implements LocalWorld
     private WorldGenStronghold strongholdGen;
     private WorldGenVillage VillageGen;
     private WorldGenMineshaft MineshaftGen;
+    private WorldGenLargeFeature PyramidsGen;
 
     private WorldGenTrees Tree;
     private WorldGenBigTree BigTree;
@@ -171,19 +172,15 @@ public class BukkitWorld implements LocalWorld
     public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry)
     {
         if (this.settings.StrongholdsEnabled)
-        {
             this.strongholdGen.a(null, this.world, x, z, chunkArray);
-        }
 
         if (this.settings.MineshaftsEnabled)
-        {
             this.MineshaftGen.a(null, this.world, x, z, chunkArray);
-        }
 
         if (this.settings.VillagesEnabled && dry)
-        {
             this.VillageGen.a(null, this.world, x, z, chunkArray);
-        }
+        if (this.settings.PyramidsEnabled)
+            this.PyramidsGen.a(null, this.world, x, z, chunkArray);
     }
 
     public void PlaceDungeons(Random rand, int x, int y, int z)
@@ -261,6 +258,8 @@ public class BukkitWorld implements LocalWorld
             this.MineshaftGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.VillagesEnabled)
             Village = this.VillageGen.a(this.world, rand, chunk_x, chunk_z);
+        if (this.settings.PyramidsEnabled)
+            this.PyramidsGen.a(this.world, rand, chunk_x, chunk_z);
 
         return Village;
     }
@@ -521,6 +520,7 @@ public class BukkitWorld implements LocalWorld
                 this.strongholdGen = new WorldGenStronghold();
                 this.VillageGen = new WorldGenVillage(0);
                 this.MineshaftGen = new WorldGenMineshaft();
+                this.PyramidsGen = new WorldGenLargeFeature();
                 this.GroundBush = new WorldGenGroundBush(3, 0);
             case TerrainTest:
             case NotGenerate:

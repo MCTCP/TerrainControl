@@ -49,6 +49,16 @@ public class Resource
         this.MaxAltitude = maxAltitude;
     }
 
+    public Resource(ResourceType type, int blockId, int frequency, int rarity, int minAltitude, int maxAltitude)
+    {
+        this.Type = type;
+        this.BlockId = blockId;
+        this.Frequency = frequency;
+        this.Rarity = rarity;
+        this.MinAltitude = minAltitude;
+        this.MaxAltitude = maxAltitude;
+    }
+
     public Resource(ResourceType type, int frequency, TreeType[] types, int[] treeChances)
     {
         this.Type = type;

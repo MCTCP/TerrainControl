@@ -1,9 +1,7 @@
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class mod_TerrainControl extends BaseMod
 {
@@ -12,7 +10,7 @@ public class mod_TerrainControl extends BaseMod
     @Override
     public String getVersion()
     {
-        return "2.2.2";
+        return "2.2.3";
     }
 
     @Override
@@ -31,13 +29,13 @@ public class mod_TerrainControl extends BaseMod
     }
 
     @Override
-    public void receiveCustomPacket(ee packet)
+    public void clientCustomPayload(asu clientHandler, ce packet)
     {
         if (!packet.a.equals(TCDefaultValues.ChannelName.stringValue()))
             return;
 
-        xd world = ModLoader.getMinecraftInstance().f;
-        SingleWorld TCWorld = new SingleWorld(world.x.j());
+        atc world = ModLoader.getMinecraftInstance().e;
+        SingleWorld TCWorld = new SingleWorld(world.A.j());
         try
         {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(packet.c);
@@ -57,29 +55,67 @@ public class mod_TerrainControl extends BaseMod
     }
 
     @Override
-    public void serverConnect(adl handler)
+    public void serverCustomPayload(gy serverHandler, ce packet)
+    {
+        /*
+        if (packet.c.length == 1)
+        {
+            if (packet.c[0] == TCDefaultValues.ProtocolVersion.intValue())
+            {
+                WorldConfig config = Plugin.TCWorld.getSettings();
+
+                System.out.println("TerrainControl: client config requested for world " + config.WorldName);
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                DataOutputStream stream = new DataOutputStream(outputStream);
+
+                try
+                {
+                    config.Serialize(stream);
+                    stream.flush();
+
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+
+                byte[] data = outputStream.toByteArray();
+
+                ce packetOut = new ce();
+                packet.a = TCDefaultValues.ChannelName.stringValue();
+                packet.c = data;
+                packet.b = data.length;
+                ModLoader.serverSendPacket(serverHandler, packetOut);
+
+            }
+        }  */
+    }
+
+    @Override
+    public void clientConnect(asu handler)
     {
         SendTCPacker();
     }
 
 
-    public static void NewWorldCreated(xd world)
+    public static void NewWorldCreated(uo world)
     {
-        SingleWorld.RestoreBiomes();
-        if (world instanceof je)
+        if (world instanceof gq && !(world instanceof gk))
+            SingleWorld.RestoreBiomes();
+        if (world instanceof atc)
             SendTCPacker();
 
     }
 
     private static void SendTCPacker()
     {
-        ee packet = new ee();
+        System.out.println("TerrainControl: client config request send to server");
+        ce packet = new ce();
         packet.a = TCDefaultValues.ChannelName.stringValue();
         byte[] data = new byte[]{(byte) TCDefaultValues.ProtocolVersion.intValue()};
 
         packet.c = data;
         packet.b = data.length;
-        ModLoader.sendPacket(packet);
+        ModLoader.clientSendPacket(packet);
     }
 
     /*

@@ -101,6 +101,7 @@ public enum TCDefaultValues
     StrongholdsEnabled(true),
     MineshaftsEnabled(true),
     VillagesEnabled(true),
+    PyramidsEnabled(true),
 
     canyonRarity(2),
     canyonMinAltitude(20),
@@ -261,6 +262,12 @@ public enum TCDefaultValues
     lapislazuliDepositSize(7),
     lapislazuliDepositMinAltitude(0),
     lapislazuliDepositMaxAltitude(16),
+
+    emeraldDepositRarity(100),
+    emeraldDepositFrequency(1),
+    emeraldDepositSize(5),
+    emeraldDepositMinAltitude(4),
+    emeraldDepositMaxAltitude(32),
 
 
     evenWaterSourceDistribution(false),

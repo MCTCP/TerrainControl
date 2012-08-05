@@ -133,6 +133,7 @@ public class WorldConfig extends ConfigFile
     public boolean StrongholdsEnabled;
     public boolean MineshaftsEnabled;
     public boolean VillagesEnabled;
+    public boolean PyramidsEnabled;
 
     public File SettingsDir;
 
@@ -416,6 +417,7 @@ public class WorldConfig extends ConfigFile
         this.StrongholdsEnabled = ReadModSettings(TCDefaultValues.StrongholdsEnabled.name(), TCDefaultValues.StrongholdsEnabled.booleanValue());
         this.VillagesEnabled = ReadModSettings(TCDefaultValues.VillagesEnabled.name(), TCDefaultValues.VillagesEnabled.booleanValue());
         this.MineshaftsEnabled = ReadModSettings(TCDefaultValues.MineshaftsEnabled.name(), TCDefaultValues.MineshaftsEnabled.booleanValue());
+        this.PyramidsEnabled = ReadModSettings(TCDefaultValues.PyramidsEnabled.name(), TCDefaultValues.PyramidsEnabled.booleanValue());
 
         this.caveRarity = ReadModSettings(TCDefaultValues.caveRarity.name(), TCDefaultValues.caveRarity.intValue());
         this.caveFrequency = ReadModSettings(TCDefaultValues.caveFrequency.name(), TCDefaultValues.caveFrequency.intValue());
@@ -650,6 +652,7 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.StrongholdsEnabled.name(), this.StrongholdsEnabled);
         WriteValue(TCDefaultValues.VillagesEnabled.name(), this.VillagesEnabled);
         WriteValue(TCDefaultValues.MineshaftsEnabled.name(), this.MineshaftsEnabled);
+        WriteValue(TCDefaultValues.PyramidsEnabled.name(), this.PyramidsEnabled);
 
         this.WriteTitle("World visual settings");
         this.WriteComment("Warning this section will work only for clients with single version of TerrainControl");
