@@ -13,7 +13,6 @@ import java.util.Random;
 
 public class TCChunkGenerator extends ChunkGenerator
 {
-    private BukkitWorld TCWorld;
     private ChunkProviderTC chunkProviderTC;
     private ArrayList<BlockPopulator> BlockPopulator = new ArrayList<BlockPopulator>();
     private boolean NotGenerate = false;
@@ -28,12 +27,11 @@ public class TCChunkGenerator extends ChunkGenerator
 
     public void Init(BukkitWorld _world)
     {
-        this.TCWorld = _world;
         this.heightBits = _world.getHeightBits();
         this.heightBitsPlusFour = heightBits + 4;
         this.chunkProviderTC = new ChunkProviderTC(_world.getSettings(), _world);
 
-        WorldConfig.TerrainMode mode = this.TCWorld.getSettings().ModeTerrain;
+        WorldConfig.TerrainMode mode = _world.getSettings().ModeTerrain;
 
         if (mode == WorldConfig.TerrainMode.Normal || mode == WorldConfig.TerrainMode.OldGenerator)
             this.BlockPopulator.add(new TCBlockPopulator(_world));

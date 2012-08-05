@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.generator.resourcegens;
 import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.LocalWorld;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class TreeGen extends ResourceGenBase
@@ -29,5 +30,46 @@ public class TreeGen extends ResourceGenBase
 
 
         }
+    }
+
+    @Override
+    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    {
+        res.Frequency = CheckValue(Props[0], 1, 100);
+
+        ArrayList<TreeType> treeTypes = new ArrayList<TreeType>();
+        ArrayList<Integer> treeChances = new ArrayList<Integer>();
+
+        for (int i = 1; i < Props.length && (i + 1) < Props.length; i += 2)
+        {
+            String tree = Props[i];
+            for (TreeType type : TreeType.values())
+                if (type.name().equals(tree))
+                {
+                    treeTypes.add(type);
+                    treeChances.add(CheckValue(Props[i + 1], 0, 100));
+                }
+        }
+        if (treeChances.size() == 0)
+            return false;
+
+        res.TreeTypes = new TreeType[treeChances.size()];
+        res.TreeChances = new int[treeChances.size()];
+        for (int t = 0; t < treeTypes.size(); t++)
+        {
+            res.TreeTypes[t] = treeTypes.get(t);
+            res.TreeChances[t] = treeChances.get(t);
+        }
+
+        return true;
+    }
+
+    @Override
+    protected String WriteString(Resource res, String blockSources)
+    {
+        String output = String.valueOf(res.Frequency);
+        for (int i = 0; i < res.TreeChances.length; i++)
+            output += "," + res.TreeTypes[i].name() + "," + res.TreeChances[i];
+        return output;
     }
 }

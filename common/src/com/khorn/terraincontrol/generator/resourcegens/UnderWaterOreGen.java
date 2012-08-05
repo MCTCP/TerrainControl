@@ -35,4 +35,27 @@ public class UnderWaterOreGen extends ResourceGenBase
             }
         }
     }
+
+    @Override
+    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    {
+
+        res.BlockId = CheckBlock(Props[0]);
+        res.MaxSize = CheckValue(Props[1], 1, 8);
+        res.Frequency = CheckValue(Props[2], 1, 100);
+        res.Rarity = CheckValue(Props[3], 0, 100);
+
+
+        res.SourceBlockId = new int[Props.length - 4];
+        for (int i = 4; i < Props.length; i++)
+            res.SourceBlockId[i - 4] = CheckBlock(Props[i]);
+
+        return true;
+    }
+
+    @Override
+    protected String WriteString(Resource res, String blockSources)
+    {
+        return res.BlockIdToName(res.BlockId) + "," + res.MaxSize + "," + res.Frequency + "," + res.Rarity + blockSources;
+    }
 }

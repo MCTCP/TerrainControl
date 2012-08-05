@@ -25,4 +25,19 @@ public class AboveWaterGen extends ResourceGenBase
             world.setBlock(j, y, m, res.BlockId, 0, false, false, false);
         }
     }
+
+    @Override
+    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    {
+        res.BlockId = CheckBlock(Props[0]);
+        res.Frequency = CheckValue(Props[1], 1, 100);
+        res.Rarity = CheckValue(Props[2], 0, 100);
+        return true;
+    }
+
+    @Override
+    protected String WriteString(Resource res, String blockSources)
+    {
+        return res.BlockIdToName(res.BlockId) + "," + res.Frequency + "," + res.Rarity;
+    }
 }

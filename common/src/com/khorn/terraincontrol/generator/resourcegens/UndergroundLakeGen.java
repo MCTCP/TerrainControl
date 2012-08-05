@@ -58,4 +58,24 @@ public class UndergroundLakeGen extends ResourceGenBase
                     }
         }
     }
+
+    @Override
+    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    {
+
+        res.MinSize = CheckValue(Props[0], 1, 25);
+        res.MaxSize = CheckValue(Props[1], 1, 60, res.MinSize);
+        res.Frequency = CheckValue(Props[2], 1, 100);
+        res.Rarity = CheckValue(Props[3], 0, 100);
+        res.MinAltitude = CheckValue(Props[4], 0, worldHeight);
+        res.MaxAltitude = CheckValue(Props[5], 0, worldHeight, res.MinAltitude);
+
+        return true;
+    }
+
+    @Override
+    protected String WriteString(Resource res, String blockSources)
+    {
+        return res.MinSize + "," + res.MaxSize + "," + res.Frequency + "," + res.Rarity + "," + res.MinAltitude + "," + res.MaxAltitude;
+    }
 }

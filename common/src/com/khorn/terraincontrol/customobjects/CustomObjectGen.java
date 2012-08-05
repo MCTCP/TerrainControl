@@ -17,6 +17,18 @@ public class CustomObjectGen extends ResourceGenBase
         SpawnCustomObjects(world, rand, world.getSettings(), _x + 8, _z + 8, biomeId);
     }
 
+    @Override
+    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    {
+        return true;
+    }
+
+    @Override
+    protected String WriteString(Resource res, String blockSources)
+    {
+        return "";
+    }
+
     private static boolean ObjectCanSpawn(LocalWorld world, int x, int y, int z, CustomObject obj)
     {
         if ((world.getTypeId(x, y - 5, z) == 0) && (obj.needsFoundation))

@@ -43,7 +43,6 @@ public class BiomeConfig extends ConfigFile
 
     public String ReplaceBiomeName;
 
-    public boolean disableNotchPonds;
 
     public boolean UseWorldWaterLevel;
     public int waterLevelMax;
@@ -133,6 +132,14 @@ public class BiomeConfig extends ConfigFile
     private void CreateDefaultResources()
     {
         Resource resource;
+
+        //Small lakes
+        resource = new Resource(ResourceType.SmallLake, DefaultMaterial.WATER.id, 0, TCDefaultValues.SmallLakeWaterFrequency.intValue(), TCDefaultValues.SmallLakeWaterRarity.intValue(), TCDefaultValues.SmallLakeMinAltitude.intValue(), TCDefaultValues.SmallLakeMaxAltitude.intValue());
+        this.ResourceSequence[this.ResourceCount++] = resource;
+
+        //Small lakes
+        resource = new Resource(ResourceType.SmallLake, DefaultMaterial.LAVA.id, 0, TCDefaultValues.SmallLakeLavaFrequency.intValue(), TCDefaultValues.SmallLakeLavaRarity.intValue(), TCDefaultValues.SmallLakeMinAltitude.intValue(), TCDefaultValues.SmallLakeMaxAltitude.intValue());
+        this.ResourceSequence[this.ResourceCount++] = resource;
 
         //Underground lakes
         resource = new Resource(ResourceType.UnderGroundLake, TCDefaultValues.undergroundLakeMinSize.intValue(), TCDefaultValues.undergroundLakeMaxSize.intValue(), TCDefaultValues.undergroundLakeFrequency.intValue(), TCDefaultValues.undergroundLakeRarity.intValue(), TCDefaultValues.undergroundLakeMinAltitude.intValue(), TCDefaultValues.undergroundLakeMaxAltitude.intValue());
@@ -330,7 +337,7 @@ public class BiomeConfig extends ConfigFile
         this.BiomeTemperature = this.ReadModSettings(TCDefaultValues.BiomeTemperature.name(), this.DefaultBiomeTemperature);
         this.BiomeWetness = this.ReadModSettings(TCDefaultValues.BiomeWetness.name(), this.DefaultBiomeWetness);
 
-        this.ReplaceBiomeName = this.ReadModSettings(TCDefaultValues.ReplaceToBiomeName.name(),TCDefaultValues.ReplaceToBiomeName.stringValue());
+        this.ReplaceBiomeName = this.ReadModSettings(TCDefaultValues.ReplaceToBiomeName.name(), TCDefaultValues.ReplaceToBiomeName.stringValue());
 
         this.BiomeHeight = this.ReadModSettings(TCDefaultValues.BiomeHeight.name(), this.DefaultBiomeSurface);
         this.BiomeVolatility = this.ReadModSettings(TCDefaultValues.BiomeVolatility.name(), this.DefaultBiomeVolatility);
@@ -344,8 +351,6 @@ public class BiomeConfig extends ConfigFile
         this.waterLevelMin = ReadModSettings(TCDefaultValues.WaterLevelMin.name(), TCDefaultValues.WaterLevelMin.intValue());
         this.waterBlock = ReadModSettings(TCDefaultValues.WaterBlock.name(), TCDefaultValues.WaterBlock.intValue());
         this.iceBlock = ReadModSettings(TCDefaultValues.IceBlock.name(), TCDefaultValues.IceBlock.intValue());
-
-        this.disableNotchPonds = this.ReadModSettings(TCDefaultValues.disableNotchPonds.name(), TCDefaultValues.disableNotchPonds.booleanValue());
 
         this.SkyColor = this.ReadModSettingsColor(TCDefaultValues.SkyColor.name(), TCDefaultValues.SkyColor.stringValue());
         this.WaterColor = this.ReadModSettingsColor(TCDefaultValues.WaterColor.name(), this.DefaultWaterColorMultiplier);
@@ -472,13 +477,12 @@ public class BiomeConfig extends ConfigFile
                     if (start != -1 && end != -1)
                     {
                         Resource res = new Resource(type);
-                        res.ReadFromString(key.substring(start + 1, end), this.worldConfig.WorldHeight);
-
-                        if (res.Done)
+                        if (type.Generator.ReadFromString(res, key.substring(start + 1, end).split(","), this.worldConfig.WorldHeight))
                         {
                             LineNumbers.add(Integer.valueOf(entry.getValue()));
                             this.ResourceSequence[this.ResourceCount++] = res;
-                        }
+                        } else
+                            System.out.println("TerrainControl: wrong resource " + type.name() + key);
                     }
                 }
             }
@@ -629,10 +633,6 @@ public class BiomeConfig extends ConfigFile
         WriteComment("  ReplacedBlocks:2=3(100-128),13=20");
         WriteComment("Replace grass block to dirt from 100 to 128 height and replace gravel to glass on all height ");
         WriteModReplaceSettings();
-        this.WriteNewLine();
-
-        WriteComment("Disable or enable small lava and water lakes on surface");
-        this.WriteValue(TCDefaultValues.disableNotchPonds.name(), this.disableNotchPonds);
 
         this.WriteTitle("Biome visual settings");
         this.WriteComment("Warning this section will work only for clients with single version of TerrainControl");
@@ -661,6 +661,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("By default this set to be near notch settings.");
         this.WriteComment("");
         this.WriteComment("Possible resources:");
+        this.WriteComment("SmallLake(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.WriteComment("Dungeon(Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.WriteComment("UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.WriteComment("Ore(Block[.BlockData],Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
@@ -668,7 +669,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("CustomObject()");
         this.WriteComment("Tree(Frequency,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
         this.WriteComment("Plant(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.WriteComment("Grass(Block,BlockData,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.WriteComment("Grass(Block,BlockData,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Reed(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Cactus(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("Liquid(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
@@ -830,7 +831,7 @@ public class BiomeConfig extends ConfigFile
     private void WriteResources() throws IOException
     {
         for (int i = 0; i < this.ResourceCount; i++)
-            this.WriteValue(this.ResourceSequence[i].WriteToString());
+            this.WriteValue(this.ResourceSequence[i].Type.Generator.WriteToString(this.ResourceSequence[i]));
     }
 
     protected void CorrectSettings()
@@ -853,9 +854,9 @@ public class BiomeConfig extends ConfigFile
         this.volatilityWeight2 = (0.5D - this.volatilityWeightRaw2) * 24.0D;
 
         this.waterLevelMin = CheckValue(this.waterLevelMin, 0, this.worldConfig.WorldHeight - 1);
-        this.waterLevelMax = CheckValue(this.waterLevelMax, 0,this.worldConfig.WorldHeight - 1, this.waterLevelMin);
+        this.waterLevelMax = CheckValue(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
 
-        this.ReplaceBiomeName = ( DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomes.contains(this.ReplaceBiomeName))?this.ReplaceBiomeName:"";
+        this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomes.contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
     }
 
     protected void RenameOldSettings()
@@ -864,6 +865,16 @@ public class BiomeConfig extends ConfigFile
         for (TCDefaultValues value : copyFromWorld)
             if (this.worldConfig.SettingsCache.containsKey(value.name()))
                 this.SettingsCache.put(value.name(), this.worldConfig.SettingsCache.get(value.name()));
+
+        if (this.SettingsCache.containsKey("disableNotchPonds"))
+        {
+            if (!ReadModSettings("disableNotchPonds", false))
+            {
+                this.SettingsCache.put("SmallLake(WATER,4,7,8," + this.worldConfig.WorldHeight + ")", "0");
+                this.SettingsCache.put("SmallLake(LAVA,2,3,8," + (this.worldConfig.WorldHeight - 8) + ")", "1");
+            }
+
+        }
     }
 
 

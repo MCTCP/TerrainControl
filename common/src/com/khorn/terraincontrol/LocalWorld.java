@@ -46,8 +46,6 @@ public interface LocalWorld
 
     public void PlaceTree(TreeType type, Random rand, int x, int y, int z);
 
-    public void PlacePonds(int BlockId, Random rand, int x, int y, int z);
-
     public void PlaceIce(int x, int z);
 
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z);

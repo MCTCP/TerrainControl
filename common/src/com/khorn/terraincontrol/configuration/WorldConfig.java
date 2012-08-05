@@ -114,11 +114,11 @@ public class WorldConfig extends ConfigFile
     public int waterBlock;
     public int iceBlock;
 
-    private double fractureHorizontal;
-    private double fractureVertical;
+    public double fractureHorizontal;
+    public double fractureVertical;
 
-    private boolean disableBedrock;
-    private boolean flatBedrock;
+    public boolean disableBedrock;
+    public boolean flatBedrock;
     public boolean ceilingBedrock;
     public int bedrockBlock;
 

@@ -17,6 +17,7 @@ public class BiomeReplace implements Runnable
     private byte BiomeIdFrom;
     private byte BiomeIdTo;
 
+    @SuppressWarnings("FieldCanBeLocal")
     private transient File[] regionFiles = null;
 
     private static boolean isWorking = false;
@@ -31,6 +32,7 @@ public class BiomeReplace implements Runnable
     }
 
 
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public void run()
     {
 

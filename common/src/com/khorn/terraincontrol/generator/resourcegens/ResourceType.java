@@ -4,32 +4,35 @@ import com.khorn.terraincontrol.customobjects.CustomObjectGen;
 
 public enum ResourceType
 {
-    Ore(OreGen.class, false),
-    UnderWaterOre(UnderWaterOreGen.class),
-    Plant(PlantGen.class),
-    Liquid(LiquidGen.class),
-    Grass(GrassGen.class),
-    Reed(ReedGen.class),
-    Cactus(CactusGen.class),
-    Dungeon(DungeonGen.class),
-    Tree(TreeGen.class),
-    CustomObject(CustomObjectGen.class),
-    UnderGroundLake(UndergroundLakeGen.class),
-    AboveWaterRes(AboveWaterGen.class),
-    Vines(VinesGen.class);
+    Ore(OreGen.class, false, 7),
+    UnderWaterOre(UnderWaterOreGen.class, 5),
+    Plant(PlantGen.class, 6),
+    Liquid(LiquidGen.class, 6),
+    Grass(GrassGen.class, 5),
+    Reed(ReedGen.class, 6),
+    Cactus(CactusGen.class, 6),
+    Dungeon(DungeonGen.class, 4),
+    Tree(TreeGen.class, 3),
+    CustomObject(CustomObjectGen.class, 0),
+    UnderGroundLake(UndergroundLakeGen.class, 6),
+    AboveWaterRes(AboveWaterGen.class, 3),
+    Vines(VinesGen.class, 4),
+    SmallLake(SmallLakeGen.class,5);
 
     public ResourceGenBase Generator;
     public final boolean CreateNewChunks;
+    public final int MinProperties;
 
 
-    private ResourceType(Class<? extends ResourceGenBase> c)
+    private ResourceType(Class<? extends ResourceGenBase> c, int props)
     {
-        this(c, true);
+        this(c, true, props);
     }
 
-    private ResourceType(Class<? extends ResourceGenBase> c, boolean createNewChunks)
+    private ResourceType(Class<? extends ResourceGenBase> c, boolean createNewChunks, int props)
     {
         this.CreateNewChunks = createNewChunks;
+        this.MinProperties = props;
         try
         {
             Generator = c.newInstance();

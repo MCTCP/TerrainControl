@@ -1,11 +1,10 @@
 package com.khorn.terraincontrol.generator;
 
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.LocalWorld;
-
+import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
 
 import java.util.Random;
 
@@ -37,35 +36,13 @@ public class ObjectSpawner
 
         boolean Village = world.PlaceTerrainObjects(rand, chunk_x, chunk_z);
 
-        if (!Village)
-        {
-            if (!localBiomeConfig.disableNotchPonds)
-            {
-
-                if (this.rand.nextInt(4) == 0)
-                {
-                    int _x = x + this.rand.nextInt(16) + 8;
-                    int _y = this.rand.nextInt(this.worldSettings.WorldHeight - 1);
-                    int _z = z + this.rand.nextInt(16) + 8;
-                    world.PlacePonds(DefaultMaterial.STATIONARY_WATER.id, this.rand, _x, _y, _z);
-                }
-
-                if (this.rand.nextInt(8) == 0)
-                {
-                    int _x = x + this.rand.nextInt(16) + 8;
-                    int _y = this.rand.nextInt(this.rand.nextInt(this.worldSettings.WorldHeight - 9) + 8);
-                    int _z = z + this.rand.nextInt(16) + 8;
-                    if ((_y < this.worldSettings.waterLevelMax) || (this.rand.nextInt(10) == 0))
-                        world.PlacePonds(DefaultMaterial.STATIONARY_LAVA.id, this.rand, _x, _y, _z);
-                }
-            }
-        }
-
 
         //Resource sequence
         for (int i = 0; i < localBiomeConfig.ResourceCount; i++)
         {
             Resource res = localBiomeConfig.ResourceSequence[i];
+            if(res.Type == ResourceType.SmallLake && Village)
+                continue;
             world.setChunksCreations(res.Type.CreateNewChunks);
             res.Type.Generator.Process(world, rand, res, x, z, biomeId);
         }

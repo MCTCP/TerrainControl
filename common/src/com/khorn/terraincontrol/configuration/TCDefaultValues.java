@@ -69,12 +69,6 @@ public enum TCDefaultValues
 
     snowThreshold(0.5D),
     iceThreshold(0.5D),
-    swampSize(2),
-    desertDirtFrequency(0),
-    muddySwamps(false),
-    claySwamps(false),
-    waterlessDeserts(false),
-    desertDirt(false),
 
     WaterLevelMax(64),
     WaterLevelMin(0),
@@ -93,7 +87,6 @@ public enum TCDefaultValues
     CeilingBedrock(false),
     FlatBedrock(false),
     BedrockobBlock(7),
-    disableNotchPonds(false),
     WorldHeightBits(7),
 
 
@@ -143,6 +136,13 @@ public enum TCDefaultValues
     undergroundLakeMaxSize(60),
     undergroundLakeMinAltitude(0),
     undergroundLakeMaxAltitude(50),
+
+    SmallLakeWaterFrequency(4),
+    SmallLakeLavaFrequency(2),
+    SmallLakeWaterRarity(7),
+    SmallLakeLavaRarity(3),
+    SmallLakeMinAltitude(8),
+    SmallLakeMaxAltitude(120),
 
 
     BiomeHeight(0.1D),

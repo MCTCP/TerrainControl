@@ -13,4 +13,21 @@ public class DungeonGen extends ResourceGenBase
         int _y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
         world.PlaceDungeons(rand, x, _y, z);
     }
+
+    @Override
+    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    {
+        res.Frequency = CheckValue(Props[0], 1, 100);
+        res.Rarity = CheckValue(Props[1], 0, 100);
+        res.MinAltitude = CheckValue(Props[2], 0, worldHeight);
+        res.MaxAltitude = CheckValue(Props[3], 0, worldHeight, res.MinAltitude);
+
+        return true;
+    }
+
+    @Override
+    protected String WriteString(Resource res, String blockSources)
+    {
+        return res.Frequency + "," + res.Rarity + "," + res.MinAltitude + "," + res.MaxAltitude;
+    }
 }

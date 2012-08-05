@@ -227,10 +227,6 @@ public class BukkitWorld implements LocalWorld
         }
     }
 
-    public void PlacePonds(int BlockId, Random rand, int x, int y, int z)
-    {
-        new WorldGenLakes(BlockId).a(this.world, rand, x, y, z);
-    }
 
     // There is raw code from ChunkProviderGenerate, check each x,z coordinate in chunk  i5 - some thing like getHighestBlockYAt
     // TODO: I think we may optimise this.

@@ -217,10 +217,6 @@ public class SingleWorld implements LocalWorld
         }
     }
 
-    public void PlacePonds(int BlockId, Random rand, int x, int y, int z)
-    {
-        new cs(BlockId).a(this.world, rand, x, y, z);
-    }
 
     public void PlaceIce(int x, int z)
     {
