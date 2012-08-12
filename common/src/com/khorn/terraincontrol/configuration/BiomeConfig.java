@@ -708,6 +708,13 @@ public class BiomeConfig extends ConfigFile
 
         this.WriteResources();
 
+        if ( DefaultBiome.getBiome(this.Biome.getId()) != null )
+        {
+            this.WriteTitle("MOB SPAWNING");
+            this.WriteComment("Mob spawning control did not work with default biomes.");
+            return;
+        }
+
         this.WriteNewLine();
         this.WriteTitle("MOB SPAWNING");
         this.WriteComment("========<TUTORIAL>========");
