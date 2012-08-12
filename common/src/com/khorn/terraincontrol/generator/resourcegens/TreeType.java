@@ -11,5 +11,6 @@ public enum TreeType
     Taiga2,
     JungleTree,
     GroundBush,
+    CocoaTree,
     ;
 }

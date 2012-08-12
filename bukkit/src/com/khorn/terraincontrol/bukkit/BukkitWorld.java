@@ -36,6 +36,7 @@ public class BukkitWorld implements LocalWorld
     private WorldGenLargeFeature PyramidsGen;
 
     private WorldGenTrees Tree;
+    private WorldGenTrees CocoaTree;
     private WorldGenBigTree BigTree;
     private WorldGenForest Forest;
     private WorldGenSwampTree SwampTree;
@@ -220,6 +221,9 @@ public class BukkitWorld implements LocalWorld
                 break;
             case GroundBush:
                 GroundBush.a(this.world, rand, x, y, z);
+                break;
+            case CocoaTree:
+                CocoaTree.a(this.world, rand, x, y, z);
                 break;
         }
     }
@@ -510,6 +514,7 @@ public class BukkitWorld implements LocalWorld
             case Normal:
             case OldGenerator:
                 this.Tree = new WorldGenTrees(false);
+                this.CocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
                 this.BigTree = new WorldGenBigTree(false);
                 this.Forest = new WorldGenForest(false);
                 this.SwampTree = new WorldGenSwampTree();

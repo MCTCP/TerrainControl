@@ -34,6 +34,7 @@ public class SingleWorld implements LocalWorld
     private yi DungeonGen;
 
     private yt Tree;
+    private yt CocoaTree;
     private xp BigTree;
     private xq Forest;
     private yr SwampTree;
@@ -255,6 +256,9 @@ public class SingleWorld implements LocalWorld
                 break;
             case GroundBush:
                 GroundBush.a(this.world, rand, x, y, z);
+                break;
+            case CocoaTree:
+                CocoaTree.a(this.world, rand, x, y, z);
                 break;
         }
     }
@@ -567,6 +571,7 @@ public class SingleWorld implements LocalWorld
 
 
         this.Tree = new yt(false);
+        this.CocoaTree = new yt(false, 5, 3, 3, true);
         this.BigTree = new xp(false);
         this.Forest = new xq(false);
         this.SwampTree = new yr();
@@ -607,7 +612,7 @@ public class SingleWorld implements LocalWorld
     {
 
         byte[] arrayOfByte2 = chunk.m();
-        BiomeIntArray = this.getBiomes(BiomeIntArray, x *16 , z *16 , 16, 16);
+        BiomeIntArray = this.getBiomes(BiomeIntArray, x * 16, z * 16, 16, 16);
 
         for (int i1 = 0; i1 < arrayOfByte2.length; i1++)
         {
