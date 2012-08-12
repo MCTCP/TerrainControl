@@ -1,11 +1,14 @@
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 public class mod_TerrainControl extends BaseMod
 {
     public static TCPlugin Plugin;
+    public static asu PacketHandler;
 
     @Override
     public String getVersion()
@@ -93,6 +96,7 @@ public class mod_TerrainControl extends BaseMod
     @Override
     public void clientConnect(asu handler)
     {
+        PacketHandler = handler;
         SendTCPacker();
     }
 
@@ -108,6 +112,16 @@ public class mod_TerrainControl extends BaseMod
 
     private static void SendTCPacker()
     {
+        try
+        {
+            if( PacketHandler == null  || ModLoader.getPrivateValue(asu.class,PacketHandler,"g") == null)
+                return;
+        } catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+            return;
+        }
+
         System.out.println("TerrainControl: client config request send to server");
         ce packet = new ce();
         packet.a = TCDefaultValues.ChannelName.stringValue();
