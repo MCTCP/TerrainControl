@@ -102,6 +102,7 @@ public enum TCDefaultValues
     MineshaftsEnabled(true),
     VillagesEnabled(true),
     PyramidsEnabled(true),
+    NetherFortressEnabled(false),
 
     canyonRarity(2),
     canyonMinAltitude(20),

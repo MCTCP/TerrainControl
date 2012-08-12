@@ -34,6 +34,7 @@ public class BukkitWorld implements LocalWorld
     private WorldGenVillage VillageGen;
     private WorldGenMineshaft MineshaftGen;
     private WorldGenLargeFeature PyramidsGen;
+    private WorldGenNether NetherFortress;
 
     private WorldGenTrees Tree;
     private WorldGenTrees CocoaTree;
@@ -182,6 +183,8 @@ public class BukkitWorld implements LocalWorld
             this.VillageGen.a(null, this.world, x, z, chunkArray);
         if (this.settings.PyramidsEnabled)
             this.PyramidsGen.a(null, this.world, x, z, chunkArray);
+        if (this.settings.NetherFortress)
+            this.NetherFortress.a(null, this.world, x, z, chunkArray);
     }
 
     public void PlaceDungeons(Random rand, int x, int y, int z)
@@ -264,6 +267,8 @@ public class BukkitWorld implements LocalWorld
             Village = this.VillageGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.PyramidsEnabled)
             this.PyramidsGen.a(this.world, rand, chunk_x, chunk_z);
+        if (this.settings.NetherFortress)
+            this.NetherFortress.a(this.world, rand, chunk_x, chunk_z);
 
         return Village;
     }
@@ -521,12 +526,14 @@ public class BukkitWorld implements LocalWorld
                 this.TaigaTree1 = new WorldGenTaiga1();
                 this.TaigaTree2 = new WorldGenTaiga2(false);
                 this.HugeMushroom = new WorldGenHugeMushroom();
-                this.JungleTree = new WorldGenMegaTree(false, 15, 3, 3);  // TODO Search more about this parameters
+                this.JungleTree = new WorldGenMegaTree(false, 15, 3, 3);
+                this.GroundBush = new WorldGenGroundBush(3, 0);
+
                 this.strongholdGen = new WorldGenStronghold();
                 this.VillageGen = new WorldGenVillage(0);
                 this.MineshaftGen = new WorldGenMineshaft();
                 this.PyramidsGen = new WorldGenLargeFeature();
-                this.GroundBush = new WorldGenGroundBush(3, 0);
+                this.NetherFortress = new WorldGenNether();
             case TerrainTest:
             case NotGenerate:
                 this.generator.Init(this);

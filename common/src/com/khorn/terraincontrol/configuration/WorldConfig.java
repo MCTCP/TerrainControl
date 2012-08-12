@@ -134,6 +134,7 @@ public class WorldConfig extends ConfigFile
     public boolean MineshaftsEnabled;
     public boolean VillagesEnabled;
     public boolean PyramidsEnabled;
+    public boolean NetherFortress;
 
     public File SettingsDir;
 
@@ -418,6 +419,7 @@ public class WorldConfig extends ConfigFile
         this.VillagesEnabled = ReadModSettings(TCDefaultValues.VillagesEnabled.name(), TCDefaultValues.VillagesEnabled.booleanValue());
         this.MineshaftsEnabled = ReadModSettings(TCDefaultValues.MineshaftsEnabled.name(), TCDefaultValues.MineshaftsEnabled.booleanValue());
         this.PyramidsEnabled = ReadModSettings(TCDefaultValues.PyramidsEnabled.name(), TCDefaultValues.PyramidsEnabled.booleanValue());
+        this.NetherFortress = ReadModSettings(TCDefaultValues.NetherFortressEnabled.name(),TCDefaultValues.NetherFortressEnabled.booleanValue());
 
         this.caveRarity = ReadModSettings(TCDefaultValues.caveRarity.name(), TCDefaultValues.caveRarity.intValue());
         this.caveFrequency = ReadModSettings(TCDefaultValues.caveFrequency.name(), TCDefaultValues.caveFrequency.intValue());
@@ -653,6 +655,7 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.VillagesEnabled.name(), this.VillagesEnabled);
         WriteValue(TCDefaultValues.MineshaftsEnabled.name(), this.MineshaftsEnabled);
         WriteValue(TCDefaultValues.PyramidsEnabled.name(), this.PyramidsEnabled);
+        WriteValue(TCDefaultValues.NetherFortressEnabled.name(), this.NetherFortress);
 
         this.WriteTitle("World visual settings");
         this.WriteComment("Warning this section will work only for clients with single version of TerrainControl");

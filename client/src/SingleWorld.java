@@ -29,6 +29,7 @@ public class SingleWorld implements LocalWorld
     private abh VillageGen;
     private yx MineshaftGen;
     private zy PyramidsGen;
+    private ze NetherFortress;
 
 
     private yi DungeonGen;
@@ -215,7 +216,8 @@ public class SingleWorld implements LocalWorld
             this.VillageGen.a(null, this.world, x, z, chunkArray);
         if (this.settings.PyramidsEnabled)
             this.PyramidsGen.a(null, this.world, x, z, chunkArray);
-
+        if (this.settings.NetherFortress)
+            this.NetherFortress.a(null, this.world, x, z, chunkArray);
 
     }
 
@@ -298,6 +300,8 @@ public class SingleWorld implements LocalWorld
             Village = this.VillageGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.PyramidsEnabled)
             this.PyramidsGen.a(this.world, rand, chunk_x, chunk_z);
+        if (this.settings.NetherFortress)
+            this.NetherFortress.a(this.world, rand, chunk_x, chunk_z);
 
         return Village;
     }
@@ -568,6 +572,7 @@ public class SingleWorld implements LocalWorld
         this.VillageGen = new abh(0);
         this.MineshaftGen = new yx();
         this.PyramidsGen = new zy();
+        this.NetherFortress = new ze();
 
 
         this.Tree = new yt(false);
