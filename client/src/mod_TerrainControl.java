@@ -8,12 +8,12 @@ import java.io.IOException;
 public class mod_TerrainControl extends BaseMod
 {
     public static TCPlugin Plugin;
-    public static asu PacketHandler;
+    public static asv PacketHandler;
 
     @Override
     public String getVersion()
     {
-        return "2.2.4";
+        return "2.2.5";
     }
 
     @Override
@@ -32,12 +32,12 @@ public class mod_TerrainControl extends BaseMod
     }
 
     @Override
-    public void clientCustomPayload(asu clientHandler, ce packet)
+    public void clientCustomPayload(asv clientHandler, ce packet)
     {
         if (!packet.a.equals(TCDefaultValues.ChannelName.stringValue()))
             return;
 
-        atc world = ModLoader.getMinecraftInstance().e;
+        atd world = ModLoader.getMinecraftInstance().e;
         SingleWorld TCWorld = new SingleWorld(world.A.j());
         try
         {
@@ -58,7 +58,7 @@ public class mod_TerrainControl extends BaseMod
     }
 
     @Override
-    public void serverCustomPayload(gy serverHandler, ce packet)
+    public void serverCustomPayload(gz serverHandler, ce packet)
     {
         /*
         if (packet.c.length == 1)
@@ -94,18 +94,18 @@ public class mod_TerrainControl extends BaseMod
     }
 
     @Override
-    public void clientConnect(asu handler)
+    public void clientConnect(asv handler)
     {
         PacketHandler = handler;
         SendTCPacker();
     }
 
 
-    public static void NewWorldCreated(uo world)
+    public static void NewWorldCreated(up world)
     {
-        if (world instanceof gq && !(world instanceof gk))
+        if (world instanceof gr && !(world instanceof gl))
             SingleWorld.RestoreBiomes();
-        if (world instanceof atc)
+        if (world instanceof atd)
             SendTCPacker();
 
     }
@@ -114,7 +114,7 @@ public class mod_TerrainControl extends BaseMod
     {
         try
         {
-            if( PacketHandler == null  || ModLoader.getPrivateValue(asu.class,PacketHandler,"g") == null)
+            if( PacketHandler == null  || ModLoader.getPrivateValue(asv.class,PacketHandler,"g") == null)
                 return;
         } catch (NoSuchFieldException e)
         {

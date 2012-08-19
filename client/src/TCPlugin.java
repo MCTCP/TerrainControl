@@ -2,7 +2,7 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 
 import java.io.File;
 
-public class TCPlugin extends uz
+public class TCPlugin extends va
 {
 
     public SingleWorld TCWorld;
@@ -14,9 +14,9 @@ public class TCPlugin extends uz
     }
 
     @Override
-    public vo getChunkManager(uo world)
+    public vp getChunkManager(up world)
     {
-        if ( world instanceof atc)
+        if ( world instanceof atd)
             return super.getChunkManager(world);
 
         this.TCWorld = new SingleWorld(world.A.j());
@@ -25,7 +25,7 @@ public class TCPlugin extends uz
 
         try
         {
-            worldDir = (File) ModLoader.getPrivateValue(aea.class, world.G(), "b");
+            worldDir = (File) ModLoader.getPrivateValue(aeb.class, world.G(), "b");
 
         } catch (NoSuchFieldException e)
         {
@@ -47,7 +47,7 @@ public class TCPlugin extends uz
         this.TCWorld.Init(world);
 
 
-        vo ChunkManager = null;
+        vp ChunkManager = null;
 
         switch (this.TCWorld.getSettings().ModeBiome)
         {
@@ -70,7 +70,7 @@ public class TCPlugin extends uz
     }
 
     @Override
-    public wh getChunkGenerator(uo world)
+    public wi getChunkGenerator(up world)
     {
         if (this.TCWorld.getSettings().ModeTerrain != WorldConfig.TerrainMode.Default)
         {

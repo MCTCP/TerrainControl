@@ -8,16 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class BiomeManager extends vo implements IBiomeManager
+public class BiomeManager extends vp implements IBiomeManager
 {
     private Layer UnZoomedLayer;
     private Layer BiomeLayer;
 
     private final Object LockObject = new Object();
 
-    private vl Cache = new vl(this);
+    private vm Cache = new vm(this);
 
-    private ArrayList<vj> biomesToSpawnIn = new ArrayList<vj>();
+    private ArrayList<vk> biomesToSpawnIn = new ArrayList<vk>();
 
 
     private WorldConfig worldConfig;
@@ -25,13 +25,13 @@ public class BiomeManager extends vo implements IBiomeManager
 
     public BiomeManager(LocalWorld world)
     {
-        this.biomesToSpawnIn.add(vj.a[DefaultBiome.FOREST.Id]);
-        this.biomesToSpawnIn.add(vj.a[DefaultBiome.PLAINS.Id]);
-        this.biomesToSpawnIn.add(vj.a[DefaultBiome.TAIGA.Id]);
-        this.biomesToSpawnIn.add(vj.a[DefaultBiome.DESERT_HILLS.Id]);
-        this.biomesToSpawnIn.add(vj.a[DefaultBiome.FOREST_HILLS.Id]);
-        this.biomesToSpawnIn.add(vj.a[DefaultBiome.JUNGLE.Id]);
-        this.biomesToSpawnIn.add(vj.a[DefaultBiome.JUNGLE_HILLS.Id]);
+        this.biomesToSpawnIn.add(vk.a[DefaultBiome.FOREST.Id]);
+        this.biomesToSpawnIn.add(vk.a[DefaultBiome.PLAINS.Id]);
+        this.biomesToSpawnIn.add(vk.a[DefaultBiome.TAIGA.Id]);
+        this.biomesToSpawnIn.add(vk.a[DefaultBiome.DESERT_HILLS.Id]);
+        this.biomesToSpawnIn.add(vk.a[DefaultBiome.FOREST_HILLS.Id]);
+        this.biomesToSpawnIn.add(vk.a[DefaultBiome.JUNGLE.Id]);
+        this.biomesToSpawnIn.add(vk.a[DefaultBiome.JUNGLE_HILLS.Id]);
 
         this.Init(world);
 
@@ -43,7 +43,7 @@ public class BiomeManager extends vo implements IBiomeManager
 
         synchronized (this.LockObject)
         {
-            this.Cache = new vl(this);
+            this.Cache = new vm(this);
         }
 
         Layer[] layers = Layer.Init(world.getSeed(), world);
@@ -60,7 +60,7 @@ public class BiomeManager extends vo implements IBiomeManager
     }
 
     //get biome
-    public vj a(int paramInt1, int paramInt2)
+    public vk a(int paramInt1, int paramInt2)
     {
         synchronized (this.LockObject)
         {
@@ -113,34 +113,34 @@ public class BiomeManager extends vo implements IBiomeManager
         return paramArrayOfFloat;
     }
 
-    public vj[] a(vj[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public vk[] a(vk[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < paramInt3 * paramInt4))
         {
-            paramArrayOfBiomeBase = new vj[paramInt3 * paramInt4];
+            paramArrayOfBiomeBase = new vk[paramInt3 * paramInt4];
         }
 
         int[] arrayOfInt = this.UnZoomedLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = vj.a[arrayOfInt[i]];
+            paramArrayOfBiomeBase[i] = vk.a[arrayOfInt[i]];
         }
 
         return paramArrayOfBiomeBase;
     }
 
-    public vj[] a(vj[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
+    public vk[] a(vk[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
     {
         if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < paramInt3 * paramInt4))
         {
-            paramArrayOfBiomeBase = new vj[paramInt3 * paramInt4];
+            paramArrayOfBiomeBase = new vk[paramInt3 * paramInt4];
         }
 
         if ((paramBoolean) && (paramInt3 == 16) && (paramInt4 == 16) && ((paramInt1 & 0xF) == 0) && ((paramInt2 & 0xF) == 0))
         {
             synchronized (this.LockObject)
             {
-                vj[] localObject = this.Cache.e(paramInt1, paramInt2);
+                vk[] localObject = this.Cache.e(paramInt1, paramInt2);
                 System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, paramInt3 * paramInt4);
             }
             return paramArrayOfBiomeBase;
@@ -148,7 +148,7 @@ public class BiomeManager extends vo implements IBiomeManager
         int[] localObject = this.BiomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = vj.a[localObject[i]];
+            paramArrayOfBiomeBase[i] = vk.a[localObject[i]];
         }
 
         return paramArrayOfBiomeBase;
@@ -169,7 +169,7 @@ public class BiomeManager extends vo implements IBiomeManager
         {
             if (arrayOfInt[i2] >= DefaultBiome.values().length)
                 return false;
-            vj localBiomeBase = vj.a[arrayOfInt[i2]];
+            vk localBiomeBase = vk.a[arrayOfInt[i2]];
             if (!paramList.contains(localBiomeBase))
                 return false;
         }
@@ -178,7 +178,7 @@ public class BiomeManager extends vo implements IBiomeManager
     }
 
     @SuppressWarnings("rawtypes")
-    public vg a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
+    public vh a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
     {
         int i = paramInt1 - paramInt3 >> 2;
         int j = paramInt2 - paramInt3 >> 2;
@@ -188,7 +188,7 @@ public class BiomeManager extends vo implements IBiomeManager
         int n = k - i + 1;
         int i1 = m - j + 1;
         int[] arrayOfInt = this.UnZoomedLayer.Calculate(i, j, n, i1);
-        vg localChunkPosition = null;
+        vh localChunkPosition = null;
         int i2 = 0;
         for (int i3 = 0; i3 < arrayOfInt.length; i3++)
         {
@@ -196,10 +196,10 @@ public class BiomeManager extends vo implements IBiomeManager
                 continue;
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            vj localBiomeBase = vj.a[arrayOfInt[i3]];
+            vk localBiomeBase = vk.a[arrayOfInt[i3]];
             if ((!paramList.contains(localBiomeBase)) || ((localChunkPosition != null) && (paramRandom.nextInt(i2 + 1) != 0)))
                 continue;
-            localChunkPosition = new vg(i4, 0, i5);
+            localChunkPosition = new vh(i4, 0, i5);
             i2++;
         }
 
@@ -246,7 +246,7 @@ public class BiomeManager extends vo implements IBiomeManager
         {
             synchronized (this.LockObject)
             {
-                vj[] localObject = this.Cache.e(x, z);
+                vk[] localObject = this.Cache.e(x, z);
                 for (int i = 0; i < x_size * z_size; i++)
                     biomeArray[i] = localObject[i].M;
             }

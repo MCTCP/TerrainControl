@@ -4,11 +4,11 @@ import com.khorn.terraincontrol.generator.ObjectSpawner;
 
 import java.util.List;
 
-public class ChunkProvider implements wh
+public class ChunkProvider implements wi
 {
 
     private SingleWorld world;
-    private uo worldHandle;
+    private up worldHandle;
     private boolean TestMode = false;
 
     private ChunkProviderTC generator;
@@ -36,13 +36,13 @@ public class ChunkProvider implements wh
         return true;
     }
 
-    public wk d(int x, int z)
+    public wl d(int x, int z)
     {
 
-        wk chunk = new wk(this.worldHandle, x, z);
+        wl chunk = new wl(this.worldHandle, x, z);
 
         byte[] BlockArray = this.generator.generate(x, z);
-        wl[] sections = chunk.i();
+        wm[] sections = chunk.i();
 
         int i1 = BlockArray.length / 256;
         for (int _x = 0; _x < 16; _x++)
@@ -55,7 +55,7 @@ public class ChunkProvider implements wh
                         int sectionId = y >> 4;
                         if (sections[sectionId] == null)
                         {
-                            sections[sectionId] = new wl(sectionId << 4);
+                            sections[sectionId] = new wm(sectionId << 4);
                         }
                         sections[sectionId].a(_x, y & 0xF, _z, block);
                     }
@@ -66,22 +66,22 @@ public class ChunkProvider implements wh
         return chunk;
     }
 
-    public wk c(int i, int i1)
+    public wl c(int i, int i1)
     {
         return d(i, i1);
     }
 
-    public void a(wh ChunkProvider, int x, int z)
+    public void a(wi ChunkProvider, int x, int z)
     {
         if (this.TestMode)
             return;
-        ahp.a = true;
+        ahq.a = true;
         this.world.LoadChunk(x, z);
         this.spawner.populate(x, z);
-        ahp.a = false;
+        ahq.a = false;
     }
 
-    public boolean a(boolean b, il il)
+    public boolean a(boolean b, im il)
     {
         return true;
     }
@@ -101,9 +101,9 @@ public class ChunkProvider implements wh
         return "TerrainControlLevelSource";
     }
 
-    public List a(jw paramaca, int paramInt1, int paramInt2, int paramInt3)
+    public List a(jx paramaca, int paramInt1, int paramInt2, int paramInt3)
     {
-        vj Biome = this.worldHandle.a(paramInt1, paramInt3);
+        vk Biome = this.worldHandle.a(paramInt1, paramInt3);
         if (Biome == null)
         {
             return null;
@@ -111,7 +111,7 @@ public class ChunkProvider implements wh
         return Biome.a(paramaca);
     }
 
-    public vg a(uo world, String s, int x, int y, int z)
+    public vh a(up world, String s, int x, int y, int z)
     {
         if (("Stronghold".equals(s)) && (this.world.strongholdGen != null))
         {

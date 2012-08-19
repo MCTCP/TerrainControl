@@ -70,7 +70,7 @@ public class WorldConfig extends ConfigFile
     public int imageXOffset;
     public int imageZOffset;
 
-    public HashMap<Integer,Integer> biomeColorMap;
+    public HashMap<Integer, Integer> biomeColorMap;
 
     // Look settings
     public int WorldFog;
@@ -201,22 +201,24 @@ public class WorldConfig extends ConfigFile
         }
 
         //Build biome replace matrix
-        for(int i = 0; i < this.ReplaceMatrixBiomes.length;i++)
-            this.ReplaceMatrixBiomes[i] = (byte)i;
+        for (int i = 0; i < this.ReplaceMatrixBiomes.length; i++)
+            this.ReplaceMatrixBiomes[i] = (byte) i;
 
         this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
+        String LoadedBiomeNames = "";
+
+
         for (LocalBiome localBiome : localBiomes)
         {
-            System.out.println("TerrainControl: Loading biome settings for " + localBiome.getName());
             BiomeConfig config = new BiomeConfig(BiomeFolder, localBiome, this);
             if (checkOnly)
                 continue;
 
-            if(!config.ReplaceBiomeName.equals(""))
+            if (!config.ReplaceBiomeName.equals(""))
             {
                 this.HaveBiomeReplace = true;
-                this.ReplaceMatrixBiomes[config.Biome.getId()] = (byte)world.getBiomeIdByName(config.ReplaceBiomeName);
+                this.ReplaceMatrixBiomes[config.Biome.getId()] = (byte) world.getBiomeIdByName(config.ReplaceBiomeName);
             }
 
             if (this.NormalBiomes.contains(config.Name))
@@ -227,18 +229,21 @@ public class WorldConfig extends ConfigFile
             this.biomeConfigs[localBiome.getId()] = config;
             if (!this.BiomeConfigsHaveReplacement)
                 this.BiomeConfigsHaveReplacement = config.ReplaceCount > 0;
+            if (this.biomes.size() != 0)
+                LoadedBiomeNames += ", ";
+            LoadedBiomeNames += localBiome.getName();
             this.biomes.add(config);
 
-            if(this.ModeBiome == BiomeMode.FromImage)
+            if (this.ModeBiome == BiomeMode.FromImage)
             {
-                if( this.biomeColorMap == null)
+                if (this.biomeColorMap == null)
                     this.biomeColorMap = new HashMap<Integer, Integer>();
 
                 try
                 {
                     int color = Integer.decode(config.BiomeColor);
                     if (color <= 0xFFFFFF)
-                        this.biomeColorMap.put(color,config.Biome.getId());
+                        this.biomeColorMap.put(color, config.Biome.getId());
                 } catch (NumberFormatException ex)
                 {
                     System.out.println("TerrainControl: wrong color in " + config.Biome.getName());
@@ -247,6 +252,8 @@ public class WorldConfig extends ConfigFile
 
             }
         }
+
+        System.out.println("TerrainControl: Loaded biomes - " + LoadedBiomeNames);
 
         this.RegisterBOBPlugins(world);
     }
@@ -282,18 +289,17 @@ public class WorldConfig extends ConfigFile
         this.IsleBiomes = CheckValue(this.IsleBiomes, this.CustomBiomes);
         this.BorderBiomes = CheckValue(this.BorderBiomes, this.CustomBiomes);
 
-        if ( this.ModeBiome == BiomeMode.FromImage)
+        if (this.ModeBiome == BiomeMode.FromImage)
         {
             File mapFile = new File(SettingsDir, imageFile);
-            if(!mapFile.exists())
+            if (!mapFile.exists())
             {
                 System.out.println("TerrainControl: Biome map file not found. Switching ModeBiome to Normal");
                 this.ModeBiome = BiomeMode.Normal;
             }
         }
 
-        this.imageFillBiome = (DefaultBiome.Contain(imageFillBiome)|| CustomBiomes.contains(imageFillBiome)) ? imageFillBiome : TCDefaultValues.ImageFillBiome.stringValue();
-
+        this.imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || CustomBiomes.contains(imageFillBiome)) ? imageFillBiome : TCDefaultValues.ImageFillBiome.stringValue();
 
 
         this.minMoisture = CheckValue(this.minMoisture, 0, 1.0F);
@@ -396,8 +402,8 @@ public class WorldConfig extends ConfigFile
 
         this.imageFile = this.ReadModSettings(TCDefaultValues.ImageFile.name(), TCDefaultValues.ImageFile.stringValue());
         this.imageFillBiome = this.ReadModSettings(TCDefaultValues.ImageFillBiome.name(), TCDefaultValues.ImageFillBiome.stringValue());
-        this.imageXOffset =  this.ReadModSettings(TCDefaultValues.ImageXOffset.name(), TCDefaultValues.ImageXOffset.intValue());
-        this.imageZOffset =  this.ReadModSettings(TCDefaultValues.ImageZOffset.name(), TCDefaultValues.ImageZOffset.intValue());
+        this.imageXOffset = this.ReadModSettings(TCDefaultValues.ImageXOffset.name(), TCDefaultValues.ImageXOffset.intValue());
+        this.imageZOffset = this.ReadModSettings(TCDefaultValues.ImageZOffset.name(), TCDefaultValues.ImageZOffset.intValue());
 
         this.minMoisture = ReadModSettings(TCDefaultValues.minMoisture.name(), TCDefaultValues.minMoisture.floatValue());
         this.maxMoisture = ReadModSettings(TCDefaultValues.maxMoisture.name(), TCDefaultValues.maxMoisture.floatValue());
@@ -419,7 +425,7 @@ public class WorldConfig extends ConfigFile
         this.VillagesEnabled = ReadModSettings(TCDefaultValues.VillagesEnabled.name(), TCDefaultValues.VillagesEnabled.booleanValue());
         this.MineshaftsEnabled = ReadModSettings(TCDefaultValues.MineshaftsEnabled.name(), TCDefaultValues.MineshaftsEnabled.booleanValue());
         this.PyramidsEnabled = ReadModSettings(TCDefaultValues.PyramidsEnabled.name(), TCDefaultValues.PyramidsEnabled.booleanValue());
-        this.NetherFortress = ReadModSettings(TCDefaultValues.NetherFortressEnabled.name(),TCDefaultValues.NetherFortressEnabled.booleanValue());
+        this.NetherFortress = ReadModSettings(TCDefaultValues.NetherFortressEnabled.name(), TCDefaultValues.NetherFortressEnabled.booleanValue());
 
         this.caveRarity = ReadModSettings(TCDefaultValues.caveRarity.name(), TCDefaultValues.caveRarity.intValue());
         this.caveFrequency = ReadModSettings(TCDefaultValues.caveFrequency.name(), TCDefaultValues.caveFrequency.intValue());
@@ -904,7 +910,7 @@ public class WorldConfig extends ConfigFile
         }
 
         stream.writeInt(this.biomes.size());
-        for ( BiomeConfig config : this.biomes)
+        for (BiomeConfig config : this.biomes)
         {
             stream.writeInt(config.Biome.getId());
             config.Serialize(stream);
@@ -933,7 +939,7 @@ public class WorldConfig extends ConfigFile
     {
         // Protocol version
         int protocolVersion = stream.readInt();
-        if ( protocolVersion != TCDefaultValues.ProtocolVersion.intValue())
+        if (protocolVersion != TCDefaultValues.ProtocolVersion.intValue())
             throw new IOException("Wrong TC protocol version");
 
         this.WorldName = ReadStringFromStream(stream);

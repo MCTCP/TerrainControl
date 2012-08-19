@@ -1,7 +1,7 @@
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 
 
-public class CustomBiome extends vj
+public class CustomBiome extends vk
 {
     private int skyColor;
     private int grassColor;
@@ -46,7 +46,7 @@ public class CustomBiome extends vj
 
     }
 
-    public void CopyBiome(vj baseBiome)
+    public void CopyBiome(vk baseBiome)
     {
         this.B = baseBiome.B;
         this.A = baseBiome.A;
