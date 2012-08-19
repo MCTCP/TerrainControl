@@ -59,7 +59,7 @@ public class LiquidGen extends ResourceGenBase
     protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
     {
         res.BlockId = CheckBlock(Props[0]);
-        res.Frequency = CheckValue(Props[1], 1, 100);
+        res.Frequency = CheckValue(Props[1], 1, 5000);
         res.Rarity = CheckValue(Props[2], 0, 100);
         res.MinAltitude = CheckValue(Props[3], 0, worldHeight);
         res.MaxAltitude = CheckValue(Props[4], 0, worldHeight, res.MinAltitude);

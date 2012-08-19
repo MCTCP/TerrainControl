@@ -879,7 +879,10 @@ public class BiomeConfig extends ConfigFile
         TCDefaultValues[] copyFromWorld = {TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl};
         for (TCDefaultValues value : copyFromWorld)
             if (this.worldConfig.SettingsCache.containsKey(value.name()))
+            {
                 this.SettingsCache.put(value.name(), this.worldConfig.SettingsCache.get(value.name()));
+                this.SettingsCache.put(value.name().toLowerCase(), this.worldConfig.SettingsCache.get(value.name()));
+            }
 
         if (this.SettingsCache.containsKey("disableNotchPonds"))
         {
