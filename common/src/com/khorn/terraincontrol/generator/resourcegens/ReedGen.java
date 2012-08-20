@@ -1,9 +1,7 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.configuration.Resource;
-import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
-
+import com.khorn.terraincontrol.configuration.Resource;
 
 import java.util.Random;
 
@@ -14,27 +12,21 @@ public class ReedGen extends ResourceGenBase
     protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
     {
 
-        int y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
-
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 80; i++)
         {
-            int j = x + rand.nextInt(4) - rand.nextInt(4);
-            int m = z + rand.nextInt(4) - rand.nextInt(4);
-            if ((!world.isEmpty(j, y, m)) || ((world.getMaterial(j - 1, y - 1, m) != DefaultMaterial.WATER) && (world.getMaterial(j + 1, y - 1, m) != DefaultMaterial.WATER) && (world.getMaterial(j, y - 1, m - 1) != DefaultMaterial.WATER) && (world.getMaterial(j, y - 1, m + 1) != DefaultMaterial.WATER)))
+            int x2 = x + rand.nextInt(8) - rand.nextInt(8);
+            int z2 = z + rand.nextInt(8) - rand.nextInt(8);
+            int y = world.getHighestBlockYAt(x2, z2) + 1;
+            if (y > res.MaxAltitude || y < res.MinAltitude || (!world.getMaterial(x2 - 1, y - 1, z2).isLiquid() && !world.getMaterial(x2 + 1, y - 1, z2).isLiquid() && !world.getMaterial(x2, y - 1, z2 - 1).isLiquid() && !world.getMaterial(x2, y - 1, z2 + 1).isLiquid()))
             {
                 continue;
             }
+            if (!res.CheckSourceId(world.getTypeId(x2, y - 1, z2)))
+                continue;
 
-            int n = 2 + rand.nextInt(rand.nextInt(3) + 1);
+            int n = 2 + rand.nextInt(rand.nextInt(5) + 1);
             for (int i1 = 0; i1 < n; i1++)
-            {
-
-                int id = world.getTypeId(j, y + i1 - 1, m);
-                if (res.CheckSourceId(id) || id == res.BlockId)
-                {
-                    world.setBlock(j, y + i1, m, res.BlockId, 0, false, false, false);
-                }
-            }
+                world.setBlock(x2, y + i1, z2, res.BlockId, 0, false, false, false);
         }
     }
 

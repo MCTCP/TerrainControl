@@ -403,14 +403,9 @@ public class SingleWorld implements LocalWorld
         wl chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
-        z = z & 0xF;
-        x = x & 0xF;
         for (int y = worldHeight - 1; y > 0; y--)
-        {
-            int blockId = chunk.a(x, y, z);
-            if (blockId != 0 && DefaultMaterial.contains(blockId) && DefaultMaterial.getMaterial(blockId).isLiquid())
+            if (this.getMaterial(x, y, z).isLiquid())
                 return y;
-        }
         return -1;
     }
 
@@ -482,6 +477,10 @@ public class SingleWorld implements LocalWorld
     public DefaultMaterial getMaterial(int x, int y, int z)
     {
         int id = this.getTypeId(x, y, z);
+        if (id == 8 || id == 9)
+        {
+            id = 9;
+        }
         return DefaultMaterial.getMaterial(id);
     }
 
