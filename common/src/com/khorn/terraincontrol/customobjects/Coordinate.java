@@ -44,7 +44,7 @@ public class Coordinate
     public static int RotateData(int type, int data)
     {
         DefaultMaterial mat = DefaultMaterial.getMaterial(type);
-        if(mat == DefaultMaterial.UNKNOW_BLOCK)
+        if(mat == DefaultMaterial.UNKNOWN_BLOCK)
             return data;
 
         switch (mat) {

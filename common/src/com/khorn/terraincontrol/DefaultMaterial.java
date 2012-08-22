@@ -143,7 +143,7 @@ public enum DefaultMaterial
     SPRUCE_WOOD_STAIRS(134),
     BIRCH_WOOD_STAIRS(135),
     JUNGLE_WOOD_STAIRS(136),
-    UNKNOW_BLOCK(255);
+    UNKNOWN_BLOCK(255);
 
     public final int id;
     private final boolean solid;
@@ -206,6 +206,6 @@ public enum DefaultMaterial
         {
             return lookupID[id];
         }
-        return UNKNOW_BLOCK;
+        return UNKNOWN_BLOCK;
     }
 }

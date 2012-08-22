@@ -980,6 +980,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultMushroom = 8;
                 this.DefaultReed = 10;
                 this.DefaultClay = 1;
+                this.DefaultWaterLily = 1;
                 this.DefaultColor = "0x99CC66";
                 this.DefaultWaterColorMultiplier = "0xe0ffae";
                 this.DefaultGrassColor = "0x7E6E7E";

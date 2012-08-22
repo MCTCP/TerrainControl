@@ -82,7 +82,7 @@ public class Resource
     public String BlockIdToName(int id)
     {
         DefaultMaterial material = DefaultMaterial.getMaterial(id);
-        if (material != DefaultMaterial.UNKNOW_BLOCK)
+        if (material != DefaultMaterial.UNKNOWN_BLOCK)
             return material.name();
         else
             return Integer.toString(id);

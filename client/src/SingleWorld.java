@@ -477,10 +477,6 @@ public class SingleWorld implements LocalWorld
     public DefaultMaterial getMaterial(int x, int y, int z)
     {
         int id = this.getTypeId(x, y, z);
-        if (id == 8 || id == 9)
-        {
-            id = 9;
-        }
         return DefaultMaterial.getMaterial(id);
     }
 
