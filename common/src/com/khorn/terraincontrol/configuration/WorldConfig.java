@@ -137,6 +137,7 @@ public class WorldConfig extends ConfigFile
     public boolean NetherFortress;
 
     public File SettingsDir;
+    public ConfigMode SettingsMode;
 
     public boolean isDeprecated = false;
     public WorldConfig newSettings = null;
@@ -174,8 +175,9 @@ public class WorldConfig extends ConfigFile
                 CustomBiomeIds.put(biomeName, world.getFreeBiomeId());
 
         // Need add check to clashes
+        if (this.SettingsMode != ConfigMode.WriteDisable)
+            this.WriteSettingsFile(settingsFile, (this.SettingsMode == ConfigMode.WriteAll));
 
-        this.WriteSettingsFile(settingsFile);
         world.setHeightBits(this.worldHeightBits);
 
 
@@ -264,6 +266,15 @@ public class WorldConfig extends ConfigFile
         {
             this.SettingsCache.put("WaterLevelMax".toLowerCase(), this.SettingsCache.get("WaterLevel"));
         }
+            if (this.SettingsCache.containsKey("ModeTerrain"))
+        {
+            this.SettingsCache.put("TerrainMode".toLowerCase(), this.SettingsCache.get("ModeTerrain"));
+        }
+        if (this.SettingsCache.containsKey("ModeBiome"))
+        {
+            this.SettingsCache.put("BiomeMode".toLowerCase(), this.SettingsCache.get("ModeBiome"));
+        }
+
     }
 
     protected void CorrectSettings()
@@ -294,7 +305,7 @@ public class WorldConfig extends ConfigFile
             File mapFile = new File(SettingsDir, imageFile);
             if (!mapFile.exists())
             {
-                System.out.println("TerrainControl: Biome map file not found. Switching ModeBiome to Normal");
+                System.out.println("TerrainControl: Biome map file not found. Switching BiomeMode to Normal");
                 this.ModeBiome = BiomeMode.Normal;
             }
         }
@@ -346,7 +357,15 @@ public class WorldConfig extends ConfigFile
     {
         try
         {
-            this.ModeTerrain = TerrainMode.valueOf(ReadModSettings(TCDefaultValues.ModeTerrain.name(), TCDefaultValues.ModeTerrain.stringValue()));
+            this.SettingsMode = ConfigMode.valueOf(ReadModSettings(TCDefaultValues.SettingsMode.name(), TCDefaultValues.SettingsMode.stringValue()));
+        } catch (IllegalArgumentException e)
+        {
+            this.SettingsMode = ConfigMode.WriteAll;
+        }
+
+        try
+        {
+            this.ModeTerrain = TerrainMode.valueOf(ReadModSettings(TCDefaultValues.TerrainMode.name(), TCDefaultValues.TerrainMode.stringValue()));
         } catch (IllegalArgumentException e)
         {
             this.ModeTerrain = TerrainMode.Normal;
@@ -354,7 +373,7 @@ public class WorldConfig extends ConfigFile
 
         try
         {
-            this.ModeBiome = BiomeMode.valueOf(ReadModSettings(TCDefaultValues.ModeBiome.name(), TCDefaultValues.ModeBiome.stringValue()));
+            this.ModeBiome = BiomeMode.valueOf(ReadModSettings(TCDefaultValues.BiomeMode.name(), TCDefaultValues.BiomeMode.stringValue()));
         } catch (IllegalArgumentException e)
         {
             this.ModeBiome = BiomeMode.Normal;
@@ -496,20 +515,28 @@ public class WorldConfig extends ConfigFile
 
     protected void WriteConfigSettings() throws IOException
     {
+        WriteTitle("Configuration settings");
+        WriteComment("Possible configurations modes : WriteAll, WriteWithoutComments, WriteDisable");
+        WriteComment("   WriteAll - default");
+        WriteComment("   WriteWithoutComments - write config files without help comments");
+        WriteComment("   WriteDisable - did not write anything, only read. Use with caution!");
+        WriteValue(TCDefaultValues.SettingsMode.name(), this.SettingsMode.name());
+
+        WriteTitle("World modes");
         WriteComment("Possible terrain modes : Normal, OldGenerator, TerrainTest, NotGenerate, Default");
         WriteComment("   Normal - use all features");
         WriteComment("   OldGenerator - generate land like 1.7.3 generator");
         WriteComment("   TerrainTest - generate only terrain without any resources");
         WriteComment("   NotGenerate - generate empty chunks");
         WriteComment("   Default - use default Notch terrain generator");
-        WriteValue(TCDefaultValues.ModeTerrain.name(), this.ModeTerrain.name());
+        WriteValue(TCDefaultValues.TerrainMode.name(), this.ModeTerrain.name());
         WriteNewLine();
         WriteComment("Possible biome modes : Normal, OldGenerator, Default");
         WriteComment("   Normal - use all features");
         WriteComment("   FromImage - get biomes from image file");
         WriteComment("   OldGenerator - generate biome like 1.7.3 generator");
         WriteComment("   Default - use default Notch biome generator");
-        WriteValue(TCDefaultValues.ModeBiome.name(), this.ModeBiome.name());
+        WriteValue(TCDefaultValues.BiomeMode.name(), this.ModeBiome.name());
 
 
         WriteTitle("Biome Generator Variables");
@@ -870,6 +897,13 @@ public class WorldConfig extends ConfigFile
         Repeat,
         ContinueNormal,
         FillEmpty,
+    }
+
+    public enum ConfigMode
+    {
+        WriteAll,
+        WriteDisable,
+        WriteWithoutComments
     }
 
     public void Serialize(DataOutputStream stream) throws IOException

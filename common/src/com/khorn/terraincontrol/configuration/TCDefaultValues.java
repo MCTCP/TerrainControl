@@ -21,8 +21,9 @@ public enum TCDefaultValues
     IsleBiomes("MushroomIsland,Ice Mountains,DesertHills,ForestHills,TaigaHills,River,JungleHills"),
     BorderBiomes("MushroomIslandShore,Beach,Extreme Hills Edge"),
 
-    ModeTerrain("Normal"),
-    ModeBiome("Normal"),
+    TerrainMode("Normal"),
+    BiomeMode("Normal"),
+    SettingsMode("WriteAll"),
 
     GenerationDepth(10),
     BiomeRarityScale(100),

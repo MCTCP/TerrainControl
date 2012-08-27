@@ -20,13 +20,15 @@ import java.util.*;
 public abstract class ConfigFile
 {
     private BufferedWriter SettingsWriter;
-    
+
     // TODO: This map is populated with lowercase versions as well.
     // TODO: That is a derped approach. Use TreeSet with CASE_INSENSITIVE_ORDER instead.
     protected HashMap<String, String> SettingsCache = new HashMap<String, String>();
-    
+
     // TODO: We should use GSON only instead of just for a few fields.
     public static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+
+    private boolean WriteComments;
 
     protected void ReadSettingsFile(File f)
     {
@@ -41,8 +43,10 @@ public abstract class ConfigFile
                 int lineNumber = 0;
                 while ((thisLine = SettingsReader.readLine()) != null)
                 {
-                    if (thisLine.trim().equals("")) continue;
-                    if (thisLine.startsWith("#") || thisLine.startsWith("<")) continue;
+                    if (thisLine.trim().equals(""))
+                        continue;
+                    if (thisLine.startsWith("#") || thisLine.startsWith("<"))
+                        continue;
                     if (thisLine.toLowerCase().contains(":"))
                     {
                         String[] splitSettings = thisLine.split(":", 2);
@@ -50,21 +54,18 @@ public abstract class ConfigFile
                         {
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                             this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
-                        }
-                        else if (splitSettings.length == 1)
+                        } else if (splitSettings.length == 1)
                         {
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
                             this.SettingsCache.put(splitSettings[0].trim(), "");
                         }
-                    }
-                    else
+                    } else
                     {
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
                     }
                     lineNumber++;
                 }
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 e.printStackTrace();
 
@@ -73,37 +74,38 @@ public abstract class ConfigFile
                     try
                     {
                         SettingsReader.close();
-                    }
-                    catch (IOException localIOException1)
+                    } catch (IOException localIOException1)
                     {
                         localIOException1.printStackTrace();
                     }
                 }
-            }
-            finally
+            } finally
             {
                 if (SettingsReader != null)
                 {
                     try
                     {
                         SettingsReader.close();
-                    }
-                    catch (IOException localIOException2)
+                    } catch (IOException localIOException2)
                     {
                         localIOException2.printStackTrace();
                     }
                 }
             }
-        }
+        }else
+            System.out.println("TerrainControl: Can not load " + f.getName());
     }
 
     protected List<WeightedMobSpawnGroup> ReadModSettings(String settingsName, List<WeightedMobSpawnGroup> defaultValue)
     {
         String json = this.SettingsCache.get(settingsName);
-        if (json == null) return defaultValue;
-        return gson.fromJson(json, new TypeToken<List<WeightedMobSpawnGroup>>(){}.getType());
+        if (json == null)
+            return defaultValue;
+        return gson.fromJson(json, new TypeToken<List<WeightedMobSpawnGroup>>()
+        {
+        }.getType());
     }
-    
+
     protected ArrayList<String> ReadModSettings(String settingsName, ArrayList<String> defaultValue)
     {
         if (this.SettingsCache.containsKey(settingsName))
@@ -127,8 +129,7 @@ public abstract class ConfigFile
             try
             {
                 return Integer.valueOf(this.SettingsCache.get(settingsName));
-            }
-            catch (NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
@@ -144,8 +145,7 @@ public abstract class ConfigFile
             try
             {
                 return Byte.valueOf(this.SettingsCache.get(settingsName));
-            }
-            catch (NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
@@ -171,8 +171,7 @@ public abstract class ConfigFile
             try
             {
                 return Double.valueOf(this.SettingsCache.get(settingsName));
-            }
-            catch (NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
@@ -189,8 +188,7 @@ public abstract class ConfigFile
             try
             {
                 color = Color.decode(this.SettingsCache.get(settingsName));
-            }
-            catch (NumberFormatException ex)
+            } catch (NumberFormatException ex)
             {
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
@@ -206,8 +204,7 @@ public abstract class ConfigFile
             try
             {
                 return Float.valueOf(this.SettingsCache.get(settingsName));
-            }
-            catch (NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
@@ -225,15 +222,15 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
-    public void WriteSettingsFile(File settingsFile)
+    public void WriteSettingsFile(File settingsFile, boolean comments)
     {
+        this.WriteComments = comments;
         try
         {
             this.SettingsWriter = new BufferedWriter(new FileWriter(settingsFile, false));
 
             this.WriteConfigSettings();
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
 
@@ -242,22 +239,19 @@ public abstract class ConfigFile
                 try
                 {
                     this.SettingsWriter.close();
-                }
-                catch (IOException localIOException1)
+                } catch (IOException localIOException1)
                 {
                     localIOException1.printStackTrace();
                 }
             }
-        }
-        finally
+        } finally
         {
             if (this.SettingsWriter != null)
             {
                 try
                 {
                     this.SettingsWriter.close();
-                }
-                catch (IOException localIOException2)
+                } catch (IOException localIOException2)
                 {
                     localIOException2.printStackTrace();
                 }
@@ -279,14 +273,14 @@ public abstract class ConfigFile
         this.SettingsWriter.write(settingsName + ":" + out);
         this.SettingsWriter.newLine();
     }
-    
+
     protected void WriteValue(String settingsName, List<WeightedMobSpawnGroup> settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + gson.toJson(settingsValue));
         this.SettingsWriter.newLine();
     }
 
-    
+
     protected void WriteValue(String settingsName, int settingsValue) throws IOException
     {
         this.SettingsWriter.write(settingsName + ":" + Integer.toString(settingsValue));
@@ -357,6 +351,8 @@ public abstract class ConfigFile
 
     protected void WriteComment(String comment) throws IOException
     {
+        if (!this.WriteComments)
+            return;
         this.SettingsWriter.write("# " + comment);
         this.SettingsWriter.newLine();
     }
@@ -403,6 +399,7 @@ public abstract class ConfigFile
         else
             return value;
     }
+
     protected float CheckValue(float value, float min, float max, float minValue)
     {
         value = CheckValue(value, min, max);

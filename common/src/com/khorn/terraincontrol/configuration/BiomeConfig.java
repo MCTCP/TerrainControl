@@ -1,16 +1,17 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.DefaultMobType;
 import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.DefaultMobType;
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 import com.khorn.terraincontrol.util.Txt;
 
-import com.khorn.terraincontrol.LocalBiome;
-
-
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +104,8 @@ public class BiomeConfig extends ConfigFile
         this.CorrectSettings();
         if (!settingsFile.exists())
             this.CreateDefaultResources();
-        this.WriteSettingsFile(settingsFile);
+        if (config.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
+            this.WriteSettingsFile(settingsFile, (config.SettingsMode == WorldConfig.ConfigMode.WriteAll));
 
         if (this.UseWorldWaterLevel)
         {
