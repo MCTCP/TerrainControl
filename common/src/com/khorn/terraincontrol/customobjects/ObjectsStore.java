@@ -1,15 +1,12 @@
 package com.khorn.terraincontrol.customobjects;
 
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-
 import java.io.File;
 import java.util.ArrayList;
 
 public class ObjectsStore
 {
-    private static ArrayList<CustomObject> ObjectsList = new ArrayList<CustomObject>();
+    private static ArrayList<CustomObject> objectsList = new ArrayList<CustomObject>();
 
     /*
      Load:
@@ -46,23 +43,80 @@ public class ObjectsStore
      */
 
 
+    private static File directory;
 
-    public static void ReadObjects(File directoryPath)
+    public static void ReadObjects(File pluginPath)
     {
+        directory = new File(pluginPath, BODefaultValues.BO_DirectoryName.stringValue());
+
+        if (!directory.exists())
+        {
+            if (!directory.mkdirs())
+            {
+                System.out.println("BOB Plugin system encountered an error, aborting!");
+                return;
+            }
+        }
+
+        File[] files = directory.listFiles();
+        for (File customObjectFile : files)
+        {
+            if (customObjectFile.isFile())
+            {
+                CustomObject object = new CustomObject(customObjectFile);
+                if (object.IsValid)
+                    objectsList.add(object);
+            }
+        }
+
+        System.out.println("TerrainControl: " + objectsList.size() + " custom objects loaded");
 
 
     }
 
-    public static void ReloadObjects(File directoryPath)
+    public static String[] ParseString(String key)
     {
+        String[] output = new String[]{key, ""};
+
+        int start = key.indexOf("(");
+        int end = key.lastIndexOf(")");
+        if (start != -1 && end != -1)
+        {
+            output[0] = key.substring(0, start);
+            output[1] = key.substring(start + 1, end);
+        }
+        return output;
+    }
+
+
+    public static CustomObject GetObjectFromName(String name)
+    {
+        CustomObject object = null;
+        for (CustomObject customObject : objectsList)
+            if (customObject.name.equals(name))
+                object = customObject;
+        return object;
+    }
+
+
+    public static CustomObjectCompiled Compile(String key)
+    {
+        String[] values = ParseString(key);
+        CustomObject object = GetObjectFromName(values[0]);
+
+
+        if (object == null)
+            return null;
+
+        return object.Compile(values[1]);
 
 
     }
 
-    public static CustomObject[] CompileObjectsForBiome(WorldConfig world, BiomeConfig biome)
+    public static void ReloadObjects()
     {
 
-        return null;
+
     }
 
 }

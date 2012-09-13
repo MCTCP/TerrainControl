@@ -44,7 +44,7 @@ public class ObjectSpawner
             if(res.Type == ResourceType.SmallLake && Village)
                 continue;
             world.setChunksCreations(res.Type.CreateNewChunks);
-            res.Type.Generator.Process(world, rand, res, x, z, biomeId);
+            res.Type.Generator.Process(world, rand, res, x, z);
         }
 
         // Ice

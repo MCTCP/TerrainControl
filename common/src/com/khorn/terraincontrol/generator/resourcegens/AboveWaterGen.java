@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
 
 import java.util.Random;
@@ -27,7 +28,7 @@ public class AboveWaterGen extends ResourceGenBase
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
     {
         res.BlockId = CheckBlock(Props[0]);
         res.Frequency = CheckValue(Props[1], 1, 100);

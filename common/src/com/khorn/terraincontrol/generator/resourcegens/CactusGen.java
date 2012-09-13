@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.LocalWorld;
 
@@ -33,7 +34,7 @@ public class CactusGen extends ResourceGenBase
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
     {
 
         if (Props[0].contains("."))
@@ -48,8 +49,8 @@ public class CactusGen extends ResourceGenBase
 
         res.Frequency = CheckValue(Props[1], 1, 100);
         res.Rarity = CheckValue(Props[2], 0, 100);
-        res.MinAltitude = CheckValue(Props[3], 0, worldHeight);
-        res.MaxAltitude = CheckValue(Props[4], 0, worldHeight, res.MinAltitude);
+        res.MinAltitude = CheckValue(Props[3], 0, biomeConfig.worldConfig.WorldHeight);
+        res.MaxAltitude = CheckValue(Props[4], 0, biomeConfig.worldConfig.WorldHeight, res.MinAltitude);
 
         res.SourceBlockId = new int[Props.length - 5];
         for (int i = 5; i < Props.length; i++)

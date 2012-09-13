@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.bukkit;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.customobjects.ObjectsStore;
 import com.khorn.terraincontrol.util.Txt;
 import net.minecraft.server.BiomeBase;
 import org.bukkit.Bukkit;
@@ -42,6 +43,8 @@ public class TCPlugin extends JavaPlugin
         this.commandExecutor = new TCCommandExecutor(this);
 
         this.listener = new TCListener(this);
+
+        ObjectsStore.ReadObjects(this.getDataFolder());
 
         Bukkit.getMessenger().registerIncomingPluginChannel(this, TCDefaultValues.ChannelName.stringValue(), this.listener);
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());

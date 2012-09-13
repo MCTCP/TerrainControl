@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
@@ -67,12 +68,12 @@ public class VinesGen extends ResourceGenBase
     public static final int[] OPPOSITE_FACING = {1, 0, 3, 2, 5, 4};
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
     {
         res.Frequency = CheckValue(Props[0], 1, 100);
         res.Rarity = CheckValue(Props[1], 0, 100);
-        res.MinAltitude = CheckValue(Props[2], 0, worldHeight);
-        res.MaxAltitude = CheckValue(Props[3], 0, worldHeight, res.MinAltitude);
+        res.MinAltitude = CheckValue(Props[2], 0, biomeConfig.worldConfig.WorldHeight);
+        res.MaxAltitude = CheckValue(Props[3], 0, biomeConfig.worldConfig.WorldHeight, res.MinAltitude);
 
         return true;
     }

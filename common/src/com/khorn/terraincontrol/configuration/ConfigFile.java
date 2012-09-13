@@ -5,17 +5,12 @@ import com.khorn.terraincontrol.lib.gson.Gson;
 import com.khorn.terraincontrol.lib.gson.GsonBuilder;
 import com.khorn.terraincontrol.lib.gson.reflect.TypeToken;
 
-import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
+import java.awt.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public abstract class ConfigFile
 {
@@ -47,7 +42,10 @@ public abstract class ConfigFile
                         continue;
                     if (thisLine.startsWith("#") || thisLine.startsWith("<"))
                         continue;
-                    if (thisLine.toLowerCase().contains(":"))
+                    if (thisLine.toLowerCase().contains("("))
+                    {
+                        this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
+                    } else if (thisLine.toLowerCase().contains(":"))
                     {
                         String[] splitSettings = thisLine.split(":", 2);
                         if (splitSettings.length == 2)
@@ -59,10 +57,21 @@ public abstract class ConfigFile
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
                             this.SettingsCache.put(splitSettings[0].trim(), "");
                         }
-                    } else
+                    } else if (thisLine.toLowerCase().contains("="))
                     {
+                        String[] splitSettings = thisLine.split("=", 2);
+                        if (splitSettings.length == 2)
+                        {
+                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
+                            //this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
+                        } else if (splitSettings.length == 1)
+                        {
+                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
+                            //this.SettingsCache.put(splitSettings[0].trim(), "");
+                        }
+                    } else
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
-                    }
+
                     lineNumber++;
                 }
             } catch (IOException e)
@@ -92,7 +101,7 @@ public abstract class ConfigFile
                     }
                 }
             }
-        }else
+        } else
             System.out.println("TerrainControl: Can not load " + f.getName());
     }
 
@@ -102,12 +111,31 @@ public abstract class ConfigFile
         if (json == null)
             return defaultValue;
         return gson.fromJson(json, new TypeToken<List<WeightedMobSpawnGroup>>()
-        {
-        }.getType());
+        {}.getType());
     }
+    /*   FUCK Java !!!!!!!!
+
+    protected <T extends Boolean> boolean ReadModSettings(TCDefaultValues value)
+    {
+       return ReadModSettings(value.name(),value.booleanValue());
+    }
+    protected <T extends Integer> int ReadModSettings(TCDefaultValues value)
+    {
+        return ReadModSettings(value.name(),value.intValue());
+    }
+    protected <T extends String> String ReadModSettings(TCDefaultValues value)
+    {
+        return (String)ReadModSettings(value.name(),value.stringValue());
+    }
+    protected <T extends Double> double ReadModSettings(TCDefaultValues value)
+    {
+        return (double)ReadModSettings(value.name(),value.doubleValue());
+    }          */
+
 
     protected ArrayList<String> ReadModSettings(String settingsName, ArrayList<String> defaultValue)
     {
+        settingsName = settingsName.toLowerCase();
         if (this.SettingsCache.containsKey(settingsName))
         {
             ArrayList<String> out = new ArrayList<String>();
@@ -454,5 +482,40 @@ public abstract class ConfigFile
             throw new EOFException();
 
         return new String(chars);
+    }
+
+    protected static String[] ReadComplexString(String line)
+    {
+        ArrayList<String> buffer = new ArrayList<String>();
+
+        int index = 0;
+        int lastFound = 0;
+        int inBracer = 0;
+
+        for (char c : line.toCharArray())
+        {
+            if (c == ',' && inBracer == 0)
+            {
+                buffer.add(line.substring(lastFound, index));
+                lastFound = index + 1;
+            }
+
+            if (c == '(')
+                inBracer++;
+            if (c == ')')
+                inBracer--;
+
+            index++;
+        }
+        buffer.add(line.substring(lastFound, index));
+
+        String[] output = new String[0];
+
+        if (inBracer == 0)
+            output = buffer.toArray(output);
+
+        return output;
+
+
     }
 }

@@ -1,304 +1,256 @@
 package com.khorn.terraincontrol.customobjects;
 
-import com.khorn.terraincontrol.configuration.Resource;
-import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.generator.resourcegens.ResourceGenBase;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.generator.resourcegens.ResourceGenBase;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class CustomObjectGen extends ResourceGenBase
 {
-    @Override
-    public void Process(LocalWorld world, Random rand, Resource res, int _x, int _z, int biomeId)
-    {
-        SpawnCustomObjects(world, rand, world.getSettings(), _x + 8, _z + 8, biomeId);
-    }
+
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    public void Process(LocalWorld world, Random rand, Resource res, int _x, int _z)
     {
-        return true;
-    }
 
-    @Override
-    protected String WriteString(Resource res, String blockSources)
-    {
-        return "";
-    }
+        if (res.CUObjects.length == 0)
+            return;
 
-    private static boolean ObjectCanSpawn(LocalWorld world, int x, int y, int z, CustomObject obj)
-    {
-        if ((world.getTypeId(x, y - 5, z) == 0) && (obj.needsFoundation))
-            return false;
-
-        boolean abort = false;
-        int checkBlock = world.getTypeId(x, y + 2, z);
-        if (!obj.spawnWater)
-            abort = ((checkBlock == DefaultMaterial.WATER.id) || (checkBlock == DefaultMaterial.STATIONARY_WATER.id));
-        if (!obj.spawnLava)
-            abort = ((checkBlock == DefaultMaterial.LAVA.id) || (checkBlock == DefaultMaterial.STATIONARY_LAVA.id));
-
-        checkBlock = world.getLightLevel(x, y + 2, z);
-        if (!obj.spawnSunlight)
-            abort = (checkBlock > 8);
-        if (!obj.spawnDarkness)
-            abort = (checkBlock < 9);
-
-        if ((y < obj.spawnElevationMin) || (y > obj.spawnElevationMax))
-            abort = true;
-
-        if (!obj.spawnOnBlockType.contains(world.getTypeId(x, y - 1, z)))
-            abort = true;
-
-        return !abort;
-    }
-
-    public static boolean SpawnCustomObjects(LocalWorld world, Random rand, WorldConfig worldSettings, int chunk_x, int chunk_z, int biomeId)
-    {
-        if (worldSettings.Objects.size() == 0)
-            return false;
+        _x = _x + 8;
+        _z = _z + 8;
 
         boolean objectSpawned = false;
-        int spawnattemps = 0;
+        int spawnAttempts = 0;
         while (!objectSpawned)
         {
-            if (spawnattemps > worldSettings.objectSpawnRatio)
-                return false;
+            if (spawnAttempts > world.getSettings().objectSpawnRatio)
+                return;
 
-            spawnattemps++;
+            spawnAttempts++;
 
-            CustomObject SelectedObject = worldSettings.Objects.get(rand.nextInt(worldSettings.Objects.size()));
-
-            if (SelectedObject.branch || !SelectedObject.canSpawnInBiome(world.getBiomeById(biomeId).getName()))
+            CustomObjectCompiled SelectedObject = res.CUObjects[rand.nextInt(res.CUObjects.length)];
+            if (SelectedObject.Branch)
                 continue;
 
             int randomRoll = rand.nextInt(100);
-            int ObjectRarity = SelectedObject.rarity;
+            int ObjectRarity = SelectedObject.Rarity;
 
             while (randomRoll < ObjectRarity)
             {
-                int x = chunk_x + rand.nextInt(16);
-                int z = chunk_z + rand.nextInt(16);
+                int x = _x + rand.nextInt(16);
+                int z = _z + rand.nextInt(16);
                 int y = world.getHighestBlockYAt(x, z);
                 ObjectRarity -= 100;
 
                 if (!ObjectCanSpawn(world, x, y, z, SelectedObject))
                     continue;
 
-                objectSpawned = GenerateCustomObject(world, rand, worldSettings, x, y, z, SelectedObject, false);
-                // Checked Biome, Branch, Tree - soo try to generate.
 
-                // here we spawn object and check group spawning
-
-                if (objectSpawned && !SelectedObject.groupId.endsWith(""))
-                {
-                    ArrayList<CustomObject> groupList = worldSettings.ObjectGroups.get(SelectedObject.groupId);
-                    if (groupList == null)
-                        return objectSpawned;
-
-                    int attempts = 3;
-                    if ((SelectedObject.groupFrequencyMax - SelectedObject.groupFrequencyMin) > 0)
-                        attempts = SelectedObject.groupFrequencyMin + rand.nextInt(SelectedObject.groupFrequencyMax - SelectedObject.groupFrequencyMin);
-
-                    while (attempts > 0)
-                    {
-                        attempts--;
-
-                        int objIndex = rand.nextInt(groupList.size());
-                        CustomObject ObjectFromGroup = groupList.get(objIndex);
-
-                        // duno about this check, but maybe it is correct
-                        if (ObjectFromGroup.branch || !ObjectFromGroup.canSpawnInBiome(world.getBiomeById(biomeId).getName()))
-                            continue;
-
-                        x = x + rand.nextInt(SelectedObject.groupSeperationMax - SelectedObject.groupSeperationMin) + SelectedObject.groupSeperationMin;
-                        z = z + rand.nextInt(SelectedObject.groupSeperationMax - SelectedObject.groupSeperationMin) + SelectedObject.groupSeperationMin;
-                        int _y = world.getHighestBlockYAt(x, z);
-                        if ((y - _y) > 10 || (_y - y) > 10)
-                            continue;
-
-                        if (!ObjectCanSpawn(world, x, y, z, ObjectFromGroup))
-                            continue;
-                        GenerateCustomObject(world, rand, worldSettings, x, _y, z, ObjectFromGroup, true);
+                objectSpawned = GenerateCustomObject(world, rand, x, y, z, SelectedObject);
 
 
-                    }
+                /*
+               if (objectSpawned && !SelectedObject.groupId.endsWith(""))
+               {
+                   ArrayList<CustomObject> groupList = worldSettings.ObjectGroups.get(SelectedObject.groupId);
+                   if (groupList == null)
+                       return objectSpawned;
 
-                }
+                   int attempts = 3;
+                   if ((SelectedObject.groupFrequencyMax - SelectedObject.groupFrequencyMin) > 0)
+                       attempts = SelectedObject.groupFrequencyMin + rand.nextInt(SelectedObject.groupFrequencyMax - SelectedObject.groupFrequencyMin);
 
+                   while (attempts > 0)
+                   {
+                       attempts--;
+
+                       int objIndex = rand.nextInt(groupList.size());
+                       CustomObject ObjectFromGroup = groupList.get(objIndex);
+
+                       // duno about this check, but maybe it is correct
+                       if (ObjectFromGroup.branch || !ObjectFromGroup.canSpawnInBiome(world.getBiomeById(biomeId).getName()))
+                           continue;
+
+                       x = x + rand.nextInt(SelectedObject.groupSeperationMax - SelectedObject.groupSeperationMin) + SelectedObject.groupSeperationMin;
+                       z = z + rand.nextInt(SelectedObject.groupSeperationMax - SelectedObject.groupSeperationMin) + SelectedObject.groupSeperationMin;
+                       int _y = world.getHighestBlockYAt(x, z);
+                       if ((y - _y) > 10 || (_y - y) > 10)
+                           continue;
+
+                       if (!ObjectCanSpawn(world, x, y, z, ObjectFromGroup))
+                           continue;
+                       GenerateCustomObject(world, rand, worldSettings, x, _y, z, ObjectFromGroup, true);
+
+
+                   }
+
+               }
+                */
             }
-
         }
-        return objectSpawned;
+
+
     }
 
-
-    public static boolean SpawnCustomTrees(LocalWorld world, Random rand, WorldConfig worldSettings, int x, int y, int z)
+    private boolean GenerateCustomObject(LocalWorld world, Random rand, int x, int y, int z, CustomObjectCompiled workObject)
     {
 
-        if (!worldSettings.HasCustomTrees)
-            return false;
+        ObjectCoordinate[] data = workObject.Data[0];
+        if (workObject.RandomRotation)
+            data = workObject.Data[rand.nextInt(4)];
 
 
-        String biomeName = world.getLocalBiome(x | 0xF, z | 0xF).getName();
-
-        boolean objectSpawned = false;
-        int spawnattemps = 0;
-        while (!objectSpawned && spawnattemps < worldSettings.objectSpawnRatio)
-        {
-            CustomObject SelectedObject = worldSettings.Objects.get(rand.nextInt(worldSettings.Objects.size()));
-
-            spawnattemps++;
-
-            if (SelectedObject.branch || !SelectedObject.canSpawnInBiome(biomeName) || !SelectedObject.tree)
-                continue;
-
-
-            int randomRoll = rand.nextInt(100);
-
-            if (randomRoll < SelectedObject.rarity)
-            {
-                if (CustomObjectGen.ObjectCanSpawn(world, x, y, z, SelectedObject))
-                    objectSpawned = GenerateCustomObject(world, rand, worldSettings, x, y, z, SelectedObject, true);
-            }
-
-        }
-        return objectSpawned;
-    }
-
-    public static boolean GenerateCustomObject(LocalWorld world, Random rand, WorldConfig worldSettings, int x, int y, int z, CustomObject workObject, boolean notify)
-    {
-        /*
-         * 1) ground check (moved to ObjectCanSpawn)
-         * 2) add branches and copy all data to work array (dont change default CustomObject object)
-         * 3) collision check and rotation
-         * 4) spawn
-         */
-
-        // 1)
-
-
-        // 2)
-
-        int index = 0;
-        int branchLimit = 0;
-        ArrayList<CustomObject> branchGroup = worldSettings.BranchGroups.get(workObject.groupId);
-        ArrayList<Coordinate> workingData = new ArrayList<Coordinate>();
-        while (index < workObject.Data.size())
-        {
-            Coordinate DataPoint = workObject.Data.get(index);
-            workingData.add(DataPoint.GetCopy());
-
-            if ((DataPoint.branchDirection != -1) && (branchGroup != null) && (branchLimit < workObject.branchLimit))
-            {
-                CustomObject workingBranch = branchGroup.get(rand.nextInt(branchGroup.size()));
-                int counter = 0;
-                while (counter < workingBranch.Data.size())
-                {
-                    Coordinate untranslatedCoordinate = workingBranch.Data.get(counter).GetCopy();
-                    int directionCounter = 0;
-                    while (directionCounter < (DataPoint.branchDirection))
-                    {
-                        untranslatedCoordinate.Rotate();
-                        directionCounter++;
-                    }
-
-                    workingData.add(untranslatedCoordinate.GetSumm(DataPoint));
-                    counter++;
-                }
-
-            }
-            index++;
-        }
-
-        // 3)
-        int RotationAmount = 0;
-        index = 0;
         int faultCounter = 0;
 
-        if (workObject.randomRotation)
+        for (ObjectCoordinate point : data)
         {
-            RotationAmount = rand.nextInt(4);
-        }
-
-
-        while (index < workingData.size())
-        {
-            int counter = 0;
-            Coordinate point = workingData.get(index);
-            while (counter < RotationAmount)
-            {
-                point.Rotate();
-                counter++;
-            }
-            if (!world.isLoaded(point.getX() + x,point.getY() + y, point.getZ() + z))
+            if (!world.isLoaded((x + point.x), (y + point.y), (z + point.z)))
                 return false;
 
-
-            if (!workObject.dig)
+            if (!workObject.Dig)
             {
-                if (world.getTypeId((x + point.getX()), (y + point.getY()), (z + point.getZ())) > 0)
+                if (world.getTypeId((x + point.x), (y + point.y), (z + point.z)) > 0)
                 {
                     faultCounter++;
-                    if (faultCounter > (workingData.size() * (workObject.collisionPercentage / 100)))
+                    if (faultCounter > (data.length * (workObject.CollisionPercentage / 100)))
                     {
                         return false;
                     }
                 }
             }
-            index++;
+
+
         }
 
-        // 4)
-
-        index = 0;
-        while (index < workingData.size())
+        for (ObjectCoordinate point : data)
         {
-            Coordinate DataPoint = workingData.get(index);
-            if (world.getTypeId(x + DataPoint.getX(), y + DataPoint.getY(), z + DataPoint.getZ()) == 0)
+
+            if (world.getTypeId(x + point.x, y + point.y, z + point.z) == 0)
             {
-                ChangeWorld(world, notify, (x + DataPoint.getX()), y + DataPoint.getY(), z + DataPoint.getZ(), DataPoint.workingData, DataPoint.workingExtra);
-            } else if (DataPoint.Digs)
+                world.setBlock((x + point.x), y + point.y, z + point.z, point.BlockId, point.BlockData, true, false, true);
+            } else if (workObject.Dig)
             {
-                ChangeWorld(world, notify, (x + DataPoint.getX()), y + DataPoint.getY(), z + DataPoint.getZ(), DataPoint.workingData, DataPoint.workingExtra);
+                world.setBlock((x + point.x), y + point.y, z + point.z, point.BlockId, point.BlockData, true, false, true);
             }
-            if ((!worldSettings.denyObjectsUnderFill) && (workObject.underFill) && (world.getTypeId(x + DataPoint.getX(), y, z + DataPoint.getZ()) > 0))
-            {
-                int depthScanner = 0;
-                int blockForFill = world.getTypeId(x, y - 1, z);
-                while (depthScanner < 64)
-                {
-                    if (DataPoint.getY() < depthScanner)
-                    {
-                        int countdown = depthScanner;
-                        while ((world.getTypeId(x + DataPoint.getX(), y + DataPoint.getY() - countdown, z + DataPoint.getZ()) == 0) && (countdown < 64))
-                        {
-                            ChangeWorld(world, notify, (x + DataPoint.getX()), y + DataPoint.getY() - countdown, z + DataPoint.getZ(), blockForFill, 0);
-                            countdown++;
-                        }
-                    }
-                    depthScanner++;
-                }
-            }
-            index++;
+
         }
         return true;
 
     }
 
-
-    private static void ChangeWorld(LocalWorld world, boolean notify, int x, int y, int z, int type, int data)
+    private static boolean ObjectCanSpawn(LocalWorld world, int x, int y, int z, CustomObjectCompiled obj)
     {
-        world.setBlock(x, y, z, type, data, true, false, notify);
-    }
+        if ((world.getTypeId(x, y - 5, z) == 0) && (obj.NeedsFoundation))
+            return false;
 
+        boolean abort = false;
+        int checkBlock = world.getTypeId(x, y + 2, z);
+        if (!obj.SpawnWater)
+            abort = ((checkBlock == DefaultMaterial.WATER.id) || (checkBlock == DefaultMaterial.STATIONARY_WATER.id));
+        if (!obj.SpawnLava)
+            abort = ((checkBlock == DefaultMaterial.LAVA.id) || (checkBlock == DefaultMaterial.STATIONARY_LAVA.id));
+
+        checkBlock = world.getLightLevel(x, y + 2, z);
+        if (!obj.SpawnSunlight)
+            abort = (checkBlock > 8);
+        if (!obj.SpawnDarkness)
+            abort = (checkBlock < 9);
+
+        if ((y < obj.SpawnElevationMin) || (y > obj.SpawnElevationMax))
+            abort = true;
+
+        if (!obj.SpawnOnBlockType.contains(world.getTypeId(x, y - 1, z)))
+            abort = true;
+
+        return !abort;
+    }
 
     @Override
     protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
     {
 
+
     }
+
+    @Override
+    protected String WriteString(Resource res, String blockSources)
+    {
+        String output = "";
+        boolean first = true;
+
+        for (String name : res.CUObjectsNames)
+        {
+            output = output + (first ? "" : ";");
+            if (first)
+                first = false;
+
+            if (name.equals(BODefaultValues.BO_Use_World.stringValue()) || name.equals(BODefaultValues.BO_Use_Biome.stringValue()))
+            {
+                output += name;
+                continue;
+            }
+
+            for (CustomObjectCompiled object : res.CUObjects)
+                if (object.Name.equals(name))
+                    output += name + "(" + object.ChangedSettings + ")";
+
+        }
+
+        return output;
+
+    }
+
+    @Override
+    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
+    {
+
+        ArrayList<CustomObjectCompiled> objects = new ArrayList<CustomObjectCompiled>();
+        ArrayList<String> objectsName = new ArrayList<String>();
+
+        if (Props.length == 1 && Props[0].equals(""))
+        {
+            for (CustomObjectCompiled objectCompiled : biomeConfig.worldConfig.CustomObjectsCompiled)
+                if (objectCompiled.parent.CheckBiome(biomeConfig.Name))
+                    objects.add(objectCompiled);
+
+            objectsName.add(BODefaultValues.BO_Use_World.stringValue());
+
+        } else
+            for (String key : Props)
+            {
+                if (key.equals(BODefaultValues.BO_Use_World.stringValue()))
+                {
+                    for (CustomObjectCompiled objectCompiled : biomeConfig.worldConfig.CustomObjectsCompiled)
+                        if (objectCompiled.parent.CheckBiome(biomeConfig.Name))
+                            objects.add(objectCompiled);
+
+                    objectsName.add(BODefaultValues.BO_Use_World.stringValue());
+                    continue;
+                }
+
+                if (key.equals(BODefaultValues.BO_Use_Biome.stringValue()))
+                {
+                    objects.addAll(biomeConfig.CustomObjectsCompiled);
+                    objectsName.add(BODefaultValues.BO_Use_Biome.stringValue());
+                    continue;
+                }
+
+                CustomObjectCompiled obj = ObjectsStore.Compile(key);
+                if (obj != null)
+                {
+                    objects.add(obj);
+                    objectsName.add(obj.Name);
+                }
+
+            }
+        res.CUObjects = objects.toArray(res.CUObjects);
+        res.CUObjectsNames = objectsName.toArray(res.CUObjectsNames);
+
+        return true;
+    }
+
 }

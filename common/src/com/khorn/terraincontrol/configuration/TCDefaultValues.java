@@ -15,6 +15,7 @@ public enum TCDefaultValues
     maxChunkBlockValue(32768),
 
     CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0"),
+
     CustomBiomes(""),
     NormalBiomes("Desert,Forest,Extreme Hills,Swampland,Plains,Taiga,Jungle"),
     IceBiomes("Ice Plains"),
@@ -24,6 +25,7 @@ public enum TCDefaultValues
     TerrainMode("Normal"),
     BiomeMode("Normal"),
     SettingsMode("WriteAll"),
+
 
     GenerationDepth(10),
     BiomeRarityScale(100),

@@ -1,20 +1,26 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
+import com.khorn.terraincontrol.customobjects.ObjectsStore;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WorldConfig extends ConfigFile
 {
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
     public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
+
+    public ArrayList<CustomObjectCompiled> CustomObjectsCompiled;
 
     public ArrayList<String> NormalBiomes = new ArrayList<String>();
     public ArrayList<String> IceBiomes = new ArrayList<String>();
@@ -23,9 +29,6 @@ public class WorldConfig extends ConfigFile
 
     public ArrayList<BiomeConfig> biomes = new ArrayList<BiomeConfig>();
 
-    public ArrayList<CustomObject> Objects = new ArrayList<CustomObject>();
-    public HashMap<String, ArrayList<CustomObject>> ObjectGroups = new HashMap<String, ArrayList<CustomObject>>();
-    public HashMap<String, ArrayList<CustomObject>> BranchGroups = new HashMap<String, ArrayList<CustomObject>>();
     public boolean HasCustomTrees = false;
 
     public byte[] ReplaceMatrixBiomes = new byte[256];
@@ -257,20 +260,20 @@ public class WorldConfig extends ConfigFile
 
         System.out.println("TerrainControl: Loaded biomes - " + LoadedBiomeNames);
 
-        this.RegisterBOBPlugins(world);
+        //this.RegisterBOBPlugins(world);
     }
 
     protected void RenameOldSettings()
     {
-        if (this.SettingsCache.containsKey("WaterLevel"))
+        if (this.SettingsCache.containsKey("WaterLevel".toLowerCase()))
         {
             this.SettingsCache.put("WaterLevelMax".toLowerCase(), this.SettingsCache.get("WaterLevel"));
         }
-            if (this.SettingsCache.containsKey("ModeTerrain"))
+            if (this.SettingsCache.containsKey("ModeTerrain".toLowerCase()))
         {
             this.SettingsCache.put("TerrainMode".toLowerCase(), this.SettingsCache.get("ModeTerrain"));
         }
-        if (this.SettingsCache.containsKey("ModeBiome"))
+        if (this.SettingsCache.containsKey("ModeBiome".toLowerCase()))
         {
             this.SettingsCache.put("BiomeMode".toLowerCase(), this.SettingsCache.get("ModeBiome"));
         }
@@ -484,6 +487,8 @@ public class WorldConfig extends ConfigFile
         this.objectSpawnRatio = this.ReadModSettings(TCDefaultValues.objectSpawnRatio.name(), TCDefaultValues.objectSpawnRatio.intValue());
         this.denyObjectsUnderFill = this.ReadModSettings(TCDefaultValues.DenyObjectsUnderFill.name(), TCDefaultValues.DenyObjectsUnderFill.booleanValue());
         this.customTreeChance = this.ReadModSettings(TCDefaultValues.customTreeChance.name(), TCDefaultValues.customTreeChance.intValue());
+
+        this.ReadCustomObjectSettings();
     }
 
     private void ReadCustomBiomes()
@@ -509,6 +514,23 @@ public class WorldConfig extends ConfigFile
 
         }
 
+
+    }
+
+    private void ReadCustomObjectSettings()
+    {
+        CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();
+
+        for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
+        {
+            String[] values = ObjectsStore.ParseString(entry.getKey());
+
+            CustomObject object = ObjectsStore.GetObjectFromName(values[0]);
+            if (object == null)
+                continue;
+
+            CustomObjectsCompiled.add(object.Compile(values[1]));
+        }
 
     }
 
@@ -768,6 +790,9 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.maxMoisture.name(), this.maxMoisture);
         WriteValue(TCDefaultValues.minTemperature.name(), this.minTemperature);
         WriteValue(TCDefaultValues.maxTemperature.name(), this.maxTemperature);
+
+        this.WriteTitle("Custom objects");
+        this.WriteCustomObjects();
     }
 
     private void WriteCustomBiomes() throws IOException
@@ -785,7 +810,7 @@ public class WorldConfig extends ConfigFile
 
     }
 
-    private void RegisterBOBPlugins(LocalWorld world)
+    /*private void RegisterBOBPlugins(LocalWorld world)
     {
         if (this.customObjects)
         {
@@ -857,6 +882,13 @@ public class WorldConfig extends ConfigFile
                     this.HasCustomTrees = true;
             }
         }
+    } */
+
+    private void WriteCustomObjects() throws IOException
+    {
+        for( CustomObjectCompiled objectCompiled : CustomObjectsCompiled)
+            this.WriteValue(objectCompiled.Name + (objectCompiled.ChangedSettings.equals("")? "":("(" + CustomObjectsCompiled + ")")));
+
     }
 
     public double getFractureHorizontal()

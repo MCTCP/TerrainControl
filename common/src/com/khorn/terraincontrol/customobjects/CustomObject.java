@@ -1,318 +1,109 @@
 package com.khorn.terraincontrol.customobjects;
 
-import com.khorn.terraincontrol.LocalWorld;
 
-import java.io.BufferedReader;
+import com.khorn.terraincontrol.configuration.ConfigFile;
+
 import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
-public class CustomObject
+public class CustomObject extends ConfigFile
 {
-    public ArrayList<Coordinate> Data = new ArrayList<Coordinate>();
-    public HashSet<Integer> spawnOnBlockType = (new HashSet<Integer>());
-    public boolean spawnSunlight = true;
-    public boolean spawnDarkness = false;
-    public boolean spawnWater = false;
-    public boolean spawnLava = false;
-    public boolean underFill = true;
-    public boolean dig = false;
-    public int rarity = 10;
-    public int spawnElevationMin = 0;
-    public int spawnElevationMax = 128;
-    public boolean randomRotation = true;
-    public String groupId = "";
-    public boolean tree = false;
-    public boolean branch = false;
-    public boolean diggingBranch = false;
-    public int groupFrequencyMin = 1;
-    public int groupFrequencyMax = 5;
-    public int groupSeperationMin = 0;
-    public int groupSeperationMax = 5;
-    public HashSet<String> spawnInBiome = new HashSet<String>();
-    public double collisionPercentage = 2;
-    public int branchLimit = 6;
-    public boolean needsFoundation = true;
-    public String name = "";
-    public String version = "1";
+
+
+    public HashSet<String> SpawnInBiome;
+
+
     public boolean IsValid = false;
+    public File FilePath;
+    public String name = "";
+    public String GroupId = "";
 
 
-    public CustomObject(File objectFile, LocalWorld world)
+    public CustomObject(File objectFile)
     {
-        try
-        {
-            BufferedReader ObjectProps = new BufferedReader(new FileReader(objectFile));
+        FilePath = objectFile;
+        name = objectFile.getName();
+        //Remove extension.
+        name = name.substring(0, name.length() - 4);
 
-            String workingString = ObjectProps.readLine();
-            if (!workingString.equals("[META]"))
-            {
-                System.out.println("Invalid BOB Plugin: " + objectFile.getName());
-                ObjectProps.close();
-                return;
-            }
-
-            boolean dataReached = false;
-            while ((workingString = ObjectProps.readLine()) != null)
-            {
-                if (!dataReached)
-                {
-                    if (workingString.contains("="))
-                    {
-                        String[] stringSet = workingString.split("=");
-                        if (stringSet[0].equals("spawnOnBlockType"))
-                        {
-                            String[] blocks = stringSet[1].split(",");
-                            int counter = 0;
-                            while (counter < blocks.length)
-                            {
-                                this.spawnOnBlockType.add(Integer.parseInt(blocks[counter]));
-                                counter++;
-                            }
-                        }
-                        if (stringSet[0].equals("spawnSunlight"))
-                        {
-                            if (stringSet[1].toLowerCase().equals("false"))
-                            {
-                                this.spawnSunlight = false;
-                            }
-                        }
-                        if (stringSet[0].equals("spawnDarkness"))
-                        {
-                            if (stringSet[1].toLowerCase().equals("true"))
-                            {
-                                this.spawnDarkness = true;
-                            }
-                        }
-                        if (stringSet[0].equals("spawnWater"))
-                        {
-                            if (stringSet[1].toLowerCase().equals("true"))
-                            {
-                                this.spawnWater = true;
-                            }
-                        }
-                        if (stringSet[0].equals("spawnLava"))
-                        {
-                            if (stringSet[1].toLowerCase().equals("true"))
-                            {
-                                this.spawnLava = true;
-                            }
-                        }
-                        if (stringSet[0].equals("underFill"))
-                        {
-                            if (stringSet[1].toLowerCase().equals("false"))
-                            {
-                                this.underFill = false;
-                            }
-                        }
-                        if (stringSet[0].equals("randomRotation"))
-                        {
-                            if (stringSet[1].toLowerCase().equals("false"))
-                            {
-                                this.randomRotation = false;
-                            }
-                        }
-                        if (stringSet[0].equals("dig"))
-                        {
-                            if (stringSet[1].toLowerCase().equals("true"))
-                            {
-                                this.dig = true;
-                            }
-                        }
-                        if (stringSet[0].equals("rarity"))
-                        {
-                            this.rarity = Integer.parseInt(stringSet[1]);
-                        }
-                        if (stringSet[0].equals("spawnElevationMin"))
-                        {
-                            this.spawnElevationMin = Integer.parseInt(stringSet[1]);
-                        }
-                        if (stringSet[0].equals("spawnElevationMax"))
-                        {
-                            this.spawnElevationMax = Integer.parseInt(stringSet[1]);
-                        }
-                        if (stringSet[0].equals("groupId"))
-                        {
-                            this.groupId = stringSet[1];
-                        }
-                        if (stringSet[0].equals("tree"))
-                        {
-                            if (stringSet[1].toLowerCase().equals("true"))
-                            {
-                                this.tree = true;
-                            }
-                        }
-                        if (stringSet[0].equals("branch"))
-                        {
-                            if (stringSet[1].toLowerCase().equals("true"))
-                            {
-                                this.branch = true;
-                            }
-                        }
-                        if (stringSet[0].equals("diggingBranch"))
-                        {
-                            if (stringSet[1].toLowerCase().equals("true"))
-                            {
-                                this.diggingBranch = true;
-                            }
-                        }
-                        if (stringSet[0].equals("groupFrequencyMin"))
-                        {
-                            this.groupFrequencyMin = Integer.parseInt(stringSet[1]);
-                        }
-                        if (stringSet[0].equals("groupFrequencyMax"))
-                        {
-                            this.groupFrequencyMax = Integer.parseInt(stringSet[1]);
-                        }
-                        if (stringSet[0].equals("groupSeperationMin"))
-                        {
-                            this.groupSeperationMin = Integer.parseInt(stringSet[1]);
-                        }
-                        if (stringSet[0].equals("groupSeperationMax"))
-                        {
-                            this.groupSeperationMax = Integer.parseInt(stringSet[1]);
-                        }
-                        if (stringSet[0].equals("collisionPercentage"))
-                        {
-                            this.collisionPercentage = (Integer.parseInt(stringSet[1]) );
-                        }
-                        if (stringSet[0].equals("spawnInBiome"))
-                        {
-                            stringSet = stringSet[1].split(",");
-                            int counter = 0;
-                            while (counter < stringSet.length)
-                            {
-                                if (stringSet[counter].equals("Icedesert"))
-                                    this.spawnInBiome.add("ice desert");
-                                if (stringSet[counter].equals("Rain Forest"))
-                                    this.spawnInBiome.add("rainforest");
-                                else if (stringSet[counter].equals("Seasonalforest"))
-                                    this.spawnInBiome.add("seasonal forest");
-                                else
-                                    this.spawnInBiome.add(stringSet[counter].toLowerCase());
-                                counter++;
-                            }
-                        }
-                        if (stringSet[0].equals("branchLimit"))
-                        {
-                            this.branchLimit = (Integer.parseInt(stringSet[1]));
-                        }
-                        if (stringSet[0].equals("needsFoundation"))
-                        {
-                            if (stringSet[1].toLowerCase().equals("false"))
-                            {
-                                this.needsFoundation = false;
-                            }
-                        }
-                        if (stringSet[0].equals("version"))
-                        {
-                            this.version = stringSet[1].toLowerCase();
-                        }
-
-                    } else if (workingString.equals("[DATA]"))
-                        dataReached = true;
-                    continue;
-                }
-
-                String[] CoordinateSet = workingString.split(":")[0].split(",");
-                String BlockString = workingString.split(":")[1];
-                Coordinate Coordinates;
-                if (this.dig)
-                {
-                    Coordinates = new Coordinate(Integer.parseInt(CoordinateSet[0]), Integer.parseInt(CoordinateSet[2]), Integer.parseInt(CoordinateSet[1]), BlockString, true);
-                } else
-                {
-                    Coordinates = new Coordinate(Integer.parseInt(CoordinateSet[0]), Integer.parseInt(CoordinateSet[2]), Integer.parseInt(CoordinateSet[1]), BlockString, false);
-
-                }
-                Coordinates.RegisterData();
-                this.Data.add(Coordinates);
-
-            }
-
-            if (!dataReached)
-            {
-                System.out.println("Invalid BOB Plugin: " + objectFile.getName());
-                ObjectProps.close();
-                return;
-            }
-
-            this.name = objectFile.getName().substring(0,objectFile.getName().length()-4);
-            this.CorrectSettings(world);
+        ReadSettingsFile(objectFile);
+        CorrectSettings();
+        if (SettingsCache.containsKey("[META]") && SettingsCache.containsKey("[DATA]"))
             this.IsValid = true;
 
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            System.out.println("Invalid BOB Plugin: " + objectFile.getName());
-        }
+        if (!this.IsValid)
+            return;
+
+        ReadConfigSettings();
 
     }
 
-    public void CorrectSettings(LocalWorld world)
+    public boolean CheckBiome(String biomeName)
     {
-        for (int blockid : spawnOnBlockType)
-        {
-            if (blockid > 96 || blockid == 0)
-                spawnOnBlockType.remove(blockid);
-        }
-
-        if (spawnOnBlockType.size() == 0)
-        {
-            spawnOnBlockType.add(2);
-            spawnOnBlockType.add(3);
-        }
-
-
-        if (rarity == 0 || rarity > 1000)
-            rarity = 10;
-
-        if (collisionPercentage == 0 || collisionPercentage > 100)
-            collisionPercentage = 2;
-
-        if (spawnElevationMin > world.getHeight())
-            spawnElevationMin = 0;
-
-        if (spawnElevationMax > world.getHeight())
-            spawnElevationMax = world.getHeight();
-
-        if (spawnElevationMax < spawnElevationMin)
-        {
-            spawnElevationMax = world.getHeight();
-            spawnElevationMin = 0;
-        }
-        if (branchLimit == 0 || branchLimit > 16)
-            branchLimit = 6;
-
-        if (groupFrequencyMin == 0 || groupFrequencyMin > 100)
-            groupFrequencyMin = 1;
-        if (groupFrequencyMax == 0 || groupFrequencyMax > 100)
-            groupFrequencyMax = 5;
-
-        if (groupFrequencyMax < groupFrequencyMin)
-        {
-            groupFrequencyMin = 1;
-            groupFrequencyMax = 5;
-        }
-
-        if (groupSeperationMin > 16)
-            groupSeperationMin = 0;
-        if (groupSeperationMax > 16)
-            groupSeperationMax = 5;
-        if (groupSeperationMax < groupSeperationMin)
-        {
-            groupSeperationMin = 0;
-            groupSeperationMax = 5;
-        }
-
-        if (spawnInBiome.size() == 0)
-            spawnInBiome.add("all");
+        return (SpawnInBiome.contains(BODefaultValues.BO_ALL_KEY.stringValue()) || SpawnInBiome.contains(BODefaultValues.BO_ALL_KEY.stringValue().toLowerCase()) || SpawnInBiome.contains(biomeName));
     }
 
-    public boolean canSpawnInBiome(String localBiome)
+    public CustomObjectCompiled Compile(String settingsLine)
     {
-        return this.spawnInBiome.contains("all") || this.spawnInBiome.contains(localBiome.toLowerCase());
+
+        HashMap<String, String> newSettings = new HashMap<String, String>();
+        for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
+            if (BODefaultValues.Contains(entry.getKey()) || ObjectCoordinate.isCoordinateString(entry.getKey()))
+                newSettings.put(entry.getKey(), entry.getValue());
+
+        String[] keys = settingsLine.split(";");
+        String changedSettings = "";
+        boolean first = true;
+
+        for (String key : keys)
+        {
+            String[] values = null;
+            if (key.contains("="))
+                values = key.split("=", 2);
+            if (key.contains(":"))
+                values = key.split("=", 2);
+            if (values == null)
+                continue;
+            if (BODefaultValues.Contains(values[0]) || ObjectCoordinate.isCoordinateString(values[0]))
+            {
+                newSettings.put(values[0], values[1]);
+                changedSettings = changedSettings + (first ? "" : ";") + key;
+                if (first)
+                    first = false;
+            }
+        }
+
+        return new CustomObjectCompiled(newSettings, name, changedSettings, this);
+
+    }
+
+
+    @Override
+    protected void ReadConfigSettings()
+    {
+        this.GroupId = ReadModSettings(BODefaultValues.groupId.name(), BODefaultValues.groupId.stringValue());
+
+        this.SpawnInBiome = new HashSet<String>(ReadModSettings(BODefaultValues.spawnInBiome.name(), BODefaultValues.spawnInBiome.StringArrayListValue()));
+
+    }
+
+    @Override
+    protected void WriteConfigSettings() throws IOException
+    {
+
+    }
+
+    @Override
+    protected void CorrectSettings()
+    {
+
+    }
+
+    @Override
+    protected void RenameOldSettings()
+    {
     }
 }

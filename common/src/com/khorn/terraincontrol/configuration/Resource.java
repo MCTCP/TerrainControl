@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
 import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
@@ -18,6 +19,9 @@ public class Resource
     public int Rarity;
     public TreeType[] TreeTypes = new TreeType[0];
     public int[] TreeChances = new int[0];
+
+    public CustomObjectCompiled[] CUObjects = new CustomObjectCompiled[0];
+    public String[] CUObjectsNames = new String[0];
 
 
     public Resource(ResourceType type)

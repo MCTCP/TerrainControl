@@ -45,4 +45,16 @@ public enum ResourceType
             e.printStackTrace();
         }
     }
+
+    public static boolean Contain(String name)
+    {
+        for(ResourceType type : ResourceType.values())
+        {
+            if(type.name().equals(name))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

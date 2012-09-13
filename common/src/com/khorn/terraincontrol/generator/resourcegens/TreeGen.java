@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.LocalWorld;
 
@@ -15,7 +16,7 @@ public class TreeGen extends ResourceGenBase
     }
 
     @Override
-    public void Process(LocalWorld world, Random rand, Resource res, int x, int z, int biomeId)
+    public void Process(LocalWorld world, Random rand, Resource res, int x, int z)
     {
         for (int i = 0; i < res.Frequency; i++)
         {
@@ -33,7 +34,7 @@ public class TreeGen extends ResourceGenBase
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
     {
         res.Frequency = CheckValue(Props[0], 1, 100);
 

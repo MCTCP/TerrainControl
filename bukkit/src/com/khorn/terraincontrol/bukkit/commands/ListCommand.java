@@ -1,12 +1,9 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-import com.khorn.terraincontrol.customobjects.CustomObject;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ListCommand extends BaseCommand
@@ -23,6 +20,7 @@ public class ListCommand extends BaseCommand
     @Override
     public boolean onCommand(CommandSender sender, List<String> args)
     {
+        /*
         BukkitWorld world = this.getWorld(sender, "");
 
         if (world != null)
@@ -50,7 +48,7 @@ public class ListCommand extends BaseCommand
             return true;
 
         }
-        sender.sendMessage(ErrorColor + "TC is not enabled for this world");
+        sender.sendMessage(ErrorColor + "TC is not enabled for this world");  */
         return true;
 
     }

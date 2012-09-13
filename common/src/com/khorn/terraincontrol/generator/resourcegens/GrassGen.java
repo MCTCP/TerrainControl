@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
@@ -9,7 +10,7 @@ import java.util.Random;
 public class GrassGen extends ResourceGenBase
 {
     @Override
-    public void Process(LocalWorld world, Random rand, Resource res, int _x, int _z, int biomeId)
+    public void Process(LocalWorld world, Random rand, Resource res, int _x, int _z)
     {
 
         for (int t = 0; t < res.Frequency; t++)
@@ -37,7 +38,7 @@ public class GrassGen extends ResourceGenBase
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
     {
         res.BlockId = CheckBlock(Props[0]);
         res.BlockData = CheckValue(Props[1], 0, 16);

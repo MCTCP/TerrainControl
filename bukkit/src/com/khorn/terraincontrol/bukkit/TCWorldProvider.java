@@ -35,7 +35,6 @@ public class TCWorldProvider extends WorldProvider
         return this;
     }
     
-    @Override
     public String getName()
     {
         return "Terrain Control";

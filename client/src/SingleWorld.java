@@ -387,9 +387,11 @@ public class SingleWorld implements LocalWorld
         z = z >> 4;
         if (this.CachedChunk != null && this.CachedChunk.g == x && this.CachedChunk.h == z)
             return this.CachedChunk;
-        int index = x - this.CurrentChunkX + 2 * (z - this.CurrentChunkZ);
-        if (index >= 0 && index < 4)
-            return CachedChunk = this.ChunkCache[index];
+
+        int index_x = (x - this.CurrentChunkX);
+        int index_z = (z - this.CurrentChunkZ);
+        if ((index_x == 0 || index_x == 1) && (index_z == 0 || index_z == 1))
+            return CachedChunk = this.ChunkCache[index_x | (index_z << 1)];
         else if (this.CreateNewChunks || this.world.F().a(x, z))
             return CachedChunk = this.world.d(x, z);
         else

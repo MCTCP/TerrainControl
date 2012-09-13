@@ -3,9 +3,6 @@ package com.khorn.terraincontrol.bukkit.commands;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.CustomObjectGen;
-
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,7 +10,6 @@ import org.bukkit.util.BlockIterator;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 public class SpawnCommand extends BaseCommand
 {
@@ -46,7 +42,7 @@ public class SpawnCommand extends BaseCommand
         }
         String bo2Name = args.get(0);
         
-        CustomObject spawnObject = null;
+        /*CustomObject spawnObject = null;
         for (CustomObject object : bukkitWorld.getSettings().Objects)
         {
             if (object.name.equalsIgnoreCase(bo2Name))
@@ -72,7 +68,7 @@ public class SpawnCommand extends BaseCommand
         else
         {
             me.sendMessage(BaseCommand.ErrorColor + "BO2 cant be spawned over there.");
-        }
+        }    */
 
         return true;
     }

@@ -4,6 +4,9 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.DefaultMobType;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.ObjectsStore;
 import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 import com.khorn.terraincontrol.util.Txt;
@@ -59,6 +62,8 @@ public class BiomeConfig extends ConfigFile
 
     public Resource[] ResourceSequence = new Resource[256];
 
+    public ArrayList<CustomObjectCompiled> CustomObjectsCompiled;
+
     public double maxAverageHeight;
     public double maxAverageDepth;
     public double volatility1;
@@ -77,7 +82,7 @@ public class BiomeConfig extends ConfigFile
     // TODO: A configuration should NOT contain what it is supposed to be configuration for. This is very bad practi
     public LocalBiome Biome;
 
-    private WorldConfig worldConfig;
+    public WorldConfig worldConfig;
     public String Name;
 
     //Spawn Config
@@ -190,7 +195,7 @@ public class BiomeConfig extends ConfigFile
 
         DefaultBiome biome = DefaultBiome.getBiome(this.Biome.getId());
 
-        if( biome != null &&  ( biome == DefaultBiome.EXTREME_HILLS  || biome == DefaultBiome.SMALL_MOUNTAINS ))
+        if (biome != null && (biome == DefaultBiome.EXTREME_HILLS || biome == DefaultBiome.SMALL_MOUNTAINS))
         {
             resource = new Resource(ResourceType.Ore, DefaultMaterial.EMERALD_ORE.id, 0, TCDefaultValues.emeraldDepositSize.intValue(), TCDefaultValues.emeraldDepositFrequency.intValue(), TCDefaultValues.emeraldDepositRarity.intValue(), TCDefaultValues.emeraldDepositMinAltitude.intValue(), this.worldConfig.WorldHeight / 4, new int[]{DefaultMaterial.STONE.id});
             this.ResourceSequence[this.ResourceCount++] = resource;
@@ -381,6 +386,7 @@ public class BiomeConfig extends ConfigFile
         this.spawnWaterCreaturesAddDefaults = ReadModSettings("spawnWaterCreaturesAddDefaults", true);
         this.spawnWaterCreatures = ReadModSettings("spawnWaterCreatures", new ArrayList<WeightedMobSpawnGroup>());
 
+        this.ReadCustomObjectSettings();
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
         this.ReadHeightSettings();
@@ -400,17 +406,18 @@ public class BiomeConfig extends ConfigFile
 
         } catch (NumberFormatException e)
         {
-            System.out.println("Wrong height settings: '" + this.SettingsCache.get(TCDefaultValues.CustomHeightControl.name()) + "'");
+            System.out.println("Wrong height settings: '" + this.SettingsCache.get(TCDefaultValues.CustomHeightControl.name().toLowerCase()) + "'");
         }
     }
 
     private void ReadReplaceSettings()
     {
-        if (this.SettingsCache.containsKey("ReplacedBlocks"))
+        String settingName = "ReplacedBlocks".toLowerCase();
+        if (this.SettingsCache.containsKey(settingName))
         {
-            if (this.SettingsCache.get("ReplacedBlocks").trim().equals("") || this.SettingsCache.get("ReplacedBlocks").equals("None"))
+            if (this.SettingsCache.get(settingName).trim().equals("") || this.SettingsCache.get(settingName).equals("None"))
                 return;
-            String[] keys = this.SettingsCache.get("ReplacedBlocks").split(",");
+            String[] keys = this.SettingsCache.get(settingName).split(",");
             try
             {
                 for (String key : keys)
@@ -465,7 +472,7 @@ public class BiomeConfig extends ConfigFile
 
             } catch (NumberFormatException e)
             {
-                System.out.println("Wrong replace settings: '" + this.SettingsCache.get("ReplacedBlocks") + "'");
+                System.out.println("Wrong replace settings: '" + this.SettingsCache.get(settingName) + "'");
             }
         }
     }
@@ -482,11 +489,13 @@ public class BiomeConfig extends ConfigFile
                 if (key.startsWith(type.name()))
                 {
                     int start = key.indexOf("(");
-                    int end = key.indexOf(")");
+                    int end = key.lastIndexOf(")");
                     if (start != -1 && end != -1)
                     {
                         Resource res = new Resource(type);
-                        if (type.Generator.ReadFromString(res, key.substring(start + 1, end).split(","), this.worldConfig.WorldHeight))
+                        String[] props = ReadComplexString(key.substring(start + 1, end));
+
+                        if (type.Generator.ReadFromString(res, props, this))
                         {
                             LineNumbers.add(Integer.valueOf(entry.getValue()));
                             this.ResourceSequence[this.ResourceCount++] = res;
@@ -515,6 +524,23 @@ public class BiomeConfig extends ConfigFile
             this.ResourceSequence[minimal] = buffer;
             LineNumbers.set(minimal, LineNumbers.get(i));
         }
+    }
+
+    private void ReadCustomObjectSettings()
+    {
+        CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();
+
+        for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
+        {
+            String[] values = ObjectsStore.ParseString(entry.getKey());
+
+            CustomObject object = ObjectsStore.GetObjectFromName(values[0]);
+            if (object == null)
+                continue;
+
+            CustomObjectsCompiled.add(object.Compile(values[1]));
+        }
+
     }
 
     protected void WriteConfigSettings() throws IOException
@@ -710,7 +736,11 @@ public class BiomeConfig extends ConfigFile
 
         this.WriteResources();
 
-        if ( DefaultBiome.getBiome(this.Biome.getId()) != null )
+        this.WriteTitle("Custom objects");
+        this.WriteCustomObjects();
+
+
+        if (DefaultBiome.getBiome(this.Biome.getId()) != null)
         {
             this.WriteTitle("MOB SPAWNING");
             this.WriteComment("Mob spawning control did not work with default biomes.");
@@ -773,6 +803,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Add extra watercreature spawn groups here");
         WriteValue("spawnWaterCreatures", this.spawnWaterCreatures);
         this.WriteNewLine();
+
     }
 
     private void WriteHeightSettings() throws IOException
@@ -851,6 +882,13 @@ public class BiomeConfig extends ConfigFile
             this.WriteValue(this.ResourceSequence[i].Type.Generator.WriteToString(this.ResourceSequence[i]));
     }
 
+    private void WriteCustomObjects() throws IOException
+    {
+        for( CustomObjectCompiled objectCompiled : CustomObjectsCompiled)
+            this.WriteValue(objectCompiled.Name + (objectCompiled.ChangedSettings.equals("")? "":("(" + objectCompiled.ChangedSettings + ")")));
+
+    }
+
     protected void CorrectSettings()
     {
         this.BiomeSize = CheckValue(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
@@ -880,15 +918,15 @@ public class BiomeConfig extends ConfigFile
     {
         TCDefaultValues[] copyFromWorld = {TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl};
         for (TCDefaultValues value : copyFromWorld)
-            if (this.worldConfig.SettingsCache.containsKey(value.name()))
+            if (this.worldConfig.SettingsCache.containsKey(value.name().toLowerCase()))
             {
-                this.SettingsCache.put(value.name(), this.worldConfig.SettingsCache.get(value.name()));
-                this.SettingsCache.put(value.name().toLowerCase(), this.worldConfig.SettingsCache.get(value.name()));
+                //this.SettingsCache.put(value.name(), this.worldConfig.SettingsCache.get(value.name().toLowerCase()));
+                this.SettingsCache.put(value.name().toLowerCase(), this.worldConfig.SettingsCache.get(value.name().toLowerCase()));
             }
 
-        if (this.SettingsCache.containsKey("disableNotchPonds"))
+        if (this.SettingsCache.containsKey("disableNotchPonds".toLowerCase()))
         {
-            if (!ReadModSettings("disableNotchPonds", false))
+            if (!ReadModSettings("disableNotchPonds".toLowerCase(), false))
             {
                 this.SettingsCache.put("SmallLake(WATER,4,7,8," + this.worldConfig.WorldHeight + ")", "0");
                 this.SettingsCache.put("SmallLake(LAVA,2,3,8," + (this.worldConfig.WorldHeight - 8) + ")", "1");

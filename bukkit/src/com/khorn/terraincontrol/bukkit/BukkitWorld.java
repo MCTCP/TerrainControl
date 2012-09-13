@@ -352,11 +352,14 @@ public class BukkitWorld implements LocalWorld
 
         x = x >> 4;
         z = z >> 4;
+
         if (this.CachedChunk != null && this.CachedChunk.x == x && this.CachedChunk.z == z)
             return this.CachedChunk;
-        int index = x - this.CurrentChunkX + 2 * (z - this.CurrentChunkZ);
-        if (index >= 0 && index < 4)
-            return CachedChunk = this.ChunkCache[index];
+
+        int index_x = (x - this.CurrentChunkX);
+        int index_z = (z - this.CurrentChunkZ);
+        if ((index_x == 0 || index_x == 1) && (index_z == 0 || index_z == 1))
+            return CachedChunk = this.ChunkCache[index_x | (index_z << 1)];
         else if (this.CreateNewChunks || this.world.chunkProvider.isChunkLoaded(x, z))
             return CachedChunk = this.world.getChunkAt(x, z);
         else
@@ -404,6 +407,7 @@ public class BukkitWorld implements LocalWorld
 
         // We fetch the chunk from a custom cache in order to speed things up.
         Chunk chunk = this.getChunk(x, y, z);
+
         if (chunk == null)
         {
             return;
@@ -416,12 +420,13 @@ public class BukkitWorld implements LocalWorld
         } else
             chunk.a(x & 15, y, z & 15, typeId, data); // Set typeId and Data
 
+
         if (updateLight)
         {
             this.world.v(x, y, z);
         }
 
-        if (notifyPlayers)
+        if (notifyPlayers && chunk.seenByPlayer)
         {
             this.world.notify(x, y, z);
         }
@@ -429,7 +434,7 @@ public class BukkitWorld implements LocalWorld
 
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data)
     {
-        this.setBlock(x, y, z, typeId, data, false, false, false);
+        this.setBlock(x, y, z, typeId, data, false, false, true);
     }
 
     public int getHighestBlockYAt(int x, int z)

@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
 import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.LocalWorld;
 
@@ -8,7 +9,7 @@ import java.util.Random;
 
 public abstract class ResourceGenBase
 {
-    public void Process(LocalWorld world, Random rand, Resource res, int _x, int _z, int biomeId)
+    public void Process(LocalWorld world, Random rand, Resource res, int _x, int _z)
     {
         for (int t = 0; t < res.Frequency; t++)
         {
@@ -23,13 +24,13 @@ public abstract class ResourceGenBase
 
     protected abstract void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z);
 
-    public boolean ReadFromString(Resource res, String[] line, int WorldHeight)
+    public boolean ReadFromString(Resource res, String[] line, BiomeConfig biomeConfig)
     {
         if (line.length < res.Type.MinProperties)
             return false;
         try
         {
-            return this.ReadString(res, line, WorldHeight);
+            return this.ReadString(res, line, biomeConfig);
 
         } catch (NumberFormatException e)
         {
@@ -48,7 +49,7 @@ public abstract class ResourceGenBase
 
     protected abstract String WriteString(Resource res, String blockSources);
 
-    protected abstract boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException;
+    protected abstract boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException;
 
     protected int CheckValue(String str, int min, int max) throws NumberFormatException
     {

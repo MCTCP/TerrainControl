@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
@@ -60,15 +61,15 @@ public class UndergroundLakeGen extends ResourceGenBase
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, int worldHeight) throws NumberFormatException
+    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
     {
 
         res.MinSize = CheckValue(Props[0], 1, 25);
         res.MaxSize = CheckValue(Props[1], 1, 60, res.MinSize);
         res.Frequency = CheckValue(Props[2], 1, 100);
         res.Rarity = CheckValue(Props[3], 0, 100);
-        res.MinAltitude = CheckValue(Props[4], 0, worldHeight);
-        res.MaxAltitude = CheckValue(Props[5], 0, worldHeight, res.MinAltitude);
+        res.MinAltitude = CheckValue(Props[4], 0, biomeConfig.worldConfig.WorldHeight);
+        res.MaxAltitude = CheckValue(Props[5], 0, biomeConfig.worldConfig.WorldHeight, res.MinAltitude);
 
         return true;
     }
