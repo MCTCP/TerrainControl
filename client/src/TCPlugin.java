@@ -1,4 +1,5 @@
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.customobjects.ObjectsStore;
 
 import java.io.File;
 
@@ -41,6 +42,8 @@ public class TCPlugin extends va
             if (!configDir.mkdirs())
                 System.out.println("TerrainControl: cant create folder " + configDir.getName());
         }
+
+        ObjectsStore.ReadObjects(configDir);
 
         WorldConfig config = new WorldConfig(configDir, TCWorld, false);
         this.TCWorld.setSettings(config);
