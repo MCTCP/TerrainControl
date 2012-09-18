@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.generator.resourcegens.ResourceGenBase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class CustomObjectGen extends ResourceGenBase
@@ -53,43 +54,35 @@ public class CustomObjectGen extends ResourceGenBase
                 objectSpawned = GenerateCustomObject(world, rand, x, y, z, SelectedObject);
 
 
-                /*
-               if (objectSpawned && !SelectedObject.groupId.endsWith(""))
-               {
-                   ArrayList<CustomObject> groupList = worldSettings.ObjectGroups.get(SelectedObject.groupId);
-                   if (groupList == null)
-                       return objectSpawned;
+                if (objectSpawned && SelectedObject.GroupObjects != null)
+                {
 
-                   int attempts = 3;
-                   if ((SelectedObject.groupFrequencyMax - SelectedObject.groupFrequencyMin) > 0)
-                       attempts = SelectedObject.groupFrequencyMin + rand.nextInt(SelectedObject.groupFrequencyMax - SelectedObject.groupFrequencyMin);
+                    int attempts = 3;
+                    if ((SelectedObject.GroupFrequencyMax - SelectedObject.GroupFrequencyMin) > 0)
+                        attempts = SelectedObject.GroupFrequencyMin + rand.nextInt(SelectedObject.GroupFrequencyMax - SelectedObject.GroupFrequencyMin);
 
-                   while (attempts > 0)
-                   {
-                       attempts--;
+                    while (attempts > 0)
+                    {
+                        attempts--;
 
-                       int objIndex = rand.nextInt(groupList.size());
-                       CustomObject ObjectFromGroup = groupList.get(objIndex);
+                        int objIndex = rand.nextInt(SelectedObject.GroupObjects.length);
+                        CustomObjectCompiled ObjectFromGroup = SelectedObject.GroupObjects[objIndex];
 
-                       // duno about this check, but maybe it is correct
-                       if (ObjectFromGroup.branch || !ObjectFromGroup.canSpawnInBiome(world.getBiomeById(biomeId).getName()))
-                           continue;
+                        if (ObjectFromGroup.Branch)
+                            continue;
 
-                       x = x + rand.nextInt(SelectedObject.groupSeperationMax - SelectedObject.groupSeperationMin) + SelectedObject.groupSeperationMin;
-                       z = z + rand.nextInt(SelectedObject.groupSeperationMax - SelectedObject.groupSeperationMin) + SelectedObject.groupSeperationMin;
-                       int _y = world.getHighestBlockYAt(x, z);
-                       if ((y - _y) > 10 || (_y - y) > 10)
-                           continue;
+                        x = x + rand.nextInt(SelectedObject.GroupSeparationMax - SelectedObject.GroupSeparationMin) + SelectedObject.GroupSeparationMin;
+                        z = z + rand.nextInt(SelectedObject.GroupSeparationMax - SelectedObject.GroupSeparationMin) + SelectedObject.GroupSeparationMin;
+                        int _y = world.getHighestBlockYAt(x, z);
+                        if ((y - _y) > 10 || (_y - y) > 10)
+                            continue;
 
-                       if (!ObjectCanSpawn(world, x, y, z, ObjectFromGroup))
-                           continue;
-                       GenerateCustomObject(world, rand, worldSettings, x, _y, z, ObjectFromGroup, true);
+                        if (!ObjectCanSpawn(world, x, y, z, ObjectFromGroup))
+                            continue;
+                        GenerateCustomObject(world, rand, x, _y, z, ObjectFromGroup);
+                    }
 
-
-                   }
-
-               }
-                */
+                }
             }
         }
 
@@ -210,13 +203,11 @@ public class CustomObjectGen extends ResourceGenBase
 
         ArrayList<CustomObjectCompiled> objects = new ArrayList<CustomObjectCompiled>();
         ArrayList<String> objectsName = new ArrayList<String>();
+        HashMap<String, ArrayList<CustomObjectCompiled>> Groups = new HashMap<String, ArrayList<CustomObjectCompiled>>();
 
         if (Props.length == 1 && Props[0].equals(""))
         {
-            for (CustomObjectCompiled objectCompiled : biomeConfig.worldConfig.CustomObjectsCompiled)
-                if (objectCompiled.parent.CheckBiome(biomeConfig.Name))
-                    objects.add(objectCompiled);
-
+            AddCompiledObjectsFromWorld(biomeConfig, objects, Groups);
             objectsName.add(BODefaultValues.BO_Use_World.stringValue());
 
         } else
@@ -224,17 +215,14 @@ public class CustomObjectGen extends ResourceGenBase
             {
                 if (key.equals(BODefaultValues.BO_Use_World.stringValue()))
                 {
-                    for (CustomObjectCompiled objectCompiled : biomeConfig.worldConfig.CustomObjectsCompiled)
-                        if (objectCompiled.parent.CheckBiome(biomeConfig.Name))
-                            objects.add(objectCompiled);
-
+                    AddCompiledObjectsFromWorld(biomeConfig, objects, Groups);
                     objectsName.add(BODefaultValues.BO_Use_World.stringValue());
                     continue;
                 }
 
                 if (key.equals(BODefaultValues.BO_Use_Biome.stringValue()))
                 {
-                    objects.addAll(biomeConfig.CustomObjectsCompiled);
+                    AddCompiledObjectsFromBiome(biomeConfig, objects, Groups);
                     objectsName.add(BODefaultValues.BO_Use_Biome.stringValue());
                     continue;
                 }
@@ -244,13 +232,69 @@ public class CustomObjectGen extends ResourceGenBase
                 {
                     objects.add(obj);
                     objectsName.add(obj.Name);
+
+                    if (!obj.parent.GroupId.equals(""))
+                    {
+                        if (!Groups.containsKey(obj.parent.GroupId))
+                            Groups.put(obj.parent.GroupId, new ArrayList<CustomObjectCompiled>());
+
+                        Groups.get(obj.parent.GroupId).add(obj);
+
+                    }
+
+
                 }
 
             }
+
+
+        for (CustomObjectCompiled objectCompiled : objects)
+            if (Groups.containsKey(objectCompiled.parent.GroupId))
+                objectCompiled.GroupObjects = Groups.get(objectCompiled.parent.GroupId).toArray(objectCompiled.GroupObjects);
+
+
         res.CUObjects = objects.toArray(res.CUObjects);
         res.CUObjectsNames = objectsName.toArray(res.CUObjectsNames);
 
         return true;
+    }
+
+
+    private void AddCompiledObjectsFromWorld(BiomeConfig biomeConfig, ArrayList<CustomObjectCompiled> output, HashMap<String, ArrayList<CustomObjectCompiled>> groups)
+    {
+        for (CustomObjectCompiled objectCompiled : biomeConfig.worldConfig.CustomObjectsCompiled)
+            if (objectCompiled.parent.CheckBiome(biomeConfig.Name))
+            {
+                output.add(objectCompiled);
+                if (!objectCompiled.parent.GroupId.equals(""))
+                {
+                    if (!groups.containsKey(objectCompiled.parent.GroupId))
+                        groups.put(objectCompiled.parent.GroupId, new ArrayList<CustomObjectCompiled>());
+
+                    groups.get(objectCompiled.parent.GroupId).add(objectCompiled);
+
+                }
+
+            }
+
+    }
+
+    private void AddCompiledObjectsFromBiome(BiomeConfig biomeConfig, ArrayList<CustomObjectCompiled> output, HashMap<String, ArrayList<CustomObjectCompiled>> groups)
+    {
+        for (CustomObjectCompiled objectCompiled : biomeConfig.CustomObjectsCompiled)
+        {
+            output.add(objectCompiled);
+            if (!objectCompiled.parent.GroupId.equals(""))
+            {
+                if (!groups.containsKey(objectCompiled.parent.GroupId))
+                    groups.put(objectCompiled.parent.GroupId, new ArrayList<CustomObjectCompiled>());
+
+                groups.get(objectCompiled.parent.GroupId).add(objectCompiled);
+
+            }
+
+        }
+
     }
 
 }

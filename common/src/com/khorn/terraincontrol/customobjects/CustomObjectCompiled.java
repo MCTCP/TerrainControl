@@ -11,6 +11,8 @@ public class CustomObjectCompiled extends ConfigFile
 {
     public ObjectCoordinate[][] Data = new ObjectCoordinate[4][];
 
+    public CustomObjectCompiled[] GroupObjects = null;
+
     public String Name;
 
     public String Version;
