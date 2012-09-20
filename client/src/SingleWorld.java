@@ -392,9 +392,14 @@ public class SingleWorld implements LocalWorld
         wl chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
+        z = z & 0xF;
+        x = x & 0xF;
         for (int y = worldHeight - 1; y > 0; y--)
-            if (this.getMaterial(x, y, z).isLiquid())
+        {
+            int id = chunk.a(x, y, z);
+            if (DefaultMaterial.getMaterial(id).isLiquid())
                 return y;
+        }
         return -1;
     }
 

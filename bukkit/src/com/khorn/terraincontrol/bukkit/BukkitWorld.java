@@ -214,7 +214,7 @@ public class BukkitWorld implements LocalWorld
             case CocoaTree:
                 return CocoaTree.a(this.world, rand, x, y, z);
         }
-       return false;
+        return false;
     }
 
 
@@ -361,8 +361,11 @@ public class BukkitWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
         for (int y = worldHeight - 1; y > 0; y--)
-            if (this.getMaterial(x, y, z).isLiquid())
+        {
+            int id = chunk.getTypeId(x, y, z);
+            if (DefaultMaterial.getMaterial(id).isLiquid())
                 return y;
+        }
         return -1;
     }
 
