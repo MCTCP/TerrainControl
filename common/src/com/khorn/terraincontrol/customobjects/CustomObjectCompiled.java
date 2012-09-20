@@ -15,6 +15,8 @@ public class CustomObjectCompiled extends ConfigFile
 
     public String Name;
 
+    public HashSet<String> SpawnInBiome;
+
     public String Version;
     public HashSet<Integer> SpawnOnBlockType;
 
@@ -39,6 +41,7 @@ public class CustomObjectCompiled extends ConfigFile
     public int GroupFrequencyMax;
     public int GroupSeparationMin;
     public int GroupSeparationMax;
+    public String GroupId;
 
     public int BranchLimit;
 
@@ -63,6 +66,12 @@ public class CustomObjectCompiled extends ConfigFile
     }
 
 
+    public boolean CheckBiome(String biomeName)
+    {
+        return (SpawnInBiome.contains(BODefaultValues.BO_ALL_KEY.stringValue()) || SpawnInBiome.contains(BODefaultValues.BO_ALL_KEY.stringValue().toLowerCase()) || SpawnInBiome.contains(biomeName));
+    }
+
+
     @Override
     protected void ReadConfigSettings()
     {
@@ -81,6 +90,9 @@ public class CustomObjectCompiled extends ConfigFile
         {
             System.out.println("TerrainControl: Custom object " + Name + " have wrong value " + BODefaultValues.spawnOnBlockType.name());
         }
+
+        this.SpawnInBiome = new HashSet<String>(ReadModSettings(BODefaultValues.spawnInBiome.name(), BODefaultValues.spawnInBiome.StringArrayListValue()));
+
 
         this.SpawnSunlight = ReadModSettings(BODefaultValues.spawnSunlight.name(), BODefaultValues.spawnSunlight.booleanValue());
         this.SpawnDarkness = ReadModSettings(BODefaultValues.spawnDarkness.name(), BODefaultValues.spawnDarkness.booleanValue());
@@ -103,6 +115,8 @@ public class CustomObjectCompiled extends ConfigFile
         this.GroupFrequencyMax = ReadModSettings(BODefaultValues.groupFrequencyMax.name(), BODefaultValues.groupFrequencyMax.intValue());
         this.GroupSeparationMin = ReadModSettings(BODefaultValues.groupSeperationMin.name(), BODefaultValues.groupSeperationMin.intValue());
         this.GroupSeparationMax = ReadModSettings(BODefaultValues.groupSeperationMax.name(), BODefaultValues.groupSeperationMax.intValue());
+        this.GroupId = ReadModSettings(BODefaultValues.groupId.name(), BODefaultValues.groupId.stringValue());
+
 
         this.BranchLimit = ReadModSettings(BODefaultValues.branchLimit.name(), BODefaultValues.branchLimit.intValue());
 

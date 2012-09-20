@@ -887,7 +887,7 @@ public class WorldConfig extends ConfigFile
     private void WriteCustomObjects() throws IOException
     {
         for( CustomObjectCompiled objectCompiled : CustomObjectsCompiled)
-            this.WriteValue(objectCompiled.Name + (objectCompiled.ChangedSettings.equals("")? "":("(" + CustomObjectsCompiled + ")")));
+            this.WriteValue(objectCompiled.Name + (objectCompiled.ChangedSettings.equals("")? "":("(" + objectCompiled.ChangedSettings + ")")));
 
     }
 

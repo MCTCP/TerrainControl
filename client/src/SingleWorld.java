@@ -195,10 +195,6 @@ public class SingleWorld implements LocalWorld
         return this.world.w.c.a(x, z).M;
     }
 
-    public LocalBiome getLocalBiome(int x, int z)
-    {
-        return Biomes[this.getBiome(x, z)];
-    }
 
     public double getBiomeFactorForOldBM(int index)
     {
@@ -226,43 +222,34 @@ public class SingleWorld implements LocalWorld
         DungeonGen.a(this.world, rand, x, y, z);
     }
 
-    public void PlaceTree(TreeType type, Random rand, int x, int y, int z)
+    public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z)
     {
         switch (type)
         {
             case Tree:
-                Tree.a(this.world, rand, x, y, z);
-                break;
+                return Tree.a(this.world, rand, x, y, z);
             case BigTree:
                 BigTree.a(1.0D, 1.0D, 1.0D);
-                BigTree.a(this.world, rand, x, y, z);
-                break;
+                return BigTree.a(this.world, rand, x, y, z);
             case Forest:
-                Forest.a(this.world, rand, x, y, z);
-                break;
+                return Forest.a(this.world, rand, x, y, z);
             case HugeMushroom:
                 HugeMushroom.a(1.0D, 1.0D, 1.0D);
-                HugeMushroom.a(this.world, rand, x, y, z);
-                break;
+                return HugeMushroom.a(this.world, rand, x, y, z);
             case SwampTree:
-                SwampTree.a(this.world, rand, x, y, z);
-                break;
+                return SwampTree.a(this.world, rand, x, y, z);
             case Taiga1:
-                TaigaTree1.a(this.world, rand, x, y, z);
-                break;
+                return TaigaTree1.a(this.world, rand, x, y, z);
             case Taiga2:
-                TaigaTree2.a(this.world, rand, x, y, z);
-                break;
+                return TaigaTree2.a(this.world, rand, x, y, z);
             case JungleTree:
-                JungleTree.a(this.world, rand, x, y, z);
-                break;
+                return JungleTree.a(this.world, rand, x, y, z);
             case GroundBush:
-                GroundBush.a(this.world, rand, x, y, z);
-                break;
+                return GroundBush.a(this.world, rand, x, y, z);
             case CocoaTree:
-                CocoaTree.a(this.world, rand, x, y, z);
-                break;
+                return CocoaTree.a(this.world, rand, x, y, z);
         }
+        return false;
     }
 
 

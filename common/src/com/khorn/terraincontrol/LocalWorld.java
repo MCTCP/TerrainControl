@@ -33,7 +33,6 @@ public interface LocalWorld
 
     public int getBiome(int x, int z);
 
-    public LocalBiome getLocalBiome(int x, int z);
 
     // temperature*rain
     public double getBiomeFactorForOldBM(int index);
@@ -44,7 +43,7 @@ public interface LocalWorld
 
     public void PlaceDungeons(Random rand, int x, int y, int z);
 
-    public void PlaceTree(TreeType type, Random rand, int x, int y, int z);
+    public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z);
 
     public void PlaceIce(int x, int z);
 

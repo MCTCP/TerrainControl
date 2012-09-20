@@ -53,43 +53,49 @@ public class CustomObjectGen extends ResourceGenBase
 
                 objectSpawned = GenerateCustomObject(world, rand, x, y, z, SelectedObject);
 
-
-                if (objectSpawned && SelectedObject.GroupObjects != null)
-                {
-
-                    int attempts = 3;
-                    if ((SelectedObject.GroupFrequencyMax - SelectedObject.GroupFrequencyMin) > 0)
-                        attempts = SelectedObject.GroupFrequencyMin + rand.nextInt(SelectedObject.GroupFrequencyMax - SelectedObject.GroupFrequencyMin);
-
-                    while (attempts > 0)
-                    {
-                        attempts--;
-
-                        int objIndex = rand.nextInt(SelectedObject.GroupObjects.length);
-                        CustomObjectCompiled ObjectFromGroup = SelectedObject.GroupObjects[objIndex];
-
-                        if (ObjectFromGroup.Branch)
-                            continue;
-
-                        x = x + rand.nextInt(SelectedObject.GroupSeparationMax - SelectedObject.GroupSeparationMin) + SelectedObject.GroupSeparationMin;
-                        z = z + rand.nextInt(SelectedObject.GroupSeparationMax - SelectedObject.GroupSeparationMin) + SelectedObject.GroupSeparationMin;
-                        int _y = world.getHighestBlockYAt(x, z);
-                        if ((y - _y) > 10 || (_y - y) > 10)
-                            continue;
-
-                        if (!ObjectCanSpawn(world, x, y, z, ObjectFromGroup))
-                            continue;
-                        GenerateCustomObject(world, rand, x, _y, z, ObjectFromGroup);
-                    }
-
-                }
+                if (objectSpawned)
+                    GenerateCustomObjectFromGroup(world, rand, x, y, z, SelectedObject);
             }
         }
 
 
     }
 
-    private boolean GenerateCustomObject(LocalWorld world, Random rand, int x, int y, int z, CustomObjectCompiled workObject)
+    public static void GenerateCustomObjectFromGroup(LocalWorld world, Random rand, int x, int y, int z, CustomObjectCompiled workObject)
+    {
+        if (workObject.GroupObjects == null)
+            return;
+
+        int attempts = 3;
+        if ((workObject.GroupFrequencyMax - workObject.GroupFrequencyMin) > 0)
+            attempts = workObject.GroupFrequencyMin + rand.nextInt(workObject.GroupFrequencyMax - workObject.GroupFrequencyMin);
+
+        while (attempts > 0)
+        {
+            attempts--;
+
+            int objIndex = rand.nextInt(workObject.GroupObjects.length);
+            CustomObjectCompiled ObjectFromGroup = workObject.GroupObjects[objIndex];
+
+            if (ObjectFromGroup.Branch)
+                continue;
+
+            x = x + rand.nextInt(workObject.GroupSeparationMax - workObject.GroupSeparationMin) + workObject.GroupSeparationMin;
+            z = z + rand.nextInt(workObject.GroupSeparationMax - workObject.GroupSeparationMin) + workObject.GroupSeparationMin;
+            int _y = world.getHighestBlockYAt(x, z);
+            if ((y - _y) > 10 || (_y - y) > 10)
+                continue;
+
+            if (!ObjectCanSpawn(world, x, y, z, ObjectFromGroup))
+                continue;
+            GenerateCustomObject(world, rand, x, _y, z, ObjectFromGroup);
+        }
+
+
+    }
+
+
+    public static boolean GenerateCustomObject(LocalWorld world, Random rand, int x, int y, int z, CustomObjectCompiled workObject)
     {
 
         ObjectCoordinate[] data = workObject.Data[0];
@@ -135,31 +141,31 @@ public class CustomObjectGen extends ResourceGenBase
 
     }
 
-    private static boolean ObjectCanSpawn(LocalWorld world, int x, int y, int z, CustomObjectCompiled obj)
+    public static boolean ObjectCanSpawn(LocalWorld world, int x, int y, int z, CustomObjectCompiled obj)
     {
         if ((world.getTypeId(x, y - 5, z) == 0) && (obj.NeedsFoundation))
             return false;
 
-        boolean abort = false;
+        boolean output = true;
         int checkBlock = world.getTypeId(x, y + 2, z);
         if (!obj.SpawnWater)
-            abort = ((checkBlock == DefaultMaterial.WATER.id) || (checkBlock == DefaultMaterial.STATIONARY_WATER.id));
+            output = !((checkBlock == DefaultMaterial.WATER.id) || (checkBlock == DefaultMaterial.STATIONARY_WATER.id));
         if (!obj.SpawnLava)
-            abort = ((checkBlock == DefaultMaterial.LAVA.id) || (checkBlock == DefaultMaterial.STATIONARY_LAVA.id));
+            output = !((checkBlock == DefaultMaterial.LAVA.id) || (checkBlock == DefaultMaterial.STATIONARY_LAVA.id));
 
         checkBlock = world.getLightLevel(x, y + 2, z);
         if (!obj.SpawnSunlight)
-            abort = (checkBlock > 8);
+            output = !(checkBlock > 8);
         if (!obj.SpawnDarkness)
-            abort = (checkBlock < 9);
+            output = !(checkBlock < 9);
 
         if ((y < obj.SpawnElevationMin) || (y > obj.SpawnElevationMax))
-            abort = true;
+            output = false;
 
         if (!obj.SpawnOnBlockType.contains(world.getTypeId(x, y - 1, z)))
-            abort = true;
+            output = false;
 
-        return !abort;
+        return output;
     }
 
     @Override
@@ -189,7 +195,7 @@ public class CustomObjectGen extends ResourceGenBase
 
             for (CustomObjectCompiled object : res.CUObjects)
                 if (object.Name.equals(name))
-                    output += name + "(" + object.ChangedSettings + ")";
+                    output += name + (object.ChangedSettings.equals("")? "":("(" + object.ChangedSettings + ")"));
 
         }
 
@@ -233,12 +239,12 @@ public class CustomObjectGen extends ResourceGenBase
                     objects.add(obj);
                     objectsName.add(obj.Name);
 
-                    if (!obj.parent.GroupId.equals(""))
+                    if (!obj.GroupId.equals(""))
                     {
-                        if (!Groups.containsKey(obj.parent.GroupId))
-                            Groups.put(obj.parent.GroupId, new ArrayList<CustomObjectCompiled>());
+                        if (!Groups.containsKey(obj.GroupId))
+                            Groups.put(obj.GroupId, new ArrayList<CustomObjectCompiled>());
 
-                        Groups.get(obj.parent.GroupId).add(obj);
+                        Groups.get(obj.GroupId).add(obj);
 
                     }
 
@@ -249,8 +255,8 @@ public class CustomObjectGen extends ResourceGenBase
 
 
         for (CustomObjectCompiled objectCompiled : objects)
-            if (Groups.containsKey(objectCompiled.parent.GroupId))
-                objectCompiled.GroupObjects = Groups.get(objectCompiled.parent.GroupId).toArray(objectCompiled.GroupObjects);
+            if (Groups.containsKey(objectCompiled.GroupId))
+                objectCompiled.GroupObjects = Groups.get(objectCompiled.GroupId).toArray(objectCompiled.GroupObjects);
 
 
         res.CUObjects = objects.toArray(res.CUObjects);
@@ -263,15 +269,15 @@ public class CustomObjectGen extends ResourceGenBase
     private void AddCompiledObjectsFromWorld(BiomeConfig biomeConfig, ArrayList<CustomObjectCompiled> output, HashMap<String, ArrayList<CustomObjectCompiled>> groups)
     {
         for (CustomObjectCompiled objectCompiled : biomeConfig.worldConfig.CustomObjectsCompiled)
-            if (objectCompiled.parent.CheckBiome(biomeConfig.Name))
+            if (objectCompiled.CheckBiome(biomeConfig.Name) && !objectCompiled.Tree)
             {
                 output.add(objectCompiled);
-                if (!objectCompiled.parent.GroupId.equals(""))
+                if (!objectCompiled.GroupId.equals(""))
                 {
-                    if (!groups.containsKey(objectCompiled.parent.GroupId))
-                        groups.put(objectCompiled.parent.GroupId, new ArrayList<CustomObjectCompiled>());
+                    if (!groups.containsKey(objectCompiled.GroupId))
+                        groups.put(objectCompiled.GroupId, new ArrayList<CustomObjectCompiled>());
 
-                    groups.get(objectCompiled.parent.GroupId).add(objectCompiled);
+                    groups.get(objectCompiled.GroupId).add(objectCompiled);
 
                 }
 
@@ -283,13 +289,15 @@ public class CustomObjectGen extends ResourceGenBase
     {
         for (CustomObjectCompiled objectCompiled : biomeConfig.CustomObjectsCompiled)
         {
+            if (objectCompiled.Tree)
+                continue;
             output.add(objectCompiled);
-            if (!objectCompiled.parent.GroupId.equals(""))
+            if (!objectCompiled.GroupId.equals(""))
             {
-                if (!groups.containsKey(objectCompiled.parent.GroupId))
-                    groups.put(objectCompiled.parent.GroupId, new ArrayList<CustomObjectCompiled>());
+                if (!groups.containsKey(objectCompiled.GroupId))
+                    groups.put(objectCompiled.GroupId, new ArrayList<CustomObjectCompiled>());
 
-                groups.get(objectCompiled.parent.GroupId).add(objectCompiled);
+                groups.get(objectCompiled.GroupId).add(objectCompiled);
 
             }
 

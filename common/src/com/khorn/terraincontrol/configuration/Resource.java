@@ -20,6 +20,10 @@ public class Resource
     public TreeType[] TreeTypes = new TreeType[0];
     public int[] TreeChances = new int[0];
 
+    // For custom trees
+    public CustomObjectCompiled[] CUObjectsWorld = new CustomObjectCompiled[0];
+    public CustomObjectCompiled[] CUObjectsBiome = new CustomObjectCompiled[0];
+
     public CustomObjectCompiled[] CUObjects = new CustomObjectCompiled[0];
     public String[] CUObjectsNames = new String[0];
 

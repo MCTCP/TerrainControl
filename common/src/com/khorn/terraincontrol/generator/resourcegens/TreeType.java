@@ -12,5 +12,7 @@ public enum TreeType
     JungleTree,
     GroundBush,
     CocoaTree,
-    ;
+    CustomTree,
+    CustomTreeWorld,
+    CustomTreeBiome
 }

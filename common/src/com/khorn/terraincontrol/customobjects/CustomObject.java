@@ -6,20 +6,15 @@ import com.khorn.terraincontrol.configuration.ConfigFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 public class CustomObject extends ConfigFile
 {
 
 
-    public HashSet<String> SpawnInBiome;
-
-
     public boolean IsValid = false;
     public File FilePath;
     public String name = "";
-    public String GroupId = "";
 
 
     public CustomObject(File objectFile)
@@ -41,14 +36,9 @@ public class CustomObject extends ConfigFile
 
     }
 
-    public boolean CheckBiome(String biomeName)
-    {
-        return (SpawnInBiome.contains(BODefaultValues.BO_ALL_KEY.stringValue()) || SpawnInBiome.contains(BODefaultValues.BO_ALL_KEY.stringValue().toLowerCase()) || SpawnInBiome.contains(biomeName));
-    }
 
     public CustomObjectCompiled Compile(String settingsLine)
     {
-
         HashMap<String, String> newSettings = new HashMap<String, String>();
         for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
             if (BODefaultValues.Contains(entry.getKey()) || ObjectCoordinate.isCoordinateString(entry.getKey()))
@@ -63,13 +53,13 @@ public class CustomObject extends ConfigFile
             String[] values = null;
             if (key.contains("="))
                 values = key.split("=", 2);
-            if (key.contains(":"))
+            else if (key.contains(":"))
                 values = key.split("=", 2);
             if (values == null)
                 continue;
-            if (BODefaultValues.Contains(values[0]) || ObjectCoordinate.isCoordinateString(values[0]))
+            if (BODefaultValues.Contains(values[0].toLowerCase()) || ObjectCoordinate.isCoordinateString(values[0]))
             {
-                newSettings.put(values[0], values[1]);
+                newSettings.put(values[0].toLowerCase(), values[1]);
                 changedSettings = changedSettings + (first ? "" : ";") + key;
                 if (first)
                     first = false;
@@ -84,9 +74,6 @@ public class CustomObject extends ConfigFile
     @Override
     protected void ReadConfigSettings()
     {
-        this.GroupId = ReadModSettings(BODefaultValues.groupId.name(), BODefaultValues.groupId.stringValue());
-
-        this.SpawnInBiome = new HashSet<String>(ReadModSettings(BODefaultValues.spawnInBiome.name(), BODefaultValues.spawnInBiome.StringArrayListValue()));
 
     }
 

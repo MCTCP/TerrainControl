@@ -98,7 +98,7 @@ public enum BODefaultValues
 
         for (BODefaultValues value : BODefaultValues.values())
         {
-            lookupName.put(value.name(), value);
+            lookupName.put(value.name().toLowerCase(), value);
         }
     }
 
