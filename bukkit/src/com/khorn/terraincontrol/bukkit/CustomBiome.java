@@ -45,9 +45,28 @@ public class CustomBiome extends BiomeBase
         this.E = config.BiomeVolatility;
         this.A = config.SurfaceBlock;
         this.B = config.GroundBlock;
-        this.temperature = config.BiomeTemperature;
-        this.humidity = config.BiomeWetness;
-        
+
+        try
+        {
+            Field temp = BiomeBase.class.getField("temperature");
+            Field humid = BiomeBase.class.getField("humidity");
+
+            if( temp == null)
+                temp =  BiomeBase.class.getField("F");
+            if( humid == null)
+                humid =  BiomeBase.class.getField("G");
+
+            temp.setFloat(this,config.BiomeTemperature);
+            humid.setFloat(this,config.BiomeWetness);
+        }
+        catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+
         // This section modifies the BiomeMetas... or "SpawnGroups" as I would like to call them :P
         List<BiomeMeta> monsters = Obfu.getBiomeBase_MonsterBiomeMetas(this);
         List<BiomeMeta> creatures = Obfu.getBiomeBase_CreatureBiomeMetas(this);

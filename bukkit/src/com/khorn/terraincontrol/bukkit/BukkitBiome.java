@@ -5,6 +5,8 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import net.minecraft.server.BiomeBase;
 
+import java.lang.reflect.Field;
+
 /**
  * The BukkitBiome is basically a wrapper for the BiomeBase.
  * If you look at the constructor and the method you will see that this is the case.
@@ -15,6 +17,9 @@ public class BukkitBiome implements LocalBiome
     private boolean isCustom;
     private int customID;
 
+    private float temperature;
+    private float humidity;
+
     public BukkitBiome(BiomeBase biome)
     {
         this.biomeBase = biome;
@@ -23,6 +28,27 @@ public class BukkitBiome implements LocalBiome
             this.isCustom = true;
         }
         customID = biomeBase.id;
+
+        try
+        {
+            Field temp = BiomeBase.class.getField("temperature");
+            Field humid = BiomeBase.class.getField("humidity");
+
+            if( temp == null)
+                temp =  BiomeBase.class.getField("F");
+            if( humid == null)
+                humid =  BiomeBase.class.getField("G");
+
+            this.temperature = temp.getFloat(biome);
+            this.humidity = humid.getFloat(biome);
+        }
+        catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public boolean isCustom()
@@ -55,12 +81,12 @@ public class BukkitBiome implements LocalBiome
 
     public float getTemperature()
     {
-        return this.biomeBase.temperature;
+        return this.temperature;
     }
 
     public float getWetness()
     {
-        return this.biomeBase.humidity;
+        return this.humidity;
     }
 
     public float getSurfaceHeight()
