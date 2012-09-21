@@ -1,7 +1,9 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.resourcegens.TreeGen;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -22,6 +24,8 @@ public class TCListener implements Listener, PluginMessageListener
     private TCPlugin tcPlugin;
     private Random random;
 
+    private TreeGen treeGenerator = new TreeGen();
+
     public TCListener(TCPlugin plugin)
     {
         this.tcPlugin = plugin;
@@ -39,14 +43,20 @@ public class TCListener implements Listener, PluginMessageListener
     public void onStructureGrow(StructureGrowEvent event)
     {
         BukkitWorld bukkitWorld = this.tcPlugin.worlds.get(event.getWorld().getUID());
-        if (bukkitWorld != null && bukkitWorld.getSettings().HasCustomTrees)
-        {
-            if (this.random.nextInt(100) < bukkitWorld.getSettings().customTreeChance)
-            {
-                //CustomObjectGen.SpawnCustomTrees(bukkitWorld, this.random, bukkitWorld.getSettings(), event.getLocation().getBlockX(), event.getLocation().getBlockY(), event.getLocation().getBlockZ());
-                event.getBlocks().clear();
-            }
-        }
+        if (bukkitWorld == null)
+            return;
+
+        int biomeId = bukkitWorld.getBiome(event.getLocation().getBlockX(), event.getLocation().getBlockZ());
+        if (biomeId >= bukkitWorld.getSettings().biomeConfigs.length || bukkitWorld.getSettings().biomeConfigs[biomeId] == null)
+            return;
+
+        BiomeConfig biomeConfig = bukkitWorld.getSettings().biomeConfigs[biomeId];
+        if (biomeConfig.SaplingResource == null)
+            return;
+
+        treeGenerator.SpawnTree(bukkitWorld,this.random,biomeConfig.SaplingResource,event.getLocation().getBlockX(), event.getLocation().getBlockY(),event.getLocation().getBlockZ());
+        event.getBlocks().clear();
+
     }
 
     public void onPluginMessageReceived(String s, Player player, byte[] bytes)

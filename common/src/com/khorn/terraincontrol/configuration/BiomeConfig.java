@@ -4,8 +4,8 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.DefaultMobType;
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
 import com.khorn.terraincontrol.customobjects.ObjectsStore;
 import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
@@ -79,7 +79,8 @@ public class BiomeConfig extends ConfigFile
 
     public int ResourceCount = 0;
 
-    // TODO: A configuration should NOT contain what it is supposed to be configuration for. This is very bad practi
+    public Resource SaplingResource = null;
+
     public LocalBiome Biome;
 
     public WorldConfig worldConfig;
@@ -387,6 +388,7 @@ public class BiomeConfig extends ConfigFile
         this.spawnWaterCreatures = ReadModSettings("spawnWaterCreatures", new ArrayList<WeightedMobSpawnGroup>());
 
         this.ReadCustomObjectSettings();
+        this.ReadSaplingSettings();
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
         this.ReadHeightSettings();
@@ -543,6 +545,25 @@ public class BiomeConfig extends ConfigFile
 
     }
 
+    private void ReadSaplingSettings()
+    {
+        String settings = ReadModSettings(TCDefaultValues.SaplingSettings.name(), TCDefaultValues.SaplingSettings.stringValue());
+        if (settings.equals(""))
+            return;
+
+        if (settings.equals("None"))
+        {
+            this.SaplingResource = new Resource(ResourceType.Tree);
+            return;
+        }
+        settings = "0," + settings;
+        String[] parsedSettings = ReadComplexString(settings);
+        Resource res = new Resource(ResourceType.Tree);
+        if (ResourceType.Tree.Generator.ReadFromString(res, parsedSettings, this))
+            this.SaplingResource = res;
+
+    }
+
     protected void WriteConfigSettings() throws IOException
     {
         WriteTitle(this.Name + " biome config");
@@ -688,6 +709,10 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Biome foliage color");
         this.WriteColorValue(TCDefaultValues.FoliageColor.name(), this.FoliageColor);
 
+
+        this.WriteNewLine();
+        this.WriteTitle("Sapling resource");
+        this.WriteSaplingSettings();
 
         this.WriteNewLine();
         this.WriteTitle("Resource queue");
@@ -884,9 +909,28 @@ public class BiomeConfig extends ConfigFile
 
     private void WriteCustomObjects() throws IOException
     {
-        for( CustomObjectCompiled objectCompiled : CustomObjectsCompiled)
-            this.WriteValue(objectCompiled.Name + (objectCompiled.ChangedSettings.equals("")? "":("(" + objectCompiled.ChangedSettings + ")")));
+        for (CustomObjectCompiled objectCompiled : CustomObjectsCompiled)
+            this.WriteValue(objectCompiled.Name + (objectCompiled.ChangedSettings.equals("") ? "" : ("(" + objectCompiled.ChangedSettings + ")")));
+    }
 
+    private void WriteSaplingSettings() throws IOException
+    {
+        if (this.SaplingResource != null)
+        {
+            if (this.SaplingResource.TreeTypes.length == 0)
+            {
+                this.WriteValue(TCDefaultValues.SaplingSettings.name(), "None");
+                return;
+            }
+
+            String output = ResourceType.Tree.Generator.WriteSettingOnly(this.SaplingResource);
+            int firstComma = output.indexOf(",");
+            if (firstComma != -1)
+                output = output.substring(firstComma + 1);
+
+            this.WriteValue(TCDefaultValues.SaplingSettings.name(), output);
+        } else
+            this.WriteValue(TCDefaultValues.SaplingSettings.name(), "");
     }
 
     protected void CorrectSettings()

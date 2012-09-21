@@ -38,6 +38,7 @@ public abstract class ResourceGenBase
         }
     }
 
+    // ToDo make it more logical.
     public String WriteToString(Resource res)
     {
         String sources = "";
@@ -45,6 +46,14 @@ public abstract class ResourceGenBase
             sources += "," + res.BlockIdToName(id);
 
         return res.Type.name() + "(" + this.WriteString(res, sources) + ")";
+    }
+
+    public String WriteSettingOnly(Resource res)
+    {
+        String sources = "";
+        for (int id : res.SourceBlockId)
+            sources += "," + res.BlockIdToName(id);
+        return this.WriteString(res, sources);
     }
 
     protected abstract String WriteString(Resource res, String blockSources);

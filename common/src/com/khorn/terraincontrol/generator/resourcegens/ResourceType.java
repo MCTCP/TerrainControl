@@ -12,7 +12,7 @@ public enum ResourceType
     Reed(ReedGen.class, 6),
     Cactus(CactusGen.class, 6),
     Dungeon(DungeonGen.class, 4),
-    Tree(TreeGen.class, 3),
+    Tree(TreeGen.class, 2),
     CustomObject(CustomObjectGen.class, 0),
     UnderGroundLake(UndergroundLakeGen.class, 6),
     AboveWaterRes(AboveWaterGen.class, 3),
@@ -44,17 +44,5 @@ public enum ResourceType
         {
             e.printStackTrace();
         }
-    }
-
-    public static boolean Contain(String name)
-    {
-        for(ResourceType type : ResourceType.values())
-        {
-            if(type.name().equals(name))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 }

@@ -29,37 +29,41 @@ public class TreeGen extends ResourceGenBase
             int _x = x + rand.nextInt(16) + 8;
             int _z = z + rand.nextInt(16) + 8;
             int _y = world.getHighestBlockYAt(_x, _z);
-
-            boolean treeSpawned = false;
-
-            for (int t = 0; t < res.TreeTypes.length && !treeSpawned; t++)
-            {
-                if (res.TreeTypes[t] == TreeType.CustomTreeWorld)
-                    treeSpawned = SpawnCustomTreeFromArray(world, rand, _x, _y, _z, res.CUObjectsWorld);
-                else if (res.TreeTypes[t] == TreeType.CustomTreeBiome)
-                    treeSpawned = SpawnCustomTreeFromArray(world, rand, _x, _y, _z, res.CUObjectsBiome);
-                else if (res.TreeTypes[t] == TreeType.CustomTree)
-                {
-
-                    CustomObjectCompiled SelectedObject = res.CUObjects[t];
-                    // TODO Branch check ?!!!
-                    if (rand.nextInt(100) < SelectedObject.Rarity)
-                    {
-                        if (!CustomObjectGen.ObjectCanSpawn(world, _x, _y, _z, SelectedObject))
-                            continue;
-
-                        treeSpawned = CustomObjectGen.GenerateCustomObject(world, rand, _x, _y, _z, SelectedObject);
-
-                        if (treeSpawned)
-                            CustomObjectGen.GenerateCustomObjectFromGroup(world, rand, _x, _y, _z, SelectedObject);
-
-                    }
-                } else if (rand.nextInt(100) < res.TreeChances[t])
-                    treeSpawned = world.PlaceTree(res.TreeTypes[t], rand, _x, _y, _z);
-            }
-
-
+            SpawnTree(world, rand, res, _x, _y, _z);
         }
+    }
+
+    public boolean SpawnTree(LocalWorld world, Random rand, Resource res, int x, int y, int z)
+    {
+        boolean treeSpawned = false;
+
+        for (int t = 0; t < res.TreeTypes.length && !treeSpawned; t++)
+        {
+            if (res.TreeTypes[t] == TreeType.CustomTreeWorld)
+                treeSpawned = SpawnCustomTreeFromArray(world, rand, x, y, z, res.CUObjectsWorld);
+            else if (res.TreeTypes[t] == TreeType.CustomTreeBiome)
+                treeSpawned = SpawnCustomTreeFromArray(world, rand, x, y, z, res.CUObjectsBiome);
+            else if (res.TreeTypes[t] == TreeType.CustomTree)
+            {
+
+                CustomObjectCompiled SelectedObject = res.CUObjects[t];
+                // TODO Branch check ?!!!
+                if (rand.nextInt(100) < SelectedObject.Rarity)
+                {
+                    if (!CustomObjectGen.ObjectCanSpawn(world, x, y, z, SelectedObject))
+                        continue;
+
+                    treeSpawned = CustomObjectGen.GenerateCustomObject(world, rand, x, y, z, SelectedObject);
+
+                    if (treeSpawned)
+                        CustomObjectGen.GenerateCustomObjectFromGroup(world, rand, x, y, z, SelectedObject);
+
+                }
+            } else if (rand.nextInt(100) < res.TreeChances[t])
+                treeSpawned = world.PlaceTree(res.TreeTypes[t], rand, x, y, z);
+        }
+        return treeSpawned;
+
     }
 
     private boolean SpawnCustomTreeFromArray(LocalWorld world, Random rand, int x, int y, int z, CustomObjectCompiled[] CUObjects)
@@ -123,7 +127,7 @@ public class TreeGen extends ResourceGenBase
                 if (type.name().equals(tree))
                 {
                     defaultTreeFound = true;
-                    if ((index++) < Props.length)
+                    if ((++index) < Props.length)
                     {
                         treeTypes.add(type);
                         treeChances.add(CheckValue(Props[index], 0, 100));
@@ -153,7 +157,7 @@ public class TreeGen extends ResourceGenBase
             }
 
             CustomObjectCompiled obj = ObjectsStore.Compile(tree);
-            if (obj != null && obj.Tree)
+            if (obj != null)
             {
                 customTrees.add(obj);
                 treeTypes.add(TreeType.CustomTree);
@@ -175,12 +179,6 @@ public class TreeGen extends ResourceGenBase
             return false;
 
 
-        for (CustomObjectCompiled objectCompiled : customTrees)
-            if (Groups.containsKey(objectCompiled.GroupId))
-                objectCompiled.GroupObjects = Groups.get(objectCompiled.GroupId).toArray(objectCompiled.GroupObjects);
-
-        Groups.clear();
-
         if (hasCustomTreeBiome)
         {
             ArrayList<CustomObjectCompiled> customTreesBiome = new ArrayList<CustomObjectCompiled>();
@@ -200,12 +198,7 @@ public class TreeGen extends ResourceGenBase
 
             }
 
-            for (CustomObjectCompiled objectCompiled : customTreesBiome)
-                if (Groups.containsKey(objectCompiled.GroupId))
-                    objectCompiled.GroupObjects = Groups.get(objectCompiled.GroupId).toArray(objectCompiled.GroupObjects);
-
             res.CUObjectsBiome = customTreesBiome.toArray(res.CUObjectsBiome);
-            Groups.clear();
 
         }
 
@@ -231,14 +224,23 @@ public class TreeGen extends ResourceGenBase
 
             }
 
-            for (CustomObjectCompiled objectCompiled : customTreesWorld)
-                if (Groups.containsKey(objectCompiled.GroupId))
-                    objectCompiled.GroupObjects = Groups.get(objectCompiled.GroupId).toArray(objectCompiled.GroupObjects);
-
             res.CUObjectsWorld = customTreesWorld.toArray(res.CUObjectsBiome);
-            Groups.clear();
 
         }
+
+        for (CustomObjectCompiled objectCompiled : res.CUObjectsBiome)
+            if (Groups.containsKey(objectCompiled.GroupId))
+                objectCompiled.GroupObjects = Groups.get(objectCompiled.GroupId).toArray(objectCompiled.GroupObjects);
+
+        for (CustomObjectCompiled objectCompiled : res.CUObjectsWorld)
+            if (Groups.containsKey(objectCompiled.GroupId))
+                objectCompiled.GroupObjects = Groups.get(objectCompiled.GroupId).toArray(objectCompiled.GroupObjects);
+
+        for (CustomObjectCompiled objectCompiled : customTrees)
+            if (Groups.containsKey(objectCompiled.GroupId))
+                objectCompiled.GroupObjects = Groups.get(objectCompiled.GroupId).toArray(objectCompiled.GroupObjects);
+
+        Groups.clear();
 
 
         res.TreeTypes = new TreeType[treeChances.size()];
@@ -271,7 +273,7 @@ public class TreeGen extends ResourceGenBase
             else if (res.TreeTypes[i] == TreeType.CustomTreeBiome)
                 output += BODefaultValues.BO_Use_Biome.stringValue();
             else if (res.TreeTypes[i] == TreeType.CustomTree)
-                output += res.CUObjects[i].Name + (res.CUObjects[i].ChangedSettings.equals("")? "":("(" + res.CUObjects[i].ChangedSettings + ")"));
+                output += res.CUObjects[i].Name + (res.CUObjects[i].ChangedSettings.equals("") ? "" : ("(" + res.CUObjects[i].ChangedSettings + ")"));
             else
                 output += res.TreeTypes[i].name() + "," + res.TreeChances[i];
         }
