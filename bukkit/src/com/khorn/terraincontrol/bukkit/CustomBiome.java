@@ -28,12 +28,10 @@ public class CustomBiome extends BiomeBase
             Biome[] mappingArray = (Biome[]) biomeMapping.get(null);
             mappingArray[id] = Biome.OCEAN;
 
-        }
-        catch (NoSuchFieldException e)
+        } catch (NoSuchFieldException e)
         {
-            e.printStackTrace();  
-        }
-        catch (IllegalAccessException e)
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
         {
             e.printStackTrace();
         }
@@ -48,18 +46,21 @@ public class CustomBiome extends BiomeBase
 
         try
         {
-            Field temp = BiomeBase.class.getField("temperature");
-            Field humid = BiomeBase.class.getField("humidity");
+            Field temp;
+            Field humid;
+            try
+            {
+                temp = BiomeBase.class.getField("temperature");
+                humid = BiomeBase.class.getField("humidity");
+            } catch (NoSuchFieldException e)
+            {
+                temp = BiomeBase.class.getField("F");
+                humid = BiomeBase.class.getField("G");
+            }
 
-            if( temp == null)
-                temp =  BiomeBase.class.getField("F");
-            if( humid == null)
-                humid =  BiomeBase.class.getField("G");
-
-            temp.setFloat(this,config.BiomeTemperature);
-            humid.setFloat(this,config.BiomeWetness);
-        }
-        catch (NoSuchFieldException e)
+            temp.setFloat(this, config.BiomeTemperature);
+            humid.setFloat(this, config.BiomeWetness);
+        } catch (NoSuchFieldException e)
         {
             e.printStackTrace();
         } catch (IllegalAccessException e)
@@ -71,18 +72,21 @@ public class CustomBiome extends BiomeBase
         List<BiomeMeta> monsters = Obfu.getBiomeBase_MonsterBiomeMetas(this);
         List<BiomeMeta> creatures = Obfu.getBiomeBase_CreatureBiomeMetas(this);
         List<BiomeMeta> watercreatures = Obfu.getBiomeBase_WaterCreatureBiomeMetas(this);
-        
+
         List<BiomeMeta> monsterMetas = Obfu.convertToBiomeMetaList(config.spawnMonsters);
         List<BiomeMeta> creatureMetas = Obfu.convertToBiomeMetaList(config.spawnCreatures);
         List<BiomeMeta> waterCreatureMetas = Obfu.convertToBiomeMetaList(config.spawnWaterCreatures);
-        
-        if ( ! config.spawnMonstersAddDefaults) monsters.clear();
+
+        if (!config.spawnMonstersAddDefaults)
+            monsters.clear();
         monsters.addAll(monsterMetas);
 
-        if ( ! config.spawnCreaturesAddDefaults) creatures.clear();
+        if (!config.spawnCreaturesAddDefaults)
+            creatures.clear();
         creatures.addAll(creatureMetas);
-        
-        if ( ! config.spawnWaterCreaturesAddDefaults) watercreatures.clear();
+
+        if (!config.spawnWaterCreaturesAddDefaults)
+            watercreatures.clear();
         watercreatures.addAll(waterCreatureMetas);
     }
 }

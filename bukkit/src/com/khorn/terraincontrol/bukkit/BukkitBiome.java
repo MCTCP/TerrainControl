@@ -23,7 +23,7 @@ public class BukkitBiome implements LocalBiome
     public BukkitBiome(BiomeBase biome)
     {
         this.biomeBase = biome;
-        if(DefaultBiome.getBiome(biome.id) == null)
+        if (DefaultBiome.getBiome(biome.id) == null)
         {
             this.isCustom = true;
         }
@@ -31,18 +31,22 @@ public class BukkitBiome implements LocalBiome
 
         try
         {
-            Field temp = BiomeBase.class.getField("temperature");
-            Field humid = BiomeBase.class.getField("humidity");
+            Field temp;
+            Field humid;
+            try
+            {
+                temp = BiomeBase.class.getField("temperature");
+                humid = BiomeBase.class.getField("humidity");
 
-            if( temp == null)
-                temp =  BiomeBase.class.getField("F");
-            if( humid == null)
-                humid =  BiomeBase.class.getField("G");
+            } catch (NoSuchFieldException e)
+            {
+                temp = BiomeBase.class.getField("F");
+                humid = BiomeBase.class.getField("G");
+            }
 
             this.temperature = temp.getFloat(biome);
             this.humidity = humid.getFloat(biome);
-        }
-        catch (NoSuchFieldException e)
+        } catch (NoSuchFieldException e)
         {
             e.printStackTrace();
         } catch (IllegalAccessException e)
@@ -55,10 +59,12 @@ public class BukkitBiome implements LocalBiome
     {
         return this.isCustom;
     }
+
     public int getCustomId()
     {
         return customID;
     }
+
     public void setCustomID(int id)
     {
         customID = id;
@@ -66,7 +72,7 @@ public class BukkitBiome implements LocalBiome
 
     public void setCustom(BiomeConfig config)
     {
-        ((CustomBiome)this.biomeBase).SetBiome(config);
+        ((CustomBiome) this.biomeBase).SetBiome(config);
     }
 
     public String getName()
