@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
 import com.khorn.terraincontrol.customobjects.ObjectsStore;
@@ -13,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class WorldConfig extends ConfigFile
 {
@@ -29,7 +29,6 @@ public class WorldConfig extends ConfigFile
 
     public ArrayList<BiomeConfig> biomes = new ArrayList<BiomeConfig>();
 
-    public boolean HasCustomTrees = false;
 
     public byte[] ReplaceMatrixBiomes = new byte[256];
     public boolean HaveBiomeReplace = false;
@@ -171,6 +170,8 @@ public class WorldConfig extends ConfigFile
 
         this.CorrectSettings();
 
+        ReadWorldCustomObjects();
+
         // Check biome ids
 
         for (String biomeName : CustomBiomes)
@@ -260,7 +261,30 @@ public class WorldConfig extends ConfigFile
 
         System.out.println("TerrainControl: Loaded biomes - " + LoadedBiomeNames);
 
-        //this.RegisterBOBPlugins(world);
+
+    }
+
+
+    private void ReadWorldCustomObjects()
+    {
+        File BOBFolder = new File(SettingsDir, TCDefaultValues.WorldBOBDirectoryName.stringValue());
+        if (BOBFolder.exists())
+            if (!BOBFolder.renameTo(new File(SettingsDir, BODefaultValues.BO_DirectoryName.stringValue())))
+            {
+                System.out.println("TerrainControl: Can`t rename old custom objects folder");
+            }
+
+
+        ArrayList<CustomObject> rawObjects = ObjectsStore.LoadObjectsFromDirectory(this.SettingsDir);
+
+
+        CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();
+
+        for (CustomObject object : rawObjects)
+            CustomObjectsCompiled.add(object.Compile(""));
+        System.out.println("TerrainControl:" + CustomObjectsCompiled.size() + " world custom objects loaded");
+
+
     }
 
     protected void RenameOldSettings()
@@ -269,7 +293,7 @@ public class WorldConfig extends ConfigFile
         {
             this.SettingsCache.put("WaterLevelMax".toLowerCase(), this.SettingsCache.get("WaterLevel"));
         }
-            if (this.SettingsCache.containsKey("ModeTerrain".toLowerCase()))
+        if (this.SettingsCache.containsKey("ModeTerrain".toLowerCase()))
         {
             this.SettingsCache.put("TerrainMode".toLowerCase(), this.SettingsCache.get("ModeTerrain"));
         }
@@ -488,7 +512,6 @@ public class WorldConfig extends ConfigFile
         this.denyObjectsUnderFill = this.ReadModSettings(TCDefaultValues.DenyObjectsUnderFill.name(), TCDefaultValues.DenyObjectsUnderFill.booleanValue());
         this.customTreeChance = this.ReadModSettings(TCDefaultValues.customTreeChance.name(), TCDefaultValues.customTreeChance.intValue());
 
-        this.ReadCustomObjectSettings();
     }
 
     private void ReadCustomBiomes()
@@ -514,23 +537,6 @@ public class WorldConfig extends ConfigFile
 
         }
 
-
-    }
-
-    private void ReadCustomObjectSettings()
-    {
-        CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();
-
-        for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
-        {
-            String[] values = ObjectsStore.ParseString(entry.getKey());
-
-            CustomObject object = ObjectsStore.GetObjectFromName(values[0]);
-            if (object == null)
-                continue;
-
-            CustomObjectsCompiled.add(object.Compile(values[1]));
-        }
 
     }
 
@@ -791,8 +797,6 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.minTemperature.name(), this.minTemperature);
         WriteValue(TCDefaultValues.maxTemperature.name(), this.maxTemperature);
 
-        this.WriteTitle("Custom objects");
-        this.WriteCustomObjects();
     }
 
     private void WriteCustomBiomes() throws IOException
@@ -883,13 +887,6 @@ public class WorldConfig extends ConfigFile
             }
         }
     } */
-
-    private void WriteCustomObjects() throws IOException
-    {
-        for( CustomObjectCompiled objectCompiled : CustomObjectsCompiled)
-            this.WriteValue(objectCompiled.Name + (objectCompiled.ChangedSettings.equals("")? "":("(" + objectCompiled.ChangedSettings + ")")));
-
-    }
 
     public double getFractureHorizontal()
     {

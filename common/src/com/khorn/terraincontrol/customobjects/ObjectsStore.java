@@ -47,29 +47,42 @@ public class ObjectsStore
 
     public static void ReadObjects(File pluginPath)
     {
-        directory = new File(pluginPath, BODefaultValues.BO_DirectoryName.stringValue());
+        objectsList = LoadObjectsFromDirectory(pluginPath);
+
+        System.out.println("TerrainControl: " + objectsList.size() + " custom objects loaded");
+
+
+    }
+
+
+    public static ArrayList<CustomObject> LoadObjectsFromDirectory(File path)
+    {
+        ArrayList<CustomObject> outputList = new ArrayList<CustomObject>();
+        directory = new File(path, BODefaultValues.BO_DirectoryName.stringValue());
 
         if (!directory.exists())
         {
             if (!directory.mkdirs())
             {
                 System.out.println("BOB Plugin system encountered an error, aborting!");
-                return;
+                return outputList;
             }
         }
 
         File[] files = directory.listFiles();
+        if (files == null)
+            return outputList;
+
         for (File customObjectFile : files)
         {
             if (customObjectFile.isFile())
             {
                 CustomObject object = new CustomObject(customObjectFile);
                 if (object.IsValid)
-                    objectsList.add(object);
+                    outputList.add(object);
             }
         }
-
-        System.out.println("TerrainControl: " + objectsList.size() + " custom objects loaded");
+        return outputList;
 
 
     }
@@ -113,6 +126,7 @@ public class ObjectsStore
 
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public static void ReloadObjects()
     {
 
