@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.TreeGen;
@@ -46,17 +47,43 @@ public class TCListener implements Listener, PluginMessageListener
         if (bukkitWorld == null)
             return;
 
-        int biomeId = bukkitWorld.getBiome(event.getLocation().getBlockX(), event.getLocation().getBlockZ());
+        int x = event.getLocation().getBlockX();
+        int y = event.getLocation().getBlockY();
+        int z = event.getLocation().getBlockZ();
+
+        int biomeId = bukkitWorld.getBiome(x, z);
         if (biomeId >= bukkitWorld.getSettings().biomeConfigs.length || bukkitWorld.getSettings().biomeConfigs[biomeId] == null)
             return;
 
         BiomeConfig biomeConfig = bukkitWorld.getSettings().biomeConfigs[biomeId];
-        if (biomeConfig.SaplingResource == null)
-            return;
+        Resource sapling;
 
-        treeGenerator.SpawnTree(bukkitWorld,this.random,biomeConfig.SaplingResource,event.getLocation().getBlockX(), event.getLocation().getBlockY(),event.getLocation().getBlockZ());
-        event.getBlocks().clear();
+        switch (event.getSpecies())
+        {
+            case REDWOOD:
+                sapling = biomeConfig.SaplingTypes[1];
+                break;
+            case BIRCH:
+                sapling = biomeConfig.SaplingTypes[2];
+                break;
+            case JUNGLE:
+            case SMALL_JUNGLE:
+            case JUNGLE_BUSH:
+                sapling = biomeConfig.SaplingTypes[3];
+                break;
+            default:
+                sapling = biomeConfig.SaplingTypes[0];
+                break;
+        }
 
+        if (sapling == null)
+            sapling = biomeConfig.SaplingResource;
+
+        if (sapling != null)
+        {
+            treeGenerator.SpawnTree(bukkitWorld, this.random, sapling, x, y, z);
+            event.getBlocks().clear();
+        }
     }
 
     public void onPluginMessageReceived(String s, Player player, byte[] bytes)

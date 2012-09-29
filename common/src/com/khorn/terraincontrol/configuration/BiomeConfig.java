@@ -61,6 +61,8 @@ public class BiomeConfig extends ConfigFile
     public int FoliageColor;
 
     public Resource[] ResourceSequence = new Resource[256];
+    public Resource[] SaplingTypes = new Resource[5];
+    public Resource SaplingResource = null;
 
     public ArrayList<CustomObjectCompiled> CustomObjectsCompiled;
 
@@ -79,7 +81,6 @@ public class BiomeConfig extends ConfigFile
 
     public int ResourceCount = 0;
 
-    public Resource SaplingResource = null;
 
     public LocalBiome Biome;
 
@@ -490,8 +491,18 @@ public class BiomeConfig extends ConfigFile
 
                         if (type.Generator.ReadFromString(res, props, this))
                         {
-                            LineNumbers.add(Integer.valueOf(entry.getValue()));
-                            this.ResourceSequence[this.ResourceCount++] = res;
+                            if (res.Type == ResourceType.Sapling)
+                            {
+                                if (res.BlockData == -1)
+                                    this.SaplingResource = res;
+                                else
+                                    this.SaplingTypes[res.BlockData] = res;
+
+                            } else
+                            {
+                                LineNumbers.add(Integer.valueOf(entry.getValue()));
+                                this.ResourceSequence[this.ResourceCount++] = res;
+                            }
                         } else
                             System.out.println("TerrainControl: wrong resource " + type.name() + key);
                     }
@@ -703,6 +714,7 @@ public class BiomeConfig extends ConfigFile
 
         this.WriteNewLine();
         this.WriteTitle("Sapling resource");
+        this.WriteComment("Work like Tree resource instead first parameter");
         this.WriteSaplingSettings();
 
         this.WriteNewLine();
@@ -895,21 +907,12 @@ public class BiomeConfig extends ConfigFile
     private void WriteSaplingSettings() throws IOException
     {
         if (this.SaplingResource != null)
-        {
-            if (this.SaplingResource.TreeTypes.length == 0)
-            {
-                this.WriteValue(TCDefaultValues.SaplingSettings.name(), "None");
-                return;
-            }
+            this.WriteValue(ResourceType.Sapling.Generator.WriteToString(this.SaplingResource));
 
-            String output = ResourceType.Tree.Generator.WriteSettingOnly(this.SaplingResource);
-            int firstComma = output.indexOf(",");
-            if (firstComma != -1)
-                output = output.substring(firstComma + 1);
+        for (Resource res : this.SaplingTypes)
+            if (res != null)
+                this.WriteValue(ResourceType.Sapling.Generator.WriteToString(res));
 
-            this.WriteValue(TCDefaultValues.SaplingSettings.name(), output);
-        } else
-            this.WriteValue(TCDefaultValues.SaplingSettings.name(), "");
     }
 
     protected void CorrectSettings()

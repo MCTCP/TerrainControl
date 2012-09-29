@@ -39,28 +39,33 @@ public class TreeGen extends ResourceGenBase
 
         for (int t = 0; t < res.TreeTypes.length && !treeSpawned; t++)
         {
-            if (res.TreeTypes[t] == TreeType.CustomTreeWorld)
-                treeSpawned = SpawnCustomTreeFromArray(world, rand, x, y, z, res.CUObjectsWorld);
-            else if (res.TreeTypes[t] == TreeType.CustomTreeBiome)
-                treeSpawned = SpawnCustomTreeFromArray(world, rand, x, y, z, res.CUObjectsBiome);
-            else if (res.TreeTypes[t] == TreeType.CustomTree)
+            if (rand.nextInt(100) < res.TreeChances[t])
             {
-
-                CustomObjectCompiled SelectedObject = res.CUObjects[t];
-                // TODO Branch check ?!!!
-                if (rand.nextInt(100) < SelectedObject.Rarity)
+                switch (res.TreeTypes[t])
                 {
-                    if (!CustomObjectGen.ObjectCanSpawn(world, x, y, z, SelectedObject))
-                        continue;
+                    case CustomTree:
+                        CustomObjectCompiled SelectedObject = res.CUObjects[t];
+                        // TODO Branch check ?!!!
 
-                    treeSpawned = CustomObjectGen.GenerateCustomObject(world, rand, x, y, z, SelectedObject);
+                        if (!CustomObjectGen.ObjectCanSpawn(world, x, y, z, SelectedObject))
+                            continue;
 
-                    if (treeSpawned)
-                        CustomObjectGen.GenerateCustomObjectFromGroup(world, rand, x, y, z, SelectedObject);
+                        treeSpawned = CustomObjectGen.GenerateCustomObject(world, rand, x, y, z, SelectedObject);
 
+                        if (treeSpawned)
+                            CustomObjectGen.GenerateCustomObjectFromGroup(world, rand, x, y, z, SelectedObject);
+                        break;
+                    case CustomTreeWorld:
+                        treeSpawned = SpawnCustomTreeFromArray(world, rand, x, y, z, res.CUObjectsWorld);
+                        break;
+                    case CustomTreeBiome:
+                        treeSpawned = SpawnCustomTreeFromArray(world, rand, x, y, z, res.CUObjectsBiome);
+                        break;
+                    default:
+                        treeSpawned = world.PlaceTree(res.TreeTypes[t], rand, x, y, z);
+                        break;
                 }
-            } else if (rand.nextInt(100) < res.TreeChances[t])
-                treeSpawned = world.PlaceTree(res.TreeTypes[t], rand, x, y, z);
+            }
         }
         return treeSpawned;
 
@@ -104,7 +109,15 @@ public class TreeGen extends ResourceGenBase
     @Override
     protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
     {
-        res.Frequency = CheckValue(Props[0], 1, 100);
+        if (res.Type == ResourceType.Sapling)
+        {
+            if(Props[0].equals("All"))
+                res.BlockData = -1;
+            else
+                res.BlockData = CheckValue(Props[0], 0, 4);
+
+        } else
+            res.Frequency = CheckValue(Props[0], 1, 100);
 
         ArrayList<TreeType> treeTypes = new ArrayList<TreeType>();
         ArrayList<Integer> treeChances = new ArrayList<Integer>();
@@ -115,7 +128,7 @@ public class TreeGen extends ResourceGenBase
         boolean hasCustomTreeWorld = false;
         boolean hasCustomTreeBiome = false;
 
-        for (int index = 1; index < Props.length; index++)
+        for (int index = 1; (index + 1) < Props.length; index += 2)
         {
             String tree = Props[index];
             boolean defaultTreeFound = false;
@@ -127,11 +140,9 @@ public class TreeGen extends ResourceGenBase
                 if (type.name().equals(tree))
                 {
                     defaultTreeFound = true;
-                    if ((++index) < Props.length)
-                    {
-                        treeTypes.add(type);
-                        treeChances.add(CheckValue(Props[index], 0, 100));
-                    }
+
+                    treeTypes.add(type);
+                    treeChances.add(CheckValue(Props[index + 1], 0, 100));
                     break;
                 }
             }
@@ -143,7 +154,7 @@ public class TreeGen extends ResourceGenBase
             if (tree.equals(BODefaultValues.BO_Use_World.stringValue()))
             {
                 treeTypes.add(TreeType.CustomTreeWorld);
-                treeChances.add(0);
+                treeChances.add(CheckValue(Props[index + 1], 0, 100));
                 hasCustomTreeWorld = true;
                 continue;
             }
@@ -151,7 +162,7 @@ public class TreeGen extends ResourceGenBase
             if (tree.equals(BODefaultValues.BO_Use_Biome.stringValue()))
             {
                 treeTypes.add(TreeType.CustomTreeBiome);
-                treeChances.add(0);
+                treeChances.add(CheckValue(Props[index + 1], 0, 100));
                 hasCustomTreeBiome = true;
                 continue;
             }
@@ -161,7 +172,7 @@ public class TreeGen extends ResourceGenBase
             {
                 customTrees.add(obj);
                 treeTypes.add(TreeType.CustomTree);
-                treeChances.add(0);
+                treeChances.add(CheckValue(Props[index + 1], 0, 100));
 
                 if (!obj.GroupId.equals(""))
                 {
@@ -254,7 +265,7 @@ public class TreeGen extends ResourceGenBase
             res.TreeTypes[t] = treeTypes.get(t);
             res.TreeChances[t] = treeChances.get(t);
             if (treeTypes.get(t) == TreeType.CustomTree)
-                res.CUObjects[t] = customTrees.get(customIndex);
+                res.CUObjects[t] = customTrees.get(customIndex++);
         }
 
         return true;
@@ -263,17 +274,26 @@ public class TreeGen extends ResourceGenBase
     @Override
     protected String WriteString(Resource res, String blockSources)
     {
-        String output = String.valueOf(res.Frequency);
+        String output;
+        if(res.Type == ResourceType.Sapling)
+        {
+           if(res.BlockData == -1)
+               output = "All";
+            else
+               output = "" + res.BlockData;
+
+        } else
+        output = String.valueOf(res.Frequency);
         for (int i = 0; i < res.TreeChances.length; i++)
         {
             output += ",";
 
             if (res.TreeTypes[i] == TreeType.CustomTreeWorld)
-                output += BODefaultValues.BO_Use_World.stringValue();
+                output += BODefaultValues.BO_Use_World.stringValue() + "," + res.TreeChances[i];
             else if (res.TreeTypes[i] == TreeType.CustomTreeBiome)
-                output += BODefaultValues.BO_Use_Biome.stringValue();
+                output += BODefaultValues.BO_Use_Biome.stringValue() + "," + res.TreeChances[i];
             else if (res.TreeTypes[i] == TreeType.CustomTree)
-                output += res.CUObjects[i].Name + (res.CUObjects[i].ChangedSettings.equals("") ? "" : ("(" + res.CUObjects[i].ChangedSettings + ")"));
+                output += res.CUObjects[i].Name + (res.CUObjects[i].ChangedSettings.equals("") ? "" : ("(" + res.CUObjects[i].ChangedSettings + ")")) + "," + res.TreeChances[i];
             else
                 output += res.TreeTypes[i].name() + "," + res.TreeChances[i];
         }
