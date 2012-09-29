@@ -183,7 +183,7 @@ public class CustomObjectGen extends ResourceGenBase
 
         for (String name : res.CUObjectsNames)
         {
-            output = output + (first ? "" : ";");
+            output = output + (first ? "" : ",");
             if (first)
                 first = false;
 

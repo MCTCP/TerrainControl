@@ -414,52 +414,41 @@ public class BiomeConfig extends ConfigFile
 
     private void ReadReplaceSettings()
     {
-        String settingName = "ReplacedBlocks".toLowerCase();
-        if (this.SettingsCache.containsKey(settingName))
+        String settingValue = ReadComplexValue("ReplacedBlocks");
+
+        if (settingValue.equals("") || settingValue.equals("None"))
+            return;
+
+        String[] keys = ReadComplexString(settingValue);
+        try
         {
-            if (this.SettingsCache.get(settingName).trim().equals("") || this.SettingsCache.get(settingName).equals("None"))
-                return;
-            String[] keys = this.SettingsCache.get(settingName).split(",");
-            try
+            for (String key : keys)
             {
-                for (String key : keys)
+
+                int start = key.indexOf("(");
+                int end = key.lastIndexOf(")");
+                if (start != -1 && end != -1)
                 {
-                    String[] blocks = key.split("=");
-                    if (blocks.length != 2)
+                    key = key.substring(start + 1, end);
+                    String[] values = key.split(",");
+                    if (values.length != 2 && values.length != 5)
                         continue;
+
+                    short fromBlockId = Short.valueOf(values[0]);
+                    short toBlockId = Short.valueOf(values[1]);
 
                     int min_y = 0;
                     int max_y = worldConfig.WorldHeight;
-
-                    int start = blocks[1].indexOf("(");
-                    int end = blocks[1].indexOf(")");
-                    if (start != -1 && end != -1)
+                    short blockData = 0;
+                    if (values.length == 5)
                     {
-                        String[] ranges = blocks[1].substring(start + 1, end).split("-");
-                        if (ranges.length != 2)
-                            continue;
-
-                        min_y = Integer.valueOf(ranges[0]);
-                        max_y = Integer.valueOf(ranges[1]);
-                        min_y = CheckValue(min_y, 0, worldConfig.WorldHeight);
-                        max_y = CheckValue(max_y, 0, worldConfig.WorldHeight, min_y);
-                        blocks[1] = blocks[1].substring(0, start);
+                        blockData = Short.valueOf(values[2]);
+                        min_y = Integer.valueOf(values[3]);
+                        max_y = Integer.valueOf(values[4]);
+                        min_y = CheckValue(min_y, 0, worldConfig.WorldHeight - 1);
+                        max_y = CheckValue(max_y, 0, worldConfig.WorldHeight - 1, min_y);
                     }
 
-                    short blockId;
-                    short blockData;
-                    short fromBlockId = Short.valueOf(blocks[0]);
-
-                    if (blocks[1].contains("."))
-                    {
-                        String[] parts = blocks[1].split("\\.");
-                        blockId = Short.valueOf(parts[0]); // Block ID
-                        blockData = Short.valueOf(parts[1]); // Block data
-                    } else
-                    {
-                        blockId = Short.valueOf(blocks[1]); // Block ID
-                        blockData = 0; // Block data
-                    }
                     if (this.ReplaceMatrixBlocks[fromBlockId] == null)
                     {
                         this.ReplaceMatrixBlocks[fromBlockId] = new short[worldConfig.WorldHeight];
@@ -467,16 +456,18 @@ public class BiomeConfig extends ConfigFile
                             this.ReplaceMatrixBlocks[fromBlockId][i] = -1;
                     }
                     for (int y = min_y; y < max_y; y++)
-                        this.ReplaceMatrixBlocks[fromBlockId][y] = (short) (blockId << 4 | blockData);
+                        this.ReplaceMatrixBlocks[fromBlockId][y] = (short) (toBlockId << 4 | blockData);
                     ReplaceCount++;
 
                 }
 
-            } catch (NumberFormatException e)
-            {
-                System.out.println("Wrong replace settings: '" + this.SettingsCache.get(settingName) + "'");
             }
+
+        } catch (NumberFormatException e)
+        {
+            System.out.println("Wrong replace settings: '" + this.SettingsCache.get(settingValue) + "'");
         }
+
     }
 
     private void ReadResourceSettings()
@@ -684,10 +675,10 @@ public class BiomeConfig extends ConfigFile
 
 
         this.WriteNewLine();
-        WriteComment("Replace Variable: BlockIdFrom=BlockIdTo[.BlockData][(minHeight-maxHeight)]");
+        WriteComment("Replace Variable: (BlockIdFrom,BlockIdTo[,BlockDataTo,minHeight,maxHeight])");
         WriteComment("Example :");
-        WriteComment("  ReplacedBlocks:2=3(100-128),13=20");
-        WriteComment("Replace grass block to dirt from 100 to 128 height and replace gravel to glass on all height ");
+        WriteComment("  ReplacedBlocks:(2,3,0,100,127),(13,20)");
+        WriteComment("Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
         WriteModReplaceSettings();
 
         this.WriteTitle("Biome visual settings");
@@ -849,7 +840,6 @@ public class BiomeConfig extends ConfigFile
             return;
         }
         String output = "";
-        boolean first = true;
 
         for (int id = 0; id < ReplaceMatrixBlocks.length; id++)
         {
@@ -870,35 +860,24 @@ public class BiomeConfig extends ConfigFile
                     replaceTo = ReplaceMatrixBlocks[id][y];
                     continue;
                 }
-                if (!first)
-                    output += ",";
+                output += "(" + id + "," + (replaceTo >> 4);
+                if ((replaceTo & 0xF) > 0 || y_start != 0 || y != (ReplaceMatrixBlocks[id].length - 1))
+                    output += "," + (replaceTo & 0xF) + "," + y_start + "," + y;
+                output += "),";
 
-                output += id + "=" + (replaceTo >> 4);
-                if ((replaceTo & 0xF) > 0)
-                    output += "." + (replaceTo & 0xF);
-                if (y_start != 0 || y != (ReplaceMatrixBlocks[id].length - 1))
-                {
-                    output += "(" + y_start + "-" + y + ")";
-                }
-                first = false;
                 replaceTo = -1;
             }
             if (replaceTo != -1)
             {
-                if (!first)
-                    output += ",";
 
-                output += id + "=" + (replaceTo >> 4);
-                if ((replaceTo & 0xF) > 0)
-                    output += "." + (replaceTo & 0xF);
-                if (y_start != 0)
-                {
-                    output += "(" + y_start + "-" + (ReplaceMatrixBlocks[id].length - 1) + ")";
-                }
-                first = false;
+                output += "(" + id + "," + (replaceTo >> 4);
+                if ((replaceTo & 0xF) > 0 || y_start != 0)
+                    output += "," + (replaceTo & 0xF) + "," + y_start + "," + (ReplaceMatrixBlocks[id].length - 1);
+                output += "),";
+
             }
         }
-        this.WriteValue("ReplacedBlocks", output);
+        this.WriteValue("ReplacedBlocks", output.substring(0, output.length() - 1));
     }
 
     private void WriteResources() throws IOException
@@ -975,6 +954,65 @@ public class BiomeConfig extends ConfigFile
                 this.SettingsCache.put("SmallLake(WATER,4,7,8," + this.worldConfig.WorldHeight + ")", "0");
                 this.SettingsCache.put("SmallLake(LAVA,2,3,8," + (this.worldConfig.WorldHeight - 8) + ")", "1");
             }
+
+        }
+
+        String replaceBlocksValue;
+        if (this.SettingsCache.containsKey("replacedblocks"))
+            replaceBlocksValue = this.SettingsCache.get("replacedblocks");
+        else
+            replaceBlocksValue = ReadComplexValue("ReplacedBlocks");
+
+        if (replaceBlocksValue.contains("="))
+        {
+            String[] values = replaceBlocksValue.split(",");
+            String output = "";
+
+            for (String block : values)
+            {
+                try
+                {
+
+                    String fromId = block.split("=")[0];
+                    String toId = block.split("=")[1];
+
+                    String toData = "0";
+                    String minHeight = "0";
+                    String maxHeight = "" + worldConfig.WorldHeight;
+
+                    Boolean longForm = false;
+
+                    int start = toId.indexOf("(");
+                    int end = toId.indexOf(")");
+                    if (start != -1 && end != -1)
+                    {
+                        String[] ranges = toId.substring(start + 1, end).split("-");
+                        toId = toId.substring(0, start);
+                        minHeight = ranges[0];
+                        maxHeight = ranges[1];
+                        longForm = true;
+                    }
+                    if (toData.contains("\\."))
+                    {
+                        String[] temp = toId.split("\\.");
+                        toId = temp[0];
+                        toData = temp[1];
+                        longForm = true;
+                    }
+
+                    if (longForm)
+                        output = output + "(" + fromId + "," + toId + "," + toData + "," + minHeight + "," + maxHeight + "),";
+                    else
+                        output = output + "(" + fromId + "," + toId + "),";
+                } catch (Exception ignored)
+                {
+
+                }
+
+            }
+
+            this.SettingsCache.put("ReplacedBlocks", output.substring(0, output.length() - 1));
+
 
         }
     }

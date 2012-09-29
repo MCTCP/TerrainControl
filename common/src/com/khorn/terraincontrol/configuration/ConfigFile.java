@@ -45,28 +45,28 @@ public abstract class ConfigFile
                     if (thisLine.toLowerCase().contains("("))
                     {
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
-                    } else if (thisLine.toLowerCase().contains(":"))
+                    } else if (thisLine.contains(":"))
                     {
-                        String[] splitSettings = thisLine.split(":", 2);
+                        String[] splitSettings = thisLine.toLowerCase().split(":", 2);
                         if (splitSettings.length == 2)
                         {
-                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                             this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
-                        } else if (splitSettings.length == 1)
-                        {
-                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
-                            this.SettingsCache.put(splitSettings[0].trim(), "");
-                        }
-                    } else if (thisLine.toLowerCase().contains("="))
-                    {
-                        String[] splitSettings = thisLine.split("=", 2);
-                        if (splitSettings.length == 2)
-                        {
-                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                             //this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
                         } else if (splitSettings.length == 1)
                         {
-                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
+                            this.SettingsCache.put(splitSettings[0].trim(), "");
+                            //this.SettingsCache.put(splitSettings[0].trim(), "");
+                        }
+                    } else if (thisLine.contains("="))
+                    {
+                        String[] splitSettings = thisLine.toLowerCase().split("=", 2);
+                        if (splitSettings.length == 2)
+                        {
+                            this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
+                            //this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
+                        } else if (splitSettings.length == 1)
+                        {
+                            this.SettingsCache.put(splitSettings[0].trim(), "");
                             //this.SettingsCache.put(splitSettings[0].trim(), "");
                         }
                     } else
@@ -516,6 +516,20 @@ public abstract class ConfigFile
 
         return output;
 
+
+    }
+
+    protected String ReadComplexValue(String startWith)
+    {
+        String settingValue = "";
+
+        for (String value : this.SettingsCache.keySet())
+            if (value.startsWith(startWith) && value.contains(":"))
+            {
+                settingValue = value.split(":", 2)[1].trim();
+                break;
+            }
+        return settingValue;
 
     }
 }
