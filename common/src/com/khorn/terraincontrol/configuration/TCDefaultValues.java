@@ -100,7 +100,6 @@ public enum TCDefaultValues
     GrassColor("0x000000"),
     FoliageColor("0x000000"),
 
-    SaplingSettings(""),
 
     StrongholdsEnabled(true),
     MineshaftsEnabled(true),

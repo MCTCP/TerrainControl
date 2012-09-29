@@ -389,7 +389,6 @@ public class BiomeConfig extends ConfigFile
         this.spawnWaterCreatures = ReadModSettings("spawnWaterCreatures", new ArrayList<WeightedMobSpawnGroup>());
 
         this.ReadCustomObjectSettings();
-        this.ReadSaplingSettings();
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
         this.ReadHeightSettings();
@@ -547,24 +546,6 @@ public class BiomeConfig extends ConfigFile
 
     }
 
-    private void ReadSaplingSettings()
-    {
-        String settings = ReadModSettings(TCDefaultValues.SaplingSettings.name(), TCDefaultValues.SaplingSettings.stringValue());
-        if (settings.equals(""))
-            return;
-
-        if (settings.equals("None"))
-        {
-            this.SaplingResource = new Resource(ResourceType.Tree);
-            return;
-        }
-        settings = "0," + settings;
-        String[] parsedSettings = ReadComplexString(settings);
-        Resource res = new Resource(ResourceType.Tree);
-        if (ResourceType.Tree.Generator.ReadFromString(res, parsedSettings, this))
-            this.SaplingResource = res;
-
-    }
 
     protected void WriteConfigSettings() throws IOException
     {
