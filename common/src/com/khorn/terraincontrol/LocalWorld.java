@@ -74,6 +74,8 @@ public interface LocalWorld
 
 
     public int getLiquidHeight(int x, int z);
+    
+    public int getSolidHeight(int x, int z);
 
     public int getHighestBlockYAt(int x, int z);
 
