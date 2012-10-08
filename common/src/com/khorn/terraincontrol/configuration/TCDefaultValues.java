@@ -6,7 +6,7 @@ import java.util.Collections;
 public enum TCDefaultValues
 {
     WorldSettingsName("WorldConfig.ini"),
-    WorldBOBDirectoryName("BOBPlugins"),
+    BO_WorldDirectoryName("WorldObjects"),
     WorldBiomeConfigDirectoryName("BiomeConfigs"),
     WorldBiomeConfigName("BiomeConfig.ini"),
     ChannelName("TerrainControl"),

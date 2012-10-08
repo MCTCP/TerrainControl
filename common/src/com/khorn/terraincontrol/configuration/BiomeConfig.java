@@ -61,7 +61,7 @@ public class BiomeConfig extends ConfigFile
     public int FoliageColor;
 
     public Resource[] ResourceSequence = new Resource[256];
-    public Resource[] SaplingTypes = new Resource[5];
+    public Resource[] SaplingTypes = new Resource[4];
     public Resource SaplingResource = null;
 
     public ArrayList<CustomObjectCompiled> CustomObjectsCompiled;

@@ -114,7 +114,7 @@ public class TreeGen extends ResourceGenBase
             if(Props[0].equals("All"))
                 res.BlockData = -1;
             else
-                res.BlockData = CheckValue(Props[0], 0, 4);
+                res.BlockData = CheckValue(Props[0], 0, 3);
 
         } else
             res.Frequency = CheckValue(Props[0], 1, 100);

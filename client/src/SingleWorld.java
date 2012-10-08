@@ -403,6 +403,22 @@ public class SingleWorld implements LocalWorld
         return -1;
     }
 
+    public int getSolidHeight(int x, int z)
+    {
+        wl chunk = this.getChunk(x, 0, z);
+        if (chunk == null)
+            return -1;
+        z = z & 0xF;
+        x = x & 0xF;
+        for (int y = worldHeight - 1; y > 0; y--)
+        {
+            int id = chunk.a(x, y, z);
+            if (DefaultMaterial.getMaterial(id).isSolid())
+                return y;
+        }
+        return -1;
+    }
+
     public boolean isEmpty(int x, int y, int z)
     {
         return this.getTypeId(x, y, z) == 0;

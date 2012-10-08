@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
 import com.khorn.terraincontrol.customobjects.ObjectsStore;
@@ -267,15 +266,25 @@ public class WorldConfig extends ConfigFile
 
     private void ReadWorldCustomObjects()
     {
-        File BOBFolder = new File(SettingsDir, TCDefaultValues.WorldBOBDirectoryName.stringValue());
-        if (BOBFolder.exists())
-            if (!BOBFolder.renameTo(new File(SettingsDir, BODefaultValues.BO_DirectoryName.stringValue())))
+        File directory = new File(SettingsDir, "BOBPlugins");
+        if (directory.exists())
+            if (!directory.renameTo(new File(SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue())))
             {
                 System.out.println("TerrainControl: Can`t rename old custom objects folder");
             }
 
+        directory = new File(this.SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
 
-        ArrayList<CustomObject> rawObjects = ObjectsStore.LoadObjectsFromDirectory(this.SettingsDir);
+        if (!directory.exists())
+        {
+            if (!directory.mkdirs())
+            {
+                System.out.println("TerrainControl: can`t create WorldObjects directory");
+                return;
+            }
+        }
+
+        ArrayList<CustomObject> rawObjects = ObjectsStore.LoadObjectsFromDirectory(directory);
 
 
         CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();
@@ -820,7 +829,7 @@ public class WorldConfig extends ConfigFile
         {
             try
             {
-                File BOBFolder = new File(SettingsDir, TCDefaultValues.WorldBOBDirectoryName.stringValue());
+                File BOBFolder = new File(SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
                 if (!BOBFolder.exists())
                 {
                     if (!BOBFolder.mkdir())

@@ -47,7 +47,19 @@ public class ObjectsStore
 
     public static void ReadObjects(File pluginPath)
     {
-        objectsList = LoadObjectsFromDirectory(pluginPath);
+        directory = new File(pluginPath, BODefaultValues.BO_GlobalDirectoryName.stringValue());
+
+        if (!directory.exists())
+        {
+            if (!directory.mkdirs())
+            {
+                System.out.println("TerrainControl: can`t create GlobalObjects directory");
+                return;
+            }
+        }
+
+
+        objectsList = LoadObjectsFromDirectory(directory);
 
         System.out.println("TerrainControl: " + objectsList.size() + " custom objects loaded");
 
@@ -58,18 +70,8 @@ public class ObjectsStore
     public static ArrayList<CustomObject> LoadObjectsFromDirectory(File path)
     {
         ArrayList<CustomObject> outputList = new ArrayList<CustomObject>();
-        directory = new File(path, BODefaultValues.BO_DirectoryName.stringValue());
 
-        if (!directory.exists())
-        {
-            if (!directory.mkdirs())
-            {
-                System.out.println("BOB Plugin system encountered an error, aborting!");
-                return outputList;
-            }
-        }
-
-        File[] files = directory.listFiles();
+        File[] files = path.listFiles();
         if (files == null)
             return outputList;
 
