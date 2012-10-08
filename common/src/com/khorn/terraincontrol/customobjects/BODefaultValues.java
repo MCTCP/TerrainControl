@@ -22,6 +22,9 @@ public enum BODefaultValues
     spawnDarkness(true),
     spawnWater(false),
     spawnLava(false),
+    spawnAboveGround(false),
+    spawnUnderGround(false),
+
     underFill(true),
     randomRotation(true),
     dig(false),

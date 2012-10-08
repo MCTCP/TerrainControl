@@ -44,7 +44,24 @@ public class CustomObjectGen extends ResourceGenBase
             {
                 int x = _x + rand.nextInt(16);
                 int z = _z + rand.nextInt(16);
-                int y = world.getHighestBlockYAt(x, z);
+                int y;
+
+                if (SelectedObject.SpawnAboveGround)
+                    y = world.getSolidHeight(x, z);
+                else if (SelectedObject.SpawnUnderGround)
+                {
+                    int solidHeight = world.getSolidHeight(x, z);
+                    if (solidHeight < 1 || solidHeight <= SelectedObject.SpawnElevationMin)
+                        continue;
+                    if (solidHeight > SelectedObject.SpawnElevationMax)
+                        solidHeight = SelectedObject.SpawnElevationMax;
+                    y = rand.nextInt(solidHeight - SelectedObject.SpawnElevationMin) + SelectedObject.SpawnElevationMin;
+                } else
+                    y = world.getHighestBlockYAt(x, z);
+
+                if (y < 0)
+                    continue;
+
                 ObjectRarity -= 100;
 
                 if (!ObjectCanSpawn(world, x, y, z, SelectedObject))
@@ -82,7 +99,24 @@ public class CustomObjectGen extends ResourceGenBase
 
             x = x + rand.nextInt(workObject.GroupSeparationMax - workObject.GroupSeparationMin) + workObject.GroupSeparationMin;
             z = z + rand.nextInt(workObject.GroupSeparationMax - workObject.GroupSeparationMin) + workObject.GroupSeparationMin;
-            int _y = world.getHighestBlockYAt(x, z);
+            int _y;
+
+            if (workObject.SpawnAboveGround)
+                _y = world.getSolidHeight(x, z);
+            else if (workObject.SpawnUnderGround)
+            {
+                int solidHeight = world.getSolidHeight(x, z);
+                if (solidHeight < 1 || solidHeight <= workObject.SpawnElevationMin)
+                    continue;
+                if (solidHeight > workObject.SpawnElevationMax)
+                    solidHeight = workObject.SpawnElevationMax;
+                _y = rand.nextInt(solidHeight - workObject.SpawnElevationMin) + workObject.SpawnElevationMin;
+            } else
+                _y = world.getHighestBlockYAt(x, z);
+
+            if (y < 0)
+                continue;
+
             if ((y - _y) > 10 || (_y - y) > 10)
                 continue;
 
@@ -195,7 +229,7 @@ public class CustomObjectGen extends ResourceGenBase
 
             for (CustomObjectCompiled object : res.CUObjects)
                 if (object.Name.equals(name))
-                    output += name + (object.ChangedSettings.equals("")? "":("(" + object.ChangedSettings + ")"));
+                    output += name + (object.ChangedSettings.equals("") ? "" : ("(" + object.ChangedSettings + ")"));
 
         }
 

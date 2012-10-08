@@ -25,6 +25,9 @@ public class CustomObjectCompiled extends ConfigFile
 
     public boolean SpawnWater;
     public boolean SpawnLava;
+    public boolean SpawnAboveGround;
+    public boolean SpawnUnderGround;
+
     public boolean SpawnSunlight;
     public boolean SpawnDarkness;
 
@@ -91,6 +94,9 @@ public class CustomObjectCompiled extends ConfigFile
         this.SpawnDarkness = ReadModSettings(BODefaultValues.spawnDarkness.name(), BODefaultValues.spawnDarkness.booleanValue());
         this.SpawnWater = ReadModSettings(BODefaultValues.spawnWater.name(), BODefaultValues.spawnWater.booleanValue());
         this.SpawnLava = ReadModSettings(BODefaultValues.spawnLava.name(), BODefaultValues.spawnLava.booleanValue());
+        this.SpawnAboveGround = ReadModSettings(BODefaultValues.spawnAboveGround.name(), BODefaultValues.spawnAboveGround.booleanValue());
+        this.SpawnUnderGround = ReadModSettings(BODefaultValues.spawnUnderGround.name(), BODefaultValues.spawnUnderGround.booleanValue());
+
         this.UnderFill = ReadModSettings(BODefaultValues.underFill.name(), BODefaultValues.underFill.booleanValue());
 
         this.RandomRotation = ReadModSettings(BODefaultValues.randomRotation.name(), BODefaultValues.randomRotation.booleanValue());
