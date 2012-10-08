@@ -112,7 +112,7 @@ public class CustomObjectGen extends ResourceGenBase
 
             if (!workObject.Dig)
             {
-                if (world.getTypeId((x + point.x), (y + point.y), (z + point.z)) > 0)
+                if (workObject.CollisionBlockType.contains(world.getTypeId((x + point.x), (y + point.y), (z + point.z))))
                 {
                     faultCounter++;
                     if (faultCounter > (data.length * (workObject.CollisionPercentage / 100)))

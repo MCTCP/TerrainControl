@@ -13,6 +13,7 @@ public enum BODefaultValues
     BO_Use_World("UseWorld"),
     BO_Use_Biome("UseBiome"),
     BO_ALL_KEY("All"),
+    BO_SolidKey("Solid"),
 
     // Custom object settings
     version("2.0"),
@@ -30,6 +31,7 @@ public enum BODefaultValues
     needsFoundation(true),
     rarity(100),
     collisionPercentage(2),
+    collisionBlockType("All"),
     spawnElevationMin(0),
     spawnElevationMax(128),
 

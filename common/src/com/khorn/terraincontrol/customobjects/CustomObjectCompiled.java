@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.customobjects;
 
+import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 
 import java.io.IOException;
@@ -19,6 +20,8 @@ public class CustomObjectCompiled extends ConfigFile
 
     public String Version;
     public HashSet<Integer> SpawnOnBlockType;
+
+    public HashSet<Integer> CollisionBlockType;
 
     public boolean SpawnWater;
     public boolean SpawnLava;
@@ -76,20 +79,10 @@ public class CustomObjectCompiled extends ConfigFile
     protected void ReadConfigSettings()
     {
         this.Version = ReadModSettings(BODefaultValues.version.name(), BODefaultValues.version.stringValue());
-        this.SpawnOnBlockType = new HashSet<Integer>();
-        ArrayList<String> blocks = ReadModSettings(BODefaultValues.spawnOnBlockType.name(), BODefaultValues.spawnOnBlockType.StringArrayListValue());
-        try
-        {
-            for (String block : blocks)
-            {
-                int blockID = Integer.decode(block);
-                if (blockID != 0)
-                    this.SpawnOnBlockType.add(blockID);
-            }
-        } catch (NumberFormatException e)
-        {
-            System.out.println("TerrainControl: Custom object " + Name + " have wrong value " + BODefaultValues.spawnOnBlockType.name());
-        }
+
+
+        this.SpawnOnBlockType = this.ReadBlockList(ReadModSettings(BODefaultValues.spawnOnBlockType.name(), BODefaultValues.spawnOnBlockType.StringArrayListValue()),BODefaultValues.spawnOnBlockType.name());
+        this.CollisionBlockType = this.ReadBlockList(ReadModSettings(BODefaultValues.collisionBlockType.name(), BODefaultValues.collisionBlockType.StringArrayListValue()),BODefaultValues.collisionBlockType.name());
 
         this.SpawnInBiome = new HashSet<String>(ReadModSettings(BODefaultValues.spawnInBiome.name(), BODefaultValues.spawnInBiome.StringArrayListValue()));
 
@@ -172,6 +165,55 @@ public class CustomObjectCompiled extends ConfigFile
             Data[3][i] = coordinate;
         }
 
+
+    }
+
+    private HashSet<Integer> ReadBlockList(ArrayList<String> blocks, String settingName)
+    {
+        HashSet<Integer> output = new HashSet<Integer>();
+
+        boolean nonIntegerValues = false;
+        boolean all = false;
+        boolean solid = false;
+
+        for (String block : blocks)
+        {
+
+            if (block.equals(BODefaultValues.BO_ALL_KEY.stringValue()))
+            {
+                all = true;
+                continue;
+            }
+            if (block.equals(BODefaultValues.BO_SolidKey.stringValue()))
+            {
+                solid = true;
+                continue;
+            }
+            try
+            {
+                int blockID = Integer.decode(block);
+                if (blockID != 0)
+                    output.add(blockID);
+            } catch (NumberFormatException e)
+            {
+                nonIntegerValues = true;
+            }
+        }
+
+        if (all || solid)
+            for (DefaultMaterial material : DefaultMaterial.values())
+            {
+                if(material.id == 0)
+                    continue;
+                if (solid && !material.isSolid())
+                    continue;
+                output.add(material.id);
+
+            }
+        if (nonIntegerValues)
+            System.out.println("TerrainControl: Custom object " + this.Name + " have wrong value " + settingName);
+
+        return output;
 
     }
 }
