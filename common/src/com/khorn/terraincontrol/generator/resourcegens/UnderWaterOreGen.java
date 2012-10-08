@@ -8,14 +8,17 @@ import java.util.Random;
 
 public class UnderWaterOreGen extends ResourceGenBase
 {
+	int maxDepth = 2;
+	
     @Override
     protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
     {
-
-        int y = world.getLiquidHeight(x, z);
+        int y = world.getSolidHeight(x, z);
+        if (world.getLiquidHeight(x, z) < y)
+        	return;
 
         int i = rand.nextInt(res.MaxSize);
-        int j = 2;
+        int j = rand.nextInt(maxDepth);
         for (int k = x - i; k <= x + i; k++)
         {
             for (int m = z - i; m <= z + i; m++)
@@ -45,11 +48,12 @@ public class UnderWaterOreGen extends ResourceGenBase
         res.MaxSize = CheckValue(Props[1], 1, 8);
         res.Frequency = CheckValue(Props[2], 1, 100);
         res.Rarity = CheckValue(Props[3], 0, 100);
+        try { maxDepth = CheckValue(Props[4], 1, 8); }
+        catch (NumberFormatException e) {}
 
-
-        res.SourceBlockId = new int[Props.length - 4];
-        for (int i = 4; i < Props.length; i++)
-            res.SourceBlockId[i - 4] = CheckBlock(Props[i]);
+        res.SourceBlockId = new int[Props.length - 5];
+        for (int i = 5; i < Props.length; i++)
+            res.SourceBlockId[i - 5] = CheckBlock(Props[i]);
 
         return true;
     }
@@ -57,6 +61,6 @@ public class UnderWaterOreGen extends ResourceGenBase
     @Override
     protected String WriteString(Resource res, String blockSources)
     {
-        return res.BlockIdToName(res.BlockId) + "," + res.MaxSize + "," + res.Frequency + "," + res.Rarity + blockSources;
+        return res.BlockIdToName(res.BlockId) + "," + res.MaxSize + "," + res.Frequency + "," + res.Rarity + "," + maxDepth + blockSources;
     }
 }
