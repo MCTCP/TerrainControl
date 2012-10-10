@@ -942,12 +942,27 @@ public class BiomeConfig extends ConfigFile
         }
 
         String replaceBlocksValue;
+        boolean oldReplaceFound = false;
         if (this.SettingsCache.containsKey("replacedblocks"))
+        {
             replaceBlocksValue = this.SettingsCache.get("replacedblocks");
+            if(replaceBlocksValue.contains("="))
+            {
+                oldReplaceFound = true;
+                this.SettingsCache.remove("replacedblocks");
+            }
+        }
         else
+        {
             replaceBlocksValue = ReadComplexValue("ReplacedBlocks");
+            if(replaceBlocksValue.contains("="))
+            {
+                oldReplaceFound = true;
+                this.SettingsCache.remove("ReplacedBlocks" + ":" + replaceBlocksValue);
+            }
+        }
 
-        if (replaceBlocksValue.contains("="))
+        if (oldReplaceFound)
         {
             String[] values = replaceBlocksValue.split(",");
             String output = "";
@@ -995,7 +1010,7 @@ public class BiomeConfig extends ConfigFile
 
             }
 
-            this.SettingsCache.put("ReplacedBlocks", output.substring(0, output.length() - 1));
+            this.SettingsCache.put("ReplacedBlocks" + ":" + output.substring(0, output.length() - 1), "");
 
 
         }
