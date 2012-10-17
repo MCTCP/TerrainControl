@@ -16,17 +16,17 @@ import java.util.HashMap;
 
 public class WorldConfig extends ConfigFile
 {
-    public ArrayList<String> CustomBiomes = new ArrayList<String>();
-    public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
+    public ArrayList<String> CustomBiomes = new ArrayList<>();
+    public HashMap<String, Integer> CustomBiomeIds = new HashMap<>();
 
     public ArrayList<CustomObjectCompiled> CustomObjectsCompiled;
 
-    public ArrayList<String> NormalBiomes = new ArrayList<String>();
-    public ArrayList<String> IceBiomes = new ArrayList<String>();
-    public ArrayList<String> IsleBiomes = new ArrayList<String>();
-    public ArrayList<String> BorderBiomes = new ArrayList<String>();
+    public ArrayList<String> NormalBiomes = new ArrayList<>();
+    public ArrayList<String> IceBiomes = new ArrayList<>();
+    public ArrayList<String> IsleBiomes = new ArrayList<>();
+    public ArrayList<String> BorderBiomes = new ArrayList<>();
 
-    public ArrayList<BiomeConfig> biomes = new ArrayList<BiomeConfig>();
+    public ArrayList<BiomeConfig> biomes = new ArrayList<>();
 
 
     public byte[] ReplaceMatrixBiomes = new byte[256];
@@ -126,10 +126,10 @@ public class WorldConfig extends ConfigFile
 
     public boolean removeSurfaceStone;
 
-    public boolean customObjects;
+    //public boolean customObjects;
     public int objectSpawnRatio;
-    public boolean denyObjectsUnderFill;
-    public int customTreeChance;
+    //public boolean denyObjectsUnderFill;
+    //public int customTreeChance;
 
     public boolean StrongholdsEnabled;
     public boolean MineshaftsEnabled;
@@ -194,7 +194,7 @@ public class WorldConfig extends ConfigFile
             }
         }
 
-        ArrayList<LocalBiome> localBiomes = new ArrayList<LocalBiome>(world.getDefaultBiomes());
+        ArrayList<LocalBiome> localBiomes = new ArrayList<>(world.getDefaultBiomes());
 
         //Add custom biomes to world
         for (String biomeName : this.CustomBiomes)
@@ -242,7 +242,7 @@ public class WorldConfig extends ConfigFile
             if (this.ModeBiome == BiomeMode.FromImage)
             {
                 if (this.biomeColorMap == null)
-                    this.biomeColorMap = new HashMap<Integer, Integer>();
+                    this.biomeColorMap = new HashMap<>();
 
                 try
                 {
@@ -287,7 +287,7 @@ public class WorldConfig extends ConfigFile
         ArrayList<CustomObject> rawObjects = ObjectsStore.LoadObjectsFromDirectory(directory);
 
 
-        CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();
+        CustomObjectsCompiled = new ArrayList<>();
 
         for (CustomObject object : rawObjects)
             CustomObjectsCompiled.add(object.Compile(""));
@@ -378,7 +378,7 @@ public class WorldConfig extends ConfigFile
         this.waterLevelMin = CheckValue(this.waterLevelMin, 0, WorldHeight - 1);
         this.waterLevelMax = CheckValue(this.waterLevelMax, 0, WorldHeight - 1, this.waterLevelMin);
 
-        this.customTreeChance = CheckValue(this.customTreeChance, 0, 100);
+        //this.customTreeChance = CheckValue(this.customTreeChance, 0, 100);
 
         if (this.ModeBiome == BiomeMode.OldGenerator && this.ModeTerrain != TerrainMode.OldGenerator)
         {
@@ -391,82 +391,59 @@ public class WorldConfig extends ConfigFile
 
     protected void ReadConfigSettings()
     {
-        try
-        {
-            this.SettingsMode = ConfigMode.valueOf(ReadModSettings(TCDefaultValues.SettingsMode.name(), TCDefaultValues.SettingsMode.stringValue()));
-        } catch (IllegalArgumentException e)
-        {
-            this.SettingsMode = ConfigMode.WriteAll;
-        }
+        this.SettingsMode = ReadSettings(TCDefaultValues.SettingsMode);
+        this.ModeTerrain = ReadSettings(TCDefaultValues.TerrainMode);
+        this.ModeBiome = ReadSettings(TCDefaultValues.BiomeMode);
 
-        try
-        {
-            this.ModeTerrain = TerrainMode.valueOf(ReadModSettings(TCDefaultValues.TerrainMode.name(), TCDefaultValues.TerrainMode.stringValue()));
-        } catch (IllegalArgumentException e)
-        {
-            this.ModeTerrain = TerrainMode.Normal;
-        }
 
-        try
-        {
-            this.ModeBiome = BiomeMode.valueOf(ReadModSettings(TCDefaultValues.BiomeMode.name(), TCDefaultValues.BiomeMode.stringValue()));
-        } catch (IllegalArgumentException e)
-        {
-            this.ModeBiome = BiomeMode.Normal;
-        }
+        this.worldHeightBits = ReadSettings(TCDefaultValues.WorldHeightBits);
+        
 
-        this.worldHeightBits = ReadModSettings(TCDefaultValues.WorldHeightBits.name(), TCDefaultValues.WorldHeightBits.intValue());
         this.worldHeightBits = CheckValue(this.worldHeightBits, 5, 8);
-
         this.WorldHeight = 1 << worldHeightBits;
         this.waterLevelMax = WorldHeight / 2;
 
 
-        this.oldBiomeSize = ReadModSettings(TCDefaultValues.oldBiomeSize.name(), TCDefaultValues.oldBiomeSize.doubleValue());
 
-        this.GenerationDepth = ReadModSettings(TCDefaultValues.GenerationDepth.name(), TCDefaultValues.GenerationDepth.intValue());
 
-        this.BiomeRarityScale = ReadModSettings(TCDefaultValues.BiomeRarityScale.name(), TCDefaultValues.BiomeRarityScale.intValue());
-        this.LandRarity = ReadModSettings(TCDefaultValues.LandRarity.name(), TCDefaultValues.LandRarity.intValue());
-        this.LandSize = ReadModSettings(TCDefaultValues.LandSize.name(), TCDefaultValues.LandSize.intValue());
-        this.LandFuzzy = ReadModSettings(TCDefaultValues.LandFuzzy.name(), TCDefaultValues.LandFuzzy.intValue());
+        this.GenerationDepth = ReadSettings(TCDefaultValues.GenerationDepth);
 
-        this.IceRarity = ReadModSettings(TCDefaultValues.IceRarity.name(), TCDefaultValues.IceRarity.intValue());
-        this.IceSize = ReadModSettings(TCDefaultValues.IceSize.name(), TCDefaultValues.IceSize.intValue());
+        this.BiomeRarityScale = ReadSettings(TCDefaultValues.BiomeRarityScale);
+        this.LandRarity = ReadSettings(TCDefaultValues.LandRarity);
+        this.LandSize = ReadSettings(TCDefaultValues.LandSize);
+        this.LandFuzzy = ReadSettings(TCDefaultValues.LandFuzzy);
 
-        this.RiverRarity = ReadModSettings(TCDefaultValues.RiverRarity.name(), TCDefaultValues.RiverRarity.intValue());
-        this.RiverSize = ReadModSettings(TCDefaultValues.RiverSize.name(), TCDefaultValues.RiverSize.intValue());
-        this.RiversEnabled = ReadModSettings(TCDefaultValues.RiversEnabled.name(), TCDefaultValues.RiversEnabled.booleanValue());
+        this.IceRarity = ReadSettings(TCDefaultValues.IceRarity);
+        this.IceSize = ReadSettings(TCDefaultValues.IceSize);
 
-        this.FrozenRivers = ReadModSettings(TCDefaultValues.FrozenRivers.name(), TCDefaultValues.FrozenRivers.booleanValue());
-        this.FrozenOcean = ReadModSettings(TCDefaultValues.FrozenOcean.name(), TCDefaultValues.FrozenOcean.booleanValue());
+        this.RiverRarity = ReadSettings(TCDefaultValues.RiverRarity);
+        this.RiverSize = ReadSettings(TCDefaultValues.RiverSize);
+        this.RiversEnabled = ReadSettings(TCDefaultValues.RiversEnabled);
 
-        this.NormalBiomes = this.ReadModSettings(TCDefaultValues.NormalBiomes.name(), TCDefaultValues.NormalBiomes.StringArrayListValue());
-        this.IceBiomes = this.ReadModSettings(TCDefaultValues.IceBiomes.name(), TCDefaultValues.IceBiomes.StringArrayListValue());
-        this.IsleBiomes = this.ReadModSettings(TCDefaultValues.IsleBiomes.name(), TCDefaultValues.IsleBiomes.StringArrayListValue());
-        this.BorderBiomes = this.ReadModSettings(TCDefaultValues.BorderBiomes.name(), TCDefaultValues.BorderBiomes.StringArrayListValue());
+        this.FrozenRivers = ReadSettings(TCDefaultValues.FrozenRivers);
+        this.FrozenOcean = ReadSettings(TCDefaultValues.FrozenOcean);
+
+        this.NormalBiomes = ReadSettings(TCDefaultValues.NormalBiomes);
+        this.IceBiomes = ReadSettings(TCDefaultValues.IceBiomes);
+        this.IsleBiomes = ReadSettings(TCDefaultValues.IsleBiomes);
+        this.BorderBiomes = ReadSettings(TCDefaultValues.BorderBiomes);
         ReadCustomBiomes();
 
-        try
-        {
-            this.imageMode = ImageMode.valueOf(ReadModSettings(TCDefaultValues.ImageMode.name(), TCDefaultValues.ImageMode.stringValue()));
-        } catch (IllegalArgumentException e)
-        {
-            this.imageMode = ImageMode.Repeat;
-        }
+        this.imageMode =  ReadSettings(TCDefaultValues.ImageMode);
+        this.imageFile = this.ReadSettings(TCDefaultValues.ImageFile);
+        this.imageFillBiome = this.ReadSettings(TCDefaultValues.ImageFillBiome);
+        this.imageXOffset = this.ReadSettings(TCDefaultValues.ImageXOffset);
+        this.imageZOffset = this.ReadSettings(TCDefaultValues.ImageZOffset);
 
-        this.imageFile = this.ReadModSettings(TCDefaultValues.ImageFile.name(), TCDefaultValues.ImageFile.stringValue());
-        this.imageFillBiome = this.ReadModSettings(TCDefaultValues.ImageFillBiome.name(), TCDefaultValues.ImageFillBiome.stringValue());
-        this.imageXOffset = this.ReadModSettings(TCDefaultValues.ImageXOffset.name(), TCDefaultValues.ImageXOffset.intValue());
-        this.imageZOffset = this.ReadModSettings(TCDefaultValues.ImageZOffset.name(), TCDefaultValues.ImageZOffset.intValue());
 
-        this.minMoisture = ReadModSettings(TCDefaultValues.minMoisture.name(), TCDefaultValues.minMoisture.floatValue());
-        this.maxMoisture = ReadModSettings(TCDefaultValues.maxMoisture.name(), TCDefaultValues.maxMoisture.floatValue());
-        this.minTemperature = ReadModSettings(TCDefaultValues.minTemperature.name(), TCDefaultValues.minTemperature.floatValue());
-        this.maxTemperature = ReadModSettings(TCDefaultValues.maxTemperature.name(), TCDefaultValues.maxTemperature.floatValue());
+        this.oldBiomeSize = ReadSettings(TCDefaultValues.oldBiomeSize);
+        this.minMoisture = ReadSettings(TCDefaultValues.minMoisture);
+        this.maxMoisture = ReadSettings(TCDefaultValues.maxMoisture);
+        this.minTemperature = ReadSettings(TCDefaultValues.minTemperature);
+        this.maxTemperature = ReadSettings(TCDefaultValues.maxTemperature);
 
-        this.WorldFog = ReadModSettingsColor(TCDefaultValues.WorldFog.name(), TCDefaultValues.WorldFog.stringValue());
-        this.WorldNightFog = ReadModSettingsColor(TCDefaultValues.WorldNightFog.name(), TCDefaultValues.WorldNightFog.stringValue());
+        this.WorldFog = ReadSettings(TCDefaultValues.WorldFog);
+        this.WorldNightFog = ReadSettings(TCDefaultValues.WorldNightFog);
 
         this.WorldFogR = ((WorldFog & 0xFF0000) >> 16) / 255F;
         this.WorldFogG = ((WorldFog & 0xFF00) >> 8) / 255F;
@@ -476,57 +453,61 @@ public class WorldConfig extends ConfigFile
         this.WorldNightFogG = ((WorldNightFog & 0xFF00) >> 8) / 255F;
         this.WorldNightFogB = (WorldNightFog & 0xFF) / 255F;
 
-        this.StrongholdsEnabled = ReadModSettings(TCDefaultValues.StrongholdsEnabled.name(), TCDefaultValues.StrongholdsEnabled.booleanValue());
-        this.VillagesEnabled = ReadModSettings(TCDefaultValues.VillagesEnabled.name(), TCDefaultValues.VillagesEnabled.booleanValue());
-        this.MineshaftsEnabled = ReadModSettings(TCDefaultValues.MineshaftsEnabled.name(), TCDefaultValues.MineshaftsEnabled.booleanValue());
-        this.PyramidsEnabled = ReadModSettings(TCDefaultValues.PyramidsEnabled.name(), TCDefaultValues.PyramidsEnabled.booleanValue());
-        this.NetherFortress = ReadModSettings(TCDefaultValues.NetherFortressEnabled.name(), TCDefaultValues.NetherFortressEnabled.booleanValue());
+        this.StrongholdsEnabled = ReadSettings(TCDefaultValues.StrongholdsEnabled);
+        this.VillagesEnabled = ReadSettings(TCDefaultValues.VillagesEnabled);
+        this.MineshaftsEnabled = ReadSettings(TCDefaultValues.MineshaftsEnabled);
+        this.PyramidsEnabled = ReadSettings(TCDefaultValues.PyramidsEnabled);
+        this.NetherFortress = ReadSettings(TCDefaultValues.NetherFortressEnabled);
 
-        this.caveRarity = ReadModSettings(TCDefaultValues.caveRarity.name(), TCDefaultValues.caveRarity.intValue());
-        this.caveFrequency = ReadModSettings(TCDefaultValues.caveFrequency.name(), TCDefaultValues.caveFrequency.intValue());
-        this.caveMinAltitude = ReadModSettings(TCDefaultValues.caveMinAltitude.name(), TCDefaultValues.caveMinAltitude.intValue());
-        this.caveMaxAltitude = ReadModSettings(TCDefaultValues.caveMaxAltitude.name(), this.WorldHeight);
-        this.individualCaveRarity = ReadModSettings(TCDefaultValues.individualCaveRarity.name(), TCDefaultValues.individualCaveRarity.intValue());
-        this.caveSystemFrequency = ReadModSettings(TCDefaultValues.caveSystemFrequency.name(), TCDefaultValues.caveSystemFrequency.intValue());
-        this.caveSystemPocketChance = ReadModSettings(TCDefaultValues.caveSystemPocketChance.name(), TCDefaultValues.caveSystemPocketChance.intValue());
-        this.caveSystemPocketMinSize = ReadModSettings(TCDefaultValues.caveSystemPocketMinSize.name(), TCDefaultValues.caveSystemPocketMinSize.intValue());
-        this.caveSystemPocketMaxSize = ReadModSettings(TCDefaultValues.caveSystemPocketMaxSize.name(), TCDefaultValues.caveSystemPocketMaxSize.intValue());
-        this.evenCaveDistribution = ReadModSettings(TCDefaultValues.evenCaveDistribution.name(), TCDefaultValues.evenCaveDistribution.booleanValue());
+        this.caveRarity = ReadSettings(TCDefaultValues.caveRarity);
+        this.caveFrequency = ReadSettings(TCDefaultValues.caveFrequency);
+        this.caveMinAltitude = ReadSettings(TCDefaultValues.caveMinAltitude);
+        this.caveMaxAltitude = ReadSettings(TCDefaultValues.caveMaxAltitude);
+        this.individualCaveRarity = ReadSettings(TCDefaultValues.individualCaveRarity);
+        this.caveSystemFrequency = ReadSettings(TCDefaultValues.caveSystemFrequency);
+        this.caveSystemPocketChance = ReadSettings(TCDefaultValues.caveSystemPocketChance);
+        this.caveSystemPocketMinSize = ReadSettings(TCDefaultValues.caveSystemPocketMinSize);
+        this.caveSystemPocketMaxSize = ReadSettings(TCDefaultValues.caveSystemPocketMaxSize);
+        this.evenCaveDistribution = ReadSettings(TCDefaultValues.evenCaveDistribution);
 
-        this.canyonRarity = ReadModSettings(TCDefaultValues.canyonRarity.name(), TCDefaultValues.canyonRarity.intValue());
-        this.canyonMinAltitude = ReadModSettings(TCDefaultValues.canyonMinAltitude.name(), TCDefaultValues.canyonMinAltitude.intValue());
-        this.canyonMaxAltitude = ReadModSettings(TCDefaultValues.canyonMaxAltitude.name(), this.WorldHeight / 2);
-        this.canyonMinLength = ReadModSettings(TCDefaultValues.canyonMinLength.name(), TCDefaultValues.canyonMinLength.intValue());
-        this.canyonMaxLength = ReadModSettings(TCDefaultValues.canyonMaxLength.name(), TCDefaultValues.canyonMaxLength.intValue());
-        this.canyonDepth = ReadModSettings(TCDefaultValues.canyonDepth.name(), TCDefaultValues.canyonDepth.doubleValue());
+        this.canyonRarity = ReadSettings(TCDefaultValues.canyonRarity);
+        this.canyonMinAltitude = ReadSettings(TCDefaultValues.canyonMinAltitude);
+        this.canyonMaxAltitude = ReadSettings(TCDefaultValues.canyonMaxAltitude);
+        this.canyonMinLength = ReadSettings(TCDefaultValues.canyonMinLength);
+        this.canyonMaxLength = ReadSettings(TCDefaultValues.canyonMaxLength);
+        this.canyonDepth = ReadSettings(TCDefaultValues.canyonDepth);
 
-        this.waterLevelMax = ReadModSettings(TCDefaultValues.WaterLevelMax.name(), this.waterLevelMax);
-        this.waterLevelMin = ReadModSettings(TCDefaultValues.WaterLevelMin.name(), TCDefaultValues.WaterLevelMin.intValue());
-        this.waterBlock = ReadModSettings(TCDefaultValues.WaterBlock.name(), TCDefaultValues.WaterBlock.intValue());
-        this.iceBlock = ReadModSettings(TCDefaultValues.IceBlock.name(), TCDefaultValues.IceBlock.intValue());
-        this.fractureHorizontal = ReadModSettings(TCDefaultValues.FractureHorizontal.name(), TCDefaultValues.FractureHorizontal.doubleValue());
-        this.fractureVertical = ReadModSettings(TCDefaultValues.FractureVertical.name(), TCDefaultValues.FractureVertical.doubleValue());
+        this.waterLevelMax = ReadSettings(TCDefaultValues.WaterLevelMax);
+        this.waterLevelMin = ReadSettings(TCDefaultValues.WaterLevelMin);
+        this.waterBlock = ReadSettings(TCDefaultValues.WaterBlock);
+        this.iceBlock = ReadSettings(TCDefaultValues.IceBlock);
 
-        this.disableBedrock = ReadModSettings(TCDefaultValues.DisableBedrock.name(), TCDefaultValues.DisableBedrock.booleanValue());
-        this.ceilingBedrock = ReadModSettings(TCDefaultValues.CeilingBedrock.name(), TCDefaultValues.CeilingBedrock.booleanValue());
-        this.flatBedrock = ReadModSettings(TCDefaultValues.FlatBedrock.name(), TCDefaultValues.FlatBedrock.booleanValue());
-        this.bedrockBlock = ReadModSettings(TCDefaultValues.BedrockobBlock.name(), TCDefaultValues.BedrockobBlock.intValue());
+        this.fractureHorizontal = ReadSettings(TCDefaultValues.FractureHorizontal);
+        this.fractureVertical = ReadSettings(TCDefaultValues.FractureVertical);
 
-        this.removeSurfaceStone = ReadModSettings(TCDefaultValues.RemoveSurfaceStone.name(), TCDefaultValues.RemoveSurfaceStone.booleanValue());
+        this.disableBedrock = ReadSettings(TCDefaultValues.DisableBedrock);
+        this.ceilingBedrock = ReadSettings(TCDefaultValues.CeilingBedrock);
+        this.flatBedrock = ReadSettings(TCDefaultValues.FlatBedrock);
+        this.bedrockBlock = ReadSettings(TCDefaultValues.BedrockobBlock);
+
+        this.removeSurfaceStone = ReadSettings(TCDefaultValues.RemoveSurfaceStone);
 
         this.oldTerrainGenerator = this.ModeTerrain == TerrainMode.OldGenerator;
 
-        this.customObjects = this.ReadModSettings(TCDefaultValues.CustomObjects.name(), TCDefaultValues.CustomObjects.booleanValue());
-        this.objectSpawnRatio = this.ReadModSettings(TCDefaultValues.objectSpawnRatio.name(), TCDefaultValues.objectSpawnRatio.intValue());
-        this.denyObjectsUnderFill = this.ReadModSettings(TCDefaultValues.DenyObjectsUnderFill.name(), TCDefaultValues.DenyObjectsUnderFill.booleanValue());
-        this.customTreeChance = this.ReadModSettings(TCDefaultValues.customTreeChance.name(), TCDefaultValues.customTreeChance.intValue());
 
+        this.objectSpawnRatio = this.ReadSettings(TCDefaultValues.objectSpawnRatio);
+
+        /*this.customObjects = this.ReadSettings(TCDefaultValues.CustomObjects.name(), TCDefaultValues.CustomObjects.booleanValue());
+
+        this.denyObjectsUnderFill = this.ReadSettings(TCDefaultValues.DenyObjectsUnderFill.name(), TCDefaultValues.DenyObjectsUnderFill.booleanValue());
+        this.customTreeChance = this.ReadSettings(TCDefaultValues.customTreeChance.name(), TCDefaultValues.customTreeChance.intValue());
+        */
     }
 
     private void ReadCustomBiomes()
     {
 
-        ArrayList<String> biomes = this.ReadModSettings(TCDefaultValues.CustomBiomes.name(), TCDefaultValues.CustomBiomes.StringArrayListValue());
+        ArrayList<String> biomes = this.ReadSettings(TCDefaultValues.CustomBiomes);
 
         for (String biome : biomes)
         {
@@ -740,20 +721,21 @@ public class WorldConfig extends ConfigFile
 
         this.WriteTitle("BOB Objects Variables");
 
-        WriteNewLine();
+        /*WriteNewLine();
         WriteComment("Enable/disable custom objects");
         this.WriteValue(TCDefaultValues.CustomObjects.name(), this.customObjects);
-
+        */
         WriteNewLine();
         WriteComment("Number of attempts for place per chunk");
         this.WriteValue(TCDefaultValues.objectSpawnRatio.name(), Integer.valueOf(this.objectSpawnRatio).intValue());
-
+        /*
         WriteNewLine();
         WriteComment("Deny custom objects underFill even it enabled in objects ");
         this.WriteValue(TCDefaultValues.DenyObjectsUnderFill.name(), this.denyObjectsUnderFill);
         WriteNewLine();
         WriteComment("Chance to grow custom instead normal tree from sapling .");
         this.WriteValue(TCDefaultValues.customTreeChance.name(), this.customTreeChance);
+        */
 
 
         WriteTitle("Cave Variables");

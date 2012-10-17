@@ -18,9 +18,11 @@ public abstract class ConfigFile
 
     // TODO: This map is populated with lowercase versions as well.
     // TODO: That is a derped approach. Use TreeSet with CASE_INSENSITIVE_ORDER instead.
-    protected HashMap<String, String> SettingsCache = new HashMap<String, String>();
+    protected HashMap<String, String> SettingsCache = new HashMap<>();
 
     // TODO: We should use GSON only instead of just for a few fields.
+    // TODO: Hah. We should remove that buggy GSON.
+
     public static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private boolean WriteComments;
@@ -47,26 +49,26 @@ public abstract class ConfigFile
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
                     } else if (thisLine.contains(":"))
                     {
-                        String[] splitSettings = thisLine.toLowerCase().split(":", 2);
+                        String[] splitSettings = thisLine.split(":", 2);
                         if (splitSettings.length == 2)
                         {
-                            this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
+                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                             //this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
                         } else if (splitSettings.length == 1)
                         {
-                            this.SettingsCache.put(splitSettings[0].trim(), "");
+                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
                             //this.SettingsCache.put(splitSettings[0].trim(), "");
                         }
                     } else if (thisLine.contains("="))
                     {
-                        String[] splitSettings = thisLine.toLowerCase().split("=", 2);
+                        String[] splitSettings = thisLine.split("=", 2);
                         if (splitSettings.length == 2)
                         {
-                            this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
+                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                             //this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
                         } else if (splitSettings.length == 1)
                         {
-                            this.SettingsCache.put(splitSettings[0].trim(), "");
+                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
                             //this.SettingsCache.put(splitSettings[0].trim(), "");
                         }
                     } else
@@ -113,32 +115,13 @@ public abstract class ConfigFile
         return gson.fromJson(json, new TypeToken<List<WeightedMobSpawnGroup>>()
         {}.getType());
     }
-    /*   FUCK Java !!!!!!!!
-
-    protected <T extends Boolean> boolean ReadModSettings(TCDefaultValues value)
-    {
-       return ReadModSettings(value.name(),value.booleanValue());
-    }
-    protected <T extends Integer> int ReadModSettings(TCDefaultValues value)
-    {
-        return ReadModSettings(value.name(),value.intValue());
-    }
-    protected <T extends String> String ReadModSettings(TCDefaultValues value)
-    {
-        return (String)ReadModSettings(value.name(),value.stringValue());
-    }
-    protected <T extends Double> double ReadModSettings(TCDefaultValues value)
-    {
-        return (double)ReadModSettings(value.name(),value.doubleValue());
-    }          */
-
 
     protected ArrayList<String> ReadModSettings(String settingsName, ArrayList<String> defaultValue)
     {
         settingsName = settingsName.toLowerCase();
         if (this.SettingsCache.containsKey(settingsName))
         {
-            ArrayList<String> out = new ArrayList<String>();
+            ArrayList<String> out = new ArrayList<>();
             if (this.SettingsCache.get(settingsName).trim().equals("") || this.SettingsCache.get(settingsName).equals("None"))
             {
                 return out;
@@ -146,6 +129,7 @@ public abstract class ConfigFile
             Collections.addAll(out, this.SettingsCache.get(settingsName).split(","));
             return out;
         }
+        System.out.println("TerrainControl: value " + settingsName + " not found.");
         return defaultValue;
     }
 
@@ -162,6 +146,7 @@ public abstract class ConfigFile
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
         }
+        System.out.println("TerrainControl: value " + settingsName + " not found.");
         return defaultValue;
     }
 
@@ -178,6 +163,7 @@ public abstract class ConfigFile
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
         }
+        System.out.println("TerrainControl: value " + settingsName + " not found.");
         return defaultValue;
     }
 
@@ -188,6 +174,7 @@ public abstract class ConfigFile
         {
             return this.SettingsCache.get(settingsName);
         }
+        System.out.println("TerrainControl: value " + settingsName + " not found.");
         return defaultValue;
     }
 
@@ -204,6 +191,7 @@ public abstract class ConfigFile
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
         }
+        System.out.println("TerrainControl: value " + settingsName + " not found.");
         return defaultValue;
     }
 
@@ -220,7 +208,8 @@ public abstract class ConfigFile
             {
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
-        }
+        } else
+            System.out.println("TerrainControl: value " + settingsName + " not found.");
         return color.getRGB() & 0xFFFFFF;
     }
 
@@ -237,6 +226,7 @@ public abstract class ConfigFile
                 System.out.println("TerrainControl: " + settingsName + " had wrong value");
             }
         }
+        System.out.println("TerrainControl: value " + settingsName + " not found.");
         return defaultValue;
     }
 
@@ -247,8 +237,78 @@ public abstract class ConfigFile
         {
             return Boolean.valueOf(this.SettingsCache.get(settingsName));
         }
+        System.out.println("TerrainControl: value " + settingsName + " not found.");
         return defaultValue;
     }
+
+    protected Enum ReadModSettings(String settingsName, Enum defaultValue)
+    {
+        settingsName = settingsName.toLowerCase();
+        if (this.SettingsCache.containsKey(settingsName))
+        {
+
+            Class enumClass = defaultValue.getDeclaringClass();
+            String value = this.SettingsCache.get(settingsName);
+
+            if (enumClass.isEnum())
+            {
+
+                Object[] enumValues = enumClass.getEnumConstants();
+                for (Object enumValue : enumValues)
+                {
+                    String enumName = ((Enum) enumValue).name();
+                    if (enumName.toLowerCase().equals(value) || enumName.equals(value))
+                        return (Enum) enumValue;
+                }
+                System.out.println("TerrainControl: " + settingsName + " had wrong value");
+
+            }
+
+        }
+        System.out.println("TerrainControl: value " + settingsName + " not found.");
+        return defaultValue;
+
+
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> T ReadSettings(TCDefaultValues value)
+    {
+        Object obj = null;
+
+        switch (value.getReturnType())
+        {
+            case String:
+                obj = ReadModSettings(value.name(), value.stringValue());
+                break;
+            case Boolean:
+                obj = ReadModSettings(value.name(), value.booleanValue());
+                break;
+            case Int:
+                obj = ReadModSettings(value.name(), value.intValue());
+                break;
+            case Enum:
+                obj = ReadModSettings(value.name(), value.enumValue());
+                break;
+            case Double:
+                obj = ReadModSettings(value.name(), value.doubleValue());
+                break;
+            case Float:
+                obj = ReadModSettings(value.name(), value.floatValue());
+                break;
+            case StringArray:
+                obj = ReadModSettings(value.name(), value.StringArrayListValue());
+                break;
+            case Color:
+                obj = ReadModSettingsColor(value.name(), value.stringValue());
+                break;
+        }
+
+
+        return (T) obj;
+
+    }
+
 
     public void WriteSettingsFile(File settingsFile, boolean comments)
     {
@@ -450,7 +510,7 @@ public abstract class ConfigFile
 
     protected ArrayList<String> CheckValue(ArrayList<String> biomes, ArrayList<String> customBiomes)
     {
-        ArrayList<String> output = new ArrayList<String>();
+        ArrayList<String> output = new ArrayList<>();
 
         for (String key : biomes)
         {
@@ -486,7 +546,7 @@ public abstract class ConfigFile
 
     protected static String[] ReadComplexString(String line)
     {
-        ArrayList<String> buffer = new ArrayList<String>();
+        ArrayList<String> buffer = new ArrayList<>();
 
         int index = 0;
         int lastFound = 0;

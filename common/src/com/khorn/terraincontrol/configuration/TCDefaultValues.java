@@ -5,35 +5,38 @@ import java.util.Collections;
 
 public enum TCDefaultValues
 {
+    //Files
     WorldSettingsName("WorldConfig.ini"),
     BO_WorldDirectoryName("WorldObjects"),
     WorldBiomeConfigDirectoryName("BiomeConfigs"),
     WorldBiomeConfigName("BiomeConfig.ini"),
+    // End files
+
+    //Network
     ChannelName("TerrainControl"),
     ProtocolVersion(4),
+    // End network
 
     maxChunkBlockValue(32768),
 
-    CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0"),
 
-    CustomBiomes(""),
-    NormalBiomes("Desert,Forest,Extreme Hills,Swampland,Plains,Taiga,Jungle"),
-    IceBiomes("Ice Plains"),
-    IsleBiomes("MushroomIsland,Ice Mountains,DesertHills,ForestHills,TaigaHills,River,JungleHills"),
-    BorderBiomes("MushroomIslandShore,Beach,Extreme Hills Edge"),
+    //World settings
+    SettingsMode(WorldConfig.ConfigMode.WriteAll),
+    TerrainMode(WorldConfig.TerrainMode.Normal),
+    BiomeMode(WorldConfig.BiomeMode.Normal),
 
-    TerrainMode("Normal"),
-    BiomeMode("Normal"),
-    SettingsMode("WriteAll"),
-
+    WorldHeightBits(7),
 
     GenerationDepth(10),
+
     BiomeRarityScale(100),
     LandRarity(97),
     LandSize(0),
     LandFuzzy(6),
+
     IceRarity(90),
     IceSize(3),
+
     RiverRarity(4),
     RiverSize(0),
     RiversEnabled(true),
@@ -41,78 +44,33 @@ public enum TCDefaultValues
     FrozenRivers(true),
     FrozenOcean(true),
 
+    NormalBiomes("Desert,Forest,Extreme Hills,Swampland,Plains,Taiga,Jungle", SettingsType.StringArray),
+    IceBiomes("Ice Plains", SettingsType.StringArray),
+    IsleBiomes("MushroomIsland,Ice Mountains,DesertHills,ForestHills,TaigaHills,River,JungleHills", SettingsType.StringArray),
+    BorderBiomes("MushroomIslandShore,Beach,Extreme Hills Edge", SettingsType.StringArray),
+
+    CustomBiomes("", SettingsType.StringArray),
+
+    ImageMode(WorldConfig.ImageMode.Repeat),
     ImageFile("map.png"),
-    ImageMode("Repeat"),
     ImageFillBiome("Ocean"),
     ImageXOffset(0),
     ImageZOffset(0),
 
     oldBiomeSize(1.5D),
+    minMoisture(0.0f),
+    maxMoisture(1.0f),
+    minTemperature(0.0f),
+    maxTemperature(1.0f),
 
-    id(0),
-    BiomeSize(5),
-    BiomeRarity(100),
-    BiomeColor(""),
-    BiomeRivers(true),
-    IsleInBiome("Ocean"),
-    BiomeIsBorder(""),
-    NotBorderNear(""),
-
-    BiomeTemperature(0.5F),
-    BiomeWetness(0.5F),
-
-
-    SurfaceBlock(2),
-    GroundBlock(3),
-
-    minMoisture(0.0D),
-    maxMoisture(1.0D),
-    minTemperature(0.0D),
-    maxTemperature(1.0D),
-
-    snowThreshold(0.5D),
-    iceThreshold(0.5D),
-
-    WaterLevelMax(64),
-    WaterLevelMin(0),
-    WaterBlock(9),
-    IceBlock(79),
-    MaxAverageHeight(0.0D),
-    MaxAverageDepth(0.0D),
-    FractureHorizontal(0.0D),
-    FractureVertical(0.0D),
-    Volatility1(0.0D),
-    Volatility2(0.0D),
-    VolatilityWeight1(0.5D),
-    VolatilityWeight2(0.45D),
-    RemoveSurfaceStone(false),
-    DisableBedrock(false),
-    CeilingBedrock(false),
-    FlatBedrock(false),
-    BedrockobBlock(7),
-    WorldHeightBits(7),
-
-
-    WorldFog("0xC0D8FF"),
-    WorldNightFog("0x0B0D17"),
-    SkyColor("0x7BA5FF"),
-    WaterColor("0xFFFFFF"),
-    GrassColor("0x000000"),
-    FoliageColor("0x000000"),
-
+    WorldFog("0xC0D8FF", SettingsType.Color),
+    WorldNightFog("0x0B0D17", SettingsType.Color),
 
     StrongholdsEnabled(true),
     MineshaftsEnabled(true),
     VillagesEnabled(true),
     PyramidsEnabled(true),
     NetherFortressEnabled(false),
-
-    canyonRarity(2),
-    canyonMinAltitude(20),
-    canyonMaxAltitude(68),
-    canyonMinLength(84),
-    canyonMaxLength(112),
-    canyonDepth(3.0D),
 
     caveRarity(7),
     caveFrequency(40),
@@ -125,22 +83,70 @@ public enum TCDefaultValues
     caveSystemPocketMaxSize(4),
     evenCaveDistribution(false),
 
-    dungeonRarity(100),
-    dungeonFrequency(8),
-    dungeonMinAltitude(0),
+    canyonRarity(2),
+    canyonMinAltitude(20),
+    canyonMaxAltitude(68),
+    canyonMinLength(84),
+    canyonMaxLength(112),
+    canyonDepth(3.0D),
 
-    vinesRarity(100),
-    vinesFrequency(50),
-    vinesMinAltitude(64),
+    WaterLevelMax(64),
+    WaterLevelMin(0),
+    WaterBlock(9),
+    IceBlock(79),
 
+    FractureHorizontal(0.0D),
+    FractureVertical(0.0D),
+
+    DisableBedrock(false),
+    CeilingBedrock(false),
+    FlatBedrock(false),
+    BedrockobBlock(7),
+    RemoveSurfaceStone(false),
+    objectSpawnRatio(2),
+
+    //End world settings
+
+    // Biome settings
+    BiomeSize(5),
+    BiomeRarity(100),
+    BiomeColor("", SettingsType.Color),
+    BiomeRivers(true),
+    IsleInBiome("Ocean", SettingsType.StringArray),
+    BiomeIsBorder("", SettingsType.StringArray),
+    NotBorderNear("", SettingsType.StringArray),
+
+    BiomeTemperature(0.5F),
+    BiomeWetness(0.5F),
+
+    ReplaceToBiomeName(""),
+
+    BiomeHeight(0.1D),
+    BiomeVolatility(0.3D),
+
+    SurfaceBlock(2),
+    GroundBlock(3),
+
+    UseWorldWaterLevel(true),
+
+    SkyColor("0x7BA5FF", SettingsType.Color),
+    WaterColor("0xFFFFFF", SettingsType.Color),
+    GrassColor("0x000000", SettingsType.Color),
+    FoliageColor("0x000000", SettingsType.Color),
+
+    Volatility1(0.0D),
+    Volatility2(0.0D),
+    VolatilityWeight1(0.5D),
+    VolatilityWeight2(0.45D),
     DisableBiomeHeight(false),
+    MaxAverageHeight(0.0D),
+    MaxAverageDepth(0.0D),
 
-    undergroundLakeFrequency(2),
-    undergroundLakeRarity(5),
-    undergroundLakeMinSize(50),
-    undergroundLakeMaxSize(60),
-    undergroundLakeMinAltitude(0),
-    undergroundLakeMaxAltitude(50),
+    CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0",SettingsType.StringArray),
+
+    // End biome settings
+
+    // Resource settings
 
     SmallLakeWaterFrequency(4),
     SmallLakeLavaFrequency(2),
@@ -149,69 +155,16 @@ public enum TCDefaultValues
     SmallLakeMinAltitude(8),
     SmallLakeMaxAltitude(120),
 
+    undergroundLakeFrequency(2),
+    undergroundLakeRarity(5),
+    undergroundLakeMinSize(50),
+    undergroundLakeMaxSize(60),
+    undergroundLakeMinAltitude(0),
+    undergroundLakeMaxAltitude(50),
 
-    BiomeHeight(0.1D),
-    BiomeVolatility(0.3D),
-    ReplaceToBiomeName(""),
-
-    UseWorldWaterLevel(true),
-
-    CustomObjects(true),
-    objectSpawnRatio(2),
-    DenyObjectsUnderFill(false),
-    customTreeChance(50),
-
-
-    cactusDepositRarity(100),
-    cactusDepositMinAltitude(0),
-    cactusDepositMaxAltitude(128),
-
-    flowerDepositRarity(100),
-    flowerDepositMinAltitude(0),
-    flowerDepositMaxAltitude(128),
-
-    roseDepositRarity(100),
-    roseDepositMinAltitude(0),
-    roseDepositMaxAltitude(128),
-
-    brownMushroomDepositRarity(100),
-    brownMushroomDepositMinAltitude(0),
-    brownMushroomDepositMaxAltitude(128),
-
-    redMushroomDepositRarity(100),
-    redMushroomDepositMinAltitude(0),
-    redMushroomDepositMaxAltitude(128),
-
-    reedDepositRarity(100),
-    reedDepositMinAltitude(0),
-    reedDepositMaxAltitude(128),
-
-    pumpkinDepositRarity(3),
-    pumpkinDepositFrequency(1),
-    pumpkinDepositMinAltitude(0),
-    pumpkinDepositMaxAltitude(128),
-
-    longGrassDepositRarity(100),
-
-    deadBushDepositRarity(100),
-
-
-    waterSourceDepositRarity(100),
-    waterSourceDepositFrequency(20),
-    waterSourceDepositMinAltitude(8),
-    waterSourceDepositMaxAltitude(128),
-
-    lavaSourceDepositRarity(100),
-    lavaSourceDepositFrequency(10),
-    lavaSourceDepositMinAltitude(8),
-    lavaSourceDepositMaxAltitude(128),
-
-    waterClayDepositRarity(100),
-    waterClayDepositSize(4),
-
-    waterSandDepositRarity(100),
-    waterSandDepositFrequency(4),
-    waterSandDepositSize(7),
+    dungeonRarity(100),
+    dungeonFrequency(8),
+    dungeonMinAltitude(0),
 
     dirtDepositRarity(100),
     dirtDepositFrequency(20),
@@ -273,34 +226,125 @@ public enum TCDefaultValues
     emeraldDepositMinAltitude(4),
     emeraldDepositMaxAltitude(32),
 
+    waterClayDepositRarity(100),
+    waterClayDepositSize(4),
 
-    evenWaterSourceDistribution(false),
-    evenLavaSourceDistribution(false);
+    waterSandDepositRarity(100),
+    waterSandDepositFrequency(4),
+    waterSandDepositSize(7),
+
+    roseDepositRarity(100),
+    roseDepositMinAltitude(0),
+    roseDepositMaxAltitude(128),
+
+    flowerDepositRarity(100),
+    flowerDepositMinAltitude(0),
+    flowerDepositMaxAltitude(128),
+
+    redMushroomDepositRarity(100),
+    redMushroomDepositMinAltitude(0),
+    redMushroomDepositMaxAltitude(128),
+
+    brownMushroomDepositRarity(100),
+    brownMushroomDepositMinAltitude(0),
+    brownMushroomDepositMaxAltitude(128),
+
+    longGrassDepositRarity(100),
+
+    deadBushDepositRarity(100),
+
+    pumpkinDepositRarity(3),
+    pumpkinDepositFrequency(1),
+    pumpkinDepositMinAltitude(0),
+    pumpkinDepositMaxAltitude(128),
+
+    reedDepositRarity(100),
+    reedDepositMinAltitude(0),
+    reedDepositMaxAltitude(128),
+
+    cactusDepositRarity(100),
+    cactusDepositMinAltitude(0),
+    cactusDepositMaxAltitude(128),
+
+    vinesRarity(100),
+    vinesFrequency(50),
+    vinesMinAltitude(64),
+
+    waterSourceDepositRarity(100),
+    waterSourceDepositFrequency(20),
+    waterSourceDepositMinAltitude(8),
+    waterSourceDepositMaxAltitude(128),
+
+    lavaSourceDepositRarity(100),
+    lavaSourceDepositFrequency(10),
+    lavaSourceDepositMinAltitude(8),
+    lavaSourceDepositMaxAltitude(128);
+
+    // End resource settings
 
 
     private int iValue;
     private double dValue;
+    private float fValue;
     private String sValue;
     private boolean bValue;
+    private Enum eValue;
+    private SettingsType returnType;
+    private ArrayList<String> sArrayValue;
+
 
     private TCDefaultValues(int i)
     {
         this.iValue = i;
+        this.returnType = SettingsType.Int;
     }
 
     private TCDefaultValues(double d)
     {
         this.dValue = d;
+        this.returnType = SettingsType.Double;
+    }
+
+    private TCDefaultValues(float f)
+    {
+        this.fValue = f;
+        this.returnType = SettingsType.Float;
     }
 
     private TCDefaultValues(String s)
     {
         this.sValue = s;
+        this.returnType = SettingsType.String;
+    }
+
+    private TCDefaultValues(String s, SettingsType type)
+    {
+        this.returnType = type;
+
+        if (type == SettingsType.StringArray)
+        {
+            this.sArrayValue = new ArrayList<>();
+            if (s.contains(","))
+                Collections.addAll(this.sArrayValue, s.split(","));
+            else
+                this.sArrayValue.add(s);
+            return;
+        }
+        this.sValue = s;
+
+    }
+
+    private TCDefaultValues(Enum e)
+    {
+        this.eValue = e;
+        this.returnType = SettingsType.Enum;
+
     }
 
     private TCDefaultValues(Boolean b)
     {
         this.bValue = b;
+        this.returnType = SettingsType.Boolean;
     }
 
 
@@ -316,7 +360,17 @@ public enum TCDefaultValues
 
     public float floatValue()
     {
-        return (float) this.dValue;
+        return this.fValue;
+    }
+
+    public Enum enumValue()
+    {
+        return this.eValue;
+    }
+
+    public SettingsType getReturnType()
+    {
+        return this.returnType;
     }
 
     public String stringValue()
@@ -326,17 +380,26 @@ public enum TCDefaultValues
 
     public ArrayList<String> StringArrayListValue()
     {
-        ArrayList<String> out = new ArrayList<String>();
-        if (this.sValue.contains(","))
-            Collections.addAll(out, this.sValue.split(","));
-        else if (!this.sValue.equals(""))
-            out.add(this.sValue);
-        return out;
+        return this.sArrayValue;
     }
 
 
     public Boolean booleanValue()
     {
         return this.bValue;
+    }
+
+    public enum SettingsType
+    {
+        String,
+        Boolean,
+        Int,
+        Enum,
+        Double,
+        Float,
+        StringArray,
+        Color
+
+
     }
 }

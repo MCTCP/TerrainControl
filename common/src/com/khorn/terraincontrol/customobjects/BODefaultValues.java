@@ -99,7 +99,7 @@ public enum BODefaultValues
 
     static
     {
-        lookupName = new HashMap<String, BODefaultValues>();
+        lookupName = new HashMap<>();
 
         for (BODefaultValues value : BODefaultValues.values())
         {

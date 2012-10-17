@@ -241,9 +241,9 @@ public class CustomObjectGen extends ResourceGenBase
     protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
     {
 
-        ArrayList<CustomObjectCompiled> objects = new ArrayList<CustomObjectCompiled>();
-        ArrayList<String> objectsName = new ArrayList<String>();
-        HashMap<String, ArrayList<CustomObjectCompiled>> Groups = new HashMap<String, ArrayList<CustomObjectCompiled>>();
+        ArrayList<CustomObjectCompiled> objects = new ArrayList<>();
+        ArrayList<String> objectsName = new ArrayList<>();
+        HashMap<String, ArrayList<CustomObjectCompiled>> Groups = new HashMap<>();
 
         if (Props.length == 1 && Props[0].equals(""))
         {

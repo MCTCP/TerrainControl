@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.DefaultMobType;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
 import com.khorn.terraincontrol.customobjects.ObjectsStore;
@@ -88,12 +89,12 @@ public class BiomeConfig extends ConfigFile
     public String Name;
 
     //Spawn Config
-    public boolean spawnMonstersAddDefaults;
-    public List<WeightedMobSpawnGroup> spawnMonsters;
-    public boolean spawnCreaturesAddDefaults;
-    public List<WeightedMobSpawnGroup> spawnCreatures;
-    public boolean spawnWaterCreaturesAddDefaults;
-    public List<WeightedMobSpawnGroup> spawnWaterCreatures;
+    public boolean spawnMonstersAddDefaults = true;
+    public List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<>();
+    public boolean spawnCreaturesAddDefaults = true;
+    public List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<>();
+    public boolean spawnWaterCreaturesAddDefaults = true;
+    public List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<>();
 
     public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
@@ -215,6 +216,7 @@ public class BiomeConfig extends ConfigFile
         }
         //Custom objects
         resource = new Resource(ResourceType.CustomObject);
+        ResourceType.CustomObject.Generator.ReadFromString(resource, new String[]{BODefaultValues.BO_Use_World.stringValue()}, this);
         this.ResourceSequence[this.ResourceCount++] = resource;
 
 
@@ -350,44 +352,45 @@ public class BiomeConfig extends ConfigFile
         this.BiomeIsBorder = ReadModSettings(TCDefaultValues.BiomeIsBorder.name(), this.DefaultBorder);
         this.NotBorderNear = ReadModSettings(TCDefaultValues.NotBorderNear.name(), this.DefaultNotBorderNear);
 
-        this.BiomeTemperature = this.ReadModSettings(TCDefaultValues.BiomeTemperature.name(), this.DefaultBiomeTemperature);
-        this.BiomeWetness = this.ReadModSettings(TCDefaultValues.BiomeWetness.name(), this.DefaultBiomeWetness);
+        this.BiomeTemperature = ReadModSettings(TCDefaultValues.BiomeTemperature.name(), this.DefaultBiomeTemperature);
+        this.BiomeWetness = ReadModSettings(TCDefaultValues.BiomeWetness.name(), this.DefaultBiomeWetness);
 
-        this.ReplaceBiomeName = this.ReadModSettings(TCDefaultValues.ReplaceToBiomeName.name(), TCDefaultValues.ReplaceToBiomeName.stringValue());
+        this.ReplaceBiomeName = ReadSettings(TCDefaultValues.ReplaceToBiomeName);
 
-        this.BiomeHeight = this.ReadModSettings(TCDefaultValues.BiomeHeight.name(), this.DefaultBiomeSurface);
-        this.BiomeVolatility = this.ReadModSettings(TCDefaultValues.BiomeVolatility.name(), this.DefaultBiomeVolatility);
+        this.BiomeHeight = ReadModSettings(TCDefaultValues.BiomeHeight.name(), this.DefaultBiomeSurface);
+        this.BiomeVolatility = ReadModSettings(TCDefaultValues.BiomeVolatility.name(), this.DefaultBiomeVolatility);
 
-        this.SurfaceBlock = this.ReadModSettings(TCDefaultValues.SurfaceBlock.name(), this.DefaultSurfaceBlock);
-        this.GroundBlock = this.ReadModSettings(TCDefaultValues.GroundBlock.name(), this.DefaultGroundBlock);
+        this.SurfaceBlock = ReadModSettings(TCDefaultValues.SurfaceBlock.name(), this.DefaultSurfaceBlock);
+        this.GroundBlock = ReadModSettings(TCDefaultValues.GroundBlock.name(), this.DefaultGroundBlock);
 
 
-        this.UseWorldWaterLevel = this.ReadModSettings(TCDefaultValues.UseWorldWaterLevel.name(), TCDefaultValues.UseWorldWaterLevel.booleanValue());
-        this.waterLevelMax = ReadModSettings(TCDefaultValues.WaterLevelMax.name(), this.worldConfig.waterLevelMax);
-        this.waterLevelMin = ReadModSettings(TCDefaultValues.WaterLevelMin.name(), TCDefaultValues.WaterLevelMin.intValue());
-        this.waterBlock = ReadModSettings(TCDefaultValues.WaterBlock.name(), TCDefaultValues.WaterBlock.intValue());
-        this.iceBlock = ReadModSettings(TCDefaultValues.IceBlock.name(), TCDefaultValues.IceBlock.intValue());
+        this.UseWorldWaterLevel = ReadSettings(TCDefaultValues.UseWorldWaterLevel);
+        this.waterLevelMax = ReadSettings(TCDefaultValues.WaterLevelMax);
+        this.waterLevelMin = ReadSettings(TCDefaultValues.WaterLevelMin);
+        this.waterBlock = ReadSettings(TCDefaultValues.WaterBlock);
+        this.iceBlock = ReadSettings(TCDefaultValues.IceBlock);
 
-        this.SkyColor = this.ReadModSettingsColor(TCDefaultValues.SkyColor.name(), TCDefaultValues.SkyColor.stringValue());
-        this.WaterColor = this.ReadModSettingsColor(TCDefaultValues.WaterColor.name(), this.DefaultWaterColorMultiplier);
-        this.GrassColor = this.ReadModSettingsColor(TCDefaultValues.GrassColor.name(), this.DefaultGrassColor);
-        this.FoliageColor = this.ReadModSettingsColor(TCDefaultValues.FoliageColor.name(), this.DefaultFoliageColor);
+        this.SkyColor = ReadSettings(TCDefaultValues.SkyColor);
+        this.WaterColor = ReadModSettingsColor(TCDefaultValues.WaterColor.name(), this.DefaultWaterColorMultiplier);
+        this.GrassColor = ReadModSettingsColor(TCDefaultValues.GrassColor.name(), this.DefaultGrassColor);
+        this.FoliageColor = ReadModSettingsColor(TCDefaultValues.FoliageColor.name(), this.DefaultFoliageColor);
 
-        this.volatilityRaw1 = ReadModSettings(TCDefaultValues.Volatility1.name(), TCDefaultValues.Volatility1.doubleValue());
-        this.volatilityRaw2 = ReadModSettings(TCDefaultValues.Volatility2.name(), TCDefaultValues.Volatility2.doubleValue());
-        this.volatilityWeightRaw1 = ReadModSettings(TCDefaultValues.VolatilityWeight1.name(), TCDefaultValues.VolatilityWeight1.doubleValue());
-        this.volatilityWeightRaw2 = ReadModSettings(TCDefaultValues.VolatilityWeight2.name(), TCDefaultValues.VolatilityWeight2.doubleValue());
-        this.disableNotchHeightControl = ReadModSettings(TCDefaultValues.DisableBiomeHeight.name(), TCDefaultValues.DisableBiomeHeight.booleanValue());
-        this.maxAverageHeight = ReadModSettings(TCDefaultValues.MaxAverageHeight.name(), TCDefaultValues.MaxAverageHeight.doubleValue());
-        this.maxAverageDepth = ReadModSettings(TCDefaultValues.MaxAverageDepth.name(), TCDefaultValues.MaxAverageDepth.doubleValue());
+        this.volatilityRaw1 = ReadSettings(TCDefaultValues.Volatility1);
+        this.volatilityRaw2 = ReadSettings(TCDefaultValues.Volatility2);
+        this.volatilityWeightRaw1 = ReadSettings(TCDefaultValues.VolatilityWeight1);
+        this.volatilityWeightRaw2 = ReadSettings(TCDefaultValues.VolatilityWeight2);
+        this.disableNotchHeightControl = ReadSettings(TCDefaultValues.DisableBiomeHeight);
+        this.maxAverageHeight = ReadSettings(TCDefaultValues.MaxAverageHeight);
+        this.maxAverageDepth = ReadSettings(TCDefaultValues.MaxAverageDepth);
 
+        /*
         this.spawnMonstersAddDefaults = ReadModSettings("spawnMonstersAddDefaults", true);
         this.spawnMonsters = ReadModSettings("spawnMonsters", new ArrayList<WeightedMobSpawnGroup>());
         this.spawnCreaturesAddDefaults = ReadModSettings("spawnCreaturesAddDefaults", true);
         this.spawnCreatures = ReadModSettings("spawnCreatures", new ArrayList<WeightedMobSpawnGroup>());
         this.spawnWaterCreaturesAddDefaults = ReadModSettings("spawnWaterCreaturesAddDefaults", true);
         this.spawnWaterCreatures = ReadModSettings("spawnWaterCreatures", new ArrayList<WeightedMobSpawnGroup>());
-
+        */
         this.ReadCustomObjectSettings();
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
@@ -398,7 +401,7 @@ public class BiomeConfig extends ConfigFile
     {
         this.heightMatrix = new double[this.worldConfig.WorldHeight / 8 + 1];
 
-        ArrayList<String> keys = this.ReadModSettings(TCDefaultValues.CustomHeightControl.name(), TCDefaultValues.CustomHeightControl.StringArrayListValue());
+        ArrayList<String> keys = ReadSettings(TCDefaultValues.CustomHeightControl);
         try
         {
             if (keys.size() != (this.worldConfig.WorldHeight / 8 + 1))
@@ -472,7 +475,7 @@ public class BiomeConfig extends ConfigFile
 
     private void ReadResourceSettings()
     {
-        ArrayList<Integer> LineNumbers = new ArrayList<Integer>();
+        ArrayList<Integer> LineNumbers = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
         {
@@ -531,7 +534,7 @@ public class BiomeConfig extends ConfigFile
 
     private void ReadCustomObjectSettings()
     {
-        CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();
+        CustomObjectsCompiled = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
         {
@@ -749,7 +752,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteCustomObjects();
 
 
-        if (DefaultBiome.getBiome(this.Biome.getId()) != null)
+        if (true)
         {
             this.WriteTitle("MOB SPAWNING");
             this.WriteComment("Mob spawning control did not work with default biomes.");
@@ -946,16 +949,15 @@ public class BiomeConfig extends ConfigFile
         if (this.SettingsCache.containsKey("replacedblocks"))
         {
             replaceBlocksValue = this.SettingsCache.get("replacedblocks");
-            if(replaceBlocksValue.contains("="))
+            if (replaceBlocksValue.contains("="))
             {
                 oldReplaceFound = true;
                 this.SettingsCache.remove("replacedblocks");
             }
-        }
-        else
+        } else
         {
             replaceBlocksValue = ReadComplexValue("ReplacedBlocks");
-            if(replaceBlocksValue.contains("="))
+            if (replaceBlocksValue.contains("="))
             {
                 oldReplaceFound = true;
                 this.SettingsCache.remove("ReplacedBlocks" + ":" + replaceBlocksValue);
@@ -1031,9 +1033,9 @@ public class BiomeConfig extends ConfigFile
     private byte DefaultGroundBlock = (byte) DefaultMaterial.DIRT.id;
     private float DefaultBiomeTemperature = 0.5F;
     private float DefaultBiomeWetness = 0.5F;
-    private ArrayList<String> DefaultIsle = new ArrayList<String>();
-    private ArrayList<String> DefaultBorder = new ArrayList<String>();
-    private ArrayList<String> DefaultNotBorderNear = new ArrayList<String>();
+    private ArrayList<String> DefaultIsle = new ArrayList<>();
+    private ArrayList<String> DefaultBorder = new ArrayList<>();
+    private ArrayList<String> DefaultNotBorderNear = new ArrayList<>();
     private boolean DefaultRiver = true;
     private int DefaultSize = 4;
     private int DefaultRarity = 100;
@@ -1250,17 +1252,17 @@ public class BiomeConfig extends ConfigFile
         this.BiomeRivers = stream.readBoolean();
 
         int count = stream.readInt();
-        this.IsleInBiome = new ArrayList<String>();
+        this.IsleInBiome = new ArrayList<>();
         while (count-- > 0)
             this.IsleInBiome.add(ReadStringFromStream(stream));
 
         count = stream.readInt();
-        this.BiomeIsBorder = new ArrayList<String>();
+        this.BiomeIsBorder = new ArrayList<>();
         while (count-- > 0)
             this.BiomeIsBorder.add(ReadStringFromStream(stream));
 
         count = stream.readInt();
-        this.NotBorderNear = new ArrayList<String>();
+        this.NotBorderNear = new ArrayList<>();
         while (count-- > 0)
             this.NotBorderNear.add(ReadStringFromStream(stream));
         this.BiomeTemperature = stream.readFloat();

@@ -87,7 +87,7 @@ public class CustomObjectCompiled extends ConfigFile
         this.SpawnOnBlockType = this.ReadBlockList(ReadModSettings(BODefaultValues.spawnOnBlockType.name(), BODefaultValues.spawnOnBlockType.StringArrayListValue()),BODefaultValues.spawnOnBlockType.name());
         this.CollisionBlockType = this.ReadBlockList(ReadModSettings(BODefaultValues.collisionBlockType.name(), BODefaultValues.collisionBlockType.StringArrayListValue()),BODefaultValues.collisionBlockType.name());
 
-        this.SpawnInBiome = new HashSet<String>(ReadModSettings(BODefaultValues.spawnInBiome.name(), BODefaultValues.spawnInBiome.StringArrayListValue()));
+        this.SpawnInBiome = new HashSet<>(ReadModSettings(BODefaultValues.spawnInBiome.name(), BODefaultValues.spawnInBiome.StringArrayListValue()));
 
 
         this.SpawnSunlight = ReadModSettings(BODefaultValues.spawnSunlight.name(), BODefaultValues.spawnSunlight.booleanValue());
@@ -144,7 +144,7 @@ public class CustomObjectCompiled extends ConfigFile
 
     private void ReadCoordinates()
     {
-        ArrayList<ObjectCoordinate> coordinates = new ArrayList<ObjectCoordinate>();
+        ArrayList<ObjectCoordinate> coordinates = new ArrayList<>();
 
         for (String key : SettingsCache.keySet())
         {
@@ -176,7 +176,7 @@ public class CustomObjectCompiled extends ConfigFile
 
     private HashSet<Integer> ReadBlockList(ArrayList<String> blocks, String settingName)
     {
-        HashSet<Integer> output = new HashSet<Integer>();
+        HashSet<Integer> output = new HashSet<>();
 
         boolean nonIntegerValues = false;
         boolean all = false;

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class ObjectsStore
 {
-    private static ArrayList<CustomObject> objectsList = new ArrayList<CustomObject>();
+    private static ArrayList<CustomObject> objectsList = new ArrayList<>();
 
     /*
      Load:
@@ -69,7 +69,7 @@ public class ObjectsStore
 
     public static ArrayList<CustomObject> LoadObjectsFromDirectory(File path)
     {
-        ArrayList<CustomObject> outputList = new ArrayList<CustomObject>();
+        ArrayList<CustomObject> outputList = new ArrayList<>();
 
         File[] files = path.listFiles();
         if (files == null)
