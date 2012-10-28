@@ -126,7 +126,7 @@ public class BukkitWorld implements LocalWorld
         if (this.biomeManager != null)
             return this.biomeManager.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
 
-        BiomeArray = this.world.worldProvider.c.getBiomes(BiomeArray, x, z, x_size, z_size);
+        BiomeArray = this.world.worldProvider.d.getBiomes(BiomeArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
@@ -138,7 +138,7 @@ public class BukkitWorld implements LocalWorld
     {
         if (this.biomeManager != null)
             return this.biomeManager.getTemperaturesTC(x, z, x_size, z_size);
-        return this.world.worldProvider.c.getTemperatures(null, x, z, x_size, z_size);
+        return this.world.worldProvider.d.getTemperatures(null, x, z, x_size, z_size);
     }
 
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
@@ -146,7 +146,7 @@ public class BukkitWorld implements LocalWorld
         if (this.biomeManager != null)
             return this.biomeManager.getBiomesTC(biomeArray, x, z, x_size, z_size);
 
-        BiomeArray = this.world.worldProvider.c.a(BiomeArray, x, z, x_size, z_size, true);
+        BiomeArray = this.world.worldProvider.d.a(BiomeArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
@@ -158,7 +158,7 @@ public class BukkitWorld implements LocalWorld
     {
         if (this.biomeManager != null)
             return this.biomeManager.getBiomeTC(x, z);
-        return this.world.worldProvider.c.getBiome(x, z).id;
+        return this.world.worldProvider.d.getBiome(x, z).id;
     }
 
     public double getBiomeFactorForOldBM(int index)
@@ -537,7 +537,7 @@ public class BukkitWorld implements LocalWorld
                 this.GroundBush = new WorldGenGroundBush(3, 0);
 
                 this.strongholdGen = new WorldGenStronghold();
-                this.VillageGen = new WorldGenVillage(0);
+                this.VillageGen = new WorldGenVillage();
                 this.MineshaftGen = new WorldGenMineshaft();
                 this.PyramidsGen = new WorldGenLargeFeature();
                 this.NetherFortress = new WorldGenNether();
