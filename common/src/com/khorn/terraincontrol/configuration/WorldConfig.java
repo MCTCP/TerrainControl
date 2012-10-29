@@ -16,17 +16,17 @@ import java.util.HashMap;
 
 public class WorldConfig extends ConfigFile
 {
-    public ArrayList<String> CustomBiomes = new ArrayList<>();
-    public HashMap<String, Integer> CustomBiomeIds = new HashMap<>();
+    public ArrayList<String> CustomBiomes = new ArrayList<String>();
+    public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
 
     public ArrayList<CustomObjectCompiled> CustomObjectsCompiled;
 
-    public ArrayList<String> NormalBiomes = new ArrayList<>();
-    public ArrayList<String> IceBiomes = new ArrayList<>();
-    public ArrayList<String> IsleBiomes = new ArrayList<>();
-    public ArrayList<String> BorderBiomes = new ArrayList<>();
+    public ArrayList<String> NormalBiomes = new ArrayList<String>();
+    public ArrayList<String> IceBiomes = new ArrayList<String>();
+    public ArrayList<String> IsleBiomes = new ArrayList<String>();
+    public ArrayList<String> BorderBiomes = new ArrayList<String>();
 
-    public ArrayList<BiomeConfig> biomes = new ArrayList<>();
+    public ArrayList<BiomeConfig> biomes = new ArrayList<BiomeConfig>();
 
 
     public byte[] ReplaceMatrixBiomes = new byte[256];
@@ -194,7 +194,7 @@ public class WorldConfig extends ConfigFile
             }
         }
 
-        ArrayList<LocalBiome> localBiomes = new ArrayList<>(world.getDefaultBiomes());
+        ArrayList<LocalBiome> localBiomes = new ArrayList<LocalBiome>(world.getDefaultBiomes());
 
         //Add custom biomes to world
         for (String biomeName : this.CustomBiomes)
@@ -242,7 +242,7 @@ public class WorldConfig extends ConfigFile
             if (this.ModeBiome == BiomeMode.FromImage)
             {
                 if (this.biomeColorMap == null)
-                    this.biomeColorMap = new HashMap<>();
+                    this.biomeColorMap = new HashMap<Integer, Integer>();
 
                 try
                 {
@@ -287,7 +287,7 @@ public class WorldConfig extends ConfigFile
         ArrayList<CustomObject> rawObjects = ObjectsStore.LoadObjectsFromDirectory(directory);
 
 
-        CustomObjectsCompiled = new ArrayList<>();
+        CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();
 
         for (CustomObject object : rawObjects)
             CustomObjectsCompiled.add(object.Compile(""));

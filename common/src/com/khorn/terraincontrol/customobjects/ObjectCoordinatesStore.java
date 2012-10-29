@@ -10,7 +10,7 @@ public class ObjectCoordinatesStore implements Runnable
 
     public ObjectCoordinatesStore()
     {
-       this.Coordinates = new Hashtable<>();
+       this.Coordinates = new Hashtable<ObjectCoordinate, ObjectBuffer>();
 
     }
 

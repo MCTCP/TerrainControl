@@ -323,7 +323,7 @@ public enum TCDefaultValues
 
         if (type == SettingsType.StringArray)
         {
-            this.sArrayValue = new ArrayList<>();
+            this.sArrayValue = new ArrayList<String>();
             if (s.contains(","))
                 Collections.addAll(this.sArrayValue, s.split(","));
             else

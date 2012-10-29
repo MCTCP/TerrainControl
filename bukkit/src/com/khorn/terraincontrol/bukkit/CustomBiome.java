@@ -28,7 +28,10 @@ public class CustomBiome extends BiomeBase
             Biome[] mappingArray = (Biome[]) biomeMapping.get(null);
             mappingArray[id] = Biome.OCEAN;
 
-        } catch (NoSuchFieldException | IllegalAccessException e)
+        } catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
         {
             e.printStackTrace();
         }
@@ -57,7 +60,10 @@ public class CustomBiome extends BiomeBase
 
             temp.setFloat(this, config.BiomeTemperature);
             humid.setFloat(this, config.BiomeWetness);
-        } catch (NoSuchFieldException | IllegalAccessException e)
+        } catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
         {
             e.printStackTrace();
         }

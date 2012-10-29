@@ -82,8 +82,8 @@ public abstract class Layer
 
         for (int i = 0; i < config.GenerationDepth + 1; i++)
         {
-            ArrayList<LocalBiome> normalBiomes = new ArrayList<>();
-            ArrayList<LocalBiome> iceBiomes = new ArrayList<>();
+            ArrayList<LocalBiome> normalBiomes = new ArrayList<LocalBiome>();
+            ArrayList<LocalBiome> iceBiomes = new ArrayList<LocalBiome>();
             for (BiomeConfig biomeConfig : config.biomes)
             {
 

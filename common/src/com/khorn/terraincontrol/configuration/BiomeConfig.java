@@ -90,11 +90,11 @@ public class BiomeConfig extends ConfigFile
 
     //Spawn Config
     public boolean spawnMonstersAddDefaults = true;
-    public List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<>();
+    public List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
     public boolean spawnCreaturesAddDefaults = true;
-    public List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<>();
+    public List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
     public boolean spawnWaterCreaturesAddDefaults = true;
-    public List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<>();
+    public List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
     public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
@@ -383,14 +383,18 @@ public class BiomeConfig extends ConfigFile
         this.maxAverageHeight = ReadSettings(TCDefaultValues.MaxAverageHeight);
         this.maxAverageDepth = ReadSettings(TCDefaultValues.MaxAverageDepth);
 
-        /*
-        this.spawnMonstersAddDefaults = ReadModSettings("spawnMonstersAddDefaults", true);
-        this.spawnMonsters = ReadModSettings("spawnMonsters", new ArrayList<WeightedMobSpawnGroup>());
-        this.spawnCreaturesAddDefaults = ReadModSettings("spawnCreaturesAddDefaults", true);
-        this.spawnCreatures = ReadModSettings("spawnCreatures", new ArrayList<WeightedMobSpawnGroup>());
-        this.spawnWaterCreaturesAddDefaults = ReadModSettings("spawnWaterCreaturesAddDefaults", true);
-        this.spawnWaterCreatures = ReadModSettings("spawnWaterCreatures", new ArrayList<WeightedMobSpawnGroup>());
-        */
+        if (DefaultBiome.getBiome(this.Biome.getId()) == null)
+        {
+            // Only for custom biomes
+            System.out.println("Reading mobs for "+this.Name);
+            this.spawnMonstersAddDefaults = ReadModSettings("spawnMonstersAddDefaults", true);
+            this.spawnMonsters = ReadModSettings("spawnMonsters", new ArrayList<WeightedMobSpawnGroup>());
+            this.spawnCreaturesAddDefaults = ReadModSettings("spawnCreaturesAddDefaults", true);
+            this.spawnCreatures = ReadModSettings("spawnCreatures", new ArrayList<WeightedMobSpawnGroup>());
+            this.spawnWaterCreaturesAddDefaults = ReadModSettings("spawnWaterCreaturesAddDefaults", true);
+            this.spawnWaterCreatures = ReadModSettings("spawnWaterCreatures", new ArrayList<WeightedMobSpawnGroup>());
+        }
+        
         this.ReadCustomObjectSettings();
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
@@ -475,7 +479,7 @@ public class BiomeConfig extends ConfigFile
 
     private void ReadResourceSettings()
     {
-        ArrayList<Integer> LineNumbers = new ArrayList<>();
+        ArrayList<Integer> LineNumbers = new ArrayList<Integer>();
 
         for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
         {
@@ -534,7 +538,7 @@ public class BiomeConfig extends ConfigFile
 
     private void ReadCustomObjectSettings()
     {
-        CustomObjectsCompiled = new ArrayList<>();
+        CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();
 
         for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
         {
@@ -752,7 +756,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteCustomObjects();
 
 
-        if (true)
+        if (DefaultBiome.getBiome(this.Biome.getId()) != null)
         {
             this.WriteTitle("MOB SPAWNING");
             this.WriteComment("Mob spawning control did not work with default biomes.");
@@ -1033,9 +1037,9 @@ public class BiomeConfig extends ConfigFile
     private byte DefaultGroundBlock = (byte) DefaultMaterial.DIRT.id;
     private float DefaultBiomeTemperature = 0.5F;
     private float DefaultBiomeWetness = 0.5F;
-    private ArrayList<String> DefaultIsle = new ArrayList<>();
-    private ArrayList<String> DefaultBorder = new ArrayList<>();
-    private ArrayList<String> DefaultNotBorderNear = new ArrayList<>();
+    private ArrayList<String> DefaultIsle = new ArrayList<String>();
+    private ArrayList<String> DefaultBorder = new ArrayList<String>();
+    private ArrayList<String> DefaultNotBorderNear = new ArrayList<String>();
     private boolean DefaultRiver = true;
     private int DefaultSize = 4;
     private int DefaultRarity = 100;
@@ -1252,17 +1256,17 @@ public class BiomeConfig extends ConfigFile
         this.BiomeRivers = stream.readBoolean();
 
         int count = stream.readInt();
-        this.IsleInBiome = new ArrayList<>();
+        this.IsleInBiome = new ArrayList<String>();
         while (count-- > 0)
             this.IsleInBiome.add(ReadStringFromStream(stream));
 
         count = stream.readInt();
-        this.BiomeIsBorder = new ArrayList<>();
+        this.BiomeIsBorder = new ArrayList<String>();
         while (count-- > 0)
             this.BiomeIsBorder.add(ReadStringFromStream(stream));
 
         count = stream.readInt();
-        this.NotBorderNear = new ArrayList<>();
+        this.NotBorderNear = new ArrayList<String>();
         while (count-- > 0)
             this.NotBorderNear.add(ReadStringFromStream(stream));
         this.BiomeTemperature = stream.readFloat();

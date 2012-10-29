@@ -44,7 +44,7 @@ public class CustomObject extends ConfigFile
 
     public CustomObjectCompiled Compile(String settingsLine)
     {
-        HashMap<String, String> newSettings = new HashMap<>();
+        HashMap<String, String> newSettings = new HashMap<String, String>();
         for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
             if (BODefaultValues.Contains(entry.getKey()) || ObjectCoordinate.isCoordinateString(entry.getKey()))
                 newSettings.put(entry.getKey(), entry.getValue());

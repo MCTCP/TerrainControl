@@ -53,9 +53,9 @@ public enum DefaultMobType
     public Set<String> getAllNames() { return this.allNames; }
 
     // LOOKUP MAPS AND OTHER PRE COMPUTATIONS
-    protected static final Map<Short, DefaultMobType> ID_MAP = new HashMap<>();
-    protected static final Map<String, DefaultMobType> NAME_MAP = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    protected static final List<String> PREFERED_NAMES = new ArrayList<>();
+    protected static final Map<Short, DefaultMobType> ID_MAP = new HashMap<Short, DefaultMobType>();
+    protected static final Map<String, DefaultMobType> NAME_MAP = new TreeMap<String, DefaultMobType>(String.CASE_INSENSITIVE_ORDER);
+    protected static final List<String> PREFERED_NAMES = new ArrayList<String>();
 
     static
     {
@@ -77,7 +77,7 @@ public enum DefaultMobType
         this.typeId = (short) typeId;
         this.formalName = names[0];
         this.preferedName = names[1];
-        this.allNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        this.allNames = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
         this.allNames.addAll(Arrays.asList(names));
     }
 
