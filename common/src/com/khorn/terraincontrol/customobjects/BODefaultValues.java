@@ -14,6 +14,7 @@ public enum BODefaultValues
     BO_Use_Biome("UseBiome"),
     BO_ALL_KEY("All"),
     BO_SolidKey("Solid"),
+    BO_Extension("bo2"),
 
     // Custom object settings
     version("2.0"),

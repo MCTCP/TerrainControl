@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 public class ObjectsStore
 {
-    private static ArrayList<CustomObject> objectsList = new ArrayList<>();
 
     /*
      Load:
@@ -17,6 +16,12 @@ public class ObjectsStore
         a) store in one array in biome
         b) store in different arrays in biome ???
      4) Load ObjectCoordinates from file and add that instance to save thread.
+
+     New load
+     1) Load all objects from world directory
+     2) Search and load objects from plugin directory
+
+
 
      Spawn:
      1)CustomObject resource, Tree resource, sapling, command
@@ -54,14 +59,13 @@ public class ObjectsStore
             if (!directory.mkdirs())
             {
                 System.out.println("TerrainControl: can`t create GlobalObjects directory");
-                return;
             }
         }
 
 
-        objectsList = LoadObjectsFromDirectory(directory);
+        //objectsList = LoadObjectsFromDirectory(directory);
 
-        System.out.println("TerrainControl: " + objectsList.size() + " custom objects loaded");
+        //System.out.println("TerrainControl: " + objectsList.size() + " custom objects loaded");
 
 
     }
@@ -106,11 +110,35 @@ public class ObjectsStore
 
     public static CustomObject GetObjectFromName(String name)
     {
-        CustomObject object = null;
-        for (CustomObject customObject : objectsList)
-            if (customObject.name.equals(name))
-                object = customObject;
-        return object;
+        if (!directory.exists())
+            return null;
+
+        File[] files = directory.listFiles();
+        if (files == null)
+            return null;
+
+        for (File customObjectFile : files)
+        {
+            if (customObjectFile.isFile())
+            {
+
+                String fileName = customObjectFile.getName();
+
+                if (!name.toLowerCase().endsWith(BODefaultValues.BO_Extension.stringValue().toLowerCase()))
+                    continue;
+
+                name = name.substring(0, name.length() - 4);
+
+                if (fileName.equals(name))
+                {
+                    CustomObject object = new CustomObject(customObjectFile);
+                    if (object.IsValid)
+                        return object;
+                }
+            }
+        }
+
+        return null;
     }
 
 

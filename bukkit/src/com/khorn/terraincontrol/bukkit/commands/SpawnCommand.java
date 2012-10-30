@@ -3,6 +3,9 @@ package com.khorn.terraincontrol.bukkit.commands;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
+import com.khorn.terraincontrol.customobjects.CustomObjectGen;
+import com.khorn.terraincontrol.customobjects.ObjectsStore;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -10,6 +13,7 @@ import org.bukkit.util.BlockIterator;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 public class SpawnCommand extends BaseCommand
 {
@@ -26,7 +30,7 @@ public class SpawnCommand extends BaseCommand
     public boolean onCommand(CommandSender sender, List<String> args)
     {
         Player me = (Player) sender;
-        
+
         BukkitWorld bukkitWorld = this.getWorld(me, "");
         if (bukkitWorld == null)
         {
@@ -34,51 +38,55 @@ public class SpawnCommand extends BaseCommand
             me.sendMessage(ErrorColor + "TerrainControl is not enabled for this world.");
             return true;
         }
-        
+
         if (args.size() == 0)
         {
             me.sendMessage(ErrorColor + "You must enter the name of the BO2.");
             return true;
         }
-        String bo2Name = args.get(0);
-        
-        /*CustomObject spawnObject = null;
-        for (CustomObject object : bukkitWorld.getSettings().Objects)
+        String[] bo2Name = ObjectsStore.ParseString(args.get(0));
+
+        CustomObjectCompiled spawnObject = null;
+        for (CustomObjectCompiled object : bukkitWorld.getSettings().CustomObjectsCompiled)
         {
-            if (object.name.equalsIgnoreCase(bo2Name))
+            if (object.Name.equals(bo2Name[0]))
             {
-                spawnObject = object;
+                spawnObject = object.parent.Compile(bo2Name[1]);
                 break;
             }
         }
-        
+
+        if (spawnObject == null)
+            spawnObject = ObjectsStore.Compile(args.get(0));
+
         if (spawnObject == null)
         {
             sender.sendMessage(ErrorColor + "BO2 not found, use '/tc list' to list the available ones.");
             return true;
         }
-        
+
         Block block = this.getWatchedBlock(me, true);
-        if (block == null) return true;
-        
-        if (CustomObjectGen.GenerateCustomObject(bukkitWorld, new Random(), bukkitWorld.getSettings(), block.getX(), block.getY(), block.getZ(), spawnObject, true))
+        if (block == null)
+            return true;
+
+        if (CustomObjectGen.GenerateCustomObject(bukkitWorld, new Random(), block.getX(), block.getY(), block.getZ(), spawnObject))
         {
-            me.sendMessage(BaseCommand.MessageColor + spawnObject.name + " was spawned.");
-        }
-        else
+            me.sendMessage(BaseCommand.MessageColor + spawnObject.Name + " was spawned.");
+        } else
         {
             me.sendMessage(BaseCommand.ErrorColor + "BO2 cant be spawned over there.");
-        }    */
+        }
 
         return true;
     }
-    
-    public Block getWatchedBlock(Player me, boolean verboose)
+
+    public Block getWatchedBlock(Player me, boolean verbose)
     {
-        if (me == null) return null;
-        
-        Block block = null;
-        
+        if (me == null)
+            return null;
+
+        Block block;
+
         Iterator<Block> itr = new BlockIterator(me, 200);
         while (itr.hasNext())
         {
@@ -88,12 +96,12 @@ public class SpawnCommand extends BaseCommand
                 return block;
             }
         }
-        
-        if (verboose)
+
+        if (verbose)
         {
-            me.sendMessage(ErrorColor.toString()+"No block in sight.");
+            me.sendMessage(ErrorColor + "No block in sight.");
         }
-        
+
         return null;
     }
 }

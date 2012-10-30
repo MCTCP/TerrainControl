@@ -21,8 +21,13 @@ public class CustomObject extends ConfigFile
     {
         FilePath = objectFile;
         name = objectFile.getName();
+
+        if(!name.toLowerCase().endsWith(BODefaultValues.BO_Extension.stringValue().toLowerCase()))
+            return;
+
         //Remove extension.
         name = name.substring(0, name.length() - 4);
+
 
         ReadSettingsFile(objectFile);
         CorrectSettings();
