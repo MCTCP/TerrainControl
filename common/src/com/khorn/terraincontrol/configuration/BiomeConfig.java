@@ -386,7 +386,7 @@ public class BiomeConfig extends ConfigFile
         if (DefaultBiome.getBiome(this.Biome.getId()) == null)
         {
             // Only for custom biomes
-            System.out.println("Reading mobs for "+this.Name);
+            // System.out.println("Reading mobs for "+this.Name); // debug
             this.spawnMonstersAddDefaults = ReadModSettings("spawnMonstersAddDefaults", true);
             this.spawnMonsters = ReadModSettings("spawnMonsters", new ArrayList<WeightedMobSpawnGroup>());
             this.spawnCreaturesAddDefaults = ReadModSettings("spawnCreaturesAddDefaults", true);
