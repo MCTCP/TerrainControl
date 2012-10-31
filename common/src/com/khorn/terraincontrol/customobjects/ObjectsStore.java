@@ -73,7 +73,7 @@ public class ObjectsStore
 
     public static ArrayList<CustomObject> LoadObjectsFromDirectory(File path)
     {
-        ArrayList<CustomObject> outputList = new ArrayList<>();
+        ArrayList<CustomObject> outputList = new ArrayList<CustomObject>();
 
         File[] files = path.listFiles();
         if (files == null)
