@@ -18,7 +18,7 @@ public abstract class ConfigFile
 
     // TODO: This map is populated with lowercase versions as well.
     // TODO: That is a derped approach. Use TreeSet with CASE_INSENSITIVE_ORDER instead.
-    protected HashMap<String, String> SettingsCache = new HashMap<>();
+    protected HashMap<String, String> SettingsCache = new HashMap<String, String>();
 
     // TODO: We should use GSON only instead of just for a few fields.
     // TODO: Hah. We should remove that buggy GSON.
@@ -109,11 +109,17 @@ public abstract class ConfigFile
 
     protected List<WeightedMobSpawnGroup> ReadModSettings(String settingsName, List<WeightedMobSpawnGroup> defaultValue)
     {
-        String json = this.SettingsCache.get(settingsName);
-        if (json == null)
-            return defaultValue;
-        return gson.fromJson(json, new TypeToken<List<WeightedMobSpawnGroup>>()
-        {}.getType());
+        settingsName = settingsName.toLowerCase();
+        if (this.SettingsCache.containsKey(settingsName))
+        {
+            String json = this.SettingsCache.get(settingsName);
+            if (json == null)
+                return defaultValue;
+            return gson.fromJson(json, new TypeToken<List<WeightedMobSpawnGroup>>()
+            {}.getType());
+        }
+        System.out.println("TerrainControl: value " + settingsName + " not found.");
+        return defaultValue;
     }
 
     protected ArrayList<String> ReadModSettings(String settingsName, ArrayList<String> defaultValue)
@@ -121,7 +127,7 @@ public abstract class ConfigFile
         settingsName = settingsName.toLowerCase();
         if (this.SettingsCache.containsKey(settingsName))
         {
-            ArrayList<String> out = new ArrayList<>();
+            ArrayList<String> out = new ArrayList<String>();
             if (this.SettingsCache.get(settingsName).trim().equals("") || this.SettingsCache.get(settingsName).equals("None"))
             {
                 return out;
@@ -510,7 +516,7 @@ public abstract class ConfigFile
 
     protected ArrayList<String> CheckValue(ArrayList<String> biomes, ArrayList<String> customBiomes)
     {
-        ArrayList<String> output = new ArrayList<>();
+        ArrayList<String> output = new ArrayList<String>();
 
         for (String key : biomes)
         {
@@ -546,7 +552,7 @@ public abstract class ConfigFile
 
     protected static String[] ReadComplexString(String line)
     {
-        ArrayList<String> buffer = new ArrayList<>();
+        ArrayList<String> buffer = new ArrayList<String>();
 
         int index = 0;
         int lastFound = 0;

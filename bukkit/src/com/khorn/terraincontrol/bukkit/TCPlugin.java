@@ -145,12 +145,12 @@ public class TCPlugin extends JavaPlugin
                 case FromImage:
                 case Normal:
                     TCWorldChunkManager manager = new TCWorldChunkManager(bukkitWorld);
-                    workWorld.worldProvider.c = manager;
+                    workWorld.worldProvider.d = manager;
                     bukkitWorld.setBiomeManager(manager);
                     break;
                 case OldGenerator:
                     TCWorldChunkManagerOld managerOld = new TCWorldChunkManagerOld(bukkitWorld);
-                    workWorld.worldProvider.c = managerOld;
+                    workWorld.worldProvider.d = managerOld;
                     bukkitWorld.setOldBiomeManager(managerOld);
                     break;
                 case Default:

@@ -176,7 +176,7 @@ public enum DefaultMaterial
     static
     {
         lookupID = new DefaultMaterial[256];
-        lookupName = new HashMap<>();
+        lookupName = new HashMap<String, DefaultMaterial>();
 
         for (DefaultMaterial material : DefaultMaterial.values())
         {
