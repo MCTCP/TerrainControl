@@ -267,7 +267,9 @@ public class CustomObjectGen extends ResourceGenBase
                     continue;
                 }
 
-                CustomObjectCompiled obj = ObjectsStore.Compile(key);
+                CustomObjectCompiled obj = ObjectsStore.CompileString(key, biomeConfig.worldConfig.CustomObjectsDirectory);
+                if (obj == null)
+                    obj = ObjectsStore.CompileString(key, ObjectsStore.GlobalDirectory);
                 if (obj != null)
                 {
                     objects.add(obj);

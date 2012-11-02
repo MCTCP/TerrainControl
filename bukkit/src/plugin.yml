@@ -1,5 +1,5 @@
 name: TerrainControl
-version: 2.3.0
+version: 2.3.2
 description: Generates a worlds.
 authors: ['Khorn', 'Olof Cayorion Larsson']
 main: com.khorn.terraincontrol.bukkit.TCPlugin
@@ -38,7 +38,7 @@ permissions:
         description: show help
     tc.cmd.list:
         default: op
-        description: list BOB plugins for this world
+        description: list bo2 objects
     tc.cmd.map:
         default: op
         description: generate biome map image
@@ -47,4 +47,4 @@ permissions:
         description: reload world settings
     tc.cmd.spawn:
         default: op
-        description: spawn BOB where you look
+        description: spawn bo2 where you look

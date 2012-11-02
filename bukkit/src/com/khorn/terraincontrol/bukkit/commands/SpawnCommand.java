@@ -22,7 +22,7 @@ public class SpawnCommand extends BaseCommand
         super(_plugin);
         name = "spawn";
         perm = TCPerm.CMD_SPAWN.node;
-        usage = "spawn BOBName";
+        usage = "spawn Name [World]";
         workOnConsole = false;
     }
 
@@ -31,33 +31,23 @@ public class SpawnCommand extends BaseCommand
     {
         Player me = (Player) sender;
 
-        BukkitWorld bukkitWorld = this.getWorld(me, "");
-        if (bukkitWorld == null)
-        {
-            // TODO: When we use a centralized BO2 repo this check will not be needed and BO2's should be spawnable in any world.
-            me.sendMessage(ErrorColor + "TerrainControl is not enabled for this world.");
-            return true;
-        }
+        BukkitWorld bukkitWorld = this.getWorld(me, args.size() > 1 ? args.get(1) : "");
 
         if (args.size() == 0)
         {
             me.sendMessage(ErrorColor + "You must enter the name of the BO2.");
             return true;
         }
-        String[] bo2Name = ObjectsStore.ParseString(args.get(0));
-
         CustomObjectCompiled spawnObject = null;
-        for (CustomObjectCompiled object : bukkitWorld.getSettings().CustomObjectsCompiled)
-        {
-            if (object.Name.equals(bo2Name[0]))
-            {
-                spawnObject = object.parent.Compile(bo2Name[1]);
-                break;
-            }
-        }
+
+        if (bukkitWorld != null)
+            spawnObject = ObjectsStore.CompileString(args.get(0), bukkitWorld.getSettings().CustomObjectsDirectory);
 
         if (spawnObject == null)
-            spawnObject = ObjectsStore.Compile(args.get(0));
+        {
+            me.sendMessage(BaseCommand.MessageColor + "BO2 not found in world directory. Searching in global directory.");
+            spawnObject = ObjectsStore.CompileString(args.get(0), ObjectsStore.GlobalDirectory);
+        }
 
         if (spawnObject == null)
         {

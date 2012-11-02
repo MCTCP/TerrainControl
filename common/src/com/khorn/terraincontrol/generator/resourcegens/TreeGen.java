@@ -111,7 +111,7 @@ public class TreeGen extends ResourceGenBase
     {
         if (res.Type == ResourceType.Sapling)
         {
-            if(Props[0].equals("All"))
+            if (Props[0].equals("All"))
                 res.BlockData = -1;
             else
                 res.BlockData = CheckValue(Props[0], 0, 3);
@@ -167,7 +167,9 @@ public class TreeGen extends ResourceGenBase
                 continue;
             }
 
-            CustomObjectCompiled obj = ObjectsStore.Compile(tree);
+            CustomObjectCompiled obj = ObjectsStore.CompileString(tree, biomeConfig.worldConfig.CustomObjectsDirectory);
+            if (obj == null)
+                obj = ObjectsStore.CompileString(tree, ObjectsStore.GlobalDirectory);
             if (obj != null)
             {
                 customTrees.add(obj);
@@ -275,15 +277,15 @@ public class TreeGen extends ResourceGenBase
     protected String WriteString(Resource res, String blockSources)
     {
         String output;
-        if(res.Type == ResourceType.Sapling)
+        if (res.Type == ResourceType.Sapling)
         {
-           if(res.BlockData == -1)
-               output = "All";
+            if (res.BlockData == -1)
+                output = "All";
             else
-               output = "" + res.BlockData;
+                output = "" + res.BlockData;
 
         } else
-        output = String.valueOf(res.Frequency);
+            output = String.valueOf(res.Frequency);
         for (int i = 0; i < res.TreeChances.length; i++)
         {
             output += ",";

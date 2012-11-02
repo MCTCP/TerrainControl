@@ -1,9 +1,14 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
+import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
+import com.khorn.terraincontrol.customobjects.ObjectsStore;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListCommand extends BaseCommand
@@ -13,42 +18,75 @@ public class ListCommand extends BaseCommand
         super(_plugin);
         name = "list";
         perm = TCPerm.CMD_LIST.node;
-        usage = "list [page]";
+        usage = "list [-w World] [page]";
         workOnConsole = false;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, List<String> args)
     {
-        /*
-        BukkitWorld world = this.getWorld(sender, "");
 
-        if (world != null)
+        int page = 1;
+
+        if (args.size() > 1 && args.get(0).equals("-w"))
         {
-            if (world.getSettings().Objects.size() == 0)
-                sender.sendMessage(MessageColor + "This world does not have custom objects");
-
-            List<String> pluginList = new ArrayList<String>();
-            for (CustomObject object : world.getSettings().Objects)
-            {
-                pluginList.add(ValueColor + object.name);
-            }
-            int page = 1;
-            if (args.size() > 0)
+            String worldName = args.get(1);
+            if (args.size() > 2)
             {
                 try
                 {
-                    page = Integer.parseInt(args.get(0));
+                    page = Integer.parseInt(args.get(2));
                 } catch (Exception e)
                 {
-                     sender.sendMessage(ErrorColor + "Wrong page number " + args.get(0));
+                    sender.sendMessage(ErrorColor + "Wrong page number " + args.get(2));
                 }
             }
-            this.ListMessage(sender, pluginList, page, "Bob plugins");
+            BukkitWorld world = this.getWorld(sender, worldName);
+
+            if (world != null)
+            {
+                if (world.getSettings().CustomObjectsCompiled.size() == 0)
+                    sender.sendMessage(MessageColor + "This world does not have custom objects");
+
+                List<String> pluginList = new ArrayList<String>();
+                for (CustomObjectCompiled object : world.getSettings().CustomObjectsCompiled)
+                {
+                    pluginList.add(ValueColor + object.Name);
+                }
+
+                this.ListMessage(sender, pluginList, page, "World bo2 objects");
+
+            } else
+                sender.sendMessage(ErrorColor + "World not found " + worldName);
             return true;
 
+
         }
-        sender.sendMessage(ErrorColor + "TC is not enabled for this world");  */
+        if (args.size() > 0)
+        {
+            try
+            {
+                page = Integer.parseInt(args.get(0));
+            } catch (Exception e)
+            {
+                sender.sendMessage(ErrorColor + "Wrong page number " + args.get(0));
+            }
+        }
+
+        ArrayList<CustomObject> globalObjects = ObjectsStore.LoadObjectsFromDirectory(ObjectsStore.GlobalDirectory);
+
+        if (globalObjects.size() == 0)
+            sender.sendMessage(MessageColor + "This global directory does not have custom objects");
+
+        List<String> pluginList = new ArrayList<String>();
+        for (CustomObject object : globalObjects)
+        {
+            pluginList.add(ValueColor + object.Name);
+        }
+
+        this.ListMessage(sender, pluginList, page, "Global bo2 objects");
+
+
         return true;
 
     }

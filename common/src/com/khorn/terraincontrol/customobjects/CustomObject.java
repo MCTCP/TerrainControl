@@ -14,19 +14,19 @@ public class CustomObject extends ConfigFile
 
     public boolean IsValid = false;
     public File FilePath;
-    public String name = "";
+    public String Name = "";
 
 
     public CustomObject(File objectFile)
     {
         FilePath = objectFile;
-        name = objectFile.getName();
+        Name = objectFile.getName();
 
-        if(!name.toLowerCase().endsWith(BODefaultValues.BO_Extension.stringValue().toLowerCase()))
+        if(!Name.toLowerCase().endsWith(BODefaultValues.BO_Extension.stringValue().toLowerCase()))
             return;
 
         //Remove extension.
-        name = name.substring(0, name.length() - 4);
+        Name = Name.substring(0, Name.length() - 4);
 
 
         ReadSettingsFile(objectFile);
@@ -71,7 +71,7 @@ public class CustomObject extends ConfigFile
             }
         }
 
-        return new CustomObjectCompiled(newSettings, name, changedSettings, this);
+        return new CustomObjectCompiled(newSettings, Name, changedSettings, this);
 
     }
 

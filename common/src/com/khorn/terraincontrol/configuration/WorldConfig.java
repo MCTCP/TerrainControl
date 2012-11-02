@@ -130,6 +130,7 @@ public class WorldConfig extends ConfigFile
     public int objectSpawnRatio;
     //public boolean denyObjectsUnderFill;
     //public int customTreeChance;
+    public File CustomObjectsDirectory;
 
     public boolean StrongholdsEnabled;
     public boolean MineshaftsEnabled;
@@ -266,25 +267,25 @@ public class WorldConfig extends ConfigFile
 
     private void ReadWorldCustomObjects()
     {
-        File directory = new File(SettingsDir, "BOBPlugins");
-        if (directory.exists())
-            if (!directory.renameTo(new File(SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue())))
+        CustomObjectsDirectory = new File(SettingsDir, "BOBPlugins");
+        if (CustomObjectsDirectory.exists())
+            if (!CustomObjectsDirectory.renameTo(new File(SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue())))
             {
                 System.out.println("TerrainControl: Can`t rename old custom objects folder");
             }
 
-        directory = new File(this.SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
+        CustomObjectsDirectory = new File(this.SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
 
-        if (!directory.exists())
+        if (!CustomObjectsDirectory.exists())
         {
-            if (!directory.mkdirs())
+            if (!CustomObjectsDirectory.mkdirs())
             {
-                System.out.println("TerrainControl: can`t create WorldObjects directory");
+                System.out.println("TerrainControl: can`t create WorldObjects CustomObjectsDirectory");
                 return;
             }
         }
 
-        ArrayList<CustomObject> rawObjects = ObjectsStore.LoadObjectsFromDirectory(directory);
+        ArrayList<CustomObject> rawObjects = ObjectsStore.LoadObjectsFromDirectory(CustomObjectsDirectory);
 
 
         CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();

@@ -18,7 +18,7 @@ public class ReloadCommand extends BaseCommand
         super(_plugin);
         name = "reload";
         perm = TCPerm.CMD_RELOAD.node;
-        usage = "reload [World]";
+        usage = "reload [world_name]";
         workOnConsole = true;
     }
 

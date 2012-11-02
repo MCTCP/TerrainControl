@@ -5,7 +5,6 @@ import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.DefaultMobType;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
-import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
 import com.khorn.terraincontrol.customobjects.ObjectsStore;
 import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
@@ -394,7 +393,7 @@ public class BiomeConfig extends ConfigFile
             this.spawnWaterCreaturesAddDefaults = ReadModSettings("spawnWaterCreaturesAddDefaults", true);
             this.spawnWaterCreatures = ReadModSettings("spawnWaterCreatures", new ArrayList<WeightedMobSpawnGroup>());
         }
-        
+
         this.ReadCustomObjectSettings();
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
@@ -542,13 +541,12 @@ public class BiomeConfig extends ConfigFile
 
         for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
         {
-            String[] values = ObjectsStore.ParseString(entry.getKey());
-
-            CustomObject object = ObjectsStore.GetObjectFromName(values[0]);
+            CustomObjectCompiled object = ObjectsStore.CompileString(entry.getKey(), worldConfig.CustomObjectsDirectory);
             if (object == null)
-                continue;
+                object = ObjectsStore.CompileString(entry.getKey(), ObjectsStore.GlobalDirectory);
+            if (object != null)
+                CustomObjectsCompiled.add(object);
 
-            CustomObjectsCompiled.add(object.Compile(values[1]));
         }
 
     }

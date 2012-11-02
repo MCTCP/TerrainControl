@@ -48,15 +48,15 @@ public class ObjectsStore
      */
 
 
-    private static File directory;
+    public static File GlobalDirectory;
 
     public static void ReadObjects(File pluginPath)
     {
-        directory = new File(pluginPath, BODefaultValues.BO_GlobalDirectoryName.stringValue());
+        GlobalDirectory = new File(pluginPath, BODefaultValues.BO_GlobalDirectoryName.stringValue());
 
-        if (!directory.exists())
+        if (!GlobalDirectory.exists())
         {
-            if (!directory.mkdirs())
+            if (!GlobalDirectory.mkdirs())
             {
                 System.out.println("TerrainControl: can`t create GlobalObjects directory");
             }
@@ -107,8 +107,7 @@ public class ObjectsStore
         return output;
     }
 
-
-    public static CustomObject GetObjectFromName(String name)
+    public static CustomObject GetObjectFromDirectory(String name, File directory)
     {
         if (!directory.exists())
             return null;
@@ -124,10 +123,10 @@ public class ObjectsStore
 
                 String fileName = customObjectFile.getName();
 
-                if (!name.toLowerCase().endsWith(BODefaultValues.BO_Extension.stringValue().toLowerCase()))
+                if (!fileName.toLowerCase().endsWith(BODefaultValues.BO_Extension.stringValue().toLowerCase()))
                     continue;
 
-                name = name.substring(0, name.length() - 4);
+                fileName = fileName.substring(0, fileName.length() - 4);
 
                 if (fileName.equals(name))
                 {
@@ -139,13 +138,14 @@ public class ObjectsStore
         }
 
         return null;
+
     }
 
 
-    public static CustomObjectCompiled Compile(String key)
+    public static CustomObjectCompiled CompileString(String key, File directory)
     {
         String[] values = ParseString(key);
-        CustomObject object = GetObjectFromName(values[0]);
+        CustomObject object = GetObjectFromDirectory(values[0], directory);
 
 
         if (object == null)
@@ -155,12 +155,4 @@ public class ObjectsStore
 
 
     }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public static void ReloadObjects()
-    {
-
-
-    }
-
 }
