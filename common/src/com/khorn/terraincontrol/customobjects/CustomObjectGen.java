@@ -289,11 +289,13 @@ public class CustomObjectGen extends ResourceGenBase
 
             }
 
-
         for (CustomObjectCompiled objectCompiled : objects)
+        {
             if (Groups.containsKey(objectCompiled.GroupId))
-                objectCompiled.GroupObjects = Groups.get(objectCompiled.GroupId).toArray(objectCompiled.GroupObjects);
-
+            {
+                objectCompiled.GroupObjects = Groups.get(objectCompiled.GroupId).toArray(new CustomObjectCompiled[0]);
+            }
+        }
 
         res.CUObjects = objects.toArray(res.CUObjects);
         res.CUObjectsNames = objectsName.toArray(res.CUObjectsNames);
