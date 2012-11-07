@@ -38,7 +38,6 @@ public class CustomObject extends ConfigFile
             return;
 
         ReadConfigSettings();
-
     }
 
 

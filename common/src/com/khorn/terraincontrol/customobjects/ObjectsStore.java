@@ -108,51 +108,32 @@ public class ObjectsStore
     }
 
     public static CustomObject GetObjectFromDirectory(String name, File directory)
-    {
-        if (!directory.exists())
-            return null;
-
-        File[] files = directory.listFiles();
-        if (files == null)
-            return null;
-
-        for (File customObjectFile : files)
+    {   
+        File customObjectFile = new File(directory, name+"."+BODefaultValues.BO_Extension.stringValue());
+        
+        if (!customObjectFile.isFile())
         {
-            if (customObjectFile.isFile())
-            {
-
-                String fileName = customObjectFile.getName();
-
-                if (!fileName.toLowerCase().endsWith(BODefaultValues.BO_Extension.stringValue().toLowerCase()))
-                    continue;
-
-                fileName = fileName.substring(0, fileName.length() - 4);
-
-                if (fileName.equals(name))
-                {
-                    CustomObject object = new CustomObject(customObjectFile);
-                    if (object.IsValid)
-                        return object;
-                }
-            }
+            return null;
         }
-
-        return null;
-
+        
+        CustomObject object = new CustomObject(customObjectFile);
+        
+        if (!object.IsValid)
+        {
+            return null;
+        }
+        
+        return object;
     }
-
 
     public static CustomObjectCompiled CompileString(String key, File directory)
     {
         String[] values = ParseString(key);
         CustomObject object = GetObjectFromDirectory(values[0], directory);
 
-
         if (object == null)
             return null;
 
         return object.Compile(values[1]);
-
-
     }
 }
