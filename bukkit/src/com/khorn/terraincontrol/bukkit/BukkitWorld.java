@@ -228,7 +228,7 @@ public class BukkitWorld implements LocalWorld
         {
             for (int _z = 0; _z < 16; _z++)
             {
-                int i5 = this.world.g(i1 + _x, i2 + _z);
+                int i5 = this.world.h(i1 + _x, i2 + _z);
 
                 if (this.world.u(_x + i1, i5 - 1, _z + i2))
                 {
