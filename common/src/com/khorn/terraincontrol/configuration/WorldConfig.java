@@ -292,7 +292,7 @@ public class WorldConfig extends ConfigFile
 
         for (CustomObject object : rawObjects)
             CustomObjectsCompiled.add(object.Compile(""));
-        System.out.println("TerrainControl:" + CustomObjectsCompiled.size() + " world custom objects loaded");
+        System.out.println("TerrainControl: " + CustomObjectsCompiled.size() + " world custom objects loaded");
 
 
     }

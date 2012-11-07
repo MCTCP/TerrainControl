@@ -10,12 +10,9 @@ import java.util.Map;
 
 public class CustomObject extends ConfigFile
 {
-
-
     public boolean IsValid = false;
     public File FilePath;
     public String Name = "";
-
 
     public CustomObject(File objectFile)
     {
@@ -39,7 +36,6 @@ public class CustomObject extends ConfigFile
 
         ReadConfigSettings();
     }
-
 
     public CustomObjectCompiled Compile(String settingsLine)
     {
@@ -74,6 +70,11 @@ public class CustomObject extends ConfigFile
 
     }
 
+    @Override
+    public boolean sayNotFoundEnabled()
+    {
+        return false;
+    }
 
     @Override
     protected void ReadConfigSettings()

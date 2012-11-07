@@ -67,8 +67,6 @@ public class CustomObjectCompiled extends ConfigFile
 
         SettingsCache.clear();
         SettingsCache = null;
-
-
     }
 
 
@@ -122,6 +120,12 @@ public class CustomObjectCompiled extends ConfigFile
         this.ReadCoordinates();
     }
 
+    @Override
+    protected boolean sayNotFoundEnabled()
+    {
+        return false;
+    }
+    
     @Override
     protected void CorrectSettings()
     {

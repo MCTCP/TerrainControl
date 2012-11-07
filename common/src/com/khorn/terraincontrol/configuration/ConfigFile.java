@@ -107,6 +107,32 @@ public abstract class ConfigFile
             System.out.println("TerrainControl: Can not load " + f.getName());
     }
 
+    // -------------------------------------------- //
+    // SAY STUFF
+    // -------------------------------------------- //
+    
+    protected boolean sayNotFoundEnabled()
+    {
+        return true;
+    }
+    
+    protected void sayNotFound(String settingsName)
+    {
+        if (this.sayNotFoundEnabled())
+        {
+            System.out.println("TerrainControl: value " + settingsName + " not found.");
+        }
+    }
+    
+    protected void sayHadWrongValue(String settingsName)
+    {
+        System.out.println("TerrainControl: " + settingsName + " had wrong value");
+    }
+    
+    // -------------------------------------------- //
+    // ReadModSettings
+    // -------------------------------------------- //
+    
     protected List<WeightedMobSpawnGroup> ReadModSettings(String settingsName, List<WeightedMobSpawnGroup> defaultValue)
     {
         settingsName = settingsName.toLowerCase();
@@ -118,7 +144,9 @@ public abstract class ConfigFile
             return gson.fromJson(json, new TypeToken<List<WeightedMobSpawnGroup>>()
             {}.getType());
         }
-        System.out.println("TerrainControl: value " + settingsName + " not found.");
+        
+        sayNotFound(settingsName);
+        
         return defaultValue;
     }
 
@@ -135,7 +163,7 @@ public abstract class ConfigFile
             Collections.addAll(out, this.SettingsCache.get(settingsName).split(","));
             return out;
         }
-        System.out.println("TerrainControl: value " + settingsName + " not found.");
+        sayNotFound(settingsName);
         return defaultValue;
     }
 
@@ -147,12 +175,13 @@ public abstract class ConfigFile
             try
             {
                 return Integer.valueOf(this.SettingsCache.get(settingsName));
-            } catch (NumberFormatException e)
+            }
+            catch (NumberFormatException e)
             {
-                System.out.println("TerrainControl: " + settingsName + " had wrong value");
+                sayHadWrongValue(settingsName);
             }
         }
-        System.out.println("TerrainControl: value " + settingsName + " not found.");
+        sayNotFound(settingsName);
         return defaultValue;
     }
 
@@ -164,12 +193,13 @@ public abstract class ConfigFile
             try
             {
                 return Byte.valueOf(this.SettingsCache.get(settingsName));
-            } catch (NumberFormatException e)
+            }
+            catch (NumberFormatException e)
             {
-                System.out.println("TerrainControl: " + settingsName + " had wrong value");
+                sayHadWrongValue(settingsName);
             }
         }
-        System.out.println("TerrainControl: value " + settingsName + " not found.");
+        sayNotFound(settingsName);
         return defaultValue;
     }
 
@@ -180,7 +210,7 @@ public abstract class ConfigFile
         {
             return this.SettingsCache.get(settingsName);
         }
-        System.out.println("TerrainControl: value " + settingsName + " not found.");
+        sayNotFound(settingsName);
         return defaultValue;
     }
 
@@ -192,12 +222,13 @@ public abstract class ConfigFile
             try
             {
                 return Double.valueOf(this.SettingsCache.get(settingsName));
-            } catch (NumberFormatException e)
+            }
+            catch (NumberFormatException e)
             {
-                System.out.println("TerrainControl: " + settingsName + " had wrong value");
+                sayHadWrongValue(settingsName);
             }
         }
-        System.out.println("TerrainControl: value " + settingsName + " not found.");
+        sayNotFound(settingsName);
         return defaultValue;
     }
 
@@ -210,12 +241,13 @@ public abstract class ConfigFile
             try
             {
                 color = Color.decode(this.SettingsCache.get(settingsName));
-            } catch (NumberFormatException ex)
+            }
+            catch (NumberFormatException ex)
             {
-                System.out.println("TerrainControl: " + settingsName + " had wrong value");
+                sayHadWrongValue(settingsName);
             }
         } else
-            System.out.println("TerrainControl: value " + settingsName + " not found.");
+            sayNotFound(settingsName);
         return color.getRGB() & 0xFFFFFF;
     }
 
@@ -227,12 +259,13 @@ public abstract class ConfigFile
             try
             {
                 return Float.valueOf(this.SettingsCache.get(settingsName));
-            } catch (NumberFormatException e)
+            }
+            catch (NumberFormatException e)
             {
-                System.out.println("TerrainControl: " + settingsName + " had wrong value");
+                sayHadWrongValue(settingsName);
             }
         }
-        System.out.println("TerrainControl: value " + settingsName + " not found.");
+        sayNotFound(settingsName);
         return defaultValue;
     }
 
@@ -243,7 +276,7 @@ public abstract class ConfigFile
         {
             return Boolean.valueOf(this.SettingsCache.get(settingsName));
         }
-        System.out.println("TerrainControl: value " + settingsName + " not found.");
+        sayNotFound(settingsName);
         return defaultValue;
     }
 
@@ -266,12 +299,12 @@ public abstract class ConfigFile
                     if (enumName.toLowerCase().equals(value) || enumName.equals(value))
                         return (Enum) enumValue;
                 }
-                System.out.println("TerrainControl: " + settingsName + " had wrong value");
+                sayHadWrongValue(settingsName);
 
             }
 
         }
-        System.out.println("TerrainControl: value " + settingsName + " not found.");
+        sayNotFound(settingsName);
         return defaultValue;
 
 
