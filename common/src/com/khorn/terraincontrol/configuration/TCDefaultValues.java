@@ -142,7 +142,7 @@ public enum TCDefaultValues
     MaxAverageHeight(0.0D),
     MaxAverageDepth(0.0D),
 
-    CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0",SettingsType.StringArray),
+    CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0", SettingsType.StringArray),
 
     // End biome settings
 
@@ -326,7 +326,7 @@ public enum TCDefaultValues
             this.sArrayValue = new ArrayList<String>();
             if (s.contains(","))
                 Collections.addAll(this.sArrayValue, s.split(","));
-            else
+            else if (!s.equals(""))
                 this.sArrayValue.add(s);
             return;
         }
