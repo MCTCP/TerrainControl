@@ -301,15 +301,15 @@ public class WorldConfig extends ConfigFile
     {
         if (this.SettingsCache.containsKey("WaterLevel".toLowerCase()))
         {
-            this.SettingsCache.put("WaterLevelMax".toLowerCase(), this.SettingsCache.get("WaterLevel"));
+            this.SettingsCache.put("WaterLevelMax".toLowerCase(), this.SettingsCache.get("WaterLevel".toLowerCase()));
         }
         if (this.SettingsCache.containsKey("ModeTerrain".toLowerCase()))
         {
-            this.SettingsCache.put("TerrainMode".toLowerCase(), this.SettingsCache.get("ModeTerrain"));
+            this.SettingsCache.put(TCDefaultValues.TerrainMode.name().toLowerCase(), this.SettingsCache.get("ModeTerrain".toLowerCase()));
         }
         if (this.SettingsCache.containsKey("ModeBiome".toLowerCase()))
         {
-            this.SettingsCache.put("BiomeMode".toLowerCase(), this.SettingsCache.get("ModeBiome"));
+            this.SettingsCache.put(TCDefaultValues.BiomeMode.name().toLowerCase(), this.SettingsCache.get("ModeBiome".toLowerCase()));
         }
 
     }
