@@ -42,6 +42,8 @@ public class CustomObjectGen extends ResourceGenBase
 
             while (randomRoll < ObjectRarity)
             {
+                ObjectRarity -= 100;
+                
                 int x = _x + rand.nextInt(16);
                 int z = _z + rand.nextInt(16);
                 int y;
@@ -61,8 +63,6 @@ public class CustomObjectGen extends ResourceGenBase
 
                 if (y < 0)
                     continue;
-
-                ObjectRarity -= 100;
 
                 if (!ObjectCanSpawn(world, x, y, z, SelectedObject))
                     continue;
