@@ -143,6 +143,15 @@ public enum DefaultMaterial
     SPRUCE_WOOD_STAIRS(134),
     BIRCH_WOOD_STAIRS(135),
     JUNGLE_WOOD_STAIRS(136),
+    COMMAND(137),
+    BEACON(138),
+    COBBLE_WALL(139, false),
+    FLOWER_POT(140, false),
+    CARROT(141, false),
+    POTATO(142, false),
+    WOOD_BUTTON(143, false),
+    SKULL(144, false),
+    ANVIL(145, false),
     UNKNOWN_BLOCK(255);
 
     public final int id;

@@ -45,7 +45,15 @@ public class BlockHelper
                     case 3: return 5 | power;
                 }
                 break;
-
+                
+            case LOG:
+                switch(data / 4) {
+                    case 1: return data + 4; // East/West-->North/South horizontal log
+                    case 2: return data - 4; // North/South-->East/West horizontal log
+                    // Default: vertical or all-bark log
+                }
+                break;
+                
             case WOOD_STAIRS:
             case COBBLESTONE_STAIRS:
             case BRICK_STAIRS:
@@ -65,6 +73,7 @@ public class BlockHelper
 
             case LEVER:
             case STONE_BUTTON:
+            case WOOD_BUTTON:
                 int thrown = data & 0x8;
                 int withoutThrown = data & ~0x8;
                 switch (withoutThrown) {
@@ -94,6 +103,7 @@ public class BlockHelper
             case LADDER:
             case WALL_SIGN:
             case CHEST:
+            case ENDER_CHEST:
             case FURNACE:
             case BURNING_FURNACE:
             case DISPENSER:
@@ -159,6 +169,23 @@ public class BlockHelper
 
             case FENCE_GATE:
                 return ((data + 3) & 0x3) | (data & ~0x3);
+                
+            case COCOA:
+                int rotationData = data % 4;
+                if(rotationData == 0) {
+                    return data + 3;
+                } else {
+                    return data - 1; 
+                }
+           
+            case ANVIL:
+                if(data % 2 == 0) {
+                    // North-south --> west-east
+                    return data + 1;
+                } else {
+                    // West-east --> north-south
+                    return data - 1;
+                }
         }
 
         return data;
