@@ -230,11 +230,11 @@ public class BukkitWorld implements LocalWorld
             {
                 int i5 = this.world.h(i1 + _x, i2 + _z);
 
-                if (this.world.u(_x + i1, i5 - 1, _z + i2))
+                if (this.world.w(_x + i1, i5 - 1, _z + i2))
                 {
                     this.world.setTypeId(_x + i1, i5 - 1, _z + i2, Block.ICE.id);
                 }
-                if (this.world.w(_x + i1, i5, _z + i2))
+                if (this.world.y(_x + i1, i5, _z + i2))
                 {
                     this.world.setTypeId(_x + i1, i5, _z + i2, Block.SNOW.id);
                 }
