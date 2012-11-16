@@ -46,7 +46,6 @@ public class TCPlugin extends JavaPlugin
 
         ObjectsStore.ReadObjects(this.getDataFolder());
 
-        Bukkit.getMessenger().registerIncomingPluginChannel(this, TCDefaultValues.ChannelName.stringValue(), this.listener);
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
 
         log("Enabled");

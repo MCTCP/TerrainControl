@@ -929,34 +929,13 @@ public class WorldConfig extends ConfigFile
 
     public void Serialize(DataOutputStream stream) throws IOException
     {
-        stream.writeInt(TCDefaultValues.ProtocolVersion.intValue());
-
+    	// General information
         WriteStringToStream(stream, this.WorldName);
-
-        stream.writeInt(this.GenerationDepth);
-        stream.writeInt(this.BiomeRarityScale);
-        stream.writeInt(this.LandRarity);
-        stream.writeInt(this.LandSize);
-        stream.writeInt(this.LandFuzzy);
-        stream.writeInt(this.IceRarity);
-        stream.writeInt(this.IceSize);
-        stream.writeBoolean(this.FrozenOcean);
-        stream.writeBoolean(this.FrozenRivers);
-        stream.writeInt(this.RiverRarity);
-        stream.writeInt(this.RiverSize);
-        stream.writeBoolean(this.RiversEnabled);
-
-        stream.writeDouble(this.oldBiomeSize);
-
-        stream.writeFloat(this.minTemperature);
-        stream.writeFloat(this.maxTemperature);
-        stream.writeFloat(this.minMoisture);
-        stream.writeFloat(this.maxMoisture);
 
         stream.writeInt(this.WorldFog);
         stream.writeInt(this.WorldNightFog);
 
-
+        // Custom biomes + ids
         stream.writeInt(this.CustomBiomes.size());
         for (String name : this.CustomBiomes)
         {
@@ -964,61 +943,21 @@ public class WorldConfig extends ConfigFile
             stream.writeInt(this.CustomBiomeIds.get(name));
         }
 
+        // BiomeConfigs
         stream.writeInt(this.biomes.size());
         for (BiomeConfig config : this.biomes)
         {
             stream.writeInt(config.Biome.getId());
             config.Serialize(stream);
         }
-
-        stream.writeInt(this.NormalBiomes.size());
-        for (String biome : this.NormalBiomes)
-            WriteStringToStream(stream, biome);
-
-        stream.writeInt(this.IceBiomes.size());
-        for (String biome : this.IceBiomes)
-            WriteStringToStream(stream, biome);
-
-        stream.writeInt(this.IsleBiomes.size());
-        for (String biome : this.IsleBiomes)
-            WriteStringToStream(stream, biome);
-
-        stream.writeInt(this.BorderBiomes.size());
-        for (String biome : this.BorderBiomes)
-            WriteStringToStream(stream, biome);
     }
 
 
     // Need for create world config from network packet
     public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
     {
-        // Protocol version
-        int protocolVersion = stream.readInt();
-        if (protocolVersion != TCDefaultValues.ProtocolVersion.intValue())
-            throw new IOException("Wrong TC protocol version");
-
+        // General information
         this.WorldName = ReadStringFromStream(stream);
-
-        this.GenerationDepth = stream.readInt();
-        this.BiomeRarityScale = stream.readInt();
-        this.LandRarity = stream.readInt();
-        this.LandSize = stream.readInt();
-        this.LandFuzzy = stream.readInt();
-        this.IceRarity = stream.readInt();
-        this.IceSize = stream.readInt();
-        this.FrozenOcean = stream.readBoolean();
-        this.FrozenRivers = stream.readBoolean();
-        this.RiverRarity = stream.readInt();
-        this.RiverSize = stream.readInt();
-        this.RiversEnabled = stream.readBoolean();
-
-        this.oldBiomeSize = stream.readDouble();
-
-        this.minTemperature = stream.readFloat();
-        this.maxTemperature = stream.readFloat();
-
-        this.minMoisture = stream.readFloat();
-        this.maxMoisture = stream.readFloat();
 
         this.WorldFog = stream.readInt();
         this.WorldNightFog = stream.readInt();
@@ -1031,6 +970,7 @@ public class WorldConfig extends ConfigFile
         this.WorldNightFogG = ((WorldNightFog & 0xFF00) >> 8) / 255F;
         this.WorldNightFogB = (WorldNightFog & 0xFF) / 255F;
 
+        // Custom biomes + ids
         int count = stream.readInt();
         while (count-- > 0)
         {
@@ -1041,6 +981,7 @@ public class WorldConfig extends ConfigFile
             this.CustomBiomeIds.put(name, id);
         }
 
+        // BiomeConfigs
         this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
         count = stream.readInt();
@@ -1050,39 +991,6 @@ public class WorldConfig extends ConfigFile
             BiomeConfig config = new BiomeConfig(stream, this, world.getBiomeById(id));
             this.biomeConfigs[id] = config;
         }
-
-        count = stream.readInt();
-        String name;
-        while (count-- > 0)
-        {
-            name = ReadStringFromStream(stream);
-            this.NormalBiomes.add(name);
-        }
-
-        count = stream.readInt();
-        while (count-- > 0)
-        {
-            name = ReadStringFromStream(stream);
-            this.IceBiomes.add(name);
-        }
-
-        count = stream.readInt();
-        while (count-- > 0)
-        {
-            name = ReadStringFromStream(stream);
-            this.IsleBiomes.add(name);
-        }
-
-        count = stream.readInt();
-        while (count-- > 0)
-        {
-            name = ReadStringFromStream(stream);
-            this.BorderBiomes.add(name);
-        }
-
-        for (BiomeConfig biomeConfig : this.biomeConfigs)
-            if (biomeConfig != null && biomeConfig.Biome.isCustom())
-                biomeConfig.Biome.setCustom(biomeConfig);
 
     }
 }

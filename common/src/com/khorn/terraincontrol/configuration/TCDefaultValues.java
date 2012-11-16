@@ -14,7 +14,7 @@ public enum TCDefaultValues
 
     //Network
     ChannelName("TerrainControl"),
-    ProtocolVersion(4),
+    ProtocolVersion(5),
     // End network
 
     maxChunkBlockValue(32768),
@@ -132,7 +132,9 @@ public enum TCDefaultValues
     SkyColor("0x7BA5FF", SettingsType.Color),
     WaterColor("0xFFFFFF", SettingsType.Color),
     GrassColor("0x000000", SettingsType.Color),
+    GrassColorIsMultiplier(true),
     FoliageColor("0x000000", SettingsType.Color),
+    FoliageColorIsMultiplier(true),
 
     Volatility1(0.0D),
     Volatility2(0.0D),

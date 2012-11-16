@@ -1,9 +1,6 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.lib.gson.Gson;
-import com.khorn.terraincontrol.lib.gson.GsonBuilder;
-import com.khorn.terraincontrol.lib.gson.reflect.TypeToken;
 
 import java.awt.*;
 import java.io.*;
@@ -23,7 +20,7 @@ public abstract class ConfigFile
     // TODO: We should use GSON only instead of just for a few fields.
     // TODO: Hah. We should remove that buggy GSON.
 
-    public static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    //public static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private boolean WriteComments;
 
@@ -135,17 +132,17 @@ public abstract class ConfigFile
     
     protected List<WeightedMobSpawnGroup> ReadModSettings(String settingsName, List<WeightedMobSpawnGroup> defaultValue)
     {
-        settingsName = settingsName.toLowerCase();
-        if (this.SettingsCache.containsKey(settingsName))
-        {
-            String json = this.SettingsCache.get(settingsName);
-            if (json == null)
-                return defaultValue;
-            return gson.fromJson(json, new TypeToken<List<WeightedMobSpawnGroup>>()
-            {}.getType());
-        }
-        
-        sayNotFound(settingsName);
+//    	settingsName = settingsName.toLowerCase();
+//        if (this.SettingsCache.containsKey(settingsName))
+//        {
+//            String json = this.SettingsCache.get(settingsName);
+//            if (json == null)
+//                return defaultValue;
+//            return gson.fromJson(json, new TypeToken<List<WeightedMobSpawnGroup>>()
+//            {}.getType());
+//        }
+//        
+//        sayNotFound(settingsName);
         
         return defaultValue;
     }
@@ -403,7 +400,8 @@ public abstract class ConfigFile
 
     protected void WriteValue(String settingsName, List<WeightedMobSpawnGroup> settingsValue) throws IOException
     {
-        this.SettingsWriter.write(settingsName + ":" + gson.toJson(settingsValue));
+    	this.SettingsWriter.write(settingsName + ": []" );
+    	//this.SettingsWriter.write(settingsName + ":" + gson.toJson(settingsValue));
         this.SettingsWriter.newLine();
     }
 

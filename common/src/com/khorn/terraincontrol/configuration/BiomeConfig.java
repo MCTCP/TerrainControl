@@ -58,7 +58,9 @@ public class BiomeConfig extends ConfigFile
     public int WaterColor;
 
     public int GrassColor;
+    public boolean GrassColorIsMultiplier;
     public int FoliageColor;
+    public boolean FoliageColorIsMultiplier;
 
     public Resource[] ResourceSequence = new Resource[256];
     public Resource[] SaplingTypes = new Resource[4];
@@ -372,7 +374,9 @@ public class BiomeConfig extends ConfigFile
         this.SkyColor = ReadSettings(TCDefaultValues.SkyColor);
         this.WaterColor = ReadModSettingsColor(TCDefaultValues.WaterColor.name(), this.DefaultWaterColorMultiplier);
         this.GrassColor = ReadModSettingsColor(TCDefaultValues.GrassColor.name(), this.DefaultGrassColor);
+        this.GrassColorIsMultiplier = ReadSettings(TCDefaultValues.GrassColorIsMultiplier);
         this.FoliageColor = ReadModSettingsColor(TCDefaultValues.FoliageColor.name(), this.DefaultFoliageColor);
+        this.FoliageColorIsMultiplier = ReadSettings(TCDefaultValues.FoliageColorIsMultiplier);
 
         this.volatilityRaw1 = ReadSettings(TCDefaultValues.Volatility1);
         this.volatilityRaw2 = ReadSettings(TCDefaultValues.Volatility2);
@@ -692,11 +696,20 @@ public class BiomeConfig extends ConfigFile
         this.WriteNewLine();
         this.WriteComment("Biome grass color");
         this.WriteColorValue(TCDefaultValues.GrassColor.name(), this.GrassColor);
+        
+        this.WriteNewLine();
+        this.WriteComment("Whether the grass color is a multiplier");
+        this.WriteComment("If you set it to true, the color will be based on this value, the BiomeTemperature and the BiomeWetness");
+        this.WriteComment("If you set it to false, the grass color will be just this color");
+        this.WriteValue(TCDefaultValues.GrassColorIsMultiplier.name(), this.GrassColorIsMultiplier);
 
         this.WriteNewLine();
         this.WriteComment("Biome foliage color");
         this.WriteColorValue(TCDefaultValues.FoliageColor.name(), this.FoliageColor);
 
+        this.WriteNewLine();
+        this.WriteComment("Whether the foliage color is a multiplier. See GrassColorIsMultiplier for details");
+        this.WriteValue(TCDefaultValues.FoliageColorIsMultiplier.name(), this.FoliageColorIsMultiplier);
 
         this.WriteNewLine();
         this.WriteTitle("Sapling resource");
@@ -1218,29 +1231,14 @@ public class BiomeConfig extends ConfigFile
     {
         WriteStringToStream(stream, this.Name);
 
-        stream.writeInt(this.BiomeSize);
-        stream.writeInt(this.BiomeRarity);
-        stream.writeBoolean(this.BiomeRivers);
-
-        stream.writeInt(this.IsleInBiome.size());
-        for (String biome : this.IsleInBiome)
-            WriteStringToStream(stream, biome);
-
-        stream.writeInt(this.BiomeIsBorder.size());
-        for (String biome : this.BiomeIsBorder)
-            WriteStringToStream(stream, biome);
-
-        stream.writeInt(this.NotBorderNear.size());
-        for (String biome : this.NotBorderNear)
-            WriteStringToStream(stream, biome);
-
         stream.writeFloat(this.BiomeTemperature);
         stream.writeFloat(this.BiomeWetness);
         stream.writeInt(this.SkyColor);
         stream.writeInt(this.WaterColor);
         stream.writeInt(this.GrassColor);
+        stream.writeBoolean(this.GrassColorIsMultiplier);
         stream.writeInt(this.FoliageColor);
-
+        stream.writeBoolean(this.FoliageColorIsMultiplier);
     }
 
     public BiomeConfig(DataInputStream stream, WorldConfig config, LocalBiome biome) throws IOException
@@ -1249,30 +1247,13 @@ public class BiomeConfig extends ConfigFile
         this.Biome = biome;
         this.worldConfig = config;
 
-        this.BiomeSize = stream.readInt();
-        this.BiomeRarity = stream.readInt();
-        this.BiomeRivers = stream.readBoolean();
-
-        int count = stream.readInt();
-        this.IsleInBiome = new ArrayList<String>();
-        while (count-- > 0)
-            this.IsleInBiome.add(ReadStringFromStream(stream));
-
-        count = stream.readInt();
-        this.BiomeIsBorder = new ArrayList<String>();
-        while (count-- > 0)
-            this.BiomeIsBorder.add(ReadStringFromStream(stream));
-
-        count = stream.readInt();
-        this.NotBorderNear = new ArrayList<String>();
-        while (count-- > 0)
-            this.NotBorderNear.add(ReadStringFromStream(stream));
         this.BiomeTemperature = stream.readFloat();
         this.BiomeWetness = stream.readFloat();
-
         this.SkyColor = stream.readInt();
         this.WaterColor = stream.readInt();
         this.GrassColor = stream.readInt();
+        this.GrassColorIsMultiplier = stream.readBoolean();
         this.FoliageColor = stream.readInt();
+        this.FoliageColorIsMultiplier = stream.readBoolean();
     }
 }

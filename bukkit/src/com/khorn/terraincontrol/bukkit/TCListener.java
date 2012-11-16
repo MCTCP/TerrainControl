@@ -11,16 +11,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.plugin.messaging.PluginMessageListener;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
-public class TCListener implements Listener, PluginMessageListener
+public class TCListener implements Listener
 {
     private TCPlugin tcPlugin;
     private Random random;
@@ -86,40 +85,56 @@ public class TCListener implements Listener, PluginMessageListener
         }
     }
 
-    public void onPluginMessageReceived(String s, Player player, byte[] bytes)
-    {
-        if (bytes.length == 1)
-        {
-            if (bytes[0] == TCDefaultValues.ProtocolVersion.intValue())
-            {
-                World world = player.getWorld();
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event)
+	{
+		// Sends the packet
 
-                if (this.tcPlugin.worlds.containsKey(world.getUID()))
-                {
-                    WorldConfig config = this.tcPlugin.worlds.get(world.getUID()).getSettings();
+		final Player player = event.getPlayer();
 
-                    System.out.println("TerrainControl: client config requested for world " + config.WorldName);
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    DataOutputStream stream = new DataOutputStream(outputStream);
+		// Because the player doesn't send the REGISTER packet immediately, we
+		// have to wait a second (20 ticks).
+		Bukkit.getScheduler().runTaskLater(tcPlugin, new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if (!player.getListeningPluginChannels().contains(TCDefaultValues.ChannelName.stringValue()))
+				{
+					// Player doesn't have TC, abort.
+					System.out.println("TerrainControl: player joined without TerrainControl");
+					return;
+				}
 
-                    try
-                    {
-                        config.Serialize(stream);
-                        stream.flush();
+				// Send the configs
+				World world = player.getWorld();
 
-                    } catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
+				if (tcPlugin.worlds.containsKey(world.getUID()))
+				{
+					WorldConfig config = tcPlugin.worlds.get(world.getUID()).getSettings();
 
-                    byte[] data = outputStream.toByteArray();
+					System.out.println("TerrainControl: config sent to player for world " + config.WorldName);
+					ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+					DataOutputStream stream = new DataOutputStream(outputStream);
 
-                    player.sendPluginMessage(this.tcPlugin, TCDefaultValues.ChannelName.stringValue(), data);
-                }
-            } else
-            {
-                System.out.println("TerrainControl: client have old TC version");
-            }
-        }
-    }
+					try
+					{
+						stream.writeInt(TCDefaultValues.ProtocolVersion.intValue());
+						config.Serialize(stream);
+						stream.flush();
+
+					} catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+
+					byte[] data = outputStream.toByteArray();
+
+					player.sendPluginMessage(tcPlugin, TCDefaultValues.ChannelName.stringValue(), data);
+				}
+			}
+		}, 20);
+
+	}
+
 }
