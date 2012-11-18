@@ -23,43 +23,48 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 @Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.3.2")
-@NetworkMod(clientSideRequired = false,serverSideRequired = false)
+@NetworkMod(clientSideRequired = false, serverSideRequired = false)
+public class TCPlugin
+{
 
-public class TCPlugin {
+    @Instance("TerrainControl")
+    public static TCPlugin instance;
 
-	@Instance("TerrainControl")
-	public static TCPlugin instance;
-	
-	public final File terrainControlDirectory = new File("mods" + File.separator + "TerrainControl");
-	private TCWorldType worldType;
+    public final File terrainControlDirectory = new File("mods" + File.separator + "TerrainControl");
+    private TCWorldType worldType;
 
+    @PreInit
+    public void preInit(FMLPreInitializationEvent event)
+    {
+        // Stub Method
+    }
 
-	@PreInit
-	public void preInit(FMLPreInitializationEvent event) {
-		// Stub Method
-	}
+    @Init
+    public void load(FMLInitializationEvent event)
+    {
+        // This is the place where the mod starts loading
+    	
+    	// Register localization
+        LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
+        // Load global custom objects
+        ObjectsStore.ReadObjects(terrainControlDirectory);
+        // Register world type
+        worldType = new TCWorldType(this, 4, "TerrainControl");
+        // Register channel
+        NetworkRegistry.instance().registerChannel(new PacketHandler(this), TCDefaultValues.ChannelName.stringValue());
+        // Register player tracker
+        GameRegistry.registerPlayerTracker(new PlayerTracker(this));
+    }
 
-	@Init
-	public void load(FMLInitializationEvent event) {
-		// Register localization
-		LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
-		// Load global custom objects
-		ObjectsStore.ReadObjects(terrainControlDirectory);
-		// Register world type
-		worldType = new TCWorldType(this, 4, "TerrainControl");
-		// Register channel
-		NetworkRegistry.instance().registerChannel(new PacketHandler(this), TCDefaultValues.ChannelName.stringValue());
-		// Register player tracked
-		GameRegistry.registerPlayerTracker(new PlayerTracker(this));
-	}
+    @PostInit
+    public void postInit(FMLPostInitializationEvent event)
+    {
+        // Stub Method
+    }
 
-	@PostInit
-	public void postInit(FMLPostInitializationEvent event) {
-		// Stub Method
-	}
-	
-	public LocalWorld getWorld() {
-		return worldType.TCWorld;
-	}
+    public LocalWorld getWorld()
+    {
+        return worldType.worldTC;
+    }
 
 }

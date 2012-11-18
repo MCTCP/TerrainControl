@@ -7,9 +7,9 @@ import com.khorn.terraincontrol.LocalBiome;
 
 public class Biome implements LocalBiome
 {
-    private BiomeGenBase biomeBase;
+    private BiomeGenCustom biomeBase;
 
-    public Biome(BiomeGenBase biome)
+    public Biome(BiomeGenCustom biome)
     {
         this.biomeBase = biome;
     }
@@ -18,6 +18,7 @@ public class Biome implements LocalBiome
     {
         return true;
     }
+
     public int getCustomId()
     {
         return getId();
@@ -25,7 +26,7 @@ public class Biome implements LocalBiome
 
     public void setCustom(BiomeConfig config)
     {
-        ((CustomBiome)this.biomeBase).SetBiome(config);
+        ((BiomeGenCustom) this.biomeBase).setVisuals(config);
     }
 
     public String getName()

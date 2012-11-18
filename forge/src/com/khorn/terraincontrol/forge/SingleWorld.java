@@ -40,20 +40,18 @@ public class SingleWorld implements LocalWorld
 
     private static int NextBiomeId = 0;
     private static int maxBiomeCount = 256;
-    private static LocalBiome[] Biomes = new LocalBiome[maxBiomeCount];
+    private static Biome[] Biomes = new Biome[maxBiomeCount];
     private static BiomeGenBase[] BiomesToRestore = new BiomeGenBase[maxBiomeCount];
 
     private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
 
     private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
 
-
     public MapGenStronghold strongholdGen;
     private MapGenVillage VillageGen;
     private MapGenMineshaft MineshaftGen;
     private MapGenScatteredFeature PyramidsGen;
     private MapGenNetherBridge NetherFortress;
-
 
     private WorldGenDungeons DungeonGen;
 
@@ -68,7 +66,6 @@ public class SingleWorld implements LocalWorld
     private WorldGenHugeTrees JungleTree;
     private WorldGenShrub GroundBush;
 
-
     private boolean CreateNewChunks;
     private Chunk[] ChunkCache;
     private Chunk CachedChunk;
@@ -78,7 +75,6 @@ public class SingleWorld implements LocalWorld
 
     private BiomeGenBase[] BiomeArray;
     private int[] BiomeIntArray;
-
 
     private int worldHeight = 128;
     private int heightBits = 7;
@@ -105,7 +101,7 @@ public class SingleWorld implements LocalWorld
         {
             BiomeGenBase oldBiome = BiomeGenBase.biomeList[i];
             BiomesToRestore[i] = oldBiome;
-            CustomBiome custom = new CustomBiome(NextBiomeId++, oldBiome.biomeName);
+            BiomeGenCustom custom = new BiomeGenCustom(NextBiomeId++, oldBiome.biomeName);
             custom.CopyBiome(oldBiome);
             Biome biome = new Biome(custom);
             Biomes[biome.getId()] = biome;
@@ -125,7 +121,7 @@ public class SingleWorld implements LocalWorld
     @Override
     public LocalBiome AddBiome(String name, int id)
     {
-        LocalBiome biome = new Biome(new CustomBiome(id, name));
+        Biome biome = new Biome(new BiomeGenCustom(id, name));
         Biomes[biome.getId()] = biome;
         this.BiomeNames.put(biome.getName(), biome);
         return biome;
@@ -239,30 +235,30 @@ public class SingleWorld implements LocalWorld
     {
         switch (type)
         {
-            case Tree:
-                return Tree.generate(this.world, rand, x, y, z);
-            case BigTree:
-                BigTree.setScale(1.0D, 1.0D, 1.0D);
-                return BigTree.generate(this.world, rand, x, y, z);
-            case Forest:
-                return Forest.generate(this.world, rand, x, y, z);
-            case HugeMushroom:
-                HugeMushroom.setScale(1.0D, 1.0D, 1.0D);
-                return HugeMushroom.generate(this.world, rand, x, y, z);
-            case SwampTree:
-                return SwampTree.generate(this.world, rand, x, y, z);
-            case Taiga1:
-                return TaigaTree1.generate(this.world, rand, x, y, z);
-            case Taiga2:
-                return TaigaTree2.generate(this.world, rand, x, y, z);
-            case JungleTree:
-                return JungleTree.generate(this.world, rand, x, y, z);
-            case GroundBush:
-                return GroundBush.generate(this.world, rand, x, y, z);
-            case CocoaTree:
-                return CocoaTree.generate(this.world, rand, x, y, z);
-            default:
-            	break;
+        case Tree:
+            return Tree.generate(this.world, rand, x, y, z);
+        case BigTree:
+            BigTree.setScale(1.0D, 1.0D, 1.0D);
+            return BigTree.generate(this.world, rand, x, y, z);
+        case Forest:
+            return Forest.generate(this.world, rand, x, y, z);
+        case HugeMushroom:
+            HugeMushroom.setScale(1.0D, 1.0D, 1.0D);
+            return HugeMushroom.generate(this.world, rand, x, y, z);
+        case SwampTree:
+            return SwampTree.generate(this.world, rand, x, y, z);
+        case Taiga1:
+            return TaigaTree1.generate(this.world, rand, x, y, z);
+        case Taiga2:
+            return TaigaTree2.generate(this.world, rand, x, y, z);
+        case JungleTree:
+            return JungleTree.generate(this.world, rand, x, y, z);
+        case GroundBush:
+            return GroundBush.generate(this.world, rand, x, y, z);
+        case CocoaTree:
+            return CocoaTree.generate(this.world, rand, x, y, z);
+        default:
+            break;
         }
         return false;
     }
@@ -284,7 +280,7 @@ public class SingleWorld implements LocalWorld
                 }
                 if (this.world.canSnowAt(_x + i1, i5, _z + i2))
                 {
-                	this.world.setBlock(_x + i1, i5, _z + i2, DefaultMaterial.SNOW.id);
+                    this.world.setBlock(_x + i1, i5, _z + i2, DefaultMaterial.SNOW.id);
                 }
             }
 
@@ -294,7 +290,7 @@ public class SingleWorld implements LocalWorld
     @Override
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
     {
-    	boolean isVillagePlaced = false;
+        boolean isVillagePlaced = false;
         if (this.settings.StrongholdsEnabled)
             this.strongholdGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
         if (this.settings.MineshaftsEnabled)
@@ -315,9 +311,9 @@ public class SingleWorld implements LocalWorld
         if (this.settings.BiomeConfigsHaveReplacement)
         {
 
-            Chunk /*wl*/ rawChunk = this.ChunkCache[0];
+            Chunk rawChunk = this.ChunkCache[0];
 
-            ExtendedBlockStorage[] /*wm[]*/ sectionsArray = rawChunk.getBlockStorageArray();
+            ExtendedBlockStorage[] sectionsArray = rawChunk.getBlockStorageArray();
 
             byte[] ChunkBiomes = rawChunk.getBiomeArray();
 
@@ -402,7 +398,6 @@ public class SingleWorld implements LocalWorld
         else
             return null;
 
-
     }
 
     @Override
@@ -461,7 +456,8 @@ public class SingleWorld implements LocalWorld
     @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
-        // If minecraft was updated and obfuscation is off - take a look at these methods:
+        // If minecraft was updated and obfuscation is off - take a look at
+        // these methods:
         // this.world.setRawTypeIdAndData(i, j, k, l, i1)
         // this.world.setTypeIdAndData(i, j, k, l, i1)
 
@@ -478,8 +474,10 @@ public class SingleWorld implements LocalWorld
             chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
             this.world.notifyBlocksOfNeighborChange(x, y, z, typeId == 0 ? oldTypeId : typeId);
         } else
-            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data); // Set typeId and Data
-
+            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data); // Set
+                                                                           // typeId
+                                                                           // and
+                                                                           // Data
 
         if (updateLight)
         {
@@ -488,7 +486,8 @@ public class SingleWorld implements LocalWorld
 
         if (notifyPlayers)
         {
-            //this.world.notifyPlayers(x, y, z) // TODO find method to notify players
+            // this.world.notifyPlayers(x, y, z) // TODO find method to notify
+            // players
         }
     }
 
@@ -574,25 +573,28 @@ public class SingleWorld implements LocalWorld
         return this.generator;
     }
 
-    @Override
-    public void setSettings(WorldConfig worldConfig)
+    public void InitM(World world, WorldConfig config)
     {
-        this.settings = worldConfig;
-    }
-
-    public void InitM(World world)
-    {
+        this.settings = config;
         this.world = world;
         this.Seed = world.getSeed();
-
+        for (Biome biome : this.Biomes)
+        {
+            // Apply settings for biomes
+            if (biome != null && config.biomeConfigs[biome.getId()] != null)
+            {
+                biome.setCustom(config.biomeConfigs[biome.getId()]);
+            }
+        }
     }
 
-    public void Init(World world)
+    public void Init(World world, WorldConfig config)
     {
+        this.settings = config;
+
         this.world = world;
         this.Seed = world.getSeed();
-        //this.world.e = this.settings.waterLevelMax;
-
+        // this.world.e = this.settings.waterLevelMax;
 
         this.DungeonGen = new WorldGenDungeons();
         this.strongholdGen = new MapGenStronghold();
@@ -601,7 +603,6 @@ public class SingleWorld implements LocalWorld
         this.MineshaftGen = new MapGenMineshaft();
         this.PyramidsGen = new MapGenScatteredFeature();
         this.NetherFortress = new MapGenNetherBridge();
-
 
         this.Tree = new WorldGenTrees(false);
         this.CocoaTree = new WorldGenTrees(false, 5, 3, 3, true);

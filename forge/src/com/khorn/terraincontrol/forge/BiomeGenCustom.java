@@ -5,8 +5,7 @@ import net.minecraft.src.ColorizerFoliage;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 
-
-public class CustomBiome extends BiomeGenBase /* vk */
+public class BiomeGenCustom extends BiomeGenBase
 {
     private int skyColor;
     private int grassColor;
@@ -17,20 +16,20 @@ public class CustomBiome extends BiomeGenBase /* vk */
     private boolean grassColorSet = false;
     private boolean foliageColorSet = false;
 
-    public CustomBiome(int id, String name)
+    public BiomeGenCustom(int id, String name)
     {
         super(id);
         this.setBiomeName(name);
 
     }
 
-    public void SetBiome(BiomeConfig config)
+    /**
+     * Needs a BiomeConfig that has all the visual settings present.
+     * 
+     * @param config
+     */
+    public void setVisuals(BiomeConfig config)
     {
-
-        this.minHeight = config.BiomeHeight; // MCP name is wrong
-        this.maxHeight = config.BiomeVolatility; // MCP name is wrong
-        this.topBlock = config.SurfaceBlock;
-        this.fillerBlock = config.GroundBlock;
         this.temperature = config.BiomeTemperature;
         this.rainfall = config.BiomeWetness;
         this.waterColorMultiplier = config.WaterColor;
@@ -47,11 +46,10 @@ public class CustomBiome extends BiomeGenBase /* vk */
             this.foliageColorSet = true;
 
         // color ?
-        //this.x = 522674;
+        // this.x = 522674;
 
         // duno.
-        //this.A = 9154376;
-
+        // this.A = 9154376;
 
     }
 
@@ -65,13 +63,11 @@ public class CustomBiome extends BiomeGenBase /* vk */
         this.maxHeight = baseBiome.maxHeight;
         this.temperature = baseBiome.temperature;
 
-
         this.theBiomeDecorator = baseBiome.theBiomeDecorator;
         this.waterColorMultiplier = baseBiome.waterColorMultiplier;
-        //this.spawnableMonsterList = baseBiome.spawnableMonsterList;
+        // this.spawnableMonsterList = baseBiome.spawnableMonsterList;
 
     }
-
 
     // Sky color from Temp
     @Override
@@ -80,22 +76,23 @@ public class CustomBiome extends BiomeGenBase /* vk */
         return this.skyColor;
     }
 
-
     // getGrassColorAtCoords
     @Override
     public int getBiomeGrassColor()
     {
         if (!this.grassColorSet)
             return super.getBiomeGrassColor();
-        if(grassColorIsMultiplier) {
-        	double temperature = getFloatTemperature();
+        if (grassColorIsMultiplier)
+        {
+            double temperature = getFloatTemperature();
             double rainfall = getFloatRainfall();
 
-            return ((ColorizerFoliage.getFoliageColor(temperature, rainfall)& 0xFEFEFE) + this.grassColor) / 2;
-        } else {
-        	return this.grassColor;
+            return ((ColorizerFoliage.getFoliageColor(temperature, rainfall) & 0xFEFEFE) + this.grassColor) / 2;
+        } else
+        {
+            return this.grassColor;
         }
-        
+
     }
 
     // getFoliageColorAtCoords
@@ -104,13 +101,15 @@ public class CustomBiome extends BiomeGenBase /* vk */
     {
         if (!this.foliageColorSet)
             return super.getBiomeFoliageColor();
-        if(foliageColorIsMultiplier) {
-        	double temperature = getFloatTemperature();
+        if (foliageColorIsMultiplier)
+        {
+            double temperature = getFloatTemperature();
             double rainfall = getFloatRainfall();
 
-            return ((ColorizerFoliage.getFoliageColor(temperature, rainfall)& 0xFEFEFE)  + this.foliageColor) / 2;
-        } else {
-        	return this.foliageColor;
+            return ((ColorizerFoliage.getFoliageColor(temperature, rainfall) & 0xFEFEFE) + this.foliageColor) / 2;
+        } else
+        {
+            return this.foliageColor;
         }
     }
 }
