@@ -26,7 +26,6 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 @NetworkMod(clientSideRequired = false, serverSideRequired = false)
 public class TCPlugin
 {
-
     @Instance("TerrainControl")
     public static TCPlugin instance;
 
@@ -43,8 +42,8 @@ public class TCPlugin
     public void load(FMLInitializationEvent event)
     {
         // This is the place where the mod starts loading
-    	
-    	// Register localization
+
+        // Register localization
         LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
         // Load global custom objects
         ObjectsStore.ReadObjects(terrainControlDirectory);

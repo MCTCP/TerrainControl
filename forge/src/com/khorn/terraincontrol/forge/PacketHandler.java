@@ -57,12 +57,20 @@ public class PacketHandler implements IPacketHandler
             if (serverProtocolVersion == clientProtocolVersion)
             {
                 // Server sent config
-                WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
+            	
+            	// Restore old biomes
+            	SingleWorld.restoreBiomes();
+            
+            	if(receivedPacket.length > 4) {
+            		// If the packet wasn't empty, add the new biomes
+            		WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
+                    
+                    SingleWorld worldTC = new SingleWorld("external");
+                    WorldConfig config = new WorldConfig(stream, worldTC);
 
-                SingleWorld worldTC = new SingleWorld("external");
-                WorldConfig config = new WorldConfig(stream, worldTC);
-
-                worldTC.InitM(worldMC, config);
+                    worldTC.InitM(worldMC, config);
+            	}
+                
 
                 System.out.println("TerrainControl: config received from server");
             } else

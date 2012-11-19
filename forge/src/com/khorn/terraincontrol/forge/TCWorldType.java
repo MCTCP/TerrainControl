@@ -31,7 +31,11 @@ public class TCWorldType extends WorldType
     {
         if (world instanceof WorldClient)
             return super.getChunkManager(world);
+        
+        // Restore old biomes
+        SingleWorld.restoreBiomes();
 
+        // Load everything
         File worldDirectory = new File(plugin.terrainControlDirectory, "worlds" + File.separator + world.getSaveHandler().getSaveDirectoryName());
 
         if (!worldDirectory.exists())

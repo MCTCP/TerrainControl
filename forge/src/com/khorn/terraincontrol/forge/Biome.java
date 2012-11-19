@@ -24,48 +24,48 @@ public class Biome implements LocalBiome
         return getId();
     }
 
-    public void setCustom(BiomeConfig config)
+    public void setVisuals(BiomeConfig config)
     {
-        ((BiomeGenCustom) this.biomeBase).setVisuals(config);
+        biomeBase.setVisuals(config);
     }
 
     public String getName()
     {
-        return this.biomeBase.biomeName;
+        return biomeBase.biomeName;
     }
 
     public int getId()
     {
-        return this.biomeBase.biomeID;
+        return biomeBase.biomeID;
     }
 
     public float getTemperature()
     {
-        return this.biomeBase.temperature;
+        return biomeBase.temperature;
     }
 
     public float getWetness()
     {
-        return this.biomeBase.rainfall;
+        return biomeBase.rainfall;
     }
 
     public float getSurfaceHeight()
     {
-        return this.biomeBase.minHeight;
+        return biomeBase.minHeight;
     }
 
     public float getSurfaceVolatility()
     {
-        return this.biomeBase.maxHeight;
+        return biomeBase.maxHeight;
     }
 
     public byte getSurfaceBlock()
     {
-        return this.biomeBase.topBlock;
+        return biomeBase.topBlock;
     }
 
     public byte getGroundBlock()
     {
-        return this.biomeBase.fillerBlock;
+        return biomeBase.fillerBlock;
     }
 }

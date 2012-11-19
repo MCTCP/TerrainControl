@@ -79,7 +79,7 @@ public class SingleWorld implements LocalWorld
     private int worldHeight = 128;
     private int heightBits = 7;
 
-    public static void RestoreBiomes()
+    public static void restoreBiomes()
     {
         for (BiomeGenBase oldBiome : BiomesToRestore)
         {
@@ -204,7 +204,7 @@ public class SingleWorld implements LocalWorld
     @Override
     public double getBiomeFactorForOldBM(int index)
     {
-        return this.old_biomeManager.old_temperature[index] * this.old_biomeManager.old_rain[index];
+        return this.old_biomeManager.oldTemperature[index] * this.old_biomeManager.oldWetness[index];
     }
 
     @Override
@@ -583,7 +583,7 @@ public class SingleWorld implements LocalWorld
             // Apply settings for biomes
             if (biome != null && config.biomeConfigs[biome.getId()] != null)
             {
-                biome.setCustom(config.biomeConfigs[biome.getId()]);
+                biome.setVisuals(config.biomeConfigs[biome.getId()]);
             }
         }
     }
