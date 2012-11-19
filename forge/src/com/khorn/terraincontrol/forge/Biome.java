@@ -1,9 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
-import net.minecraft.src.BiomeGenBase;
-
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 
 public class Biome implements LocalBiome
 {

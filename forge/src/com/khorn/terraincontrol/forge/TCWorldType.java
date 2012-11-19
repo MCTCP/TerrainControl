@@ -1,19 +1,14 @@
 package com.khorn.terraincontrol.forge;
 
 import java.io.File;
-import java.util.Random;
-
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.customobjects.ObjectsStore;
 
 import net.minecraft.src.IChunkProvider;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.SaveHandler;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldChunkManager;
 import net.minecraft.src.WorldClient;
 import net.minecraft.src.WorldType;
-import cpw.mods.fml.common.IWorldGenerator;
+
+import com.khorn.terraincontrol.configuration.WorldConfig;
 
 public class TCWorldType extends WorldType
 {

@@ -4,20 +4,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.Packet250CustomPayload;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityPlayerMP;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.Packet250CustomPayload;
-import net.minecraft.src.WorldClient;
-import net.minecraftforge.common.ForgeHooks;
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.IPlayerTracker;
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.common.network.Player;
 
 public class PlayerTracker implements IPlayerTracker
 {
@@ -38,7 +34,8 @@ public class PlayerTracker implements IPlayerTracker
     	
     	// Get the config
     	LocalWorld worldTC = plugin.getWorld();
-    	String worldName = FMLClientHandler.instance().getServer().worldServers[0].getSaveHandler().getSaveDirectoryName();
+    	
+    	String worldName = MinecraftServer.getServer().worldServers[0].getSaveHandler().getSaveDirectoryName();
     	if(worldTC == null || !worldTC.getName().equals(worldName)) {
     		// World not loaded
     		return;

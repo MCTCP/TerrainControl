@@ -1,11 +1,9 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.*;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.generator.resourcegens.TreeType;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Random;
 
 import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Chunk;
@@ -15,7 +13,6 @@ import net.minecraft.src.MapGenNetherBridge;
 import net.minecraft.src.MapGenScatteredFeature;
 import net.minecraft.src.MapGenStronghold;
 import net.minecraft.src.MapGenVillage;
-import net.minecraft.src.ModLoader;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldGenBigMushroom;
 import net.minecraft.src.WorldGenBigTree;
@@ -28,67 +25,76 @@ import net.minecraft.src.WorldGenTaiga1;
 import net.minecraft.src.WorldGenTaiga2;
 import net.minecraft.src.WorldGenTrees;
 
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.IBiomeManager;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+
 public class SingleWorld implements LocalWorld
 {
     private ChunkProvider generator;
     private World world;
     private WorldConfig settings;
     private String name;
-    private long Seed;
+    private long seed;
     private IBiomeManager biomeManager;
-    private BiomeManagerOld old_biomeManager;
+    private BiomeManagerOld oldBiomeManager;
 
-    private static int NextBiomeId = 0;
+    private static int nextBiomeId = 0;
     private static int maxBiomeCount = 256;
-    private static Biome[] Biomes = new Biome[maxBiomeCount];
-    private static BiomeGenBase[] BiomesToRestore = new BiomeGenBase[maxBiomeCount];
+    private static Biome[] biomes = new Biome[maxBiomeCount];
+    private static BiomeGenBase[] biomesToRestore = new BiomeGenBase[maxBiomeCount];
 
-    private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
+    private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
-    private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
+    private static ArrayList<LocalBiome> defaultBiomes = new ArrayList<LocalBiome>();
 
     public MapGenStronghold strongholdGen;
-    private MapGenVillage VillageGen;
-    private MapGenMineshaft MineshaftGen;
-    private MapGenScatteredFeature PyramidsGen;
-    private MapGenNetherBridge NetherFortress;
+    private MapGenVillage villageGen;
+    private MapGenMineshaft mineshaftGen;
+    private MapGenScatteredFeature pyramidsGen;
+    private MapGenNetherBridge netherFortress;
 
-    private WorldGenDungeons DungeonGen;
+    private WorldGenDungeons dungeonGen;
 
-    private WorldGenTrees Tree;
-    private WorldGenTrees CocoaTree;
-    private WorldGenBigTree BigTree;
-    private WorldGenForest Forest;
-    private WorldGenSwamp SwampTree;
-    private WorldGenTaiga1 TaigaTree1;
-    private WorldGenTaiga2 TaigaTree2;
-    private WorldGenBigMushroom HugeMushroom;
-    private WorldGenHugeTrees JungleTree;
-    private WorldGenShrub GroundBush;
+    private WorldGenTrees tree;
+    private WorldGenTrees cocoaTree;
+    private WorldGenBigTree bigTree;
+    private WorldGenForest forest;
+    private WorldGenSwamp swampTree;
+    private WorldGenTaiga1 taigaTree1;
+    private WorldGenTaiga2 taigaTree2;
+    private WorldGenBigMushroom hugeMushroom;
+    private WorldGenHugeTrees jungleTree;
+    private WorldGenShrub groundBush;
 
-    private boolean CreateNewChunks;
-    private Chunk[] ChunkCache;
-    private Chunk CachedChunk;
+    private boolean createNewChunks;
+    private Chunk[] chunkCache;
+    private Chunk cachedChunk;
 
-    private int CurrentChunkX;
-    private int CurrentChunkZ;
+    private int currentChunkX;
+    private int currentChunkZ;
 
-    private BiomeGenBase[] BiomeArray;
-    private int[] BiomeIntArray;
+    private BiomeGenBase[] biomeGenBaseArray;
+    private int[] biomeIntArray;
 
     private int worldHeight = 128;
     private int heightBits = 7;
 
     public static void restoreBiomes()
     {
-        for (BiomeGenBase oldBiome : BiomesToRestore)
+        for (BiomeGenBase oldBiome : biomesToRestore)
         {
             if (oldBiome == null)
                 continue;
             BiomeGenBase.biomeList[oldBiome.biomeID] = oldBiome;
         }
-        NextBiomeId = 0;
-        DefaultBiomes.clear();
+        nextBiomeId = 0;
+        defaultBiomes.clear();
         MapGenVillage.villageSpawnBiomes = Arrays.asList(BiomeGenBase.plains, BiomeGenBase.desert);
 
     }
@@ -100,13 +106,13 @@ public class SingleWorld implements LocalWorld
         for (int i = 0; i < DefaultBiome.values().length; i++)
         {
             BiomeGenBase oldBiome = BiomeGenBase.biomeList[i];
-            BiomesToRestore[i] = oldBiome;
-            BiomeGenCustom custom = new BiomeGenCustom(NextBiomeId++, oldBiome.biomeName);
+            biomesToRestore[i] = oldBiome;
+            BiomeGenCustom custom = new BiomeGenCustom(nextBiomeId++, oldBiome.biomeName);
             custom.CopyBiome(oldBiome);
             Biome biome = new Biome(custom);
-            Biomes[biome.getId()] = biome;
-            DefaultBiomes.add(biome);
-            this.BiomeNames.put(biome.getName(), biome);
+            biomes[biome.getId()] = biome;
+            defaultBiomes.add(biome);
+            this.biomeNames.put(biome.getName(), biome);
         }
         MapGenVillage.villageSpawnBiomes = Arrays.asList(BiomeGenBase.biomeList[DefaultBiome.PLAINS.Id], BiomeGenBase.biomeList[DefaultBiome.DESERT.Id]);
 
@@ -122,8 +128,8 @@ public class SingleWorld implements LocalWorld
     public LocalBiome AddBiome(String name, int id)
     {
         Biome biome = new Biome(new BiomeGenCustom(id, name));
-        Biomes[biome.getId()] = biome;
-        this.BiomeNames.put(biome.getName(), biome);
+        biomes[biome.getId()] = biome;
+        this.biomeNames.put(biome.getName(), biome);
         return biome;
     }
 
@@ -136,25 +142,25 @@ public class SingleWorld implements LocalWorld
     @Override
     public int getFreeBiomeId()
     {
-        return NextBiomeId++;
+        return nextBiomeId++;
     }
 
     @Override
     public LocalBiome getBiomeById(int id)
     {
-        return Biomes[id];
+        return biomes[id];
     }
 
     @Override
     public int getBiomeIdByName(String name)
     {
-        return this.BiomeNames.get(name).getId();
+        return this.biomeNames.get(name).getId();
     }
 
     @Override
     public ArrayList<LocalBiome> getDefaultBiomes()
     {
-        return DefaultBiomes;
+        return defaultBiomes;
     }
 
     @Override
@@ -163,11 +169,11 @@ public class SingleWorld implements LocalWorld
         if (this.biomeManager != null)
             return this.biomeManager.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
 
-        BiomeArray = this.world.provider.worldChunkMgr.getBiomesForGeneration(BiomeArray, x, z, x_size, z_size);
+        biomeGenBaseArray = this.world.provider.worldChunkMgr.getBiomesForGeneration(biomeGenBaseArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = BiomeArray[i].biomeID;
+            biomeArray[i] = biomeGenBaseArray[i].biomeID;
         return biomeArray;
     }
 
@@ -185,11 +191,11 @@ public class SingleWorld implements LocalWorld
         if (this.biomeManager != null)
             return this.biomeManager.getBiomesTC(biomeArray, x, z, x_size, z_size);
 
-        BiomeArray = this.world.provider.worldChunkMgr.getBiomeGenAt(BiomeArray, x, z, x_size, z_size, true);
+        biomeGenBaseArray = this.world.provider.worldChunkMgr.getBiomeGenAt(biomeGenBaseArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = BiomeArray[i].biomeID;
+            biomeArray[i] = biomeGenBaseArray[i].biomeID;
         return biomeArray;
     }
 
@@ -204,7 +210,7 @@ public class SingleWorld implements LocalWorld
     @Override
     public double getBiomeFactorForOldBM(int index)
     {
-        return this.old_biomeManager.oldTemperature[index] * this.old_biomeManager.oldWetness[index];
+        return this.oldBiomeManager.oldTemperature[index] * this.oldBiomeManager.oldWetness[index];
     }
 
     @Override
@@ -214,20 +220,20 @@ public class SingleWorld implements LocalWorld
             this.strongholdGen.generate(null, this.world, x, z, chunkArray);
 
         if (this.settings.MineshaftsEnabled)
-            this.MineshaftGen.generate(null, this.world, x, z, chunkArray);
+            this.mineshaftGen.generate(null, this.world, x, z, chunkArray);
         if (this.settings.VillagesEnabled && dry)
-            this.VillageGen.generate(null, this.world, x, z, chunkArray);
+            this.villageGen.generate(null, this.world, x, z, chunkArray);
         if (this.settings.PyramidsEnabled)
-            this.PyramidsGen.generate(null, this.world, x, z, chunkArray);
+            this.pyramidsGen.generate(null, this.world, x, z, chunkArray);
         if (this.settings.NetherFortress)
-            this.NetherFortress.generate(null, this.world, x, z, chunkArray);
+            this.netherFortress.generate(null, this.world, x, z, chunkArray);
 
     }
 
     @Override
     public void PlaceDungeons(Random rand, int x, int y, int z)
     {
-        DungeonGen.generate(this.world, rand, x, y, z);
+        dungeonGen.generate(this.world, rand, x, y, z);
     }
 
     @Override
@@ -236,27 +242,27 @@ public class SingleWorld implements LocalWorld
         switch (type)
         {
         case Tree:
-            return Tree.generate(this.world, rand, x, y, z);
+            return tree.generate(this.world, rand, x, y, z);
         case BigTree:
-            BigTree.setScale(1.0D, 1.0D, 1.0D);
-            return BigTree.generate(this.world, rand, x, y, z);
+            bigTree.setScale(1.0D, 1.0D, 1.0D);
+            return bigTree.generate(this.world, rand, x, y, z);
         case Forest:
-            return Forest.generate(this.world, rand, x, y, z);
+            return forest.generate(this.world, rand, x, y, z);
         case HugeMushroom:
-            HugeMushroom.setScale(1.0D, 1.0D, 1.0D);
-            return HugeMushroom.generate(this.world, rand, x, y, z);
+            hugeMushroom.setScale(1.0D, 1.0D, 1.0D);
+            return hugeMushroom.generate(this.world, rand, x, y, z);
         case SwampTree:
-            return SwampTree.generate(this.world, rand, x, y, z);
+            return swampTree.generate(this.world, rand, x, y, z);
         case Taiga1:
-            return TaigaTree1.generate(this.world, rand, x, y, z);
+            return taigaTree1.generate(this.world, rand, x, y, z);
         case Taiga2:
-            return TaigaTree2.generate(this.world, rand, x, y, z);
+            return taigaTree2.generate(this.world, rand, x, y, z);
         case JungleTree:
-            return JungleTree.generate(this.world, rand, x, y, z);
+            return jungleTree.generate(this.world, rand, x, y, z);
         case GroundBush:
-            return GroundBush.generate(this.world, rand, x, y, z);
+            return groundBush.generate(this.world, rand, x, y, z);
         case CocoaTree:
-            return CocoaTree.generate(this.world, rand, x, y, z);
+            return cocoaTree.generate(this.world, rand, x, y, z);
         default:
             break;
         }
@@ -294,13 +300,13 @@ public class SingleWorld implements LocalWorld
         if (this.settings.StrongholdsEnabled)
             this.strongholdGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
         if (this.settings.MineshaftsEnabled)
-            this.MineshaftGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            this.mineshaftGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
         if (this.settings.VillagesEnabled)
-            isVillagePlaced = this.VillageGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            isVillagePlaced = this.villageGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
         if (this.settings.PyramidsEnabled)
-            this.PyramidsGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            this.pyramidsGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
         if (this.settings.NetherFortress)
-            this.NetherFortress.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            this.netherFortress.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
 
         return isVillagePlaced;
     }
@@ -311,14 +317,14 @@ public class SingleWorld implements LocalWorld
         if (this.settings.BiomeConfigsHaveReplacement)
         {
 
-            Chunk rawChunk = this.ChunkCache[0];
+            Chunk rawChunk = this.chunkCache[0];
 
             ExtendedBlockStorage[] sectionsArray = rawChunk.getBlockStorageArray();
 
             byte[] ChunkBiomes = rawChunk.getBiomeArray();
 
-            int x = this.CurrentChunkX * 16;
-            int z = this.CurrentChunkZ * 16;
+            int x = this.currentChunkX * 16;
+            int z = this.currentChunkZ * 16;
 
             for (ExtendedBlockStorage section : sectionsArray)
             {
@@ -360,7 +366,7 @@ public class SingleWorld implements LocalWorld
     {
         if (this.settings.HaveBiomeReplace)
         {
-            byte[] ChunkBiomes = this.ChunkCache[0].getBiomeArray();
+            byte[] ChunkBiomes = this.chunkCache[0].getBiomeArray();
 
             for (int i = 0; i < ChunkBiomes.length; i++)
                 ChunkBiomes[i] = this.settings.ReplaceMatrixBiomes[ChunkBiomes[i]];
@@ -370,13 +376,13 @@ public class SingleWorld implements LocalWorld
 
     public void LoadChunk(int x, int z)
     {
-        this.CurrentChunkX = x;
-        this.CurrentChunkZ = z;
-        this.ChunkCache[0] = this.world.getChunkFromChunkCoords(x, z);
-        this.ChunkCache[1] = this.world.getChunkFromChunkCoords(x + 1, z);
-        this.ChunkCache[2] = this.world.getChunkFromChunkCoords(x, z + 1);
-        this.ChunkCache[3] = this.world.getChunkFromChunkCoords(x + 1, z + 1);
-        this.CreateNewChunks = true;
+        this.currentChunkX = x;
+        this.currentChunkZ = z;
+        this.chunkCache[0] = this.world.getChunkFromChunkCoords(x, z);
+        this.chunkCache[1] = this.world.getChunkFromChunkCoords(x + 1, z);
+        this.chunkCache[2] = this.world.getChunkFromChunkCoords(x, z + 1);
+        this.chunkCache[3] = this.world.getChunkFromChunkCoords(x + 1, z + 1);
+        this.createNewChunks = true;
     }
 
     private Chunk getChunk(int x, int y, int z)
@@ -386,15 +392,15 @@ public class SingleWorld implements LocalWorld
 
         x = x >> 4;
         z = z >> 4;
-        if (this.CachedChunk != null && this.CachedChunk.xPosition == x && this.CachedChunk.zPosition == z)
-            return this.CachedChunk;
+        if (this.cachedChunk != null && this.cachedChunk.xPosition == x && this.cachedChunk.zPosition == z)
+            return this.cachedChunk;
 
-        int index_x = (x - this.CurrentChunkX);
-        int index_z = (z - this.CurrentChunkZ);
+        int index_x = (x - this.currentChunkX);
+        int index_z = (z - this.currentChunkZ);
         if ((index_x == 0 || index_x == 1) && (index_z == 0 || index_z == 1))
-            return CachedChunk = this.ChunkCache[index_x | (index_z << 1)];
-        else if (this.CreateNewChunks || this.world.getChunkProvider().chunkExists(x, z))
-            return CachedChunk = this.world.getChunkFromBlockCoords(x, z);
+            return cachedChunk = this.chunkCache[index_x | (index_z << 1)];
+        else if (this.createNewChunks || this.world.getChunkProvider().chunkExists(x, z))
+            return cachedChunk = this.world.getChunkFromBlockCoords(x, z);
         else
             return null;
 
@@ -518,7 +524,7 @@ public class SingleWorld implements LocalWorld
     @Override
     public void setChunksCreations(boolean createNew)
     {
-        this.CreateNewChunks = createNew;
+        this.createNewChunks = createNew;
     }
 
     @Override
@@ -553,7 +559,7 @@ public class SingleWorld implements LocalWorld
     @Override
     public long getSeed()
     {
-        return this.Seed;
+        return this.seed;
     }
 
     @Override
@@ -577,8 +583,8 @@ public class SingleWorld implements LocalWorld
     {
         this.settings = config;
         this.world = world;
-        this.Seed = world.getSeed();
-        for (Biome biome : this.Biomes)
+        this.seed = world.getSeed();
+        for (Biome biome : biomes)
         {
             // Apply settings for biomes
             if (biome != null && config.biomeConfigs[biome.getId()] != null)
@@ -593,29 +599,29 @@ public class SingleWorld implements LocalWorld
         this.settings = config;
 
         this.world = world;
-        this.Seed = world.getSeed();
+        this.seed = world.getSeed();
         // this.world.e = this.settings.waterLevelMax;
 
-        this.DungeonGen = new WorldGenDungeons();
+        this.dungeonGen = new WorldGenDungeons();
         this.strongholdGen = new MapGenStronghold();
 
-        this.VillageGen = new MapGenVillage();
-        this.MineshaftGen = new MapGenMineshaft();
-        this.PyramidsGen = new MapGenScatteredFeature();
-        this.NetherFortress = new MapGenNetherBridge();
+        this.villageGen = new MapGenVillage();
+        this.mineshaftGen = new MapGenMineshaft();
+        this.pyramidsGen = new MapGenScatteredFeature();
+        this.netherFortress = new MapGenNetherBridge();
 
-        this.Tree = new WorldGenTrees(false);
-        this.CocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
-        this.BigTree = new WorldGenBigTree(false);
-        this.Forest = new WorldGenForest(false);
-        this.SwampTree = new WorldGenSwamp();
-        this.TaigaTree1 = new WorldGenTaiga1();
-        this.TaigaTree2 = new WorldGenTaiga2(false);
-        this.HugeMushroom = new WorldGenBigMushroom();
-        this.JungleTree = new WorldGenHugeTrees(false, 15, 3, 3);
-        this.GroundBush = new WorldGenShrub(3, 0);
+        this.tree = new WorldGenTrees(false);
+        this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
+        this.bigTree = new WorldGenBigTree(false);
+        this.forest = new WorldGenForest(false);
+        this.swampTree = new WorldGenSwamp();
+        this.taigaTree1 = new WorldGenTaiga1();
+        this.taigaTree2 = new WorldGenTaiga2(false);
+        this.hugeMushroom = new WorldGenBigMushroom();
+        this.jungleTree = new WorldGenHugeTrees(false, 15, 3, 3);
+        this.groundBush = new WorldGenShrub(3, 0);
 
-        this.ChunkCache = new Chunk[4];
+        this.chunkCache = new Chunk[4];
         this.generator = new ChunkProvider(this);
     }
 
@@ -626,7 +632,7 @@ public class SingleWorld implements LocalWorld
 
     public void setOldBiomeManager(BiomeManagerOld manager)
     {
-        this.old_biomeManager = manager;
+        this.oldBiomeManager = manager;
         this.biomeManager = manager;
     }
 
@@ -646,11 +652,11 @@ public class SingleWorld implements LocalWorld
     {
 
         byte[] arrayOfByte2 = chunk.getBiomeArray();
-        BiomeIntArray = this.getBiomes(BiomeIntArray, x * 16, z * 16, 16, 16);
+        biomeIntArray = this.getBiomes(biomeIntArray, x * 16, z * 16, 16, 16);
 
         for (int i1 = 0; i1 < arrayOfByte2.length; i1++)
         {
-            arrayOfByte2[i1] = (byte) BiomeIntArray[i1];
+            arrayOfByte2[i1] = (byte) biomeIntArray[i1];
         }
     }
 }

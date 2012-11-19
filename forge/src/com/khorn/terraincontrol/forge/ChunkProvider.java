@@ -1,9 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.generator.ChunkProviderTC;
-import com.khorn.terraincontrol.generator.ObjectSpawner;
-
 import java.util.List;
 
 import net.minecraft.src.BiomeGenBase;
@@ -15,6 +11,10 @@ import net.minecraft.src.ExtendedBlockStorage;
 import net.minecraft.src.IChunkProvider;
 import net.minecraft.src.IProgressUpdate;
 import net.minecraft.src.World;
+
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.ChunkProviderTC;
+import com.khorn.terraincontrol.generator.ObjectSpawner;
 
 public class ChunkProvider implements IChunkProvider
 {
@@ -117,6 +117,7 @@ public class ChunkProvider implements IChunkProvider
         return "TerrainControlLevelSource";
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public List getPossibleCreatures(EnumCreatureType paramaca, int paramInt1, int paramInt2, int paramInt3)
     {

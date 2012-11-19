@@ -1,11 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.IBiomeManager;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -14,6 +8,12 @@ import net.minecraft.src.BiomeCache;
 import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.ChunkPosition;
 import net.minecraft.src.WorldChunkManager;
+
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.IBiomeManager;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
 
 public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
 {

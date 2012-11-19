@@ -6,7 +6,7 @@ public interface LocalBiome
 {
     public abstract boolean isCustom();
 
-    public abstract void setCustom(BiomeConfig config);
+    public abstract void setVisuals(BiomeConfig config);
 
     public abstract String getName();
 

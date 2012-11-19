@@ -126,7 +126,7 @@ public class BiomeConfig extends ConfigFile
 
 
         if (biome.isCustom())
-            biome.setCustom(this);
+            biome.setVisuals(this);
     }
 
 

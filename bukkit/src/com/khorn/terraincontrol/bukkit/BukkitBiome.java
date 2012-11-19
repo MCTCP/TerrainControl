@@ -70,7 +70,7 @@ public class BukkitBiome implements LocalBiome
         customID = id;
     }
 
-    public void setCustom(BiomeConfig config)
+    public void setVisuals(BiomeConfig config)
     {
         ((CustomBiome) this.biomeBase).SetBiome(config);
     }

@@ -32,7 +32,7 @@ public class NullBiome extends BukkitBiome
     }
 
     @Override
-    public void setCustom(BiomeConfig config)
+    public void setVisuals(BiomeConfig config)
     {
 
     }
