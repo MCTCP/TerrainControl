@@ -6,7 +6,9 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.customobjects.ObjectsStore;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.PostInit;
@@ -47,7 +49,9 @@ public class TCPlugin
         // Register world type
         worldType = new TCWorldType(this, 4, "TerrainControl");
         // Register channel
-        NetworkRegistry.instance().registerChannel(new PacketHandler(this), TCDefaultValues.ChannelName.stringValue());
+        if(FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            NetworkRegistry.instance().registerChannel(new PacketHandler(this), TCDefaultValues.ChannelName.stringValue());
+        }
         // Register player tracker
         GameRegistry.registerPlayerTracker(new PlayerTracker(this));
     }
