@@ -487,7 +487,12 @@ public class SingleWorld implements LocalWorld
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        return chunk.getHeightValue(x, z);
+        int y = chunk.getHeightValue(x, z);
+        while(chunk.getBlockID(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight) {
+            // Fix for incorrect lightmap
+            y += 1;
+        }
+        return y;
     }
 
     @Override

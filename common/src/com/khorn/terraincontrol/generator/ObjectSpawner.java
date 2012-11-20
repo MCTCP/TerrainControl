@@ -55,7 +55,8 @@ public class ObjectSpawner
             {
                 int blockToFreezeX = x + 8 + i;
                 int blockToFreezeZ = z + 8 + j;
-                if (worldSettings.biomeConfigs[world.getBiome(blockToFreezeX, blockToFreezeZ)].BiomeTemperature <= TCDefaultValues.snowAndIceMaxTemp.floatValue())
+                BiomeConfig biomeConfig = worldSettings.biomeConfigs[world.getBiome(blockToFreezeX, blockToFreezeZ)];
+                if (biomeConfig.BiomeTemperature < TCDefaultValues.snowAndIceMaxTemp.floatValue())
                 {
                     int blockToFreezeY = world.getHighestBlockYAt(blockToFreezeX, blockToFreezeZ);
                     if (blockToFreezeY > 0)
@@ -63,7 +64,7 @@ public class ObjectSpawner
                         // Ice has to be placed one block in the world
                         if (DefaultMaterial.getMaterial(world.getTypeId(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ)).isLiquid())
                         {
-                            world.setBlock(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ, DefaultMaterial.ICE.id, 0);
+                            world.setBlock(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ, biomeConfig.iceBlock, 0);
                         } else
                         {
                             // Snow has to be placed on the world

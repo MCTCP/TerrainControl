@@ -426,7 +426,12 @@ public class BukkitWorld implements LocalWorld
         }
         z = z & 0xF;
         x = x & 0xF;
-        return chunk.b(x, z);
+        int y = chunk.b(x, z);
+        while(chunk.getTypeId(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight) {
+            // Fix for incorrect lightmap
+            y += 1;
+        }
+        return y;
     }
 
     public DefaultMaterial getMaterial(int x, int y, int z)
