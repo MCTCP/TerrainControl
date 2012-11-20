@@ -24,9 +24,18 @@ public class TCWorldType extends WorldType
     @Override
     public WorldChunkManager getChunkManager(World world)
     {
-        if (world instanceof WorldClient)
-            return super.getChunkManager(world);
-        
+        try
+        {
+            if (world instanceof WorldClient)
+            {
+                return super.getChunkManager(world);
+            }
+        } catch (NoClassDefFoundError e)
+        {
+            // There isn't a WorldClient class, so we are on a stand-alone
+            // server. Continue normally.
+        }
+
         // Restore old biomes
         SingleWorld.restoreBiomes();
 
