@@ -12,8 +12,6 @@ import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 
@@ -29,16 +27,12 @@ public class PacketHandler implements IPacketHandler
     @Override
     public void onPacketData(INetworkManager manager, Packet250CustomPayload receivedPacket, Player player)
     {
-        // This method receives the TerrainControl packet with the custom biome colors and weather.
-        
+        // This method receives the TerrainControl packet with the custom biome
+        // colors and weather.
+
         if (!receivedPacket.channel.equals(TCDefaultValues.ChannelName.stringValue()))
         {
             // Make sure that the right channel is being received
-            return;
-        }
-        if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT)
-        {
-            // Make sure that we are on the client (the server only sends packets to the client)
             return;
         }
 
@@ -52,20 +46,20 @@ public class PacketHandler implements IPacketHandler
             if (serverProtocolVersion == clientProtocolVersion)
             {
                 // Server sent config
-            	
-            	// Restore old biomes
-            	SingleWorld.restoreBiomes();
-            
-            	if(receivedPacket.length > 4) {
-            		// If the packet wasn't empty, add the new biomes
-            		WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
-                    
+
+                // Restore old biomes
+                SingleWorld.restoreBiomes();
+
+                if (receivedPacket.length > 4)
+                {
+                    // If the packet wasn't empty, add the new biomes
+                    WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
+
                     SingleWorld worldTC = new SingleWorld("external");
                     WorldConfig config = new WorldConfig(stream, worldTC);
 
                     worldTC.InitM(worldMC, config);
-            	}
-                
+                }
 
                 System.out.println("TerrainControl: config received from server");
             } else
