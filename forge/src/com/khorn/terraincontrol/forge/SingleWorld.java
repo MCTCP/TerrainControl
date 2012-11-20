@@ -270,30 +270,6 @@ public class SingleWorld implements LocalWorld
     }
 
     @Override
-    public void PlaceIce(int x, int z)
-    {
-        int i1 = x + 8;
-        int i2 = z + 8;
-        for (int _x = 0; _x < 16; _x++)
-        {
-            for (int _z = 0; _z < 16; _z++)
-            {
-                int i5 = this.world.getFirstUncoveredBlock(i1 + _x, i2 + _z);
-
-                if (this.world.isBlockFreezable(_x + i1, i5 - 1, _z + i2))
-                {
-                    this.world.setBlock(_x + i1, i5 - 1, _z + i2, DefaultMaterial.ICE.id);
-                }
-                if (this.world.canSnowAt(_x + i1, i5, _z + i2))
-                {
-                    this.world.setBlock(_x + i1, i5, _z + i2, DefaultMaterial.SNOW.id);
-                }
-            }
-
-        }
-    }
-
-    @Override
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
     {
         boolean isVillagePlaced = false;

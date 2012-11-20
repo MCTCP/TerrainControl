@@ -45,8 +45,6 @@ public interface LocalWorld
 
     public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z);
 
-    public void PlaceIce(int x, int z);
-
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z);
 
     public void DoBlockReplace();

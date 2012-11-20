@@ -1,8 +1,10 @@
 package com.khorn.terraincontrol.generator;
 
+import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
 
@@ -21,10 +23,10 @@ public class ObjectSpawner
         this.world = localWorld;
     }
 
-    public void populate(int chunk_x, int chunk_z)
+    public void populate(int chunkX, int chunkZ)
     {
-        int x = chunk_x * 16;
-        int z = chunk_z * 16;
+        int x = chunkX * 16;
+        int z = chunkZ * 16;
 
         int biomeId = world.getBiome(x + 16, z + 16);
         BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
@@ -32,29 +34,52 @@ public class ObjectSpawner
         this.rand.setSeed(world.getSeed());
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
-        this.rand.setSeed(chunk_x * l1 + chunk_z * l2 ^ world.getSeed());
+        this.rand.setSeed(chunkX * l1 + chunkZ * l2 ^ world.getSeed());
 
-        boolean Village = world.PlaceTerrainObjects(rand, chunk_x, chunk_z);
+        boolean Village = world.PlaceTerrainObjects(rand, chunkX, chunkZ);
 
-
-        //Resource sequence
+        // Resource sequence
         for (int i = 0; i < localBiomeConfig.ResourceCount; i++)
         {
             Resource res = localBiomeConfig.ResourceSequence[i];
-            if(res.Type == ResourceType.SmallLake && Village)
+            if (res.Type == ResourceType.SmallLake && Village)
                 continue;
             world.setChunksCreations(res.Type.CreateNewChunks);
             res.Type.Generator.Process(world, rand, res, x, z);
         }
 
-        // Ice
-        world.PlaceIce(x, z);
-
+        // Snow and ice
+        for (int i = 0; i < 16; i++)
+        {
+            for (int j = 0; j < 16; j++)
+            {
+                int blockToFreezeX = x + 8 + i;
+                int blockToFreezeZ = z + 8 + j;
+                if (worldSettings.biomeConfigs[world.getBiome(blockToFreezeX, blockToFreezeZ)].BiomeTemperature <= TCDefaultValues.snowAndIceMaxTemp.floatValue())
+                {
+                    int blockToFreezeY = world.getHighestBlockYAt(blockToFreezeX, blockToFreezeZ);
+                    if (blockToFreezeY > 0)
+                    {
+                        // Ice has to be placed one block in the world
+                        if (DefaultMaterial.getMaterial(world.getTypeId(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ)).isLiquid())
+                        {
+                            world.setBlock(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ, DefaultMaterial.ICE.id, 0);
+                        } else
+                        {
+                            // Snow has to be placed on the world
+                            if (DefaultMaterial.getMaterial(world.getTypeId(blockToFreezeX, blockToFreezeY, blockToFreezeZ)) == DefaultMaterial.AIR)
+                            {
+                                world.setBlock(blockToFreezeX, blockToFreezeY, blockToFreezeZ, DefaultMaterial.SNOW.id, 0);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         world.DoBlockReplace();
 
         world.DoBiomeReplace();
-
 
         if (this.worldSettings.isDeprecated)
             this.worldSettings = this.worldSettings.newSettings;

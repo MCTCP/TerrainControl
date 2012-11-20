@@ -217,31 +217,6 @@ public class BukkitWorld implements LocalWorld
         return false;
     }
 
-
-    // There is raw code from ChunkProviderGenerate, check each x,z coordinate in chunk  i5 - some thing like getHighestBlockYAt
-    // TODO: I think we may optimise this.
-    public void PlaceIce(int x, int z)
-    {
-        int i1 = x + 8;
-        int i2 = z + 8;
-        for (int _x = 0; _x < 16; _x++)
-        {
-            for (int _z = 0; _z < 16; _z++)
-            {
-                int i5 = this.world.h(i1 + _x, i2 + _z);
-
-                if (this.world.w(_x + i1, i5 - 1, _z + i2))
-                {
-                    this.world.setTypeId(_x + i1, i5 - 1, _z + i2, Block.ICE.id);
-                }
-                if (this.world.y(_x + i1, i5, _z + i2))
-                {
-                    this.world.setTypeId(_x + i1, i5, _z + i2, Block.SNOW.id);
-                }
-            }
-        }
-    }
-
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
     {
         boolean Village = false;

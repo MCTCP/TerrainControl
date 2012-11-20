@@ -18,7 +18,8 @@ public enum TCDefaultValues
     // End network
 
     maxChunkBlockValue(32768),
-
+    
+    snowAndIceMaxTemp(0.15F),
 
     //World settings
     SettingsMode(WorldConfig.ConfigMode.WriteAll),
