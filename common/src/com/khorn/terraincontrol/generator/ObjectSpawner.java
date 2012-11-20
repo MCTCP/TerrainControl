@@ -67,10 +67,13 @@ public class ObjectSpawner
                             world.setBlock(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ, biomeConfig.iceBlock, 0);
                         } else
                         {
-                            // Snow has to be placed on the world
-                            if (DefaultMaterial.getMaterial(world.getTypeId(blockToFreezeX, blockToFreezeY, blockToFreezeZ)) == DefaultMaterial.AIR)
+                            // Snow has to be placed on an empty space on a solid block in the world
+                            if (world.getMaterial(blockToFreezeX, blockToFreezeY, blockToFreezeZ) == DefaultMaterial.AIR)
                             {
-                                world.setBlock(blockToFreezeX, blockToFreezeY, blockToFreezeZ, DefaultMaterial.SNOW.id, 0);
+                                if (world.getMaterial(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ).isSolid()) 
+                                {
+                                    world.setBlock(blockToFreezeX, blockToFreezeY, blockToFreezeZ, DefaultMaterial.SNOW.id, 0);
+                                }
                             }
                         }
                     }
