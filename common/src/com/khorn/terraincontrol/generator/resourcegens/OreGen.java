@@ -86,7 +86,7 @@ public class OreGen extends ResourceGenBase
             res.BlockId = CheckBlock(Props[0]);
         }
 
-        res.MaxSize = CheckValue(Props[1], 1, 32);
+        res.MaxSize = CheckValue(Props[1], 1, 128);
         res.Frequency = CheckValue(Props[2], 1, 100);
         res.Rarity = CheckValue(Props[3], 0, 100);
         res.MinAltitude = CheckValue(Props[4], 0, biomeConfig.worldConfig.WorldHeight);

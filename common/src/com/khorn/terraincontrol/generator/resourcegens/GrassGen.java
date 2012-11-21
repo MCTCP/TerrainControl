@@ -42,7 +42,7 @@ public class GrassGen extends ResourceGenBase
     {
         res.BlockId = CheckBlock(Props[0]);
         res.BlockData = CheckValue(Props[1], 0, 16);
-        res.Frequency = CheckValue(Props[2], 1, 100);
+        res.Frequency = CheckValue(Props[2], 1, 500);
         res.Rarity = CheckValue(Props[3], 0, 100);
 
         res.SourceBlockId = new int[Props.length - 4];

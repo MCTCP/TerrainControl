@@ -720,7 +720,9 @@ public class BiomeConfig extends ConfigFile
         this.WriteTitle("Resource queue");
         this.WriteComment("This section control all resources spawning after terrain generation");
         this.WriteComment("So first line is first resource which will be placed. Second line - second resource.");
-        this.WriteComment("By default this set to be near notch settings.");
+        this.WriteComment("By default this set to be near vanilla settings.");
+        this.WriteComment("");
+        this.WriteComment("Keep in mind that a high size, frequency or rarity might slow down terrain generation.");
         this.WriteComment("");
         this.WriteComment("Possible resources:");
         this.WriteComment("SmallLake(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude)");
