@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import net.minecraft.server.BiomeBase;
@@ -28,7 +29,7 @@ public class BiomeCommand extends BaseCommand
     public boolean onCommand(CommandSender sender, List<String> args)
     {
         Player player = (Player) sender;
-
+        
         Chunk chunk = player.getWorld().getChunkAt(player.getLocation());
 
         player.sendMessage(ChatColor.AQUA.toString() + "You are in: ");

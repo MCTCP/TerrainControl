@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
@@ -21,11 +24,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TCPlugin extends JavaPlugin
+public class TCPlugin extends JavaPlugin implements TerrainControlEngine
 {
     private final HashMap<String, BukkitWorld> NotInitedWorlds = new HashMap<String, BukkitWorld>();
 
-    @SuppressWarnings("UnusedDeclaration")
     public TCListener listener;
     public TCCommandExecutor commandExecutor;
 
@@ -33,11 +35,15 @@ public class TCPlugin extends JavaPlugin
 
     public void onDisable()
     {
-        log("Can not be disabled.");
+        TerrainControl.log("Can not be disabled.");
+        TerrainControl.stopEngine();
     }
 
     public void onEnable()
     {
+        // Start the engine
+        TerrainControl.startEngine(this);
+        
         TCWorldChunkManagerOld.GenBiomeDiagram();
 
         this.commandExecutor = new TCCommandExecutor(this);
@@ -48,7 +54,7 @@ public class TCPlugin extends JavaPlugin
 
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
 
-        log("Enabled");
+        TerrainControl.log("Enabled");
     }
 
     @Override
@@ -62,7 +68,7 @@ public class TCPlugin extends JavaPlugin
     {
         if (worldName.trim().equals(""))
         {
-            log("world name is empty string !!");
+            TerrainControl.log("world name is empty string !!");
             return null;
         }
 
@@ -70,7 +76,7 @@ public class TCPlugin extends JavaPlugin
         {
             if (world.getName().equals(worldName))
             {
-                log("enabled for '" + worldName + "'");
+                TerrainControl.log("enabled for '" + worldName + "'");
                 return world.getChunkGenerator();
             }
         }
@@ -93,7 +99,7 @@ public class TCPlugin extends JavaPlugin
 
         world.setChunkGenerator(generator);
 
-        log("mode " + conf.ModeTerrain.name() + " enabled for '" + worldName + "'");
+        TerrainControl.log("mode " + conf.ModeTerrain.name() + " enabled for '" + worldName + "'");
         return generator;
     }
 
@@ -101,14 +107,14 @@ public class TCPlugin extends JavaPlugin
     {
         File baseFolder = new File(this.getDataFolder(), "worlds" + System.getProperty("file.separator") + worldName);
 
-        log("Loading settings for " + worldName);
+        TerrainControl.log("Loading settings for " + worldName);
 
         if (!baseFolder.exists())
         {
-            log("settings does not exist, creating defaults");
+            TerrainControl.log("settings does not exist, creating defaults");
 
             if (!baseFolder.mkdirs())
-                log("cant create folder " + baseFolder.getName());
+                TerrainControl.log("cant create folder " + baseFolder.getName());
         }
         // Get for init BiomeMapping
         CraftBlock.biomeBaseToBiome(BiomeBase.OCEAN);
@@ -125,7 +131,7 @@ public class TCPlugin extends JavaPlugin
             this.NotInitedWorlds.put(worldName, bukkitWorld);
         }
 
-        log("settings for '" + worldName + "' loaded");
+        TerrainControl.log("settings for '" + worldName + "' loaded");
         return worldConfig;
     }
 
@@ -158,20 +164,25 @@ public class TCPlugin extends JavaPlugin
 
             this.worlds.put(workWorld.getDataManager().getUUID(), bukkitWorld);
 
-            log("world initialized with seed is " + workWorld.getSeed());
+            TerrainControl.log("world initialized with seed is " + workWorld.getSeed());
         }
     }
 
-    // -------------------------------------------- //
-    // LOGGING
-    // -------------------------------------------- //
-    public static void log(Object... msg)
+    @Override
+    public void log(Level level, String... msg)
     {
-        log(Level.INFO, msg);
+        Logger.getLogger("Minecraft").log(level, "[TerrainControl] " + Txt.implode(msg, " "));
     }
 
-    public static void log(Level level, Object... msg)
+    @Override
+    public LocalWorld getWorld(String name)
     {
-        Logger.getLogger("Minecraft").log(level, "TerrainControl: " + Txt.implode(msg, " "));
+        World world = Bukkit.getWorld(name);
+        if(world == null)
+        {
+            // World not loaded
+            return null;
+        }
+        return this.worlds.get(world.getUID());
     }
 }

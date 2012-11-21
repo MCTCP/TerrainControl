@@ -46,7 +46,7 @@ public class TCListener implements Listener
         int y = event.getLocation().getBlockY();
         int z = event.getLocation().getBlockZ();
 
-        int biomeId = bukkitWorld.getBiome(x, z);
+        int biomeId = bukkitWorld.getCalculatedBiomeId(x, z);
         if (biomeId >= bukkitWorld.getSettings().biomeConfigs.length || bukkitWorld.getSettings().biomeConfigs[biomeId] == null)
             return;
 

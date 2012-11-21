@@ -8,17 +8,17 @@ import java.util.Random;
 
 public interface LocalWorld
 {
-    //Biome init
+    // Biome init
     public LocalBiome AddBiome(String name, int id);
 
     public LocalBiome getNullBiome(String name);
 
-    public int getMaxBiomesCount(); // With static id allocation this is not a required feature.
+    public int getMaxBiomesCount(); // With static id allocation this is not a
+                                    // required feature.
 
     public int getFreeBiomeId();
-    
-    public LocalBiome getBiomeById(int id);
 
+    public LocalBiome getBiomeById(int id);
 
     public int getBiomeIdByName(String name);
 
@@ -31,8 +31,29 @@ public interface LocalWorld
 
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size);
 
-    public int getBiome(int x, int z);
+    public int getCalculatedBiomeId(int x, int z);
 
+    /**
+     * Calculates the biome that should generate at the given coordinates.
+     * 
+     * @param x
+     *            The block x.
+     * @param z
+     *            The block z.
+     * @return The biome at the given coordinates.
+     */
+    public LocalBiome getCalculatedBiome(int x, int z);
+
+    /**
+     * Gets the (stored) biome at the given coordinates.
+     * 
+     * @param x
+     *            The block x.
+     * @param z
+     *            The block z.
+     * @return The biome at the given coordinates.
+     */
+    public LocalBiome getBiome(int x, int z);
 
     // temperature*rain
     public double getBiomeFactorForOldBM(int index);
@@ -51,7 +72,6 @@ public interface LocalWorld
 
     public void DoBiomeReplace();
 
-
     // Blocks
 
     public int getTypeId(int x, int y, int z);
@@ -62,17 +82,18 @@ public interface LocalWorld
 
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data);
 
-    //public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int Data);
+    // public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int
+    // Data);
 
-    //public void setRawBlockId(int x, int y, int z, int BlockId);
+    // public void setRawBlockId(int x, int y, int z, int BlockId);
 
-    //public void setBlockId(int x, int y, int z, int BlockId);
+    // public void setBlockId(int x, int y, int z, int BlockId);
 
-    //public void setBlockIdAndData(int x, int y, int z, int BlockId, int Data);
-
+    // public void setBlockIdAndData(int x, int y, int z, int BlockId, int
+    // Data);
 
     public int getLiquidHeight(int x, int z);
-    
+
     public int getSolidHeight(int x, int z);
 
     public int getHighestBlockYAt(int x, int z);
@@ -85,7 +106,6 @@ public interface LocalWorld
 
     public boolean isLoaded(int x, int y, int z);
 
-
     public WorldConfig getSettings();
 
     // public void setSettings(WorldConfig settings);
@@ -96,7 +116,6 @@ public interface LocalWorld
     public long getSeed();
 
     public int getHeight();
-
 
     public int getHeightBits();
 

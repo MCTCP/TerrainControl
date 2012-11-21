@@ -154,7 +154,7 @@ public class BukkitWorld implements LocalWorld
         return biomeArray;
     }
 
-    public int getBiome(int x, int z)
+    public int getCalculatedBiomeId(int x, int z)
     {
         if (this.biomeManager != null)
             return this.biomeManager.getBiomeTC(x, z);
@@ -550,5 +550,17 @@ public class BukkitWorld implements LocalWorld
     {
         this.heightBits = heightBits;
         this.worldHeight = 1 << heightBits;
+    }
+
+    @Override
+    public LocalBiome getCalculatedBiome(int x, int z)
+    {
+        return getBiomeById(getCalculatedBiomeId(x, z));
+    }
+
+    @Override
+    public LocalBiome getBiome(int x, int z)
+    {
+        return getBiomeById(world.getBiome(x, z).id);
     }
 }

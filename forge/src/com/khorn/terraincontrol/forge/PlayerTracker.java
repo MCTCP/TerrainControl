@@ -10,6 +10,7 @@ import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.Packet250CustomPayload;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
@@ -31,15 +32,16 @@ public class PlayerTracker implements IPlayerTracker
         // Server-side - called whenever a player logs in
         // I couldn't find a way to detect if the client has TerrainControl,
         // so for now the configs are sent anyway.
-    	
-    	// Get the config
-    	LocalWorld worldTC = plugin.getWorld();
-    	
-    	String worldName = MinecraftServer.getServer().worldServers[0].getSaveHandler().getSaveDirectoryName();
-    	if(worldTC == null || !worldTC.getName().equals(worldName)) {
-    		// World not loaded
-    		return;
-    	}
+
+        // Get the config
+        String worldName = MinecraftServer.getServer().worldServers[0].getSaveHandler().getSaveDirectoryName();
+        LocalWorld worldTC = TerrainControl.getWorld(worldName);
+
+        if (worldTC == null)
+        {
+            // World not loaded
+            return;
+        }
         WorldConfig config = worldTC.getSettings();
 
         // Serialize it

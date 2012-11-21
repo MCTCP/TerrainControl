@@ -1,10 +1,16 @@
 package com.khorn.terraincontrol.forge;
 
 import java.io.File;
+import java.util.logging.Level;
+
+import net.minecraft.server.MinecraftServer;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.customobjects.ObjectsStore;
+import com.khorn.terraincontrol.util.Txt;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -23,7 +29,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 
 @Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.3.3")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false)
-public class TCPlugin
+public class TCPlugin implements TerrainControlEngine
 {
     @Instance("TerrainControl")
     public static TCPlugin instance;
@@ -42,6 +48,8 @@ public class TCPlugin
     {
         // This is the place where the mod starts loading
 
+        // Start engine
+        TerrainControl.startEngine(this);
         // Register localization
         LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
         // Load global custom objects
@@ -62,9 +70,32 @@ public class TCPlugin
         // Stub Method
     }
 
-    public LocalWorld getWorld()
+    @Override
+    public LocalWorld getWorld(String name)
     {
-        return worldType.worldTC;
+        LocalWorld world = worldType.worldTC;
+        if(world == null)
+        {
+            return null;
+        }
+        String worldName = MinecraftServer.getServer().worldServers[0].getSaveHandler().getSaveDirectoryName();
+        if(world.getName() == worldName)
+        {
+            return world;
+        }
+        else
+        {
+            // Outdated world stored
+            worldType.worldTC = null;
+            return null;
+        }
+        
+    }
+
+    @Override
+    public void log(Level level, String... messages)
+    {
+        System.out.println("TerrainControl: " + Txt.implode(messages, ","));
     }
 
 }

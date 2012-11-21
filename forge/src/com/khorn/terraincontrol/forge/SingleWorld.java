@@ -200,7 +200,7 @@ public class SingleWorld implements LocalWorld
     }
 
     @Override
-    public int getBiome(int x, int z)
+    public int getCalculatedBiomeId(int x, int z)
     {
         if (this.biomeManager != null)
             return this.biomeManager.getBiomeTC(x, z);
@@ -639,5 +639,17 @@ public class SingleWorld implements LocalWorld
         {
             arrayOfByte2[i1] = (byte) biomeIntArray[i1];
         }
+    }
+
+    @Override
+    public LocalBiome getCalculatedBiome(int x, int z)
+    {
+        return getBiomeById(this.getCalculatedBiomeId(x, z));
+    }
+
+    @Override
+    public LocalBiome getBiome(int x, int z)
+    {
+        return getBiomeById(world.getBiomeGenForCoords(x, z).biomeID);
     }
 }
