@@ -132,17 +132,16 @@ public abstract class ConfigFile
     
     protected List<WeightedMobSpawnGroup> ReadModSettings(String settingsName, List<WeightedMobSpawnGroup> defaultValue)
     {
-//    	settingsName = settingsName.toLowerCase();
-//        if (this.SettingsCache.containsKey(settingsName))
-//        {
-//            String json = this.SettingsCache.get(settingsName);
-//            if (json == null)
-//                return defaultValue;
-//            return gson.fromJson(json, new TypeToken<List<WeightedMobSpawnGroup>>()
-//            {}.getType());
-//        }
-//        
-//        sayNotFound(settingsName);
+    	settingsName = settingsName.toLowerCase();
+        if (this.SettingsCache.containsKey(settingsName))
+        {
+            String json = this.SettingsCache.get(settingsName);
+            if (json == null)
+                return defaultValue;
+            return WeightedMobSpawnGroup.fromJson(json);
+        }
+        
+        sayNotFound(settingsName);
         
         return defaultValue;
     }
@@ -400,8 +399,7 @@ public abstract class ConfigFile
 
     protected void WriteValue(String settingsName, List<WeightedMobSpawnGroup> settingsValue) throws IOException
     {
-    	this.SettingsWriter.write(settingsName + ": []" );
-    	//this.SettingsWriter.write(settingsName + ":" + gson.toJson(settingsValue));
+    	this.SettingsWriter.write(settingsName + ": " + WeightedMobSpawnGroup.toJson(settingsValue));
         this.SettingsWriter.newLine();
     }
 
@@ -581,7 +579,8 @@ public abstract class ConfigFile
         return new String(chars);
     }
 
-    protected static String[] ReadComplexString(String line)
+    // Default access modifier, so that WeightedMobSpawnGroup can use it
+    static String[] ReadComplexString(String line)
     {
         ArrayList<String> buffer = new ArrayList<String>();
 
