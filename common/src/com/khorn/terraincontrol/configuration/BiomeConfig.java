@@ -943,6 +943,7 @@ public class BiomeConfig extends ConfigFile
 
     protected void RenameOldSettings()
     {
+        // Old values from WorldConfig
         TCDefaultValues[] copyFromWorld = {TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl};
         for (TCDefaultValues value : copyFromWorld)
             if (this.worldConfig.SettingsCache.containsKey(value.name().toLowerCase()))
@@ -951,6 +952,7 @@ public class BiomeConfig extends ConfigFile
                 this.SettingsCache.put(value.name().toLowerCase(), this.worldConfig.SettingsCache.get(value.name().toLowerCase()));
             }
 
+        // disableNotchPonds
         if (this.SettingsCache.containsKey("disableNotchPonds".toLowerCase()))
         {
             if (!ReadModSettings("disableNotchPonds".toLowerCase(), false))
@@ -960,7 +962,30 @@ public class BiomeConfig extends ConfigFile
             }
 
         }
+        
+        // CustomTreeChance
+        int customTreeChance = 0; // Default value
+        if(worldConfig.SettingsCache.containsKey("customtreechance"))
+        {
+            try {
+                customTreeChance = Integer.parseInt(worldConfig.SettingsCache.get("customtreechance"));
+            } catch(NumberFormatException e) {
+                // Ignore, so leave customTreeChance at 0
+            }
+        }
+        if(customTreeChance == 100)
+        {
+            this.SettingsCache.put("Sapling(All,UseWorld,100)", "-");
+        }
+        if(customTreeChance > 0 && customTreeChance < 100)
+        {
+            this.SettingsCache.put("Sapling(0,UseWorld,"+customTreeChance+",BigTree,10,Tree,100)", "-"); // Oak
+            this.SettingsCache.put("Sapling(1,UseWorld,"+customTreeChance+",Taiga2,100)", "-"); // Redwood
+            this.SettingsCache.put("Sapling(2,UseWorld,"+customTreeChance+",Forest,100)", "-"); // Birch
+            this.SettingsCache.put("Sapling(3,UseWorld,"+customTreeChance+",CocoaTree,100)", "-"); // Jungle
+        }
 
+        // ReplacedBlocks
         String replaceBlocksValue;
         boolean oldReplaceFound = false;
         if (this.SettingsCache.containsKey("replacedblocks"))
