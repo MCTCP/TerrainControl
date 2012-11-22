@@ -110,7 +110,7 @@ public abstract class ConfigFile
     
     protected boolean sayNotFoundEnabled()
     {
-        return true;
+        return false;
     }
     
     protected void sayNotFound(String settingsName)
