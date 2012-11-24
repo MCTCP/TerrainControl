@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.DefaultMobType;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
 import com.khorn.terraincontrol.customobjects.ObjectsStore;
@@ -543,6 +544,23 @@ public class BiomeConfig extends ConfigFile
     {
         CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();
 
+        // Read from BiomeObjects setting
+        String customObjectsString = ReadModSettings("biomeobjects","");
+        if(customObjectsString.length() > 0)
+        {
+            String[] customObjects = customObjectsString.split(",");
+            for (String customObject : customObjects)
+            {
+                CustomObjectCompiled object = ObjectsStore.CompileString(customObject, worldConfig.CustomObjectsDirectory);
+                if (object == null)
+                    object = ObjectsStore.CompileString(customObject, ObjectsStore.GlobalDirectory);
+                if (object != null)
+                    CustomObjectsCompiled.add(object);
+            }
+        }
+        
+        // Read from random places in BiomeConfig
+        // TODO: Remove this in 2.4, as it's quite resource intensive
         for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
         {
             CustomObjectCompiled object = ObjectsStore.CompileString(entry.getKey(), worldConfig.CustomObjectsDirectory);
@@ -766,6 +784,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteResources();
 
         this.WriteTitle("Custom objects");
+        this.WriteComment("These objects will spawn when using the UseBiome keyword.");
         this.WriteCustomObjects();
 
 
@@ -901,8 +920,22 @@ public class BiomeConfig extends ConfigFile
 
     private void WriteCustomObjects() throws IOException
     {
+        StringBuilder builder = new StringBuilder();
         for (CustomObjectCompiled objectCompiled : CustomObjectsCompiled)
-            this.WriteValue(objectCompiled.Name + (objectCompiled.ChangedSettings.equals("") ? "" : ("(" + objectCompiled.ChangedSettings + ")")));
+        {
+            builder.append(objectCompiled.Name);
+            if(!objectCompiled.ChangedSettings.equals(""))
+            {
+                builder.append("(" + objectCompiled.ChangedSettings + ")");
+            }
+            builder.append(',');
+        }
+        if(builder.length() > 0)
+        {
+            // Delete last char
+            builder.deleteCharAt(builder.length() - 1);
+        }
+        this.WriteValue("BiomeObjects", builder.toString());
     }
 
     private void WriteSaplingSettings() throws IOException

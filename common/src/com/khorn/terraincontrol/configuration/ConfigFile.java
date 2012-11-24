@@ -41,10 +41,7 @@ public abstract class ConfigFile
                         continue;
                     if (thisLine.startsWith("#") || thisLine.startsWith("<"))
                         continue;
-                    if (thisLine.toLowerCase().contains("("))
-                    {
-                        this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
-                    } else if (thisLine.contains(":"))
+                    if (thisLine.contains(":"))
                     {
                         String[] splitSettings = thisLine.split(":", 2);
                         if (splitSettings.length == 2)
@@ -56,6 +53,9 @@ public abstract class ConfigFile
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
                             //this.SettingsCache.put(splitSettings[0].trim(), "");
                         }
+                    } if (thisLine.toLowerCase().contains("("))
+                    {
+                        this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
                     } else if (thisLine.contains("="))
                     {
                         String[] splitSettings = thisLine.split("=", 2);
