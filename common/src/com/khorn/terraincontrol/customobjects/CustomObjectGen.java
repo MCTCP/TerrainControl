@@ -307,7 +307,7 @@ public class CustomObjectGen extends ResourceGenBase
     private void AddCompiledObjectsFromWorld(BiomeConfig biomeConfig, ArrayList<CustomObjectCompiled> output, HashMap<String, ArrayList<CustomObjectCompiled>> groups)
     {
         for (CustomObjectCompiled objectCompiled : biomeConfig.worldConfig.CustomObjectsCompiled)
-            if (objectCompiled.CheckBiome(biomeConfig.Name) && !objectCompiled.Tree)
+            if (objectCompiled.CheckBiome(biomeConfig.Name))
             {
                 output.add(objectCompiled);
                 if (!objectCompiled.GroupId.equals(""))
@@ -327,8 +327,6 @@ public class CustomObjectGen extends ResourceGenBase
     {
         for (CustomObjectCompiled objectCompiled : biomeConfig.CustomObjectsCompiled)
         {
-            if (objectCompiled.Tree)
-                continue;
             output.add(objectCompiled);
             if (!objectCompiled.GroupId.equals(""))
             {
