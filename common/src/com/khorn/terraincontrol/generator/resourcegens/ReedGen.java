@@ -12,23 +12,19 @@ public class ReedGen extends ResourceGenBase
     @Override
     protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
     {
-
-        for (int i = 0; i < 80; i++)
+        int y = world.getHighestBlockYAt(x, z);
+        if (y > res.MaxAltitude || y < res.MinAltitude || (!world.getMaterial(x - 1, y - 1, z).isLiquid() && !world.getMaterial(x + 1, y - 1, z).isLiquid() && !world.getMaterial(x, y - 1, z - 1).isLiquid() && !world.getMaterial(x, y - 1, z + 1).isLiquid()))
         {
-            int x2 = x + rand.nextInt(8) - rand.nextInt(8);
-            int z2 = z + rand.nextInt(8) - rand.nextInt(8);
-            int y = world.getHighestBlockYAt(x2, z2) + 1;
-            if (y > res.MaxAltitude || y < res.MinAltitude || (!world.getMaterial(x2 - 1, y - 1, z2).isLiquid() && !world.getMaterial(x2 + 1, y - 1, z2).isLiquid() && !world.getMaterial(x2, y - 1, z2 - 1).isLiquid() && !world.getMaterial(x2, y - 1, z2 + 1).isLiquid()))
-            {
-                continue;
-            }
-            if (!res.CheckSourceId(world.getTypeId(x2, y - 1, z2)))
-                continue;
-
-            int n = 2 + rand.nextInt(rand.nextInt(5) + 1);
-            for (int i1 = 0; i1 < n; i1++)
-                world.setBlock(x2, y + i1, z2, res.BlockId, 0, false, false, false);
+            return;
         }
+        if (!res.CheckSourceId(world.getTypeId(x, y - 1, z)))
+        {
+            return;
+        }
+        
+        int n = 1 + rand.nextInt(2);
+        for (int i1 = 0; i1 < n; i1++)
+            world.setBlock(x, y + i1, z, res.BlockId, res.BlockData, false, false, false);
     }
 
     @Override

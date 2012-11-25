@@ -4,7 +4,6 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.DefaultMobType;
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
 import com.khorn.terraincontrol.customobjects.ObjectsStore;
@@ -1148,7 +1147,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultTrees = 0;
                 this.DefaultDeadBrush = 4;
                 this.DefaultGrass = 0;
-                this.DefaultReed = 50;
+                this.DefaultReed = 10;
                 this.DefaultCactus = 10;
                 this.DefaultColor = "0xFFCC33";
                 break;
