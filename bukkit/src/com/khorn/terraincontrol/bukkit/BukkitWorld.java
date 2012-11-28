@@ -505,6 +505,12 @@ public class BukkitWorld implements LocalWorld
 
             case Normal:
             case OldGenerator:
+                this.strongholdGen = new WorldGenStronghold();
+                this.VillageGen = new WorldGenVillage();
+                this.MineshaftGen = new WorldGenMineshaft();
+                this.PyramidsGen = new WorldGenLargeFeature();
+                this.NetherFortress = new WorldGenNether();
+            case NotGenerate:
                 this.Tree = new WorldGenTrees(false);
                 this.CocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
                 this.BigTree = new WorldGenBigTree(false);
@@ -515,14 +521,7 @@ public class BukkitWorld implements LocalWorld
                 this.HugeMushroom = new WorldGenHugeMushroom();
                 this.JungleTree = new WorldGenMegaTree(false, 15, 3, 3);
                 this.GroundBush = new WorldGenGroundBush(3, 0);
-
-                this.strongholdGen = new WorldGenStronghold();
-                this.VillageGen = new WorldGenVillage();
-                this.MineshaftGen = new WorldGenMineshaft();
-                this.PyramidsGen = new WorldGenLargeFeature();
-                this.NetherFortress = new WorldGenNether();
             case TerrainTest:
-            case NotGenerate:
                 this.generator.Init(this);
                 break;
             case Default:
