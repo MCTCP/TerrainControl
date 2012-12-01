@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.customobjects.ObjectsStore;
+import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.util.Txt;
 import net.minecraft.server.BiomeBase;
 import org.bukkit.Bukkit;
@@ -49,8 +49,6 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         this.commandExecutor = new TCCommandExecutor(this);
 
         this.listener = new TCListener(this);
-
-        ObjectsStore.ReadObjects(this.getDataFolder());
 
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
 
@@ -184,5 +182,11 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             return null;
         }
         return this.worlds.get(world.getUID());
+    }
+
+    @Override
+    public File getGlobalObjectsDirectory()
+    {
+        return new File(this.getDataFolder(), BODefaultValues.BO_GlobalDirectoryName.stringValue());
     }
 }

@@ -1,14 +1,14 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
-import com.khorn.terraincontrol.customobjects.ObjectsStore;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ListCommand extends BaseCommand
@@ -45,13 +45,13 @@ public class ListCommand extends BaseCommand
 
             if (world != null)
             {
-                if (world.getSettings().CustomObjectsCompiled.size() == 0)
+                if (world.getSettings().customObjects.size() == 0)
                     sender.sendMessage(MessageColor + "This world does not have custom objects");
 
                 List<String> pluginList = new ArrayList<String>();
-                for (CustomObjectCompiled object : world.getSettings().CustomObjectsCompiled)
+                for (CustomObject object : world.getSettings().customObjects.values())
                 {
-                    pluginList.add(ValueColor + object.Name);
+                    pluginList.add(ValueColor + object.getName());
                 }
 
                 this.ListMessage(sender, pluginList, page, "World bo2 objects");
@@ -59,7 +59,6 @@ public class ListCommand extends BaseCommand
             } else
                 sender.sendMessage(ErrorColor + "World not found " + worldName);
             return true;
-
 
         }
         if (args.size() > 0)
@@ -73,7 +72,7 @@ public class ListCommand extends BaseCommand
             }
         }
 
-        ArrayList<CustomObject> globalObjects = ObjectsStore.LoadObjectsFromDirectory(ObjectsStore.GlobalDirectory);
+        Collection<CustomObject> globalObjects = TerrainControl.getCustomObjectManager().globalObjects.values();
 
         if (globalObjects.size() == 0)
             sender.sendMessage(MessageColor + "This global directory does not have custom objects");
@@ -81,11 +80,10 @@ public class ListCommand extends BaseCommand
         List<String> pluginList = new ArrayList<String>();
         for (CustomObject object : globalObjects)
         {
-            pluginList.add(ValueColor + object.Name);
+            pluginList.add(ValueColor + object.getName());
         }
 
         this.ListMessage(sender, pluginList, page, "Global bo2 objects");
-
 
         return true;
 

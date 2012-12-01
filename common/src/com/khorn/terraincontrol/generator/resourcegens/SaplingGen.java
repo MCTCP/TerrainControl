@@ -10,31 +10,17 @@ import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
-public class TreeGen extends Resource
+public class SaplingGen extends Resource
 {
-    private List<CustomObject> trees;
-    private List<String> treeNames;
-    private List<Integer> treeChances;
+    public List<CustomObject> trees;
+    public List<String> treeNames;
+    public List<Integer> treeChances;
+    public int saplingType;
 
     @Override
     public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        for (int i = 0; i < frequency; i++)
-        {
-            for (int treeNumber = 0; treeNumber < trees.size(); treeNumber++)
-            {
-                if (random.nextInt(100) < treeChances.get(treeNumber))
-                {
-                    int x = chunkX * 16 + random.nextInt(16);
-                    int z = chunkZ * 16 + random.nextInt(16);
-                    if (trees.get(treeNumber).spawnAsTree(world, random, x, z))
-                    {
-                        // Success, on to the next tree!
-                        break;
-                    }
-                }
-            }
-        }
+        // Left blank, as it shouldn't spawn anything.
     }
 
     @Override
@@ -42,7 +28,13 @@ public class TreeGen extends Resource
     {
         assureSize(3, args);
 
-        frequency = getInt(args.get(0), 1, 100);
+        if (args.get(0).equalsIgnoreCase("All"))
+        {
+            saplingType = -1;
+        } else
+        {
+            saplingType = getInt(args.get(0), -1, 3);
+        }
 
         trees = new ArrayList<CustomObject>();
         treeNames = new ArrayList<String>();
@@ -68,13 +60,17 @@ public class TreeGen extends Resource
     @Override
     public ResourceType getType()
     {
-        return ResourceType.biomeConfigResource;
+        return ResourceType.saplingResource;
     }
 
     @Override
     public String makeString()
     {
-        String output = "Tree(" + frequency;
+        String output = "Sapling(" + saplingType;
+        if (saplingType == -1)
+        {
+            output = "Sapling(All";
+        }
         for (int i = 0; i < treeNames.size(); i++)
         {
             output += "," + treeNames.get(i) + "," + treeChances.get(i);
@@ -86,5 +82,21 @@ public class TreeGen extends Resource
     public void spawn(LocalWorld world, Random random, int x, int z)
     {
         // Left blank, as process() already handles this
+    }
+
+    public boolean growSapling(LocalWorld world, Random random, int x, int y, int z)
+    {
+        for (int treeNumber = 0; treeNumber < trees.size(); treeNumber++)
+        {
+            if (random.nextInt(100) < treeChances.get(treeNumber))
+            {
+                if (trees.get(treeNumber).spawnAsTree(world, random, x, z))
+                {
+                    // Success!
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

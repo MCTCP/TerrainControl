@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol;
 
+import java.io.File;
 import java.util.logging.Level;
 
 public interface TerrainControlEngine
@@ -9,11 +10,17 @@ public interface TerrainControlEngine
      * @param name The name of the world.
      * @return The world object.
      */
-    public abstract LocalWorld getWorld(String name);
+    public LocalWorld getWorld(String name);
     
     /**
      * Logs the messages.
      * @param message The messages to log.
      */
-    public abstract void log(Level level, String... message);
+    public void log(Level level, String... message);
+    
+    /**
+     * Returns the folder where the global objects are stored in.
+     * @return
+     */
+    public File getGlobalObjectsDirectory();
 }

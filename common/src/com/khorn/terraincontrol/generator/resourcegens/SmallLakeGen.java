@@ -1,25 +1,30 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Resource;
-
+import java.util.List;
 import java.util.Random;
 
-public class SmallLakeGen extends ResourceGenBase
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
+
+public class SmallLakeGen extends Resource
 {
 
     private final boolean[] BooleanBuffer = new boolean[2048];
-
+    private int blockId;
+    private int blockData;
+    private int minAltitude;
+    private int maxAltitude;
 
     @Override
-    protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
+    public void spawn(LocalWorld world, Random rand, int x, int z)
     {
         x -= 8;
         z -= 8;
 
-        int y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
+        int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
 
         // Search any free space
         while ((y > 5) && (world.isEmpty(x, y, z)))
@@ -30,7 +35,6 @@ public class SmallLakeGen extends ResourceGenBase
 
         // y = floor
         y -= 4;
-
 
         synchronized (BooleanBuffer)
         {
@@ -67,14 +71,17 @@ public class SmallLakeGen extends ResourceGenBase
                 {
                     for (i2 = 0; i2 < 8; i2++)
                     {
-                        boolean flag = (!BooleanBuffer[((j * 16 + i1) * 8 + i2)]) && (((j < 15) && (BooleanBuffer[(((j + 1) * 16 + i1) * 8 + i2)])) || ((j > 0) && (BooleanBuffer[(((j - 1) * 16 + i1) * 8 + i2)])) || ((i1 < 15) && (BooleanBuffer[((j * 16 + (i1 + 1)) * 8 + i2)])) || ((i1 > 0) && (BooleanBuffer[((j * 16 + (i1 - 1)) * 8 + i2)])) || ((i2 < 7) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 + 1))])) || ((i2 > 0) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 - 1))])));
+                        boolean flag = (!BooleanBuffer[((j * 16 + i1) * 8 + i2)])
+                                && (((j < 15) && (BooleanBuffer[(((j + 1) * 16 + i1) * 8 + i2)])) || ((j > 0) && (BooleanBuffer[(((j - 1) * 16 + i1) * 8 + i2)]))
+                                        || ((i1 < 15) && (BooleanBuffer[((j * 16 + (i1 + 1)) * 8 + i2)])) || ((i1 > 0) && (BooleanBuffer[((j * 16 + (i1 - 1)) * 8 + i2)]))
+                                        || ((i2 < 7) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 + 1))])) || ((i2 > 0) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 - 1))])));
 
                         if (flag)
                         {
                             DefaultMaterial localMaterial = world.getMaterial(x + j, y + i2, z + i1);
                             if ((i2 >= 4) && (localMaterial.isLiquid()))
                                 return;
-                            if ((i2 < 4) && (!localMaterial.isSolid()) && (world.getTypeId(x + j, y + i2, z + i1) != res.BlockId))
+                            if ((i2 < 4) && (!localMaterial.isSolid()) && (world.getTypeId(x + j, y + i2, z + i1) != blockId))
                                 return;
                         }
                     }
@@ -90,7 +97,7 @@ public class SmallLakeGen extends ResourceGenBase
                     {
                         if (BooleanBuffer[((j * 16 + i1) * 8 + i2)])
                         {
-                            world.setBlock(x + j, y + i2, z + i1, res.BlockId, res.BlockData);
+                            world.setBlock(x + j, y + i2, z + i1, blockId, blockData);
                             BooleanBuffer[((j * 16 + i1) * 8 + i2)] = false;
                         }
                     }
@@ -104,77 +111,31 @@ public class SmallLakeGen extends ResourceGenBase
                     }
                 }
             }
-            /*
-           for (j = 0; j < 16; j++) {
-               for (i1 = 0; i1 < 16; i1++) {
-                   for (i2 = 4; i2 < 8; i2++) {
-                       if ((BooleanBuffer[((j * 16 + i1) * 8 + i2)] == 0) ||
-                               (paramWorld.getTypeId(x + j, y + i2 - 1, z + i1) != Block.DIRT.id) || (paramWorld.a(EnumSkyBlock.SKY, x + j, y + i2, z + i1) <= 0)) continue;
-                       BiomeBase localBiomeBase = paramWorld.getBiome(x + j, z + i1);
-                       if (localBiomeBase.A == Block.MYCEL.id) paramWorld.setRawTypeId(x + j, y + i2 - 1, z + i1, Block.MYCEL.id); else {
-                           paramWorld.setRawTypeId(x + j, y + i2 - 1, z + i1, Block.GRASS.id);
-                       }
-                   }
-               }
-
-           }
-
-           if (Block.byId[this.a].material == Material.LAVA) {
-               for (j = 0; j < 16; j++) {
-                   for (i1 = 0; i1 < 16; i1++) {
-                       for (i2 = 0; i2 < 8; i2++) {
-                           int i4 = (BooleanBuffer[((j * 16 + i1) * 8 + i2)] == 0) && (((j < 15) && (BooleanBuffer[(((j + 1) * 16 + i1) * 8 + i2)] != 0)) || ((j > 0) && (BooleanBuffer[(((j - 1) * 16 + i1) * 8 + i2)] != 0)) || ((i1 < 15) && (BooleanBuffer[((j * 16 + (i1 + 1)) * 8 + i2)] != 0)) || ((i1 > 0) && (BooleanBuffer[((j * 16 + (i1 - 1)) * 8 + i2)] != 0)) || ((i2 < 7) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 + 1))] != 0)) || ((i2 > 0) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 - 1))] != 0))) ? 1 : 0;
-
-                           if ((i4 == 0) ||
-                                   ((i2 >= 4) && (rand.nextInt(2) == 0)) || (!paramWorld.getMaterial(x + j, y + i2, z + i1).isBuildable())) continue;
-                           paramWorld.setRawTypeId(x + j, y + i2, z + i1, Block.STONE.id);
-                       }
-                   }
-
-               }
-
-           }
-
-           if (Block.byId[this.a].material == Material.WATER) {
-               for (j = 0; j < 16; j++) {
-                   for (i1 = 0; i1 < 16; i1++) {
-                       i2 = 4;
-                       if (!paramWorld.s(x + j, y + i2, z + i1)) continue; paramWorld.setRawTypeId(x + j, y + i2, z + i1, Block.ICE.id);
-                   }
-               }
-           } */
 
         }
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
+    public void load(List<String> args) throws InvalidResourceException
     {
-        if (Props[0].contains("."))
-        {
-            String[] block = Props[0].split("\\.");
-            res.BlockId = CheckBlock(block[0]);
-            res.BlockData = CheckValue(block[1], 0, 16);
-        } else
-        {
-            res.BlockId = CheckBlock(Props[0]);
-        }
-
-        res.Frequency = CheckValue(Props[1], 1, 100);
-        res.Rarity = CheckValue(Props[2], 0, 100);
-        res.MinAltitude = CheckValue(Props[3], 0, biomeConfig.worldConfig.WorldHeight);
-        res.MaxAltitude = CheckValue(Props[4], 0, biomeConfig.worldConfig.WorldHeight, res.MinAltitude);
-        return true;
+        assureSize(5, args);
+        blockId = getBlockId(args.get(0));
+        blockData = getBlockData(args.get(0));
+        frequency = getInt(args.get(1), 1, 100);
+        rarity = getInt(args.get(2), 1, 100);
+        minAltitude = getInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = getInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
     }
 
     @Override
-    protected String WriteString(Resource res, String blockSources)
+    public ResourceType getType()
     {
-        String blockId = res.BlockIdToName(res.BlockId);
-        if (res.BlockData > 0)
-        {
-            blockId += "." + res.BlockData;
-        }
-        return blockId + "," + res.Frequency + "," + res.Rarity + "," + res.MinAltitude + "," + res.MaxAltitude;
+        return ResourceType.biomeConfigResource;
+    }
+
+    @Override
+    public String makeString()
+    {
+        return "SmallLake(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
     }
 }

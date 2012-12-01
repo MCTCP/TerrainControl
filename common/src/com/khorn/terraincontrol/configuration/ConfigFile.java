@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ConfigFile
 {
@@ -15,7 +16,7 @@ public abstract class ConfigFile
 
     // TODO: This map is populated with lowercase versions as well.
     // TODO: That is a derped approach. Use TreeSet with CASE_INSENSITIVE_ORDER instead.
-    protected HashMap<String, String> SettingsCache = new HashMap<String, String>();
+    protected Map<String, String> SettingsCache = new HashMap<String, String>();
 
     // TODO: We should use GSON only instead of just for a few fields.
     // TODO: Hah. We should remove that buggy GSON.

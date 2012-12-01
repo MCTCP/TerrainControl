@@ -1,14 +1,14 @@
 package com.khorn.terraincontrol.generator;
 
+import java.util.Random;
+
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
-
-import java.util.Random;
+import com.khorn.terraincontrol.generator.resourcegens.SmallLakeGen;
 
 public class ObjectSpawner
 {
@@ -42,10 +42,10 @@ public class ObjectSpawner
         for (int i = 0; i < localBiomeConfig.ResourceCount; i++)
         {
             Resource res = localBiomeConfig.ResourceSequence[i];
-            if (res.Type == ResourceType.SmallLake && Village)
+            if (res instanceof SmallLakeGen && Village)
                 continue;
-            world.setChunksCreations(res.Type.CreateNewChunks);
-            res.Type.Generator.Process(world, rand, res, x, z);
+            world.setChunksCreations(false);
+            res.process(world, rand, chunkX, chunkZ);
         }
 
         // Snow and ice
@@ -67,10 +67,11 @@ public class ObjectSpawner
                             world.setBlock(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ, biomeConfig.iceBlock, 0);
                         } else
                         {
-                            // Snow has to be placed on an empty space on a solid block in the world
+                            // Snow has to be placed on an empty space on a
+                            // solid block in the world
                             if (world.getMaterial(blockToFreezeX, blockToFreezeY, blockToFreezeZ) == DefaultMaterial.AIR)
                             {
-                                if (world.getMaterial(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ).isSolid()) 
+                                if (world.getMaterial(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ).isSolid())
                                 {
                                     world.setBlock(blockToFreezeX, blockToFreezeY, blockToFreezeZ, DefaultMaterial.SNOW.id, 0);
                                 }

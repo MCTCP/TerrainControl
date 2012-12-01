@@ -1,11 +1,10 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
-import com.khorn.terraincontrol.customobjects.CustomObjectGen;
-import com.khorn.terraincontrol.customobjects.ObjectsStore;
+import com.khorn.terraincontrol.customobjects.CustomObject;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -38,20 +37,14 @@ public class SpawnCommand extends BaseCommand
             me.sendMessage(ErrorColor + "You must enter the name of the BO2.");
             return true;
         }
-        CustomObjectCompiled spawnObject = null;
+        CustomObject spawnObject = null;
 
         if (bukkitWorld != null)
-            spawnObject = ObjectsStore.CompileString(args.get(0), bukkitWorld.getSettings().CustomObjectsDirectory);
+            spawnObject = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(0), bukkitWorld);
 
         if (spawnObject == null)
         {
-            me.sendMessage(BaseCommand.MessageColor + "BO2 not found in world directory. Searching in global directory.");
-            spawnObject = ObjectsStore.CompileString(args.get(0), ObjectsStore.GlobalDirectory);
-        }
-
-        if (spawnObject == null)
-        {
-            sender.sendMessage(ErrorColor + "BO2 not found, use '/tc list' to list the available ones.");
+            sender.sendMessage(ErrorColor + "Object not found, use '/tc list' to list the available ones.");
             return true;
         }
 
@@ -59,9 +52,9 @@ public class SpawnCommand extends BaseCommand
         if (block == null)
             return true;
 
-        if (CustomObjectGen.GenerateCustomObject(bukkitWorld, new Random(), block.getX(), block.getY(), block.getZ(), spawnObject))
+        if (spawnObject.spawn(bukkitWorld, new Random(), block.getX(), block.getY(), block.getZ()))
         {
-            me.sendMessage(BaseCommand.MessageColor + spawnObject.Name + " was spawned.");
+            me.sendMessage(BaseCommand.MessageColor + spawnObject.getName() + " was spawned.");
         } else
         {
             me.sendMessage(BaseCommand.ErrorColor + "BO2 cant be spawned over there.");

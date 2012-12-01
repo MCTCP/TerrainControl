@@ -1,17 +1,26 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Resource;
-import com.khorn.terraincontrol.LocalWorld;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-public class CactusGen extends ResourceGenBase
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
+
+public class CactusGen extends Resource
 {
+    private int blockId;
+    private int blockData;
+    private int minAltitude;
+    private int maxAltitude;
+    private List<Integer> sourceBlocks;
+
     @Override
-    protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
+    public void spawn(LocalWorld world, Random rand, int x, int z)
     {
-        int y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
+        int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
 
         for (int i = 0; i < 10; i++)
         {
@@ -24,9 +33,9 @@ public class CactusGen extends ResourceGenBase
                 for (int i1 = 0; i1 < n; i1++)
                 {
                     int id = world.getTypeId(j, k + i1 - 1, m);
-                    if (res.CheckSourceId(id) || id == res.BlockId)
+                    if (sourceBlocks.contains(id))
                     {
-                        world.setBlock(j, k + i1, m, res.BlockId, 0, false, false, false);
+                        world.setBlock(j, k + i1, m, blockId, blockData, false, false, false);
                     }
                 }
             }
@@ -34,39 +43,35 @@ public class CactusGen extends ResourceGenBase
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
+    public ResourceType getType()
     {
-
-        if (Props[0].contains("."))
-        {
-            String[] block = Props[0].split("\\.");
-            res.BlockId = CheckBlock(block[0]);
-            res.BlockData = CheckValue(block[1], 0, 16);
-        } else
-        {
-            res.BlockId = CheckBlock(Props[0]);
-        }
-
-        res.Frequency = CheckValue(Props[1], 1, 100);
-        res.Rarity = CheckValue(Props[2], 0, 100);
-        res.MinAltitude = CheckValue(Props[3], 0, biomeConfig.worldConfig.WorldHeight);
-        res.MaxAltitude = CheckValue(Props[4], 0, biomeConfig.worldConfig.WorldHeight, res.MinAltitude);
-
-        res.SourceBlockId = new int[Props.length - 5];
-        for (int i = 5; i < Props.length; i++)
-            res.SourceBlockId[i - 5] = CheckBlock(Props[i]);
-
-        return true;
+        return ResourceType.biomeConfigResource;
     }
 
     @Override
-    protected String WriteString(Resource res, String blockSources)
+    public String makeString()
     {
-        String blockId = res.BlockIdToName(res.BlockId);
-        if (res.BlockData > 0)
+        return "Cactus(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks);
+    }
+
+    @Override
+    public void load(List<String> args) throws InvalidResourceException
+    {
+        if (args.size() < 6)
         {
-            blockId += "." + res.BlockData;
+            throw new InvalidResourceException("Too few arguments supplied");
         }
-        return blockId + "," + res.Frequency + "," + res.Rarity + "," + res.MinAltitude + "," + res.MaxAltitude + blockSources;
+
+        blockId = getBlockId(args.get(0));
+        blockData = getBlockData(args.get(0));
+        frequency = getInt(args.get(1), 1, 100);
+        rarity = getInt(args.get(2), 1, 100);
+        minAltitude = getInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = getInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
+        sourceBlocks = new ArrayList<Integer>();
+        for (int i = 5; i < args.size(); i++)
+        {
+            sourceBlocks.add(getBlockId(args.get(i)));
+        }
     }
 }

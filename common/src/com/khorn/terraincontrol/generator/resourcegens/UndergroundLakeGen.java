@@ -1,23 +1,30 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.MathHelper;
 
+import java.util.List;
 import java.util.Random;
 
-public class UndergroundLakeGen extends ResourceGenBase
+public class UndergroundLakeGen extends Resource
 {
+    private int minSize;
+    private int maxSize;
+    private int minAltitude;
+    private int maxAltitude;
+
     @Override
-    protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
+    public void spawn(LocalWorld world, Random rand, int x, int z)
     {
-        int y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
+        int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
 
         if (y >= world.getHighestBlockYAt(x, z))
             return;
-        int size = rand.nextInt(res.MaxSize - res.MinSize) + res.MinSize;
+        int size = rand.nextInt(maxSize - minSize) + minSize;
 
         float mPi = rand.nextFloat() * 3.141593F;
 
@@ -54,29 +61,34 @@ public class UndergroundLakeGen extends ResourceGenBase
                         int uBlock = world.getTypeId(xLake, yLake - 1, zLake);
                         if (uBlock != 0) // not air
                             world.setBlock(xLake, yLake, zLake, DefaultMaterial.WATER.id, 0, false, false, false);
-                        else // Air block
+                        else
+                            // Air block
                             world.setBlock(xLake, yLake, zLake, 0, 0, false, false, false);
                     }
         }
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
+    public void load(List<String> args) throws InvalidResourceException
     {
-
-        res.MinSize = CheckValue(Props[0], 1, 25);
-        res.MaxSize = CheckValue(Props[1], 1, 60, res.MinSize);
-        res.Frequency = CheckValue(Props[2], 1, 100);
-        res.Rarity = CheckValue(Props[3], 0, 100);
-        res.MinAltitude = CheckValue(Props[4], 0, biomeConfig.worldConfig.WorldHeight);
-        res.MaxAltitude = CheckValue(Props[5], 0, biomeConfig.worldConfig.WorldHeight, res.MinAltitude);
-
-        return true;
+        assureSize(6, args);
+        minSize = getInt(args.get(0), 1, 25);
+        maxSize = getInt(args.get(1), minSize, 60);
+        frequency = getInt(args.get(2), 1, 100);
+        rarity = getInt(args.get(3), 1, 100);
+        minAltitude = getInt(args.get(4), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = getInt(args.get(5), minAltitude + 1, TerrainControl.worldHeight);
     }
 
     @Override
-    protected String WriteString(Resource res, String blockSources)
+    public ResourceType getType()
     {
-        return res.MinSize + "," + res.MaxSize + "," + res.Frequency + "," + res.Rarity + "," + res.MinAltitude + "," + res.MaxAltitude;
+        return ResourceType.biomeConfigResource;
+    }
+
+    @Override
+    public String makeString()
+    {
+        return "UnderGroundLake(" + minSize + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
     }
 }

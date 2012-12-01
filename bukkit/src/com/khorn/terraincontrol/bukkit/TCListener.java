@@ -12,20 +12,15 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldInitEvent;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Resource;
-import com.khorn.terraincontrol.generator.resourcegens.TreeGen;
+import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
 
 public class TCListener implements Listener
 {
     private TCPlugin tcPlugin;
-    private Random random;
-
-    private TreeGen treeGenerator = new TreeGen();
 
     public TCListener(TCPlugin plugin)
     {
         this.tcPlugin = plugin;
-        this.random = new Random();
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -51,7 +46,7 @@ public class TCListener implements Listener
             return;
 
         BiomeConfig biomeConfig = bukkitWorld.getSettings().biomeConfigs[biomeId];
-        Resource sapling;
+        SaplingGen sapling;
 
         switch (event.getSpecies())
         {
@@ -76,8 +71,25 @@ public class TCListener implements Listener
 
         if (sapling != null)
         {
-            treeGenerator.SpawnTree(bukkitWorld, this.random, sapling, x, y, z);
-            event.getBlocks().clear();
+            boolean success = false;
+            for(int i = 0; i < bukkitWorld.getSettings().objectSpawnRatio; i++)
+            {
+                if(sapling.growSapling(bukkitWorld, new Random(), x, y, z)) 
+                {
+                    success = true;
+                    break;
+                }
+            }
+                
+            if(success)
+            {
+                // Just spawned the tree, clear the blocks list to prevent Bukkit spawning another tree
+                event.getBlocks().clear();
+            } else
+            {
+                // Cannot grow, so leave the sapling there
+                event.setCancelled(true);
+            }
         }
     }
 

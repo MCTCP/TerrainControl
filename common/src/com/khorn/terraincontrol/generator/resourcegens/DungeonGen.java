@@ -1,34 +1,47 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 
+import java.util.List;
 import java.util.Random;
 
-public class DungeonGen extends ResourceGenBase
+public class DungeonGen extends Resource
 {
+    private int minAltitude;
+    private int maxAltitude;
+
     @Override
-    protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
+    public void load(List<String> args) throws InvalidResourceException
     {
-        int _y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
-        world.PlaceDungeons(rand, x, _y, z);
+        if (args.size() < 4)
+        {
+            throw new InvalidResourceException("Too few arguments supplied");
+        }
+        frequency = getInt(args.get(0), 1, 100);
+        rarity = getInt(args.get(1), 1, 100);
+        minAltitude = getInt(args.get(2), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = getInt(args.get(3), minAltitude + 1, TerrainControl.worldHeight);
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
+    public void spawn(LocalWorld world, Random random, int x, int z)
     {
-        res.Frequency = CheckValue(Props[0], 1, 100);
-        res.Rarity = CheckValue(Props[1], 0, 100);
-        res.MinAltitude = CheckValue(Props[2], 0, biomeConfig.worldConfig.WorldHeight);
-        res.MaxAltitude = CheckValue(Props[3], 0, biomeConfig.worldConfig.WorldHeight, res.MinAltitude);
-
-        return true;
+        int y = random.nextInt(maxAltitude - minAltitude) + minAltitude;
+        world.PlaceDungeons(random, x, y, z);
     }
 
     @Override
-    protected String WriteString(Resource res, String blockSources)
+    public ResourceType getType()
     {
-        return res.Frequency + "," + res.Rarity + "," + res.MinAltitude + "," + res.MaxAltitude;
+        return ResourceType.biomeConfigResource;
+    }
+
+    @Override
+    public String makeString()
+    {
+        return "Dungeon(" + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
     }
 }

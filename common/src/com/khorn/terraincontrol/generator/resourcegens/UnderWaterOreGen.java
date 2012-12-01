@@ -1,36 +1,43 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Resource;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-public class UnderWaterOreGen extends ResourceGenBase
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
+
+public class UnderWaterOreGen extends Resource
 {
+    private int blockId;
+    private List<Integer> sourceBlocks;
+    private int size;
+    private int blockData;
+
     @Override
-    protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
+    public void spawn(LocalWorld world, Random rand, int x, int z)
     {
         int y = world.getSolidHeight(x, z);
         if (world.getLiquidHeight(x, z) < y || y == -1)
             return;
 
-        int i = rand.nextInt(res.MaxSize);
-        int j = 2;
-        for (int k = x - i; k <= x + i; k++)
+        int currentSize = rand.nextInt(size);
+        int two = 2;
+        for (int k = x - currentSize; k <= x + currentSize; k++)
         {
-            for (int m = z - i; m <= z + i; m++)
+            for (int m = z - currentSize; m <= z + currentSize; m++)
             {
                 int n = k - x;
                 int i1 = m - z;
-                if (n * n + i1 * i1 <= i * i)
+                if (n * n + i1 * i1 <= currentSize * currentSize)
                 {
-                    for (int i2 = y - j; i2 <= y + j; i2++)
+                    for (int i2 = y - two; i2 <= y + two; i2++)
                     {
                         int i3 = world.getTypeId(k, i2, m);
-                        if (res.CheckSourceId(i3))
+                        if (sourceBlocks.contains(i3))
                         {
-                            world.setBlock(k, i2, m, res.BlockId, 0, false, false, false);
+                            world.setBlock(k, i2, m, blockId, blockData, false, false, false);
                         }
                     }
                 }
@@ -39,25 +46,30 @@ public class UnderWaterOreGen extends ResourceGenBase
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
+    public void load(List<String> args) throws InvalidResourceException
     {
-
-        res.BlockId = CheckBlock(Props[0]);
-        res.MaxSize = CheckValue(Props[1], 1, 8);
-        res.Frequency = CheckValue(Props[2], 1, 100);
-        res.Rarity = CheckValue(Props[3], 0, 100);
-
-
-        res.SourceBlockId = new int[Props.length - 4];
-        for (int i = 4; i < Props.length; i++)
-            res.SourceBlockId[i - 4] = CheckBlock(Props[i]);
-
-        return true;
+        assureSize(5, args);
+        blockId = getBlockId(args.get(0));
+        blockData = getBlockData(args.get(0));
+        size = getInt(args.get(1), 1, 8);
+        frequency = getInt(args.get(2), 1, 100);
+        rarity = getInt(args.get(3), 1, 100);
+        sourceBlocks = new ArrayList<Integer>();
+        for (int i = 4; i < args.size(); i++)
+        {
+            sourceBlocks.add(getBlockId(args.get(i)));
+        }
     }
 
     @Override
-    protected String WriteString(Resource res, String blockSources)
+    public ResourceType getType()
     {
-        return res.BlockIdToName(res.BlockId) + "," + res.MaxSize + "," + res.Frequency + "," + res.Rarity + blockSources;
+        return ResourceType.biomeConfigResource;
+    }
+
+    @Override
+    public String makeString()
+    {
+        return "UnderWaterOre(" + makeMaterial(blockId, blockData) + "," + size + "," + frequency + "," + rarity + makeMaterial(sourceBlocks) + ")";
     }
 }

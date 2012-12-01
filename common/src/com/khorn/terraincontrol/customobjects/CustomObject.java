@@ -1,101 +1,123 @@
 package com.khorn.terraincontrol.customobjects;
 
-
-import com.khorn.terraincontrol.configuration.ConfigFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
-public class CustomObject extends ConfigFile
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
+
+public interface CustomObject
 {
-    public boolean IsValid = false;
-    public File FilePath;
-    public String Name = "";
+    /**
+     * Returns the name of this object.
+     * 
+     * @return
+     */
+    public String getName();
 
-    public CustomObject(File objectFile)
-    {
-        FilePath = objectFile;
-        Name = objectFile.getName();
+    /**
+     * Returns whether this object can spawn as a tree. UseWorld and UseBiome
+     * should return true.
+     * 
+     * @return Whether this object can spawn as a tree.
+     */
+    public boolean canSpawnAsTree();
 
-        if(!Name.toLowerCase().endsWith(BODefaultValues.BO_Extension.stringValue().toLowerCase()))
-            return;
+    /**
+     * Returns whether this object can spawn from the CustomObject() resource.
+     * Vanilla trees should return false; everything else should return true.
+     * 
+     * @return
+     */
+    public boolean canSpawnAsObject();
 
-        //Remove extension.
-        Name = Name.substring(0, Name.length() - 4);
+    /**
+     * Spawns the object at the given position.
+     * 
+     * @param world
+     * @param x
+     * @param y
+     * @param z
+     * @return Whether the attempt was successful.
+     */
+    public boolean spawn(LocalWorld world, Random random, int x, int y, int z);
 
+    /**
+     * Spawns the object at the given position. If the object isn't a tree, it
+     * shouldn't spawn and it should return false.
+     * 
+     * @param world
+     * @param x
+     * @param y
+     * @param z
+     * @return Whether the attempt was successful.
+     */
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int y, int z);
 
-        ReadSettingsFile(objectFile);
-        CorrectSettings();
-        if (SettingsCache.containsKey("[META]") && SettingsCache.containsKey("[DATA]"))
-            this.IsValid = true;
+    /**
+     * Spawns the object at the given position. It should search a suitable y
+     * location by itself.
+     * 
+     * @param world
+     * @param x
+     * @param y
+     * @param z
+     * @return Whether the attempt was successful.
+     */
+    public boolean spawn(LocalWorld world, Random random, int x, int z);
 
-        if (!this.IsValid)
-            return;
+    /**
+     * Spawns the object at the given position. It should search a suitable y
+     * location by itself. If the object isn't a tree, it shouldn't spawn and it
+     * should return false.
+     * 
+     * @param world
+     * @param x
+     * @param y
+     * @param z
+     * @return Whether the attempt was successful.
+     */
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z);
 
-        ReadConfigSettings();
-    }
+    /**
+     * Spawns the object in a chunk. The object can search a good y position by
+     * itself.
+     * 
+     * @param world
+     * @param random
+     * @param chunkX
+     * @param chunkZ
+     */
+    public void process(LocalWorld world, Random random, int chunkX, int chunkZ);
 
-    public CustomObjectCompiled Compile(String settingsLine)
-    {
-        HashMap<String, String> newSettings = new HashMap<String, String>();
-        for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
-            if (BODefaultValues.Contains(entry.getKey()) || ObjectCoordinate.isCoordinateString(entry.getKey()))
-                newSettings.put(entry.getKey(), entry.getValue());
+    /**
+     * Spawns the object in a chunk. The object can search a good y position by
+     * itself. If the object isn't a tree, the object shouldn't spawn and it
+     * should return false.
+     * 
+     * @param world
+     * @param random
+     * @param x
+     * @param z
+     */
+    public void processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ);
 
-        String[] keys = settingsLine.split(";");
-        String changedSettings = "";
-        boolean first = true;
+    /**
+     * Returns a copy of this object will all the settings applied. Can return
+     * null if the settings are invalid.
+     * 
+     * @param settings
+     *            A Map with all the settings.
+     * @return A copy of this object will all the settings applied.
+     */
+    public CustomObject applySettings(Map<String, String> settings);
 
-        for (String key : keys)
-        {
-            String[] values = null;
-            if (key.contains("="))
-                values = key.split("=", 2);
-            else if (key.contains(":"))
-                values = key.split("=", 2);
-            if (values == null)
-                continue;
-            if (BODefaultValues.Contains(values[0].toLowerCase()) || ObjectCoordinate.isCoordinateString(values[0]))
-            {
-                newSettings.put(values[0].toLowerCase(), values[1]);
-                changedSettings = changedSettings + (first ? "" : ";") + key;
-                if (first)
-                    first = false;
-            }
-        }
-
-        return new CustomObjectCompiled(newSettings, Name, changedSettings, this);
-
-    }
-
-    @Override
-    public boolean sayNotFoundEnabled()
-    {
-        return false;
-    }
-
-    @Override
-    protected void ReadConfigSettings()
-    {
-
-    }
-
-    @Override
-    protected void WriteConfigSettings() throws IOException
-    {
-
-    }
-
-    @Override
-    protected void CorrectSettings()
-    {
-
-    }
-
-    @Override
-    protected void RenameOldSettings()
-    {
-    }
+    /**
+     * Returns whether this object would like to spawn in this biome. BO2s will
+     * return whether this biome is in their spawnInBiome setting.
+     * 
+     * @param biome
+     * @return
+     */
+    public boolean hasPreferenceToSpawnIn(LocalBiome biome);
 }

@@ -9,7 +9,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
-import com.khorn.terraincontrol.customobjects.ObjectsStore;
+import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.util.Txt;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -52,8 +52,6 @@ public class TCPlugin implements TerrainControlEngine
         TerrainControl.startEngine(this);
         // Register localization
         LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
-        // Load global custom objects
-        ObjectsStore.ReadObjects(terrainControlDirectory);
         // Register world type
         worldType = new TCWorldType(this, 4, "TerrainControl");
         // Register channel
@@ -96,6 +94,12 @@ public class TCPlugin implements TerrainControlEngine
     public void log(Level level, String... messages)
     {
         System.out.println("TerrainControl: " + Txt.implode(messages, ","));
+    }
+
+    @Override
+    public File getGlobalObjectsDirectory()
+    {
+        return new File(terrainControlDirectory, BODefaultValues.BO_GlobalDirectoryName.stringValue());
     }
 
 }

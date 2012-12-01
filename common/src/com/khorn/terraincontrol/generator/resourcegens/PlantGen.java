@@ -1,69 +1,68 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-public class PlantGen extends ResourceGenBase
+public class PlantGen extends Resource
 {
+    private int blockId;
+    private int blockData;
+    private int minAltitude;
+    private int maxAltitude;
+    private List<Integer> sourceBlocks;
+
     @Override
-    protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
+    public void spawn(LocalWorld world, Random rand, int x, int z)
     {
-        int y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
+        int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
 
         for (int i = 0; i < 64; i++)
         {
             int j = x + rand.nextInt(8) - rand.nextInt(8);
             int k = y + rand.nextInt(4) - rand.nextInt(4);
             int m = z + rand.nextInt(8) - rand.nextInt(8);
-            if ((!world.isEmpty(j, k, m)) || (!res.CheckSourceId(world.getTypeId(j, k - 1, m))))
+            if ((!world.isEmpty(j, k, m)) || (!sourceBlocks.contains(world.getTypeId(j, k - 1, m))))
                 continue;
 
-            if (res.BlockData > 0)
-            {
-                world.setBlock(j, k, m, res.BlockId, res.BlockData, false, false, false);
-            } else
-            {
-                world.setBlock(j, k, m, res.BlockId, 0, false, false, false);
-            }
+            world.setBlock(j, k, m, blockId, blockData, false, false, false);
         }
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
+    public void load(List<String> args) throws InvalidResourceException
     {
-        if (Props[0].contains("."))
+        if (args.size() < 6)
         {
-            String[] block = Props[0].split("\\.");
-            res.BlockId = CheckBlock(block[0]);
-            res.BlockData = CheckValue(block[1], 0, 16);
-        } else
-        {
-            res.BlockId = CheckBlock(Props[0]);
+            throw new InvalidResourceException("Too few arguments supplied");
         }
-
-        res.Frequency = CheckValue(Props[1], 1, 100);
-        res.Rarity = CheckValue(Props[2], 0, 100);
-        res.MinAltitude = CheckValue(Props[3], 0, biomeConfig.worldConfig.WorldHeight);
-        res.MaxAltitude = CheckValue(Props[4], 0, biomeConfig.worldConfig.WorldHeight, res.MinAltitude);
-
-        res.SourceBlockId = new int[Props.length - 5];
-        for (int i = 5; i < Props.length; i++)
-            res.SourceBlockId[i - 5] = CheckBlock(Props[i]);
-
-        return true;
+        blockId = getBlockId(args.get(0));
+        blockData = getBlockData(args.get(0));
+        frequency = getInt(args.get(1), 1, 100);
+        rarity = getInt(args.get(2), 1, 100);
+        minAltitude = getInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = getInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
+        sourceBlocks = new ArrayList<Integer>();
+        for (int i = 5; i < args.size(); i++)
+        {
+            sourceBlocks.add(getBlockId(args.get(i)));
+        }
     }
 
     @Override
-    protected String WriteString(Resource res, String blockSources)
+    public ResourceType getType()
     {
-        String blockId = res.BlockIdToName(res.BlockId);
-        if (res.BlockData > 0)
-        {
-            blockId += "." + res.BlockData;
-        }
-        return blockId + "," + res.Frequency + "," + res.Rarity + "," + res.MinAltitude + "," + res.MaxAltitude + blockSources;
+        return ResourceType.biomeConfigResource;
+    }
+
+    @Override
+    public String makeString()
+    {
+        return "Plant(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
     }
 }

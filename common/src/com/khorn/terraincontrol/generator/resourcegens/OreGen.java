@@ -1,38 +1,48 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Resource;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.util.MathHelper;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-public class OreGen extends ResourceGenBase
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.util.MathHelper;
+
+public class OreGen extends Resource
 {
+    private int blockId;
+    private int blockData;
+    private int minAltitude;
+    private int maxAltitude;
+    private int maxSize;
+    private List<Integer> sourceBlocks;
+
     @Override
-    protected void SpawnResource(LocalWorld world, Random rand, Resource res, int x, int z)
+    public void spawn(LocalWorld world, Random rand, int x, int z)
     {
-        int y = rand.nextInt(res.MaxAltitude - res.MinAltitude) + res.MinAltitude;
+        int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
 
         float f = rand.nextFloat() * 3.141593F;
 
-        double d1 = x + 8 + MathHelper.sin(f) * res.MaxSize / 8.0F;
-        double d2 = x + 8 - MathHelper.sin(f) * res.MaxSize / 8.0F;
-        double d3 = z + 8 + MathHelper.cos(f) * res.MaxSize / 8.0F;
-        double d4 = z + 8 - MathHelper.cos(f) * res.MaxSize / 8.0F;
+        double d1 = x + 8 + MathHelper.sin(f) * maxSize / 8.0F;
+        double d2 = x + 8 - MathHelper.sin(f) * maxSize / 8.0F;
+        double d3 = z + 8 + MathHelper.cos(f) * maxSize / 8.0F;
+        double d4 = z + 8 - MathHelper.cos(f) * maxSize / 8.0F;
 
         double d5 = y + rand.nextInt(3) - 2;
         double d6 = y + rand.nextInt(3) - 2;
 
-        for (int i = 0; i <= res.MaxSize; i++)
+        for (int i = 0; i <= maxSize; i++)
         {
-            double d7 = d1 + (d2 - d1) * i / res.MaxSize;
-            double d8 = d5 + (d6 - d5) * i / res.MaxSize;
-            double d9 = d3 + (d4 - d3) * i / res.MaxSize;
+            double d7 = d1 + (d2 - d1) * i / maxSize;
+            double d8 = d5 + (d6 - d5) * i / maxSize;
+            double d9 = d3 + (d4 - d3) * i / maxSize;
 
-            double d10 = rand.nextDouble() * res.MaxSize / 16.0D;
-            double d11 = (MathHelper.sin(i * 3.141593F / res.MaxSize) + 1.0F) * d10 + 1.0D;
-            double d12 = (MathHelper.sin(i * 3.141593F / res.MaxSize) + 1.0F) * d10 + 1.0D;
+            double d10 = rand.nextDouble() * maxSize / 16.0D;
+            double d11 = (MathHelper.sin(i * 3.141593F / maxSize) + 1.0F) * d10 + 1.0D;
+            double d12 = (MathHelper.sin(i * 3.141593F / maxSize) + 1.0F) * d10 + 1.0D;
 
             int j = MathHelper.floor(d7 - d11 / 2.0D);
             int k = MathHelper.floor(d8 - d12 / 2.0D);
@@ -55,15 +65,9 @@ public class OreGen extends ResourceGenBase
                             for (int i5 = m; i5 <= i2; i5++)
                             {
                                 double d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);
-                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && res.CheckSourceId(world.getTypeId(i3, i4, i5)))
+                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(world.getTypeId(i3, i4, i5)))
                                 {
-                                    if (res.BlockData > 0)
-                                    {
-                                        world.setBlock(i3, i4, i5, res.BlockId, res.BlockData, false, false, false);
-                                    } else
-                                    {
-                                        world.setBlock(i3, i4, i5, res.BlockId, 0, false, false, false);
-                                    }
+                                    world.setBlock(i3, i4, i5, blockId, blockData, false, false, false);
                                 }
                             }
                         }
@@ -74,40 +78,35 @@ public class OreGen extends ResourceGenBase
     }
 
     @Override
-    protected boolean ReadString(Resource res, String[] Props, BiomeConfig biomeConfig) throws NumberFormatException
+    public void load(List<String> args) throws InvalidResourceException
     {
-        if (Props[0].contains("."))
+        if (args.size() < 7)
         {
-            String[] block = Props[0].split("\\.");
-            res.BlockId = CheckBlock(block[0]);
-            res.BlockData = CheckValue(block[1], 0, 16);
-        } else
-        {
-            res.BlockId = CheckBlock(Props[0]);
+            throw new InvalidResourceException("Too few arguments supplied");
         }
-
-        res.MaxSize = CheckValue(Props[1], 1, 128);
-        res.Frequency = CheckValue(Props[2], 1, 100);
-        res.Rarity = CheckValue(Props[3], 0, 100);
-        res.MinAltitude = CheckValue(Props[4], 0, biomeConfig.worldConfig.WorldHeight);
-        res.MaxAltitude = CheckValue(Props[5], 0, biomeConfig.worldConfig.WorldHeight, res.MinAltitude);
-
-        res.SourceBlockId = new int[Props.length - 6];
-        for (int i = 6; i < Props.length; i++)
-            res.SourceBlockId[i - 6] = CheckBlock(Props[i]);
-
-        return true;
-
+        blockId = getBlockId(args.get(0));
+        blockData = getBlockData(args.get(0));
+        maxSize = getInt(args.get(1), 1, 128);
+        frequency = getInt(args.get(2), 1, 100);
+        rarity = getInt(args.get(3), 1, 100);
+        minAltitude = getInt(args.get(4), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = getInt(args.get(5), minAltitude + 1, TerrainControl.worldHeight);
+        sourceBlocks = new ArrayList<Integer>();
+        for (int i = 6; i < args.size(); i++)
+        {
+            sourceBlocks.add(getBlockId(args.get(i)));
+        }
     }
 
     @Override
-    protected String WriteString(Resource res, String blockSources)
+    public ResourceType getType()
     {
-        String blockId = res.BlockIdToName(res.BlockId);
-        if (res.BlockData > 0)
-        {
-            blockId += "." + res.BlockData;
-        }
-        return blockId + "," + res.MaxSize + "," + res.Frequency + "," + res.Rarity + "," + res.MinAltitude + "," + res.MaxAltitude + blockSources;
+        return ResourceType.biomeConfigResource;
+    }
+
+    @Override
+    public String makeString()
+    {
+        return "Ore(" + makeMaterial(blockId, blockData) + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
     }
 }

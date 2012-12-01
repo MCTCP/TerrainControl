@@ -3,9 +3,8 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.CustomObjectCompiled;
-import com.khorn.terraincontrol.customobjects.ObjectsStore;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -13,13 +12,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class WorldConfig extends ConfigFile
 {
+    public LocalWorld world;
+    
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
     public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
 
-    public ArrayList<CustomObjectCompiled> CustomObjectsCompiled;
+    /**
+     * Holds all world CustomObjects. All keys should be lowercase.
+     */
+    public Map<String,CustomObject> customObjects = new HashMap<String, CustomObject>();
 
     public ArrayList<String> NormalBiomes = new ArrayList<String>();
     public ArrayList<String> IceBiomes = new ArrayList<String>();
@@ -31,10 +36,6 @@ public class WorldConfig extends ConfigFile
 
     public byte[] ReplaceMatrixBiomes = new byte[256];
     public boolean HaveBiomeReplace = false;
-
-    // public BiomeBase currentBiome;
-    // --Commented out by Inspection (17.07.11 1:49):String seedValue;
-
 
     // For old biome generator
     public double oldBiomeSize;
@@ -161,6 +162,7 @@ public class WorldConfig extends ConfigFile
     {
         this.SettingsDir = settingsDir;
         this.WorldName = world.getName();
+        this.world = world;
 
         File settingsFile = new File(this.SettingsDir, TCDefaultValues.WorldSettingsName.stringValue());
 
@@ -285,15 +287,9 @@ public class WorldConfig extends ConfigFile
             }
         }
 
-        ArrayList<CustomObject> rawObjects = ObjectsStore.LoadObjectsFromDirectory(CustomObjectsDirectory);
+        customObjects = TerrainControl.getCustomObjectManager().loadObjects(CustomObjectsDirectory);
 
-
-        CustomObjectsCompiled = new ArrayList<CustomObjectCompiled>();
-
-        for (CustomObject object : rawObjects)
-            CustomObjectsCompiled.add(object.Compile(""));
-        System.out.println("TerrainControl: " + CustomObjectsCompiled.size() + " world custom objects loaded");
-
+        TerrainControl.log(customObjects.size() + " world custom objects loaded");
 
     }
 
