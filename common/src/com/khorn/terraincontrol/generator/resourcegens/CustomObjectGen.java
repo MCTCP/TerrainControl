@@ -25,6 +25,7 @@ public class CustomObjectGen extends Resource
             args.add("UseWorld");
         }
         objects = new ArrayList<CustomObject>();
+        objectNames = new ArrayList<String>();
         for (String arg : args)
         {
             CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(arg, worldConfig);
