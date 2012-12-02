@@ -102,11 +102,6 @@ public class BO2 extends ConfigFile implements CustomObject
     @Override
     public boolean spawn(LocalWorld world, Random random, int x, int y, int z)
     {
-        if (!ObjectCanSpawn(world, x, y, z))
-        {
-            return false;
-        }
-
         ObjectCoordinate[] data = Data[0];
         if (RandomRotation)
             data = Data[random.nextInt(4)];
