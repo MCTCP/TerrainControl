@@ -26,7 +26,7 @@ public class TCSender implements Runnable
         if (!player.getListeningPluginChannels().contains(TCDefaultValues.ChannelName.stringValue()))
         {
             // Player doesn't have TC, abort.
-            System.out.println("TerrainControl: player joined without TerrainControl");
+            // System.out.println("TerrainControl: player joined without TerrainControl"); // debug
             return;
         }
 
@@ -37,7 +37,7 @@ public class TCSender implements Runnable
         {
             WorldConfig config = plugin.worlds.get(world.getUID()).getSettings();
 
-            System.out.println("TerrainControl: config sent to player for world " + config.WorldName);
+            // System.out.println("TerrainControl: config sent to player for world " + config.WorldName); //debug
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream stream = new DataOutputStream(outputStream);
 
