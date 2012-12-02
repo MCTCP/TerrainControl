@@ -308,7 +308,7 @@ public abstract class ConfigFile
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T ReadSettings(TCDefaultValues value)
+    protected <T> T ReadSettings(TCSetting value)
     {
         Object obj = null;
 
@@ -333,7 +333,7 @@ public abstract class ConfigFile
                 obj = ReadModSettings(value.name(), value.floatValue());
                 break;
             case StringArray:
-                obj = ReadModSettings(value.name(), value.StringArrayListValue());
+                obj = ReadModSettings(value.name(), value.stringArrayListValue());
                 break;
             case Color:
                 obj = ReadModSettingsColor(value.name(), value.stringValue());

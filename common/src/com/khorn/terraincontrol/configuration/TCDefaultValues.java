@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.configuration;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public enum TCDefaultValues
+public enum TCDefaultValues implements TCSetting
 {
     //Files
     WorldSettingsName("WorldConfig.ini"),
@@ -337,7 +337,7 @@ public enum TCDefaultValues
 
     }
 
-    private TCDefaultValues(Enum e)
+    private TCDefaultValues(Enum<?> e)
     {
         this.eValue = e;
         this.returnType = SettingsType.Enum;
@@ -366,7 +366,7 @@ public enum TCDefaultValues
         return this.fValue;
     }
 
-    public Enum enumValue()
+    public Enum<?> enumValue()
     {
         return this.eValue;
     }
@@ -381,28 +381,15 @@ public enum TCDefaultValues
         return this.sValue;
     }
 
-    public ArrayList<String> StringArrayListValue()
+    public ArrayList<String> stringArrayListValue()
     {
         return this.sArrayValue;
     }
 
-
-    public Boolean booleanValue()
+    public boolean booleanValue()
     {
         return this.bValue;
     }
 
-    public enum SettingsType
-    {
-        String,
-        Boolean,
-        Int,
-        Enum,
-        Double,
-        Float,
-        StringArray,
-        Color
-
-
-    }
+    
 }

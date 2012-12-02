@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.bo2.BO2Loader;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Loader;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
 public class CustomObjectManager
@@ -60,6 +61,7 @@ public class CustomObjectManager
 
         // Register loaders
         TerrainControl.registerCustomObjectLoader("bo2", new BO2Loader());
+        TerrainControl.registerCustomObjectLoader("bo3", new BO3Loader());
 
         // Load all global objects (they can overwrite special objects)
         TerrainControl.getEngine().getGlobalObjectsDirectory().mkdirs();
