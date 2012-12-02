@@ -48,9 +48,7 @@ public class CustomObjectManager
     Call branch in this chunk or in next ??
      
      */
-    
-    
-    
+
     public final Map<String, CustomObjectLoader> loaders;
     public final Map<String, CustomObject> globalObjects;
 
@@ -59,54 +57,67 @@ public class CustomObjectManager
         // These are the actual lists, not just a copy.
         this.loaders = loaders;
         this.globalObjects = globalObjects;
-        
+
         // Register loaders
         TerrainControl.registerCustomObjectLoader("bo2", new BO2Loader());
-        
+
         // Load all global objects (they can overwrite special objects)
         TerrainControl.getEngine().getGlobalObjectsDirectory().mkdirs();
         this.globalObjects.putAll(loadObjects(TerrainControl.getEngine().getGlobalObjectsDirectory()));
         TerrainControl.log(this.globalObjects.size() + " global custom objects loaded.");
-        
+
         // Put some default CustomObjects
-        for(TreeType type: TreeType.values())
+        for (TreeType type : TreeType.values())
         {
             globalObjects.put(type.name().toLowerCase(), new TreeObject(type));
         }
         globalObjects.put("useworld", new UseWorld());
         globalObjects.put("usebiome", new UseBiome());
     }
-    
+
     /**
      * Returns the global CustomObject with the given name.
-     * @param name Name of the CustomObject, case-insensitive.
+     * 
+     * @param name
+     *            Name of the CustomObject, case-insensitive.
      * @return The CustomObject, or null if there isn't one with that name.
      */
     public CustomObject getCustomObject(String name)
     {
         return globalObjects.get(name.toLowerCase());
     }
-    
+
     /**
-     * Returns the CustomObject with the given name. It searches for a world object first, and then it searches for a global object.
-     * @param name Name of the CustomObject, case-insensitive.
-     * @param world The world to search in first before searching the global objects.
+     * Returns the CustomObject with the given name. It searches for a world
+     * object first, and then it searches for a global object.
+     * 
+     * @param name
+     *            Name of the CustomObject, case-insensitive.
+     * @param world
+     *            The world to search in first before searching the global
+     *            objects.
      * @return The CustomObject, or null if there isn't one with that name.
      */
     public CustomObject getCustomObject(String name, LocalWorld world)
     {
         return getCustomObject(name, world.getSettings());
     }
-    
+
     /**
-     * Returns the CustomObject with the given name. It searches for a world object first, and then it searches for a global object.
-     * @param name Name of the CustomObject, case-insensitive.
-     * @param config The config to search in first before searching the global objects.
+     * Returns the CustomObject with the given name. It searches for a world
+     * object first, and then it searches for a global object.
+     * 
+     * @param name
+     *            Name of the CustomObject, case-insensitive.
+     * @param config
+     *            The config to search in first before searching the global
+     *            objects.
      * @return The CustomObject, or null if there isn't one with that name.
      */
     public CustomObject getCustomObject(String name, WorldConfig config)
     {
-        if(config.customObjects.containsKey(name.toLowerCase())) {
+        if (config.customObjects.containsKey(name.toLowerCase()))
+        {
             return config.customObjects.get(name.toLowerCase());
         }
         return getCustomObject(name);
@@ -131,56 +142,51 @@ public class CustomObjectManager
         for (File file : directory.listFiles())
         {
             // Get name and extension
-            String[] fileName = file.getName().split("\\.");
-            String objectName;
-            String objectType;
-            if (fileName.length == 1)
+            String fileName = file.getName();
+            int index = fileName.indexOf('.');
+            if (index != -1)
             {
-                // Found an object without an extension
-                objectName = fileName[0];
-                objectType = "";
-            } else
-            {
-                // Found an object with an extension
-                objectType = fileName[fileName.length - 1];
-                objectName = "";
-                for (int i = 0; i < fileName.length - 2; i++)
-                {
-                    objectName += fileName[i];
-                }
-            }
+                String objectType = fileName.substring(index + 1, fileName.length());
+                String objectName = fileName.substring(0, index);
 
-            // Get the object
-            CustomObjectLoader loader = loaders.get(objectType);
-            if (loader != null)
-            {
-                objects.put(objectName.toLowerCase(), loader.loadFromFile(objectName, file));
+                // Get the object
+                CustomObjectLoader loader = loaders.get(objectType.toLowerCase());
+                if (loader != null)
+                {
+                    objects.put(objectName.toLowerCase(), loader.loadFromFile(objectName, file));
+                }
             }
         }
 
         return objects;
     }
-    
+
     /**
-     * Parses a String in the format name(setting1=foo,setting2=bar) and returns a CustomObject.
+     * Parses a String in the format name(setting1=foo,setting2=bar) and returns
+     * a CustomObject.
+     * 
      * @param string
-     * @param world The world to search in
+     * @param world
+     *            The world to search in
      * @return A CustomObject, or null if no one was found.
      */
     public CustomObject getObjectFromString(String string, LocalWorld world)
     {
         return this.getObjectFromString(string, world.getSettings());
     }
-    
+
     /**
-     * Parses a String in the format name(setting1=foo,setting2=bar) and returns a CustomObject.
+     * Parses a String in the format name(setting1=foo,setting2=bar) and returns
+     * a CustomObject.
+     * 
      * @param string
-     * @param config The config to search in
+     * @param config
+     *            The config to search in
      * @return A CustomObject, or null if no one was found.
      */
     public CustomObject getObjectFromString(String string, WorldConfig config)
     {
-        String[] parts = new String[]{string, ""};
+        String[] parts = new String[] { string, "" };
 
         int start = string.indexOf("(");
         int end = string.lastIndexOf(")");
@@ -191,31 +197,32 @@ public class CustomObjectManager
         }
 
         CustomObject object = getCustomObject(parts[0], config);
-        
-        if(object != null && parts[1].length() != 0) {
+
+        if (object != null && parts[1].length() != 0)
+        {
             // More settings have been given
             Map<String, String> settingsMap = new HashMap<String, String>();
-            
+
             String[] settings = parts[1].split(";");
-            for(String setting: settings)
+            for (String setting : settings)
             {
                 String[] settingParts = setting.split("=");
-                if(settingParts.length == 1)
+                if (settingParts.length == 1)
                 {
                     // Boolean values
                     settingsMap.put(settingParts[0], "true");
-                } else if(settingParts.length == 2)
+                } else if (settingParts.length == 2)
                 {
                     settingsMap.put(settingParts[0], settingParts[1]);
                 }
             }
-            
-            if(settingsMap.size() > 0)
+
+            if (settingsMap.size() > 0)
             {
                 object = object.applySettings(settingsMap);
             }
         }
-        
+
         return object;
     }
 }
