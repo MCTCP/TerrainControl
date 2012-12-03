@@ -53,20 +53,15 @@ public class CustomObjectManager
     public final Map<String, CustomObjectLoader> loaders;
     public final Map<String, CustomObject> globalObjects;
 
-    public CustomObjectManager(Map<String, CustomObjectLoader> loaders, Map<String, CustomObject> globalObjects)
+    public CustomObjectManager(Map<String, CustomObjectLoader> loaders, Map<String, CustomObject> specialObjects)
     {
         // These are the actual lists, not just a copy.
         this.loaders = loaders;
-        this.globalObjects = globalObjects;
+        this.globalObjects = specialObjects;
 
         // Register loaders
         TerrainControl.registerCustomObjectLoader("bo2", new BO2Loader());
         TerrainControl.registerCustomObjectLoader("bo3", new BO3Loader());
-
-        // Load all global objects (they can overwrite special objects)
-        TerrainControl.getEngine().getGlobalObjectsDirectory().mkdirs();
-        this.globalObjects.putAll(loadObjects(TerrainControl.getEngine().getGlobalObjectsDirectory()));
-        TerrainControl.log(this.globalObjects.size() + " global custom objects loaded.");
 
         // Put some default CustomObjects
         for (TreeType type : TreeType.values())
@@ -75,6 +70,12 @@ public class CustomObjectManager
         }
         globalObjects.put("useworld", new UseWorld());
         globalObjects.put("usebiome", new UseBiome());
+        
+        // Load all global objects (they can overwrite special objects)
+        TerrainControl.getEngine().getGlobalObjectsDirectory().mkdirs();
+        Map<String, CustomObject> globalObjects = loadObjects(TerrainControl.getEngine().getGlobalObjectsDirectory());
+        TerrainControl.log(globalObjects.size() + " global custom objects loaded.");
+        this.globalObjects.putAll(globalObjects);
     }
 
     /**

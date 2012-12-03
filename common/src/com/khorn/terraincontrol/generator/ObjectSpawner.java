@@ -53,8 +53,8 @@ public class ObjectSpawner
         {
             for (int j = 0; j < 16; j++)
             {
-                int blockToFreezeX = x + 8 + i;
-                int blockToFreezeZ = z + 8 + j;
+                int blockToFreezeX = x + i;
+                int blockToFreezeZ = z + j;
                 BiomeConfig biomeConfig = worldSettings.biomeConfigs[world.getCalculatedBiomeId(blockToFreezeX, blockToFreezeZ)];
                 if (biomeConfig.BiomeTemperature < TCDefaultValues.snowAndIceMaxTemp.floatValue())
                 {
