@@ -145,7 +145,7 @@ public class CustomObjectManager
         {
             // Get name and extension
             String fileName = file.getName();
-            int index = fileName.indexOf('.');
+            int index = fileName.lastIndexOf('.');
             if (index != -1)
             {
                 String objectType = fileName.substring(index + 1, fileName.length());

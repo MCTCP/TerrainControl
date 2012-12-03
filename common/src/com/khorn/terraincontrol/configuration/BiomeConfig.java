@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.UseBiome;
 import com.khorn.terraincontrol.generator.resourcegens.AboveWaterGen;
 import com.khorn.terraincontrol.generator.resourcegens.CactusGen;
 import com.khorn.terraincontrol.generator.resourcegens.CustomObjectGen;
@@ -553,7 +554,7 @@ public class BiomeConfig extends ConfigFile
             for (String customObjectString : customObjectStrings)
             {
                 CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(customObjectString, worldConfig);
-                if (object != null)
+                if (object != null && !(object instanceof UseBiome))
                 {
                     biomeObjects.add(object);
                     biomeObjectStrings.add(customObjectString);

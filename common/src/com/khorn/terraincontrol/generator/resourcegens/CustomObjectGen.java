@@ -19,10 +19,10 @@ public class CustomObjectGen extends Resource
     @Override
     public void load(List<String> args) throws InvalidResourceException
     {
-        if (args.size() == 0)
+        if (args.size() == 0 || (args.size() == 1 && args.get(0).trim().equals("")))
         {
             // Backwards compability
-            args.add("UseWorld");
+            args.set(0, "UseWorld");
         }
         objects = new ArrayList<CustomObject>();
         objectNames = new ArrayList<String>();

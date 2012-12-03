@@ -8,7 +8,7 @@ import com.khorn.terraincontrol.LocalWorld;
 
 /**
  * UseWorld is a keyword that spawns the objects in the WorldObjects folder.
- *
+ * 
  */
 public class UseWorld implements CustomObject
 {
@@ -34,11 +34,14 @@ public class UseWorld implements CustomObject
     @Override
     public boolean spawn(LocalWorld world, Random random, int x, int y, int z)
     {
-        for(CustomObject object: world.getSettings().customObjects.values())
+        for (CustomObject object : world.getSettings().customObjects.values())
         {
-            if(object.hasPreferenceToSpawnIn(world.getBiome(x, z)) && object.spawn(world, random, x, y, z))
+            if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
-                return true;
+                if (object.spawn(world, random, x, y, z))
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -47,11 +50,14 @@ public class UseWorld implements CustomObject
     @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int y, int z)
     {
-        for(CustomObject object: world.getSettings().customObjects.values())
+        for (CustomObject object : world.getSettings().customObjects.values())
         {
-            if(object.spawnAsTree(world, random, x, y, z))
+            if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
-                return true;
+                if (object.spawnAsTree(world, random, x, y, z))
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -60,11 +66,15 @@ public class UseWorld implements CustomObject
     @Override
     public boolean spawn(LocalWorld world, Random random, int x, int z)
     {
-        for(CustomObject object: world.getSettings().customObjects.values())
+        for (CustomObject object : world.getSettings().customObjects.values())
         {
-            if(object.spawn(world, random, x, z))
+            if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
-                return true;
+
+                if (object.spawn(world, random, x, z))
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -73,11 +83,14 @@ public class UseWorld implements CustomObject
     @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
     {
-        for(CustomObject object: world.getSettings().customObjects.values())
+        for (CustomObject object : world.getSettings().customObjects.values())
         {
-            if(object.spawnAsTree(world, random, x, z))
+            if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
-                return true;
+                if (object.spawnAsTree(world, random, x, z))
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -86,18 +99,24 @@ public class UseWorld implements CustomObject
     @Override
     public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        for(CustomObject object: world.getSettings().customObjects.values())
+        for (CustomObject object : world.getSettings().customObjects.values())
         {
-            object.process(world, random, chunkX, chunkZ);
+            if (object.hasPreferenceToSpawnIn(world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8)))
+            {
+                object.process(world, random, chunkX, chunkZ);
+            }
         }
     }
 
     @Override
     public void processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        for(CustomObject object: world.getSettings().customObjects.values())
+        for (CustomObject object : world.getSettings().customObjects.values())
         {
-            object.processAsTree(world, random, chunkX, chunkZ);
+            if (object.hasPreferenceToSpawnIn(world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8)))
+            {
+                object.processAsTree(world, random, chunkX, chunkZ);
+            }
         }
     }
 

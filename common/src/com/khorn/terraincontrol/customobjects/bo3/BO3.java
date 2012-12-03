@@ -107,16 +107,16 @@ public class BO3 extends ConfigFile implements CustomObject
         WriteComment("This is the config file of a custom object.");
         WriteComment("If you add this object correctly to your BiomeConfigs, it will spawn in the world.");
         WriteComment("");
-        WriteComment("This is the creator of this BO3 object:");
+        WriteComment("This is the creator of this BO3 object");
         WriteValue("author", author);
         WriteNewLine();
-        WriteComment("A short description of this BO3 object:");
+        WriteComment("A short description of this BO3 object");
         WriteValue("description", description);
         WriteNewLine();
         WriteComment("The BO3 version, don't change this! It can be used by external applications to do a version check.");
-        WriteValue("version=3");
+        WriteValue("version", 3);
         
-        WriteTitle("Misc settings");
+        WriteTitle("Main settings");
         WriteComment("This needs to be set to true to spawn the object in the Tree and Sapling resources.");
         WriteValue("tree", tree);
     }
