@@ -104,7 +104,7 @@ public enum TCDefaultValues implements TCSetting
     FlatBedrock(false),
     BedrockobBlock(7),
     RemoveSurfaceStone(false),
-    objectSpawnRatio(2),
+    objectSpawnRatio(1),
 
     //End world settings
 

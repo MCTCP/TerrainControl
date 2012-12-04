@@ -193,17 +193,25 @@ public class BO2 extends ConfigFile implements CustomObject
     @Override
     public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        int randomRoll = random.nextInt(100);
-        int ObjectRarity = Rarity;
-
-        while (randomRoll < ObjectRarity)
+        boolean objectSpawned = false;
+        int spawnAttempts = 0;
+        
+        while(!objectSpawned && spawnAttempts < world.getSettings().objectSpawnRatio)
         {
-            ObjectRarity -= 100;
+            spawnAttempts++;
+            
+            int randomRoll = random.nextInt(100);
+            int ObjectRarity = Rarity;
 
-            int x = chunkX * 16 + random.nextInt(16) + 8;
-            int z = chunkZ * 16 + random.nextInt(16) + 8;
+            while (randomRoll < ObjectRarity)
+            {
+                ObjectRarity -= 100;
 
-            spawn(world, random, x, z);
+                int x = chunkX * 16 + random.nextInt(16) + 8;
+                int z = chunkZ * 16 + random.nextInt(16) + 8;
+
+                objectSpawned = spawn(world, random, x, z);
+            }
         }
     }
 

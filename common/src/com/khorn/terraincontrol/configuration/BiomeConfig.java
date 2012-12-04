@@ -662,6 +662,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteNewLine();
         WriteComment("Block id from stone to surface, like dirt in plain biome ");
         WriteValue(TCDefaultValues.GroundBlock.name(), this.GroundBlock);
+        WriteNewLine();
 
         WriteComment("If disabled use water levels and blocks below for this biome");
         WriteValue(TCDefaultValues.UseWorldWaterLevel.name(), this.UseWorldWaterLevel);

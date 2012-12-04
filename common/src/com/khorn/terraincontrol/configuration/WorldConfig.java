@@ -723,8 +723,11 @@ public class WorldConfig extends ConfigFile
         this.WriteValue(TCDefaultValues.CustomObjects.name(), this.customObjects);
         */
         WriteNewLine();
-        WriteComment("Number of attempts for place per chunk");
-        this.WriteValue(TCDefaultValues.objectSpawnRatio.name(), Integer.valueOf(this.objectSpawnRatio).intValue());
+        WriteComment("Terrain Control tries <objectSpawnRatio> times to spawn a BO2.");
+        WriteComment("A high value makes BO2s with a low rarity spawn more.");
+        WriteComment("Doesn't affect BO3s. It also doesn't affect growing saplings anymore.");
+        this.WriteValue(TCDefaultValues.objectSpawnRatio.name(), this.objectSpawnRatio);
+        
         /*
         WriteNewLine();
         WriteComment("Deny custom objects underFill even it enabled in objects ");

@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldInitEvent;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
 
@@ -67,12 +68,14 @@ public class TCListener implements Listener
         }
 
         if (sapling == null)
+        {
             sapling = biomeConfig.SaplingResource;
+        }
 
         if (sapling != null)
         {
             boolean success = false;
-            for(int i = 0; i < bukkitWorld.getSettings().objectSpawnRatio; i++)
+            for(int i = 0; i < 10; i++)
             {
                 if(sapling.growSapling(bukkitWorld, new Random(), x, y, z)) 
                 {
@@ -85,6 +88,7 @@ public class TCListener implements Listener
             {
                 // Just spawned the tree, clear the blocks list to prevent Bukkit spawning another tree
                 event.getBlocks().clear();
+                TerrainControl.log("Grown!");
             } else
             {
                 // Cannot grow, so leave the sapling there

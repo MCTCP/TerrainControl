@@ -28,6 +28,7 @@ public class ResourcesManager
         put("Ore", OreGen.class);
         put("Plant", PlantGen.class);
         put("Reed", ReedGen.class);
+        put("Sapling", SaplingGen.class);
         put("SmallLake", SmallLakeGen.class);
         put("Tree", TreeGen.class);
         put("UndergroundLake", UndergroundLakeGen.class);
