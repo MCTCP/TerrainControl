@@ -16,124 +16,130 @@ public class BukkitWorld implements LocalWorld
     private World world;
     private WorldConfig settings;
     private String name;
-    private long Seed;
+    private long seed;
     private IBiomeManager biomeManager;
-    private TCWorldChunkManagerOld old_biomeManager;
+    private TCWorldChunkManagerOld oldBiomeManager;
 
-    // TODO: We must refactor so fields start with lowercase chars.
-    // TODO: It is bad practice to use a big char as start of a field name.
-
-    private static int NextBiomeId = DefaultBiome.values().length;
+    private static int nextBiomeId = DefaultBiome.values().length;
     private static int maxBiomeCount = 256;
-    private static LocalBiome[] Biomes = new LocalBiome[maxBiomeCount];
+    private static LocalBiome[] biomes = new LocalBiome[maxBiomeCount];
 
-    private HashMap<String, LocalBiome> BiomeNames = new HashMap<String, LocalBiome>();
-    private static ArrayList<LocalBiome> DefaultBiomes = new ArrayList<LocalBiome>();
+    private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
+    private static ArrayList<LocalBiome> defaultBiomes = new ArrayList<LocalBiome>();
 
     private WorldGenStronghold strongholdGen;
-    private WorldGenVillage VillageGen;
-    private WorldGenMineshaft MineshaftGen;
-    private WorldGenLargeFeature PyramidsGen;
-    private WorldGenNether NetherFortress;
+    private WorldGenVillage villageGen;
+    private WorldGenMineshaft mineshaftGen;
+    private WorldGenLargeFeature pyramidsGen;
+    private WorldGenNether netherFortress;
 
-    private WorldGenTrees Tree;
-    private WorldGenTrees CocoaTree;
-    private WorldGenBigTree BigTree;
-    private WorldGenForest Forest;
-    private WorldGenSwampTree SwampTree;
-    private WorldGenTaiga1 TaigaTree1;
-    private WorldGenTaiga2 TaigaTree2;
-    private WorldGenHugeMushroom HugeMushroom;
-    private WorldGenMegaTree JungleTree;
-    private WorldGenGroundBush GroundBush;
+    private WorldGenTrees tree;
+    private WorldGenTrees cocoaTree;
+    private WorldGenBigTree bigTree;
+    private WorldGenForest forest;
+    private WorldGenSwampTree swampTree;
+    private WorldGenTaiga1 taigaTree1;
+    private WorldGenTaiga2 taigaTree2;
+    private WorldGenHugeMushroom hugeMushroom;
+    private WorldGenMegaTree jungleTree;
+    private WorldGenGroundBush groundBush;
 
-    private boolean CreateNewChunks;
-    private Chunk[] ChunkCache;
-    private Chunk CachedChunk;
+    private boolean createNewChunks;
+    private Chunk[] chunkCache;
+    private Chunk cachedChunk;
 
-    private int CurrentChunkX;
-    private int CurrentChunkZ;
+    private int currentChunkX;
+    private int currentChunkZ;
 
-    private BiomeBase[] BiomeArray;
+    private BiomeBase[] biomeBaseArray;
 
     //TODO do something with that when bukkit allow custom world height.
     private int worldHeight = 256;
     private int heightBits = 8;
 
-    private int CustomBiomesCount = 21;
+    private int customBiomesCount = 21;
 
     static
     {
         for (int i = 0; i < DefaultBiome.values().length; i++)
         {
-            Biomes[i] = new BukkitBiome(BiomeBase.biomes[i]);
-            DefaultBiomes.add(Biomes[i]);
+            biomes[i] = new BukkitBiome(BiomeBase.biomes[i]);
+            defaultBiomes.add(biomes[i]);
         }
     }
 
     public BukkitWorld(String _name)
     {
         this.name = _name;
-        for (LocalBiome biome : DefaultBiomes)
+        for (LocalBiome biome : defaultBiomes)
         {
-            this.BiomeNames.put(biome.getName(), biome);
+            this.biomeNames.put(biome.getName(), biome);
         }
     }
 
+    @Override
     public LocalBiome getNullBiome(String name)
     {
         return new NullBiome(name);
     }
 
+    @Override
     public LocalBiome AddBiome(String name, int id)
     {
         BukkitBiome biome = new BukkitBiome(new CustomBiome(id, name));
-        biome.setCustomID(CustomBiomesCount++);
-        Biomes[biome.getId()] = biome;
-        this.BiomeNames.put(biome.getName(), biome);
+        biome.setCustomID(customBiomesCount++);
+        biomes[biome.getId()] = biome;
+        this.biomeNames.put(biome.getName(), biome);
         return biome;
     }
 
+    @Override
     public int getMaxBiomesCount()
     {
         return maxBiomeCount;
     }
 
+    @Override
     public int getFreeBiomeId()
     {
-        return NextBiomeId++;
+        return nextBiomeId++;
     }
 
 
+    @Override
     public LocalBiome getBiomeById(int id)
     {
-        return Biomes[id];
+        return biomes[id];
     }
 
 
+    @Override
     public int getBiomeIdByName(String name)
     {
-        return this.BiomeNames.get(name).getId();
+        return this.biomeNames.get(name).getId();
     }
 
+    @Override
     public ArrayList<LocalBiome> getDefaultBiomes()
     {
-        return DefaultBiomes;
+        return defaultBiomes;
     }
 
+    @Override
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
             return this.biomeManager.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
 
-        BiomeArray = this.world.worldProvider.d.getBiomes(BiomeArray, x, z, x_size, z_size);
+        biomeBaseArray = this.world.worldProvider.d.getBiomes(biomeBaseArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = BiomeArray[i].id;
+            biomeArray[i] = biomeBaseArray[i].id;
         return biomeArray;
     }
 
+    @Override
     public float[] getTemperatures(int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
@@ -141,19 +147,21 @@ public class BukkitWorld implements LocalWorld
         return this.world.worldProvider.d.getTemperatures(null, x, z, x_size, z_size);
     }
 
+    @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
             return this.biomeManager.getBiomesTC(biomeArray, x, z, x_size, z_size);
 
-        BiomeArray = this.world.worldProvider.d.a(BiomeArray, x, z, x_size, z_size, true);
+        biomeBaseArray = this.world.worldProvider.d.a(biomeBaseArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = BiomeArray[i].id;
+            biomeArray[i] = biomeBaseArray[i].id;
         return biomeArray;
     }
 
+    @Override
     public int getCalculatedBiomeId(int x, int z)
     {
         if (this.biomeManager != null)
@@ -161,93 +169,99 @@ public class BukkitWorld implements LocalWorld
         return this.world.worldProvider.d.getBiome(x, z).id;
     }
 
+    @Override
     public double getBiomeFactorForOldBM(int index)
     {
-        return this.old_biomeManager.old_temperature[index] * this.old_biomeManager.old_rain[index];
+        return this.oldBiomeManager.old_temperature[index] * this.oldBiomeManager.old_rain[index];
     }
 
+    @Override
     public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry)
     {
         if (this.settings.StrongholdsEnabled)
             this.strongholdGen.a(null, this.world, x, z, chunkArray);
 
         if (this.settings.MineshaftsEnabled)
-            this.MineshaftGen.a(null, this.world, x, z, chunkArray);
+            this.mineshaftGen.a(null, this.world, x, z, chunkArray);
 
         if (this.settings.VillagesEnabled && dry)
-            this.VillageGen.a(null, this.world, x, z, chunkArray);
+            this.villageGen.a(null, this.world, x, z, chunkArray);
         if (this.settings.PyramidsEnabled)
-            this.PyramidsGen.a(null, this.world, x, z, chunkArray);
+            this.pyramidsGen.a(null, this.world, x, z, chunkArray);
         if (this.settings.NetherFortress)
-            this.NetherFortress.a(null, this.world, x, z, chunkArray);
+            this.netherFortress.a(null, this.world, x, z, chunkArray);
     }
 
+    @Override
     public void PlaceDungeons(Random rand, int x, int y, int z)
     {
         new WorldGenDungeons().a(this.world, rand, x, y, z);
     }
 
+    @Override
     public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z)
     {
         switch (type)
         {
             case Tree:
-                return Tree.a(this.world, rand, x, y, z);
+                return tree.a(this.world, rand, x, y, z);
             case BigTree:
-                BigTree.a(1.0D, 1.0D, 1.0D);
-                return BigTree.a(this.world, rand, x, y, z);
+                bigTree.a(1.0D, 1.0D, 1.0D);
+                return bigTree.a(this.world, rand, x, y, z);
             case Forest:
-                return Forest.a(this.world, rand, x, y, z);
+                return forest.a(this.world, rand, x, y, z);
             case HugeMushroom:
-                HugeMushroom.a(1.0D, 1.0D, 1.0D);
-                return HugeMushroom.a(this.world, rand, x, y, z);
+                hugeMushroom.a(1.0D, 1.0D, 1.0D);
+                return hugeMushroom.a(this.world, rand, x, y, z);
             case SwampTree:
-                return SwampTree.a(this.world, rand, x, y, z);
+                return swampTree.a(this.world, rand, x, y, z);
             case Taiga1:
-                return TaigaTree1.a(this.world, rand, x, y, z);
+                return taigaTree1.a(this.world, rand, x, y, z);
             case Taiga2:
-                return TaigaTree2.a(this.world, rand, x, y, z);
+                return taigaTree2.a(this.world, rand, x, y, z);
             case JungleTree:
-                return JungleTree.a(this.world, rand, x, y, z);
+                return jungleTree.a(this.world, rand, x, y, z);
             case GroundBush:
-                return GroundBush.a(this.world, rand, x, y, z);
+                return groundBush.a(this.world, rand, x, y, z);
             case CocoaTree:
-                return CocoaTree.a(this.world, rand, x, y, z);
+                return cocoaTree.a(this.world, rand, x, y, z);
         }
         return false;
     }
 
+    @Override
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
     {
         boolean Village = false;
         if (this.settings.StrongholdsEnabled)
             this.strongholdGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.MineshaftsEnabled)
-            this.MineshaftGen.a(this.world, rand, chunk_x, chunk_z);
+            this.mineshaftGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.VillagesEnabled)
-            Village = this.VillageGen.a(this.world, rand, chunk_x, chunk_z);
+            Village = this.villageGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.PyramidsEnabled)
-            this.PyramidsGen.a(this.world, rand, chunk_x, chunk_z);
+            this.pyramidsGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.NetherFortress)
-            this.NetherFortress.a(this.world, rand, chunk_x, chunk_z);
+            this.netherFortress.a(this.world, rand, chunk_x, chunk_z);
 
         return Village;
     }
 
     // This part work with ReplacedBlocks after all spawns
     // TODO: check how its work.
-    public void DoBlockReplace()
+    @Override
+    public void replaceBlocks()
     {
         if (this.settings.BiomeConfigsHaveReplacement)
         {
-            Chunk rawChunk = this.ChunkCache[0];
+            Chunk rawChunk = this.chunkCache[0];
 
             ChunkSection[] sectionsArray = rawChunk.i();
 
             byte[] ChunkBiomes = rawChunk.m();
 
-            int x = this.CurrentChunkX * 16;
-            int z = this.CurrentChunkZ * 16;
+            int x = this.currentChunkX * 16;
+            int z = this.currentChunkZ * 16;
 
             for (ChunkSection section : sectionsArray)
             {
@@ -283,11 +297,12 @@ public class BukkitWorld implements LocalWorld
         }
     }
 
-    public void DoBiomeReplace()
+    @Override
+    public void replaceBiomesLate()
     {
         if (this.settings.HaveBiomeReplace)
         {
-            byte[] ChunkBiomes = this.ChunkCache[0].m();
+            byte[] ChunkBiomes = this.chunkCache[0].m();
 
             for (int i = 0; i < ChunkBiomes.length; i++)
                 ChunkBiomes[i] = this.settings.ReplaceMatrixBiomes[ChunkBiomes[i]];
@@ -297,13 +312,13 @@ public class BukkitWorld implements LocalWorld
 
     public void LoadChunk(Chunk chunk)
     {
-        this.CurrentChunkX = chunk.x;
-        this.CurrentChunkZ = chunk.z;
-        this.ChunkCache[0] = chunk;
-        this.ChunkCache[1] = this.world.getChunkAt(chunk.x + 1, chunk.z);
-        this.ChunkCache[2] = this.world.getChunkAt(chunk.x, chunk.z + 1);
-        this.ChunkCache[3] = this.world.getChunkAt(chunk.x + 1, chunk.z + 1);
-        this.CreateNewChunks = true;
+        this.currentChunkX = chunk.x;
+        this.currentChunkZ = chunk.z;
+        this.chunkCache[0] = chunk;
+        this.chunkCache[1] = this.world.getChunkAt(chunk.x + 1, chunk.z);
+        this.chunkCache[2] = this.world.getChunkAt(chunk.x, chunk.z + 1);
+        this.chunkCache[3] = this.world.getChunkAt(chunk.x + 1, chunk.z + 1);
+        this.createNewChunks = true;
     }
 
     private Chunk getChunk(int x, int y, int z)
@@ -314,20 +329,21 @@ public class BukkitWorld implements LocalWorld
         x = x >> 4;
         z = z >> 4;
 
-        if (this.CachedChunk != null && this.CachedChunk.x == x && this.CachedChunk.z == z)
-            return this.CachedChunk;
+        if (this.cachedChunk != null && this.cachedChunk.x == x && this.cachedChunk.z == z)
+            return this.cachedChunk;
 
-        int index_x = (x - this.CurrentChunkX);
-        int index_z = (z - this.CurrentChunkZ);
+        int index_x = (x - this.currentChunkX);
+        int index_z = (z - this.currentChunkZ);
         if ((index_x == 0 || index_x == 1) && (index_z == 0 || index_z == 1))
-            return CachedChunk = this.ChunkCache[index_x | (index_z << 1)];
-        else if (this.CreateNewChunks || this.world.chunkProvider.isChunkLoaded(x, z))
-            return CachedChunk = this.world.getChunkAt(x, z);
+            return cachedChunk = this.chunkCache[index_x | (index_z << 1)];
+        else if (this.createNewChunks || this.world.chunkProvider.isChunkLoaded(x, z))
+            return cachedChunk = this.world.getChunkAt(x, z);
         else
             return null;
 
     }
 
+    @Override
     public int getLiquidHeight(int x, int z)
     {
         Chunk chunk = this.getChunk(x, 0, z);
@@ -344,6 +360,7 @@ public class BukkitWorld implements LocalWorld
         return -1;
     }
     
+    @Override
     public int getSolidHeight(int x, int z)
     {
         Chunk chunk = this.getChunk(x, 0, z);
@@ -360,11 +377,13 @@ public class BukkitWorld implements LocalWorld
         return -1;
     }
 
+    @Override
     public boolean isEmpty(int x, int y, int z)
     {
         return this.getTypeId(x, y, z) == 0;
     }
 
+    @Override
     public int getTypeId(int x, int y, int z)
     {
         Chunk chunk = this.getChunk(x, y, z);
@@ -379,6 +398,7 @@ public class BukkitWorld implements LocalWorld
         return chunk.getTypeId(x, y, z);
     }
 
+    @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
         // If minecraft was updated and obfuscation is off - take a look at these methods:
@@ -412,11 +432,13 @@ public class BukkitWorld implements LocalWorld
         }
     }
 
+    @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data)
     {
         this.setBlock(x, y, z, typeId, data, false, false, true);
     }
 
+    @Override
     public int getHighestBlockYAt(int x, int z)
     {
         Chunk chunk = this.getChunk(x, 0, z);
@@ -434,47 +456,56 @@ public class BukkitWorld implements LocalWorld
         return y;
     }
 
+    @Override
     public DefaultMaterial getMaterial(int x, int y, int z)
     {
         int id = this.getTypeId(x, y, z);
         return DefaultMaterial.getMaterial(id);
     }
 
+    @Override
     public void setChunksCreations(boolean createNew)
     {
-        this.CreateNewChunks = createNew;
+        this.createNewChunks = createNew;
     }
 
+    @Override
     public int getLightLevel(int x, int y, int z)
     {
         return world.getLightLevel(x, y, z);
     }
 
+    @Override
     public boolean isLoaded(int x, int y, int z)
     {
         return world.isLoaded(x, y, z);
     }
 
+    @Override
     public WorldConfig getSettings()
     {
         return this.settings;
     }
 
+    @Override
     public String getName()
     {
         return this.name;
     }
 
+    @Override
     public long getSeed()
     {
-        return this.Seed;
+        return this.seed;
     }
 
+    @Override
     public int getHeight()
     {
         return worldHeight;
     }
 
+    @Override
     public int getHeightBits()
     {
         return heightBits;
@@ -493,12 +524,12 @@ public class BukkitWorld implements LocalWorld
     public void Init(World _world)
     {
         this.world = _world;
-        this.Seed = world.getSeed();
+        this.seed = world.getSeed();
 
         // TODO: Should WorldProviderTC extend even more? For example for spawn point etc?
         // this.world.worldProvider = new TCWorldProvider().setSeaLevel(this.settings.waterLevelMax); // cause errors with entity burn, disabled temporary.
 
-        this.ChunkCache = new Chunk[4];
+        this.chunkCache = new Chunk[4];
 
         switch (this.settings.ModeTerrain)
         {
@@ -506,21 +537,21 @@ public class BukkitWorld implements LocalWorld
             case Normal:
             case OldGenerator:
                 this.strongholdGen = new WorldGenStronghold();
-                this.VillageGen = new WorldGenVillage();
-                this.MineshaftGen = new WorldGenMineshaft();
-                this.PyramidsGen = new WorldGenLargeFeature();
-                this.NetherFortress = new WorldGenNether();
+                this.villageGen = new WorldGenVillage();
+                this.mineshaftGen = new WorldGenMineshaft();
+                this.pyramidsGen = new WorldGenLargeFeature();
+                this.netherFortress = new WorldGenNether();
             case NotGenerate:
-                this.Tree = new WorldGenTrees(false);
-                this.CocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
-                this.BigTree = new WorldGenBigTree(false);
-                this.Forest = new WorldGenForest(false);
-                this.SwampTree = new WorldGenSwampTree();
-                this.TaigaTree1 = new WorldGenTaiga1();
-                this.TaigaTree2 = new WorldGenTaiga2(false);
-                this.HugeMushroom = new WorldGenHugeMushroom();
-                this.JungleTree = new WorldGenMegaTree(false, 15, 3, 3);
-                this.GroundBush = new WorldGenGroundBush(3, 0);
+                this.tree = new WorldGenTrees(false);
+                this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
+                this.bigTree = new WorldGenBigTree(false);
+                this.forest = new WorldGenForest(false);
+                this.swampTree = new WorldGenSwampTree();
+                this.taigaTree1 = new WorldGenTaiga1();
+                this.taigaTree2 = new WorldGenTaiga2(false);
+                this.hugeMushroom = new WorldGenHugeMushroom();
+                this.jungleTree = new WorldGenMegaTree(false, 15, 3, 3);
+                this.groundBush = new WorldGenGroundBush(3, 0);
             case TerrainTest:
                 this.generator.Init(this);
                 break;
@@ -541,10 +572,11 @@ public class BukkitWorld implements LocalWorld
 
     public void setOldBiomeManager(TCWorldChunkManagerOld manager)
     {
-        this.old_biomeManager = manager;
+        this.oldBiomeManager = manager;
         this.biomeManager = manager;
     }
 
+    @Override
     public void setHeightBits(int heightBits)
     {
         this.heightBits = heightBits;

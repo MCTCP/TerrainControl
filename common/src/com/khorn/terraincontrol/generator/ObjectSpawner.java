@@ -36,19 +36,33 @@ public class ObjectSpawner
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
         this.rand.setSeed(chunkX * l1 + chunkZ * l2 ^ world.getSeed());
 
-        boolean Village = world.PlaceTerrainObjects(rand, chunkX, chunkZ);
+        boolean hasGeneratedAVillage = world.PlaceTerrainObjects(rand, chunkX, chunkZ);
 
         // Resource sequence
         for (int i = 0; i < localBiomeConfig.ResourceCount; i++)
         {
             Resource res = localBiomeConfig.ResourceSequence[i];
-            if (res instanceof SmallLakeGen && Village)
+            if (res instanceof SmallLakeGen && hasGeneratedAVillage)
                 continue;
             world.setChunksCreations(false);
             res.process(world, rand, chunkX, chunkZ);
         }
 
         // Snow and ice
+        placeSnowAndIce(chunkX, chunkZ);
+
+        world.replaceBlocks();
+
+        world.replaceBiomesLate();
+
+        if (this.worldSettings.isDeprecated)
+            this.worldSettings = this.worldSettings.newSettings;
+    }
+    
+    protected void placeSnowAndIce(int chunkX, int chunkZ)
+    {
+        int x = chunkX * 16 + 8;
+        int z = chunkZ * 16 + 8;
         for (int i = 0; i < 16; i++)
         {
             for (int j = 0; j < 16; j++)
@@ -81,12 +95,5 @@ public class ObjectSpawner
                 }
             }
         }
-
-        world.DoBlockReplace();
-
-        world.DoBiomeReplace();
-
-        if (this.worldSettings.isDeprecated)
-            this.worldSettings = this.worldSettings.newSettings;
     }
 }

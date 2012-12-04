@@ -288,7 +288,7 @@ public class SingleWorld implements LocalWorld
     }
 
     @Override
-    public void DoBlockReplace()
+    public void replaceBlocks()
     {
         if (this.settings.BiomeConfigsHaveReplacement)
         {
@@ -338,7 +338,7 @@ public class SingleWorld implements LocalWorld
     }
 
     @Override
-    public void DoBiomeReplace()
+    public void replaceBiomesLate()
     {
         if (this.settings.HaveBiomeReplace)
         {

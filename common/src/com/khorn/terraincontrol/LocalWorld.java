@@ -68,9 +68,9 @@ public interface LocalWorld
 
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z);
 
-    public void DoBlockReplace();
-
-    public void DoBiomeReplace();
+    public void replaceBlocks();
+    
+    public void replaceBiomesLate();
 
     // Blocks
 

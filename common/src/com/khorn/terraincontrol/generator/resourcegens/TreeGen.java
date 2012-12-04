@@ -25,8 +25,8 @@ public class TreeGen extends Resource
             {
                 if (random.nextInt(100) < treeChances.get(treeNumber))
                 {
-                    int x = chunkX * 16 + random.nextInt(16);
-                    int z = chunkZ * 16 + random.nextInt(16);
+                    int x = chunkX * 16 + random.nextInt(16) + 8;
+                    int z = chunkZ * 16 + random.nextInt(16) + 8;
                     if (trees.get(treeNumber).spawnAsTree(world, random, x, z))
                     {
                         // Success, on to the next tree!

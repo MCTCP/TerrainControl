@@ -200,8 +200,8 @@ public class BO2 extends ConfigFile implements CustomObject
         {
             ObjectRarity -= 100;
 
-            int x = chunkX * 16 + random.nextInt(16);
-            int z = chunkZ * 16 + random.nextInt(16);
+            int x = chunkX * 16 + random.nextInt(16) + 8;
+            int z = chunkZ * 16 + random.nextInt(16) + 8;
 
             spawn(world, random, x, z);
         }
