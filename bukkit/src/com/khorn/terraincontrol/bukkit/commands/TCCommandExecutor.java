@@ -1,14 +1,15 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import com.khorn.terraincontrol.bukkit.TCPlugin;
 
 public class TCCommandExecutor implements CommandExecutor
 {

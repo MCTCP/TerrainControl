@@ -1,10 +1,11 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import com.khorn.terraincontrol.bukkit.TCPerm;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 
-import java.util.List;
+import com.khorn.terraincontrol.bukkit.TCPerm;
+import com.khorn.terraincontrol.bukkit.TCPlugin;
 
 public class CheckCommand extends BaseCommand
 {

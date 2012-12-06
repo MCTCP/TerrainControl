@@ -1,16 +1,17 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.IBiomeManager;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
-import net.minecraft.server.BiomeBase;
-import net.minecraft.server.BiomeCache;
-import net.minecraft.server.ChunkPosition;
-import net.minecraft.server.WorldChunkManager;
-
 import java.util.List;
 import java.util.Random;
+
+import net.minecraft.server.v1_4_5.BiomeBase;
+import net.minecraft.server.v1_4_5.BiomeCache;
+import net.minecraft.server.v1_4_5.ChunkPosition;
+import net.minecraft.server.v1_4_5.WorldChunkManager;
+
+import com.khorn.terraincontrol.IBiomeManager;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
 
 public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeManager
 {

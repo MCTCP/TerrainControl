@@ -1,17 +1,18 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.bukkit.TCPerm;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
-import net.minecraft.server.BiomeBase;
-import net.minecraft.server.WorldChunkManager;
+import java.util.List;
+
+import net.minecraft.server.v1_4_5.BiomeBase;
+import net.minecraft.server.v1_4_5.WorldChunkManager;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.v1_4_5.CraftWorld;
 import org.bukkit.entity.Player;
 
-import java.util.List;
+import com.khorn.terraincontrol.bukkit.TCPerm;
+import com.khorn.terraincontrol.bukkit.TCPlugin;
 
 
 public class BiomeCommand extends BaseCommand

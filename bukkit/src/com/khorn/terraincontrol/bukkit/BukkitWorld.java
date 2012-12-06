@@ -1,14 +1,37 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.*;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.generator.resourcegens.TreeType;
-import net.minecraft.server.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+
+import net.minecraft.server.v1_4_5.BiomeBase;
+import net.minecraft.server.v1_4_5.Chunk;
+import net.minecraft.server.v1_4_5.ChunkSection;
+import net.minecraft.server.v1_4_5.World;
+import net.minecraft.server.v1_4_5.WorldGenBigTree;
+import net.minecraft.server.v1_4_5.WorldGenDungeons;
+import net.minecraft.server.v1_4_5.WorldGenForest;
+import net.minecraft.server.v1_4_5.WorldGenGroundBush;
+import net.minecraft.server.v1_4_5.WorldGenHugeMushroom;
+import net.minecraft.server.v1_4_5.WorldGenLargeFeature;
+import net.minecraft.server.v1_4_5.WorldGenMegaTree;
+import net.minecraft.server.v1_4_5.WorldGenMineshaft;
+import net.minecraft.server.v1_4_5.WorldGenNether;
+import net.minecraft.server.v1_4_5.WorldGenStronghold;
+import net.minecraft.server.v1_4_5.WorldGenSwampTree;
+import net.minecraft.server.v1_4_5.WorldGenTaiga1;
+import net.minecraft.server.v1_4_5.WorldGenTaiga2;
+import net.minecraft.server.v1_4_5.WorldGenTrees;
+import net.minecraft.server.v1_4_5.WorldGenVillage;
+
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.IBiomeManager;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
 public class BukkitWorld implements LocalWorld
 {

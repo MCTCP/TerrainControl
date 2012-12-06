@@ -1,15 +1,17 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.generator.ChunkProviderTC;
-import net.minecraft.server.Block;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import net.minecraft.server.v1_4_5.Block;
+
 import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.ChunkProviderTC;
 
 public class TCChunkGenerator extends ChunkGenerator
 {

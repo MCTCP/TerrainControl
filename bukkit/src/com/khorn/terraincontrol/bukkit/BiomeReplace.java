@@ -1,12 +1,24 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
-import net.minecraft.server.*;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.CraftWorld;
-
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.lang.reflect.Field;
+
+import net.minecraft.server.v1_4_5.ChunkProviderServer;
+import net.minecraft.server.v1_4_5.ChunkRegionLoader;
+import net.minecraft.server.v1_4_5.NBTCompressedStreamTools;
+import net.minecraft.server.v1_4_5.NBTTagCompound;
+import net.minecraft.server.v1_4_5.RegionFile;
+
+import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_4_5.CraftWorld;
+
+import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 
 
 public class BiomeReplace implements Runnable
