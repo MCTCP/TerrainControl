@@ -2,15 +2,13 @@ package com.khorn.terraincontrol.configuration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
 
-public abstract class Resource
+public abstract class ConfigFunction
 {
     protected int frequency;
     protected int rarity;
@@ -26,13 +24,13 @@ public abstract class Resource
     }
     
     /**
-     * Convenience method for creating a resource. Used to create the default resources.
+     * Convenience method for creating a config function. Used to create the default config functions.
      * @param world
      * @param clazz
      * @param args
      * @return
      */
-    public static Resource create(WorldConfig config, Class<? extends Resource> clazz, Object... args)
+    public static ConfigFunction create(WorldConfig config, Class<? extends ConfigFunction> clazz, Object... args)
     {
         List<String> stringArgs = new ArrayList<String>(args.length);
         for(Object arg: args)
@@ -40,10 +38,10 @@ public abstract class Resource
             stringArgs.add("" + arg);
         }
         
-        Resource resource;
+        ConfigFunction configFunction;
         try
         {
-            resource = clazz.newInstance();
+            configFunction = clazz.newInstance();
         } catch (InstantiationException e)
         {
             return null;
@@ -51,16 +49,16 @@ public abstract class Resource
         {
             return null;
         }
-        resource.setWorldConfig(config);
+        configFunction.setWorldConfig(config);
         try {
-            resource.load(stringArgs);
+            configFunction.load(stringArgs);
         } catch(InvalidResourceException e)
         {
-            TerrainControl.log("Invalid default resource! Please report! " + clazz.getName() + ": "+e.getMessage());
+            TerrainControl.log("Invalid default config function! Please report! " + clazz.getName() + ": "+e.getMessage());
             e.printStackTrace();
         }
         
-        return resource;
+        return configFunction;
     }
 
     /**
@@ -75,34 +73,6 @@ public abstract class Resource
      *             If the resoure is invalid.
      */
     public abstract void load(List<String> args) throws InvalidResourceException;
-
-    /**
-     * Spawns the resource at this position, ignoring rarity and frequency.
-     * 
-     * @param world
-     * @param chunkX
-     * @param chunkZ
-     */
-    public abstract void spawn(LocalWorld world, Random random, int x, int z);
-
-    /**
-     * Spawns the resource normally.
-     * 
-     * @param world
-     * @param chunkX
-     * @param chunkZ
-     */
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
-    {
-        for (int t = 0; t < frequency; t++)
-        {
-            if (random.nextInt(100) > rarity)
-                continue;
-            int x = chunkX * 16 + random.nextInt(16) + 8;
-            int z = chunkZ * 16 + random.nextInt(16) + 8;
-            spawn(world, random, x, z);
-        }
-    }
 
     /**
      * Gets the type of this resource.

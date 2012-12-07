@@ -6,7 +6,6 @@ import java.util.Random;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 public class VinesGen extends Resource

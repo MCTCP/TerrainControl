@@ -5,18 +5,17 @@ import java.util.Map;
 
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Resource;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
-public class ResourcesManager
+public class ConfigFunctionsManager
 {
-    private Map<String, Class<? extends Resource>> resourceTypes;
+    private Map<String, Class<? extends ConfigFunction>> configFunctions;
 
-    public ResourcesManager(Map<String, Class<? extends Resource>> resourceTypes)
+    public ConfigFunctionsManager(Map<String, Class<? extends ConfigFunction>> configFunctions)
     {
         // Also store in this class
-        this.resourceTypes = resourceTypes;
+        this.configFunctions = configFunctions;
 
         // Add vanilla resources
         put("AboveWaterRes", AboveWaterGen.class);
@@ -36,13 +35,13 @@ public class ResourcesManager
         put("Vines", VinesGen.class);
     }
 
-    public void put(String name, Class<? extends Resource> value)
+    public void put(String name, Class<? extends ConfigFunction> value)
     {
-        resourceTypes.put(name.toLowerCase(), value);
+        configFunctions.put(name.toLowerCase(), value);
     }
 
     /**
-     * Creates a resource with the specified name.
+     * Creates a ConfigFunction with the specified name.
      * 
      * @param name
      *            Name of the resource, like Ore
@@ -50,14 +49,14 @@ public class ResourcesManager
      *            String representation of the args.
      * @return The resource, or null of no matching resource could be found.
      */
-    public Resource getResource(String name, BiomeConfig biomeConfig, List<String> args)
+    public ConfigFunction getConfigFunction(String name, BiomeConfig biomeConfig, List<String> args)
     {
-        if (resourceTypes.containsKey(name.toLowerCase()))
+        if (configFunctions.containsKey(name.toLowerCase()))
         {
-            Resource resource;
+            ConfigFunction configFunction;
             try
             {
-                resource = resourceTypes.get(name.toLowerCase()).newInstance();
+                configFunction = configFunctions.get(name.toLowerCase()).newInstance();
             } catch (InstantiationException e)
             {
                 TerrainControl.log("Reflection error while loading the resources: " + e.getMessage());
@@ -69,17 +68,17 @@ public class ResourcesManager
                 e.printStackTrace();
                 return null;
             }
-            resource.setWorldConfig(biomeConfig.worldConfig);
+            configFunction.setWorldConfig(biomeConfig.worldConfig);
             try
             {
-                resource.load(args);
+                configFunction.load(args);
             } catch (InvalidResourceException e)
             {
                 TerrainControl.log("Invalid resource " + name + " in " + biomeConfig.Name + ": " + e.getMessage());
                 return null;
             }
 
-            return resource;
+            return configFunction;
 
         }
 

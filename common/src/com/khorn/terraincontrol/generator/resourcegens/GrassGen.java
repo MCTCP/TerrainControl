@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;

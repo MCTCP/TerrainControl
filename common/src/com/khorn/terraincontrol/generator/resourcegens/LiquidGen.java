@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.generator.resourcegens;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 
-import com.khorn.terraincontrol.configuration.Resource;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 import java.util.ArrayList;

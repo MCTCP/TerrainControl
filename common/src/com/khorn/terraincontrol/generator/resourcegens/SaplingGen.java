@@ -6,22 +6,16 @@ import java.util.Random;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
-public class SaplingGen extends Resource
+public class SaplingGen extends ConfigFunction
 {
     public List<CustomObject> trees;
     public List<String> treeNames;
     public List<Integer> treeChances;
     public int saplingType;
-
-    @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
-    {
-        // Left blank, as it shouldn't spawn anything.
-    }
 
     @Override
     public void load(List<String> args) throws InvalidResourceException
@@ -76,12 +70,6 @@ public class SaplingGen extends Resource
             output += "," + treeNames.get(i) + "," + treeChances.get(i);
         }
         return output + ")";
-    }
-
-    @Override
-    public void spawn(LocalWorld world, Random random, int x, int z)
-    {
-        // Left blank, as process() already handles this
     }
 
     public boolean growSapling(LocalWorld world, Random random, int x, int y, int z)

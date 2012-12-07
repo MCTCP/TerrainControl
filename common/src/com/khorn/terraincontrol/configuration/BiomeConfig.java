@@ -1,10 +1,18 @@
 package com.khorn.terraincontrol.configuration;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.DefaultMobType;
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.UseBiome;
@@ -17,6 +25,7 @@ import com.khorn.terraincontrol.generator.resourcegens.LiquidGen;
 import com.khorn.terraincontrol.generator.resourcegens.OreGen;
 import com.khorn.terraincontrol.generator.resourcegens.PlantGen;
 import com.khorn.terraincontrol.generator.resourcegens.ReedGen;
+import com.khorn.terraincontrol.generator.resourcegens.Resource;
 import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
 import com.khorn.terraincontrol.generator.resourcegens.SmallLakeGen;
@@ -26,15 +35,6 @@ import com.khorn.terraincontrol.generator.resourcegens.UnderWaterOreGen;
 import com.khorn.terraincontrol.generator.resourcegens.UndergroundLakeGen;
 import com.khorn.terraincontrol.generator.resourcegens.VinesGen;
 import com.khorn.terraincontrol.util.Txt;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 public class BiomeConfig extends ConfigFile
 {
@@ -499,7 +499,7 @@ public class BiomeConfig extends ConfigFile
                 String name = key.substring(0, start);
                 String[] props = ReadComplexString(key.substring(start + 1, end));
 
-                Resource res = TerrainControl.getResourcesManager().getResource(name, this, Arrays.asList(props));
+                ConfigFunction res = TerrainControl.getConfigFunctionsManager().getConfigFunction(name, this, Arrays.asList(props));
 
                 if (res != null)
                 {
@@ -515,7 +515,7 @@ public class BiomeConfig extends ConfigFile
                     } else if (res.getType() == ResourceType.biomeConfigResource)
                     {
                         LineNumbers.add(Integer.valueOf(entry.getValue()));
-                        this.ResourceSequence[this.ResourceCount++] = res;
+                        this.ResourceSequence[this.ResourceCount++] = (Resource) res;
                     }
                 }
             }
@@ -924,7 +924,7 @@ public class BiomeConfig extends ConfigFile
         if (this.SaplingResource != null)
             this.WriteValue(SaplingResource.makeString());
 
-        for (Resource res : this.SaplingTypes)
+        for (SaplingGen res : this.SaplingTypes)
             if (res != null)
                 this.WriteValue(res.makeString());
 

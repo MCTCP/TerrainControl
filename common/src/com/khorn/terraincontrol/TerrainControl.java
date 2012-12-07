@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-import com.khorn.terraincontrol.configuration.Resource;
+import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
-import com.khorn.terraincontrol.generator.resourcegens.ResourcesManager;
+import com.khorn.terraincontrol.generator.resourcegens.Resource;
+import com.khorn.terraincontrol.generator.resourcegens.ConfigFunctionsManager;
 
 public class TerrainControl
 {
@@ -25,13 +26,13 @@ public class TerrainControl
     public static int worldDepth = 0;
 
     private static TerrainControlEngine engine;
-    private static ResourcesManager resourcesManager;
+    private static ConfigFunctionsManager configFunctionsManager;
     private static CustomObjectManager customObjectManager;
 
     // Used before TerrainControl is initialized
     private static Map<String, CustomObjectLoader> customObjectLoaders = new HashMap<String, CustomObjectLoader>();
     private static Map<String, CustomObject> specialCustomObjects;
-    private static Map<String, Class<? extends Resource>> resourceTypes;
+    private static Map<String, Class<? extends ConfigFunction>> configFunctions;
 
     private TerrainControl()
     {
@@ -62,13 +63,12 @@ public class TerrainControl
         }
         customObjectManager = new CustomObjectManager(customObjectLoaders, specialCustomObjects);
 
-        if (resourceTypes == null)
+        if (configFunctions == null)
         {
-            resourceTypes = new HashMap<String, Class<? extends Resource>>();
+            configFunctions = new HashMap<String, Class<? extends ConfigFunction>>();
         }
         
-        resourcesManager = new ResourcesManager(resourceTypes);
-        //resourcesManager.start(resourceTypes);
+        configFunctionsManager = new ConfigFunctionsManager(configFunctions);
     }
 
     /**
@@ -79,11 +79,11 @@ public class TerrainControl
     {
         engine = null;
         customObjectManager = null;
-        resourcesManager = null;
+        configFunctionsManager = null;
 
         customObjectLoaders.clear();
         specialCustomObjects.clear();
-        resourceTypes.clear();
+        configFunctions.clear();
     }
 
     /**
@@ -172,9 +172,9 @@ public class TerrainControl
      * 
      * @return The Resource manager.
      */
-    public static ResourcesManager getResourcesManager()
+    public static ConfigFunctionsManager getConfigFunctionsManager()
     {
-        return resourcesManager;
+        return configFunctionsManager;
     }
 
     /**
@@ -216,15 +216,15 @@ public class TerrainControl
      * fully loaded.
      * 
      * @param name
-     * @param resourceType
+     * @param configFunction
      */
-    public static void registerResourceType(String name, Class<? extends Resource> resourceType)
+    public static void registerConfigFunction(String name, Class<? extends ConfigFunction> configFunction)
     {
-        if (resourceTypes == null)
+        if (configFunctions == null)
         {
-            resourceTypes = new HashMap<String, Class<? extends Resource>>();
+            configFunctions = new HashMap<String, Class<? extends ConfigFunction>>();
         }
-        resourceTypes.put(name.toLowerCase(), resourceType);
+        configFunctions.put(name.toLowerCase(), configFunction);
     }
 
 }
