@@ -51,7 +51,7 @@ public abstract class Resource extends ConfigFunction
      * @param args
      * @return
      */
-    public static Resource create(WorldConfig config, Class<? extends Resource> clazz, Object... args)
+    public static Resource createResource(WorldConfig config, Class<? extends Resource> clazz, Object... args)
     {
         List<String> stringArgs = new ArrayList<String>(args.length);
         for(Object arg: args)

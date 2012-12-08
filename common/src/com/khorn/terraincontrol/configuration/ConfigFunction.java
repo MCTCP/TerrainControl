@@ -139,7 +139,7 @@ public abstract class ConfigFunction
             return material.id;
         }
 
-        return getInt(string, 0, 256);
+        return getInt(string, 0, TerrainControl.supportedBlockIds);
     }
 
     /**

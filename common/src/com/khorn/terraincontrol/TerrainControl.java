@@ -8,7 +8,6 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
-import com.khorn.terraincontrol.generator.resourcegens.Resource;
 import com.khorn.terraincontrol.generator.resourcegens.ConfigFunctionsManager;
 
 public class TerrainControl
@@ -24,6 +23,11 @@ public class TerrainControl
      * is capped at. 0 in Minecraft.
      */
     public static int worldDepth = 0;
+    
+    /**
+     * The maximum block id that is supported. 255 on CraftBukkit.
+     */
+    public static int supportedBlockIds = 255;
 
     private static TerrainControlEngine engine;
     private static ConfigFunctionsManager configFunctionsManager;

@@ -50,6 +50,7 @@ public class TCPlugin implements TerrainControlEngine
 
         // Start engine
         TerrainControl.startEngine(this);
+        TerrainControl.supportedBlockIds = 4095;
         // Register localization
         LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
         // Register world type
