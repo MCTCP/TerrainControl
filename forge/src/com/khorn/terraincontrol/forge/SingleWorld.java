@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
+import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.TileEntity;
 import net.minecraft.src.BiomeGenBase;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.ExtendedBlockStorage;
@@ -30,7 +32,9 @@ import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.IBiomeManager;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
@@ -651,5 +655,19 @@ public class SingleWorld implements LocalWorld
     public LocalBiome getBiome(int x, int z)
     {
         return getBiomeById(world.getBiomeGenForCoords(x, z).biomeID);
+    }
+
+    @Override
+    public void attachMetadata(int x, int y, int z, Tag tag)
+    {
+        // Convert Tag to a native nms tag
+        NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
+        // Add the x, y and z position to it
+        nmsTag.setInteger("x", x);
+        nmsTag.setInteger("y", y);
+        nmsTag.setInteger("z", z);
+        // Create a Tile Entity of it and add it to the world
+        TileEntity tileEntity = TileEntity.createAndLoadEntity(nmsTag);
+        world.setBlockTileEntity(x, y, z, tileEntity);
     }
 }

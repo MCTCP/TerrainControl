@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol;
 
+import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
@@ -120,5 +121,7 @@ public interface LocalWorld
     public int getHeightBits();
 
     public void setHeightBits(int heightBits);
+    
+    public void attachMetadata(int x, int y, int z, Tag tag);
 
 }

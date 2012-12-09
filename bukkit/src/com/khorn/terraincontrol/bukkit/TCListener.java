@@ -88,7 +88,6 @@ public class TCListener implements Listener
             {
                 // Just spawned the tree, clear the blocks list to prevent Bukkit spawning another tree
                 event.getBlocks().clear();
-                TerrainControl.log("Grown!");
             } else
             {
                 // Cannot grow, so leave the sapling there

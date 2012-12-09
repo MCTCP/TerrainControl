@@ -7,6 +7,8 @@ import java.util.Random;
 import net.minecraft.server.v1_4_5.BiomeBase;
 import net.minecraft.server.v1_4_5.Chunk;
 import net.minecraft.server.v1_4_5.ChunkSection;
+import net.minecraft.server.v1_4_5.NBTTagCompound;
+import net.minecraft.server.v1_4_5.TileEntity;
 import net.minecraft.server.v1_4_5.World;
 import net.minecraft.server.v1_4_5.WorldGenBigTree;
 import net.minecraft.server.v1_4_5.WorldGenDungeons;
@@ -29,7 +31,9 @@ import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.IBiomeManager;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
@@ -616,5 +620,19 @@ public class BukkitWorld implements LocalWorld
     public LocalBiome getBiome(int x, int z)
     {
         return getBiomeById(world.getBiome(x, z).id);
+    }
+
+    @Override
+    public void attachMetadata(int x, int y, int z, Tag tag)
+    {
+        // Convert Tag to a native nms tag
+        NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
+        // Add the x, y and z position to it
+        nmsTag.setInt("x", x);
+        nmsTag.setInt("y", y);
+        nmsTag.setInt("z", z);
+        // Create a Tile Entity of it and add it to the world
+        TileEntity tileEntity = TileEntity.c(nmsTag);
+        world.setTileEntity(x, y, z, tileEntity);
     }
 }
