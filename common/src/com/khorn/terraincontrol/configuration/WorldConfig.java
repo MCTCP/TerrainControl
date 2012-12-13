@@ -312,26 +312,26 @@ public class WorldConfig extends ConfigFile
 
     protected void CorrectSettings()
     {
-        this.oldBiomeSize = CheckValue(this.oldBiomeSize, 0.1D, 10.0D);
+        this.oldBiomeSize = applyBounds(this.oldBiomeSize, 0.1D, 10.0D);
 
-        this.GenerationDepth = CheckValue(this.GenerationDepth, 1, 20);
-        this.BiomeRarityScale = CheckValue(this.BiomeRarityScale, 1, Integer.MAX_VALUE);
+        this.GenerationDepth = applyBounds(this.GenerationDepth, 1, 20);
+        this.BiomeRarityScale = applyBounds(this.BiomeRarityScale, 1, Integer.MAX_VALUE);
 
-        this.LandRarity = CheckValue(this.LandRarity, 1, 100);
-        this.LandSize = CheckValue(this.LandSize, 0, this.GenerationDepth);
-        this.LandFuzzy = CheckValue(this.LandFuzzy, 0, this.GenerationDepth - this.LandSize);
+        this.LandRarity = applyBounds(this.LandRarity, 1, 100);
+        this.LandSize = applyBounds(this.LandSize, 0, this.GenerationDepth);
+        this.LandFuzzy = applyBounds(this.LandFuzzy, 0, this.GenerationDepth - this.LandSize);
 
 
-        this.IceRarity = CheckValue(this.IceRarity, 1, 100);
-        this.IceSize = CheckValue(this.IceSize, 0, this.GenerationDepth);
+        this.IceRarity = applyBounds(this.IceRarity, 1, 100);
+        this.IceSize = applyBounds(this.IceSize, 0, this.GenerationDepth);
 
-        this.RiverRarity = CheckValue(this.RiverRarity, 0, this.GenerationDepth);
-        this.RiverSize = CheckValue(this.RiverSize, 0, this.GenerationDepth - this.RiverRarity);
+        this.RiverRarity = applyBounds(this.RiverRarity, 0, this.GenerationDepth);
+        this.RiverSize = applyBounds(this.RiverSize, 0, this.GenerationDepth - this.RiverRarity);
 
-        this.NormalBiomes = CheckValue(this.NormalBiomes, this.CustomBiomes);
-        this.IceBiomes = CheckValue(this.IceBiomes, this.CustomBiomes);
-        this.IsleBiomes = CheckValue(this.IsleBiomes, this.CustomBiomes);
-        this.BorderBiomes = CheckValue(this.BorderBiomes, this.CustomBiomes);
+        this.NormalBiomes = filterBiomes(this.NormalBiomes, this.CustomBiomes);
+        this.IceBiomes = filterBiomes(this.IceBiomes, this.CustomBiomes);
+        this.IsleBiomes = filterBiomes(this.IsleBiomes, this.CustomBiomes);
+        this.BorderBiomes = filterBiomes(this.BorderBiomes, this.CustomBiomes);
 
         if (this.ModeBiome == BiomeMode.FromImage)
         {
@@ -346,34 +346,34 @@ public class WorldConfig extends ConfigFile
         this.imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || CustomBiomes.contains(imageFillBiome)) ? imageFillBiome : TCDefaultValues.ImageFillBiome.stringValue();
 
 
-        this.minMoisture = CheckValue(this.minMoisture, 0, 1.0F);
-        this.maxMoisture = CheckValue(this.maxMoisture, 0, 1.0F, this.minMoisture);
+        this.minMoisture = applyBounds(this.minMoisture, 0, 1.0F);
+        this.maxMoisture = applyBounds(this.maxMoisture, 0, 1.0F, this.minMoisture);
 
-        this.minTemperature = CheckValue(this.minTemperature, 0, 1.0F);
-        this.maxTemperature = CheckValue(this.maxTemperature, 0, 1.0F, this.minTemperature);
-
-
-        this.caveRarity = CheckValue(this.caveRarity, 0, 100);
-        this.caveFrequency = CheckValue(this.caveFrequency, 0, 200);
-        this.caveMinAltitude = CheckValue(this.caveMinAltitude, 0, WorldHeight);
-        this.caveMaxAltitude = CheckValue(this.caveMaxAltitude, 0, WorldHeight, this.caveMinAltitude);
-        this.individualCaveRarity = CheckValue(this.individualCaveRarity, 0, 100);
-        this.caveSystemFrequency = CheckValue(this.caveSystemFrequency, 0, 200);
-        this.caveSystemPocketChance = CheckValue(this.caveSystemPocketChance, 0, 100);
-        this.caveSystemPocketMinSize = CheckValue(this.caveSystemPocketMinSize, 0, 100);
-        this.caveSystemPocketMaxSize = CheckValue(this.caveSystemPocketMaxSize, 0, 100, this.caveSystemPocketMinSize);
+        this.minTemperature = applyBounds(this.minTemperature, 0, 1.0F);
+        this.maxTemperature = applyBounds(this.maxTemperature, 0, 1.0F, this.minTemperature);
 
 
-        this.canyonRarity = CheckValue(this.canyonRarity, 0, 100);
-        this.canyonMinAltitude = CheckValue(this.canyonMinAltitude, 0, WorldHeight);
-        this.canyonMaxAltitude = CheckValue(this.canyonMaxAltitude, 0, WorldHeight, this.canyonMinAltitude);
-        this.canyonMinLength = CheckValue(this.canyonMinLength, 1, 500);
-        this.canyonMaxLength = CheckValue(this.canyonMaxLength, 1, 500, this.canyonMinLength);
-        this.canyonDepth = CheckValue(this.canyonDepth, 0.1D, 15D);
+        this.caveRarity = applyBounds(this.caveRarity, 0, 100);
+        this.caveFrequency = applyBounds(this.caveFrequency, 0, 200);
+        this.caveMinAltitude = applyBounds(this.caveMinAltitude, 0, WorldHeight);
+        this.caveMaxAltitude = applyBounds(this.caveMaxAltitude, 0, WorldHeight, this.caveMinAltitude);
+        this.individualCaveRarity = applyBounds(this.individualCaveRarity, 0, 100);
+        this.caveSystemFrequency = applyBounds(this.caveSystemFrequency, 0, 200);
+        this.caveSystemPocketChance = applyBounds(this.caveSystemPocketChance, 0, 100);
+        this.caveSystemPocketMinSize = applyBounds(this.caveSystemPocketMinSize, 0, 100);
+        this.caveSystemPocketMaxSize = applyBounds(this.caveSystemPocketMaxSize, 0, 100, this.caveSystemPocketMinSize);
 
 
-        this.waterLevelMin = CheckValue(this.waterLevelMin, 0, WorldHeight - 1);
-        this.waterLevelMax = CheckValue(this.waterLevelMax, 0, WorldHeight - 1, this.waterLevelMin);
+        this.canyonRarity = applyBounds(this.canyonRarity, 0, 100);
+        this.canyonMinAltitude = applyBounds(this.canyonMinAltitude, 0, WorldHeight);
+        this.canyonMaxAltitude = applyBounds(this.canyonMaxAltitude, 0, WorldHeight, this.canyonMinAltitude);
+        this.canyonMinLength = applyBounds(this.canyonMinLength, 1, 500);
+        this.canyonMaxLength = applyBounds(this.canyonMaxLength, 1, 500, this.canyonMinLength);
+        this.canyonDepth = applyBounds(this.canyonDepth, 0.1D, 15D);
+
+
+        this.waterLevelMin = applyBounds(this.waterLevelMin, 0, WorldHeight - 1);
+        this.waterLevelMax = applyBounds(this.waterLevelMax, 0, WorldHeight - 1, this.waterLevelMin);
 
         //this.customTreeChance = CheckValue(this.customTreeChance, 0, 100);
 
@@ -396,7 +396,7 @@ public class WorldConfig extends ConfigFile
         this.worldHeightBits = ReadSettings(TCDefaultValues.WorldHeightBits);
         
 
-        this.worldHeightBits = CheckValue(this.worldHeightBits, 5, 8);
+        this.worldHeightBits = applyBounds(this.worldHeightBits, 5, 8);
         this.WorldHeight = 1 << worldHeightBits;
         this.waterLevelMax = WorldHeight / 2;
 

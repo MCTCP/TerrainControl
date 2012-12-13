@@ -9,8 +9,16 @@ public enum BO3Settings implements TCSetting
 {
     author("Unknown"),
     description("No description given"),
-    tree(true);
+    tree(true),
+    frequency(1),
+    rarity(100.0),
+    rotateRandomly(false),
+    spawnHeight(SpawnHeight.highestBlock),
+    excludedBiomes("All", SettingsType.StringArray);
 
+    // The spawn height
+    public enum SpawnHeight{randomY, highestBlock, highestSolidBlock}
+    
     private Object value;
     private SettingsType returnType;
 

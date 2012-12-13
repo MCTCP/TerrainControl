@@ -6,39 +6,45 @@ import java.util.List;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
-import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
 
-public abstract class ConfigFunction
+public abstract class ConfigFunction<T>
 {
     protected int frequency;
     protected int rarity;
-    protected WorldConfig worldConfig;
+    private T holder;
 
-    /**
-     * Sets the world. Needed for some resources, like CustomObject and Tree.
-     * @param world
-     */
-    public void setWorldConfig(WorldConfig worldConfig)
+    @SuppressWarnings("unchecked")
+    public void setHolder(Object holder)
     {
-        this.worldConfig = worldConfig;
+        this.holder = (T) holder;
+    }
+
+    public T getHolder()
+    {
+        return holder;
     }
     
+    public abstract Class<T> getType();
+
     /**
-     * Convenience method for creating a config function. Used to create the default config functions.
+     * Convenience method for creating a config function. Used to create the
+     * default config functions.
+     * 
+     * @param <E>
      * @param world
      * @param clazz
      * @param args
      * @return
      */
-    public static ConfigFunction create(WorldConfig config, Class<? extends ConfigFunction> clazz, Object... args)
+    public static <T> ConfigFunction<?> create(T holder, Class<? extends ConfigFunction<T>> clazz, Object... args)
     {
         List<String> stringArgs = new ArrayList<String>(args.length);
-        for(Object arg: args)
+        for (Object arg : args)
         {
             stringArgs.add("" + arg);
         }
-        
-        ConfigFunction configFunction;
+
+        ConfigFunction<?> configFunction;
         try
         {
             configFunction = clazz.newInstance();
@@ -49,15 +55,16 @@ public abstract class ConfigFunction
         {
             return null;
         }
-        configFunction.setWorldConfig(config);
-        try {
-            configFunction.load(stringArgs);
-        } catch(InvalidResourceException e)
+        configFunction.setHolder(holder);
+        try
         {
-            TerrainControl.log("Invalid default config function! Please report! " + clazz.getName() + ": "+e.getMessage());
+            configFunction.load(stringArgs);
+        } catch (InvalidResourceException e)
+        {
+            TerrainControl.log("Invalid default config function! Please report! " + clazz.getName() + ": " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         return configFunction;
     }
 
@@ -73,13 +80,6 @@ public abstract class ConfigFunction
      *             If the resoure is invalid.
      */
     public abstract void load(List<String> args) throws InvalidResourceException;
-
-    /**
-     * Gets the type of this resource.
-     * 
-     * @return The type of this resource.
-     */
-    public abstract ResourceType getType();
 
     /**
      * Gets a String representation, like Tree(10,BigTree,50,Tree,100)

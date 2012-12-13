@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import com.khorn.terraincontrol.configuration.ConfigFunction;
+import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
-import com.khorn.terraincontrol.generator.resourcegens.ConfigFunctionsManager;
 
 public class TerrainControl
 {
@@ -36,7 +36,7 @@ public class TerrainControl
     // Used before TerrainControl is initialized
     private static Map<String, CustomObjectLoader> customObjectLoaders = new HashMap<String, CustomObjectLoader>();
     private static Map<String, CustomObject> specialCustomObjects;
-    private static Map<String, Class<? extends ConfigFunction>> configFunctions;
+    private static Map<String, Class<? extends ConfigFunction<?>>> configFunctions;
 
     private TerrainControl()
     {
@@ -57,6 +57,15 @@ public class TerrainControl
         }
         TerrainControl.engine = engine;
 
+        // Config functions
+        if (configFunctions == null)
+        {
+            configFunctions = new HashMap<String, Class<? extends ConfigFunction<?>>>();
+        }
+        
+        configFunctionsManager = new ConfigFunctionsManager(configFunctions);
+        
+        // Custom objects
         if (customObjectLoaders == null)
         {
             customObjectLoaders = new HashMap<String, CustomObjectLoader>();
@@ -67,12 +76,7 @@ public class TerrainControl
         }
         customObjectManager = new CustomObjectManager(customObjectLoaders, specialCustomObjects);
 
-        if (configFunctions == null)
-        {
-            configFunctions = new HashMap<String, Class<? extends ConfigFunction>>();
-        }
         
-        configFunctionsManager = new ConfigFunctionsManager(configFunctions);
     }
 
     /**
@@ -222,11 +226,11 @@ public class TerrainControl
      * @param name
      * @param configFunction
      */
-    public static void registerConfigFunction(String name, Class<? extends ConfigFunction> configFunction)
+    public static void registerConfigFunction(String name, Class<? extends ConfigFunction<?>> configFunction)
     {
         if (configFunctions == null)
         {
-            configFunctions = new HashMap<String, Class<? extends ConfigFunction>>();
+            configFunctions = new HashMap<String, Class<? extends ConfigFunction<?>>>();
         }
         configFunctions.put(name.toLowerCase(), configFunction);
     }

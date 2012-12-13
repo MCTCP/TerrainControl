@@ -49,7 +49,7 @@ public class TreeGen extends Resource
 
         for (int i = 1; i < args.size() - 1; i += 2)
         {
-            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(i), worldConfig);
+            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(i), getHolder());
             if (object == null)
             {
                 throw new InvalidResourceException("Custom object " + args.get(i) + " not found!");
@@ -62,12 +62,6 @@ public class TreeGen extends Resource
             treeNames.add(args.get(i));
             treeChances.add(getInt(args.get(i + 1), 1, 100));
         }
-    }
-
-    @Override
-    public ResourceType getType()
-    {
-        return ResourceType.biomeConfigResource;
     }
 
     @Override

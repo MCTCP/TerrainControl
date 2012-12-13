@@ -7,16 +7,23 @@ import java.util.Random;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
-public class SaplingGen extends ConfigFunction
+public class SaplingGen extends ConfigFunction<WorldConfig>
 {
     public List<CustomObject> trees;
     public List<String> treeNames;
     public List<Integer> treeChances;
     public int saplingType;
 
+    @Override
+    public Class<WorldConfig> getType()
+    {
+        return WorldConfig.class;
+    }
+    
     @Override
     public void load(List<String> args) throws InvalidResourceException
     {
@@ -36,7 +43,7 @@ public class SaplingGen extends ConfigFunction
 
         for (int i = 1; i < args.size() - 1; i += 2)
         {
-            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(i), worldConfig);
+            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(i), getHolder());
             if (object == null)
             {
                 throw new InvalidResourceException("Custom object " + args.get(i) + " not found!");
@@ -49,12 +56,6 @@ public class SaplingGen extends ConfigFunction
             treeNames.add(args.get(i));
             treeChances.add(getInt(args.get(i + 1), 1, 100));
         }
-    }
-
-    @Override
-    public ResourceType getType()
-    {
-        return ResourceType.saplingResource;
     }
 
     @Override

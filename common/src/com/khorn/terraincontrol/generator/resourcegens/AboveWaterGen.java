@@ -44,12 +44,6 @@ public class AboveWaterGen extends Resource
     }
 
     @Override
-    public ResourceType getType()
-    {
-        return ResourceType.biomeConfigResource;
-    }
-
-    @Override
     public String makeString()
     {
         return "AboveWaterGen(" + makeMaterial(blockId) + "," + frequency + "," + rarity + ")";

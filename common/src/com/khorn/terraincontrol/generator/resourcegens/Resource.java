@@ -14,8 +14,14 @@ import com.khorn.terraincontrol.exception.InvalidResourceException;
  * Represents a Resource: something that can generate in the world.
  *
  */
-public abstract class Resource extends ConfigFunction
+public abstract class Resource extends ConfigFunction<WorldConfig>
 {
+    @Override
+    public Class<WorldConfig> getType()
+    {
+        return WorldConfig.class;
+    }
+    
     /**
      * Spawns the resource at this position, ignoring rarity and frequency.
      * 
@@ -70,7 +76,7 @@ public abstract class Resource extends ConfigFunction
         {
             return null;
         }
-        resource.setWorldConfig(config);
+        resource.setHolder(config);
         try {
             resource.load(stringArgs);
         } catch(InvalidResourceException e)

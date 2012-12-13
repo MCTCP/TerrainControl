@@ -98,12 +98,6 @@ public class OreGen extends Resource
     }
 
     @Override
-    public ResourceType getType()
-    {
-        return ResourceType.biomeConfigResource;
-    }
-
-    @Override
     public String makeString()
     {
         return "Ore(" + makeMaterial(blockId, blockData) + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";

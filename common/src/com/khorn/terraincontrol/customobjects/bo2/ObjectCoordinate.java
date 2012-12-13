@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.customobjects;
+package com.khorn.terraincontrol.customobjects.bo2;
 
 import com.khorn.terraincontrol.util.BlockHelper;
 

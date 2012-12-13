@@ -33,12 +33,6 @@ public class DungeonGen extends Resource
     }
 
     @Override
-    public ResourceType getType()
-    {
-        return ResourceType.biomeConfigResource;
-    }
-
-    @Override
     public String makeString()
     {
         return "Dungeon(" + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";

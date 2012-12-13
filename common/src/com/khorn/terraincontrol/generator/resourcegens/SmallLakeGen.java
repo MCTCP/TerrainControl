@@ -127,12 +127,6 @@ public class SmallLakeGen extends Resource
     }
 
     @Override
-    public ResourceType getType()
-    {
-        return ResourceType.biomeConfigResource;
-    }
-
-    @Override
     public String makeString()
     {
         return "SmallLake(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";

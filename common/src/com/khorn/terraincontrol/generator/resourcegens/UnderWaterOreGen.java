@@ -61,12 +61,6 @@ public class UnderWaterOreGen extends Resource
     }
 
     @Override
-    public ResourceType getType()
-    {
-        return ResourceType.biomeConfigResource;
-    }
-
-    @Override
     public String makeString()
     {
         return "UnderWaterOre(" + makeMaterial(blockId, blockData) + "," + size + "," + frequency + "," + rarity + makeMaterial(sourceBlocks) + ")";

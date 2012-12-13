@@ -80,12 +80,6 @@ public class VinesGen extends Resource
     }
 
     @Override
-    public ResourceType getType()
-    {
-        return ResourceType.biomeConfigResource;
-    }
-
-    @Override
     public String makeString()
     {
         return "Vines(" + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";

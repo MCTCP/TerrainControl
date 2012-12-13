@@ -27,7 +27,7 @@ public class CustomObjectGen extends Resource
         objectNames = new ArrayList<String>();
         for (String arg : args)
         {
-            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(arg, worldConfig);
+            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(arg, getHolder());
             if (object == null || !object.canSpawnAsObject())
             {
                 throw new InvalidResourceException("No custom object found with the name " + arg);
@@ -50,12 +50,6 @@ public class CustomObjectGen extends Resource
         {
             object.process(world, random, chunkX, chunkZ);
         }
-    }
-
-    @Override
-    public ResourceType getType()
-    {
-        return ResourceType.biomeConfigResource;
     }
 
     @Override

@@ -14,7 +14,6 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.ObjectCoordinate;
 
 /**
  * The good old BO2.

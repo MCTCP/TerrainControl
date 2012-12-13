@@ -60,12 +60,6 @@ public class GrassGen extends Resource
     }
 
     @Override
-    public ResourceType getType()
-    {
-        return ResourceType.biomeConfigResource;
-    }
-
-    @Override
     public String makeString()
     {
         return "Grass(" + makeMaterial(blockId) + "," + blockData + "," + frequency + "," + rarity + makeMaterial(sourceBlocks) + ")";

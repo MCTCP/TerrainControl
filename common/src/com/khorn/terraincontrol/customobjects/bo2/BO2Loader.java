@@ -11,4 +11,10 @@ public class BO2Loader implements CustomObjectLoader
     {
         return new BO2(file, objectName);
     }
+
+    @Override
+    public void onShutdown()
+    {
+        // Stub method
+    }
 }

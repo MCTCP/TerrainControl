@@ -14,14 +14,10 @@ public abstract class ConfigFile
 {
     private BufferedWriter SettingsWriter;
 
-    // TODO: This map is populated with lowercase versions as well.
-    // TODO: That is a derped approach. Use TreeSet with CASE_INSENSITIVE_ORDER instead.
+    /**
+     * Stores all the settings. Settings like Name:Value or Name=Value are stored as name, Value and settings like Function(a, b, c) are stored as function(a, b, c), lineNumber
+     */
     protected Map<String, String> SettingsCache = new HashMap<String, String>();
-
-    // TODO: We should use GSON only instead of just for a few fields.
-    // TODO: Hah. We should remove that buggy GSON.
-
-    //public static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private boolean WriteComments;
 
@@ -48,13 +44,11 @@ public abstract class ConfigFile
                         if (splitSettings.length == 2)
                         {
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
-                            //this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
                         } else if (splitSettings.length == 1)
                         {
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
-                            //this.SettingsCache.put(splitSettings[0].trim(), "");
                         }
-                    } if (thisLine.toLowerCase().contains("("))
+                    } else if (thisLine.toLowerCase().contains("("))
                     {
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
                     } else if (thisLine.contains("="))
@@ -63,11 +57,9 @@ public abstract class ConfigFile
                         if (splitSettings.length == 2)
                         {
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
-                            //this.SettingsCache.put(splitSettings[0].trim(), splitSettings[1].trim());
                         } else if (splitSettings.length == 1)
                         {
                             this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
-                            //this.SettingsCache.put(splitSettings[0].trim(), "");
                         }
                     } else
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
@@ -277,13 +269,13 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
-    protected Enum ReadModSettings(String settingsName, Enum defaultValue)
+    protected Enum<?> ReadModSettings(String settingsName, Enum<?> defaultValue)
     {
         settingsName = settingsName.toLowerCase();
         if (this.SettingsCache.containsKey(settingsName))
         {
 
-            Class enumClass = defaultValue.getDeclaringClass();
+            Class<?> enumClass = defaultValue.getDeclaringClass();
             String value = this.SettingsCache.get(settingsName);
 
             if (enumClass.isEnum())
@@ -292,9 +284,9 @@ public abstract class ConfigFile
                 Object[] enumValues = enumClass.getEnumConstants();
                 for (Object enumValue : enumValues)
                 {
-                    String enumName = ((Enum) enumValue).name();
+                    String enumName = ((Enum<?>) enumValue).name();
                     if (enumName.toLowerCase().equals(value) || enumName.equals(value))
-                        return (Enum) enumValue;
+                        return (Enum<?>) enumValue;
                 }
                 sayHadWrongValue(settingsName);
 
@@ -494,7 +486,7 @@ public abstract class ConfigFile
 
     protected abstract void RenameOldSettings();
 
-    protected int CheckValue(int value, int min, int max)
+    protected int applyBounds(int value, int min, int max)
     {
         if (value > max)
             return max;
@@ -504,7 +496,7 @@ public abstract class ConfigFile
             return value;
     }
 
-    protected double CheckValue(double value, double min, double max)
+    protected double applyBounds(double value, double min, double max)
     {
         if (value > max)
             return max;
@@ -514,7 +506,7 @@ public abstract class ConfigFile
             return value;
     }
 
-    protected float CheckValue(float value, float min, float max)
+    protected float applyBounds(float value, float min, float max)
     {
         if (value > max)
             return max;
@@ -524,9 +516,9 @@ public abstract class ConfigFile
             return value;
     }
 
-    protected float CheckValue(float value, float min, float max, float minValue)
+    protected float applyBounds(float value, float min, float max, float minValue)
     {
-        value = CheckValue(value, min, max);
+        value = applyBounds(value, min, max);
 
         if (value < minValue)
             return minValue + 1;
@@ -534,9 +526,9 @@ public abstract class ConfigFile
             return value;
     }
 
-    protected int CheckValue(int value, int min, int max, int minValue)
+    protected int applyBounds(int value, int min, int max, int minValue)
     {
-        value = CheckValue(value, min, max);
+        value = applyBounds(value, min, max);
 
         if (value < minValue)
             return minValue + 1;
@@ -544,7 +536,7 @@ public abstract class ConfigFile
             return value;
     }
 
-    protected ArrayList<String> CheckValue(ArrayList<String> biomes, ArrayList<String> customBiomes)
+    protected ArrayList<String> filterBiomes(ArrayList<String> biomes, ArrayList<String> customBiomes)
     {
         ArrayList<String> output = new ArrayList<String>();
 
@@ -580,8 +572,8 @@ public abstract class ConfigFile
         return new String(chars);
     }
 
-    // Default access modifier, so that WeightedMobSpawnGroup can use it
-    static String[] ReadComplexString(String line)
+    // Public access modifier, so that WeightedMobSpawnGroup can use it
+    public static String[] ReadComplexString(String line)
     {
         ArrayList<String> buffer = new ArrayList<String>();
 

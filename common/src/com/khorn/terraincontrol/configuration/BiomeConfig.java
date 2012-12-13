@@ -26,7 +26,6 @@ import com.khorn.terraincontrol.generator.resourcegens.OreGen;
 import com.khorn.terraincontrol.generator.resourcegens.PlantGen;
 import com.khorn.terraincontrol.generator.resourcegens.ReedGen;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
-import com.khorn.terraincontrol.generator.resourcegens.ResourceType;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
 import com.khorn.terraincontrol.generator.resourcegens.SmallLakeGen;
 import com.khorn.terraincontrol.generator.resourcegens.TreeGen;
@@ -460,8 +459,8 @@ public class BiomeConfig extends ConfigFile
                         blockData = Short.valueOf(values[2]);
                         min_y = Integer.valueOf(values[3]);
                         max_y = Integer.valueOf(values[4]);
-                        min_y = CheckValue(min_y, 0, worldConfig.WorldHeight - 1);
-                        max_y = CheckValue(max_y, 0, worldConfig.WorldHeight - 1, min_y);
+                        min_y = applyBounds(min_y, 0, worldConfig.WorldHeight - 1);
+                        max_y = applyBounds(max_y, 0, worldConfig.WorldHeight - 1, min_y);
                     }
 
                     if (this.ReplaceMatrixBlocks[fromBlockId] == null)
@@ -499,12 +498,12 @@ public class BiomeConfig extends ConfigFile
                 String name = key.substring(0, start);
                 String[] props = ReadComplexString(key.substring(start + 1, end));
 
-                ConfigFunction res = TerrainControl.getConfigFunctionsManager().getConfigFunction(name, this, Arrays.asList(props));
+                ConfigFunction<WorldConfig> res = TerrainControl.getConfigFunctionsManager().getConfigFunction(name, worldConfig, this.Name + " on line " + entry.getValue(), Arrays.asList(props));
 
                 if (res != null)
                 {
 
-                    if (res.getType() == ResourceType.saplingResource)
+                    if (res instanceof SaplingGen)
                     {
                         SaplingGen sapling = (SaplingGen) res;
                         if (sapling.saplingType == -1)
@@ -512,7 +511,7 @@ public class BiomeConfig extends ConfigFile
                         else
                             this.SaplingTypes[sapling.saplingType] = sapling;
 
-                    } else if (res.getType() == ResourceType.biomeConfigResource)
+                    } else if (res instanceof Resource)
                     {
                         LineNumbers.add(Integer.valueOf(entry.getValue()));
                         this.ResourceSequence[this.ResourceCount++] = (Resource) res;
@@ -932,16 +931,16 @@ public class BiomeConfig extends ConfigFile
 
     protected void CorrectSettings()
     {
-        this.BiomeSize = CheckValue(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
-        this.BiomeHeight = (float) CheckValue(this.BiomeHeight, -10.0, 10.0);
-        this.BiomeRarity = CheckValue(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
+        this.BiomeSize = applyBounds(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
+        this.BiomeHeight = (float) applyBounds(this.BiomeHeight, -10.0, 10.0);
+        this.BiomeRarity = applyBounds(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
 
-        this.BiomeTemperature = CheckValue(this.BiomeTemperature, 0.0F, 1.0F);
-        this.BiomeWetness = CheckValue(this.BiomeWetness, 0.0F, 1.0F);
+        this.BiomeTemperature = applyBounds(this.BiomeTemperature, 0.0F, 1.0F);
+        this.BiomeWetness = applyBounds(this.BiomeWetness, 0.0F, 1.0F);
 
-        this.IsleInBiome = CheckValue(this.IsleInBiome, this.worldConfig.CustomBiomes);
-        this.BiomeIsBorder = CheckValue(this.BiomeIsBorder, this.worldConfig.CustomBiomes);
-        this.NotBorderNear = CheckValue(this.NotBorderNear, this.worldConfig.CustomBiomes);
+        this.IsleInBiome = filterBiomes(this.IsleInBiome, this.worldConfig.CustomBiomes);
+        this.BiomeIsBorder = filterBiomes(this.BiomeIsBorder, this.worldConfig.CustomBiomes);
+        this.NotBorderNear = filterBiomes(this.NotBorderNear, this.worldConfig.CustomBiomes);
 
         this.volatility1 = this.volatilityRaw1 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw1) + 1.0D) : this.volatilityRaw1 + 1.0D;
         this.volatility2 = this.volatilityRaw2 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw2) + 1.0D) : this.volatilityRaw2 + 1.0D;
@@ -949,8 +948,8 @@ public class BiomeConfig extends ConfigFile
         this.volatilityWeight1 = (this.volatilityWeightRaw1 - 0.5D) * 24.0D;
         this.volatilityWeight2 = (0.5D - this.volatilityWeightRaw2) * 24.0D;
 
-        this.waterLevelMin = CheckValue(this.waterLevelMin, 0, this.worldConfig.WorldHeight - 1);
-        this.waterLevelMax = CheckValue(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
+        this.waterLevelMin = applyBounds(this.waterLevelMin, 0, this.worldConfig.WorldHeight - 1);
+        this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
 
         this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomes.contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
     }
