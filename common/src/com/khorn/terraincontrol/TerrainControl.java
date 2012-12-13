@@ -89,6 +89,10 @@ public class TerrainControl
         customObjectManager = null;
         configFunctionsManager = null;
 
+        for(CustomObjectLoader loader: customObjectLoaders.values())
+        {
+            loader.onShutdown();
+        }
         customObjectLoaders.clear();
         specialCustomObjects.clear();
         configFunctions.clear();

@@ -110,7 +110,7 @@ public class BO3 extends ConfigFile implements CustomObject
         }
         for (BlockFunction block : blocks)
         {
-            world.setBlock(x + block.x, y + block.y, z + block.z, block.blockId, block.blockData);
+            block.spawn(world, random, x + block.x, y + block.y, z + block.z);
         }
         return true;
     }

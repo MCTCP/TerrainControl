@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -16,7 +17,7 @@ public class BO3Loader implements CustomObjectLoader
 {
     // A list of already loaded meta Tags. The path is the key, a NBT Tag
     // is the value.
-    private static Map<String, Tag> loadedTags;
+    private static Map<String, Tag> loadedTags = new HashMap<String, Tag>();
 
     public BO3Loader()
     {
@@ -44,7 +45,8 @@ public class BO3Loader implements CustomObjectLoader
             // Read it from a file next to the BO3
 
             FileInputStream stream = new FileInputStream(path);
-            Tag metadata = Tag.readFrom(stream);
+            // Get the first tag in the file
+            Tag metadata = ((Tag[])Tag.readFrom(stream).getValue())[0];
             stream.close();
             // Add it to the cache
             loadedTags.put(path, metadata);
