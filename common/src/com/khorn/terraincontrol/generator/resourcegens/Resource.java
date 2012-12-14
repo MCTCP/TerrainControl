@@ -17,7 +17,7 @@ import com.khorn.terraincontrol.exception.InvalidResourceException;
 public abstract class Resource extends ConfigFunction<WorldConfig>
 {
     @Override
-    public Class<WorldConfig> getType()
+    public Class<WorldConfig> getHolderType()
     {
         return WorldConfig.class;
     }

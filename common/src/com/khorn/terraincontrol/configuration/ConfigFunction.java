@@ -24,7 +24,7 @@ public abstract class ConfigFunction<T>
         return holder;
     }
     
-    public abstract Class<T> getType();
+    public abstract Class<T> getHolderType();
 
     /**
      * Convenience method for creating a config function. Used to create the

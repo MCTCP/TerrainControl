@@ -25,13 +25,15 @@ public class BO3 extends ConfigFile implements CustomObject
     public String name;
     public String author;
     public String description;
-    private ConfigMode settingsMode;
+    public ConfigMode settingsMode;
 
     public boolean tree;
     public int frequency;
     public double rarity;
     public boolean rotateRandomly;
     public SpawnHeight spawnHeight;
+    public int minHeight;
+    public int maxHeight;
     public ArrayList<String> excludedBiomes;
 
     public BlockFunction[][] blocks = new BlockFunction[4][]; // four rotations
@@ -128,18 +130,27 @@ public class BO3 extends ConfigFile implements CustomObject
     @Override
     public boolean spawn(LocalWorld world, Random random, int x, int z)
     {
-        // TODO min and max altitude
         if (spawnHeight == SpawnHeight.randomY)
         {
-            return spawn(world, random, x, random.nextInt(256), z);
+            return spawn(world, random, x, minHeight + random.nextInt(maxHeight), z);
         }
         if (spawnHeight == SpawnHeight.highestBlock)
         {
-            return spawn(world, random, x, world.getHighestBlockYAt(x, z), z);
+            int y = world.getHighestBlockYAt(x, z);
+            if(y < minHeight || y > maxHeight)
+            {
+                return false;
+            }
+            return spawn(world, random, x, y, z);
         }
         if (spawnHeight == SpawnHeight.highestSolidBlock)
         {
-            return spawn(world, random, x, world.getSolidHeight(x, z), z);
+            int y = world.getSolidHeight(x, z);
+            if(y < minHeight || y > maxHeight)
+            {
+                return false;
+            }
+            return spawn(world, random, x, y, z);
         }
         return false;
     }
@@ -235,6 +246,10 @@ public class BO3 extends ConfigFile implements CustomObject
         WriteComment("The spawn height of the BO3 - randomY, highestBlock or highestSolidBlock.");
         WriteValue("SpawnHeight", spawnHeight.toString());
         WriteNewLine();
+        WriteComment("The height limits for the BO3.");
+        WriteValue("MinHeight", minHeight);
+        WriteValue("MaxHeight", maxHeight);
+        WriteNewLine();
         WriteComment("When spawned with the UseWorld keyword, this BO3 should NOT spawn in the following biomes.");
         WriteComment("If you write the BO3 name directly in the BiomeConfigs, this will be ignored.");
         WriteValue("ExcludedBiomes", excludedBiomes);
@@ -255,6 +270,8 @@ public class BO3 extends ConfigFile implements CustomObject
         rarity = ReadSettings(BO3Settings.rarity);
         rotateRandomly = ReadSettings(BO3Settings.rotateRandomly);
         spawnHeight = ReadSettings(BO3Settings.spawnHeight);
+        minHeight = ReadSettings(BO3Settings.minHeight);
+        maxHeight = ReadSettings(BO3Settings.maxHeight);
         excludedBiomes = ReadSettings(BO3Settings.excludedBiomes);
 
         // Read the resources
@@ -311,6 +328,8 @@ public class BO3 extends ConfigFile implements CustomObject
     {
         frequency = applyBounds(frequency, 1, 200);
         rarity = applyBounds(rarity, 0.000001, 100.0);
+        minHeight = applyBounds(minHeight, TerrainControl.worldDepth, TerrainControl.worldHeight - 1);
+        maxHeight = applyBounds(maxHeight, minHeight + 1, TerrainControl.worldHeight);
     }
 
     @Override

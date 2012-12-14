@@ -19,7 +19,7 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
     public int saplingType;
 
     @Override
-    public Class<WorldConfig> getType()
+    public Class<WorldConfig> getHolderType()
     {
         return WorldConfig.class;
     }

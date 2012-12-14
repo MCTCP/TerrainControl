@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
 
 public abstract class BO3Function extends ConfigFunction<BO3>
 {
-    public Class<BO3> getType() {
+    public Class<BO3> getHolderType() {
         return BO3.class;
     }
 }

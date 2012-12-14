@@ -14,6 +14,8 @@ public enum BO3Settings implements TCSetting
     rarity(100.0),
     rotateRandomly(false),
     spawnHeight(SpawnHeight.highestBlock),
+    minHeight(0),
+    maxHeight(256),
     excludedBiomes("All", SettingsType.StringArray);
 
     // The spawn height
