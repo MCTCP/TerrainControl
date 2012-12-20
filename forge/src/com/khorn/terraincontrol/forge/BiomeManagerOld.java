@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.src.BiomeCache;
-import net.minecraft.src.BiomeGenBase;
-import net.minecraft.src.ChunkPosition;
-import net.minecraft.src.WorldChunkManager;
+import net.minecraft.world.ChunkPosition;
+import net.minecraft.world.biome.BiomeCache;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.WorldChunkManager;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.IBiomeManager;

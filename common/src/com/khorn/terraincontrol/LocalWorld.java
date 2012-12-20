@@ -76,6 +76,8 @@ public interface LocalWorld
     // Blocks
 
     public int getTypeId(int x, int y, int z);
+    
+    public byte getTypeData(int x, int y, int z);
 
     public boolean isEmpty(int x, int y, int z);
 

@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
-import net.minecraft.src.BiomeGenBase;
-import net.minecraft.src.ColorizerFoliage;
+import net.minecraft.world.ColorizerFoliage;
+import net.minecraft.world.biome.BiomeGenBase;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 

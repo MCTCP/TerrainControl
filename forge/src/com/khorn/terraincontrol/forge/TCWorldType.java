@@ -2,11 +2,11 @@ package com.khorn.terraincontrol.forge;
 
 import java.io.File;
 
-import net.minecraft.src.IChunkProvider;
-import net.minecraft.src.World;
-import net.minecraft.src.WorldChunkManager;
-import net.minecraft.src.WorldClient;
-import net.minecraft.src.WorldType;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.WorldChunkManager;
+import net.minecraft.world.chunk.IChunkProvider;
 
 import com.khorn.terraincontrol.configuration.WorldConfig;
 

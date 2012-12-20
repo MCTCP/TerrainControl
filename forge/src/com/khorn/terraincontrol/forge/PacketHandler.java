@@ -4,9 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import net.minecraft.src.INetworkManager;
-import net.minecraft.src.Packet250CustomPayload;
-import net.minecraft.src.WorldClient;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.network.INetworkManager;
+import net.minecraft.network.packet.Packet250CustomPayload;
 
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;

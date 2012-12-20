@@ -5,37 +5,37 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.TileEntity;
-import net.minecraft.src.BiomeGenBase;
-import net.minecraft.src.Chunk;
-import net.minecraft.src.ExtendedBlockStorage;
-import net.minecraft.src.MapGenMineshaft;
-import net.minecraft.src.MapGenNetherBridge;
-import net.minecraft.src.MapGenScatteredFeature;
-import net.minecraft.src.MapGenStronghold;
-import net.minecraft.src.MapGenVillage;
-import net.minecraft.src.World;
-import net.minecraft.src.WorldGenBigMushroom;
-import net.minecraft.src.WorldGenBigTree;
-import net.minecraft.src.WorldGenDungeons;
-import net.minecraft.src.WorldGenForest;
-import net.minecraft.src.WorldGenHugeTrees;
-import net.minecraft.src.WorldGenShrub;
-import net.minecraft.src.WorldGenSwamp;
-import net.minecraft.src.WorldGenTaiga1;
-import net.minecraft.src.WorldGenTaiga2;
-import net.minecraft.src.WorldGenTrees;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.world.gen.feature.MapGenScatteredFeature;
+import net.minecraft.world.gen.feature.WorldGenBigMushroom;
+import net.minecraft.world.gen.feature.WorldGenBigTree;
+import net.minecraft.world.gen.feature.WorldGenDungeons;
+import net.minecraft.world.gen.feature.WorldGenForest;
+import net.minecraft.world.gen.feature.WorldGenHugeTrees;
+import net.minecraft.world.gen.feature.WorldGenShrub;
+import net.minecraft.world.gen.feature.WorldGenSwamp;
+import net.minecraft.world.gen.feature.WorldGenTaiga1;
+import net.minecraft.world.gen.feature.WorldGenTaiga2;
+import net.minecraft.world.gen.feature.WorldGenTrees;
+import net.minecraft.world.gen.structure.MapGenMineshaft;
+import net.minecraft.world.gen.structure.MapGenNetherBridge;
+import net.minecraft.world.gen.structure.MapGenStronghold;
+import net.minecraft.world.gen.structure.MapGenVillage;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.IBiomeManager;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
 public class SingleWorld implements LocalWorld
@@ -437,6 +437,19 @@ public class SingleWorld implements LocalWorld
         x = x & 0xF;
 
         return chunk.getBlockID(x, y, z);
+    }
+    
+    @Override
+    public byte getTypeData(int x, int y, int z)
+    {
+        Chunk chunk = this.getChunk(x, y, z);
+        if (chunk == null)
+            return 0;
+        
+        z = z & 0xF;
+        x = x & 0xF;
+
+        return (byte) chunk.getBlockMetadata(x, y, z);
     }
 
     @Override

@@ -424,6 +424,21 @@ public class BukkitWorld implements LocalWorld
 
         return chunk.getTypeId(x, y, z);
     }
+    
+    @Override
+    public byte getTypeData(int x, int y, int z)
+    {
+        Chunk chunk = this.getChunk(x, y, z);
+        if (chunk == null)
+        {
+            return 0;
+        }
+
+        z = z & 0xF;
+        x = x & 0xF;
+
+        return (byte) chunk.getData(x, y, z);
+    }
 
     @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
