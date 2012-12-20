@@ -9,6 +9,10 @@ import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.util.BlockHelper;
 
+/**
+ * Represents a block in a BO3.
+ * 
+ */
 public class BlockFunction extends BO3Function
 {
     public int blockId;
@@ -58,14 +62,6 @@ public class BlockFunction extends BO3Function
         return start + ")";
     }
 
-    /**
-     * Returns a new BlockFunction that is rotated 90 degrees.
-     * <p />
-     * Note: the metadata has a magical link: if you change it on the rotated
-     * one, it also changes on the original and vice versa.
-     * 
-     * @return A new BlockFunction that is rotated 90 degrees.
-     */
     public BlockFunction rotate()
     {
         BlockFunction block = new BlockFunction();
@@ -82,7 +78,7 @@ public class BlockFunction extends BO3Function
     }
 
     /**
-     * Spawns this block
+     * Spawns this block at the position. The saved x, y and z in this block are ignored.
      * 
      * @param world
      * @param x
@@ -104,5 +100,4 @@ public class BlockFunction extends BO3Function
             }
         }
     }
-
 }

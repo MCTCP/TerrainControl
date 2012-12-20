@@ -3,12 +3,16 @@ package com.khorn.terraincontrol.customobjects.bo3;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.configuration.TCSetting;
 
 public enum BO3Settings implements TCSetting
 {
+    // BO3
     author("Unknown"),
     description("No description given"),
+    
+    // Main settings
     tree(true),
     frequency(1),
     rarity(100.0),
@@ -16,10 +20,17 @@ public enum BO3Settings implements TCSetting
     spawnHeight(SpawnHeight.highestBlock),
     minHeight(0),
     maxHeight(256),
-    excludedBiomes("All", SettingsType.StringArray);
+    excludedBiomes("All", SettingsType.StringArray),
+    
+    // Source block settings
+    sourceBlock(DefaultMaterial.AIR.id),
+    outsideSourceBlock(OutsideSourceBlock.placeAnyway),
+    maxPercentageOutsideSourceBlock(100);
 
     // The spawn height
     public enum SpawnHeight{randomY, highestBlock, highestSolidBlock}
+    // What to do when outside the source block
+    public enum OutsideSourceBlock{dontPlace, placeAnyway}
     
     private Object value;
     private SettingsType returnType;

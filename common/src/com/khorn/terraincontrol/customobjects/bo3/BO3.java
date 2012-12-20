@@ -17,6 +17,7 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeight;
 
 public class BO3 extends ConfigFile implements CustomObject
@@ -36,7 +37,12 @@ public class BO3 extends ConfigFile implements CustomObject
     public int maxHeight;
     public ArrayList<String> excludedBiomes;
 
+    public int sourceBlock;
+    public int maxPercentageOutsideSourceBlock;
+    public OutsideSourceBlock outsideSourceBlock;
+
     public BlockFunction[][] blocks = new BlockFunction[4][]; // four rotations
+    public BO3Check[][] bo3Checks = new BO3Check[4][];
 
     /**
      * Creates a BO3 from a file.
@@ -80,7 +86,7 @@ public class BO3 extends ConfigFile implements CustomObject
 
         if (rotateRandomly)
         {
-            rotateBlocks();
+            rotateBlockAndChecks();
         }
     }
 
@@ -106,13 +112,48 @@ public class BO3 extends ConfigFile implements CustomObject
     public boolean spawn(LocalWorld world, Random random, int x, int y, int z)
     {
         BlockFunction[] blocks = this.blocks[0];
+        BO3Check[] checks = this.bo3Checks[0];
         if (rotateRandomly)
         {
-            blocks = this.blocks[random.nextInt(4)];
+            int rotation = random.nextInt(4);
+            blocks = this.blocks[rotation];
+            checks = this.bo3Checks[rotation];
         }
+        // Check for spawning
+        for (BO3Check check: checks)
+        {
+            if(check.preventsSpawn(world, x + check.x, y + check.y, z + check.z))
+            {
+                // A check failed
+                return false;
+            }
+        }
+        // Check for source blocks
+        int blocksOutsideSourceBlock = 0;
         for (BlockFunction block : blocks)
         {
-            block.spawn(world, random, x + block.x, y + block.y, z + block.z);
+            if(!world.isLoaded(x + block.x, y + block.y, z + block.z))
+            {
+                // Cannot spawn BO3, part of world is not loaded
+                return false;
+            }
+            if(world.getTypeId(x + block.x, y + block.y, z + block.z) != sourceBlock) {
+                blocksOutsideSourceBlock ++;
+            }
+        }
+        if((blocksOutsideSourceBlock / blocks.length * 100) > maxPercentageOutsideSourceBlock)
+        {
+            // Too many blocks outside source block
+            return false;
+        }
+        // Spawn
+        for (BlockFunction block : blocks)
+        {
+            int previousBlock = world.getTypeId(x + block.x, y + block.y, z + block.z);
+            if(previousBlock == sourceBlock || outsideSourceBlock == OutsideSourceBlock.placeAnyway)
+            {
+                block.spawn(world, random, x + block.x, y + block.y, z + block.z);
+            }
         }
         return true;
     }
@@ -137,7 +178,7 @@ public class BO3 extends ConfigFile implements CustomObject
         if (spawnHeight == SpawnHeight.highestBlock)
         {
             int y = world.getHighestBlockYAt(x, z);
-            if(y < minHeight || y > maxHeight)
+            if (y < minHeight || y > maxHeight)
             {
                 return false;
             }
@@ -146,7 +187,7 @@ public class BO3 extends ConfigFile implements CustomObject
         if (spawnHeight == SpawnHeight.highestSolidBlock)
         {
             int y = world.getSolidHeight(x, z);
-            if(y < minHeight || y > maxHeight)
+            if (y < minHeight || y > maxHeight)
             {
                 return false;
             }
@@ -254,6 +295,18 @@ public class BO3 extends ConfigFile implements CustomObject
         WriteComment("If you write the BO3 name directly in the BiomeConfigs, this will be ignored.");
         WriteValue("ExcludedBiomes", excludedBiomes);
 
+        // Sourceblock
+        WriteTitle("Source block settings");
+        WriteComment("The block the BO3 should spawn in");
+        WriteValue("SourceBlock", sourceBlock);
+        WriteNewLine();
+        WriteComment("The maximum percentage of the BO3 that can be outside the SourceBlock.");
+        WriteComment("The BO3 won't be placed on a location with more blocks outside the SourceBlock than this percentage.");
+        WriteValue("MaxPercentageOutsideSourceBlock", maxPercentageOutsideSourceBlock);
+        WriteNewLine();
+        WriteComment("What to do when a block is about to be placed outside the SourceBlock? (dontPlace, placeAnyway)");
+        WriteValue("OutsideSourceBlock", outsideSourceBlock.toString());
+
         // Blocks
         writeResources();
     }
@@ -274,6 +327,10 @@ public class BO3 extends ConfigFile implements CustomObject
         maxHeight = ReadSettings(BO3Settings.maxHeight);
         excludedBiomes = ReadSettings(BO3Settings.excludedBiomes);
 
+        sourceBlock = ReadSettings(BO3Settings.sourceBlock);
+        maxPercentageOutsideSourceBlock = ReadSettings(BO3Settings.maxPercentageOutsideSourceBlock);
+        outsideSourceBlock = ReadSettings(BO3Settings.outsideSourceBlock);
+
         // Read the resources
         readResources();
     }
@@ -281,6 +338,7 @@ public class BO3 extends ConfigFile implements CustomObject
     private void readResources()
     {
         List<BlockFunction> tempBlocksList = new ArrayList<BlockFunction>();
+        List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
 
         for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
         {
@@ -299,6 +357,9 @@ public class BO3 extends ConfigFile implements CustomObject
                     if (res instanceof BlockFunction)
                     {
                         tempBlocksList.add((BlockFunction) res);
+                    } else if (res instanceof BO3Check)
+                    {
+                        tempChecksList.add((BO3Check) res);
                     }
                 }
             }
@@ -306,6 +367,7 @@ public class BO3 extends ConfigFile implements CustomObject
 
         // Store the blocks
         blocks[0] = tempBlocksList.toArray(new BlockFunction[tempBlocksList.size()]);
+        bo3Checks[0] = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
     }
 
     public void writeResources() throws IOException
@@ -321,6 +383,15 @@ public class BO3 extends ConfigFile implements CustomObject
         {
             WriteValue(block.makeString());
         }
+
+        // BO3Checks
+        WriteTitle("BO3 checks");
+        WriteComment("Require a condition at a certain location in order for the BO3 to be spawned.");
+        WriteComment("BlockCheck(x,y,z,id[.data][,id[.data][,...]])");
+        for (BO3Check check : bo3Checks[0])
+        {
+            WriteValue(check.makeString());
+        }
     }
 
     @Override
@@ -330,6 +401,8 @@ public class BO3 extends ConfigFile implements CustomObject
         rarity = applyBounds(rarity, 0.000001, 100.0);
         minHeight = applyBounds(minHeight, TerrainControl.worldDepth, TerrainControl.worldHeight - 1);
         maxHeight = applyBounds(maxHeight, minHeight + 1, TerrainControl.worldHeight);
+        sourceBlock = applyBounds(sourceBlock, 0, TerrainControl.supportedBlockIds);
+        maxPercentageOutsideSourceBlock = applyBounds(maxPercentageOutsideSourceBlock, 0, 100);
     }
 
     @Override
@@ -339,16 +412,23 @@ public class BO3 extends ConfigFile implements CustomObject
     }
 
     /**
-     * Rotates all the blocks
+     * Rotates all the blocks and all the checks
      */
-    private void rotateBlocks()
+    private void rotateBlockAndChecks()
     {
         for (int i = 1; i < 4; i++)
         {
+            // Blocks
             blocks[i] = new BlockFunction[blocks[i - 1].length];
             for (int j = 0; j < blocks[i].length; j++)
             {
                 blocks[i][j] = blocks[i - 1][j].rotate();
+            }
+            // BO3 checks
+            bo3Checks[i] = new BO3Check[bo3Checks[i - 1].length];
+            for (int j = 0; j < blocks[i].length; j++)
+            {
+                bo3Checks[i][j] = bo3Checks[i - 1][j].rotate();
             }
         }
     }

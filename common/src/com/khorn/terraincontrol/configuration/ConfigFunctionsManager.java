@@ -102,7 +102,7 @@ public class ConfigFunctionsManager
         boolean matchingTypes = true;
         try
         {
-            matchingTypes = holder.getClass().isAssignableFrom((Class<?>) clazz.getMethod("getType").invoke(configFunction));
+            matchingTypes = holder.getClass().isAssignableFrom((Class<?>) clazz.getMethod("getHolderType").invoke(configFunction));
         } catch (Exception e)
         {
             TerrainControl.log("Reflection error (" + e.getClass().getSimpleName() + ") while loading the resources: " + e.getMessage());
