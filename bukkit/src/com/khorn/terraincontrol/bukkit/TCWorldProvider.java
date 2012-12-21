@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
-import net.minecraft.server.v1_4_5.WorldProvider;
+import net.minecraft.server.v1_4_6.WorldProvider;
+
 
 
 /**

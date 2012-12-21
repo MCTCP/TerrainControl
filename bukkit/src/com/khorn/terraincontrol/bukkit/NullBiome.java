@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.bukkit;
 
-import net.minecraft.server.v1_4_5.BiomeBase;
+import net.minecraft.server.v1_4_6.BiomeBase;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 

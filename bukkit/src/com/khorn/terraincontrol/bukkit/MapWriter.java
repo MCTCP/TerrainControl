@@ -7,8 +7,8 @@ import java.io.FileOutputStream;
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 
-import net.minecraft.server.v1_4_5.BiomeBase;
-import net.minecraft.server.v1_4_5.World;
+import net.minecraft.server.v1_4_6.BiomeBase;
+import net.minecraft.server.v1_4_6.World;
 
 import org.bukkit.command.CommandSender;
 

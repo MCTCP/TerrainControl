@@ -9,14 +9,14 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
-import net.minecraft.server.v1_4_5.ChunkProviderServer;
-import net.minecraft.server.v1_4_5.ChunkRegionLoader;
-import net.minecraft.server.v1_4_5.NBTCompressedStreamTools;
-import net.minecraft.server.v1_4_5.NBTTagCompound;
-import net.minecraft.server.v1_4_5.RegionFile;
+import net.minecraft.server.v1_4_6.ChunkProviderServer;
+import net.minecraft.server.v1_4_6.ChunkRegionLoader;
+import net.minecraft.server.v1_4_6.NBTCompressedStreamTools;
+import net.minecraft.server.v1_4_6.NBTTagCompound;
+import net.minecraft.server.v1_4_6.RegionFile;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_5.CraftWorld;
+import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
 
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 

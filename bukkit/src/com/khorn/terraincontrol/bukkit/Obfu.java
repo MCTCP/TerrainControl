@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.server.v1_4_5.BiomeBase;
-import net.minecraft.server.v1_4_5.BiomeMeta;
-import net.minecraft.server.v1_4_5.EntityTypes;
+import net.minecraft.server.v1_4_6.BiomeBase;
+import net.minecraft.server.v1_4_6.BiomeMeta;
+import net.minecraft.server.v1_4_6.EntityTypes;
 
 import com.khorn.terraincontrol.DefaultMobType;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;

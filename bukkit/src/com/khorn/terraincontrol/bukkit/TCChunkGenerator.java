@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.server.v1_4_5.Block;
+import net.minecraft.server.v1_4_6.Block;
 
 import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;

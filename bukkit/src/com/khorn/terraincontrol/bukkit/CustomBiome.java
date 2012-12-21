@@ -3,11 +3,11 @@ package com.khorn.terraincontrol.bukkit;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import net.minecraft.server.v1_4_5.BiomeBase;
-import net.minecraft.server.v1_4_5.BiomeMeta;
+import net.minecraft.server.v1_4_6.BiomeBase;
+import net.minecraft.server.v1_4_6.BiomeMeta;
 
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_4_5.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_4_6.block.CraftBlock;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 
