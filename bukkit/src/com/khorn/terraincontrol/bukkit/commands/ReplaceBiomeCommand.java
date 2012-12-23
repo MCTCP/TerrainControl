@@ -66,7 +66,7 @@ public class ReplaceBiomeCommand extends BaseCommand
 
         BiomeReplace replace = new BiomeReplace(world,biomeIdFrom,biomeIdTo,sender);
 
-        this.plugin.getServer().getScheduler().scheduleAsyncDelayedTask(this.plugin, replace);
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, replace);
 
         return true;
 

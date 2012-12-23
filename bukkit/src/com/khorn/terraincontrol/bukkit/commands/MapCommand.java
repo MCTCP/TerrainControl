@@ -112,7 +112,7 @@ public class MapCommand extends BaseCommand
 
         MapWriter map = new MapWriter(this.plugin, world.getHandle(), size, angle, sender, offsetX, offsetZ, label);
 
-        this.plugin.getServer().getScheduler().scheduleAsyncDelayedTask(this.plugin, map);
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, map);
 
         return true;
     }
