@@ -71,7 +71,7 @@ public class TCPlugin implements TerrainControlEngine
         LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
         
         // Register world type
-        worldType = new TCWorldType(this, 4, "TerrainControl");
+        worldType = new TCWorldType(this, "TerrainControl");
         
         // Register channel
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
