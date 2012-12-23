@@ -29,7 +29,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 
-@Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.4.2")
+@Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.4.3")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")
 public class TCPlugin implements TerrainControlEngine
 {
