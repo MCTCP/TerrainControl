@@ -59,19 +59,19 @@ public class TreeObject implements CustomObject
     }
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
         // A tree has no rarity, so spawn it once in the chunk
         int x = chunkX * 16 + random.nextInt(16);
         int z = chunkZ * 16 + random.nextInt(16);
         int y = world.getHighestBlockYAt(x, z);
-        world.PlaceTree(type, random, x, y, z);
+        return world.PlaceTree(type, random, x, y, z);
     }
 
     @Override
-    public void processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        process(world, random, chunkX, chunkZ);
+        return process(world, random, chunkX, chunkZ);
     }
 
     @Override

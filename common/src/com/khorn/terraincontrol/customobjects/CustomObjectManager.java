@@ -119,9 +119,11 @@ public class CustomObjectManager
      */
     public CustomObject getCustomObject(String name, WorldConfig config)
     {
-        if (config.customObjects.containsKey(name.toLowerCase()))
+        for(CustomObject object: config.customObjects)
         {
-            return config.customObjects.get(name.toLowerCase());
+            if(object.getName().equalsIgnoreCase(name)) {
+                return object;
+            }
         }
         return getCustomObject(name);
     }

@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.customobjects;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -90,21 +91,27 @@ public class UseBiome implements CustomObject
     }
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        for (CustomObject object : getPossibleObjectsAt(world, chunkX * 16 + 8, chunkZ * 16 + 8))
+        List<CustomObject> possibleObjects = getPossibleObjectsAt(world, chunkX * 16 + 8, chunkZ * 16 + 8);
+        if(possibleObjects.size() == 0)
         {
-            object.process(world, random, chunkX, chunkZ);
+            return false;
         }
+        CustomObject object = possibleObjects.get(random.nextInt(possibleObjects.size()));
+        return object.process(world, random, chunkX, chunkZ);
     }
 
     @Override
-    public void processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        for (CustomObject object : getPossibleObjectsAt(world, chunkX * 16 + 8, chunkZ * 16 + 8))
+        List<CustomObject> possibleObjects = getPossibleObjectsAt(world, chunkX * 16 + 8, chunkZ * 16 + 8);
+        if(possibleObjects.size() == 0)
         {
-            object.processAsTree(world, random, chunkX, chunkZ);
+            return false;
         }
+        CustomObject object = possibleObjects.get(random.nextInt(possibleObjects.size()));
+        return object.processAsTree(world, random, chunkX, chunkZ);
     }
 
     @Override

@@ -80,15 +80,16 @@ public interface CustomObject
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z);
 
     /**
-     * Spawns the object in a chunk. The object can search a good y position by
+     * Spawns the object one or more times in a chunk. The object can search a good y position by
      * itself.
      * 
      * @param world
      * @param random
      * @param chunkX
      * @param chunkZ
+     * @return Whether at least one object spawned successfully.
      */
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ);
+    public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ);
 
     /**
      * Spawns the object in a chunk. The object can search a good y position by
@@ -99,8 +100,9 @@ public interface CustomObject
      * @param random
      * @param x
      * @param z
+     * @return Whether at least one object spawned successfully.
      */
-    public void processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ);
+    public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ);
 
     /**
      * Returns a copy of this object will all the settings applied. Can return

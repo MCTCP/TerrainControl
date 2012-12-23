@@ -190,39 +190,38 @@ public class BO2 extends ConfigFile implements CustomObject
     }
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean process(LocalWorld world, Random rand, int chunkX, int chunkZ)
     {
-        boolean objectSpawned = false;
-        int spawnAttempts = 0;
         
-        while(!objectSpawned && spawnAttempts < world.getSettings().objectSpawnRatio)
+        if (Branch)
+            return false;
+        
+        int randomRoll = rand.nextInt(100);
+        int ObjectRarity = Rarity;
+        boolean objectSpawned = false;
+
+        while (randomRoll < ObjectRarity)
         {
-            spawnAttempts++;
+            ObjectRarity -= 100;
             
-            int randomRoll = random.nextInt(100);
-            int ObjectRarity = Rarity;
+            int x = chunkX * 16 + rand.nextInt(16);
+            int z = chunkZ * 16 + rand.nextInt(16);
 
-            while (randomRoll < ObjectRarity)
-            {
-                ObjectRarity -= 100;
-
-                int x = chunkX * 16 + random.nextInt(16) + 8;
-                int z = chunkZ * 16 + random.nextInt(16) + 8;
-
-                objectSpawned = spawn(world, random, x, z);
-            }
+            objectSpawned = spawn(world, rand, x, z);
         }
+        
+        return objectSpawned;
     }
 
     @Override
-    public void processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
         if (!Tree)
         {
-            return;
+            return false;
         }
 
-        process(world, random, chunkX, chunkZ);
+        return process(world, random, chunkX, chunkZ);
     }
 
     @Override
@@ -367,7 +366,7 @@ public class BO2 extends ConfigFile implements CustomObject
 
             }
         if (nonIntegerValues)
-            System.out.println("TerrainControl: Custom object " + this.Name + " have wrong value " + settingName);
+            System.out.println("TerrainControl: Custom object " + this.Name + " has wrong value " + settingName);
 
         return output;
 

@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WorldConfig extends ConfigFile
@@ -21,10 +22,9 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
     public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
 
-    /**
-     * Holds all world CustomObjects. All keys should be lowercase.
-     */
-    public Map<String,CustomObject> customObjects = new HashMap<String, CustomObject>();
+    // Holds all world CustomObjects.
+    public List<CustomObject> customObjects = new ArrayList<CustomObject>();
+    
 
     public ArrayList<String> NormalBiomes = new ArrayList<String>();
     public ArrayList<String> IceBiomes = new ArrayList<String>();
@@ -287,7 +287,11 @@ public class WorldConfig extends ConfigFile
             }
         }
 
-        customObjects = TerrainControl.getCustomObjectManager().loadObjects(CustomObjectsDirectory);
+        Map<String, CustomObject> customObjectsMap = TerrainControl.getCustomObjectManager().loadObjects(CustomObjectsDirectory);
+        for(CustomObject object: customObjectsMap.values())
+        {
+            customObjects.add(object);
+        }
 
         TerrainControl.log(customObjects.size() + " world custom objects loaded");
 

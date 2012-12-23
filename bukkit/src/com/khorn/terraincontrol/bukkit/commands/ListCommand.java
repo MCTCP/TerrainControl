@@ -50,7 +50,7 @@ public class ListCommand extends BaseCommand
                     sender.sendMessage(MessageColor + "This world does not have custom objects");
 
                 List<String> pluginList = new ArrayList<String>();
-                for (CustomObject object : world.getSettings().customObjects.values())
+                for (CustomObject object : world.getSettings().customObjects)
                 {
                     pluginList.add(ValueColor + object.getName());
                 }

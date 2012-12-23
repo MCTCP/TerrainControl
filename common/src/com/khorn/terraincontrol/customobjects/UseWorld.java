@@ -5,6 +5,8 @@ import java.util.Random;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 
 /**
  * UseWorld is a keyword that spawns the objects in the WorldObjects folder.
@@ -34,7 +36,7 @@ public class UseWorld implements CustomObject
     @Override
     public boolean spawn(LocalWorld world, Random random, int x, int y, int z)
     {
-        for (CustomObject object : world.getSettings().customObjects.values())
+        for (CustomObject object : world.getSettings().customObjects)
         {
             if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
@@ -50,7 +52,7 @@ public class UseWorld implements CustomObject
     @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int y, int z)
     {
-        for (CustomObject object : world.getSettings().customObjects.values())
+        for (CustomObject object : world.getSettings().customObjects)
         {
             if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
@@ -66,7 +68,7 @@ public class UseWorld implements CustomObject
     @Override
     public boolean spawn(LocalWorld world, Random random, int x, int z)
     {
-        for (CustomObject object : world.getSettings().customObjects.values())
+        for (CustomObject object : world.getSettings().customObjects)
         {
             if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
@@ -83,7 +85,7 @@ public class UseWorld implements CustomObject
     @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
     {
-        for (CustomObject object : world.getSettings().customObjects.values())
+        for (CustomObject object : world.getSettings().customObjects)
         {
             if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
@@ -97,27 +99,65 @@ public class UseWorld implements CustomObject
     }
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean process(LocalWorld world, Random rand, int chunk_x, int chunk_z)
     {
-        for (CustomObject object : world.getSettings().customObjects.values())
+        
+        
+        WorldConfig worldSettings = world.getSettings();
+
+        if (worldSettings.customObjects.size() == 0)
+            return false;
+        
+        boolean objectSpawned = false;
+        int spawnattemps = 0;
+        while (!objectSpawned)
         {
-            if (object.hasPreferenceToSpawnIn(world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8)))
-            {
-                object.process(world, random, chunkX, chunkZ);
-            }
+            if (spawnattemps > worldSettings.objectSpawnRatio)
+                return false;
+
+            spawnattemps++;
+
+            CustomObject SelectedObject = worldSettings.customObjects.get(rand.nextInt(worldSettings.customObjects.size()));
+            
+            if (!SelectedObject.hasPreferenceToSpawnIn(world.getBiome(chunk_x * 16 + 8, chunk_z * 16 + 8)))
+                continue;
+
+            
+            // Process the object
+            
+            objectSpawned = SelectedObject.process(world, rand, chunk_x, chunk_z);
+
         }
+        return objectSpawned;
     }
 
     @Override
-    public void processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean processAsTree(LocalWorld world, Random rand, int chunk_x, int chunk_z)
     {
-        for (CustomObject object : world.getSettings().customObjects.values())
+        WorldConfig worldSettings = world.getSettings();
+
+        if (worldSettings.customObjects.size() == 0)
+            return false;
+
+        boolean objectSpawned = false;
+        int spawnattemps = 0;
+        while (!objectSpawned)
         {
-            if (object.hasPreferenceToSpawnIn(world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8)))
-            {
-                object.processAsTree(world, random, chunkX, chunkZ);
-            }
+            if (spawnattemps > worldSettings.objectSpawnRatio)
+                return false;
+
+            spawnattemps++;
+
+            CustomObject SelectedObject = worldSettings.customObjects.get(rand.nextInt(worldSettings.customObjects.size()));
+
+            if (!SelectedObject.hasPreferenceToSpawnIn(world.getBiome(chunk_x * 16 + 8, chunk_z * 16 + 8)))
+                continue;
+
+            // Process the object
+            objectSpawned = SelectedObject.processAsTree(world, rand, chunk_x, chunk_z);
+
         }
+        return objectSpawned;
     }
 
     @Override
