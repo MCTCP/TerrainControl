@@ -141,7 +141,7 @@ public class BO3 extends ConfigFile implements CustomObject
                 blocksOutsideSourceBlock ++;
             }
         }
-        if((blocksOutsideSourceBlock / blocks.length * 100) > maxPercentageOutsideSourceBlock)
+        if((( (double) blocksOutsideSourceBlock / (double) blocks.length) * 100.0) > maxPercentageOutsideSourceBlock)
         {
             // Too many blocks outside source block
             return false;
@@ -207,8 +207,10 @@ public class BO3 extends ConfigFile implements CustomObject
     }
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
+        boolean atLeastOneObjectHasSpawned = false;
+        
         int chunkMiddleX = chunkX * 16 + 8;
         int chunkMiddleZ = chunkZ * 16 + 8;
         for (int i = 0; i < frequency; i++)
@@ -216,19 +218,24 @@ public class BO3 extends ConfigFile implements CustomObject
             double test = random.nextDouble() * 100.0;
             if (rarity > test)
             {
-                spawn(world, random, chunkMiddleX + random.nextInt(16), chunkMiddleZ + random.nextInt(16));
+                if(spawn(world, random, chunkMiddleX + random.nextInt(16), chunkMiddleZ + random.nextInt(16)))
+                {
+                    atLeastOneObjectHasSpawned = true;
+                }
             }
         }
+        
+        return atLeastOneObjectHasSpawned;
     }
 
     @Override
-    public void processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
         if (!tree)
         {
-            return;
+            return false;
         }
-        process(world, random, chunkX, chunkZ);
+        return process(world, random, chunkX, chunkZ);
     }
 
     @Override
@@ -426,7 +433,7 @@ public class BO3 extends ConfigFile implements CustomObject
             }
             // BO3 checks
             bo3Checks[i] = new BO3Check[bo3Checks[i - 1].length];
-            for (int j = 0; j < blocks[i].length; j++)
+            for (int j = 0; j < bo3Checks[i].length; j++)
             {
                 bo3Checks[i][j] = bo3Checks[i - 1][j].rotate();
             }

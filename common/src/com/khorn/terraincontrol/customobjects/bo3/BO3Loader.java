@@ -23,6 +23,8 @@ public class BO3Loader implements CustomObjectLoader
     {
         // Register BO3 ConfigFunctions
         TerrainControl.registerConfigFunction("Block", BlockFunction.class);
+        TerrainControl.registerConfigFunction("BlockCheck", BlockCheck.class);
+        TerrainControl.registerConfigFunction("LightCheck", LightCheck.class);
     }
 
     public CustomObject loadFromFile(String objectName, File file)
