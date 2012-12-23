@@ -64,17 +64,18 @@ public class BlockFunction extends BO3Function
 
     public BlockFunction rotate()
     {
-        BlockFunction block = new BlockFunction();
-        block.x = z;
-        block.y = y;
-        block.z = -x;
-        block.blockId = blockId;
-        block.blockData = BlockHelper.RotateData(blockId, blockData);
-        block.metaDataTags = metaDataTags;
-        block.metaDataNames = metaDataNames;
-        block.metaDataChances = metaDataChances;
+        BlockFunction rotatedBlock = new BlockFunction();
+        rotatedBlock.x = z;
+        rotatedBlock.y = y;
+        rotatedBlock.z = -x;
+        rotatedBlock.blockId = blockId;
+        rotatedBlock.blockData = BlockHelper.RotateData(blockId, blockData);
+        rotatedBlock.hasMetaData = hasMetaData;
+        rotatedBlock.metaDataTags = metaDataTags;
+        rotatedBlock.metaDataNames = metaDataNames;
+        rotatedBlock.metaDataChances = metaDataChances;
 
-        return block;
+        return rotatedBlock;
     }
 
     /**

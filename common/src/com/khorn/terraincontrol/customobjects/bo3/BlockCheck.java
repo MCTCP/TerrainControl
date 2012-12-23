@@ -83,26 +83,26 @@ public class BlockCheck extends BO3Check
     @Override
     public BO3Check rotate()
     {
-        BlockCheck check = new BlockCheck();
-        check.x = z;
-        check.y = y;
-        check.z = -x;
-        check.blockIds = blockIds;
+        BlockCheck rotatedCheck = new BlockCheck();
+        rotatedCheck.x = z;
+        rotatedCheck.y = y;
+        rotatedCheck.z = -x;
+        rotatedCheck.blockIds = blockIds;
 
-        check.blockDatas = new ArrayList<Byte>();
+        rotatedCheck.blockDatas = new ArrayList<Byte>();
         for (int i = 0; i < blockDatas.size(); i++)
         {
             // Only try to rotate if some block data has been set.
             if (blockDatas.get(i) == -1)
             {
-                check.blockDatas.add((byte) -1);
+                rotatedCheck.blockDatas.add((byte) -1);
             } else
             {
-                check.blockDatas.add((byte) BlockHelper.RotateData(blockIds.get(i), blockDatas.get(i)));
+                rotatedCheck.blockDatas.add((byte) BlockHelper.RotateData(blockIds.get(i), blockDatas.get(i)));
             }
         }
 
-        return check;
+        return rotatedCheck;
     }
 
 }
