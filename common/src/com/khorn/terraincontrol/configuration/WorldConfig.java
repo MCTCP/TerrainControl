@@ -284,11 +284,7 @@ public class WorldConfig extends ConfigFile
             }
         }
 
-        Map<String, CustomObject> customObjectsMap = TerrainControl.getCustomObjectManager().loadObjects(CustomObjectsDirectory);
-        for(CustomObject object: customObjectsMap.values())
-        {
-            customObjects.add(object);
-        }
+        customObjects = new ArrayList<CustomObject>(TerrainControl.getCustomObjectManager().loadObjects(CustomObjectsDirectory).values());
 
         TerrainControl.log(customObjects.size() + " world custom objects loaded");
 
