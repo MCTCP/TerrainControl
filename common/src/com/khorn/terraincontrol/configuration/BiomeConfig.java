@@ -731,7 +731,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Dungeon(Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.WriteComment("UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.WriteComment("Ore(Block[.BlockData],Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.WriteComment("UnderWaterOre(Block,Size,Frequency,Rarity,maxDepth,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.WriteComment("UnderWaterOre(Block,Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
         this.WriteComment("CustomObject()");
         this.WriteComment("Tree(Frequency,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
         this.WriteComment("Plant(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
