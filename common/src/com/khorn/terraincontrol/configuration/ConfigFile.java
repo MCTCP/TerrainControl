@@ -34,37 +34,35 @@ public abstract class ConfigFile
                 int lineNumber = 0;
                 while ((thisLine = SettingsReader.readLine()) != null)
                 {
+                    lineNumber++;
+                    
                     if (thisLine.trim().equals(""))
-                        continue;
-                    if (thisLine.startsWith("#") || thisLine.startsWith("<"))
-                        continue;
-                    if (thisLine.contains(":"))
                     {
+                        // Empty line, ignore
+                        continue;
+                    } else if (thisLine.startsWith("#") || thisLine.startsWith("<"))
+                    {
+                        // Comment, ignore
+                        continue;
+                    } else if (thisLine.contains(":"))
+                    {
+                        // Setting, split and add it
                         String[] splitSettings = thisLine.split(":", 2);
-                        if (splitSettings.length == 2)
-                        {
-                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
-                        } else if (splitSettings.length == 1)
-                        {
-                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
-                        }
+                        this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                     } else if (thisLine.toLowerCase().contains("("))
                     {
+                        // Resource, add it
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
                     } else if (thisLine.contains("="))
                     {
+                        // Setting, split it and add it
                         String[] splitSettings = thisLine.split("=", 2);
-                        if (splitSettings.length == 2)
-                        {
-                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
-                        } else if (splitSettings.length == 1)
-                        {
-                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), "");
-                        }
+                        this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                     } else
+                    {
+                        // Unknown, just add it
                         this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
-
-                    lineNumber++;
+                    }
                 }
             } catch (IOException e)
             {

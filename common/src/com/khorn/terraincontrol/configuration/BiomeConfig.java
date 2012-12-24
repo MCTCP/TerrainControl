@@ -428,7 +428,7 @@ public class BiomeConfig extends ConfigFile
 
     private void ReadReplaceSettings()
     {
-        String settingValue = ReadComplexValue("ReplacedBlocks");
+        String settingValue = ReadModSettings("ReplacedBlocks", "None");
 
         if (settingValue.equals("") || settingValue.equals("None"))
             return;
@@ -1002,44 +1002,25 @@ public class BiomeConfig extends ConfigFile
         }
 
         // ReplacedBlocks
-        String replaceBlocksValue;
-        boolean oldReplaceFound = false;
-        if (this.SettingsCache.containsKey("replacedblocks"))
-        {
-            replaceBlocksValue = this.SettingsCache.get("replacedblocks");
-            if (replaceBlocksValue.contains("="))
-            {
-                oldReplaceFound = true;
-                this.SettingsCache.remove("replacedblocks");
-            }
-        } else
-        {
-            replaceBlocksValue = ReadComplexValue("ReplacedBlocks");
-            if (replaceBlocksValue.contains("="))
-            {
-                oldReplaceFound = true;
-                this.SettingsCache.remove("ReplacedBlocks" + ":" + replaceBlocksValue);
-            }
-        }
+        String replacedBlocksValue = ReadModSettings("ReplacedBlocks", "None");
 
-        if (oldReplaceFound)
+        if (replacedBlocksValue.contains("="))
         {
-            String[] values = replaceBlocksValue.split(",");
+            String[] values = replacedBlocksValue.split(",");
             String output = "";
 
-            for (String block : values)
+            for (String replacedBlock : values)
             {
                 try
                 {
-
-                    String fromId = block.split("=")[0];
-                    String toId = block.split("=")[1];
+                    String fromId = replacedBlock.split("=")[0];
+                    String toId = replacedBlock.split("=")[1];
 
                     String toData = "0";
                     String minHeight = "0";
                     String maxHeight = "" + worldConfig.WorldHeight;
 
-                    Boolean longForm = false;
+                    boolean longForm = false;
 
                     int start = toId.indexOf("(");
                     int end = toId.indexOf(")");
@@ -1051,7 +1032,7 @@ public class BiomeConfig extends ConfigFile
                         maxHeight = ranges[1];
                         longForm = true;
                     }
-                    if (toData.contains("\\."))
+                    if (toId.contains("."))
                     {
                         String[] temp = toId.split("\\.");
                         toId = temp[0];
@@ -1070,8 +1051,7 @@ public class BiomeConfig extends ConfigFile
 
             }
 
-            this.SettingsCache.put("ReplacedBlocks" + ":" + output.substring(0, output.length() - 1), "");
-
+            this.SettingsCache.put("replacedblocks", output.substring(0, output.length() - 1));
         }
     }
 
