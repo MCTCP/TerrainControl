@@ -16,9 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public class WorldConfig extends ConfigFile
-{
-    public LocalWorld world;
-    
+{   
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
     public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
 
@@ -162,7 +160,6 @@ public class WorldConfig extends ConfigFile
     {
         this.SettingsDir = settingsDir;
         this.WorldName = world.getName();
-        this.world = world;
 
         File settingsFile = new File(this.SettingsDir, TCDefaultValues.WorldSettingsName.stringValue());
 
