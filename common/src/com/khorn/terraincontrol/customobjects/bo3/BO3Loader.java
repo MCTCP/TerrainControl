@@ -22,9 +22,9 @@ public class BO3Loader implements CustomObjectLoader
     public BO3Loader()
     {
         // Register BO3 ConfigFunctions
-        TerrainControl.registerConfigFunction("Block", BlockFunction.class);
-        TerrainControl.registerConfigFunction("BlockCheck", BlockCheck.class);
-        TerrainControl.registerConfigFunction("LightCheck", LightCheck.class);
+        TerrainControl.getConfigFunctionsManager().registerConfigFunction("Block", BlockFunction.class);
+        TerrainControl.getConfigFunctionsManager().registerConfigFunction("BlockCheck", BlockCheck.class);
+        TerrainControl.getConfigFunctionsManager().registerConfigFunction("LightCheck", LightCheck.class);
     }
 
     public CustomObject loadFromFile(String objectName, File file)
@@ -45,7 +45,6 @@ public class BO3Loader implements CustomObjectLoader
         try
         {
             // Read it from a file next to the BO3
-
             FileInputStream stream = new FileInputStream(path);
             // Get the first tag in the file
             Tag metadata = ((Tag[])Tag.readFrom(stream).getValue())[0];

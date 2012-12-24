@@ -11,6 +11,7 @@ import java.util.Random;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
@@ -105,6 +106,7 @@ public class BO2 extends ConfigFile implements CustomObject
         if (RandomRotation)
             data = Data[random.nextInt(4)];
 
+        // Spawn check
         int faultCounter = 0;
 
         for (ObjectCoordinate point : data)
@@ -123,12 +125,14 @@ public class BO2 extends ConfigFile implements CustomObject
                     }
                 }
             }
-
         }
+        
+        // Call event
+        TerrainControl.fireCustomObjectSpawnEvent(this, world, x, y, z);
 
+        // Spawn
         for (ObjectCoordinate point : data)
         {
-
             if (world.getTypeId(x + point.x, y + point.y, z + point.z) == 0)
             {
                 world.setBlock((x + point.x), y + point.y, z + point.z, point.BlockId, point.BlockData, true, false, true);
@@ -136,7 +140,6 @@ public class BO2 extends ConfigFile implements CustomObject
             {
                 world.setBlock((x + point.x), y + point.y, z + point.z, point.BlockId, point.BlockData, true, false, true);
             }
-
         }
         return true;
     }

@@ -53,15 +53,15 @@ public class CustomObjectManager
     public final Map<String, CustomObjectLoader> loaders;
     public final Map<String, CustomObject> globalObjects;
 
-    public CustomObjectManager(Map<String, CustomObjectLoader> loaders, Map<String, CustomObject> specialObjects)
+    public CustomObjectManager()
     {
         // These are the actual lists, not just a copy.
-        this.loaders = loaders;
-        this.globalObjects = specialObjects;
+        this.loaders = new HashMap<String, CustomObjectLoader>();
+        this.globalObjects = new HashMap<String, CustomObject>();
 
         // Register loaders
-        TerrainControl.registerCustomObjectLoader("bo2", new BO2Loader());
-        TerrainControl.registerCustomObjectLoader("bo3", new BO3Loader());
+        registerCustomObjectLoader("bo2", new BO2Loader());
+        registerCustomObjectLoader("bo3", new BO3Loader());
 
         // Put some default CustomObjects
         for (TreeType type : TreeType.values())
@@ -70,12 +70,41 @@ public class CustomObjectManager
         }
         globalObjects.put("useworld", new UseWorld());
         globalObjects.put("usebiome", new UseBiome());
-        
+    }
+
+    public void loadGlobalObjects()
+    {
         // Load all global objects (they can overwrite special objects)
         TerrainControl.getEngine().getGlobalObjectsDirectory().mkdirs();
         Map<String, CustomObject> globalObjects = loadObjects(TerrainControl.getEngine().getGlobalObjectsDirectory());
         TerrainControl.log(globalObjects.size() + " global custom objects loaded.");
         this.globalObjects.putAll(globalObjects);
+    }
+
+    /**
+     * Registers a custom object loader. Register before the config files are
+     * getting loaded, please!
+     * 
+     * @param extension
+     *            The extension of the file. This loader will be responsible for
+     *            all files with this extension.
+     * @param loader
+     *            The loader.
+     */
+    public void registerCustomObjectLoader(String extension, CustomObjectLoader loader)
+    {
+        loaders.put(extension.toLowerCase(), loader);
+    }
+
+    /**
+     * Register a global object.
+     * 
+     * @param object
+     *            The object to register.
+     */
+    public void registerGlobalObject(CustomObject object)
+    {
+        globalObjects.put(object.getName().toLowerCase(), object);
     }
 
     /**
@@ -119,9 +148,10 @@ public class CustomObjectManager
      */
     public CustomObject getCustomObject(String name, WorldConfig config)
     {
-        for(CustomObject object: config.customObjects)
+        for (CustomObject object : config.customObjects)
         {
-            if(object.getName().equalsIgnoreCase(name)) {
+            if (object.getName().equalsIgnoreCase(name))
+            {
                 return object;
             }
         }

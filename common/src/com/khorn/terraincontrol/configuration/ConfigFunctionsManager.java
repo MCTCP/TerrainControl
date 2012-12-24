@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.configuration;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,30 +26,30 @@ public class ConfigFunctionsManager
 {
     private Map<String, Class<? extends ConfigFunction<?>>> configFunctions;
 
-    public ConfigFunctionsManager(Map<String, Class<? extends ConfigFunction<?>>> configFunctions)
+    public ConfigFunctionsManager()
     {
         // Also store in this class
-        this.configFunctions = configFunctions;
+        this.configFunctions = new HashMap<String, Class<? extends ConfigFunction<?>>>();
 
         // Add vanilla resources
-        put("AboveWaterRes", AboveWaterGen.class);
-        put("Cactus", CactusGen.class);
-        put("CustomObject", CustomObjectGen.class);
-        put("Dungeon", DungeonGen.class);
-        put("Grass", GrassGen.class);
-        put("Liquid", LiquidGen.class);
-        put("Ore", OreGen.class);
-        put("Plant", PlantGen.class);
-        put("Reed", ReedGen.class);
-        put("Sapling", SaplingGen.class);
-        put("SmallLake", SmallLakeGen.class);
-        put("Tree", TreeGen.class);
-        put("UndergroundLake", UndergroundLakeGen.class);
-        put("UnderWaterOre", UnderWaterOreGen.class);
-        put("Vines", VinesGen.class);
+        registerConfigFunction("AboveWaterRes", AboveWaterGen.class);
+        registerConfigFunction("Cactus", CactusGen.class);
+        registerConfigFunction("CustomObject", CustomObjectGen.class);
+        registerConfigFunction("Dungeon", DungeonGen.class);
+        registerConfigFunction("Grass", GrassGen.class);
+        registerConfigFunction("Liquid", LiquidGen.class);
+        registerConfigFunction("Ore", OreGen.class);
+        registerConfigFunction("Plant", PlantGen.class);
+        registerConfigFunction("Reed", ReedGen.class);
+        registerConfigFunction("Sapling", SaplingGen.class);
+        registerConfigFunction("SmallLake", SmallLakeGen.class);
+        registerConfigFunction("Tree", TreeGen.class);
+        registerConfigFunction("UndergroundLake", UndergroundLakeGen.class);
+        registerConfigFunction("UnderWaterOre", UnderWaterOreGen.class);
+        registerConfigFunction("Vines", VinesGen.class);
     }
 
-    public void put(String name, Class<? extends ConfigFunction<?>> value)
+    public void registerConfigFunction(String name, Class<? extends ConfigFunction<?>> value)
     {
         configFunctions.put(name.toLowerCase(), value);
     }

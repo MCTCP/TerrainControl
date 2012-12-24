@@ -1,10 +1,9 @@
 package com.khorn.terraincontrol;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
-import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
@@ -23,7 +22,7 @@ public class TerrainControl
      * is capped at. 0 in Minecraft.
      */
     public static int worldDepth = 0;
-    
+
     /**
      * The maximum block id that is supported. 255 on CraftBukkit.
      */
@@ -33,10 +32,7 @@ public class TerrainControl
     private static ConfigFunctionsManager configFunctionsManager;
     private static CustomObjectManager customObjectManager;
 
-    // Used before TerrainControl is initialized
-    private static Map<String, CustomObjectLoader> customObjectLoaders = new HashMap<String, CustomObjectLoader>();
-    private static Map<String, CustomObject> specialCustomObjects;
-    private static Map<String, Class<? extends ConfigFunction<?>>> configFunctions;
+    private static List<EventHandler> eventHandlers = new ArrayList<EventHandler>();
 
     private TerrainControl()
     {
@@ -55,28 +51,21 @@ public class TerrainControl
         {
             throw new UnsupportedOperationException("Engine is already set!");
         }
+        
+        // Start the engine
         TerrainControl.engine = engine;
+        configFunctionsManager = new ConfigFunctionsManager();
+        customObjectManager = new CustomObjectManager();
 
-        // Config functions
-        if (configFunctions == null)
+        // Fire start event
+        for (EventHandler handler : eventHandlers)
         {
-            configFunctions = new HashMap<String, Class<? extends ConfigFunction<?>>>();
+            handler.onStart();
         }
-        
-        configFunctionsManager = new ConfigFunctionsManager(configFunctions);
-        
-        // Custom objects
-        if (customObjectLoaders == null)
-        {
-            customObjectLoaders = new HashMap<String, CustomObjectLoader>();
-        }
-        if (specialCustomObjects == null)
-        {
-            specialCustomObjects = new HashMap<String, CustomObject>();
-        }
-        customObjectManager = new CustomObjectManager(customObjectLoaders, specialCustomObjects);
 
-        
+        // Load global objects after the event has been fired, so that custom
+        // object types are also taken into account
+        customObjectManager.loadGlobalObjects();
     }
 
     /**
@@ -85,17 +74,16 @@ public class TerrainControl
      */
     public static void stopEngine()
     {
-        engine = null;
-        customObjectManager = null;
-        configFunctionsManager = null;
-
-        for(CustomObjectLoader loader: customObjectLoaders.values())
+        // Shutdown all loaders
+        for (CustomObjectLoader loader : customObjectManager.loaders.values())
         {
             loader.onShutdown();
         }
-        customObjectLoaders.clear();
-        specialCustomObjects.clear();
-        configFunctions.clear();
+
+        engine = null;
+        customObjectManager = null;
+        configFunctionsManager = null;
+        eventHandlers.clear();
     }
 
     /**
@@ -189,54 +177,24 @@ public class TerrainControl
         return configFunctionsManager;
     }
 
+    // Events
+    
     /**
-     * Registers a CustomObject loader. Can be called before Terrain Control is
-     * fully loaded.
+     * Register your event handler here. You can do this before TerrainControl
+     * is started.
      * 
-     * @param extension
-     *            The file extension, without a dot.
-     * @param loader
-     *            The loader.
+     * @param handler
      */
-    public static void registerCustomObjectLoader(String extension, CustomObjectLoader loader)
+    public static void registerEventHandler(EventHandler handler)
     {
-        if (customObjectLoaders == null)
-        {
-            customObjectLoaders = new HashMap<String, CustomObjectLoader>();
-        }
-        customObjectLoaders.put(extension.toLowerCase(), loader);
+        eventHandlers.add(handler);
     }
-
-    /**
-     * Registers a special CustomObject, like UseWorld or UseBiome or a tree.
-     * Can be called before Terrain Control is fully loaded.
-     * 
-     * @param extension
-     * @param loader
-     */
-    public static void registerSpecialCustomObject(String name, CustomObject object)
+    
+    public static void fireCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
     {
-        if (specialCustomObjects == null)
+        for(EventHandler handler: eventHandlers)
         {
-            specialCustomObjects = new HashMap<String, CustomObject>();
+            handler.onCustomObjectSpawn(object, world, x, y, z);
         }
-        specialCustomObjects.put(name.toLowerCase(), object);
     }
-
-    /**
-     * Register a new Resource type. Can be called before Terrain Control is
-     * fully loaded.
-     * 
-     * @param name
-     * @param configFunction
-     */
-    public static void registerConfigFunction(String name, Class<? extends ConfigFunction<?>> configFunction)
-    {
-        if (configFunctions == null)
-        {
-            configFunctions = new HashMap<String, Class<? extends ConfigFunction<?>>>();
-        }
-        configFunctions.put(name.toLowerCase(), configFunction);
-    }
-
 }
