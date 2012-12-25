@@ -44,6 +44,8 @@ public interface LocalWorld
      * @return The biome at the given coordinates.
      */
     public LocalBiome getCalculatedBiome(int x, int z);
+    
+    public int getBiomeId(int x, int z);
 
     /**
      * Gets the (stored) biome at the given coordinates.

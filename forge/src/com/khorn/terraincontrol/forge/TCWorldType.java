@@ -9,6 +9,7 @@ import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.chunk.IChunkProvider;
 
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.util.WorldHelper;
 
 public class TCWorldType extends WorldType
 {
@@ -17,7 +18,7 @@ public class TCWorldType extends WorldType
 
     public TCWorldType(TCPlugin plugin, String paramString)
     {
-        super(WorldTypeHelper.getNextWorldTypeID(), paramString);
+        super(WorldHelper.getNextWorldTypeID(), paramString);
         this.plugin = plugin;
     }
 

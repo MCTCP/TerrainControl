@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.util.logging.Level;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.MinecraftForge;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -62,25 +63,28 @@ public class TCPlugin implements TerrainControlEngine
             System.out.println("Could not reflect the Minecraft directory, save location may be unpredicatble.");
             e.printStackTrace();
         }
-        
+
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
         TerrainControl.startEngine(this);
-        
+
         // Register localization
         LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
-        
+
         // Register world type
         worldType = new TCWorldType(this, "TerrainControl");
-        
+
         // Register channel
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
             NetworkRegistry.instance().registerChannel(new PacketHandler(this), TCDefaultValues.ChannelName.stringValue());
         }
-        
+
         // Register player tracker
         GameRegistry.registerPlayerTracker(new PlayerTracker(this));
+
+        // Register sapling tracker
+        MinecraftForge.TERRAIN_GEN_BUS.register(new SaplingListener());
     }
 
     @PostInit

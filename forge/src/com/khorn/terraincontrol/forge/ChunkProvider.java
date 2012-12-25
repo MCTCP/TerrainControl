@@ -65,7 +65,8 @@ public class ChunkProvider implements IChunkProvider
                         int sectionId = blockY >> 4;
                         if (sections[sectionId] == null)
                         {
-                            sections[sectionId] = new ExtendedBlockStorage(sectionId << 4, true); // Second argument is skylight
+                            // Second argument is skylight
+                            sections[sectionId] = new ExtendedBlockStorage(sectionId << 4, !chunk.worldObj.provider.hasNoSky); 
                         }
                         sections[sectionId].setExtBlockID(blockX, blockY & 0xF, blockZ, block);
                     }
@@ -145,8 +146,9 @@ public class ChunkProvider implements IChunkProvider
         return 0;
     }
 
-	@Override
-	public void recreateStructures(int chunkX, int chunkZ) {
-		// TODO What should this do?
-	}
+    @Override
+    public void recreateStructures(int chunkX, int chunkZ)
+    {
+        // TODO What should this do?
+    }
 }

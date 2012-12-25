@@ -315,7 +315,7 @@ public class SingleWorld implements LocalWorld
                 {
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF ];
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
 
                         if (biomeConfig.ReplaceCount > 0)
                         {
@@ -438,14 +438,14 @@ public class SingleWorld implements LocalWorld
 
         return chunk.getBlockID(x, y, z);
     }
-    
+
     @Override
     public byte getTypeData(int x, int y, int z)
     {
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
             return 0;
-        
+
         z = z & 0xF;
         x = x & 0xF;
 
@@ -460,34 +460,24 @@ public class SingleWorld implements LocalWorld
         // this.world.setRawTypeIdAndData(i, j, k, l, i1)
         // this.world.setTypeIdAndData(i, j, k, l, i1)
 
-        // We fetch the chunk from a custom cache in order to speed things up.
-        Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null)
-        {
-            return;
-        }
-
         if (applyPhysics)
         {
-            int oldTypeId = chunk.getBlockID(x & 15, y, z & 15);
-            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
-            this.world.notifyBlocksOfNeighborChange(x, y, z, typeId == 0 ? oldTypeId : typeId);
+            world.setBlockAndMetadataWithNotify(x, y, z, typeId, data);
         } else
-            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data); // Set
-                                                                           // typeId
-                                                                           // and
-                                                                           // Data
+        {
+            world.setBlockAndMetadata(x, y, z, typeId, data);
+        }
 
         if (updateLight)
         {
-            this.world.updateAllLightTypes(x, y, z);
+            world.updateAllLightTypes(x, y, z);
         }
-
-        if (notifyPlayers)
-        {
-            // this.world.notifyPlayers(x, y, z) // TODO find method to notify
-            // players
-        }
+        //
+        // if (notifyPlayers)
+        // {
+        // // this.world.notifyPlayers(x, y, z) // TODO find method to notify
+        // // players
+        // }
     }
 
     @Override
@@ -505,7 +495,8 @@ public class SingleWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
         int y = chunk.getHeightValue(x, z);
-        while(chunk.getBlockID(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight) {
+        while (chunk.getBlockID(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight)
+        {
             // Fix for incorrect lightmap
             y += 1;
         }
@@ -662,6 +653,12 @@ public class SingleWorld implements LocalWorld
     public LocalBiome getCalculatedBiome(int x, int z)
     {
         return getBiomeById(this.getCalculatedBiomeId(x, z));
+    }
+
+    @Override
+    public int getBiomeId(int x, int z)
+    {
+        return world.getBiomeGenForCoords(x, z).biomeID;
     }
 
     @Override

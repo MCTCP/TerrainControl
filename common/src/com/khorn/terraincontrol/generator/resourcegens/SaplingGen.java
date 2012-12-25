@@ -79,7 +79,7 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
         {
             if (random.nextInt(100) < treeChances.get(treeNumber))
             {
-                if (trees.get(treeNumber).spawnAsTree(world, random, x, z))
+                if (trees.get(treeNumber).spawnAsTree(world, random, x, y, z))
                 {
                     // Success!
                     return true;

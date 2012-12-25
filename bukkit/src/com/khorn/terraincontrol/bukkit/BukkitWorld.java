@@ -630,6 +630,12 @@ public class BukkitWorld implements LocalWorld
     {
         return getBiomeById(getCalculatedBiomeId(x, z));
     }
+    
+    @Override
+    public int getBiomeId(int x, int z)
+    {
+        return world.getBiome(x, z).id;
+    }
 
     @Override
     public LocalBiome getBiome(int x, int z)

@@ -13,6 +13,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.util.WorldHelper;
 
 import cpw.mods.fml.common.IPlayerTracker;
 
@@ -34,8 +35,7 @@ public class PlayerTracker implements IPlayerTracker
         // so for now the configs are sent anyway.
 
         // Get the config
-        String worldName = MinecraftServer.getServer().worldServers[0].getSaveHandler().getSaveDirectoryName();
-        LocalWorld worldTC = TerrainControl.getWorld(worldName);
+        LocalWorld worldTC = WorldHelper.toLocalWorld(player.worldObj);
 
         if (worldTC == null)
         {
