@@ -605,18 +605,4 @@ public abstract class ConfigFile
 
 
     }
-
-    protected String ReadComplexValue(String startWith)
-    {
-        String settingValue = "";
-
-        for (String value : this.SettingsCache.keySet())
-            if (value.startsWith(startWith) && value.contains(":"))
-            {
-                settingValue = value.split(":", 2)[1].trim();
-                break;
-            }
-        return settingValue;
-
-    }
 }

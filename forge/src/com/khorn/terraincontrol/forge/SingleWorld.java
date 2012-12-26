@@ -349,7 +349,7 @@ public class SingleWorld implements LocalWorld
             byte[] ChunkBiomes = this.chunkCache[0].getBiomeArray();
 
             for (int i = 0; i < ChunkBiomes.length; i++)
-                ChunkBiomes[i] = this.settings.ReplaceMatrixBiomes[ChunkBiomes[i]];
+                ChunkBiomes[i] = (byte) (this.settings.ReplaceMatrixBiomes[ChunkBiomes[i] & 0xFF] & 0xFF);
         }
 
     }

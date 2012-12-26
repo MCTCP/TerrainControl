@@ -332,7 +332,7 @@ public class BukkitWorld implements LocalWorld
             byte[] ChunkBiomes = this.chunkCache[0].m();
 
             for (int i = 0; i < ChunkBiomes.length; i++)
-                ChunkBiomes[i] = ((byte)this.settings.ReplaceMatrixBiomes[ChunkBiomes[i] & 0xFF] & 0xFF);
+                ChunkBiomes[i] = (byte) (this.settings.ReplaceMatrixBiomes[ChunkBiomes[i] & 0xFF] & 0xFF);
         }
 
     }
