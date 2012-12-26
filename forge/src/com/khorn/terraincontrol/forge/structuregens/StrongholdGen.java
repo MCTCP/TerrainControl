@@ -1,25 +1,20 @@
 package com.khorn.terraincontrol.forge.structuregens;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Map.Entry;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.Biome;
-
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.structure.ComponentStrongholdStairs2;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
+
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.Biome;
 
 public class StrongholdGen extends MapGenStructure
 {
@@ -50,6 +45,7 @@ public class StrongholdGen extends MapGenStructure
         }
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected boolean canSpawnStructureAtCoords(int par1, int par2)
     {
         if (!this.ranBiomeCheck)

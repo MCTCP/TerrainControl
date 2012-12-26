@@ -19,7 +19,6 @@ import net.minecraft.server.v1_4_6.WorldGenLargeFeature;
 import net.minecraft.server.v1_4_6.WorldGenMegaTree;
 import net.minecraft.server.v1_4_6.WorldGenMineshaft;
 import net.minecraft.server.v1_4_6.WorldGenNether;
-import net.minecraft.server.v1_4_6.WorldGenStronghold;
 import net.minecraft.server.v1_4_6.WorldGenSwampTree;
 import net.minecraft.server.v1_4_6.WorldGenTaiga1;
 import net.minecraft.server.v1_4_6.WorldGenTaiga2;
@@ -31,6 +30,7 @@ import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.IBiomeManager;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.bukkit.structuregens.StrongholdGen;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
@@ -54,7 +54,7 @@ public class BukkitWorld implements LocalWorld
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
     private static ArrayList<LocalBiome> defaultBiomes = new ArrayList<LocalBiome>();
 
-    private WorldGenStronghold strongholdGen;
+    private StrongholdGen strongholdGen;
     private WorldGenVillage villageGen;
     private WorldGenMineshaft mineshaftGen;
     private WorldGenLargeFeature pyramidsGen;
@@ -205,7 +205,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry)
     {
-        if (this.settings.StrongholdsEnabled)
+        if (this.settings.strongholdsEnabled)
             this.strongholdGen.a(null, this.world, x, z, chunkArray);
 
         if (this.settings.MineshaftsEnabled)
@@ -260,7 +260,7 @@ public class BukkitWorld implements LocalWorld
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
     {
         boolean Village = false;
-        if (this.settings.StrongholdsEnabled)
+        if (this.settings.strongholdsEnabled)
             this.strongholdGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.MineshaftsEnabled)
             this.mineshaftGen.a(this.world, rand, chunk_x, chunk_z);
@@ -578,7 +578,7 @@ public class BukkitWorld implements LocalWorld
 
             case Normal:
             case OldGenerator:
-                this.strongholdGen = new WorldGenStronghold();
+                this.strongholdGen = new StrongholdGen(settings);
                 this.villageGen = new WorldGenVillage();
                 this.mineshaftGen = new WorldGenMineshaft();
                 this.pyramidsGen = new WorldGenLargeFeature();

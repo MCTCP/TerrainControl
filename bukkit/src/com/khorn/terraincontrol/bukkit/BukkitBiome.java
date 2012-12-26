@@ -70,6 +70,11 @@ public class BukkitBiome implements LocalBiome
     {
         customID = id;
     }
+    
+    public BiomeBase getHandle()
+    {
+        return biomeBase;
+    }
 
     public void setVisuals(BiomeConfig config)
     {
