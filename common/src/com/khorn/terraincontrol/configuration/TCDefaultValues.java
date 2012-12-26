@@ -68,6 +68,10 @@ public enum TCDefaultValues implements TCSetting
     WorldNightFog("0x0B0D17", SettingsType.Color),
 
     StrongholdsEnabled(true),
+    StrongholdCount(3),
+    StrongholdDistance(32.0),
+    StrongholdSpread(3),
+    
     MineshaftsEnabled(true),
     VillagesEnabled(true),
     PyramidsEnabled(true),

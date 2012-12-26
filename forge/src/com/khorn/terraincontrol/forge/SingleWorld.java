@@ -35,6 +35,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.structuregens.StrongholdGen;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
@@ -57,7 +58,7 @@ public class SingleWorld implements LocalWorld
 
     private static ArrayList<LocalBiome> defaultBiomes = new ArrayList<LocalBiome>();
 
-    public MapGenStronghold strongholdGen;
+    public StrongholdGen strongholdGen;
     private MapGenVillage villageGen;
     private MapGenMineshaft mineshaftGen;
     private MapGenScatteredFeature pyramidsGen;
@@ -99,8 +100,6 @@ public class SingleWorld implements LocalWorld
         }
         nextBiomeId = 0;
         defaultBiomes.clear();
-        MapGenVillage.villageSpawnBiomes = Arrays.asList(BiomeGenBase.plains, BiomeGenBase.desert);
-
     }
 
     public SingleWorld(String _name)
@@ -118,8 +117,6 @@ public class SingleWorld implements LocalWorld
             defaultBiomes.add(biome);
             this.biomeNames.put(biome.getName(), biome);
         }
-        MapGenVillage.villageSpawnBiomes = Arrays.asList(BiomeGenBase.biomeList[DefaultBiome.PLAINS.Id], BiomeGenBase.biomeList[DefaultBiome.DESERT.Id]);
-
     }
 
     @Override
@@ -220,7 +217,7 @@ public class SingleWorld implements LocalWorld
     @Override
     public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry)
     {
-        if (this.settings.StrongholdsEnabled)
+        if (this.settings.strongholdsEnabled)
             this.strongholdGen.generate(null, this.world, x, z, chunkArray);
 
         if (this.settings.MineshaftsEnabled)
@@ -277,7 +274,7 @@ public class SingleWorld implements LocalWorld
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
     {
         boolean isVillagePlaced = false;
-        if (this.settings.StrongholdsEnabled)
+        if (this.settings.strongholdsEnabled)
             this.strongholdGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
         if (this.settings.MineshaftsEnabled)
             this.mineshaftGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
@@ -592,7 +589,7 @@ public class SingleWorld implements LocalWorld
         // this.world.e = this.settings.waterLevelMax;
 
         this.dungeonGen = new WorldGenDungeons();
-        this.strongholdGen = new MapGenStronghold();
+        this.strongholdGen = new StrongholdGen(config);
 
         this.villageGen = new MapGenVillage();
         this.mineshaftGen = new MapGenMineshaft();

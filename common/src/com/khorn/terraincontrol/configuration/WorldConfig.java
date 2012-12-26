@@ -105,6 +105,12 @@ public class WorldConfig extends ConfigFile
     public int canyonMaxLength;
     public double canyonDepth;
 
+    // Strongholds
+    public boolean strongholdsEnabled;
+    public double strongholdDistance;
+    public int strongholdCount;
+    public int strongholdSpread;
+
     //Terrain
     public boolean oldTerrainGenerator;
 
@@ -124,13 +130,10 @@ public class WorldConfig extends ConfigFile
 
     public boolean removeSurfaceStone;
 
-    //public boolean customObjects;
     public int objectSpawnRatio;
-    //public boolean denyObjectsUnderFill;
-    //public int customTreeChance;
     public File CustomObjectsDirectory;
 
-    public boolean StrongholdsEnabled;
+    // Structures
     public boolean MineshaftsEnabled;
     public boolean VillagesEnabled;
     public boolean PyramidsEnabled;
@@ -446,7 +449,11 @@ public class WorldConfig extends ConfigFile
         this.WorldNightFogG = ((WorldNightFog & 0xFF00) >> 8) / 255F;
         this.WorldNightFogB = (WorldNightFog & 0xFF) / 255F;
 
-        this.StrongholdsEnabled = ReadSettings(TCDefaultValues.StrongholdsEnabled);
+        this.strongholdsEnabled = ReadSettings(TCDefaultValues.StrongholdsEnabled);
+        this.strongholdCount = ReadSettings(TCDefaultValues.StrongholdCount);
+        this.strongholdDistance = ReadSettings(TCDefaultValues.StrongholdDistance);
+        this.strongholdSpread = ReadSettings(TCDefaultValues.StrongholdSpread);
+        
         this.VillagesEnabled = ReadSettings(TCDefaultValues.VillagesEnabled);
         this.MineshaftsEnabled = ReadSettings(TCDefaultValues.MineshaftsEnabled);
         this.PyramidsEnabled = ReadSettings(TCDefaultValues.PyramidsEnabled);
@@ -695,11 +702,17 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
 
         WriteTitle("Map objects");
-        WriteValue(TCDefaultValues.StrongholdsEnabled.name(), this.StrongholdsEnabled);
         WriteValue(TCDefaultValues.VillagesEnabled.name(), this.VillagesEnabled);
         WriteValue(TCDefaultValues.MineshaftsEnabled.name(), this.MineshaftsEnabled);
         WriteValue(TCDefaultValues.PyramidsEnabled.name(), this.PyramidsEnabled);
         WriteValue(TCDefaultValues.NetherFortressEnabled.name(), this.NetherFortress);
+        
+        WriteTitle("Strongholds");
+        WriteComment("Not much is known about these settings. They are directly passed to the stronghold generator.");
+        WriteValue(TCDefaultValues.StrongholdsEnabled.name(), this.strongholdsEnabled);
+        WriteValue(TCDefaultValues.StrongholdCount.name(), this.strongholdCount);
+        WriteValue(TCDefaultValues.StrongholdDistance.name(), this.strongholdDistance);
+        WriteValue(TCDefaultValues.StrongholdSpread.name(), this.strongholdSpread);
 
         this.WriteTitle("World visual settings");
         this.WriteComment("Warning this section will work only for clients with single version of TerrainControl");
@@ -714,24 +727,11 @@ public class WorldConfig extends ConfigFile
 
         this.WriteTitle("BOB Objects Variables");
 
-        /*WriteNewLine();
-        WriteComment("Enable/disable custom objects");
-        this.WriteValue(TCDefaultValues.CustomObjects.name(), this.customObjects);
-        */
         WriteNewLine();
         WriteComment("Terrain Control tries <objectSpawnRatio> times to spawn a BO2.");
         WriteComment("A high value makes BO2s with a low rarity spawn more.");
         WriteComment("Doesn't affect BO3s. It also doesn't affect growing saplings anymore.");
         this.WriteValue(TCDefaultValues.objectSpawnRatio.name(), this.objectSpawnRatio);
-        
-        /*
-        WriteNewLine();
-        WriteComment("Deny custom objects underFill even it enabled in objects ");
-        this.WriteValue(TCDefaultValues.DenyObjectsUnderFill.name(), this.denyObjectsUnderFill);
-        WriteNewLine();
-        WriteComment("Chance to grow custom instead normal tree from sapling .");
-        this.WriteValue(TCDefaultValues.customTreeChance.name(), this.customTreeChance);
-        */
 
 
         WriteTitle("Cave Variables");

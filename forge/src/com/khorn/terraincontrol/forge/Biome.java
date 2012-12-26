@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
+import net.minecraft.world.biome.BiomeGenBase;
+
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 
@@ -30,6 +32,11 @@ public class Biome implements LocalBiome
     public String getName()
     {
         return biomeBase.biomeName;
+    }
+    
+    public BiomeGenBase getHandle()
+    {
+        return biomeBase;
     }
 
     public int getId()

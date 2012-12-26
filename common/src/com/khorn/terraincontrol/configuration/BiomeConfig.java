@@ -96,6 +96,8 @@ public class BiomeConfig extends ConfigFile
     private double volatilityWeightRaw2;
     public boolean disableNotchHeightControl;
     public double[] heightMatrix;
+    
+    public boolean strongholdsEnabled;
 
     public int ResourceCount = 0;
 
@@ -390,6 +392,8 @@ public class BiomeConfig extends ConfigFile
         this.disableNotchHeightControl = ReadSettings(TCDefaultValues.DisableBiomeHeight);
         this.maxAverageHeight = ReadSettings(TCDefaultValues.MaxAverageHeight);
         this.maxAverageDepth = ReadSettings(TCDefaultValues.MaxAverageDepth);
+        
+        this.strongholdsEnabled = ReadModSettings(TCDefaultValues.StrongholdsEnabled.name(), this.DefaultStrongholds);
 
         if (DefaultBiome.getBiome(this.Biome.getId()) == null)
         {
@@ -770,6 +774,11 @@ public class BiomeConfig extends ConfigFile
         this.WriteTitle("Custom objects");
         this.WriteComment("These objects will spawn when using the UseBiome keyword.");
         this.WriteCustomObjects();
+        
+        this.WriteTitle("Structures");
+        this.WriteComment("Here you can enable or disable the stuctures.");
+        this.WriteComment("If you disable the structure in the WorldConfig, it won't spawn, regardless of this setting.");
+        this.WriteValue("StrongholdsEnabled", strongholdsEnabled);
 
         if (DefaultBiome.getBiome(this.Biome.getId()) != null)
         {
@@ -1080,6 +1089,7 @@ public class BiomeConfig extends ConfigFile
     private String DefaultWaterColorMultiplier = "0xFFFFFF";
     private String DefaultGrassColor = "0xFFFFFF";
     private String DefaultFoliageColor = "0xFFFFFF";
+    private boolean DefaultStrongholds = true;
 
     private void InitDefaults()
     {
@@ -1092,19 +1102,18 @@ public class BiomeConfig extends ConfigFile
 
         switch (this.Biome.getId())
         {
-        case 0:
+        case 0: // Ocean
             this.DefaultColor = "0x3333FF";
+            this.DefaultStrongholds = false;
             break;
-        case 1:
-        {
+        case 1: // Plains
             this.DefaultTrees = 0;
             this.DefaultFlowers = 4;
             this.DefaultGrass = 20;
             this.DefaultColor = "0x999900";
+            this.DefaultStrongholds = false;
             break;
-        }
-        case 2:
-        {
+        case 2: // Desert
             this.DefaultTrees = 0;
             this.DefaultDeadBrush = 4;
             this.DefaultGrass = 0;
@@ -1112,26 +1121,20 @@ public class BiomeConfig extends ConfigFile
             this.DefaultCactus = 10;
             this.DefaultColor = "0xFFCC33";
             break;
-        }
-        case 3:
+        case 3: // Extreme hills
             this.DefaultColor = "0x333300";
             break;
-        case 4:
-        {
+        case 4: // Forest
             this.DefaultTrees = 10;
             this.DefaultGrass = 15;
             this.DefaultColor = "0x00FF00";
             break;
-        }
-        case 5:
-        {
+        case 5: // Taiga
             this.DefaultTrees = 10;
             this.DefaultGrass = 10;
             this.DefaultColor = "0x007700";
             break;
-        }
-        case 6:
-        {
+        case 6: // Swampland
             this.DefaultTrees = 2;
             this.DefaultFlowers = -999;
             this.DefaultDeadBrush = 1;
@@ -1144,30 +1147,30 @@ public class BiomeConfig extends ConfigFile
             this.DefaultGrassColor = "0x7E6E7E";
             this.DefaultFoliageColor = "0x7E6E7E";
             break;
-        }
-        case 7:
+        case 7: // River
             this.DefaultSize = 8;
             this.DefaultRarity = 95;
             this.DefaultIsle.add(DefaultBiome.SWAMPLAND.Name);
             this.DefaultColor = "0x00CCCC";
-        case 8:
-        case 9:
-
+            this.DefaultStrongholds = false;
+        case 8: // Hell
+        case 9: // Sky
             break;
-        case 10:
+        case 10: // FrozenOcean
             this.DefaultColor = "0xFFFFFF";
+            this.DefaultStrongholds = false;
             break;
-        case 11:
+        case 11: // FrozenRiver
             this.DefaultColor = "0x66FFFF";
+            this.DefaultStrongholds = false;
             break;
-        case 12:
+        case 12: // Ice Plains
             this.DefaultColor = "0xCCCCCC";
             break;
-        case 13:
+        case 13: // Ice Mountains
             this.DefaultColor = "0xCC9966";
             break;
-        case 14:
-        {
+        case 14: // MushroomIsland
             this.DefaultSurfaceBlock = (byte) DefaultMaterial.MYCEL.id;
             this.DefaultMushroom = 1;
             this.DefaultGrass = 0;
@@ -1179,17 +1182,16 @@ public class BiomeConfig extends ConfigFile
             this.DefaultIsle.add(DefaultBiome.OCEAN.Name);
             this.DefaultColor = "0xFF33CC";
             this.DefaultWaterLily = 1;
+            this.DefaultStrongholds = false;
             break;
-        }
-        case 15:
-        {
+        case 15: // MushroomIslandShore
             this.DefaultRiver = false;
             this.DefaultSize = 9;
             this.DefaultBorder.add(DefaultBiome.MUSHROOM_ISLAND.Name);
             this.DefaultColor = "0xFF9999";
+            this.DefaultStrongholds = false;
             break;
-        }
-        case 16:
+        case 16: // Beach
             this.DefaultTrees = 0;
             this.DefaultSize = 8;
             this.DefaultBorder.add(DefaultBiome.OCEAN.Name);
@@ -1198,8 +1200,9 @@ public class BiomeConfig extends ConfigFile
             this.DefaultNotBorderNear.add(DefaultBiome.EXTREME_HILLS.Name);
             this.DefaultNotBorderNear.add(DefaultBiome.MUSHROOM_ISLAND.Name);
             this.DefaultColor = "0xFFFF00";
+            this.DefaultStrongholds = false;
             break;
-        case 17:
+        case 17: // DesertHills
             this.DefaultSize = 6;
             this.DefaultRarity = 97;
             this.DefaultIsle.add(DefaultBiome.DESERT.Name);
@@ -1210,7 +1213,7 @@ public class BiomeConfig extends ConfigFile
             this.DefaultCactus = 10;
             this.DefaultColor = "0x996600";
             break;
-        case 18:
+        case 18: // ForestHills
             this.DefaultSize = 6;
             this.DefaultRarity = 97;
             this.DefaultIsle.add(DefaultBiome.FOREST.Name);
@@ -1218,7 +1221,7 @@ public class BiomeConfig extends ConfigFile
             this.DefaultGrass = 15;
             this.DefaultColor = "0x009900";
             break;
-        case 19:
+        case 19: // TaigaHills
             this.DefaultSize = 6;
             this.DefaultRarity = 97;
             this.DefaultIsle.add(DefaultBiome.TAIGA.Name);
@@ -1226,18 +1229,18 @@ public class BiomeConfig extends ConfigFile
             this.DefaultGrass = 10;
             this.DefaultColor = "0x003300";
             break;
-        case 20:
+        case 20: // Extreme Hills Edge
             this.DefaultSize = 8;
             this.DefaultBorder.add(DefaultBiome.EXTREME_HILLS.Name);
             this.DefaultColor = "0x666600";
             break;
-        case 21:
+        case 21: // Jungle
             this.DefaultTrees = 50;
             this.DefaultGrass = 25;
             this.DefaultFlowers = 4;
             this.DefaultColor = "0xCC6600";
             break;
-        case 22:
+        case 22: // JungleHills
             this.DefaultTrees = 50;
             this.DefaultGrass = 25;
             this.DefaultFlowers = 4;
