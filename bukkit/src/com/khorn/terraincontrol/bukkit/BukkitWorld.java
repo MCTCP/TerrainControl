@@ -207,11 +207,9 @@ public class BukkitWorld implements LocalWorld
     {
         if (this.settings.strongholdsEnabled)
             this.strongholdGen.a(null, this.world, x, z, chunkArray);
-
-        if (this.settings.MineshaftsEnabled)
+        if (this.settings.mineshaftsEnabled)
             this.mineshaftGen.a(null, this.world, x, z, chunkArray);
-
-        if (this.settings.VillagesEnabled && dry)
+        if (this.settings.villagesEnabled && dry)
             this.villageGen.a(null, this.world, x, z, chunkArray);
         if (this.settings.PyramidsEnabled)
             this.pyramidsGen.a(null, this.world, x, z, chunkArray);
@@ -262,9 +260,9 @@ public class BukkitWorld implements LocalWorld
         boolean Village = false;
         if (this.settings.strongholdsEnabled)
             this.strongholdGen.a(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.MineshaftsEnabled)
+        if (this.settings.mineshaftsEnabled)
             this.mineshaftGen.a(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.VillagesEnabled)
+        if (this.settings.villagesEnabled)
             Village = this.villageGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.PyramidsEnabled)
             this.pyramidsGen.a(this.world, rand, chunk_x, chunk_z);

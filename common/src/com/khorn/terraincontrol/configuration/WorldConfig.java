@@ -28,8 +28,11 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> IsleBiomes = new ArrayList<String>();
     public ArrayList<String> BorderBiomes = new ArrayList<String>();
 
+    // TODO: why two lists?
+    /** List of all BiomeConfigs */
     public ArrayList<BiomeConfig> biomes = new ArrayList<BiomeConfig>();
-
+    /** The BiomeConfigs mapped by their id */
+    public BiomeConfig[] biomeConfigs;
 
     public byte[] ReplaceMatrixBiomes = new byte[256];
     public boolean HaveBiomeReplace = false;
@@ -110,6 +113,11 @@ public class WorldConfig extends ConfigFile
     public double strongholdDistance;
     public int strongholdCount;
     public int strongholdSpread;
+    
+    // Villages
+    public boolean villagesEnabled;
+    public int villageSize;
+    public int villageDistance; // Has a minimum of 9
 
     //Terrain
     public boolean oldTerrainGenerator;
@@ -134,8 +142,8 @@ public class WorldConfig extends ConfigFile
     public File CustomObjectsDirectory;
 
     // Structures
-    public boolean MineshaftsEnabled;
-    public boolean VillagesEnabled;
+    public boolean mineshaftsEnabled;
+    
     public boolean PyramidsEnabled;
     public boolean NetherFortress;
 
@@ -149,7 +157,7 @@ public class WorldConfig extends ConfigFile
     public TerrainMode ModeTerrain;
     public BiomeMode ModeBiome;
 
-    public BiomeConfig[] biomeConfigs;
+    
     public boolean BiomeConfigsHaveReplacement = false;
 
     public int normalBiomesRarity;
@@ -337,7 +345,7 @@ public class WorldConfig extends ConfigFile
             File mapFile = new File(SettingsDir, imageFile);
             if (!mapFile.exists())
             {
-                System.out.println("TerrainControl: Biome map file not found. Switching BiomeMode to Normal");
+                TerrainControl.log("Biome map file not found. Switching BiomeMode to Normal");
                 this.ModeBiome = BiomeMode.Normal;
             }
         }
@@ -373,12 +381,12 @@ public class WorldConfig extends ConfigFile
 
         this.waterLevelMin = applyBounds(this.waterLevelMin, 0, WorldHeight - 1);
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, WorldHeight - 1, this.waterLevelMin);
-
-        //this.customTreeChance = CheckValue(this.customTreeChance, 0, 100);
+        
+        this.villageDistance = applyBounds(this.villageDistance, 9, Integer.MAX_VALUE);
 
         if (this.ModeBiome == BiomeMode.OldGenerator && this.ModeTerrain != TerrainMode.OldGenerator)
         {
-            System.out.println("TerrainControl: Old biome generator works only with old terrain generator!");
+            TerrainControl.log("Old biome generator works only with old terrain generator!");
             this.ModeBiome = BiomeMode.Normal;
 
         }
@@ -454,8 +462,11 @@ public class WorldConfig extends ConfigFile
         this.strongholdDistance = ReadSettings(TCDefaultValues.StrongholdDistance);
         this.strongholdSpread = ReadSettings(TCDefaultValues.StrongholdSpread);
         
-        this.VillagesEnabled = ReadSettings(TCDefaultValues.VillagesEnabled);
-        this.MineshaftsEnabled = ReadSettings(TCDefaultValues.MineshaftsEnabled);
+        this.villagesEnabled = ReadSettings(TCDefaultValues.VillagesEnabled);
+        this.villageDistance = ReadSettings(TCDefaultValues.VillageDistance);
+        this.villageSize = ReadSettings(TCDefaultValues.VillageSize);
+        
+        this.mineshaftsEnabled = ReadSettings(TCDefaultValues.MineshaftsEnabled);
         this.PyramidsEnabled = ReadSettings(TCDefaultValues.PyramidsEnabled);
         this.NetherFortress = ReadSettings(TCDefaultValues.NetherFortressEnabled);
 
@@ -496,12 +507,6 @@ public class WorldConfig extends ConfigFile
 
 
         this.objectSpawnRatio = this.ReadSettings(TCDefaultValues.objectSpawnRatio);
-
-        /*this.customObjects = this.ReadSettings(TCDefaultValues.CustomObjects.name(), TCDefaultValues.CustomObjects.booleanValue());
-
-        this.denyObjectsUnderFill = this.ReadSettings(TCDefaultValues.DenyObjectsUnderFill.name(), TCDefaultValues.DenyObjectsUnderFill.booleanValue());
-        this.customTreeChance = this.ReadSettings(TCDefaultValues.customTreeChance.name(), TCDefaultValues.customTreeChance.intValue());
-        */
     }
 
     private void ReadCustomBiomes()
@@ -618,7 +623,7 @@ public class WorldConfig extends ConfigFile
         WriteNewLine();     // TODO Write correct help
         WriteComment("List of ALL custom biomes.");
         WriteComment("Example: ");
-        WriteComment("  CustomBiomes:TestBiome1, BiomeTest2");
+        WriteComment("  CustomBiomes:TestBiome1,BiomeTest2");
         WriteComment("This will add two biomes and generate biome config files");
         WriteComment("Any changes here need server restart.");
         /*
@@ -702,17 +707,29 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
 
         WriteTitle("Map objects");
-        WriteValue(TCDefaultValues.VillagesEnabled.name(), this.VillagesEnabled);
-        WriteValue(TCDefaultValues.MineshaftsEnabled.name(), this.MineshaftsEnabled);
+        WriteValue(TCDefaultValues.MineshaftsEnabled.name(), this.mineshaftsEnabled);
         WriteValue(TCDefaultValues.PyramidsEnabled.name(), this.PyramidsEnabled);
         WriteValue(TCDefaultValues.NetherFortressEnabled.name(), this.NetherFortress);
         
         WriteTitle("Strongholds");
         WriteComment("Not much is known about these settings. They are directly passed to the stronghold generator.");
         WriteValue(TCDefaultValues.StrongholdsEnabled.name(), this.strongholdsEnabled);
+        WriteNewLine();
         WriteValue(TCDefaultValues.StrongholdCount.name(), this.strongholdCount);
+        WriteNewLine();
         WriteValue(TCDefaultValues.StrongholdDistance.name(), this.strongholdDistance);
+        WriteNewLine();
         WriteValue(TCDefaultValues.StrongholdSpread.name(), this.strongholdSpread);
+        
+        WriteTitle("Villages");
+        WriteComment("Whether the villages are enabled or not. Overrides the setting in the BiomeConfigs.");
+        WriteValue(TCDefaultValues.VillagesEnabled.name(), this.villagesEnabled);
+        WriteNewLine();
+        WriteComment("The size of the village. Larger is bigger. Normal worlds have 0 as default, superflat worlds 1.");
+        WriteValue(TCDefaultValues.VillageSize.name(), this.villageSize);
+        WriteNewLine();
+        WriteComment("The minimum distance between the villages in chunks. Minimum value is 9.");
+        WriteValue(TCDefaultValues.VillageDistance.name(), this.villageDistance);
 
         this.WriteTitle("World visual settings");
         this.WriteComment("Warning this section will work only for clients with single version of TerrainControl");
@@ -800,80 +817,6 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.CustomBiomes.name(), output);
 
     }
-
-    /*private void RegisterBOBPlugins(LocalWorld world)
-    {
-        if (this.customObjects)
-        {
-            try
-            {
-                File BOBFolder = new File(SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
-                if (!BOBFolder.exists())
-                {
-                    if (!BOBFolder.mkdir())
-                    {
-                        System.out.println("BOB Plugin system encountered an error, aborting!");
-                        return;
-                    }
-                }
-                String[] BOBFolderArray = BOBFolder.list();
-                int i = 0;
-                while (i < BOBFolderArray.length)
-                {
-                    File BOBFile = new File(BOBFolder, BOBFolderArray[i]);
-                    if ((BOBFile.getName().endsWith(".bo2")) || (BOBFile.getName().endsWith(".BO2")))
-                    {
-                        CustomObject WorkingCustomObject = new CustomObject(BOBFile, world);
-                        if (WorkingCustomObject.IsValid)
-                        {
-
-                            if (!WorkingCustomObject.groupId.equals(""))
-                            {
-                                if (WorkingCustomObject.branch)
-                                {
-                                    if (BranchGroups.containsKey(WorkingCustomObject.groupId))
-                                        BranchGroups.get(WorkingCustomObject.groupId).add(WorkingCustomObject);
-                                    else
-                                    {
-                                        ArrayList<CustomObject> groupList = new ArrayList<CustomObject>();
-                                        groupList.add(WorkingCustomObject);
-                                        BranchGroups.put(WorkingCustomObject.groupId, groupList);
-                                    }
-
-                                } else
-                                {
-                                    if (ObjectGroups.containsKey(WorkingCustomObject.groupId))
-                                        ObjectGroups.get(WorkingCustomObject.groupId).add(WorkingCustomObject);
-                                    else
-                                    {
-                                        ArrayList<CustomObject> groupList = new ArrayList<CustomObject>();
-                                        groupList.add(WorkingCustomObject);
-                                        ObjectGroups.put(WorkingCustomObject.groupId, groupList);
-                                    }
-                                }
-
-                            }
-
-                            this.Objects.add(WorkingCustomObject);
-
-                            System.out.println("BOB Plugin Registered: " + BOBFile.getName());
-
-                        }
-                    }
-                    i++;
-                }
-            } catch (Exception e)
-            {
-                System.out.println("BOB Plugin system encountered an error, aborting!");
-            }
-
-            for (CustomObject Object : this.Objects)
-            {
-                if (Object.tree)
-                    this.HasCustomTrees = true;
-            }
-        }
-    } */
 
     public double getFractureHorizontal()
     {

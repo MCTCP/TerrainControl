@@ -66,16 +66,23 @@ public enum TCDefaultValues implements TCSetting
 
     WorldFog("0xC0D8FF", SettingsType.Color),
     WorldNightFog("0x0B0D17", SettingsType.Color),
-
+    
+    
+    PyramidsEnabled(true),
+    NetherFortressEnabled(false),
+    
     StrongholdsEnabled(true),
     StrongholdCount(3),
     StrongholdDistance(32.0),
     StrongholdSpread(3),
     
-    MineshaftsEnabled(true),
     VillagesEnabled(true),
-    PyramidsEnabled(true),
-    NetherFortressEnabled(false),
+    VillageDistance(32),
+    VillageSize(0),
+    VillageType(BiomeConfig.VillageType.disabled),
+    
+    MineshaftsEnabled(true),
+    MineshaftRarity(1D),
 
     caveRarity(7),
     caveFrequency(40),

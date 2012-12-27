@@ -112,4 +112,10 @@ public class BiomeGenCustom extends BiomeGenBase
             return this.foliageColor;
         }
     }
+    
+    @Override
+    public String toString()
+    {
+        return "BiomeGenCustom of " + biomeName;
+    }
 }

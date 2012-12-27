@@ -12,9 +12,11 @@ import net.minecraft.world.gen.structure.ComponentStrongholdStairs2;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.Biome;
+import com.khorn.terraincontrol.util.Txt;
 
 public class StrongholdGen extends MapGenStructure
 {
@@ -43,6 +45,8 @@ public class StrongholdGen extends MapGenStructure
                 allowedBiomeGenBases.add(((Biome)biomeConfig.Biome).getHandle());
             }
         }
+        
+        TerrainControl.log(Txt.implode(allowedBiomeGenBases,","));
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -55,7 +59,7 @@ public class StrongholdGen extends MapGenStructure
             double randomNumBetween0and2PI = random.nextDouble() * Math.PI * 2.0D;
             int var6 = 1;
 
-            for (int var7 = 0; var7 < this.structureCoords.length; ++var7)
+            for (int i = 0; i < this.structureCoords.length; ++i)
             {
                 double var8 = (1.25D * (double) var6 + random.nextDouble()) * this.distance * (double) var6;
                 int var10 = (int) Math.round(Math.cos(randomNumBetween0and2PI) * var8);
@@ -63,17 +67,17 @@ public class StrongholdGen extends MapGenStructure
                 ArrayList var12 = new ArrayList();
                 Collections.addAll(var12, this.allowedBiomeGenBases);
                 ChunkPosition var13 = this.worldObj.getWorldChunkManager().findBiomePosition((var10 << 4) + 8, (var11 << 4) + 8, 112, var12, random);
-
+                
                 if (var13 != null)
                 {
                     var10 = var13.x >> 4;
                     var11 = var13.z >> 4;
                 }
 
-                this.structureCoords[var7] = new ChunkCoordIntPair(var10, var11);
+                this.structureCoords[i] = new ChunkCoordIntPair(var10, var11);
                 randomNumBetween0and2PI += (Math.PI * 2D) * (double) var6 / (double) this.spread;
 
-                if (var7 == this.spread)
+                if (i == this.spread)
                 {
                     var6 += 2 + random.nextInt(5);
                     this.spread += 1 + random.nextInt(2);

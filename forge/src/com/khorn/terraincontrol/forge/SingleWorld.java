@@ -21,9 +21,7 @@ import net.minecraft.world.gen.feature.WorldGenSwamp;
 import net.minecraft.world.gen.feature.WorldGenTaiga1;
 import net.minecraft.world.gen.feature.WorldGenTaiga2;
 import net.minecraft.world.gen.feature.WorldGenTrees;
-import net.minecraft.world.gen.structure.MapGenMineshaft;
 import net.minecraft.world.gen.structure.MapGenNetherBridge;
-import net.minecraft.world.gen.structure.MapGenVillage;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
@@ -33,7 +31,9 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.structuregens.MineshaftGen;
 import com.khorn.terraincontrol.forge.structuregens.StrongholdGen;
+import com.khorn.terraincontrol.forge.structuregens.VillageGen;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
@@ -57,8 +57,8 @@ public class SingleWorld implements LocalWorld
     private static ArrayList<LocalBiome> defaultBiomes = new ArrayList<LocalBiome>();
 
     public StrongholdGen strongholdGen;
-    private MapGenVillage villageGen;
-    private MapGenMineshaft mineshaftGen;
+    public VillageGen villageGen;
+    private MineshaftGen mineshaftGen;
     private MapGenScatteredFeature pyramidsGen;
     private MapGenNetherBridge netherFortress;
 
@@ -218,9 +218,9 @@ public class SingleWorld implements LocalWorld
         if (this.settings.strongholdsEnabled)
             this.strongholdGen.generate(null, this.world, x, z, chunkArray);
 
-        if (this.settings.MineshaftsEnabled)
+        if (this.settings.mineshaftsEnabled)
             this.mineshaftGen.generate(null, this.world, x, z, chunkArray);
-        if (this.settings.VillagesEnabled && dry)
+        if (this.settings.villagesEnabled && dry)
             this.villageGen.generate(null, this.world, x, z, chunkArray);
         if (this.settings.PyramidsEnabled)
             this.pyramidsGen.generate(null, this.world, x, z, chunkArray);
@@ -274,9 +274,9 @@ public class SingleWorld implements LocalWorld
         boolean isVillagePlaced = false;
         if (this.settings.strongholdsEnabled)
             this.strongholdGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.MineshaftsEnabled)
+        if (this.settings.mineshaftsEnabled)
             this.mineshaftGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.VillagesEnabled)
+        if (this.settings.villagesEnabled)
             isVillagePlaced = this.villageGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
         if (this.settings.PyramidsEnabled)
             this.pyramidsGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
@@ -424,14 +424,13 @@ public class SingleWorld implements LocalWorld
     @Override
     public int getTypeId(int x, int y, int z)
     {
-        Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null)
+        if(world.getChunkProvider().chunkExists(x / 16, z / 16) || createNewChunks)
+        {
+            return world.getBlockId(x, y, z);
+        } else
+        {
             return 0;
-
-        z = z & 0xF;
-        x = x & 0xF;
-
-        return chunk.getBlockID(x, y, z);
+        }
     }
 
     @Override
@@ -450,14 +449,9 @@ public class SingleWorld implements LocalWorld
     @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
-        // If minecraft was updated and obfuscation is off - take a look at
-        // these methods:
-        // this.world.setRawTypeIdAndData(i, j, k, l, i1)
-        // this.world.setTypeIdAndData(i, j, k, l, i1)
-
         if (applyPhysics)
         {
-            world.setBlockAndMetadataWithNotify(x, y, z, typeId, data);
+            world.setBlockAndMetadataWithUpdate(x, y, z, typeId, data, notifyPlayers);
         } else
         {
             world.setBlockAndMetadata(x, y, z, typeId, data);
@@ -465,14 +459,8 @@ public class SingleWorld implements LocalWorld
 
         if (updateLight)
         {
-            world.updateAllLightTypes(x, y, z);
+            this.world.updateAllLightTypes(x, y, z);
         }
-        //
-        // if (notifyPlayers)
-        // {
-        // // this.world.notifyPlayers(x, y, z) // TODO find method to notify
-        // // players
-        // }
     }
 
     @Override
@@ -589,8 +577,8 @@ public class SingleWorld implements LocalWorld
         this.dungeonGen = new WorldGenDungeons();
         this.strongholdGen = new StrongholdGen(config);
 
-        this.villageGen = new MapGenVillage();
-        this.mineshaftGen = new MapGenMineshaft();
+        this.villageGen = new VillageGen(config);
+        this.mineshaftGen = new MineshaftGen();
         this.pyramidsGen = new MapGenScatteredFeature();
         this.netherFortress = new MapGenNetherBridge();
 

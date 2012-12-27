@@ -98,6 +98,9 @@ public class BiomeConfig extends ConfigFile
     public double[] heightMatrix;
     
     public boolean strongholdsEnabled;
+    public enum VillageType { disabled, wood, sandstone}
+    public VillageType villageType;
+    public double mineshaftsRarity;
 
     public int ResourceCount = 0;
 
@@ -394,6 +397,8 @@ public class BiomeConfig extends ConfigFile
         this.maxAverageDepth = ReadSettings(TCDefaultValues.MaxAverageDepth);
         
         this.strongholdsEnabled = ReadModSettings(TCDefaultValues.StrongholdsEnabled.name(), this.DefaultStrongholds);
+        this.villageType = (VillageType) ReadModSettings(TCDefaultValues.VillageType.name(), this.DefaultVillageType);
+        this.mineshaftsRarity = ReadSettings(TCDefaultValues.MineshaftRarity);
 
         if (DefaultBiome.getBiome(this.Biome.getId()) == null)
         {
@@ -776,14 +781,20 @@ public class BiomeConfig extends ConfigFile
         this.WriteCustomObjects();
         
         this.WriteTitle("Structures");
-        this.WriteComment("Here you can enable or disable the stuctures.");
+        this.WriteComment("Here you can change, enable or disable the stuctures.");
         this.WriteComment("If you disable the structure in the WorldConfig, it won't spawn, regardless of this setting.");
-        this.WriteValue("StrongholdsEnabled", strongholdsEnabled);
+        this.WriteValue(TCDefaultValues.StrongholdsEnabled.name(), strongholdsEnabled);
+        this.WriteNewLine();
+        this.WriteComment("The village type in this biome. Can be wood, sandstone or disabled.");
+        this.WriteValue(TCDefaultValues.VillageType.name(), villageType.toString());
+        this.WriteNewLine();
+        this.WriteComment("The mineshaft rarity from 0 to 100. 0 = no mineshafts, 100 = a wooden chaos.");
+        this.WriteValue(TCDefaultValues.MineshaftRarity.name(), mineshaftsRarity);
 
         if (DefaultBiome.getBiome(this.Biome.getId()) != null)
         {
             this.WriteTitle("MOB SPAWNING");
-            this.WriteComment("Mob spawning control did not work with default biomes.");
+            this.WriteComment("Mob spawning control doesn't work in default biomes.");
             return;
         }
 
@@ -1090,6 +1101,7 @@ public class BiomeConfig extends ConfigFile
     private String DefaultGrassColor = "0xFFFFFF";
     private String DefaultFoliageColor = "0xFFFFFF";
     private boolean DefaultStrongholds = true;
+    private VillageType DefaultVillageType = VillageType.disabled;
 
     private void InitDefaults()
     {
@@ -1112,6 +1124,7 @@ public class BiomeConfig extends ConfigFile
             this.DefaultGrass = 20;
             this.DefaultColor = "0x999900";
             this.DefaultStrongholds = false;
+            this.DefaultVillageType = VillageType.wood;
             break;
         case 2: // Desert
             this.DefaultTrees = 0;
@@ -1120,6 +1133,7 @@ public class BiomeConfig extends ConfigFile
             this.DefaultReed = 10;
             this.DefaultCactus = 10;
             this.DefaultColor = "0xFFCC33";
+            this.DefaultVillageType = VillageType.sandstone;
             break;
         case 3: // Extreme hills
             this.DefaultColor = "0x333300";
@@ -1212,6 +1226,7 @@ public class BiomeConfig extends ConfigFile
             this.DefaultReed = 50;
             this.DefaultCactus = 10;
             this.DefaultColor = "0x996600";
+            this.DefaultVillageType = VillageType.sandstone;
             break;
         case 18: // ForestHills
             this.DefaultSize = 6;

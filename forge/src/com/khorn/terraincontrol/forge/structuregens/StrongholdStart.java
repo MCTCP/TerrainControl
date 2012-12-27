@@ -10,6 +10,7 @@ import net.minecraft.world.gen.structure.StructureStrongholdPieces;
 
 class StrongholdStart extends StructureStart
 {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public StrongholdStart(World world, Random random, int par3, int par4)
     {
         StructureStrongholdPieces.prepareStructurePieces();

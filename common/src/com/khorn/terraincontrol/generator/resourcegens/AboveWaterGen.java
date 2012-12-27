@@ -46,7 +46,7 @@ public class AboveWaterGen extends Resource
     @Override
     public String makeString()
     {
-        return "AboveWaterGen(" + makeMaterial(blockId) + "," + frequency + "," + rarity + ")";
+        return "AboveWaterRes(" + makeMaterial(blockId) + "," + frequency + "," + rarity + ")";
     }
 
 }

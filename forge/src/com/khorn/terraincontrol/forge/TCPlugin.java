@@ -4,7 +4,6 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 
 import com.khorn.terraincontrol.LocalWorld;
@@ -101,17 +100,11 @@ public class TCPlugin implements TerrainControlEngine
         {
             return null;
         }
-        String worldName = MinecraftServer.getServer().worldServers[0].getSaveHandler().getSaveDirectoryName();
-        if (world.getName() == worldName)
+        if (world.getName().equals(name))
         {
             return world;
-        } else
-        {
-            // Outdated world stored
-            worldType.worldTC = null;
-            return null;
         }
-
+        return null;
     }
 
     @Override
