@@ -7,10 +7,10 @@ import net.minecraft.server.v1_4_6.BiomeBase;
 import net.minecraft.server.v1_4_6.BiomeCache;
 import net.minecraft.server.v1_4_6.ChunkPosition;
 import net.minecraft.server.v1_4_6.WorldChunkManager;
+import net.minecraft.server.v1_4_6.WorldGenVillage;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.IBiomeManager;
-import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.biomelayers.layers.Layer;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
@@ -23,15 +23,17 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
     private float[] buffer = new float[256];
 
     private WorldConfig worldConfig;
+    private BukkitWorld localWorld;
 
-    public TCWorldChunkManager(LocalWorld world)
+    public TCWorldChunkManager(BukkitWorld world)
     {
         super();
         this.Init(world);
     }
 
-    public void Init(LocalWorld world)
+    public void Init(BukkitWorld world)
     {
+        localWorld = world;
         this.worldConfig = world.getSettings();
         synchronized (this.LockObject)
         {
@@ -44,6 +46,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         this.BiomeLayer = layers[1];
     }
 
+    @Override
     public BiomeBase getBiome(int paramInt1, int paramInt2)
     {
         synchronized (this.LockObject)
@@ -52,6 +55,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         }
     }
 
+    @Override
     public float[] getWetness(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < paramInt3 * paramInt4))
@@ -74,6 +78,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
     }
 
 
+    @Override
     public float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < paramInt3 * paramInt4))
@@ -95,6 +100,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         return paramArrayOfFloat;
     }
 
+    @Override
     public BiomeBase[] getBiomes(BiomeBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < paramInt3 * paramInt4))
@@ -111,6 +117,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         return paramArrayOfBiomeBase;
     }
 
+    @Override
     public BiomeBase[] a(BiomeBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
     {
         if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < paramInt3 * paramInt4))
@@ -137,8 +144,17 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
     }
 
     @SuppressWarnings("rawtypes")
+    @Override
+    // areBiomeViable
     public boolean a(int paramInt1, int paramInt2, int paramInt3, List paramList)
     {
+        // Hack for villages in other biomes
+        // (The alternative would be to completely override the village spawn code)
+        if(paramList == WorldGenVillage.e)
+        {
+            paramList = localWorld.villageGen.villageSpawnBiomes;
+        }
+        
         int i = paramInt1 - paramInt3 >> 2;
         int j = paramInt2 - paramInt3 >> 2;
         int k = paramInt1 + paramInt3 >> 2;
@@ -146,12 +162,10 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
 
         int n = k - i + 1;
         int i1 = m - j + 1;
-        int[] arrayOfInt = this.UnZoomedLayer.Calculate(i, j, n, i1);
+        BiomeBase[] arrayOfInt = this.getBiomes(null,i, j, n, i1);
         for (int i2 = 0; i2 < n * i1; i2++)
         {
-            if (arrayOfInt[i2] >= DefaultBiome.values().length)
-                return false;
-            BiomeBase localBiomeBase = BiomeBase.biomes[arrayOfInt[i2]];
+            BiomeBase localBiomeBase = arrayOfInt[i2];
             if (!paramList.contains(localBiomeBase))
                 return false;
         }
@@ -159,6 +173,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         return true;
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public ChunkPosition a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
     {
@@ -188,6 +203,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         return localChunkPosition;
     }
 
+    @Override
     public void b()
     {
         synchronized (this.LockObject)
@@ -196,6 +212,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         }
     }
 
+    @Override
     public int[] getBiomesUnZoomedTC(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if ((biomeArray == null) || (biomeArray.length < x_size * z_size))
@@ -210,11 +227,13 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         return biomeArray;
     }
 
+    @Override
     public float[] getTemperaturesTC(int x, int z, int x_size, int z_size)
     {
         return this.getTemperatures(buffer, x, z, x_size, z_size);
     }
 
+    @Override
     public int[] getBiomesTC(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if ((biomeArray == null) || (biomeArray.length < x_size * z_size))
@@ -242,6 +261,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
 
     }
 
+    @Override
     public int getBiomeTC(int x, int z)
     {
         return this.getBiome(x, z).id;

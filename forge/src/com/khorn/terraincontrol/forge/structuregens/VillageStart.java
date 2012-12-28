@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
+import com.khorn.terraincontrol.TerrainControl;
+
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.ComponentVillageRoadPiece;
-import net.minecraft.world.gen.structure.ComponentVillageStartPiece;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.gen.structure.StructureVillagePieces;
@@ -19,12 +20,13 @@ class StructureVillageStart extends StructureStart
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public StructureVillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {      
-        ArrayList var6 = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);
-        ComponentVillageStartPiece var7 = new ComponentVillageStartPiece(world.getWorldChunkManager(), 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, var6, size);
-        this.components.add(var7);
-        var7.buildComponent(var7, this.components, random);
-        ArrayList var8 = var7.field_74930_j;
-        ArrayList var9 = var7.field_74932_i;
+        ArrayList<StructureComponent> villagePieces = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);
+        TerrainControl.log("Spawning village with " + villagePieces.size() + " pieces.");
+        VillageStartPiece startPiece = new VillageStartPiece(world, 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, villagePieces, size);
+        this.components.add(startPiece);
+        startPiece.buildComponent(startPiece, this.components, random);
+        ArrayList var8 = startPiece.field_74930_j;
+        ArrayList var9 = startPiece.field_74932_i;
         int var10;
 
         while (!var8.isEmpty() || !var9.isEmpty())
@@ -35,13 +37,13 @@ class StructureVillageStart extends StructureStart
             {
                 var10 = random.nextInt(var9.size());
                 var11 = (StructureComponent)var9.remove(var10);
-                var11.buildComponent(var7, this.components, random);
+                var11.buildComponent(startPiece, this.components, random);
             }
             else
             {
                 var10 = random.nextInt(var8.size());
                 var11 = (StructureComponent)var8.remove(var10);
-                var11.buildComponent(var7, this.components, random);
+                var11.buildComponent(startPiece, this.components, random);
             }
         }
 

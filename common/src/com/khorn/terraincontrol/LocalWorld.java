@@ -86,16 +86,8 @@ public interface LocalWorld
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers);
 
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data);
-
-    // public void setRawBlockIdAndData(int x, int y, int z, int BlockId, int
-    // Data);
-
-    // public void setRawBlockId(int x, int y, int z, int BlockId);
-
-    // public void setBlockId(int x, int y, int z, int BlockId);
-
-    // public void setBlockIdAndData(int x, int y, int z, int BlockId, int
-    // Data);
+    
+    public void attachMetadata(int x, int y, int z, Tag tag);
 
     public int getLiquidHeight(int x, int z);
 
@@ -113,8 +105,6 @@ public interface LocalWorld
 
     public WorldConfig getSettings();
 
-    // public void setSettings(WorldConfig settings);
-
     public String getName();
 
     // Terrain init
@@ -125,7 +115,4 @@ public interface LocalWorld
     public int getHeightBits();
 
     public void setHeightBits(int heightBits);
-    
-    public void attachMetadata(int x, int y, int z, Tag tag);
-
 }

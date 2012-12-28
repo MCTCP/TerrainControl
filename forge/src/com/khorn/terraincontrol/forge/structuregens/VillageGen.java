@@ -16,7 +16,7 @@ import com.khorn.terraincontrol.forge.Biome;
 public class VillageGen extends MapGenStructure
 {
     /** A list of all the biomes villages can spawn in. */
-    private List<BiomeGenBase> villageSpawnBiomes;
+    public List<BiomeGenBase> villageSpawnBiomes;
 
     /** Village size, 0 for normal, 1 for flat map */
     private int size;
@@ -65,9 +65,9 @@ public class VillageGen extends MapGenStructure
 
         if (var3 == var5 && var4 == var6)
         {
-            boolean var8 = this.worldObj.getWorldChunkManager().areBiomesViable(var3 * 16 + 8, var4 * 16 + 8, 0, villageSpawnBiomes);
+            boolean canSpawn = this.worldObj.getWorldChunkManager().areBiomesViable(var3 * 16 + 8, var4 * 16 + 8, 0, villageSpawnBiomes);
 
-            if (var8)
+            if (canSpawn)
             {
                 return true;
             }

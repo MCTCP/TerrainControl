@@ -1,37 +1,37 @@
-package com.khorn.terraincontrol.forge.structuregens;
+package com.khorn.terraincontrol.bukkit.structuregens;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Random;
 
-import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.WorldChunkManager;
-import net.minecraft.world.gen.structure.ComponentVillageStartPiece;
+import net.minecraft.server.v1_4_6.BiomeBase;
+import net.minecraft.server.v1_4_6.World;
+import net.minecraft.server.v1_4_6.WorldChunkManager;
+import net.minecraft.server.v1_4_6.WorldGenVillageStartPiece;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
-import com.khorn.terraincontrol.forge.util.WorldHelper;
 
-public class VillageStartPiece extends ComponentVillageStartPiece
+public class VillageStartPiece extends WorldGenVillageStartPiece
 {
     public final WorldChunkManager worldChunkManager;
 
     @SuppressWarnings("rawtypes")
-    public VillageStartPiece(World world, int par2, Random par3Random, int par4, int par5, ArrayList par6ArrayList, int size)
+    public VillageStartPiece(World world, int i, Random random, int blockX, int blockZ, ArrayList arraylist, int size)
     {
-        super(world.getWorldChunkManager(), par2, par3Random, par4, par5, par6ArrayList, size);
+        super(world.getWorldChunkManager(), i, random, blockX, blockZ, arraylist, size);
         this.worldChunkManager = world.getWorldChunkManager();
         
         // Whether the village is a sandstone village
-        BiomeGenBase currentBiomeGenBase = worldChunkManager.getBiomeGenAt(par4, par5);
+        BiomeBase currentBiomeGenBase = worldChunkManager.getBiome(blockX, blockZ);
         LocalWorld worldTC = WorldHelper.toLocalWorld(world);
-        BiomeConfig config = worldTC.getSettings().biomeConfigs[currentBiomeGenBase.biomeID];
+        BiomeConfig config = worldTC.getSettings().biomeConfigs[currentBiomeGenBase.id];
         setSandstoneVillage(config.villageType == VillageType.sandstone);
         
-        this.startPiece = this;
+        this.k = this;
     }
     
     /**
@@ -40,7 +40,7 @@ public class VillageStartPiece extends ComponentVillageStartPiece
      */
     private void setSandstoneVillage(boolean sandstoneVillage)
     {
-        for(Field field : ComponentVillageStartPiece.class.getFields())
+        for(Field field : WorldGenVillageStartPiece.class.getFields())
         {
             if(field.getType().toString().equals("boolean"))
             {
@@ -58,7 +58,7 @@ public class VillageStartPiece extends ComponentVillageStartPiece
         }
     }
 
-    public WorldChunkManager getWorldChunkManager()
+    public WorldChunkManager d()
     {
         return this.worldChunkManager;
     }

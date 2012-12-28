@@ -10,10 +10,12 @@ import net.minecraft.server.v1_4_6.World;
 import net.minecraft.server.v1_4_6.WorldGenStrongholdPieces;
 import net.minecraft.server.v1_4_6.WorldGenStrongholdStart;
 
-class StrongholdStart extends StructureStart {
+class StrongholdStart extends StructureStart
+{
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public StrongholdStart(World world, Random random, int i, int j) {
+    public StrongholdStart(World world, Random random, int i, int j)
+    {
         WorldGenStrongholdPieces.a();
         WorldGenStrongholdStart worldgenstrongholdstart = new WorldGenStrongholdStart(0, random, (i << 4) + 2, (j << 4) + 2);
 
@@ -21,7 +23,8 @@ class StrongholdStart extends StructureStart {
         worldgenstrongholdstart.a(worldgenstrongholdstart, this.a, random);
         ArrayList arraylist = worldgenstrongholdstart.c;
 
-        while (!arraylist.isEmpty()) {
+        while (!arraylist.isEmpty())
+        {
             int k = random.nextInt(arraylist.size());
             StructurePiece structurepiece = (StructurePiece) arraylist.remove(k);
 
@@ -32,4 +35,3 @@ class StrongholdStart extends StructureStart {
         this.a(world, random, 10);
     }
 }
-

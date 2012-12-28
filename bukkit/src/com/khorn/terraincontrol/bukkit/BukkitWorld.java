@@ -17,20 +17,20 @@ import net.minecraft.server.v1_4_6.WorldGenGroundBush;
 import net.minecraft.server.v1_4_6.WorldGenHugeMushroom;
 import net.minecraft.server.v1_4_6.WorldGenLargeFeature;
 import net.minecraft.server.v1_4_6.WorldGenMegaTree;
-import net.minecraft.server.v1_4_6.WorldGenMineshaft;
 import net.minecraft.server.v1_4_6.WorldGenNether;
 import net.minecraft.server.v1_4_6.WorldGenSwampTree;
 import net.minecraft.server.v1_4_6.WorldGenTaiga1;
 import net.minecraft.server.v1_4_6.WorldGenTaiga2;
 import net.minecraft.server.v1_4_6.WorldGenTrees;
-import net.minecraft.server.v1_4_6.WorldGenVillage;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.IBiomeManager;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.bukkit.structuregens.MineshaftGen;
 import com.khorn.terraincontrol.bukkit.structuregens.StrongholdGen;
+import com.khorn.terraincontrol.bukkit.structuregens.VillageGen;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
@@ -54,11 +54,11 @@ public class BukkitWorld implements LocalWorld
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
     private static ArrayList<LocalBiome> defaultBiomes = new ArrayList<LocalBiome>();
 
-    private StrongholdGen strongholdGen;
-    private WorldGenVillage villageGen;
-    private WorldGenMineshaft mineshaftGen;
-    private WorldGenLargeFeature pyramidsGen;
-    private WorldGenNether netherFortress;
+    public StrongholdGen strongholdGen;
+    public VillageGen villageGen;
+    public MineshaftGen mineshaftGen;
+    public WorldGenLargeFeature pyramidsGen;
+    public WorldGenNether netherFortress;
 
     private WorldGenTrees tree;
     private WorldGenTrees cocoaTree;
@@ -577,8 +577,8 @@ public class BukkitWorld implements LocalWorld
             case Normal:
             case OldGenerator:
                 this.strongholdGen = new StrongholdGen(settings);
-                this.villageGen = new WorldGenVillage();
-                this.mineshaftGen = new WorldGenMineshaft();
+                this.villageGen = new VillageGen(settings);
+                this.mineshaftGen = new MineshaftGen();
                 this.pyramidsGen = new WorldGenLargeFeature();
                 this.netherFortress = new WorldGenNether();
             case NotGenerate:

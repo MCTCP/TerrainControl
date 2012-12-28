@@ -30,13 +30,14 @@ public class StrongholdGen extends StructureGenerator
         this.distance = worldConfig.strongholdDistance;
         this.structureCoords = new ChunkCoordIntPair[worldConfig.strongholdCount];
         this.spread = worldConfig.strongholdSpread;
-        
+
         allowedBiomes = new ArrayList<BiomeBase>();
-        
-        for(BiomeConfig biomeConfig: worldConfig.biomes)
+
+        for (BiomeConfig biomeConfig : worldConfig.biomes)
         {
-            if(biomeConfig.strongholdsEnabled) {
-                allowedBiomes.add(((BukkitBiome)biomeConfig.Biome).getHandle());
+            if (biomeConfig.strongholdsEnabled)
+            {
+                allowedBiomes.add(((BukkitBiome) biomeConfig.Biome).getHandle());
             }
         }
     }
@@ -118,9 +119,10 @@ public class StrongholdGen extends StructureGenerator
 
     protected StructureStart b(int i, int j)
     {
-        StrongholdStart worldgenstronghold2start = new StrongholdStart(this.c, this.b, i, j);;
+        StrongholdStart worldgenstronghold2start = new StrongholdStart(this.c, this.b, i, j);
+        ;
 
-        while(worldgenstronghold2start.b().isEmpty() || ((WorldGenStrongholdStart) worldgenstronghold2start.b().get(0)).b == null)
+        while (worldgenstronghold2start.b().isEmpty() || ((WorldGenStrongholdStart) worldgenstronghold2start.b().get(0)).b == null)
         {
             worldgenstronghold2start = new StrongholdStart(this.c, this.b, i, j);
         }
