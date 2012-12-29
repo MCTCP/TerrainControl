@@ -1,11 +1,14 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import static com.khorn.terraincontrol.events.ResourceEvent.Type.SMALL_LAKE;
+
 import java.util.List;
 import java.util.Random;
 
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 public class SmallLakeGen extends Resource
@@ -18,6 +21,18 @@ public class SmallLakeGen extends Resource
     private int maxAltitude;
 
     @Override
+	public void process(LocalWorld world, Random random, int chunkX,
+			int chunkZ, boolean hasGeneratedAVillage) {
+        ResourceEvent event = getResourceEvent(world, random, chunkX, chunkZ, hasGeneratedAVillage);
+        TerrainControl.fireResourceEvent(event);
+        if (event.isCancelled())
+        	return;
+        
+        if (!hasGeneratedAVillage)
+    		super.process(world, random, chunkX, chunkZ, hasGeneratedAVillage);
+	}
+
+	@Override
     public void spawn(LocalWorld world, Random rand, int x, int z)
     {
         x -= 8;
@@ -131,4 +146,10 @@ public class SmallLakeGen extends Resource
     {
         return "SmallLake(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
     }
+
+	@Override
+	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
+			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
+		return new ResourceEvent(SMALL_LAKE, world, random, chunkX, chunkZ, blockId, blockData, hasGeneratedAVillage);
+	}
 }

@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import static com.khorn.terraincontrol.events.ResourceEvent.Type.TREE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -7,6 +9,7 @@ import java.util.Random;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 public class TreeGen extends Resource
@@ -16,8 +19,13 @@ public class TreeGen extends Resource
     private List<Integer> treeChances;
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public void process(LocalWorld world, Random random, int chunkX, int chunkZ, boolean hasGeneratedAVillage)
     {
+        ResourceEvent event = getResourceEvent(world, random, chunkX, chunkZ, hasGeneratedAVillage);
+        TerrainControl.fireResourceEvent(event);
+        if (event.isCancelled())
+        	return;
+
         for (int i = 0; i < frequency; i++)
         {
             for (int treeNumber = 0; treeNumber < trees.size(); treeNumber++)
@@ -80,4 +88,10 @@ public class TreeGen extends Resource
     {
         // Left blank, as process() already handles this
     }
+
+	@Override
+	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
+			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
+		return new ResourceEvent(TREE, world, random, chunkX, chunkZ, 0, 0, hasGeneratedAVillage);
+	}
 }

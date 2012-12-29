@@ -1,11 +1,14 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import static com.khorn.terraincontrol.events.ResourceEvent.Type.CACTUS;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 public class CactusGen extends Resource
@@ -67,4 +70,10 @@ public class CactusGen extends Resource
             sourceBlocks.add(getBlockId(args.get(i)));
         }
     }
+
+	@Override
+	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
+			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
+		return new ResourceEvent(CACTUS, world, random, chunkX, chunkZ, blockId, blockData, hasGeneratedAVillage);
+	}
 }

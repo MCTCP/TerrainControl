@@ -8,6 +8,10 @@ import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
+import com.khorn.terraincontrol.events.CustomObjectSpawnEvent;
+import com.khorn.terraincontrol.events.EventHandler;
+import com.khorn.terraincontrol.events.PopulateEvent;
+import com.khorn.terraincontrol.events.ResourceEvent;
 
 public class TerrainControl
 {
@@ -189,12 +193,35 @@ public class TerrainControl
     {
         eventHandlers.add(handler);
     }
-    
+
+    @Deprecated
     public static void fireCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
+    {
+    	CustomObjectSpawnEvent event = new CustomObjectSpawnEvent(object, world, x, y, z);
+    	fireCustomObjectSpawnEvent(event);
+    }
+
+    public static void fireCustomObjectSpawnEvent(CustomObjectSpawnEvent event)
     {
         for(EventHandler handler: eventHandlers)
         {
-            handler.onCustomObjectSpawn(object, world, x, y, z);
+            handler.onCustomObjectSpawn(event);
         }
     }
+
+	public static void firePopulateEvent(PopulateEvent event)
+	{    	
+        for(EventHandler handler: eventHandlers)
+        {
+            handler.onPopulateEvent(event);
+        }
+	}
+
+	public static void fireResourceEvent(ResourceEvent event)
+	{    	
+        for(EventHandler handler: eventHandlers)
+        {
+            handler.onResourceEvent(event);
+        }
+	}
 }

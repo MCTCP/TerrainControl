@@ -1,10 +1,13 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import static com.khorn.terraincontrol.events.ResourceEvent.Type.ABOVE_WATER;
 
 import java.util.List;
 import java.util.Random;
+
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.events.ResourceEvent;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 public class AboveWaterGen extends Resource
 {
@@ -49,4 +52,9 @@ public class AboveWaterGen extends Resource
         return "AboveWaterRes(" + makeMaterial(blockId) + "," + frequency + "," + rarity + ")";
     }
 
+	@Override
+	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
+			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
+		return new ResourceEvent(ABOVE_WATER, world, random, chunkX, chunkZ, blockId, blockData, hasGeneratedAVillage);
+	}
 }

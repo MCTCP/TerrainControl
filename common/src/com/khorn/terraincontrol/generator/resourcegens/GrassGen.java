@@ -1,8 +1,12 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import static com.khorn.terraincontrol.events.ResourceEvent.Type.GRASS;
+
+import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +43,13 @@ public class GrassGen extends Resource
     }
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public void process(LocalWorld world, Random random, int chunkX, int chunkZ, boolean hasGeneratedAVillage)
     {
+        ResourceEvent event = getResourceEvent(world, random, chunkX, chunkZ, hasGeneratedAVillage);
+        TerrainControl.fireResourceEvent(event);
+        if (event.isCancelled())
+        	return;
+
         for (int t = 0; t < frequency; t++)
         {
             if (random.nextInt(100) >= rarity)
@@ -64,4 +73,10 @@ public class GrassGen extends Resource
     {
         return "Grass(" + makeMaterial(blockId) + "," + blockData + "," + frequency + "," + rarity + makeMaterial(sourceBlocks) + ")";
     }
+
+	@Override
+	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
+			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
+		return new ResourceEvent(GRASS, world, random, chunkX, chunkZ, blockId, blockData, hasGeneratedAVillage);
+	}
 }
