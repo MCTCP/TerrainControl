@@ -97,7 +97,9 @@ public class BiomeConfig extends ConfigFile
     public boolean disableNotchHeightControl;
     public double[] heightMatrix;
     
+    // Structures
     public boolean strongholdsEnabled;
+    public boolean netherFortressesEnabled;
     public enum VillageType { disabled, wood, sandstone}
     public VillageType villageType;
     public double mineshaftsRarity;
@@ -187,7 +189,7 @@ public class BiomeConfig extends ConfigFile
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         // Clay
-        resource = Resource.createResource(worldConfig, OreGen.class, DefaultMaterial.CLAY.id, TCDefaultValues.clayDepositSize.intValue(), TCDefaultValues.clayDepositFrequency.intValue(), TCDefaultValues.clayDepositRarity.intValue(), TCDefaultValues.clayDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.STONE.id);
+        resource = Resource.createResource(worldConfig, OreGen.class, DefaultMaterial.CLAY.id, TCDefaultValues.clayDepositSize.intValue(), TCDefaultValues.clayDepositFrequency.intValue(), TCDefaultValues.clayDepositRarity.intValue(), TCDefaultValues.clayDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.SAND.id);
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         // Coal
@@ -397,6 +399,7 @@ public class BiomeConfig extends ConfigFile
         this.maxAverageDepth = ReadSettings(TCDefaultValues.MaxAverageDepth);
         
         this.strongholdsEnabled = ReadModSettings(TCDefaultValues.StrongholdsEnabled.name(), this.DefaultStrongholds);
+        this.netherFortressesEnabled = ReadModSettings(TCDefaultValues.NetherFortressesEnabled.name(), true);
         this.villageType = (VillageType) ReadModSettings(TCDefaultValues.VillageType.name(), this.DefaultVillageType);
         this.mineshaftsRarity = ReadSettings(TCDefaultValues.MineshaftRarity);
 
@@ -782,13 +785,20 @@ public class BiomeConfig extends ConfigFile
         
         this.WriteTitle("Structures");
         this.WriteComment("Here you can change, enable or disable the stuctures.");
-        this.WriteComment("If you disable the structure in the WorldConfig, it won't spawn, regardless of this setting.");
+        this.WriteComment("If you have disabled the structure in the WorldConfig, it won't spawn,");
+        this.WriteComment("regardless of these settings.");
+        this.WriteNewLine();
+        this.WriteComment("Disables strongholds for this biome. If there is no suitable biome nearby,");
+        this.WriteComment("Minecraft will ignore this setting.");
         this.WriteValue(TCDefaultValues.StrongholdsEnabled.name(), strongholdsEnabled);
+        this.WriteNewLine();
+        this.WriteComment("Whether a Nether Fortress can start in this biome.");
+        this.WriteValue(TCDefaultValues.NetherFortressesEnabled.name(), netherFortressesEnabled);
         this.WriteNewLine();
         this.WriteComment("The village type in this biome. Can be wood, sandstone or disabled.");
         this.WriteValue(TCDefaultValues.VillageType.name(), villageType.toString());
         this.WriteNewLine();
-        this.WriteComment("The mineshaft rarity from 0 to 100. 0 = no mineshafts, 100 = a wooden chaos.");
+        this.WriteComment("The mineshaft rarity from 0 to 100. 0 = no mineshafts, 1 = default rarity, 100 = a wooden chaos.");
         this.WriteValue(TCDefaultValues.MineshaftRarity.name(), mineshaftsRarity);
 
         if (DefaultBiome.getBiome(this.Biome.getId()) != null)

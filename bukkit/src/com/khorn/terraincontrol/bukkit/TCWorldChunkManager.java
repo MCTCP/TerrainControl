@@ -66,7 +66,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         int[] arrayOfInt = this.BiomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getWetness() / 65536.0F;
+            float f1 = worldConfig.biomeConfigs.get(arrayOfInt[i]).getWetness() / 65536.0F;
             if (f1 < this.worldConfig.minMoisture)
                 f1 = this.worldConfig.minMoisture;
             if (f1 > this.worldConfig.maxMoisture)
@@ -89,7 +89,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         int[] arrayOfInt = this.BiomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getTemperature() / 65536.0F;
+            float f1 = worldConfig.biomeConfigs.get(arrayOfInt[i]).getTemperature() / 65536.0F;
             if (f1 < this.worldConfig.minTemperature)
                 f1 = this.worldConfig.minTemperature;
             if (f1 > this.worldConfig.maxTemperature)
@@ -145,7 +145,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
 
     @SuppressWarnings("rawtypes")
     @Override
-    // areBiomeViable
+    // areBiomesViable
     public boolean a(int paramInt1, int paramInt2, int paramInt3, List paramList)
     {
         // Hack for villages in other biomes

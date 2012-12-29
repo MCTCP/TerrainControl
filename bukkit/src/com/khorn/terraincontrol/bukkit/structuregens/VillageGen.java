@@ -8,7 +8,6 @@ import net.minecraft.server.v1_4_6.BiomeBase;
 import net.minecraft.server.v1_4_6.StructureGenerator;
 import net.minecraft.server.v1_4_6.StructureStart;
 
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
@@ -33,7 +32,7 @@ public class VillageGen extends StructureGenerator
         
         // Add all village biomes to the list
         villageSpawnBiomes = new ArrayList<BiomeBase>();
-        for(BiomeConfig config: worldConfig.biomes)
+        for(BiomeConfig config: worldConfig.biomeConfigs.values())
         {
             if(config.villageType != VillageType.disabled)
             {

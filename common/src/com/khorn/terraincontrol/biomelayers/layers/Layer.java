@@ -84,7 +84,7 @@ public abstract class Layer
         {
             ArrayList<LocalBiome> normalBiomes = new ArrayList<LocalBiome>();
             ArrayList<LocalBiome> iceBiomes = new ArrayList<LocalBiome>();
-            for (BiomeConfig biomeConfig : config.biomes)
+            for (BiomeConfig biomeConfig : config.biomeConfigs.values())
             {
 
                 if (biomeConfig.BiomeSize != i)
@@ -157,7 +157,7 @@ public abstract class Layer
 
             LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
             boolean haveBorder = false;
-            for (BiomeConfig biomeConfig : config.biomes)
+            for (BiomeConfig biomeConfig : config.biomeConfigs.values())
             {
                 if (biomeConfig.BiomeSize != depth)
                     continue;

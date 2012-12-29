@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
-import com.khorn.terraincontrol.TerrainControl;
-
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.ComponentVillageRoadPiece;
 import net.minecraft.world.gen.structure.StructureComponent;
@@ -21,7 +19,6 @@ class StructureVillageStart extends StructureStart
     public StructureVillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {      
         ArrayList<StructureComponent> villagePieces = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);
-        TerrainControl.log("Spawning village with " + villagePieces.size() + " pieces.");
         VillageStartPiece startPiece = new VillageStartPiece(world, 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, villagePieces, size);
         this.components.add(startPiece);
         startPiece.buildComponent(startPiece, this.components, random);

@@ -31,7 +31,7 @@ public class VillageGen extends MapGenStructure
         
         // Add all village biomes to the list
         villageSpawnBiomes = new ArrayList<BiomeGenBase>();
-        for(BiomeConfig config: worldConfig.biomes)
+        for(BiomeConfig config: worldConfig.biomeConfigs.values())
         {
             if(config.villageType != VillageType.disabled)
             {

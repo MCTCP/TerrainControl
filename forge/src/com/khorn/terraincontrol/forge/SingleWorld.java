@@ -21,7 +21,6 @@ import net.minecraft.world.gen.feature.WorldGenSwamp;
 import net.minecraft.world.gen.feature.WorldGenTaiga1;
 import net.minecraft.world.gen.feature.WorldGenTaiga2;
 import net.minecraft.world.gen.feature.WorldGenTrees;
-import net.minecraft.world.gen.structure.MapGenNetherBridge;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
@@ -32,6 +31,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.structuregens.MineshaftGen;
+import com.khorn.terraincontrol.forge.structuregens.NetherFortressGen;
 import com.khorn.terraincontrol.forge.structuregens.StrongholdGen;
 import com.khorn.terraincontrol.forge.structuregens.VillageGen;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
@@ -58,9 +58,9 @@ public class SingleWorld implements LocalWorld
 
     public StrongholdGen strongholdGen;
     public VillageGen villageGen;
-    private MineshaftGen mineshaftGen;
+    public MineshaftGen mineshaftGen;
     private MapGenScatteredFeature pyramidsGen;
-    private MapGenNetherBridge netherFortress;
+    public NetherFortressGen netherFortressGen;
 
     private WorldGenDungeons dungeonGen;
 
@@ -224,8 +224,8 @@ public class SingleWorld implements LocalWorld
             this.villageGen.generate(null, this.world, x, z, chunkArray);
         if (this.settings.PyramidsEnabled)
             this.pyramidsGen.generate(null, this.world, x, z, chunkArray);
-        if (this.settings.NetherFortress)
-            this.netherFortress.generate(null, this.world, x, z, chunkArray);
+        if (this.settings.netherFortressesEnabled)
+            this.netherFortressGen.generate(null, this.world, x, z, chunkArray);
 
     }
 
@@ -280,8 +280,8 @@ public class SingleWorld implements LocalWorld
             isVillagePlaced = this.villageGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
         if (this.settings.PyramidsEnabled)
             this.pyramidsGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.NetherFortress)
-            this.netherFortress.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+        if (this.settings.netherFortressesEnabled)
+            this.netherFortressGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
 
         return isVillagePlaced;
     }
@@ -310,7 +310,7 @@ public class SingleWorld implements LocalWorld
                 {
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs.get(ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF);
 
                         if (biomeConfig.ReplaceCount > 0)
                         {
@@ -559,9 +559,9 @@ public class SingleWorld implements LocalWorld
         for (Biome biome : biomes)
         {
             // Apply settings for biomes
-            if (biome != null && config.biomeConfigs[biome.getId()] != null)
+            if (biome != null && config.biomeConfigs.get(biome.getId()) != null)
             {
-                biome.setVisuals(config.biomeConfigs[biome.getId()]);
+                biome.setVisuals(config.biomeConfigs.get(biome.getId()));
             }
         }
     }
@@ -580,7 +580,7 @@ public class SingleWorld implements LocalWorld
         this.villageGen = new VillageGen(config);
         this.mineshaftGen = new MineshaftGen();
         this.pyramidsGen = new MapGenScatteredFeature();
-        this.netherFortress = new MapGenNetherBridge();
+        this.netherFortressGen = new NetherFortressGen();
 
         this.tree = new WorldGenTrees(false);
         this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);

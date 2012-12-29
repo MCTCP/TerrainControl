@@ -29,7 +29,7 @@ public class ObjectSpawner
         int z = chunkZ * 16;
 
         int biomeId = world.getCalculatedBiomeId(x + 16, z + 16);
-        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
+        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs.get(biomeId);
 
         this.rand.setSeed(world.getSeed());
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
@@ -69,7 +69,7 @@ public class ObjectSpawner
             {
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
-                BiomeConfig biomeConfig = worldSettings.biomeConfigs[world.getCalculatedBiomeId(blockToFreezeX, blockToFreezeZ)];
+                BiomeConfig biomeConfig = worldSettings.biomeConfigs.get(world.getCalculatedBiomeId(blockToFreezeX, blockToFreezeZ));
                 if (biomeConfig.BiomeTemperature < TCDefaultValues.snowAndIceMaxTemp.floatValue())
                 {
                     int blockToFreezeY = world.getHighestBlockYAt(blockToFreezeX, blockToFreezeZ);

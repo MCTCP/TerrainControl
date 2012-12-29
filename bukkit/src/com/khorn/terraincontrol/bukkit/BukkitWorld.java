@@ -213,7 +213,7 @@ public class BukkitWorld implements LocalWorld
             this.villageGen.a(null, this.world, x, z, chunkArray);
         if (this.settings.PyramidsEnabled)
             this.pyramidsGen.a(null, this.world, x, z, chunkArray);
-        if (this.settings.NetherFortress)
+        if (this.settings.netherFortressesEnabled)
             this.netherFortress.a(null, this.world, x, z, chunkArray);
     }
 
@@ -266,7 +266,7 @@ public class BukkitWorld implements LocalWorld
             Village = this.villageGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.PyramidsEnabled)
             this.pyramidsGen.a(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.NetherFortress)
+        if (this.settings.netherFortressesEnabled)
             this.netherFortress.a(this.world, rand, chunk_x, chunk_z);
 
         return Village;
@@ -297,7 +297,7 @@ public class BukkitWorld implements LocalWorld
                 {
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF ];
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs.get(ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF );
                         if (biomeConfig != null && biomeConfig.ReplaceCount > 0)
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)

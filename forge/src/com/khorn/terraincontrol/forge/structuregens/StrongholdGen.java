@@ -12,41 +12,34 @@ import net.minecraft.world.gen.structure.ComponentStrongholdStairs2;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
 
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.Biome;
-import com.khorn.terraincontrol.util.Txt;
 
 public class StrongholdGen extends MapGenStructure
 {
     private List<BiomeGenBase> allowedBiomeGenBases;
 
-    /**
-     * is spawned false and set true once the defined BiomeGenBases were
-     * compared with the present ones
-     */
     private boolean ranBiomeCheck;
     private ChunkCoordIntPair[] structureCoords;
     private double distance;
     private int spread;
 
     public StrongholdGen(WorldConfig worldConfig)
-    {       
+    {
         this.distance = worldConfig.strongholdDistance;
         this.structureCoords = new ChunkCoordIntPair[worldConfig.strongholdCount];
         this.spread = worldConfig.strongholdSpread;
-        
+
         allowedBiomeGenBases = new ArrayList<BiomeGenBase>();
-        
-        for(BiomeConfig biomeConfig: worldConfig.biomes)
+
+        for (BiomeConfig biomeConfig : worldConfig.biomeConfigs.values())
         {
-            if(biomeConfig.strongholdsEnabled) {
-                allowedBiomeGenBases.add(((Biome)biomeConfig.Biome).getHandle());
+            if (biomeConfig.strongholdsEnabled)
+            {
+                allowedBiomeGenBases.add(((Biome) biomeConfig.Biome).getHandle());
             }
         }
-        
-        TerrainControl.log(Txt.implode(allowedBiomeGenBases,","));
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -67,7 +60,7 @@ public class StrongholdGen extends MapGenStructure
                 ArrayList var12 = new ArrayList();
                 Collections.addAll(var12, this.allowedBiomeGenBases);
                 ChunkPosition var13 = this.worldObj.getWorldChunkManager().findBiomePosition((var10 << 4) + 8, (var11 << 4) + 8, 112, var12, random);
-                
+
                 if (var13 != null)
                 {
                     var10 = var13.x >> 4;
@@ -87,14 +80,14 @@ public class StrongholdGen extends MapGenStructure
             this.ranBiomeCheck = true;
         }
 
-        ChunkCoordIntPair[] var14 = this.structureCoords;
-        int var15 = var14.length;
+        ChunkCoordIntPair[] structureCoords = this.structureCoords;
+        int structureCoordsLength = structureCoords.length;
 
-        for (int var5 = 0; var5 < var15; ++var5)
+        for (int i = 0; i < structureCoordsLength; i++)
         {
-            ChunkCoordIntPair var16 = var14[var5];
+            ChunkCoordIntPair structureCoord = structureCoords[i];
 
-            if (par1 == var16.chunkXPos && par2 == var16.chunkZPos)
+            if (par1 == structureCoord.chunkXPos && par2 == structureCoord.chunkZPos)
             {
                 return true;
             }

@@ -69,7 +69,7 @@ public enum TCDefaultValues implements TCSetting
     
     
     PyramidsEnabled(true),
-    NetherFortressEnabled(false),
+    NetherFortressesEnabled(false),
     
     StrongholdsEnabled(true),
     StrongholdCount(3),
@@ -102,7 +102,7 @@ public enum TCDefaultValues implements TCSetting
     canyonMaxLength(112),
     canyonDepth(3.0D),
 
-    WaterLevelMax(64),
+    WaterLevelMax(63),
     WaterLevelMin(0),
     WaterBlock(9),
     IceBlock(79),

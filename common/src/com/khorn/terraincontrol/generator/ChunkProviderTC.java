@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.generator;
 
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.terrainsgens.CanyonsGen;
 import com.khorn.terraincontrol.generator.terrainsgens.CavesGen;
@@ -148,9 +149,9 @@ public class ChunkProviderTC
                             {
                                 int biomeId = BiomeArray[(z * 4 + piece_z)*16 + (piece_x + x * 4) ];
                                 int i15 = 0;
-                                if (y * 8 + piece_y < this.worldSettings.biomeConfigs[biomeId].waterLevelMax && y * 8 + piece_y > this.worldSettings.biomeConfigs[biomeId].waterLevelMin)
+                                if (y * 8 + piece_y < this.worldSettings.biomeConfigs.get(biomeId).waterLevelMax && y * 8 + piece_y > this.worldSettings.biomeConfigs.get(biomeId).waterLevelMin)
                                 {
-                                    i15 = this.worldSettings.biomeConfigs[biomeId].waterBlock;
+                                    i15 = this.worldSettings.biomeConfigs.get(biomeId).waterBlock;
                                 }
 
                                 if (d16 > 0.0D)
@@ -186,6 +187,7 @@ public class ChunkProviderTC
 
 
         for (int x = 0; x < 16; x++)
+        {
             for (int z = 0; z < 16; z++)
             {
                 float temperature = TemperatureArray[(z + x * 16)];
@@ -195,12 +197,16 @@ public class ChunkProviderTC
 
                 int i5 = -1;
 
-                int surfaceBlock = this.worldSettings.biomeConfigs[biomeId].SurfaceBlock;
-                int groundBlock = this.worldSettings.biomeConfigs[biomeId].GroundBlock;
-                int waterLevel = this.worldSettings.biomeConfigs[biomeId].waterLevelMax;
+                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs.get(biomeId);
+                int surfaceBlock = biomeConfig.SurfaceBlock;
+                int groundBlock = biomeConfig.GroundBlock;
+                int waterLevel = biomeConfig.waterLevelMax;
 
                 if (this.worldSettings.ceilingBedrock)
-                    paramArrayOfByte[(z * 16 + x) * this.height + this.heightMinusOne] = (byte) this.worldSettings.bedrockBlock;
+                {
+                    // Moved one block lower to fix lighting issues
+                    paramArrayOfByte[(z * 16 + x) * this.height + this.heightMinusOne - 1] = (byte) this.worldSettings.bedrockBlock;
+                }
 
                 for (int y = this.heightMinusOne; y >= 0; y--)
                 {
@@ -224,16 +230,16 @@ public class ChunkProviderTC
                                     groundBlock = (byte) DefaultMaterial.STONE.id;
                                 } else if ((y >= waterLevel - 4) && (y <= waterLevel + 1))
                                 {
-                                    surfaceBlock = this.worldSettings.biomeConfigs[biomeId].SurfaceBlock;
-                                    groundBlock = this.worldSettings.biomeConfigs[biomeId].GroundBlock;
+                                    surfaceBlock = biomeConfig.SurfaceBlock;
+                                    groundBlock = biomeConfig.GroundBlock;
                                 }
 
                                 if ((y < waterLevel) && (y > this.worldSettings.waterLevelMin) && (surfaceBlock == 0))
                                 {
                                     if (temperature < 0.15F)
-                                        surfaceBlock = (byte) this.worldSettings.biomeConfigs[biomeId].iceBlock;
+                                        surfaceBlock = (byte) biomeConfig.iceBlock;
                                     else
-                                        surfaceBlock = (byte) this.worldSettings.biomeConfigs[biomeId].waterBlock;
+                                        surfaceBlock = (byte) biomeConfig.waterBlock;
                                 }
 
                                 i5 = stone_noise;
@@ -256,11 +262,10 @@ public class ChunkProviderTC
                             }
                     }
                 }
-                if (paramArrayOfByte[(z * 16 + x) * this.height + this.worldSettings.biomeConfigs[biomeId].waterLevelMax] == this.worldSettings.biomeConfigs[biomeId].waterBlock)
+                if (paramArrayOfByte[(z * 16 + x) * this.height + biomeConfig.waterLevelMax] == biomeConfig.waterBlock)
                     dryBlock--;
-
-
             }
+        }
 
         return dryBlock > 250;
     }
@@ -294,6 +299,7 @@ public class ChunkProviderTC
             {
 
                 int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (max_X + 5))];
+                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs.get(biomeId);
 
                 double d3 = this.k[i2D] / 8000.0D;
                 if (d3 < 0.0D)
@@ -305,14 +311,14 @@ public class ChunkProviderTC
                     d3 /= 2.0D;
                     if (d3 < -1.0D)
                         d3 = -1.0D;
-                    d3 -= this.worldSettings.biomeConfigs[biomeId].maxAverageDepth;
+                    d3 -= biomeConfig.maxAverageDepth;
                     d3 /= 1.4D;
                     d3 /= 2.0D;
                 } else
                 {
                     if (d3 > 1.0D)
                         d3 = 1.0D;
-                    d3 += this.worldSettings.biomeConfigs[biomeId].maxAverageHeight;
+                    d3 += biomeConfig.maxAverageHeight;
                     d3 /= 8.0D;
                 }
 
@@ -334,18 +340,18 @@ public class ChunkProviderTC
                     if (d8 > 0.0D)
                         d8 *= 4.0D;
 
-                    double d9 = this.h[i3D] / 512.0D * this.worldSettings.biomeConfigs[biomeId].volatility1;
-                    double d10 = this.i[i3D] / 512.0D * this.worldSettings.biomeConfigs[biomeId].volatility2;
+                    double d9 = this.h[i3D] / 512.0D * biomeConfig.volatility1;
+                    double d10 = this.i[i3D] / 512.0D * biomeConfig.volatility2;
 
                     double d11 = (this.g[i3D] / 10.0D + 1.0D) / 2.0D;
-                    if (d11 < this.worldSettings.biomeConfigs[biomeId].volatilityWeight1)
+                    if (d11 < biomeConfig.volatilityWeight1)
                         d7 = d9;
-                    else if (d11 > this.worldSettings.biomeConfigs[biomeId].volatilityWeight2)
+                    else if (d11 > biomeConfig.volatilityWeight2)
                         d7 = d10;
                     else
                         d7 = d9 + (d10 - d9) * d11;
 
-                    if (!this.worldSettings.biomeConfigs[biomeId].disableNotchHeightControl)
+                    if (!biomeConfig.disableNotchHeightControl)
                     {
                         d7 += d8;
 
@@ -356,7 +362,7 @@ public class ChunkProviderTC
                         }
 
                     }
-                    d7 += this.worldSettings.biomeConfigs[biomeId].heightMatrix[y];
+                    d7 += biomeConfig.heightMatrix[y];
 
                     outArray[i3D] = d7;
                     i3D++;
@@ -376,7 +382,7 @@ public class ChunkProviderTC
         } else
         {
             int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (max_X + 5))];
-            this.VolatilityFactor = (1.0D - worldSettings.biomeConfigs[biomeId].BiomeTemperature * worldSettings.biomeConfigs[biomeId].BiomeWetness);
+            this.VolatilityFactor = (1.0D - worldSettings.biomeConfigs.get(biomeId).BiomeTemperature * worldSettings.biomeConfigs.get(biomeId).BiomeWetness);
         }
         this.VolatilityFactor *= this.VolatilityFactor;
         this.VolatilityFactor = 1.0D - this.VolatilityFactor * this.VolatilityFactor;
@@ -405,14 +411,15 @@ public class ChunkProviderTC
             for (int nextZ = -i7; nextZ <= i7; nextZ++)
             {
                 int nextBiomeId = this.BiomeArray[(x + nextX + 2 + (z + nextZ + 2) * (max_X + 5))];
-                float f5 = this.NearBiomeWeight[(nextX + 2 + (nextZ + 2) * 5)] / (this.worldSettings.biomeConfigs[nextBiomeId].BiomeHeight + 2.0F);
+                BiomeConfig nextBiomeConfig = this.worldSettings.biomeConfigs.get(nextBiomeId);
+                float f5 = this.NearBiomeWeight[(nextX + 2 + (nextZ + 2) * 5)] / (nextBiomeConfig.BiomeHeight + 2.0F);
                 f5 = Math.abs(f5);
-                if (this.worldSettings.biomeConfigs[nextBiomeId].BiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
+                if (nextBiomeConfig.BiomeHeight > this.worldSettings.biomeConfigs.get(biomeId).BiomeHeight)
                 {
                     f5 /= 2.0F;
                 }
-                f2 += this.worldSettings.biomeConfigs[nextBiomeId].BiomeVolatility * f5;
-                f3 += this.worldSettings.biomeConfigs[nextBiomeId].BiomeHeight * f5;
+                f2 += nextBiomeConfig.BiomeVolatility * f5;
+                f3 += nextBiomeConfig.BiomeHeight * f5;
                 f4 += f5;
             }
         }
