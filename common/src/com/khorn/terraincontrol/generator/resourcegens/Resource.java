@@ -1,13 +1,17 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import static com.khorn.terraincontrol.events.ResourceEvent.Type.ICE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 /**
@@ -37,9 +41,15 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
      * @param world
      * @param chunkX
      * @param chunkZ
+     * @param hasGeneratedAVillage 
      */
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public void process(LocalWorld world, Random random, int chunkX, int chunkZ, boolean hasGeneratedAVillage)
     {
+        ResourceEvent event = getResourceEvent(world, random, chunkX, chunkZ, hasGeneratedAVillage);
+        TerrainControl.fireResourceEvent(event);
+        if (event.isCancelled())
+        	return;
+
         for (int t = 0; t < frequency; t++)
         {
             if (random.nextInt(100) > rarity)
@@ -50,7 +60,9 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
         }
     }
     
-    /**
+    protected abstract ResourceEvent getResourceEvent(LocalWorld world, Random random, int chunkX, int chunkZ, boolean hasGeneratedAVillage);
+
+	/**
      * Convenience method for creating a resource. Used to create the default resources.
      * @param world
      * @param clazz
