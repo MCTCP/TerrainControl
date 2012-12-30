@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.TREE;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -9,7 +7,6 @@ import java.util.Random;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 public class TreeGen extends Resource
@@ -19,13 +16,15 @@ public class TreeGen extends Resource
     private List<Integer> treeChances;
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ, boolean hasGeneratedAVillage)
+    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        ResourceEvent event = getResourceEvent(world, random, chunkX, chunkZ, hasGeneratedAVillage);
-        TerrainControl.fireResourceEvent(event);
-        if (event.isCancelled())
-        	return;
-
+        // Fire event
+        if(!TerrainControl.fireResourceProcessEvent(this, world, random, chunkX, chunkZ))
+        {
+            return;
+        }
+        
+        // Process
         for (int i = 0; i < frequency; i++)
         {
             for (int treeNumber = 0; treeNumber < trees.size(); treeNumber++)
@@ -49,7 +48,7 @@ public class TreeGen extends Resource
     {
         assureSize(3, args);
 
-        frequency = getInt(args.get(0), 1, 100);
+        frequency = readInt(args.get(0), 1, 100);
 
         trees = new ArrayList<CustomObject>();
         treeNames = new ArrayList<String>();
@@ -68,7 +67,7 @@ public class TreeGen extends Resource
             }
             trees.add(object);
             treeNames.add(args.get(i));
-            treeChances.add(getInt(args.get(i + 1), 1, 100));
+            treeChances.add(readInt(args.get(i + 1), 1, 100));
         }
     }
 
@@ -88,10 +87,4 @@ public class TreeGen extends Resource
     {
         // Left blank, as process() already handles this
     }
-
-	@Override
-	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
-			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
-		return new ResourceEvent(TREE, world, random, chunkX, chunkZ, 0, 0, hasGeneratedAVillage);
-	}
 }

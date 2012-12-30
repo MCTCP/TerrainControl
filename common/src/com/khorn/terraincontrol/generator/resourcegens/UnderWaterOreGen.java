@@ -1,21 +1,16 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.UNDERWATER_ORE;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 public class UnderWaterOreGen extends Resource
 {
-    private int blockId;
     private List<Integer> sourceBlocks;
     private int size;
-    private int blockData;
 
     @Override
     public void spawn(LocalWorld world, Random rand, int x, int z)
@@ -51,15 +46,15 @@ public class UnderWaterOreGen extends Resource
     public void load(List<String> args) throws InvalidResourceException
     {
         assureSize(5, args);
-        blockId = getBlockId(args.get(0));
-        blockData = getBlockData(args.get(0));
-        size = getInt(args.get(1), 1, 8);
-        frequency = getInt(args.get(2), 1, 100);
-        rarity = getInt(args.get(3), 1, 100);
+        blockId = readBlockId(args.get(0));
+        blockData = readBlockData(args.get(0));
+        size = readInt(args.get(1), 1, 8);
+        frequency = readInt(args.get(2), 1, 100);
+        rarity = readInt(args.get(3), 1, 100);
         sourceBlocks = new ArrayList<Integer>();
         for (int i = 4; i < args.size(); i++)
         {
-            sourceBlocks.add(getBlockId(args.get(i)));
+            sourceBlocks.add(readBlockId(args.get(i)));
         }
     }
 
@@ -68,10 +63,4 @@ public class UnderWaterOreGen extends Resource
     {
         return "UnderWaterOre(" + makeMaterial(blockId, blockData) + "," + size + "," + frequency + "," + rarity + makeMaterial(sourceBlocks) + ")";
     }
-
-	@Override
-	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
-			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
-		return new ResourceEvent(UNDERWATER_ORE, world, random, chunkX, chunkZ, blockId, blockData, hasGeneratedAVillage);
-	}
 }

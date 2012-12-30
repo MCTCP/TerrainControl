@@ -1,8 +1,5 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.UNDERGROUND_LAKE;
-
-import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
@@ -73,13 +70,15 @@ public class UndergroundLakeGen extends Resource
     @Override
     public void load(List<String> args) throws InvalidResourceException
     {
+        blockId = DefaultMaterial.WATER.id; // Hardcoded for now
+        
         assureSize(6, args);
-        minSize = getInt(args.get(0), 1, 25);
-        maxSize = getInt(args.get(1), minSize, 60);
-        frequency = getInt(args.get(2), 1, 100);
-        rarity = getInt(args.get(3), 1, 100);
-        minAltitude = getInt(args.get(4), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = getInt(args.get(5), minAltitude + 1, TerrainControl.worldHeight);
+        minSize = readInt(args.get(0), 1, 25);
+        maxSize = readInt(args.get(1), minSize, 60);
+        frequency = readInt(args.get(2), 1, 100);
+        rarity = readInt(args.get(3), 1, 100);
+        minAltitude = readInt(args.get(4), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = readInt(args.get(5), minAltitude + 1, TerrainControl.worldHeight);
     }
 
     @Override
@@ -87,10 +86,4 @@ public class UndergroundLakeGen extends Resource
     {
         return "UnderGroundLake(" + minSize + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
     }
-
-	@Override
-	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
-			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
-		return new ResourceEvent(UNDERGROUND_LAKE, world, random, chunkX, chunkZ, 0, 0, hasGeneratedAVillage);
-	}
 }

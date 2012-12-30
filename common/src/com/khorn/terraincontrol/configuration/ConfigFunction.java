@@ -99,7 +99,7 @@ public abstract class ConfigFunction<T>
      * @throws InvalidResourceException
      *             If the number is invalid.
      */
-    public int getInt(String string, int minValue, int maxValue) throws InvalidResourceException
+    protected int readInt(String string, int minValue, int maxValue) throws InvalidResourceException
     {
         try
         {
@@ -125,7 +125,7 @@ public abstract class ConfigFunction<T>
      * @param string
      * @return
      */
-    public int getBlockId(String string) throws InvalidResourceException
+    protected int readBlockId(String string) throws InvalidResourceException
     {
         if (string.indexOf('.') != -1)
         {
@@ -139,7 +139,7 @@ public abstract class ConfigFunction<T>
             return material.id;
         }
 
-        return getInt(string, 0, TerrainControl.supportedBlockIds);
+        return readInt(string, 0, TerrainControl.supportedBlockIds);
     }
 
     /**
@@ -149,7 +149,7 @@ public abstract class ConfigFunction<T>
      * @return
      * @throws InvalidResourceException
      */
-    public int getBlockData(String string) throws InvalidResourceException
+    protected int readBlockData(String string) throws InvalidResourceException
     {
         if (string.indexOf('.') == -1)
         {
@@ -159,10 +159,10 @@ public abstract class ConfigFunction<T>
 
         // Get block data
         string = string.split("\\.")[1];
-        return getInt(string, 0, 16);
+        return readInt(string, 0, 16);
     }
 
-    public void assureSize(int size, List<String> args) throws InvalidResourceException
+    protected void assureSize(int size, List<String> args) throws InvalidResourceException
     {
         if (args.size() < size)
         {
@@ -179,7 +179,7 @@ public abstract class ConfigFunction<T>
      *            The block data
      * @return String in the format blockname[.blockdata]
      */
-    public String makeMaterial(int id, int data)
+    protected String makeMaterial(int id, int data)
     {
         String materialString = "" + id;
         DefaultMaterial material = DefaultMaterial.getMaterial(id);
@@ -204,7 +204,7 @@ public abstract class ConfigFunction<T>
      *            The block id
      * @return String in the format blockname
      */
-    public String makeMaterial(int id)
+    protected String makeMaterial(int id)
     {
         return makeMaterial(id, 0);
     }
@@ -215,7 +215,7 @@ public abstract class ConfigFunction<T>
      * @param ids
      * @return
      */
-    public String makeMaterial(List<Integer> ids)
+    protected String makeMaterial(List<Integer> ids)
     {
         String string = "";
         for (int blockId : ids)

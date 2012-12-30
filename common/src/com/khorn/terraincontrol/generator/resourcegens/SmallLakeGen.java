@@ -1,38 +1,20 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.SMALL_LAKE;
-
 import java.util.List;
 import java.util.Random;
 
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 public class SmallLakeGen extends Resource
 {
-
     private final boolean[] BooleanBuffer = new boolean[2048];
-    private int blockId;
-    private int blockData;
-    private int minAltitude;
-    private int maxAltitude;
+    public int minAltitude;
+    public int maxAltitude;
 
     @Override
-	public void process(LocalWorld world, Random random, int chunkX,
-			int chunkZ, boolean hasGeneratedAVillage) {
-        ResourceEvent event = getResourceEvent(world, random, chunkX, chunkZ, hasGeneratedAVillage);
-        TerrainControl.fireResourceEvent(event);
-        if (event.isCancelled())
-        	return;
-        
-        if (!hasGeneratedAVillage)
-    		super.process(world, random, chunkX, chunkZ, hasGeneratedAVillage);
-	}
-
-	@Override
     public void spawn(LocalWorld world, Random rand, int x, int z)
     {
         x -= 8;
@@ -133,12 +115,12 @@ public class SmallLakeGen extends Resource
     public void load(List<String> args) throws InvalidResourceException
     {
         assureSize(5, args);
-        blockId = getBlockId(args.get(0));
-        blockData = getBlockData(args.get(0));
-        frequency = getInt(args.get(1), 1, 100);
-        rarity = getInt(args.get(2), 1, 100);
-        minAltitude = getInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = getInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
+        blockId = readBlockId(args.get(0));
+        blockData = readBlockData(args.get(0));
+        frequency = readInt(args.get(1), 1, 100);
+        rarity = readInt(args.get(2), 1, 100);
+        minAltitude = readInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
     }
 
     @Override
@@ -146,10 +128,4 @@ public class SmallLakeGen extends Resource
     {
         return "SmallLake(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
     }
-
-	@Override
-	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
-			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
-		return new ResourceEvent(SMALL_LAKE, world, random, chunkX, chunkZ, blockId, blockData, hasGeneratedAVillage);
-	}
 }

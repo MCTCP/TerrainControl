@@ -1,9 +1,5 @@
 package com.khorn.terraincontrol.generator;
 
-import static com.khorn.terraincontrol.events.PopulateEvent.Type.BEGIN;
-import static com.khorn.terraincontrol.events.PopulateEvent.Type.END;
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.ICE;
-
 import java.util.Random;
 
 import com.khorn.terraincontrol.DefaultMaterial;
@@ -12,9 +8,8 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.events.PopulateEvent;
-import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
+import com.khorn.terraincontrol.generator.resourcegens.SmallLakeGen;
 
 public class ObjectSpawner
 {
@@ -30,44 +25,52 @@ public class ObjectSpawner
     }
 
     public void populate(int chunkX, int chunkZ)
-    {
+    {       
+        // Get the corner block coords
         int x = chunkX * 16;
         int z = chunkZ * 16;
 
+        // Get the BiomeConfig of the other corner
         int biomeId = world.getCalculatedBiomeId(x + 16, z + 16);
         BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs.get(biomeId);
 
+        // Get the random generator
         this.rand.setSeed(world.getSeed());
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
         this.rand.setSeed(chunkX * l1 + chunkZ * l2 ^ world.getSeed());
-
-        TerrainControl.firePopulateEvent(new PopulateEvent(BEGIN, world, rand, chunkX, chunkZ, false));
         
+        // Fire event
+        TerrainControl.firePopulationStartEvent(world, rand, chunkX, chunkZ);
+
+        // Generate structures
         boolean hasGeneratedAVillage = world.PlaceTerrainObjects(rand, chunkX, chunkZ);
 
         // Resource sequence
         for (int i = 0; i < localBiomeConfig.ResourceCount; i++)
         {
-            world.setChunksCreations(false);
             Resource res = localBiomeConfig.ResourceSequence[i];
-            res.process(world, rand, chunkX, chunkZ, hasGeneratedAVillage);
+            if (res instanceof SmallLakeGen && hasGeneratedAVillage)
+                continue;
+            world.setChunksCreations(false);
+            res.process(world, rand, chunkX, chunkZ);
         }
 
         // Snow and ice
-        ResourceEvent event = new ResourceEvent(ICE, world, rand, chunkX, chunkZ, DefaultMaterial.ICE.id, 0, hasGeneratedAVillage);
-        TerrainControl.fireResourceEvent(event);
-        if (!event.isCancelled())
-        	placeSnowAndIce(chunkX, chunkZ);
+        placeSnowAndIce(chunkX, chunkZ);
 
+        // Replace blocks
         world.replaceBlocks();
 
+        // Replace biomes
         world.replaceBiomesLate();
 
-        TerrainControl.firePopulateEvent(new PopulateEvent(END, world, rand, chunkX, chunkZ, hasGeneratedAVillage));
-        
+        // Replace settings (?)
         if (this.worldSettings.isDeprecated)
             this.worldSettings = this.worldSettings.newSettings;
+        
+        // Fire event
+        TerrainControl.firePopulationEndEvent(world, rand, chunkX, chunkZ);
     }
     
     protected void placeSnowAndIce(int chunkX, int chunkZ)

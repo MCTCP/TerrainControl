@@ -1,20 +1,15 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.CACTUS;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 public class CactusGen extends Resource
 {
-    private int blockId;
-    private int blockData;
     private int minAltitude;
     private int maxAltitude;
     private List<Integer> sourceBlocks;
@@ -58,22 +53,16 @@ public class CactusGen extends Resource
             throw new InvalidResourceException("Too few arguments supplied");
         }
 
-        blockId = getBlockId(args.get(0));
-        blockData = getBlockData(args.get(0));
-        frequency = getInt(args.get(1), 1, 100);
-        rarity = getInt(args.get(2), 1, 100);
-        minAltitude = getInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = getInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
+        blockId = readBlockId(args.get(0));
+        blockData = readBlockData(args.get(0));
+        frequency = readInt(args.get(1), 1, 100);
+        rarity = readInt(args.get(2), 1, 100);
+        minAltitude = readInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
         sourceBlocks = new ArrayList<Integer>();
         for (int i = 5; i < args.size(); i++)
         {
-            sourceBlocks.add(getBlockId(args.get(i)));
+            sourceBlocks.add(readBlockId(args.get(i)));
         }
     }
-
-	@Override
-	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
-			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
-		return new ResourceEvent(CACTUS, world, random, chunkX, chunkZ, blockId, blockData, hasGeneratedAVillage);
-	}
 }

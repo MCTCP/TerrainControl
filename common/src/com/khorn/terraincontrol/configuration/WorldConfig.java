@@ -312,7 +312,7 @@ public class WorldConfig extends ConfigFile
         }
         if(this.SettingsCache.containsKey("NetherFortressEnabled".toLowerCase()))
         {
-            this.SettingsCache.put(TCDefaultValues.NetherFortressesEnabled.name().toLowerCase(), this.SettingsCache.get("ModeBiome".toLowerCase()));
+            this.SettingsCache.put(TCDefaultValues.NetherFortressesEnabled.name().toLowerCase(), this.SettingsCache.get("NetherFortressEnabled".toLowerCase()));
         }
 
     }

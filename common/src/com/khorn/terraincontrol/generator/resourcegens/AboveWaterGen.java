@@ -1,19 +1,13 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.ABOVE_WATER;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 import java.util.List;
 import java.util.Random;
 
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.events.ResourceEvent;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
-
 public class AboveWaterGen extends Resource
 {
-    private int blockId;
-    private int blockData;
-
     @Override
     public void load(List<String> args) throws InvalidResourceException
     {
@@ -22,10 +16,10 @@ public class AboveWaterGen extends Resource
             throw new InvalidResourceException("Too few arguments supplied");
         }
 
-        blockId = getBlockId(args.get(0));
-        blockData = getBlockData(args.get(0));
-        frequency = getInt(args.get(1), 1, 100);
-        rarity = getInt(args.get(2), 1, 100);
+        blockId = readBlockId(args.get(0));
+        blockData = readBlockData(args.get(0));
+        frequency = readInt(args.get(1), 1, 100);
+        rarity = readInt(args.get(2), 1, 100);
     }
 
     @Override
@@ -52,9 +46,4 @@ public class AboveWaterGen extends Resource
         return "AboveWaterRes(" + makeMaterial(blockId) + "," + frequency + "," + rarity + ")";
     }
 
-	@Override
-	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
-			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
-		return new ResourceEvent(ABOVE_WATER, world, random, chunkX, chunkZ, blockId, blockData, hasGeneratedAVillage);
-	}
 }

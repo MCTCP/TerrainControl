@@ -1,5 +1,10 @@
 package com.khorn.terraincontrol.events;
 
+import java.util.Random;
+
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.generator.resourcegens.Resource;
 
 /**
  * Inherit this class, override methods as necessary and register it with
@@ -18,29 +23,88 @@ public abstract class EventHandler
     }
 
     /**
-     * Called whenever a custom object successfully spawns.
+     * Called whenever a single custom object successfully spawns.
      * 
-     * It is up to the implementation of the CustomObject to fire this
-     * event. UseWorld and UseBiome won't fire this event, but BO2 and BO3 will.
+     * It is up to the implementation of the CustomObject to fire this event.
+     * UseWorld and UseBiome won't fire this event, but BO2 and BO3 will.
+     * 
+     * This event should NOT be used to modify data in the object or the world.
+     * However, you can cancel the event by returning false.
+     * 
+     * @param object
+     *            The object that is about to spawn.
+     * @param world
+     *            The world where it will spawn.
+     * @param random
+     *            The random generator.
+     * @param x
+     *            The x of the object origin.
+     * @param y
+     *            The y of the object origin.
+     * @param z
+     *            The z of the object origin.
+     * @return Whether the event should be cancelled. You cannot "uncancel"
+     *         events, so returning true when the event is already cancelled
+     *         does nothing.
      */
-    public void onCustomObjectSpawn(CustomObjectSpawnEvent event)
+    public boolean onCustomObjectSpawn(CustomObject object, LocalWorld world, Random random, int x, int y, int z, boolean isCancelled)
     {
-
+        return true;
     }
 
     /**
-     * Called at the beginning and end of chunk population.
+     * Called whenever a resource is processed for the chunk.
+     * 
+     * @param resource
+     *            The resource that is about to spawn.
+     * @param world
+     *            The world the resource will spawn in.
+     * @param random
+     *            The random generator.
+     * @param chunkX
+     *            The x coordinate of the chunk the resource will spawn in.
+     * @param chunkZ
+     *            The z coordinate of the chunk the resource will spawn in.
+     * @return Whether the event should be cancelled. You cannot "uncancel"
+     *         events, so returning true when the event is already cancelled
+     *         does nothing.
      */
-	public void onPopulateEvent(PopulateEvent event)
-	{
-
-	}
+    public boolean onResourceProcess(Resource resource, LocalWorld world, Random random, int chunkX, int chunkZ, boolean isCancelled)
+    {
+        return true;
+    }
 
     /**
-     * Called before spawning a resource. Cancelling the event cancels the spawn.
+     * Called whenever Terrain Control starts to populate a chunk. Cannot be cancelled.
+     * 
+     * @param world
+     *            The world where the population occurred.
+     * @param random
+     *            The random generator.
+     * @param chunkX
+     *            The x coordinate of the chunk that is being populated.
+     * @param chunkZ
+     *            The z coordinate of the chunk that is being populated.
      */
-	public void onResourceEvent(ResourceEvent event)
-	{
+    public void onPopulateStart(LocalWorld world, Random random, int chunkX, int chunkZ)
+    {
 
-	}
+    }
+    
+    /**
+     * Called whenever Terrain Control is done populating a chunk. Cannot be cancelled.
+     * 
+     * @param world
+     *            The world where the population occurred.
+     * @param random
+     *            The random generator.
+     * @param chunkX
+     *            The x coordinate of the chunk that is being populated.
+     * @param chunkZ
+     *            The z coordinate of the chunk that is being populated.
+     */
+    public void onPopulateEnd(LocalWorld world, Random random, int chunkX, int chunkZ)
+    {
+
+    }
 }

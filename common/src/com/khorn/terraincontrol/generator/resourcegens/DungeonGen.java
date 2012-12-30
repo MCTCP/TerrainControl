@@ -1,14 +1,11 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.DUNGEON;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 
 import java.util.List;
 import java.util.Random;
-
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.events.ResourceEvent;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 public class DungeonGen extends Resource
 {
@@ -22,10 +19,10 @@ public class DungeonGen extends Resource
         {
             throw new InvalidResourceException("Too few arguments supplied");
         }
-        frequency = getInt(args.get(0), 1, 100);
-        rarity = getInt(args.get(1), 1, 100);
-        minAltitude = getInt(args.get(2), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = getInt(args.get(3), minAltitude + 1, TerrainControl.worldHeight);
+        frequency = readInt(args.get(0), 1, 100);
+        rarity = readInt(args.get(1), 1, 100);
+        minAltitude = readInt(args.get(2), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = readInt(args.get(3), minAltitude + 1, TerrainControl.worldHeight);
     }
 
     @Override
@@ -40,10 +37,4 @@ public class DungeonGen extends Resource
     {
         return "Dungeon(" + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
     }
-
-	@Override
-	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
-			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
-		return new ResourceEvent(DUNGEON, world, random, chunkX, chunkZ, 0, 0, hasGeneratedAVillage);
-	}
 }

@@ -2,16 +2,16 @@ package com.khorn.terraincontrol;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
-import com.khorn.terraincontrol.events.CustomObjectSpawnEvent;
 import com.khorn.terraincontrol.events.EventHandler;
-import com.khorn.terraincontrol.events.PopulateEvent;
-import com.khorn.terraincontrol.events.ResourceEvent;
+import com.khorn.terraincontrol.events.EventPriority;
+import com.khorn.terraincontrol.generator.resourcegens.Resource;
 
 public class TerrainControl
 {
@@ -36,7 +36,8 @@ public class TerrainControl
     private static ConfigFunctionsManager configFunctionsManager;
     private static CustomObjectManager customObjectManager;
 
-    private static List<EventHandler> eventHandlers = new ArrayList<EventHandler>();
+    private static List<EventHandler> cancelableEventHandlers = new ArrayList<EventHandler>();
+    private static List<EventHandler> monitoringEventHandlers = new ArrayList<EventHandler>();
 
     private TerrainControl()
     {
@@ -55,14 +56,18 @@ public class TerrainControl
         {
             throw new UnsupportedOperationException("Engine is already set!");
         }
-        
+
         // Start the engine
         TerrainControl.engine = engine;
         configFunctionsManager = new ConfigFunctionsManager();
         customObjectManager = new CustomObjectManager();
 
         // Fire start event
-        for (EventHandler handler : eventHandlers)
+        for (EventHandler handler : cancelableEventHandlers)
+        {
+            handler.onStart();
+        }
+        for (EventHandler handler : monitoringEventHandlers)
         {
             handler.onStart();
         }
@@ -87,7 +92,8 @@ public class TerrainControl
         engine = null;
         customObjectManager = null;
         configFunctionsManager = null;
-        eventHandlers.clear();
+        cancelableEventHandlers.clear();
+        monitoringEventHandlers.clear();
     }
 
     /**
@@ -182,46 +188,92 @@ public class TerrainControl
     }
 
     // Events
-    
+
     /**
-     * Register your event handler here. You can do this before TerrainControl
-     * is started.
+     * Register your event handler here with normal priority. You can do this
+     * before TerrainControl is started.
      * 
      * @param handler
+     *            The handler that will receive the events.
      */
     public static void registerEventHandler(EventHandler handler)
     {
-        eventHandlers.add(handler);
+        cancelableEventHandlers.add(handler);
     }
 
-    @Deprecated
-    public static void fireCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
+    /**
+     * Register you event handler here with the given priority. You can do this
+     * before TerrainControl is started.
+     * 
+     * @param handler
+     *            The handler that will receive the events.
+     * @param priority
+     *            The priority of the event.
+     */
+    public static void registerEventHandler(EventHandler handler, EventPriority priority)
     {
-    	CustomObjectSpawnEvent event = new CustomObjectSpawnEvent(object, world, x, y, z);
-    	fireCustomObjectSpawnEvent(event);
+        if (priority == EventPriority.CANCELABLE)
+        {
+            cancelableEventHandlers.add(handler);
+        } else
+        {
+            monitoringEventHandlers.add(handler);
+        }
     }
 
-    public static void fireCustomObjectSpawnEvent(CustomObjectSpawnEvent event)
+    // Firing events
+    // All methods first call the cancelableEventHandlers, and then the monitoringEventHandlers.
+    // Only cancelableEventHandlers can cancel events.
+    // Cancelled events are still fired.
+
+    public static boolean fireCustomObjectSpawnEvent(CustomObject object, LocalWorld world, Random random, int x, int y, int z)
     {
-        for(EventHandler handler: eventHandlers)
+        boolean isCancelled = false;
+        for (EventHandler handler : cancelableEventHandlers)
         {
-            handler.onCustomObjectSpawn(event);
+            if (!handler.onCustomObjectSpawn(object, world, random, x, y, z, isCancelled))
+            {
+                isCancelled = true;
+            }
         }
+        for (EventHandler handler : monitoringEventHandlers)
+        {
+            handler.onCustomObjectSpawn(object, world, random, x, y, z, isCancelled);
+        }
+        return isCancelled;
     }
 
-	public static void firePopulateEvent(PopulateEvent event)
-	{    	
-        for(EventHandler handler: eventHandlers)
+    public static boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, int chunkX, int chunkZ)
+    {
+        boolean isCancelled = false;
+        for (EventHandler handler : cancelableEventHandlers)
         {
-            handler.onPopulateEvent(event);
+            if (!handler.onResourceProcess(resource, world, random, chunkX, chunkZ, isCancelled))
+            {
+                isCancelled = true;
+            }
         }
-	}
+        for (EventHandler handler : monitoringEventHandlers)
+        {
+            handler.onResourceProcess(resource, world, random, chunkX, chunkZ, isCancelled);
+        }
+        return isCancelled;
+    }
 
-	public static void fireResourceEvent(ResourceEvent event)
-	{    	
-        for(EventHandler handler: eventHandlers)
-        {
-            handler.onResourceEvent(event);
-        }
-	}
+    public static void firePopulationStartEvent(LocalWorld world, Random random, int chunkX, int chunkZ)
+    {
+        for (EventHandler handler : cancelableEventHandlers)
+            handler.onPopulateStart(world, random, chunkX, chunkZ);
+        for (EventHandler handler : monitoringEventHandlers)
+            handler.onPopulateStart(world, random, chunkX, chunkZ);
+    }
+    
+    public static void firePopulationEndEvent(LocalWorld world, Random random, int chunkX, int chunkZ)
+    {
+        for (EventHandler handler : cancelableEventHandlers)
+            handler.onPopulateEnd(world, random, chunkX, chunkZ);
+        for (EventHandler handler : monitoringEventHandlers)
+            handler.onPopulateEnd(world, random, chunkX, chunkZ);
+    }
+
 }

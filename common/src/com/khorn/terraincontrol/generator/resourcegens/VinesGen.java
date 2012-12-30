@@ -1,14 +1,11 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.VINES;
-
 import java.util.List;
 import java.util.Random;
 
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 public class VinesGen extends Resource
@@ -75,11 +72,13 @@ public class VinesGen extends Resource
     @Override
     public void load(List<String> args) throws InvalidResourceException
     {
+        blockId = DefaultMaterial.VINE.id; // Hardcoded for now
+        
         assureSize(4, args);
-        frequency = getInt(args.get(0), 1, 100);
-        rarity = getInt(args.get(1), 1, 100);
-        minAltitude = getInt(args.get(2), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = getInt(args.get(3), minAltitude + 1, TerrainControl.worldHeight);
+        frequency = readInt(args.get(0), 1, 100);
+        rarity = readInt(args.get(1), 1, 100);
+        minAltitude = readInt(args.get(2), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = readInt(args.get(3), minAltitude + 1, TerrainControl.worldHeight);
     }
 
     @Override
@@ -87,10 +86,4 @@ public class VinesGen extends Resource
     {
         return "Vines(" + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
     }
-
-	@Override
-	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
-			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
-		return new ResourceEvent(VINES, world, random, chunkX, chunkZ, 0, 0, hasGeneratedAVillage);
-	}
 }

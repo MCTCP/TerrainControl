@@ -146,8 +146,14 @@ public class BO3 extends ConfigFile implements CustomObject
             // Too many blocks outside source block
             return false;
         }
+        
         // Call event
-        TerrainControl.fireCustomObjectSpawnEvent(this, world, x, y, z);
+        if(!TerrainControl.fireCustomObjectSpawnEvent(this, world, random, x, y, z))
+        {
+            // Cancelled
+            return false;
+        }
+        
         // Spawn
         for (BlockFunction block : blocks)
         {

@@ -30,11 +30,11 @@ public class BlockFunction extends BO3Function
     public void load(List<String> args) throws InvalidResourceException
     {
         assureSize(4, args);
-        blockId = getBlockId(args.get(0));
-        blockData = getBlockData(args.get(0));
-        x = getInt(args.get(1), -100, 100);
-        y = getInt(args.get(2), -100, 100);
-        z = getInt(args.get(3), -100, 100);
+        blockId = readBlockId(args.get(0));
+        blockData = readBlockData(args.get(0));
+        x = readInt(args.get(1), -100, 100);
+        y = readInt(args.get(2), -100, 100);
+        z = readInt(args.get(3), -100, 100);
         metaDataTags = new ArrayList<Tag>();
         metaDataChances = new ArrayList<Integer>();
         metaDataNames = new ArrayList<String>();
@@ -45,7 +45,7 @@ public class BlockFunction extends BO3Function
             {
                 metaDataTags.add(tag);
                 metaDataNames.add(args.get(i));
-                metaDataChances.add(getInt(args.get(i + 1), 1, 100));
+                metaDataChances.add(readInt(args.get(i + 1), 1, 100));
                 hasMetaData = true;
             }
         }

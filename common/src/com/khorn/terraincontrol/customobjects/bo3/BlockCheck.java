@@ -35,9 +35,9 @@ public class BlockCheck extends BO3Check
     public void load(List<String> args) throws InvalidResourceException
     {
         assureSize(4, args);
-        x = getInt(args.get(0), -100, 100);
-        y = getInt(args.get(1), -100, 100);
-        z = getInt(args.get(2), -100, 100);
+        x = readInt(args.get(0), -100, 100);
+        y = readInt(args.get(1), -100, 100);
+        z = readInt(args.get(2), -100, 100);
         blockIds = new ArrayList<Integer>();
         blockDatas = new ArrayList<Byte>();
         for (int i = 3; i < args.size(); i++)
@@ -46,12 +46,12 @@ public class BlockCheck extends BO3Check
             if (blockIdAndData.contains("."))
             {
                 // It's a block id and block data
-                blockIds.add(getBlockId(blockIdAndData));
-                blockDatas.add((byte) getBlockData(blockIdAndData));
+                blockIds.add(readBlockId(blockIdAndData));
+                blockDatas.add((byte) readBlockData(blockIdAndData));
             } else
             {
                 // It's only a block id
-                blockIds.add(getBlockId(blockIdAndData));
+                blockIds.add(readBlockId(blockIdAndData));
                 blockDatas.add((byte) -1);
             }
         }

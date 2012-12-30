@@ -1,12 +1,8 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.GRASS;
-
-import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +10,6 @@ import java.util.Random;
 
 public class GrassGen extends Resource
 {
-    private int blockId;
-    private int blockData;
     private List<Integer> sourceBlocks;
 
     @Override
@@ -25,14 +19,14 @@ public class GrassGen extends Resource
         {
             throw new InvalidResourceException("Too few arguments supplied");
         }
-        blockId = getBlockId(args.get(0));
-        blockData = getInt(args.get(1), 0, 16);
-        frequency = getInt(args.get(2), 1, 500);
-        rarity = getInt(args.get(3), 1, 100);
+        blockId = readBlockId(args.get(0));
+        blockData = readInt(args.get(1), 0, 16);
+        frequency = readInt(args.get(2), 1, 500);
+        rarity = readInt(args.get(3), 1, 100);
         sourceBlocks = new ArrayList<Integer>();
         for (int i = 4; i < args.size(); i++)
         {
-            sourceBlocks.add(getBlockId(args.get(i)));
+            sourceBlocks.add(readBlockId(args.get(i)));
         }
     }
 
@@ -43,13 +37,8 @@ public class GrassGen extends Resource
     }
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ, boolean hasGeneratedAVillage)
+    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        ResourceEvent event = getResourceEvent(world, random, chunkX, chunkZ, hasGeneratedAVillage);
-        TerrainControl.fireResourceEvent(event);
-        if (event.isCancelled())
-        	return;
-
         for (int t = 0; t < frequency; t++)
         {
             if (random.nextInt(100) >= rarity)
@@ -73,10 +62,4 @@ public class GrassGen extends Resource
     {
         return "Grass(" + makeMaterial(blockId) + "," + blockData + "," + frequency + "," + rarity + makeMaterial(sourceBlocks) + ")";
     }
-
-	@Override
-	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
-			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
-		return new ResourceEvent(GRASS, world, random, chunkX, chunkZ, blockId, blockData, hasGeneratedAVillage);
-	}
 }

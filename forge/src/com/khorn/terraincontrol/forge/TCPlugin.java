@@ -11,7 +11,9 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
+import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.util.Txt;
+import com.sun.istack.internal.logging.Logger;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
@@ -73,17 +75,23 @@ public class TCPlugin implements TerrainControlEngine
         // Register world type
         worldType = new TCWorldType(this, "TerrainControl");
 
-        // Register channel
+        // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
             NetworkRegistry.instance().registerChannel(new PacketHandler(this), TCDefaultValues.ChannelName.stringValue());
         }
 
-        // Register player tracker
+        // Register player tracker, for sending configs.
         GameRegistry.registerPlayerTracker(new PlayerTracker(this));
 
-        // Register sapling tracker
+        // Register sapling tracker, for custom tree growth.
         MinecraftForge.TERRAIN_GEN_BUS.register(new SaplingListener());
+
+        // Register to our own events, so that they can be fired again as Forge
+        // events.
+        // TODO: make this optional for people who haven't installed other
+        // terrain mods, and don't want to lose performance.
+        TerrainControl.registerEventHandler(new EventManager(), EventPriority.CANCELABLE);
     }
 
     @PostInit
@@ -110,7 +118,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public void log(Level level, String... messages)
     {
-        FMLCommonHandler.instance().getFMLLogger().log(level, "[TerrainControl] " + Txt.implode(messages, ","));
+        Logger.getLogger(TCPlugin.class).log(level, "[TerrainControl] " + Txt.implode(messages, ","));
     }
 
     @Override

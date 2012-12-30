@@ -1,17 +1,13 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.ICE;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 /**
@@ -20,6 +16,9 @@ import com.khorn.terraincontrol.exception.InvalidResourceException;
  */
 public abstract class Resource extends ConfigFunction<WorldConfig>
 {
+    protected int blockId = -1;
+    protected int blockData = -1;
+    
     @Override
     public Class<WorldConfig> getHolderType()
     {
@@ -36,20 +35,23 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
     public abstract void spawn(LocalWorld world, Random random, int x, int z);
 
     /**
-     * Spawns the resource normally.
+     * Spawns the resource normally. Can be cancelled by an event.
+     * 
+     * When you override this, don't forget to call the event!
      * 
      * @param world
      * @param chunkX
      * @param chunkZ
-     * @param hasGeneratedAVillage 
      */
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ, boolean hasGeneratedAVillage)
+    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        ResourceEvent event = getResourceEvent(world, random, chunkX, chunkZ, hasGeneratedAVillage);
-        TerrainControl.fireResourceEvent(event);
-        if (event.isCancelled())
-        	return;
-
+        // Fire event
+        if(!TerrainControl.fireResourceProcessEvent(this, world, random, chunkX, chunkZ))
+        {
+            return;
+        }
+        
+        // Process
         for (int t = 0; t < frequency; t++)
         {
             if (random.nextInt(100) > rarity)
@@ -60,9 +62,7 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
         }
     }
     
-    protected abstract ResourceEvent getResourceEvent(LocalWorld world, Random random, int chunkX, int chunkZ, boolean hasGeneratedAVillage);
-
-	/**
+    /**
      * Convenience method for creating a resource. Used to create the default resources.
      * @param world
      * @param clazz
@@ -98,5 +98,14 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
         }
         
         return resource;
+    }
+    
+    /**
+     * Returns the block id. Resources that don't have a block id should return -1.
+     * @return 
+     */
+    public int getBlockId()
+    {
+        return blockId;
     }
 }

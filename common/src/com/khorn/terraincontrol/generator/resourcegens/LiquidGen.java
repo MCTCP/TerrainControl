@@ -1,11 +1,8 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.LIQUID;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 
-import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 
 import java.util.ArrayList;
@@ -14,8 +11,6 @@ import java.util.Random;
 
 public class LiquidGen extends Resource
 {
-    private int blockId;
-    private int blockData;
     private List<Integer> sourceBlocks;
     private int minAltitude;
     private int maxAltitude;
@@ -72,16 +67,16 @@ public class LiquidGen extends Resource
         {
             throw new InvalidResourceException("Too few arguments supplied");
         }
-        blockId = getBlockId(args.get(0));
-        blockData = getBlockData(args.get(0));
-        frequency = getInt(args.get(1), 1, 5000);
-        rarity = getInt(args.get(2), 1, 100);
-        minAltitude = getInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = getInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
+        blockId = readBlockId(args.get(0));
+        blockData = readBlockData(args.get(0));
+        frequency = readInt(args.get(1), 1, 5000);
+        rarity = readInt(args.get(2), 1, 100);
+        minAltitude = readInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
+        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
         sourceBlocks = new ArrayList<Integer>();
         for (int i = 5; i < args.size(); i++)
         {
-            sourceBlocks.add(getBlockId(args.get(i)));
+            sourceBlocks.add(readBlockId(args.get(i)));
         }
     }
 
@@ -90,10 +85,4 @@ public class LiquidGen extends Resource
     {
         return "Liquid(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
     }
-
-	@Override
-	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
-			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
-		return new ResourceEvent(LIQUID, world, random, chunkX, chunkZ, blockId, blockData, hasGeneratedAVillage);
-	}
 }

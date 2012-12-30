@@ -128,7 +128,11 @@ public class BO2 extends ConfigFile implements CustomObject
         }
         
         // Call event
-        TerrainControl.fireCustomObjectSpawnEvent(this, world, x, y, z);
+        if(!TerrainControl.fireCustomObjectSpawnEvent(this, world, random, x, y, z))
+        {
+            // Cancelled
+            return false;
+        }
 
         // Spawn
         for (ObjectCoordinate point : data)

@@ -34,7 +34,7 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
             saplingType = -1;
         } else
         {
-            saplingType = getInt(args.get(0), -1, 3);
+            saplingType = readInt(args.get(0), -1, 3);
         }
 
         trees = new ArrayList<CustomObject>();
@@ -54,7 +54,7 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
             }
             trees.add(object);
             treeNames.add(args.get(i));
-            treeChances.add(getInt(args.get(i + 1), 1, 100));
+            treeChances.add(readInt(args.get(i + 1), 1, 100));
         }
     }
 

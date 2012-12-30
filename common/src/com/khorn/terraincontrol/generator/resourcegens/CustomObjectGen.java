@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import static com.khorn.terraincontrol.events.ResourceEvent.Type.CUSTOM_OBJECT;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -9,7 +7,6 @@ import java.util.Random;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.events.ResourceEvent;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.util.Txt;
 
@@ -47,13 +44,8 @@ public class CustomObjectGen extends Resource
     }
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ, boolean hasGeneratedAVillage)
+    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        ResourceEvent event = getResourceEvent(world, random, chunkX, chunkZ, hasGeneratedAVillage);
-        TerrainControl.fireResourceEvent(event);
-        if (event.isCancelled())
-        	return;
-
         for (CustomObject object : objects)
         {
             object.process(world, random, chunkX, chunkZ);
@@ -65,11 +57,5 @@ public class CustomObjectGen extends Resource
     {
         return "CustomObject(" + Txt.implode(objectNames, ",") + ")";
     }
-
-	@Override
-	protected ResourceEvent getResourceEvent(LocalWorld world, Random random,
-			int chunkX, int chunkZ, boolean hasGeneratedAVillage) {
-		return new ResourceEvent(CUSTOM_OBJECT, world, random, chunkX, chunkZ, 0, 0, hasGeneratedAVillage);
-	}
 
 }
