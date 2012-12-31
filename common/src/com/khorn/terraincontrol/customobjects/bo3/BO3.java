@@ -269,58 +269,58 @@ public class BO3 extends ConfigFile implements CustomObject
     protected void WriteConfigSettings() throws IOException
     {
         // The object
-        WriteTitle("BO3 object");
-        WriteComment("This is the config file of a custom object.");
-        WriteComment("If you add this object correctly to your BiomeConfigs, it will spawn in the world.");
-        WriteComment("");
-        WriteComment("This is the creator of this BO3 object");
-        WriteValue("Author", author);
-        WriteNewLine();
-        WriteComment("A short description of this BO3 object");
-        WriteValue("Description", description);
-        WriteNewLine();
-        WriteComment("The BO3 version, don't change this! It can be used by external applications to do a version check.");
-        WriteValue("Version", 3);
-        WriteNewLine();
-        WriteComment("The settings mode, WriteAll, WriteWithoutComments or WriteDisable. See WorldConfig.");
-        WriteValue("SettingsMode", settingsMode.toString());
+        writeBigTitle("BO3 object");
+        writeComment("This is the config file of a custom object.");
+        writeComment("If you add this object correctly to your BiomeConfigs, it will spawn in the world.");
+        writeComment("");
+        writeComment("This is the creator of this BO3 object");
+        writeValue("Author", author);
+        writeNewLine();
+        writeComment("A short description of this BO3 object");
+        writeValue("Description", description);
+        writeNewLine();
+        writeComment("The BO3 version, don't change this! It can be used by external applications to do a version check.");
+        writeValue("Version", 3);
+        writeNewLine();
+        writeComment("The settings mode, WriteAll, WriteWithoutComments or WriteDisable. See WorldConfig.");
+        writeValue("SettingsMode", settingsMode.toString());
 
         // Main settings
-        WriteTitle("Main settings");
-        WriteComment("This needs to be set to true to spawn the object in the Tree and Sapling resources.");
-        WriteValue("Tree", tree);
-        WriteNewLine();
-        WriteComment("The frequency of the BO3 from 1 to 200. Tries this many times to spawn this BO3 when using the CustomObject(...) resource.");
-        WriteValue("Frequency", frequency);
-        WriteNewLine();
-        WriteComment("The rarity of the BO3 from 0 to 100. Each spawn attempt has rarity% chance to succeed when using the CustomObject(...) resource.");
-        WriteValue("Rarity", rarity);
-        WriteNewLine();
-        WriteComment("If you set this to true, the BO3 will be placed with a random rotation.");
-        WriteValue("RotateRandomly", rotateRandomly);
-        WriteNewLine();
-        WriteComment("The spawn height of the BO3 - randomY, highestBlock or highestSolidBlock.");
-        WriteValue("SpawnHeight", spawnHeight.toString());
-        WriteNewLine();
-        WriteComment("The height limits for the BO3.");
-        WriteValue("MinHeight", minHeight);
-        WriteValue("MaxHeight", maxHeight);
-        WriteNewLine();
-        WriteComment("When spawned with the UseWorld keyword, this BO3 should NOT spawn in the following biomes.");
-        WriteComment("If you write the BO3 name directly in the BiomeConfigs, this will be ignored.");
-        WriteValue("ExcludedBiomes", excludedBiomes);
+        writeBigTitle("Main settings");
+        writeComment("This needs to be set to true to spawn the object in the Tree and Sapling resources.");
+        writeValue("Tree", tree);
+        writeNewLine();
+        writeComment("The frequency of the BO3 from 1 to 200. Tries this many times to spawn this BO3 when using the CustomObject(...) resource.");
+        writeValue("Frequency", frequency);
+        writeNewLine();
+        writeComment("The rarity of the BO3 from 0 to 100. Each spawn attempt has rarity% chance to succeed when using the CustomObject(...) resource.");
+        writeValue("Rarity", rarity);
+        writeNewLine();
+        writeComment("If you set this to true, the BO3 will be placed with a random rotation.");
+        writeValue("RotateRandomly", rotateRandomly);
+        writeNewLine();
+        writeComment("The spawn height of the BO3 - randomY, highestBlock or highestSolidBlock.");
+        writeValue("SpawnHeight", spawnHeight.toString());
+        writeNewLine();
+        writeComment("The height limits for the BO3.");
+        writeValue("MinHeight", minHeight);
+        writeValue("MaxHeight", maxHeight);
+        writeNewLine();
+        writeComment("When spawned with the UseWorld keyword, this BO3 should NOT spawn in the following biomes.");
+        writeComment("If you write the BO3 name directly in the BiomeConfigs, this will be ignored.");
+        writeValue("ExcludedBiomes", excludedBiomes);
 
         // Sourceblock
-        WriteTitle("Source block settings");
-        WriteComment("The block the BO3 should spawn in");
-        WriteValue("SourceBlock", sourceBlock);
-        WriteNewLine();
-        WriteComment("The maximum percentage of the BO3 that can be outside the SourceBlock.");
-        WriteComment("The BO3 won't be placed on a location with more blocks outside the SourceBlock than this percentage.");
-        WriteValue("MaxPercentageOutsideSourceBlock", maxPercentageOutsideSourceBlock);
-        WriteNewLine();
-        WriteComment("What to do when a block is about to be placed outside the SourceBlock? (dontPlace, placeAnyway)");
-        WriteValue("OutsideSourceBlock", outsideSourceBlock.toString());
+        writeBigTitle("Source block settings");
+        writeComment("The block the BO3 should spawn in");
+        writeValue("SourceBlock", sourceBlock);
+        writeNewLine();
+        writeComment("The maximum percentage of the BO3 that can be outside the SourceBlock.");
+        writeComment("The BO3 won't be placed on a location with more blocks outside the SourceBlock than this percentage.");
+        writeValue("MaxPercentageOutsideSourceBlock", maxPercentageOutsideSourceBlock);
+        writeNewLine();
+        writeComment("What to do when a block is about to be placed outside the SourceBlock? (dontPlace, placeAnyway)");
+        writeValue("OutsideSourceBlock", outsideSourceBlock.toString());
 
         // Blocks
         writeResources();
@@ -388,24 +388,24 @@ public class BO3 extends ConfigFile implements CustomObject
     public void writeResources() throws IOException
     {
         // Blocks
-        WriteTitle("Blocks");
-        WriteComment("All the blocks used in the BO3 are listed here.");
-        WriteComment("Syntax: Block(id[.data],x,y,z[,nbtfile.nbt,chance[,anothernbtfile.nbt,chance[,...]]])");
-        WriteComment("So Block(CHEST,0,0,0,chest.nbt,50,anotherchest.nbt,100) will spawn a chest at the BO3");
-        WriteComment("origin, and give it a 50% chance to have the contents of chest.nbt, or, if that fails,");
-        WriteComment("a 100% percent chance to have the contents of anotherchest.nbt.");
+        writeBigTitle("Blocks");
+        writeComment("All the blocks used in the BO3 are listed here.");
+        writeComment("Syntax: Block(id[.data],x,y,z[,nbtfile.nbt,chance[,anothernbtfile.nbt,chance[,...]]])");
+        writeComment("So Block(CHEST,0,0,0,chest.nbt,50,anotherchest.nbt,100) will spawn a chest at the BO3");
+        writeComment("origin, and give it a 50% chance to have the contents of chest.nbt, or, if that fails,");
+        writeComment("a 100% percent chance to have the contents of anotherchest.nbt.");
         for (BlockFunction block : blocks[0])
         {
-            WriteValue(block.makeString());
+            writeValue(block.makeString());
         }
 
         // BO3Checks
-        WriteTitle("BO3 checks");
-        WriteComment("Require a condition at a certain location in order for the BO3 to be spawned.");
-        WriteComment("BlockCheck(x,y,z,id[.data][,id[.data][,...]])");
+        writeBigTitle("BO3 checks");
+        writeComment("Require a condition at a certain location in order for the BO3 to be spawned.");
+        writeComment("BlockCheck(x,y,z,id[.data][,id[.data][,...]])");
         for (BO3Check check : bo3Checks[0])
         {
-            WriteValue(check.makeString());
+            writeValue(check.makeString());
         }
     }
 

@@ -111,7 +111,7 @@ public class BiomeConfig extends ConfigFile
     public LocalBiome Biome;
 
     public WorldConfig worldConfig;
-    public String Name;
+    public String name;
 
     // Spawn Config
     public boolean spawnMonstersAddDefaults = true;
@@ -124,11 +124,11 @@ public class BiomeConfig extends ConfigFile
     public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
         this.Biome = biome;
-        this.Name = biome.getName();
+        this.name = biome.getName();
         worldConfig = config;
         InitDefaults();
 
-        File settingsFile = new File(settingsDir, this.Name + TCDefaultValues.WorldBiomeConfigName.stringValue());
+        File settingsFile = new File(settingsDir, this.name + TCDefaultValues.WorldBiomeConfigName.stringValue());
 
         this.ReadSettingsFile(settingsFile);
         this.RenameOldSettings();
@@ -513,7 +513,7 @@ public class BiomeConfig extends ConfigFile
                 String name = key.substring(0, start);
                 String[] props = ReadComplexString(key.substring(start + 1, end));
 
-                ConfigFunction<WorldConfig> res = TerrainControl.getConfigFunctionsManager().getConfigFunction(name, worldConfig, this.Name + " on line " + entry.getValue(), Arrays.asList(props));
+                ConfigFunction<WorldConfig> res = TerrainControl.getConfigFunctionsManager().getConfigFunction(name, worldConfig, this.name + " on line " + entry.getValue(), Arrays.asList(props));
 
                 if (res != null)
                 {
@@ -579,297 +579,310 @@ public class BiomeConfig extends ConfigFile
 
     protected void WriteConfigSettings() throws IOException
     {
-        WriteTitle(this.Name + " biome config");
+        if(DefaultBiome.getBiome(this.Biome.getId()) != null)
+        {
+            writeComment("This is the biome config file of the " + this.name + " biome, which is one of the vanilla biomes.");
+        } else
+        {
+            writeComment("This is the biome config file of the " + this.name + " biome, which is a custom biome.");
+        }
+        writeNewLine();
 
-        WriteComment("Biome size from 0 to GenerationDepth. Show in what zoom level biome will be generated (see GenerationDepth)");
-        WriteComment("Higher numbers=Smaller% of world / Lower numbers=Bigger % of world");
-        WriteComment("Don`t work on Ocean and River (frozen versions too) biomes until not added as normal biome.");
-        WriteValue(TCDefaultValues.BiomeSize.name(), this.BiomeSize);
-        this.WriteNewLine();
+        writeBigTitle("Biome placement");
+        
+        writeComment("Biome size from 0 to GenerationDepth. Defines in which biome layer this biome will be generated (see GenerationDepth).");
+        writeComment("Higher numbers give a smaller biome, lower numbers a larger biome.");
+        writeComment("Oceans and rivers are generated using a dirrerent algorithm in the default settings,");
+        writeComment("(they aren't in one of the biome lists), so this setting won't affect them.");
+        writeValue(TCDefaultValues.BiomeSize.name(), this.BiomeSize);
+        this.writeNewLine();
 
-        WriteComment("Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.");
-        WriteComment("Example for normal biome :");
-        WriteComment("  100 rarity mean 1/6 chance than other ( with 6 default normal biomes).");
-        WriteComment("  50 rarity mean 1/11 chance than other");
-        WriteComment("For isle biome this is chance to spawn isle in good place.");
-        WriteComment("Don`t work on Ocean and River (frozen versions too) biomes until not added as normal biome.");
-        WriteValue(TCDefaultValues.BiomeRarity.name(), this.BiomeRarity);
-        this.WriteNewLine();
+        // TODO
+        writeComment("Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.");
+        writeComment("Example for normal biome :");
+        writeComment("  100 rarity mean 1/6 chance than other ( with 6 default normal biomes).");
+        writeComment("  50 rarity mean 1/11 chance than other");
+        writeComment("For isle biome this is chance to spawn isle in good place.");
+        writeComment("Don`t work on Ocean and River (frozen versions too) biomes until not added as normal biome.");
+        writeValue(TCDefaultValues.BiomeRarity.name(), this.BiomeRarity);
+        this.writeNewLine();
 
-        WriteComment("Biome color in hex value. Biome color in /tc map command");
-        WriteValue(TCDefaultValues.BiomeColor.name(), this.BiomeColor);
-        this.WriteNewLine();
+        writeComment("The hexadecimal color value of this biome. Used in the output of the /tc map command,");
+        writeComment("and used in the input of BiomeMode:FromImage.");
+        writeValue(TCDefaultValues.BiomeColor.name(), this.BiomeColor);
+        this.writeNewLine();
 
-        WriteComment("True if biome can pass rivers.");
-        WriteValue(TCDefaultValues.BiomeRivers.name(), this.BiomeRivers);
-        this.WriteNewLine();
+        writeComment("Set this to false to disable rivers in this biome.");
+        writeValue(TCDefaultValues.BiomeRivers.name(), this.BiomeRivers);
+        this.writeNewLine();
+        
+        writeComment("Replace this biome to specified after all generations. Warning this will cause saplings and mob spawning work as in specified biome");
+        writeValue(TCDefaultValues.ReplaceToBiomeName.name(), this.ReplaceBiomeName);
+        this.writeNewLine();
 
-        WriteComment("Biome name list where this biome will be spawned as isle. Like Mushroom isle in Ocean.  This work only if this biome is in IsleBiomes in world config");
-        WriteValue(TCDefaultValues.IsleInBiome.name(), this.IsleInBiome);
-        this.WriteNewLine();
+        writeSmallTitle("Isle biomes only");
+        
+        writeComment("Biome name list where this biome will be spawned as isle. Like Mushroom isle in Ocean.  This work only if this biome is in IsleBiomes in world config");
+        writeValue(TCDefaultValues.IsleInBiome.name(), this.IsleInBiome);
+        this.writeNewLine();
+        
+        writeSmallTitle("Border biomes only");
 
-        WriteComment("Biome name list where this biome will be border.Like Mushroom isle shore. Use is compared as IsleInBiome");
-        WriteValue(TCDefaultValues.BiomeIsBorder.name(), this.BiomeIsBorder);
-        this.WriteNewLine();
+        writeComment("Biome name list where this biome will be border.Like Mushroom isle shore. Use is compared as IsleInBiome");
+        writeValue(TCDefaultValues.BiomeIsBorder.name(), this.BiomeIsBorder);
+        this.writeNewLine();
 
-        WriteComment("Biome name list near border is not applied. ");
-        WriteValue(TCDefaultValues.NotBorderNear.name(), this.NotBorderNear);
-        this.WriteNewLine();
+        writeComment("Biome name list near border is not applied. ");
+        writeValue(TCDefaultValues.NotBorderNear.name(), this.NotBorderNear);
+        this.writeNewLine();
 
-        WriteComment("Biome temperature. Float value from 0.0 to 1.0");
-        WriteValue(TCDefaultValues.BiomeTemperature.name(), this.BiomeTemperature);
-        this.WriteNewLine();
-        WriteComment("Biome wetness. Float value from 0.0 to 1.0");
-        WriteValue(TCDefaultValues.BiomeWetness.name(), this.BiomeWetness);
-        this.WriteNewLine();
+        writeBigTitle("Biome height and volatility");
+        writeComment("BiomeHeight mean how much height will be added in terrain generation");
+        writeComment("It is double value from -10.0 to 10.0");
+        writeComment("Value 0.0 equivalent half of map height with all other default settings");
+        writeValue(TCDefaultValues.BiomeHeight.name(), this.BiomeHeight);
 
-        WriteComment("Replace this biome to specified after all generations. Warning this will cause saplings and mob spawning work as in specified biome");
-        WriteValue(TCDefaultValues.ReplaceToBiomeName.name(), this.ReplaceBiomeName);
-        this.WriteNewLine();
+        this.writeNewLine();
+        writeComment("Biome volatility.");
+        writeValue(TCDefaultValues.BiomeVolatility.name(), this.BiomeVolatility);
 
-        WriteTitle("Terrain Generator Variables");
-        WriteComment("BiomeHeight mean how much height will be added in terrain generation");
-        WriteComment("It is double value from -10.0 to 10.0");
-        WriteComment("Value 0.0 equivalent half of map height with all other default settings");
-        WriteValue(TCDefaultValues.BiomeHeight.name(), this.BiomeHeight);
+        writeNewLine();
+        writeComment("If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.");
+        writeComment("If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.");
+        writeValue(TCDefaultValues.MaxAverageHeight.name(), this.maxAverageHeight);
 
-        this.WriteNewLine();
-        WriteComment("Biome volatility.");
-        WriteValue(TCDefaultValues.BiomeVolatility.name(), this.BiomeVolatility);
+        writeNewLine();
+        writeComment("If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the ottom of the ocean) will fall before leveling off when it begins to decrease in elevation. ");
+        writeComment("If the value is less than 0, then it will cause the terrain to either fall to a lesser depth before leveling out or increase in height if the value is a large enough negative.");
+        writeValue(TCDefaultValues.MaxAverageDepth.name(), this.maxAverageDepth);
 
-        WriteNewLine();
-        WriteComment("If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.");
-        WriteComment("If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.");
-        WriteValue(TCDefaultValues.MaxAverageHeight.name(), this.maxAverageHeight);
+        writeNewLine();
+        writeComment("Another type of noise. This noise is independent from biomes. The larger the values the more chaotic/volatile landscape generation becomes.");
+        writeComment("Setting the values to negative will have the opposite effect and make landscape generation calmer/gentler.");
+        writeValue(TCDefaultValues.Volatility1.name(), this.volatilityRaw1);
+        writeValue(TCDefaultValues.Volatility2.name(), this.volatilityRaw2);
 
-        WriteNewLine();
-        WriteComment("If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the ottom of the ocean) will fall before leveling off when it begins to decrease in elevation. ");
-        WriteComment("If the value is less than 0, then it will cause the terrain to either fall to a lesser depth before leveling out or increase in height if the value is a large enough negative.");
-        WriteValue(TCDefaultValues.MaxAverageDepth.name(), this.maxAverageDepth);
+        writeNewLine();
+        writeComment("Adjust the weight of the corresponding volatility settings. This allows you to change how prevalent you want either of the volatility settings to be in the terrain.");
+        writeValue(TCDefaultValues.VolatilityWeight1.name(), this.volatilityWeightRaw1);
+        writeValue(TCDefaultValues.VolatilityWeight2.name(), this.volatilityWeightRaw2);
 
-        WriteNewLine();
-        WriteComment("Another type of noise. This noise is independent from biomes. The larger the values the more chaotic/volatile landscape generation becomes.");
-        WriteComment("Setting the values to negative will have the opposite effect and make landscape generation calmer/gentler.");
-        WriteValue(TCDefaultValues.Volatility1.name(), this.volatilityRaw1);
-        WriteValue(TCDefaultValues.Volatility2.name(), this.volatilityRaw2);
-
-        WriteNewLine();
-        WriteComment("Adjust the weight of the corresponding volatility settings. This allows you to change how prevalent you want either of the volatility settings to be in the terrain.");
-        WriteValue(TCDefaultValues.VolatilityWeight1.name(), this.volatilityWeightRaw1);
-        WriteValue(TCDefaultValues.VolatilityWeight2.name(), this.volatilityWeightRaw2);
-
-        WriteNewLine();
-        WriteComment("Disable all noises except Volatility1 and Volatility2. Also disable default block chance from height.");
-        WriteValue(TCDefaultValues.DisableBiomeHeight.name(), this.disableNotchHeightControl);
-        WriteNewLine();
-        WriteComment("List of custom height factor, 17 double entries, each entire control of about 7 blocks height from down. Positive entry - better chance of spawn blocks, negative - smaller");
-        WriteComment("Values which affect your configuration may be found only experimental. That may be very big, like ~3000.0 depends from height");
-        WriteComment("Example:");
-        WriteComment("  CustomHeightControl:0.0,-2500.0,0.0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0");
-        WriteComment("Make empty layer above bedrock layer. ");
+        writeNewLine();
+        writeComment("Disable all noises except Volatility1 and Volatility2. Also disable default block chance from height.");
+        writeValue(TCDefaultValues.DisableBiomeHeight.name(), this.disableNotchHeightControl);
+        writeNewLine();
+        writeComment("List of custom height factor, 17 double entries, each entire control of about 7 blocks height from down. Positive entry - better chance of spawn blocks, negative - smaller");
+        writeComment("Values which affect your configuration may be found only experimental. That may be very big, like ~3000.0 depends from height");
+        writeComment("Example:");
+        writeComment("  CustomHeightControl:0.0,-2500.0,0.0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0");
+        writeComment("Make empty layer above bedrock layer. ");
         WriteHeightSettings();
+        
+        this.writeBigTitle("Blocks");
 
-        this.WriteNewLine();
-        WriteComment("Surface block id");
-        WriteValue(TCDefaultValues.SurfaceBlock.name(), this.SurfaceBlock);
+        this.writeNewLine();
+        writeComment("Surface block id");
+        writeValue(TCDefaultValues.SurfaceBlock.name(), this.SurfaceBlock);
 
-        this.WriteNewLine();
-        WriteComment("Block id from stone to surface, like dirt in plain biome ");
-        WriteValue(TCDefaultValues.GroundBlock.name(), this.GroundBlock);
-        WriteNewLine();
-
-        WriteComment("If disabled use water levels and blocks below for this biome");
-        WriteValue(TCDefaultValues.UseWorldWaterLevel.name(), this.UseWorldWaterLevel);
-        WriteNewLine();
-
-        WriteComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
-        WriteValue(TCDefaultValues.WaterLevelMax.name(), this.waterLevelMax);
-        WriteValue(TCDefaultValues.WaterLevelMin.name(), this.waterLevelMin);
-        WriteNewLine();
-        WriteComment("BlockId used as water in WaterLevel");
-        WriteValue(TCDefaultValues.WaterBlock.name(), this.waterBlock);
-        WriteNewLine();
-        WriteComment("BlockId used as ice");
-        WriteValue(TCDefaultValues.IceBlock.name(), this.iceBlock);
-
-        this.WriteNewLine();
-        WriteComment("Replace Variable: (BlockIdFrom,BlockIdTo[,BlockDataTo,minHeight,maxHeight])");
-        WriteComment("Example :");
-        WriteComment("  ReplacedBlocks:(2,3,0,100,127),(13,20)");
-        WriteComment("Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
+        this.writeNewLine();
+        writeComment("Block id from stone to surface, like dirt in plain biome ");
+        writeValue(TCDefaultValues.GroundBlock.name(), this.GroundBlock);
+        writeNewLine();
+        
+        this.writeNewLine();
+        writeComment("Replace Variable: (BlockIdFrom,BlockIdTo[,BlockDataTo,minHeight,maxHeight])");
+        writeComment("Example :");
+        writeComment("  ReplacedBlocks:(2,3,0,100,127),(13,20)");
+        writeComment("Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
         WriteModReplaceSettings();
+        
+        this.writeBigTitle("Water and ice");
 
-        this.WriteTitle("Biome visual settings");
-        this.WriteComment("Warning this section will work only for clients with single version of TerrainControl");
+        writeComment("Set this to false to use the water and ice settings of this biome.");
+        writeValue(TCDefaultValues.UseWorldWaterLevel.name(), this.UseWorldWaterLevel);
+        writeNewLine();
 
-        this.WriteNewLine();
-        this.WriteComment("Biome sky color");
-        this.WriteColorValue(TCDefaultValues.SkyColor.name(), this.SkyColor);
+        writeComment("Set water level. Every empty between this levels will be fill water or another block from WaterBlock.");
+        writeValue(TCDefaultValues.WaterLevelMax.name(), this.waterLevelMax);
+        writeValue(TCDefaultValues.WaterLevelMin.name(), this.waterLevelMin);
+        writeNewLine();
+        writeComment("BlockId used as water in WaterLevelMax");
+        writeValue(TCDefaultValues.WaterBlock.name(), this.waterBlock);
+        writeNewLine();
+        writeComment("BlockId used as ice. Ice only spawns if the BiomeTemperture is low enough.");
+        writeValue(TCDefaultValues.IceBlock.name(), this.iceBlock);
 
-        this.WriteNewLine();
-        this.WriteComment("Biome water color multiplier ");
-        this.WriteColorValue(TCDefaultValues.WaterColor.name(), this.WaterColor);
+        this.writeBigTitle("Visuals and weather");
+        this.writeComment("Most of the settings here only have an effect on players with the client version of Terrain Control installed.");
+        
+        writeComment("Biome temperature. Float value from 0.0 to 1.0.");
+        writeValue(TCDefaultValues.BiomeTemperature.name(), this.BiomeTemperature);
+        this.writeNewLine();
+        
+        writeComment("Biome wetness. Float value from 0.0 to 1.0.");
+        writeValue(TCDefaultValues.BiomeWetness.name(), this.BiomeWetness);
+        this.writeNewLine();
 
-        this.WriteNewLine();
-        this.WriteComment("Biome grass color");
-        this.WriteColorValue(TCDefaultValues.GrassColor.name(), this.GrassColor);
+        this.writeComment("Biome sky color.");
+        this.writeColorValue(TCDefaultValues.SkyColor.name(), this.SkyColor);
 
-        this.WriteNewLine();
-        this.WriteComment("Whether the grass color is a multiplier");
-        this.WriteComment("If you set it to true, the color will be based on this value, the BiomeTemperature and the BiomeWetness");
-        this.WriteComment("If you set it to false, the grass color will be just this color");
-        this.WriteValue(TCDefaultValues.GrassColorIsMultiplier.name(), this.GrassColorIsMultiplier);
+        this.writeNewLine();
+        this.writeComment("Biome water color multiplier.");
+        this.writeColorValue(TCDefaultValues.WaterColor.name(), this.WaterColor);
 
-        this.WriteNewLine();
-        this.WriteComment("Biome foliage color");
-        this.WriteColorValue(TCDefaultValues.FoliageColor.name(), this.FoliageColor);
+        this.writeNewLine();
+        this.writeComment("Biome grass color.");
+        this.writeColorValue(TCDefaultValues.GrassColor.name(), this.GrassColor);
 
-        this.WriteNewLine();
-        this.WriteComment("Whether the foliage color is a multiplier. See GrassColorIsMultiplier for details");
-        this.WriteValue(TCDefaultValues.FoliageColorIsMultiplier.name(), this.FoliageColorIsMultiplier);
+        this.writeNewLine();
+        this.writeComment("Whether the grass color is a multiplier.");
+        this.writeComment("If you set it to true, the color will be based on this value, the BiomeTemperature and the BiomeWetness.");
+        this.writeComment("If you set it to false, the grass color will be just this color.");
+        this.writeValue(TCDefaultValues.GrassColorIsMultiplier.name(), this.GrassColorIsMultiplier);
 
-        this.WriteNewLine();
-        this.WriteTitle("Sapling resource");
-        this.WriteComment("Work like Tree resource instead first parameter");
-        this.WriteSaplingSettings();
+        this.writeNewLine();
+        this.writeComment("Biome foliage color.");
+        this.writeColorValue(TCDefaultValues.FoliageColor.name(), this.FoliageColor);
 
-        this.WriteNewLine();
-        this.WriteTitle("Resource queue");
-        this.WriteComment("This section control all resources spawning after terrain generation");
-        this.WriteComment("So first line is first resource which will be placed. Second line - second resource.");
-        this.WriteComment("By default this set to be near vanilla settings.");
-        this.WriteComment("");
-        this.WriteComment("Keep in mind that a high size, frequency or rarity might slow down terrain generation.");
-        this.WriteComment("");
-        this.WriteComment("Possible resources:");
-        this.WriteComment("SmallLake(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude)");
-        this.WriteComment("Dungeon(Frequency,Rarity,MinAltitude,MaxAltitude)");
-        this.WriteComment("UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)");
-        this.WriteComment("Ore(Block[.BlockData],Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.WriteComment("UnderWaterOre(Block,Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.WriteComment("CustomObject()");
-        this.WriteComment("Tree(Frequency,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
-        this.WriteComment("Plant(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.WriteComment("Grass(Block,BlockData,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.WriteComment("Reed(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.WriteComment("Cactus(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.WriteComment("Liquid(Block,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.WriteComment("AboveWaterRes(Block,Frequency,Rarity)");
-        this.WriteComment("Vines(Frequency,Rarity,MinAltitude,MaxAltitude)");
-        this.WriteComment("");
-        this.WriteComment("Some comments:  ");
-        this.WriteComment("Block and BlockSource - can be id or name, Frequency - is count of attempts for place resource");
-        this.WriteComment("Rarity - chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass");
-        this.WriteComment("MinAltitude and MaxAltitude - height limits");
-        this.WriteComment("BlockSource - mean where or whereupon resource will be placed ");
-        this.WriteComment("CustomObject resource - mean where in queue custom object will be trying to place");
-        this.WriteComment("Tree types: ");
-        this.WriteComment("     Tree");
-        this.WriteComment("     BigTree");
-        this.WriteComment("     Forest");
-        this.WriteComment("     HugeMushroom");
-        this.WriteComment("     SwampTree");
-        this.WriteComment("     Taiga1");
-        this.WriteComment("     Taiga2");
-        this.WriteComment("     JungleTree");
-        this.WriteComment("     GroundBush");
-        this.WriteComment("     CocoaTree");
-        this.WriteComment("TreeType_Chance - similar Rarity. Example:");
-        this.WriteComment("  Tree(10,Taiga1,35,Taiga2,100) - plugin trying to 10 attempts, in each attempt he try place Taiga1 ( 35% chance ) if not he place Taiga2 (100% chance)");
-        this.WriteComment("Plant resource used for place something like flower, small mushrooms, pumpkins");
-        this.WriteComment("Liquid resource is one block water or lava source");
-        this.WriteComment("");
+        this.writeNewLine();
+        this.writeComment("Whether the foliage color is a multiplier. See GrassColorIsMultiplier for details.");
+        this.writeValue(TCDefaultValues.FoliageColorIsMultiplier.name(), this.FoliageColorIsMultiplier);
+
+        this.writeNewLine();
+        this.writeBigTitle("Resource queue");
+        this.writeComment("This section control all resources spawning after terrain generation");
+        this.writeComment("The resources will be placed in this order.");
+        this.writeComment("");
+        this.writeComment("Keep in mind that a high size, frequency or rarity might slow down terrain generation.");
+        this.writeComment("");
+        this.writeComment("Possible resources:");
+        this.writeComment("SmallLake(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude)");
+        this.writeComment("Dungeon(Frequency,Rarity,MinAltitude,MaxAltitude)");
+        this.writeComment("UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)");
+        this.writeComment("Ore(Block[.BlockData],Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("UnderWaterOre(Block[.BlockData],Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("CustomObject(Object[,AnotherObject[,...]])");
+        this.writeComment("Tree(Frequency,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
+        this.writeComment("Plant(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Grass(Block,BlockData,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Reed(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Cactus(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Liquid(Block[.BlockData],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("AboveWaterRes(Block[.BlockData],Frequency,Rarity)");
+        this.writeComment("Vines(Frequency,Rarity,MinAltitude,MaxAltitude)");
+        this.writeComment("");
+        this.writeComment("Some comments:");
+        this.writeComment("Block and BlockSource - can be id or name, Frequency - is count of attempts for place resource");
+        this.writeComment("Rarity - chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass");
+        this.writeComment("MinAltitude and MaxAltitude - height limits");
+        this.writeComment("BlockSource - mean where or whereupon resource will be placed ");
+        this.writeComment("Tree types: Tree - BigTree - Forest (a birch tree) - HugeMushroom (not a tree but still counts)");
+        this.writeComment("   Taiga1 - Taiga2 - JungleTree (the huge jungle tree) - GroundBush - CocoaTree");
+        this.writeComment("   You can also use your own custom objects, as long as they have set Tree to true in their settings.");
+        this.writeComment("");
+        this.writeComment("TreeType_Chance - similar Rarity. Example:");
+        this.writeComment("  Tree(10,Taiga1,35,Taiga2,100) - plugin trying to 10 attempts, in each attempt he try place Taiga1 ( 35% chance ) if not he place Taiga2 (100% chance)");
+        this.writeComment("Plant resource used for place something like flower, small mushrooms, pumpkins");
+        this.writeComment("Liquid resource is one block water or lava source");
+        this.writeComment("");
 
         this.WriteResources();
+        
+        this.writeNewLine();
+        this.writeBigTitle("Sapling resource");
+        this.writeComment("Work like Tree resource instead first parameter.");
+        this.WriteSaplingSettings();
 
-        this.WriteTitle("Custom objects");
-        this.WriteComment("These objects will spawn when using the UseBiome keyword.");
+        this.writeBigTitle("Custom objects");
+        this.writeComment("These objects will spawn when using the UseBiome keyword.");
         this.WriteCustomObjects();
         
-        this.WriteTitle("Structures");
-        this.WriteComment("Here you can change, enable or disable the stuctures.");
-        this.WriteComment("If you have disabled the structure in the WorldConfig, it won't spawn,");
-        this.WriteComment("regardless of these settings.");
-        this.WriteNewLine();
-        this.WriteComment("Disables strongholds for this biome. If there is no suitable biome nearby,");
-        this.WriteComment("Minecraft will ignore this setting.");
-        this.WriteValue(TCDefaultValues.StrongholdsEnabled.name(), strongholdsEnabled);
-        this.WriteNewLine();
-        this.WriteComment("Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
-        this.WriteValue(TCDefaultValues.NetherFortressesEnabled.name(), netherFortressesEnabled);
-        this.WriteNewLine();
-        this.WriteComment("The village type in this biome. Can be wood, sandstone or disabled.");
-        this.WriteValue(TCDefaultValues.VillageType.name(), villageType.toString());
-        this.WriteNewLine();
-        this.WriteComment("The mineshaft rarity from 0 to 100. 0 = no mineshafts, 1 = default rarity, 100 = a wooden chaos.");
-        this.WriteValue(TCDefaultValues.MineshaftRarity.name(), mineshaftsRarity);
-        this.WriteNewLine();
-        this.WriteComment("The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut or disabled.");
-        this.WriteValue(TCDefaultValues.RareBuildingType.name(), rareBuildingType.toString());
+        this.writeBigTitle("Structures");
+        this.writeComment("Here you can change, enable or disable the stuctures.");
+        this.writeComment("If you have disabled the structure in the WorldConfig, it won't spawn,");
+        this.writeComment("regardless of these settings.");
+        this.writeNewLine();
+        this.writeComment("Disables strongholds for this biome. If there is no suitable biome nearby,");
+        this.writeComment("Minecraft will ignore this setting.");
+        this.writeValue(TCDefaultValues.StrongholdsEnabled.name(), strongholdsEnabled);
+        this.writeNewLine();
+        this.writeComment("Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
+        this.writeValue(TCDefaultValues.NetherFortressesEnabled.name(), netherFortressesEnabled);
+        this.writeNewLine();
+        this.writeComment("The village type in this biome. Can be wood, sandstone or disabled.");
+        this.writeValue(TCDefaultValues.VillageType.name(), villageType.toString());
+        this.writeNewLine();
+        this.writeComment("The mineshaft rarity from 0 to 100. 0 = no mineshafts, 1 = default rarity, 100 = a wooden chaos.");
+        this.writeValue(TCDefaultValues.MineshaftRarity.name(), mineshaftsRarity);
+        this.writeNewLine();
+        this.writeComment("The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut or disabled.");
+        this.writeValue(TCDefaultValues.RareBuildingType.name(), rareBuildingType.toString());
 
+       
+
+        this.writeNewLine();
+        this.writeBigTitle("Mob spawning");
         if (DefaultBiome.getBiome(this.Biome.getId()) != null)
         {
-            this.WriteTitle("MOB SPAWNING");
-            this.WriteComment("Mob spawning control doesn't work in default biomes.");
+            // Stop in the default biomes
+            this.writeComment("Mob spawning control doesn't work in default biomes.");
             return;
         }
+        
+        this.writeComment("========<TUTORIAL>========");
+        this.writeComment("This is where you configure mob spawning. Changing this section is optional.");
+        this.writeComment("");
+        this.writeComment("#STEP1: Understanding what a mobgroup is.");
+        this.writeComment("A mobgroups is made of four parts. They are mob, weight, min and max.");
+        this.writeComment("The mob is one of the avaliable mobnames: " + Txt.implodeCommaAnd(DefaultMobType.getPreferedNames()));
+        this.writeComment("The weight is used for a random selection. This is a positive integer.");
+        this.writeComment("The min is the minimum amount of mobs spawning as a group. This is a positive integer.");
+        this.writeComment("The max is the maximum amount of mobs spawning as a group. This is a positive integer.");
+        this.writeComment("");
+        this.writeComment("#STEP2: Understanding how write a mobgroup as JSON as well as lists of them.");
+        this.writeComment("Json is a tree document format: http://en.wikipedia.org/wiki/JSON");
+        this.writeComment("Write a mobgroup like this: {\"mob\": \"mobname\", \"weight\": integer, \"min\": integer, \"max\": integer}");
+        this.writeComment("For example: {\"mob\": \"Ocelot\", \"weight\": 10, \"min\": 2, \"max\": 6}");
+        this.writeComment("For example: {\"mob\": \"MushroomCow\", \"weight\": 5, \"min\": 2, \"max\": 2}");
+        this.writeComment("A json list of mobgroups looks like this: [mobgroup, mobgroup, mobgroup...]");
+        this.writeComment("This would be an ampty list: []");
+        this.writeComment("You can validate your json here: http://jsonlint.com/");
+        this.writeComment("");
+        this.writeComment("#STEP3: Understanding what to do with all this info");
+        this.writeComment("There are three categories of mobs: monsters, creatures and watercreatures.");
+        this.writeComment("These list may be populated with default values if thee booleans bellow is set to true");
+        this.writeComment("You may also add your own mobgroups in the lists below");
+        this.writeComment("");
+        this.writeComment("#STEP4: What is in the default mob groups?");
+        this.writeComment("The default mob groups are controlled by vanilla minecraft.");
+        this.writeComment("At 2012-03-24 you could find them here: https://github.com/Bukkit/mc-dev/blob/master/net/minecraft/server/BiomeBase.java#L75");
+        this.writeComment("In simple terms:");
+        this.writeComment("Default creatures: [{\"mob\": \"Sheep\", \"weight\": 12, \"min\": 4, \"max\": 4}, {\"mob\": \"Pig\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Chicken\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Cow\", \"weight\": 8, \"min\": 4, \"max\": 4}]");
+        this.writeComment("Default monsters: [{\"mob\": \"Spider\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Zombie\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Skeleton\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Creeper\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Slime\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Enderman\", \"weight\": 1, \"min\": 1, \"max\": 4}]");
+        this.writeComment("Default watercreatures: [{\"mob\": \"Squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]");
+        this.writeComment("");
+        this.writeComment("So for example ocelots wont spawn unless you add them below.");
 
-        this.WriteNewLine();
-        this.WriteTitle("MOB SPAWNING");
-        this.WriteComment("========<TUTORIAL>========");
-        this.WriteComment("This is where you configure mob spawning. Changing this section is optional.");
-        this.WriteComment("");
-        this.WriteComment("#STEP1: Understanding what a mobgroup is.");
-        this.WriteComment("A mobgroups is made of four parts. They are mob, weight, min and max.");
-        this.WriteComment("The mob is one of the avaliable mobnames: " + Txt.implodeCommaAnd(DefaultMobType.getPreferedNames()));
-        this.WriteComment("The weight is used for a random selection. This is a positive integer.");
-        this.WriteComment("The min is the minimum amount of mobs spawning as a group. This is a positive integer.");
-        this.WriteComment("The max is the maximum amount of mobs spawning as a group. This is a positive integer.");
-        this.WriteComment("");
-        this.WriteComment("#STEP2: Understanding how write a mobgroup as JSON as well as lists of them.");
-        this.WriteComment("Json is a tree document format: http://en.wikipedia.org/wiki/JSON");
-        this.WriteComment("Write a mobgroup like this: {\"mob\": \"mobname\", \"weight\": integer, \"min\": integer, \"max\": integer}");
-        this.WriteComment("For example: {\"mob\": \"Ocelot\", \"weight\": 10, \"min\": 2, \"max\": 6}");
-        this.WriteComment("For example: {\"mob\": \"MushroomCow\", \"weight\": 5, \"min\": 2, \"max\": 2}");
-        this.WriteComment("A json list of mobgroups looks like this: [mobgroup, mobgroup, mobgroup...]");
-        this.WriteComment("This would be an ampty list: []");
-        this.WriteComment("You can validate your json here: http://jsonlint.com/");
-        this.WriteComment("");
-        this.WriteComment("#STEP3: Understanding what to do with all this info");
-        this.WriteComment("There are three categories of mobs: monsters, creatures and watercreatures.");
-        this.WriteComment("These list may be populated with default values if thee booleans bellow is set to true");
-        this.WriteComment("You may also add your own mobgroups in the lists below");
-        this.WriteComment("");
-        this.WriteComment("#STEP4: What is in the default mob groups?");
-        this.WriteComment("The default mob groups are controlled by vanilla minecraft.");
-        this.WriteComment("At 2012-03-24 you could find them here: https://github.com/Bukkit/mc-dev/blob/master/net/minecraft/server/BiomeBase.java#L75");
-        this.WriteComment("In simple terms:");
-        this.WriteComment("Default creatures: [{\"mob\": \"Sheep\", \"weight\": 12, \"min\": 4, \"max\": 4}, {\"mob\": \"Pig\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Chicken\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Cow\", \"weight\": 8, \"min\": 4, \"max\": 4}]");
-        this.WriteComment("Default monsters: [{\"mob\": \"Spider\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Zombie\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Skeleton\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Creeper\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Slime\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Enderman\", \"weight\": 1, \"min\": 1, \"max\": 4}]");
-        this.WriteComment("Default watercreatures: [{\"mob\": \"Squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]");
-        this.WriteComment("");
-        this.WriteComment("So for example ocelots wont spawn unless you add them below.");
+        this.writeNewLine();
+        this.writeComment("========<CONFIGURATION>========");
 
-        this.WriteNewLine();
-        this.WriteComment("========<CONFIGURATION>========");
+        this.writeComment("Should we add the default monster spawn groups?");
+        writeValue("spawnMonstersAddDefaults", this.spawnMonstersAddDefaults);
+        this.writeComment("Add extra monster spawn groups here");
+        writeValue("spawnMonsters", this.spawnMonsters);
+        this.writeNewLine();
 
-        this.WriteComment("Should we add the default monster spawn groups?");
-        WriteValue("spawnMonstersAddDefaults", this.spawnMonstersAddDefaults);
-        this.WriteComment("Add extra monster spawn groups here");
-        WriteValue("spawnMonsters", this.spawnMonsters);
-        this.WriteNewLine();
+        this.writeComment("Should we add the default creature spawn groups?");
+        writeValue("spawnCreaturesAddDefaults", this.spawnCreaturesAddDefaults);
+        this.writeComment("Add extra creature spawn groups here");
+        writeValue("spawnCreatures", this.spawnCreatures);
+        this.writeNewLine();
 
-        this.WriteComment("Should we add the default creature spawn groups?");
-        WriteValue("spawnCreaturesAddDefaults", this.spawnCreaturesAddDefaults);
-        this.WriteComment("Add extra creature spawn groups here");
-        WriteValue("spawnCreatures", this.spawnCreatures);
-        this.WriteNewLine();
-
-        this.WriteComment("Should we add the default watercreature spawn groups?");
-        WriteValue("spawnWaterCreaturesAddDefaults", this.spawnWaterCreaturesAddDefaults);
-        this.WriteComment("Add extra watercreature spawn groups here");
-        WriteValue("spawnWaterCreatures", this.spawnWaterCreatures);
-        this.WriteNewLine();
+        this.writeComment("Should we add the default watercreature spawn groups?");
+        writeValue("spawnWaterCreaturesAddDefaults", this.spawnWaterCreaturesAddDefaults);
+        this.writeComment("Add extra watercreature spawn groups here");
+        writeValue("spawnWaterCreatures", this.spawnWaterCreatures);
+        this.writeNewLine();
 
     }
 
@@ -879,14 +892,14 @@ public class BiomeConfig extends ConfigFile
         for (int i = 1; i < this.heightMatrix.length; i++)
             output = output + "," + Double.toString(this.heightMatrix[i]);
 
-        this.WriteValue(TCDefaultValues.CustomHeightControl.name(), output);
+        this.writeValue(TCDefaultValues.CustomHeightControl.name(), output);
     }
 
     private void WriteModReplaceSettings() throws IOException
     {
         if (this.ReplaceCount == 0)
         {
-            this.WriteValue("ReplacedBlocks", "None");
+            this.writeValue("ReplacedBlocks", "None");
             return;
         }
         String output = "";
@@ -927,14 +940,14 @@ public class BiomeConfig extends ConfigFile
 
             }
         }
-        this.WriteValue("ReplacedBlocks", output.substring(0, output.length() - 1));
+        this.writeValue("ReplacedBlocks", output.substring(0, output.length() - 1));
     }
 
     private void WriteResources() throws IOException
     {
         for (int i = 0; i < this.ResourceCount; i++)
         {
-            this.WriteValue(this.ResourceSequence[i].makeString());
+            this.writeValue(this.ResourceSequence[i].makeString());
         }
     }
 
@@ -951,17 +964,17 @@ public class BiomeConfig extends ConfigFile
             // Delete last char
             builder.deleteCharAt(builder.length() - 1);
         }
-        this.WriteValue("BiomeObjects", builder.toString());
+        this.writeValue("BiomeObjects", builder.toString());
     }
 
     private void WriteSaplingSettings() throws IOException
     {
         if (this.SaplingResource != null)
-            this.WriteValue(SaplingResource.makeString());
+            this.writeValue(SaplingResource.makeString());
 
         for (SaplingGen res : this.SaplingTypes)
             if (res != null)
-                this.WriteValue(res.makeString());
+                this.writeValue(res.makeString());
 
     }
 
@@ -1289,7 +1302,7 @@ public class BiomeConfig extends ConfigFile
 
     public void Serialize(DataOutputStream stream) throws IOException
     {
-        WriteStringToStream(stream, this.Name);
+        WriteStringToStream(stream, this.name);
 
         stream.writeFloat(this.BiomeTemperature);
         stream.writeFloat(this.BiomeWetness);
@@ -1303,7 +1316,7 @@ public class BiomeConfig extends ConfigFile
 
     public BiomeConfig(DataInputStream stream, WorldConfig config, LocalBiome biome) throws IOException
     {
-        this.Name = ReadStringFromStream(stream);
+        this.name = ReadStringFromStream(stream);
         this.Biome = biome;
         this.worldConfig = config;
 

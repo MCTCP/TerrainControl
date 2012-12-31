@@ -233,9 +233,9 @@ public class WorldConfig extends ConfigFile
                 this.ReplaceMatrixBiomes[config.Biome.getId()] = (byte) world.getBiomeIdByName(config.ReplaceBiomeName);
             }
 
-            if (this.NormalBiomes.contains(config.Name))
+            if (this.NormalBiomes.contains(config.name))
                 this.normalBiomesRarity += config.BiomeRarity;
-            if (this.IceBiomes.contains(config.Name))
+            if (this.IceBiomes.contains(config.name))
                 this.iceBiomesRarity += config.BiomeRarity;
 
             if (!this.BiomeConfigsHaveReplacement)
@@ -534,92 +534,92 @@ public class WorldConfig extends ConfigFile
     @Override
     protected void WriteConfigSettings() throws IOException
     {
-        WriteTitle("Configuration settings");
-        WriteComment("Possible configurations modes : WriteAll, WriteWithoutComments, WriteDisable");
-        WriteComment("   WriteAll - default");
-        WriteComment("   WriteWithoutComments - write config files without help comments");
-        WriteComment("   WriteDisable - did not write anything, only read. Use with caution!");
-        WriteValue(TCDefaultValues.SettingsMode.name(), this.SettingsMode.name());
+        writeBigTitle("Main settings");
+        writeComment("Possible configurations modes : WriteAll, WriteWithoutComments, WriteDisable");
+        writeComment("   WriteAll - default");
+        writeComment("   WriteWithoutComments - write config files without help comments");
+        writeComment("   WriteDisable - did not write anything, only read. Use with caution!");
+        writeValue(TCDefaultValues.SettingsMode.name(), this.SettingsMode.name());
 
-        WriteTitle("World modes");
-        WriteComment("Possible terrain modes : Normal, OldGenerator, TerrainTest, NotGenerate, Default");
-        WriteComment("   Normal - use all features");
-        WriteComment("   OldGenerator - generate land like 1.7.3 generator");
-        WriteComment("   TerrainTest - generate only terrain without any resources");
-        WriteComment("   NotGenerate - generate empty chunks");
-        WriteComment("   Default - use default Notch terrain generator");
-        WriteValue(TCDefaultValues.TerrainMode.name(), this.ModeTerrain.name());
-        WriteNewLine();
-        WriteComment("Possible biome modes : Normal, OldGenerator, Default");
-        WriteComment("   Normal - use all features");
-        WriteComment("   FromImage - get biomes from image file");
-        WriteComment("   OldGenerator - generate biome like 1.7.3 generator");
-        WriteComment("   Default - use default Notch biome generator");
-        WriteValue(TCDefaultValues.BiomeMode.name(), this.ModeBiome.name());
+        writeBigTitle("World modes");
+        writeComment("Possible terrain modes : Normal, OldGenerator, TerrainTest, NotGenerate, Default");
+        writeComment("   Normal - use all features");
+        writeComment("   OldGenerator - generate land like 1.7.3 generator");
+        writeComment("   TerrainTest - generate only terrain without any resources");
+        writeComment("   NotGenerate - generate empty chunks");
+        writeComment("   Default - use default Notch terrain generator");
+        writeValue(TCDefaultValues.TerrainMode.name(), this.ModeTerrain.name());
+        writeNewLine();
+        writeComment("Possible biome modes : Normal, OldGenerator, Default");
+        writeComment("   Normal - use all features");
+        writeComment("   FromImage - get biomes from image file");
+        writeComment("   OldGenerator - generate biome like 1.7.3 generator");
+        writeComment("   Default - use default Notch biome generator");
+        writeValue(TCDefaultValues.BiomeMode.name(), this.ModeBiome.name());
 
-        WriteTitle("Biome Generator Variables");
+        writeBigTitle("Biome Generator Variables");
 
-        WriteComment("IMPORTANT value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.");
-        WriteComment("Large %/total area biomes (Continents) must be set small, (limit=0)");
-        WriteComment("Small %/total area biomes (Oasis,Mountain Peaks) must be larger (limit=GenerationDepth)");
-        WriteComment("This could also represent \"Total number of biome sizes\" ");
-        WriteComment("Small values (about 1-2) and Large values (about 20) may affect generator performance.");
-        WriteValue(TCDefaultValues.GenerationDepth.name(), this.GenerationDepth);
-        WriteNewLine();
+        writeComment("IMPORTANT value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.");
+        writeComment("Large %/total area biomes (Continents) must be set small, (limit=0)");
+        writeComment("Small %/total area biomes (Oasis,Mountain Peaks) must be larger (limit=GenerationDepth)");
+        writeComment("This could also represent \"Total number of biome sizes\" ");
+        writeComment("Small values (about 1-2) and Large values (about 20) may affect generator performance.");
+        writeValue(TCDefaultValues.GenerationDepth.name(), this.GenerationDepth);
+        writeNewLine();
 
-        WriteComment("Max biome rarity from 1 to infinity. By default this is 100, but you can raise it for");
-        WriteComment("fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
-        WriteValue(TCDefaultValues.BiomeRarityScale.name(), this.BiomeRarityScale);
-        WriteNewLine();
-        WriteComment("Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
-        WriteValue(TCDefaultValues.LandRarity.name(), this.LandRarity);
-        WriteNewLine();
-        WriteComment("Land size from 0 to GenerationDepth.");
-        WriteValue(TCDefaultValues.LandSize.name(), this.LandSize);
-        WriteNewLine();
-        WriteComment("Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
-        WriteValue(TCDefaultValues.LandFuzzy.name(), this.LandFuzzy);
-        WriteNewLine();
+        writeComment("Max biome rarity from 1 to infinity. By default this is 100, but you can raise it for");
+        writeComment("fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
+        writeValue(TCDefaultValues.BiomeRarityScale.name(), this.BiomeRarityScale);
+        writeNewLine();
+        writeComment("Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
+        writeValue(TCDefaultValues.LandRarity.name(), this.LandRarity);
+        writeNewLine();
+        writeComment("Land size from 0 to GenerationDepth.");
+        writeValue(TCDefaultValues.LandSize.name(), this.LandSize);
+        writeNewLine();
+        writeComment("Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
+        writeValue(TCDefaultValues.LandFuzzy.name(), this.LandFuzzy);
+        writeNewLine();
 
-        WriteComment("Ice areas rarity from 100 to 1. If you set smaller than 90 and IceSize near 0 beware ice world");
-        WriteValue(TCDefaultValues.IceRarity.name(), this.IceRarity);
-        WriteNewLine();
-        WriteComment("Ice area size from 0 to GenerationDepth.");
-        WriteValue(TCDefaultValues.IceSize.name(), this.IceSize);
-        WriteNewLine();
+        writeComment("Ice areas rarity from 100 to 1. If you set smaller than 90 and IceSize near 0 beware ice world");
+        writeValue(TCDefaultValues.IceRarity.name(), this.IceRarity);
+        writeNewLine();
+        writeComment("Ice area size from 0 to GenerationDepth.");
+        writeValue(TCDefaultValues.IceSize.name(), this.IceSize);
+        writeNewLine();
 
-        WriteValue(TCDefaultValues.FrozenRivers.name(), this.FrozenRivers);
-        WriteNewLine();
-        WriteValue(TCDefaultValues.FrozenOcean.name(), this.FrozenOcean);
-        WriteNewLine();
+        writeValue(TCDefaultValues.FrozenRivers.name(), this.FrozenRivers);
+        writeNewLine();
+        writeValue(TCDefaultValues.FrozenOcean.name(), this.FrozenOcean);
+        writeNewLine();
 
-        WriteComment("River rarity.Must be from 0 to GenerationDepth.");
-        WriteValue(TCDefaultValues.RiverRarity.name(), this.RiverRarity);
-        WriteNewLine();
-        WriteComment("River size from 0 to GenerationDepth - RiverRarity");
-        WriteValue(TCDefaultValues.RiverSize.name(), this.RiverSize);
-        WriteNewLine();
-        WriteValue(TCDefaultValues.RiversEnabled.name(), this.RiversEnabled);
-        WriteNewLine();
+        writeComment("River rarity.Must be from 0 to GenerationDepth.");
+        writeValue(TCDefaultValues.RiverRarity.name(), this.RiverRarity);
+        writeNewLine();
+        writeComment("River size from 0 to GenerationDepth - RiverRarity");
+        writeValue(TCDefaultValues.RiverSize.name(), this.RiverSize);
+        writeNewLine();
+        writeValue(TCDefaultValues.RiversEnabled.name(), this.RiversEnabled);
+        writeNewLine();
 
-        WriteComment("Biomes which used in normal biome algorithm. Biome name is case sensitive.");
-        WriteValue(TCDefaultValues.NormalBiomes.name(), this.NormalBiomes);
-        WriteNewLine();
-        WriteComment("Biomes which used in ice biome algorithm. Biome name is case sensitive.");
-        WriteValue(TCDefaultValues.IceBiomes.name(), this.IceBiomes);
-        WriteNewLine();
-        WriteComment("Biomes which used as isles. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.");
-        WriteValue(TCDefaultValues.IsleBiomes.name(), this.IsleBiomes);
-        WriteNewLine();
-        WriteComment("Biomes which used as borders. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
-        WriteValue(TCDefaultValues.BorderBiomes.name(), this.BorderBiomes);
+        writeComment("Biomes which used in normal biome algorithm. Biome name is case sensitive.");
+        writeValue(TCDefaultValues.NormalBiomes.name(), this.NormalBiomes);
+        writeNewLine();
+        writeComment("Biomes which used in ice biome algorithm. Biome name is case sensitive.");
+        writeValue(TCDefaultValues.IceBiomes.name(), this.IceBiomes);
+        writeNewLine();
+        writeComment("Biomes which used as isles. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.");
+        writeValue(TCDefaultValues.IsleBiomes.name(), this.IsleBiomes);
+        writeNewLine();
+        writeComment("Biomes which used as borders. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
+        writeValue(TCDefaultValues.BorderBiomes.name(), this.BorderBiomes);
 
-        WriteNewLine(); // TODO Write correct help
-        WriteComment("List of ALL custom biomes.");
-        WriteComment("Example: ");
-        WriteComment("  CustomBiomes:TestBiome1,BiomeTest2");
-        WriteComment("This will add two biomes and generate biome config files");
-        WriteComment("Any changes here need server restart.");
+        writeNewLine(); // TODO Write correct help
+        writeComment("List of ALL custom biomes.");
+        writeComment("Example: ");
+        writeComment("  CustomBiomes:TestBiome1,BiomeTest2");
+        writeComment("This will add two biomes and generate biome config files");
+        writeComment("Any changes here need server restart.");
         /*
          * WriteComment(
          * "The id of the biome must be unique for all biomes on the server.");
@@ -637,177 +637,177 @@ public class WorldConfig extends ConfigFile
          */
         WriteCustomBiomes();
 
-        WriteTitle("Biome Image Generator Variables");
+        writeBigTitle("Biome Image Generator Variables");
 
-        WriteNewLine();
-        WriteComment("Possible modes when generator outside image boundaries: Repeat, ContinueNormal, FillEmpty");
-        WriteComment("   Repeat - repeat image");
-        WriteComment("   ContinueNormal - continue normal generation");
-        WriteComment("   FillEmpty - fill by biome in \"ImageFillBiome settings\" ");
-        WriteValue(TCDefaultValues.ImageMode.name(), this.imageMode.name());
+        writeNewLine();
+        writeComment("Possible modes when generator outside image boundaries: Repeat, ContinueNormal, FillEmpty");
+        writeComment("   Repeat - repeat image");
+        writeComment("   ContinueNormal - continue normal generation");
+        writeComment("   FillEmpty - fill by biome in \"ImageFillBiome settings\" ");
+        writeValue(TCDefaultValues.ImageMode.name(), this.imageMode.name());
 
-        WriteNewLine();
-        WriteComment("Source png file for FromImage biome mode.");
-        WriteValue(TCDefaultValues.ImageFile.name(), this.imageFile);
+        writeNewLine();
+        writeComment("Source png file for FromImage biome mode.");
+        writeValue(TCDefaultValues.ImageFile.name(), this.imageFile);
 
-        WriteNewLine();
-        WriteComment("Biome name for fill outside image boundaries with FillEmpty mode.");
-        WriteValue(TCDefaultValues.ImageFillBiome.name(), this.imageFillBiome);
+        writeNewLine();
+        writeComment("Biome name for fill outside image boundaries with FillEmpty mode.");
+        writeValue(TCDefaultValues.ImageFillBiome.name(), this.imageFillBiome);
 
-        WriteNewLine();
-        WriteComment("Shifts map position from x=0 and z=0 coordinates.");
-        WriteValue(TCDefaultValues.ImageXOffset.name(), this.imageXOffset);
-        WriteValue(TCDefaultValues.ImageZOffset.name(), this.imageZOffset);
+        writeNewLine();
+        writeComment("Shifts map position from x=0 and z=0 coordinates.");
+        writeValue(TCDefaultValues.ImageXOffset.name(), this.imageXOffset);
+        writeValue(TCDefaultValues.ImageZOffset.name(), this.imageZOffset);
 
-        WriteTitle("Terrain Generator Variables");
-        WriteComment("Height bits determinate generation height. Min 5, max 8");
-        WriteComment("For example 7 = 128 height, 8 = 256 height");
-        WriteValue(TCDefaultValues.WorldHeightBits.name(), this.worldHeightBits);
-        WriteNewLine();
+        writeBigTitle("Terrain Generator Variables");
+        writeComment("Height bits determinate generation height. Min 5, max 8");
+        writeComment("For example 7 = 128 height, 8 = 256 height");
+        writeValue(TCDefaultValues.WorldHeightBits.name(), this.worldHeightBits);
+        writeNewLine();
 
-        WriteComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
-        WriteValue(TCDefaultValues.WaterLevelMax.name(), this.waterLevelMax);
-        WriteValue(TCDefaultValues.WaterLevelMin.name(), this.waterLevelMin);
-        WriteNewLine();
-        WriteComment("BlockId used as water in WaterLevel");
-        WriteValue(TCDefaultValues.WaterBlock.name(), this.waterBlock);
-        WriteNewLine();
-        WriteComment("BlockId used as ice");
-        WriteValue(TCDefaultValues.IceBlock.name(), this.iceBlock);
+        writeComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
+        writeValue(TCDefaultValues.WaterLevelMax.name(), this.waterLevelMax);
+        writeValue(TCDefaultValues.WaterLevelMin.name(), this.waterLevelMin);
+        writeNewLine();
+        writeComment("BlockId used as water in WaterLevel");
+        writeValue(TCDefaultValues.WaterBlock.name(), this.waterBlock);
+        writeNewLine();
+        writeComment("BlockId used as ice");
+        writeValue(TCDefaultValues.IceBlock.name(), this.iceBlock);
 
-        WriteNewLine();
-        WriteComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured horizontally.");
-        WriteValue(TCDefaultValues.FractureHorizontal.name(), this.fractureHorizontal);
+        writeNewLine();
+        writeComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured horizontally.");
+        writeValue(TCDefaultValues.FractureHorizontal.name(), this.fractureHorizontal);
 
-        WriteNewLine();
-        WriteComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured vertically.");
-        WriteComment("Positive values will lead to large cliffs/overhangs, floating islands, and/or a cavern world depending on other settings.");
-        WriteValue(TCDefaultValues.FractureVertical.name(), this.fractureVertical);
+        writeNewLine();
+        writeComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured vertically.");
+        writeComment("Positive values will lead to large cliffs/overhangs, floating islands, and/or a cavern world depending on other settings.");
+        writeValue(TCDefaultValues.FractureVertical.name(), this.fractureVertical);
 
-        WriteNewLine();
-        WriteComment("Attempts to replace all surface stone with biome surface block");
-        WriteValue(TCDefaultValues.RemoveSurfaceStone.name(), this.removeSurfaceStone);
+        writeNewLine();
+        writeComment("Attempts to replace all surface stone with biome surface block");
+        writeValue(TCDefaultValues.RemoveSurfaceStone.name(), this.removeSurfaceStone);
 
-        WriteNewLine();
-        WriteComment("Disable bottom of map bedrock generation");
-        WriteValue(TCDefaultValues.DisableBedrock.name(), this.disableBedrock);
+        writeNewLine();
+        writeComment("Disable bottom of map bedrock generation");
+        writeValue(TCDefaultValues.DisableBedrock.name(), this.disableBedrock);
 
-        WriteNewLine();
-        WriteComment("Enable ceiling of map bedrock generation");
-        WriteValue(TCDefaultValues.CeilingBedrock.name(), this.ceilingBedrock);
+        writeNewLine();
+        writeComment("Enable ceiling of map bedrock generation");
+        writeValue(TCDefaultValues.CeilingBedrock.name(), this.ceilingBedrock);
 
-        WriteNewLine();
-        WriteComment("Make bottom layer of bedrock flat");
-        WriteValue(TCDefaultValues.FlatBedrock.name(), this.flatBedrock);
+        writeNewLine();
+        writeComment("Make bottom layer of bedrock flat");
+        writeValue(TCDefaultValues.FlatBedrock.name(), this.flatBedrock);
 
-        WriteNewLine();
-        WriteComment("BlockId used as bedrock");
-        WriteValue(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
+        writeNewLine();
+        writeComment("BlockId used as bedrock");
+        writeValue(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
 
-        WriteTitle("Strongholds");
-        WriteComment("Not much is known about these settings. They are directly passed to the stronghold generator.");
-        WriteValue(TCDefaultValues.StrongholdsEnabled.name(), this.strongholdsEnabled);
-        WriteNewLine();
-        WriteValue(TCDefaultValues.StrongholdCount.name(), this.strongholdCount);
-        WriteNewLine();
-        WriteValue(TCDefaultValues.StrongholdDistance.name(), this.strongholdDistance);
-        WriteNewLine();
-        WriteValue(TCDefaultValues.StrongholdSpread.name(), this.strongholdSpread);
+        writeBigTitle("Strongholds");
+        writeComment("Not much is known about these settings. They are directly passed to the stronghold generator.");
+        writeValue(TCDefaultValues.StrongholdsEnabled.name(), this.strongholdsEnabled);
+        writeNewLine();
+        writeValue(TCDefaultValues.StrongholdCount.name(), this.strongholdCount);
+        writeNewLine();
+        writeValue(TCDefaultValues.StrongholdDistance.name(), this.strongholdDistance);
+        writeNewLine();
+        writeValue(TCDefaultValues.StrongholdSpread.name(), this.strongholdSpread);
 
-        WriteTitle("Villages");
-        WriteComment("Whether the villages are enabled or not.");
-        WriteValue(TCDefaultValues.VillagesEnabled.name(), this.villagesEnabled);
-        WriteNewLine();
-        WriteComment("The size of the village. Larger is bigger. Normal worlds have 0 as default, superflat worlds 1.");
-        WriteValue(TCDefaultValues.VillageSize.name(), this.villageSize);
-        WriteNewLine();
-        WriteComment("The minimum distance between the village centers in chunks. Minimum value is 9.");
-        WriteValue(TCDefaultValues.VillageDistance.name(), this.villageDistance);
+        writeBigTitle("Villages");
+        writeComment("Whether the villages are enabled or not.");
+        writeValue(TCDefaultValues.VillagesEnabled.name(), this.villagesEnabled);
+        writeNewLine();
+        writeComment("The size of the village. Larger is bigger. Normal worlds have 0 as default, superflat worlds 1.");
+        writeValue(TCDefaultValues.VillageSize.name(), this.villageSize);
+        writeNewLine();
+        writeComment("The minimum distance between the village centers in chunks. Minimum value is 9.");
+        writeValue(TCDefaultValues.VillageDistance.name(), this.villageDistance);
 
-        WriteTitle("Rare buildings");
-        WriteComment("Rare buildings are either desert pyramids, jungle temples or swamp huts.");
-        WriteNewLine();
-        WriteComment("Whether rare buildings are enabled.");
-        WriteValue(TCDefaultValues.RareBuildingsEnabled.name(), this.rareBuildingsEnabled);
-        WriteNewLine();
-        WriteComment("The minimum distance between rare buildings in chunks.");
-        WriteValue(TCDefaultValues.MinimumDistanceBetweenRareBuildings.name(), this.minimumDistanceBetweenRareBuildings);
-        WriteNewLine();
-        WriteComment("The maximum distance between rare buildings in chunks.");
-        WriteValue(TCDefaultValues.MaximumDistanceBetweenRareBuildings.name(), this.maximumDistanceBetweenRareBuildings);
+        writeBigTitle("Rare buildings");
+        writeComment("Rare buildings are either desert pyramids, jungle temples or swamp huts.");
+        writeNewLine();
+        writeComment("Whether rare buildings are enabled.");
+        writeValue(TCDefaultValues.RareBuildingsEnabled.name(), this.rareBuildingsEnabled);
+        writeNewLine();
+        writeComment("The minimum distance between rare buildings in chunks.");
+        writeValue(TCDefaultValues.MinimumDistanceBetweenRareBuildings.name(), this.minimumDistanceBetweenRareBuildings);
+        writeNewLine();
+        writeComment("The maximum distance between rare buildings in chunks.");
+        writeValue(TCDefaultValues.MaximumDistanceBetweenRareBuildings.name(), this.maximumDistanceBetweenRareBuildings);
 
-        WriteTitle("Other structures");
-        WriteValue(TCDefaultValues.MineshaftsEnabled.name(), this.mineshaftsEnabled);
-        WriteValue(TCDefaultValues.NetherFortressesEnabled.name(), this.netherFortressesEnabled);
+        writeBigTitle("Other structures");
+        writeValue(TCDefaultValues.MineshaftsEnabled.name(), this.mineshaftsEnabled);
+        writeValue(TCDefaultValues.NetherFortressesEnabled.name(), this.netherFortressesEnabled);
 
-        this.WriteTitle("World visual settings");
-        this.WriteComment("Warning this section will work only for clients with single version of TerrainControl");
+        this.writeBigTitle("World visual settings");
+        this.writeComment("Warning this section will work only for clients with single version of TerrainControl");
 
-        WriteComment("World fog color");
-        WriteColorValue(TCDefaultValues.WorldFog.name(), this.WorldFog);
-        this.WriteNewLine();
+        writeComment("World fog color");
+        writeColorValue(TCDefaultValues.WorldFog.name(), this.WorldFog);
+        this.writeNewLine();
 
-        WriteComment("World night fog color");
-        WriteColorValue(TCDefaultValues.WorldNightFog.name(), this.WorldNightFog);
-        this.WriteNewLine();
+        writeComment("World night fog color");
+        writeColorValue(TCDefaultValues.WorldNightFog.name(), this.WorldNightFog);
+        this.writeNewLine();
 
-        this.WriteTitle("BOB Objects Variables");
+        this.writeBigTitle("BOB Objects Variables");
 
-        WriteNewLine();
-        WriteComment("Terrain Control tries <objectSpawnRatio> times to spawn a BO2.");
-        WriteComment("A high value makes BO2s with a low rarity spawn more.");
-        WriteComment("Doesn't affect BO3s. It also doesn't affect growing saplings anymore.");
-        this.WriteValue(TCDefaultValues.objectSpawnRatio.name(), this.objectSpawnRatio);
+        writeNewLine();
+        writeComment("Terrain Control tries <objectSpawnRatio> times to spawn a BO2.");
+        writeComment("A high value makes BO2s with a low rarity spawn more.");
+        writeComment("Doesn't affect BO3s. It also doesn't affect growing saplings anymore.");
+        this.writeValue(TCDefaultValues.objectSpawnRatio.name(), this.objectSpawnRatio);
 
-        WriteTitle("Cave Variables");
+        writeBigTitle("Cave Variables");
 
-        WriteComment("TerrainControl attempts once per chunk to create a cave or cave system.");
-        WriteComment("This is chance of success on that attempt.");
-        WriteValue(TCDefaultValues.caveRarity.name(), this.caveRarity);
-        WriteNewLine();
-        WriteComment("If successful, It tries to add this many caves in that chunk but trends towards lower results.");
-        WriteComment("Input of 40 tends to result in 5-6 caves or cave systems starting per chunk.");
-        WriteValue(TCDefaultValues.caveFrequency.name(), this.caveFrequency);
-        WriteNewLine();
-        WriteComment("Trends towards lower elevations.");
-        WriteValue(TCDefaultValues.caveMinAltitude.name(), this.caveMinAltitude);
-        WriteValue(TCDefaultValues.caveMaxAltitude.name(), this.caveMaxAltitude);
-        WriteNewLine();
-        WriteComment("Chance that any cave made during \" caveFrequency\" will generate without a connecting cave or system.");
-        WriteComment("Will also attempt to create a pocket - a higher than normal density of cave systems nearby, however no guarantee of connecting to it.");
-        WriteValue(TCDefaultValues.individualCaveRarity.name(), this.individualCaveRarity);
-        WriteNewLine();
-        WriteComment("Number of attempts during \" caveFreqency\" to start a system instead of continuing a single cave.");
-        WriteComment("Warning:High values cause extremely slow world generation and lag.");
-        WriteValue(TCDefaultValues.caveSystemFrequency.name(), this.caveSystemFrequency);
-        WriteNewLine();
-        WriteComment("Adds additional attempts for cave pocket after \"individualCaveRarity\" attempts.");
-        WriteValue(TCDefaultValues.caveSystemPocketChance.name(), this.caveSystemPocketChance);
-        WriteNewLine();
-        WriteComment("When triggered, Overrides \"caveFrequency\"");
-        WriteValue(TCDefaultValues.caveSystemPocketMinSize.name(), this.caveSystemPocketMinSize);
-        WriteValue(TCDefaultValues.caveSystemPocketMaxSize.name(), this.caveSystemPocketMaxSize);
-        WriteNewLine();
-        WriteComment("Turns off Randomizer = CAVES EVERYWHERE!");
-        WriteValue(TCDefaultValues.evenCaveDistribution.name(), this.evenCaveDistribution);
+        writeComment("TerrainControl attempts once per chunk to create a cave or cave system.");
+        writeComment("This is chance of success on that attempt.");
+        writeValue(TCDefaultValues.caveRarity.name(), this.caveRarity);
+        writeNewLine();
+        writeComment("If successful, It tries to add this many caves in that chunk but trends towards lower results.");
+        writeComment("Input of 40 tends to result in 5-6 caves or cave systems starting per chunk.");
+        writeValue(TCDefaultValues.caveFrequency.name(), this.caveFrequency);
+        writeNewLine();
+        writeComment("Trends towards lower elevations.");
+        writeValue(TCDefaultValues.caveMinAltitude.name(), this.caveMinAltitude);
+        writeValue(TCDefaultValues.caveMaxAltitude.name(), this.caveMaxAltitude);
+        writeNewLine();
+        writeComment("Chance that any cave made during \" caveFrequency\" will generate without a connecting cave or system.");
+        writeComment("Will also attempt to create a pocket - a higher than normal density of cave systems nearby, however no guarantee of connecting to it.");
+        writeValue(TCDefaultValues.individualCaveRarity.name(), this.individualCaveRarity);
+        writeNewLine();
+        writeComment("Number of attempts during \" caveFreqency\" to start a system instead of continuing a single cave.");
+        writeComment("Warning:High values cause extremely slow world generation and lag.");
+        writeValue(TCDefaultValues.caveSystemFrequency.name(), this.caveSystemFrequency);
+        writeNewLine();
+        writeComment("Adds additional attempts for cave pocket after \"individualCaveRarity\" attempts.");
+        writeValue(TCDefaultValues.caveSystemPocketChance.name(), this.caveSystemPocketChance);
+        writeNewLine();
+        writeComment("When triggered, Overrides \"caveFrequency\"");
+        writeValue(TCDefaultValues.caveSystemPocketMinSize.name(), this.caveSystemPocketMinSize);
+        writeValue(TCDefaultValues.caveSystemPocketMaxSize.name(), this.caveSystemPocketMaxSize);
+        writeNewLine();
+        writeComment("Turns off Randomizer = CAVES EVERYWHERE!");
+        writeValue(TCDefaultValues.evenCaveDistribution.name(), this.evenCaveDistribution);
 
-        WriteTitle("Canyon Variables");
-        WriteValue(TCDefaultValues.canyonRarity.name(), this.canyonRarity);
-        WriteValue(TCDefaultValues.canyonMinAltitude.name(), this.canyonMinAltitude);
-        WriteValue(TCDefaultValues.canyonMaxAltitude.name(), this.canyonMaxAltitude);
-        WriteValue(TCDefaultValues.canyonMinLength.name(), this.canyonMinLength);
-        WriteValue(TCDefaultValues.canyonMaxLength.name(), this.canyonMaxLength);
-        WriteValue(TCDefaultValues.canyonDepth.name(), this.canyonDepth);
+        writeBigTitle("Canyon Variables");
+        writeValue(TCDefaultValues.canyonRarity.name(), this.canyonRarity);
+        writeValue(TCDefaultValues.canyonMinAltitude.name(), this.canyonMinAltitude);
+        writeValue(TCDefaultValues.canyonMaxAltitude.name(), this.canyonMaxAltitude);
+        writeValue(TCDefaultValues.canyonMinLength.name(), this.canyonMinLength);
+        writeValue(TCDefaultValues.canyonMaxLength.name(), this.canyonMaxLength);
+        writeValue(TCDefaultValues.canyonDepth.name(), this.canyonDepth);
 
-        WriteNewLine();
-        WriteTitle("Old Biome Generator Variables");
-        WriteComment("This generator works only with old terrain generator!");
+        writeNewLine();
+        writeBigTitle("Old Biome Generator Variables");
+        writeComment("This generator works only with old terrain generator!");
         // WriteComment("Since 1.8.3 notch take temperature from biomes, so changing this you can`t affect new biome generation ");
-        WriteValue(TCDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
-        WriteValue(TCDefaultValues.minMoisture.name(), this.minMoisture);
-        WriteValue(TCDefaultValues.maxMoisture.name(), this.maxMoisture);
-        WriteValue(TCDefaultValues.minTemperature.name(), this.minTemperature);
-        WriteValue(TCDefaultValues.maxTemperature.name(), this.maxTemperature);
+        writeValue(TCDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
+        writeValue(TCDefaultValues.minMoisture.name(), this.minMoisture);
+        writeValue(TCDefaultValues.maxMoisture.name(), this.maxMoisture);
+        writeValue(TCDefaultValues.minTemperature.name(), this.minTemperature);
+        writeValue(TCDefaultValues.maxTemperature.name(), this.maxTemperature);
 
     }
 
@@ -822,7 +822,7 @@ public class WorldConfig extends ConfigFile
             first = false;
             output += biome + ":" + CustomBiomeIds.get(biome);
         }
-        WriteValue(TCDefaultValues.CustomBiomes.name(), output);
+        writeValue(TCDefaultValues.CustomBiomes.name(), output);
 
     }
 

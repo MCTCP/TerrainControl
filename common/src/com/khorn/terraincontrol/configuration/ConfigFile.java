@@ -12,7 +12,7 @@ import java.util.Map;
 
 public abstract class ConfigFile
 {
-    private BufferedWriter SettingsWriter;
+    private BufferedWriter settingsWriter;
 
     /**
      * Stores all the settings. Settings like Name:Value or Name=Value are stored as name, Value and settings like Function(a, b, c) are stored as function(a, b, c), lineNumber
@@ -341,18 +341,18 @@ public abstract class ConfigFile
         this.WriteComments = comments;
         try
         {
-            this.SettingsWriter = new BufferedWriter(new FileWriter(settingsFile, false));
+            this.settingsWriter = new BufferedWriter(new FileWriter(settingsFile, false));
 
             this.WriteConfigSettings();
         } catch (IOException e)
         {
             e.printStackTrace();
 
-            if (this.SettingsWriter != null)
+            if (this.settingsWriter != null)
             {
                 try
                 {
-                    this.SettingsWriter.close();
+                    this.settingsWriter.close();
                 } catch (IOException localIOException1)
                 {
                     localIOException1.printStackTrace();
@@ -360,11 +360,11 @@ public abstract class ConfigFile
             }
         } finally
         {
-            if (this.SettingsWriter != null)
+            if (this.settingsWriter != null)
             {
                 try
                 {
-                    this.SettingsWriter.close();
+                    this.settingsWriter.close();
                 } catch (IOException localIOException2)
                 {
                     localIOException2.printStackTrace();
@@ -373,7 +373,7 @@ public abstract class ConfigFile
         }
     }
 
-    protected void WriteValue(String settingsName, ArrayList<String> settingsValue) throws IOException
+    protected void writeValue(String settingsName, ArrayList<String> settingsValue) throws IOException
     {
         String out = "";
         for (String key : settingsValue)
@@ -384,96 +384,115 @@ public abstract class ConfigFile
                 out += "," + key;
         }
 
-        this.SettingsWriter.write(settingsName + ":" + out);
-        this.SettingsWriter.newLine();
+        this.settingsWriter.write(settingsName + ":" + out);
+        this.settingsWriter.newLine();
     }
 
-    protected void WriteValue(String settingsName, List<WeightedMobSpawnGroup> settingsValue) throws IOException
+    protected void writeValue(String settingsName, List<WeightedMobSpawnGroup> settingsValue) throws IOException
     {
-    	this.SettingsWriter.write(settingsName + ": " + WeightedMobSpawnGroup.toJson(settingsValue));
-        this.SettingsWriter.newLine();
+    	this.settingsWriter.write(settingsName + ": " + WeightedMobSpawnGroup.toJson(settingsValue));
+        this.settingsWriter.newLine();
     }
 
 
-    protected void WriteValue(String settingsName, int settingsValue) throws IOException
+    protected void writeValue(String settingsName, int settingsValue) throws IOException
     {
-        this.SettingsWriter.write(settingsName + ":" + Integer.toString(settingsValue));
-        this.SettingsWriter.newLine();
+        this.settingsWriter.write(settingsName + ":" + Integer.toString(settingsValue));
+        this.settingsWriter.newLine();
     }
 
-    protected void WriteValue(String settingsName, double settingsValue) throws IOException
+    protected void writeValue(String settingsName, double settingsValue) throws IOException
     {
-        this.SettingsWriter.write(settingsName + ":" + Double.toString(settingsValue));
-        this.SettingsWriter.newLine();
+        this.settingsWriter.write(settingsName + ":" + Double.toString(settingsValue));
+        this.settingsWriter.newLine();
     }
 
-    protected void WriteValue(String settingsName, float settingsValue) throws IOException
+    protected void writeValue(String settingsName, float settingsValue) throws IOException
     {
-        this.SettingsWriter.write(settingsName + ":" + Float.toString(settingsValue));
-        this.SettingsWriter.newLine();
+        this.settingsWriter.write(settingsName + ":" + Float.toString(settingsValue));
+        this.settingsWriter.newLine();
     }
 
-    protected void WriteValue(String settingsName, boolean settingsValue) throws IOException
+    protected void writeValue(String settingsName, boolean settingsValue) throws IOException
     {
-        this.SettingsWriter.write(settingsName + ":" + Boolean.toString(settingsValue));
-        this.SettingsWriter.newLine();
+        this.settingsWriter.write(settingsName + ":" + Boolean.toString(settingsValue));
+        this.settingsWriter.newLine();
     }
 
-    protected void WriteValue(String settingsName, String settingsValue) throws IOException
+    protected void writeValue(String settingsName, String settingsValue) throws IOException
     {
-        this.SettingsWriter.write(settingsName + ":" + settingsValue);
-        this.SettingsWriter.newLine();
+        this.settingsWriter.write(settingsName + ":" + settingsValue);
+        this.settingsWriter.newLine();
     }
 
-    protected void WriteValue(String settingsName) throws IOException
+    protected void writeValue(String settingsName) throws IOException
     {
-        this.SettingsWriter.write(settingsName);
-        this.SettingsWriter.newLine();
+        this.settingsWriter.write(settingsName);
+        this.settingsWriter.newLine();
     }
 
-    protected void WriteColorValue(String settingsName, int RGB) throws IOException
+    protected void writeColorValue(String settingsName, int RGB) throws IOException
     {
-        this.SettingsWriter.write(settingsName + ":0x" + Integer.toHexString((0xFFFFFF & RGB) | 0x1000000).substring(1));
-        this.SettingsWriter.newLine();
+        this.settingsWriter.write(settingsName + ":0x" + Integer.toHexString((0xFFFFFF & RGB) | 0x1000000).substring(1));
+        this.settingsWriter.newLine();
     }
 
-    protected void WriteTitle(String title) throws IOException
+    protected void writeBigTitle(String title) throws IOException
     {
-        this.SettingsWriter.newLine();
-        this.SettingsWriter.write("#######################################################################");
-        this.SettingsWriter.newLine();
-        this.SettingsWriter.write("# +-----------------------------------------------------------------+ #");
-        this.SettingsWriter.newLine();
-        title = "  " + title + "  ";
+        this.settingsWriter.newLine();
+        this.settingsWriter.write("#######################################################################");
+        this.settingsWriter.newLine();
+        this.settingsWriter.write("# +-----------------------------------------------------------------+ #");
+        this.settingsWriter.newLine();
+        StringBuilder builder = new StringBuilder(title);
+        builder.insert(0, ' ');
+        builder.append(' ');
         boolean flag = true;
-        while (title.length() < 65)
+        while (builder.length() < 65)
         {
             if (flag)
-                title = " " + title;
+                builder.insert(0, ' ');
             else
-                title = title + " ";
+                builder.append(' ');
             flag = !flag;
         }
-        this.SettingsWriter.write("# |" + title + "| #");
-        this.SettingsWriter.newLine();
-        this.SettingsWriter.write("# +-----------------------------------------------------------------+ #");
-        this.SettingsWriter.newLine();
-        this.SettingsWriter.write("#######################################################################");
-        this.SettingsWriter.newLine();
-        this.SettingsWriter.newLine();
+        this.settingsWriter.write("# |" + builder.toString() + "| #");
+        this.settingsWriter.newLine();
+        this.settingsWriter.write("# +-----------------------------------------------------------------+ #");
+        this.settingsWriter.newLine();
+        this.settingsWriter.write("#######################################################################");
+        this.settingsWriter.newLine();
+        this.settingsWriter.newLine();
+    }
+    
+    protected void writeSmallTitle(String title) throws IOException
+    {
+        int titleLength = title.length();
+        StringBuilder rowBuilder = new StringBuilder(titleLength + 4);
+        for(int i = 0; i < titleLength + 4; i++)
+        {
+            rowBuilder.append('#');
+        }
+        this.settingsWriter.write(rowBuilder.toString());
+        this.settingsWriter.newLine();
+        this.settingsWriter.write("# " + title + " #");
+        this.settingsWriter.newLine();
+        this.settingsWriter.write(rowBuilder.toString());
+        this.settingsWriter.newLine();
+        this.settingsWriter.newLine();
     }
 
-    protected void WriteComment(String comment) throws IOException
+    protected void writeComment(String comment) throws IOException
     {
         if (!this.WriteComments)
             return;
-        this.SettingsWriter.write("# " + comment);
-        this.SettingsWriter.newLine();
+        this.settingsWriter.write("# " + comment);
+        this.settingsWriter.newLine();
     }
 
-    protected void WriteNewLine() throws IOException
+    protected void writeNewLine() throws IOException
     {
-        this.SettingsWriter.newLine();
+        this.settingsWriter.newLine();
     }
 
     protected abstract void WriteConfigSettings() throws IOException;

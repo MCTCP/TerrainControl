@@ -89,14 +89,14 @@ public abstract class Layer
 
                 if (biomeConfig.BiomeSize != i)
                     continue;
-                if (config.NormalBiomes.contains(biomeConfig.Name))
+                if (config.NormalBiomes.contains(biomeConfig.name))
                 {
                     for (int t = 0; t < biomeConfig.BiomeRarity; t++)
                         normalBiomes.add(biomeConfig.Biome);
                     config.normalBiomesRarity -= biomeConfig.BiomeRarity;
                 }
 
-                if (config.IceBiomes.contains(biomeConfig.Name))
+                if (config.IceBiomes.contains(biomeConfig.name))
                 {
                     for (int t = 0; t < biomeConfig.BiomeRarity; t++)
                         iceBiomes.add(biomeConfig.Biome);
@@ -161,7 +161,7 @@ public abstract class Layer
             {
                 if (biomeConfig.BiomeSize != depth)
                     continue;
-                if (config.IsleBiomes.contains(biomeConfig.Name) && biomeConfig.IsleInBiome != null)
+                if (config.IsleBiomes.contains(biomeConfig.name) && biomeConfig.IsleInBiome != null)
                 {
                     int id = biomeConfig.Biome.getId();
                     if (biomeConfig.Biome.isCustom())
@@ -182,7 +182,7 @@ public abstract class Layer
                     MainLayer = layerBiome;
                 }
 
-                if (config.BorderBiomes.contains(biomeConfig.Name) && biomeConfig.BiomeIsBorder != null)
+                if (config.BorderBiomes.contains(biomeConfig.name) && biomeConfig.BiomeIsBorder != null)
                 {
                     haveBorder = true;
 
