@@ -61,6 +61,8 @@ public abstract class EventHandler
      *            The world the resource will spawn in.
      * @param random
      *            The random generator.
+     * @param villageInChunk
+     *            Whether there is a village in the current chunk.
      * @param chunkX
      *            The x coordinate of the chunk the resource will spawn in.
      * @param chunkZ
@@ -69,41 +71,47 @@ public abstract class EventHandler
      *         events, so returning true when the event is already cancelled
      *         does nothing.
      */
-    public boolean onResourceProcess(Resource resource, LocalWorld world, Random random, int chunkX, int chunkZ, boolean isCancelled)
+    public boolean onResourceProcess(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ, boolean isCancelled)
     {
         return true;
     }
 
     /**
-     * Called whenever Terrain Control starts to populate a chunk. Cannot be cancelled.
+     * Called whenever Terrain Control starts to populate a chunk. Cannot be
+     * cancelled.
      * 
      * @param world
      *            The world where the population occurred.
      * @param random
      *            The random generator.
+     * @param vilageInChunk
+     *            Whether there is a village in the current chunk.
      * @param chunkX
      *            The x coordinate of the chunk that is being populated.
      * @param chunkZ
      *            The z coordinate of the chunk that is being populated.
      */
-    public void onPopulateStart(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public void onPopulateStart(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
 
     }
-    
+
     /**
-     * Called whenever Terrain Control is done populating a chunk. Cannot be cancelled.
+     * Called whenever Terrain Control is done populating a chunk. Cannot be
+     * cancelled.
      * 
      * @param world
      *            The world where the population occurred.
      * @param random
      *            The random generator.
+     * @param vilageInChunk
+     *            Whether there is a village in the current chunk.
      * @param chunkX
      *            The x coordinate of the chunk that is being populated.
      * @param chunkZ
      *            The z coordinate of the chunk that is being populated.
      */
-    public void onPopulateEnd(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public void onPopulateEnd(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
 
     }

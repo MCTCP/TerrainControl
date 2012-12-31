@@ -67,8 +67,6 @@ public enum TCDefaultValues implements TCSetting
     WorldFog("0xC0D8FF", SettingsType.Color),
     WorldNightFog("0x0B0D17", SettingsType.Color),
     
-    
-    PyramidsEnabled(true),
     NetherFortressesEnabled(false),
     
     StrongholdsEnabled(true),
@@ -83,6 +81,11 @@ public enum TCDefaultValues implements TCSetting
     
     MineshaftsEnabled(true),
     MineshaftRarity(1D),
+    
+    RareBuildingsEnabled(true),
+    MinimumDistanceBetweenRareBuildings(8),
+    MaximumDistanceBetweenRareBuildings(32),
+    RareBuildingType(BiomeConfig.RareBuildingType.disabled),
 
     caveRarity(7),
     caveFrequency(40),

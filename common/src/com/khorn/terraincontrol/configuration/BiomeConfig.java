@@ -37,7 +37,7 @@ import com.khorn.terraincontrol.util.Txt;
 
 public class BiomeConfig extends ConfigFile
 {
-    public short[][] ReplaceMatrixBlocks = new short[256][];
+    public short[][] ReplaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
     public int ReplaceCount = 0;
 
     public int BiomeSize;
@@ -103,6 +103,8 @@ public class BiomeConfig extends ConfigFile
     public enum VillageType { disabled, wood, sandstone}
     public VillageType villageType;
     public double mineshaftsRarity;
+    public enum RareBuildingType { disabled, desertPyramid, jungleTemple, swampHut }
+    public RareBuildingType rareBuildingType;
 
     public int ResourceCount = 0;
 
@@ -402,6 +404,7 @@ public class BiomeConfig extends ConfigFile
         this.netherFortressesEnabled = ReadModSettings(TCDefaultValues.NetherFortressesEnabled.name(), true);
         this.villageType = (VillageType) ReadModSettings(TCDefaultValues.VillageType.name(), this.DefaultVillageType);
         this.mineshaftsRarity = ReadSettings(TCDefaultValues.MineshaftRarity);
+        this.rareBuildingType = (RareBuildingType) ReadModSettings(TCDefaultValues.RareBuildingType.name(), this.DefaultRareBuildingType);
 
         if (DefaultBiome.getBiome(this.Biome.getId()) == null)
         {
@@ -792,7 +795,7 @@ public class BiomeConfig extends ConfigFile
         this.WriteComment("Minecraft will ignore this setting.");
         this.WriteValue(TCDefaultValues.StrongholdsEnabled.name(), strongholdsEnabled);
         this.WriteNewLine();
-        this.WriteComment("Whether a Nether Fortress can start in this biome.");
+        this.WriteComment("Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
         this.WriteValue(TCDefaultValues.NetherFortressesEnabled.name(), netherFortressesEnabled);
         this.WriteNewLine();
         this.WriteComment("The village type in this biome. Can be wood, sandstone or disabled.");
@@ -800,6 +803,9 @@ public class BiomeConfig extends ConfigFile
         this.WriteNewLine();
         this.WriteComment("The mineshaft rarity from 0 to 100. 0 = no mineshafts, 1 = default rarity, 100 = a wooden chaos.");
         this.WriteValue(TCDefaultValues.MineshaftRarity.name(), mineshaftsRarity);
+        this.WriteNewLine();
+        this.WriteComment("The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut or disabled.");
+        this.WriteValue(TCDefaultValues.RareBuildingType.name(), rareBuildingType.toString());
 
         if (DefaultBiome.getBiome(this.Biome.getId()) != null)
         {
@@ -1112,6 +1118,7 @@ public class BiomeConfig extends ConfigFile
     private String DefaultFoliageColor = "0xFFFFFF";
     private boolean DefaultStrongholds = true;
     private VillageType DefaultVillageType = VillageType.disabled;
+    private RareBuildingType DefaultRareBuildingType = RareBuildingType.disabled;
 
     private void InitDefaults()
     {
@@ -1144,6 +1151,7 @@ public class BiomeConfig extends ConfigFile
             this.DefaultCactus = 10;
             this.DefaultColor = "0xFFCC33";
             this.DefaultVillageType = VillageType.sandstone;
+            this.DefaultRareBuildingType = RareBuildingType.desertPyramid;
             break;
         case 3: // Extreme hills
             this.DefaultColor = "0x333300";
@@ -1170,6 +1178,7 @@ public class BiomeConfig extends ConfigFile
             this.DefaultWaterColorMultiplier = "0xe0ffae";
             this.DefaultGrassColor = "0x7E6E7E";
             this.DefaultFoliageColor = "0x7E6E7E";
+            this.DefaultRareBuildingType = RareBuildingType.swampHut;
             break;
         case 7: // River
             this.DefaultSize = 8;
@@ -1237,6 +1246,7 @@ public class BiomeConfig extends ConfigFile
             this.DefaultCactus = 10;
             this.DefaultColor = "0x996600";
             this.DefaultVillageType = VillageType.sandstone;
+            this.DefaultRareBuildingType = RareBuildingType.desertPyramid;
             break;
         case 18: // ForestHills
             this.DefaultSize = 6;
@@ -1264,6 +1274,7 @@ public class BiomeConfig extends ConfigFile
             this.DefaultGrass = 25;
             this.DefaultFlowers = 4;
             this.DefaultColor = "0xCC6600";
+            this.DefaultRareBuildingType = RareBuildingType.jungleTemple;
             break;
         case 22: // JungleHills
             this.DefaultTrees = 50;
@@ -1271,6 +1282,7 @@ public class BiomeConfig extends ConfigFile
             this.DefaultFlowers = 4;
             this.DefaultColor = "0x663300";
             this.DefaultIsle.add(DefaultBiome.JUNGLE.Name);
+            this.DefaultRareBuildingType = RareBuildingType.jungleTemple;
             break;
         }
     }

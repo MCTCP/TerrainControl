@@ -39,12 +39,12 @@ public class ObjectSpawner
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
         this.rand.setSeed(chunkX * l1 + chunkZ * l2 ^ world.getSeed());
-        
-        // Fire event
-        TerrainControl.firePopulationStartEvent(world, rand, chunkX, chunkZ);
 
         // Generate structures
         boolean hasGeneratedAVillage = world.PlaceTerrainObjects(rand, chunkX, chunkZ);
+        
+        // Fire event
+        TerrainControl.firePopulationStartEvent(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
 
         // Resource sequence
         for (int i = 0; i < localBiomeConfig.ResourceCount; i++)
@@ -53,7 +53,7 @@ public class ObjectSpawner
             if (res instanceof SmallLakeGen && hasGeneratedAVillage)
                 continue;
             world.setChunksCreations(false);
-            res.process(world, rand, chunkX, chunkZ);
+            res.process(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
         }
 
         // Snow and ice
@@ -70,7 +70,7 @@ public class ObjectSpawner
             this.worldSettings = this.worldSettings.newSettings;
         
         // Fire event
-        TerrainControl.firePopulationEndEvent(world, rand, chunkX, chunkZ);
+        TerrainControl.firePopulationEndEvent(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
     }
     
     protected void placeSnowAndIce(int chunkX, int chunkZ)

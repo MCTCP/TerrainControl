@@ -32,6 +32,7 @@ import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.structuregens.MineshaftGen;
 import com.khorn.terraincontrol.forge.structuregens.NetherFortressGen;
+import com.khorn.terraincontrol.forge.structuregens.RareBuildingGen;
 import com.khorn.terraincontrol.forge.structuregens.StrongholdGen;
 import com.khorn.terraincontrol.forge.structuregens.VillageGen;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
@@ -59,7 +60,7 @@ public class SingleWorld implements LocalWorld
     public StrongholdGen strongholdGen;
     public VillageGen villageGen;
     public MineshaftGen mineshaftGen;
-    private MapGenScatteredFeature pyramidsGen;
+    public RareBuildingGen rareBuildingGen;
     public NetherFortressGen netherFortressGen;
 
     private WorldGenDungeons dungeonGen;
@@ -222,8 +223,8 @@ public class SingleWorld implements LocalWorld
             this.mineshaftGen.generate(null, this.world, x, z, chunkArray);
         if (this.settings.villagesEnabled && dry)
             this.villageGen.generate(null, this.world, x, z, chunkArray);
-        if (this.settings.PyramidsEnabled)
-            this.pyramidsGen.generate(null, this.world, x, z, chunkArray);
+        if (this.settings.rareBuildingsEnabled)
+            this.rareBuildingGen.generate(null, this.world, x, z, chunkArray);
         if (this.settings.netherFortressesEnabled)
             this.netherFortressGen.generate(null, this.world, x, z, chunkArray);
 
@@ -278,8 +279,8 @@ public class SingleWorld implements LocalWorld
             this.mineshaftGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
         if (this.settings.villagesEnabled)
             isVillagePlaced = this.villageGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.PyramidsEnabled)
-            this.pyramidsGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+        if (this.settings.rareBuildingsEnabled)
+            this.rareBuildingGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
         if (this.settings.netherFortressesEnabled)
             this.netherFortressGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
 
@@ -579,7 +580,7 @@ public class SingleWorld implements LocalWorld
 
         this.villageGen = new VillageGen(config);
         this.mineshaftGen = new MineshaftGen();
-        this.pyramidsGen = new MapGenScatteredFeature();
+        this.rareBuildingGen = new RareBuildingGen(config);
         this.netherFortressGen = new NetherFortressGen();
 
         this.tree = new WorldGenTrees(false);

@@ -211,7 +211,7 @@ public class BukkitWorld implements LocalWorld
             this.mineshaftGen.a(null, this.world, x, z, chunkArray);
         if (this.settings.villagesEnabled && dry)
             this.villageGen.a(null, this.world, x, z, chunkArray);
-        if (this.settings.PyramidsEnabled)
+        if (this.settings.rareBuildingsEnabled)
             this.pyramidsGen.a(null, this.world, x, z, chunkArray);
         if (this.settings.netherFortressesEnabled)
             this.netherFortress.a(null, this.world, x, z, chunkArray);
@@ -264,7 +264,7 @@ public class BukkitWorld implements LocalWorld
             this.mineshaftGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.villagesEnabled)
             Village = this.villageGen.a(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.PyramidsEnabled)
+        if (this.settings.rareBuildingsEnabled)
             this.pyramidsGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.netherFortressesEnabled)
             this.netherFortress.a(this.world, rand, chunk_x, chunk_z);

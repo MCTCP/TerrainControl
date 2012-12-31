@@ -31,13 +31,13 @@ public class GrassGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
     {
         // Handled by process().
     }
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         for (int t = 0; t < frequency; t++)
         {

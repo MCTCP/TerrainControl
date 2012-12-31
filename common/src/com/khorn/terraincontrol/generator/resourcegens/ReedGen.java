@@ -15,7 +15,7 @@ public class ReedGen extends Resource
     private List<Integer> sourceBlocks;
 
     @Override
-    public void spawn(LocalWorld world, Random rand, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
         int y = world.getHighestBlockYAt(x, z);
         if (y > maxAltitude

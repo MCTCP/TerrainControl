@@ -38,14 +38,20 @@ public class CustomObjectGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
     {
         // Left blank, as process(..) already handles this.
     }
 
     @Override
-    public void process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
+        // Fire event
+        if(!TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkX, chunkZ))
+        {
+            return;
+        }
+        
         for (CustomObject object : objects)
         {
             object.process(world, random, chunkX, chunkZ);

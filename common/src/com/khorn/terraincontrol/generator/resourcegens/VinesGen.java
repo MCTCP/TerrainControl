@@ -14,7 +14,7 @@ public class VinesGen extends Resource
     private int maxAltitude;
 
     @Override
-    public void spawn(LocalWorld world, Random rand, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
         int _x = x;
         int _z = z;

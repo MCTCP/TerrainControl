@@ -13,7 +13,7 @@ public class UnderWaterOreGen extends Resource
     private int size;
 
     @Override
-    public void spawn(LocalWorld world, Random rand, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
         int y = world.getSolidHeight(x, z);
         if (world.getLiquidHeight(x, z) < y || y == -1)

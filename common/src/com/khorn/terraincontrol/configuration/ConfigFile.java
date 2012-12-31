@@ -483,6 +483,23 @@ public abstract class ConfigFile
     protected abstract void CorrectSettings();
 
     protected abstract void RenameOldSettings();
+    
+    /**
+     * Renames an old setting. If the old setting isn't found, this does
+     * nothing.
+     * 
+     * @param oldValue
+     *            Name of the old setting.
+     * @param newValue
+     *            The new setting.
+     */
+    protected void renameOldSetting(String oldValue, TCDefaultValues newValue)
+    {
+        if (this.SettingsCache.containsKey(oldValue.toLowerCase()))
+        {
+            this.SettingsCache.put(newValue.name().toLowerCase(), this.SettingsCache.get(oldValue.toLowerCase()));
+        }
+    }
 
     protected int applyBounds(int value, int min, int max)
     {

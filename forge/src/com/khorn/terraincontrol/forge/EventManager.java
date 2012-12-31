@@ -22,6 +22,7 @@ import com.khorn.terraincontrol.generator.resourcegens.OreGen;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
 import com.khorn.terraincontrol.generator.resourcegens.SmallLakeGen;
 import com.khorn.terraincontrol.generator.resourcegens.UndergroundLakeGen;
+import com.khorn.terraincontrol.generator.resourcegens.CustomObjectGen;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 
@@ -35,16 +36,20 @@ public class EventManager extends EventHandler
     private Map<String, Boolean> hasDecorationBegun = new HashMap<String, Boolean>();
 
     @Override
-    public boolean onResourceProcess(Resource resource, LocalWorld localWorld, Random random, int chunkX, int chunkZ, boolean isCancelled)
+    public boolean onResourceProcess(Resource resource, LocalWorld localWorld, Random random, boolean villageInChunk, int chunkX, int chunkZ, boolean isCancelled)
     {
         final SingleWorld world = (SingleWorld) localWorld;
 
         // Convert to Forge event and fire
-        if (resource instanceof DungeonGen || resource instanceof SmallLakeGen || resource instanceof UndergroundLakeGen || resource instanceof LiquidGen)
+        if (resource instanceof DungeonGen || 
+            resource instanceof SmallLakeGen || 
+            resource instanceof UndergroundLakeGen || 
+            resource instanceof LiquidGen ||
+            resource instanceof CustomObjectGen)
         {
             // Fire population event
             Populate.EventType forgeEvent = getPopulateEventType(resource.getBlockId());
-            return TerrainGen.populate(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, false, forgeEvent);
+            return TerrainGen.populate(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, villageInChunk, forgeEvent);
         } else if (resource instanceof OreGen)
         {
             if(!hasOreGenerationBegun(world))
@@ -71,7 +76,7 @@ public class EventManager extends EventHandler
     }
     
     @Override
-    public void onPopulateStart(LocalWorld localWorld, Random random, int chunkX, int chunkZ)
+    public void onPopulateStart(LocalWorld localWorld, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         final SingleWorld world = (SingleWorld) localWorld;
         
@@ -80,12 +85,12 @@ public class EventManager extends EventHandler
         setOreGenerationBegun(world, false);
         
         // Fire event
-        final PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Pre(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, false);
+        final PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Pre(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, villageInChunk);
         MinecraftForge.EVENT_BUS.post(forgeEvent);
     }
     
     @Override
-    public void onPopulateEnd(LocalWorld localWorld, Random random, int chunkX, int chunkZ)
+    public void onPopulateEnd(LocalWorld localWorld, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         final SingleWorld world = (SingleWorld) localWorld;
         
@@ -106,7 +111,7 @@ public class EventManager extends EventHandler
         }
         
         // Population close
-        final PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Post(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, false);
+        final PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Post(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, villageInChunk);
         MinecraftForge.EVENT_BUS.post(forgeEvent);
         
         // Population close (FML and ModLoader style)

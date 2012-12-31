@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.forge.structuregens;
 
 import java.util.ArrayList;
 import java.util.Random;
+
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.ComponentStrongholdStairs2;
 import net.minecraft.world.gen.structure.StructureComponent;

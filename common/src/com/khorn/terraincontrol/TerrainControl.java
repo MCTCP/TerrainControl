@@ -240,40 +240,40 @@ public class TerrainControl
         {
             handler.onCustomObjectSpawn(object, world, random, x, y, z, isCancelled);
         }
-        return isCancelled;
+        return !isCancelled;
     }
 
-    public static boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, int chunkX, int chunkZ)
+    public static boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         boolean isCancelled = false;
         for (EventHandler handler : cancelableEventHandlers)
         {
-            if (!handler.onResourceProcess(resource, world, random, chunkX, chunkZ, isCancelled))
+            if (!handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, isCancelled))
             {
                 isCancelled = true;
             }
         }
         for (EventHandler handler : monitoringEventHandlers)
         {
-            handler.onResourceProcess(resource, world, random, chunkX, chunkZ, isCancelled);
+            handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, isCancelled);
         }
-        return isCancelled;
+        return !isCancelled;
     }
 
-    public static void firePopulationStartEvent(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public static void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         for (EventHandler handler : cancelableEventHandlers)
-            handler.onPopulateStart(world, random, chunkX, chunkZ);
+            handler.onPopulateStart(world, random, villageInChunk, chunkX, chunkZ);
         for (EventHandler handler : monitoringEventHandlers)
-            handler.onPopulateStart(world, random, chunkX, chunkZ);
+            handler.onPopulateStart(world, random, villageInChunk, chunkX, chunkZ);
     }
     
-    public static void firePopulationEndEvent(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public static void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         for (EventHandler handler : cancelableEventHandlers)
-            handler.onPopulateEnd(world, random, chunkX, chunkZ);
+            handler.onPopulateEnd(world, random, villageInChunk, chunkX, chunkZ);
         for (EventHandler handler : monitoringEventHandlers)
-            handler.onPopulateEnd(world, random, chunkX, chunkZ);
+            handler.onPopulateEnd(world, random, villageInChunk, chunkX, chunkZ);
     }
 
 }

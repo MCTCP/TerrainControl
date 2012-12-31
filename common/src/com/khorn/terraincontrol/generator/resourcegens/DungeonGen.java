@@ -26,7 +26,7 @@ public class DungeonGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
     {
         int y = random.nextInt(maxAltitude - minAltitude) + minAltitude;
         world.PlaceDungeons(random, x, y, z);

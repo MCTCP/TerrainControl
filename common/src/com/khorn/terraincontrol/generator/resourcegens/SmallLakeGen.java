@@ -15,8 +15,14 @@ public class SmallLakeGen extends Resource
     public int maxAltitude;
 
     @Override
-    public void spawn(LocalWorld world, Random rand, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
+        if(villageInChunk)
+        {
+            // Lakes and villages don't like each other.
+            return;
+        }
+        
         x -= 8;
         z -= 8;
 

@@ -1,11 +1,5 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.customobjects.CustomObject;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -14,15 +8,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.customobjects.CustomObject;
 
 public class WorldConfig extends ConfigFile
-{   
+{
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
     public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
 
     // Holds all world CustomObjects.
     public List<CustomObject> customObjects = new ArrayList<CustomObject>();
-    
 
     public ArrayList<String> NormalBiomes = new ArrayList<String>();
     public ArrayList<String> IceBiomes = new ArrayList<String>();
@@ -30,6 +30,7 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> BorderBiomes = new ArrayList<String>();
 
     public Map<Integer, BiomeConfig> biomeConfigs;
+    public int highestBiomeId; // The highest biome id used in this world
 
     public byte[] ReplaceMatrixBiomes = new byte[256];
     public boolean HaveBiomeReplace = false;
@@ -64,7 +65,7 @@ public class WorldConfig extends ConfigFile
 
     public String imageFile;
     public ImageMode imageMode;
-    //public int imageZoom;
+    // public int imageZoom;
     public String imageFillBiome;
     public int imageXOffset;
     public int imageZOffset;
@@ -82,10 +83,9 @@ public class WorldConfig extends ConfigFile
     public float WorldNightFogG;
     public float WorldNightFogB;
 
+    // Specific biome settings
 
-    //Specific biome settings
-
-    //Caves
+    // Caves
     public int caveRarity;
     public int caveFrequency;
     public int caveMinAltitude;
@@ -97,7 +97,7 @@ public class WorldConfig extends ConfigFile
     public int caveSystemPocketMaxSize;
     public boolean evenCaveDistribution;
 
-    //Canyons
+    // Canyons
     public int canyonRarity;
     public int canyonMinAltitude;
     public int canyonMaxAltitude;
@@ -110,13 +110,22 @@ public class WorldConfig extends ConfigFile
     public double strongholdDistance;
     public int strongholdCount;
     public int strongholdSpread;
-    
+
     // Villages
     public boolean villagesEnabled;
     public int villageSize;
     public int villageDistance; // Has a minimum of 9
 
-    //Terrain
+    // Pyramids (also swamp huts and jungle temples)
+    public boolean rareBuildingsEnabled;
+    public int minimumDistanceBetweenRareBuildings;
+    public int maximumDistanceBetweenRareBuildings;
+
+    // Other structures
+    public boolean mineshaftsEnabled;
+    public boolean netherFortressesEnabled;
+
+    // Terrain
     public boolean oldTerrainGenerator;
 
     public int waterLevelMax;
@@ -132,17 +141,10 @@ public class WorldConfig extends ConfigFile
     public boolean ceilingBedrock;
     public int bedrockBlock;
 
-
     public boolean removeSurfaceStone;
 
     public int objectSpawnRatio;
     public File CustomObjectsDirectory;
-
-    // Structures
-    public boolean mineshaftsEnabled;
-    
-    public boolean PyramidsEnabled;
-    public boolean netherFortressesEnabled;
 
     public File SettingsDir;
     public ConfigMode SettingsMode;
@@ -154,7 +156,6 @@ public class WorldConfig extends ConfigFile
     public TerrainMode ModeTerrain;
     public BiomeMode ModeBiome;
 
-    
     public boolean BiomeConfigsHaveReplacement = false;
 
     public int normalBiomesRarity;
@@ -190,20 +191,19 @@ public class WorldConfig extends ConfigFile
 
         world.setHeightBits(this.worldHeightBits);
 
-
         File BiomeFolder = new File(SettingsDir, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
         if (!BiomeFolder.exists())
         {
             if (!BiomeFolder.mkdir())
             {
-                System.out.println("TerrainControl: error create biome configs directory, working with defaults");
+                TerrainControl.log(Level.WARNING, "Error creating biome configs directory, working with defaults");
                 return;
             }
         }
 
         ArrayList<LocalBiome> localBiomes = new ArrayList<LocalBiome>(world.getDefaultBiomes());
 
-        //Add custom biomes to world
+        // Add custom biomes to world
         for (String biomeName : this.CustomBiomes)
         {
             if (checkOnly)
@@ -212,14 +212,14 @@ public class WorldConfig extends ConfigFile
                 localBiomes.add(world.AddBiome(biomeName, this.CustomBiomeIds.get(biomeName)));
         }
 
-        //Build biome replace matrix
+        // Build biome replace matrix
         for (int i = 0; i < this.ReplaceMatrixBiomes.length; i++)
             this.ReplaceMatrixBiomes[i] = (byte) i;
 
         this.biomeConfigs = new HashMap<Integer, BiomeConfig>();
+        this.highestBiomeId = 0;
 
         String LoadedBiomeNames = "";
-
 
         for (LocalBiome localBiome : localBiomes)
         {
@@ -244,6 +244,11 @@ public class WorldConfig extends ConfigFile
                 LoadedBiomeNames += ", ";
             LoadedBiomeNames += localBiome.getName();
             this.biomeConfigs.put(localBiome.getId(), config);
+            if (localBiome.getId() > this.highestBiomeId)
+            {
+                // Found new highest biome id
+                this.highestBiomeId = localBiome.getId();
+            }
 
             if (this.ModeBiome == BiomeMode.FromImage)
             {
@@ -260,15 +265,12 @@ public class WorldConfig extends ConfigFile
                     System.out.println("TerrainControl: wrong color in " + config.Biome.getName());
                 }
 
-
             }
         }
 
         System.out.println("TerrainControl: Loaded biomes - " + LoadedBiomeNames);
 
-
     }
-
 
     private void ReadWorldCustomObjects()
     {
@@ -296,27 +298,17 @@ public class WorldConfig extends ConfigFile
 
     }
 
+    @Override
     protected void RenameOldSettings()
     {
-        if (this.SettingsCache.containsKey("WaterLevel".toLowerCase()))
-        {
-            this.SettingsCache.put("WaterLevelMax".toLowerCase(), this.SettingsCache.get("WaterLevel".toLowerCase()));
-        }
-        if (this.SettingsCache.containsKey("ModeTerrain".toLowerCase()))
-        {
-            this.SettingsCache.put(TCDefaultValues.TerrainMode.name().toLowerCase(), this.SettingsCache.get("ModeTerrain".toLowerCase()));
-        }
-        if (this.SettingsCache.containsKey("ModeBiome".toLowerCase()))
-        {
-            this.SettingsCache.put(TCDefaultValues.BiomeMode.name().toLowerCase(), this.SettingsCache.get("ModeBiome".toLowerCase()));
-        }
-        if(this.SettingsCache.containsKey("NetherFortressEnabled".toLowerCase()))
-        {
-            this.SettingsCache.put(TCDefaultValues.NetherFortressesEnabled.name().toLowerCase(), this.SettingsCache.get("NetherFortressEnabled".toLowerCase()));
-        }
-
+        renameOldSetting("WaterLevel", TCDefaultValues.WaterLevelMax);
+        renameOldSetting("ModeTerrain", TCDefaultValues.TerrainMode);
+        renameOldSetting("ModeBiome", TCDefaultValues.BiomeMode);
+        renameOldSetting("NetherFortressEnabled", TCDefaultValues.NetherFortressesEnabled);
+        renameOldSetting("PyramidsEnabled", TCDefaultValues.RareBuildingsEnabled);
     }
 
+    @Override
     protected void CorrectSettings()
     {
         this.oldBiomeSize = applyBounds(this.oldBiomeSize, 0.1D, 10.0D);
@@ -327,7 +319,6 @@ public class WorldConfig extends ConfigFile
         this.LandRarity = applyBounds(this.LandRarity, 1, 100);
         this.LandSize = applyBounds(this.LandSize, 0, this.GenerationDepth);
         this.LandFuzzy = applyBounds(this.LandFuzzy, 0, this.GenerationDepth - this.LandSize);
-
 
         this.IceRarity = applyBounds(this.IceRarity, 1, 100);
         this.IceSize = applyBounds(this.IceSize, 0, this.GenerationDepth);
@@ -352,13 +343,11 @@ public class WorldConfig extends ConfigFile
 
         this.imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || CustomBiomes.contains(imageFillBiome)) ? imageFillBiome : TCDefaultValues.ImageFillBiome.stringValue();
 
-
         this.minMoisture = applyBounds(this.minMoisture, 0, 1.0F);
         this.maxMoisture = applyBounds(this.maxMoisture, 0, 1.0F, this.minMoisture);
 
         this.minTemperature = applyBounds(this.minTemperature, 0, 1.0F);
         this.maxTemperature = applyBounds(this.maxTemperature, 0, 1.0F, this.minTemperature);
-
 
         this.caveRarity = applyBounds(this.caveRarity, 0, 100);
         this.caveFrequency = applyBounds(this.caveFrequency, 0, 200);
@@ -370,7 +359,6 @@ public class WorldConfig extends ConfigFile
         this.caveSystemPocketMinSize = applyBounds(this.caveSystemPocketMinSize, 0, 100);
         this.caveSystemPocketMaxSize = applyBounds(this.caveSystemPocketMaxSize, 0, 100, this.caveSystemPocketMinSize);
 
-
         this.canyonRarity = applyBounds(this.canyonRarity, 0, 100);
         this.canyonMinAltitude = applyBounds(this.canyonMinAltitude, 0, WorldHeight);
         this.canyonMaxAltitude = applyBounds(this.canyonMaxAltitude, 0, WorldHeight, this.canyonMinAltitude);
@@ -378,11 +366,12 @@ public class WorldConfig extends ConfigFile
         this.canyonMaxLength = applyBounds(this.canyonMaxLength, 1, 500, this.canyonMinLength);
         this.canyonDepth = applyBounds(this.canyonDepth, 0.1D, 15D);
 
-
         this.waterLevelMin = applyBounds(this.waterLevelMin, 0, WorldHeight - 1);
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, WorldHeight - 1, this.waterLevelMin);
-        
+
         this.villageDistance = applyBounds(this.villageDistance, 9, Integer.MAX_VALUE);
+        this.minimumDistanceBetweenRareBuildings = applyBounds(this.minimumDistanceBetweenRareBuildings, 1, Integer.MAX_VALUE);
+        this.maximumDistanceBetweenRareBuildings = applyBounds(this.maximumDistanceBetweenRareBuildings, this.minimumDistanceBetweenRareBuildings + 1, Integer.MAX_VALUE);
 
         if (this.ModeBiome == BiomeMode.OldGenerator && this.ModeTerrain != TerrainMode.OldGenerator)
         {
@@ -392,7 +381,7 @@ public class WorldConfig extends ConfigFile
         }
     }
 
-
+    @Override
     protected void ReadConfigSettings()
     {
         // Main modes
@@ -432,7 +421,7 @@ public class WorldConfig extends ConfigFile
         ReadCustomBiomes();
 
         // Images
-        this.imageMode =  ReadSettings(TCDefaultValues.ImageMode);
+        this.imageMode = ReadSettings(TCDefaultValues.ImageMode);
         this.imageFile = this.ReadSettings(TCDefaultValues.ImageFile);
         this.imageFillBiome = this.ReadSettings(TCDefaultValues.ImageFillBiome);
         this.imageXOffset = this.ReadSettings(TCDefaultValues.ImageXOffset);
@@ -462,13 +451,16 @@ public class WorldConfig extends ConfigFile
         this.strongholdCount = ReadSettings(TCDefaultValues.StrongholdCount);
         this.strongholdDistance = ReadSettings(TCDefaultValues.StrongholdDistance);
         this.strongholdSpread = ReadSettings(TCDefaultValues.StrongholdSpread);
-        
+
         this.villagesEnabled = ReadSettings(TCDefaultValues.VillagesEnabled);
         this.villageDistance = ReadSettings(TCDefaultValues.VillageDistance);
         this.villageSize = ReadSettings(TCDefaultValues.VillageSize);
-        
+
+        this.rareBuildingsEnabled = ReadSettings(TCDefaultValues.RareBuildingsEnabled);
+        this.minimumDistanceBetweenRareBuildings = ReadSettings(TCDefaultValues.MinimumDistanceBetweenRareBuildings);
+        this.maximumDistanceBetweenRareBuildings = ReadSettings(TCDefaultValues.MaximumDistanceBetweenRareBuildings);
+
         this.mineshaftsEnabled = ReadSettings(TCDefaultValues.MineshaftsEnabled);
-        this.PyramidsEnabled = ReadSettings(TCDefaultValues.PyramidsEnabled);
         this.netherFortressesEnabled = ReadSettings(TCDefaultValues.NetherFortressesEnabled);
 
         // Caves
@@ -537,10 +529,9 @@ public class WorldConfig extends ConfigFile
 
         }
 
-
     }
 
-
+    @Override
     protected void WriteConfigSettings() throws IOException
     {
         WriteTitle("Configuration settings");
@@ -566,9 +557,7 @@ public class WorldConfig extends ConfigFile
         WriteComment("   Default - use default Notch biome generator");
         WriteValue(TCDefaultValues.BiomeMode.name(), this.ModeBiome.name());
 
-
         WriteTitle("Biome Generator Variables");
-
 
         WriteComment("IMPORTANT value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.");
         WriteComment("Large %/total area biomes (Continents) must be set small, (limit=0)");
@@ -625,23 +614,28 @@ public class WorldConfig extends ConfigFile
         WriteComment("Biomes which used as borders. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
         WriteValue(TCDefaultValues.BorderBiomes.name(), this.BorderBiomes);
 
-        WriteNewLine();     // TODO Write correct help
+        WriteNewLine(); // TODO Write correct help
         WriteComment("List of ALL custom biomes.");
         WriteComment("Example: ");
         WriteComment("  CustomBiomes:TestBiome1,BiomeTest2");
         WriteComment("This will add two biomes and generate biome config files");
         WriteComment("Any changes here need server restart.");
         /*
-               WriteComment("The id of the biome must be unique for all biomes on the server.");
-        WriteComment("The available id's range from "+idMin+" to "+idMax+" and the first 0 to "+(DefaultBiome.values().length-1)+" is occupied by vanilla minecraft biomes.");
-        WriteComment("To leave room for future vanilla biomes we suggest your custom biomes start at id "+idSuggestedCustomMin+".");
-        WriteComment("The id for the biome will be saved to disc together with the chunk data (new feature since the Anvil map format).");
-        WriteComment("This means that if you change the biome id after you generated your map, the ids in the map wont change.");
-        WriteComment("Orphaned ids are interpreted as id 1 = Plains. Example things that depend on the biome id is mob spawning and growth from saplings.");
-
+         * WriteComment(
+         * "The id of the biome must be unique for all biomes on the server.");
+         * WriteComment("The available id's range from "+idMin+" to "+idMax+
+         * " and the first 0 to "+(DefaultBiome.values().length-1)+
+         * " is occupied by vanilla minecraft biomes."); WriteComment(
+         * "To leave room for future vanilla biomes we suggest your custom biomes start at id "
+         * +idSuggestedCustomMin+"."); WriteComment(
+         * "The id for the biome will be saved to disc together with the chunk data (new feature since the Anvil map format)."
+         * ); WriteComment(
+         * "This means that if you change the biome id after you generated your map, the ids in the map wont change."
+         * ); WriteComment(
+         * "Orphaned ids are interpreted as id 1 = Plains. Example things that depend on the biome id is mob spawning and growth from saplings."
+         * );
          */
         WriteCustomBiomes();
-
 
         WriteTitle("Biome Image Generator Variables");
 
@@ -664,7 +658,6 @@ public class WorldConfig extends ConfigFile
         WriteComment("Shifts map position from x=0 and z=0 coordinates.");
         WriteValue(TCDefaultValues.ImageXOffset.name(), this.imageXOffset);
         WriteValue(TCDefaultValues.ImageZOffset.name(), this.imageZOffset);
-
 
         WriteTitle("Terrain Generator Variables");
         WriteComment("Height bits determinate generation height. Min 5, max 8");
@@ -710,7 +703,7 @@ public class WorldConfig extends ConfigFile
         WriteNewLine();
         WriteComment("BlockId used as bedrock");
         WriteValue(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
-        
+
         WriteTitle("Strongholds");
         WriteComment("Not much is known about these settings. They are directly passed to the stronghold generator.");
         WriteValue(TCDefaultValues.StrongholdsEnabled.name(), this.strongholdsEnabled);
@@ -720,7 +713,7 @@ public class WorldConfig extends ConfigFile
         WriteValue(TCDefaultValues.StrongholdDistance.name(), this.strongholdDistance);
         WriteNewLine();
         WriteValue(TCDefaultValues.StrongholdSpread.name(), this.strongholdSpread);
-        
+
         WriteTitle("Villages");
         WriteComment("Whether the villages are enabled or not.");
         WriteValue(TCDefaultValues.VillagesEnabled.name(), this.villagesEnabled);
@@ -730,10 +723,21 @@ public class WorldConfig extends ConfigFile
         WriteNewLine();
         WriteComment("The minimum distance between the village centers in chunks. Minimum value is 9.");
         WriteValue(TCDefaultValues.VillageDistance.name(), this.villageDistance);
-        
+
+        WriteTitle("Rare buildings");
+        WriteComment("Rare buildings are either desert pyramids, jungle temples or swamp huts.");
+        WriteNewLine();
+        WriteComment("Whether rare buildings are enabled.");
+        WriteValue(TCDefaultValues.RareBuildingsEnabled.name(), this.rareBuildingsEnabled);
+        WriteNewLine();
+        WriteComment("The minimum distance between rare buildings in chunks.");
+        WriteValue(TCDefaultValues.MinimumDistanceBetweenRareBuildings.name(), this.minimumDistanceBetweenRareBuildings);
+        WriteNewLine();
+        WriteComment("The maximum distance between rare buildings in chunks.");
+        WriteValue(TCDefaultValues.MaximumDistanceBetweenRareBuildings.name(), this.maximumDistanceBetweenRareBuildings);
+
         WriteTitle("Other structures");
         WriteValue(TCDefaultValues.MineshaftsEnabled.name(), this.mineshaftsEnabled);
-        WriteValue(TCDefaultValues.PyramidsEnabled.name(), this.PyramidsEnabled);
         WriteValue(TCDefaultValues.NetherFortressesEnabled.name(), this.netherFortressesEnabled);
 
         this.WriteTitle("World visual settings");
@@ -754,7 +758,6 @@ public class WorldConfig extends ConfigFile
         WriteComment("A high value makes BO2s with a low rarity spawn more.");
         WriteComment("Doesn't affect BO3s. It also doesn't affect growing saplings anymore.");
         this.WriteValue(TCDefaultValues.objectSpawnRatio.name(), this.objectSpawnRatio);
-
 
         WriteTitle("Cave Variables");
 
@@ -799,7 +802,7 @@ public class WorldConfig extends ConfigFile
         WriteNewLine();
         WriteTitle("Old Biome Generator Variables");
         WriteComment("This generator works only with old terrain generator!");
-        //WriteComment("Since 1.8.3 notch take temperature from biomes, so changing this you can`t affect new biome generation ");
+        // WriteComment("Since 1.8.3 notch take temperature from biomes, so changing this you can`t affect new biome generation ");
         WriteValue(TCDefaultValues.oldBiomeSize.name(), this.oldBiomeSize);
         WriteValue(TCDefaultValues.minMoisture.name(), this.minMoisture);
         WriteValue(TCDefaultValues.maxMoisture.name(), this.maxMoisture);
@@ -833,7 +836,6 @@ public class WorldConfig extends ConfigFile
         return this.fractureVertical < 0.0D ? 1.0D / (Math.abs(this.fractureVertical) + 1.0D) : this.fractureVertical + 1.0D;
     }
 
-
     public boolean createAdminium(int y)
     {
         return (!this.disableBedrock) && ((!this.flatBedrock) || (y == 0));
@@ -841,38 +843,27 @@ public class WorldConfig extends ConfigFile
 
     public enum TerrainMode
     {
-        Normal,
-        OldGenerator,
-        TerrainTest,
-        NotGenerate,
-        Default
+        Normal, OldGenerator, TerrainTest, NotGenerate, Default
     }
 
     public enum BiomeMode
     {
-        Normal,
-        FromImage,
-        OldGenerator,
-        Default
+        Normal, FromImage, OldGenerator, Default
     }
 
     public enum ImageMode
     {
-        Repeat,
-        ContinueNormal,
-        FillEmpty,
+        Repeat, ContinueNormal, FillEmpty,
     }
 
     public enum ConfigMode
     {
-        WriteAll,
-        WriteDisable,
-        WriteWithoutComments
+        WriteAll, WriteDisable, WriteWithoutComments
     }
 
     public void Serialize(DataOutputStream stream) throws IOException
     {
-    	// General information
+        // General information
         WriteStringToStream(stream, this.WorldName);
 
         stream.writeInt(this.WorldFog);
@@ -894,7 +885,6 @@ public class WorldConfig extends ConfigFile
             config.Serialize(stream);
         }
     }
-
 
     // Need for create world config from network packet
     public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException

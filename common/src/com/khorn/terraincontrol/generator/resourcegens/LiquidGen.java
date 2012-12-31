@@ -16,7 +16,7 @@ public class LiquidGen extends Resource
     private int maxAltitude;
 
     @Override
-    public void spawn(LocalWorld world, Random rand, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
         int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
 
