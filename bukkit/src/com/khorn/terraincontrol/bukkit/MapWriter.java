@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.bukkit;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
+import java.util.logging.Level;
 
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
@@ -12,6 +13,7 @@ import net.minecraft.server.v1_4_6.World;
 
 import org.bukkit.command.CommandSender;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.sun.imageio.plugins.png.PNGImageWriter;
@@ -19,9 +21,9 @@ import com.sun.imageio.plugins.png.PNGImageWriterSpi;
 
 public class MapWriter implements Runnable
 {
-    private static int[] Default_Colors = {0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0, 0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999, 0xFFFF00, 0x996600, 0x009900, 0x003300, 0x666600};
-    @SuppressWarnings({"FieldCanBeLocal"})
-    private static boolean isWork = false; // TODO: Rename this to something better, perhaps isWorking?
+    public static final int[] defaultColors = {0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0, 0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999, 0xFFFF00, 0x996600, 0x009900, 0x003300, 0x666600};
+    
+    public static boolean isWorking = false;
 
     private TCPlugin plugin;
     private World world;
@@ -52,24 +54,24 @@ public class MapWriter implements Runnable
 
     public void run()
     {
-        if (MapWriter.isWork)
+        if (MapWriter.isWorking)
         {
             sender.sendMessage(BaseCommand.ErrorColor + "Another instance of map writer is running");
             return;
         }
 
-        MapWriter.isWork = true;
+        MapWriter.isWorking = true;
         int height = size;
         int width = size;
 
         try
         {
-            int[] Colors = Default_Colors;
+            int[] colors = defaultColors;
 
             BukkitWorld bukkitWorld = plugin.worlds.get(world.getDataManager().getUUID());
             if (bukkitWorld != null)
             {
-                Colors = new int[bukkitWorld.getSettings().biomeConfigs.size()];
+                colors = new int[bukkitWorld.getSettings().highestBiomeId + 1];
                 for (BiomeConfig biomeConfig : bukkitWorld.getSettings().biomeConfigs.values())
                 {
                     if (biomeConfig != null)
@@ -78,10 +80,10 @@ public class MapWriter implements Runnable
                         {
                             int color = Integer.decode(biomeConfig.BiomeColor);
                             if (color <= 0xFFFFFF)
-                                Colors[biomeConfig.Biome.getId()] = color;
+                                colors[biomeConfig.Biome.getId()] = color;
                         } catch (NumberFormatException ex)
                         {
-                            System.out.println("TerrainControl: wrong color in " + biomeConfig.Biome.getName());
+                            TerrainControl.log(Level.WARNING, "Wrong color in " + biomeConfig.Biome.getName());
                             sender.sendMessage(BaseCommand.ErrorColor + "Wrong color in " + biomeConfig.Biome.getName());
                         }
                     }
@@ -115,7 +117,7 @@ public class MapWriter implements Runnable
 
                     if (time2 > time + 2000L)
                     {
-                        sender.sendMessage(BaseCommand.MessageColor + Integer.toString((x + height / 2) * 100 / height) + "%");
+                        sender.sendMessage(BaseCommand.MessageColor + ((x + height / 2) * 100 / height) + "%");
                         time = time2;
                     }
 
@@ -146,7 +148,7 @@ public class MapWriter implements Runnable
                                     break;
                             }
 
-                            biomeImage.setRGB(image_x, image_y, Colors[BiomeBuffer[x1 + 16 * z1].id]);
+                            biomeImage.setRGB(image_x, image_y, colors[BiomeBuffer[x1 + 16 * z1].id]);
 
                             Color tempColor = Color.getHSBColor(0.7f - tempArray[x1 + 16 * z1] * 0.7f, 0.9f, tempArray[x1 + 16 * z1] * 0.7f + 0.3f);
 
@@ -158,13 +160,22 @@ public class MapWriter implements Runnable
 
             sender.sendMessage(BaseCommand.MessageColor + "Writing images...");
             PNGImageWriter PngEncoder = new PNGImageWriter(new PNGImageWriterSpi());
-            ImageOutputStream imageOutput = new FileCacheImageOutputStream(new FileOutputStream(label + world.worldData.getName() + "_biome.png", false), null);
+            
+            // Write biome colors
+            FileOutputStream fileOutput = new FileOutputStream(label + world.worldData.getName() + "_biome.png", false);
+            ImageOutputStream imageOutput = new FileCacheImageOutputStream(fileOutput, null);
             PngEncoder.setOutput(imageOutput);
             PngEncoder.write(biomeImage);
+            imageOutput.close();
+            fileOutput.close();
 
-            imageOutput = new FileCacheImageOutputStream(new FileOutputStream(label + world.worldData.getName() + "_temperature.png", false), null);
+            // Write temperatures
+            fileOutput = new FileOutputStream(label + world.worldData.getName() + "_temperature.png", false);
+            imageOutput = new FileCacheImageOutputStream(fileOutput, null);
             PngEncoder.setOutput(imageOutput);
             PngEncoder.write(tempImage);
+            imageOutput.close();
+            fileOutput.close();
 
             PngEncoder.dispose();
 
@@ -174,6 +185,6 @@ public class MapWriter implements Runnable
         {
             e1.printStackTrace();
         }
-        MapWriter.isWork = false;
+        MapWriter.isWorking = false;
     }
 }
