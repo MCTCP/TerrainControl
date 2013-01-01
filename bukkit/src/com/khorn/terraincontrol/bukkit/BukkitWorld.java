@@ -15,9 +15,7 @@ import net.minecraft.server.v1_4_6.WorldGenDungeons;
 import net.minecraft.server.v1_4_6.WorldGenForest;
 import net.minecraft.server.v1_4_6.WorldGenGroundBush;
 import net.minecraft.server.v1_4_6.WorldGenHugeMushroom;
-import net.minecraft.server.v1_4_6.WorldGenLargeFeature;
 import net.minecraft.server.v1_4_6.WorldGenMegaTree;
-import net.minecraft.server.v1_4_6.WorldGenNether;
 import net.minecraft.server.v1_4_6.WorldGenSwampTree;
 import net.minecraft.server.v1_4_6.WorldGenTaiga1;
 import net.minecraft.server.v1_4_6.WorldGenTaiga2;
@@ -29,6 +27,8 @@ import com.khorn.terraincontrol.IBiomeManager;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.structuregens.MineshaftGen;
+import com.khorn.terraincontrol.bukkit.structuregens.NetherFortressGen;
+import com.khorn.terraincontrol.bukkit.structuregens.RareBuildingGen;
 import com.khorn.terraincontrol.bukkit.structuregens.StrongholdGen;
 import com.khorn.terraincontrol.bukkit.structuregens.VillageGen;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
@@ -57,8 +57,8 @@ public class BukkitWorld implements LocalWorld
     public StrongholdGen strongholdGen;
     public VillageGen villageGen;
     public MineshaftGen mineshaftGen;
-    public WorldGenLargeFeature pyramidsGen;
-    public WorldGenNether netherFortress;
+    public RareBuildingGen pyramidsGen;
+    public NetherFortressGen netherFortress;
 
     private WorldGenTrees tree;
     private WorldGenTrees cocoaTree;
@@ -579,8 +579,8 @@ public class BukkitWorld implements LocalWorld
                 this.strongholdGen = new StrongholdGen(settings);
                 this.villageGen = new VillageGen(settings);
                 this.mineshaftGen = new MineshaftGen();
-                this.pyramidsGen = new WorldGenLargeFeature();
-                this.netherFortress = new WorldGenNether();
+                this.pyramidsGen = new RareBuildingGen(settings);
+                this.netherFortress = new NetherFortressGen();
             case NotGenerate:
                 this.tree = new WorldGenTrees(false);
                 this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
