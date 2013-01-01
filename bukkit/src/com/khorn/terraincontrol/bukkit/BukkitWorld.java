@@ -566,8 +566,8 @@ public class BukkitWorld implements LocalWorld
         this.world = _world;
         this.seed = world.getSeed();
 
-        // TODO: Should WorldProviderTC extend even more? For example for spawn point etc?
-        // this.world.worldProvider = new TCWorldProvider().setSeaLevel(this.settings.waterLevelMax); // cause errors with entity burn, disabled temporary.
+        // TODO check for mob burning issues
+        this.world.worldProvider = new TCWorldProvider(this);
 
         this.chunkCache = new Chunk[4];
 

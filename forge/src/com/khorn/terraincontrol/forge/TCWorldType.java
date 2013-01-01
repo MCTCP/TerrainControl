@@ -85,5 +85,11 @@ public class TCWorldType extends WorldType
         } else
             return super.getChunkGenerator(world, generatorOptions);
     }
-
+    
+    
+    @Override
+    public int getMinimumSpawnHeight(World world)
+    {
+        return WorldHelper.toLocalWorld(world).getSettings().waterLevelMax;
+    }
 }

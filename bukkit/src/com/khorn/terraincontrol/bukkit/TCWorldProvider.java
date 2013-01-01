@@ -12,33 +12,22 @@ import net.minecraft.server.v1_4_6.WorldProvider;
  */
 public class TCWorldProvider extends WorldProvider
 {
-    protected int seaLevel = 64;
+    protected BukkitWorld localWorld;
+    
+    public TCWorldProvider(BukkitWorld localWorld)
+    {
+        this.localWorld = localWorld;
+    }
     
     @Override
     public int getSeaLevel()
     {
-        return this.seaLevel;
+        return localWorld.getSettings().waterLevelMax;
     }
-    
-    public TCWorldProvider setSeaLevel(int value)
-    {
-        if (value < 1)
-        {
-            this.seaLevel = 1;
-        }
-        else if (value > 256)
-        {
-            this.seaLevel = 256;
-        }
-        else
-        {
-            this.seaLevel = value;
-        }
-        return this;
-    }
-    
+
+    @Override
     public String getName()
     {
-        return "Terrain Control";
+        return "Overworld";
     }
 }
