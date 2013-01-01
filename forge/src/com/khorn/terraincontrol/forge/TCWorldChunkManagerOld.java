@@ -15,7 +15,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
 
-public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
+public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeManager
 {
 
     private WorldConfig localWrk;
@@ -33,7 +33,7 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
 
     private static BiomeGenBase[] biomeDiagram = new BiomeGenBase[4096];
 
-    public BiomeManagerOld(LocalWorld world)
+    public TCWorldChunkManagerOld(LocalWorld world)
     {
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.FOREST.Id]);
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.PLAINS.Id]);
@@ -160,7 +160,7 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
                 this.oldTemperature[i] = d4;
                 this.oldWetness[i] = d5;
 
-                paramArrayOfzp[(i++)] = BiomeManagerOld.getBiomeFromDiagram(d4, d5);
+                paramArrayOfzp[(i++)] = TCWorldChunkManagerOld.getBiomeFromDiagram(d4, d5);
             }
 
         }
@@ -335,7 +335,7 @@ public class BiomeManagerOld extends WorldChunkManager implements IBiomeManager
                 this.oldTemperature[i] = d4;
                 this.oldWetness[i] = d5;
 
-                biomeArray[(i++)] = BiomeManagerOld.getBiomeFromDiagram(d4, d5).biomeID;
+                biomeArray[(i++)] = TCWorldChunkManagerOld.getBiomeFromDiagram(d4, d5).biomeID;
             }
 
         }

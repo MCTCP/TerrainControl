@@ -15,7 +15,7 @@ import com.khorn.terraincontrol.IBiomeManager;
 import com.khorn.terraincontrol.biomelayers.layers.Layer;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
-public class BiomeManager extends WorldChunkManager implements IBiomeManager
+public class TCWorldChunkManager extends WorldChunkManager implements IBiomeManager
 {
     private Layer unZoomedLayer;
     private Layer biomeLayer;
@@ -29,7 +29,7 @@ public class BiomeManager extends WorldChunkManager implements IBiomeManager
     private WorldConfig worldConfig;
     private SingleWorld localWorld;
 
-    public BiomeManager(SingleWorld world)
+    public TCWorldChunkManager(SingleWorld world)
     {
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.FOREST.Id]);
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.PLAINS.Id]);

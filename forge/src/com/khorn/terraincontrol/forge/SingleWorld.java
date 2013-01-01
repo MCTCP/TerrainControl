@@ -10,7 +10,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import net.minecraft.world.gen.feature.MapGenScatteredFeature;
 import net.minecraft.world.gen.feature.WorldGenBigMushroom;
 import net.minecraft.world.gen.feature.WorldGenBigTree;
 import net.minecraft.world.gen.feature.WorldGenDungeons;
@@ -46,7 +45,7 @@ public class SingleWorld implements LocalWorld
     private String name;
     private long seed;
     private IBiomeManager biomeManager;
-    private BiomeManagerOld oldBiomeManager;
+    private TCWorldChunkManagerOld oldBiomeManager;
 
     private static int nextBiomeId = 0;
     private static int maxBiomeCount = 256;
@@ -573,7 +572,6 @@ public class SingleWorld implements LocalWorld
 
         this.world = world;
         this.seed = world.getSeed();
-        // this.world.e = this.settings.waterLevelMax;
 
         this.dungeonGen = new WorldGenDungeons();
         this.strongholdGen = new StrongholdGen(config);
@@ -603,7 +601,7 @@ public class SingleWorld implements LocalWorld
         this.biomeManager = manager;
     }
 
-    public void setOldBiomeManager(BiomeManagerOld manager)
+    public void setOldBiomeManager(TCWorldChunkManagerOld manager)
     {
         this.oldBiomeManager = manager;
         this.biomeManager = manager;

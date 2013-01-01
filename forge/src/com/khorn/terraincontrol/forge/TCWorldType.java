@@ -55,25 +55,25 @@ public class TCWorldType extends WorldType
         WorldConfig config = new WorldConfig(worldDirectory, worldTC, false);
         this.worldTC.Init(world, config);
 
-        WorldChunkManager ChunkManager = null;
+        WorldChunkManager chunkManager = null;
 
         switch (this.worldTC.getSettings().ModeBiome)
         {
         case FromImage:
         case Normal:
-            ChunkManager = new BiomeManager(this.worldTC);
-            this.worldTC.setBiomeManager((BiomeManager) ChunkManager);
+            chunkManager = new TCWorldChunkManager(this.worldTC);
+            this.worldTC.setBiomeManager((TCWorldChunkManager) chunkManager);
             break;
         case OldGenerator:
-            ChunkManager = new BiomeManagerOld(this.worldTC);
-            this.worldTC.setOldBiomeManager((BiomeManagerOld) ChunkManager);
+            chunkManager = new TCWorldChunkManagerOld(this.worldTC);
+            this.worldTC.setOldBiomeManager((TCWorldChunkManagerOld) chunkManager);
             break;
         case Default:
-            ChunkManager = super.getChunkManager(world);
+            chunkManager = super.getChunkManager(world);
             break;
         }
 
-        return ChunkManager;
+        return chunkManager;
     }
 
     @Override
