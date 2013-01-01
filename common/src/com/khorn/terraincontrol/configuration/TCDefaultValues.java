@@ -83,7 +83,7 @@ public enum TCDefaultValues implements TCSetting
     MineshaftRarity(1D),
     
     RareBuildingsEnabled(true),
-    MinimumDistanceBetweenRareBuildings(8),
+    MinimumDistanceBetweenRareBuildings(9),
     MaximumDistanceBetweenRareBuildings(32),
     RareBuildingType(BiomeConfig.RareBuildingType.disabled),
 

@@ -118,7 +118,7 @@ public class WorldConfig extends ConfigFile
 
     // Pyramids (also swamp huts and jungle temples)
     public boolean rareBuildingsEnabled;
-    public int minimumDistanceBetweenRareBuildings;
+    public int minimumDistanceBetweenRareBuildings; // Minecraft's internal value is 1 chunk lower
     public int maximumDistanceBetweenRareBuildings;
 
     // Other structures
@@ -371,7 +371,7 @@ public class WorldConfig extends ConfigFile
 
         this.villageDistance = applyBounds(this.villageDistance, 9, Integer.MAX_VALUE);
         this.minimumDistanceBetweenRareBuildings = applyBounds(this.minimumDistanceBetweenRareBuildings, 1, Integer.MAX_VALUE);
-        this.maximumDistanceBetweenRareBuildings = applyBounds(this.maximumDistanceBetweenRareBuildings, this.minimumDistanceBetweenRareBuildings + 1, Integer.MAX_VALUE);
+        this.maximumDistanceBetweenRareBuildings = applyBounds(this.maximumDistanceBetweenRareBuildings, this.minimumDistanceBetweenRareBuildings, Integer.MAX_VALUE);
 
         if (this.ModeBiome == BiomeMode.OldGenerator && this.ModeTerrain != TerrainMode.OldGenerator)
         {
@@ -731,10 +731,13 @@ public class WorldConfig extends ConfigFile
         writeComment("BlockId used as bedrock");
         writeValue(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
         
+        // TODO should it also affect UseBiome?
         writeNewLine();
-        writeComment("Terrain Control tries <objectSpawnRatio> times to spawn a BO2.");
-        writeComment("A high value makes BO2s with a low rarity spawn more.");
-        writeComment("Doesn't affect BO3s. It also doesn't affect growing saplings anymore.");
+        writeComment("When using the UseWorld keyword for spawning custom objects, Terrain Control");
+        writeComment("spawns one of the possible custom objects. There is of course a chance that");
+        writeComment("the chosen object cannot spawn. This setting tells TC how many times it should");
+        writeComment("try again.");
+        writeComment("This setting doesn't affect growing saplings anymore.");
         this.writeValue(TCDefaultValues.objectSpawnRatio.name(), this.objectSpawnRatio);
 
         // Strongholds

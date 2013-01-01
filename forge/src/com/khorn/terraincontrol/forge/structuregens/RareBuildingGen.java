@@ -45,7 +45,8 @@ public class RareBuildingGen extends MapGenStructure
         
         this.scatteredFeatureSpawnList = new ArrayList();
         this.maxDistanceBetweenScatteredFeatures = worldConfig.maximumDistanceBetweenRareBuildings;
-        this.minDistanceBetweenScatteredFeatures = worldConfig.minimumDistanceBetweenRareBuildings;
+        // Minecraft's internal minimum distance is one chunk lower than TC's value
+        this.minDistanceBetweenScatteredFeatures = worldConfig.minimumDistanceBetweenRareBuildings - 1;
         this.scatteredFeatureSpawnList.add(new SpawnListEntry(EntityWitch.class, 1, 1, 1));
     }
 
