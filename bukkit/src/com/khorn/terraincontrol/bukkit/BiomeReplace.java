@@ -151,7 +151,7 @@ public class BiomeReplace implements Runnable
                                 boolean needSave = false;
 
                                 for (int t = 0; t < biomeArray.length; t++)
-                                    if (biomeArray[t] == BiomeIdFrom)
+                                    if (BiomeIdFrom == -1 || biomeArray[t] == BiomeIdFrom)
                                     {
                                         biomeArray[t] = BiomeIdTo;
                                         needSave = true;
