@@ -567,7 +567,13 @@ public class BukkitWorld implements LocalWorld
         this.seed = world.getSeed();
 
         // TODO check for mob burning issues
-        this.world.worldProvider = new TCWorldProvider(this);
+        if(this.world.worldProvider.getName().equals("Overworld"))
+        {
+            // Only replace the worldProvider if it's the overworld
+            // Replacing other dimensions causes a lot of glitches
+            this.world.worldProvider = new TCWorldProvider(this);
+        }
+        
 
         this.chunkCache = new Chunk[4];
 
