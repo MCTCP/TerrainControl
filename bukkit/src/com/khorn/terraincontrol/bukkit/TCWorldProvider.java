@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.bukkit;
 
-import net.minecraft.server.v1_4_6.WorldProvider;
+import net.minecraft.server.v1_4_6.WorldProviderNormal;
 
 
 
@@ -10,7 +10,7 @@ import net.minecraft.server.v1_4_6.WorldProvider;
  * The value seem to be hardcoded in CraftWorld and we are a bit unsure about if that matters.
  * At least it should be a good thing that we set the value here.
  */
-public class TCWorldProvider extends WorldProvider
+public class TCWorldProvider extends WorldProviderNormal
 {
     protected BukkitWorld localWorld;
     
