@@ -24,9 +24,9 @@ public class Biome implements LocalBiome
         return getId();
     }
 
-    public void setVisuals(BiomeConfig config)
+    public void setEffects(BiomeConfig config)
     {
-        biomeBase.setVisuals(config);
+        biomeBase.setEffects(config);
     }
 
     public String getName()

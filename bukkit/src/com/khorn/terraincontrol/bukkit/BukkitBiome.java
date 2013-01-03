@@ -76,9 +76,9 @@ public class BukkitBiome implements LocalBiome
         return biomeBase;
     }
 
-    public void setVisuals(BiomeConfig config)
+    public void setEffects(BiomeConfig config)
     {
-        ((CustomBiome) this.biomeBase).SetBiome(config);
+        ((CustomBiome) this.biomeBase).setEffects(config);
     }
 
     public String getName()

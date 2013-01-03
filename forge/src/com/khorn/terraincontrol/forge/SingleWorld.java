@@ -6,6 +6,7 @@ import java.util.Random;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.SpawnerAnimals;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
@@ -348,6 +349,12 @@ public class SingleWorld implements LocalWorld
         }
 
     }
+    
+    @Override
+    public void placePopulationMobs(BiomeConfig config, Random random, int chunkX, int chunkZ)
+    {
+        SpawnerAnimals.performWorldGenSpawning(this.getWorld(), ((Biome)config.Biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
+    }
 
     public void LoadChunk(int x, int z)
     {
@@ -561,7 +568,7 @@ public class SingleWorld implements LocalWorld
             // Apply settings for biomes
             if (biome != null && config.biomeConfigs.get(biome.getId()) != null)
             {
-                biome.setVisuals(config.biomeConfigs.get(biome.getId()));
+                biome.setEffects(config.biomeConfigs.get(biome.getId()));
             }
         }
     }

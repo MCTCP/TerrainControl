@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol;
 
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
@@ -74,6 +75,11 @@ public interface LocalWorld
     public void replaceBlocks();
     
     public void replaceBiomesLate();
+    
+    /**
+     * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the terrain generation.
+     */
+    public void placePopulationMobs(BiomeConfig config, Random random, int chunkX, int chunkZ);
 
     // Blocks
 

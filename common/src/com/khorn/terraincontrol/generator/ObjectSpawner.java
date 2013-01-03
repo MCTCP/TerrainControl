@@ -9,7 +9,6 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
-import com.khorn.terraincontrol.generator.resourcegens.SmallLakeGen;
 
 public class ObjectSpawner
 {
@@ -50,11 +49,12 @@ public class ObjectSpawner
         for (int i = 0; i < localBiomeConfig.ResourceCount; i++)
         {
             Resource res = localBiomeConfig.ResourceSequence[i];
-            if (res instanceof SmallLakeGen && hasGeneratedAVillage)
-                continue;
             world.setChunksCreations(false);
             res.process(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
         }
+        
+        // Animals
+        world.placePopulationMobs(localBiomeConfig, rand, chunkX, chunkZ);
 
         // Snow and ice
         placeSnowAndIce(chunkX, chunkZ);

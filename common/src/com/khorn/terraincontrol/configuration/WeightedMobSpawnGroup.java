@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import com.khorn.terraincontrol.DefaultMobType;
 import com.khorn.terraincontrol.TerrainControl;
 
 /**
@@ -13,11 +12,11 @@ import com.khorn.terraincontrol.TerrainControl;
  */
 public class WeightedMobSpawnGroup
 {
-    // -------------------------------------------- //
-    // FIELDS
-    // -------------------------------------------- //
     protected String mob = null;
-    
+    protected int max = 0;
+    protected int weight = 0;
+    protected int min = 0;
+
     public WeightedMobSpawnGroup(String mobName, int weight, int min, int max)
     {
         this.mob = mobName;
@@ -31,78 +30,43 @@ public class WeightedMobSpawnGroup
         return this.mob;
     }
 
-    public DefaultMobType getDefaultMobType()
-    {
-        DefaultMobType ret = DefaultMobType.fromName(this.mob);
-        if (ret == null)
-        {
-            System.err.println("Invalid mob name: " + this.mob);
-        }
-        return ret;
-    }
-
-    public void setMobName(String value)
-    {
-        this.mob = value;
-    }
-
-    protected int weight = 0;
-
     public int getWeight()
     {
         return this.weight;
     }
-
-    public void setWeight(int value)
-    {
-        this.weight = value;
-    }
-
-    protected int min = 0;
 
     public int getMin()
     {
         return this.min;
     }
 
-    public void setMin(int value)
-    {
-        this.min = value;
-    }
-
-    protected int max = 0;
-
     public int getMax()
     {
         return this.max;
-    }
-
-    public void setMax(int value)
-    {
-        this.max = value;
     }
 
     public static List<WeightedMobSpawnGroup> fromJson(String originalJson)
     {
         // Example: [{"mob": "Sheep", "weight": 12, "min": 4, "max": 4}]
         List<WeightedMobSpawnGroup> mobGroups = new ArrayList<WeightedMobSpawnGroup>();
-        
+
         String json = originalJson.trim();
-        if(json.length() <= 2)
+        if (json.length() <= 2)
         {
             // Empty Json
             return mobGroups;
         }
         // Remove the [..]
-        json = removeFirstAndLastChar(json); 
-        
+        json = removeFirstAndLastChar(json);
+
         // Every group is seperated by a , but in the group the , is also used.
-        // So convert the ( to {, the ) to } and use an existing function to get each group
+        // So convert the ( to {, the ) to } and use an existing function to get
+        // each group
         json = json.replace('{', '(');
         json = json.replace('}', ')');
-        
+
         String[] groups = ConfigFile.ReadComplexString(json);
-        
+
         try
         {
             for (String group : groups)
@@ -152,11 +116,12 @@ public class WeightedMobSpawnGroup
 
         return mobGroups;
     }
-    
+
     public static String toJson(List<WeightedMobSpawnGroup> list)
     {
         StringBuilder json = new StringBuilder("[");
-        for(WeightedMobSpawnGroup group: list) {
+        for (WeightedMobSpawnGroup group : list)
+        {
             json.append("{\"mob\": \"");
             json.append(group.getMobName());
             json.append("\", \"weight\": ");
@@ -168,10 +133,10 @@ public class WeightedMobSpawnGroup
             json.append("}, ");
         }
         // Remove ", " at end
-        if(json.length() != 1)
+        if (json.length() != 1)
         {
             json.deleteCharAt(json.length() - 1);
-            json.deleteCharAt(json.length() - 1); 
+            json.deleteCharAt(json.length() - 1);
         }
         // Add closing bracket
         json.append(']');

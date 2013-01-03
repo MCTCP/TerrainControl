@@ -8,6 +8,7 @@ import net.minecraft.server.v1_4_6.BiomeBase;
 import net.minecraft.server.v1_4_6.Chunk;
 import net.minecraft.server.v1_4_6.ChunkSection;
 import net.minecraft.server.v1_4_6.NBTTagCompound;
+import net.minecraft.server.v1_4_6.SpawnerCreature;
 import net.minecraft.server.v1_4_6.TileEntity;
 import net.minecraft.server.v1_4_6.World;
 import net.minecraft.server.v1_4_6.WorldGenBigTree;
@@ -333,6 +334,12 @@ public class BukkitWorld implements LocalWorld
                 ChunkBiomes[i] = (byte) (this.settings.ReplaceMatrixBiomes[ChunkBiomes[i] & 0xFF] & 0xFF);
         }
 
+    }
+    
+    @Override
+    public void placePopulationMobs(BiomeConfig config, Random random, int chunkX, int chunkZ)
+    {
+        SpawnerCreature.a(this.world, ((BukkitBiome)config.Biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
     }
 
     public void LoadChunk(Chunk chunk)

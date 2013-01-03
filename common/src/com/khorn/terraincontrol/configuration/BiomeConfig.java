@@ -11,7 +11,6 @@ import java.util.Map;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.DefaultMobType;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
@@ -120,6 +119,8 @@ public class BiomeConfig extends ConfigFile
     public List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
     public boolean spawnWaterCreaturesAddDefaults = true;
     public List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
+    public boolean spawnAmbientCreaturesAddDefaults = true;
+    public List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
     public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
@@ -149,7 +150,7 @@ public class BiomeConfig extends ConfigFile
         }
 
         if (biome.isCustom())
-            biome.setVisuals(this);
+            biome.setEffects(this);
     }
 
     public int getTemperature()
@@ -415,6 +416,8 @@ public class BiomeConfig extends ConfigFile
             this.spawnCreatures = ReadModSettings("spawnCreatures", new ArrayList<WeightedMobSpawnGroup>());
             this.spawnWaterCreaturesAddDefaults = ReadModSettings("spawnWaterCreaturesAddDefaults", true);
             this.spawnWaterCreatures = ReadModSettings("spawnWaterCreatures", new ArrayList<WeightedMobSpawnGroup>());
+            this.spawnAmbientCreaturesAddDefaults = ReadModSettings("spawnAmbientCreaturesAddDefaults", true);
+            this.spawnAmbientCreatures = ReadModSettings("spawnAmbientCreatures", new ArrayList<WeightedMobSpawnGroup>());
         }
 
         this.ReadCustomObjectSettings();
@@ -834,7 +837,8 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("");
         this.writeComment("#STEP1: Understanding what a mobgroup is.");
         this.writeComment("A mobgroups is made of four parts. They are mob, weight, min and max.");
-        this.writeComment("The mob is one of the avaliable mobnames: " + Txt.implodeCommaAnd(DefaultMobType.getPreferedNames()));
+        this.writeComment("The mob is one of the Minecraft internal mob names.");
+        this.writeComment("See http://www.minecraftwiki.net/wiki/Chunk_format#Mobs");
         this.writeComment("The weight is used for a random selection. This is a positive integer.");
         this.writeComment("The min is the minimum amount of mobs spawning as a group. This is a positive integer.");
         this.writeComment("The max is the maximum amount of mobs spawning as a group. This is a positive integer.");
@@ -882,6 +886,12 @@ public class BiomeConfig extends ConfigFile
         writeValue("spawnWaterCreaturesAddDefaults", this.spawnWaterCreaturesAddDefaults);
         this.writeComment("Add extra watercreature spawn groups here");
         writeValue("spawnWaterCreatures", this.spawnWaterCreatures);
+        this.writeNewLine();
+        
+        this.writeComment("Should we add the default ambient creature spawn groups? (Currently only bats)");
+        writeValue("spawnAmbientCreaturesAddDefaults", this.spawnAmbientCreaturesAddDefaults);
+        this.writeComment("Add extra ambient creature spawn groups here");
+        writeValue("spawnAmbientCreatures", this.spawnAmbientCreatures);
         this.writeNewLine();
 
     }
