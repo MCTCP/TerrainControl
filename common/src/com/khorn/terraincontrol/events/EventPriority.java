@@ -11,5 +11,5 @@ public enum EventPriority
      * Register with this prioriyt if you want to monitor the event. You cannot
      * cancel the event during this stage.
      */
-    MONITOR;
+    MONITOR
 }

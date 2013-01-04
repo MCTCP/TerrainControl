@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.generator;
 
-import java.util.Random;
-
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -9,6 +7,8 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
+
+import java.util.Random;
 
 public class ObjectSpawner
 {
@@ -24,7 +24,7 @@ public class ObjectSpawner
     }
 
     public void populate(int chunkX, int chunkZ)
-    {       
+    {
         // Get the corner block coords
         int x = chunkX * 16;
         int z = chunkZ * 16;
@@ -41,7 +41,7 @@ public class ObjectSpawner
 
         // Generate structures
         boolean hasGeneratedAVillage = world.PlaceTerrainObjects(rand, chunkX, chunkZ);
-        
+
         // Fire event
         TerrainControl.firePopulationStartEvent(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
 
@@ -52,7 +52,7 @@ public class ObjectSpawner
             world.setChunksCreations(false);
             res.process(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
         }
-        
+
         // Animals
         world.placePopulationMobs(localBiomeConfig, rand, chunkX, chunkZ);
 
@@ -65,14 +65,14 @@ public class ObjectSpawner
         // Replace biomes
         world.replaceBiomesLate();
 
-        // Replace settings (?)
+        // Replace settings after Reload command
         if (this.worldSettings.isDeprecated)
             this.worldSettings = this.worldSettings.newSettings;
-        
+
         // Fire event
         TerrainControl.firePopulationEndEvent(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
     }
-    
+
     protected void placeSnowAndIce(int chunkX, int chunkZ)
     {
         int x = chunkX * 16 + 8;

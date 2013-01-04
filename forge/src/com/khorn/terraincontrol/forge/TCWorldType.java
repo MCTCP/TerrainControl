@@ -1,15 +1,14 @@
 package com.khorn.terraincontrol.forge;
 
-import java.io.File;
-
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.util.WorldHelper;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.chunk.IChunkProvider;
 
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.util.WorldHelper;
+import java.io.File;
 
 public class TCWorldType extends WorldType
 {
@@ -59,18 +58,18 @@ public class TCWorldType extends WorldType
 
         switch (this.worldTC.getSettings().ModeBiome)
         {
-        case FromImage:
-        case Normal:
-            chunkManager = new TCWorldChunkManager(this.worldTC);
-            this.worldTC.setBiomeManager((TCWorldChunkManager) chunkManager);
-            break;
-        case OldGenerator:
-            chunkManager = new TCWorldChunkManagerOld(this.worldTC);
-            this.worldTC.setOldBiomeManager((TCWorldChunkManagerOld) chunkManager);
-            break;
-        case Default:
-            chunkManager = super.getChunkManager(world);
-            break;
+            case FromImage:
+            case Normal:
+                chunkManager = new TCWorldChunkManager(this.worldTC);
+                this.worldTC.setBiomeManager((TCWorldChunkManager) chunkManager);
+                break;
+            case OldGenerator:
+                chunkManager = new TCWorldChunkManagerOld(this.worldTC);
+                this.worldTC.setOldBiomeManager((TCWorldChunkManagerOld) chunkManager);
+                break;
+            case Default:
+                chunkManager = super.getChunkManager(world);
+                break;
         }
 
         return chunkManager;
@@ -85,8 +84,8 @@ public class TCWorldType extends WorldType
         } else
             return super.getChunkGenerator(world, generatorOptions);
     }
-    
-    
+
+
     @Override
     public int getMinimumSpawnHeight(World world)
     {

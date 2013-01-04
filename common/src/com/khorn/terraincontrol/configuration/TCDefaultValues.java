@@ -18,7 +18,7 @@ public enum TCDefaultValues implements TCSetting
     // End network
 
     maxChunkBlockValue(32768),
-    
+
     snowAndIceMaxTemp(0.15F),
 
     //World settings
@@ -66,22 +66,22 @@ public enum TCDefaultValues implements TCSetting
 
     WorldFog("0xC0D8FF", SettingsType.Color),
     WorldNightFog("0x0B0D17", SettingsType.Color),
-    
+
     NetherFortressesEnabled(false),
-    
+
     StrongholdsEnabled(true),
     StrongholdCount(3),
     StrongholdDistance(32.0),
     StrongholdSpread(3),
-    
+
     VillagesEnabled(true),
     VillageDistance(32),
     VillageSize(0),
     VillageType(BiomeConfig.VillageType.disabled),
-    
+
     MineshaftsEnabled(true),
     MineshaftRarity(1D),
-    
+
     RareBuildingsEnabled(true),
     MinimumDistanceBetweenRareBuildings(9),
     MaximumDistanceBetweenRareBuildings(32),
@@ -405,5 +405,5 @@ public enum TCDefaultValues implements TCSetting
         return this.bValue;
     }
 
-    
+
 }

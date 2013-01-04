@@ -1,19 +1,18 @@
 package com.khorn.terraincontrol.forge;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.IBiomeManager;
+import com.khorn.terraincontrol.biomelayers.layers.Layer;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeCache;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.gen.structure.MapGenVillage;
 
-import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.IBiomeManager;
-import com.khorn.terraincontrol.biomelayers.layers.Layer;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class TCWorldChunkManager extends WorldChunkManager implements IBiomeManager
 {
@@ -171,11 +170,11 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
     {
         // Hack for StructureVillagePieces.getNextComponentVillagePath(..)
         // (The alternative would be to completely override the village spawn code)
-        if(paramList == MapGenVillage.villageSpawnBiomes)
+        if (paramList == MapGenVillage.villageSpawnBiomes)
         {
             paramList = localWorld.villageGen.villageSpawnBiomes;
         }
-        
+
         int i = paramInt1 - paramInt3 >> 2;
         int j = paramInt2 - paramInt3 >> 2;
         int k = paramInt1 + paramInt3 >> 2;

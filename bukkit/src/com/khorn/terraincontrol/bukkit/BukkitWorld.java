@@ -1,42 +1,17 @@
 package com.khorn.terraincontrol.bukkit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-
-import net.minecraft.server.v1_4_6.BiomeBase;
-import net.minecraft.server.v1_4_6.Chunk;
-import net.minecraft.server.v1_4_6.ChunkSection;
-import net.minecraft.server.v1_4_6.NBTTagCompound;
-import net.minecraft.server.v1_4_6.SpawnerCreature;
-import net.minecraft.server.v1_4_6.TileEntity;
-import net.minecraft.server.v1_4_6.World;
-import net.minecraft.server.v1_4_6.WorldGenBigTree;
-import net.minecraft.server.v1_4_6.WorldGenDungeons;
-import net.minecraft.server.v1_4_6.WorldGenForest;
-import net.minecraft.server.v1_4_6.WorldGenGroundBush;
-import net.minecraft.server.v1_4_6.WorldGenHugeMushroom;
-import net.minecraft.server.v1_4_6.WorldGenMegaTree;
-import net.minecraft.server.v1_4_6.WorldGenSwampTree;
-import net.minecraft.server.v1_4_6.WorldGenTaiga1;
-import net.minecraft.server.v1_4_6.WorldGenTaiga2;
-import net.minecraft.server.v1_4_6.WorldGenTrees;
-
-import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.IBiomeManager;
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.bukkit.structuregens.MineshaftGen;
-import com.khorn.terraincontrol.bukkit.structuregens.NetherFortressGen;
-import com.khorn.terraincontrol.bukkit.structuregens.RareBuildingGen;
-import com.khorn.terraincontrol.bukkit.structuregens.StrongholdGen;
-import com.khorn.terraincontrol.bukkit.structuregens.VillageGen;
+import com.khorn.terraincontrol.*;
+import com.khorn.terraincontrol.bukkit.structuregens.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import net.minecraft.server.v1_4_6.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 public class BukkitWorld implements LocalWorld
 {
@@ -298,7 +273,7 @@ public class BukkitWorld implements LocalWorld
                 {
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigs.get(ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF );
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs.get(ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF);
                         if (biomeConfig != null && biomeConfig.ReplaceCount > 0)
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)
@@ -335,11 +310,11 @@ public class BukkitWorld implements LocalWorld
         }
 
     }
-    
+
     @Override
     public void placePopulationMobs(BiomeConfig config, Random random, int chunkX, int chunkZ)
     {
-        SpawnerCreature.a(this.world, ((BukkitBiome)config.Biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
+        SpawnerCreature.a(this.world, ((BukkitBiome) config.Biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
     }
 
     public void LoadChunk(Chunk chunk)
@@ -391,7 +366,7 @@ public class BukkitWorld implements LocalWorld
         }
         return -1;
     }
-    
+
     @Override
     public int getSolidHeight(int x, int z)
     {
@@ -429,7 +404,7 @@ public class BukkitWorld implements LocalWorld
 
         return chunk.getTypeId(x, y, z);
     }
-    
+
     @Override
     public byte getTypeData(int x, int y, int z)
     {
@@ -496,7 +471,8 @@ public class BukkitWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
         int y = chunk.b(x, z);
-        while(chunk.getTypeId(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight) {
+        while (chunk.getTypeId(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight)
+        {
             // Fix for incorrect lightmap
             y += 1;
         }
@@ -574,13 +550,13 @@ public class BukkitWorld implements LocalWorld
         this.seed = world.getSeed();
 
         // TODO check for mob burning issues
-        if(this.world.worldProvider.getName().equals("Overworld"))
+        if (this.world.worldProvider.getName().equals("Overworld"))
         {
             // Only replace the worldProvider if it's the overworld
             // Replacing other dimensions causes a lot of glitches
             this.world.worldProvider = new TCWorldProvider(this);
         }
-        
+
 
         this.chunkCache = new Chunk[4];
 
@@ -641,7 +617,7 @@ public class BukkitWorld implements LocalWorld
     {
         return getBiomeById(getCalculatedBiomeId(x, z));
     }
-    
+
     @Override
     public int getBiomeId(int x, int z)
     {

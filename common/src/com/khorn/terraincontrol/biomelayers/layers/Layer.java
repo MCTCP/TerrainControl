@@ -1,12 +1,12 @@
 package com.khorn.terraincontrol.biomelayers.layers;
 
-import java.util.ArrayList;
-
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+
+import java.util.ArrayList;
 
 public abstract class Layer
 {
@@ -189,7 +189,7 @@ public abstract class Layer
                     for (String replaceFromName : biomeConfig.BiomeIsBorder)
                     {
                         int replaceFrom = world.getBiomeIdByName(replaceFromName);
-                        layerBiomeBorder.AddBiome(biomeConfig,replaceFrom,world);
+                        layerBiomeBorder.AddBiome(biomeConfig, replaceFrom, world);
 
                     }
 
@@ -209,13 +209,13 @@ public abstract class Layer
 
         MainLayer = new LayerSmooth(400L, MainLayer);
 
-        if( config.ModeBiome == WorldConfig.BiomeMode.FromImage)
+        if (config.ModeBiome == WorldConfig.BiomeMode.FromImage)
         {
 
-            if ( config.imageMode == WorldConfig.ImageMode.ContinueNormal)
-                MainLayer = new LayerFromImage(1L,MainLayer,config,world);
+            if (config.imageMode == WorldConfig.ImageMode.ContinueNormal)
+                MainLayer = new LayerFromImage(1L, MainLayer, config, world);
             else
-                MainLayer = new LayerFromImage(1L,null,config,world);
+                MainLayer = new LayerFromImage(1L, null, config, world);
         }
 
 

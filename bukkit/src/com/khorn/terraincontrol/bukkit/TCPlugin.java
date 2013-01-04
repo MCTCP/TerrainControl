@@ -1,13 +1,14 @@
 package com.khorn.terraincontrol.bukkit;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.TerrainControlEngine;
+import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
+import com.khorn.terraincontrol.configuration.TCDefaultValues;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.customobjects.BODefaultValues;
+import com.khorn.terraincontrol.util.Txt;
 import net.minecraft.server.v1_4_6.BiomeBase;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -17,14 +18,11 @@ import org.bukkit.craftbukkit.v1_4_6.block.CraftBlock;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.TerrainControlEngine;
-import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.customobjects.BODefaultValues;
-import com.khorn.terraincontrol.util.Txt;
+import java.io.File;
+import java.util.HashMap;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TCPlugin extends JavaPlugin implements TerrainControlEngine
 {
@@ -45,7 +43,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
         // Start the engine
         TerrainControl.startEngine(this);
-        
+
         TCWorldChunkManagerOld.GenBiomeDiagram();
 
         this.commandExecutor = new TCCommandExecutor(this);
@@ -178,7 +176,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     public LocalWorld getWorld(String name)
     {
         World world = Bukkit.getWorld(name);
-        if(world == null)
+        if (world == null)
         {
             // World not loaded
             return null;

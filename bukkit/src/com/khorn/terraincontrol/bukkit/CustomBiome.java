@@ -1,25 +1,24 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.MobAlternativeNames;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+import net.minecraft.server.v1_4_6.BiomeBase;
+import net.minecraft.server.v1_4_6.BiomeMeta;
+import net.minecraft.server.v1_4_6.Entity;
+import net.minecraft.server.v1_4_6.EntityTypes;
+import org.bukkit.block.Biome;
+import org.bukkit.craftbukkit.v1_4_6.block.CraftBlock;
+
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import net.minecraft.server.v1_4_6.BiomeBase;
-import net.minecraft.server.v1_4_6.BiomeMeta;
-import net.minecraft.server.v1_4_6.Entity;
-import net.minecraft.server.v1_4_6.EntityTypes;
-
-import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_4_6.block.CraftBlock;
-
-import com.khorn.terraincontrol.MobAlternativeNames;
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
-
 public class CustomBiome extends BiomeBase
 {
+    @SuppressWarnings("MismatchedReadAndWriteOfArray")
     public CustomBiome(int id, String name)
     {
         super(id);
@@ -31,7 +30,7 @@ public class CustomBiome extends BiomeBase
             Field biomeMapping = CraftBlock.class.getDeclaredField("BIOME_MAPPING");
             biomeMapping.setAccessible(true);
             Biome[] mappingArray = (Biome[]) biomeMapping.get(null);
-            
+
             mappingArray[id] = Biome.OCEAN;
 
         } catch (Exception e)
@@ -57,7 +56,7 @@ public class CustomBiome extends BiomeBase
         addMobs(this.L, config.spawnWaterCreaturesAddDefaults, config.spawnWaterCreatures);
         addMobs(this.M, config.spawnAmbientCreaturesAddDefaults, config.spawnAmbientCreatures);
     }
-    
+
     // Adds the mobs to the internal list. Displays a warning for each mob type it doesn't understand
     protected void addMobs(List<BiomeMeta> internalList, boolean addDefaults, List<WeightedMobSpawnGroup> configList)
     {
@@ -65,10 +64,10 @@ public class CustomBiome extends BiomeBase
         {
             internalList.clear();
         }
-        for(WeightedMobSpawnGroup mobGroup: configList)
+        for (WeightedMobSpawnGroup mobGroup : configList)
         {
             Class<? extends Entity> entityClass = getEntityClass(mobGroup);
-            if(entityClass != null)
+            if (entityClass != null)
             {
                 internalList.add(new BiomeMeta(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
             } else
@@ -78,7 +77,7 @@ public class CustomBiome extends BiomeBase
             }
         }
     }
-    
+
     // Gets the class of the entity.
     @SuppressWarnings("unchecked")
     protected Class<? extends Entity> getEntityClass(WeightedMobSpawnGroup mobGroup)
@@ -90,7 +89,7 @@ public class CustomBiome extends BiomeBase
             entitiesField.setAccessible(true);
             Map<String, Class<? extends Entity>> entitiesList = (Map<String, Class<? extends Entity>>) entitiesField.get(null);
             return entitiesList.get(mobName);
-        } catch(Exception e)
+        } catch (Exception e)
         {
             TerrainControl.log(Level.SEVERE, "Someone forgot to update the mob spawning code! Please report!");
             e.printStackTrace();

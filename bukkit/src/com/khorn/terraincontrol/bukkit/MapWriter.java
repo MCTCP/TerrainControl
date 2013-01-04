@@ -1,28 +1,25 @@
 package com.khorn.terraincontrol.bukkit;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.util.logging.Level;
-
-import javax.imageio.stream.FileCacheImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
-
-import net.minecraft.server.v1_4_6.BiomeBase;
-import net.minecraft.server.v1_4_6.World;
-
-import org.bukkit.command.CommandSender;
-
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.sun.imageio.plugins.png.PNGImageWriter;
 import com.sun.imageio.plugins.png.PNGImageWriterSpi;
+import net.minecraft.server.v1_4_6.BiomeBase;
+import net.minecraft.server.v1_4_6.World;
+import org.bukkit.command.CommandSender;
+
+import javax.imageio.stream.FileCacheImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
+import java.util.logging.Level;
 
 public class MapWriter implements Runnable
 {
     public static final int[] defaultColors = {0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0, 0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999, 0xFFFF00, 0x996600, 0x009900, 0x003300, 0x666600};
-    
+
     public static boolean isWorking = false;
 
     private TCPlugin plugin;
@@ -160,7 +157,7 @@ public class MapWriter implements Runnable
 
             sender.sendMessage(BaseCommand.MessageColor + "Writing images...");
             PNGImageWriter PngEncoder = new PNGImageWriter(new PNGImageWriterSpi());
-            
+
             // Write biome colors
             FileOutputStream fileOutput = new FileOutputStream(label + world.worldData.getName() + "_biome.png", false);
             ImageOutputStream imageOutput = new FileCacheImageOutputStream(fileOutput, null);

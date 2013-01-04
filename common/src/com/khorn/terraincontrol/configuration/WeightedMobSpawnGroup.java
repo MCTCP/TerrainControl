@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.TerrainControl;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-
-import com.khorn.terraincontrol.TerrainControl;
 
 /**
  * This class holds data for a bukkit nms.BiomeMeta class. The name does not

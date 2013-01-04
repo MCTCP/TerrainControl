@@ -147,7 +147,7 @@ public class ChunkProviderTC
                             double d17 = (d12 - d11) * d15;
                             for (int piece_z = 0; piece_z < 4; piece_z++)
                             {
-                                int biomeId = BiomeArray[(z * 4 + piece_z)*16 + (piece_x + x * 4) ];
+                                int biomeId = BiomeArray[(z * 4 + piece_z) * 16 + (piece_x + x * 4)];
                                 int i15 = 0;
                                 if (y * 8 + piece_y < this.worldSettings.biomeConfigs.get(biomeId).waterLevelMax && y * 8 + piece_y > this.worldSettings.biomeConfigs.get(biomeId).waterLevelMin)
                                 {

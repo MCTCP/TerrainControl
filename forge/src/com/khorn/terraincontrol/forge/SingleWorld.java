@@ -1,9 +1,12 @@
 package com.khorn.terraincontrol.forge;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-
+import com.khorn.terraincontrol.*;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.Tag;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.structuregens.*;
+import com.khorn.terraincontrol.forge.util.NBTHelper;
+import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.SpawnerAnimals;
@@ -11,32 +14,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import net.minecraft.world.gen.feature.WorldGenBigMushroom;
-import net.minecraft.world.gen.feature.WorldGenBigTree;
-import net.minecraft.world.gen.feature.WorldGenDungeons;
-import net.minecraft.world.gen.feature.WorldGenForest;
-import net.minecraft.world.gen.feature.WorldGenHugeTrees;
-import net.minecraft.world.gen.feature.WorldGenShrub;
-import net.minecraft.world.gen.feature.WorldGenSwamp;
-import net.minecraft.world.gen.feature.WorldGenTaiga1;
-import net.minecraft.world.gen.feature.WorldGenTaiga2;
-import net.minecraft.world.gen.feature.WorldGenTrees;
+import net.minecraft.world.gen.feature.*;
 
-import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.IBiomeManager;
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Tag;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.structuregens.MineshaftGen;
-import com.khorn.terraincontrol.forge.structuregens.NetherFortressGen;
-import com.khorn.terraincontrol.forge.structuregens.RareBuildingGen;
-import com.khorn.terraincontrol.forge.structuregens.StrongholdGen;
-import com.khorn.terraincontrol.forge.structuregens.VillageGen;
-import com.khorn.terraincontrol.forge.util.NBTHelper;
-import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 public class SingleWorld implements LocalWorld
 {
@@ -241,30 +223,30 @@ public class SingleWorld implements LocalWorld
     {
         switch (type)
         {
-        case Tree:
-            return tree.generate(this.world, rand, x, y, z);
-        case BigTree:
-            bigTree.setScale(1.0D, 1.0D, 1.0D);
-            return bigTree.generate(this.world, rand, x, y, z);
-        case Forest:
-            return forest.generate(this.world, rand, x, y, z);
-        case HugeMushroom:
-            hugeMushroom.setScale(1.0D, 1.0D, 1.0D);
-            return hugeMushroom.generate(this.world, rand, x, y, z);
-        case SwampTree:
-            return swampTree.generate(this.world, rand, x, y, z);
-        case Taiga1:
-            return taigaTree1.generate(this.world, rand, x, y, z);
-        case Taiga2:
-            return taigaTree2.generate(this.world, rand, x, y, z);
-        case JungleTree:
-            return jungleTree.generate(this.world, rand, x, y, z);
-        case GroundBush:
-            return groundBush.generate(this.world, rand, x, y, z);
-        case CocoaTree:
-            return cocoaTree.generate(this.world, rand, x, y, z);
-        default:
-            break;
+            case Tree:
+                return tree.generate(this.world, rand, x, y, z);
+            case BigTree:
+                bigTree.setScale(1.0D, 1.0D, 1.0D);
+                return bigTree.generate(this.world, rand, x, y, z);
+            case Forest:
+                return forest.generate(this.world, rand, x, y, z);
+            case HugeMushroom:
+                hugeMushroom.setScale(1.0D, 1.0D, 1.0D);
+                return hugeMushroom.generate(this.world, rand, x, y, z);
+            case SwampTree:
+                return swampTree.generate(this.world, rand, x, y, z);
+            case Taiga1:
+                return taigaTree1.generate(this.world, rand, x, y, z);
+            case Taiga2:
+                return taigaTree2.generate(this.world, rand, x, y, z);
+            case JungleTree:
+                return jungleTree.generate(this.world, rand, x, y, z);
+            case GroundBush:
+                return groundBush.generate(this.world, rand, x, y, z);
+            case CocoaTree:
+                return cocoaTree.generate(this.world, rand, x, y, z);
+            default:
+                break;
         }
         return false;
     }
@@ -349,11 +331,11 @@ public class SingleWorld implements LocalWorld
         }
 
     }
-    
+
     @Override
     public void placePopulationMobs(BiomeConfig config, Random random, int chunkX, int chunkZ)
     {
-        SpawnerAnimals.performWorldGenSpawning(this.getWorld(), ((Biome)config.Biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
+        SpawnerAnimals.performWorldGenSpawning(this.getWorld(), ((Biome) config.Biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
     }
 
     public void LoadChunk(int x, int z)
@@ -431,7 +413,7 @@ public class SingleWorld implements LocalWorld
     @Override
     public int getTypeId(int x, int y, int z)
     {
-        if(world.getChunkProvider().chunkExists(x / 16, z / 16) || createNewChunks)
+        if (world.getChunkProvider().chunkExists(x / 16, z / 16) || createNewChunks)
         {
             return world.getBlockId(x, y, z);
         } else

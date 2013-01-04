@@ -9,9 +9,8 @@ public interface LocalBiome
     /**
      * Sets the post generator effects. For the client it are things like
      * colors. For the server it are things like mob spawning.
-     * 
-     * @param config
-     *            The BiomeConfig of the biome.
+     *
+     * @param config The BiomeConfig of the biome.
      */
     public abstract void setEffects(BiomeConfig config);
 

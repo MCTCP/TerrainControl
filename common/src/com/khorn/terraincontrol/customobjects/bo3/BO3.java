@@ -1,14 +1,5 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -19,6 +10,10 @@ import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeight;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 public class BO3 extends ConfigFile implements CustomObject
 {
@@ -46,7 +41,7 @@ public class BO3 extends ConfigFile implements CustomObject
 
     /**
      * Creates a BO3 from a file.
-     * 
+     *
      * @param name
      * @param file
      */
@@ -63,7 +58,7 @@ public class BO3 extends ConfigFile implements CustomObject
     /**
      * Creates a BO3 with the specified settings. Ignores the settings in the
      * settings file.
-     * 
+     *
      * @param name
      * @param file
      * @param settings
@@ -120,9 +115,9 @@ public class BO3 extends ConfigFile implements CustomObject
             checks = this.bo3Checks[rotation];
         }
         // Check for spawning
-        for (BO3Check check: checks)
+        for (BO3Check check : checks)
         {
-            if(check.preventsSpawn(world, x + check.x, y + check.y, z + check.z))
+            if (check.preventsSpawn(world, x + check.x, y + check.y, z + check.z))
             {
                 // A check failed
                 return false;
@@ -132,33 +127,34 @@ public class BO3 extends ConfigFile implements CustomObject
         int blocksOutsideSourceBlock = 0;
         for (BlockFunction block : blocks)
         {
-            if(!world.isLoaded(x + block.x, y + block.y, z + block.z))
+            if (!world.isLoaded(x + block.x, y + block.y, z + block.z))
             {
                 // Cannot spawn BO3, part of world is not loaded
                 return false;
             }
-            if(world.getTypeId(x + block.x, y + block.y, z + block.z) != sourceBlock) {
-                blocksOutsideSourceBlock ++;
+            if (world.getTypeId(x + block.x, y + block.y, z + block.z) != sourceBlock)
+            {
+                blocksOutsideSourceBlock++;
             }
         }
-        if((( (double) blocksOutsideSourceBlock / (double) blocks.length) * 100.0) > maxPercentageOutsideSourceBlock)
+        if ((((double) blocksOutsideSourceBlock / (double) blocks.length) * 100.0) > maxPercentageOutsideSourceBlock)
         {
             // Too many blocks outside source block
             return false;
         }
-        
+
         // Call event
-        if(!TerrainControl.fireCustomObjectSpawnEvent(this, world, random, x, y, z))
+        if (!TerrainControl.fireCustomObjectSpawnEvent(this, world, random, x, y, z))
         {
             // Cancelled
             return false;
         }
-        
+
         // Spawn
         for (BlockFunction block : blocks)
         {
             int previousBlock = world.getTypeId(x + block.x, y + block.y, z + block.z);
-            if(previousBlock == sourceBlock || outsideSourceBlock == OutsideSourceBlock.placeAnyway)
+            if (previousBlock == sourceBlock || outsideSourceBlock == OutsideSourceBlock.placeAnyway)
             {
                 block.spawn(world, random, x + block.x, y + block.y, z + block.z);
             }
@@ -218,7 +214,7 @@ public class BO3 extends ConfigFile implements CustomObject
     public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
         boolean atLeastOneObjectHasSpawned = false;
-        
+
         int chunkMiddleX = chunkX * 16 + 8;
         int chunkMiddleZ = chunkZ * 16 + 8;
         for (int i = 0; i < frequency; i++)
@@ -226,13 +222,13 @@ public class BO3 extends ConfigFile implements CustomObject
             double test = random.nextDouble() * 100.0;
             if (rarity > test)
             {
-                if(spawn(world, random, chunkMiddleX + random.nextInt(16), chunkMiddleZ + random.nextInt(16)))
+                if (spawn(world, random, chunkMiddleX + random.nextInt(16), chunkMiddleZ + random.nextInt(16)))
                 {
                     atLeastOneObjectHasSpawned = true;
                 }
             }
         }
-        
+
         return atLeastOneObjectHasSpawned;
     }
 

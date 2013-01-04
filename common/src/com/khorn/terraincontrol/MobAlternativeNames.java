@@ -7,7 +7,6 @@ import java.util.Map;
  * Contains a lot of alternative mob names. The implementation should support
  * this names, along with the other names that are available on the current
  * platform.
- * 
  */
 public enum MobAlternativeNames
 {
@@ -65,11 +64,9 @@ public enum MobAlternativeNames
 
     /**
      * Register aliases here
-     * 
-     * @param internalMinecraftName
-     *            The internal Minecraft mob id, for example Ozelot
-     * @param aliases
-     *            The alias, for example Ocelot
+     *
+     * @param internalMinecraftName The internal Minecraft mob id, for example Ozelot
+     * @param aliases               The alias, for example Ocelot
      */
     public static void register(String internalMinecraftName, String... aliases)
     {
@@ -82,9 +79,8 @@ public enum MobAlternativeNames
     /**
      * Returns the internal name of the mob. If it can't be found, it returns
      * the alias.
-     * 
-     * @param alias
-     *            The alias.
+     *
+     * @param alias The alias.
      * @return The internal name, or if it can't be found, the alias.
      */
     public static String getInternalMinecraftName(String alias)

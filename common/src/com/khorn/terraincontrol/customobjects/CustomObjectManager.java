@@ -1,14 +1,15 @@
 package com.khorn.terraincontrol.customobjects;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.bo2.BO2Loader;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Loader;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CustomObjectManager
 {
@@ -84,12 +85,10 @@ public class CustomObjectManager
     /**
      * Registers a custom object loader. Register before the config files are
      * getting loaded, please!
-     * 
-     * @param extension
-     *            The extension of the file. This loader will be responsible for
-     *            all files with this extension.
-     * @param loader
-     *            The loader.
+     *
+     * @param extension The extension of the file. This loader will be responsible for
+     *                  all files with this extension.
+     * @param loader    The loader.
      */
     public void registerCustomObjectLoader(String extension, CustomObjectLoader loader)
     {
@@ -98,9 +97,8 @@ public class CustomObjectManager
 
     /**
      * Register a global object.
-     * 
-     * @param object
-     *            The object to register.
+     *
+     * @param object The object to register.
      */
     public void registerGlobalObject(CustomObject object)
     {
@@ -109,9 +107,8 @@ public class CustomObjectManager
 
     /**
      * Returns the global CustomObject with the given name.
-     * 
-     * @param name
-     *            Name of the CustomObject, case-insensitive.
+     *
+     * @param name Name of the CustomObject, case-insensitive.
      * @return The CustomObject, or null if there isn't one with that name.
      */
     public CustomObject getCustomObject(String name)
@@ -122,12 +119,10 @@ public class CustomObjectManager
     /**
      * Returns the CustomObject with the given name. It searches for a world
      * object first, and then it searches for a global object.
-     * 
-     * @param name
-     *            Name of the CustomObject, case-insensitive.
-     * @param world
-     *            The world to search in first before searching the global
-     *            objects.
+     *
+     * @param name  Name of the CustomObject, case-insensitive.
+     * @param world The world to search in first before searching the global
+     *              objects.
      * @return The CustomObject, or null if there isn't one with that name.
      */
     public CustomObject getCustomObject(String name, LocalWorld world)
@@ -138,12 +133,10 @@ public class CustomObjectManager
     /**
      * Returns the CustomObject with the given name. It searches for a world
      * object first, and then it searches for a global object.
-     * 
-     * @param name
-     *            Name of the CustomObject, case-insensitive.
-     * @param config
-     *            The config to search in first before searching the global
-     *            objects.
+     *
+     * @param name   Name of the CustomObject, case-insensitive.
+     * @param config The config to search in first before searching the global
+     *               objects.
      * @return The CustomObject, or null if there isn't one with that name.
      */
     public CustomObject getCustomObject(String name, WorldConfig config)
@@ -161,9 +154,8 @@ public class CustomObjectManager
     /**
      * Returns a Map with all CustomObjects in a directory in it. The Map will
      * have the lowercase object name as a key.
-     * 
-     * @param directory
-     *            The directory to load from.
+     *
+     * @param directory The directory to load from.
      * @return
      */
     public Map<String, CustomObject> loadObjects(File directory)
@@ -199,10 +191,9 @@ public class CustomObjectManager
     /**
      * Parses a String in the format name(setting1=foo,setting2=bar) and returns
      * a CustomObject.
-     * 
+     *
      * @param string
-     * @param world
-     *            The world to search in
+     * @param world  The world to search in
      * @return A CustomObject, or null if no one was found.
      */
     public CustomObject getObjectFromString(String string, LocalWorld world)
@@ -213,15 +204,14 @@ public class CustomObjectManager
     /**
      * Parses a String in the format name(setting1=foo,setting2=bar) and returns
      * a CustomObject.
-     * 
+     *
      * @param string
-     * @param config
-     *            The config to search in
+     * @param config The config to search in
      * @return A CustomObject, or null if no one was found.
      */
     public CustomObject getObjectFromString(String string, WorldConfig config)
     {
-        String[] parts = new String[] { string, "" };
+        String[] parts = new String[]{string, ""};
 
         int start = string.indexOf("(");
         int end = string.lastIndexOf(")");

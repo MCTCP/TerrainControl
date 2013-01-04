@@ -1,48 +1,48 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
-import net.minecraft.server.v1_4_6.BiomeBase;
-import net.minecraft.server.v1_4_6.BiomeMeta;
-import net.minecraft.server.v1_4_6.EntityWitch;
-import net.minecraft.server.v1_4_6.StructureGenerator;
-import net.minecraft.server.v1_4_6.StructureStart;
-
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import net.minecraft.server.v1_4_6.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class RareBuildingGen extends StructureGenerator
 {
     public List<BiomeBase> biomeList;
 
-    /** contains possible spawns for scattered features */
+    /**
+     * contains possible spawns for scattered features
+     */
     @SuppressWarnings("rawtypes")
     private List scatteredFeatureSpawnList;
 
-    /** the maximum distance between scattered features */
+    /**
+     * the maximum distance between scattered features
+     */
     private int maxDistanceBetweenScatteredFeatures;
 
-    /** the minimum distance between scattered features */
+    /**
+     * the minimum distance between scattered features
+     */
     private int minDistanceBetweenScatteredFeatures;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public RareBuildingGen(WorldConfig worldConfig)
     {
         biomeList = new ArrayList<BiomeBase>();
-        
-        for(BiomeConfig biomeConfig: worldConfig.biomeConfigs.values())
+
+        for (BiomeConfig biomeConfig : worldConfig.biomeConfigs.values())
         {
-            if(biomeConfig.rareBuildingType != RareBuildingType.disabled)
+            if (biomeConfig.rareBuildingType != RareBuildingType.disabled)
             {
-                biomeList.add(((BukkitBiome)biomeConfig.Biome).getHandle());
+                biomeList.add(((BukkitBiome) biomeConfig.Biome).getHandle());
             }
         }
-        
+
         this.scatteredFeatureSpawnList = new ArrayList();
         this.maxDistanceBetweenScatteredFeatures = worldConfig.maximumDistanceBetweenRareBuildings;
         // Minecraft's internal minimum distance is one chunk lower than TC's value
@@ -78,12 +78,9 @@ public class RareBuildingGen extends StructureGenerator
         if (var3 == var5 && var4 == var6)
         {
             BiomeBase biomeAtPosition = this.c.getWorldChunkManager().getBiome(var3 * 16 + 8, var4 * 16 + 8);
-            Iterator<BiomeBase> biomeListIterator = biomeList.iterator();
 
-            while (biomeListIterator.hasNext())
+            for (BiomeBase biome : biomeList)
             {
-                BiomeBase biome = (BiomeBase)biomeListIterator.next();
-
                 if (biomeAtPosition.id == biome.id)
                 {
                     return true;

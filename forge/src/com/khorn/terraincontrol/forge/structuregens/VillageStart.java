@@ -1,23 +1,24 @@
 package com.khorn.terraincontrol.forge.structuregens;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Random;
-
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.ComponentVillageRoadPiece;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.gen.structure.StructureVillagePieces;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 class StructureVillageStart extends StructureStart
 {
-    /** well ... thats what it does */
+    /**
+     * well ... thats what it does
+     */
     private boolean hasMoreThanTwoComponents = false;
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public StructureVillageStart(World world, Random random, int chunkX, int chunkZ, int size)
-    {      
+    {
         ArrayList<StructureComponent> villagePieces = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);
         VillageStartPiece startPiece = new VillageStartPiece(world, 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, villagePieces, size);
         this.components.add(startPiece);
@@ -33,24 +34,22 @@ class StructureVillageStart extends StructureStart
             if (var8.isEmpty())
             {
                 var10 = random.nextInt(var9.size());
-                var11 = (StructureComponent)var9.remove(var10);
+                var11 = (StructureComponent) var9.remove(var10);
                 var11.buildComponent(startPiece, this.components, random);
-            }
-            else
+            } else
             {
                 var10 = random.nextInt(var8.size());
-                var11 = (StructureComponent)var8.remove(var10);
+                var11 = (StructureComponent) var8.remove(var10);
                 var11.buildComponent(startPiece, this.components, random);
             }
         }
 
         this.updateBoundingBox();
         var10 = 0;
-        Iterator var13 = this.components.iterator();
 
-        while (var13.hasNext())
+        for (Object component : this.components)
         {
-            StructureComponent var12 = (StructureComponent)var13.next();
+            StructureComponent var12 = (StructureComponent) component;
 
             if (!(var12 instanceof ComponentVillageRoadPiece))
             {

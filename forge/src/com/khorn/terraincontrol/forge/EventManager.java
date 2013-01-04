@@ -1,9 +1,10 @@
 package com.khorn.terraincontrol.forge;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.events.EventHandler;
+import com.khorn.terraincontrol.generator.resourcegens.*;
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate;
@@ -13,22 +14,12 @@ import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate;
 import net.minecraftforge.event.terraingen.TerrainGen;
 
-import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.events.EventHandler;
-import com.khorn.terraincontrol.generator.resourcegens.DungeonGen;
-import com.khorn.terraincontrol.generator.resourcegens.LiquidGen;
-import com.khorn.terraincontrol.generator.resourcegens.OreGen;
-import com.khorn.terraincontrol.generator.resourcegens.Resource;
-import com.khorn.terraincontrol.generator.resourcegens.SmallLakeGen;
-import com.khorn.terraincontrol.generator.resourcegens.UndergroundLakeGen;
-import com.khorn.terraincontrol.generator.resourcegens.CustomObjectGen;
-
-import cpw.mods.fml.common.registry.GameRegistry;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Translates TerrainControl events into MinecraftForge terrain events
- * 
  */
 public class EventManager extends EventHandler
 {
@@ -41,29 +32,29 @@ public class EventManager extends EventHandler
         final SingleWorld world = (SingleWorld) localWorld;
 
         // Convert to Forge event and fire
-        if (resource instanceof DungeonGen || 
-            resource instanceof SmallLakeGen || 
-            resource instanceof UndergroundLakeGen || 
-            resource instanceof LiquidGen ||
-            resource instanceof CustomObjectGen)
+        if (resource instanceof DungeonGen ||
+                resource instanceof SmallLakeGen ||
+                resource instanceof UndergroundLakeGen ||
+                resource instanceof LiquidGen ||
+                resource instanceof CustomObjectGen)
         {
             // Fire population event
             Populate.EventType forgeEvent = getPopulateEventType(resource.getBlockId());
             return TerrainGen.populate(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, villageInChunk, forgeEvent);
         } else if (resource instanceof OreGen)
         {
-            if(!hasOreGenerationBegun(world))
+            if (!hasOreGenerationBegun(world))
             {
                 // Fire ore generation start event
                 MinecraftForge.ORE_GEN_BUS.post(new OreGenEvent.Pre(world.getWorld(), random, chunkX, chunkZ));
-                setOreGenerationBegun(world,true);
+                setOreGenerationBegun(world, true);
             }
             // Fire ore generation event
             GenerateMinable.EventType forgeEvent = getOreEventType(resource.getBlockId());
             return TerrainGen.generateOre(world.getWorld(), random, null, chunkX, chunkZ, forgeEvent);
         } else
         {
-            if(!hasDecorationBegun(world))
+            if (!hasDecorationBegun(world))
             {
                 // Fire decoration start event
                 MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Pre(world.getWorld(), random, chunkX, chunkZ));
@@ -74,46 +65,46 @@ public class EventManager extends EventHandler
             return TerrainGen.decorate(world.getWorld(), random, chunkX, chunkZ, forgeEvent);
         }
     }
-    
+
     @Override
     public void onPopulateStart(LocalWorld localWorld, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         final SingleWorld world = (SingleWorld) localWorld;
-        
+
         // Reset states
         setDecorationBegun(world, false);
         setOreGenerationBegun(world, false);
-        
+
         // Fire event
         final PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Pre(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, villageInChunk);
         MinecraftForge.EVENT_BUS.post(forgeEvent);
     }
-    
+
     @Override
     public void onPopulateEnd(LocalWorld localWorld, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         final SingleWorld world = (SingleWorld) localWorld;
-        
+
         // Fire all events
-        
+
         // Decoration close
-        if(hasDecorationBegun(world))
+        if (hasDecorationBegun(world))
         {
             MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Post(world.getWorld(), random, chunkX, chunkZ));
             setDecorationBegun(world, false);
         }
-        
+
         // Ore generation close
-        if(hasOreGenerationBegun(world))
+        if (hasOreGenerationBegun(world))
         {
             MinecraftForge.EVENT_BUS.post(new OreGenEvent.Post(world.getWorld(), random, chunkX, chunkZ));
             setOreGenerationBegun(world, false);
         }
-        
+
         // Population close
         final PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Post(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, villageInChunk);
         MinecraftForge.EVENT_BUS.post(forgeEvent);
-        
+
         // Population close (FML and ModLoader style)
         GameRegistry.generateWorld(chunkX, chunkZ, world.getWorld(), world.getChunkGenerator(), world.getChunkGenerator());
     }
@@ -172,22 +163,22 @@ public class EventManager extends EventHandler
             return GenerateMinable.EventType.REDSTONE;
         return GenerateMinable.EventType.CUSTOM;
     }
-    
+
     private boolean hasOreGenerationBegun(LocalWorld world)
     {
         return hasOreGenBegun.get(world.getName());
     }
-    
+
     private boolean hasDecorationBegun(LocalWorld world)
     {
         return hasDecorationBegun.get(world.getName());
     }
-    
+
     private void setOreGenerationBegun(LocalWorld world, boolean begun)
     {
         hasOreGenBegun.put(world.getName(), begun);
     }
-    
+
     private void setDecorationBegun(LocalWorld world, boolean begun)
     {
         hasDecorationBegun.put(world.getName(), begun);

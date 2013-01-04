@@ -1,12 +1,12 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import java.util.List;
-import java.util.Random;
-
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
+
+import java.util.List;
+import java.util.Random;
 
 public class SmallLakeGen extends Resource
 {
@@ -17,12 +17,12 @@ public class SmallLakeGen extends Resource
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
-        if(villageInChunk)
+        if (villageInChunk)
         {
             // Lakes and villages don't like each other.
             return;
         }
-        
+
         x -= 8;
         z -= 8;
 
@@ -73,10 +73,7 @@ public class SmallLakeGen extends Resource
                 {
                     for (i2 = 0; i2 < 8; i2++)
                     {
-                        boolean flag = (!BooleanBuffer[((j * 16 + i1) * 8 + i2)])
-                                && (((j < 15) && (BooleanBuffer[(((j + 1) * 16 + i1) * 8 + i2)])) || ((j > 0) && (BooleanBuffer[(((j - 1) * 16 + i1) * 8 + i2)]))
-                                        || ((i1 < 15) && (BooleanBuffer[((j * 16 + (i1 + 1)) * 8 + i2)])) || ((i1 > 0) && (BooleanBuffer[((j * 16 + (i1 - 1)) * 8 + i2)]))
-                                        || ((i2 < 7) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 + 1))])) || ((i2 > 0) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 - 1))])));
+                        boolean flag = (!BooleanBuffer[((j * 16 + i1) * 8 + i2)]) && (((j < 15) && (BooleanBuffer[(((j + 1) * 16 + i1) * 8 + i2)])) || ((j > 0) && (BooleanBuffer[(((j - 1) * 16 + i1) * 8 + i2)])) || ((i1 < 15) && (BooleanBuffer[((j * 16 + (i1 + 1)) * 8 + i2)])) || ((i1 > 0) && (BooleanBuffer[((j * 16 + (i1 - 1)) * 8 + i2)])) || ((i2 < 7) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 + 1))])) || ((i2 > 0) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 - 1))])));
 
                         if (flag)
                         {

@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.generator.terrainsgens;
 
-import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.MathHelper;
 
 import java.util.Random;
@@ -11,7 +11,7 @@ public class CavesGen extends TerrainGenBase
 {
     private WorldConfig worldSettings;
 
-    public CavesGen(WorldConfig wrk,LocalWorld world)
+    public CavesGen(WorldConfig wrk, LocalWorld world)
     {
         super(world);
         this.worldSettings = wrk;
@@ -155,7 +155,7 @@ public class CavesGen extends TerrainGenBase
                     int i10 = (i6 * 16 + i9) * this.worldSettings.WorldHeight + i2;
                     int i11 = 0;
                     if (d9 * d9 + d10 * d10 < 1.0D)
-                     {
+                    {
                         for (int i12 = i2 - 1; i12 >= i1; i12--)
                         {
                             double d11 = (i12 + 0.5D - paramDouble2) / d4;
@@ -187,7 +187,7 @@ public class CavesGen extends TerrainGenBase
         }
     }
 
-    protected void a( int paramInt1, int paramInt2, int paramInt3, int paramInt4, byte[] paramArrayOfByte)
+    protected void a(int paramInt1, int paramInt2, int paramInt3, int paramInt4, byte[] paramArrayOfByte)
     {
         int i = this.c.nextInt(this.c.nextInt(this.c.nextInt(this.worldSettings.caveFrequency) + 1) + 1);
         if (this.worldSettings.evenCaveDistribution)

@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.biomelayers.layers;
 
-import com.khorn.terraincontrol.biomelayers.ArraysCache;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.biomelayers.ArraysCache;
 
 
 public class LayerBiomeInBiome extends Layer

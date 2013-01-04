@@ -1,25 +1,28 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import net.minecraft.server.v1_4_6.BiomeBase;
-import net.minecraft.server.v1_4_6.StructureGenerator;
-import net.minecraft.server.v1_4_6.StructureStart;
-
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import net.minecraft.server.v1_4_6.BiomeBase;
+import net.minecraft.server.v1_4_6.StructureGenerator;
+import net.minecraft.server.v1_4_6.StructureStart;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class VillageGen extends StructureGenerator
 {
 
-    /** A list of all the biomes villages can spawn in. */
+    /**
+     * A list of all the biomes villages can spawn in.
+     */
     public List<BiomeBase> villageSpawnBiomes;
 
-    /** Village size, 0 for normal, 1 for flat map */
+    /**
+     * Village size, 0 for normal, 1 for flat map
+     */
     private int size;
     private int distance;
     private int minimumDistance;
@@ -29,14 +32,14 @@ public class VillageGen extends StructureGenerator
         size = worldConfig.villageSize;
         distance = worldConfig.villageDistance;
         minimumDistance = 8;
-        
+
         // Add all village biomes to the list
         villageSpawnBiomes = new ArrayList<BiomeBase>();
-        for(BiomeConfig config: worldConfig.biomeConfigs.values())
+        for (BiomeConfig config : worldConfig.biomeConfigs.values())
         {
-            if(config.villageType != VillageType.disabled)
+            if (config.villageType != VillageType.disabled)
             {
-                villageSpawnBiomes.add(((BukkitBiome)config.Biome).getHandle());
+                villageSpawnBiomes.add(((BukkitBiome) config.Biome).getHandle());
             }
         }
     }

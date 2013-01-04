@@ -1,48 +1,52 @@
 package com.khorn.terraincontrol.forge.structuregens;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.Biome;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.SpawnListEntry;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.Biome;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class RareBuildingGen extends MapGenStructure
 {
     public List<BiomeGenBase> biomeList;
 
-    /** contains possible spawns for scattered features */
+    /**
+     * contains possible spawns for scattered features
+     */
     @SuppressWarnings("rawtypes")
     private List scatteredFeatureSpawnList;
 
-    /** the maximum distance between scattered features */
+    /**
+     * the maximum distance between scattered features
+     */
     private int maxDistanceBetweenScatteredFeatures;
 
-    /** the minimum distance between scattered features */
+    /**
+     * the minimum distance between scattered features
+     */
     private int minDistanceBetweenScatteredFeatures;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public RareBuildingGen(WorldConfig worldConfig)
     {
         biomeList = new ArrayList<BiomeGenBase>();
-        
-        for(BiomeConfig biomeConfig: worldConfig.biomeConfigs.values())
+
+        for (BiomeConfig biomeConfig : worldConfig.biomeConfigs.values())
         {
-            if(biomeConfig.rareBuildingType != RareBuildingType.disabled)
+            if (biomeConfig.rareBuildingType != RareBuildingType.disabled)
             {
-                biomeList.add(((Biome)biomeConfig.Biome).getHandle());
+                biomeList.add(((Biome) biomeConfig.Biome).getHandle());
             }
         }
-        
+
         this.scatteredFeatureSpawnList = new ArrayList();
         this.maxDistanceBetweenScatteredFeatures = worldConfig.maximumDistanceBetweenRareBuildings;
         // Minecraft's internal minimum distance is one chunk lower than TC's value
@@ -77,12 +81,9 @@ public class RareBuildingGen extends MapGenStructure
         if (var3 == var5 && var4 == var6)
         {
             BiomeGenBase biomeAtPosition = this.worldObj.getWorldChunkManager().getBiomeGenAt(var3 * 16 + 8, var4 * 16 + 8);
-            Iterator<BiomeGenBase> biomeListIterator = biomeList.iterator();
 
-            while (biomeListIterator.hasNext())
+            for (BiomeGenBase biome : biomeList)
             {
-                BiomeGenBase biome = (BiomeGenBase)biomeListIterator.next();
-
                 if (biomeAtPosition.biomeID == biome.biomeID)
                 {
                     return true;

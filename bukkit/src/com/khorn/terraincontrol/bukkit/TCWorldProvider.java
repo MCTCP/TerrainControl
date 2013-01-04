@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.bukkit;
 import net.minecraft.server.v1_4_6.WorldProviderNormal;
 
 
-
 /**
  * We extend this file to be able to set the sea level.
  * In minecraft 1.2.3 this is used in a few places such as spawning algorithms for villages.
@@ -13,12 +12,12 @@ import net.minecraft.server.v1_4_6.WorldProviderNormal;
 public class TCWorldProvider extends WorldProviderNormal
 {
     protected BukkitWorld localWorld;
-    
+
     public TCWorldProvider(BukkitWorld localWorld)
     {
         this.localWorld = localWorld;
     }
-    
+
     @Override
     public int getSeaLevel()
     {

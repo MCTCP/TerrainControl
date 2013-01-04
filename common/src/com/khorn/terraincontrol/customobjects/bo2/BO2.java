@@ -1,13 +1,5 @@
 package com.khorn.terraincontrol.customobjects.bo2;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
@@ -16,9 +8,12 @@ import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
 /**
  * The good old BO2.
- * 
  */
 public class BO2 extends ConfigFile implements CustomObject
 {
@@ -126,9 +121,9 @@ public class BO2 extends ConfigFile implements CustomObject
                 }
             }
         }
-        
+
         // Call event
-        if(!TerrainControl.fireCustomObjectSpawnEvent(this, world, random, x, y, z))
+        if (!TerrainControl.fireCustomObjectSpawnEvent(this, world, random, x, y, z))
         {
             // Cancelled
             return false;
@@ -151,12 +146,7 @@ public class BO2 extends ConfigFile implements CustomObject
     @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int y, int z)
     {
-        if (!Tree)
-        {
-            // Can only spawn as a tree if this is a tree.
-            return false;
-        }
-        return spawn(world, random, x, y, z);
+        return Tree && spawn(world, random, x, y, z);
     }
 
     @Override
@@ -199,10 +189,10 @@ public class BO2 extends ConfigFile implements CustomObject
     @Override
     public boolean process(LocalWorld world, Random rand, int chunkX, int chunkZ)
     {
-        
+
         if (Branch)
             return false;
-        
+
         int randomRoll = rand.nextInt(100);
         int ObjectRarity = Rarity;
         boolean objectSpawned = false;
@@ -210,25 +200,21 @@ public class BO2 extends ConfigFile implements CustomObject
         while (randomRoll < ObjectRarity)
         {
             ObjectRarity -= 100;
-            
+
             int x = chunkX * 16 + rand.nextInt(16);
             int z = chunkZ * 16 + rand.nextInt(16);
 
             objectSpawned = spawn(world, rand, x, z);
         }
-        
+
         return objectSpawned;
     }
 
     @Override
     public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        if (!Tree)
-        {
-            return false;
-        }
+        return Tree && process(world, random, chunkX, chunkZ);
 
-        return process(world, random, chunkX, chunkZ);
     }
 
     @Override
@@ -379,6 +365,7 @@ public class BO2 extends ConfigFile implements CustomObject
 
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean ObjectCanSpawn(LocalWorld world, int x, int y, int z)
     {
         if ((world.getTypeId(x, y - 5, z) == 0) && (NeedsFoundation))

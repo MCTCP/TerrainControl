@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.biomelayers.layers;
 
 
-import com.khorn.terraincontrol.biomelayers.ArraysCache;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 
 
 public class LayerBiomeBorder extends Layer
@@ -19,7 +19,7 @@ public class LayerBiomeBorder extends Layer
     private boolean[][] BordersFrom;
     private int[] BordersTo;
 
-    
+
     public void AddBiome(BiomeConfig ReplaceTo, int ReplaceFrom, LocalWorld world)
     {
         this.BordersFrom[ReplaceFrom] = new boolean[world.getMaxBiomesCount()];
@@ -48,10 +48,10 @@ public class LayerBiomeBorder extends Layer
                 int biomeId = GetBiomeFromLayer(currentPiece);
                 if (BordersFrom[biomeId] != null)
                 {
-                    int i1 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + (i + 1 - 1) * (paramInt3 + 2))] );
-                    int i2 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + 1 + (i + 1) * (paramInt3 + 2))] );
-                    int i3 = GetBiomeFromLayer(arrayOfInt1[(j + 1 - 1 + (i + 1) * (paramInt3 + 2))] );
-                    int i4 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + (i + 1 + 1) * (paramInt3 + 2))] );
+                    int i1 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + (i + 1 - 1) * (paramInt3 + 2))]);
+                    int i2 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + 1 + (i + 1) * (paramInt3 + 2))]);
+                    int i3 = GetBiomeFromLayer(arrayOfInt1[(j + 1 - 1 + (i + 1) * (paramInt3 + 2))]);
+                    int i4 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + (i + 1 + 1) * (paramInt3 + 2))]);
                     boolean[] biomeFrom = BordersFrom[biomeId];
                     if (biomeFrom[i1] && biomeFrom[i2] && biomeFrom[i3] && biomeFrom[i4])
                         if ((i1 != biomeId) || (i2 != biomeId) || (i3 != biomeId) || (i4 != biomeId))

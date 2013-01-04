@@ -1,8 +1,7 @@
 package com.khorn.terraincontrol.forge.structuregens;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.forge.util.WorldHelper;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityMagmaCube;
 import net.minecraft.entity.monster.EntityPigZombie;
@@ -11,8 +10,8 @@ import net.minecraft.world.biome.SpawnListEntry;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
 
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.forge.util.WorldHelper;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NetherFortressGen extends MapGenStructure
 {

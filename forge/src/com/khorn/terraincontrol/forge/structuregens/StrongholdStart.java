@@ -1,17 +1,17 @@
 package com.khorn.terraincontrol.forge.structuregens;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.ComponentStrongholdStairs2;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.gen.structure.StructureStrongholdPieces;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 class StrongholdStart extends StructureStart
 {
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public StrongholdStart(World world, Random random, int par3, int par4)
     {
         StructureStrongholdPieces.prepareStructurePieces();
@@ -23,7 +23,7 @@ class StrongholdStart extends StructureStart
         while (!var6.isEmpty())
         {
             int var7 = random.nextInt(var6.size());
-            StructureComponent var8 = (StructureComponent)var6.remove(var7);
+            StructureComponent var8 = (StructureComponent) var6.remove(var7);
             var8.buildComponent(var5, this.components, random);
         }
 

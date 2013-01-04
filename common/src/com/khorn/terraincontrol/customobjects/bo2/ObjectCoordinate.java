@@ -48,13 +48,13 @@ public class ObjectCoordinate
     {
         ObjectCoordinate newCoordinate = new ObjectCoordinate(this.z, this.y, (this.x * -1));
         newCoordinate.BlockId = this.BlockId;
-        newCoordinate.BlockData = BlockHelper.RotateData(this.BlockId,this.BlockData);
+        newCoordinate.BlockData = BlockHelper.RotateData(this.BlockId, this.BlockData);
         newCoordinate.BranchOdds = this.BranchOdds;
 
-        if(this.BranchDirection != -1)
+        if (this.BranchDirection != -1)
         {
-            newCoordinate.BranchDirection = this.BranchDirection +1;
-            if(newCoordinate.BranchDirection > 3)
+            newCoordinate.BranchDirection = this.BranchDirection + 1;
+            if (newCoordinate.BranchDirection > 3)
                 newCoordinate.BranchDirection = 0;
         }
 

@@ -16,7 +16,7 @@ public interface LocalWorld
     public LocalBiome getNullBiome(String name);
 
     public int getMaxBiomesCount(); // With static id allocation this is not a
-                                    // required feature.
+    // required feature.
 
     public int getFreeBiomeId();
 
@@ -37,24 +37,20 @@ public interface LocalWorld
 
     /**
      * Calculates the biome that should generate at the given coordinates.
-     * 
-     * @param x
-     *            The block x.
-     * @param z
-     *            The block z.
+     *
+     * @param x The block x.
+     * @param z The block z.
      * @return The biome at the given coordinates.
      */
     public LocalBiome getCalculatedBiome(int x, int z);
-    
+
     public int getBiomeId(int x, int z);
 
     /**
      * Gets the (stored) biome at the given coordinates.
-     * 
-     * @param x
-     *            The block x.
-     * @param z
-     *            The block z.
+     *
+     * @param x The block x.
+     * @param z The block z.
      * @return The biome at the given coordinates.
      */
     public LocalBiome getBiome(int x, int z);
@@ -73,9 +69,9 @@ public interface LocalWorld
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z);
 
     public void replaceBlocks();
-    
+
     public void replaceBiomesLate();
-    
+
     /**
      * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the terrain generation.
      */
@@ -84,7 +80,7 @@ public interface LocalWorld
     // Blocks
 
     public int getTypeId(int x, int y, int z);
-    
+
     public byte getTypeData(int x, int y, int z);
 
     public boolean isEmpty(int x, int y, int z);
@@ -92,7 +88,7 @@ public interface LocalWorld
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers);
 
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data);
-    
+
     public void attachMetadata(int x, int y, int z, Tag tag);
 
     public int getLiquidHeight(int x, int z);

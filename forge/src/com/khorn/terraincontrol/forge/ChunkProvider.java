@@ -1,7 +1,8 @@
 package com.khorn.terraincontrol.forge;
 
-import java.util.List;
-
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.ChunkProviderTC;
+import com.khorn.terraincontrol.generator.ObjectSpawner;
 import net.minecraft.block.BlockSand;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.IProgressUpdate;
@@ -12,9 +13,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.generator.ChunkProviderTC;
-import com.khorn.terraincontrol.generator.ObjectSpawner;
+import java.util.List;
 
 public class ChunkProvider implements IChunkProvider
 {
@@ -66,7 +65,7 @@ public class ChunkProvider implements IChunkProvider
                         if (sections[sectionId] == null)
                         {
                             // Second argument is skylight
-                            sections[sectionId] = new ExtendedBlockStorage(sectionId << 4, !chunk.worldObj.provider.hasNoSky); 
+                            sections[sectionId] = new ExtendedBlockStorage(sectionId << 4, !chunk.worldObj.provider.hasNoSky);
                         }
                         sections[sectionId].setExtBlockID(blockX, blockY & 0xF, blockZ, block);
                     }

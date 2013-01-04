@@ -1,12 +1,11 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
+import org.bukkit.command.CommandSender;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HelpCommand extends BaseCommand
 {
@@ -27,14 +26,14 @@ public class HelpCommand extends BaseCommand
         {
             lines.add(MessageColor + "/tc " + command.usage + " - " + command.getHelp());
         }
-        
+
         int page = 1;
         if (args.size() > 0)
         {
             try
             {
                 page = Integer.parseInt(args.get(0));
-            } catch (NumberFormatException  e)
+            } catch (NumberFormatException e)
             {
                 sender.sendMessage(ErrorColor + "Wrong page number " + args.get(0));
             }

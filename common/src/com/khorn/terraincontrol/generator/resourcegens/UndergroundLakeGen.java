@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.util.MathHelper;
 
 import java.util.List;
@@ -71,7 +71,7 @@ public class UndergroundLakeGen extends Resource
     public void load(List<String> args) throws InvalidResourceException
     {
         blockId = DefaultMaterial.WATER.id; // Hardcoded for now
-        
+
         assureSize(6, args);
         minSize = readInt(args.get(0), 1, 25);
         maxSize = readInt(args.get(1), minSize, 60);

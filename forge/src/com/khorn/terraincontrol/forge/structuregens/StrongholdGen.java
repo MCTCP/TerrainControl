@@ -1,10 +1,8 @@
 package com.khorn.terraincontrol.forge.structuregens;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.Biome;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -12,9 +10,10 @@ import net.minecraft.world.gen.structure.ComponentStrongholdStairs2;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.Biome;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class StrongholdGen extends MapGenStructure
 {
@@ -42,7 +41,7 @@ public class StrongholdGen extends MapGenStructure
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected boolean canSpawnStructureAtCoords(int par1, int par2)
     {
         if (!this.ranBiomeCheck)
@@ -81,12 +80,9 @@ public class StrongholdGen extends MapGenStructure
         }
 
         ChunkCoordIntPair[] structureCoords = this.structureCoords;
-        int structureCoordsLength = structureCoords.length;
 
-        for (int i = 0; i < structureCoordsLength; i++)
+        for (ChunkCoordIntPair structureCoord : structureCoords)
         {
-            ChunkCoordIntPair structureCoord = structureCoords[i];
-
             if (par1 == structureCoord.chunkXPos && par2 == structureCoord.chunkZPos)
             {
                 return true;
@@ -104,10 +100,8 @@ public class StrongholdGen extends MapGenStructure
     {
         ArrayList<ChunkPosition> chunkPositions = new ArrayList<ChunkPosition>();
 
-        for (int i = 0; i < structureCoords.length; i++)
+        for (ChunkCoordIntPair structureCoord : structureCoords)
         {
-            ChunkCoordIntPair structureCoord = structureCoords[i];
-
             if (structureCoord != null)
             {
                 chunkPositions.add(structureCoord.getChunkPosition(64));

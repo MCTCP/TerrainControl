@@ -4,11 +4,8 @@ import com.khorn.terraincontrol.DefaultBiome;
 
 import java.awt.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public abstract class ConfigFile
 {
@@ -35,15 +32,13 @@ public abstract class ConfigFile
                 while ((thisLine = SettingsReader.readLine()) != null)
                 {
                     lineNumber++;
-                    
+
                     if (thisLine.trim().equals(""))
                     {
                         // Empty line, ignore
-                        continue;
                     } else if (thisLine.startsWith("#") || thisLine.startsWith("<"))
                     {
                         // Comment, ignore
-                        continue;
                     } else if (thisLine.contains(":"))
                     {
                         // Setting, split and add it
@@ -98,12 +93,12 @@ public abstract class ConfigFile
     // -------------------------------------------- //
     // SAY STUFF
     // -------------------------------------------- //
-    
+
     protected boolean sayNotFoundEnabled()
     {
         return false;
     }
-    
+
     protected void sayNotFound(String settingsName)
     {
         if (this.sayNotFoundEnabled())
@@ -111,19 +106,19 @@ public abstract class ConfigFile
             System.out.println("TerrainControl: value " + settingsName + " not found.");
         }
     }
-    
+
     protected void sayHadWrongValue(String settingsName)
     {
         System.out.println("TerrainControl: " + settingsName + " had wrong value");
     }
-    
+
     // -------------------------------------------- //
     // ReadModSettings
     // -------------------------------------------- //
-    
+
     protected List<WeightedMobSpawnGroup> ReadModSettings(String settingsName, List<WeightedMobSpawnGroup> defaultValue)
     {
-    	settingsName = settingsName.toLowerCase();
+        settingsName = settingsName.toLowerCase();
         if (this.SettingsCache.containsKey(settingsName))
         {
             String json = this.SettingsCache.get(settingsName);
@@ -131,9 +126,9 @@ public abstract class ConfigFile
                 return defaultValue;
             return WeightedMobSpawnGroup.fromJson(json);
         }
-        
+
         sayNotFound(settingsName);
-        
+
         return defaultValue;
     }
 
@@ -162,8 +157,7 @@ public abstract class ConfigFile
             try
             {
                 return Integer.valueOf(this.SettingsCache.get(settingsName));
-            }
-            catch (NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 sayHadWrongValue(settingsName);
             }
@@ -180,8 +174,7 @@ public abstract class ConfigFile
             try
             {
                 return Byte.valueOf(this.SettingsCache.get(settingsName));
-            }
-            catch (NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 sayHadWrongValue(settingsName);
             }
@@ -209,8 +202,7 @@ public abstract class ConfigFile
             try
             {
                 return Double.valueOf(this.SettingsCache.get(settingsName));
-            }
-            catch (NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 sayHadWrongValue(settingsName);
             }
@@ -228,8 +220,7 @@ public abstract class ConfigFile
             try
             {
                 color = Color.decode(this.SettingsCache.get(settingsName));
-            }
-            catch (NumberFormatException ex)
+            } catch (NumberFormatException ex)
             {
                 sayHadWrongValue(settingsName);
             }
@@ -246,8 +237,7 @@ public abstract class ConfigFile
             try
             {
                 return Float.valueOf(this.SettingsCache.get(settingsName));
-            }
-            catch (NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 sayHadWrongValue(settingsName);
             }
@@ -390,7 +380,7 @@ public abstract class ConfigFile
 
     protected void writeValue(String settingsName, List<WeightedMobSpawnGroup> settingsValue) throws IOException
     {
-    	this.settingsWriter.write(settingsName + ": " + WeightedMobSpawnGroup.toJson(settingsValue));
+        this.settingsWriter.write(settingsName + ": " + WeightedMobSpawnGroup.toJson(settingsValue));
         this.settingsWriter.newLine();
     }
 
@@ -464,12 +454,12 @@ public abstract class ConfigFile
         this.settingsWriter.newLine();
         this.settingsWriter.newLine();
     }
-    
+
     protected void writeSmallTitle(String title) throws IOException
     {
         int titleLength = title.length();
         StringBuilder rowBuilder = new StringBuilder(titleLength + 4);
-        for(int i = 0; i < titleLength + 4; i++)
+        for (int i = 0; i < titleLength + 4; i++)
         {
             rowBuilder.append('#');
         }
@@ -502,15 +492,13 @@ public abstract class ConfigFile
     protected abstract void CorrectSettings();
 
     protected abstract void RenameOldSettings();
-    
+
     /**
      * Renames an old setting. If the old setting isn't found, this does
      * nothing.
-     * 
-     * @param oldValue
-     *            Name of the old setting.
-     * @param newValue
-     *            The new setting.
+     *
+     * @param oldValue Name of the old setting.
+     * @param newValue The new setting.
      */
     protected void renameOldSetting(String oldValue, TCDefaultValues newValue)
     {

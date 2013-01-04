@@ -1,12 +1,11 @@
 package com.khorn.terraincontrol.bukkit;
 
-import java.lang.reflect.Field;
-
-import net.minecraft.server.v1_4_6.BiomeBase;
-
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import net.minecraft.server.v1_4_6.BiomeBase;
+
+import java.lang.reflect.Field;
 
 /**
  * The BukkitBiome is basically a wrapper for the BiomeBase.
@@ -70,7 +69,7 @@ public class BukkitBiome implements LocalBiome
     {
         customID = id;
     }
-    
+
     public BiomeBase getHandle()
     {
         return biomeBase;

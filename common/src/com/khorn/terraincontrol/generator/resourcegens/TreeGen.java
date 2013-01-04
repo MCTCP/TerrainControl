@@ -1,13 +1,13 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class TreeGen extends Resource
 {
@@ -19,11 +19,11 @@ public class TreeGen extends Resource
     public void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         // Fire event
-        if(!TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkX, chunkZ))
+        if (!TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkX, chunkZ))
         {
             return;
         }
-        
+
         // Process
         for (int i = 0; i < frequency; i++)
         {
@@ -61,7 +61,7 @@ public class TreeGen extends Resource
             {
                 throw new InvalidResourceException("Custom object " + args.get(i) + " not found!");
             }
-            if(!object.canSpawnAsTree())
+            if (!object.canSpawnAsTree())
             {
                 throw new InvalidResourceException("Custom object " + args.get(i) + " is not a tree!");
             }

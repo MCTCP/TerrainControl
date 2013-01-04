@@ -1,22 +1,10 @@
 package com.khorn.terraincontrol.bukkit.util;
 
+import com.khorn.terraincontrol.configuration.Tag;
+import net.minecraft.server.v1_4_6.*;
+
 import java.lang.reflect.Field;
 import java.util.Map;
-
-import net.minecraft.server.v1_4_6.NBTBase;
-import net.minecraft.server.v1_4_6.NBTTagByte;
-import net.minecraft.server.v1_4_6.NBTTagByteArray;
-import net.minecraft.server.v1_4_6.NBTTagCompound;
-import net.minecraft.server.v1_4_6.NBTTagDouble;
-import net.minecraft.server.v1_4_6.NBTTagFloat;
-import net.minecraft.server.v1_4_6.NBTTagInt;
-import net.minecraft.server.v1_4_6.NBTTagIntArray;
-import net.minecraft.server.v1_4_6.NBTTagList;
-import net.minecraft.server.v1_4_6.NBTTagLong;
-import net.minecraft.server.v1_4_6.NBTTagShort;
-import net.minecraft.server.v1_4_6.NBTTagString;
-
-import com.khorn.terraincontrol.configuration.Tag;
 
 public class NBTHelper
 {
@@ -24,14 +12,14 @@ public class NBTHelper
     /**
      * Converts a net.minecraft.server compound NBT tag to a
      * net.minecraftwiki.wiki.NBTClass NBT compound tag.
-     * 
+     *
      * @param nmsTag
      * @return
      */
     @SuppressWarnings("rawtypes")
     public static Tag getNBTFromNMSTagCompound(NBTTagCompound nmsTag)
     {
-        Tag compoundTag = new Tag(Tag.Type.TAG_Compound, nmsTag.getName(), new Tag[] { new Tag(Tag.Type.TAG_End, null, null) });
+        Tag compoundTag = new Tag(Tag.Type.TAG_Compound, nmsTag.getName(), new Tag[]{new Tag(Tag.Type.TAG_End, null, null)});
 
         // Get the child tags using some reflection magic
         Field mapField;
@@ -59,31 +47,31 @@ public class NBTHelper
             Tag.Type type = Tag.Type.values()[nmsChildTag.getTypeId()];
             switch (type)
             {
-            case TAG_End:
-                break;
-            case TAG_Byte:
-            case TAG_Short:
-            case TAG_Int:
-            case TAG_Long:
-            case TAG_Float:
-            case TAG_Double:
-            case TAG_Byte_Array:
-            case TAG_String:
-            case TAG_Int_Array:
-                compoundTag.addTag(new Tag(type, nmsChildTag.getName(), getValueFromNms(nmsChildTag)));
-                break;
-            case TAG_List:
-                Tag listChildTag = getNBTFromNMSTagList((NBTTagList) nmsChildTag);
-                if (listChildTag != null)
-                {
-                    compoundTag.addTag(listChildTag);
-                }
-                break;
-            case TAG_Compound:
-                compoundTag.addTag(getNBTFromNMSTagCompound((NBTTagCompound) nmsChildTag));
-                break;
-            default:
-                break;
+                case TAG_End:
+                    break;
+                case TAG_Byte:
+                case TAG_Short:
+                case TAG_Int:
+                case TAG_Long:
+                case TAG_Float:
+                case TAG_Double:
+                case TAG_Byte_Array:
+                case TAG_String:
+                case TAG_Int_Array:
+                    compoundTag.addTag(new Tag(type, nmsChildTag.getName(), getValueFromNms(nmsChildTag)));
+                    break;
+                case TAG_List:
+                    Tag listChildTag = getNBTFromNMSTagList((NBTTagList) nmsChildTag);
+                    if (listChildTag != null)
+                    {
+                        compoundTag.addTag(listChildTag);
+                    }
+                    break;
+                case TAG_Compound:
+                    compoundTag.addTag(getNBTFromNMSTagCompound((NBTTagCompound) nmsChildTag));
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -93,7 +81,7 @@ public class NBTHelper
     /**
      * Converts a net.minecraft.server list NBT tag to a
      * net.minecraftwiki.wiki.NBTClass NBT list tag.
-     * 
+     *
      * @param nmsListTag
      * @return
      */
@@ -114,42 +102,42 @@ public class NBTHelper
             NBTBase nmsChildTag = nmsListTag.get(i);
             switch (listType)
             {
-            case TAG_End:
-                break;
-            case TAG_Byte:
-            case TAG_Short:
-            case TAG_Int:
-            case TAG_Long:
-            case TAG_Float:
-            case TAG_Double:
-            case TAG_Byte_Array:
-            case TAG_String:
-            case TAG_Int_Array:
-                listTag.addTag(new Tag(listType, nmsChildTag.getName(), getValueFromNms(nmsChildTag)));
-                break;
-            case TAG_List:
-                Tag listChildTag = getNBTFromNMSTagList((NBTTagList) nmsChildTag);
-                if (listChildTag != null)
-                {
-                    listTag.addTag(listChildTag);
-                }
-                break;
-            case TAG_Compound:
-                listTag.addTag(getNBTFromNMSTagCompound((NBTTagCompound) nmsChildTag));
-                break;
-            default:
-                break;
+                case TAG_End:
+                    break;
+                case TAG_Byte:
+                case TAG_Short:
+                case TAG_Int:
+                case TAG_Long:
+                case TAG_Float:
+                case TAG_Double:
+                case TAG_Byte_Array:
+                case TAG_String:
+                case TAG_Int_Array:
+                    listTag.addTag(new Tag(listType, nmsChildTag.getName(), getValueFromNms(nmsChildTag)));
+                    break;
+                case TAG_List:
+                    Tag listChildTag = getNBTFromNMSTagList((NBTTagList) nmsChildTag);
+                    if (listChildTag != null)
+                    {
+                        listTag.addTag(listChildTag);
+                    }
+                    break;
+                case TAG_Compound:
+                    listTag.addTag(getNBTFromNMSTagCompound((NBTTagCompound) nmsChildTag));
+                    break;
+                default:
+                    break;
             }
         }
         return listTag;
     }
-    
+
     // Internal methods below
 
     /**
      * Gets the value from a nms tag (since that object doesn't have a simple
      * value field)
-     * 
+     *
      * @param nmsTag
      * @return
      */
@@ -158,34 +146,34 @@ public class NBTHelper
         Tag.Type type = Tag.Type.values()[nmsTag.getTypeId()];
         switch (type)
         {
-        case TAG_Byte:
-            return ((NBTTagByte) nmsTag).data;
-        case TAG_Short:
-            return ((NBTTagShort) nmsTag).data;
-        case TAG_Int:
-            return ((NBTTagInt) nmsTag).data;
-        case TAG_Long:
-            return ((NBTTagLong) nmsTag).data;
-        case TAG_Float:
-            return ((NBTTagFloat) nmsTag).data;
-        case TAG_Double:
-            return ((NBTTagDouble) nmsTag).data;
-        case TAG_Byte_Array:
-            return ((NBTTagByteArray) nmsTag).data;
-        case TAG_String:
-            return ((NBTTagString) nmsTag).data;
-        case TAG_Int_Array:
-            return ((NBTTagIntArray) nmsTag).data;
-        default:
-            // Cannot read this from a tag
-            throw new IllegalArgumentException(type + "doesn't have a simple value!");
+            case TAG_Byte:
+                return ((NBTTagByte) nmsTag).data;
+            case TAG_Short:
+                return ((NBTTagShort) nmsTag).data;
+            case TAG_Int:
+                return ((NBTTagInt) nmsTag).data;
+            case TAG_Long:
+                return ((NBTTagLong) nmsTag).data;
+            case TAG_Float:
+                return ((NBTTagFloat) nmsTag).data;
+            case TAG_Double:
+                return ((NBTTagDouble) nmsTag).data;
+            case TAG_Byte_Array:
+                return ((NBTTagByteArray) nmsTag).data;
+            case TAG_String:
+                return ((NBTTagString) nmsTag).data;
+            case TAG_Int_Array:
+                return ((NBTTagIntArray) nmsTag).data;
+            default:
+                // Cannot read this from a tag
+                throw new IllegalArgumentException(type + "doesn't have a simple value!");
         }
     }
 
     /**
      * Converts a net.minecraftwiki.wiki.NBTClass NBT compound tag into an
      * net.minecraft.server NBT compound tag.
-     * 
+     *
      * @param compoundTag
      * @return
      */
@@ -197,27 +185,27 @@ public class NBTHelper
         {
             switch (tag.getType())
             {
-            case TAG_End:
-                break;
-            case TAG_Byte:
-            case TAG_Short:
-            case TAG_Int:
-            case TAG_Long:
-            case TAG_Float:
-            case TAG_Double:
-            case TAG_Byte_Array:
-            case TAG_String:
-            case TAG_Int_Array:
-                nmsTag.set(tag.getName(), createTagNms(tag.getType(), tag.getName(), tag.getValue()));
-                break;
-            case TAG_List:
-                nmsTag.set(tag.getName(), getNMSFromNBTTagList(tag));
-                break;
-            case TAG_Compound:
-                nmsTag.set(tag.getName(), getNMSFromNBTTagCompound(tag));
-                break;
-            default:
-                break;
+                case TAG_End:
+                    break;
+                case TAG_Byte:
+                case TAG_Short:
+                case TAG_Int:
+                case TAG_Long:
+                case TAG_Float:
+                case TAG_Double:
+                case TAG_Byte_Array:
+                case TAG_String:
+                case TAG_Int_Array:
+                    nmsTag.set(tag.getName(), createTagNms(tag.getType(), tag.getName(), tag.getValue()));
+                    break;
+                case TAG_List:
+                    nmsTag.set(tag.getName(), getNMSFromNBTTagList(tag));
+                    break;
+                case TAG_Compound:
+                    nmsTag.set(tag.getName(), getNMSFromNBTTagCompound(tag));
+                    break;
+                default:
+                    break;
             }
         }
         return nmsTag;
@@ -226,7 +214,7 @@ public class NBTHelper
     /**
      * Converts a net.minecraftwiki.wiki.NBTClass NBT list tag into an
      * net.minecraft.server NBT list tag.
-     * 
+     *
      * @param listTag
      * @return
      */
@@ -238,27 +226,27 @@ public class NBTHelper
         {
             switch (tag.getType())
             {
-            case TAG_End:
-                break;
-            case TAG_Byte:
-            case TAG_Short:
-            case TAG_Int:
-            case TAG_Long:
-            case TAG_Float:
-            case TAG_Double:
-            case TAG_Byte_Array:
-            case TAG_String:
-            case TAG_Int_Array:
-                nmsTag.add(createTagNms(tag.getType(), tag.getName(), tag.getValue()));
-                break;
-            case TAG_List:
-                nmsTag.add(getNMSFromNBTTagList(tag));
-                break;
-            case TAG_Compound:
-                nmsTag.add(getNMSFromNBTTagCompound(tag));
-                break;
-            default:
-                break;
+                case TAG_End:
+                    break;
+                case TAG_Byte:
+                case TAG_Short:
+                case TAG_Int:
+                case TAG_Long:
+                case TAG_Float:
+                case TAG_Double:
+                case TAG_Byte_Array:
+                case TAG_String:
+                case TAG_Int_Array:
+                    nmsTag.add(createTagNms(tag.getType(), tag.getName(), tag.getValue()));
+                    break;
+                case TAG_List:
+                    nmsTag.add(getNMSFromNBTTagList(tag));
+                    break;
+                case TAG_Compound:
+                    nmsTag.add(getNMSFromNBTTagCompound(tag));
+                    break;
+                default:
+                    break;
             }
         }
         return nmsTag;
@@ -267,7 +255,7 @@ public class NBTHelper
     /**
      * Creates a net.minecraft.server.NBTBase tag. Doesn't work for ends, lists
      * and compounds.
-     * 
+     *
      * @param type
      * @param name
      * @param value
@@ -277,27 +265,27 @@ public class NBTHelper
     {
         switch (type)
         {
-        case TAG_Byte:
-            return new NBTTagByte(name, (Byte) value);
-        case TAG_Short:
-            return new NBTTagShort(name, (Short) value);
-        case TAG_Int:
-            return new NBTTagInt(name, (Integer) value);
-        case TAG_Long:
-            return new NBTTagLong(name, (Long) value);
-        case TAG_Float:
-            return new NBTTagFloat(name, (Float) value);
-        case TAG_Double:
-            return new NBTTagDouble(name, (Double) value);
-        case TAG_Byte_Array:
-            return new NBTTagByteArray(name, (byte[]) value);
-        case TAG_String:
-            return new NBTTagString(name, (String) value);
-        case TAG_Int_Array:
-            return new NBTTagIntArray(name, (int[]) value);
-        default:
-            // Cannot make this into a tag
-            throw new IllegalArgumentException(type + "doesn't have a simple value!");
+            case TAG_Byte:
+                return new NBTTagByte(name, (Byte) value);
+            case TAG_Short:
+                return new NBTTagShort(name, (Short) value);
+            case TAG_Int:
+                return new NBTTagInt(name, (Integer) value);
+            case TAG_Long:
+                return new NBTTagLong(name, (Long) value);
+            case TAG_Float:
+                return new NBTTagFloat(name, (Float) value);
+            case TAG_Double:
+                return new NBTTagDouble(name, (Double) value);
+            case TAG_Byte_Array:
+                return new NBTTagByteArray(name, (byte[]) value);
+            case TAG_String:
+                return new NBTTagString(name, (String) value);
+            case TAG_Int_Array:
+                return new NBTTagIntArray(name, (int[]) value);
+            default:
+                // Cannot make this into a tag
+                throw new IllegalArgumentException(type + "doesn't have a simple value!");
         }
     }
 }

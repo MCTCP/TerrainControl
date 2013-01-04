@@ -1,11 +1,11 @@
 package com.khorn.terraincontrol.configuration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class ConfigFunction<T>
 {
@@ -23,15 +23,14 @@ public abstract class ConfigFunction<T>
     {
         return holder;
     }
-    
+
     public abstract Class<T> getHolderType();
 
     /**
      * Convenience method for creating a config function. Used to create the
      * default config functions.
-     * 
-     * @param <E>
-     * @param world
+     *
+     * @param <T>
      * @param clazz
      * @param args
      * @return
@@ -71,19 +70,17 @@ public abstract class ConfigFunction<T>
     /**
      * Loads the settings. Returns false if one of the arguments contains an
      * error.
-     * 
-     * @param args
-     *            List of args.
+     *
+     * @param args List of args.
      * @return Returns false if one of the arguments contains an error,
      *         otherwise true.
-     * @throws InvalidResourceException
-     *             If the resoure is invalid.
+     * @throws InvalidResourceException If the resoure is invalid.
      */
     public abstract void load(List<String> args) throws InvalidResourceException;
 
     /**
      * Gets a String representation, like Tree(10,BigTree,50,Tree,100)
-     * 
+     *
      * @return A String representation, like Tree(10,BigTree,50,Tree,100)
      */
     public abstract String makeString();
@@ -91,13 +88,12 @@ public abstract class ConfigFunction<T>
     /**
      * Parses the string and returns a number between minValue and maxValue.
      * Returns Resource.INCORRECT_NUMBER if the string is not a number.
-     * 
+     *
      * @param string
      * @param minValue
      * @param maxValue
      * @return
-     * @throws InvalidResourceException
-     *             If the number is invalid.
+     * @throws InvalidResourceException If the number is invalid.
      */
     protected int readInt(String string, int minValue, int maxValue) throws InvalidResourceException
     {
@@ -121,7 +117,7 @@ public abstract class ConfigFunction<T>
 
     /**
      * Returns the block id with the given name.
-     * 
+     *
      * @param string
      * @return
      */
@@ -144,7 +140,7 @@ public abstract class ConfigFunction<T>
 
     /**
      * Gets the block data from a material string.
-     * 
+     *
      * @param string
      * @return
      * @throws InvalidResourceException
@@ -172,11 +168,9 @@ public abstract class ConfigFunction<T>
 
     /**
      * Gets the material name back from the id and data.
-     * 
-     * @param id
-     *            The block id
-     * @param data
-     *            The block data
+     *
+     * @param id   The block id
+     * @param data The block data
      * @return String in the format blockname[.blockdata]
      */
     protected String makeMaterial(int id, int data)
@@ -199,9 +193,8 @@ public abstract class ConfigFunction<T>
 
     /**
      * Gets the material name back from the id.
-     * 
-     * @param id
-     *            The block id
+     *
+     * @param id The block id
      * @return String in the format blockname
      */
     protected String makeMaterial(int id)
@@ -211,7 +204,7 @@ public abstract class ConfigFunction<T>
 
     /**
      * Returns a String in the format ",materialName,materialName,etc"
-     * 
+     *
      * @param ids
      * @return
      */

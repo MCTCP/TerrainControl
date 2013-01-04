@@ -1,20 +1,12 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
+import net.minecraft.server.v1_4_6.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.bukkit.util.WorldHelper;
-
-import net.minecraft.server.v1_4_6.BiomeMeta;
-import net.minecraft.server.v1_4_6.EntityBlaze;
-import net.minecraft.server.v1_4_6.EntityMagmaCube;
-import net.minecraft.server.v1_4_6.EntityPigZombie;
-import net.minecraft.server.v1_4_6.EntitySkeleton;
-import net.minecraft.server.v1_4_6.StructureGenerator;
-import net.minecraft.server.v1_4_6.StructureStart;
-import net.minecraft.server.v1_4_6.World;
 
 public class NetherFortressGen extends StructureGenerator
 {

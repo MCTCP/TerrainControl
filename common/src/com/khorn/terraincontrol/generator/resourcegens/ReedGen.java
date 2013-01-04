@@ -18,10 +18,7 @@ public class ReedGen extends Resource
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
         int y = world.getHighestBlockYAt(x, z);
-        if (y > maxAltitude
-                || y < minAltitude
-                || (!world.getMaterial(x - 1, y - 1, z).isLiquid() && !world.getMaterial(x + 1, y - 1, z).isLiquid() && !world.getMaterial(x, y - 1, z - 1).isLiquid() && !world.getMaterial(x, y - 1,
-                        z + 1).isLiquid()))
+        if (y > maxAltitude || y < minAltitude || (!world.getMaterial(x - 1, y - 1, z).isLiquid() && !world.getMaterial(x + 1, y - 1, z).isLiquid() && !world.getMaterial(x, y - 1, z - 1).isLiquid() && !world.getMaterial(x, y - 1, z + 1).isLiquid()))
         {
             return;
         }

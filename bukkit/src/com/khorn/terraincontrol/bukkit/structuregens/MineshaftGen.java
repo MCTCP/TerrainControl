@@ -1,14 +1,13 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import java.util.Random;
-
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import net.minecraft.server.v1_4_6.StructureGenerator;
 import net.minecraft.server.v1_4_6.StructureStart;
 import net.minecraft.server.v1_4_6.World;
 import net.minecraft.server.v1_4_6.WorldGenMineshaftStart;
 
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.bukkit.util.WorldHelper;
+import java.util.Random;
 
 public class MineshaftGen extends StructureGenerator
 {

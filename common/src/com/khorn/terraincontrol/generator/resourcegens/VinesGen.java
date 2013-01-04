@@ -1,12 +1,12 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import java.util.List;
-import java.util.Random;
-
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
+
+import java.util.List;
+import java.util.Random;
 
 public class VinesGen extends Resource
 {
@@ -45,35 +45,35 @@ public class VinesGen extends Resource
         int id;
         switch (paramInt4)
         {
-        default:
-            return false;
-        case 1:
-            id = (world.getTypeId(x, y + 1, z));
-            break;
-        case 2:
-            id = (world.getTypeId(x, y, z + 1));
-            break;
-        case 3:
-            id = (world.getTypeId(x, y, z - 1));
-            break;
-        case 5:
-            id = (world.getTypeId(x - 1, y, z));
-            break;
-        case 4:
-            id = (world.getTypeId(x + 1, y, z));
-            break;
+            default:
+                return false;
+            case 1:
+                id = (world.getTypeId(x, y + 1, z));
+                break;
+            case 2:
+                id = (world.getTypeId(x, y, z + 1));
+                break;
+            case 3:
+                id = (world.getTypeId(x, y, z - 1));
+                break;
+            case 5:
+                id = (world.getTypeId(x - 1, y, z));
+                break;
+            case 4:
+                id = (world.getTypeId(x + 1, y, z));
+                break;
         }
         return DefaultMaterial.getMaterial(id).isSolid();
     }
 
-    public static final int[] d = { -1, -1, 2, 0, 1, 3 };
-    public static final int[] OPPOSITE_FACING = { 1, 0, 3, 2, 5, 4 };
+    public static final int[] d = {-1, -1, 2, 0, 1, 3};
+    public static final int[] OPPOSITE_FACING = {1, 0, 3, 2, 5, 4};
 
     @Override
     public void load(List<String> args) throws InvalidResourceException
     {
         blockId = DefaultMaterial.VINE.id; // Hardcoded for now
-        
+
         assureSize(4, args);
         frequency = readInt(args.get(0), 1, 100);
         rarity = readInt(args.get(1), 1, 100);

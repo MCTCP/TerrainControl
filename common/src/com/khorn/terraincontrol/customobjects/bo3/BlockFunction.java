@@ -1,17 +1,16 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.util.BlockHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 /**
  * Represents a block in a BO3.
- * 
  */
 public class BlockFunction extends BO3Function
 {
@@ -80,7 +79,7 @@ public class BlockFunction extends BO3Function
 
     /**
      * Spawns this block at the position. The saved x, y and z in this block are ignored.
-     * 
+     *
      * @param world
      * @param x
      * @param y

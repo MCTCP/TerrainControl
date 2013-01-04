@@ -1,20 +1,14 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
+import com.khorn.terraincontrol.bukkit.BukkitBiome;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import net.minecraft.server.v1_4_6.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import net.minecraft.server.v1_4_6.BiomeBase;
-import net.minecraft.server.v1_4_6.ChunkCoordIntPair;
-import net.minecraft.server.v1_4_6.ChunkPosition;
-import net.minecraft.server.v1_4_6.StructureGenerator;
-import net.minecraft.server.v1_4_6.StructureStart;
-import net.minecraft.server.v1_4_6.WorldGenStrongholdStart;
-
-import com.khorn.terraincontrol.bukkit.BukkitBiome;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WorldConfig;
 
 public class StrongholdGen extends StructureGenerator
 {
@@ -42,7 +36,7 @@ public class StrongholdGen extends StructureGenerator
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected boolean a(int i, int j)
     {
         if (!this.ranBiomeCheck)
@@ -82,12 +76,9 @@ public class StrongholdGen extends StructureGenerator
         }
 
         ChunkCoordIntPair[] achunkcoordintpair = this.structureCoords;
-        int k1 = achunkcoordintpair.length;
 
-        for (int l1 = 0; l1 < k1; ++l1)
+        for (ChunkCoordIntPair chunkcoordintpair : achunkcoordintpair)
         {
-            ChunkCoordIntPair chunkcoordintpair = achunkcoordintpair[l1];
-
             if (i == chunkcoordintpair.x && j == chunkcoordintpair.z)
             {
                 return true;
@@ -97,17 +88,14 @@ public class StrongholdGen extends StructureGenerator
         return false;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected List p_()
     {
         ArrayList arraylist = new ArrayList();
         ChunkCoordIntPair[] achunkcoordintpair = this.structureCoords;
-        int i = achunkcoordintpair.length;
 
-        for (int j = 0; j < i; ++j)
+        for (ChunkCoordIntPair chunkcoordintpair : achunkcoordintpair)
         {
-            ChunkCoordIntPair chunkcoordintpair = achunkcoordintpair[j];
-
             if (chunkcoordintpair != null)
             {
                 arraylist.add(chunkcoordintpair.a(64));
@@ -120,7 +108,6 @@ public class StrongholdGen extends StructureGenerator
     protected StructureStart b(int i, int j)
     {
         StrongholdStart worldgenstronghold2start = new StrongholdStart(this.c, this.b, i, j);
-        ;
 
         while (worldgenstronghold2start.b().isEmpty() || ((WorldGenStrongholdStart) worldgenstronghold2start.b().get(0)).b == null)
         {

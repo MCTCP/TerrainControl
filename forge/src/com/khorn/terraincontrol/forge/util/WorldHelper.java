@@ -1,12 +1,11 @@
 package com.khorn.terraincontrol.forge.util;
 
-import java.util.NoSuchElementException;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
+
+import java.util.NoSuchElementException;
 
 public abstract class WorldHelper
 {
@@ -14,7 +13,7 @@ public abstract class WorldHelper
     /**
      * Returns a free world type id. If there is no free id available, it throws
      * a NoSuchElementException.
-     * 
+     *
      * @return A free world type id.
      */
     public static int getNextWorldTypeID()
@@ -28,7 +27,7 @@ public abstract class WorldHelper
     /**
      * Returns the LocalWorld of the Minecraft world. Returns null if there is
      * no world.
-     * 
+     *
      * @param world
      * @return The LocalWorld, or null if there is none.
      */

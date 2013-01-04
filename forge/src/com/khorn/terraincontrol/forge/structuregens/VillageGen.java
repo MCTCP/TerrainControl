@@ -1,24 +1,27 @@
 package com.khorn.terraincontrol.forge.structuregens;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.gen.structure.MapGenStructure;
-import net.minecraft.world.gen.structure.StructureStart;
-
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.Biome;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.StructureStart;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class VillageGen extends MapGenStructure
 {
-    /** A list of all the biomes villages can spawn in. */
+    /**
+     * A list of all the biomes villages can spawn in.
+     */
     public List<BiomeGenBase> villageSpawnBiomes;
 
-    /** Village size, 0 for normal, 1 for flat map */
+    /**
+     * Village size, 0 for normal, 1 for flat map
+     */
     private int size;
     private int distance;
     private int minimumDistance;
@@ -28,20 +31,20 @@ public class VillageGen extends MapGenStructure
         size = worldConfig.villageSize;
         distance = worldConfig.villageDistance;
         minimumDistance = 8;
-        
+
         // Add all village biomes to the list
         villageSpawnBiomes = new ArrayList<BiomeGenBase>();
-        for(BiomeConfig config: worldConfig.biomeConfigs.values())
+        for (BiomeConfig config : worldConfig.biomeConfigs.values())
         {
-            if(config.villageType != VillageType.disabled)
+            if (config.villageType != VillageType.disabled)
             {
-                villageSpawnBiomes.add(((Biome)config.Biome).getHandle());
+                villageSpawnBiomes.add(((Biome) config.Biome).getHandle());
             }
         }
     }
 
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)
-    {       
+    {
         int var3 = chunkX;
         int var4 = chunkZ;
 

@@ -1,10 +1,5 @@
 package com.khorn.terraincontrol;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.logging.Level;
-
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
@@ -12,6 +7,11 @@ import com.khorn.terraincontrol.customobjects.CustomObjectManager;
 import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.logging.Level;
 
 public class TerrainControl
 {
@@ -46,9 +46,8 @@ public class TerrainControl
 
     /**
      * Starts the engine, making all API methods available.
-     * 
-     * @param engine
-     *            The implementation of the engine.
+     *
+     * @param engine The implementation of the engine.
      */
     public static void startEngine(TerrainControlEngine engine)
     {
@@ -98,7 +97,7 @@ public class TerrainControl
 
     /**
      * Returns the engine, containing the API methods.
-     * 
+     *
      * @return The engine
      */
     public static TerrainControlEngine getEngine()
@@ -108,9 +107,8 @@ public class TerrainControl
 
     /**
      * Returns the world object with the given name.
-     * 
-     * @param name
-     *            The name of the world.
+     *
+     * @param name The name of the world.
      * @return The world object.
      */
     public static LocalWorld getWorld(String name)
@@ -122,13 +120,10 @@ public class TerrainControl
      * Convienence method to quickly get the biome name at the given
      * coordinates. Will return null if the world isn't loaded by Terrain
      * Control.
-     * 
-     * @param world
-     *            The world name.
-     * @param x
-     *            The block x in the world.
-     * @param z
-     *            The block z in the world.
+     *
+     * @param worldName The world name.
+     * @param x         The block x in the world.
+     * @param z         The block z in the world.
      * @return The biome name, or null if the world isn't managed by Terrain
      *         Control.
      */
@@ -146,9 +141,8 @@ public class TerrainControl
     /**
      * Logs the message(s) with normal importance. Message will be prefixed with
      * TerrainControl, so don't do that yourself.
-     * 
-     * @param messages
-     *            The messages to log.
+     *
+     * @param messages The messages to log.
      */
     public static void log(String... messages)
     {
@@ -158,9 +152,8 @@ public class TerrainControl
     /**
      * Logs the message(s) with the given importance. Message will be prefixed
      * with TerrainControl, so don't do that yourself.
-     * 
-     * @param messages
-     *            The messages to log.
+     *
+     * @param messages The messages to log.
      */
     public static void log(Level level, String... messages)
     {
@@ -169,7 +162,7 @@ public class TerrainControl
 
     /**
      * Returns the CustomObject manager, with hooks to spawn CustomObjects.
-     * 
+     *
      * @return The CustomObject manager.
      */
     public static CustomObjectManager getCustomObjectManager()
@@ -179,7 +172,7 @@ public class TerrainControl
 
     /**
      * Returns the Resource manager.
-     * 
+     *
      * @return The Resource manager.
      */
     public static ConfigFunctionsManager getConfigFunctionsManager()
@@ -192,9 +185,8 @@ public class TerrainControl
     /**
      * Register your event handler here with normal priority. You can do this
      * before TerrainControl is started.
-     * 
-     * @param handler
-     *            The handler that will receive the events.
+     *
+     * @param handler The handler that will receive the events.
      */
     public static void registerEventHandler(EventHandler handler)
     {
@@ -204,11 +196,9 @@ public class TerrainControl
     /**
      * Register you event handler here with the given priority. You can do this
      * before TerrainControl is started.
-     * 
-     * @param handler
-     *            The handler that will receive the events.
-     * @param priority
-     *            The priority of the event.
+     *
+     * @param handler  The handler that will receive the events.
+     * @param priority The priority of the event.
      */
     public static void registerEventHandler(EventHandler handler, EventPriority priority)
     {
@@ -226,6 +216,7 @@ public class TerrainControl
     // Only cancelableEventHandlers can cancel events.
     // Cancelled events are still fired.
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean fireCustomObjectSpawnEvent(CustomObject object, LocalWorld world, Random random, int x, int y, int z)
     {
         boolean isCancelled = false;
@@ -243,6 +234,7 @@ public class TerrainControl
         return !isCancelled;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         boolean isCancelled = false;
@@ -267,7 +259,7 @@ public class TerrainControl
         for (EventHandler handler : monitoringEventHandlers)
             handler.onPopulateStart(world, random, villageInChunk, chunkX, chunkZ);
     }
-    
+
     public static void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         for (EventHandler handler : cancelableEventHandlers)

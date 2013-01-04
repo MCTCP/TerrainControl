@@ -1,8 +1,9 @@
 package com.khorn.terraincontrol.forge;
 
-import java.util.List;
-import java.util.logging.Level;
-
+import com.khorn.terraincontrol.MobAlternativeNames;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
@@ -10,10 +11,8 @@ import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.SpawnListEntry;
 
-import com.khorn.terraincontrol.MobAlternativeNames;
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+import java.util.List;
+import java.util.logging.Level;
 
 public class BiomeGenCustom extends BiomeGenBase
 {
@@ -35,7 +34,7 @@ public class BiomeGenCustom extends BiomeGenBase
 
     /**
      * Needs a BiomeConfig that has all the visual settings present.
-     * 
+     *
      * @param config
      */
     @SuppressWarnings("unchecked")

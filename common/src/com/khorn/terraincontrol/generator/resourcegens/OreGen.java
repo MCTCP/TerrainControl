@@ -1,13 +1,13 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.util.MathHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class OreGen extends Resource
 {

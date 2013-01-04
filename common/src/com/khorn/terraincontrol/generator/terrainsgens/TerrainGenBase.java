@@ -15,7 +15,7 @@ public class TerrainGenBase
         this.d = world;
     }
 
-    public void a(  int chunk_x, int chunk_z, byte[] paramArrayOfByte)
+    public void a(int chunk_x, int chunk_z, byte[] paramArrayOfByte)
     {
         int i = this.b;
 

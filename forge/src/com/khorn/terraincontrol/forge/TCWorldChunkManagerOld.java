@@ -1,19 +1,16 @@
 package com.khorn.terraincontrol.forge;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
+import com.khorn.terraincontrol.IBiomeManager;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeCache;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 
-import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.IBiomeManager;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
+import java.util.List;
+import java.util.Random;
 
 public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeManager
 {
@@ -29,15 +26,10 @@ public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeM
     private BiomeGenBase[] tempBiomeBases;
     private BiomeCache cache = new BiomeCache(this);
 
-    private ArrayList<BiomeGenBase> biomesToSpawnIn = new ArrayList<BiomeGenBase>();
-
     private static BiomeGenBase[] biomeDiagram = new BiomeGenBase[4096];
 
     public TCWorldChunkManagerOld(LocalWorld world)
     {
-        this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.FOREST.Id]);
-        this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.PLAINS.Id]);
-        this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.TAIGA.Id]);
 
         this.localWrk = world.getSettings();
         this.temperatureGenerator = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 9871L), 4);

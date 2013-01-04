@@ -1,17 +1,16 @@
 package com.khorn.terraincontrol.bukkit;
 
-import java.util.List;
-import java.util.Random;
-
+import com.khorn.terraincontrol.IBiomeManager;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
 import net.minecraft.server.v1_4_6.BiomeBase;
 import net.minecraft.server.v1_4_6.BiomeCache;
 import net.minecraft.server.v1_4_6.ChunkPosition;
 import net.minecraft.server.v1_4_6.WorldChunkManager;
 
-import com.khorn.terraincontrol.IBiomeManager;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
+import java.util.List;
+import java.util.Random;
 
 public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeManager
 {
@@ -278,12 +277,12 @@ public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeM
         {
             return BiomeBase.PLAINS;
         }
-        
+
         if (paramFloat2 < 0.9F)
         {
             return BiomeBase.FOREST;
         }
-        
+
         return BiomeBase.FOREST;
     }
 
@@ -293,10 +292,10 @@ public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeM
         {
             biomeArray = new int[x_size * z_size];
         }
-        if ( (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
+        if ((x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
             BiomeBase[] localObject = this.Cache.e(x, z);
-            for(int i= 0; i< x_size*z_size;i++)
+            for (int i = 0; i < x_size * z_size; i++)
                 biomeArray[i] = localObject[i].id;
             return biomeArray;
         }
@@ -347,16 +346,16 @@ public class TCWorldChunkManagerOld extends WorldChunkManager implements IBiomeM
 
     public float[] getTemperaturesTC(int x, int z, int x_size, int z_size)
     {
-        return this.getTemperatures(null,x,z,x_size,z_size);
+        return this.getTemperatures(null, x, z, x_size, z_size);
     }
 
     public int[] getBiomesTC(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
-        return this.getBiomesUnZoomedTC(biomeArray,x,z,x_size,z_size);
+        return this.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
     }
 
     public int getBiomeTC(int x, int z)
     {
-        return this.getBiome(x,z).id;
+        return this.getBiome(x, z).id;
     }
 }

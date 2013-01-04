@@ -1,25 +1,25 @@
 package com.khorn.terraincontrol.bukkit;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
+import com.khorn.terraincontrol.configuration.TCDefaultValues;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class TCSender implements Runnable
 {
     private Player player;
     private TCPlugin plugin;
-    
-    public TCSender(TCPlugin plugin, Player player) {
+
+    public TCSender(TCPlugin plugin, Player player)
+    {
         this.plugin = plugin;
         this.player = player;
     }
-    
+
     @Override
     public void run()
     {

@@ -1,11 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.util.logging.Level;
-
-import net.minecraftforge.common.MinecraftForge;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -13,7 +7,6 @@ import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.util.Txt;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
@@ -29,6 +22,11 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.common.MinecraftForge;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.logging.Level;
 
 @Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.4.4")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")

@@ -1,16 +1,15 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
-
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.bukkit.TCWorldChunkManager;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
+
+import java.util.List;
 
 public class ReloadCommand extends BaseCommand
 {
@@ -35,7 +34,7 @@ public class ReloadCommand extends BaseCommand
 
         WorldConfig oldSettings = world.getSettings();
 
-        this.plugin.CreateSettings(world.getName(),world);
+        this.plugin.CreateSettings(world.getName(), world);
 
         oldSettings.newSettings = world.getSettings();
         oldSettings.isDeprecated = true;

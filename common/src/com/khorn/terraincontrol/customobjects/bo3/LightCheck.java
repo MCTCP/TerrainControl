@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import java.util.List;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
+
+import java.util.List;
 
 public class LightCheck extends BO3Check
 {
@@ -15,7 +15,7 @@ public class LightCheck extends BO3Check
     public boolean preventsSpawn(LocalWorld world, int x, int y, int z)
     {
         int lightLevel = world.getLightLevel(x, y, z);
-        if(lightLevel < minLightLevel || lightLevel > maxLightLevel)
+        if (lightLevel < minLightLevel || lightLevel > maxLightLevel)
         {
             // Out of bounds
             return false;

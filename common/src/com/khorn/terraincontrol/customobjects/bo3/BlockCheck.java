@@ -1,11 +1,11 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
 import com.khorn.terraincontrol.util.BlockHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BlockCheck extends BO3Check
 {
@@ -15,7 +15,7 @@ public class BlockCheck extends BO3Check
     @Override
     public boolean preventsSpawn(LocalWorld world, int x, int y, int z)
     {
-        int blockId = world.getTypeId(x, y , z);
+        int blockId = world.getTypeId(x, y, z);
         int indexOf = blockIds.indexOf(blockId);
         if (indexOf == -1)
         {
@@ -70,7 +70,7 @@ public class BlockCheck extends BO3Check
         {
             builder.append(',');
             builder.append(blockIds.get(i));
-            if(blockDatas.get(i) != -1)
+            if (blockDatas.get(i) != -1)
             {
                 builder.append('.');
                 builder.append(blockDatas.get(i));

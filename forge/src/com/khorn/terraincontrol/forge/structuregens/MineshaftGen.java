@@ -1,11 +1,10 @@
 package com.khorn.terraincontrol.forge.structuregens;
 
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.forge.util.WorldHelper;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureMineshaftStart;
 import net.minecraft.world.gen.structure.StructureStart;
-
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.forge.util.WorldHelper;
 
 public class MineshaftGen extends MapGenStructure
 {

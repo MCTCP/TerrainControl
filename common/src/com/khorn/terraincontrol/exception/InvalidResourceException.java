@@ -7,5 +7,5 @@ public class InvalidResourceException extends Exception
     {
         super(string);
     }
-    
+
 }

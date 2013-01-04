@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.customobjects.bo2;
 
-import java.io.File;
-
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
+
+import java.io.File;
 
 public class BO2Loader implements CustomObjectLoader
 {

@@ -1,26 +1,12 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.generator.resourcegens.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
-import com.khorn.terraincontrol.generator.resourcegens.AboveWaterGen;
-import com.khorn.terraincontrol.generator.resourcegens.CactusGen;
-import com.khorn.terraincontrol.generator.resourcegens.CustomObjectGen;
-import com.khorn.terraincontrol.generator.resourcegens.DungeonGen;
-import com.khorn.terraincontrol.generator.resourcegens.GrassGen;
-import com.khorn.terraincontrol.generator.resourcegens.LiquidGen;
-import com.khorn.terraincontrol.generator.resourcegens.OreGen;
-import com.khorn.terraincontrol.generator.resourcegens.PlantGen;
-import com.khorn.terraincontrol.generator.resourcegens.ReedGen;
-import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
-import com.khorn.terraincontrol.generator.resourcegens.SmallLakeGen;
-import com.khorn.terraincontrol.generator.resourcegens.TreeGen;
-import com.khorn.terraincontrol.generator.resourcegens.UnderWaterOreGen;
-import com.khorn.terraincontrol.generator.resourcegens.UndergroundLakeGen;
-import com.khorn.terraincontrol.generator.resourcegens.VinesGen;
 
 public class ConfigFunctionsManager
 {
@@ -56,16 +42,12 @@ public class ConfigFunctionsManager
 
     /**
      * Returns a config function with the given name.
-     * 
-     * @param name
-     *            The name of the config function.
-     * @param holder
-     *            The holder of the config function. WorldConfig or BO3.
-     * @param locationOfResource
-     *            The location of the config function, for example
-     *            TaigaBiomeConfig.ini.
-     * @param args
-     *            The args of the function.
+     *
+     * @param name               The name of the config function.
+     * @param holder             The holder of the config function. WorldConfig or BO3.
+     * @param locationOfResource The location of the config function, for example
+     *                           TaigaBiomeConfig.ini.
+     * @param args               The args of the function.
      * @return A config function with the given name, or null of it wasn't
      *         found.
      */
@@ -86,7 +68,7 @@ public class ConfigFunctionsManager
         // Get a config function
         try
         {
-            configFunction = (ConfigFunction<?>) clazz.newInstance();
+            configFunction = clazz.newInstance();
         } catch (InstantiationException e)
         {
             TerrainControl.log("Reflection error (Instantiation) while loading the resources: " + e.getMessage());
@@ -98,9 +80,9 @@ public class ConfigFunctionsManager
             e.printStackTrace();
             return null;
         }
-        
+
         // Check if config function is of the right type
-        boolean matchingTypes = true;
+        boolean matchingTypes;
         try
         {
             matchingTypes = holder.getClass().isAssignableFrom((Class<?>) clazz.getMethod("getHolderType").invoke(configFunction));
