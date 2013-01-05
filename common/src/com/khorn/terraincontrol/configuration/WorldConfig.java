@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 public class WorldConfig extends ConfigFile
@@ -29,8 +28,8 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> IsleBiomes = new ArrayList<String>();
     public ArrayList<String> BorderBiomes = new ArrayList<String>();
 
-    public Map<Integer, BiomeConfig> biomeConfigs;
-    public int highestBiomeId; // The highest biome id used in this world
+    public BiomeConfig[] biomeConfigs;  // Must be simple array for fast access. Beware! Some ids may contain null values;
+    public int biomesCount; // Overall biome count in this world.
 
     public byte[] ReplaceMatrixBiomes = new byte[256];
     public boolean HaveBiomeReplace = false;
@@ -216,8 +215,8 @@ public class WorldConfig extends ConfigFile
         for (int i = 0; i < this.ReplaceMatrixBiomes.length; i++)
             this.ReplaceMatrixBiomes[i] = (byte) i;
 
-        this.biomeConfigs = new HashMap<Integer, BiomeConfig>();
-        this.highestBiomeId = 0;
+        this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
+        this.biomesCount = 0;
 
         String LoadedBiomeNames = "";
 
@@ -240,15 +239,12 @@ public class WorldConfig extends ConfigFile
 
             if (!this.BiomeConfigsHaveReplacement)
                 this.BiomeConfigsHaveReplacement = config.ReplaceCount > 0;
-            if (this.biomeConfigs.size() != 0)
+            if (biomesCount != 0)
                 LoadedBiomeNames += ", ";
             LoadedBiomeNames += localBiome.getName();
-            this.biomeConfigs.put(localBiome.getId(), config);
-            if (localBiome.getId() > this.highestBiomeId)
-            {
-                // Found new highest biome id
-                this.highestBiomeId = localBiome.getId();
-            }
+
+            this.biomeConfigs[localBiome.getId()] = config;
+            biomesCount++;
 
             if (this.ModeBiome == BiomeMode.FromImage)
             {
@@ -934,9 +930,11 @@ public class WorldConfig extends ConfigFile
         }
 
         // BiomeConfigs
-        stream.writeInt(this.biomeConfigs.size());
-        for (BiomeConfig config : biomeConfigs.values())
+        stream.writeInt(this.biomesCount);
+        for (BiomeConfig config : biomeConfigs)
         {
+            if (config == null)
+                continue;
             stream.writeInt(config.Biome.getId());
             config.Serialize(stream);
         }
@@ -971,14 +969,14 @@ public class WorldConfig extends ConfigFile
         }
 
         // BiomeConfigs
-        this.biomeConfigs = new HashMap<Integer, BiomeConfig>();
+        this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
         count = stream.readInt();
         while (count-- > 0)
         {
             int id = stream.readInt();
             BiomeConfig config = new BiomeConfig(stream, this, world.getBiomeById(id));
-            this.biomeConfigs.put(id, config);
+            this.biomeConfigs[id] = config;
         }
 
     }

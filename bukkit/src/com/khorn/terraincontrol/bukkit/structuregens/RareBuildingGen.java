@@ -35,8 +35,10 @@ public class RareBuildingGen extends StructureGenerator
     {
         biomeList = new ArrayList<BiomeBase>();
 
-        for (BiomeConfig biomeConfig : worldConfig.biomeConfigs.values())
+        for (BiomeConfig biomeConfig : worldConfig.biomeConfigs)
         {
+            if (biomeConfig == null)
+                continue;
             if (biomeConfig.rareBuildingType != RareBuildingType.disabled)
             {
                 biomeList.add(((BukkitBiome) biomeConfig.Biome).getHandle());
@@ -101,7 +103,7 @@ public class RareBuildingGen extends StructureGenerator
     /**
      * returns possible spawns for scattered features
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "UnusedDeclaration"})
     public List getScatteredFeatureSpawnList()
     {
         return this.scatteredFeatureSpawnList;

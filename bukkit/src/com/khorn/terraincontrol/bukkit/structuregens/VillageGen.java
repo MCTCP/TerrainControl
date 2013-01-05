@@ -35,8 +35,10 @@ public class VillageGen extends StructureGenerator
 
         // Add all village biomes to the list
         villageSpawnBiomes = new ArrayList<BiomeBase>();
-        for (BiomeConfig config : worldConfig.biomeConfigs.values())
+        for (BiomeConfig config : worldConfig.biomeConfigs)
         {
+            if (config == null)
+                continue;
             if (config.villageType != VillageType.disabled)
             {
                 villageSpawnBiomes.add(((BukkitBiome) config.Biome).getHandle());

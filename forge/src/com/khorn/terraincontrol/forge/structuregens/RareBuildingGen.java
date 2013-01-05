@@ -39,8 +39,10 @@ public class RareBuildingGen extends MapGenStructure
     {
         biomeList = new ArrayList<BiomeGenBase>();
 
-        for (BiomeConfig biomeConfig : worldConfig.biomeConfigs.values())
+        for (BiomeConfig biomeConfig : worldConfig.biomeConfigs)
         {
+            if(biomeConfig == null)
+                continue;
             if (biomeConfig.rareBuildingType != RareBuildingType.disabled)
             {
                 biomeList.add(((Biome) biomeConfig.Biome).getHandle());
@@ -103,7 +105,7 @@ public class RareBuildingGen extends MapGenStructure
     /**
      * returns possible spawns for scattered features
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "UnusedDeclaration"})
     public List getScatteredFeatureSpawnList()
     {
         return this.scatteredFeatureSpawnList;

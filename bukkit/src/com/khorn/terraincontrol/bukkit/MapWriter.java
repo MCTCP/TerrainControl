@@ -68,8 +68,8 @@ public class MapWriter implements Runnable
             BukkitWorld bukkitWorld = plugin.worlds.get(world.getDataManager().getUUID());
             if (bukkitWorld != null)
             {
-                colors = new int[bukkitWorld.getSettings().highestBiomeId + 1];
-                for (BiomeConfig biomeConfig : bukkitWorld.getSettings().biomeConfigs.values())
+                colors = new int[bukkitWorld.getSettings().biomesCount + 1];
+                for (BiomeConfig biomeConfig : bukkitWorld.getSettings().biomeConfigs)
                 {
                     if (biomeConfig != null)
                     {

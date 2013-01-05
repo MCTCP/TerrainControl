@@ -13,7 +13,7 @@ public class RareBuildingStart extends StructureStart
     public RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
     {
         LocalWorld localWorld = WorldHelper.toLocalWorld(world);
-        BiomeConfig biomeConfig = localWorld.getSettings().biomeConfigs.get(localWorld.getCalculatedBiomeId(chunkX * 16 + 8, chunkZ * 16 + 8));
+        BiomeConfig biomeConfig = localWorld.getSettings().biomeConfigs[localWorld.getCalculatedBiomeId(chunkX * 16 + 8, chunkZ * 16 + 8)];
         StructurePiece building;
         switch (biomeConfig.rareBuildingType)
         {

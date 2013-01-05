@@ -27,7 +27,7 @@ public class VillageStartPiece extends ComponentVillageStartPiece
         // Whether the village is a sandstone village
         BiomeGenBase currentBiomeGenBase = worldChunkManager.getBiomeGenAt(par4, par5);
         LocalWorld worldTC = WorldHelper.toLocalWorld(world);
-        BiomeConfig config = worldTC.getSettings().biomeConfigs.get(currentBiomeGenBase.biomeID);
+        BiomeConfig config = worldTC.getSettings().biomeConfigs[currentBiomeGenBase.biomeID];
         setSandstoneVillage(config.villageType == VillageType.sandstone);
 
         this.startPiece = this;

@@ -25,7 +25,7 @@ public class SaplingListener
         }
 
         // Get the BiomeConfig
-        BiomeConfig biomeConfig = worldTC.getSettings().biomeConfigs.get(worldTC.getBiomeId(event.x, event.z));
+        BiomeConfig biomeConfig = worldTC.getSettings().biomeConfigs[worldTC.getBiomeId(event.x, event.z)];
 
         // Get the sapling data
         int saplingId = world.getBlockId(event.x, event.y, event.z);

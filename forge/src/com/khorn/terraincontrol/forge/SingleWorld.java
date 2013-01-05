@@ -293,7 +293,7 @@ public class SingleWorld implements LocalWorld
                 {
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigs.get(ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF);
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
 
                         if (biomeConfig.ReplaceCount > 0)
                         {
@@ -548,9 +548,9 @@ public class SingleWorld implements LocalWorld
         for (Biome biome : biomes)
         {
             // Apply settings for biomes
-            if (biome != null && config.biomeConfigs.get(biome.getId()) != null)
+            if (biome != null && config.biomeConfigs[biome.getId()] != null)
             {
-                biome.setEffects(config.biomeConfigs.get(biome.getId()));
+                biome.setEffects(config.biomeConfigs[biome.getId()]);
             }
         }
     }

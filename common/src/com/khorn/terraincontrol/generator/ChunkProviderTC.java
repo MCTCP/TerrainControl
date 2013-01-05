@@ -149,9 +149,9 @@ public class ChunkProviderTC
                             {
                                 int biomeId = BiomeArray[(z * 4 + piece_z) * 16 + (piece_x + x * 4)];
                                 int i15 = 0;
-                                if (y * 8 + piece_y < this.worldSettings.biomeConfigs.get(biomeId).waterLevelMax && y * 8 + piece_y > this.worldSettings.biomeConfigs.get(biomeId).waterLevelMin)
+                                if (y * 8 + piece_y < this.worldSettings.biomeConfigs[biomeId].waterLevelMax && y * 8 + piece_y > this.worldSettings.biomeConfigs[biomeId].waterLevelMin)
                                 {
-                                    i15 = this.worldSettings.biomeConfigs.get(biomeId).waterBlock;
+                                    i15 = this.worldSettings.biomeConfigs[biomeId].waterBlock;
                                 }
 
                                 if (d16 > 0.0D)
@@ -197,7 +197,7 @@ public class ChunkProviderTC
 
                 int i5 = -1;
 
-                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs.get(biomeId);
+                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[biomeId];
                 int surfaceBlock = biomeConfig.SurfaceBlock;
                 int groundBlock = biomeConfig.GroundBlock;
                 int waterLevel = biomeConfig.waterLevelMax;
@@ -299,7 +299,7 @@ public class ChunkProviderTC
             {
 
                 int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (max_X + 5))];
-                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs.get(biomeId);
+                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
                 double d3 = this.k[i2D] / 8000.0D;
                 if (d3 < 0.0D)
@@ -382,7 +382,7 @@ public class ChunkProviderTC
         } else
         {
             int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (max_X + 5))];
-            this.VolatilityFactor = (1.0D - worldSettings.biomeConfigs.get(biomeId).BiomeTemperature * worldSettings.biomeConfigs.get(biomeId).BiomeWetness);
+            this.VolatilityFactor = (1.0D - worldSettings.biomeConfigs[biomeId].BiomeTemperature * worldSettings.biomeConfigs[biomeId].BiomeWetness);
         }
         this.VolatilityFactor *= this.VolatilityFactor;
         this.VolatilityFactor = 1.0D - this.VolatilityFactor * this.VolatilityFactor;
@@ -411,10 +411,10 @@ public class ChunkProviderTC
             for (int nextZ = -i7; nextZ <= i7; nextZ++)
             {
                 int nextBiomeId = this.BiomeArray[(x + nextX + 2 + (z + nextZ + 2) * (max_X + 5))];
-                BiomeConfig nextBiomeConfig = this.worldSettings.biomeConfigs.get(nextBiomeId);
+                BiomeConfig nextBiomeConfig = this.worldSettings.biomeConfigs[nextBiomeId];
                 float f5 = this.NearBiomeWeight[(nextX + 2 + (nextZ + 2) * 5)] / (nextBiomeConfig.BiomeHeight + 2.0F);
                 f5 = Math.abs(f5);
-                if (nextBiomeConfig.BiomeHeight > this.worldSettings.biomeConfigs.get(biomeId).BiomeHeight)
+                if (nextBiomeConfig.BiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
                 {
                     f5 /= 2.0F;
                 }

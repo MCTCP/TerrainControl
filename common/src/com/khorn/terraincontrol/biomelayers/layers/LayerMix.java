@@ -30,7 +30,7 @@ public class LayerMix extends Layer
                 int currentPiece = arrayOfInt1[(j + i * paramInt3)];
                 if ((currentPiece & LandBit) != 0)
                 {
-                    if (this.worldConfig.RiversEnabled && (currentPiece & RiverBits) != 0 && this.worldConfig.biomeConfigs.get(currentPiece & BiomeBits).BiomeRivers)
+                    if (this.worldConfig.RiversEnabled && (currentPiece & RiverBits) != 0 && this.worldConfig.biomeConfigs[currentPiece & BiomeBits].BiomeRivers)
                         if (this.worldConfig.FrozenRivers && (currentPiece & IceBit) != 0)
                             currentPiece = DefaultBiome.FROZEN_RIVER.Id;
                         else

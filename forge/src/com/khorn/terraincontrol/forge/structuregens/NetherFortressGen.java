@@ -25,7 +25,7 @@ public class NetherFortressGen extends MapGenStructure
         this.spawnList.add(new SpawnListEntry(EntityMagmaCube.class, 3, 4, 4));
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "UnusedDeclaration"})
     public List getSpawnList()
     {
         return this.spawnList;
@@ -50,7 +50,7 @@ public class NetherFortressGen extends MapGenStructure
             {
                 LocalWorld world = WorldHelper.toLocalWorld(worldObj);
                 int biomeId = world.getCalculatedBiomeId(chunkX * 16 + 8, chunkZ * 16 + 8);
-                if (!world.getSettings().biomeConfigs.get(biomeId).netherFortressesEnabled)
+                if (!world.getSettings().biomeConfigs[biomeId].netherFortressesEnabled)
                 {
                     return false;
                 }

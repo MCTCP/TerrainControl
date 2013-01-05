@@ -27,8 +27,10 @@ public class StrongholdGen extends StructureGenerator
 
         allowedBiomes = new ArrayList<BiomeBase>();
 
-        for (BiomeConfig biomeConfig : worldConfig.biomeConfigs.values())
+        for (BiomeConfig biomeConfig : worldConfig.biomeConfigs)
         {
+            if (biomeConfig == null)
+                continue;
             if (biomeConfig.strongholdsEnabled)
             {
                 allowedBiomes.add(((BukkitBiome) biomeConfig.Biome).getHandle());

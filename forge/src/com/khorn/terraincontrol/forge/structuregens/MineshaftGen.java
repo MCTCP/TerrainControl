@@ -14,7 +14,7 @@ public class MineshaftGen extends MapGenStructure
         {
             LocalWorld world = WorldHelper.toLocalWorld(this.worldObj);
             int biomeId = world.getCalculatedBiomeId(chunkX * 16 + 8, chunkZ * 16 + 8);
-            if (rand.nextDouble() * 100.0 < world.getSettings().biomeConfigs.get(biomeId).mineshaftsRarity)
+            if (rand.nextDouble() * 100.0 < world.getSettings().biomeConfigs[biomeId].mineshaftsRarity)
             {
                 return true;
             }
