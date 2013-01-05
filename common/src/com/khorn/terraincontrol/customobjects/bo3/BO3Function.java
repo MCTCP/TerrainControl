@@ -6,13 +6,13 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
  * Represents a BO3 function - a ConfigFunction with a BO3 as holder. It can be
  * rotated.
  */
-public abstract class BO3Function extends ConfigFunction<BO3>
+public abstract class BO3Function extends ConfigFunction<BO3Config>
 {
 
     @Override
-    public Class<BO3> getHolderType()
+    public Class<BO3Config> getHolderType()
     {
-        return BO3.class;
+        return BO3Config.class;
     }
 
     /**

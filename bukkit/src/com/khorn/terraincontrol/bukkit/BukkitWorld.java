@@ -56,7 +56,7 @@ public class BukkitWorld implements LocalWorld
 
     private BiomeBase[] biomeBaseArray;
 
-    //TODO do something with that when bukkit allow custom world height.
+    // TODO do something with that when bukkit allow custom world height.
     private int worldHeight = 256;
     private int heightBits = 8;
 
@@ -108,13 +108,11 @@ public class BukkitWorld implements LocalWorld
         return nextBiomeId++;
     }
 
-
     @Override
     public LocalBiome getBiomeById(int id)
     {
         return biomes[id];
     }
-
 
     @Override
     public int getBiomeIdByName(String name)
@@ -423,7 +421,8 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
-        // If minecraft was updated and obfuscation is off - take a look at these methods:
+        // If minecraft was updated and obfuscation is off - take a look at
+        // these methods:
         // this.world.setRawTypeIdAndData(i, j, k, l, i1)
         // this.world.setTypeIdAndData(i, j, k, l, i1)
 
@@ -441,7 +440,6 @@ public class BukkitWorld implements LocalWorld
             this.world.applyPhysics(x, y, z, typeId == 0 ? oldTypeId : typeId);
         } else
             chunk.a(x & 15, y, z & 15, typeId, data); // Set typeId and Data
-
 
         if (updateLight)
         {
@@ -557,7 +555,6 @@ public class BukkitWorld implements LocalWorld
             this.world.worldProvider = new TCWorldProvider(this);
         }
 
-
         this.chunkCache = new Chunk[4];
 
         switch (this.settings.ModeTerrain)
@@ -633,14 +630,22 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void attachMetadata(int x, int y, int z, Tag tag)
     {
-        // Convert Tag to a native nms tag
-        NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
-        // Add the x, y and z position to it
-        nmsTag.setInt("x", x);
-        nmsTag.setInt("y", y);
-        nmsTag.setInt("z", z);
-        // Create a Tile Entity of it and add it to the world
-        TileEntity tileEntity = TileEntity.c(nmsTag);
-        world.setTileEntity(x, y, z, tileEntity);
+        if (Block.byId[world.getTypeId(x, y, z)] instanceof BlockContainer)
+        {
+            // Because villages (and other stuctures) don't use our setBlock
+            // methods, the world can sometimes become out of sync. This
+            // workaround makes sure that no tile entity get's placed if it
+            // isn't save to do so.
+
+            // Convert Tag to a native nms tag
+            NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
+            // Add the x, y and z position to it
+            nmsTag.setInt("x", x);
+            nmsTag.setInt("y", y);
+            nmsTag.setInt("z", z);
+            // Create a Tile Entity of it and add it to the world
+            TileEntity tileEntity = TileEntity.c(nmsTag);
+            world.setTileEntity(x, y, z, tileEntity);
+        }
     }
 }
