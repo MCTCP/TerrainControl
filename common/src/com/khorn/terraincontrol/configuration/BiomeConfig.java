@@ -39,6 +39,7 @@ public class BiomeConfig extends ConfigFile
     public float BiomeWetness;
 
     public boolean BiomeRivers;
+    public String RiverBiome;
 
     public byte SurfaceBlock;
     public byte GroundBlock;
@@ -357,6 +358,7 @@ public class BiomeConfig extends ConfigFile
         this.BiomeColor = ReadModSettings(TCDefaultValues.BiomeColor.name(), this.DefaultColor);
 
         this.BiomeRivers = ReadModSettings(TCDefaultValues.BiomeRivers.name(), this.DefaultRiver);
+        this.RiverBiome = ReadModSettings(TCDefaultValues.RiverBiome.name(),this.DefaultRiverBiome);
 
         this.IsleInBiome = ReadModSettings(TCDefaultValues.IsleInBiome.name(), this.DefaultIsle);
         this.BiomeIsBorder = ReadModSettings(TCDefaultValues.BiomeIsBorder.name(), this.DefaultBorder);
@@ -610,6 +612,10 @@ public class BiomeConfig extends ConfigFile
 
         writeComment("Set this to false to disable rivers in this biome.");
         writeValue(TCDefaultValues.BiomeRivers.name(), this.BiomeRivers);
+        this.writeNewLine();
+
+        writeComment("Biome name used as river in this biome");
+        writeValue(TCDefaultValues.RiverBiome.name(), this.RiverBiome);
         this.writeNewLine();
 
         writeComment("Replace this biome to specified after all generations. Warning this will cause saplings and mob spawning work as in specified biome");
@@ -1003,6 +1009,8 @@ public class BiomeConfig extends ConfigFile
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
 
         this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomes.contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
+        this.RiverBiome =  (DefaultBiome.Contain(this.RiverBiome) || this.worldConfig.CustomBiomes.contains(this.RiverBiome)) ? this.RiverBiome : "";
+
     }
 
     protected void RenameOldSettings()
@@ -1124,6 +1132,7 @@ public class BiomeConfig extends ConfigFile
     private ArrayList<String> DefaultBorder = new ArrayList<String>();
     private ArrayList<String> DefaultNotBorderNear = new ArrayList<String>();
     private boolean DefaultRiver = true;
+    private String DefaultRiverBiome = DefaultBiome.RIVER.Name;
     private int DefaultSize = 4;
     private int DefaultRarity = 100;
     private String DefaultColor = "0x000000";
@@ -1149,6 +1158,8 @@ public class BiomeConfig extends ConfigFile
             case 0: // Ocean
                 this.DefaultColor = "0x3333FF";
                 this.DefaultStrongholds = false;
+                this.DefaultRiver = false;
+                this.DefaultRiverBiome = DefaultBiome.OCEAN.Name;
                 break;
             case 1: // Plains
                 this.DefaultTrees = 0;
@@ -1207,6 +1218,8 @@ public class BiomeConfig extends ConfigFile
             case 10: // FrozenOcean
                 this.DefaultColor = "0xFFFFFF";
                 this.DefaultStrongholds = false;
+                this.DefaultRiver = false;
+                this.DefaultRiverBiome = DefaultBiome.FROZEN_OCEAN.Name;
                 break;
             case 11: // FrozenRiver
                 this.DefaultColor = "0x66FFFF";
@@ -1214,9 +1227,11 @@ public class BiomeConfig extends ConfigFile
                 break;
             case 12: // Ice Plains
                 this.DefaultColor = "0xCCCCCC";
+                this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
                 break;
             case 13: // Ice Mountains
                 this.DefaultColor = "0xCC9966";
+                this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
                 break;
             case 14: // MushroomIsland
                 this.DefaultSurfaceBlock = (byte) DefaultMaterial.MYCEL.id;
@@ -1278,6 +1293,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultTrees = 10;
                 this.DefaultGrass = 10;
                 this.DefaultColor = "0x003300";
+                this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
                 break;
             case 20: // Extreme Hills Edge
                 this.DefaultSize = 8;

@@ -209,7 +209,7 @@ public abstract class Layer
 
 
         }
-        MainLayer = new LayerMix(1L, MainLayer, config);
+        MainLayer = new LayerMix(1L, MainLayer, config, world);
 
         MainLayer = new LayerSmooth(400L, MainLayer);
 
