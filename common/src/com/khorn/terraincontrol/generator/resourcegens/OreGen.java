@@ -77,10 +77,8 @@ public class OreGen extends Resource
     @Override
     public void load(List<String> args) throws InvalidResourceException
     {
-        if (args.size() < 7)
-        {
-            throw new InvalidResourceException("Too few arguments supplied");
-        }
+        assureSize(7, args);
+
         blockId = readBlockId(args.get(0));
         blockData = readBlockData(args.get(0));
         maxSize = readInt(args.get(1), 1, 128);

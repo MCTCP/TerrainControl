@@ -48,10 +48,7 @@ public class CactusGen extends Resource
     @Override
     public void load(List<String> args) throws InvalidResourceException
     {
-        if (args.size() < 6)
-        {
-            throw new InvalidResourceException("Too few arguments supplied");
-        }
+        assureSize(6, args);
 
         blockId = readBlockId(args.get(0));
         blockData = readBlockData(args.get(0));

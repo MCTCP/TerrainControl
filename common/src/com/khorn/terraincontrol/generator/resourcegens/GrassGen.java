@@ -15,10 +15,8 @@ public class GrassGen extends Resource
     @Override
     public void load(List<String> args) throws InvalidResourceException
     {
-        if (args.size() < 5)
-        {
-            throw new InvalidResourceException("Too few arguments supplied");
-        }
+        assureSize(5, args);
+
         blockId = readBlockId(args.get(0));
         blockData = readInt(args.get(1), 0, 16);
         frequency = readInt(args.get(2), 1, 500);

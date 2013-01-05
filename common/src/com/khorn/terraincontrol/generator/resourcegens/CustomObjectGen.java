@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
-import com.khorn.terraincontrol.util.Txt;
+import com.khorn.terraincontrol.util.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public class CustomObjectGen extends Resource
     @Override
     public String makeString()
     {
-        return "CustomObject(" + Txt.implode(objectNames, ",") + ")";
+        return "CustomObject(" + StringHelper.join(objectNames, ",") + ")";
     }
 
 }

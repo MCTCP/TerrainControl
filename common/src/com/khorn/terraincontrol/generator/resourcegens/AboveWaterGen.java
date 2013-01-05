@@ -11,10 +11,7 @@ public class AboveWaterGen extends Resource
     @Override
     public void load(List<String> args) throws InvalidResourceException
     {
-        if (args.size() < 3)
-        {
-            throw new InvalidResourceException("Too few arguments supplied");
-        }
+        assureSize(3, args);
 
         blockId = readBlockId(args.get(0));
         blockData = readBlockData(args.get(0));
