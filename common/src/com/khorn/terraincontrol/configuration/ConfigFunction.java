@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.StringHelper;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public abstract class ConfigFunction<T>
         try
         {
             configFunction.load(stringArgs);
-        } catch (InvalidResourceException e)
+        } catch (InvalidConfigException e)
         {
             TerrainControl.log("Invalid default config function! Please report! " + clazz.getName() + ": " + e.getMessage());
             e.printStackTrace();
@@ -74,9 +74,9 @@ public abstract class ConfigFunction<T>
      * @param args List of args.
      * @return Returns false if one of the arguments contains an error,
      *         otherwise true.
-     * @throws InvalidResourceException If the resoure is invalid.
+     * @throws InvalidConfigException If the resoure is invalid.
      */
-    public abstract void load(List<String> args) throws InvalidResourceException;
+    public abstract void load(List<String> args) throws InvalidConfigException;
 
     /**
      * Gets a String representation, like Tree(10,BigTree,50,Tree,100)
@@ -93,9 +93,9 @@ public abstract class ConfigFunction<T>
      * @param minValue
      * @param maxValue
      * @return
-     * @throws InvalidResourceException If the number is invalid.
+     * @throws InvalidConfigException If the number is invalid.
      */
-    protected int readInt(String string, int minValue, int maxValue) throws InvalidResourceException
+    protected int readInt(String string, int minValue, int maxValue) throws InvalidConfigException
     {
         return StringHelper.readInt(string, minValue, maxValue);
     }
@@ -106,7 +106,7 @@ public abstract class ConfigFunction<T>
      * @param string
      * @return
      */
-    protected int readBlockId(String string) throws InvalidResourceException
+    protected int readBlockId(String string) throws InvalidConfigException
     {
         return StringHelper.readBlockId(string);
     }
@@ -116,18 +116,18 @@ public abstract class ConfigFunction<T>
      *
      * @param string
      * @return
-     * @throws InvalidResourceException
+     * @throws InvalidConfigException
      */
-    protected int readBlockData(String string) throws InvalidResourceException
+    protected int readBlockData(String string) throws InvalidConfigException
     {
         return StringHelper.readBlockData(string);
     }
 
-    protected void assureSize(int size, List<String> args) throws InvalidResourceException
+    protected void assureSize(int size, List<String> args) throws InvalidConfigException
     {
         if (args.size() < size)
         {
-            throw new InvalidResourceException("Too few arguments supplied");
+            throw new InvalidConfigException("Too few arguments supplied");
         }
     }
 

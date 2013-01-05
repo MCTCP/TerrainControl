@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.generator.resourcegens;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.StringHelper;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class CustomObjectGen extends Resource
     private List<String> objectNames;
 
     @Override
-    public void load(List<String> args) throws InvalidResourceException
+    public void load(List<String> args) throws InvalidConfigException
     {
         if (args.size() == 0 || (args.size() == 1 && args.get(0).trim().equals("")))
         {
@@ -30,7 +30,7 @@ public class CustomObjectGen extends Resource
             CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(arg, getHolder());
             if (object == null || !object.canSpawnAsObject())
             {
-                throw new InvalidResourceException("No custom object found with the name " + arg);
+                throw new InvalidConfigException("No custom object found with the name " + arg);
             }
             objects.add(object);
             objectNames.add(arg);

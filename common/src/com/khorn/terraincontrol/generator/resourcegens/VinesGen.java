@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.generator.resourcegens;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.List;
 import java.util.Random;
@@ -70,7 +70,7 @@ public class VinesGen extends Resource
     public static final int[] OPPOSITE_FACING = {1, 0, 3, 2, 5, 4};
 
     @Override
-    public void load(List<String> args) throws InvalidResourceException
+    public void load(List<String> args) throws InvalidConfigException
     {
         blockId = DefaultMaterial.VINE.id; // Hardcoded for now
 

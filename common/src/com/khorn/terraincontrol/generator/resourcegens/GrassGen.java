@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.generator.resourcegens;
 
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ public class GrassGen extends Resource
     private List<Integer> sourceBlocks;
 
     @Override
-    public void load(List<String> args) throws InvalidResourceException
+    public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(5, args);
 

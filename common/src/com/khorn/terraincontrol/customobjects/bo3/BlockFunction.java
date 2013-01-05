@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.Tag;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.BlockHelper;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class BlockFunction extends BO3Function
     public String metaDataName;
 
     @Override
-    public void load(List<String> args) throws InvalidResourceException
+    public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(4, args);
         x = readInt(args.get(0), -100, 100);

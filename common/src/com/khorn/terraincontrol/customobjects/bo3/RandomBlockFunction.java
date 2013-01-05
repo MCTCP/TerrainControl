@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.util.BlockHelper;
 
 import com.khorn.terraincontrol.configuration.Tag;
 
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class RandomBlockFunction extends BlockFunction
     public List<Tag> metaDataTags = new ArrayList<Tag>();
 
     @Override
-    public void load(List<String> args) throws InvalidResourceException
+    public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(5, args);
         x = readInt(args.get(0), -100, 100);
@@ -48,7 +48,7 @@ public class RandomBlockFunction extends BlockFunction
                 // metadata
                 metaDataNames.add("");
                 metaDataTags.add(null);
-            } catch (InvalidResourceException e)
+            } catch (InvalidConfigException e)
             {
                 // Maybe it's a NBT file?
 

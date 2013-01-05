@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +95,7 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
         try
         {
             resource.load(stringArgs);
-        } catch (InvalidResourceException e)
+        } catch (InvalidConfigException e)
         {
             TerrainControl.log("Invalid default resource! Please report! " + clazz.getName() + ": " + e.getMessage());
             e.printStackTrace();

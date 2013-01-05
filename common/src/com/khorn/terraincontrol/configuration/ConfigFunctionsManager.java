@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resourcegens.*;
 
 import java.util.HashMap;
@@ -105,7 +105,7 @@ public class ConfigFunctionsManager
         try
         {
             configFunction.load(args);
-        } catch (InvalidResourceException e)
+        } catch (InvalidConfigException e)
         {
             TerrainControl.log("Invalid resource " + name + " in " + locationOfResource + ": " + e.getMessage());
             return null;

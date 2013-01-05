@@ -5,7 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
     }
 
     @Override
-    public void load(List<String> args) throws InvalidResourceException
+    public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(3, args);
 
@@ -46,11 +46,11 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
             CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(i), getHolder());
             if (object == null)
             {
-                throw new InvalidResourceException("Custom object " + args.get(i) + " not found!");
+                throw new InvalidConfigException("Custom object " + args.get(i) + " not found!");
             }
             if (!object.canSpawnAsTree())
             {
-                throw new InvalidResourceException("Custom object " + args.get(i) + " is not a tree!");
+                throw new InvalidConfigException("Custom object " + args.get(i) + " is not a tree!");
             }
             trees.add(object);
             treeNames.add(args.get(i));

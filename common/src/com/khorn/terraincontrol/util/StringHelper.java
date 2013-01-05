@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.util;
 
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,9 +40,9 @@ public abstract class StringHelper
      * @param minValue  The minimum value, inclusive.
      * @param maxValue  The maximum value, inclusive.
      * @return          The number in the String, capped at the minValue and maxValue.
-     * @throws InvalidResourceException If the number is invalid.
+     * @throws InvalidConfigException If the number is invalid.
      */
-    public static int readInt(String string, int minValue, int maxValue) throws InvalidResourceException
+    public static int readInt(String string, int minValue, int maxValue) throws InvalidConfigException
     {
         try
         {
@@ -58,7 +58,7 @@ public abstract class StringHelper
             return number;
         } catch (NumberFormatException e)
         {
-            throw new InvalidResourceException("Incorrect number: " + string);
+            throw new InvalidConfigException("Incorrect number: " + string);
         }
     }
 
@@ -68,7 +68,7 @@ public abstract class StringHelper
      * @param string
      * @return
      */
-    public static int readBlockId(String string) throws InvalidResourceException
+    public static int readBlockId(String string) throws InvalidConfigException
     {
         if(string.contains("SPONGE")) TerrainControl.log("parsing. " + string);
         // Parse . (Deprecated)
@@ -100,9 +100,9 @@ public abstract class StringHelper
      *
      * @param string    The String to parse, in the format name/id[:data/.data]
      * @return The block data.
-     * @throws InvalidResourceException If the input is invalid.
+     * @throws InvalidConfigException If the input is invalid.
      */
-    public static int readBlockData(String string) throws InvalidResourceException
+    public static int readBlockData(String string) throws InvalidConfigException
     {
         if (string.indexOf(':') != -1)
         {

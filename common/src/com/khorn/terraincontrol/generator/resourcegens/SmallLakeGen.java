@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.generator.resourcegens;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.List;
 import java.util.Random;
@@ -115,7 +115,7 @@ public class SmallLakeGen extends Resource
     }
 
     @Override
-    public void load(List<String> args) throws InvalidResourceException
+    public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(5, args);
         blockId = readBlockId(args.get(0));

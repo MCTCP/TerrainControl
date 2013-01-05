@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class LightCheck extends BO3Check
     }
 
     @Override
-    public void load(List<String> args) throws InvalidResourceException
+    public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(5, args);
         x = readInt(args.get(0), -100, 100);
