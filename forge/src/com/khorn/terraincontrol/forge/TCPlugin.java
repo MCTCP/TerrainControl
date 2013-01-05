@@ -1,12 +1,13 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.util.StringHelper;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.events.EventPriority;
-import com.khorn.terraincontrol.util.Txt;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
@@ -115,7 +116,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public void log(Level level, String... messages)
     {
-        FMLCommonHandler.instance().getFMLLogger().log(level, "[TerrainControl] " + Txt.implode(messages, ","));
+        FMLCommonHandler.instance().getFMLLogger().log(level, "TerrainControl: " + StringHelper.join(messages, ","));
     }
 
     @Override

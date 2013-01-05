@@ -7,7 +7,7 @@ import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
-import com.khorn.terraincontrol.util.Txt;
+import com.khorn.terraincontrol.util.StringHelper;
 import net.minecraft.server.v1_4_6.BiomeBase;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -169,7 +169,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     @Override
     public void log(Level level, String... msg)
     {
-        Logger.getLogger("Minecraft").log(level, "[TerrainControl] " + Txt.implode(msg, " "));
+        Logger.getLogger("Minecraft").log(level, "[TerrainControl] " + StringHelper.join(msg, " "));
     }
 
     @Override

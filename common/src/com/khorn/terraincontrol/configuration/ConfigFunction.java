@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidResourceException;
+import com.khorn.terraincontrol.util.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,22 +97,7 @@ public abstract class ConfigFunction<T>
      */
     protected int readInt(String string, int minValue, int maxValue) throws InvalidResourceException
     {
-        try
-        {
-            int number = Integer.parseInt(string);
-            if (number < minValue)
-            {
-                return minValue;
-            }
-            if (number > maxValue)
-            {
-                return maxValue;
-            }
-            return number;
-        } catch (NumberFormatException e)
-        {
-            throw new InvalidResourceException("Incorrect number: " + string);
-        }
+        return StringHelper.readInt(string, minValue, maxValue);
     }
 
     /**
@@ -123,19 +108,7 @@ public abstract class ConfigFunction<T>
      */
     protected int readBlockId(String string) throws InvalidResourceException
     {
-        if (string.indexOf('.') != -1)
-        {
-            // Ignore block data
-            string = string.split("\\.")[0];
-        }
-
-        DefaultMaterial material = DefaultMaterial.getMaterial(string);
-        if (material != null)
-        {
-            return material.id;
-        }
-
-        return readInt(string, 0, TerrainControl.supportedBlockIds);
+        return StringHelper.readBlockId(string);
     }
 
     /**
@@ -147,15 +120,7 @@ public abstract class ConfigFunction<T>
      */
     protected int readBlockData(String string) throws InvalidResourceException
     {
-        if (string.indexOf('.') == -1)
-        {
-            // No block data
-            return 0;
-        }
-
-        // Get block data
-        string = string.split("\\.")[1];
-        return readInt(string, 0, 16);
+        return StringHelper.readBlockData(string);
     }
 
     protected void assureSize(int size, List<String> args) throws InvalidResourceException
@@ -175,20 +140,7 @@ public abstract class ConfigFunction<T>
      */
     protected String makeMaterial(int id, int data)
     {
-        String materialString = "" + id;
-        DefaultMaterial material = DefaultMaterial.getMaterial(id);
-        if (material != DefaultMaterial.UNKNOWN_BLOCK)
-        {
-            // No name, return number as String
-            materialString = material.toString();
-        }
-
-        if (data > 0)
-        {
-            materialString = materialString + "." + data;
-        }
-
-        return materialString;
+        return StringHelper.makeMaterial(id, data);
     }
 
     /**
@@ -199,7 +151,7 @@ public abstract class ConfigFunction<T>
      */
     protected String makeMaterial(int id)
     {
-        return makeMaterial(id, 0);
+        return StringHelper.makeMaterial(id);
     }
 
     /**

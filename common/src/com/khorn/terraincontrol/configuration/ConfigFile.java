@@ -39,18 +39,22 @@ public abstract class ConfigFile
                     } else if (thisLine.startsWith("#") || thisLine.startsWith("<"))
                     {
                         // Comment, ignore
-                    } else if (thisLine.contains(":"))
+                    } else if (thisLine.contains(":") || thisLine.toLowerCase().contains("("))
                     {
-                        // Setting, split and add it
-                        String[] splitSettings = thisLine.split(":", 2);
-                        this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
-                    } else if (thisLine.toLowerCase().contains("("))
-                    {
-                        // Resource, add it
-                        this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
+                        // Setting or resource
+                        if(thisLine.contains("(") && (!thisLine.contains(":") || thisLine.indexOf('(') < thisLine.indexOf(":")) )
+                        {
+                            // ( is first, so it's a resource
+                            this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
+                        } else
+                        {
+                            // : is first, so it's a setting
+                            String[] splitSettings = thisLine.split(":", 2);
+                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
+                        }
                     } else if (thisLine.contains("="))
                     {
-                        // Setting, split it and add it
+                        // Setting (old style), split it and add it
                         String[] splitSettings = thisLine.split("=", 2);
                         this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                     } else
