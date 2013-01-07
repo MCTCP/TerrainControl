@@ -17,6 +17,8 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
 {
     protected int blockId = -1;
     protected int blockData = -1;
+    protected int frequency;
+    protected int rarity;
 
     @Override
     public Class<WorldConfig> getHolderType()
@@ -26,6 +28,9 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
 
     /**
      * Spawns the resource at this position, ignoring rarity and frequency.
+     * <p/>
+     * If you want chunk-control over the resource, override spawnInChunk
+     * instead, and leave this method blank.
      *
      * @param world          The world.
      * @param villageInChunk Whether there is a village in the chunk.
@@ -37,14 +42,15 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
     /**
      * Spawns the resource normally. Can be cancelled by an event.
      * <p/>
-     * When you override this, don't forget to call the event!
+     * If you want to override this, override spawnInChunk instead.
      *
      * @param world          The world.
+     * @param random         The random number generator.
      * @param villageInChunk Whether there is a village in the chunk.
      * @param chunkX         The chunk x.
      * @param chunkZ         The chunk z.
      */
-    public void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    public final void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         // Fire event
         if (!TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkX, chunkZ))
@@ -52,7 +58,21 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
             return;
         }
 
-        // Process
+        // Spawn
+        spawnInChunk(world, random, villageInChunk, chunkX, chunkZ);
+    }
+    
+    /**
+     * Called once per chunk, instead of once per attempt.
+     * 
+     * @param world          The world.
+     * @param random         The random number generator.
+     * @param villageInChunk Whether there is a village in the chunk.
+     * @param chunkX         The chunk x.
+     * @param chunkZ         The chunk z.
+     */
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    {
         for (int t = 0; t < frequency; t++)
         {
             if (random.nextInt(100) > rarity)

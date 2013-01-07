@@ -16,15 +16,8 @@ public class TreeGen extends Resource
     private List<Integer> treeChances;
 
     @Override
-    public void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
-        // Fire event
-        if (!TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkX, chunkZ))
-        {
-            return;
-        }
-
-        // Process
         for (int i = 0; i < frequency; i++)
         {
             for (int treeNumber = 0; treeNumber < trees.size(); treeNumber++)

@@ -9,8 +9,6 @@ import java.util.List;
 
 public abstract class ConfigFunction<T>
 {
-    protected int frequency;
-    protected int rarity;
     private T holder;
 
     @SuppressWarnings("unchecked")
@@ -87,7 +85,6 @@ public abstract class ConfigFunction<T>
 
     /**
      * Parses the string and returns a number between minValue and maxValue.
-     * Returns Resource.INCORRECT_NUMBER if the string is not a number.
      *
      * @param string
      * @param minValue
@@ -99,6 +96,20 @@ public abstract class ConfigFunction<T>
     {
         return StringHelper.readInt(string, minValue, maxValue);
     }
+    
+    /**
+     * Parses the string and returns a number between minValue and maxValue.
+     *
+     * @param string   The string to parse.
+     * @param minValue The minimum value.
+     * @param maxValue The maximum value.
+     * @return A double between min and max.
+     * @throws InvalidConfigException If the number is invalid.
+     */
+    protected double readDouble(String string, double minValue, double maxValue) throws InvalidConfigException
+    {
+        return StringHelper.readDouble(string, minValue, maxValue);
+    }
 
     /**
      * Returns the block id with the given name.
@@ -109,6 +120,26 @@ public abstract class ConfigFunction<T>
     protected int readBlockId(String string) throws InvalidConfigException
     {
         return StringHelper.readBlockId(string);
+    }
+    
+    /**
+     * Reads all block ids from the start position until the end of the list.
+     * 
+     * @param strings The input strings.
+     * @param start   The position to start. The first element in the list
+     *                has index 0, the last one size() - 1.
+     * @return All block ids.
+     * @throws InvalidConfigException If one of the elements in the list is not a valid block id.
+     */
+    protected List<Integer> readBlockIds(List<String> strings, int start) throws InvalidConfigException
+    {
+        List<Integer> blockIds = new ArrayList<Integer>();
+        for(int i = start; i < strings.size(); i++)
+        {
+            blockIds.add(StringHelper.readBlockId(strings.get(i)));
+        }
+        
+        return blockIds;
     }
 
     /**

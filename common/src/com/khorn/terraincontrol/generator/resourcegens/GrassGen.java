@@ -35,7 +35,7 @@ public class GrassGen extends Resource
     }
 
     @Override
-    public void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         for (int t = 0; t < frequency; t++)
         {

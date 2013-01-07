@@ -32,6 +32,7 @@ public class ConfigFunctionsManager
         registerConfigFunction("Tree", TreeGen.class);
         registerConfigFunction("UndergroundLake", UndergroundLakeGen.class);
         registerConfigFunction("UnderWaterOre", UnderWaterOreGen.class);
+        registerConfigFunction("Vein", VeinGen.class);
         registerConfigFunction("Vines", VinesGen.class);
     }
 
