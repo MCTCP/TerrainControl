@@ -480,7 +480,8 @@ public abstract class ConfigFile
     {
         if (!this.WriteComments)
             return;
-        this.settingsWriter.write("# " + comment);
+        if(comment.length() > 0)
+            this.settingsWriter.write("# " + comment);
         this.settingsWriter.newLine();
     }
 

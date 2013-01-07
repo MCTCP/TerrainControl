@@ -306,7 +306,7 @@ public enum TCDefaultValues implements TCSetting
     private float fValue;
     private String sValue;
     private boolean bValue;
-    private Enum eValue;
+    private Enum<?> eValue;
     private SettingsType returnType;
     private ArrayList<String> sArrayValue;
 
