@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.generator.resourcegens.SaplingType;
+
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
 import org.bukkit.Bukkit;
@@ -50,24 +52,30 @@ public class TCListener implements Listener
         switch (event.getSpecies())
         {
             case REDWOOD:
-                sapling = biomeConfig.SaplingTypes[1];
+            case TALL_REDWOOD: // Both share the same sapling
+                sapling = biomeConfig.getSaplingGen(SaplingType.Redwood);
                 break;
             case BIRCH:
-                sapling = biomeConfig.SaplingTypes[2];
+                sapling = biomeConfig.getSaplingGen(SaplingType.Birch);
                 break;
             case JUNGLE:
+                sapling = biomeConfig.getSaplingGen(SaplingType.BigJungle);
+                break;
             case SMALL_JUNGLE:
-            case JUNGLE_BUSH:
-                sapling = biomeConfig.SaplingTypes[3];
+                sapling = biomeConfig.getSaplingGen(SaplingType.SmallJungle);
+                break;
+            case TREE:
+            case BIG_TREE: // Both share the same sapling
+                sapling = biomeConfig.getSaplingGen(SaplingType.Oak);
+                break;
+            case RED_MUSHROOM:
+                sapling = biomeConfig.getSaplingGen(SaplingType.RedMushroom);
+                break;
+            case BROWN_MUSHROOM:
+                sapling = biomeConfig.getSaplingGen(SaplingType.BrownMushroom);
                 break;
             default:
-                sapling = biomeConfig.SaplingTypes[0];
-                break;
-        }
-
-        if (sapling == null)
-        {
-            sapling = biomeConfig.SaplingResource;
+                sapling = null;
         }
 
         if (sapling != null)

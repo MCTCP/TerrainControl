@@ -16,7 +16,7 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
     public List<CustomObject> trees;
     public List<String> treeNames;
     public List<Integer> treeChances;
-    public int saplingType;
+    public SaplingType saplingType;
 
     @Override
     public Class<WorldConfig> getHolderType()
@@ -29,12 +29,10 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
     {
         assureSize(3, args);
 
-        if (args.get(0).equalsIgnoreCase("All"))
+        saplingType = SaplingType.get(args.get(0));
+        if (saplingType == null)
         {
-            saplingType = -1;
-        } else
-        {
-            saplingType = readInt(args.get(0), -1, 3);
+            throw new InvalidConfigException("Unknown sapling type " + args.get(0));
         }
 
         trees = new ArrayList<CustomObject>();
@@ -62,10 +60,7 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
     public String makeString()
     {
         String output = "Sapling(" + saplingType;
-        if (saplingType == -1)
-        {
-            output = "Sapling(All";
-        }
+
         for (int i = 0; i < treeNames.size(); i++)
         {
             output += "," + treeNames.get(i) + "," + treeChances.get(i);

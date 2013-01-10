@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.util.StringHelper;
+
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalBiome;
@@ -61,8 +63,8 @@ public class BiomeConfig extends ConfigFile
     public boolean FoliageColorIsMultiplier;
 
     public Resource[] ResourceSequence = new Resource[256];
-    public SaplingGen[] SaplingTypes = new SaplingGen[4];
-    public SaplingGen SaplingResource = null;
+    private SaplingGen[] saplingTypes = new SaplingGen[20];
+    private SaplingGen saplingResource = null;
 
     public ArrayList<CustomObject> biomeObjects;
     public ArrayList<String> biomeObjectStrings;
@@ -155,6 +157,16 @@ public class BiomeConfig extends ConfigFile
     public int getWetness()
     {
         return (int) (this.BiomeWetness * 65536.0F);
+    }
+    
+    public SaplingGen getSaplingGen(SaplingType type)
+    {
+        SaplingGen gen = this.saplingTypes[type.getSaplingId()];
+        if(gen == null && type.growsTree())
+        {
+            gen = this.saplingResource;
+        }
+        return gen;
     }
 
     private void CreateDefaultResources()
@@ -519,10 +531,10 @@ public class BiomeConfig extends ConfigFile
                     if (res instanceof SaplingGen)
                     {
                         SaplingGen sapling = (SaplingGen) res;
-                        if (sapling.saplingType == -1)
-                            this.SaplingResource = sapling;
+                        if (sapling.saplingType == SaplingType.All)
+                            this.saplingResource = sapling;
                         else
-                            this.SaplingTypes[sapling.saplingType] = sapling;
+                            this.saplingTypes[sapling.saplingType.getSaplingId()] = sapling;
 
                     } else if (res instanceof Resource)
                     {
@@ -798,7 +810,17 @@ public class BiomeConfig extends ConfigFile
 
         this.writeNewLine();
         this.writeBigTitle("Sapling resource");
-        this.writeComment("Work like Tree resource instead first parameter.");
+        this.writeComment("Terrain Control allows you to grow your custom objects from saplings, instead");
+        this.writeComment("of the vanilla trees. Add one or more Sapling functions here to override vanilla");
+        this.writeComment("spawning for that sapling.");
+        this.writeComment("");
+        this.writeComment("The syntax is: Sapling(SaplingType,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
+        this.writeComment("Works like Tree resource instead first parameter.");
+        this.writeComment("");
+        this.writeComment("Sapling types: " + StringHelper.join(SaplingType.values(), ", "));
+        this.writeComment("All - will make the tree spawn from all saplings, but not from mushrooms.");
+        this.writeComment("BigJungle - for when 4 jungle saplings grow at once.");
+        this.writeComment("RedMushroom/BrownMushroom - will only grow when bonemeal is used.");
         this.WriteSaplingSettings();
 
         this.writeBigTitle("Custom objects");
@@ -983,10 +1005,10 @@ public class BiomeConfig extends ConfigFile
 
     private void WriteSaplingSettings() throws IOException
     {
-        if (this.SaplingResource != null)
-            this.writeValue(SaplingResource.makeString());
+        if (this.saplingResource != null)
+            this.writeValue(saplingResource.makeString());
 
-        for (SaplingGen res : this.SaplingTypes)
+        for (SaplingGen res : this.saplingTypes)
             if (res != null)
                 this.writeValue(res.makeString());
 

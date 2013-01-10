@@ -83,7 +83,9 @@ public class TCPlugin implements TerrainControlEngine
         GameRegistry.registerPlayerTracker(new PlayerTracker(this));
 
         // Register sapling tracker, for custom tree growth.
-        MinecraftForge.TERRAIN_GEN_BUS.register(new SaplingListener());
+        SaplingListener saplingListener = new SaplingListener();
+        MinecraftForge.TERRAIN_GEN_BUS.register(saplingListener);
+        MinecraftForge.EVENT_BUS.register(saplingListener);
 
         // Register to our own events, so that they can be fired again as Forge
         // events.

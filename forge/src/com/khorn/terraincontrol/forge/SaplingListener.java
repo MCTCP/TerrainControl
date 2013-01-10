@@ -5,70 +5,200 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
+import com.khorn.terraincontrol.generator.resourcegens.SaplingType;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockSapling;
 import net.minecraft.world.World;
 import net.minecraftforge.event.Event.Result;
 import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
+
+import java.util.Random;
 
 public class SaplingListener
 {
     @ForgeSubscribe
     public void onSaplingGrow(SaplingGrowTreeEvent event)
     {
-        // Get the Terrain Control world
+        int x = event.x;
+        int y = event.y;
+        int z = event.z;
         World world = event.world;
-        LocalWorld worldTC = WorldHelper.toLocalWorld(event.world);
-        if (worldTC == null)
+        LocalWorld localWorld = WorldHelper.toLocalWorld(world);
+
+        if (localWorld == null)
         {
-            // World not managed by TerrainControl
+            // World not managed by Terrain Control
             return;
         }
 
-        // Get the BiomeConfig
-        BiomeConfig biomeConfig = worldTC.getSettings().biomeConfigs[worldTC.getBiomeId(event.x, event.z)];
+        int blockId = world.getBlockId(x, y, z);
+        BlockSapling saplingBlock = (BlockSapling) Block.sapling;
 
-        // Get the sapling data
-        int saplingId = world.getBlockId(event.x, event.y, event.z);
-        int saplingData = world.getBlockMetadata(event.x, event.y, event.z) & 3;
-
-        // Check if it's a vanilla sapling
-        if (saplingId != DefaultMaterial.SAPLING.id)
+        if (blockId != saplingBlock.blockID)
         {
-            // Maybe support for modded saplings in the future?
+            // Only vanilla saplings
             return;
         }
 
-        // Get the sapling
-        SaplingGen saplingGen = biomeConfig.SaplingTypes[saplingData];
-        if (saplingGen == null)
-        {
-            // Try the non-specific SaplingResource
-            saplingGen = biomeConfig.SaplingResource;
-        }
+        int blockData = world.getBlockMetadata(x, y, z) & 3;
 
-        // Grow tree
-        if (saplingGen != null)
-        {
-            // Remove sapling
-            worldTC.setBlock(event.x, event.y, event.z, DefaultMaterial.AIR.id, 0);
+        SaplingType treeToGrow = null;
 
-            boolean success = false;
-            for (int i = 0; i < 10; i++)
+        boolean hugeJungleTreeHasGrown = false;
+        int jungleOffsetX = 0;
+        int jungleOffsetZ = 0;
+
+        // Get the sapling type
+        if (blockData == 1)
+        {
+            // Redwood trees
+            treeToGrow = SaplingType.Redwood;
+        } else if (blockData == 2)
+        {
+            // Birch trees
+            treeToGrow = SaplingType.Birch;
+        } else if (blockData == 3)
+        {
+            // Jungle trees
+            for (jungleOffsetX = 0; jungleOffsetX >= -1; --jungleOffsetX)
             {
-                if (saplingGen.growSapling(worldTC, event.rand, event.x, event.y, event.z))
+                for (jungleOffsetZ = 0; jungleOffsetZ >= -1; --jungleOffsetZ)
                 {
-                    success = true;
+                    if (saplingBlock.isSameSapling(world, x + jungleOffsetX, y, z + jungleOffsetZ, 3) && saplingBlock.isSameSapling(world, x + jungleOffsetX + 1, y, z + jungleOffsetZ, 3) && saplingBlock.isSameSapling(world, x + jungleOffsetX, y, z + jungleOffsetZ + 1, 3) && saplingBlock.isSameSapling(world, x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, 3))
+                    {
+                        treeToGrow = SaplingType.BigJungle;
+                        hugeJungleTreeHasGrown = true;
+                        break;
+                    }
+                }
+
+                if (treeToGrow != null)
+                {
                     break;
                 }
             }
-            if (!success)
-            {
-                // Restore sapling
-                worldTC.setBlock(event.x, event.y, event.z, DefaultMaterial.SAPLING.id, saplingData);
-            }
 
-            // Cancel event (we have grown a tree by ourselves)
-            event.setResult(Result.DENY);
+            if (treeToGrow == null)
+            {
+                jungleOffsetZ = 0;
+                jungleOffsetX = 0;
+                treeToGrow = SaplingType.SmallJungle;
+            }
+        } else
+        {
+            // Normal trees
+            treeToGrow = SaplingType.Oak;
         }
+
+        // Get the sapling generator
+        SaplingGen saplingGen = this.getSaplingGen(localWorld, treeToGrow, x, z);
+        if (saplingGen == null)
+        {
+            // No sapling generator set for this sapling
+            return;
+        }
+
+        // When we have reached this point, we know that we have to handle the
+        // event ourselves
+        // So cancel it
+        event.setResult(Result.DENY);
+
+        // Remove saplings
+        if (hugeJungleTreeHasGrown)
+        {
+            world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ, 0);
+            world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ, 0);
+            world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ + 1, 0);
+            world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, 0);
+        } else
+        {
+            world.setBlock(x, y, z, 0);
+        }
+
+        // Try ten times to grow sapling
+        boolean saplingGrown = false;
+        for (int i = 0; i < 10; i++)
+        {
+            if (saplingGen.growSapling(localWorld, new Random(), x + jungleOffsetX, y, z + jungleOffsetZ))
+            {
+                saplingGrown = true;
+                break;
+            }
+        }
+
+        if (!saplingGrown)
+        {
+            // Restore sapling
+            if (hugeJungleTreeHasGrown)
+            {
+                world.setBlockAndMetadata(x + jungleOffsetX, y, z + jungleOffsetZ, blockId, blockData);
+                world.setBlockAndMetadata(x + jungleOffsetX + 1, y, z + jungleOffsetZ, blockId, blockData);
+                world.setBlockAndMetadata(x + jungleOffsetX, y, z + jungleOffsetZ + 1, blockId, blockData);
+                world.setBlockAndMetadata(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, blockId, blockData);
+            } else
+            {
+                world.setBlockAndMetadata(x, y, z, blockId, blockData);
+            }
+        }
+
+    }
+
+    @ForgeSubscribe
+    public void onBonemealUse(BonemealEvent event)
+    {
+        LocalWorld localWorld = WorldHelper.toLocalWorld(event.world);
+        if (localWorld == null)
+        {
+            // World not managerd by Terrain Control
+            return;
+        }
+
+        // Get sapling gen
+        SaplingGen gen = null;
+        if (event.ID == Block.mushroomRed.blockID)
+        {
+            gen = getSaplingGen(localWorld, SaplingType.RedMushroom, event.X, event.Z);
+        } else if (event.ID == Block.mushroomBrown.blockID)
+        {
+            gen = getSaplingGen(localWorld, SaplingType.BrownMushroom, event.X, event.Z);
+        }
+        if (gen == null)
+        {
+            // No sapling gen specified for this type
+            return;
+        }
+
+        // Generate mushroom
+        event.setResult(Result.ALLOW);
+        event.world.setBlock(event.X, event.Y, event.Z, DefaultMaterial.AIR.id);
+
+        boolean mushroomGrown = false;
+        Random random = new Random();
+        for (int i = 0; i < 10; i++)
+        {
+            if (gen.growSapling(localWorld, random, event.X, event.Y, event.Z))
+            {
+                mushroomGrown = true;
+                break;
+            }
+        }
+        if (!mushroomGrown)
+        {
+            // Restore mushroom
+            event.world.setBlock(event.X, event.Y, event.Z, event.ID);
+        }
+    }
+
+    // Can return null
+    public SaplingGen getSaplingGen(LocalWorld world, SaplingType type, int x, int z)
+    {
+        BiomeConfig biomeConfig = world.getSettings().biomeConfigs[world.getBiomeId(x, z)];
+        if (biomeConfig == null)
+        {
+            return null;
+        }
+        return biomeConfig.getSaplingGen(type);
     }
 }
