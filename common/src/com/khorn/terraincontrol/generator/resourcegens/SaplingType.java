@@ -74,7 +74,7 @@ public enum SaplingType
         if(id < 0 || id >= lookupList.length)
         {
             // Should never happen, unless someone uses a wrong id in the Sapling function
-            return SaplingType.Oak;
+            return null;
         }
         return lookupList[id];
     }

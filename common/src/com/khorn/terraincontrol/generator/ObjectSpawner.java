@@ -30,7 +30,7 @@ public class ObjectSpawner
         int z = chunkZ * 16;
 
         // Get the BiomeConfig of the other corner
-        int biomeId = world.getCalculatedBiomeId(x + 16, z + 16);
+        int biomeId = world.getBiomeId(x + 16, z + 16);
         BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
         // Get the random generator
@@ -83,7 +83,7 @@ public class ObjectSpawner
             {
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
-                BiomeConfig biomeConfig = worldSettings.biomeConfigs[world.getCalculatedBiomeId(blockToFreezeX, blockToFreezeZ)];
+                BiomeConfig biomeConfig = worldSettings.biomeConfigs[world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
                 if (biomeConfig.BiomeTemperature < TCDefaultValues.snowAndIceMaxTemp.floatValue())
                 {
                     int blockToFreezeY = world.getHighestBlockYAt(blockToFreezeX, blockToFreezeZ);
