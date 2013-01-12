@@ -80,7 +80,9 @@ public class ListCommand extends BaseCommand
         List<String> pluginList = new ArrayList<String>();
         for (CustomObject object : globalObjects)
         {
-            pluginList.add(ValueColor + object.getName());
+            if(object.canSpawnAsObject()) {
+                pluginList.add(ValueColor + object.getName());
+            }
         }
 
         this.ListMessage(sender, pluginList, page, "Global bo2 objects");
