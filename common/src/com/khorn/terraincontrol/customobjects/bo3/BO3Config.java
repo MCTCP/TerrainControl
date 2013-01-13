@@ -243,7 +243,7 @@ public class BO3Config extends ConfigFile
         frequency = applyBounds(frequency, 1, 200);
         rarity = applyBounds(rarity, 0.000001, 100.0);
         minHeight = applyBounds(minHeight, TerrainControl.worldDepth, TerrainControl.worldHeight - 1);
-        maxHeight = applyBounds(maxHeight, minHeight + 1, TerrainControl.worldHeight);
+        maxHeight = applyBounds(maxHeight, minHeight, TerrainControl.worldHeight);
         sourceBlock = applyBounds(sourceBlock, 0, TerrainControl.supportedBlockIds);
         maxPercentageOutsideSourceBlock = applyBounds(maxPercentageOutsideSourceBlock, 0, 100);
     }

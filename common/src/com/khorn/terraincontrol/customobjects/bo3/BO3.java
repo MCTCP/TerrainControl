@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import com.khorn.terraincontrol.util.MathHelper;
+
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -137,7 +139,7 @@ public class BO3 implements CustomObject
     {
         if (settings.spawnHeight == SpawnHeight.randomY)
         {
-            return spawn(world, random, x, settings.minHeight + random.nextInt(settings.maxHeight), z);
+            return spawn(world, random, x, MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight), z);
         }
         if (settings.spawnHeight == SpawnHeight.highestBlock)
         {
