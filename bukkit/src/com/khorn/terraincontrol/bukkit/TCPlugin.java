@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -43,8 +45,6 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
         // Start the engine
         TerrainControl.startEngine(this);
-
-        TCWorldChunkManagerOld.GenBiomeDiagram();
 
         this.commandExecutor = new TCCommandExecutor(this);
 
@@ -129,11 +129,10 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             this.NotInitedWorlds.put(worldName, bukkitWorld);
         }
 
-        TerrainControl.log("settings for '" + worldName + "' loaded");
         return worldConfig;
     }
 
-    public void WorldInit(World world)
+    public void onWorldInit(World world)
     {
         if (this.NotInitedWorlds.containsKey(world.getName()))
         {
@@ -143,26 +142,20 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
 
             bukkitWorld.Init(workWorld);
 
-            switch (bukkitWorld.getSettings().ModeBiome)
+            Class<? extends BiomeGenerator> biomeModeClass = bukkitWorld.getSettings().biomeMode;
+            if (biomeModeClass != TerrainControl.getBiomeModeManager().VANILLA)
             {
-                case FromImage:
-                case Normal:
-                    TCWorldChunkManager manager = new TCWorldChunkManager(bukkitWorld);
-                    workWorld.worldProvider.d = manager;
-                    bukkitWorld.setBiomeManager(manager);
-                    break;
-                case OldGenerator:
-                    TCWorldChunkManagerOld managerOld = new TCWorldChunkManagerOld(bukkitWorld);
-                    workWorld.worldProvider.d = managerOld;
-                    bukkitWorld.setOldBiomeManager(managerOld);
-                    break;
-                case Default:
-                    break;
+                TCWorldChunkManager worldChunkManager = new TCWorldChunkManager(bukkitWorld);
+                workWorld.worldProvider.d = worldChunkManager;
+
+                BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeModeClass, bukkitWorld, new BiomeCacheWrapper(worldChunkManager));
+                worldChunkManager.setBiomeManager(biomeManager);
+                bukkitWorld.setBiomeManager(biomeManager);
             }
 
             this.worlds.put(workWorld.getDataManager().getUUID(), bukkitWorld);
 
-            TerrainControl.log("world initialized with seed is " + workWorld.getSeed());
+            TerrainControl.log("World initialized; seed is " + workWorld.getSeed());
         }
     }
 

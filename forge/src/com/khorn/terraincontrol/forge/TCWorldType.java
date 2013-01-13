@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
+
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -21,6 +24,7 @@ public class TCWorldType extends WorldType
         this.plugin = plugin;
     }
 
+    // Actually: getBiomeManager
     @Override
     public WorldChunkManager getChunkManager(World world)
     {
@@ -56,20 +60,17 @@ public class TCWorldType extends WorldType
 
         WorldChunkManager chunkManager = null;
 
-        switch (this.worldTC.getSettings().ModeBiome)
+        Class<? extends BiomeGenerator> biomeManagerClass = this.worldTC.getSettings().biomeMode;
+
+        if (biomeManagerClass == TerrainControl.getBiomeModeManager().VANILLA)
         {
-            case FromImage:
-            case Normal:
-                chunkManager = new TCWorldChunkManager(this.worldTC);
-                this.worldTC.setBiomeManager((TCWorldChunkManager) chunkManager);
-                break;
-            case OldGenerator:
-                chunkManager = new TCWorldChunkManagerOld(this.worldTC);
-                this.worldTC.setOldBiomeManager((TCWorldChunkManagerOld) chunkManager);
-                break;
-            case Default:
-                chunkManager = super.getChunkManager(world);
-                break;
+            chunkManager = super.getChunkManager(world);
+        } else
+        {
+            chunkManager = new TCWorldChunkManager(this.worldTC);
+            BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeManagerClass, worldTC, new BiomeCacheWrapper(chunkManager));
+            ((TCWorldChunkManager) chunkManager).setBiomeManager(biomeManager);
+            this.worldTC.setBiomeManager(biomeManager);
         }
 
         return chunkManager;
@@ -84,7 +85,6 @@ public class TCWorldType extends WorldType
         } else
             return super.getChunkGenerator(world, generatorOptions);
     }
-
 
     @Override
     public int getMinimumSpawnHeight(World world)

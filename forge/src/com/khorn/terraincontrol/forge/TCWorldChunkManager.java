@@ -1,11 +1,9 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
+
 import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.IBiomeManager;
-import com.khorn.terraincontrol.biomelayers.layers.Layer;
-import com.khorn.terraincontrol.configuration.WorldConfig;
 import net.minecraft.world.ChunkPosition;
-import net.minecraft.world.biome.BiomeCache;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.gen.structure.MapGenVillage;
@@ -14,18 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class TCWorldChunkManager extends WorldChunkManager implements IBiomeManager
+/**
+ * Actually a biome manager.
+ *
+ */
+public class TCWorldChunkManager extends WorldChunkManager
 {
-    private Layer unZoomedLayer;
-    private Layer biomeLayer;
-
-    private final Object lockObject = new Object();
-
-    private BiomeCache cache = new BiomeCache(this);
-
+    private BiomeGenerator biomeManager;
     private ArrayList<BiomeGenBase> biomesToSpawnIn = new ArrayList<BiomeGenBase>();
 
-    private WorldConfig worldConfig;
     private SingleWorld localWorld;
 
     public TCWorldChunkManager(SingleWorld world)
@@ -37,26 +32,13 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.FOREST_HILLS.Id]);
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.JUNGLE.Id]);
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.JUNGLE_HILLS.Id]);
-
-        this.Init(world);
-
-    }
-
-    public void Init(SingleWorld world)
-    {
-        this.worldConfig = world.getSettings();
+        
         this.localWorld = world;
-
-        synchronized (this.lockObject)
-        {
-            this.cache = new BiomeCache(this);
-        }
-
-        Layer[] layers = Layer.Init(world.getSeed(), world);
-
-        this.unZoomedLayer = layers[0];
-        this.biomeLayer = layers[1];
-
+    }
+    
+    public void setBiomeManager(BiomeGenerator manager)
+    {
+        this.biomeManager = manager;
     }
 
     @SuppressWarnings("rawtypes")
@@ -69,67 +51,32 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
     @Override
     public BiomeGenBase getBiomeGenAt(int paramInt1, int paramInt2)
     {
-        synchronized (this.lockObject)
-        {
-            return this.cache.getBiomeGenAt(paramInt1, paramInt2);
-        }
+        return BiomeGenBase.biomeList[biomeManager.getBiome(paramInt1, paramInt2)];
     }
 
     // rain
     @Override
     public float[] getRainfall(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
-        if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < paramInt3 * paramInt4))
-        {
-            paramArrayOfFloat = new float[paramInt3 * paramInt4];
-        }
-
-        int[] arrayOfInt = this.biomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
-        for (int i = 0; i < paramInt3 * paramInt4; i++)
-        {
-            float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getWetness() / 65536.0F;
-            if (f1 < this.worldConfig.minMoisture)
-                f1 = this.worldConfig.minMoisture;
-            if (f1 > this.worldConfig.maxMoisture)
-                f1 = this.worldConfig.maxMoisture;
-            paramArrayOfFloat[i] = f1;
-        }
-
-        return paramArrayOfFloat;
+        return biomeManager.getRainfall(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
     }
 
     // Temperature
     @Override
     public float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
-        if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < paramInt3 * paramInt4))
-        {
-            paramArrayOfFloat = new float[paramInt3 * paramInt4];
-        }
-
-        int[] arrayOfInt = this.biomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
-        for (int i = 0; i < paramInt3 * paramInt4; i++)
-        {
-            float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getTemperature() / 65536.0F;
-            if (f1 < this.worldConfig.minTemperature)
-                f1 = this.worldConfig.minTemperature;
-            if (f1 > this.worldConfig.maxTemperature)
-                f1 = this.worldConfig.maxTemperature;
-            paramArrayOfFloat[i] = f1;
-        }
-
-        return paramArrayOfFloat;
+        return biomeManager.getTemperatures(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
     }
 
     @Override
     public BiomeGenBase[] getBiomesForGeneration(BiomeGenBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
-        if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < paramInt3 * paramInt4))
+        int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4);
+        if(paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
         {
-            paramArrayOfBiomeBase = new BiomeGenBase[paramInt3 * paramInt4];
+            paramArrayOfBiomeBase = new BiomeGenBase[arrayOfInt.length];
         }
-
-        int[] arrayOfInt = this.unZoomedLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
+        
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
             paramArrayOfBiomeBase[i] = BiomeGenBase.biomeList[arrayOfInt[i]];
@@ -141,24 +88,15 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
     @Override
     public BiomeGenBase[] getBiomeGenAt(BiomeGenBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
     {
-        if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < paramInt3 * paramInt4))
+        int[] arrayOfInt = this.biomeManager.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4);
+        if(paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
         {
-            paramArrayOfBiomeBase = new BiomeGenBase[paramInt3 * paramInt4];
+            paramArrayOfBiomeBase = new BiomeGenBase[arrayOfInt.length];
         }
-
-        if ((paramBoolean) && (paramInt3 == 16) && (paramInt4 == 16) && ((paramInt1 & 0xF) == 0) && ((paramInt2 & 0xF) == 0))
-        {
-            synchronized (this.lockObject)
-            {
-                BiomeGenBase[] localObject = this.cache.getCachedBiomes(paramInt1, paramInt2);
-                System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, paramInt3 * paramInt4);
-            }
-            return paramArrayOfBiomeBase;
-        }
-        int[] localObject = this.biomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
+        
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = BiomeGenBase.biomeList[localObject[i]];
+            paramArrayOfBiomeBase[i] = BiomeGenBase.biomeList[arrayOfInt[i]];
         }
 
         return paramArrayOfBiomeBase;
@@ -204,7 +142,7 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
 
         int n = k - i + 1;
         int i1 = m - j + 1;
-        int[] arrayOfInt = this.unZoomedLayer.Calculate(i, j, n, i1);
+        int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, i, j, n, i1);
         ChunkPosition localChunkPosition = null;
         int i2 = 0;
         for (int i3 = 0; i3 < arrayOfInt.length; i3++)
@@ -226,66 +164,6 @@ public class TCWorldChunkManager extends WorldChunkManager implements IBiomeMana
     @Override
     public void cleanupCache()
     {
-        synchronized (this.lockObject)
-        {
-            this.cache.cleanupCache();
-        }
-    }
-
-    @Override
-    public int[] getBiomesUnZoomedTC(int[] biomeArray, int x, int z, int x_size, int z_size)
-    {
-        if ((biomeArray == null) || (biomeArray.length < x_size * z_size))
-        {
-            biomeArray = new int[x_size * z_size];
-        }
-
-        int[] arrayOfInt = this.unZoomedLayer.Calculate(x, z, x_size, z_size);
-
-        System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);
-
-        return biomeArray;
-    }
-
-    private float[] Tbuffer = new float[256];
-
-    @Override
-    public float[] getTemperaturesTC(int x, int z, int x_size, int z_size)
-    {
-        return this.getTemperatures(Tbuffer, x, z, x_size, z_size);
-    }
-
-    @Override
-    public int[] getBiomesTC(int[] biomeArray, int x, int z, int x_size, int z_size)
-    {
-        if ((biomeArray == null) || (biomeArray.length < x_size * z_size))
-        {
-            biomeArray = new int[x_size * z_size];
-        }
-
-        if ((x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
-        {
-            synchronized (this.lockObject)
-            {
-                BiomeGenBase[] localObject = this.cache.getCachedBiomes(x, z);
-                for (int i = 0; i < x_size * z_size; i++)
-                    biomeArray[i] = localObject[i].biomeID;
-            }
-
-            return biomeArray;
-        }
-
-        int[] arrayOfInt = this.biomeLayer.Calculate(x, z, x_size, z_size);
-
-        System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);
-
-        return biomeArray;
-
-    }
-
-    @Override
-    public int getBiomeTC(int x, int z)
-    {
-        return this.getBiomeGenAt(x, z).biomeID;
+        this.biomeManager.cleanupCache();
     }
 }

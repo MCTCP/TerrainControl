@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
+
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
@@ -117,7 +119,8 @@ public class WorldConfig extends ConfigFile
 
     // Pyramids (also swamp huts and jungle temples)
     public boolean rareBuildingsEnabled;
-    public int minimumDistanceBetweenRareBuildings; // Minecraft's internal value is 1 chunk lower
+    public int minimumDistanceBetweenRareBuildings; // Minecraft's internal
+                                                    // value is 1 chunk lower
     public int maximumDistanceBetweenRareBuildings;
 
     // Other structures
@@ -153,7 +156,7 @@ public class WorldConfig extends ConfigFile
 
     public String WorldName;
     public TerrainMode ModeTerrain;
-    public BiomeMode ModeBiome;
+    public Class<? extends BiomeGenerator> biomeMode;
 
     public boolean BiomeConfigsHaveReplacement = false;
 
@@ -242,11 +245,13 @@ public class WorldConfig extends ConfigFile
             if (biomesCount != 0)
                 LoadedBiomeNames += ", ";
             LoadedBiomeNames += localBiome.getName();
+            this.biomeConfigs[localBiome.getId()] = config;
+            biomesCount++;
 
             this.biomeConfigs[localBiome.getId()] = config;
             biomesCount++;
 
-            if (this.ModeBiome == BiomeMode.FromImage)
+            if (this.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
             {
                 if (this.biomeColorMap == null)
                     this.biomeColorMap = new HashMap<Integer, Integer>();
@@ -327,13 +332,13 @@ public class WorldConfig extends ConfigFile
         this.IsleBiomes = filterBiomes(this.IsleBiomes, this.CustomBiomes);
         this.BorderBiomes = filterBiomes(this.BorderBiomes, this.CustomBiomes);
 
-        if (this.ModeBiome == BiomeMode.FromImage)
+        if (this.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
         {
             File mapFile = new File(SettingsDir, imageFile);
             if (!mapFile.exists())
             {
                 TerrainControl.log("Biome map file not found. Switching BiomeMode to Normal");
-                this.ModeBiome = BiomeMode.Normal;
+                this.biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
             }
         }
 
@@ -369,10 +374,10 @@ public class WorldConfig extends ConfigFile
         this.minimumDistanceBetweenRareBuildings = applyBounds(this.minimumDistanceBetweenRareBuildings, 1, Integer.MAX_VALUE);
         this.maximumDistanceBetweenRareBuildings = applyBounds(this.maximumDistanceBetweenRareBuildings, this.minimumDistanceBetweenRareBuildings, Integer.MAX_VALUE);
 
-        if (this.ModeBiome == BiomeMode.OldGenerator && this.ModeTerrain != TerrainMode.OldGenerator)
+        if (this.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && this.ModeTerrain != TerrainMode.OldGenerator)
         {
             TerrainControl.log("Old biome generator works only with old terrain generator!");
-            this.ModeBiome = BiomeMode.Normal;
+            this.biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
 
         }
     }
@@ -383,7 +388,7 @@ public class WorldConfig extends ConfigFile
         // Main modes
         this.SettingsMode = ReadSettings(TCDefaultValues.SettingsMode);
         this.ModeTerrain = ReadSettings(TCDefaultValues.TerrainMode);
-        this.ModeBiome = ReadSettings(TCDefaultValues.BiomeMode);
+        this.biomeMode = TerrainControl.getBiomeModeManager().getBiomeManager((String) ReadSettings(TCDefaultValues.BiomeMode));
 
         // World and water height
         this.worldHeightBits = ReadSettings(TCDefaultValues.WorldHeightBits);
@@ -554,7 +559,7 @@ public class WorldConfig extends ConfigFile
         writeComment("   FromImage - get biomes from image file");
         writeComment("   OldGenerator - generate biome like the Beta 1.7.3 generator");
         writeComment("   Default - use default Notch biome generator");
-        writeValue(TCDefaultValues.BiomeMode.name(), this.ModeBiome.name());
+        writeValue(TCDefaultValues.BiomeMode.name(), TerrainControl.getBiomeModeManager().getName(biomeMode));
 
         // Custom biomes
         writeBigTitle("Custom biomes");
@@ -896,11 +901,6 @@ public class WorldConfig extends ConfigFile
     public enum TerrainMode
     {
         Normal, OldGenerator, TerrainTest, NotGenerate, Default
-    }
-
-    public enum BiomeMode
-    {
-        Normal, FromImage, OldGenerator, Default
     }
 
     public enum ImageMode

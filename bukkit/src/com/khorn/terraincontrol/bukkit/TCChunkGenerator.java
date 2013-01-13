@@ -43,14 +43,14 @@ public class TCChunkGenerator extends ChunkGenerator
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
-        this.plugin.WorldInit(world);
+        this.plugin.onWorldInit(world);
         return this.BlockPopulator;
     }
 
     @Override
     public boolean canSpawn(World world, int x, int z)
     {
-        this.plugin.WorldInit(world);
+        this.plugin.onWorldInit(world);
 
         int i = world.getHighestBlockAt(x, z).getTypeId();
         return i != 0 && Block.byId[i].material.isSolid();

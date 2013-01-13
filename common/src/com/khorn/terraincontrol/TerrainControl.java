@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol;
 
+import com.khorn.terraincontrol.biomegenerators.BiomeModeManager;
+
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
@@ -35,6 +37,7 @@ public class TerrainControl
     private static TerrainControlEngine engine;
     private static ConfigFunctionsManager configFunctionsManager;
     private static CustomObjectManager customObjectManager;
+    private static BiomeModeManager biomeManagers;
 
     private static List<EventHandler> cancelableEventHandlers = new ArrayList<EventHandler>();
     private static List<EventHandler> monitoringEventHandlers = new ArrayList<EventHandler>();
@@ -60,6 +63,7 @@ public class TerrainControl
         TerrainControl.engine = engine;
         configFunctionsManager = new ConfigFunctionsManager();
         customObjectManager = new CustomObjectManager();
+        biomeManagers = new BiomeModeManager();
 
         // Fire start event
         for (EventHandler handler : cancelableEventHandlers)
@@ -91,6 +95,7 @@ public class TerrainControl
         engine = null;
         customObjectManager = null;
         configFunctionsManager = null;
+        biomeManagers = null;
         cancelableEventHandlers.clear();
         monitoringEventHandlers.clear();
     }
@@ -179,6 +184,16 @@ public class TerrainControl
     {
         return configFunctionsManager;
     }
+    
+    /**
+     * Returns the biome managers. Register your own biome manager here.
+     * 
+     * @return The biome managers.
+     */
+    public static BiomeModeManager getBiomeModeManager()
+    {
+        return biomeManagers;
+    }
 
     // Events
 
@@ -216,40 +231,38 @@ public class TerrainControl
     // Only cancelableEventHandlers can cancel events.
     // Cancelled events are still fired.
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean fireCustomObjectSpawnEvent(CustomObject object, LocalWorld world, Random random, int x, int y, int z)
     {
-        boolean isCancelled = false;
+        boolean success = true;
         for (EventHandler handler : cancelableEventHandlers)
         {
-            if (!handler.onCustomObjectSpawn(object, world, random, x, y, z, isCancelled))
+            if (!handler.onCustomObjectSpawn(object, world, random, x, y, z, !success))
             {
-                isCancelled = true;
+                success = false;
             }
         }
         for (EventHandler handler : monitoringEventHandlers)
         {
-            handler.onCustomObjectSpawn(object, world, random, x, y, z, isCancelled);
+            handler.onCustomObjectSpawn(object, world, random, x, y, z, !success);
         }
-        return !isCancelled;
+        return success;
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
-        boolean isCancelled = false;
+        boolean success = true;
         for (EventHandler handler : cancelableEventHandlers)
         {
-            if (!handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, isCancelled))
+            if (!handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, !success))
             {
-                isCancelled = true;
+                success = false;
             }
         }
         for (EventHandler handler : monitoringEventHandlers)
         {
-            handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, isCancelled);
+            handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, !success);
         }
-        return !isCancelled;
+        return success;
     }
 
     public static void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)

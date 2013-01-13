@@ -69,6 +69,7 @@ public class MapWriter implements Runnable
             if (bukkitWorld != null)
             {
                 colors = new int[bukkitWorld.getSettings().biomeConfigs.length];
+
                 for (BiomeConfig biomeConfig : bukkitWorld.getSettings().biomeConfigs)
                 {
                     if (biomeConfig != null)

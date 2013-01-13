@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
+import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
+
+
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.bukkit.structuregens.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
@@ -20,8 +24,7 @@ public class BukkitWorld implements LocalWorld
     private WorldConfig settings;
     private String name;
     private long seed;
-    private IBiomeManager biomeManager;
-    private TCWorldChunkManagerOld oldBiomeManager;
+    private BiomeGenerator biomeManager;
 
     private static int nextBiomeId = DefaultBiome.values().length;
     private static int maxBiomeCount = 256;
@@ -130,7 +133,7 @@ public class BukkitWorld implements LocalWorld
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size);
 
         biomeBaseArray = this.world.worldProvider.d.getBiomes(biomeBaseArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -144,7 +147,7 @@ public class BukkitWorld implements LocalWorld
     public float[] getTemperatures(int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getTemperaturesTC(x, z, x_size, z_size);
+            return this.biomeManager.getTemperatures(null, x, z, x_size, z_size);
         return this.world.worldProvider.d.getTemperatures(null, x, z, x_size, z_size);
     }
 
@@ -152,7 +155,7 @@ public class BukkitWorld implements LocalWorld
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomesTC(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size);
 
         biomeBaseArray = this.world.worldProvider.d.a(biomeBaseArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -166,14 +169,15 @@ public class BukkitWorld implements LocalWorld
     public int getCalculatedBiomeId(int x, int z)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomeTC(x, z);
+            return this.biomeManager.getBiome(x, z);
         return this.world.worldProvider.d.getBiome(x, z).id;
     }
 
     @Override
     public double getBiomeFactorForOldBM(int index)
     {
-        return this.oldBiomeManager.old_temperature[index] * this.oldBiomeManager.old_rain[index];
+        OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) this.biomeManager;
+        return oldBiomeGenerator.oldTemperature1[index] * oldBiomeGenerator.oldWetness[index];
     }
 
     @Override
@@ -591,14 +595,8 @@ public class BukkitWorld implements LocalWorld
         this.generator = _generator;
     }
 
-    public void setBiomeManager(IBiomeManager manager)
+    public void setBiomeManager(BiomeGenerator manager)
     {
-        this.biomeManager = manager;
-    }
-
-    public void setOldBiomeManager(TCWorldChunkManagerOld manager)
-    {
-        this.oldBiomeManager = manager;
         this.biomeManager = manager;
     }
 

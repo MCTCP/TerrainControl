@@ -28,7 +28,7 @@ public class TCListener implements Listener
     @EventHandler(priority = EventPriority.HIGH)
     public void onWorldInit(WorldInitEvent event)
     {
-        this.tcPlugin.WorldInit(event.getWorld());
+        this.tcPlugin.onWorldInit(event.getWorld());
     }
 
     @EventHandler(priority = EventPriority.NORMAL)

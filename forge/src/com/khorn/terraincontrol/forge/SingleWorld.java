@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
+import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
+
+
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
@@ -27,8 +31,7 @@ public class SingleWorld implements LocalWorld
     private WorldConfig settings;
     private String name;
     private long seed;
-    private IBiomeManager biomeManager;
-    private TCWorldChunkManagerOld oldBiomeManager;
+    private BiomeGenerator biomeManager;
 
     private static int nextBiomeId = 0;
     private static int maxBiomeCount = 256;
@@ -149,7 +152,7 @@ public class SingleWorld implements LocalWorld
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomesUnZoomedTC(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size);
 
         biomeGenBaseArray = this.world.provider.worldChunkMgr.getBiomesForGeneration(biomeGenBaseArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -163,7 +166,7 @@ public class SingleWorld implements LocalWorld
     public float[] getTemperatures(int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getTemperaturesTC(x, z, x_size, z_size);
+            return this.biomeManager.getTemperatures(null, x, z, x_size, z_size);
         return this.world.provider.worldChunkMgr.getTemperatures(new float[0], x, z, x_size, z_size);
     }
 
@@ -171,7 +174,7 @@ public class SingleWorld implements LocalWorld
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomesTC(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size);
 
         biomeGenBaseArray = this.world.provider.worldChunkMgr.getBiomeGenAt(biomeGenBaseArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -185,14 +188,15 @@ public class SingleWorld implements LocalWorld
     public int getCalculatedBiomeId(int x, int z)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomeTC(x, z);
+            return this.biomeManager.getBiome(x, z);
         return this.world.provider.worldChunkMgr.getBiomeGenAt(x, z).biomeID;
     }
 
     @Override
     public double getBiomeFactorForOldBM(int index)
     {
-        return this.oldBiomeManager.oldTemperature[index] * this.oldBiomeManager.oldWetness[index];
+        OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) this.biomeManager;
+        return oldBiomeGenerator.oldTemperature1[index] * oldBiomeGenerator.oldWetness[index];
     }
 
     @Override
@@ -585,14 +589,8 @@ public class SingleWorld implements LocalWorld
         this.generator = new ChunkProvider(this);
     }
 
-    public void setBiomeManager(IBiomeManager manager)
+    public void setBiomeManager(BiomeGenerator manager)
     {
-        this.biomeManager = manager;
-    }
-
-    public void setOldBiomeManager(TCWorldChunkManagerOld manager)
-    {
-        this.oldBiomeManager = manager;
         this.biomeManager = manager;
     }
 

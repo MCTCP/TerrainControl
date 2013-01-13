@@ -24,7 +24,7 @@ public enum TCDefaultValues implements TCSetting
     //World settings
     SettingsMode(WorldConfig.ConfigMode.WriteAll),
     TerrainMode(WorldConfig.TerrainMode.Normal),
-    BiomeMode(WorldConfig.BiomeMode.Normal),
+    BiomeMode("Normal"),
 
     WorldHeightBits(7),
 
