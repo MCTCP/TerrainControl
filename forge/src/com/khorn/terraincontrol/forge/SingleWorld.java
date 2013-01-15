@@ -1,10 +1,11 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
-
-
-import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;

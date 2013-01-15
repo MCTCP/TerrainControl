@@ -1,8 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
-
 import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import net.minecraft.server.v1_4_6.BiomeBase;
 import net.minecraft.server.v1_4_6.ChunkPosition;
 import net.minecraft.server.v1_4_6.WorldChunkManager;

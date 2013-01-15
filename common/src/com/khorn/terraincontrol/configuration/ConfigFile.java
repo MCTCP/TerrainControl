@@ -2,10 +2,9 @@ package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.DefaultBiome;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.*;
 import java.util.*;
-import java.util.List;
 
 public abstract class ConfigFile
 {

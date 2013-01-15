@@ -1,10 +1,11 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
-
-
-import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.bukkit.structuregens.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;

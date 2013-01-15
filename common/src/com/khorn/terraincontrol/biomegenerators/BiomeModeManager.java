@@ -1,8 +1,7 @@
 package com.khorn.terraincontrol.biomegenerators;
 
-import com.khorn.terraincontrol.TerrainControl;
-
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 
 import java.util.HashMap;
 import java.util.Map;

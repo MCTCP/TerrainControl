@@ -1,8 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
-
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import net.minecraft.client.multiplayer.WorldClient;

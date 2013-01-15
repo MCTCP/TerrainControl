@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol;
 
 import com.khorn.terraincontrol.biomegenerators.BiomeModeManager;
-
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;

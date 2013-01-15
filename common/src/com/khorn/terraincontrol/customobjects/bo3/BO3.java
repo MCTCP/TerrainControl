@@ -1,13 +1,12 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.util.MathHelper;
-
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeight;
+import com.khorn.terraincontrol.util.MathHelper;
 
 import java.io.File;
 import java.util.HashMap;

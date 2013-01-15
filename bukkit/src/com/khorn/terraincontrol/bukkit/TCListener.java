@@ -1,9 +1,8 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.generator.resourcegens.SaplingType;
-
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
+import com.khorn.terraincontrol.generator.resourcegens.SaplingType;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

@@ -4,10 +4,11 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.biomelayers.ArraysCache;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 public class LayerFromImage extends Layer
 {

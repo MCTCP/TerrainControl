@@ -1,10 +1,9 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
+import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;

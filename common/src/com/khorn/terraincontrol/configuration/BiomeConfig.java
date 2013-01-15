@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.util.StringHelper;
-
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalBiome;
@@ -9,6 +7,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.UseBiome;
 import com.khorn.terraincontrol.generator.resourcegens.*;
+import com.khorn.terraincontrol.util.StringHelper;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
