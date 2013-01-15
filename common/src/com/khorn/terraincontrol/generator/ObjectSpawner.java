@@ -30,7 +30,7 @@ public class ObjectSpawner
         int z = chunkZ * 16;
 
         // Get the BiomeConfig of the other corner
-        int biomeId = world.getBiomeId(x + 16, z + 16);
+        int biomeId = world.getBiomeId(x + 15, z + 15);
         BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
         // Get the random generator
