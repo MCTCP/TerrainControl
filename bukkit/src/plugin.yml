@@ -1,6 +1,6 @@
 name: TerrainControl
-version: 2.4.4
-description: Generates a worlds.
+version: 2.4.5
+description: Generates custom worlds.
 authors: ['Khorn', 'Olof Cayorion Larsson', 'Rutger Kok']
 main: com.khorn.terraincontrol.bukkit.TCPlugin
 load: startup
