@@ -39,7 +39,6 @@ public class BiomeConfig extends ConfigFile
     public float BiomeTemperature;
     public float BiomeWetness;
 
-    public boolean BiomeRivers;
     public String RiverBiome;
 
     public byte SurfaceBlock;
@@ -368,7 +367,6 @@ public class BiomeConfig extends ConfigFile
 
         this.BiomeColor = ReadModSettings(TCDefaultValues.BiomeColor.name(), this.DefaultColor);
 
-        this.BiomeRivers = ReadModSettings(TCDefaultValues.BiomeRivers.name(), this.DefaultRiver);
         this.RiverBiome = ReadModSettings(TCDefaultValues.RiverBiome.name(),this.DefaultRiverBiome);
 
         this.IsleInBiome = ReadModSettings(TCDefaultValues.IsleInBiome.name(), this.DefaultIsle);
@@ -621,11 +619,7 @@ public class BiomeConfig extends ConfigFile
         writeValue(TCDefaultValues.BiomeColor.name(), this.BiomeColor);
         this.writeNewLine();
 
-        writeComment("Set this to false to disable rivers in this biome.");
-        writeValue(TCDefaultValues.BiomeRivers.name(), this.BiomeRivers);
-        this.writeNewLine();
-
-        writeComment("Biome name used as river in this biome");
+        writeComment("Biome name used as river in this biome. Leave empty to disable rivers.");
         writeValue(TCDefaultValues.RiverBiome.name(), this.RiverBiome);
         this.writeNewLine();
 
@@ -1086,6 +1080,13 @@ public class BiomeConfig extends ConfigFile
             this.SettingsCache.put("Sapling(2,UseWorld," + customTreeChance + ",Forest,100)", "-"); // Birch
             this.SettingsCache.put("Sapling(3,UseWorld," + customTreeChance + ",CocoaTree,100)", "-"); // Jungle
         }
+        
+        // BiomeRivers
+        if(ReadModSettings("BiomeRivers", true) == false) 
+        {
+            // If the rivers were disabled using the old setting, disable them also using the new setting
+            this.SettingsCache.put("riverbiome", "");
+        }
 
         // ReplacedBlocks
         String replacedBlocksValue = ReadModSettings("ReplacedBlocks", "None");
@@ -1158,7 +1159,6 @@ public class BiomeConfig extends ConfigFile
     private ArrayList<String> DefaultIsle = new ArrayList<String>();
     private ArrayList<String> DefaultBorder = new ArrayList<String>();
     private ArrayList<String> DefaultNotBorderNear = new ArrayList<String>();
-    private boolean DefaultRiver = true;
     private String DefaultRiverBiome = DefaultBiome.RIVER.Name;
     private int DefaultSize = 4;
     private int DefaultRarity = 100;
@@ -1185,8 +1185,7 @@ public class BiomeConfig extends ConfigFile
             case 0: // Ocean
                 this.DefaultColor = "0x3333FF";
                 this.DefaultStrongholds = false;
-                this.DefaultRiver = false;
-                this.DefaultRiverBiome = DefaultBiome.OCEAN.Name;
+                this.DefaultRiverBiome = "";
                 break;
             case 1: // Plains
                 this.DefaultTrees = 0;
@@ -1245,8 +1244,7 @@ public class BiomeConfig extends ConfigFile
             case 10: // FrozenOcean
                 this.DefaultColor = "0xFFFFFF";
                 this.DefaultStrongholds = false;
-                this.DefaultRiver = false;
-                this.DefaultRiverBiome = DefaultBiome.FROZEN_OCEAN.Name;
+                this.DefaultRiverBiome = "";
                 break;
             case 11: // FrozenRiver
                 this.DefaultColor = "0x66FFFF";
@@ -1254,11 +1252,19 @@ public class BiomeConfig extends ConfigFile
                 break;
             case 12: // Ice Plains
                 this.DefaultColor = "0xCCCCCC";
-                this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
+                if(worldConfig.ReadModSettings("FrozenRivers", true) == true)
+                {
+                    // Only make river frozen if there isn't some old setting that prevents it
+                    this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
+                }
                 break;
             case 13: // Ice Mountains
                 this.DefaultColor = "0xCC9966";
-                this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
+                if(worldConfig.ReadModSettings("FrozenRivers", true) == true)
+                {
+                    // Only make river frozen if there isn't some old setting that prevents it
+                    this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
+                }
                 break;
             case 14: // MushroomIsland
                 this.DefaultSurfaceBlock = (byte) DefaultMaterial.MYCEL.id;
@@ -1267,7 +1273,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultFlowers = 0;
                 this.DefaultTrees = 0;
                 this.DefaultRarity = 1;
-                this.DefaultRiver = false;
+                this.DefaultRiverBiome = "";
                 this.DefaultSize = 6;
                 this.DefaultIsle.add(DefaultBiome.OCEAN.Name);
                 this.DefaultColor = "0xFF33CC";
@@ -1275,7 +1281,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultStrongholds = false;
                 break;
             case 15: // MushroomIslandShore
-                this.DefaultRiver = false;
+                this.DefaultRiverBiome = "";
                 this.DefaultSize = 9;
                 this.DefaultBorder.add(DefaultBiome.MUSHROOM_ISLAND.Name);
                 this.DefaultColor = "0xFF9999";

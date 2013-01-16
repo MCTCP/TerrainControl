@@ -42,7 +42,6 @@ public enum TCDefaultValues implements TCSetting
     RiverSize(0),
     RiversEnabled(true),
 
-    FrozenRivers(true),
     FrozenOcean(true),
 
     NormalBiomes("Desert,Forest,Extreme Hills,Swampland,Plains,Taiga,Jungle", SettingsType.StringArray),
@@ -126,7 +125,6 @@ public enum TCDefaultValues implements TCSetting
     BiomeSize(5),
     BiomeRarity(100),
     BiomeColor("", SettingsType.Color),
-    BiomeRivers(true),
     RiverBiome("River"),
     IsleInBiome("Ocean", SettingsType.StringArray),
     BiomeIsBorder("", SettingsType.StringArray),

@@ -58,7 +58,6 @@ public class WorldConfig extends ConfigFile
     public int RiverSize;
     public boolean RiversEnabled;
 
-    public boolean FrozenRivers;
     public boolean FrozenOcean;
 
     // Biome image
@@ -410,7 +409,6 @@ public class WorldConfig extends ConfigFile
         this.RiverSize = ReadSettings(TCDefaultValues.RiverSize);
         this.RiversEnabled = ReadSettings(TCDefaultValues.RiversEnabled);
 
-        this.FrozenRivers = ReadSettings(TCDefaultValues.FrozenRivers);
         this.FrozenOcean = ReadSettings(TCDefaultValues.FrozenOcean);
 
         // Biomes
@@ -648,9 +646,6 @@ public class WorldConfig extends ConfigFile
         writeNewLine();
 
         writeSmallTitle("River settings");
-
-        writeValue(TCDefaultValues.FrozenRivers.name(), this.FrozenRivers);
-        writeNewLine();
 
         writeComment("River rarity.Must be from 0 to GenerationDepth.");
         writeValue(TCDefaultValues.RiverRarity.name(), this.RiverRarity);
