@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.util;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-import net.minecraft.server.v1_4_6.World;
+import net.minecraft.server.v1_4_R1.World;
 
 public abstract class WorldHelper
 {

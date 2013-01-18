@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import net.minecraft.server.v1_4_6.*;
+import net.minecraft.server.v1_4_R1.*;
 
 import java.util.ArrayList;
 import java.util.Collections;

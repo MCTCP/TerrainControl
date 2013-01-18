@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import net.minecraft.server.v1_4_6.StructurePiece;
-import net.minecraft.server.v1_4_6.StructureStart;
-import net.minecraft.server.v1_4_6.World;
-import net.minecraft.server.v1_4_6.WorldGenNetherPiece15;
+import net.minecraft.server.v1_4_R1.StructurePiece;
+import net.minecraft.server.v1_4_R1.StructureStart;
+import net.minecraft.server.v1_4_R1.World;
+import net.minecraft.server.v1_4_R1.WorldGenNetherPiece15;
 
 import java.util.ArrayList;
 import java.util.Random;

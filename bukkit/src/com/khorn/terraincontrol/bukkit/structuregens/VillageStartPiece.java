@@ -5,10 +5,10 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
-import net.minecraft.server.v1_4_6.BiomeBase;
-import net.minecraft.server.v1_4_6.World;
-import net.minecraft.server.v1_4_6.WorldChunkManager;
-import net.minecraft.server.v1_4_6.WorldGenVillageStartPiece;
+import net.minecraft.server.v1_4_R1.BiomeBase;
+import net.minecraft.server.v1_4_R1.World;
+import net.minecraft.server.v1_4_R1.WorldChunkManager;
+import net.minecraft.server.v1_4_R1.WorldGenVillageStartPiece;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

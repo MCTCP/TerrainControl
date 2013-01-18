@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
-import net.minecraft.server.v1_4_6.*;
+import net.minecraft.server.v1_4_R1.*;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
+import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
 
 import java.io.*;
 import java.lang.reflect.Field;
