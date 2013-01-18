@@ -246,9 +246,6 @@ public class WorldConfig extends ConfigFile
             this.biomeConfigs[localBiome.getId()] = config;
             biomesCount++;
 
-            this.biomeConfigs[localBiome.getId()] = config;
-            biomesCount++;
-
             if (this.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
             {
                 if (this.biomeColorMap == null)
