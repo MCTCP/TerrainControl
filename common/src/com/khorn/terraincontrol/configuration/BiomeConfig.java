@@ -6,6 +6,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.UseBiome;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resourcegens.*;
 import com.khorn.terraincontrol.util.StringHelper;
 
@@ -20,7 +21,7 @@ import java.util.Map;
 
 public class BiomeConfig extends ConfigFile
 {
-    public short[][] ReplaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
+    public short[][] replaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
     public int ReplaceCount = 0;
 
     public int BiomeSize;
@@ -467,32 +468,38 @@ public class BiomeConfig extends ConfigFile
                 {
                     key = key.substring(start + 1, end);
                     String[] values = key.split(",");
-                    if (values.length != 2 && values.length != 5)
-                        continue;
-
-                    short fromBlockId = Short.valueOf(values[0]);
-                    short toBlockId = Short.valueOf(values[1]);
-
-                    int min_y = 0;
-                    int max_y = worldConfig.WorldHeight;
-                    short blockData = 0;
                     if (values.length == 5)
                     {
-                        blockData = Short.valueOf(values[2]);
-                        min_y = Integer.valueOf(values[3]);
-                        max_y = Integer.valueOf(values[4]);
-                        min_y = applyBounds(min_y, 0, worldConfig.WorldHeight - 1);
-                        max_y = applyBounds(max_y, 0, worldConfig.WorldHeight - 1, min_y);
+                        // Replace in TC 2.3 style found
+                        values = new String[] {values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)};
+                    }
+                    
+                    if (values.length != 2 && values.length != 4)
+                        continue;
+
+                    short fromBlockId = (short) StringHelper.readBlockId(values[0]);
+                    short toBlockId = (short) StringHelper.readBlockId(values[1]);
+                    short blockData = (short) StringHelper.readBlockData(values[1]);
+                    
+                    int minY = 0;
+                    int maxY = worldConfig.WorldHeight - 1;
+                    
+                    if (values.length == 4)
+                    {
+                        minY = Integer.valueOf(values[2]);
+                        maxY = Integer.valueOf(values[3]);
+                        minY = applyBounds(minY, 0, worldConfig.WorldHeight - 1);
+                        maxY = applyBounds(maxY, minY, worldConfig.WorldHeight - 1);
                     }
 
-                    if (this.ReplaceMatrixBlocks[fromBlockId] == null)
+                    if (this.replaceMatrixBlocks[fromBlockId] == null)
                     {
-                        this.ReplaceMatrixBlocks[fromBlockId] = new short[worldConfig.WorldHeight];
+                        this.replaceMatrixBlocks[fromBlockId] = new short[worldConfig.WorldHeight];
                         for (int i = 0; i < worldConfig.WorldHeight; i++)
-                            this.ReplaceMatrixBlocks[fromBlockId][i] = -1;
+                            this.replaceMatrixBlocks[fromBlockId][i] = -1;
                     }
-                    for (int y = min_y; y < max_y; y++)
-                        this.ReplaceMatrixBlocks[fromBlockId][y] = (short) (toBlockId << 4 | blockData);
+                    for (int y = minY; y <= maxY; y++)
+                        this.replaceMatrixBlocks[fromBlockId][y] = (short) (toBlockId << 4 | blockData);
                     ReplaceCount++;
 
                 }
@@ -501,7 +508,10 @@ public class BiomeConfig extends ConfigFile
 
         } catch (NumberFormatException e)
         {
-            System.out.println("Wrong replace settings: '" + this.SettingsCache.get(settingValue) + "'");
+            TerrainControl.log("Wrong replace settings: '" + this.SettingsCache.get(settingValue) + "'");
+        } catch (InvalidConfigException e)
+        {
+            TerrainControl.log("Wrong replace settings: '" + this.SettingsCache.get(settingValue) + "'");
         }
 
     }
@@ -697,9 +707,9 @@ public class BiomeConfig extends ConfigFile
         writeNewLine();
 
         this.writeNewLine();
-        writeComment("Replace Variable: (BlockIdFrom,BlockIdTo[,BlockDataTo,minHeight,maxHeight])");
+        writeComment("Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])");
         writeComment("Example :");
-        writeComment("  ReplacedBlocks:(2,3,0,100,127),(13,20)");
+        writeComment("  ReplacedBlocks:(GRASS,DIRT,100,127),(GRAVEL,GLASS)");
         writeComment("Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
         WriteModReplaceSettings();
 
@@ -933,40 +943,53 @@ public class BiomeConfig extends ConfigFile
         }
         String output = "";
 
-        for (int id = 0; id < ReplaceMatrixBlocks.length; id++)
+        // Read all block ids
+        for (int blockIdFrom = 0; blockIdFrom < replaceMatrixBlocks.length; blockIdFrom++)
         {
-            if (ReplaceMatrixBlocks[id] == null)
+            if (replaceMatrixBlocks[blockIdFrom] == null)
                 continue;
+            
+            int previousReplaceTo = -1; // What the y coord just below had it's replace setting set to
+            int yStart = 0;
 
-            int replaceTo = -1;
-            int y_start = 0;
-
-            for (int y = 0; y < ReplaceMatrixBlocks[id].length; y++)
-            {
-                if (ReplaceMatrixBlocks[id][y] == replaceTo)
-                    continue;
-
-                if (replaceTo == -1)
+            for (int y = 0; y <= replaceMatrixBlocks[blockIdFrom].length; y++)
+            {                
+                int currentReplaceTo = (y == replaceMatrixBlocks[blockIdFrom].length)? -1 : replaceMatrixBlocks[blockIdFrom][y];
+                
+                if (currentReplaceTo == previousReplaceTo)
                 {
-                    y_start = y;
-                    replaceTo = ReplaceMatrixBlocks[id][y];
+                    // Same as the previous entry, do nothing
                     continue;
                 }
-                output += "(" + id + "," + (replaceTo >> 4);
-                if ((replaceTo & 0xF) > 0 || y_start != 0 || y != (ReplaceMatrixBlocks[id].length - 1))
-                    output += "," + (replaceTo & 0xF) + "," + y_start + "," + y;
-                output += "),";
 
-                replaceTo = -1;
-            }
-            if (replaceTo != -1)
-            {
-
-                output += "(" + id + "," + (replaceTo >> 4);
-                if ((replaceTo & 0xF) > 0 || y_start != 0)
-                    output += "," + (replaceTo & 0xF) + "," + y_start + "," + (ReplaceMatrixBlocks[id].length - 1);
-                output += "),";
-
+                // Not the same as the previous entry, previous entry wasn't -1
+                // So we have found the end of a replace setting
+                if (previousReplaceTo != -1)
+                {
+                    output += "(" + StringHelper.makeMaterial(blockIdFrom) + ",";
+                    if (yStart != 0 || y != (replaceMatrixBlocks[blockIdFrom].length))
+                    {
+                        // Long form
+                        output += StringHelper.makeMaterial(previousReplaceTo >> 4, previousReplaceTo & 0xF) + "," + yStart + "," + (y - 1);
+                    } else
+                    {
+                        // Short form
+                        output += StringHelper.makeMaterial(previousReplaceTo >> 4, previousReplaceTo & 0xF);
+                    }
+                    output += "),";
+    
+                    // Reset the previousReplaceTo
+                    previousReplaceTo = -1;
+                }
+               
+                if (previousReplaceTo == -1)
+                {
+                    // Not the same as the previous entry, previous entry was -1
+                    // So we have found the start of a new replace setting
+                    yStart = y;
+                    previousReplaceTo = currentReplaceTo;
+                    continue;
+                }
             }
         }
         this.writeValue("ReplacedBlocks", output.substring(0, output.length() - 1));
@@ -1105,7 +1128,7 @@ public class BiomeConfig extends ConfigFile
 
                     String toData = "0";
                     String minHeight = "0";
-                    String maxHeight = "" + worldConfig.WorldHeight;
+                    int maxHeight = worldConfig.WorldHeight;
 
                     boolean longForm = false;
 
@@ -1116,7 +1139,7 @@ public class BiomeConfig extends ConfigFile
                         String[] ranges = toId.substring(start + 1, end).split("-");
                         toId = toId.substring(0, start);
                         minHeight = ranges[0];
-                        maxHeight = ranges[1];
+                        maxHeight = Integer.parseInt(ranges[1]);
                         longForm = true;
                     }
                     if (toId.contains("."))
@@ -1128,7 +1151,7 @@ public class BiomeConfig extends ConfigFile
                     }
 
                     if (longForm)
-                        output = output + "(" + fromId + "," + toId + "," + toData + "," + minHeight + "," + maxHeight + "),";
+                        output = output + "(" + fromId + "," + toId + ":" + toData + "," + minHeight + "," + (maxHeight - 1) + "),";
                     else
                         output = output + "(" + fromId + "," + toId + "),";
                 } catch (Exception ignored)

@@ -305,10 +305,10 @@ public class SingleWorld implements LocalWorld
                             for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
                                 int blockId = section.getExtBlockID(sectionX, sectionY, sectionZ);
-                                if (biomeConfig.ReplaceMatrixBlocks[blockId] == null)
+                                if (biomeConfig.replaceMatrixBlocks[blockId] == null)
                                     continue;
 
-                                int replaceTo = biomeConfig.ReplaceMatrixBlocks[blockId][section.getYLocation() + sectionY];
+                                int replaceTo = biomeConfig.replaceMatrixBlocks[blockId][section.getYLocation() + sectionY];
                                 if (replaceTo == -1)
                                     continue;
 

@@ -282,10 +282,10 @@ public class BukkitWorld implements LocalWorld
                             for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
                                 int blockId = section.a(sectionX, sectionY, sectionZ);
-                                if (biomeConfig.ReplaceMatrixBlocks[blockId] == null)
+                                if (biomeConfig.replaceMatrixBlocks[blockId] == null)
                                     continue;
 
-                                int replaceTo = biomeConfig.ReplaceMatrixBlocks[blockId][section.d() + sectionY];
+                                int replaceTo = biomeConfig.replaceMatrixBlocks[blockId][section.d() + sectionY];
                                 if (replaceTo == -1)
                                     continue;
 
