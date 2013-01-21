@@ -42,6 +42,9 @@ public class BiomeGenCustom extends BiomeGenBase
     {
         this.temperature = config.BiomeTemperature;
         this.rainfall = config.BiomeWetness;
+        if(this.rainfall == 0) {
+            this.setDisableRain();
+        }
         this.waterColorMultiplier = config.WaterColor;
         this.skyColor = config.SkyColor;
         this.grassColor = config.GrassColor;

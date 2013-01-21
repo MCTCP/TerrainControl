@@ -49,6 +49,9 @@ public class CustomBiome extends BiomeBase
         this.B = config.GroundBlock;
         this.temperature = config.BiomeTemperature;
         this.humidity = config.BiomeWetness;
+        if(this.humidity == 0) {
+            this.b(); // this.disableRain()
+        }
 
         // Mob spawning
         addMobs(this.J, config.spawnMonstersAddDefaults, config.spawnMonsters);
