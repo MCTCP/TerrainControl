@@ -1,13 +1,11 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.TerrainControl;
-
 import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.TerrainControl;
 
 import java.awt.Color;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
 
 public abstract class ConfigFile
 {
@@ -102,7 +100,7 @@ public abstract class ConfigFile
 
     protected void sayNotFound(String settingsName)
     {
-        TerrainControl.log("Value " + settingsName + " not found.");
+        // TerrainControl.log("Value " + settingsName + " not found.");
     }
 
     protected void sayHadWrongValue(String settingsName)
