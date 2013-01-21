@@ -78,13 +78,19 @@ public class BO3Config extends ConfigFile
         CorrectSettings();
         if (settingsMode != ConfigMode.WriteDisable)
         {
-            WriteSettingsFile(file, settingsMode == ConfigMode.WriteAll);
+            writeSettingsFile(file, settingsMode == ConfigMode.WriteAll);
         }
 
         if (rotateRandomly)
         {
             rotateBlockAndChecks();
         }
+    }
+    
+    @Override
+    public void sayFileNotFound(File file) 
+    {
+        // Ignore
     }
 
     public Map<String, String> getSettingsCache()

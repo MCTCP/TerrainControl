@@ -34,7 +34,7 @@ public class BiomeCommand extends BaseCommand
         player.sendMessage(ChatColor.AQUA.toString() + "You are in: ");
         WorldChunkManager biomeManager = ((CraftWorld) player.getLocation().getWorld()).getHandle().getWorldChunkManager();
 
-        player.sendMessage(ValueColor + biomeManager.getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16).y + MessageColor + " chunk biome!");
+        player.sendMessage(VALUE_COLOR + biomeManager.getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16).y + MESSAGE_COLOR + " chunk biome!");
 
         if (args.size() == 1 && args.get(0).equals("-f"))
         {
@@ -47,10 +47,10 @@ public class BiomeCommand extends BaseCommand
             biomeManager.getWetness(humidity, (int) player.getLocation().getX(), (int) player.getLocation().getZ(), 1, 1);
 
 
-            player.sendMessage(ValueColor + biome[0].y + MessageColor + " block biome!");
-            player.sendMessage(ValueColor + humidity[0] + MessageColor + " block humidity!");
+            player.sendMessage(VALUE_COLOR + biome[0].y + MESSAGE_COLOR + " block biome!");
+            player.sendMessage(VALUE_COLOR + humidity[0] + MESSAGE_COLOR + " block humidity!");
             //double notchTemp = biomeManager.temperature[0] - (((CraftWorld) player.getLocation().getWorld()).getHandle().e((int) player.getLocation().getX(), (int) player.getLocation().getZ()) - 64) / 64.0D * 0.3D;
-            player.sendMessage(ValueColor + temp[0] + MessageColor + " block temperature!");
+            player.sendMessage(VALUE_COLOR + temp[0] + MESSAGE_COLOR + " block temperature!");
             //player.sendMessage(ValueColor + notchTemp + MessageColor + " block temperature with height constant!");
         }
 

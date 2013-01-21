@@ -87,7 +87,7 @@ public abstract class BaseCommand
         return ret;
     }
 
-    public static final String ErrorColor = ChatColor.RED.toString();
-    public static final String MessageColor = ChatColor.GREEN.toString();
-    public static final String ValueColor = ChatColor.DARK_GREEN.toString();
+    public static final String ERROR_COLOR = ChatColor.RED.toString();
+    public static final String MESSAGE_COLOR = ChatColor.GREEN.toString();
+    public static final String VALUE_COLOR = ChatColor.DARK_GREEN.toString();
 }

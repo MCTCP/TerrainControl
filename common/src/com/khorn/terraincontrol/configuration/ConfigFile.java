@@ -1,10 +1,13 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.TerrainControl;
+
 import com.khorn.terraincontrol.DefaultBiome;
 
 import java.awt.Color;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
 
 public abstract class ConfigFile
 {
@@ -90,29 +93,26 @@ public abstract class ConfigFile
                 }
             }
         } else
-            System.out.println("TerrainControl: Can not load " + f.getName());
+            sayFileNotFound(f);
     }
 
     // -------------------------------------------- //
     // SAY STUFF
     // -------------------------------------------- //
 
-    protected boolean sayNotFoundEnabled()
-    {
-        return false;
-    }
-
     protected void sayNotFound(String settingsName)
     {
-        if (this.sayNotFoundEnabled())
-        {
-            System.out.println("TerrainControl: value " + settingsName + " not found.");
-        }
+        TerrainControl.log("Value " + settingsName + " not found.");
     }
 
     protected void sayHadWrongValue(String settingsName)
     {
-        System.out.println("TerrainControl: " + settingsName + " had wrong value");
+        TerrainControl.log(settingsName + " had wrong value");
+    }
+    
+    protected void sayFileNotFound(File file)
+    {
+        TerrainControl.log("File not found: " + file .getName());
     }
 
     // -------------------------------------------- //
@@ -329,7 +329,7 @@ public abstract class ConfigFile
     }
 
 
-    public void WriteSettingsFile(File settingsFile, boolean comments)
+    public void writeSettingsFile(File settingsFile, boolean comments)
     {
         this.WriteComments = comments;
         try

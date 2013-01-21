@@ -24,7 +24,7 @@ public class HelpCommand extends BaseCommand
         List<String> lines = new ArrayList<String>();
         for (BaseCommand command : plugin.commandExecutor.commandHashMap.values())
         {
-            lines.add(MessageColor + "/tc " + command.usage + " - " + command.getHelp());
+            lines.add(MESSAGE_COLOR + "/tc " + command.usage + " - " + command.getHelp());
         }
 
         int page = 1;
@@ -35,7 +35,7 @@ public class HelpCommand extends BaseCommand
                 page = Integer.parseInt(args.get(0));
             } catch (NumberFormatException e)
             {
-                sender.sendMessage(ErrorColor + "Wrong page number " + args.get(0));
+                sender.sendMessage(ERROR_COLOR + "Wrong page number " + args.get(0));
             }
         }
 

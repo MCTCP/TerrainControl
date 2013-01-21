@@ -134,7 +134,7 @@ public class BiomeConfig extends ConfigFile
         if (!settingsFile.exists())
             this.CreateDefaultResources();
         if (config.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
-            this.WriteSettingsFile(settingsFile, (config.SettingsMode == WorldConfig.ConfigMode.WriteAll));
+            this.writeSettingsFile(settingsFile, (config.SettingsMode == WorldConfig.ConfigMode.WriteAll));
 
         if (this.UseWorldWaterLevel)
         {

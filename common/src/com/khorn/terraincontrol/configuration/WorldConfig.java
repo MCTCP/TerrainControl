@@ -187,7 +187,7 @@ public class WorldConfig extends ConfigFile
 
         // Need add check to clashes
         if (this.SettingsMode != ConfigMode.WriteDisable)
-            this.WriteSettingsFile(settingsFile, (this.SettingsMode == ConfigMode.WriteAll));
+            this.writeSettingsFile(settingsFile, (this.SettingsMode == ConfigMode.WriteAll));
 
         world.setHeightBits(this.worldHeightBits);
 

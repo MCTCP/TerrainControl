@@ -22,13 +22,13 @@ public class CheckCommand extends BaseCommand
     {
         if (args.size() == 0)
         {
-            sender.sendMessage(ErrorColor + "You need to select world");
+            sender.sendMessage(ERROR_COLOR + "You need to select world");
             return true;
         }
 
         plugin.CreateSettings(args.get(0), null);
 
-        sender.sendMessage(MessageColor + "Done!");
+        sender.sendMessage(MESSAGE_COLOR + "Done!");
         return true;
     }
 }

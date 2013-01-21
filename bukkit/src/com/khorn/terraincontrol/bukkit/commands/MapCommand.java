@@ -42,7 +42,7 @@ public class MapCommand extends BaseCommand
         {
             if (sender instanceof ConsoleCommandSender)
             {
-                sender.sendMessage(ErrorColor + "You need to select world");
+                sender.sendMessage(ERROR_COLOR + "You need to select world");
                 return true;
             }
             world = (CraftWorld) ((Player) sender).getWorld();
@@ -60,7 +60,7 @@ public class MapCommand extends BaseCommand
                     size = Integer.parseInt(args.get(i + 1));
                 } catch (Exception e)
                 {
-                    sender.sendMessage(ErrorColor + "Wrong size " + args.get(i + 1));
+                    sender.sendMessage(ERROR_COLOR + "Wrong size " + args.get(i + 1));
                 }
             }
             if (args.get(i).equals("-o"))
@@ -71,7 +71,7 @@ public class MapCommand extends BaseCommand
                     offsetZ = Integer.parseInt(args.get(i + 2));
                 } catch (Exception e)
                 {
-                    sender.sendMessage(ErrorColor + "Wrong size " + args.get(i + 1));
+                    sender.sendMessage(ERROR_COLOR + "Wrong size " + args.get(i + 1));
                 }
             }
             if (args.get(i).equals("-r"))
@@ -95,11 +95,11 @@ public class MapCommand extends BaseCommand
                         }
                     } else
                     {
-                        sender.sendMessage(ErrorColor + "Angles must be divisible by 90 degrees");
+                        sender.sendMessage(ERROR_COLOR + "Angles must be divisible by 90 degrees");
                     }
                 } catch (Exception e)
                 {
-                    sender.sendMessage(ErrorColor + "Wrong angle " + args.get(i + 1));
+                    sender.sendMessage(ERROR_COLOR + "Wrong angle " + args.get(i + 1));
                 }
             }
             if (args.get(i).equals("-l"))

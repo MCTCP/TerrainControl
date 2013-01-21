@@ -54,7 +54,7 @@ public class MapWriter implements Runnable
     {
         if (MapWriter.isWorking)
         {
-            sender.sendMessage(BaseCommand.ErrorColor + "Another instance of map writer is running");
+            sender.sendMessage(BaseCommand.ERROR_COLOR + "Another instance of map writer is running");
             return;
         }
 
@@ -83,14 +83,14 @@ public class MapWriter implements Runnable
                         } catch (NumberFormatException ex)
                         {
                             TerrainControl.log(Level.WARNING, "Wrong color in " + biomeConfig.Biome.getName());
-                            sender.sendMessage(BaseCommand.ErrorColor + "Wrong color in " + biomeConfig.Biome.getName());
+                            sender.sendMessage(BaseCommand.ERROR_COLOR + "Wrong color in " + biomeConfig.Biome.getName());
                         }
                     }
                 }
             }
 
 
-            sender.sendMessage(BaseCommand.MessageColor + "Generating map...");
+            sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Generating map...");
             float[] tempArray = new float[256];
             BiomeBase[] BiomeBuffer = new BiomeBase[256];
 
@@ -116,7 +116,7 @@ public class MapWriter implements Runnable
 
                     if (time2 > time + 2000L)
                     {
-                        sender.sendMessage(BaseCommand.MessageColor + ((x + height / 2) * 100 / height) + "%");
+                        sender.sendMessage(BaseCommand.MESSAGE_COLOR + ((x + height / 2) * 100 / height) + "%");
                         time = time2;
                     }
 
@@ -157,7 +157,7 @@ public class MapWriter implements Runnable
                 }
             }
 
-            sender.sendMessage(BaseCommand.MessageColor + "Writing images...");
+            sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Writing images...");
             PNGImageWriter PngEncoder = new PNGImageWriter(new PNGImageWriterSpi());
 
             // Write biome colors
@@ -178,7 +178,7 @@ public class MapWriter implements Runnable
 
             PngEncoder.dispose();
 
-            sender.sendMessage(BaseCommand.MessageColor + "Done");
+            sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Done");
 
         } catch (Exception e1)
         {

@@ -38,7 +38,7 @@ public class ListCommand extends BaseCommand
                     page = Integer.parseInt(args.get(2));
                 } catch (Exception e)
                 {
-                    sender.sendMessage(ErrorColor + "Wrong page number " + args.get(2));
+                    sender.sendMessage(ERROR_COLOR + "Wrong page number " + args.get(2));
                 }
             }
             BukkitWorld world = this.getWorld(sender, worldName);
@@ -46,18 +46,18 @@ public class ListCommand extends BaseCommand
             if (world != null)
             {
                 if (world.getSettings().customObjects.size() == 0)
-                    sender.sendMessage(MessageColor + "This world does not have custom objects");
+                    sender.sendMessage(MESSAGE_COLOR + "This world does not have custom objects");
 
                 List<String> pluginList = new ArrayList<String>();
                 for (CustomObject object : world.getSettings().customObjects)
                 {
-                    pluginList.add(ValueColor + object.getName());
+                    pluginList.add(VALUE_COLOR + object.getName());
                 }
 
                 this.ListMessage(sender, pluginList, page, "World bo2 objects");
 
             } else
-                sender.sendMessage(ErrorColor + "World not found " + worldName);
+                sender.sendMessage(ERROR_COLOR + "World not found " + worldName);
             return true;
 
         }
@@ -68,20 +68,20 @@ public class ListCommand extends BaseCommand
                 page = Integer.parseInt(args.get(0));
             } catch (Exception e)
             {
-                sender.sendMessage(ErrorColor + "Wrong page number " + args.get(0));
+                sender.sendMessage(ERROR_COLOR + "Wrong page number " + args.get(0));
             }
         }
 
         Collection<CustomObject> globalObjects = TerrainControl.getCustomObjectManager().globalObjects.values();
 
         if (globalObjects.size() == 0)
-            sender.sendMessage(MessageColor + "This global directory does not have custom objects");
+            sender.sendMessage(MESSAGE_COLOR + "This global directory does not have custom objects");
 
         List<String> pluginList = new ArrayList<String>();
         for (CustomObject object : globalObjects)
         {
             if(object.canSpawnAsObject()) {
-                pluginList.add(ValueColor + object.getName());
+                pluginList.add(VALUE_COLOR + object.getName());
             }
         }
 

@@ -29,7 +29,7 @@ public class ReloadCommand extends BaseCommand
         BukkitWorld world = this.getWorld(sender, args.size() > 0 ? args.get(0) : "");
         if (world == null)
         {
-            sender.sendMessage(ErrorColor + "You need to select world");
+            sender.sendMessage(ERROR_COLOR + "You need to select world");
             return true;
         }
 
@@ -46,7 +46,7 @@ public class ReloadCommand extends BaseCommand
             ((TCWorldChunkManager) worldServer.worldProvider.d).Init(world);
         }
 
-        sender.sendMessage(MessageColor + "WorldConfig for world " + world.getName() + " reloaded");
+        sender.sendMessage(MESSAGE_COLOR + "WorldConfig for world " + world.getName() + " reloaded");
         return true;
     }
 }
