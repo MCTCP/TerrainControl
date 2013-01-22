@@ -67,7 +67,11 @@ public class BO3Config extends ConfigFile
     {
         this.file = file;
         this.name = name;
+
         this.SettingsCache = settings;
+
+        // Make sure that the BO3 file won't get overwritten
+        this.SettingsCache.put(TCDefaultValues.SettingsMode.toString().toLowerCase(), ConfigMode.WriteDisable.toString());
 
         init();
     }
@@ -86,9 +90,9 @@ public class BO3Config extends ConfigFile
             rotateBlockAndChecks();
         }
     }
-    
+
     @Override
-    public void sayFileNotFound(File file) 
+    public void sayFileNotFound(File file)
     {
         // Ignore
     }
