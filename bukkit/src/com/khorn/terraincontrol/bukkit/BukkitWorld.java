@@ -542,6 +542,11 @@ public class BukkitWorld implements LocalWorld
         return this.generator;
     }
 
+    public World getWorld()
+    {
+        return this.world;
+    }
+
     public void setSettings(WorldConfig worldConfig)
     {
         this.settings = worldConfig;

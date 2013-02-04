@@ -5,7 +5,7 @@ import net.minecraft.server.v1_4_R1.WorldProviderNormal;
 
 /**
  * We extend this file to be able to set the sea level.
- * In minecraft 1.2.3 this is used in a few places such as spawning algorithms for villages.
+ * In Minecraft this is used in a few places such as spawning algorithms for villages.
  * The value seem to be hardcoded in CraftWorld and we are a bit unsure about if that matters.
  * At least it should be a good thing that we set the value here.
  */
@@ -16,6 +16,7 @@ public class TCWorldProvider extends WorldProviderNormal
     public TCWorldProvider(BukkitWorld localWorld)
     {
         this.localWorld = localWorld;
+        this.a(localWorld.getWorld());
     }
 
     @Override
