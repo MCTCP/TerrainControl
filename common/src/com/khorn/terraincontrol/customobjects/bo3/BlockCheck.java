@@ -98,7 +98,7 @@ public class BlockCheck extends BO3Check
                 rotatedCheck.blockDatas.add((byte) -1);
             } else
             {
-                rotatedCheck.blockDatas.add((byte) BlockHelper.RotateData(blockIds.get(i), blockDatas.get(i)));
+                rotatedCheck.blockDatas.add((byte) BlockHelper.rotateData(blockIds.get(i), blockDatas.get(i)));
             }
         }
 

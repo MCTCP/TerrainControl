@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.Rotation;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,6 +30,7 @@ public class SpawnCommand extends BaseCommand
     public boolean onCommand(CommandSender sender, List<String> args)
     {
         Player me = (Player) sender;
+        Random random = new Random();
 
         BukkitWorld bukkitWorld = this.getWorld(me, args.size() > 1 ? args.get(1) : "");
 
@@ -52,12 +54,14 @@ public class SpawnCommand extends BaseCommand
         if (block == null)
             return true;
 
-        if (spawnObject.spawn(bukkitWorld, new Random(), block.getX(), block.getY(), block.getZ()))
+        Rotation rotation = spawnObject.canRotateRandomly()? Rotation.getRandomRotation(random): Rotation.NORTH;
+        
+        if (spawnObject.spawnForced(bukkitWorld, random, rotation, block.getX(), block.getY(), block.getZ()))
         {
             me.sendMessage(BaseCommand.MESSAGE_COLOR + spawnObject.getName() + " was spawned.");
         } else
         {
-            me.sendMessage(BaseCommand.ERROR_COLOR + "BO2 cant be spawned over there.");
+            me.sendMessage(BaseCommand.ERROR_COLOR + "Object can't be spawned over there.");
         }
 
         return true;

@@ -21,6 +21,7 @@ public class ConfigFunctionsManager
         registerConfigFunction("AboveWaterRes", AboveWaterGen.class);
         registerConfigFunction("Cactus", CactusGen.class);
         registerConfigFunction("CustomObject", CustomObjectGen.class);
+        registerConfigFunction("CustomStructure", CustomStructureGen.class);
         registerConfigFunction("Dungeon", DungeonGen.class);
         registerConfigFunction("Grass", GrassGen.class);
         registerConfigFunction("Liquid", LiquidGen.class);

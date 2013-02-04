@@ -94,7 +94,7 @@ public class RandomBlockFunction extends BlockFunction
         rotatedBlock.blockDatas = new ArrayList<Byte>(blockIds.size());
         for (int i = 0; i < blockDatas.size(); i++)
         {
-            rotatedBlock.blockDatas.add((byte) BlockHelper.RotateData(blockIds.get(i), blockDatas.get(i)));
+            rotatedBlock.blockDatas.add((byte) BlockHelper.rotateData(blockIds.get(i), blockDatas.get(i)));
         }
         rotatedBlock.metaDataTags = metaDataTags;
         rotatedBlock.metaDataNames = metaDataNames;

@@ -6,8 +6,15 @@ import com.khorn.terraincontrol.DefaultMaterial;
 public class BlockHelper
 {
 
+    /**
+     * Rotate the block. North -> west - > south - > east
+     * 
+     * @param type
+     * @param data
+     * @return
+     */
     @SuppressWarnings("PointlessBitwiseExpression")
-    public static int RotateData(int type, int data)
+    public static int rotateData(int type, int data)
     {
         DefaultMaterial mat = DefaultMaterial.getMaterial(type);
         if (mat == DefaultMaterial.UNKNOWN_BLOCK)
@@ -80,6 +87,7 @@ public class BlockHelper
             case BRICK_STAIRS:
             case SMOOTH_STAIRS:
             case NETHER_BRICK_STAIRS:
+            case SANDSTONE_STAIRS:
                 switch (data)
                 {
                     case 2:

@@ -3,19 +3,21 @@ package com.khorn.terraincontrol.customobjects.bo3;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.*;
+import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeight;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightSetting;
 import com.khorn.terraincontrol.util.MathHelper;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class BO3 implements CustomObject
+public class BO3 implements StructuredCustomObject
 {
     private BO3Config settings;
+    private String name;
+    private File file;
 
     /**
      * Creates a BO3 from a file.
@@ -25,26 +27,34 @@ public class BO3 implements CustomObject
      */
     public BO3(String name, File file)
     {
-        this.settings = new BO3Config(name, file);
+        this.name = name;
+        this.file = file;
+    }
+    
+    @Override
+    public void onEnable(Map<String,CustomObject> otherObjectsInDirectory)
+    {
+        this.settings = new BO3Config(name, file, otherObjectsInDirectory);
     }
 
     /**
      * Creates a BO3 with the specified settings. Ignores the settings in the
      * settings file.
      *
-     * @param name
-     * @param file
-     * @param settings
+     * @param oldObject     The object where this object is based on
+     * @param extraSettings The settings to override
      */
-    public BO3(String name, File file, Map<String, String> settings)
+    public BO3(BO3 oldObject, Map<String, String> extraSettings)
     {
-        this.settings = new BO3Config(name, file, settings);
+        this.settings = new BO3Config(oldObject, extraSettings);
+        this.name = settings.name;
+        this.file = settings.file;
     }
 
     @Override
     public String getName()
     {
-        return settings.name;
+        return name;
     }
 
     public BO3Config getSettings()
@@ -65,16 +75,11 @@ public class BO3 implements CustomObject
     }
 
     @Override
-    public boolean spawn(LocalWorld world, Random random, int x, int y, int z)
+    public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {
-        BlockFunction[] blocks = settings.blocks[0];
-        BO3Check[] checks = settings.bo3Checks[0];
-        if (settings.rotateRandomly)
-        {
-            int rotation = random.nextInt(4);
-            blocks = settings.blocks[rotation];
-            checks = settings.bo3Checks[rotation];
-        }
+        BlockFunction[] blocks = settings.blocks[rotation.getRotationId()];
+        BO3Check[] checks = settings.bo3Checks[rotation.getRotationId()];
+
         // Check for spawning
         for (BO3Check check : checks)
         {
@@ -105,11 +110,26 @@ public class BO3 implements CustomObject
         }
 
         // Call event
-        if (!TerrainControl.fireCustomObjectSpawnEvent(this, world, random, x, y, z))
+        if (!TerrainControl.fireCanCustomObjectSpawnEvent(this, world, x, y, z))
         {
             // Cancelled
             return false;
         }
+
+        // Can most likely spawn here
+        return true;
+    }
+
+    @Override
+    public boolean canRotateRandomly()
+    {
+        return settings.rotateRandomly;
+    }
+
+    @Override
+    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    {
+        BlockFunction[] blocks = settings.blocks[rotation.getRotationId()];
 
         // Spawn
         for (BlockFunction block : blocks)
@@ -124,41 +144,35 @@ public class BO3 implements CustomObject
     }
 
     @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int y, int z)
-    {
-        if (settings.tree)
-        {
-            return spawn(world, random, x, y, z);
-        }
-        return false;
-    }
-
-    @Override
     public boolean spawn(LocalWorld world, Random random, int x, int z)
     {
-        if (settings.spawnHeight == SpawnHeight.randomY)
+        Rotation rotation = settings.rotateRandomly? Rotation.getRandomRotation(random) : Rotation.NORTH;
+        int y = 0;
+        if (settings.spawnHeight == SpawnHeightSetting.randomY)
         {
-            return spawn(world, random, x, MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight), z);
+            y = MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight);
         }
-        if (settings.spawnHeight == SpawnHeight.highestBlock)
+        if (settings.spawnHeight == SpawnHeightSetting.highestBlock)
         {
-            int y = world.getHighestBlockYAt(x, z);
+            y = world.getHighestBlockYAt(x, z);
             if (y < settings.minHeight || y > settings.maxHeight)
             {
                 return false;
             }
-            return spawn(world, random, x, y, z);
         }
-        if (settings.spawnHeight == SpawnHeight.highestSolidBlock)
+        if (settings.spawnHeight == SpawnHeightSetting.highestSolidBlock)
         {
-            int y = world.getSolidHeight(x, z);
+            y = world.getSolidHeight(x, z);
             if (y < settings.minHeight || y > settings.maxHeight)
             {
                 return false;
             }
-            return spawn(world, random, x, y, z);
         }
-        return false;
+        if (!canSpawnAt(world, rotation, x, y, z))
+        {
+            return false;
+        }
+        return spawnForced(world, random, rotation, x, y, z);
     }
 
     @Override
@@ -180,8 +194,7 @@ public class BO3 implements CustomObject
         int chunkMiddleZ = chunkZ * 16 + 8;
         for (int i = 0; i < settings.frequency; i++)
         {
-            double test = random.nextDouble() * 100.0;
-            if (settings.rarity > test)
+            if (settings.rarity > random.nextDouble() * 100.0)
             {
                 if (spawn(world, random, chunkMiddleX + random.nextInt(16), chunkMiddleZ + random.nextInt(16)))
                 {
@@ -206,10 +219,7 @@ public class BO3 implements CustomObject
     @Override
     public CustomObject applySettings(Map<String, String> extraSettings)
     {
-        Map<String, String> newSettings = new HashMap<String, String>();
-        newSettings.putAll(settings.getSettingsCache());
-        newSettings.putAll(extraSettings);
-        return new BO3(getName(), settings.file, newSettings);
+        return new BO3(this, extraSettings);
     }
 
     @Override
@@ -220,5 +230,40 @@ public class BO3 implements CustomObject
             return false;
         }
         return true;
+    }
+    
+    @Override
+    public boolean hasBranches()
+    {
+        return settings.branches[0].length != 0;
+    }
+
+    @Override
+    public Branch[] getBranches(Rotation rotation)
+    {
+        return settings.branches[rotation.getRotationId()];
+    }
+
+    @Override
+    public CustomObjectCoordinate makeCustomObjectCoordinate(Random random, int chunkX, int chunkZ)
+    {
+        if (settings.rarity > random.nextDouble() * 100.0) {
+            Rotation rotation = settings.rotateRandomly? Rotation.getRandomRotation(random) : Rotation.NORTH;
+            int height = MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight);
+            return new CustomObjectCoordinate(this, rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16));
+        }
+        return null;
+    }
+
+    @Override
+    public int getMaxBranchDepth()
+    {
+        return settings.maxBranchDepth;
+    }
+
+    @Override
+    public SpawnHeight getSpawnHeight()
+    {
+        return this.settings.spawnHeight.toSpawnHeight();
     }
 }

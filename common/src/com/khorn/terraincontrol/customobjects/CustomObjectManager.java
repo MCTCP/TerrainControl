@@ -165,6 +165,7 @@ public class CustomObjectManager
             throw new IllegalArgumentException("Given file is not a directory: " + directory.getAbsolutePath());
         }
 
+        // Load all objects from the files
         Map<String, CustomObject> objects = new HashMap<String, CustomObject>();
         for (File file : directory.listFiles())
         {
@@ -183,6 +184,12 @@ public class CustomObjectManager
                     objects.put(objectName.toLowerCase(), loader.loadFromFile(objectName, file));
                 }
             }
+        }
+        
+        // Enable all the objects
+        for(CustomObject object: objects.values())
+        {
+            object.onEnable(objects);
         }
 
         return objects;

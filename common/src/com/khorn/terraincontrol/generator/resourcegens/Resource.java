@@ -2,8 +2,8 @@ package com.khorn.terraincontrol.generator.resourcegens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
-import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.Random;
 /**
  * Represents a Resource: something that can generate in the world.
  */
-public abstract class Resource extends ConfigFunction<WorldConfig>
+public abstract class Resource extends ConfigFunction<BiomeConfig>
 {
     protected int blockId = -1;
     protected int blockData = -1;
@@ -21,9 +21,9 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
     protected int rarity;
 
     @Override
-    public Class<WorldConfig> getHolderType()
+    public Class<BiomeConfig> getHolderType()
     {
-        return WorldConfig.class;
+        return BiomeConfig.class;
     }
 
     /**
@@ -92,7 +92,7 @@ public abstract class Resource extends ConfigFunction<WorldConfig>
      * @param args
      * @return
      */
-    public static Resource createResource(WorldConfig config, Class<? extends Resource> clazz, Object... args)
+    public static Resource createResource(BiomeConfig config, Class<? extends Resource> clazz, Object... args)
     {
         List<String> stringArgs = new ArrayList<String>(args.length);
         for (Object arg : args)
