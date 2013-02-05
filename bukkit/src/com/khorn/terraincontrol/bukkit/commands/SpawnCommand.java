@@ -53,10 +53,8 @@ public class SpawnCommand extends BaseCommand
         Block block = this.getWatchedBlock(me, true);
         if (block == null)
             return true;
-
-        Rotation rotation = spawnObject.canRotateRandomly()? Rotation.getRandomRotation(random): Rotation.NORTH;
         
-        if (spawnObject.spawnForced(bukkitWorld, random, rotation, block.getX(), block.getY(), block.getZ()))
+        if (spawnObject.spawnForced(bukkitWorld, random, Rotation.NORTH, block.getX(), block.getY(), block.getZ()))
         {
             me.sendMessage(BaseCommand.MESSAGE_COLOR + spawnObject.getName() + " was spawned.");
         } else
