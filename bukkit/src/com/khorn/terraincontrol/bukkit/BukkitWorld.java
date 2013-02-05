@@ -11,6 +11,7 @@ import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 import net.minecraft.server.v1_4_R1.*;
 
@@ -23,6 +24,7 @@ public class BukkitWorld implements LocalWorld
     private TCChunkGenerator generator;
     private World world;
     private WorldConfig settings;
+    private CustomObjectStructureCache structureCache;
     private String name;
     private long seed;
     private BiomeGenerator biomeManager;
@@ -378,11 +380,11 @@ public class BukkitWorld implements LocalWorld
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = worldHeight - 1; y > 0; y--)
+        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
             int id = chunk.getTypeId(x, y, z);
             if (DefaultMaterial.getMaterial(id).isSolid())
-                return y;
+                return y + 1;
         }
         return -1;
     }
@@ -556,6 +558,7 @@ public class BukkitWorld implements LocalWorld
     {
         this.world = _world;
         this.seed = world.getSeed();
+        this.structureCache = new CustomObjectStructureCache(this);
 
         // TODO check for mob burning issues
         if (this.world.worldProvider.getName().equals("Overworld"))
@@ -651,5 +654,11 @@ public class BukkitWorld implements LocalWorld
             TileEntity tileEntity = TileEntity.c(nmsTag);
             world.setTileEntity(x, y, z, tileEntity);
         }
+    }
+
+    @Override
+    public CustomObjectStructureCache getStructureCache()
+    {
+        return this.structureCache;
     }
 }

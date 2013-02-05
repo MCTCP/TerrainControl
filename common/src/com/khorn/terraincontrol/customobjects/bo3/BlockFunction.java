@@ -62,7 +62,7 @@ public class BlockFunction extends BO3Function
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.blockId = blockId;
-        rotatedBlock.blockData = BlockHelper.RotateData(blockId, blockData);
+        rotatedBlock.blockData = BlockHelper.rotateData(blockId, blockData);
         rotatedBlock.hasMetaData = hasMetaData;
         rotatedBlock.metaDataTag = metaDataTag;
         rotatedBlock.metaDataName = metaDataName;

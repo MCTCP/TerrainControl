@@ -230,19 +230,19 @@ public class TerrainControl
     // Only cancelableEventHandlers can cancel events.
     // Cancelled events are still fired.
 
-    public static boolean fireCustomObjectSpawnEvent(CustomObject object, LocalWorld world, Random random, int x, int y, int z)
+    public static boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
     {
         boolean success = true;
         for (EventHandler handler : cancelableEventHandlers)
         {
-            if (!handler.onCustomObjectSpawn(object, world, random, x, y, z, !success))
+            if (!handler.canCustomObjectSpawn(object, world, x, y, z, !success))
             {
                 success = false;
             }
         }
         for (EventHandler handler : monitoringEventHandlers)
         {
-            handler.onCustomObjectSpawn(object, world, random, x, y, z, !success);
+            handler.canCustomObjectSpawn(object, world, x, y, z, !success);
         }
         return success;
     }

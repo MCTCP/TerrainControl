@@ -8,8 +8,8 @@ public class ObjectCoordinate
     public int y;
     public int z;
     private int hash;
-    public int BlockId;
-    public int BlockData;
+    public int blockId;
+    public int blockData;
     public int BranchDirection;
     public int BranchOdds;
 
@@ -20,7 +20,7 @@ public class ObjectCoordinate
         this.y = _y;
         this.z = _z;
         this.BranchDirection = -1;
-        this.BlockData = 0;
+        this.blockData = 0;
         this.BranchOdds = -1;
 
         hash = x + z << 8 + y << 16;
@@ -47,8 +47,8 @@ public class ObjectCoordinate
     public ObjectCoordinate Rotate()
     {
         ObjectCoordinate newCoordinate = new ObjectCoordinate(this.z, this.y, (this.x * -1));
-        newCoordinate.BlockId = this.BlockId;
-        newCoordinate.BlockData = BlockHelper.RotateData(this.BlockId, this.BlockData);
+        newCoordinate.blockId = this.blockId;
+        newCoordinate.blockData = BlockHelper.rotateData(this.blockId, this.blockData);
         newCoordinate.BranchOdds = this.BranchOdds;
 
         if (this.BranchDirection != -1)
@@ -99,9 +99,9 @@ public class ObjectCoordinate
             {
                 String stringSet[] = workingDataString.split("\\.");
                 workingDataString = stringSet[0];
-                newCoordinate.BlockData = Integer.parseInt(stringSet[1]);
+                newCoordinate.blockData = Integer.parseInt(stringSet[1]);
             }
-            newCoordinate.BlockId = Integer.parseInt(workingDataString);
+            newCoordinate.blockId = Integer.parseInt(workingDataString);
 
             return newCoordinate;
 

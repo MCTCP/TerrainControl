@@ -3,6 +3,7 @@ package com.khorn.terraincontrol;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 
 import java.util.ArrayList;
@@ -93,8 +94,14 @@ public interface LocalWorld
 
     public int getLiquidHeight(int x, int z);
 
+    /**
+     * Returns the block above the highest solid block.
+     */
     public int getSolidHeight(int x, int z);
 
+    /**
+     * Returns the block above the highest block.
+     */
     public int getHighestBlockYAt(int x, int z);
 
     public DefaultMaterial getMaterial(int x, int y, int z);
@@ -106,6 +113,8 @@ public interface LocalWorld
     public boolean isLoaded(int x, int y, int z);
 
     public WorldConfig getSettings();
+    
+    public CustomObjectStructureCache getStructureCache();
 
     public String getName();
 

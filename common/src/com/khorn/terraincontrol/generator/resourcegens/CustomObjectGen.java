@@ -27,7 +27,7 @@ public class CustomObjectGen extends Resource
         objectNames = new ArrayList<String>();
         for (String arg : args)
         {
-            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(arg, getHolder());
+            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(arg, getHolder().worldConfig);
             if (object == null || !object.canSpawnAsObject())
             {
                 throw new InvalidConfigException("No custom object found with the name " + arg);

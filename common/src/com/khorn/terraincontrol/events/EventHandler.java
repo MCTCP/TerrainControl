@@ -22,7 +22,9 @@ public abstract class EventHandler
     }
 
     /**
-     * Called whenever a single custom object successfully spawns.
+     * Called whenever a check needs to be run to spawn an object. Always 
+     * called as the last check. You can be (almost) sure that an object
+     * will spawn after this, so it can be used to log CustomObject spawn.
      * <p/>
      * It is up to the implementation of the CustomObject to fire this event.
      * UseWorld and UseBiome won't fire this event, but BO2 and BO3 will.
@@ -32,7 +34,6 @@ public abstract class EventHandler
      *
      * @param object The object that is about to spawn.
      * @param world  The world where it will spawn.
-     * @param random The random generator.
      * @param x      The x of the object origin.
      * @param y      The y of the object origin.
      * @param z      The z of the object origin.
@@ -40,7 +41,7 @@ public abstract class EventHandler
      *         events, so returning true when the event is already cancelled
      *         does nothing.
      */
-    public boolean onCustomObjectSpawn(CustomObject object, LocalWorld world, Random random, int x, int y, int z, boolean isCancelled)
+    public boolean canCustomObjectSpawn(CustomObject object, LocalWorld world, int x, int y, int z, boolean isCancelled)
     {
         return true;
     }

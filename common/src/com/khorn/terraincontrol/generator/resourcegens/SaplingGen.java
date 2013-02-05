@@ -2,16 +2,17 @@ package com.khorn.terraincontrol.generator.resourcegens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
-import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.Rotation;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class SaplingGen extends ConfigFunction<WorldConfig>
+public class SaplingGen extends ConfigFunction<BiomeConfig>
 {
     public List<CustomObject> trees;
     public List<String> treeNames;
@@ -19,9 +20,9 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
     public SaplingType saplingType;
 
     @Override
-    public Class<WorldConfig> getHolderType()
+    public Class<BiomeConfig> getHolderType()
     {
-        return WorldConfig.class;
+        return BiomeConfig.class;
     }
 
     @Override
@@ -41,7 +42,7 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
 
         for (int i = 1; i < args.size() - 1; i += 2)
         {
-            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(i), getHolder());
+            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(i), getHolder().worldConfig);
             if (object == null)
             {
                 throw new InvalidConfigException("Custom object " + args.get(i) + " not found!");
@@ -74,7 +75,8 @@ public class SaplingGen extends ConfigFunction<WorldConfig>
         {
             if (random.nextInt(100) < treeChances.get(treeNumber))
             {
-                if (trees.get(treeNumber).spawnAsTree(world, random, x, y, z))
+                Rotation rotation = trees.get(treeNumber).canRotateRandomly()? Rotation.getRandomRotation(random) : Rotation.NORTH;
+                if (trees.get(treeNumber).spawnForced(world, random, rotation, x, y, z))
                 {
                     // Success!
                     return true;

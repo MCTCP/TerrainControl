@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.Rotation;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,75 +18,78 @@ import java.util.*;
  */
 public class BO2 extends ConfigFile implements CustomObject
 {
-    public ObjectCoordinate[][] Data = new ObjectCoordinate[4][];
+    public ObjectCoordinate[][] data = new ObjectCoordinate[4][];
 
-    public BO2[] GroupObjects = null;
+    public BO2[] groupObjects = null;
 
-    public String Name;
+    public String name;
 
-    public HashSet<String> SpawnInBiome;
+    public HashSet<String> spawnInBiome;
 
-    public String Version;
-    public HashSet<Integer> SpawnOnBlockType;
+    public String version;
+    public HashSet<Integer> spawnOnBlockType;
 
-    public HashSet<Integer> CollisionBlockType;
+    public HashSet<Integer> collisionBlockType;
 
-    public boolean SpawnWater;
-    public boolean SpawnLava;
-    public boolean SpawnAboveGround;
-    public boolean SpawnUnderGround;
+    public boolean spawnWater;
+    public boolean spawnLava;
+    public boolean spawnAboveGround;
+    public boolean spawnUnderGround;
 
-    public boolean SpawnSunlight;
-    public boolean SpawnDarkness;
+    public boolean spawnSunlight;
+    public boolean spawnDarkness;
 
-    public boolean UnderFill;
-    public boolean RandomRotation;
-    public boolean Dig;
-    public boolean Tree;
-    public boolean Branch;
-    public boolean DiggingBranch;
-    public boolean NeedsFoundation;
-    public int Rarity;
-    public double CollisionPercentage;
-    public int SpawnElevationMin;
-    public int SpawnElevationMax;
+    public boolean underFill;
+    public boolean randomRotation;
+    public boolean dig;
+    public boolean tree;
+    public boolean branch;
+    public boolean diggingBranch;
+    public boolean needsFoundation;
+    public int rarity;
+    public double collisionPercentage;
+    public int spawnElevationMin;
+    public int spawnElevationMax;
 
-    public int GroupFrequencyMin;
-    public int GroupFrequencyMax;
-    public int GroupSeparationMin;
-    public int GroupSeparationMax;
-    public String GroupId;
+    public int groupFrequencyMin;
+    public int groupFrequencyMax;
+    public int groupSeparationMin;
+    public int groupSeparationMax;
+    public String groupId;
 
-    public int BranchLimit;
+    public int branchLimit;
 
     public BO2(File file, String name)
     {
-        ReadSettingsFile(file);
-        this.Name = name;
-
-        ReadConfigSettings();
-        CorrectSettings();
+        readSettingsFile(file);
+        this.name = name;
     }
 
     public BO2(Map<String, String> settings, String name)
     {
-        SettingsCache = settings;
-        this.Name = name;
-
-        ReadConfigSettings();
-        CorrectSettings();
+        settingsCache = settings;
+        this.name = name;
+        // Initialize immediately
+        readConfigSettings();
+        correctSettings();
+    }
+    
+    @Override
+    public void onEnable(Map<String,CustomObject> otherObjectsInDirectory) {
+        readConfigSettings();
+        correctSettings();
     }
 
     @Override
     public String getName()
     {
-        return this.Name;
+        return this.name;
     }
 
     @Override
     public boolean canSpawnAsTree()
     {
-        return Tree;
+        return tree;
     }
 
     @Override
@@ -93,15 +97,71 @@ public class BO2 extends ConfigFile implements CustomObject
     {
         return true;
     }
+    
+    @Override
+    public boolean canRotateRandomly()
+    {
+        return randomRotation;
+    }
 
     @Override
-    public boolean spawn(LocalWorld world, Random random, int x, int y, int z)
+    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-        ObjectCoordinate[] data = Data[0];
-        if (RandomRotation)
-            data = Data[random.nextInt(4)];
+        ObjectCoordinate[] data = this.data[rotation.getRotationId()];
 
-        // Spawn check
+        // Spawn
+        for (ObjectCoordinate point : data)
+        {
+            if (world.getTypeId(x + point.x, y + point.y, z + point.z) == 0)
+            {
+                world.setBlock((x + point.x), y + point.y, z + point.z, point.blockId, point.blockData, true, false, true);
+            } else if (dig)
+            {
+                world.setBlock((x + point.x), y + point.y, z + point.z, point.blockId, point.blockData, true, false, true);
+            }
+        }
+        return true;
+    }
+
+    public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
+    {
+        // Basic checks
+        if ((world.getTypeId(x, y - 5, z) == 0) && (needsFoundation))
+            return false;
+
+        int checkBlock = world.getTypeId(x, y + 2, z);
+        if (!spawnWater)
+        {
+            if ((checkBlock == DefaultMaterial.WATER.id) || (checkBlock == DefaultMaterial.STATIONARY_WATER.id))
+                return false;
+        }
+        if (!spawnLava)
+        {
+            if ((checkBlock == DefaultMaterial.LAVA.id) || (checkBlock == DefaultMaterial.STATIONARY_LAVA.id))
+                return false;
+        }
+
+        checkBlock = world.getLightLevel(x, y + 2, z);
+        if (!spawnSunlight)
+        {
+            if (checkBlock > 8)
+                return false;
+        }
+        if (!spawnDarkness)
+        {
+            if (checkBlock < 9)
+                return false;
+        }
+
+        if ((y < spawnElevationMin) || (y > spawnElevationMax))
+            return false;
+
+        if (!spawnOnBlockType.contains(world.getTypeId(x, y - 1, z)))
+            return false;
+
+        ObjectCoordinate[] data = this.data[rotation.getRotationId()];
+
+        // Check all blocks
         int faultCounter = 0;
 
         for (ObjectCoordinate point : data)
@@ -109,12 +169,12 @@ public class BO2 extends ConfigFile implements CustomObject
             if (!world.isLoaded((x + point.x), (y + point.y), (z + point.z)))
                 return false;
 
-            if (!Dig)
+            if (!dig)
             {
-                if (CollisionBlockType.contains(world.getTypeId((x + point.x), (y + point.y), (z + point.z))))
+                if (collisionBlockType.contains(world.getTypeId((x + point.x), (y + point.y), (z + point.z))))
                 {
                     faultCounter++;
-                    if (faultCounter > (data.length * (CollisionPercentage / 100)))
+                    if (faultCounter > (data.length * (collisionPercentage / 100)))
                     {
                         return false;
                     }
@@ -123,59 +183,44 @@ public class BO2 extends ConfigFile implements CustomObject
         }
 
         // Call event
-        if (!TerrainControl.fireCustomObjectSpawnEvent(this, world, random, x, y, z))
+        if (!TerrainControl.fireCanCustomObjectSpawnEvent(this, world, x, y, z))
         {
             // Cancelled
             return false;
         }
 
-        // Spawn
-        for (ObjectCoordinate point : data)
-        {
-            if (world.getTypeId(x + point.x, y + point.y, z + point.z) == 0)
-            {
-                world.setBlock((x + point.x), y + point.y, z + point.z, point.BlockId, point.BlockData, true, false, true);
-            } else if (Dig)
-            {
-                world.setBlock((x + point.x), y + point.y, z + point.z, point.BlockId, point.BlockData, true, false, true);
-            }
-        }
         return true;
-    }
-
-    @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int y, int z)
-    {
-        return Tree && spawn(world, random, x, y, z);
     }
 
     @Override
     public boolean spawn(LocalWorld world, Random random, int x, int z)
     {
         int y;
-        if (SpawnAboveGround)
+        if (spawnAboveGround)
             y = world.getSolidHeight(x, z);
-        else if (SpawnUnderGround)
+        else if (spawnUnderGround)
         {
             int solidHeight = world.getSolidHeight(x, z);
-            if (solidHeight < 1 || solidHeight <= SpawnElevationMin)
+            if (solidHeight < 1 || solidHeight <= spawnElevationMin)
                 return false;
-            if (solidHeight > SpawnElevationMax)
-                solidHeight = SpawnElevationMax;
-            y = random.nextInt(solidHeight - SpawnElevationMin) + SpawnElevationMin;
+            if (solidHeight > spawnElevationMax)
+                solidHeight = spawnElevationMax;
+            y = random.nextInt(solidHeight - spawnElevationMin) + spawnElevationMin;
         } else
             y = world.getHighestBlockYAt(x, z);
 
         if (y < 0)
             return false;
 
-        if (!ObjectCanSpawn(world, x, y, z))
+        Rotation rotation = randomRotation ? Rotation.getRandomRotation(random) : Rotation.NORTH;
+
+        if (!canSpawnAt(world, rotation, x, y, z))
             return false;
 
-        boolean objectSpawned = this.spawn(world, random, x, y, z);
+        boolean objectSpawned = spawnForced(world, random, rotation, x, y, z);
 
-        if (objectSpawned)
-            GenerateCustomObjectFromGroup(world, random, x, y, z);
+//        if (objectSpawned)
+//            GenerateCustomObjectFromGroup(world, random, x, y, z);
 
         return objectSpawned;
     }
@@ -190,11 +235,11 @@ public class BO2 extends ConfigFile implements CustomObject
     public boolean process(LocalWorld world, Random rand, int chunkX, int chunkZ)
     {
 
-        if (Branch)
+        if (branch)
             return false;
 
         int randomRoll = rand.nextInt(100);
-        int ObjectRarity = Rarity;
+        int ObjectRarity = rarity;
         boolean objectSpawned = false;
 
         while (randomRoll < ObjectRarity)
@@ -213,7 +258,7 @@ public class BO2 extends ConfigFile implements CustomObject
     @Override
     public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        return Tree && process(world, random, chunkX, chunkZ);
+        return tree && process(world, random, chunkX, chunkZ);
 
     }
 
@@ -221,66 +266,66 @@ public class BO2 extends ConfigFile implements CustomObject
     public CustomObject applySettings(Map<String, String> extraSettings)
     {
         Map<String, String> newSettings = new HashMap<String, String>();
-        newSettings.putAll(SettingsCache);
+        newSettings.putAll(settingsCache);
         newSettings.putAll(extraSettings);
         return new BO2(newSettings, getName());
     }
 
     @Override
-    protected void WriteConfigSettings() throws IOException
+    protected void writeConfigSettings() throws IOException
     {
         // It doesn't write.
     }
 
     @Override
-    protected void ReadConfigSettings()
+    protected void readConfigSettings()
     {
-        this.Version = ReadModSettings(BODefaultValues.version.name(), BODefaultValues.version.stringValue());
+        this.version = readModSettings(BODefaultValues.version.name(), BODefaultValues.version.stringValue());
 
-        this.SpawnOnBlockType = this.ReadBlockList(ReadModSettings(BODefaultValues.spawnOnBlockType.name(), BODefaultValues.spawnOnBlockType.StringArrayListValue()), BODefaultValues.spawnOnBlockType.name());
-        this.CollisionBlockType = this.ReadBlockList(ReadModSettings(BODefaultValues.collisionBlockType.name(), BODefaultValues.collisionBlockType.StringArrayListValue()), BODefaultValues.collisionBlockType.name());
+        this.spawnOnBlockType = this.ReadBlockList(readModSettings(BODefaultValues.spawnOnBlockType.name(), BODefaultValues.spawnOnBlockType.StringArrayListValue()), BODefaultValues.spawnOnBlockType.name());
+        this.collisionBlockType = this.ReadBlockList(readModSettings(BODefaultValues.collisionBlockType.name(), BODefaultValues.collisionBlockType.StringArrayListValue()), BODefaultValues.collisionBlockType.name());
 
-        this.SpawnInBiome = new HashSet<String>(ReadModSettings(BODefaultValues.spawnInBiome.name(), BODefaultValues.spawnInBiome.StringArrayListValue()));
+        this.spawnInBiome = new HashSet<String>(readModSettings(BODefaultValues.spawnInBiome.name(), BODefaultValues.spawnInBiome.StringArrayListValue()));
 
-        this.SpawnSunlight = ReadModSettings(BODefaultValues.spawnSunlight.name(), BODefaultValues.spawnSunlight.booleanValue());
-        this.SpawnDarkness = ReadModSettings(BODefaultValues.spawnDarkness.name(), BODefaultValues.spawnDarkness.booleanValue());
-        this.SpawnWater = ReadModSettings(BODefaultValues.spawnWater.name(), BODefaultValues.spawnWater.booleanValue());
-        this.SpawnLava = ReadModSettings(BODefaultValues.spawnLava.name(), BODefaultValues.spawnLava.booleanValue());
-        this.SpawnAboveGround = ReadModSettings(BODefaultValues.spawnAboveGround.name(), BODefaultValues.spawnAboveGround.booleanValue());
-        this.SpawnUnderGround = ReadModSettings(BODefaultValues.spawnUnderGround.name(), BODefaultValues.spawnUnderGround.booleanValue());
+        this.spawnSunlight = readModSettings(BODefaultValues.spawnSunlight.name(), BODefaultValues.spawnSunlight.booleanValue());
+        this.spawnDarkness = readModSettings(BODefaultValues.spawnDarkness.name(), BODefaultValues.spawnDarkness.booleanValue());
+        this.spawnWater = readModSettings(BODefaultValues.spawnWater.name(), BODefaultValues.spawnWater.booleanValue());
+        this.spawnLava = readModSettings(BODefaultValues.spawnLava.name(), BODefaultValues.spawnLava.booleanValue());
+        this.spawnAboveGround = readModSettings(BODefaultValues.spawnAboveGround.name(), BODefaultValues.spawnAboveGround.booleanValue());
+        this.spawnUnderGround = readModSettings(BODefaultValues.spawnUnderGround.name(), BODefaultValues.spawnUnderGround.booleanValue());
 
-        this.UnderFill = ReadModSettings(BODefaultValues.underFill.name(), BODefaultValues.underFill.booleanValue());
+        this.underFill = readModSettings(BODefaultValues.underFill.name(), BODefaultValues.underFill.booleanValue());
 
-        this.RandomRotation = ReadModSettings(BODefaultValues.randomRotation.name(), BODefaultValues.randomRotation.booleanValue());
-        this.Dig = ReadModSettings(BODefaultValues.dig.name(), BODefaultValues.dig.booleanValue());
-        this.Tree = ReadModSettings(BODefaultValues.tree.name(), BODefaultValues.tree.booleanValue());
-        this.Branch = ReadModSettings(BODefaultValues.branch.name(), BODefaultValues.branch.booleanValue());
-        this.DiggingBranch = ReadModSettings(BODefaultValues.diggingBranch.name(), BODefaultValues.diggingBranch.booleanValue());
-        this.NeedsFoundation = ReadModSettings(BODefaultValues.needsFoundation.name(), BODefaultValues.needsFoundation.booleanValue());
-        this.Rarity = ReadModSettings(BODefaultValues.rarity.name(), BODefaultValues.rarity.intValue());
-        this.CollisionPercentage = ReadModSettings(BODefaultValues.collisionPercentage.name(), BODefaultValues.collisionPercentage.intValue());
-        this.SpawnElevationMin = ReadModSettings(BODefaultValues.spawnElevationMin.name(), BODefaultValues.spawnElevationMin.intValue());
-        this.SpawnElevationMax = ReadModSettings(BODefaultValues.spawnElevationMax.name(), BODefaultValues.spawnElevationMax.intValue());
+        this.randomRotation = readModSettings(BODefaultValues.randomRotation.name(), BODefaultValues.randomRotation.booleanValue());
+        this.dig = readModSettings(BODefaultValues.dig.name(), BODefaultValues.dig.booleanValue());
+        this.tree = readModSettings(BODefaultValues.tree.name(), BODefaultValues.tree.booleanValue());
+        this.branch = readModSettings(BODefaultValues.branch.name(), BODefaultValues.branch.booleanValue());
+        this.diggingBranch = readModSettings(BODefaultValues.diggingBranch.name(), BODefaultValues.diggingBranch.booleanValue());
+        this.needsFoundation = readModSettings(BODefaultValues.needsFoundation.name(), BODefaultValues.needsFoundation.booleanValue());
+        this.rarity = readModSettings(BODefaultValues.rarity.name(), BODefaultValues.rarity.intValue());
+        this.collisionPercentage = readModSettings(BODefaultValues.collisionPercentage.name(), BODefaultValues.collisionPercentage.intValue());
+        this.spawnElevationMin = readModSettings(BODefaultValues.spawnElevationMin.name(), BODefaultValues.spawnElevationMin.intValue());
+        this.spawnElevationMax = readModSettings(BODefaultValues.spawnElevationMax.name(), BODefaultValues.spawnElevationMax.intValue());
 
-        this.GroupFrequencyMin = ReadModSettings(BODefaultValues.groupFrequencyMin.name(), BODefaultValues.groupFrequencyMin.intValue());
-        this.GroupFrequencyMax = ReadModSettings(BODefaultValues.groupFrequencyMax.name(), BODefaultValues.groupFrequencyMax.intValue());
-        this.GroupSeparationMin = ReadModSettings(BODefaultValues.groupSeperationMin.name(), BODefaultValues.groupSeperationMin.intValue());
-        this.GroupSeparationMax = ReadModSettings(BODefaultValues.groupSeperationMax.name(), BODefaultValues.groupSeperationMax.intValue());
-        this.GroupId = ReadModSettings(BODefaultValues.groupId.name(), BODefaultValues.groupId.stringValue());
+        this.groupFrequencyMin = readModSettings(BODefaultValues.groupFrequencyMin.name(), BODefaultValues.groupFrequencyMin.intValue());
+        this.groupFrequencyMax = readModSettings(BODefaultValues.groupFrequencyMax.name(), BODefaultValues.groupFrequencyMax.intValue());
+        this.groupSeparationMin = readModSettings(BODefaultValues.groupSeperationMin.name(), BODefaultValues.groupSeperationMin.intValue());
+        this.groupSeparationMax = readModSettings(BODefaultValues.groupSeperationMax.name(), BODefaultValues.groupSeperationMax.intValue());
+        this.groupId = readModSettings(BODefaultValues.groupId.name(), BODefaultValues.groupId.stringValue());
 
-        this.BranchLimit = ReadModSettings(BODefaultValues.branchLimit.name(), BODefaultValues.branchLimit.intValue());
+        this.branchLimit = readModSettings(BODefaultValues.branchLimit.name(), BODefaultValues.branchLimit.intValue());
 
         this.ReadCoordinates();
     }
 
     @Override
-    protected void CorrectSettings()
+    protected void correctSettings()
     {
         // Stub method
     }
 
     @Override
-    protected void RenameOldSettings()
+    protected void renameOldSettings()
     {
         // Stub method
     }
@@ -289,29 +334,29 @@ public class BO2 extends ConfigFile implements CustomObject
     {
         ArrayList<ObjectCoordinate> coordinates = new ArrayList<ObjectCoordinate>();
 
-        for (String key : SettingsCache.keySet())
+        for (String key : settingsCache.keySet())
         {
-            ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(key, SettingsCache.get(key));
+            ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(key, settingsCache.get(key));
             if (buffer != null)
                 coordinates.add(buffer);
         }
 
-        Data[0] = new ObjectCoordinate[coordinates.size()];
-        Data[1] = new ObjectCoordinate[coordinates.size()];
-        Data[2] = new ObjectCoordinate[coordinates.size()];
-        Data[3] = new ObjectCoordinate[coordinates.size()];
+        data[0] = new ObjectCoordinate[coordinates.size()];
+        data[1] = new ObjectCoordinate[coordinates.size()];
+        data[2] = new ObjectCoordinate[coordinates.size()];
+        data[3] = new ObjectCoordinate[coordinates.size()];
 
         for (int i = 0; i < coordinates.size(); i++)
         {
             ObjectCoordinate coordinate = coordinates.get(i);
 
-            Data[0][i] = coordinate;
+            data[0][i] = coordinate;
             coordinate = coordinate.Rotate();
-            Data[1][i] = coordinate;
+            data[1][i] = coordinate;
             coordinate = coordinate.Rotate();
-            Data[2][i] = coordinate;
+            data[2][i] = coordinate;
             coordinate = coordinate.Rotate();
-            Data[3][i] = coordinate;
+            data[3][i] = coordinate;
         }
 
     }
@@ -359,41 +404,14 @@ public class BO2 extends ConfigFile implements CustomObject
 
             }
         if (nonIntegerValues)
-            System.out.println("TerrainControl: Custom object " + this.Name + " has wrong value " + settingName);
+            System.out.println("TerrainControl: Custom object " + this.name + " has wrong value " + settingName);
 
         return output;
 
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean ObjectCanSpawn(LocalWorld world, int x, int y, int z)
-    {
-        if ((world.getTypeId(x, y - 5, z) == 0) && (NeedsFoundation))
-            return false;
-
-        boolean output = true;
-        int checkBlock = world.getTypeId(x, y + 2, z);
-        if (!SpawnWater)
-            output = !((checkBlock == DefaultMaterial.WATER.id) || (checkBlock == DefaultMaterial.STATIONARY_WATER.id));
-        if (!SpawnLava)
-            output = !((checkBlock == DefaultMaterial.LAVA.id) || (checkBlock == DefaultMaterial.STATIONARY_LAVA.id));
-
-        checkBlock = world.getLightLevel(x, y + 2, z);
-        if (!SpawnSunlight)
-            output = !(checkBlock > 8);
-        if (!SpawnDarkness)
-            output = !(checkBlock < 9);
-
-        if ((y < SpawnElevationMin) || (y > SpawnElevationMax))
-            output = false;
-
-        if (!SpawnOnBlockType.contains(world.getTypeId(x, y - 1, z)))
-            output = false;
-
-        return output;
-    }
-
-    public void GenerateCustomObjectFromGroup(LocalWorld world, Random random, int x, int y, int z)
+    // Old branch code - is being rewritten
+/*    public void GenerateCustomObjectFromGroup(LocalWorld world, Random random, int x, int y, int z)
     {
         if (GroupObjects == null)
             return;
@@ -438,12 +456,11 @@ public class BO2 extends ConfigFile implements CustomObject
             ObjectFromGroup.spawn(world, random, x, _y, z);
         }
 
-    }
+    }*/
 
     @Override
     public boolean hasPreferenceToSpawnIn(LocalBiome biome)
     {
-        return SpawnInBiome.contains(biome.getName()) || SpawnInBiome.contains("All");
+        return spawnInBiome.contains(biome.getName()) || spawnInBiome.contains("All");
     }
-
 }

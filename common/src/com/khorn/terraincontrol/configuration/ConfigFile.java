@@ -14,22 +14,22 @@ public abstract class ConfigFile
     /**
      * Stores all the settings. Settings like Name:Value or Name=Value are stored as name, Value and settings like Function(a, b, c) are stored as function(a, b, c), lineNumber
      */
-    protected Map<String, String> SettingsCache = new HashMap<String, String>();
+    protected Map<String, String> settingsCache = new HashMap<String, String>();
 
-    private boolean WriteComments;
+    private boolean writeComments;
 
-    protected void ReadSettingsFile(File f)
+    protected void readSettingsFile(File f)
     {
-        BufferedReader SettingsReader = null;
+        BufferedReader settingsReader = null;
 
         if (f.exists())
         {
             try
             {
-                SettingsReader = new BufferedReader(new FileReader(f));
+                settingsReader = new BufferedReader(new FileReader(f));
                 String thisLine;
                 int lineNumber = 0;
-                while ((thisLine = SettingsReader.readLine()) != null)
+                while ((thisLine = settingsReader.readLine()) != null)
                 {
                     lineNumber++;
 
@@ -45,33 +45,33 @@ public abstract class ConfigFile
                         if(thisLine.contains("(") && (!thisLine.contains(":") || thisLine.indexOf('(') < thisLine.indexOf(":")) )
                         {
                             // ( is first, so it's a resource
-                            this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
+                            this.settingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
                         } else
                         {
                             // : is first, so it's a setting
                             String[] splitSettings = thisLine.split(":", 2);
-                            this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
+                            this.settingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                         }
                     } else if (thisLine.contains("="))
                     {
                         // Setting (old style), split it and add it
                         String[] splitSettings = thisLine.split("=", 2);
-                        this.SettingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
+                        this.settingsCache.put(splitSettings[0].trim().toLowerCase(), splitSettings[1].trim());
                     } else
                     {
                         // Unknown, just add it
-                        this.SettingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
+                        this.settingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
                     }
                 }
             } catch (IOException e)
             {
                 e.printStackTrace();
 
-                if (SettingsReader != null)
+                if (settingsReader != null)
                 {
                     try
                     {
-                        SettingsReader.close();
+                        settingsReader.close();
                     } catch (IOException localIOException1)
                     {
                         localIOException1.printStackTrace();
@@ -79,11 +79,11 @@ public abstract class ConfigFile
                 }
             } finally
             {
-                if (SettingsReader != null)
+                if (settingsReader != null)
                 {
                     try
                     {
-                        SettingsReader.close();
+                        settingsReader.close();
                     } catch (IOException localIOException2)
                     {
                         localIOException2.printStackTrace();
@@ -117,12 +117,12 @@ public abstract class ConfigFile
     // ReadModSettings
     // -------------------------------------------- //
 
-    protected List<WeightedMobSpawnGroup> ReadModSettings(String settingsName, List<WeightedMobSpawnGroup> defaultValue)
+    protected List<WeightedMobSpawnGroup> readModSettings(String settingsName, List<WeightedMobSpawnGroup> defaultValue)
     {
         settingsName = settingsName.toLowerCase();
-        if (this.SettingsCache.containsKey(settingsName))
+        if (this.settingsCache.containsKey(settingsName))
         {
-            String json = this.SettingsCache.get(settingsName);
+            String json = this.settingsCache.get(settingsName);
             if (json == null)
                 return defaultValue;
             return WeightedMobSpawnGroup.fromJson(json);
@@ -133,31 +133,31 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
-    protected ArrayList<String> ReadModSettings(String settingsName, ArrayList<String> defaultValue)
+    protected ArrayList<String> readModSettings(String settingsName, ArrayList<String> defaultValue)
     {
         settingsName = settingsName.toLowerCase();
-        if (this.SettingsCache.containsKey(settingsName))
+        if (this.settingsCache.containsKey(settingsName))
         {
             ArrayList<String> out = new ArrayList<String>();
-            if (this.SettingsCache.get(settingsName).trim().equals("") || this.SettingsCache.get(settingsName).equals("None"))
+            if (this.settingsCache.get(settingsName).trim().equals("") || this.settingsCache.get(settingsName).equals("None"))
             {
                 return out;
             }
-            Collections.addAll(out, this.SettingsCache.get(settingsName).split(","));
+            Collections.addAll(out, this.settingsCache.get(settingsName).split(","));
             return out;
         }
         sayNotFound(settingsName);
         return defaultValue;
     }
 
-    protected int ReadModSettings(String settingsName, int defaultValue)
+    protected int readModSettings(String settingsName, int defaultValue)
     {
         settingsName = settingsName.toLowerCase();
-        if (this.SettingsCache.containsKey(settingsName))
+        if (this.settingsCache.containsKey(settingsName))
         {
             try
             {
-                return Integer.valueOf(this.SettingsCache.get(settingsName));
+                return Integer.valueOf(this.settingsCache.get(settingsName));
             } catch (NumberFormatException e)
             {
                 sayHadWrongValue(settingsName);
@@ -167,14 +167,14 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
-    protected byte ReadModSettings(String settingsName, byte defaultValue)
+    protected byte readModSettings(String settingsName, byte defaultValue)
     {
         settingsName = settingsName.toLowerCase();
-        if (this.SettingsCache.containsKey(settingsName))
+        if (this.settingsCache.containsKey(settingsName))
         {
             try
             {
-                return Byte.valueOf(this.SettingsCache.get(settingsName));
+                return Byte.valueOf(this.settingsCache.get(settingsName));
             } catch (NumberFormatException e)
             {
                 sayHadWrongValue(settingsName);
@@ -184,25 +184,25 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
-    protected String ReadModSettings(String settingsName, String defaultValue)
+    protected String readModSettings(String settingsName, String defaultValue)
     {
         settingsName = settingsName.toLowerCase();
-        if (this.SettingsCache.containsKey(settingsName))
+        if (this.settingsCache.containsKey(settingsName))
         {
-            return this.SettingsCache.get(settingsName);
+            return this.settingsCache.get(settingsName);
         }
         sayNotFound(settingsName);
         return defaultValue;
     }
 
-    protected double ReadModSettings(String settingsName, double defaultValue)
+    protected double readModSettings(String settingsName, double defaultValue)
     {
         settingsName = settingsName.toLowerCase();
-        if (this.SettingsCache.containsKey(settingsName))
+        if (this.settingsCache.containsKey(settingsName))
         {
             try
             {
-                return Double.valueOf(this.SettingsCache.get(settingsName));
+                return Double.valueOf(this.settingsCache.get(settingsName));
             } catch (NumberFormatException e)
             {
                 sayHadWrongValue(settingsName);
@@ -212,15 +212,15 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
-    protected int ReadModSettingsColor(String settingsName, String defaultValue)
+    protected int readModSettingsColor(String settingsName, String defaultValue)
     {
         settingsName = settingsName.toLowerCase();
         Color color = Color.decode(defaultValue);
-        if (this.SettingsCache.containsKey(settingsName))
+        if (this.settingsCache.containsKey(settingsName))
         {
             try
             {
-                color = Color.decode(this.SettingsCache.get(settingsName));
+                color = Color.decode(this.settingsCache.get(settingsName));
             } catch (NumberFormatException ex)
             {
                 sayHadWrongValue(settingsName);
@@ -230,14 +230,14 @@ public abstract class ConfigFile
         return color.getRGB() & 0xFFFFFF;
     }
 
-    protected float ReadModSettings(String settingsName, float defaultValue)
+    protected float readModSettings(String settingsName, float defaultValue)
     {
         settingsName = settingsName.toLowerCase();
-        if (this.SettingsCache.containsKey(settingsName))
+        if (this.settingsCache.containsKey(settingsName))
         {
             try
             {
-                return Float.valueOf(this.SettingsCache.get(settingsName));
+                return Float.valueOf(this.settingsCache.get(settingsName));
             } catch (NumberFormatException e)
             {
                 sayHadWrongValue(settingsName);
@@ -247,25 +247,25 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
-    protected boolean ReadModSettings(String settingsName, boolean defaultValue)
+    protected boolean readModSettings(String settingsName, boolean defaultValue)
     {
         settingsName = settingsName.toLowerCase();
-        if (this.SettingsCache.containsKey(settingsName))
+        if (this.settingsCache.containsKey(settingsName))
         {
-            return Boolean.valueOf(this.SettingsCache.get(settingsName));
+            return Boolean.valueOf(this.settingsCache.get(settingsName));
         }
         sayNotFound(settingsName);
         return defaultValue;
     }
 
-    protected Enum<?> ReadModSettings(String settingsName, Enum<?> defaultValue)
+    protected Enum<?> readModSettings(String settingsName, Enum<?> defaultValue)
     {
         settingsName = settingsName.toLowerCase();
-        if (this.SettingsCache.containsKey(settingsName))
+        if (this.settingsCache.containsKey(settingsName))
         {
 
             Class<?> enumClass = defaultValue.getDeclaringClass();
-            String value = this.SettingsCache.get(settingsName);
+            String value = this.settingsCache.get(settingsName);
 
             if (enumClass.isEnum())
             {
@@ -289,35 +289,35 @@ public abstract class ConfigFile
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T ReadSettings(TCSetting value)
+    protected <T> T readSettings(TCSetting value)
     {
         Object obj = null;
 
         switch (value.getReturnType())
         {
             case String:
-                obj = ReadModSettings(value.name(), value.stringValue());
+                obj = readModSettings(value.name(), value.stringValue());
                 break;
             case Boolean:
-                obj = ReadModSettings(value.name(), value.booleanValue());
+                obj = readModSettings(value.name(), value.booleanValue());
                 break;
             case Int:
-                obj = ReadModSettings(value.name(), value.intValue());
+                obj = readModSettings(value.name(), value.intValue());
                 break;
             case Enum:
-                obj = ReadModSettings(value.name(), value.enumValue());
+                obj = readModSettings(value.name(), value.enumValue());
                 break;
             case Double:
-                obj = ReadModSettings(value.name(), value.doubleValue());
+                obj = readModSettings(value.name(), value.doubleValue());
                 break;
             case Float:
-                obj = ReadModSettings(value.name(), value.floatValue());
+                obj = readModSettings(value.name(), value.floatValue());
                 break;
             case StringArray:
-                obj = ReadModSettings(value.name(), value.stringArrayListValue());
+                obj = readModSettings(value.name(), value.stringArrayListValue());
                 break;
             case Color:
-                obj = ReadModSettingsColor(value.name(), value.stringValue());
+                obj = readModSettingsColor(value.name(), value.stringValue());
                 break;
         }
 
@@ -329,12 +329,12 @@ public abstract class ConfigFile
 
     public void writeSettingsFile(File settingsFile, boolean comments)
     {
-        this.WriteComments = comments;
+        this.writeComments = comments;
         try
         {
             this.settingsWriter = new BufferedWriter(new FileWriter(settingsFile, false));
 
-            this.WriteConfigSettings();
+            this.writeConfigSettings();
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -475,7 +475,7 @@ public abstract class ConfigFile
 
     protected void writeComment(String comment) throws IOException
     {
-        if (!this.WriteComments)
+        if (!this.writeComments)
             return;
         if(comment.length() > 0)
             this.settingsWriter.write("# " + comment);
@@ -487,13 +487,13 @@ public abstract class ConfigFile
         this.settingsWriter.newLine();
     }
 
-    protected abstract void WriteConfigSettings() throws IOException;
+    protected abstract void writeConfigSettings() throws IOException;
 
-    protected abstract void ReadConfigSettings();
+    protected abstract void readConfigSettings();
 
-    protected abstract void CorrectSettings();
+    protected abstract void correctSettings();
 
-    protected abstract void RenameOldSettings();
+    protected abstract void renameOldSettings();
 
     /**
      * Renames an old setting. If the old setting isn't found, this does
@@ -504,9 +504,9 @@ public abstract class ConfigFile
      */
     protected void renameOldSetting(String oldValue, TCDefaultValues newValue)
     {
-        if (this.SettingsCache.containsKey(oldValue.toLowerCase()))
+        if (this.settingsCache.containsKey(oldValue.toLowerCase()))
         {
-            this.SettingsCache.put(newValue.name().toLowerCase(), this.SettingsCache.get(oldValue.toLowerCase()));
+            this.settingsCache.put(newValue.name().toLowerCase(), this.settingsCache.get(oldValue.toLowerCase()));
         }
     }
 
@@ -580,14 +580,14 @@ public abstract class ConfigFile
         return output;
     }
 
-    protected static void WriteStringToStream(DataOutputStream stream, String value) throws IOException
+    protected static void writeStringToStream(DataOutputStream stream, String value) throws IOException
     {
         byte[] bytes = value.getBytes();
         stream.writeShort(bytes.length);
         stream.write(bytes);
     }
 
-    protected static String ReadStringFromStream(DataInputStream stream) throws IOException
+    protected static String readStringFromStream(DataInputStream stream) throws IOException
     {
         byte[] chars = new byte[stream.readShort()];
         if (stream.read(chars, 0, chars.length) != chars.length)
@@ -597,7 +597,7 @@ public abstract class ConfigFile
     }
 
     // Public access modifier, so that WeightedMobSpawnGroup can use it
-    public static String[] ReadComplexString(String line)
+    public static String[] readComplexString(String line)
     {
         ArrayList<String> buffer = new ArrayList<String>();
 

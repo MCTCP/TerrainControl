@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
+
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.configuration.TCSetting;
 
@@ -17,9 +19,10 @@ public enum BO3Settings implements TCSetting
     frequency(1),
     rarity(100.0),
     rotateRandomly(false),
-    spawnHeight(SpawnHeight.highestBlock),
+    spawnHeight(SpawnHeightSetting.highestBlock),
     minHeight(0),
     maxHeight(256),
+    maxBranchDepth(10),
     excludedBiomes("All", SettingsType.StringArray),
 
     // Source block settings
@@ -28,9 +31,21 @@ public enum BO3Settings implements TCSetting
     maxPercentageOutsideSourceBlock(100);
 
     // The spawn height
-    public enum SpawnHeight
+    public enum SpawnHeightSetting
     {
-        randomY, highestBlock, highestSolidBlock
+        randomY(SpawnHeight.PROVIDED), highestBlock(SpawnHeight.HIGHEST_BLOCK), highestSolidBlock(SpawnHeight.HIGHEST_SOLID_BLOCK);
+        
+        private SpawnHeight height;
+        
+        private SpawnHeightSetting(SpawnHeight height)
+        {
+            this.height = height;
+        }
+        
+        public SpawnHeight toSpawnHeight()
+        {
+            return height;
+        }
     }
 
     // What to do when outside the source block

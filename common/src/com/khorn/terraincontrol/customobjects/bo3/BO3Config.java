@@ -5,8 +5,9 @@ import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
+import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeight;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightSetting;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,8 @@ public class BO3Config extends ConfigFile
 {
     public File file;
     public String name;
+    public Map<String, CustomObject> otherObjectsInDirectory;
+
     public String author;
     public String description;
     public ConfigMode settingsMode;
@@ -27,7 +30,7 @@ public class BO3Config extends ConfigFile
     public int frequency;
     public double rarity;
     public boolean rotateRandomly;
-    public SpawnHeight spawnHeight;
+    public SpawnHeightSetting spawnHeight;
     public int minHeight;
     public int maxHeight;
     public ArrayList<String> excludedBiomes;
@@ -39,18 +42,22 @@ public class BO3Config extends ConfigFile
     public BlockFunction[][] blocks = new BlockFunction[4][]; // four rotations
     public BO3Check[][] bo3Checks = new BO3Check[4][];
 
+    public int maxBranchDepth;
+    public BranchFunction[][] branches = new BranchFunction[4][];
+
     /**
      * Creates a BO3Config from a file.
      *
      * @param name
      * @param file
      */
-    public BO3Config(String name, File file)
+    public BO3Config(String name, File file, Map<String, CustomObject> otherObjectsInDirectory)
     {
         this.file = file;
         this.name = name;
+        this.otherObjectsInDirectory = otherObjectsInDirectory;
 
-        ReadSettingsFile(file);
+        readSettingsFile(file);
 
         init();
     }
@@ -63,23 +70,24 @@ public class BO3Config extends ConfigFile
      * @param file
      * @param settings
      */
-    public BO3Config(String name, File file, Map<String, String> settings)
+    public BO3Config(BO3 oldObject, Map<String, String> extraSettings)
     {
-        this.file = file;
-        this.name = name;
+        this.file = oldObject.getSettings().file;
+        this.name = oldObject.getName();
 
-        this.SettingsCache = settings;
+        this.settingsCache = oldObject.getSettings().settingsCache;
+        this.settingsCache.putAll(extraSettings);
 
         // Make sure that the BO3 file won't get overwritten
-        this.SettingsCache.put(TCDefaultValues.SettingsMode.toString().toLowerCase(), ConfigMode.WriteDisable.toString());
+        this.settingsCache.put(TCDefaultValues.SettingsMode.toString().toLowerCase(), ConfigMode.WriteDisable.toString());
 
         init();
     }
 
     private void init()
     {
-        ReadConfigSettings();
-        CorrectSettings();
+        readConfigSettings();
+        correctSettings();
         if (settingsMode != ConfigMode.WriteDisable)
         {
             writeSettingsFile(file, settingsMode == ConfigMode.WriteAll);
@@ -99,11 +107,11 @@ public class BO3Config extends ConfigFile
 
     public Map<String, String> getSettingsCache()
     {
-        return SettingsCache;
+        return settingsCache;
     }
 
     @Override
-    protected void WriteConfigSettings() throws IOException
+    protected void writeConfigSettings() throws IOException
     {
         // The object
         writeBigTitle("BO3 object");
@@ -128,9 +136,11 @@ public class BO3Config extends ConfigFile
         writeValue("Tree", tree);
         writeNewLine();
         writeComment("The frequency of the BO3 from 1 to 200. Tries this many times to spawn this BO3 when using the CustomObject(...) resource.");
+        writeComment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
         writeValue("Frequency", frequency);
         writeNewLine();
         writeComment("The rarity of the BO3 from 0 to 100. Each spawn attempt has rarity% chance to succeed when using the CustomObject(...) resource.");
+        writeComment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
         writeValue("Rarity", rarity);
         writeNewLine();
         writeComment("If you set this to true, the BO3 will be placed with a random rotation.");
@@ -142,6 +152,11 @@ public class BO3Config extends ConfigFile
         writeComment("The height limits for the BO3.");
         writeValue("MinHeight", minHeight);
         writeValue("MaxHeight", maxHeight);
+        writeNewLine();
+        writeComment("Objects can have other objects attacthed to it: branches. Branches can also");
+        writeComment("have branches attached to it, which can also have branches, etc. This is the");
+        writeComment("maximum branch depth for this objects.");
+        writeValue("MaxBranchDepth", maxBranchDepth);
         writeNewLine();
         writeComment("When spawned with the UseWorld keyword, this BO3 should NOT spawn in the following biomes.");
         writeComment("If you write the BO3 name directly in the BiomeConfigs, this will be ignored.");
@@ -159,29 +174,30 @@ public class BO3Config extends ConfigFile
         writeComment("What to do when a block is about to be placed outside the SourceBlock? (dontPlace, placeAnyway)");
         writeValue("OutsideSourceBlock", outsideSourceBlock.toString());
 
-        // Blocks
+        // Blocks and other things
         writeResources();
     }
 
     @Override
-    protected void ReadConfigSettings()
+    protected void readConfigSettings()
     {
-        author = ReadSettings(BO3Settings.author);
-        description = ReadSettings(BO3Settings.description);
-        settingsMode = ReadSettings(TCDefaultValues.SettingsMode);
+        author = readSettings(BO3Settings.author);
+        description = readSettings(BO3Settings.description);
+        settingsMode = readSettings(TCDefaultValues.SettingsMode);
 
-        tree = ReadSettings(BO3Settings.tree);
-        frequency = ReadSettings(BO3Settings.frequency);
-        rarity = ReadSettings(BO3Settings.rarity);
-        rotateRandomly = ReadSettings(BO3Settings.rotateRandomly);
-        spawnHeight = ReadSettings(BO3Settings.spawnHeight);
-        minHeight = ReadSettings(BO3Settings.minHeight);
-        maxHeight = ReadSettings(BO3Settings.maxHeight);
-        excludedBiomes = ReadSettings(BO3Settings.excludedBiomes);
+        tree = readSettings(BO3Settings.tree);
+        frequency = readSettings(BO3Settings.frequency);
+        rarity = readSettings(BO3Settings.rarity);
+        rotateRandomly = readSettings(BO3Settings.rotateRandomly);
+        spawnHeight = readSettings(BO3Settings.spawnHeight);
+        minHeight = readSettings(BO3Settings.minHeight);
+        maxHeight = readSettings(BO3Settings.maxHeight);
+        maxBranchDepth = readSettings(BO3Settings.maxBranchDepth);
+        excludedBiomes = readSettings(BO3Settings.excludedBiomes);
 
-        sourceBlock = ReadSettings(BO3Settings.sourceBlock);
-        maxPercentageOutsideSourceBlock = ReadSettings(BO3Settings.maxPercentageOutsideSourceBlock);
-        outsideSourceBlock = ReadSettings(BO3Settings.outsideSourceBlock);
+        sourceBlock = readSettings(BO3Settings.sourceBlock);
+        maxPercentageOutsideSourceBlock = readSettings(BO3Settings.maxPercentageOutsideSourceBlock);
+        outsideSourceBlock = readSettings(BO3Settings.outsideSourceBlock);
 
         // Read the resources
         readResources();
@@ -191,8 +207,9 @@ public class BO3Config extends ConfigFile
     {
         List<BlockFunction> tempBlocksList = new ArrayList<BlockFunction>();
         List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
+        List<BranchFunction> tempBranchesList = new ArrayList<BranchFunction>();
 
-        for (Map.Entry<String, String> entry : this.SettingsCache.entrySet())
+        for (Map.Entry<String, String> entry : this.settingsCache.entrySet())
         {
             String key = entry.getKey();
             int start = key.indexOf("(");
@@ -200,7 +217,7 @@ public class BO3Config extends ConfigFile
             if (start != -1 && end != -1)
             {
                 String name = key.substring(0, start);
-                String[] props = ReadComplexString(key.substring(start + 1, end));
+                String[] props = readComplexString(key.substring(start + 1, end));
 
                 ConfigFunction<BO3Config> res = TerrainControl.getConfigFunctionsManager().getConfigFunction(name, this, this.name + " on line " + entry.getValue(), Arrays.asList(props));
 
@@ -212,6 +229,9 @@ public class BO3Config extends ConfigFile
                     } else if (res instanceof BO3Check)
                     {
                         tempChecksList.add((BO3Check) res);
+                    } else if (res instanceof BranchFunction)
+                    {
+                        tempBranchesList.add((BranchFunction) res);
                     }
                 }
             }
@@ -220,6 +240,7 @@ public class BO3Config extends ConfigFile
         // Store the blocks
         blocks[0] = tempBlocksList.toArray(new BlockFunction[tempBlocksList.size()]);
         bo3Checks[0] = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
+        branches[0] = tempBranchesList.toArray(new BranchFunction[tempBranchesList.size()]);
     }
 
     public void writeResources() throws IOException
@@ -245,21 +266,36 @@ public class BO3Config extends ConfigFile
         {
             writeValue(check.makeString());
         }
+
+        // Branches
+        writeBigTitle("Branches");
+        writeComment("Branches are objects that will spawn when this object spawns when it is used in");
+        writeComment("the CustomStructure resource. Branches can also have branches, making complex");
+        writeComment("structures possible.");
+        writeComment("Branch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]])");
+        writeComment("branchName - name of the object to spawn.");
+        writeComment("rotation - NORTH, SOUTH, EAST or WEST.");
+        for (BranchFunction branch : branches[0])
+        {
+            writeValue(branch.makeString());
+        }
+
     }
 
     @Override
-    protected void CorrectSettings()
+    protected void correctSettings()
     {
         frequency = applyBounds(frequency, 1, 200);
         rarity = applyBounds(rarity, 0.000001, 100.0);
         minHeight = applyBounds(minHeight, TerrainControl.worldDepth, TerrainControl.worldHeight - 1);
         maxHeight = applyBounds(maxHeight, minHeight, TerrainControl.worldHeight);
+        maxBranchDepth = applyBounds(maxBranchDepth, 1, Integer.MAX_VALUE);
         sourceBlock = applyBounds(sourceBlock, 0, TerrainControl.supportedBlockIds);
         maxPercentageOutsideSourceBlock = applyBounds(maxPercentageOutsideSourceBlock, 0, 100);
     }
 
     @Override
-    protected void RenameOldSettings()
+    protected void renameOldSettings()
     {
         // Stub method - there are no old setting to convert yet (:
     }
@@ -282,6 +318,12 @@ public class BO3Config extends ConfigFile
             for (int j = 0; j < bo3Checks[i].length; j++)
             {
                 bo3Checks[i][j] = bo3Checks[i - 1][j].rotate();
+            }
+            // Branches
+            branches[i] = new BranchFunction[branches[i - 1].length];
+            for (int j = 0; j < branches[i].length; j++)
+            {
+                branches[i][j] = branches[i - 1][j].rotate();
             }
         }
     }

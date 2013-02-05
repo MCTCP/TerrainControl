@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.forge.structuregens.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
@@ -30,6 +31,7 @@ public class SingleWorld implements LocalWorld
     private ChunkProvider generator;
     private World world;
     private WorldConfig settings;
+    private CustomObjectStructureCache structureCache;
     private String name;
     private long seed;
     private BiomeGenerator biomeManager;
@@ -400,11 +402,11 @@ public class SingleWorld implements LocalWorld
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = worldHeight - 1; y > 0; y--)
+        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
             int id = chunk.getBlockID(x, y, z);
             if (DefaultMaterial.getMaterial(id).isSolid())
-                return y;
+                return y + 1;
         }
         return -1;
     }
@@ -566,6 +568,7 @@ public class SingleWorld implements LocalWorld
 
         this.world = world;
         this.seed = world.getSeed();
+        this.structureCache = new CustomObjectStructureCache(this);
 
         this.dungeonGen = new WorldGenDungeons();
         this.strongholdGen = new StrongholdGen(config);
@@ -649,5 +652,11 @@ public class SingleWorld implements LocalWorld
         // Create a Tile Entity of it and add it to the world
         TileEntity tileEntity = TileEntity.createAndLoadEntity(nmsTag);
         world.setBlockTileEntity(x, y, z, tileEntity);
+    }
+
+    @Override
+    public CustomObjectStructureCache getStructureCache()
+    {
+        return this.structureCache;
     }
 }

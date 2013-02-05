@@ -9,6 +9,15 @@ import java.util.Random;
 public interface CustomObject
 {
     /**
+     * Called after all objects are loaded. The settings should be loaded
+     * inside this method.
+     * 
+     * @param otherObjectsInDirectory A map of all other objects in the
+     *                                directory. Keys are lowercase.
+     */
+    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory);
+    
+    /**
      * Returns the name of this object.
      *
      * @return
@@ -27,32 +36,40 @@ public interface CustomObject
      * Returns whether this object can spawn from the CustomObject() resource.
      * Vanilla trees should return false; everything else should return true.
      *
-     * @return
+     * @return Whether this object can spawn as an object.
      */
     public boolean canSpawnAsObject();
+    
+    /**
+     * Returns whether this object can be placed with a random rotation. If
+     * not, the rotation should always be NORTH.
+     * 
+     * @return Whether this object can be placed with a random rotation.
+     */
+    public boolean canRotateRandomly();
 
     /**
-     * Spawns the object at the given position.
+     * Spawns the object at the given position. It shouldn't execute any checks.
      *
      * @param world
      * @param x
      * @param y
      * @param z
-     * @return Whether the attempt was successful.
+     * @return Whether the attempt was successful. (It should never fail, but you never know.)
      */
-    public boolean spawn(LocalWorld world, Random random, int x, int y, int z);
-
+    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);
+    
     /**
-     * Spawns the object at the given position. If the object isn't a tree, it
-     * shouldn't spawn and it should return false.
-     *
-     * @param world
-     * @param x
-     * @param y
-     * @param z
-     * @return Whether the attempt was successful.
+     * Returns whether the location would theoretically allow the object to
+     * spawn there. Frequency/rarity is ignored.
+     * 
+     * @param world The world to check.
+     * @param x     X coord of the object origin.
+     * @param y     Y coord of the object origin.
+     * @param z     Z coord of the object origin.
+     * @return Whether the location allows for this object.
      */
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int y, int z);
+    public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z);
 
     /**
      * Spawns the object at the given position. It should search a suitable y

@@ -65,7 +65,7 @@ public class WeightedMobSpawnGroup
         json = json.replace('{', '(');
         json = json.replace('}', ')');
 
-        String[] groups = ConfigFile.ReadComplexString(json);
+        String[] groups = ConfigFile.readComplexString(json);
 
         try
         {
