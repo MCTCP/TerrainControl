@@ -19,9 +19,9 @@ public class TreeObject implements CustomObject
     {
         this.type = type;
     }
-    
+
     @Override
-    public void onEnable(Map<String,CustomObject> otherObjectsInDirectory)
+    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
     {
         // Stub method
     }
@@ -92,12 +92,6 @@ public class TreeObject implements CustomObject
 
     @Override
     public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ)
-    {
-        return processAsTree(world, random, chunkX, chunkZ);
-    }
-
-    @Override
-    public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
         // A tree has no rarity, so spawn it once in the chunk
         int x = chunkX * 16 + random.nextInt(16);

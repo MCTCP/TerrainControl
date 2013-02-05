@@ -256,13 +256,6 @@ public class BO2 extends ConfigFile implements CustomObject
     }
 
     @Override
-    public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
-    {
-        return tree && process(world, random, chunkX, chunkZ);
-
-    }
-
-    @Override
     public CustomObject applySettings(Map<String, String> extraSettings)
     {
         Map<String, String> newSettings = new HashMap<String, String>();

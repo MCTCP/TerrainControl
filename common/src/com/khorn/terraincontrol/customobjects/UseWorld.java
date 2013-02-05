@@ -13,7 +13,7 @@ import java.util.Random;
 public class UseWorld implements CustomObject
 {
     @Override
-    public void onEnable(Map<String,CustomObject> otherObjectsInDirectory)
+    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
     {
         // Stub method
     }
@@ -88,9 +88,9 @@ public class UseWorld implements CustomObject
     @Override
     public boolean process(LocalWorld world, Random rand, int chunk_x, int chunk_z)
     {
-        // Pick one object, try to spawn that, if that fails, try with another object,
-        // as long as the objectSpawnRatio cap isn't reached.
-        
+        // Pick one object, try to spawn that, if that fails, try with another
+        // object, as long as the objectSpawnRatio cap isn't reached.
+
         WorldConfig worldSettings = world.getSettings();
 
         if (worldSettings.customObjects.size() == 0)
@@ -112,38 +112,6 @@ public class UseWorld implements CustomObject
 
             // Process the object
             objectSpawned = selectedObject.process(world, rand, chunk_x, chunk_z);
-
-        }
-        return objectSpawned;
-    }
-
-    @Override
-    public boolean processAsTree(LocalWorld world, Random rand, int chunk_x, int chunk_z)
-    {
-        // Pick one object, try to spawn that, if that fails, try with another object,
-        // as long as the objectSpawnRatio cap isn't reached.
-        
-        WorldConfig worldSettings = world.getSettings();
-
-        if (worldSettings.customObjects.size() == 0)
-            return false;
-
-        boolean objectSpawned = false;
-        int spawnattemps = 0;
-        while (!objectSpawned)
-        {
-            if (spawnattemps > worldSettings.objectSpawnRatio)
-                return false;
-
-            spawnattemps++;
-
-            CustomObject selectedObject = worldSettings.customObjects.get(rand.nextInt(worldSettings.customObjects.size()));
-
-            if (!selectedObject.hasPreferenceToSpawnIn(world.getBiome(chunk_x * 16 + 8, chunk_z * 16 + 8)))
-                continue;
-
-            // Process the object
-            objectSpawned = selectedObject.processAsTree(world, rand, chunk_x, chunk_z);
 
         }
         return objectSpawned;

@@ -17,7 +17,7 @@ public interface StructuredCustomObject extends CustomObject
      * @return Whether this object has branches attached to it.
      */
     public boolean hasBranches();
-    
+
     /**
      * Returns a list of all branches in this object. Null is not a valid
      * return value, return an empty list instead.
@@ -25,7 +25,7 @@ public interface StructuredCustomObject extends CustomObject
      * @return A list of all branches in this object.
      */
     public Branch[] getBranches(Rotation rotation);
-    
+
     /**
      * Create a coordinate for this at a random position in the chunk.
      * Should respect it's own rarity setting. Can return null.
@@ -35,7 +35,7 @@ public interface StructuredCustomObject extends CustomObject
      * @return The CustomObjectCoordinate
      */
     public CustomObjectCoordinate makeCustomObjectCoordinate(Random random, int chunkX, int chunkZ);
-    
+
     /**
      * Branches can have branches which can have branches, etc. This
      * method returns the limit of searching for branches.

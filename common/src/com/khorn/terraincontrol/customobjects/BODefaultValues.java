@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.customobjects;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,12 +88,10 @@ public enum BODefaultValues
         return out;
     }
 
-
     public Boolean booleanValue()
     {
         return this.bValue;
     }
-
 
     private static Map<String, BODefaultValues> lookupName;
 

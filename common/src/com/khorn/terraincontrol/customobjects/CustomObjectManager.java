@@ -11,45 +11,36 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class is the registry for the custom object types. It also stores
+ * the global objects. World objects are stored in the WorldConfig class.
+ * <p />
+ * 
+ * Terrain Control supports multiple types of custom objects. By default, it
+ * supports BO2s, BO3s and a number of special "objects" like trees and
+ * UseWorld.
+ * <p />
+ * 
+ * All those implement CustomObject. Plugin developers can register their
+ * own custom object types. If you have a number of CustomObjects that you
+ * want to register, just add your object to the global objects in the
+ * onStart event using registerGlobalObject. If you have your own file
+ * format, just use registerCustomObjectLoader(extension, loader).
+ * <p />
+ * 
+ * Even trees are custom objects. If you want to add your own tree type, add
+ * your tree to the global objects and make sure that it's canSpawnAsObject
+ * returns false.
+ * <p />
+ * 
+ * If your object implements StructuredCustomObject instead of CustomObject,
+ * it will be able to have other objects attached to it, forming a
+ * structure. As long as each individual object fits in a chunk, Terrain
+ * Control will make sure that the structure gets spawned correctly, chunk
+ * for chunk.
+ */
 public class CustomObjectManager
 {
-    /*
-     * Khoorn's comment, copied from the removed class ObjectsStore:
-
-    Load:
-    1)Load here all objects.
-    2)Start save coordinates thread.
-    2)Pre compile objects (make arrays for different angle) ??
-    3)Compile custom objects array for each biome. Based on world Bo2 list + Biome Bo2 list + Biome CustomTree list
-       a) store in one array in biome
-       b) store in different arrays in biome ???
-    4) Load ObjectCoordinates from file and add that instance to save thread.
-
-    New load
-    1) Load all objects from world directory
-    2) Search and load objects from plugin directory
-
-
-
-    Spawn:
-    1)CustomObject resource, Tree resource, sapling, command
-    2)Select random object if needed.
-    3)Check for biome and select CustomBiome array if needed.
-    4)Check for spawn conditions.
-    5)Check for collision
-       a) Check for block collisions
-       b) If out of loaded chunks and object.dig == false - drop.
-       c) If out of loaded chunks and object.branch && !object.digBranch == true - drop
-       d) ??
-    6)Set blocks
-       a) If out of loaded chunks - get ObjectBuffer from CoordinatesStore and save to it.
-       b) If found branch start point  - select random branch from group and call 5 for it.
-
-
-    Calculate branch size for in chunk check??
-    Call branch in this chunk or in next ??
-     
-     */
 
     public final Map<String, CustomObjectLoader> loaders;
     public final Map<String, CustomObject> globalObjects;
@@ -67,10 +58,12 @@ public class CustomObjectManager
         // Put some default CustomObjects
         for (TreeType type : TreeType.values())
         {
-            globalObjects.put(type.name().toLowerCase(), new TreeObject(type));
+            registerGlobalObject(new TreeObject(type));
         }
-        globalObjects.put("useworld", new UseWorld());
-        globalObjects.put("usebiome", new UseBiome());
+        registerGlobalObject(new UseWorld());
+        registerGlobalObject(new UseBiome());
+        registerGlobalObject(new UseWorldAll());
+        registerGlobalObject(new UseBiomeAll());
     }
 
     public void loadGlobalObjects()
@@ -185,9 +178,9 @@ public class CustomObjectManager
                 }
             }
         }
-        
+
         // Enable all the objects
-        for(CustomObject object: objects.values())
+        for (CustomObject object : objects.values())
         {
             object.onEnable(objects);
         }
@@ -218,7 +211,7 @@ public class CustomObjectManager
      */
     public CustomObject getObjectFromString(String string, WorldConfig config)
     {
-        String[] parts = new String[]{string, ""};
+        String[] parts = new String[] {string, ""};
 
         int start = string.indexOf("(");
         int end = string.lastIndexOf(")");

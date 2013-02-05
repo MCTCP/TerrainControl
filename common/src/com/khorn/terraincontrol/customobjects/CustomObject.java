@@ -16,7 +16,7 @@ public interface CustomObject
      *                                directory. Keys are lowercase.
      */
     public void onEnable(Map<String, CustomObject> otherObjectsInDirectory);
-    
+
     /**
      * Returns the name of this object.
      *
@@ -39,7 +39,7 @@ public interface CustomObject
      * @return Whether this object can spawn as an object.
      */
     public boolean canSpawnAsObject();
-    
+
     /**
      * Returns whether this object can be placed with a random rotation. If
      * not, the rotation should always be NORTH.
@@ -58,7 +58,7 @@ public interface CustomObject
      * @return Whether the attempt was successful. (It should never fail, but you never know.)
      */
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);
-    
+
     /**
      * Returns whether the location would theoretically allow the object to
      * spawn there. Frequency/rarity is ignored.
@@ -105,19 +105,6 @@ public interface CustomObject
      * @return Whether at least one object spawned successfully.
      */
     public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ);
-
-    /**
-     * Spawns the object in a chunk. The object can search a good y position by
-     * itself. If the object isn't a tree, the object shouldn't spawn and it
-     * should return false.
-     *
-     * @param world
-     * @param random
-     * @param chunkX
-     * @param chunkZ
-     * @return Whether at least one object spawned successfully.
-     */
-    public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ);
 
     /**
      * Returns a copy of this object will all the settings applied. Can return

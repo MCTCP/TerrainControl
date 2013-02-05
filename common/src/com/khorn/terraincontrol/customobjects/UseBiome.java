@@ -18,9 +18,9 @@ public class UseBiome implements CustomObject
     {
         return world.getSettings().biomeConfigs[world.getBiome(x, z).getId()].biomeObjects;
     }
-    
+
     @Override
-    public void onEnable(Map<String,CustomObject> otherObjectsInDirectory)
+    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
     {
         // Stub method
     }
@@ -86,9 +86,9 @@ public class UseBiome implements CustomObject
     public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
         List<CustomObject> possibleObjects = getPossibleObjectsAt(world, chunkX * 16 + 8, chunkZ * 16 + 8);
-        
-        // Pick one object, try to spawn that, if that fails, try with another object,
-        // as long as the objectSpawnRatio cap isn't reached.
+
+        // Pick one object, try to spawn that, if that fails, try with another
+        // object, as long as the objectSpawnRatio cap isn't reached.
         int objectSpawnRatio = world.getSettings().objectSpawnRatio;
 
         if (possibleObjects.size() == 0)
@@ -104,42 +104,6 @@ public class UseBiome implements CustomObject
             spawnattemps++;
 
             CustomObject selectedObject = possibleObjects.get(random.nextInt(possibleObjects.size()));
-
-            if (!selectedObject.hasPreferenceToSpawnIn(world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8)))
-                continue;
-
-            // Process the object
-            objectSpawned = selectedObject.process(world, random, chunkX, chunkZ);
-
-        }
-        return objectSpawned;
-    }
-
-    @Override
-    public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
-    {
-        List<CustomObject> possibleObjects = getPossibleObjectsAt(world, chunkX * 16 + 8, chunkZ * 16 + 8);
-        
-        // Pick one object, try to spawn that, if that fails, try with another object,
-        // as long as the objectSpawnRatio cap isn't reached.
-        int objectSpawnRatio = world.getSettings().objectSpawnRatio;
-
-        if (possibleObjects.size() == 0)
-            return false;
-
-        boolean objectSpawned = false;
-        int spawnattemps = 0;
-        while (!objectSpawned)
-        {
-            if (spawnattemps > objectSpawnRatio)
-                return false;
-
-            spawnattemps++;
-
-            CustomObject selectedObject = possibleObjects.get(random.nextInt(possibleObjects.size()));
-
-            if (!selectedObject.hasPreferenceToSpawnIn(world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8)))
-                continue;
 
             // Process the object
             objectSpawned = selectedObject.process(world, random, chunkX, chunkZ);
@@ -166,7 +130,7 @@ public class UseBiome implements CustomObject
     public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {
         List<CustomObject> objects = getPossibleObjectsAt(world, x, z);
-        if(objects.size() == 0)
+        if (objects.size() == 0)
         {
             // No objects to spawn
             return false;

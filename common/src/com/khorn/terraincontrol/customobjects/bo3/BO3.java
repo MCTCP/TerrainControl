@@ -30,9 +30,9 @@ public class BO3 implements StructuredCustomObject
         this.name = name;
         this.file = file;
     }
-    
+
     @Override
-    public void onEnable(Map<String,CustomObject> otherObjectsInDirectory)
+    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
     {
         this.settings = new BO3Config(name, file, otherObjectsInDirectory);
     }
@@ -146,7 +146,7 @@ public class BO3 implements StructuredCustomObject
     @Override
     public boolean spawn(LocalWorld world, Random random, int x, int z)
     {
-        Rotation rotation = settings.rotateRandomly? Rotation.getRandomRotation(random) : Rotation.NORTH;
+        Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int y = 0;
         if (settings.spawnHeight == SpawnHeightSetting.randomY)
         {
@@ -207,16 +207,6 @@ public class BO3 implements StructuredCustomObject
     }
 
     @Override
-    public boolean processAsTree(LocalWorld world, Random random, int chunkX, int chunkZ)
-    {
-        if (!settings.tree)
-        {
-            return false;
-        }
-        return process(world, random, chunkX, chunkZ);
-    }
-
-    @Override
     public CustomObject applySettings(Map<String, String> extraSettings)
     {
         return new BO3(this, extraSettings);
@@ -231,7 +221,7 @@ public class BO3 implements StructuredCustomObject
         }
         return true;
     }
-    
+
     @Override
     public boolean hasBranches()
     {
@@ -247,8 +237,9 @@ public class BO3 implements StructuredCustomObject
     @Override
     public CustomObjectCoordinate makeCustomObjectCoordinate(Random random, int chunkX, int chunkZ)
     {
-        if (settings.rarity > random.nextDouble() * 100.0) {
-            Rotation rotation = settings.rotateRandomly? Rotation.getRandomRotation(random) : Rotation.NORTH;
+        if (settings.rarity > random.nextDouble() * 100.0)
+        {
+            Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
             int height = MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight);
             return new CustomObjectCoordinate(this, rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16));
         }

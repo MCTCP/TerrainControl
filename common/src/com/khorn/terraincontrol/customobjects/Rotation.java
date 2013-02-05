@@ -14,14 +14,14 @@ public enum Rotation
     WEST(1),
     SOUTH(2),
     EAST(3);
-    
+
     private final int ROTATION_ID;
-    
+
     private Rotation(int id)
     {
         this.ROTATION_ID = id;
     }
-    
+
     /**
      * Returns the id of the rotation. Can be 0, 1, 2 or 3.
      * 
@@ -31,7 +31,7 @@ public enum Rotation
     {
         return ROTATION_ID;
     }
-    
+
     /**
      * Get the rotation with the given id. Returns null if the
      * rotation id isn't found.
@@ -41,17 +41,17 @@ public enum Rotation
      */
     public static Rotation getRotation(int id)
     {
-        for(Rotation rotation: values())
+        for (Rotation rotation : values())
         {
-            if(rotation.ROTATION_ID == id)
+            if (rotation.ROTATION_ID == id)
             {
                 return rotation;
             }
         }
-        
+
         return null;
     }
-    
+
     /**
      * Returns a random rotation.
      * 
@@ -62,7 +62,7 @@ public enum Rotation
     {
         return values()[random.nextInt(values().length)];
     }
-    
+
     /**
      * Returns the next rotation. NORTH -> WEST -> SOUTH -> EAST
      * @param rotation The previous rotation.
@@ -72,11 +72,11 @@ public enum Rotation
     {
         int id = rotation.getRotationId();
         id++;
-        if(id >= values().length)
+        if (id >= values().length)
         {
             id = 0;
         }
-        
+
         return Rotation.getRotation(id);
     }
 
@@ -84,25 +84,31 @@ public enum Rotation
     {
         Rotation rotation = null;
         // Try to parse it as a number
-        try {
+        try
+        {
             rotation = getRotation(Integer.parseInt(string));
-        } catch(NumberFormatException e) {}
-        
-        if(rotation != null)
+        } catch (NumberFormatException e)
+        {
+        }
+
+        if (rotation != null)
         {
             return rotation;
         }
-        
+
         // Try to parse it as a String
-        try {
+        try
+        {
             rotation = Rotation.valueOf(string.toUpperCase());
-        } catch(IllegalArgumentException e) {}
-        
-        if(rotation != null)
+        } catch (IllegalArgumentException e)
+        {
+        }
+
+        if (rotation != null)
         {
             return rotation;
         }
-        
+
         // Failed
         throw new InvalidConfigException("Unknown rotation: " + string);
     }
