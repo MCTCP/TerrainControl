@@ -245,6 +245,7 @@ public class BlockHelper
                 return ((data + 3) & 0x3) | (data & ~0x3);
 
             case COCOA:
+            case TRIPWIRE_HOOK:
                 int rotationData = data % 4;
                 if (rotationData == 0)
                 {

@@ -327,7 +327,7 @@ public class SingleWorld implements LocalWorld
     }
 
     @Override
-    public void replaceBiomesLate()
+    public void replaceBiomes()
     {
         if (this.settings.HaveBiomeReplace)
         {

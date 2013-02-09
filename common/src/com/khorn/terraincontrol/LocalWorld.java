@@ -71,7 +71,7 @@ public interface LocalWorld
 
     public void replaceBlocks();
 
-    public void replaceBiomesLate();
+    public void replaceBiomes();
 
     /**
      * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the terrain generation.

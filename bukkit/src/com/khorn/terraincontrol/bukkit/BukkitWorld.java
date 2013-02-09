@@ -1,9 +1,6 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
 import com.khorn.terraincontrol.bukkit.structuregens.*;
@@ -304,7 +301,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void replaceBiomesLate()
+    public void replaceBiomes()
     {
         if (this.settings.HaveBiomeReplace)
         {
@@ -456,6 +453,11 @@ public class BukkitWorld implements LocalWorld
         if (notifyPlayers && chunk.seenByPlayer)
         {
             this.world.notify(x, y, z);
+        }
+
+        if (chunk.getTypeId(x & 15, y, z & 15) != typeId || chunk.getData(x & 15, y, z & 15) != data)
+        {
+            TerrainControl.log("Placement failed: tried to place " + typeId + ":" + data + " but placed " + chunk.getTypeId(x & 15, y, z & 15) + ":" + chunk.getData(x & 15, y, z & 15));
         }
     }
 

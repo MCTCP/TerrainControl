@@ -93,10 +93,7 @@ public class BO3Config extends ConfigFile
             writeSettingsFile(file, settingsMode == ConfigMode.WriteAll);
         }
 
-        if (rotateRandomly)
-        {
-            rotateBlockAndChecks();
-        }
+        rotateBlockAndChecks();
     }
 
     @Override

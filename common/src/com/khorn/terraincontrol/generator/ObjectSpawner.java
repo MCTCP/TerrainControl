@@ -63,7 +63,7 @@ public class ObjectSpawner
         world.replaceBlocks();
 
         // Replace biomes
-        world.replaceBiomesLate();
+        world.replaceBiomes();
 
         // Replace settings after Reload command
         if (this.worldSettings.isDeprecated)
