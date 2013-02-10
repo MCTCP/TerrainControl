@@ -1,0 +1,6 @@
+*.jpg  	binary
+*.png 	binary
+*.gif 	binary
+
+*.txt text eol=crlf
+*.java text eol=crlf
