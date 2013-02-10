@@ -440,10 +440,18 @@ public class BukkitWorld implements LocalWorld
         if (applyPhysics)
         {
             int oldTypeId = chunk.getTypeId(x & 15, y, z & 15);
-            chunk.a(x & 15, y, z & 15, typeId, data);
+            chunk.a(x & 15, y, z & 15, typeId, data); // chunk.setTypeIdAndData(....)
+            // Workaround for (bug in?) CraftBukkit
+            if (chunk.i()[y >> 4] != null)
+                chunk.i()[y >> 4].j().a(x & 15, y & 15, z & 15, data); // chunk.getSections()[..].getData().set(....)
             this.world.applyPhysics(x, y, z, typeId == 0 ? oldTypeId : typeId);
         } else
-            chunk.a(x & 15, y, z & 15, typeId, data); // Set typeId and Data
+        {
+            chunk.a(x & 15, y, z & 15, typeId, data); // chunk.setTypeIdAndData(....)
+            // Workaround for (bug in?) CraftBukkit
+            if (chunk.i()[y >> 4] != null)
+                chunk.i()[y >> 4].j().a(x & 15, y & 15, z & 15, data); // chunk.getSections()[..].getData().set(....)
+        }
 
         if (updateLight)
         {
@@ -455,10 +463,6 @@ public class BukkitWorld implements LocalWorld
             this.world.notify(x, y, z);
         }
 
-        if (chunk.getTypeId(x & 15, y, z & 15) != typeId || chunk.getData(x & 15, y, z & 15) != data)
-        {
-            TerrainControl.log("Placement failed: tried to place " + typeId + ":" + data + " but placed " + chunk.getTypeId(x & 15, y, z & 15) + ":" + chunk.getData(x & 15, y, z & 15));
-        }
     }
 
     @Override
