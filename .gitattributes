@@ -2,5 +2,5 @@
 *.png 	binary
 *.gif 	binary
 
-*.txt text eol=crlf
-*.java text eol=crlf
+*.txt text eol=lf
+*.java text eol=lf
