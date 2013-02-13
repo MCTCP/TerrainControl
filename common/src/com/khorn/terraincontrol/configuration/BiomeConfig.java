@@ -197,10 +197,6 @@ public class BiomeConfig extends ConfigFile
         resource = Resource.createResource(this, OreGen.class, DefaultMaterial.GRAVEL.id, TCDefaultValues.gravelDepositSize.intValue(), TCDefaultValues.gravelDepositFrequency.intValue(), TCDefaultValues.gravelDepositRarity.intValue(), TCDefaultValues.gravelDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.STONE.id);
         this.ResourceSequence[this.ResourceCount++] = resource;
 
-        // Clay
-        resource = Resource.createResource(this, OreGen.class, DefaultMaterial.CLAY.id, TCDefaultValues.clayDepositSize.intValue(), TCDefaultValues.clayDepositFrequency.intValue(), TCDefaultValues.clayDepositRarity.intValue(), TCDefaultValues.clayDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.SAND.id);
-        this.ResourceSequence[this.ResourceCount++] = resource;
-
         // Coal
         resource = Resource.createResource(this, OreGen.class, DefaultMaterial.COAL_ORE.id, TCDefaultValues.coalDepositSize.intValue(), TCDefaultValues.coalDepositFrequency.intValue(), TCDefaultValues.coalDepositRarity.intValue(), TCDefaultValues.coalDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.STONE.id);
         this.ResourceSequence[this.ResourceCount++] = resource;
@@ -359,7 +355,13 @@ public class BiomeConfig extends ConfigFile
         // Lava source
         resource = Resource.createResource(this, LiquidGen.class, DefaultMaterial.LAVA.id, TCDefaultValues.lavaSourceDepositFrequency.intValue(), TCDefaultValues.lavaSourceDepositRarity.intValue(), TCDefaultValues.lavaSourceDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.STONE.id);
         this.ResourceSequence[this.ResourceCount++] = resource;
-
+        
+        // Desert wells
+        if(this.DefaultWell != null)
+        {
+            resource = Resource.createResource(this, WellGen.class, this.DefaultWell);
+            this.ResourceSequence[this.ResourceCount++] = resource;
+        }
     }
 
     protected void readConfigSettings()
@@ -1178,6 +1180,7 @@ public class BiomeConfig extends ConfigFile
     private int DefaultReed = 0;
     private int DefaultCactus = 0;
     private int DefaultClay = 1;
+    private Object[] DefaultWell;
     private float DefaultBiomeSurface = 0.1F;
     private float DefaultBiomeVolatility = 0.3F;
     private byte DefaultSurfaceBlock = (byte) DefaultMaterial.GRASS.id;
@@ -1230,6 +1233,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultReed = 10;
                 this.DefaultCactus = 10;
                 this.DefaultColor = "0xFFCC33";
+                this.DefaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
                 this.DefaultVillageType = VillageType.sandstone;
                 this.DefaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;
@@ -1336,6 +1340,7 @@ public class BiomeConfig extends ConfigFile
                 this.DefaultReed = 50;
                 this.DefaultCactus = 10;
                 this.DefaultColor = "0x996600";
+                this.DefaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
                 this.DefaultVillageType = VillageType.sandstone;
                 this.DefaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;

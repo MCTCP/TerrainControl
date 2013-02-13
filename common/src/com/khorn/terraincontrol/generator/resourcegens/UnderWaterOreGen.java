@@ -50,7 +50,7 @@ public class UnderWaterOreGen extends Resource
         blockData = readBlockData(args.get(0));
         size = readInt(args.get(1), 1, 8);
         frequency = readInt(args.get(2), 1, 100);
-        rarity = readInt(args.get(3), 1, 100);
+        rarity = readRarity(args.get(3));
         sourceBlocks = new ArrayList<Integer>();
         for (int i = 4; i < args.size(); i++)
         {

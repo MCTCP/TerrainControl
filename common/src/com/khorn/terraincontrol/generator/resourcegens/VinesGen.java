@@ -76,7 +76,7 @@ public class VinesGen extends Resource
 
         assureSize(4, args);
         frequency = readInt(args.get(0), 1, 100);
-        rarity = readInt(args.get(1), 1, 100);
+        rarity = readRarity(args.get(1));
         minAltitude = readInt(args.get(2), TerrainControl.worldDepth, TerrainControl.worldHeight);
         maxAltitude = readInt(args.get(3), minAltitude + 1, TerrainControl.worldHeight);
     }

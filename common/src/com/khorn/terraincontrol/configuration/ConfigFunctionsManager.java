@@ -35,6 +35,7 @@ public class ConfigFunctionsManager
         registerConfigFunction("UnderWaterOre", UnderWaterOreGen.class);
         registerConfigFunction("Vein", VeinGen.class);
         registerConfigFunction("Vines", VinesGen.class);
+        registerConfigFunction("Well", WellGen.class);
     }
 
     public void registerConfigFunction(String name, Class<? extends ConfigFunction<?>> value)

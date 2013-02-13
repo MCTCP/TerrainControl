@@ -67,7 +67,7 @@ public class LiquidGen extends Resource
         blockId = readBlockId(args.get(0));
         blockData = readBlockData(args.get(0));
         frequency = readInt(args.get(1), 1, 5000);
-        rarity = readInt(args.get(2), 1, 100);
+        rarity = readRarity(args.get(2));
         minAltitude = readInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
         maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
         sourceBlocks = new ArrayList<Integer>();

@@ -18,7 +18,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     protected int blockId = -1;
     protected int blockData = -1;
     protected int frequency;
-    protected int rarity;
+    protected double rarity;
 
     @Override
     public Class<BiomeConfig> getHolderType()
@@ -75,7 +75,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     {
         for (int t = 0; t < frequency; t++)
         {
-            if (random.nextInt(100) > rarity)
+            if (random.nextDouble() * 100.0 > rarity)
                 continue;
             int x = chunkX * 16 + random.nextInt(16) + 8;
             int z = chunkZ * 16 + random.nextInt(16) + 8;

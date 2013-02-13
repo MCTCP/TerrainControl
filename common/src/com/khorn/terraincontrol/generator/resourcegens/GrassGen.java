@@ -20,7 +20,7 @@ public class GrassGen extends Resource
         blockId = readBlockId(args.get(0));
         blockData = readInt(args.get(1), 0, 16);
         frequency = readInt(args.get(2), 1, 500);
-        rarity = readInt(args.get(3), 1, 100);
+        rarity = readRarity(args.get(3));
         sourceBlocks = new ArrayList<Integer>();
         for (int i = 4; i < args.size(); i++)
         {

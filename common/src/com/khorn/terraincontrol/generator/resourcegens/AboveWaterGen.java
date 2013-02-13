@@ -16,7 +16,7 @@ public class AboveWaterGen extends Resource
         blockId = readBlockId(args.get(0));
         blockData = readBlockData(args.get(0));
         frequency = readInt(args.get(1), 1, 100);
-        rarity = readInt(args.get(2), 1, 100);
+        rarity = readRarity(args.get(2));
     }
 
     @Override

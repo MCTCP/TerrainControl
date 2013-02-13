@@ -110,6 +110,18 @@ public abstract class ConfigFunction<T>
     {
         return StringHelper.readDouble(string, minValue, maxValue);
     }
+    
+    /**
+     * Parses the string and returns the rarity between 0.000001 and 100 (inclusive)
+     * 
+     * @param string The string to parse.
+     * @return The rarity.
+     * @throws InvalidConfigException If the number is invalid.
+     */
+    protected double readRarity(String string) throws InvalidConfigException
+    {
+        return StringHelper.readDouble(string, 0.000001, 100);
+    }
 
     /**
      * Returns the block id with the given name.
