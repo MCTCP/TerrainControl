@@ -243,8 +243,16 @@ public class WorldConfig extends ConfigFile
             if (biomesCount != 0)
                 LoadedBiomeNames += ", ";
             LoadedBiomeNames += localBiome.getName();
+            // Add biome to the biome array
+            if (this.biomeConfigs[localBiome.getId()] == null)
+            {
+                // Only if it won't overwrite another biome in the array
+                biomesCount++;
+            } else
+            {
+                TerrainControl.log(Level.WARNING, "Duplicate biome id " + localBiome.getId() + " (" + this.biomeConfigs[localBiome.getId()].name + " and " + config.name + ")!");
+            }
             this.biomeConfigs[localBiome.getId()] = config;
-            biomesCount++;
 
             if (this.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
             {

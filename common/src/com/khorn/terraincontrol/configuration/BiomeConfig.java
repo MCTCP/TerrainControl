@@ -1221,7 +1221,7 @@ public class BiomeConfig extends ConfigFile
             case 1: // Plains
                 this.DefaultTrees = 0;
                 this.DefaultFlowers = 4;
-                this.DefaultGrass = 20;
+                this.DefaultGrass = 100;
                 this.DefaultColor = "0x999900";
                 this.DefaultStrongholds = false;
                 this.DefaultVillageType = VillageType.wood;
