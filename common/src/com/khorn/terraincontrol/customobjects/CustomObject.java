@@ -73,17 +73,6 @@ public interface CustomObject
 
     /**
      * Spawns the object at the given position. It should search a suitable y
-     * location by itself.
-     *
-     * @param world
-     * @param x
-     * @param z
-     * @return Whether the attempt was successful.
-     */
-    public boolean spawn(LocalWorld world, Random random, int x, int z);
-
-    /**
-     * Spawns the object at the given position. It should search a suitable y
      * location by itself. If the object isn't a tree, it shouldn't spawn and it
      * should return false.
      *

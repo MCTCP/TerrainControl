@@ -74,12 +74,6 @@ public class TreeObject implements CustomObject
     }
 
     @Override
-    public boolean spawn(LocalWorld world, Random random, int x, int z)
-    {
-        return spawnAsTree(world, random, x, z);
-    }
-
-    @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
     {
         int y = world.getHighestBlockYAt(x, z);

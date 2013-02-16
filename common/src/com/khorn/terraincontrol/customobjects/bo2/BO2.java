@@ -192,8 +192,7 @@ public class BO2 extends ConfigFile implements CustomObject
         return true;
     }
 
-    @Override
-    public boolean spawn(LocalWorld world, Random random, int x, int z)
+    protected boolean spawn(LocalWorld world, Random random, int x, int z)
     {
         int y;
         if (spawnAboveGround)
