@@ -375,13 +375,14 @@ public class BukkitWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
-        z = z & 0xF;
-        x = x & 0xF;
+
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            int id = chunk.getTypeId(x, y, z);
-            if (DefaultMaterial.getMaterial(id).isSolid())
+            int id = chunk.getTypeId(x & 0xF, y, z & 0xF);
+            if (DefaultMaterial.getMaterial(id).isSolid()) {
+                
                 return y + 1;
+            }
         }
         return -1;
     }

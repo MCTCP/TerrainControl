@@ -1,7 +1,9 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,26 +17,28 @@ public class UnderWaterOreGen extends Resource
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
-        int y = world.getSolidHeight(x, z) - 1;
-        if (world.getLiquidHeight(x, z) < y || y == -1)
+        int firstSolidBlock = world.getSolidHeight(x, z) - 1;
+        if (world.getLiquidHeight(x, z) < firstSolidBlock || firstSolidBlock == -1)
+        {
             return;
+        }
 
         int currentSize = rand.nextInt(size);
         int two = 2;
-        for (int k = x - currentSize; k <= x + currentSize; k++)
+        for (int currentX = x - currentSize; currentX <= x + currentSize; currentX++)
         {
-            for (int m = z - currentSize; m <= z + currentSize; m++)
+            for (int currentZ = z - currentSize; currentZ <= z + currentSize; currentZ++)
             {
-                int n = k - x;
-                int i1 = m - z;
-                if (n * n + i1 * i1 <= currentSize * currentSize)
+                int deltaX = currentX - x;
+                int deltaZ = currentZ - z;
+                if (deltaX * deltaX + deltaZ * deltaZ <= currentSize * currentSize)
                 {
-                    for (int i2 = y - two; i2 <= y + two; i2++)
+                    for (int y = firstSolidBlock - two; y <= firstSolidBlock + two; y++)
                     {
-                        int i3 = world.getTypeId(k, i2, m);
+                        int i3 = world.getTypeId(currentX, y, currentZ);
                         if (sourceBlocks.contains(i3))
                         {
-                            world.setBlock(k, i2, m, blockId, blockData, false, false, false);
+                            world.setBlock(currentX, y, currentZ, blockId, blockData, false, false, false);
                         }
                     }
                 }
