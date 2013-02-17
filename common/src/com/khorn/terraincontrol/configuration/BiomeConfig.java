@@ -538,7 +538,7 @@ public class BiomeConfig extends ConfigFile
                 if (res != null)
                 {
 
-                    if (res instanceof SaplingGen)
+                    if (res instanceof SaplingGen && res.isValid())
                     {
                         SaplingGen sapling = (SaplingGen) res;
                         if (sapling.saplingType == SaplingType.All)
@@ -792,6 +792,7 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("AboveWaterRes(Block[:Data],Frequency,Rarity)");
         this.writeComment("Vines(Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.writeComment("Vein(Block[:Data],MinRadius,MaxRadius,Rarity,OreSize,OreFrequency,OreRarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..])");
+        this.writeComment("Well(BaseBlock[:Data],HalfSlabBlock[:Data],WaterBlock[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..])");
         this.writeComment("");
         this.writeComment("Block and BlockSource: can be id or name, Frequency - is count of attempts for place resource");
         this.writeComment("Rarity: chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass");
@@ -1006,7 +1007,7 @@ public class BiomeConfig extends ConfigFile
     {
         for (int i = 0; i < this.ResourceCount; i++)
         {
-            this.writeValue(this.ResourceSequence[i].makeString());
+            this.writeValue(this.ResourceSequence[i].write());
         }
     }
 
@@ -1029,11 +1030,11 @@ public class BiomeConfig extends ConfigFile
     private void WriteSaplingSettings() throws IOException
     {
         if (this.saplingResource != null)
-            this.writeValue(saplingResource.makeString());
+            this.writeValue(saplingResource.write());
 
         for (SaplingGen res : this.saplingTypes)
             if (res != null)
-                this.writeValue(res.makeString());
+                this.writeValue(res.write());
 
     }
 

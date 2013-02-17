@@ -44,7 +44,7 @@ public class BlockFunction extends BO3Function
     }
 
     @Override
-    public String makeString()
+    protected String makeString()
     {
         String start = "Block(" + x + "," + y + "," + z + "," + makeMaterial(blockId, blockData);
         if (hasMetaData)

@@ -52,6 +52,12 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
      */
     public final void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
+        if(!isValid())
+        {
+            // Don't process invalid resources
+            return;
+        }
+        
         // Fire event
         if (!TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkX, chunkZ))
         {

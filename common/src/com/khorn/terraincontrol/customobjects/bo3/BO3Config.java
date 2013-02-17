@@ -218,7 +218,7 @@ public class BO3Config extends ConfigFile
 
                 ConfigFunction<BO3Config> res = TerrainControl.getConfigFunctionsManager().getConfigFunction(name, this, this.name + " on line " + entry.getValue(), Arrays.asList(props));
 
-                if (res != null)
+                if (res != null && res.isValid())
                 {
                     if (res instanceof BlockFunction)
                     {
@@ -252,7 +252,7 @@ public class BO3Config extends ConfigFile
         writeComment("fails, a 100% percent chance to have the contents of anotherchest.nbt.");
         for (BlockFunction block : blocks[0])
         {
-            writeValue(block.makeString());
+            writeValue(block.write());
         }
 
         // BO3Checks
@@ -261,7 +261,7 @@ public class BO3Config extends ConfigFile
         writeComment("BlockCheck(x,y,z,id[.data][,id[.data][,...]])");
         for (BO3Check check : bo3Checks[0])
         {
-            writeValue(check.makeString());
+            writeValue(check.write());
         }
 
         // Branches
