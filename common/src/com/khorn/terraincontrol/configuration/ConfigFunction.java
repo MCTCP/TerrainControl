@@ -106,6 +106,19 @@ public abstract class ConfigFunction<T>
     {
         return valid;
     }
+    
+    /**
+     * Forcibly sets the internal valid flag of this function to the 
+     * specified value. As long as you are using the read method you
+     * shouldn't use this, as the read method will automatically set
+     * it to the correct value.
+     * 
+     * @param valid New value for the valid flag.
+     */
+    public void setValid(boolean valid)
+    {
+        this.valid = valid;
+    }
 
     public final String write()
     {

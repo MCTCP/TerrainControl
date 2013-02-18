@@ -93,7 +93,7 @@ public class BO3Config extends ConfigFile
             writeSettingsFile(file, settingsMode == ConfigMode.WriteAll);
         }
 
-        rotateBlockAndChecks();
+        rotateBlocksAndChecks();
     }
 
     @Override
@@ -300,7 +300,7 @@ public class BO3Config extends ConfigFile
     /**
      * Rotates all the blocks and all the checks
      */
-    private void rotateBlockAndChecks()
+    public void rotateBlocksAndChecks()
     {
         for (int i = 1; i < 4; i++)
         {
