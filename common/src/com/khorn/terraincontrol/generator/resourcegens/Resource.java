@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.exception.InvalidConfigException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 /**
  * Represents a Resource: something that can generate in the world.
@@ -52,12 +53,12 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
      */
     public final void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
-        if(!isValid())
+        if (!isValid())
         {
             // Don't process invalid resources
             return;
         }
-        
+
         // Fire event
         if (!TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkX, chunkZ))
         {
@@ -67,7 +68,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
         // Spawn
         spawnInChunk(world, random, villageInChunk, chunkX, chunkZ);
     }
-    
+
     /**
      * Called once per chunk, instead of once per attempt.
      * 
@@ -121,10 +122,12 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
         try
         {
             resource.load(stringArgs);
+            resource.setValid(true);
         } catch (InvalidConfigException e)
         {
-            TerrainControl.log("Invalid default resource! Please report! " + clazz.getName() + ": " + e.getMessage());
+            TerrainControl.log(Level.SEVERE, "Invalid default resource! Please report! " + clazz.getName() + ": " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return resource;
