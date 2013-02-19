@@ -96,10 +96,10 @@ public class ObjectSpawner
                         } else
                         {
                             // Snow has to be placed on an empty space on a
-                            // solid block in the world
+                            // block that accepts snow in the world
                             if (world.getMaterial(blockToFreezeX, blockToFreezeY, blockToFreezeZ) == DefaultMaterial.AIR)
                             {
-                                if (world.getMaterial(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ).isSolid())
+                                if (!world.getMaterial(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ).preventsSnowfall())
                                 {
                                     world.setBlock(blockToFreezeX, blockToFreezeY, blockToFreezeZ, DefaultMaterial.SNOW.id, 0);
                                 }

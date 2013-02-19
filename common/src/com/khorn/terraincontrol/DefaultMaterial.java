@@ -85,7 +85,7 @@ public enum DefaultMaterial
     REDSTONE_TORCH_ON(76, false),
     STONE_BUTTON(77, false),
     SNOW(78, false),
-    ICE(79),
+    ICE(79, Property.SOLID, Property.PREVENTS_SNOWFALL),
     SNOW_BLOCK(80),
     CACTUS(81),
     CLAY(82),
@@ -156,17 +156,60 @@ public enum DefaultMaterial
 
     public final int id;
     private final boolean solid;
+    private final boolean preventsSnowfall;
 
-    private DefaultMaterial(int Id, boolean _solid)
+    public enum Property
     {
-        this.id = Id;
-        this.solid = _solid;
+        SOLID,
+        PREVENTS_SNOWFALL
     }
 
-    private DefaultMaterial(int Id)
+    /**
+     * Creates a new material.
+     * 
+     * @param id    Id of the material.
+     * @param solid Whether the material is solid. If set to false, it will also prevent snowfall.
+     */
+    private DefaultMaterial(int id, boolean solid)
     {
-        this.id = Id;
+        this.id = id;
+        this.solid = solid;
+        this.preventsSnowfall = !solid;
+    }
+
+    /**
+     * Creates a new solid material where snow will fall on.
+     * 
+     * @param id Id of the material.
+     */
+    private DefaultMaterial(int id)
+    {
+        this.id = id;
         this.solid = true;
+        this.preventsSnowfall = false;
+    }
+
+    /**
+     * Creates a new material. All properties are set to false
+     * and can be set to true.
+     * 
+     * @param id         Id of the material.
+     * @param properties List of properties to set to true.
+     */
+    private DefaultMaterial(int id, Property... properties)
+    {
+        this.id = id;
+        boolean solid = false;
+        boolean preventsSnowfall = false;
+        for (Property property : properties)
+        {
+            if (property.equals(Property.SOLID))
+                solid = true;
+            if (property.equals(Property.PREVENTS_SNOWFALL))
+                preventsSnowfall = true;
+        }
+        this.solid = solid;
+        this.preventsSnowfall = preventsSnowfall;
     }
 
     public boolean isLiquid()
@@ -177,6 +220,11 @@ public enum DefaultMaterial
     public boolean isSolid()
     {
         return this.solid;
+    }
+
+    public boolean preventsSnowfall()
+    {
+        return this.preventsSnowfall;
     }
 
     private static DefaultMaterial[] lookupID;
