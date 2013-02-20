@@ -234,11 +234,11 @@ public class CustomObjectManager
                 String[] settingParts = setting.split("=");
                 if (settingParts.length == 1)
                 {
-                    // Boolean values
+                    // Boolean values or resources
                     settingsMap.put(settingParts[0], "true");
                 } else if (settingParts.length == 2)
                 {
-                    settingsMap.put(settingParts[0], settingParts[1]);
+                    settingsMap.put(settingParts[0].toLowerCase(), settingParts[1]);
                 }
             }
 

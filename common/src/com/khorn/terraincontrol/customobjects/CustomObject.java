@@ -99,7 +99,7 @@ public interface CustomObject
      * Returns a copy of this object will all the settings applied. Can return
      * null if the settings are invalid.
      *
-     * @param settings A Map with all the settings.
+     * @param settings A Map with all the settings. The name of the setting is always lowercase.
      * @return A copy of this object will all the settings applied.
      */
     public CustomObject applySettings(Map<String, String> settings);
