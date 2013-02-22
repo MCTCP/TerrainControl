@@ -44,7 +44,7 @@ public class CustomObjectStructure
 
     protected void addBranches(CustomObjectCoordinate coordObject, int depth)
     {
-        for (Branch branch : coordObject.getStructuredObject().getBranches(start.getRotation()))
+        for (Branch branch : coordObject.getStructuredObject().getBranches(coordObject.getRotation()))
         {
             CustomObjectCoordinate childCoordObject = branch.toCustomObjectCoordinate(world, random, coordObject.getX(), coordObject.getY(), coordObject.getZ());
 
