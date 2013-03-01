@@ -41,8 +41,7 @@ public class RandomBlockFunction extends BlockFunction
             try
             {
                 blockChances.add((byte) readInt(args.get(i), 1, 100));
-                // If it can read the number at the position, it doesn't have
-                // metadata
+                // If it can read the number, it doesn't have metadata
                 metaDataNames.add("");
                 metaDataTags.add(null);
             } catch (InvalidConfigException e)
@@ -55,6 +54,10 @@ public class RandomBlockFunction extends BlockFunction
                 {
                     metaDataNames.add(args.get(i));
                     metaDataTags.add(metaData);
+                } else
+                {
+                    metaDataNames.add("");
+                    metaDataTags.add(null);
                 }
 
                 // Get the chance

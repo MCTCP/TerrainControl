@@ -1,6 +1,10 @@
 package com.khorn.terraincontrol.configuration;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -23,7 +27,18 @@ public class Tag
      */
     public enum Type
     {
-        TAG_End, TAG_Byte, TAG_Short, TAG_Int, TAG_Long, TAG_Float, TAG_Double, TAG_Byte_Array, TAG_String, TAG_List, TAG_Compound, TAG_Int_Array
+        TAG_End,
+        TAG_Byte,
+        TAG_Short,
+        TAG_Int,
+        TAG_Long,
+        TAG_Float,
+        TAG_Double,
+        TAG_Byte_Array,
+        TAG_String,
+        TAG_List,
+        TAG_Compound,
+        TAG_Int_Array
     }
 
     /**
@@ -350,9 +365,17 @@ public class Tag
      * @throws IOException if there was no valid NBT structure in the InputStream or if
      *                     another IOException occurred.
      */
-    public static Tag readFrom(InputStream is) throws IOException
+    public static Tag readFrom(InputStream is, boolean compressed) throws IOException
     {
-        DataInputStream dis = new DataInputStream(new GZIPInputStream(is));
+        DataInputStream dis = null;
+        if (compressed)
+        {
+            dis = new DataInputStream(new GZIPInputStream(is));
+        } else
+        {
+            dis = new DataInputStream(is);
+        }
+
         byte type = dis.readByte();
         Tag tag;
 

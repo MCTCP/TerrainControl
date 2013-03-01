@@ -54,7 +54,7 @@ public class ListCommand extends BaseCommand
                     pluginList.add(VALUE_COLOR + object.getName());
                 }
 
-                this.ListMessage(sender, pluginList, page, "World bo2 objects");
+                this.ListMessage(sender, pluginList, page, "World objects");
 
             } else
                 sender.sendMessage(ERROR_COLOR + "World not found " + worldName);
@@ -80,12 +80,13 @@ public class ListCommand extends BaseCommand
         List<String> pluginList = new ArrayList<String>();
         for (CustomObject object : globalObjects)
         {
-            if(object.canSpawnAsObject()) {
+            if (object.canSpawnAsObject())
+            {
                 pluginList.add(VALUE_COLOR + object.getName());
             }
         }
 
-        this.ListMessage(sender, pluginList, page, "Global bo2 objects");
+        this.ListMessage(sender, pluginList, page, "Global objects", "Use /tc list -w [world] for world objects");
 
         return true;
 

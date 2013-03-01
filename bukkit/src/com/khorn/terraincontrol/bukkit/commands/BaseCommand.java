@@ -27,7 +27,6 @@ public abstract class BaseCommand
 
     public abstract boolean onCommand(CommandSender sender, List<String> args);
 
-
     protected BukkitWorld getWorld(CommandSender sender, String arg)
     {
         if (arg.equals(""))
@@ -55,7 +54,7 @@ public abstract class BaseCommand
         return null;
     }
 
-    protected void ListMessage(CommandSender sender, List<String> lines, int page, String listName)
+    protected void ListMessage(CommandSender sender, List<String> lines, int page, String... headers)
     {
         int pageCount = (lines.size() >> 3) + 1;
         if (page > pageCount)
@@ -63,7 +62,13 @@ public abstract class BaseCommand
             page = pageCount;
         }
 
-        sender.sendMessage(ChatColor.AQUA.toString() + listName + " page " + page + "/" + pageCount);
+        sender.sendMessage(ChatColor.AQUA.toString() + headers[0] + " - page " + page + "/" + pageCount);
+        for (int headerId = 1; headerId < headers.length; headerId++)
+        {
+            // Send all remaining headers
+            sender.sendMessage(ChatColor.AQUA + headers[headerId]);
+        }
+
         page--;
 
         for (int i = page * 8; i < lines.size() && i < (page * 8 + 8); i++)
