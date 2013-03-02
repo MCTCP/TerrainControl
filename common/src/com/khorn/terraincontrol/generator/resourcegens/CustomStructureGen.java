@@ -12,7 +12,7 @@ import java.util.Random;
 public class CustomStructureGen extends Resource
 {
     private List<StructuredCustomObject> objects;
-    private List<Integer> objectChances;
+    private List<Double> objectChances;
     private List<String> objectNames;
 
     @Override
@@ -20,8 +20,8 @@ public class CustomStructureGen extends Resource
     {
         objects = new ArrayList<StructuredCustomObject>();
         objectNames = new ArrayList<String>();
-        objectChances = new ArrayList<Integer>();
-        for (int i = 0; i < args.size() - 1; i++)
+        objectChances = new ArrayList<Double>();
+        for (int i = 0; i < args.size() - 1; i += 2)
         {
             CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(i), getHolder().worldConfig);
             if (object == null || !object.canSpawnAsObject())
@@ -34,7 +34,7 @@ public class CustomStructureGen extends Resource
             }
             objects.add((StructuredCustomObject) object);
             objectNames.add(args.get(i));
-            objectChances.add(readInt(args.get(i + 1), 1, 100));
+            objectChances.add(readRarity(args.get(i + 1)));
         }
 
         // Inject ourselves in the BiomeConfig
@@ -93,7 +93,7 @@ public class CustomStructureGen extends Resource
         }
         for (int objectNumber = 0; objectNumber < objects.size(); objectNumber++)
         {
-            if (random.nextInt(100) < objectChances.get(objectNumber))
+            if (random.nextDouble() * 100.0 < objectChances.get(objectNumber))
             {
                 return objects.get(objectNumber).makeCustomObjectCoordinate(random, chunkX, chunkZ);
             }

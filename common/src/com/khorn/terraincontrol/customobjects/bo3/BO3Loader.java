@@ -37,7 +37,8 @@ public class BO3Loader implements CustomObjectLoader
         return new BO3(objectName, file);
     }
 
-    @SuppressWarnings("resource") // Actually, we use tryToClose(..) to close the stream
+    @SuppressWarnings("resource")
+    // Actually, we use tryToClose(..) to close the stream
     public static Tag loadMetadata(String name, File bo3File)
     {
         String path = bo3File.getParent() + File.separator + name;
@@ -89,24 +90,31 @@ public class BO3Loader implements CustomObjectLoader
         // 2. chest.nbt with a Compound tag in it with all the data
 
         // Check for type 1 by searching for an id tag
-
-        Tag idTag = metadata.findTagByName("id");
-        if (idTag == null || !idTag.getType().equals(Type.TAG_String))
+        Tag[] values = (Tag[]) metadata.getValue();
+        for (Tag subTag : values)
         {
-            // Not found, search for type 2
-            try
+            if (subTag.getName().equals("id") && subTag.getType().equals(Tag.Type.TAG_String))
             {
-                metadata = ((Tag[]) metadata.getValue())[0];
-            } catch (Exception e)
-            {
-                TerrainControl.log(Level.WARNING, "Structure of NBT file is incorrect: " + e.getMessage());
-                e.printStackTrace();
-                return null;
+                // Found id tag, so return the root tag
+                return metadata;
             }
         }
+        // No id tag found, so check for type 2
+        try
+        {
+            return registerMetadata(path, ((Tag[]) metadata.getValue())[0]);
+        } catch (Exception e)
+        {
+            TerrainControl.log(Level.WARNING, "Structure of NBT file is incorrect: " + e.getMessage());
+            return null;
+        }
 
+    }
+
+    public static Tag registerMetadata(String pathOnDisk, Tag metadata)
+    {
         // Add it to the cache
-        loadedTags.put(path, metadata);
+        loadedTags.put(pathOnDisk, metadata);
         // Return it
         return metadata;
     }

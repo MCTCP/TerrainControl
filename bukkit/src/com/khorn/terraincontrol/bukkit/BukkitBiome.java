@@ -55,11 +55,13 @@ public class BukkitBiome implements LocalBiome
         }
     }
 
+    @Override
     public boolean isCustom()
     {
         return this.isCustom;
     }
 
+    @Override
     public int getCustomId()
     {
         return customID;
@@ -75,46 +77,55 @@ public class BukkitBiome implements LocalBiome
         return biomeBase;
     }
 
+    @Override
     public void setEffects(BiomeConfig config)
     {
         ((CustomBiome) this.biomeBase).setEffects(config);
     }
 
+    @Override
     public String getName()
     {
         return this.biomeBase.y;
     }
 
+    @Override
     public int getId()
     {
         return this.biomeBase.id;
     }
 
+    @Override
     public float getTemperature()
     {
         return this.temperature;
     }
 
+    @Override
     public float getWetness()
     {
         return this.humidity;
     }
 
+    @Override
     public float getSurfaceHeight()
     {
         return this.biomeBase.D;
     }
 
+    @Override
     public float getSurfaceVolatility()
     {
         return this.biomeBase.E;
     }
 
+    @Override
     public byte getSurfaceBlock()
     {
         return this.biomeBase.A;
     }
 
+    @Override
     public byte getGroundBlock()
     {
         return this.biomeBase.B;
