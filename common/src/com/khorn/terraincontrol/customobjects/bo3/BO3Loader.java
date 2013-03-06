@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.configuration.Tag.Type;
-
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.customobjects.CustomObject;
