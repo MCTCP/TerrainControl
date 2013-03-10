@@ -444,17 +444,22 @@ public class SingleWorld implements LocalWorld
     @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
-        if (applyPhysics)
+        Chunk chunk = getChunk(x, 0, z);
+        if (chunk != null)
         {
-            world.setBlockAndMetadataWithUpdate(x, y, z, typeId, data, notifyPlayers);
-        } else
-        {
-            world.setBlockAndMetadata(x, y, z, typeId, data);
+            chunk.setBlockIDWithMetadata(x & 0xF, y, z & 0xF, typeId, data);
         }
-
         if (updateLight)
         {
-            this.world.updateAllLightTypes(x, y, z);
+            world.updateAllLightTypes(x, y, z);
+        }
+        if (applyPhysics)
+        {
+            world.notifyBlocksOfNeighborChange(x, y, z, typeId);
+        }
+        if (notifyPlayers)
+        {
+            // TODO
         }
     }
 

@@ -31,10 +31,10 @@ public class TCWorldChunkManager extends WorldChunkManager
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.FOREST_HILLS.Id]);
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.JUNGLE.Id]);
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.JUNGLE_HILLS.Id]);
-        
+
         this.localWorld = world;
     }
-    
+
     public void setBiomeManager(BiomeGenerator manager)
     {
         this.biomeManager = manager;
@@ -71,11 +71,11 @@ public class TCWorldChunkManager extends WorldChunkManager
     public BiomeGenBase[] getBiomesForGeneration(BiomeGenBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4);
-        if(paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
+        if (paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
         {
             paramArrayOfBiomeBase = new BiomeGenBase[arrayOfInt.length];
         }
-        
+
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
             paramArrayOfBiomeBase[i] = BiomeGenBase.biomeList[arrayOfInt[i]];
@@ -88,11 +88,11 @@ public class TCWorldChunkManager extends WorldChunkManager
     public BiomeGenBase[] getBiomeGenAt(BiomeGenBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
     {
         int[] arrayOfInt = this.biomeManager.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4);
-        if(paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
+        if (paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
         {
             paramArrayOfBiomeBase = new BiomeGenBase[arrayOfInt.length];
         }
-        
+
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
             paramArrayOfBiomeBase[i] = BiomeGenBase.biomeList[arrayOfInt[i]];
@@ -106,7 +106,8 @@ public class TCWorldChunkManager extends WorldChunkManager
     public boolean areBiomesViable(int paramInt1, int paramInt2, int paramInt3, List paramList)
     {
         // Hack for StructureVillagePieces.getNextComponentVillagePath(..)
-        // (The alternative would be to completely override the village spawn code)
+        // (The alternative would be to completely override the village spawn
+        // code)
         if (paramList == MapGenVillage.villageSpawnBiomes)
         {
             paramList = localWorld.villageGen.villageSpawnBiomes;

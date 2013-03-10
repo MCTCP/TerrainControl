@@ -42,7 +42,8 @@ public class BiomeGenCustom extends BiomeGenBase
     {
         this.temperature = config.BiomeTemperature;
         this.rainfall = config.BiomeWetness;
-        if(this.rainfall == 0) {
+        if (this.rainfall == 0)
+        {
             this.setDisableRain();
         }
         this.waterColorMultiplier = config.WaterColor;
@@ -62,7 +63,7 @@ public class BiomeGenCustom extends BiomeGenBase
         addMobs(this.spawnableMonsterList, config.spawnMonstersAddDefaults, config.spawnMonsters);
         addMobs(this.spawnableCreatureList, config.spawnCreaturesAddDefaults, config.spawnCreatures);
         addMobs(this.spawnableWaterCreatureList, config.spawnWaterCreaturesAddDefaults, config.spawnWaterCreatures);
-        addMobs(this.field_82914_M, config.spawnAmbientCreaturesAddDefaults, config.spawnAmbientCreatures);
+        addMobs(this.spawnableCaveCreatureList, config.spawnAmbientCreaturesAddDefaults, config.spawnAmbientCreatures);
 
         // color ?
         // this.x = 522674;
@@ -117,7 +118,7 @@ public class BiomeGenCustom extends BiomeGenBase
         this.spawnableMonsterList = baseBiome.getSpawnableList(EnumCreatureType.monster);
         this.spawnableCreatureList = baseBiome.getSpawnableList(EnumCreatureType.creature);
         this.spawnableWaterCreatureList = baseBiome.getSpawnableList(EnumCreatureType.waterCreature);
-        this.field_82914_M = baseBiome.getSpawnableList(EnumCreatureType.ambient);
+        this.spawnableCaveCreatureList = baseBiome.getSpawnableList(EnumCreatureType.ambient);
     }
 
     // Sky color from Temp

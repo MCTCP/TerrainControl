@@ -100,7 +100,7 @@ public class ChunkProvider implements IChunkProvider
     }
 
     @Override
-    public boolean unload100OldestChunks()
+    public boolean unloadQueuedChunks()
     {
         return false;
     }
@@ -148,6 +148,25 @@ public class ChunkProvider implements IChunkProvider
     @Override
     public void recreateStructures(int chunkX, int chunkZ)
     {
-        // TODO What should this do?
+        if (world.mineshaftGen != null)
+        {
+            world.mineshaftGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+        }
+        if (world.villageGen != null)
+        {
+            world.villageGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+        }
+        if (world.strongholdGen != null)
+        {
+            world.strongholdGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+        }
+        if (world.rareBuildingGen != null)
+        {
+            world.rareBuildingGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+        }
+        if (world.netherFortressGen != null)
+        {
+            world.netherFortressGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+        }
     }
 }

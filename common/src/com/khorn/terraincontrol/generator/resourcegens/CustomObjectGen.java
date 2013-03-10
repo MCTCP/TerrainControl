@@ -21,7 +21,7 @@ public class CustomObjectGen extends Resource
         if (args.size() == 0 || (args.size() == 1 && args.get(0).trim().equals("")))
         {
             // Backwards compability
-            args.clear();
+            args = new ArrayList<String>();
             args.add("UseWorld");
         }
         objects = new ArrayList<CustomObject>();
