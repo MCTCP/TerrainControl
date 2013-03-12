@@ -41,7 +41,7 @@ public enum SaplingType
     {
         for(SaplingType type: SaplingType.values())
         {
-            if(type.id > 0)
+            if(type.id >= 0)
             {
                 lookupList[type.id] = type;
             }

@@ -91,7 +91,7 @@ public class BO3Loader implements CustomObjectLoader
         Tag[] values = (Tag[]) metadata.getValue();
         for (Tag subTag : values)
         {
-            if (subTag.getName().equals("id") && subTag.getType().equals(Tag.Type.TAG_String))
+            if (subTag.getName() != null && subTag.equals("id") && subTag.getType().equals(Tag.Type.TAG_String))
             {
                 // Found id tag, so return the root tag
                 return metadata;
