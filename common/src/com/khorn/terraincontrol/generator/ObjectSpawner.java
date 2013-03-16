@@ -99,7 +99,7 @@ public class ObjectSpawner
                             // block that accepts snow in the world
                             if (world.getMaterial(blockToFreezeX, blockToFreezeY, blockToFreezeZ) == DefaultMaterial.AIR)
                             {
-                                if (!world.getMaterial(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ).preventsSnowfall())
+                                if (world.getMaterial(blockToFreezeX, blockToFreezeY - 1, blockToFreezeZ).isSolid())
                                 {
                                     world.setBlock(blockToFreezeX, blockToFreezeY, blockToFreezeZ, DefaultMaterial.SNOW.id, 0);
                                 }

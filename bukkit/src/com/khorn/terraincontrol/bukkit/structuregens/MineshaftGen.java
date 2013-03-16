@@ -2,16 +2,17 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
-import net.minecraft.server.v1_4_R1.StructureGenerator;
-import net.minecraft.server.v1_4_R1.StructureStart;
-import net.minecraft.server.v1_4_R1.World;
-import net.minecraft.server.v1_4_R1.WorldGenMineshaftStart;
+import net.minecraft.server.v1_5_R1.StructureGenerator;
+import net.minecraft.server.v1_5_R1.StructureStart;
+import net.minecraft.server.v1_5_R1.World;
+import net.minecraft.server.v1_5_R1.WorldGenMineshaftStart;
 
 import java.util.Random;
 
 public class MineshaftGen extends StructureGenerator
 {
     // canSpawnStructureAtCoords
+    @Override
     protected boolean a(int chunkX, int chunkZ)
     {
         Random rand = b;
@@ -29,6 +30,7 @@ public class MineshaftGen extends StructureGenerator
         return false;
     }
 
+    @Override
     protected StructureStart b(int i, int j)
     {
         return new WorldGenMineshaftStart(this.c, this.b, i, j);

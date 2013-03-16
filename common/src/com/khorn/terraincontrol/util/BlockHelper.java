@@ -13,7 +13,7 @@ public class BlockHelper
      * @param data
      * @return
      */
-    @SuppressWarnings("PointlessBitwiseExpression")
+    @SuppressWarnings({"PointlessBitwiseExpression", "incomplete-switch"})
     public static int rotateData(int type, int data)
     {
         DefaultMaterial mat = DefaultMaterial.getMaterial(type);
@@ -53,6 +53,7 @@ public class BlockHelper
 
             case POWERED_RAIL:
             case DETECTOR_RAIL:
+            case ACTIVATOR_RAIL:
                 int power = data & ~0x7;
                 switch (data & 0x7)
                 {
@@ -88,6 +89,7 @@ public class BlockHelper
             case SMOOTH_STAIRS:
             case NETHER_BRICK_STAIRS:
             case SANDSTONE_STAIRS:
+            case QUARTZ_STAIRS:
                 switch (data)
                 {
                     case 2:
@@ -152,9 +154,11 @@ public class BlockHelper
             case WALL_SIGN:
             case CHEST:
             case ENDER_CHEST:
+            case TRAPPED_CHEST:
             case FURNACE:
             case BURNING_FURNACE:
             case DISPENSER:
+            case DROPPER:
                 switch (data)
                 {
                     case 5:
@@ -265,6 +269,12 @@ public class BlockHelper
                     // West-east --> north-south
                     return data - 1;
                 }
+                
+            case QUARTZ_BLOCK:
+                if (data == 3)
+                    return 4;
+                if (data == 4)
+                    return 3;
         }
 
         return data;

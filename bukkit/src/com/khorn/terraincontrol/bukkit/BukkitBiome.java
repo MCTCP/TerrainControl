@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import net.minecraft.server.v1_4_R1.BiomeBase;
+import net.minecraft.server.v1_5_R1.BiomeBase;
 
 import java.lang.reflect.Field;
 

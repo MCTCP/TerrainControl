@@ -4,9 +4,9 @@ import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import net.minecraft.server.v1_4_R1.BiomeBase;
-import net.minecraft.server.v1_4_R1.StructureGenerator;
-import net.minecraft.server.v1_4_R1.StructureStart;
+import net.minecraft.server.v1_5_R1.BiomeBase;
+import net.minecraft.server.v1_5_R1.StructureGenerator;
+import net.minecraft.server.v1_5_R1.StructureStart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +46,7 @@ public class VillageGen extends StructureGenerator
         }
     }
 
+    @Override
     protected boolean a(int chunkX, int chunkZ)
     {
         int k = chunkX;
@@ -63,7 +64,7 @@ public class VillageGen extends StructureGenerator
 
         int i1 = chunkX / this.distance;
         int j1 = chunkZ / this.distance;
-        Random random = this.c.F(i1, j1, 10387312);
+        Random random = this.c.H(i1, j1, 10387312);
 
         i1 *= this.distance;
         j1 *= this.distance;
@@ -82,8 +83,9 @@ public class VillageGen extends StructureGenerator
         return false;
     }
 
+    @Override
     protected StructureStart b(int chunkX, int chunkZ)
     {
-        return new WorldGenVillageStart(this.c, this.b, chunkX, chunkZ, this.size);
+        return new VillageStart(this.c, this.b, chunkX, chunkZ, this.size);
     }
 }

@@ -85,7 +85,7 @@ public enum DefaultMaterial
     REDSTONE_TORCH_ON(76, false),
     STONE_BUTTON(77, false),
     SNOW(78, false),
-    ICE(79, Property.SOLID, Property.PREVENTS_SNOWFALL),
+    ICE(79, false),
     SNOW_BLOCK(80),
     CACTUS(81),
     CLAY(82),
@@ -152,29 +152,35 @@ public enum DefaultMaterial
     WOOD_BUTTON(143, false),
     SKULL(144, false),
     ANVIL(145, false),
+    TRAPPED_CHEST(146),
+    GOLD_PLATE(147, false),
+    IRON_PLATE(148, false),
+    REDSTONE_COMPARATOR_OFF(149, false),
+    REDSTONE_COMPARATOR_ON(150, false),
+    DAYLIGHT_DETECTOR(151, false),
+    REDSTONE_BLOCK(152),
+    QUARTZ_ORE(153),
+    HOPPER(154),
+    QUARTZ_BLOCK(155),
+    QUARTZ_STAIRS(156),
+    ACTIVATOR_RAIL(157, false),
+    DROPPER(158),
     UNKNOWN_BLOCK(255);
 
     public final int id;
     private final boolean solid;
-    private final boolean preventsSnowfall;
-
-    public enum Property
-    {
-        SOLID,
-        PREVENTS_SNOWFALL
-    }
 
     /**
      * Creates a new material.
      * 
      * @param id    Id of the material.
-     * @param solid Whether the material is solid. If set to false, it will also prevent snowfall.
+     * @param solid Whether the material is solid. If set to false, it will prevent snowfall.
+     *              Note: this isn't always equal to what Minecraft calls solid.
      */
     private DefaultMaterial(int id, boolean solid)
     {
         this.id = id;
         this.solid = solid;
-        this.preventsSnowfall = !solid;
     }
 
     /**
@@ -186,30 +192,6 @@ public enum DefaultMaterial
     {
         this.id = id;
         this.solid = true;
-        this.preventsSnowfall = false;
-    }
-
-    /**
-     * Creates a new material. All properties are set to false
-     * and can be set to true.
-     * 
-     * @param id         Id of the material.
-     * @param properties List of properties to set to true.
-     */
-    private DefaultMaterial(int id, Property... properties)
-    {
-        this.id = id;
-        boolean solid = false;
-        boolean preventsSnowfall = false;
-        for (Property property : properties)
-        {
-            if (property.equals(Property.SOLID))
-                solid = true;
-            if (property.equals(Property.PREVENTS_SNOWFALL))
-                preventsSnowfall = true;
-        }
-        this.solid = solid;
-        this.preventsSnowfall = preventsSnowfall;
     }
 
     public boolean isLiquid()
@@ -220,11 +202,6 @@ public enum DefaultMaterial
     public boolean isSolid()
     {
         return this.solid;
-    }
-
-    public boolean preventsSnowfall()
-    {
-        return this.preventsSnowfall;
     }
 
     private static DefaultMaterial[] lookupID;

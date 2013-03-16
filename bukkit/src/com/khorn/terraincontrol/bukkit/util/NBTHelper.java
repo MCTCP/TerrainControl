@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.bukkit.util;
 
 import com.khorn.terraincontrol.configuration.Tag;
-import net.minecraft.server.v1_4_R1.*;
+import net.minecraft.server.v1_5_R1.*;
 
 import java.lang.reflect.Field;
 import java.util.Map;

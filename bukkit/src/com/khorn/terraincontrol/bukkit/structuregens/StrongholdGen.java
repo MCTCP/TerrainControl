@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import net.minecraft.server.v1_4_R1.*;
+import net.minecraft.server.v1_5_R1.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +38,7 @@ public class StrongholdGen extends StructureGenerator
         }
     }
 
+    @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected boolean a(int i, int j)
     {
@@ -51,7 +52,7 @@ public class StrongholdGen extends StructureGenerator
 
             for (int l = 0; l < this.structureCoords.length; ++l)
             {
-                double d1 = (1.25D * (double) k + random.nextDouble()) * this.distance * (double) k;
+                double d1 = (1.25D * k + random.nextDouble()) * this.distance * k;
                 int i1 = (int) Math.round(Math.cos(d0) * d1);
                 int j1 = (int) Math.round(Math.sin(d0) * d1);
                 ArrayList arraylist = new ArrayList();
@@ -66,7 +67,7 @@ public class StrongholdGen extends StructureGenerator
                 }
 
                 this.structureCoords[l] = new ChunkCoordIntPair(i1, j1);
-                d0 += 6.283185307179586D * (double) k / (double) this.spread;
+                d0 += 6.283185307179586D * k / this.spread;
                 if (l == this.spread)
                 {
                     k += 2 + random.nextInt(5);
@@ -90,6 +91,7 @@ public class StrongholdGen extends StructureGenerator
         return false;
     }
 
+    @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected List p_()
     {
@@ -107,6 +109,7 @@ public class StrongholdGen extends StructureGenerator
         return arraylist;
     }
 
+    @Override
     protected StructureStart b(int i, int j)
     {
         StrongholdStart worldgenstronghold2start = new StrongholdStart(this.c, this.b, i, j);

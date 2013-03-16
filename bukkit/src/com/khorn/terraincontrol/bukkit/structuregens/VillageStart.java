@@ -1,16 +1,16 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import net.minecraft.server.v1_4_R1.*;
+import net.minecraft.server.v1_5_R1.*;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-class WorldGenVillageStart extends StructureStart
+public class VillageStart extends StructureStart
 {
     private boolean hasMoreThanTwoComponents = false;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public WorldGenVillageStart(World world, Random random, int chunkX, int chunkZ, int size)
+    public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
         ArrayList listOfPieces = WorldGenVillagePieces.a(random, size);
         VillageStartPiece worldgenvillagestartpiece = new VillageStartPiece(world, 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, listOfPieces, size);
@@ -55,6 +55,7 @@ class WorldGenVillageStart extends StructureStart
         this.hasMoreThanTwoComponents = componentCount > 2;
     }
 
+    @Override
     public boolean d()
     {
         return this.hasMoreThanTwoComponents;

@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
-import net.minecraft.server.v1_4_R1.*;
+import net.minecraft.server.v1_5_R1.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,7 @@ public class NetherFortressGen extends StructureGenerator
     }
 
     // canSpawnAtChunkCoords
+    @Override
     protected boolean a(int chunkX, int chunkZ)
     {
         Random rand = this.b;
@@ -35,7 +36,7 @@ public class NetherFortressGen extends StructureGenerator
 
         int var3 = chunkX >> 4;
         int var4 = chunkZ >> 4;
-        rand.setSeed((long) (var3 ^ var4 << 4) ^ worldObj.getSeed());
+        rand.setSeed(var3 ^ var4 << 4 ^ worldObj.getSeed());
         rand.nextInt();
 
         if (rand.nextInt(3) != 0)
@@ -59,6 +60,7 @@ public class NetherFortressGen extends StructureGenerator
         }
     }
 
+    @Override
     protected StructureStart b(int i, int j)
     {
         return new NetherFortressStart(this.c, this.b, i, j);
