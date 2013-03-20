@@ -382,7 +382,7 @@ public class BukkitWorld implements LocalWorld
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
             int id = chunk.getTypeId(x & 0xF, y, z & 0xF);
-            if (DefaultMaterial.getMaterial(id).isSolid()) 
+            if (DefaultMaterial.getMaterial(id).isSolid())
             {
                 return y + 1;
             }
@@ -647,23 +647,15 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void attachMetadata(int x, int y, int z, Tag tag)
     {
-        if (Block.byId[world.getTypeId(x, y, z)] instanceof BlockContainer)
-        {
-            // Because villages (and other stuctures) don't use our setBlock
-            // methods, the world can sometimes become out of sync. This
-            // workaround makes sure that no tile entity get's placed if it
-            // isn't save to do so.
-
-            // Convert Tag to a native nms tag
-            NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
-            // Add the x, y and z position to it
-            nmsTag.setInt("x", x);
-            nmsTag.setInt("y", y);
-            nmsTag.setInt("z", z);
-            // Create a Tile Entity of it and add it to the world
-            TileEntity tileEntity = TileEntity.c(nmsTag);
-            world.setTileEntity(x, y, z, tileEntity);
-        }
+        // Convert Tag to a native nms tag
+        NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
+        // Add the x, y and z position to it
+        nmsTag.setInt("x", x);
+        nmsTag.setInt("y", y);
+        nmsTag.setInt("z", z);
+        // Add that data to the current tile entity in the world
+        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        tileEntity.a(nmsTag); // tileEntity.load
     }
 
     @Override

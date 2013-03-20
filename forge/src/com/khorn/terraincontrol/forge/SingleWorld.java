@@ -653,9 +653,9 @@ public class SingleWorld implements LocalWorld
         nmsTag.setInteger("x", x);
         nmsTag.setInteger("y", y);
         nmsTag.setInteger("z", z);
-        // Create a Tile Entity of it and add it to the world
-        TileEntity tileEntity = TileEntity.createAndLoadEntity(nmsTag);
-        world.setBlockTileEntity(x, y, z, tileEntity);
+        // Add that data to the current tile entity in the world
+        TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+        tileEntity.readFromNBT(nmsTag);
     }
 
     @Override
