@@ -59,13 +59,19 @@ public class TCChunkGenerator extends ChunkGenerator
     @Override
     public byte[][] generateBlockSections(World world, Random random, int x, int z, BiomeGrid biomes)
     {
+        //if (!this.plugin.isEnabled())
+        //{
+        //    // TODO: do something useful
+        //    throw new RuntimeException("Plugin not enabled!");
+        //}
+
         if (this.NotGenerate)
             return new byte[16][];
         byte[] BlockArray = this.chunkProviderTC.generate(x, z);
 
         byte[][] SectionBlocks = new byte[16][];
 
-        //TODO Too slow, for fix need change generator output.
+        // TODO Too slow, for fix need change generator output.
         int max_y = BlockArray.length / 256;
         for (int _x = 0; _x < 16; _x++)
             for (int _z = 0; _z < 16; _z++)

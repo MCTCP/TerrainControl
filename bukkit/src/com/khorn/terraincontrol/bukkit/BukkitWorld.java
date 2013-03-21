@@ -452,7 +452,7 @@ public class BukkitWorld implements LocalWorld
         } else
         {
             chunk.a(x & 15, y, z & 15, typeId, data); // chunk.setTypeIdAndData(....)
-            // Workaround for (bug in?) CraftBukkit
+            // Workaround for (bug in?) Minecraft
             if (chunk.i()[y >> 4] != null)
                 chunk.i()[y >> 4].j().a(x & 15, y & 15, z & 15, data); // chunk.getSections()[..].getData().set(....)
         }
@@ -564,7 +564,7 @@ public class BukkitWorld implements LocalWorld
         this.settings = worldConfig;
     }
 
-    public void Init(World _world)
+    public void enable(World _world)
     {
         this.world = _world;
         this.seed = world.getSeed();
@@ -575,7 +575,7 @@ public class BukkitWorld implements LocalWorld
         {
             // Only replace the worldProvider if it's the overworld
             // Replacing other dimensions causes a lot of glitches
-            this.world.worldProvider = new TCWorldProvider(this);
+            this.world.worldProvider = new TCWorldProvider(this, this.world.worldProvider);
         }
 
         this.chunkCache = new Chunk[4];
@@ -606,6 +606,18 @@ public class BukkitWorld implements LocalWorld
                 break;
             case Default:
                 break;
+        }
+    }
+
+    /**
+     * Cleans up references of itself in Minecraft's native code.
+     */
+    public void disable()
+    {
+        // Restore old world provider if replaced
+        if (world.worldProvider instanceof TCWorldProvider)
+        {
+            world.worldProvider = ((TCWorldProvider) world.worldProvider).getOldWorldProvider();
         }
     }
 

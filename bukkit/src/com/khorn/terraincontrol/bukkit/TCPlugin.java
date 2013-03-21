@@ -36,7 +36,13 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
 
     public void onDisable()
     {
-        TerrainControl.log("Can not be disabled.");
+        // Cleanup worlds
+        for (BukkitWorld world : worlds.values())
+        {
+            world.disable();
+        }
+        worlds.clear();
+
         TerrainControl.stopEngine();
     }
 
@@ -50,7 +56,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         this.listener = new TCListener(this);
 
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
-
+        
         TerrainControl.log("Enabled");
     }
 
@@ -139,7 +145,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
 
             net.minecraft.server.v1_5_R1.World workWorld = ((CraftWorld) world).getHandle();
 
-            bukkitWorld.Init(workWorld);
+            bukkitWorld.enable(workWorld);
 
             Class<? extends BiomeGenerator> biomeModeClass = bukkitWorld.getSettings().biomeMode;
             if (biomeModeClass != TerrainControl.getBiomeModeManager().VANILLA)

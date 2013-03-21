@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.util;
 
-
 import com.khorn.terraincontrol.DefaultMaterial;
 
 public class BlockHelper
@@ -157,8 +156,6 @@ public class BlockHelper
             case TRAPPED_CHEST:
             case FURNACE:
             case BURNING_FURNACE:
-            case DISPENSER:
-            case DROPPER:
                 switch (data)
                 {
                     case 5:
@@ -169,6 +166,23 @@ public class BlockHelper
                         return 4;
                     case 3:
                         return 5;
+                }
+                break;
+
+            case DISPENSER:
+            case DROPPER:
+            case HOPPER:
+                int dispPower = data & 0x8;
+                switch (data & ~0x8)
+                {
+                    case 5:
+                        return 2 | dispPower;
+                    case 4:
+                        return 3 | dispPower;
+                    case 2:
+                        return 4 | dispPower;
+                    case 3:
+                        return 5 | dispPower;
                 }
                 break;
 
@@ -189,6 +203,8 @@ public class BlockHelper
 
             case DIODE_BLOCK_OFF:
             case DIODE_BLOCK_ON:
+            case REDSTONE_COMPARATOR_OFF:
+            case REDSTONE_COMPARATOR_ON:
                 int dir = data & 0x03;
                 int delay = data - dir;
                 switch (dir)
@@ -269,7 +285,7 @@ public class BlockHelper
                     // West-east --> north-south
                     return data - 1;
                 }
-                
+
             case QUARTZ_BLOCK:
                 if (data == 3)
                     return 4;
@@ -279,6 +295,5 @@ public class BlockHelper
 
         return data;
     }
-
 
 }

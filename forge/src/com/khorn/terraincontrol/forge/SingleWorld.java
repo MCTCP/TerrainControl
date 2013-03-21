@@ -448,6 +448,9 @@ public class SingleWorld implements LocalWorld
         if (chunk != null)
         {
             chunk.setBlockIDWithMetadata(x & 0xF, y, z & 0xF, typeId, data);
+            // Workaround for (bug in?) Minecraft
+            if (chunk.getBlockStorageArray()[y >> 4] != null)
+                chunk.getBlockStorageArray()[y >> 4].getMetadataArray().set(x & 15, y & 15, z & 15, data);
         }
         if (updateLight)
         {

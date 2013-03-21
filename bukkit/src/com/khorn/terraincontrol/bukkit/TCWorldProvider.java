@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
+import net.minecraft.server.v1_5_R1.WorldProvider;
 import net.minecraft.server.v1_5_R1.WorldProviderNormal;
-
 
 /**
  * We extend this file to be able to set the sea level.
@@ -12,10 +12,12 @@ import net.minecraft.server.v1_5_R1.WorldProviderNormal;
 public class TCWorldProvider extends WorldProviderNormal
 {
     protected BukkitWorld localWorld;
+    private final WorldProvider oldWorldProvider;
 
-    public TCWorldProvider(BukkitWorld localWorld)
+    public TCWorldProvider(BukkitWorld localWorld, WorldProvider oldWorldProvider)
     {
         this.localWorld = localWorld;
+        this.oldWorldProvider = oldWorldProvider;
         this.a(localWorld.getWorld());
     }
 
@@ -29,5 +31,16 @@ public class TCWorldProvider extends WorldProviderNormal
     public String getName()
     {
         return "Overworld";
+    }
+
+    /**
+     * Returns the world provider that was replaced by the current world provider.
+     * When the plugin disables, this needs to be restored.
+     * 
+     * @return The old world provider.
+     */
+    public WorldProvider getOldWorldProvider()
+    {
+        return oldWorldProvider;
     }
 }
