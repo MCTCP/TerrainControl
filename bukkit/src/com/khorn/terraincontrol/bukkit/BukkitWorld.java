@@ -1,9 +1,6 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
 import com.khorn.terraincontrol.bukkit.structuregens.*;
@@ -13,7 +10,7 @@ import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
-import net.minecraft.server.v1_5_R1.*;
+import net.minecraft.server.v1_5_R2.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -667,7 +664,13 @@ public class BukkitWorld implements LocalWorld
         nmsTag.setInt("z", z);
         // Add that data to the current tile entity in the world
         TileEntity tileEntity = world.getTileEntity(x, y, z);
-        tileEntity.a(nmsTag); // tileEntity.load
+        if(tileEntity != null)
+        {
+            tileEntity.a(nmsTag); // tileEntity.load
+        } else
+        {
+            TerrainControl.log("Skipping tile entity with id " + nmsTag.getString("id") + ", cannot be placed at " + x + "," + y + "," + z + " on id " + world.getTypeId(x, y, z));
+        }
     }
 
     @Override

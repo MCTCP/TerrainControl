@@ -1,9 +1,6 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -658,7 +655,13 @@ public class SingleWorld implements LocalWorld
         nmsTag.setInteger("z", z);
         // Add that data to the current tile entity in the world
         TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
-        tileEntity.readFromNBT(nmsTag);
+        if(tileEntity != null)
+        {
+            tileEntity.readFromNBT(nmsTag);
+        } else
+        {
+            TerrainControl.log("Skipping tile entity with id " + nmsTag.getString("id") + ", cannot be placed at " + x + "," + y + "," + z + " on id " + world.getBlockId(x, y, z));
+        }
     }
 
     @Override

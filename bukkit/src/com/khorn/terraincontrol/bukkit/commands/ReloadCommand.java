@@ -8,7 +8,7 @@ import com.khorn.terraincontrol.bukkit.TCWorldChunkManager;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_5_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class ReloadCommand extends BaseCommand
 
         if (world.getSettings().biomeMode == TerrainControl.getBiomeModeManager().NORMAL)
         {
-            net.minecraft.server.v1_5_R1.World worldServer = ((CraftWorld) Bukkit.getWorld(world.getName())).getHandle();
+            net.minecraft.server.v1_5_R2.World worldServer = ((CraftWorld) Bukkit.getWorld(world.getName())).getHandle();
             ((TCWorldChunkManager) worldServer.worldProvider.d).Init(world);
         }
 

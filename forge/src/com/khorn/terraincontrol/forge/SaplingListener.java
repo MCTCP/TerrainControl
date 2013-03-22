@@ -107,13 +107,13 @@ public class SaplingListener
         // Remove saplings
         if (hugeJungleTreeHasGrown)
         {
-            world.func_94571_i(x + jungleOffsetX, y, z + jungleOffsetZ); // world.makeEmpty
-            world.func_94571_i(x + jungleOffsetX + 1, y, z + jungleOffsetZ);
-            world.func_94571_i(x + jungleOffsetX, y, z + jungleOffsetZ + 1);
-            world.func_94571_i(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1);
+            world.setBlockToAir(x + jungleOffsetX, y, z + jungleOffsetZ);
+            world.setBlockToAir(x + jungleOffsetX + 1, y, z + jungleOffsetZ);
+            world.setBlockToAir(x + jungleOffsetX, y, z + jungleOffsetZ + 1);
+            world.setBlockToAir(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1);
         } else
         {
-            world.func_94571_i(x, y, z);
+            world.setBlockToAir(x, y, z);
         }
 
         // Try ten times to grow sapling
@@ -132,13 +132,13 @@ public class SaplingListener
             // Restore sapling
             if (hugeJungleTreeHasGrown)
             {
-                world.setBlockAndMetadataWithNotify(x + jungleOffsetX, y, z + jungleOffsetZ, blockId, blockData, 4);
-                world.setBlockAndMetadataWithNotify(x + jungleOffsetX + 1, y, z + jungleOffsetZ, blockId, blockData, 4);
-                world.setBlockAndMetadataWithNotify(x + jungleOffsetX, y, z + jungleOffsetZ + 1, blockId, blockData, 4);
-                world.setBlockAndMetadataWithNotify(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, blockId, blockData, 4);
+                world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ, blockId, blockData, 4);
+                world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ, blockId, blockData, 4);
+                world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ + 1, blockId, blockData, 4);
+                world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, blockId, blockData, 4);
             } else
             {
-                world.setBlockAndMetadataWithNotify(x, y, z, blockId, blockData, 4);
+                world.setBlock(x, y, z, blockId, blockData, 4);
             }
         }
 
@@ -171,7 +171,7 @@ public class SaplingListener
 
         // Generate mushroom
         event.setResult(Result.ALLOW);
-        event.world.func_94571_i(event.X, event.Y, event.Z); // world.makeEmpty
+        event.world.setBlockToAir(event.X, event.Y, event.Z);
 
         boolean mushroomGrown = false;
         Random random = new Random();
@@ -186,7 +186,7 @@ public class SaplingListener
         if (!mushroomGrown)
         {
             // Restore mushroom
-            event.world.setBlockAndMetadataWithNotify(event.X, event.Y, event.Z, event.ID, 0, 2);
+            event.world.setBlock(event.X, event.Y, event.Z, event.ID, 0, 2);
         }
     }
 

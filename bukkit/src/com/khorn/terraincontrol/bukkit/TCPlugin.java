@@ -9,13 +9,13 @@ import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.util.StringHelper;
-import net.minecraft.server.v1_5_R1.BiomeBase;
+import net.minecraft.server.v1_5_R2.BiomeBase;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_5_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_5_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_5_R2.block.CraftBlock;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -143,7 +143,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         {
             BukkitWorld bukkitWorld = this.NotInitedWorlds.remove(world.getName());
 
-            net.minecraft.server.v1_5_R1.World workWorld = ((CraftWorld) world).getHandle();
+            net.minecraft.server.v1_5_R2.World workWorld = ((CraftWorld) world).getHandle();
 
             bukkitWorld.enable(workWorld);
 
