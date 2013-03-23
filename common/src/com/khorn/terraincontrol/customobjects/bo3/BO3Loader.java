@@ -84,14 +84,14 @@ public class BO3Loader implements CustomObjectLoader
         }
 
         // The file can be structured in two ways:
-        // 1. chest.nbt with all the contents direclty in it
+        // 1. chest.nbt with all the contents directly in it
         // 2. chest.nbt with a Compound tag in it with all the data
 
         // Check for type 1 by searching for an id tag
         Tag[] values = (Tag[]) metadata.getValue();
         for (Tag subTag : values)
         {
-            if (subTag.getName() != null && subTag.equals("id") && subTag.getType().equals(Tag.Type.TAG_String))
+            if (subTag.getName() != null && subTag.getName().equals("id") && subTag.getType().equals(Tag.Type.TAG_String))
             {
                 // Found id tag, so return the root tag
                 return metadata;

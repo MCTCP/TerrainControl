@@ -664,7 +664,7 @@ public class BukkitWorld implements LocalWorld
         nmsTag.setInt("z", z);
         // Add that data to the current tile entity in the world
         TileEntity tileEntity = world.getTileEntity(x, y, z);
-        if(tileEntity != null)
+        if (tileEntity != null)
         {
             tileEntity.a(nmsTag); // tileEntity.load
         } else
