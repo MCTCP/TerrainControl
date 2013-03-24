@@ -67,7 +67,7 @@ public class ChunkProvider implements IChunkProvider
                             // Second argument is skylight
                             sections[sectionId] = new ExtendedBlockStorage(sectionId << 4, !chunk.worldObj.provider.hasNoSky);
                         }
-                        sections[sectionId].setExtBlockID(blockX, blockY & 0xF, blockZ, block);
+                        sections[sectionId].setExtBlockID(blockX, blockY & 0xF, blockZ, block & 0xFF);
                     }
                 }
         world.FillChunkForBiomes(chunk, chunkX, chunkZ);

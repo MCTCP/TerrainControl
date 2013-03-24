@@ -42,7 +42,7 @@ public abstract class ConfigFile
                     } else if (thisLine.contains(":") || thisLine.toLowerCase().contains("("))
                     {
                         // Setting or resource
-                        if(thisLine.contains("(") && (!thisLine.contains(":") || thisLine.indexOf('(') < thisLine.indexOf(":")) )
+                        if (thisLine.contains("(") && (!thisLine.contains(":") || thisLine.indexOf('(') < thisLine.indexOf(":")))
                         {
                             // ( is first, so it's a resource
                             this.settingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
@@ -107,10 +107,10 @@ public abstract class ConfigFile
     {
         TerrainControl.log(settingsName + " had wrong value");
     }
-    
+
     protected void sayFileNotFound(File file)
     {
-        TerrainControl.log("File not found: " + file .getName());
+        TerrainControl.log("File not found: " + file.getName());
     }
 
     // -------------------------------------------- //
@@ -174,7 +174,12 @@ public abstract class ConfigFile
         {
             try
             {
-                return Byte.valueOf(this.settingsCache.get(settingsName));
+                short number = Short.valueOf(this.settingsCache.get(settingsName));
+                if (number < 0 || number > 255)
+                {
+                    throw new NumberFormatException();
+                }
+                return (byte) number;
             } catch (NumberFormatException e)
             {
                 sayHadWrongValue(settingsName);
@@ -385,6 +390,11 @@ public abstract class ConfigFile
         this.settingsWriter.newLine();
     }
 
+    protected void writeValue(String settingsName, byte settingsValue) throws IOException
+    {
+        this.settingsWriter.write(settingsName + ":" + (settingsValue & 0xFF));
+        this.settingsWriter.newLine();
+    }
 
     protected void writeValue(String settingsName, int settingsValue) throws IOException
     {
@@ -477,7 +487,7 @@ public abstract class ConfigFile
     {
         if (!this.writeComments)
             return;
-        if(comment.length() > 0)
+        if (comment.length() > 0)
             this.settingsWriter.write("# " + comment);
         this.settingsWriter.newLine();
     }

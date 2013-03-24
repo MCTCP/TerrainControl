@@ -707,7 +707,6 @@ public class BiomeConfig extends ConfigFile
         this.writeNewLine();
         writeComment("Block id from stone to surface, like dirt in plain biome ");
         writeValue(TCDefaultValues.GroundBlock.name(), this.GroundBlock);
-        writeNewLine();
 
         this.writeNewLine();
         writeComment("Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])");
