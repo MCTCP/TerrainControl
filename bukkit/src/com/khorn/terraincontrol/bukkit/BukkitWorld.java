@@ -674,6 +674,22 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
+    public Tag getMetadata(int x, int y, int z)
+    {
+        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        if (tileEntity == null)
+        {
+            return null;
+        }
+        NBTTagCompound nmsTag = new NBTTagCompound();
+        tileEntity.b(nmsTag); // tileEntity.save
+        nmsTag.remove("x");
+        nmsTag.remove("y");
+        nmsTag.remove("z");
+        return NBTHelper.getNBTFromNMSTagCompound(nmsTag);
+    }
+
+    @Override
     public CustomObjectStructureCache getStructureCache()
     {
         return this.structureCache;

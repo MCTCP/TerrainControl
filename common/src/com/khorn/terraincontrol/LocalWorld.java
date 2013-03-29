@@ -16,8 +16,8 @@ public interface LocalWorld
 
     public LocalBiome getNullBiome(String name);
 
-    public int getMaxBiomesCount(); // With static id allocation this is not a
-    // required feature.
+    // With static id allocation this is not a required feature.
+    public int getMaxBiomesCount();
 
     public int getFreeBiomeId();
 
@@ -92,6 +92,8 @@ public interface LocalWorld
 
     public void attachMetadata(int x, int y, int z, Tag tag);
 
+    public Tag getMetadata(int x, int y, int z);
+
     public int getLiquidHeight(int x, int z);
 
     /**
@@ -113,7 +115,7 @@ public interface LocalWorld
     public boolean isLoaded(int x, int y, int z);
 
     public WorldConfig getSettings();
-    
+
     public CustomObjectStructureCache getStructureCache();
 
     public String getName();

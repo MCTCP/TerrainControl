@@ -655,13 +655,29 @@ public class SingleWorld implements LocalWorld
         nmsTag.setInteger("z", z);
         // Add that data to the current tile entity in the world
         TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
-        if(tileEntity != null)
+        if (tileEntity != null)
         {
             tileEntity.readFromNBT(nmsTag);
         } else
         {
             TerrainControl.log("Skipping tile entity with id " + nmsTag.getString("id") + ", cannot be placed at " + x + "," + y + "," + z + " on id " + world.getBlockId(x, y, z));
         }
+    }
+
+    @Override
+    public Tag getMetadata(int x, int y, int z)
+    {
+        TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+        if (tileEntity == null)
+        {
+            return null;
+        }
+        NBTTagCompound nmsTag = new NBTTagCompound();
+        tileEntity.writeToNBT(nmsTag);
+        nmsTag.removeTag("x");
+        nmsTag.removeTag("y");
+        nmsTag.removeTag("z");
+        return NBTHelper.getNBTFromNMSTagCompound(nmsTag);
     }
 
     @Override
