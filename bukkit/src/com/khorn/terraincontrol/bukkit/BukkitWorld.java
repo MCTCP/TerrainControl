@@ -507,7 +507,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public int getLightLevel(int x, int y, int z)
     {
-        return world.getLightLevel(x, y, z);
+        return world.m(x, y, z); // world.getBlockAndSkyLightAsItWereDay
     }
 
     @Override

@@ -502,7 +502,8 @@ public class SingleWorld implements LocalWorld
     @Override
     public int getLightLevel(int x, int y, int z)
     {
-        return world.getBlockLightValue(x, y, z);
+        // Actually, this calculates the block and skylight as it were day.
+        return world.getFullBlockLightValue(x, y, z);
     }
 
     @Override

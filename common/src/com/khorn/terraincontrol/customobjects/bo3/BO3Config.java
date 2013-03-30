@@ -258,7 +258,8 @@ public class BO3Config extends ConfigFile
         // BO3Checks
         writeBigTitle("BO3 checks");
         writeComment("Require a condition at a certain location in order for the BO3 to be spawned.");
-        writeComment("BlockCheck(x,y,z,id[.data][,id[.data][,...]])");
+        writeComment("BlockCheck(x,y,z,id[:data][,id[:data][,...]])");
+        writeComment("LightCheck(x,y,z,minLightLevel,maxLightLevel)");
         for (BO3Check check : bo3Checks[0])
         {
             writeValue(check.write());

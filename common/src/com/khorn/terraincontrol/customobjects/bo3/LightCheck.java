@@ -18,10 +18,10 @@ public class LightCheck extends BO3Check
         if (lightLevel < minLightLevel || lightLevel > maxLightLevel)
         {
             // Out of bounds
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     @Override
