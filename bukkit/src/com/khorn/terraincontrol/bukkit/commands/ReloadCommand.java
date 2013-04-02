@@ -4,11 +4,9 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-import com.khorn.terraincontrol.bukkit.TCWorldChunkManager;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 
@@ -29,24 +27,18 @@ public class ReloadCommand extends BaseCommand
         BukkitWorld world = this.getWorld(sender, args.size() > 0 ? args.get(0) : "");
         if (world == null)
         {
-            sender.sendMessage(ERROR_COLOR + "You need to select world");
-            return true;
+            sender.sendMessage(ERROR_COLOR + "World not found. Either you are not in a world with Terrain Control, or you are the console.");
+            return false;
         }
 
-        WorldConfig oldSettings = world.getSettings();
+        WorldConfig newSettings = new WorldConfig(plugin.getWorldSettingsFolder(world.getName()), world, false);
+        world.setSettings(newSettings);
 
-        this.plugin.CreateSettings(world.getName(), world);
-
-        oldSettings.newSettings = world.getSettings();
-        oldSettings.isDeprecated = true;
-
-        if (world.getSettings().biomeMode == TerrainControl.getBiomeModeManager().NORMAL)
+        sender.sendMessage(MESSAGE_COLOR + "Configs for world '" + world.getName() + "' reloaded");
+        if (sender instanceof Player)
         {
-            net.minecraft.server.v1_5_R2.World worldServer = ((CraftWorld) Bukkit.getWorld(world.getName())).getHandle();
-            ((TCWorldChunkManager) worldServer.worldProvider.d).Init(world);
+            TerrainControl.log(sender.getName() + " reloaded the config files for world '" + world.getName() + "'.");
         }
-
-        sender.sendMessage(MESSAGE_COLOR + "WorldConfig for world " + world.getName() + " reloaded");
         return true;
     }
 }

@@ -1,9 +1,12 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
+import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import org.bukkit.command.CommandSender;
 
+import java.io.File;
 import java.util.List;
 
 public class CheckCommand extends BaseCommand
@@ -26,7 +29,9 @@ public class CheckCommand extends BaseCommand
             return true;
         }
 
-        plugin.CreateSettings(args.get(0), null);
+        String worldName = args.get(0);
+        File settingsFolder = plugin.getWorldSettingsFolder(worldName);
+        new WorldConfig(settingsFolder, new BukkitWorld(worldName), true);
 
         sender.sendMessage(MESSAGE_COLOR + "Done!");
         return true;

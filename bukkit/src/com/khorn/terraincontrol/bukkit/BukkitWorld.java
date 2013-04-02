@@ -11,6 +11,7 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 import net.minecraft.server.v1_5_R2.*;
+import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,8 +19,11 @@ import java.util.Random;
 
 public class BukkitWorld implements LocalWorld
 {
+    // Initially false, set to true when enabled once
+    private boolean initialized;
+
     private TCChunkGenerator generator;
-    private World world;
+    private WorldServer world;
     private WorldConfig settings;
     private CustomObjectStructureCache structureCache;
     private String name;
@@ -556,53 +560,93 @@ public class BukkitWorld implements LocalWorld
         return this.world;
     }
 
+    /**
+     * Sets the new settings and deprecates any references to the old settings, if any.
+     * @param worldConfig The new settings.
+     */
     public void setSettings(WorldConfig worldConfig)
     {
+        if (this.settings != null)
+        {
+            this.settings.newSettings = worldConfig;
+            this.settings.isDeprecated = true;
+        }
         this.settings = worldConfig;
     }
 
-    public void enable(World _world)
+    /**
+     * Enables/reloads this BukkitWorld. If you are reloading, 
+     * don't forget to set the new settings first using 
+     * {@link #setSettings(WorldConfig)}.
+     * @param world The world that needs to be enabled.
+     */
+    public void enable(org.bukkit.World world)
     {
-        this.world = _world;
-        this.seed = world.getSeed();
-        this.structureCache = new CustomObjectStructureCache(this);
+        WorldServer mcWorld = ((CraftWorld) world).getHandle();
 
-        // TODO check for mob burning issues
-        if (this.world.worldProvider.getName().equals("Overworld"))
+        // Do the things that always need to happen, whether we are enabling for
+        // the first time or reloading
+        this.world = mcWorld;
+        this.seed = mcWorld.getSeed();
+        this.chunkCache = new Chunk[4];
+
+        // Inject our own WorldProvider
+        if (mcWorld.worldProvider.getName().equals("Overworld"))
         {
             // Only replace the worldProvider if it's the overworld
             // Replacing other dimensions causes a lot of glitches
-            this.world.worldProvider = new TCWorldProvider(this, this.world.worldProvider);
+            mcWorld.worldProvider = new TCWorldProvider(this, this.world.worldProvider);
+        }
+        
+        // Inject our own BiomeManager (called WorldChunkManager)
+        Class<? extends BiomeGenerator> biomeModeClass = this.settings.biomeMode;
+        if (biomeModeClass != TerrainControl.getBiomeModeManager().VANILLA)
+        {
+            TCWorldChunkManager worldChunkManager = new TCWorldChunkManager(this);
+            mcWorld.worldProvider.d = worldChunkManager;
+
+            BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeModeClass, this, new BiomeCacheWrapper(worldChunkManager));
+            worldChunkManager.setBiomeManager(biomeManager);
+            setBiomeManager(biomeManager);
         }
 
-        this.chunkCache = new Chunk[4];
-
-        switch (this.settings.ModeTerrain)
+        if (!initialized)
         {
+            // Things that need to be done only when enabling for the first time
+            this.structureCache = new CustomObjectStructureCache(this);
 
-            case Normal:
-            case OldGenerator:
-                this.strongholdGen = new StrongholdGen(settings);
-                this.villageGen = new VillageGen(settings);
-                this.mineshaftGen = new MineshaftGen();
-                this.pyramidsGen = new RareBuildingGen(settings);
-                this.netherFortress = new NetherFortressGen();
-            case NotGenerate:
-                this.tree = new WorldGenTrees(false);
-                this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
-                this.bigTree = new WorldGenBigTree(false);
-                this.forest = new WorldGenForest(false);
-                this.swampTree = new WorldGenSwampTree();
-                this.taigaTree1 = new WorldGenTaiga1();
-                this.taigaTree2 = new WorldGenTaiga2(false);
-                this.hugeMushroom = new WorldGenHugeMushroom();
-                this.jungleTree = new WorldGenMegaTree(false, 15, 3, 3);
-                this.groundBush = new WorldGenGroundBush(3, 0);
-            case TerrainTest:
-                this.generator.Init(this);
-                break;
-            case Default:
-                break;
+            switch (this.settings.ModeTerrain)
+            {
+                case Normal:
+                case OldGenerator:
+                    this.strongholdGen = new StrongholdGen(settings);
+                    this.villageGen = new VillageGen(settings);
+                    this.mineshaftGen = new MineshaftGen();
+                    this.pyramidsGen = new RareBuildingGen(settings);
+                    this.netherFortress = new NetherFortressGen();
+                case NotGenerate:
+                    this.tree = new WorldGenTrees(false);
+                    this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
+                    this.bigTree = new WorldGenBigTree(false);
+                    this.forest = new WorldGenForest(false);
+                    this.swampTree = new WorldGenSwampTree();
+                    this.taigaTree1 = new WorldGenTaiga1();
+                    this.taigaTree2 = new WorldGenTaiga2(false);
+                    this.hugeMushroom = new WorldGenHugeMushroom();
+                    this.jungleTree = new WorldGenMegaTree(false, 15, 3, 3);
+                    this.groundBush = new WorldGenGroundBush(3, 0);
+                case TerrainTest:
+                    this.generator.Init(this);
+                    break;
+                case Default:
+                    break;
+            }
+
+            this.initialized = true;
+        } else
+        {
+            // Things that need to be done only on reloading
+            this.structureCache.reload(this);
         }
     }
 

@@ -18,14 +18,9 @@ public class TCWorldChunkManager extends WorldChunkManager
     public TCWorldChunkManager(BukkitWorld world)
     {
         super();
-        this.Init(world);
-    }
-
-    public void Init(BukkitWorld world)
-    {
         localWorld = world;
     }
-    
+
     public void setBiomeManager(BiomeGenerator manager)
     {
         this.biomeManager = manager;
@@ -42,7 +37,6 @@ public class TCWorldChunkManager extends WorldChunkManager
     {
         return biomeManager.getRainfall(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
     }
-
 
     @Override
     public float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
@@ -90,7 +84,8 @@ public class TCWorldChunkManager extends WorldChunkManager
     public boolean a(int paramInt1, int paramInt2, int paramInt3, List paramList)
     {
         // Hack for villages in other biomes
-        // (The alternative would be to completely override the village spawn code)
+        // (The alternative would be to completely override the village spawn
+        // code)
         if (paramList == WorldGenVillage.e)
         {
             paramList = localWorld.villageGen.villageSpawnBiomes;

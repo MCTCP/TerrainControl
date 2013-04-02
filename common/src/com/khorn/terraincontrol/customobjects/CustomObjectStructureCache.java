@@ -24,6 +24,12 @@ public class CustomObjectStructureCache
         this.structureCache = new HashMap<ChunkCoordinate, CustomObjectStructure>();
     }
 
+    public void reload(LocalWorld world)
+    {
+        this.world = world;
+        structureCache.clear();
+    }
+
     public CustomObjectStructure getStructureStart(int chunkX, int chunkZ)
     {
         ChunkCoordinate coord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
