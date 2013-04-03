@@ -31,32 +31,53 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     public TCListener listener;
     public TCCommandExecutor commandExecutor;
 
+    // Debug setting. Set it to true to make Terrain Control try to disable
+    // itself. However, terrain generators aren't cleaned up properly by Bukkit,
+    // so this won't really work until that bug is fixed.
+    public boolean cleanupOnDisable = false;
+
     public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
 
+    @Override
     public void onDisable()
     {
-        // Cleanup worlds
-        for (BukkitWorld world : worlds.values())
+        if (cleanupOnDisable)
         {
-            world.disable();
-        }
-        worlds.clear();
+            // Cleanup worlds
+            for (BukkitWorld world : worlds.values())
+            {
+                world.disable();
+            }
+            worlds.clear();
 
-        TerrainControl.stopEngine();
+            TerrainControl.stopEngine();
+        }
     }
 
+    @Override
     public void onEnable()
     {
-        // Start the engine
-        TerrainControl.startEngine(this);
+        if (Bukkit.getWorlds().size() != 0 && !cleanupOnDisable)
+        {
+            // Reload "handling"
+            // (worlds are already loaded and TC didn't clean up itself)
+            log(Level.SEVERE, "The server was just /reloaded! Terrain Control has problems handling this,");
+            log(Level.SEVERE, "as old parts from before the reload have not been cleaned up.");
+            log(Level.SEVERE, "Unexpected things may happen! Please restart the server!");
+            log(Level.SEVERE, "In the future, instead of /reloading, please restart the server,");
+            log(Level.SEVERE, "or reload a plugin using it's built-in command (like /tc reload),");
+            log(Level.SEVERE, "or use a plugin managing plugin that can reload one plugin at a time.");
+            setEnabled(false);
+        } else
+        {
+            // Start the engine
+            TerrainControl.startEngine(this);
+            this.commandExecutor = new TCCommandExecutor(this);
+            this.listener = new TCListener(this);
+            Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
 
-        this.commandExecutor = new TCCommandExecutor(this);
-
-        this.listener = new TCListener(this);
-
-        Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
-
-        TerrainControl.log("Global objects loaded, waiting for worlds to load");
+            TerrainControl.log("Global objects loaded, waiting for worlds to load");
+        }
     }
 
     @Override
@@ -130,7 +151,6 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         return baseFolder;
     }
 
-    // Called by TCListener
     public void onWorldInit(World world)
     {
         if (this.notInitedWorlds.containsKey(world.getName()))

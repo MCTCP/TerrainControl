@@ -59,12 +59,6 @@ public class TCChunkGenerator extends ChunkGenerator
     @Override
     public byte[][] generateBlockSections(World world, Random random, int x, int z, BiomeGrid biomes)
     {
-        //if (!this.plugin.isEnabled())
-        //{
-        //    // TODO: do something useful
-        //    throw new RuntimeException("Plugin not enabled!");
-        //}
-
         if (this.NotGenerate)
             return new byte[16][];
         byte[] BlockArray = this.chunkProviderTC.generate(x, z);
