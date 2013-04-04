@@ -9,27 +9,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class TCSender implements Runnable
+public class TCSender
 {
-    private Player player;
     private TCPlugin plugin;
 
-    public TCSender(TCPlugin plugin, Player player)
+    public TCSender(TCPlugin plugin)
     {
         this.plugin = plugin;
-        this.player = player;
     }
 
-    @Override
-    public void run()
+    public void send(Player player)
     {
-        if (!player.getListeningPluginChannels().contains(TCDefaultValues.ChannelName.stringValue()))
-        {
-            // Player doesn't have TC, abort.
-            // System.out.println("TerrainControl: player joined without TerrainControl"); // debug
-            return;
-        }
-
         // Send the configs
         World world = player.getWorld();
 
@@ -37,7 +27,7 @@ public class TCSender implements Runnable
         {
             WorldConfig config = plugin.worlds.get(world.getUID()).getSettings();
 
-            // System.out.println("TerrainControl: config sent to player for world " + config.WorldName); //debug
+            // TerrainControl.log("config sent to player for world " + config.WorldName); //debug
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream stream = new DataOutputStream(outputStream);
 
@@ -46,7 +36,6 @@ public class TCSender implements Runnable
                 stream.writeInt(TCDefaultValues.ProtocolVersion.intValue());
                 config.Serialize(stream);
                 stream.flush();
-
             } catch (IOException e)
             {
                 e.printStackTrace();

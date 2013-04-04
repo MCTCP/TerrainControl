@@ -1,14 +1,16 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingType;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldInitEvent;
 
@@ -17,10 +19,12 @@ import java.util.Random;
 public class TCListener implements Listener
 {
     private TCPlugin tcPlugin;
+    private TCSender tcSender;
 
     public TCListener(TCPlugin plugin)
     {
         this.tcPlugin = plugin;
+        this.tcSender = new TCSender(plugin);
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -91,7 +95,8 @@ public class TCListener implements Listener
 
             if (success)
             {
-                // Just spawned the tree, clear the blocks list to prevent Bukkit spawning another tree
+                // Just spawned the tree, clear the blocks list to prevent
+                // Bukkit spawning another tree
                 event.getBlocks().clear();
             } else
             {
@@ -102,19 +107,24 @@ public class TCListener implements Listener
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event)
+    public void onPlayerRegisterChannel(PlayerRegisterChannelEvent event)
     {
-        // Sends the packet
-        // Because the player doesn't send the REGISTER packet immediately, we
-        // have to wait a second (20 ticks).
-        Bukkit.getScheduler().runTaskLater(tcPlugin, new TCSender(tcPlugin, event.getPlayer()), 20);
+        // Sends custom colors on join
+        if (event.getChannel().equals(TCDefaultValues.ChannelName.stringValue()))
+        {
+            tcSender.send(event.getPlayer());
+        }
     }
 
     @EventHandler
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event)
     {
         // Resends the packet so that the biomes are right again
-        Bukkit.getScheduler().runTaskLater(tcPlugin, new TCSender(tcPlugin, event.getPlayer()), 1);
+        Player player = event.getPlayer();
+        if (player.getListeningPluginChannels().contains(TCDefaultValues.ChannelName.stringValue()))
+        {
+            tcSender.send(player);
+        }
     }
 
 }
