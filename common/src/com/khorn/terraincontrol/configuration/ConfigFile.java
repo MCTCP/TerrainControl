@@ -167,6 +167,28 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
+    protected long readModSettings(String settingsName, long defaultValue)
+    {
+        settingsName = settingsName.toLowerCase();
+        if (this.settingsCache.containsKey(settingsName))
+        {
+            String value = settingsCache.get(settingsName);
+            if (value.isEmpty())
+            {
+                return 0;
+            }
+            try
+            {
+                return Long.parseLong(value);
+            } catch (NumberFormatException e)
+            {
+                sayHadWrongValue(settingsName);
+            }
+        }
+        sayNotFound(settingsName);
+        return defaultValue;
+    }
+
     protected byte readModSettings(String settingsName, byte defaultValue)
     {
         settingsName = settingsName.toLowerCase();
@@ -290,7 +312,6 @@ public abstract class ConfigFile
         sayNotFound(settingsName);
         return defaultValue;
 
-
     }
 
     @SuppressWarnings("unchecked")
@@ -309,6 +330,9 @@ public abstract class ConfigFile
             case Int:
                 obj = readModSettings(value.name(), value.intValue());
                 break;
+            case Long:
+                obj = readModSettings(value.name(), value.longValue());
+                break;
             case Enum:
                 obj = readModSettings(value.name(), value.enumValue());
                 break;
@@ -326,11 +350,9 @@ public abstract class ConfigFile
                 break;
         }
 
-
         return (T) obj;
 
     }
-
 
     public void writeSettingsFile(File settingsFile, boolean comments)
     {
@@ -638,7 +660,6 @@ public abstract class ConfigFile
             output = buffer.toArray(output);
 
         return output;
-
 
     }
 }

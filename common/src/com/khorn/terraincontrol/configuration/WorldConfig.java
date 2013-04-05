@@ -164,10 +164,14 @@ public class WorldConfig extends ConfigFile
     public int worldHeightBits;
     public int WorldHeight;
 
+    private long worldSeed;
+    public long resourcesSeed;
+
     public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
     {
         this.SettingsDir = settingsDir;
         this.WorldName = world.getName();
+        this.worldSeed = world.getSeed();
 
         File settingsFile = new File(this.SettingsDir, TCDefaultValues.WorldSettingsName.stringValue());
 
@@ -377,6 +381,11 @@ public class WorldConfig extends ConfigFile
         this.minimumDistanceBetweenRareBuildings = applyBounds(this.minimumDistanceBetweenRareBuildings, 1, Integer.MAX_VALUE);
         this.maximumDistanceBetweenRareBuildings = applyBounds(this.maximumDistanceBetweenRareBuildings, this.minimumDistanceBetweenRareBuildings, Integer.MAX_VALUE);
 
+        if(this.resourcesSeed == 0) {
+            // Empty seed means "use world seed"
+            this.resourcesSeed = this.worldSeed;
+        }
+        
         if (this.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && this.ModeTerrain != TerrainMode.OldGenerator)
         {
             TerrainControl.log("Old biome generator works only with old terrain generator!");
@@ -504,7 +513,8 @@ public class WorldConfig extends ConfigFile
 
         // Misc
         this.removeSurfaceStone = readSettings(TCDefaultValues.RemoveSurfaceStone);
-        this.objectSpawnRatio = this.readSettings(TCDefaultValues.objectSpawnRatio);
+        this.objectSpawnRatio = readSettings(TCDefaultValues.objectSpawnRatio);
+        this.resourcesSeed = readSettings(TCDefaultValues.ResourcesSeed);
 
         this.oldTerrainGenerator = this.ModeTerrain == TerrainMode.OldGenerator;
     }
@@ -731,7 +741,17 @@ public class WorldConfig extends ConfigFile
         writeComment("BlockId used as bedrock");
         writeValue(TCDefaultValues.BedrockobBlock.name(), this.bedrockBlock);
 
-        if(objectSpawnRatio != 1)
+        writeNewLine();
+        writeComment("Seed used for the resource generation. Can only be numeric. Leave blank to use the world seed.");
+        if (this.resourcesSeed == this.worldSeed)
+        {   // Same as worldseed, so leave blank
+            writeValue(TCDefaultValues.ResourcesSeed.name(), "");
+        } else
+        {
+            writeValue(TCDefaultValues.ResourcesSeed.name(), this.resourcesSeed);
+        }
+
+        if (objectSpawnRatio != 1)
         {
             // Write the old objectSpawnRatio
             writeNewLine();
@@ -906,17 +926,25 @@ public class WorldConfig extends ConfigFile
 
     public enum TerrainMode
     {
-        Normal, OldGenerator, TerrainTest, NotGenerate, Default
+        Normal,
+        OldGenerator,
+        TerrainTest,
+        NotGenerate,
+        Default
     }
 
     public enum ImageMode
     {
-        Repeat, ContinueNormal, FillEmpty,
+        Repeat,
+        ContinueNormal,
+        FillEmpty,
     }
 
     public enum ConfigMode
     {
-        WriteAll, WriteDisable, WriteWithoutComments
+        WriteAll,
+        WriteDisable,
+        WriteWithoutComments
     }
 
     public void Serialize(DataOutputStream stream) throws IOException

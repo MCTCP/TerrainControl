@@ -5,23 +5,21 @@ import java.util.Collections;
 
 public enum TCDefaultValues implements TCSetting
 {
-    //Files
+    // Files
     WorldSettingsName("WorldConfig.ini"),
     BO_WorldDirectoryName("WorldObjects"),
     WorldBiomeConfigDirectoryName("BiomeConfigs"),
     WorldBiomeConfigName("BiomeConfig.ini"),
     // End files
 
-    //Network
+    // Network
     ChannelName("TerrainControl"),
     ProtocolVersion(5),
     // End network
 
-    maxChunkBlockValue(32768),
-
     snowAndIceMaxTemp(0.15F),
 
-    //World settings
+    // World settings
     SettingsMode(WorldConfig.ConfigMode.WriteAll),
     TerrainMode(WorldConfig.TerrainMode.Normal),
     BiomeMode("Normal"),
@@ -118,8 +116,9 @@ public enum TCDefaultValues implements TCSetting
     BedrockobBlock(7),
     RemoveSurfaceStone(false),
     objectSpawnRatio(1),
+    ResourcesSeed(0L), // "L" means that it is a long instead of an int
 
-    //End world settings
+    // End world settings
 
     // Biome settings
     BiomeSize(5),
@@ -298,8 +297,8 @@ public enum TCDefaultValues implements TCSetting
 
     // End resource settings
 
-
     private int iValue;
+    private long lValue;
     private double dValue;
     private float fValue;
     private String sValue;
@@ -307,7 +306,6 @@ public enum TCDefaultValues implements TCSetting
     private Enum<?> eValue;
     private SettingsType returnType;
     private ArrayList<String> sArrayValue;
-
 
     private TCDefaultValues(int i)
     {
@@ -325,6 +323,12 @@ public enum TCDefaultValues implements TCSetting
     {
         this.fValue = f;
         this.returnType = SettingsType.Float;
+    }
+
+    private TCDefaultValues(long l)
+    {
+        this.lValue = l;
+        this.returnType = SettingsType.Long;
     }
 
     private TCDefaultValues(String s)
@@ -357,16 +361,20 @@ public enum TCDefaultValues implements TCSetting
 
     }
 
-    private TCDefaultValues(Boolean b)
+    private TCDefaultValues(boolean b)
     {
         this.bValue = b;
         this.returnType = SettingsType.Boolean;
     }
 
-
     public int intValue()
     {
         return this.iValue;
+    }
+
+    public long longValue()
+    {
+        return this.lValue;
     }
 
     public double doubleValue()
@@ -403,6 +411,5 @@ public enum TCDefaultValues implements TCSetting
     {
         return this.bValue;
     }
-
 
 }

@@ -9,6 +9,7 @@ public interface TCSetting
         String,
         Boolean,
         Int,
+        Long,
         Enum,
         Double,
         Float,
@@ -19,6 +20,8 @@ public interface TCSetting
     public String name();
 
     public int intValue();
+    
+    public long longValue();
 
     public float floatValue();
 

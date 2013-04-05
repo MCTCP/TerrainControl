@@ -33,15 +33,17 @@ public enum BO3Settings implements TCSetting
     // The spawn height
     public enum SpawnHeightSetting
     {
-        randomY(SpawnHeight.PROVIDED), highestBlock(SpawnHeight.HIGHEST_BLOCK), highestSolidBlock(SpawnHeight.HIGHEST_SOLID_BLOCK);
-        
+        randomY(SpawnHeight.PROVIDED),
+        highestBlock(SpawnHeight.HIGHEST_BLOCK),
+        highestSolidBlock(SpawnHeight.HIGHEST_SOLID_BLOCK);
+
         private SpawnHeight height;
-        
+
         private SpawnHeightSetting(SpawnHeight height)
         {
             this.height = height;
         }
-        
+
         public SpawnHeight toSpawnHeight()
         {
             return height;
@@ -51,7 +53,8 @@ public enum BO3Settings implements TCSetting
     // What to do when outside the source block
     public enum OutsideSourceBlock
     {
-        dontPlace, placeAnyway
+        dontPlace,
+        placeAnyway
     }
 
     private Object value;
@@ -61,6 +64,12 @@ public enum BO3Settings implements TCSetting
     {
         value = i;
         returnType = SettingsType.Int;
+    }
+
+    private BO3Settings(long i)
+    {
+        value = i;
+        returnType = SettingsType.Long;
     }
 
     private BO3Settings(double d)
@@ -151,5 +160,11 @@ public enum BO3Settings implements TCSetting
     public boolean booleanValue()
     {
         return (Boolean) value;
+    }
+
+    @Override
+    public long longValue()
+    {
+        return (Long) value;
     }
 }
