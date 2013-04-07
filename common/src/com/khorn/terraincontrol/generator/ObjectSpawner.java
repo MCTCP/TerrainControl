@@ -34,10 +34,11 @@ public class ObjectSpawner
         BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
         // Get the random generator
-        this.rand.setSeed(worldSettings.resourcesSeed);
+        long resourcesSeed = worldSettings.resourcesSeed != 0L? worldSettings.resourcesSeed : world.getSeed();
+        this.rand.setSeed(resourcesSeed);
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
-        this.rand.setSeed(chunkX * l1 + chunkZ * l2 ^ worldSettings.resourcesSeed);
+        this.rand.setSeed(chunkX * l1 + chunkZ * l2 ^ resourcesSeed);
 
         // Generate structures
         boolean hasGeneratedAVillage = world.PlaceTerrainObjects(rand, chunkX, chunkZ);

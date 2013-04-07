@@ -144,7 +144,7 @@ public class WorldConfig extends ConfigFile
     public boolean removeSurfaceStone;
 
     public int objectSpawnRatio;
-    public File CustomObjectsDirectory;
+    public File customObjectsDirectory;
 
     public File SettingsDir;
     public ConfigMode SettingsMode;
@@ -164,14 +164,12 @@ public class WorldConfig extends ConfigFile
     public int worldHeightBits;
     public int WorldHeight;
 
-    private long worldSeed;
     public long resourcesSeed;
 
     public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
     {
         this.SettingsDir = settingsDir;
         this.WorldName = world.getName();
-        this.worldSeed = world.getSeed();
 
         File settingsFile = new File(this.SettingsDir, TCDefaultValues.WorldSettingsName.stringValue());
 
@@ -270,39 +268,41 @@ public class WorldConfig extends ConfigFile
                         this.biomeColorMap.put(color, config.Biome.getId());
                 } catch (NumberFormatException ex)
                 {
-                    System.out.println("TerrainControl: wrong color in " + config.Biome.getName());
+                    TerrainControl.log(Level.WARNING, "Wrong color in " + config.Biome.getName());
                 }
 
             }
         }
 
-        System.out.println("TerrainControl: Loaded biomes - " + LoadedBiomeNames);
+        TerrainControl.log("Loaded biomes - " + LoadedBiomeNames);
 
     }
 
     private void ReadWorldCustomObjects()
     {
-        CustomObjectsDirectory = new File(SettingsDir, "BOBPlugins");
-        if (CustomObjectsDirectory.exists())
-            if (!CustomObjectsDirectory.renameTo(new File(SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue())))
+        customObjectsDirectory = new File(this.SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
+        
+        File oldCustomObjectsDirectory = new File(SettingsDir, "BOBPlugins");
+        if (oldCustomObjectsDirectory.exists()) {
+            if (!oldCustomObjectsDirectory.renameTo(new File(SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue())))
             {
-                System.out.println("TerrainControl: Can`t rename old custom objects folder");
+                TerrainControl.log(Level.WARNING, "Fould old BOBPlugins folder, but it cannot be renamed to WorldObjects.");
+                TerrainControl.log(Level.WARNING, "Please move the BO2s manually and delete BOBPlugins afterwards.");
             }
+        }
 
-        CustomObjectsDirectory = new File(this.SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
-
-        if (!CustomObjectsDirectory.exists())
+        if (!customObjectsDirectory.exists())
         {
-            if (!CustomObjectsDirectory.mkdirs())
+            if (!customObjectsDirectory.mkdirs())
             {
-                System.out.println("TerrainControl: can`t create WorldObjects CustomObjectsDirectory");
+                TerrainControl.log(Level.WARNING, "Can`t create WorldObjects folder. No write permissions?");
                 return;
             }
         }
 
-        customObjects = new ArrayList<CustomObject>(TerrainControl.getCustomObjectManager().loadObjects(CustomObjectsDirectory).values());
+        customObjects = new ArrayList<CustomObject>(TerrainControl.getCustomObjectManager().loadObjects(customObjectsDirectory).values());
 
-        TerrainControl.log(customObjects.size() + " world custom objects loaded");
+        TerrainControl.log(customObjects.size() + " world custom objects loaded.");
 
     }
 
@@ -380,11 +380,6 @@ public class WorldConfig extends ConfigFile
         this.villageDistance = applyBounds(this.villageDistance, 9, Integer.MAX_VALUE);
         this.minimumDistanceBetweenRareBuildings = applyBounds(this.minimumDistanceBetweenRareBuildings, 1, Integer.MAX_VALUE);
         this.maximumDistanceBetweenRareBuildings = applyBounds(this.maximumDistanceBetweenRareBuildings, this.minimumDistanceBetweenRareBuildings, Integer.MAX_VALUE);
-
-        if(this.resourcesSeed == 0) {
-            // Empty seed means "use world seed"
-            this.resourcesSeed = this.worldSeed;
-        }
         
         if (this.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && this.ModeTerrain != TerrainMode.OldGenerator)
         {
@@ -743,8 +738,8 @@ public class WorldConfig extends ConfigFile
 
         writeNewLine();
         writeComment("Seed used for the resource generation. Can only be numeric. Leave blank to use the world seed.");
-        if (this.resourcesSeed == this.worldSeed)
-        {   // Same as worldseed, so leave blank
+        if (this.resourcesSeed == 0)
+        {   // It's zero, so leave it blank, we're using the world seed
             writeValue(TCDefaultValues.ResourcesSeed.name(), "");
         } else
         {

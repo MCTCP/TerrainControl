@@ -9,7 +9,6 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.util.StringHelper;
 import net.minecraft.server.v1_5_R2.BiomeBase;
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -89,7 +88,16 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
     {
-        Validate.notEmpty(worldName.trim(), "World name cannot be empty");
+        if(worldName.equals("")) {
+            TerrainControl.log("Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
+            return new TCChunkGenerator(this);
+        }
+        if(worldName.equals("test")) {
+            TerrainControl.log("Ignoring world with the name \"test\". This is not a valid world name,");
+            TerrainControl.log("as it's used by Multiverse to check if \"TerrainControl\" a valid generator name.");
+            TerrainControl.log("So if you were just using /mv create, don't worry about this message.");
+            return new TCChunkGenerator(this);
+        }
 
         // Check if not already enabled
         for (BukkitWorld world : worlds.values())
@@ -110,7 +118,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         // This is really needed. Try for yourself if you don't believe it,
         // you will get a java.lang.IllegalArgumentException when adding biomes
         CraftBlock.biomeBaseToBiome(BiomeBase.OCEAN);
-
+        
         // Load settings
         File baseFolder = getWorldSettingsFolder(worldName);
         WorldConfig worldConfig = new WorldConfig(baseFolder, localWorld, false);

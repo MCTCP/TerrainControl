@@ -27,7 +27,6 @@ public class BukkitWorld implements LocalWorld
     private WorldConfig settings;
     private CustomObjectStructureCache structureCache;
     private String name;
-    private long seed;
     private BiomeGenerator biomeManager;
 
     private static int nextBiomeId = DefaultBiome.values().length;
@@ -239,19 +238,19 @@ public class BukkitWorld implements LocalWorld
     @Override
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
     {
-        boolean Village = false;
+        boolean villageGenerated = false;
         if (this.settings.strongholdsEnabled)
             this.strongholdGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.mineshaftsEnabled)
             this.mineshaftGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.villagesEnabled)
-            Village = this.villageGen.a(this.world, rand, chunk_x, chunk_z);
+            villageGenerated = this.villageGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.rareBuildingsEnabled)
             this.pyramidsGen.a(this.world, rand, chunk_x, chunk_z);
         if (this.settings.netherFortressesEnabled)
             this.netherFortress.a(this.world, rand, chunk_x, chunk_z);
 
-        return Village;
+        return villageGenerated;
     }
 
     // This part work with ReplacedBlocks after all spawns
@@ -535,7 +534,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public long getSeed()
     {
-        return this.seed;
+        return world.getSeed();
     }
 
     @Override
@@ -587,7 +586,6 @@ public class BukkitWorld implements LocalWorld
         // Do the things that always need to happen, whether we are enabling for
         // the first time or reloading
         this.world = mcWorld;
-        this.seed = mcWorld.getSeed();
         this.chunkCache = new Chunk[4];
 
         // Inject our own WorldProvider
