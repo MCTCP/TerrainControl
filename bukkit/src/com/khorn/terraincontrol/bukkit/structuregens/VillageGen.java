@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import net.minecraft.server.v1_5_R2.BiomeBase;
 import net.minecraft.server.v1_5_R2.StructureGenerator;
 import net.minecraft.server.v1_5_R2.StructureStart;
+import net.minecraft.server.v1_5_R2.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,5 +88,26 @@ public class VillageGen extends StructureGenerator
     protected StructureStart b(int chunkX, int chunkZ)
     {
         return new VillageStart(this.c, this.b, chunkX, chunkZ, this.size);
+    }
+
+    // Two methods to help MCPC+ dynamically rename things.
+    // It has problems with classes that extend native Minecraft classes
+    public void prepare(World world, int chunkX, int chunkZ, byte[] chunkArray)
+    {
+        a(null, world, chunkX, chunkZ, chunkArray);
+    }
+
+    /**
+     * Spawns a village.
+     *
+     * @param world  The world to spawn in.
+     * @param random The random number generator for the seed.
+     * @param chunkX The x coord of the chunk
+     * @param chunkZ The y coord of the chunk.
+     * @return Whether a village was generated successfully.
+     */
+    public boolean place(World world, Random random, int chunkX, int chunkZ)
+    {
+        return a(world, random, chunkX, chunkZ);
     }
 }

@@ -35,4 +35,17 @@ public class MineshaftGen extends StructureGenerator
     {
         return new WorldGenMineshaftStart(this.c, this.b, i, j);
     }
+
+    // Two methods to help MCPC+ dynamically rename things.
+    // It has problems with classes that extend native Minecraft classes
+    public void prepare(World world, int chunkX, int chunkZ, byte[] chunkArray)
+    {
+        a(null, world, chunkX, chunkZ, chunkArray);
+    }
+
+    public void place(World world, Random random, int chunkX, int chunkZ)
+    {
+        a(world, random, chunkX, chunkZ);
+    }
+
 }

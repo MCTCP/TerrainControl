@@ -69,6 +69,13 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             setEnabled(false);
         } else
         {
+            if (Bukkit.getVersion().contains("MCPC-Plus"))
+            {
+                // We're on MCPC+, so enable the extra block ids.
+                TerrainControl.supportedBlockIds = 4095;
+                log(Level.INFO, "MCPC+ detected, enabling extended block id support.");
+            }
+
             // Start the engine
             TerrainControl.startEngine(this);
             this.commandExecutor = new TCCommandExecutor(this);
@@ -88,11 +95,13 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
     {
-        if(worldName.equals("")) {
+        if (worldName.equals(""))
+        {
             TerrainControl.log("Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
             return new TCChunkGenerator(this);
         }
-        if(worldName.equals("test")) {
+        if (worldName.equals("test"))
+        {
             TerrainControl.log("Ignoring world with the name \"test\". This is not a valid world name,");
             TerrainControl.log("as it's used by Multiverse to check if \"TerrainControl\" a valid generator name.");
             TerrainControl.log("So if you were just using /mv create, don't worry about this message.");
@@ -118,7 +127,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         // This is really needed. Try for yourself if you don't believe it,
         // you will get a java.lang.IllegalArgumentException when adding biomes
         CraftBlock.biomeBaseToBiome(BiomeBase.OCEAN);
-        
+
         // Load settings
         File baseFolder = getWorldSettingsFolder(worldName);
         WorldConfig worldConfig = new WorldConfig(baseFolder, localWorld, false);

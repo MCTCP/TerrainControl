@@ -11,9 +11,7 @@ import java.util.Random;
 
 class StructureVillageStart extends StructureStart
 {
-    /**
-     * well ... thats what it does
-     */
+    // well ... thats what it does
     private boolean hasMoreThanTwoComponents = false;
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -21,6 +19,7 @@ class StructureVillageStart extends StructureStart
     {
         ArrayList<StructureComponent> villagePieces = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);
         VillageStartPiece startPiece = new VillageStartPiece(world, 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, villagePieces, size);
+        
         this.components.add(startPiece);
         startPiece.buildComponent(startPiece, this.components, random);
         ArrayList var8 = startPiece.field_74930_j;

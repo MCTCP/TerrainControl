@@ -5,13 +5,12 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
-import net.minecraft.server.v1_5_R2.BiomeBase;
-import net.minecraft.server.v1_5_R2.World;
-import net.minecraft.server.v1_5_R2.WorldChunkManager;
-import net.minecraft.server.v1_5_R2.WorldGenVillageStartPiece;
+import net.minecraft.server.v1_5_R2.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 public class VillageStartPiece extends WorldGenVillageStartPiece
@@ -62,5 +61,24 @@ public class VillageStartPiece extends WorldGenVillageStartPiece
     public WorldChunkManager d()
     {
         return this.worldChunkManager;
+    }
+
+    // Three methods to help MCPC+ dynamically rename things.
+    // It has problems with classes that extend native Minecraft classes
+    public void buildComponent(VillageStartPiece startPiece, LinkedList<?> list, Random random)
+    {
+        a(startPiece, list, random);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<StructurePiece> getPiecesListJ()
+    {
+        return j;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<StructurePiece> getPiecesListI()
+    {
+        return i;
     }
 }

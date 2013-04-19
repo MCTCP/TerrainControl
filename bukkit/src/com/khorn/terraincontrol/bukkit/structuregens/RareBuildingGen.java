@@ -47,7 +47,8 @@ public class RareBuildingGen extends StructureGenerator
 
         this.scatteredFeatureSpawnList = new ArrayList();
         this.maxDistanceBetweenScatteredFeatures = worldConfig.maximumDistanceBetweenRareBuildings;
-        // Minecraft's internal minimum distance is one chunk lower than TC's value
+        // Minecraft's internal minimum distance is one chunk lower than TC's
+        // value
         this.minDistanceBetweenScatteredFeatures = worldConfig.minimumDistanceBetweenRareBuildings - 1;
         this.scatteredFeatureSpawnList.add(new BiomeMeta(EntityWitch.class, 1, 1, 1));
     }
@@ -107,5 +108,17 @@ public class RareBuildingGen extends StructureGenerator
     public List getScatteredFeatureSpawnList()
     {
         return this.scatteredFeatureSpawnList;
+    }
+
+    // Two methods to help MCPC+ dynamically rename things.
+    // It has problems with classes that extend native Minecraft classes
+    public void prepare(World world, int chunkX, int chunkZ, byte[] chunkArray)
+    {
+        a(null, world, chunkX, chunkZ, chunkArray);
+    }
+
+    public void place(World world, Random random, int chunkX, int chunkZ)
+    {
+        a(world, random, chunkX, chunkZ);
     }
 }

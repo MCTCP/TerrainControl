@@ -3,22 +3,24 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 import net.minecraft.server.v1_5_R2.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class VillageStart extends StructureStart
 {
+    // well ... thats what it does
     private boolean hasMoreThanTwoComponents = false;
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings("unchecked")
     public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
-        ArrayList listOfPieces = WorldGenVillagePieces.a(random, size);
-        VillageStartPiece worldgenvillagestartpiece = new VillageStartPiece(world, 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, listOfPieces, size);
+        ArrayList<StructurePiece> villagePieces = WorldGenVillagePieces.a(random, size);
+        VillageStartPiece startPiece = new VillageStartPiece(world, 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, villagePieces, size);
 
-        this.a.add(worldgenvillagestartpiece);
-        worldgenvillagestartpiece.a(worldgenvillagestartpiece, this.a, random);
-        ArrayList<StructurePiece> arraylist1 = worldgenvillagestartpiece.j;
-        ArrayList<StructurePiece> arraylist2 = worldgenvillagestartpiece.i;
+        this.a.add(startPiece);
+        startPiece.buildComponent(startPiece, this.a, random);
+        List<StructurePiece> arraylist1 = startPiece.getPiecesListJ();
+        List<StructurePiece> arraylist2 = startPiece.getPiecesListI();
 
         int componentCount;
 
@@ -30,12 +32,12 @@ public class VillageStart extends StructureStart
             {
                 componentCount = random.nextInt(arraylist2.size());
                 structurepiece = arraylist2.remove(componentCount);
-                structurepiece.a(worldgenvillagestartpiece, this.a, random);
+                structurepiece.a(startPiece, this.a, random);
             } else
             {
                 componentCount = random.nextInt(arraylist1.size());
                 structurepiece = arraylist1.remove(componentCount);
-                structurepiece.a(worldgenvillagestartpiece, this.a, random);
+                structurepiece.a(startPiece, this.a, random);
             }
         }
 

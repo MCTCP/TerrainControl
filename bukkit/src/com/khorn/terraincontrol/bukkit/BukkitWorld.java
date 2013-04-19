@@ -184,18 +184,18 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry)
+    public void PrepareTerrainObjects(int chunkX, int chunkZ, byte[] chunkArray, boolean dry)
     {
         if (this.settings.strongholdsEnabled)
-            this.strongholdGen.a(null, this.world, x, z, chunkArray);
+            this.strongholdGen.prepare(this.world, chunkX, chunkZ, chunkArray);
         if (this.settings.mineshaftsEnabled)
-            this.mineshaftGen.a(null, this.world, x, z, chunkArray);
+            this.mineshaftGen.prepare(this.world, chunkX, chunkZ, chunkArray);
         if (this.settings.villagesEnabled && dry)
-            this.villageGen.a(null, this.world, x, z, chunkArray);
+            this.villageGen.prepare(this.world, chunkX, chunkZ, chunkArray);
         if (this.settings.rareBuildingsEnabled)
-            this.pyramidsGen.a(null, this.world, x, z, chunkArray);
+            this.pyramidsGen.prepare(this.world, chunkX, chunkZ, chunkArray);
         if (this.settings.netherFortressesEnabled)
-            this.netherFortress.a(null, this.world, x, z, chunkArray);
+            this.netherFortress.prepare(this.world, chunkX, chunkZ, chunkArray);
     }
 
     @Override
@@ -236,19 +236,19 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
+    public boolean PlaceTerrainObjects(Random random, int chunkX, int chunkZ)
     {
         boolean villageGenerated = false;
         if (this.settings.strongholdsEnabled)
-            this.strongholdGen.a(this.world, rand, chunk_x, chunk_z);
+            this.strongholdGen.place(this.world, random, chunkX, chunkZ);
         if (this.settings.mineshaftsEnabled)
-            this.mineshaftGen.a(this.world, rand, chunk_x, chunk_z);
+            this.mineshaftGen.place(this.world, random, chunkX, chunkZ);
         if (this.settings.villagesEnabled)
-            villageGenerated = this.villageGen.a(this.world, rand, chunk_x, chunk_z);
+            villageGenerated = this.villageGen.place(this.world, random, chunkX, chunkZ);
         if (this.settings.rareBuildingsEnabled)
-            this.pyramidsGen.a(this.world, rand, chunk_x, chunk_z);
+            this.pyramidsGen.place(this.world, random, chunkX, chunkZ);
         if (this.settings.netherFortressesEnabled)
-            this.netherFortress.a(this.world, rand, chunk_x, chunk_z);
+            this.netherFortress.place(this.world, random, chunkX, chunkZ);
 
         return villageGenerated;
     }
@@ -595,7 +595,7 @@ public class BukkitWorld implements LocalWorld
             // Replacing other dimensions causes a lot of glitches
             mcWorld.worldProvider = new TCWorldProvider(this, this.world.worldProvider);
         }
-        
+
         // Inject our own BiomeManager (called WorldChunkManager)
         Class<? extends BiomeGenerator> biomeModeClass = this.settings.biomeMode;
         if (biomeModeClass != TerrainControl.getBiomeModeManager().VANILLA)
