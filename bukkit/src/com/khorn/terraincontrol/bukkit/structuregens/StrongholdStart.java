@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 import net.minecraft.server.v1_5_R2.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 public class StrongholdStart extends StructureStart
@@ -28,5 +29,13 @@ public class StrongholdStart extends StructureStart
 
         this.c();
         this.a(world, random, 10);
+    }
+
+    // One method to help MCPC+ dynamically rename things.
+    // It has problems with classes that extend native Minecraft classes
+    @SuppressWarnings("unchecked")
+    public LinkedList<WorldGenStrongholdStart> getComponents()
+    {
+        return b();
     }
 }

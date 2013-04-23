@@ -110,16 +110,16 @@ public class StrongholdGen extends StructureGenerator
     }
 
     @Override
-    protected StructureStart b(int i, int j)
+    protected StructureStart b(int chunkX, int chunkZ)
     {
-        StrongholdStart worldgenstronghold2start = new StrongholdStart(this.c, this.b, i, j);
+        StrongholdStart strongholdStart = new StrongholdStart(this.c, this.b, chunkX, chunkZ);
 
-        while (worldgenstronghold2start.b().isEmpty() || ((WorldGenStrongholdStart) worldgenstronghold2start.b().get(0)).b == null)
+        while (strongholdStart.getComponents().isEmpty() || (strongholdStart.getComponents().get(0)).b == null)
         {
-            worldgenstronghold2start = new StrongholdStart(this.c, this.b, i, j);
+            strongholdStart = new StrongholdStart(this.c, this.b, chunkX, chunkZ);
         }
 
-        return worldgenstronghold2start;
+        return strongholdStart;
     }
 
     // Two methods to help MCPC+ dynamically rename things.
