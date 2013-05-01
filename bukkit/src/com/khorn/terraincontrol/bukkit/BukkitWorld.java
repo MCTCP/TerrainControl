@@ -10,8 +10,8 @@ import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
-import net.minecraft.server.v1_5_R2.*;
-import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
+import net.minecraft.server.v1_5_R3.*;
+import org.bukkit.craftbukkit.v1_5_R3.CraftWorld;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -283,17 +283,17 @@ public class BukkitWorld implements LocalWorld
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
-                                int blockId = section.a(sectionX, sectionY, sectionZ);
+                                int blockId = section.getTypeId(sectionX, sectionY, sectionZ);
                                 if (biomeConfig.replaceMatrixBlocks[blockId] == null)
                                     continue;
 
-                                int replaceTo = biomeConfig.replaceMatrixBlocks[blockId][section.d() + sectionY];
+                                int replaceTo = biomeConfig.replaceMatrixBlocks[blockId][section.getYPosition() + sectionY];
                                 if (replaceTo == -1)
                                     continue;
 
-                                section.a(sectionX, sectionY, sectionZ, replaceTo >> 4);
-                                section.b(sectionX, sectionY, sectionZ, replaceTo & 0xF);
-                                world.notify((x + sectionX), (section.d() + sectionY), (z + sectionZ));
+                                section.setTypeId(sectionX, sectionY, sectionZ, replaceTo >> 4);
+                                section.setData(sectionX, sectionY, sectionZ, replaceTo & 0xF);
+                                world.notify((x + sectionX), (section.getYPosition() + sectionY), (z + sectionZ));
 
                             }
                         }
@@ -446,15 +446,19 @@ public class BukkitWorld implements LocalWorld
             int oldTypeId = chunk.getTypeId(x & 15, y, z & 15);
             chunk.a(x & 15, y, z & 15, typeId, data); // chunk.setTypeIdAndData(....)
             // Workaround for (bug in?) CraftBukkit
-            if (chunk.i()[y >> 4] != null)
-                chunk.i()[y >> 4].j().a(x & 15, y & 15, z & 15, data); // chunk.getSections()[..].getData().set(....)
+            if (chunk.i()[y >> 4] != null) {
+                // chunk.getSections()[..].getDataArray().set(....)
+                chunk.i()[y >> 4].getDataArray().a(x & 15, y & 15, z & 15, data);
+            }
             this.world.applyPhysics(x, y, z, typeId == 0 ? oldTypeId : typeId);
         } else
         {
             chunk.a(x & 15, y, z & 15, typeId, data); // chunk.setTypeIdAndData(....)
             // Workaround for (bug in?) Minecraft
-            if (chunk.i()[y >> 4] != null)
-                chunk.i()[y >> 4].j().a(x & 15, y & 15, z & 15, data); // chunk.getSections()[..].getData().set(....)
+            if (chunk.i()[y >> 4] != null) {
+                // chunk.getSections()[..].getDataArray().set(....)
+                chunk.i()[y >> 4].getDataArray().a(x & 15, y & 15, z & 15, data);
+            }
         }
 
         if (updateLight)

@@ -2,10 +2,10 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
-import net.minecraft.server.v1_5_R2.StructureGenerator;
-import net.minecraft.server.v1_5_R2.StructureStart;
-import net.minecraft.server.v1_5_R2.World;
-import net.minecraft.server.v1_5_R2.WorldGenMineshaftStart;
+import net.minecraft.server.v1_5_R3.StructureGenerator;
+import net.minecraft.server.v1_5_R3.StructureStart;
+import net.minecraft.server.v1_5_R3.World;
+import net.minecraft.server.v1_5_R3.WorldGenMineshaftStart;
 
 import java.util.Random;
 

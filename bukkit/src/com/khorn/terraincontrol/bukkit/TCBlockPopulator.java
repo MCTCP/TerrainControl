@@ -4,7 +4,7 @@ package com.khorn.terraincontrol.bukkit;
 import com.khorn.terraincontrol.generator.ObjectSpawner;
 import org.bukkit.Chunk;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_5_R2.CraftChunk;
+import org.bukkit.craftbukkit.v1_5_R3.CraftChunk;
 import org.bukkit.generator.BlockPopulator;
 
 import java.util.Random;
