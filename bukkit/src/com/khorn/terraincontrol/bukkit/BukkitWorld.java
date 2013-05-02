@@ -446,24 +446,27 @@ public class BukkitWorld implements LocalWorld
             int oldTypeId = chunk.getTypeId(x & 15, y, z & 15);
             chunk.a(x & 15, y, z & 15, typeId, data); // chunk.setTypeIdAndData(....)
             // Workaround for (bug in?) CraftBukkit
-            if (chunk.i()[y >> 4] != null) {
+            if (chunk.i()[y >> 4] != null)
+            {
                 // chunk.getSections()[..].getDataArray().set(....)
                 chunk.i()[y >> 4].getDataArray().a(x & 15, y & 15, z & 15, data);
             }
             this.world.applyPhysics(x, y, z, typeId == 0 ? oldTypeId : typeId);
         } else
         {
-            chunk.a(x & 15, y, z & 15, typeId, data); // chunk.setTypeIdAndData(....)
-            // Workaround for (bug in?) Minecraft
-            if (chunk.i()[y >> 4] != null) {
-                // chunk.getSections()[..].getDataArray().set(....)
+            if (chunk.i()[y >> 4] == null)
+            {
+                chunk.a(x & 15, y, z & 15, typeId, data);
+            } else
+            {
+                chunk.i()[y >> 4].setTypeId(x & 15, y & 15, z & 15, typeId);
                 chunk.i()[y >> 4].getDataArray().a(x & 15, y & 15, z & 15, data);
             }
         }
 
         if (updateLight)
         {
-            this.world.v(x, y, z);
+            this.world.A(x, y, z);
         }
 
         if (notifyPlayers && chunk.seenByPlayer)

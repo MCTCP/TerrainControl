@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
+import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
@@ -71,15 +72,17 @@ public class SpawnCommand extends BaseCommand
             return null;
 
         Block block;
+        Block previousBlock = null;
 
         Iterator<Block> itr = new BlockIterator(me, 200);
         while (itr.hasNext())
         {
             block = itr.next();
-            if (block.getTypeId() != 0)
+            if (block.getTypeId() != DefaultMaterial.AIR.id && block.getTypeId() != DefaultMaterial.LONG_GRASS.id)
             {
-                return block;
+                return previousBlock;
             }
+            previousBlock = block;
         }
 
         if (verbose)
