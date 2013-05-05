@@ -19,7 +19,7 @@ public class NBTHelper
     @SuppressWarnings("rawtypes")
     public static Tag getNBTFromNMSTagCompound(NBTTagCompound nmsTag)
     {
-        Tag compoundTag = new Tag(Tag.Type.TAG_Compound, nmsTag.getName(), new Tag[]{new Tag(Tag.Type.TAG_End, null, null)});
+        Tag compoundTag = new Tag(Tag.Type.TAG_Compound, nmsTag.getName(), new Tag[] {new Tag(Tag.Type.TAG_End, null, null)});
 
         // Get the child tags using some reflection magic
         Field mapField;

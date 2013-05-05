@@ -33,7 +33,7 @@ public abstract class WorldHelper
      */
     public static LocalWorld toLocalWorld(World world)
     {
-        String worldName = world.getSaveHandler().getSaveDirectoryName();
+        String worldName = world.getSaveHandler().getWorldDirectoryName();
         return TerrainControl.getWorld(worldName);
     }
 

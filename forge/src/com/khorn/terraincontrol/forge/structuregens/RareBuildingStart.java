@@ -29,8 +29,8 @@ public class RareBuildingStart extends StructureStart
                 break;
             case disabled:
             default:
-                // Should never happen, but on biome borders there is chance that a
-                // structure gets started in a biome where it shouldn't.
+                // Should never happen, but on biome borders there is chance
+                // that a structure gets started in a biome where it shouldn't.
                 building = null;
                 break;
         }

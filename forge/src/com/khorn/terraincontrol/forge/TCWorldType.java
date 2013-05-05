@@ -43,7 +43,7 @@ public class TCWorldType extends WorldType
         SingleWorld.restoreBiomes();
 
         // Load everything
-        File worldDirectory = new File(plugin.terrainControlDirectory, "worlds" + File.separator + world.getSaveHandler().getSaveDirectoryName());
+        File worldDirectory = new File(plugin.terrainControlDirectory, "worlds" + File.separator + world.getSaveHandler().getWorldDirectoryName());
 
         if (!worldDirectory.exists())
         {
@@ -53,7 +53,7 @@ public class TCWorldType extends WorldType
                 System.out.println("TerrainControl: cant create folder " + worldDirectory.getAbsolutePath());
         }
 
-        this.worldTC = new SingleWorld(world.getSaveHandler().getSaveDirectoryName());
+        this.worldTC = new SingleWorld(world.getSaveHandler().getWorldDirectoryName());
         WorldConfig config = new WorldConfig(worldDirectory, worldTC, false);
         this.worldTC.Init(world, config);
 

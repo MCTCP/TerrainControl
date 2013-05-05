@@ -41,7 +41,7 @@ public class RareBuildingGen extends MapGenStructure
 
         for (BiomeConfig biomeConfig : worldConfig.biomeConfigs)
         {
-            if(biomeConfig == null)
+            if (biomeConfig == null)
                 continue;
             if (biomeConfig.rareBuildingType != RareBuildingType.disabled)
             {
@@ -51,7 +51,7 @@ public class RareBuildingGen extends MapGenStructure
 
         this.scatteredFeatureSpawnList = new ArrayList();
         this.maxDistanceBetweenScatteredFeatures = worldConfig.maximumDistanceBetweenRareBuildings;
-        // Minecraft's internal minimum distance is one chunk lower than TC's value
+        // Minecraft's internal minimum distance is one lower than TC's value
         this.minDistanceBetweenScatteredFeatures = worldConfig.minimumDistanceBetweenRareBuildings - 1;
         this.scatteredFeatureSpawnList.add(new SpawnListEntry(EntityWitch.class, 1, 1, 1));
     }

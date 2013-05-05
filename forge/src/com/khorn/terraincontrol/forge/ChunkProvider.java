@@ -169,4 +169,10 @@ public class ChunkProvider implements IChunkProvider
             world.netherFortressGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
         }
     }
+
+    @Override
+    public void func_104112_b()
+    {
+        // Empty, just like Minecraft's ChunkProviderGenerate
+    }
 }

@@ -20,7 +20,8 @@ import java.util.Random;
  */
 public class EventManager extends EventHandler
 {
-    private Map<String, Boolean> hasOreGenBegun = new HashMap<String, Boolean>(); // world name, boolean
+    // Two maps, key is world name, value is boolean
+    private Map<String, Boolean> hasOreGenBegun = new HashMap<String, Boolean>();
     private Map<String, Boolean> hasDecorationBegun = new HashMap<String, Boolean>();
 
     @Override
