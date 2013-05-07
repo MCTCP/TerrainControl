@@ -23,6 +23,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+/**
+ * The name of this class is a relic from when it could only
+ * be used for singleplayer. Shortly after Terrain Control 
+ * was converted to use Forge instead of ModLoader, it also 
+ * worked on multiplayer. However, the name was unchanged.
+ * A better name would be ForgeWorld.
+ *
+ */
 public class SingleWorld implements LocalWorld
 {
     private ChunkProvider generator;
@@ -416,13 +424,16 @@ public class SingleWorld implements LocalWorld
     @Override
     public int getTypeId(int x, int y, int z)
     {
-        if (world.getChunkProvider().chunkExists(x / 16, z / 16) || createNewChunks)
-        {
-            return world.getBlockId(x, y, z);
-        } else
+        Chunk chunk = this.getChunk(x, y, z);
+        if (chunk == null)
         {
             return 0;
         }
+
+        z = z & 0xF;
+        x = x & 0xF;
+
+        return chunk.getBlockID(x, y, z);
     }
 
     @Override
@@ -441,25 +452,43 @@ public class SingleWorld implements LocalWorld
     @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
-        Chunk chunk = getChunk(x, 0, z);
-        if (chunk != null)
+        // We fetch the chunk from a custom cache in order to speed things up.
+        Chunk chunk = this.getChunk(x, y, z);
+
+        if (chunk == null)
         {
-            chunk.setBlockIDWithMetadata(x & 0xF, y, z & 0xF, typeId, data);
-            // Workaround for (bug in?) Minecraft
-            if (chunk.getBlockStorageArray()[y >> 4] != null)
-                chunk.getBlockStorageArray()[y >> 4].getMetadataArray().set(x & 15, y & 15, z & 15, data);
-        }
-        if (updateLight)
-        {
-            world.updateAllLightTypes(x, y, z);
+            return;
         }
         if (applyPhysics)
         {
-            world.notifyBlocksOfNeighborChange(x, y, z, typeId);
-        }
-        if (notifyPlayers)
+            int oldTypeId = chunk.getBlockID(x & 15, y, z & 15);
+            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
+            // Workaround for (bug in?) Minecraft
+            if (chunk.getBlockStorageArray()[y >> 4] != null)
+            {
+                chunk.getBlockStorageArray()[y >> 4].getMetadataArray().set(x & 15, y & 15, z & 15, data);
+            }
+            this.world.notifyBlockChange(x, y, z, typeId == 0 ? oldTypeId : typeId);
+        } else
         {
-            // TODO
+            if (chunk.getBlockStorageArray()[y >> 4] == null)
+            {
+                chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
+            } else
+            {
+                chunk.getBlockStorageArray()[y >> 4].setExtBlockID(x & 15, y & 15, z & 15, typeId);
+                chunk.getBlockStorageArray()[y >> 4].getMetadataArray().set(x & 15, y & 15, z & 15, data);
+            }
+        }
+
+        if (updateLight)
+        {
+            this.world.updateAllLightTypes(x, y, z);
+        }
+
+        if (notifyPlayers && chunk.sendUpdates)
+        {
+            this.world.markBlockForUpdate(x, y, z);
         }
     }
 
