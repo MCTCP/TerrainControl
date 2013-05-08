@@ -33,8 +33,15 @@ public class ObjectSpawner
         int biomeId = world.getBiomeId(x + 15, z + 15);
         BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
+        // Null check
+        if (localBiomeConfig == null)
+        {
+            TerrainControl.log("Unknown biome id " + biomeId + " at " + (x + 15) + "," + (z + 15) + "  (chunk " + chunkX + "," + chunkZ + "). Population failed.");
+            return;
+        }
+
         // Get the random generator
-        long resourcesSeed = worldSettings.resourcesSeed != 0L? worldSettings.resourcesSeed : world.getSeed();
+        long resourcesSeed = worldSettings.resourcesSeed != 0L ? worldSettings.resourcesSeed : world.getSeed();
         this.rand.setSeed(resourcesSeed);
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
@@ -85,7 +92,7 @@ public class ObjectSpawner
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
                 BiomeConfig biomeConfig = worldSettings.biomeConfigs[world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
-                if (biomeConfig.BiomeTemperature < TCDefaultValues.snowAndIceMaxTemp.floatValue())
+                if (biomeConfig != null && biomeConfig.BiomeTemperature < TCDefaultValues.snowAndIceMaxTemp.floatValue())
                 {
                     int blockToFreezeY = world.getHighestBlockYAt(blockToFreezeX, blockToFreezeZ);
                     if (blockToFreezeY > 0)
