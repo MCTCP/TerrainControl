@@ -1,7 +1,7 @@
 name: TerrainControl
-version: 2.4.11
+version: 2.4.12
 description: Advanced custom world generator.
-authors: ['Khorn', 'Olof Cayorion Larsson', 'Rutger Kok']
+authors: ['Khorn', 'Olof Cayorion Larsson']
 main: com.khorn.terraincontrol.bukkit.TCPlugin
 load: startup
 commands:
