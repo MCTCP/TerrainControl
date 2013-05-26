@@ -5,21 +5,22 @@ import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.BlockHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class RandomBlockFunction extends BlockFunction
 {
-    public List<Integer> blockIds = new ArrayList<Integer>();
-    public List<Byte> blockDatas = new ArrayList<Byte>();
-    public List<Byte> blockChances = new ArrayList<Byte>();
-    public List<String> metaDataNames = new ArrayList<String>();
-    public List<Tag> metaDataTags = new ArrayList<Tag>();
+    public int[] blockIds;
+    public byte[] blockDatas;
+    public byte[] blockChances;
+    public String[] metaDataNames;
+    public Tag[] metaDataTags;
+    
+    public int blockCount = 0;
 
     @Override
     public void load(List<String> args) throws InvalidConfigException
-    {
+    {       
         assureSize(5, args);
         x = readInt(args.get(0), -100, 100);
         y = readInt(args.get(1), -100, 100);
@@ -28,22 +29,25 @@ public class RandomBlockFunction extends BlockFunction
         // Now read the random parts
         int i = 3;
         int size = args.size();
-        int groupNumber = 0;
+        
+        // The arrays are a little bit too large, just to be sure
+        blockIds = new int[size / 2 + 1];
+        blockDatas = new byte[size / 2 + 1];
+        blockChances = new byte[size / 2 + 1];
+        metaDataNames = new String[size / 2 + 1];
+        metaDataTags = new Tag[size / 2 + 1];
 
         while (i < size)
         {
             // Parse block id and data
-            blockIds.add(readBlockId(args.get(i)));
-            blockDatas.add((byte) readBlockData(args.get(i)));
+            blockIds[blockCount] = readBlockId(args.get(i));
+            blockDatas[blockCount] = (byte) readBlockData(args.get(i));
 
             // Parse chance and metadata
             i++;
             try
             {
-                blockChances.add((byte) readInt(args.get(i), 1, 100));
-                // If it can read the number, it doesn't have metadata
-                metaDataNames.add("");
-                metaDataTags.add(null);
+                blockChances[blockCount] = (byte) readInt(args.get(i), 1, 100);
             } catch (InvalidConfigException e)
             {
                 // Maybe it's a NBT file?
@@ -52,20 +56,17 @@ public class RandomBlockFunction extends BlockFunction
                 Tag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().file);
                 if (metaData != null)
                 {
-                    metaDataNames.add(args.get(i));
-                    metaDataTags.add(metaData);
-                } else
-                {
-                    metaDataNames.add("");
-                    metaDataTags.add(null);
+                    metaDataNames[blockCount] = args.get(i);
+                    metaDataTags[blockCount] = metaData;
                 }
 
                 // Get the chance
                 i++;
-                blockChances.add(groupNumber, (byte) readInt(args.get(i), 1, 100));
+                blockChances[blockCount] = (byte) readInt(args.get(i), 1, 100);
             }
 
             i++;
+            blockCount++;
         }
     }
 
@@ -73,14 +74,14 @@ public class RandomBlockFunction extends BlockFunction
     public String makeString()
     {
         String text = "RandomBlock(" + x + "," + y + "," + z;
-        for (int i = 0; i < blockIds.size(); i++)
+        for (int i = 0; i < blockCount; i++)
         {
-            if (metaDataTags.get(i) == null)
+            if (metaDataTags[i] == null)
             {
-                text += "," + makeMaterial(blockIds.get(i), blockDatas.get(i)) + "," + blockChances.get(i);
+                text += "," + makeMaterial(blockIds[i], blockDatas[i]) + "," + blockChances[i];
             } else
             {
-                text += "," + makeMaterial(blockIds.get(i), blockDatas.get(i)) + "," + metaDataNames.get(i) + "," + blockChances.get(i);
+                text += "," + makeMaterial(blockIds[i], blockDatas[i]) + "," + metaDataNames[i] + "," + blockChances[i];
             }
         }
         return text + ")";
@@ -93,11 +94,12 @@ public class RandomBlockFunction extends BlockFunction
         rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
+        rotatedBlock.blockCount = blockCount;
         rotatedBlock.blockIds = blockIds;
-        rotatedBlock.blockDatas = new ArrayList<Byte>(blockIds.size());
-        for (int i = 0; i < blockDatas.size(); i++)
+        rotatedBlock.blockDatas = new byte[blockCount];
+        for (int i = 0; i < blockCount; i++)
         {
-            rotatedBlock.blockDatas.add((byte) BlockHelper.rotateData(blockIds.get(i), blockDatas.get(i)));
+            rotatedBlock.blockDatas[i] = (byte) BlockHelper.rotateData(blockIds[i], blockDatas[i]);
         }
         rotatedBlock.blockChances = blockChances;
         rotatedBlock.metaDataTags = metaDataTags;
@@ -109,14 +111,14 @@ public class RandomBlockFunction extends BlockFunction
     @Override
     public void spawn(LocalWorld world, Random random, int x, int y, int z)
     {
-        for (int i = 0; i < blockChances.size(); i++)
+        for (int i = 0; i < blockCount; i++)
         {
-            if (random.nextInt(100) < blockChances.get(i))
+            if (random.nextInt(100) < blockChances[i])
             {
-                world.setBlock(x, y, z, blockIds.get(i), blockDatas.get(i));
-                if (metaDataTags.get(i) != null)
+                world.setBlock(x, y, z, blockIds[i], blockDatas[i]);
+                if (metaDataTags[i] != null)
                 {
-                    world.attachMetadata(x, y, z, metaDataTags.get(i));
+                    world.attachMetadata(x, y, z, metaDataTags[i]);
                 }
                 break;
             }
