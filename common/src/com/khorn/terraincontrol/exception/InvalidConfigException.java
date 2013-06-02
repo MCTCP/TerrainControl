@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.exception;
 
+@SuppressWarnings("serial") // No need to serialize this
 public class InvalidConfigException extends Exception
 {
 

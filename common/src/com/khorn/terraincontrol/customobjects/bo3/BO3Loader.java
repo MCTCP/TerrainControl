@@ -35,7 +35,6 @@ public class BO3Loader implements CustomObjectLoader
         return new BO3(objectName, file);
     }
 
-    @SuppressWarnings("resource")
     // Actually, we use tryToClose(..) to close the stream
     public static Tag loadMetadata(String name, File bo3File)
     {

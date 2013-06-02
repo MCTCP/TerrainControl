@@ -15,12 +15,12 @@ public class RandomBlockFunction extends BlockFunction
     public byte[] blockChances;
     public String[] metaDataNames;
     public Tag[] metaDataTags;
-    
+
     public int blockCount = 0;
 
     @Override
     public void load(List<String> args) throws InvalidConfigException
-    {       
+    {
         assureSize(5, args);
         x = readInt(args.get(0), -100, 100);
         y = readInt(args.get(1), -100, 100);
@@ -29,7 +29,7 @@ public class RandomBlockFunction extends BlockFunction
         // Now read the random parts
         int i = 3;
         int size = args.size();
-        
+
         // The arrays are a little bit too large, just to be sure
         blockIds = new int[size / 2 + 1];
         blockDatas = new byte[size / 2 + 1];

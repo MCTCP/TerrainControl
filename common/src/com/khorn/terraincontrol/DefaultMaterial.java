@@ -32,7 +32,7 @@ public enum DefaultMaterial
     DISPENSER(23),
     SANDSTONE(24),
     NOTE_BLOCK(25),
-    BED_BLOCK(26),
+    BED_BLOCK(26, false),
     POWERED_RAIL(27, false),
     DETECTOR_RAIL(28, false),
     PISTON_STICKY_BASE(29, false),

@@ -205,18 +205,19 @@ public class BlockHelper
             case DIODE_BLOCK_ON:
             case REDSTONE_COMPARATOR_OFF:
             case REDSTONE_COMPARATOR_ON:
+            case BED_BLOCK:
                 int dir = data & 0x03;
-                int delay = data - dir;
+                int withoutDir = data - dir;
                 switch (dir)
                 {
                     case 1:
-                        return 0 | delay;
+                        return 0 | withoutDir;
                     case 2:
-                        return 1 | delay;
+                        return 1 | withoutDir;
                     case 3:
-                        return 2 | delay;
+                        return 2 | withoutDir;
                     case 0:
-                        return 3 | delay;
+                        return 3 | withoutDir;
                 }
                 break;
 
