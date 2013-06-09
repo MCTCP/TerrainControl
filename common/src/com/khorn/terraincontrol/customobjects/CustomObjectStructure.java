@@ -85,15 +85,7 @@ public class CustomObjectStructure
         {
             for (CustomObjectCoordinate coordObject : objectsInChunk)
             {
-                if (coordObject.getObject() instanceof StructuredCustomObject && coordObject.getStructuredObject().hasBranches())
-                {
-                    // It has to spawn, other object depend on it
-                    coordObject.spawnForced(world, height, random);
-                } else
-                {
-                    // No problem if it fails
-                    coordObject.spawnWithChecks(world, height, random);
-                }
+                coordObject.spawnWithChecks(world, height, random);
             }
         }
     }

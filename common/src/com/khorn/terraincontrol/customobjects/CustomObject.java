@@ -20,7 +20,7 @@ public interface CustomObject
     /**
      * Returns the name of this object.
      *
-     * @return
+     * @return The name, without the extension.
      */
     public String getName();
 

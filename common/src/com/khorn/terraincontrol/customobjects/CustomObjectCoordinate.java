@@ -77,11 +77,6 @@ public class CustomObjectCoordinate
         return rotation;
     }
 
-    public boolean spawnForced(LocalWorld world, SpawnHeight height, Random random)
-    {
-        return object.spawnForced(world, random, rotation, x, getCorrectY(world, height), z);
-    }
-
     public boolean spawnWithChecks(LocalWorld world, SpawnHeight height, Random random)
     {
         int y = getCorrectY(world, height);
