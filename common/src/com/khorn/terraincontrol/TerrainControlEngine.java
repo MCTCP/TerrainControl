@@ -26,4 +26,12 @@ public interface TerrainControlEngine
      * @return
      */
     public File getGlobalObjectsDirectory();
+    
+    /**
+     * Returns whether the given id is a valid block id. If the block doesn't exist, the id is considered invalid.
+     *
+     * @param id The id of the block.
+     * @return Whether the given id is a valid block id.
+     */
+    public boolean isValidBlockId(int id);
 }

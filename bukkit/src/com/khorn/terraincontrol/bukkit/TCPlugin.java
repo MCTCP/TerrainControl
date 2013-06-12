@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.util.StringHelper;
 import net.minecraft.server.v1_5_R3.BiomeBase;
+import net.minecraft.server.v1_5_R3.Block;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -206,5 +207,24 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     public File getGlobalObjectsDirectory()
     {
         return new File(this.getDataFolder(), BODefaultValues.BO_GlobalDirectoryName.stringValue());
+    }
+
+    @Override
+    public boolean isValidBlockId(int id)
+    {
+        if (id == 0)
+        {
+            // Air is a special case
+            return true;
+        }
+        if (id < 0 || id > TerrainControl.supportedBlockIds)
+        {
+            return false;
+        }
+        if (Block.byId[id] == null)
+        {
+            return false;
+        }
+        return true;
     }
 }

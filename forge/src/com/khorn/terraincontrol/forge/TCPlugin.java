@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
+import net.minecraft.block.Block;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -122,5 +124,24 @@ public class TCPlugin implements TerrainControlEngine
     public File getGlobalObjectsDirectory()
     {
         return new File(terrainControlDirectory, BODefaultValues.BO_GlobalDirectoryName.stringValue());
+    }
+
+    @Override
+    public boolean isValidBlockId(int id)
+    {
+        if (id == 0)
+        {
+            // Air is a special case
+            return true;
+        }
+        if (id < 0 || id > TerrainControl.supportedBlockIds)
+        {
+            return false;
+        }
+        if (Block.blocksList[id] == null)
+        {
+            return false;
+        }
+        return true;
     }
 }

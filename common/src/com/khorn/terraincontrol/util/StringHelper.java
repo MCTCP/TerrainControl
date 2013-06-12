@@ -31,7 +31,7 @@ public abstract class StringHelper
         }
         return ret.toString();
     }
-    
+
     /**
      * Parses the string and returns a number between minValue and maxValue.
      *
@@ -60,7 +60,7 @@ public abstract class StringHelper
             throw new InvalidConfigException("Incorrect number: " + string);
         }
     }
-    
+
     /**
      * Parses the string and returns a number between minValue and maxValue.
      *
@@ -91,10 +91,12 @@ public abstract class StringHelper
     }
 
     /**
-     * Returns the block id with the given name.
+     * Returns the id of the block with the given name. For custom
+     * blocks their id can be used.
      *
-     * @param string
-     * @return
+     * @param string The name of the block.
+     * @return The id of the block.
+     * @throws InvalidConfigException If the name is invalid.
      */
     public static int readBlockId(String string) throws InvalidConfigException
     {
@@ -104,7 +106,7 @@ public abstract class StringHelper
             // Ignore block data
             string = string.split("\\.")[0];
         }
-        
+
         // Parse :
         if (string.indexOf(':') != -1)
         {
@@ -118,7 +120,13 @@ public abstract class StringHelper
             return material.id;
         }
 
-        return readInt(string, 0, TerrainControl.supportedBlockIds);
+        // Parse as number
+        int blockId = readInt(string, 0, TerrainControl.supportedBlockIds);
+        if (!TerrainControl.getEngine().isValidBlockId(blockId))
+        {
+            throw new InvalidConfigException("There is no block with the block id " + blockId);
+        }
+        return blockId;
     }
 
     /**
@@ -143,7 +151,7 @@ public abstract class StringHelper
             return readInt(string, 0, 15);
         }
         // No block data
-        return 0;       
+        return 0;
     }
 
     /**
