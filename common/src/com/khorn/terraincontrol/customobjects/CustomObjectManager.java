@@ -10,6 +10,7 @@ import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * This class is the registry for the custom object types. It also stores
@@ -143,29 +144,49 @@ public class CustomObjectManager
         }
         return getCustomObject(name);
     }
-
-    /**
-     * Returns a Map with all CustomObjects in a directory in it. The Map will
-     * have the lowercase object name as a key.
+	
+	/**
+     * Returns a Map with all CustomObjects in a directory and its sub-directories
+     * in it. The Map will have the lowercase object name as a key.
      *
      * @param directory The directory to load from.
      * @return
      */
     public Map<String, CustomObject> loadObjects(File directory)
     {
+		return loadObjects(directory, true);
+	}
+    
+	
+	/**
+     * Returns a Map with all CustomObjects in a directory and its sub-directories
+     * in it. The Map will have the lowercase object name as a key.
+     *
+     * @param directory The directory to load from.
+     * @param enable Whether or not to enable the CustomeObject's in @objects
+     * @return
+     */
+    public Map<String, CustomObject> loadObjects(File directory, boolean enable)
+    {
+		
         if (!directory.isDirectory())
         {
             throw new IllegalArgumentException("Given file is not a directory: " + directory.getAbsolutePath());
         }
 
-        // Load all objects from the files
+        // Load all objects from the files and folders under @directory
         Map<String, CustomObject> objects = new HashMap<String, CustomObject>();
         for (File file : directory.listFiles())
         {
             // Get name and extension
             String fileName = file.getName();
             int index = fileName.lastIndexOf('.');
-            if (index != -1)
+            // If we come across a directory decend into it without enabling the objects
+            if (file.isDirectory()) 
+            {
+                objects.putAll(this.loadObjects(file, false));
+            }
+            else if (index != -1)
             {
                 String objectType = fileName.substring(index + 1, fileName.length());
                 String objectName = fileName.substring(0, index);
@@ -179,12 +200,16 @@ public class CustomObjectManager
             }
         }
 
-        // Enable all the objects
-        for (CustomObject object : objects.values())
+        // Enable all the objects at end of recursive loading		
+        if (enable)
         {
-            object.onEnable(objects);
+            TerrainControl.log(Level.INFO, ("[BOB ENABLE INFO] {{BEGIN}} " + directory.getParentFile().getName().toUpperCase()+File.separator+directory.getName()).toUpperCase());
+			for (CustomObject object : objects.values())
+			{
+				object.onEnable(objects);
+			}
+                TerrainControl.log(Level.INFO, ("[BOB ENABLE INFO] {{ END }} " + directory.getParentFile().getName().toUpperCase()+File.separator+directory.getName()).toUpperCase());
         }
-
         return objects;
     }
 
