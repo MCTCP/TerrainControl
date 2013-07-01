@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
+import com.khorn.terraincontrol.bukkit.util.BukkitMetricsHelper;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
@@ -84,6 +85,9 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
 
             TerrainControl.log("Global objects loaded, waiting for worlds to load");
+
+            // Start metrics
+            new BukkitMetricsHelper(this);
         }
     }
 

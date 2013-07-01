@@ -43,7 +43,7 @@ public class BlockCheck extends BO3Check
         for (int i = 3; i < args.size(); i++)
         {
             String blockIdAndData = args.get(i);
-            if (blockIdAndData.contains("."))
+            if (blockIdAndData.contains(".") || blockIdAndData.contains(":"))
             {
                 // It's a block id and block data
                 blockIds.add(readBlockId(blockIdAndData));

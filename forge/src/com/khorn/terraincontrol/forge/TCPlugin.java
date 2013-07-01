@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-import net.minecraft.block.Block;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -22,6 +20,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.io.File;
@@ -112,6 +111,17 @@ public class TCPlugin implements TerrainControlEngine
             return world;
         }
         return null;
+    }
+
+    /**
+     * Gets the world loaded by Terrain Control.
+     * <p />
+     * Note: this method may be removed in the future, when multiworld support is introduced.
+     * @return The world loaded by Terrain Control, or null if no world is loaded.
+     */
+    public LocalWorld getWorld()
+    {
+        return worldType.worldTC;
     }
 
     @Override
