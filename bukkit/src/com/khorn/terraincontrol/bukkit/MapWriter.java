@@ -5,8 +5,8 @@ import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.sun.imageio.plugins.png.PNGImageWriter;
 import com.sun.imageio.plugins.png.PNGImageWriterSpi;
-import net.minecraft.server.v1_5_R3.BiomeBase;
-import net.minecraft.server.v1_5_R3.World;
+import net.minecraft.server.v1_6_R1.BiomeBase;
+import net.minecraft.server.v1_6_R1.World;
 import org.bukkit.command.CommandSender;
 
 import java.awt.Color;

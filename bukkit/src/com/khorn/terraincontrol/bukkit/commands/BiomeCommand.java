@@ -2,12 +2,12 @@ package com.khorn.terraincontrol.bukkit.commands;
 
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-import net.minecraft.server.v1_5_R3.BiomeBase;
-import net.minecraft.server.v1_5_R3.WorldChunkManager;
+import net.minecraft.server.v1_6_R1.BiomeBase;
+import net.minecraft.server.v1_6_R1.WorldChunkManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_5_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_6_R1.CraftWorld;
 import org.bukkit.entity.Player;
 
 import java.util.List;

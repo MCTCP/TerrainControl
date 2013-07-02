@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
+
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
@@ -12,6 +13,7 @@ import net.minecraft.world.gen.structure.ComponentVillageStartPiece;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class VillageStartPiece extends ComponentVillageStartPiece
@@ -19,7 +21,7 @@ public class VillageStartPiece extends ComponentVillageStartPiece
     public final WorldChunkManager worldChunkManager;
 
     @SuppressWarnings("rawtypes")
-    public VillageStartPiece(World world, int par2, Random par3Random, int par4, int par5, ArrayList par6ArrayList, int size)
+    public VillageStartPiece(World world, int par2, Random par3Random, int par4, int par5, List par6ArrayList, int size)
     {
         super(world.getWorldChunkManager(), par2, par3Random, par4, par5, par6ArrayList, size);
         this.worldChunkManager = world.getWorldChunkManager();

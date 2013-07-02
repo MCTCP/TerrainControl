@@ -8,13 +8,9 @@ import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.util.StringHelper;
 import cpw.mods.fml.common.*;
-import cpw.mods.fml.common.Mod.Init;
+import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -27,7 +23,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
-@Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.4.12")
+@Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.4.13")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")
 public class TCPlugin implements TerrainControlEngine
 {
@@ -37,13 +33,7 @@ public class TCPlugin implements TerrainControlEngine
     public File terrainControlDirectory;
     private TCWorldType worldType;
 
-    @PreInit
-    public void preInit(FMLPreInitializationEvent event)
-    {
-        // Stub Method
-    }
-
-    @Init
+    @EventHandler
     public void load(FMLInitializationEvent event)
     {
         // This is the place where the mod starts loading
@@ -90,12 +80,6 @@ public class TCPlugin implements TerrainControlEngine
         // TODO: make this optional for people who haven't installed other
         // terrain mods, and don't want to lose performance.
         TerrainControl.registerEventHandler(new EventManager(), EventPriority.CANCELABLE);
-    }
-
-    @PostInit
-    public void postInit(FMLPostInitializationEvent event)
-    {
-        // Stub Method
     }
 
     @Override

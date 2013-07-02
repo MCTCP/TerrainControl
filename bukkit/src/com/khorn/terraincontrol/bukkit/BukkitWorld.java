@@ -10,8 +10,8 @@ import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
-import net.minecraft.server.v1_5_R3.*;
-import org.bukkit.craftbukkit.v1_5_R3.CraftWorld;
+import net.minecraft.server.v1_6_R1.*;
+import org.bukkit.craftbukkit.v1_6_R1.CraftWorld;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -138,7 +138,7 @@ public class BukkitWorld implements LocalWorld
         if (this.biomeManager != null)
             return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size);
 
-        biomeBaseArray = this.world.worldProvider.d.getBiomes(biomeBaseArray, x, z, x_size, z_size);
+        biomeBaseArray = this.world.worldProvider.e.getBiomes(biomeBaseArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
@@ -151,7 +151,7 @@ public class BukkitWorld implements LocalWorld
     {
         if (this.biomeManager != null)
             return this.biomeManager.getTemperatures(null, x, z, x_size, z_size);
-        return this.world.worldProvider.d.getTemperatures(null, x, z, x_size, z_size);
+        return this.world.worldProvider.e.getTemperatures(null, x, z, x_size, z_size);
     }
 
     @Override
@@ -160,7 +160,7 @@ public class BukkitWorld implements LocalWorld
         if (this.biomeManager != null)
             return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size);
 
-        biomeBaseArray = this.world.worldProvider.d.a(biomeBaseArray, x, z, x_size, z_size, true);
+        biomeBaseArray = this.world.worldProvider.e.a(biomeBaseArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
@@ -173,7 +173,7 @@ public class BukkitWorld implements LocalWorld
     {
         if (this.biomeManager != null)
             return this.biomeManager.getBiome(x, z);
-        return this.world.worldProvider.d.getBiome(x, z).id;
+        return this.world.worldProvider.e.getBiome(x, z).id;
     }
 
     @Override
@@ -608,7 +608,7 @@ public class BukkitWorld implements LocalWorld
         if (biomeModeClass != TerrainControl.getBiomeModeManager().VANILLA)
         {
             TCWorldChunkManager worldChunkManager = new TCWorldChunkManager(this);
-            mcWorld.worldProvider.d = worldChunkManager;
+            mcWorld.worldProvider.e = worldChunkManager;
 
             BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeModeClass, this, new BiomeCacheWrapper(worldChunkManager));
             worldChunkManager.setBiomeManager(biomeManager);

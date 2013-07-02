@@ -1,8 +1,7 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import net.minecraft.server.v1_5_R3.*;
+import net.minecraft.server.v1_6_R1.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -14,7 +13,7 @@ public class VillageStart extends StructureStart
     @SuppressWarnings("unchecked")
     public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
-        ArrayList<StructurePiece> villagePieces = WorldGenVillagePieces.a(random, size);
+        List<StructurePiece> villagePieces = WorldGenVillagePieces.a(random, size);
         VillageStartPiece startPiece = new VillageStartPiece(world, 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, villagePieces, size);
 
         this.a.add(startPiece);

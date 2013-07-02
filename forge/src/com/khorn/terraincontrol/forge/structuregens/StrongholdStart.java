@@ -7,6 +7,7 @@ import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.gen.structure.StructureStrongholdPieces;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 class StrongholdStart extends StructureStart
@@ -18,7 +19,7 @@ class StrongholdStart extends StructureStart
         ComponentStrongholdStairs2 var5 = new ComponentStrongholdStairs2(0, random, (par3 << 4) + 2, (par4 << 4) + 2);
         this.components.add(var5);
         var5.buildComponent(var5, this.components, random);
-        ArrayList var6 = var5.field_75026_c;
+        List var6 = var5.field_75026_c;
 
         while (!var6.isEmpty())
         {

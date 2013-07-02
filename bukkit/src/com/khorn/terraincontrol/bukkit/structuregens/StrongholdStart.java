@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import net.minecraft.server.v1_5_R3.*;
+import net.minecraft.server.v1_6_R1.*;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 public class StrongholdStart extends StructureStart
@@ -17,7 +17,7 @@ public class StrongholdStart extends StructureStart
 
         this.a.add(worldgenstrongholdstart);
         worldgenstrongholdstart.a(worldgenstrongholdstart, this.a, random);
-        ArrayList arraylist = worldgenstrongholdstart.c;
+        List arraylist = worldgenstrongholdstart.c;
 
         while (!arraylist.isEmpty())
         {

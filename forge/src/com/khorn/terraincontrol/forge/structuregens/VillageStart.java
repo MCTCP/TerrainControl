@@ -7,6 +7,7 @@ import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.gen.structure.StructureVillagePieces;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 class StructureVillageStart extends StructureStart
@@ -17,13 +18,13 @@ class StructureVillageStart extends StructureStart
     @SuppressWarnings({"rawtypes", "unchecked"})
     public StructureVillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
-        ArrayList<StructureComponent> villagePieces = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);
+        List<StructureComponent> villagePieces = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);
         VillageStartPiece startPiece = new VillageStartPiece(world, 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, villagePieces, size);
 
         this.components.add(startPiece);
         startPiece.buildComponent(startPiece, this.components, random);
-        ArrayList var8 = startPiece.field_74930_j;
-        ArrayList var9 = startPiece.field_74932_i;
+        List var8 = startPiece.field_74930_j;
+        List var9 = startPiece.field_74932_i;
         int var10;
 
         while (!var8.isEmpty() || !var9.isEmpty())

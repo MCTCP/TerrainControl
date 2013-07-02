@@ -165,6 +165,11 @@ public enum DefaultMaterial
     QUARTZ_STAIRS(156),
     ACTIVATOR_RAIL(157, false),
     DROPPER(158),
+    STAINED_CLAY(159),
+    HAY_BLOCK(170),
+    CARPET(171, false),
+    HARD_CLAY(172),
+    COAL_BLOCK(173),
     UNKNOWN_BLOCK(255);
 
     public final int id;

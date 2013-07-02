@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import net.minecraft.server.v1_5_R3.StructurePiece;
-import net.minecraft.server.v1_5_R3.StructureStart;
-import net.minecraft.server.v1_5_R3.World;
-import net.minecraft.server.v1_5_R3.WorldGenNetherPiece15;
+import net.minecraft.server.v1_6_R1.StructurePiece;
+import net.minecraft.server.v1_6_R1.StructureStart;
+import net.minecraft.server.v1_6_R1.World;
+import net.minecraft.server.v1_6_R1.WorldGenNetherPiece15;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -18,7 +18,7 @@ public class NetherFortressStart extends StructureStart
 
         this.a.add(worldgennetherpiece15);
         worldgennetherpiece15.a(worldgennetherpiece15, this.a, random);
-        ArrayList arraylist = worldgennetherpiece15.d;
+        ArrayList arraylist = worldgennetherpiece15.e;
 
         while (!arraylist.isEmpty())
         {

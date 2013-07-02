@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.util.ForgeMetricsHelper;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
+
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -17,11 +18,19 @@ public class TCWorldType extends WorldType
 {
     public SingleWorld worldTC;
     private TCPlugin plugin;
+    private String worldType;
 
     public TCWorldType(TCPlugin plugin, String paramString)
     {
         super(WorldHelper.getNextWorldTypeID(), paramString);
         this.plugin = plugin;
+        this.worldType = paramString;
+    }
+
+    @Override
+    public String getTranslateName()
+    {
+        return worldType;
     }
 
     // Actually: getBiomeManager
