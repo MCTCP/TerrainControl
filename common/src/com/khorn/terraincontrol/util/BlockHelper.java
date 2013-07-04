@@ -72,6 +72,7 @@ public class BlockHelper
                 break;
 
             case LOG:
+            case HAY_BLOCK:
                 switch (data / 4)
                 {
                     case 1:
@@ -83,6 +84,9 @@ public class BlockHelper
                 break;
 
             case WOOD_STAIRS:
+            case BIRCH_WOOD_STAIRS:
+            case SPRUCE_WOOD_STAIRS:
+            case JUNGLE_WOOD_STAIRS:
             case COBBLESTONE_STAIRS:
             case BRICK_STAIRS:
             case SMOOTH_STAIRS:
