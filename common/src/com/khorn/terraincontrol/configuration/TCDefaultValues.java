@@ -166,7 +166,7 @@ public enum TCDefaultValues implements TCSetting
     SmallLakeWaterFrequency(4),
     SmallLakeLavaFrequency(2),
     SmallLakeWaterRarity(7),
-    SmallLakeLavaRarity(3),
+    SmallLakeLavaRarity(1),
     SmallLakeMinAltitude(8),
     SmallLakeMaxAltitude(120),
 

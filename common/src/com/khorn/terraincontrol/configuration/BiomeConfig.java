@@ -123,7 +123,7 @@ public class BiomeConfig extends ConfigFile
         this.Biome = biome;
         this.name = biome.getName();
         worldConfig = config;
-        InitDefaults();
+        initDefaults();
 
         File settingsFile = new File(settingsDir, this.name + TCDefaultValues.WorldBiomeConfigName.stringValue());
 
@@ -133,7 +133,7 @@ public class BiomeConfig extends ConfigFile
 
         this.correctSettings();
         if (!settingsFile.exists())
-            this.CreateDefaultResources();
+            this.createDefaultResources();
         if (config.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
             this.writeSettingsFile(settingsFile, (config.SettingsMode == WorldConfig.ConfigMode.WriteAll));
 
@@ -169,15 +169,17 @@ public class BiomeConfig extends ConfigFile
         return gen;
     }
 
-    private void CreateDefaultResources()
+    private void createDefaultResources()
     {
         Resource resource;
 
-        // Small lakes
-        resource = Resource.createResource(this, SmallLakeGen.class, DefaultMaterial.WATER.id, TCDefaultValues.SmallLakeWaterFrequency.intValue(), TCDefaultValues.SmallLakeWaterRarity.intValue(), TCDefaultValues.SmallLakeMinAltitude.intValue(), TCDefaultValues.SmallLakeMaxAltitude.intValue());
-        this.ResourceSequence[this.ResourceCount++] = resource;
+        // Small water lakes
+        if(this.defaultWaterLakes) {
+            resource = Resource.createResource(this, SmallLakeGen.class, DefaultMaterial.WATER.id, TCDefaultValues.SmallLakeWaterFrequency.intValue(), TCDefaultValues.SmallLakeWaterRarity.intValue(), TCDefaultValues.SmallLakeMinAltitude.intValue(), TCDefaultValues.SmallLakeMaxAltitude.intValue());
+            this.ResourceSequence[this.ResourceCount++] = resource;
+        }
 
-        // Small lakes
+        // Small lava lakes
         resource = Resource.createResource(this, SmallLakeGen.class, DefaultMaterial.LAVA.id, TCDefaultValues.SmallLakeLavaFrequency.intValue(), TCDefaultValues.SmallLakeLavaRarity.intValue(), TCDefaultValues.SmallLakeMinAltitude.intValue(), TCDefaultValues.SmallLakeMaxAltitude.intValue());
         this.ResourceSequence[this.ResourceCount++] = resource;
 
@@ -234,9 +236,9 @@ public class BiomeConfig extends ConfigFile
         this.ResourceSequence[this.ResourceCount++] = resource;
 
         // Under water clay
-        if (this.DefaultClay > 0)
+        if (this.defaultClay > 0)
         {
-            resource = Resource.createResource(this, UnderWaterOreGen.class, DefaultMaterial.CLAY.id, TCDefaultValues.waterClayDepositSize.intValue(), this.DefaultClay, TCDefaultValues.waterClayDepositRarity.intValue(), DefaultMaterial.DIRT.id, DefaultMaterial.CLAY.id);
+            resource = Resource.createResource(this, UnderWaterOreGen.class, DefaultMaterial.CLAY.id, TCDefaultValues.waterClayDepositSize.intValue(), this.defaultClay, TCDefaultValues.waterClayDepositRarity.intValue(), DefaultMaterial.DIRT.id, DefaultMaterial.CLAY.id);
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
         // Custom objects
@@ -251,7 +253,7 @@ public class BiomeConfig extends ConfigFile
                 case EXTREME_HILLS: // BigHills - default
                 case RIVER: // River - default
                 case SMALL_MOUNTAINS: // SmallHills
-                    resource = Resource.createResource(this, TreeGen.class, this.DefaultTrees, TreeType.BigTree, 1, TreeType.Tree, 9);
+                    resource = Resource.createResource(this, TreeGen.class, this.defaultTrees, TreeType.BigTree, 1, TreeType.Tree, 9);
                     this.ResourceSequence[this.ResourceCount++] = resource;
                     break;
                 case PLAINS: // Plains - no tree
@@ -260,68 +262,68 @@ public class BiomeConfig extends ConfigFile
                     break;
                 case FOREST_HILLS: // HillsForest
                 case FOREST: // Forest - forest
-                    resource = Resource.createResource(this, TreeGen.class, this.DefaultTrees, TreeType.Forest, 20, TreeType.BigTree, 10, TreeType.Tree, 100);
+                    resource = Resource.createResource(this, TreeGen.class, this.defaultTrees, TreeType.Forest, 20, TreeType.BigTree, 10, TreeType.Tree, 100);
                     this.ResourceSequence[this.ResourceCount++] = resource;
                     break;
                 case TAIGA_HILLS: // HillsTaiga
                 case TAIGA: // Taiga - taiga
-                    resource = Resource.createResource(this, TreeGen.class, this.DefaultTrees, TreeType.Taiga1, 35, TreeType.Taiga2, 100);
+                    resource = Resource.createResource(this, TreeGen.class, this.defaultTrees, TreeType.Taiga1, 35, TreeType.Taiga2, 100);
                     this.ResourceSequence[this.ResourceCount++] = resource;
                     break;
                 case SWAMPLAND: // Swamp - swamp
-                    resource = Resource.createResource(this, TreeGen.class, this.DefaultTrees, TreeType.SwampTree, 100);
+                    resource = Resource.createResource(this, TreeGen.class, this.defaultTrees, TreeType.SwampTree, 100);
                     this.ResourceSequence[this.ResourceCount++] = resource;
                     break;
                 case MUSHROOM_ISLAND: // Mushroom island
-                    resource = Resource.createResource(this, TreeGen.class, this.DefaultTrees, TreeType.HugeMushroom, 100);
+                    resource = Resource.createResource(this, TreeGen.class, this.defaultTrees, TreeType.HugeMushroom, 100);
                     this.ResourceSequence[this.ResourceCount++] = resource;
                     break;
                 case JUNGLE:// Jungle
                 case JUNGLE_HILLS:
-                    resource = Resource.createResource(this, TreeGen.class, this.DefaultTrees, TreeType.BigTree, 10, TreeType.GroundBush, 50, TreeType.JungleTree, 35, TreeType.CocoaTree, 100);
+                    resource = Resource.createResource(this, TreeGen.class, this.defaultTrees, TreeType.BigTree, 10, TreeType.GroundBush, 50, TreeType.JungleTree, 35, TreeType.CocoaTree, 100);
                     this.ResourceSequence[this.ResourceCount++] = resource;
                     break;
 
             }
-        if (this.DefaultWaterLily > 0)
+        if (this.defaultWaterLily > 0)
         {
-            resource = Resource.createResource(this, AboveWaterGen.class, DefaultMaterial.WATER_LILY.id, this.DefaultWaterLily, 100);
+            resource = Resource.createResource(this, AboveWaterGen.class, DefaultMaterial.WATER_LILY.id, this.defaultWaterLily, 100);
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
-        if (this.DefaultFlowers > 0)
+        if (this.defaultFlowers > 0)
         {
             // Red flower
-            resource = Resource.createResource(this, PlantGen.class, DefaultMaterial.RED_ROSE.id, this.DefaultFlowers, TCDefaultValues.roseDepositRarity.intValue(), TCDefaultValues.roseDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id);
+            resource = Resource.createResource(this, PlantGen.class, DefaultMaterial.RED_ROSE.id, this.defaultFlowers, TCDefaultValues.roseDepositRarity.intValue(), TCDefaultValues.roseDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id);
             this.ResourceSequence[this.ResourceCount++] = resource;
 
             // Yellow flower
-            resource = Resource.createResource(this, PlantGen.class, DefaultMaterial.YELLOW_FLOWER.id, this.DefaultFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id);
+            resource = Resource.createResource(this, PlantGen.class, DefaultMaterial.YELLOW_FLOWER.id, this.defaultFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id);
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
-        if (this.DefaultMushroom > 0)
+        if (this.defaultMushroom > 0)
         {
             // Red mushroom
-            resource = Resource.createResource(this, PlantGen.class, DefaultMaterial.RED_MUSHROOM.id, this.DefaultMushroom, TCDefaultValues.redMushroomDepositRarity.intValue(), TCDefaultValues.redMushroomDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultSurfaceBlock, DefaultMaterial.DIRT.id);
+            resource = Resource.createResource(this, PlantGen.class, DefaultMaterial.RED_MUSHROOM.id, this.defaultMushroom, TCDefaultValues.redMushroomDepositRarity.intValue(), TCDefaultValues.redMushroomDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id);
             this.ResourceSequence[this.ResourceCount++] = resource;
 
             // Brown mushroom
-            resource = Resource.createResource(this, PlantGen.class, DefaultMaterial.BROWN_MUSHROOM.id, this.DefaultMushroom, TCDefaultValues.brownMushroomDepositRarity.intValue(), TCDefaultValues.brownMushroomDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultSurfaceBlock, DefaultMaterial.DIRT.id);
+            resource = Resource.createResource(this, PlantGen.class, DefaultMaterial.BROWN_MUSHROOM.id, this.defaultMushroom, TCDefaultValues.brownMushroomDepositRarity.intValue(), TCDefaultValues.brownMushroomDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id);
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
-        if (this.DefaultGrass > 0)
+        if (this.defaultGrass > 0)
         {
             // Grass
-            resource = Resource.createResource(this, GrassGen.class, DefaultMaterial.LONG_GRASS.id, 1, this.DefaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id);
+            resource = Resource.createResource(this, GrassGen.class, DefaultMaterial.LONG_GRASS.id, 1, this.defaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id);
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
-        if (this.DefaultDeadBrush > 0)
+        if (this.defaultDeadBrush > 0)
         {
             // Dead Bush
-            resource = Resource.createResource(this, GrassGen.class, DefaultMaterial.DEAD_BUSH.id, 0, this.DefaultDeadBrush, TCDefaultValues.deadBushDepositRarity.intValue(), DefaultMaterial.SAND.id);
+            resource = Resource.createResource(this, GrassGen.class, DefaultMaterial.DEAD_BUSH.id, 0, this.defaultDeadBrush, TCDefaultValues.deadBushDepositRarity.intValue(), DefaultMaterial.SAND.id);
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
@@ -329,17 +331,17 @@ public class BiomeConfig extends ConfigFile
         resource = Resource.createResource(this, PlantGen.class, DefaultMaterial.PUMPKIN.id, TCDefaultValues.pumpkinDepositFrequency.intValue(), TCDefaultValues.pumpkinDepositRarity.intValue(), TCDefaultValues.pumpkinDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.GRASS.id);
         this.ResourceSequence[this.ResourceCount++] = resource;
 
-        if (this.DefaultReed > 0)
+        if (this.defaultReed > 0)
         {
             // Reed
-            resource = Resource.createResource(this, ReedGen.class, DefaultMaterial.SUGAR_CANE_BLOCK.id, this.DefaultReed, TCDefaultValues.reedDepositRarity.intValue(), TCDefaultValues.reedDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SAND.id);
+            resource = Resource.createResource(this, ReedGen.class, DefaultMaterial.SUGAR_CANE_BLOCK.id, this.defaultReed, TCDefaultValues.reedDepositRarity.intValue(), TCDefaultValues.reedDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SAND.id);
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
 
-        if (this.DefaultCactus > 0)
+        if (this.defaultCactus > 0)
         {
             // Cactus
-            resource = Resource.createResource(this, CactusGen.class, DefaultMaterial.CACTUS.id, this.DefaultCactus, TCDefaultValues.cactusDepositRarity.intValue(), TCDefaultValues.cactusDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.SAND.id);
+            resource = Resource.createResource(this, CactusGen.class, DefaultMaterial.CACTUS.id, this.defaultCactus, TCDefaultValues.cactusDepositRarity.intValue(), TCDefaultValues.cactusDepositMinAltitude.intValue(), this.worldConfig.WorldHeight, DefaultMaterial.SAND.id);
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
         if (biome == DefaultBiome.JUNGLE || biome == DefaultBiome.JUNGLE_HILLS)
@@ -357,36 +359,36 @@ public class BiomeConfig extends ConfigFile
         this.ResourceSequence[this.ResourceCount++] = resource;
         
         // Desert wells
-        if(this.DefaultWell != null)
+        if(this.defaultWell != null)
         {
-            resource = Resource.createResource(this, WellGen.class, this.DefaultWell);
+            resource = Resource.createResource(this, WellGen.class, this.defaultWell);
             this.ResourceSequence[this.ResourceCount++] = resource;
         }
     }
 
     protected void readConfigSettings()
     {
-        this.BiomeSize = readModSettings(TCDefaultValues.BiomeSize.name(), this.DefaultSize);
-        this.BiomeRarity = readModSettings(TCDefaultValues.BiomeRarity.name(), this.DefaultRarity);
+        this.BiomeSize = readModSettings(TCDefaultValues.BiomeSize.name(), this.defaultSize);
+        this.BiomeRarity = readModSettings(TCDefaultValues.BiomeRarity.name(), this.defaultRarity);
 
-        this.BiomeColor = readModSettings(TCDefaultValues.BiomeColor.name(), this.DefaultColor);
+        this.BiomeColor = readModSettings(TCDefaultValues.BiomeColor.name(), this.defaultColor);
 
-        this.RiverBiome = readModSettings(TCDefaultValues.RiverBiome.name(),this.DefaultRiverBiome);
+        this.RiverBiome = readModSettings(TCDefaultValues.RiverBiome.name(),this.defaultRiverBiome);
 
-        this.IsleInBiome = readModSettings(TCDefaultValues.IsleInBiome.name(), this.DefaultIsle);
-        this.BiomeIsBorder = readModSettings(TCDefaultValues.BiomeIsBorder.name(), this.DefaultBorder);
-        this.NotBorderNear = readModSettings(TCDefaultValues.NotBorderNear.name(), this.DefaultNotBorderNear);
+        this.IsleInBiome = readModSettings(TCDefaultValues.IsleInBiome.name(), this.defaultIsle);
+        this.BiomeIsBorder = readModSettings(TCDefaultValues.BiomeIsBorder.name(), this.defaultBorder);
+        this.NotBorderNear = readModSettings(TCDefaultValues.NotBorderNear.name(), this.defaultNotBorderNear);
 
-        this.BiomeTemperature = readModSettings(TCDefaultValues.BiomeTemperature.name(), this.DefaultBiomeTemperature);
-        this.BiomeWetness = readModSettings(TCDefaultValues.BiomeWetness.name(), this.DefaultBiomeWetness);
+        this.BiomeTemperature = readModSettings(TCDefaultValues.BiomeTemperature.name(), this.defaultBiomeTemperature);
+        this.BiomeWetness = readModSettings(TCDefaultValues.BiomeWetness.name(), this.defaultBiomeWetness);
 
         this.ReplaceBiomeName = readSettings(TCDefaultValues.ReplaceToBiomeName);
 
-        this.BiomeHeight = readModSettings(TCDefaultValues.BiomeHeight.name(), this.DefaultBiomeSurface);
-        this.BiomeVolatility = readModSettings(TCDefaultValues.BiomeVolatility.name(), this.DefaultBiomeVolatility);
+        this.BiomeHeight = readModSettings(TCDefaultValues.BiomeHeight.name(), this.defaultBiomeSurface);
+        this.BiomeVolatility = readModSettings(TCDefaultValues.BiomeVolatility.name(), this.defaultBiomeVolatility);
 
-        this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock.name(), this.DefaultSurfaceBlock);
-        this.GroundBlock = readModSettings(TCDefaultValues.GroundBlock.name(), this.DefaultGroundBlock);
+        this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock.name(), this.defaultSurfaceBlock);
+        this.GroundBlock = readModSettings(TCDefaultValues.GroundBlock.name(), this.defaultGroundBlock);
 
         this.UseWorldWaterLevel = readSettings(TCDefaultValues.UseWorldWaterLevel);
         this.waterLevelMax = readSettings(TCDefaultValues.WaterLevelMax);
@@ -395,10 +397,10 @@ public class BiomeConfig extends ConfigFile
         this.iceBlock = readSettings(TCDefaultValues.IceBlock);
 
         this.SkyColor = readSettings(TCDefaultValues.SkyColor);
-        this.WaterColor = readModSettingsColor(TCDefaultValues.WaterColor.name(), this.DefaultWaterColorMultiplier);
-        this.GrassColor = readModSettingsColor(TCDefaultValues.GrassColor.name(), this.DefaultGrassColor);
+        this.WaterColor = readModSettingsColor(TCDefaultValues.WaterColor.name(), this.defaultWaterColorMultiplier);
+        this.GrassColor = readModSettingsColor(TCDefaultValues.GrassColor.name(), this.defaultGrassColor);
         this.GrassColorIsMultiplier = readSettings(TCDefaultValues.GrassColorIsMultiplier);
-        this.FoliageColor = readModSettingsColor(TCDefaultValues.FoliageColor.name(), this.DefaultFoliageColor);
+        this.FoliageColor = readModSettingsColor(TCDefaultValues.FoliageColor.name(), this.defaultFoliageColor);
         this.FoliageColorIsMultiplier = readSettings(TCDefaultValues.FoliageColorIsMultiplier);
 
         this.volatilityRaw1 = readSettings(TCDefaultValues.Volatility1);
@@ -409,11 +411,11 @@ public class BiomeConfig extends ConfigFile
         this.maxAverageHeight = readSettings(TCDefaultValues.MaxAverageHeight);
         this.maxAverageDepth = readSettings(TCDefaultValues.MaxAverageDepth);
 
-        this.strongholdsEnabled = readModSettings(TCDefaultValues.StrongholdsEnabled.name(), this.DefaultStrongholds);
+        this.strongholdsEnabled = readModSettings(TCDefaultValues.StrongholdsEnabled.name(), this.defaultStrongholds);
         this.netherFortressesEnabled = readModSettings(TCDefaultValues.NetherFortressesEnabled.name(), true);
-        this.villageType = (VillageType) readModSettings(TCDefaultValues.VillageType.name(), this.DefaultVillageType);
+        this.villageType = (VillageType) readModSettings(TCDefaultValues.VillageType.name(), this.defaultVillageType);
         this.mineshaftsRarity = readSettings(TCDefaultValues.MineshaftRarity);
-        this.rareBuildingType = (RareBuildingType) readModSettings(TCDefaultValues.RareBuildingType.name(), this.DefaultRareBuildingType);
+        this.rareBuildingType = (RareBuildingType) readModSettings(TCDefaultValues.RareBuildingType.name(), this.defaultRareBuildingType);
 
         if (DefaultBiome.getBiome(this.Biome.getId()) == null)
         {
@@ -890,16 +892,16 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("");
         this.writeComment("#STEP3: Understanding what to do with all this info");
         this.writeComment("There are three categories of mobs: monsters, creatures and watercreatures.");
-        this.writeComment("These list may be populated with default values if thee booleans bellow is set to true");
+        this.writeComment("These list may be populated with Default values if thee booleans bellow is set to true");
         this.writeComment("You may also add your own mobgroups in the lists below");
         this.writeComment("");
         this.writeComment("#STEP4: What is in the default mob groups?");
         this.writeComment("The default mob groups are controlled by vanilla minecraft.");
         this.writeComment("At 2012-03-24 you could find them here: https://github.com/Bukkit/mc-dev/blob/master/net/minecraft/server/BiomeBase.java#L75");
         this.writeComment("In simple terms:");
-        this.writeComment("Default creatures: [{\"mob\": \"Sheep\", \"weight\": 12, \"min\": 4, \"max\": 4}, {\"mob\": \"Pig\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Chicken\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Cow\", \"weight\": 8, \"min\": 4, \"max\": 4}]");
-        this.writeComment("Default monsters: [{\"mob\": \"Spider\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Zombie\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Skeleton\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Creeper\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Slime\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Enderman\", \"weight\": 1, \"min\": 1, \"max\": 4}]");
-        this.writeComment("Default watercreatures: [{\"mob\": \"Squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]");
+        this.writeComment("default creatures: [{\"mob\": \"Sheep\", \"weight\": 12, \"min\": 4, \"max\": 4}, {\"mob\": \"Pig\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Chicken\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Cow\", \"weight\": 8, \"min\": 4, \"max\": 4}]");
+        this.writeComment("default monsters: [{\"mob\": \"Spider\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Zombie\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Skeleton\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Creeper\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Slime\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Enderman\", \"weight\": 1, \"min\": 1, \"max\": 4}]");
+        this.writeComment("default watercreatures: [{\"mob\": \"Squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]");
         this.writeComment("");
         this.writeComment("So for example ocelots wont spawn unless you add them below.");
 
@@ -1172,214 +1174,217 @@ public class BiomeConfig extends ConfigFile
         }
     }
 
-    private int DefaultTrees = 1;
-    private int DefaultFlowers = 2;
-    private int DefaultGrass = 10;
-    private int DefaultDeadBrush = 0;
-    private int DefaultMushroom = 0;
-    private int DefaultReed = 0;
-    private int DefaultCactus = 0;
-    private int DefaultClay = 1;
-    private Object[] DefaultWell;
-    private float DefaultBiomeSurface = 0.1F;
-    private float DefaultBiomeVolatility = 0.3F;
-    private byte DefaultSurfaceBlock = (byte) DefaultMaterial.GRASS.id;
-    private byte DefaultGroundBlock = (byte) DefaultMaterial.DIRT.id;
-    private float DefaultBiomeTemperature = 0.5F;
-    private float DefaultBiomeWetness = 0.5F;
-    private ArrayList<String> DefaultIsle = new ArrayList<String>();
-    private ArrayList<String> DefaultBorder = new ArrayList<String>();
-    private ArrayList<String> DefaultNotBorderNear = new ArrayList<String>();
-    private String DefaultRiverBiome = DefaultBiome.RIVER.Name;
-    private int DefaultSize = 4;
-    private int DefaultRarity = 100;
-    private String DefaultColor = "0x000000";
-    private int DefaultWaterLily = 0;
-    private String DefaultWaterColorMultiplier = "0xFFFFFF";
-    private String DefaultGrassColor = "0xFFFFFF";
-    private String DefaultFoliageColor = "0xFFFFFF";
-    private boolean DefaultStrongholds = true;
-    private VillageType DefaultVillageType = VillageType.disabled;
-    private RareBuildingType DefaultRareBuildingType = RareBuildingType.disabled;
+    protected boolean defaultWaterLakes = true;
+    protected int defaultTrees = 1;
+    protected int defaultFlowers = 2;
+    protected int defaultGrass = 10;
+    protected int defaultDeadBrush = 0;
+    protected int defaultMushroom = 0;
+    protected int defaultReed = 0;
+    protected int defaultCactus = 0;
+    protected int defaultClay = 1;
+    protected Object[] defaultWell;
+    protected float defaultBiomeSurface = 0.1F;
+    protected float defaultBiomeVolatility = 0.3F;
+    protected byte defaultSurfaceBlock = (byte) DefaultMaterial.GRASS.id;
+    protected byte defaultGroundBlock = (byte) DefaultMaterial.DIRT.id;
+    protected float defaultBiomeTemperature = 0.5F;
+    protected float defaultBiomeWetness = 0.5F;
+    protected ArrayList<String> defaultIsle = new ArrayList<String>();
+    protected ArrayList<String> defaultBorder = new ArrayList<String>();
+    protected ArrayList<String> defaultNotBorderNear = new ArrayList<String>();
+    protected String defaultRiverBiome = DefaultBiome.RIVER.Name;
+    protected int defaultSize = 4;
+    protected int defaultRarity = 100;
+    protected String defaultColor = "0x000000";
+    protected int defaultWaterLily = 0;
+    protected String defaultWaterColorMultiplier = "0xFFFFFF";
+    protected String defaultGrassColor = "0xFFFFFF";
+    protected String defaultFoliageColor = "0xFFFFFF";
+    protected boolean defaultStrongholds = true;
+    protected VillageType defaultVillageType = VillageType.disabled;
+    protected RareBuildingType defaultRareBuildingType = RareBuildingType.disabled;
 
-    private void InitDefaults()
+    protected void initDefaults()
     {
-        this.DefaultBiomeSurface = this.Biome.getSurfaceHeight();
-        this.DefaultBiomeVolatility = this.Biome.getSurfaceVolatility();
-        this.DefaultSurfaceBlock = this.Biome.getSurfaceBlock();
-        this.DefaultGroundBlock = this.Biome.getGroundBlock();
-        this.DefaultBiomeTemperature = this.Biome.getTemperature();
-        this.DefaultBiomeWetness = this.Biome.getWetness();
+        this.defaultBiomeSurface = this.Biome.getSurfaceHeight();
+        this.defaultBiomeVolatility = this.Biome.getSurfaceVolatility();
+        this.defaultSurfaceBlock = this.Biome.getSurfaceBlock();
+        this.defaultGroundBlock = this.Biome.getGroundBlock();
+        this.defaultBiomeTemperature = this.Biome.getTemperature();
+        this.defaultBiomeWetness = this.Biome.getWetness();
 
         switch (this.Biome.getId())
         {
             case 0: // Ocean
-                this.DefaultColor = "0x3333FF";
-                this.DefaultStrongholds = false;
-                this.DefaultRiverBiome = "";
+                this.defaultColor = "0x3333FF";
+                this.defaultStrongholds = false;
+                this.defaultRiverBiome = "";
                 break;
             case 1: // Plains
-                this.DefaultTrees = 0;
-                this.DefaultFlowers = 4;
-                this.DefaultGrass = 100;
-                this.DefaultColor = "0x999900";
-                this.DefaultStrongholds = false;
-                this.DefaultVillageType = VillageType.wood;
+                this.defaultTrees = 0;
+                this.defaultFlowers = 4;
+                this.defaultGrass = 100;
+                this.defaultColor = "0x999900";
+                this.defaultStrongholds = false;
+                this.defaultVillageType = VillageType.wood;
                 break;
             case 2: // Desert
-                this.DefaultTrees = 0;
-                this.DefaultDeadBrush = 4;
-                this.DefaultGrass = 0;
-                this.DefaultReed = 10;
-                this.DefaultCactus = 10;
-                this.DefaultColor = "0xFFCC33";
-                this.DefaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
-                this.DefaultVillageType = VillageType.sandstone;
-                this.DefaultRareBuildingType = RareBuildingType.desertPyramid;
+                this.defaultWaterLakes = false;
+                this.defaultTrees = 0;
+                this.defaultDeadBrush = 4;
+                this.defaultGrass = 0;
+                this.defaultReed = 10;
+                this.defaultCactus = 10;
+                this.defaultColor = "0xFFCC33";
+                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
+                this.defaultVillageType = VillageType.sandstone;
+                this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;
             case 3: // Extreme hills
-                this.DefaultColor = "0x333300";
+                this.defaultColor = "0x333300";
                 break;
             case 4: // Forest
-                this.DefaultTrees = 10;
-                this.DefaultGrass = 15;
-                this.DefaultColor = "0x00FF00";
+                this.defaultTrees = 10;
+                this.defaultGrass = 15;
+                this.defaultColor = "0x00FF00";
                 break;
             case 5: // Taiga
-                this.DefaultTrees = 10;
-                this.DefaultGrass = 10;
-                this.DefaultColor = "0x007700";
+                this.defaultTrees = 10;
+                this.defaultGrass = 10;
+                this.defaultColor = "0x007700";
                 break;
             case 6: // Swampland
-                this.DefaultTrees = 2;
-                this.DefaultFlowers = -999;
-                this.DefaultDeadBrush = 1;
-                this.DefaultMushroom = 8;
-                this.DefaultReed = 10;
-                this.DefaultClay = 1;
-                this.DefaultWaterLily = 1;
-                this.DefaultColor = "0x99CC66";
-                this.DefaultWaterColorMultiplier = "0xe0ffae";
-                this.DefaultGrassColor = "0x7E6E7E";
-                this.DefaultFoliageColor = "0x7E6E7E";
-                this.DefaultRareBuildingType = RareBuildingType.swampHut;
+                this.defaultTrees = 2;
+                this.defaultFlowers = -999;
+                this.defaultDeadBrush = 1;
+                this.defaultMushroom = 8;
+                this.defaultReed = 10;
+                this.defaultClay = 1;
+                this.defaultWaterLily = 1;
+                this.defaultColor = "0x99CC66";
+                this.defaultWaterColorMultiplier = "0xe0ffae";
+                this.defaultGrassColor = "0x7E6E7E";
+                this.defaultFoliageColor = "0x7E6E7E";
+                this.defaultRareBuildingType = RareBuildingType.swampHut;
                 break;
             case 7: // River
-                this.DefaultSize = 8;
-                this.DefaultRarity = 95;
-                this.DefaultIsle.add(DefaultBiome.SWAMPLAND.Name);
-                this.DefaultColor = "0x00CCCC";
-                this.DefaultStrongholds = false;
+                this.defaultSize = 8;
+                this.defaultRarity = 95;
+                this.defaultIsle.add(DefaultBiome.SWAMPLAND.Name);
+                this.defaultColor = "0x00CCCC";
+                this.defaultStrongholds = false;
             case 8: // Hell
             case 9: // Sky
                 break;
             case 10: // FrozenOcean
-                this.DefaultColor = "0xFFFFFF";
-                this.DefaultStrongholds = false;
-                this.DefaultRiverBiome = "";
+                this.defaultColor = "0xFFFFFF";
+                this.defaultStrongholds = false;
+                this.defaultRiverBiome = "";
                 break;
             case 11: // FrozenRiver
-                this.DefaultColor = "0x66FFFF";
-                this.DefaultStrongholds = false;
+                this.defaultColor = "0x66FFFF";
+                this.defaultStrongholds = false;
                 break;
             case 12: // Ice Plains
-                this.DefaultColor = "0xCCCCCC";
+                this.defaultColor = "0xCCCCCC";
                 if(worldConfig.readModSettings("FrozenRivers", true) == true)
                 {
                     // Only make river frozen if there isn't some old setting that prevents it
-                    this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
+                    this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
                 }
                 break;
             case 13: // Ice Mountains
-                this.DefaultColor = "0xCC9966";
+                this.defaultColor = "0xCC9966";
                 if(worldConfig.readModSettings("FrozenRivers", true) == true)
                 {
                     // Only make river frozen if there isn't some old setting that prevents it
-                    this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
+                    this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
                 }
                 break;
             case 14: // MushroomIsland
-                this.DefaultSurfaceBlock = (byte) DefaultMaterial.MYCEL.id;
-                this.DefaultMushroom = 1;
-                this.DefaultGrass = 0;
-                this.DefaultFlowers = 0;
-                this.DefaultTrees = 0;
-                this.DefaultRarity = 1;
-                this.DefaultRiverBiome = "";
-                this.DefaultSize = 6;
-                this.DefaultIsle.add(DefaultBiome.OCEAN.Name);
-                this.DefaultColor = "0xFF33CC";
-                this.DefaultWaterLily = 1;
-                this.DefaultStrongholds = false;
+                this.defaultSurfaceBlock = (byte) DefaultMaterial.MYCEL.id;
+                this.defaultMushroom = 1;
+                this.defaultGrass = 0;
+                this.defaultFlowers = 0;
+                this.defaultTrees = 0;
+                this.defaultRarity = 1;
+                this.defaultRiverBiome = "";
+                this.defaultSize = 6;
+                this.defaultIsle.add(DefaultBiome.OCEAN.Name);
+                this.defaultColor = "0xFF33CC";
+                this.defaultWaterLily = 1;
+                this.defaultStrongholds = false;
                 break;
             case 15: // MushroomIslandShore
-                this.DefaultRiverBiome = "";
-                this.DefaultSize = 9;
-                this.DefaultBorder.add(DefaultBiome.MUSHROOM_ISLAND.Name);
-                this.DefaultColor = "0xFF9999";
-                this.DefaultStrongholds = false;
+                this.defaultRiverBiome = "";
+                this.defaultSize = 9;
+                this.defaultBorder.add(DefaultBiome.MUSHROOM_ISLAND.Name);
+                this.defaultColor = "0xFF9999";
+                this.defaultStrongholds = false;
                 break;
             case 16: // Beach
-                this.DefaultTrees = 0;
-                this.DefaultSize = 8;
-                this.DefaultBorder.add(DefaultBiome.OCEAN.Name);
-                this.DefaultNotBorderNear.add(DefaultBiome.RIVER.Name);
-                this.DefaultNotBorderNear.add(DefaultBiome.SWAMPLAND.Name);
-                this.DefaultNotBorderNear.add(DefaultBiome.EXTREME_HILLS.Name);
-                this.DefaultNotBorderNear.add(DefaultBiome.MUSHROOM_ISLAND.Name);
-                this.DefaultColor = "0xFFFF00";
-                this.DefaultStrongholds = false;
+                this.defaultTrees = 0;
+                this.defaultSize = 8;
+                this.defaultBorder.add(DefaultBiome.OCEAN.Name);
+                this.defaultNotBorderNear.add(DefaultBiome.RIVER.Name);
+                this.defaultNotBorderNear.add(DefaultBiome.SWAMPLAND.Name);
+                this.defaultNotBorderNear.add(DefaultBiome.EXTREME_HILLS.Name);
+                this.defaultNotBorderNear.add(DefaultBiome.MUSHROOM_ISLAND.Name);
+                this.defaultColor = "0xFFFF00";
+                this.defaultStrongholds = false;
                 break;
             case 17: // DesertHills
-                this.DefaultSize = 6;
-                this.DefaultRarity = 97;
-                this.DefaultIsle.add(DefaultBiome.DESERT.Name);
-                this.DefaultTrees = 0;
-                this.DefaultDeadBrush = 4;
-                this.DefaultGrass = 0;
-                this.DefaultReed = 50;
-                this.DefaultCactus = 10;
-                this.DefaultColor = "0x996600";
-                this.DefaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
-                this.DefaultVillageType = VillageType.sandstone;
-                this.DefaultRareBuildingType = RareBuildingType.desertPyramid;
+                this.defaultWaterLakes = false;
+                this.defaultSize = 6;
+                this.defaultRarity = 97;
+                this.defaultIsle.add(DefaultBiome.DESERT.Name);
+                this.defaultTrees = 0;
+                this.defaultDeadBrush = 4;
+                this.defaultGrass = 0;
+                this.defaultReed = 50;
+                this.defaultCactus = 10;
+                this.defaultColor = "0x996600";
+                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
+                this.defaultVillageType = VillageType.sandstone;
+                this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;
             case 18: // ForestHills
-                this.DefaultSize = 6;
-                this.DefaultRarity = 97;
-                this.DefaultIsle.add(DefaultBiome.FOREST.Name);
-                this.DefaultTrees = 10;
-                this.DefaultGrass = 15;
-                this.DefaultColor = "0x009900";
+                this.defaultSize = 6;
+                this.defaultRarity = 97;
+                this.defaultIsle.add(DefaultBiome.FOREST.Name);
+                this.defaultTrees = 10;
+                this.defaultGrass = 15;
+                this.defaultColor = "0x009900";
                 break;
             case 19: // TaigaHills
-                this.DefaultSize = 6;
-                this.DefaultRarity = 97;
-                this.DefaultIsle.add(DefaultBiome.TAIGA.Name);
-                this.DefaultTrees = 10;
-                this.DefaultGrass = 10;
-                this.DefaultColor = "0x003300";
-                this.DefaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
+                this.defaultSize = 6;
+                this.defaultRarity = 97;
+                this.defaultIsle.add(DefaultBiome.TAIGA.Name);
+                this.defaultTrees = 10;
+                this.defaultGrass = 10;
+                this.defaultColor = "0x003300";
+                this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
                 break;
             case 20: // Extreme Hills Edge
-                this.DefaultSize = 8;
-                this.DefaultBorder.add(DefaultBiome.EXTREME_HILLS.Name);
-                this.DefaultColor = "0x666600";
+                this.defaultSize = 8;
+                this.defaultBorder.add(DefaultBiome.EXTREME_HILLS.Name);
+                this.defaultColor = "0x666600";
                 break;
             case 21: // Jungle
-                this.DefaultTrees = 50;
-                this.DefaultGrass = 25;
-                this.DefaultFlowers = 4;
-                this.DefaultColor = "0xCC6600";
-                this.DefaultRareBuildingType = RareBuildingType.jungleTemple;
+                this.defaultTrees = 50;
+                this.defaultGrass = 25;
+                this.defaultFlowers = 4;
+                this.defaultColor = "0xCC6600";
+                this.defaultRareBuildingType = RareBuildingType.jungleTemple;
                 break;
             case 22: // JungleHills
-                this.DefaultTrees = 50;
-                this.DefaultGrass = 25;
-                this.DefaultFlowers = 4;
-                this.DefaultColor = "0x663300";
-                this.DefaultIsle.add(DefaultBiome.JUNGLE.Name);
-                this.DefaultRareBuildingType = RareBuildingType.jungleTemple;
+                this.defaultTrees = 50;
+                this.defaultGrass = 25;
+                this.defaultFlowers = 4;
+                this.defaultColor = "0x663300";
+                this.defaultIsle.add(DefaultBiome.JUNGLE.Name);
+                this.defaultRareBuildingType = RareBuildingType.jungleTemple;
                 break;
         }
     }
