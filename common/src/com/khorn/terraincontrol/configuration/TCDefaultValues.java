@@ -39,6 +39,7 @@ public enum TCDefaultValues implements TCSetting
     RiverRarity(4),
     RiverSize(0),
     RiversEnabled(true),
+    RandomRivers(false),
 
     FrozenOcean(true),
 

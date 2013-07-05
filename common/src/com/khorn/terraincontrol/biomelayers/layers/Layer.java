@@ -124,11 +124,17 @@ public abstract class Layer
 
         Layer MainLayer = new LayerEmpty(1L);
 
+        Layer RiverLayer = new LayerEmpty(1L);
+        boolean riversStarted = false;
+
 
         for (int depth = 0; depth <= config.GenerationDepth; depth++)
         {
 
             MainLayer = new LayerZoom(2001 + depth, MainLayer);
+
+            if (config.RandomRivers && riversStarted)
+                RiverLayer = new LayerZoom(2001 + depth, RiverLayer);
 
             if (config.LandSize == depth)
             {
@@ -154,10 +160,21 @@ public abstract class Layer
                 MainLayer = new LayerIce(depth, MainLayer, config.IceRarity);
 
             if (config.RiverRarity == depth)
-                MainLayer = new LayerRiverInit(155, MainLayer);
+                if (config.RandomRivers)
+                {
+                    RiverLayer = new LayerRiverInit(155, RiverLayer);
+                    riversStarted = true;
+                } else
+                    MainLayer = new LayerRiverInit(155, MainLayer);
+
 
             if ((config.GenerationDepth - config.RiverSize) == depth)
-                MainLayer = new LayerRiver(5 + depth, MainLayer);
+            {
+                if (config.RandomRivers)
+                    RiverLayer = new LayerRiver(5 + depth, RiverLayer);
+                else
+                    MainLayer = new LayerRiver(5 + depth, MainLayer);
+            }
 
             LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
             boolean haveBorder = false;
@@ -211,7 +228,10 @@ public abstract class Layer
 
 
         }
-        MainLayer = new LayerMix(1L, MainLayer, config, world);
+        if (config.RandomRivers)
+            MainLayer = new LayerMixWithRiver(1L, MainLayer, RiverLayer, config, world);
+        else
+            MainLayer = new LayerMix(1L, MainLayer, config, world);
 
         MainLayer = new LayerSmooth(400L, MainLayer);
 
@@ -229,7 +249,7 @@ public abstract class Layer
 
         //TemperatureLayer = new LayerTemperatureMix(TemperatureLayer, ZoomedLayer, 0, config);
 
-        ZoomedLayer.b(paramLong);
+        ZoomedLayer.SetWorldSeed(paramLong);
 
         MainLayer = new LayerCacheInit(1, MainLayer);
         ZoomedLayer = new LayerCacheInit(1, ZoomedLayer);
@@ -248,11 +268,11 @@ public abstract class Layer
         this.d += paramLong;
     }
 
-    public void b(long paramLong)
+    public void SetWorldSeed(long paramLong)
     {
         this.b = paramLong;
         if (this.child != null)
-            this.child.b(paramLong);
+            this.child.SetWorldSeed(paramLong);
         this.b *= (this.b * 6364136223846793005L + 1442695040888963407L);
         this.b += this.d;
         this.b *= (this.b * 6364136223846793005L + 1442695040888963407L);

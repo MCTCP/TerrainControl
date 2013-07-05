@@ -54,11 +54,18 @@ public class WorldConfig extends ConfigFile
     public int IceRarity;
     public int IceSize;
 
+
+
+    public boolean FrozenOcean;
+
+    // Rivers
+
     public int RiverRarity;
     public int RiverSize;
     public boolean RiversEnabled;
 
-    public boolean FrozenOcean;
+    public boolean RandomRivers;
+
 
     // Biome image
 
@@ -414,11 +421,15 @@ public class WorldConfig extends ConfigFile
         this.IceRarity = readSettings(TCDefaultValues.IceRarity);
         this.IceSize = readSettings(TCDefaultValues.IceSize);
 
+        this.FrozenOcean = readSettings(TCDefaultValues.FrozenOcean);
+
+        // Rivers
+
         this.RiverRarity = readSettings(TCDefaultValues.RiverRarity);
         this.RiverSize = readSettings(TCDefaultValues.RiverSize);
         this.RiversEnabled = readSettings(TCDefaultValues.RiversEnabled);
+        this.RandomRivers = readSettings(TCDefaultValues.RandomRivers);
 
-        this.FrozenOcean = readSettings(TCDefaultValues.FrozenOcean);
 
         // Biomes
         this.NormalBiomes = readSettings(TCDefaultValues.NormalBiomes);
@@ -666,6 +677,10 @@ public class WorldConfig extends ConfigFile
         writeNewLine();
 
         writeValue(TCDefaultValues.RiversEnabled.name(), this.RiversEnabled);
+        writeNewLine();
+
+        writeComment("Enable random rives.  Typically rivers follow biome borders. This settings disable that.");
+        writeValue(TCDefaultValues.RandomRivers.name(), this.RandomRivers);
         writeNewLine();
 
         // Settings for BiomeMode:FromImage
