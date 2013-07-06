@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.biomelayers.layers;
 
 
-import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.biomelayers.ArrayCache;
 
 public class LayerEmpty extends Layer
 {
@@ -11,9 +11,9 @@ public class LayerEmpty extends Layer
     }
 
     @Override
-    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size)
     {
-        int[] arrayOfInt = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
+        int[] arrayOfInt = arrayCache.GetArray( x_size * z_size);
         for (int i = 0; i < arrayOfInt.length; i++)
             arrayOfInt[i] = 0;
         return arrayOfInt;

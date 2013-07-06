@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.biomelayers.ArrayCache;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
@@ -304,7 +305,7 @@ public abstract class Layer
         return i;
     }
 
-    protected abstract int[] GetBiomes(int cacheId, int x, int z, int x_size, int z_size);
+    protected abstract int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size);
 
     public int[] Calculate(int x, int z, int x_size, int z_size)
     {

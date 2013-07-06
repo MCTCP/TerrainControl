@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.biomelayers.layers;
 
 
-import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.biomelayers.ArrayCache;
 
 public class LayerZoomVoronoi extends Layer
 {
@@ -11,25 +11,25 @@ public class LayerZoomVoronoi extends Layer
         this.child = paramGenLayer;
     }
 
-    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size)
     {
-        paramInt1 -= 2;
-        paramInt2 -= 2;
+        x -= 2;
+        z -= 2;
         int i = 2;
         int j = 1 << i;
-        int k = paramInt1 >> i;
-        int m = paramInt2 >> i;
-        int n = (paramInt3 >> i) + 3;
-        int i1 = (paramInt4 >> i) + 3;
-        int[] arrayOfInt1 = this.child.GetBiomes(cacheId, k, m, n, i1);
+        int k = x >> i;
+        int m = z >> i;
+        int n = (x_size >> i) + 3;
+        int i1 = (z_size >> i) + 3;
+        int[] arrayOfInt1 = this.child.GetBiomes(arrayCache, k, m, n, i1);
 
         int i2 = n << i;
         int i3 = i1 << i;
-        int[] arrayOfInt2 = ArraysCache.GetArray(cacheId, i2 * i3);
+        int[] arrayOfInt2 = arrayCache.GetArray( i2 * i3);
         for (int i4 = 0; i4 < i1 - 1; i4++)
         {
-            int i5 = arrayOfInt1[(0 + (i4 + 0) * n)];
-            int i6 = arrayOfInt1[(0 + (i4 + 1) * n)];
+            int i5 = arrayOfInt1[((i4) * n)];
+            int i6 = arrayOfInt1[((i4 + 1) * n)];
             for (int i7 = 0; i7 < n - 1; i7++)
             {
                 double d1 = j * 0.9D;
@@ -46,7 +46,7 @@ public class LayerZoomVoronoi extends Layer
                 double d8 = (nextInt(1024) / 1024.0D - 0.5D) * d1 + j;
                 double d9 = (nextInt(1024) / 1024.0D - 0.5D) * d1 + j;
 
-                int i8 = arrayOfInt1[(i7 + 1 + (i4 + 0) * n)];
+                int i8 = arrayOfInt1[(i7 + 1 + (i4) * n)];
                 int i9 = arrayOfInt1[(i7 + 1 + (i4 + 1) * n)];
 
                 for (int i10 = 0; i10 < j; i10++)
@@ -76,10 +76,10 @@ public class LayerZoomVoronoi extends Layer
                 i6 = i9;
             }
         }
-        int[] arrayOfInt3 = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
-        for (int i5 = 0; i5 < paramInt4; i5++)
+        int[] arrayOfInt3 = arrayCache.GetArray( x_size * z_size);
+        for (int i5 = 0; i5 < z_size; i5++)
         {
-            System.arraycopy(arrayOfInt2, (i5 + (paramInt2 & j - 1)) * (n << i) + (paramInt1 & j - 1), arrayOfInt3, i5 * paramInt3, paramInt3);
+            System.arraycopy(arrayOfInt2, (i5 + (z & j - 1)) * (n << i) + (x & j - 1), arrayOfInt3, i5 * x_size, x_size);
         }
         return arrayOfInt3;
     }

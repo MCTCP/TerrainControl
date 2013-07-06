@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.biomelayers.layers;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.biomelayers.ArrayCache;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 
 
@@ -33,32 +33,32 @@ public class LayerBiomeBorder extends Layer
     }
 
     @Override
-    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size)
     {
-        int[] arrayOfInt1 = this.child.GetBiomes(cacheId, paramInt1 - 1, paramInt2 - 1, paramInt3 + 2, paramInt4 + 2);
+        int[] arrayOfInt1 = this.child.GetBiomes(arrayCache, x - 1, z - 1, x_size + 2, z_size + 2);
 
-        int[] arrayOfInt2 = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
-        for (int i = 0; i < paramInt4; i++)
+        int[] arrayOfInt2 = arrayCache.GetArray(x_size * z_size);
+        for (int i = 0; i < z_size; i++)
         {
-            for (int j = 0; j < paramInt3; j++)
+            for (int j = 0; j < x_size; j++)
             {
-                SetSeed(j + paramInt1, i + paramInt2);
-                int currentPiece = arrayOfInt1[(j + 1 + (i + 1) * (paramInt3 + 2))];
+                SetSeed(j + x, i + z);
+                int currentPiece = arrayOfInt1[(j + 1 + (i + 1) * (x_size + 2))];
 
                 int biomeId = GetBiomeFromLayer(currentPiece);
                 if (BordersFrom[biomeId] != null)
                 {
-                    int i1 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + (i + 1 - 1) * (paramInt3 + 2))]);
-                    int i2 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + 1 + (i + 1) * (paramInt3 + 2))]);
-                    int i3 = GetBiomeFromLayer(arrayOfInt1[(j + 1 - 1 + (i + 1) * (paramInt3 + 2))]);
-                    int i4 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + (i + 1 + 1) * (paramInt3 + 2))]);
+                    int i1 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + (i + 1 - 1) * (x_size + 2))]);
+                    int i2 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + 1 + (i + 1) * (x_size + 2))]);
+                    int i3 = GetBiomeFromLayer(arrayOfInt1[(j + 1 - 1 + (i + 1) * (x_size + 2))]);
+                    int i4 = GetBiomeFromLayer(arrayOfInt1[(j + 1 + (i + 1 + 1) * (x_size + 2))]);
                     boolean[] biomeFrom = BordersFrom[biomeId];
                     if (biomeFrom[i1] && biomeFrom[i2] && biomeFrom[i3] && biomeFrom[i4])
                         if ((i1 != biomeId) || (i2 != biomeId) || (i3 != biomeId) || (i4 != biomeId))
                             currentPiece = (currentPiece & (IslandBit | RiverBits | IceBit)) | LandBit | BordersTo[biomeId];
                 }
 
-                arrayOfInt2[(j + i * paramInt3)] = currentPiece;
+                arrayOfInt2[(j + i * x_size)] = currentPiece;
 
             }
         }

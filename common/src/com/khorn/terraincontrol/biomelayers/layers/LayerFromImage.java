@@ -1,14 +1,13 @@
 package com.khorn.terraincontrol.biomelayers.layers;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.biomelayers.ArrayCache;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 public class LayerFromImage extends Layer
 {
@@ -60,13 +59,13 @@ public class LayerFromImage extends Layer
 
 
     @Override
-    protected int[] GetBiomes(int cacheId, int x, int z, int x_size, int z_size)
+    protected int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size)
     {
-        int[] arrayOfInt1 = ArraysCache.GetArray(cacheId, x_size * z_size);
+        int[] arrayOfInt1 = arrayCache.GetArray( x_size * z_size);
         int[] arrayOfInt2 = null;
 
         if (this.child != null)
-            arrayOfInt2 = this.child.GetBiomes(cacheId, x, z, x_size, z_size);
+            arrayOfInt2 = this.child.GetBiomes(arrayCache, x, z, x_size, z_size);
 
         int Buffer_x;
         int Buffer_z;

@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.biomelayers.layers;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.biomelayers.ArrayCache;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
@@ -32,20 +32,20 @@ public class LayerMix extends Layer
     private int[] RiverBiomes;
 
     @Override
-    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size)
     {
 
-        int[] arrayOfInt1 = this.child.GetBiomes(cacheId, paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt1 = this.child.GetBiomes(arrayCache, x, z, x_size, z_size);
 
-        int[] arrayOfInt2 = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
+        int[] arrayOfInt2 = arrayCache.GetArray( x_size * z_size);
 
         int currentPiece;
         int cachedId;
-        for (int i = 0; i < paramInt4; i++)
+        for (int i = 0; i < z_size; i++)
         {
-            for (int j = 0; j < paramInt3; j++)
+            for (int j = 0; j < x_size; j++)
             {
-                currentPiece = arrayOfInt1[(j + i * paramInt3)];
+                currentPiece = arrayOfInt1[(j + i * x_size)];
 
                 if ((currentPiece & LandBit) != 0)
                     cachedId = currentPiece & BiomeBits;
@@ -59,7 +59,7 @@ public class LayerMix extends Layer
                 else
                     currentPiece = cachedId;
 
-                arrayOfInt2[(j + i * paramInt3)] = currentPiece;
+                arrayOfInt2[(j + i * x_size)] = currentPiece;
             }
         }
 

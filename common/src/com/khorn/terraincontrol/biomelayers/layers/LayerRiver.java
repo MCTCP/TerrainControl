@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.biomelayers.layers;
 
 
-import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.biomelayers.ArrayCache;
 
 public class LayerRiver extends Layer
 {
@@ -11,22 +11,22 @@ public class LayerRiver extends Layer
         this.child = paramGenLayer;
     }
 
-    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size)
     {
-        int i = paramInt1 - 1;
-        int j = paramInt2 - 1;
-        int k = paramInt3 + 2;
-        int m = paramInt4 + 2;
-        int[] arrayOfInt1 = this.child.GetBiomes(cacheId, i, j, k, m);
+        int i = x - 1;
+        int j = z - 1;
+        int k = x_size + 2;
+        int m = z_size + 2;
+        int[] arrayOfInt1 = this.child.GetBiomes(arrayCache, i, j, k, m);
 
-        int[] arrayOfInt2 = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
-        for (int n = 0; n < paramInt4; n++)
+        int[] arrayOfInt2 = arrayCache.GetArray( x_size * z_size);
+        for (int n = 0; n < z_size; n++)
         {
-            for (int i1 = 0; i1 < paramInt3; i1++)
+            for (int i1 = 0; i1 < x_size; i1++)
             {
                 int i2 = arrayOfInt1[(i1 + 0 + (n + 1) * k)] & RiverBits;
                 int i3 = arrayOfInt1[(i1 + 2 + (n + 1) * k)] & RiverBits;
-                int i4 = arrayOfInt1[(i1 + 1 + (n + 0) * k)] & RiverBits;
+                int i4 = arrayOfInt1[(i1 + 1 + (n) * k)] & RiverBits;
                 int i5 = arrayOfInt1[(i1 + 1 + (n + 2) * k)] & RiverBits;
                 int i6 = arrayOfInt1[(i1 + 1 + (n + 1) * k)] & RiverBits;
                 int currentPiece = arrayOfInt1[(i1 + 1 + (n + 1) * k)];
@@ -39,7 +39,7 @@ public class LayerRiver extends Layer
                     currentPiece |= RiverBits;
                     currentPiece ^= RiverBits;
                 }
-                arrayOfInt2[(i1 + n * paramInt3)] = currentPiece;
+                arrayOfInt2[(i1 + n * x_size)] = currentPiece;
             }
         }
 

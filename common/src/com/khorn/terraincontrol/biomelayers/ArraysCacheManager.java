@@ -1,48 +1,44 @@
 package com.khorn.terraincontrol.biomelayers;
 
-import java.util.ArrayList;
-
 @SuppressWarnings("rawtypes")
-public class ArraysCache
+public class ArraysCacheManager
 {
-    private static final int[][][] SmallArrays = new int[4][][];
-    private static final int[] SmallArraysNext = new int[4];
-    private static final ArrayList[] BigArrays = new ArrayList[4];
-    private static final int[] BigArraysNext = new int[4];
-    private static final boolean[] ArraysInUse = new boolean[4];
 
-    public static int GetCacheId()
+    private static final ArrayCache[] ArrayCaches = new ArrayCache[4];
+
+    static
     {
-        synchronized (ArraysInUse)
+        for (int i = 0; i < ArrayCaches.length; i++)
+            ArrayCaches[i] = new ArrayCache();
+
+    }
+
+    public static ArrayCache GetCache()
+    {
+        synchronized (ArrayCaches)
         {
-            for (int i = 0; i < ArraysInUse.length; i++)
+            for (ArrayCache ArrayCache : ArrayCaches)
             {
-                if (!ArraysInUse[i])
+                if (ArrayCache.isFree)
                 {
-
-                    ArraysInUse[i] = true;
-                    if (SmallArrays[i] == null)
-                        SmallArrays[i] = new int[128][];
-                    if (BigArrays[i] == null)
-                        BigArrays[i] = new ArrayList();
-
-                    return i;
+                    ArrayCache.isFree = false;
+                    return ArrayCache;
                 }
             }
+
         }
-        return 0; // Exception ??
+        return null; // Exception ??
     }
 
-    public static void ReleaseCacheId(int id)
+    public static void ReleaseCache(ArrayCache cache)
     {
-        synchronized (ArraysInUse)
+        synchronized (ArrayCaches)
         {
-            ArraysInUse[id] = false;
-            SmallArraysNext[id] = 0;
-            BigArraysNext[id] = 0;
+            cache.Release();
         }
     }
 
+    /*
     @SuppressWarnings({"unchecked"})
     public static int[] GetArray(int cacheId, int size)
     {
@@ -76,4 +72,5 @@ public class ArraysCache
         BigArraysNext[cacheId]++;
         return array;
     }
+    */
 }

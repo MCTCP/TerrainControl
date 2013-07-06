@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.biomelayers.layers;
 
 
-import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.biomelayers.ArrayCache;
 
 public class LayerRiverInit extends Layer
 {
@@ -11,23 +11,23 @@ public class LayerRiverInit extends Layer
         this.child = paramGenLayer;
     }
 
-    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size)
     {
-        int[] arrayOfInt1 = this.child.GetBiomes(cacheId, paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt1 = this.child.GetBiomes(arrayCache, x, z, x_size, z_size);
 
-        int[] arrayOfInt2 = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
-        for (int i = 0; i < paramInt4; i++)
+        int[] arrayOfInt2 = arrayCache.GetArray( x_size * z_size);
+        for (int i = 0; i < z_size; i++)
         {
-            for (int j = 0; j < paramInt3; j++)
+            for (int j = 0; j < x_size; j++)
             {
-                SetSeed(i + paramInt2, j + paramInt1);           // reversed
-                int currentPiece = arrayOfInt1[(j + i * paramInt3)];
+                SetSeed(i + z, j + x);           // reversed
+                int currentPiece = arrayOfInt1[(j + i * x_size)];
                 if (nextInt(2) == 0)
                     currentPiece |= 1024;
                 else
                     currentPiece |= 2048;
 
-                arrayOfInt2[(j + i * paramInt3)] = currentPiece;
+                arrayOfInt2[(j + i * x_size)] = currentPiece;
             }
         }
 
