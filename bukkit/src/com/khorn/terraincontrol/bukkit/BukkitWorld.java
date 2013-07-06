@@ -429,57 +429,63 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
-        // If minecraft was updated and obfuscation is off - take a look at
-        // these methods:
-        // this.world.setRawTypeIdAndData(i, j, k, l, i1)
-        // this.world.setTypeIdAndData(i, j, k, l, i1)
-
-        // We fetch the chunk from a custom cache in order to speed things up.
-        Chunk chunk = this.getChunk(x, y, z);
-
-        if (chunk == null)
+        /*
+         * This method usually breaks on every Minecraft update. Always check
+         * whether the names are still correct. Often, you'll also need to
+         * rewrite parts of this method for newer block place logic.
+         */
+        if (this.isLoaded(x, y, z))
         {
-            return;
-        }
-        if (applyPhysics)
-        {
-            int oldTypeId = chunk.getTypeId(x & 15, y, z & 15);
-            chunk.a(x & 15, y, z & 15, typeId, data); // chunk.setTypeIdAndData(....)
-            // Workaround for (bug in?) CraftBukkit
-            if (chunk.i()[y >> 4] != null)
+            if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
             {
-                // chunk.getSections()[..].getDataArray().set(....)
-                chunk.i()[y >> 4].getDataArray().a(x & 15, y & 15, z & 15, data);
+                return;
             }
-            this.world.applyPhysics(x, y, z, typeId == 0 ? oldTypeId : typeId);
-        } else
-        {
-            if (chunk.i()[y >> 4] == null)
+
+            // Get chunk from (faster) custom cache
+            Chunk chunk = this.getChunk(x, y, z);
+
+            // Get old block id (only needed for physics)
+            int oldBlockId = 0;
+            if (applyPhysics)
+            {
+                oldBlockId = chunk.getTypeId(x & 15, y, z & 15);
+            }
+
+            // Place block
+            if (applyPhysics)
             {
                 chunk.a(x & 15, y, z & 15, typeId, data);
             } else
             {
-                chunk.i()[y >> 4].setTypeId(x & 15, y & 15, z & 15, typeId);
-                chunk.i()[y >> 4].getDataArray().a(x & 15, y & 15, z & 15, data);
+                // Temporarily make static, so that torches etc. don't pop off
+                boolean oldStatic = world.isStatic;
+                world.isStatic = true;
+                chunk.a(x & 15, y, z & 15, typeId, data);
+                world.isStatic = oldStatic;
+            }
+
+            // Relight and update
+            if (updateLight)
+            {
+                world.A(x, y, z);
+            }
+
+            if (notifyPlayers && !world.isStatic)
+            {
+                world.notify(x, y, z);
+            }
+
+            if (!world.isStatic && applyPhysics)
+            {
+                world.update(x, y, z, oldBlockId);
             }
         }
-
-        if (updateLight)
-        {
-            this.world.A(x, y, z);
-        }
-
-        if (notifyPlayers && chunk.seenByPlayer)
-        {
-            this.world.notify(x, y, z);
-        }
-
     }
 
     @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data)
     {
-        this.setBlock(x, y, z, typeId, data, false, false, true);
+        this.setBlock(x, y, z, typeId, data, true, false, true);
     }
 
     @Override

@@ -19,6 +19,8 @@ public class TCWorldProvider extends WorldProviderNormal
         this.localWorld = localWorld;
         this.oldWorldProvider = oldWorldProvider;
         this.a(localWorld.getWorld());
+        this.f = oldWorldProvider.f;
+        this.g = oldWorldProvider.g;
     }
 
     @Override
