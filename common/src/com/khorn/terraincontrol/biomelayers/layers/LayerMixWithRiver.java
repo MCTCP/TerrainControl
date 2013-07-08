@@ -45,7 +45,7 @@ public class LayerMixWithRiver extends Layer
 
         int[] arrayOfInt1 = this.child.GetBiomes(arrayCache, x, z, x_size, z_size);
         int[] arrayOfInt2 = this.RiverLayer.GetBiomes(arrayCache, x, z, x_size, z_size);
-        int[] arrayOfInt3 = arrayCache.GetArray( x_size * z_size);
+        int[] arrayOfInt3 = arrayCache.GetArray(x_size * z_size);
 
         int currentPiece;
         int currentRiver;
@@ -65,8 +65,12 @@ public class LayerMixWithRiver extends Layer
                     cachedId = DefaultBiome.OCEAN.Id;
 
                 if (this.worldConfig.RiversEnabled && (currentRiver & RiverBits) != 0 && !this.worldConfig.biomeConfigs[cachedId].RiverBiome.isEmpty())
-                    currentPiece = this.RiverBiomes[cachedId];
-                else
+                {
+                    if (arrayCache.ReturnRiver)
+                        currentPiece = cachedId | RiverBits;
+                    else
+                        currentPiece = this.RiverBiomes[cachedId];
+                } else
                     currentPiece = cachedId;
 
                 arrayOfInt3[(j + i * x_size)] = currentPiece;

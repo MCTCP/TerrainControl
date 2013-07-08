@@ -3,6 +3,8 @@ package com.khorn.terraincontrol.generator;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.biomelayers.ArraysCacheManager;
+import com.khorn.terraincontrol.biomelayers.layers.Layer;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.terrainsgens.CanyonsGen;
@@ -101,6 +103,7 @@ public class ChunkProviderTC
         int i4 = i1 + 1;
         int i5 = this.height / 8 + 1;
         int i6 = i1 + 1;
+        ArraysCacheManager.NextRiver = true;
         if (this.worldSettings.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
         {
             this.BiomeArray = this.localWorld.getBiomesUnZoomed(this.BiomeArray, chunkX * 16, chunkZ * 16, 16, 16);
@@ -299,7 +302,7 @@ public class ChunkProviderTC
             for (int z = 0; z < max_Z; z++)
             {
 
-                int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (max_X + 5))];
+                int biomeId = (this.BiomeArray[(x + 2 + (z + 2) * (max_X + 5))] | Layer.RiverBits) ^ Layer.RiverBits ;
                 BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
                 double d3 = this.k[i2D] / 8000.0D;
@@ -407,20 +410,29 @@ public class ChunkProviderTC
         int i7 = 2;
 
         int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (max_X + 5))];
+        boolean isRiver = (biomeId & Layer.RiverBits) > 0;
+        biomeId = (biomeId | Layer.RiverBits) ^ Layer.RiverBits;
+
+
         for (int nextX = -i7; nextX <= i7; nextX++)
         {
             for (int nextZ = -i7; nextZ <= i7; nextZ++)
             {
                 int nextBiomeId = this.BiomeArray[(x + nextX + 2 + (z + nextZ + 2) * (max_X + 5))];
-                BiomeConfig nextBiomeConfig = this.worldSettings.biomeConfigs[nextBiomeId];
-                float f5 = this.NearBiomeWeight[(nextX + 2 + (nextZ + 2) * 5)] / (nextBiomeConfig.BiomeHeight + 2.0F);
+
+
+                BiomeConfig nextBiomeConfig = this.worldSettings.biomeConfigs[(nextBiomeId| Layer.RiverBits)^Layer.RiverBits];
+
+                float nextBiomeHeight =  nextBiomeConfig.BiomeHeight -  (((nextBiomeId & Layer.RiverBits) > 0)? 1.0F:0.0F);
+
+                float f5 = this.NearBiomeWeight[(nextX + 2 + (nextZ + 2) * 5)] / (nextBiomeHeight + 2.0F);
                 f5 = Math.abs(f5);
-                if (nextBiomeConfig.BiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
+                if (nextBiomeHeight > (this.worldSettings.biomeConfigs[biomeId].BiomeHeight - (isRiver? 1.0F: 0.0F)))
                 {
                     f5 /= 2.0F;
                 }
                 f2 += nextBiomeConfig.BiomeVolatility * f5;
-                f3 += nextBiomeConfig.BiomeHeight * f5;
+                f3 += nextBiomeHeight * f5;
                 f4 += f5;
             }
         }

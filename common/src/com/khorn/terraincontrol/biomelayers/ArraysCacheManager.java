@@ -5,6 +5,7 @@ public class ArraysCacheManager
 {
 
     private static final ArrayCache[] ArrayCaches = new ArrayCache[4];
+    public static boolean NextRiver = false;
 
     static
     {
@@ -22,6 +23,8 @@ public class ArraysCacheManager
                 if (ArrayCache.isFree)
                 {
                     ArrayCache.isFree = false;
+                    ArrayCache.ReturnRiver = NextRiver;
+                    NextRiver = false;
                     return ArrayCache;
                 }
             }

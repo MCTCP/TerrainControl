@@ -12,6 +12,8 @@ public class ArrayCache
 
     public boolean isFree = true;
 
+    public boolean ReturnRiver = false;
+
 
     public ArrayCache()
     {
@@ -23,6 +25,7 @@ public class ArrayCache
         SmallArraysNext = 0;
         BigArraysNext = 0;
         isFree = true;
+        ReturnRiver = false;
     }
 
     @SuppressWarnings({"unchecked"})
