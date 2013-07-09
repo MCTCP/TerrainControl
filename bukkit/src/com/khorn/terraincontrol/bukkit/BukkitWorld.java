@@ -444,6 +444,13 @@ public class BukkitWorld implements LocalWorld
             // Get chunk from (faster) custom cache
             Chunk chunk = this.getChunk(x, y, z);
 
+            if (chunk == null)
+            {
+                // TODO investigate why this happens
+                // This isn't normal
+                return;
+            }
+
             // Get old block id (only needed for physics)
             int oldBlockId = 0;
             if (applyPhysics)
