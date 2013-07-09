@@ -9,13 +9,13 @@ import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.util.StringHelper;
-import net.minecraft.server.v1_6_R1.BiomeBase;
-import net.minecraft.server.v1_6_R1.Block;
+import net.minecraft.server.v1_6_R2.BiomeBase;
+import net.minecraft.server.v1_6_R2.Block;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_6_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_6_R2.block.CraftBlock;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 

@@ -10,8 +10,8 @@ import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
-import net.minecraft.server.v1_6_R1.*;
-import org.bukkit.craftbukkit.v1_6_R1.CraftWorld;
+import net.minecraft.server.v1_6_R2.*;
+import org.bukkit.craftbukkit.v1_6_R2.CraftWorld;
 
 import java.util.ArrayList;
 import java.util.HashMap;
