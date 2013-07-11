@@ -434,58 +434,55 @@ public class BukkitWorld implements LocalWorld
          * whether the names are still correct. Often, you'll also need to
          * rewrite parts of this method for newer block place logic.
          */
-        if (this.isLoaded(x, y, z))
+
+        if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
         {
-            if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
-            {
-                return;
-            }
+            return;
+        }
 
-            // Get chunk from (faster) custom cache
-            Chunk chunk = this.getChunk(x, y, z);
+        // Get chunk from (faster) custom cache
+        Chunk chunk = this.getChunk(x, y, z);
 
-            if (chunk == null)
-            {
-                // TODO investigate why this happens
-                // This isn't normal
-                return;
-            }
+        if (chunk == null)
+        {
+            // Chunk is unloaded
+            return;
+        }
 
-            // Get old block id (only needed for physics)
-            int oldBlockId = 0;
-            if (applyPhysics)
-            {
-                oldBlockId = chunk.getTypeId(x & 15, y, z & 15);
-            }
+        // Get old block id (only needed for physics)
+        int oldBlockId = 0;
+        if (applyPhysics)
+        {
+            oldBlockId = chunk.getTypeId(x & 15, y, z & 15);
+        }
 
-            // Place block
-            if (applyPhysics)
-            {
-                chunk.a(x & 15, y, z & 15, typeId, data);
-            } else
-            {
-                // Temporarily make static, so that torches etc. don't pop off
-                boolean oldStatic = world.isStatic;
-                world.isStatic = true;
-                chunk.a(x & 15, y, z & 15, typeId, data);
-                world.isStatic = oldStatic;
-            }
+        // Place block
+        if (applyPhysics)
+        {
+            chunk.a(x & 15, y, z & 15, typeId, data);
+        } else
+        {
+            // Temporarily make static, so that torches etc. don't pop off
+            boolean oldStatic = world.isStatic;
+            world.isStatic = true;
+            chunk.a(x & 15, y, z & 15, typeId, data);
+            world.isStatic = oldStatic;
+        }
 
-            // Relight and update
-            if (updateLight)
-            {
-                world.A(x, y, z);
-            }
+        // Relight and update
+        if (updateLight)
+        {
+            world.A(x, y, z);
+        }
 
-            if (notifyPlayers && !world.isStatic)
-            {
-                world.notify(x, y, z);
-            }
+        if (notifyPlayers && !world.isStatic)
+        {
+            world.notify(x, y, z);
+        }
 
-            if (!world.isStatic && applyPhysics)
-            {
-                world.update(x, y, z, oldBlockId);
-            }
+        if (!world.isStatic && applyPhysics)
+        {
+            world.update(x, y, z, oldBlockId);
         }
     }
 
@@ -536,7 +533,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public boolean isLoaded(int x, int y, int z)
     {
-        return world.isLoaded(x, y, z);
+        return this.getChunk(x, y, z) != null;
     }
 
     @Override

@@ -456,58 +456,55 @@ public class SingleWorld implements LocalWorld
          * whether the names are still correct. Often, you'll also need to
          * rewrite parts of this method for newer block place logic.
          */
-        if (this.isLoaded(x, y, z))
+
+        if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
         {
-            if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
-            {
-                return;
-            }
+            return;
+        }
 
-            // Get chunk from (faster) custom cache
-            Chunk chunk = this.getChunk(x, y, z);
+        // Get chunk from (faster) custom cache
+        Chunk chunk = this.getChunk(x, y, z);
 
-            if (chunk == null)
-            {
-                // TODO investigate why this happens
-                // This isn't normal
-                return;
-            }
+        if (chunk == null)
+        {
+            // Chunk is unloaded
+            return;
+        }
 
-            // Get old block id (only needed for physics)
-            int oldBlockId = 0;
-            if (applyPhysics)
-            {
-                oldBlockId = chunk.getBlockID(x & 15, y, z & 15);
-            }
+        // Get old block id (only needed for physics)
+        int oldBlockId = 0;
+        if (applyPhysics)
+        {
+            oldBlockId = chunk.getBlockID(x & 15, y, z & 15);
+        }
 
-            // Place block
-            if (applyPhysics)
-            {
-                chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
-            } else
-            {
-                // Temporarily make remote, so that torches etc. don't pop off
-                boolean oldStatic = world.isRemote;
-                world.isRemote = true;
-                chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
-                world.isRemote = oldStatic;
-            }
+        // Place block
+        if (applyPhysics)
+        {
+            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
+        } else
+        {
+            // Temporarily make remote, so that torches etc. don't pop off
+            boolean oldStatic = world.isRemote;
+            world.isRemote = true;
+            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
+            world.isRemote = oldStatic;
+        }
 
-            // Relight and update
-            if (updateLight)
-            {
-                world.updateAllLightTypes(x, y, z);
-            }
+        // Relight and update
+        if (updateLight)
+        {
+            world.updateAllLightTypes(x, y, z);
+        }
 
-            if (notifyPlayers && !world.isRemote)
-            {
-                world.markBlockForUpdate(x, y, z);
-            }
+        if (notifyPlayers && !world.isRemote)
+        {
+            world.markBlockForUpdate(x, y, z);
+        }
 
-            if (!world.isRemote && applyPhysics)
-            {
-                world.notifyBlockChange(x, y, z, oldBlockId);
-            }
+        if (!world.isRemote && applyPhysics)
+        {
+            world.notifyBlockChange(x, y, z, oldBlockId);
         }
     }
 
@@ -557,12 +554,7 @@ public class SingleWorld implements LocalWorld
     @Override
     public boolean isLoaded(int x, int y, int z)
     {
-        if (y < 0 || y >= this.worldHeight)
-            return false;
-        x = x >> 4;
-        z = z >> 4;
-
-        return world.getChunkProvider().chunkExists(x, z);
+        return getChunk(x, y, z) != null;
     }
 
     @Override
