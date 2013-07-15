@@ -204,7 +204,7 @@ public class CavesGen extends TerrainGenBase
             if (this.worldSettings.evenCaveDistribution)
                 d2 = this.c.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude) + this.worldSettings.caveMinAltitude;
             else
-                d2 = this.c.nextInt(this.c.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude) + this.worldSettings.caveMinAltitude + 1);
+                d2 = this.c.nextInt(this.c.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude) + 1) + this.worldSettings.caveMinAltitude;
             double d3 = paramInt2 * 16 + this.c.nextInt(16);
 
             int k = this.worldSettings.caveSystemFrequency;
