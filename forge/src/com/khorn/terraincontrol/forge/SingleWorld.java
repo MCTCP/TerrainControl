@@ -212,7 +212,6 @@ public class SingleWorld implements LocalWorld
     {
         if (this.settings.strongholdsEnabled)
             this.strongholdGen.generate(null, this.world, x, z, chunkArray);
-
         if (this.settings.mineshaftsEnabled)
             this.mineshaftGen.generate(null, this.world, x, z, chunkArray);
         if (this.settings.villagesEnabled && dry)
@@ -452,50 +451,63 @@ public class SingleWorld implements LocalWorld
     @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
-        // We fetch the chunk from a custom cache in order to speed things up.
-        Chunk chunk = this.getChunk(x, y, z);
-
-        if (chunk == null)
+        /*
+         * This method usually breaks on every Minecraft update. Always check
+         * whether the names are still correct. Often, you'll also need to
+         * rewrite parts of this method for newer block place logic.
+         */
+        if (this.isLoaded(x, y, z))
         {
-            return;
-        }
-        if (applyPhysics)
-        {
-            int oldTypeId = chunk.getBlockID(x & 15, y, z & 15);
-            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
-            // Workaround for (bug in?) Minecraft
-            if (chunk.getBlockStorageArray()[y >> 4] != null)
+            if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
             {
-                chunk.getBlockStorageArray()[y >> 4].getMetadataArray().set(x & 15, y & 15, z & 15, data);
+                return;
             }
-            this.world.notifyBlockChange(x, y, z, typeId == 0 ? oldTypeId : typeId);
-        } else
-        {
-            if (chunk.getBlockStorageArray()[y >> 4] == null)
+
+            // Get chunk from (faster) custom cache
+            Chunk chunk = this.getChunk(x, y, z);
+
+            // Get old block id (only needed for physics)
+            int oldBlockId = 0;
+            if (applyPhysics)
+            {
+                oldBlockId = chunk.getBlockID(x & 15, y, z & 15);
+            }
+
+            // Place block
+            if (applyPhysics)
             {
                 chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
             } else
             {
-                chunk.getBlockStorageArray()[y >> 4].setExtBlockID(x & 15, y & 15, z & 15, typeId);
-                chunk.getBlockStorageArray()[y >> 4].getMetadataArray().set(x & 15, y & 15, z & 15, data);
+                // Temporarily make remote, so that torches etc. don't pop off
+                boolean oldStatic = world.isRemote;
+                world.isRemote = true;
+                chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
+                world.isRemote = oldStatic;
             }
-        }
 
-        if (updateLight)
-        {
-            this.world.updateAllLightTypes(x, y, z);
-        }
+            // Relight and update
+            if (updateLight)
+            {
+                world.updateAllLightTypes(x, y, z);
+            }
 
-        if (notifyPlayers && chunk.sendUpdates)
-        {
-            this.world.markBlockForUpdate(x, y, z);
+            if (notifyPlayers && !world.isRemote)
+            {
+                world.markBlockForUpdate(x, y, z);
+            }
+
+            if (!world.isRemote && applyPhysics)
+            {
+                world.notifyBlockChange(x, y, z, oldBlockId);
+            }
         }
     }
 
     @Override
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data)
     {
-        this.setBlock(x, y, z, typeId, data, false, false, false);
+        this.setBlock(x, y, z, typeId, data, true, false, true);
     }
 
     @Override
