@@ -100,17 +100,17 @@ public class ChunkProviderTC
         int i1 = 4;
         int i2 = this.height / 8;
 
-        int i4 = i1 + 1;
-        int i5 = this.height / 8 + 1;
-        int i6 = i1 + 1;
+        int noise_xSize = i1 + 1;
+        int noise_ySize = this.height / 8 + 1;
+        int noise_zSize = i1 + 1;
         ArraysCacheManager.NextRiver = true;
         if (this.worldSettings.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
         {
             this.BiomeArray = this.localWorld.getBiomesUnZoomed(this.BiomeArray, chunkX * 16, chunkZ * 16, 16, 16);
         } else
-            this.BiomeArray = this.localWorld.getBiomesUnZoomed(this.BiomeArray, chunkX * 4 - 2, chunkZ * 4 - 2, i4 + 5, i6 + 5);
+            this.BiomeArray = this.localWorld.getBiomesUnZoomed(this.BiomeArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5);
 
-        this.u = GenerateTerrainNoise(this.u, chunkX * i1, 0, chunkZ * i1, i4, i5, i6);
+        this.u = GenerateTerrainNoise(this.u, chunkX * i1, 0, chunkZ * i1, noise_xSize, noise_ySize, noise_zSize);
 
         this.BiomeArray = this.localWorld.getBiomes(this.BiomeArray, chunkX * 16, chunkZ * 16, ChunkMaxX, ChunkMaxZ);
 
@@ -124,15 +124,15 @@ public class ChunkProviderTC
                 for (int y = 0; y < i2; y++)
                 {
 
-                    double d2 = this.u[(((x + 0) * i6 + (z + 0)) * i5 + (y + 0))];
-                    double d3 = this.u[(((x + 0) * i6 + (z + 1)) * i5 + (y + 0))];
-                    double d4 = this.u[(((x + 1) * i6 + (z + 0)) * i5 + (y + 0))];
-                    double d5 = this.u[(((x + 1) * i6 + (z + 1)) * i5 + (y + 0))];
+                    double d2 = this.u[(((x + 0) * noise_zSize + (z + 0)) * noise_ySize + (y + 0))];
+                    double d3 = this.u[(((x + 0) * noise_zSize + (z + 1)) * noise_ySize + (y + 0))];
+                    double d4 = this.u[(((x + 1) * noise_zSize + (z + 0)) * noise_ySize + (y + 0))];
+                    double d5 = this.u[(((x + 1) * noise_zSize + (z + 1)) * noise_ySize + (y + 0))];
 
-                    double d6 = (this.u[(((x + 0) * i6 + (z + 0)) * i5 + (y + 1))] - d2) * d1;
-                    double d7 = (this.u[(((x + 0) * i6 + (z + 1)) * i5 + (y + 1))] - d3) * d1;
-                    double d8 = (this.u[(((x + 1) * i6 + (z + 0)) * i5 + (y + 1))] - d4) * d1;
-                    double d9 = (this.u[(((x + 1) * i6 + (z + 1)) * i5 + (y + 1))] - d5) * d1;
+                    double d6 = (this.u[(((x + 0) * noise_zSize + (z + 0)) * noise_ySize + (y + 1))] - d2) * d1;
+                    double d7 = (this.u[(((x + 0) * noise_zSize + (z + 1)) * noise_ySize + (y + 1))] - d3) * d1;
+                    double d8 = (this.u[(((x + 1) * noise_zSize + (z + 0)) * noise_ySize + (y + 1))] - d4) * d1;
+                    double d9 = (this.u[(((x + 1) * noise_zSize + (z + 1)) * noise_ySize + (y + 1))] - d5) * d1;
 
                     for (int piece_y = 0; piece_y < 8; piece_y++)
                     {
@@ -275,7 +275,7 @@ public class ChunkProviderTC
     }
 
 
-    private double[] GenerateTerrainNoise(double[] outArray, int paramInt1, int paramInt2, int paramInt3, int max_X, int max_Y, int max_Z)
+    private double[] GenerateTerrainNoise(double[] outArray, int xOffset, int yOffset, int zOffset, int max_X, int max_Y, int max_Z)
     {
         if (outArray == null)
         {
@@ -283,16 +283,16 @@ public class ChunkProviderTC
         }
 
 
-        double d1 = 684.41200000000003D * this.worldSettings.getFractureHorizontal();
-        double d2 = 684.41200000000003D * this.worldSettings.getFractureVertical();
+        double xzScale = 684.41200000000003D * this.worldSettings.getFractureHorizontal();
+        double yScale = 684.41200000000003D * this.worldSettings.getFractureVertical();
 
         if (this.worldSettings.oldTerrainGenerator)
-            this.j = this.a.Noise2D(this.j, paramInt1, paramInt3, max_X, max_Z, 1.121D, 1.121D);
-        this.k = this.b.Noise2D(this.k, paramInt1, paramInt3, max_X, max_Z, 200.0D, 200.0D);
+            this.j = this.a.Noise2D(this.j, xOffset, zOffset, max_X, max_Z, 1.121D, 1.121D);
+        this.k = this.b.Noise2D(this.k, xOffset, zOffset, max_X, max_Z, 200.0D, 200.0D);
 
-        this.g = this.q.Noise3D(this.g, paramInt1, paramInt2, paramInt3, max_X, max_Y, max_Z, d1 / 80.0D, d2 / 160.0D, d1 / 80.0D);
-        this.h = this.o.Noise3D(this.h, paramInt1, paramInt2, paramInt3, max_X, max_Y, max_Z, d1, d2, d1);
-        this.i = this.p.Noise3D(this.i, paramInt1, paramInt2, paramInt3, max_X, max_Y, max_Z, d1, d2, d1);
+        this.g = this.q.Noise3D(this.g, xOffset, yOffset, zOffset, max_X, max_Y, max_Z, xzScale / 80.0D, yScale / 160.0D, xzScale / 80.0D);
+        this.h = this.o.Noise3D(this.h, xOffset, yOffset, zOffset, max_X, max_Y, max_Z, xzScale, yScale, xzScale);
+        this.i = this.p.Noise3D(this.i, xOffset, yOffset, zOffset, max_X, max_Y, max_Z, xzScale, yScale, xzScale);
 
         int i3D = 0;
         int i2D = 0;
