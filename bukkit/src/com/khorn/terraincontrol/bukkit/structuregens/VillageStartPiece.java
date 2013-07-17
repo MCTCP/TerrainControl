@@ -5,7 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
-import net.minecraft.server.v1_6_R1.*;
+import net.minecraft.server.v1_6_R2.*;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;

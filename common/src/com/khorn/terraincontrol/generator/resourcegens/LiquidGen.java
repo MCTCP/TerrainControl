@@ -19,12 +19,12 @@ public class LiquidGen extends Resource
     {
         int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
 
-        if (sourceBlocks.contains(world.getTypeId(x, y + 1, z)))
+        if (!sourceBlocks.contains(world.getTypeId(x, y + 1, z)))
             return;
-        if (sourceBlocks.contains(world.getTypeId(x, y - 1, z)))
+        if (!sourceBlocks.contains(world.getTypeId(x, y - 1, z)))
             return;
 
-        if ((world.getTypeId(x, y, z) != 0) && (sourceBlocks.contains(world.getTypeId(x, y, z))))
+        if ((world.getTypeId(x, y, z) != 0) && (!sourceBlocks.contains(world.getTypeId(x, y, z))))
             return;
 
         int i = 0;

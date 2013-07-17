@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import net.minecraft.server.v1_6_R1.*;
+import net.minecraft.server.v1_6_R2.*;
 
 import java.util.List;
 import java.util.Random;

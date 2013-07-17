@@ -153,13 +153,11 @@ public class WorldConfig extends ConfigFile
     public int objectSpawnRatio;
     public File customObjectsDirectory;
 
-    public File SettingsDir;
     public ConfigMode SettingsMode;
 
     public boolean isDeprecated = false;
     public WorldConfig newSettings = null;
 
-    public String WorldName;
     public TerrainMode ModeTerrain;
     public Class<? extends BiomeGenerator> biomeMode;
 
@@ -175,10 +173,10 @@ public class WorldConfig extends ConfigFile
 
     public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
     {
-        this.SettingsDir = settingsDir;
-        this.WorldName = world.getName();
+        this.file = settingsDir;
+        this.name = world.getName();
 
-        File settingsFile = new File(this.SettingsDir, TCDefaultValues.WorldSettingsName.stringValue());
+        File settingsFile = new File(this.file, TCDefaultValues.WorldSettingsName.stringValue());
 
         this.readSettingsFile(settingsFile);
         this.renameOldSettings();
@@ -200,7 +198,7 @@ public class WorldConfig extends ConfigFile
 
         world.setHeightBits(this.worldHeightBits);
 
-        File BiomeFolder = new File(SettingsDir, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
+        File BiomeFolder = new File(file, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
         if (!BiomeFolder.exists())
         {
             if (!BiomeFolder.mkdir())
@@ -287,11 +285,11 @@ public class WorldConfig extends ConfigFile
 
     private void ReadWorldCustomObjects()
     {
-        customObjectsDirectory = new File(this.SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
+        customObjectsDirectory = new File(this.file, TCDefaultValues.BO_WorldDirectoryName.stringValue());
         
-        File oldCustomObjectsDirectory = new File(SettingsDir, "BOBPlugins");
+        File oldCustomObjectsDirectory = new File(file, "BOBPlugins");
         if (oldCustomObjectsDirectory.exists()) {
-            if (!oldCustomObjectsDirectory.renameTo(new File(SettingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue())))
+            if (!oldCustomObjectsDirectory.renameTo(new File(file, TCDefaultValues.BO_WorldDirectoryName.stringValue())))
             {
                 TerrainControl.log(Level.WARNING, "Fould old BOBPlugins folder, but it cannot be renamed to WorldObjects.");
                 TerrainControl.log(Level.WARNING, "Please move the BO2s manually and delete BOBPlugins afterwards.");
@@ -348,7 +346,7 @@ public class WorldConfig extends ConfigFile
 
         if (this.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
         {
-            File mapFile = new File(SettingsDir, imageFile);
+            File mapFile = new File(file, imageFile);
             if (!mapFile.exists())
             {
                 TerrainControl.log("Biome map file not found. Switching BiomeMode to Normal");
@@ -960,7 +958,7 @@ public class WorldConfig extends ConfigFile
     public void Serialize(DataOutputStream stream) throws IOException
     {
         // General information
-        writeStringToStream(stream, this.WorldName);
+        writeStringToStream(stream, this.name);
 
         stream.writeInt(this.WorldFog);
         stream.writeInt(this.WorldNightFog);
@@ -988,7 +986,7 @@ public class WorldConfig extends ConfigFile
     public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
     {
         // General information
-        this.WorldName = readStringFromStream(stream);
+        this.name = readStringFromStream(stream);
 
         this.WorldFog = stream.readInt();
         this.WorldNightFog = stream.readInt();
