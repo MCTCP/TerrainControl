@@ -6,10 +6,14 @@ import com.khorn.terraincontrol.TerrainControl;
 import java.awt.Color;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
 
 public abstract class ConfigFile
 {
     private BufferedWriter settingsWriter;
+    
+    public String name;
+    public File file;
 
     /**
      * Stores all the settings. Settings like Name:Value or Name=Value are stored as name, Value and settings like Function(a, b, c) are stored as function(a, b, c), lineNumber
@@ -91,24 +95,32 @@ public abstract class ConfigFile
                 }
             }
         } else
-            sayFileNotFound(f);
+            logFileNotFound(f);
     }
 
     // -------------------------------------------- //
-    // SAY STUFF
+    // LOG STUFF
     // -------------------------------------------- //
 
-    protected void sayNotFound(String settingsName)
+    protected void logSettingNotFound(String settingsName)
     {
-        // TerrainControl.log("Value " + settingsName + " not found.");
+        // TerrainControl.log("`"+settingsName + "` in `" + this.file.getName() + "` was not found.");
     }
-
-    protected void sayHadWrongValue(String settingsName)
+    protected void logSettingValueInvalid(String settingsName)
     {
-        TerrainControl.log(settingsName + " had wrong value");
+         TerrainControl.log(Level.WARNING, getSettingValueInvalidError(settingsName));
     }
-
-    protected void sayFileNotFound(File file)
+    protected void logSettingValueInvalid(String settingsName, Exception e)
+    {
+        TerrainControl.log(Level.WARNING, e.getClass().getSimpleName() + " :: " + getSettingValueInvalidError(settingsName));
+    }
+    
+    private String getSettingValueInvalidError(String settingsName)
+    {
+        return "Value of "+settingsName + ": `"+this.settingsCache.get(settingsName)+"' in " + this.file.getName() + " is not valid.";
+    }
+    
+    protected void logFileNotFound(File file)
     {
         TerrainControl.log("File not found: " + file.getName());
     }
@@ -128,7 +140,7 @@ public abstract class ConfigFile
             return WeightedMobSpawnGroup.fromJson(json);
         }
 
-        sayNotFound(settingsName);
+        logSettingNotFound(settingsName);
 
         return defaultValue;
     }
@@ -146,7 +158,7 @@ public abstract class ConfigFile
             Collections.addAll(out, this.settingsCache.get(settingsName).split(","));
             return out;
         }
-        sayNotFound(settingsName);
+        logSettingNotFound(settingsName);
         return defaultValue;
     }
 
@@ -160,10 +172,10 @@ public abstract class ConfigFile
                 return Integer.valueOf(this.settingsCache.get(settingsName));
             } catch (NumberFormatException e)
             {
-                sayHadWrongValue(settingsName);
+                logSettingValueInvalid(settingsName, e);
             }
         }
-        sayNotFound(settingsName);
+        logSettingNotFound(settingsName);
         return defaultValue;
     }
 
@@ -182,10 +194,10 @@ public abstract class ConfigFile
                 return Long.parseLong(value);
             } catch (NumberFormatException e)
             {
-                sayHadWrongValue(settingsName);
+                logSettingValueInvalid(settingsName, e);
             }
         }
-        sayNotFound(settingsName);
+        logSettingNotFound(settingsName);
         return defaultValue;
     }
 
@@ -204,10 +216,10 @@ public abstract class ConfigFile
                 return (byte) number;
             } catch (NumberFormatException e)
             {
-                sayHadWrongValue(settingsName);
+                logSettingValueInvalid(settingsName, e);
             }
         }
-        sayNotFound(settingsName);
+        logSettingNotFound(settingsName);
         return defaultValue;
     }
 
@@ -218,7 +230,7 @@ public abstract class ConfigFile
         {
             return this.settingsCache.get(settingsName);
         }
-        sayNotFound(settingsName);
+        logSettingNotFound(settingsName);
         return defaultValue;
     }
 
@@ -232,10 +244,10 @@ public abstract class ConfigFile
                 return Double.valueOf(this.settingsCache.get(settingsName));
             } catch (NumberFormatException e)
             {
-                sayHadWrongValue(settingsName);
+                logSettingValueInvalid(settingsName, e);
             }
         }
-        sayNotFound(settingsName);
+        logSettingNotFound(settingsName);
         return defaultValue;
     }
 
@@ -248,12 +260,12 @@ public abstract class ConfigFile
             try
             {
                 color = Color.decode(this.settingsCache.get(settingsName));
-            } catch (NumberFormatException ex)
+            } catch (NumberFormatException e)
             {
-                sayHadWrongValue(settingsName);
+                logSettingValueInvalid(settingsName, e);
             }
         } else
-            sayNotFound(settingsName);
+            logSettingNotFound(settingsName);
         return color.getRGB() & 0xFFFFFF;
     }
 
@@ -267,10 +279,10 @@ public abstract class ConfigFile
                 return Float.valueOf(this.settingsCache.get(settingsName));
             } catch (NumberFormatException e)
             {
-                sayHadWrongValue(settingsName);
+                logSettingValueInvalid(settingsName, e);
             }
         }
-        sayNotFound(settingsName);
+        logSettingNotFound(settingsName);
         return defaultValue;
     }
 
@@ -281,7 +293,7 @@ public abstract class ConfigFile
         {
             return Boolean.valueOf(this.settingsCache.get(settingsName));
         }
-        sayNotFound(settingsName);
+        logSettingNotFound(settingsName);
         return defaultValue;
     }
 
@@ -304,12 +316,12 @@ public abstract class ConfigFile
                     if (enumName.toLowerCase().equals(value) || enumName.equals(value))
                         return (Enum<?>) enumValue;
                 }
-                sayHadWrongValue(settingsName);
+                logSettingValueInvalid(settingsName);
 
             }
 
         }
-        sayNotFound(settingsName);
+        logSettingNotFound(settingsName);
         return defaultValue;
 
     }

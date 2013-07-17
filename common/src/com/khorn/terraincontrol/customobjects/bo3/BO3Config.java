@@ -18,8 +18,6 @@ import java.util.Map;
 
 public class BO3Config extends ConfigFile
 {
-    public File file;
-    public String name;
     public Map<String, CustomObject> otherObjectsInDirectory;
 
     public String author;
@@ -97,7 +95,7 @@ public class BO3Config extends ConfigFile
     }
 
     @Override
-    public void sayFileNotFound(File file)
+    public void logFileNotFound(File file)
     {
         // Ignore
     }
