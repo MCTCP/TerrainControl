@@ -22,8 +22,6 @@ public class BO2 extends ConfigFile implements CustomObject
 
     public BO2[] groupObjects = null;
 
-    public String name;
-
     public HashSet<String> spawnInBiome;
 
     public String version;
