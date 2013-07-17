@@ -120,9 +120,9 @@ public abstract class ConfigFile
         return "Value of "+settingsName + ": `"+this.settingsCache.get(settingsName)+"' in " + this.file.getName() + " is not valid.";
     }
     
-    protected void logFileNotFound(File file)
+    protected void logFileNotFound(File logFile)
     {
-        TerrainControl.log("File not found: " + file.getName());
+        TerrainControl.log("File not found: " + logFile.getName());
     }
 
     // -------------------------------------------- //
