@@ -82,6 +82,8 @@ public class ChunkProviderTC
         this.CaveGen = new CavesGen(this.worldSettings, this.localWorld);
         this.CanyonGen = new CanyonsGen(this.worldSettings, this.localWorld);
 
+
+        // Contains 2d array 5*5.  Maximum wight is in array center.
         this.NearBiomeWeight = new float[25];
         for (int x = -2; x <= 2; x++)
         {
@@ -305,31 +307,31 @@ public class ChunkProviderTC
                 int biomeId = (this.BiomeArray[(x + 2 + (z + 2) * (max_X + 5))] | Layer.RiverBits) ^ Layer.RiverBits ;
                 BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
-                double d3 = this.k[i2D] / 8000.0D;
-                if (d3 < 0.0D)
-                    d3 = -d3 * 0.3D;
-                d3 = d3 * 3.0D - 2.0D;
+                double noiseHeight = this.k[i2D] / 8000.0D;
+                if (noiseHeight < 0.0D)
+                    noiseHeight = -noiseHeight * 0.3D;
+                noiseHeight = noiseHeight * 3.0D - 2.0D;
 
-                if (d3 < 0.0D)
+                if (noiseHeight < 0.0D)
                 {
-                    d3 /= 2.0D;
-                    if (d3 < -1.0D)
-                        d3 = -1.0D;
-                    d3 -= biomeConfig.maxAverageDepth;
-                    d3 /= 1.4D;
-                    d3 /= 2.0D;
+                    noiseHeight /= 2.0D;
+                    if (noiseHeight < -1.0D)
+                        noiseHeight = -1.0D;
+                    noiseHeight -= biomeConfig.maxAverageDepth;
+                    noiseHeight /= 1.4D;
+                    noiseHeight /= 2.0D;
                 } else
                 {
-                    if (d3 > 1.0D)
-                        d3 = 1.0D;
-                    d3 += biomeConfig.maxAverageHeight;
-                    d3 /= 8.0D;
+                    if (noiseHeight > 1.0D)
+                        noiseHeight = 1.0D;
+                    noiseHeight += biomeConfig.maxAverageHeight;
+                    noiseHeight /= 8.0D;
                 }
 
                 if (this.worldSettings.oldTerrainGenerator)
-                    this.oldTerrainNoise(x, z, i2D, max_X, max_Y, d3);
+                    this.oldTerrainNoise(x, z, i2D, max_X, max_Y, noiseHeight);
                 else
-                    this.newTerrainNoise(x, z, max_X, max_Y, d3);
+                    this.newTerrainNoise(x, z, max_X, max_Y, noiseHeight);
 
 
                 i2D++;
@@ -377,7 +379,7 @@ public class ChunkProviderTC
 
     }
 
-    private void oldTerrainNoise(int x, int z, int i4, int max_X, int max_Y, double d3)
+    private void oldTerrainNoise(int x, int z, int i4, int max_X, int max_Y, double noiseHeight)
     {
         if (this.worldSettings.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
         {
@@ -394,29 +396,30 @@ public class ChunkProviderTC
         this.VolatilityFactor = (this.g[i4] + 256.0D) / 512.0D * this.VolatilityFactor;
         if (this.VolatilityFactor > 1.0D)
             this.VolatilityFactor = 1.0D;
-        if (this.VolatilityFactor < 0.0D || d3 < 0.0D)
+        if (this.VolatilityFactor < 0.0D || noiseHeight < 0.0D)
             this.VolatilityFactor = 0.0D;
 
         this.VolatilityFactor += 0.5D;
-        this.HeightFactor = max_Y * (2.0D + d3) / 4.0D;
+        this.HeightFactor = max_Y * (2.0D + noiseHeight) / 4.0D;
     }
 
-    private void newTerrainNoise(int x, int z, int max_X, int max_Y, double d3)
+    private void newTerrainNoise(int x, int z, int max_X, int max_Y, double noiseHeight)
     {
-        float f2 = 0.0F;
-        float f3 = 0.0F;
-        float f4 = 0.0F;
+        float volatilitySum = 0.0F;
+        float heightSum = 0.0F;
+        float biomeWeightSum = 0.0F;
 
-        int i7 = 2;
+        // TODO We may change that ???!!
+        int lookRadius = 2;
 
         int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (max_X + 5))];
         boolean isRiver = (biomeId & Layer.RiverBits) > 0;
         biomeId = (biomeId | Layer.RiverBits) ^ Layer.RiverBits;
 
 
-        for (int nextX = -i7; nextX <= i7; nextX++)
+        for (int nextX = -lookRadius; nextX <= lookRadius; nextX++)
         {
-            for (int nextZ = -i7; nextZ <= i7; nextZ++)
+            for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
             {
                 int nextBiomeId = this.BiomeArray[(x + nextX + 2 + (z + nextZ + 2) * (max_X + 5))];
 
@@ -425,29 +428,25 @@ public class ChunkProviderTC
 
                 float nextBiomeHeight =  nextBiomeConfig.BiomeHeight -  (((nextBiomeId & Layer.RiverBits) > 0)? 1.0F:0.0F);
 
-                float f5 = this.NearBiomeWeight[(nextX + 2 + (nextZ + 2) * 5)] / (nextBiomeHeight + 2.0F);
-                f5 = Math.abs(f5);
+                float biomeWeight = this.NearBiomeWeight[(nextX + 2 + (nextZ + 2) * 5)] / (nextBiomeHeight + 2.0F);
+                biomeWeight = Math.abs(biomeWeight);
                 if (nextBiomeHeight > (this.worldSettings.biomeConfigs[biomeId].BiomeHeight - (isRiver? 1.0F: 0.0F)))
                 {
-                    f5 /= 2.0F;
+                    biomeWeight /= 2.0F;
                 }
-                f2 += nextBiomeConfig.BiomeVolatility * f5;
-                f3 += nextBiomeHeight * f5;
-                f4 += f5;
+                volatilitySum += nextBiomeConfig.BiomeVolatility * biomeWeight;
+                heightSum += nextBiomeHeight * biomeWeight;
+                biomeWeightSum += biomeWeight;
             }
         }
-        f2 /= f4;
-        f3 /= f4;
+        volatilitySum /= biomeWeightSum;
+        heightSum /= biomeWeightSum;
 
-        f2 = f2 * 0.9F + 0.1F;
-        f3 = (f3 * 4.0F - 1.0F) / 8.0F;
+        volatilitySum = volatilitySum * 0.9F + 0.1F;
+        heightSum = (heightSum * 4.0F - 1.0F) / 8.0F;
 
-        double d4 = f3;
-        this.VolatilityFactor = f2;
-
-        d4 += d3 * 0.2D;
-
-        this.HeightFactor = max_Y * (2.0D + d4) / 4.0D;
+        this.VolatilityFactor = volatilitySum;
+        this.HeightFactor = max_Y * (2.0D + heightSum + noiseHeight * 0.2D) / 4.0D;
     }
 
 
