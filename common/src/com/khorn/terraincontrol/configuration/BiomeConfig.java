@@ -106,7 +106,6 @@ public class BiomeConfig extends ConfigFile
     public LocalBiome Biome;
 
     public WorldConfig worldConfig;
-    public String name;
 
     // Spawn Config
     public boolean spawnMonstersAddDefaults = true;
