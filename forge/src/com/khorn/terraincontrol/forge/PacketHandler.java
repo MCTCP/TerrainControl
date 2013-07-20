@@ -46,14 +46,14 @@ public class PacketHandler implements IPacketHandler
                 // Server sent config
 
                 // Restore old biomes
-                SingleWorld.restoreBiomes();
+                ForgeWorld.restoreBiomes();
 
                 if (receivedPacket.length > 4)
                 {
                     // If the packet wasn't empty, add the new biomes
                     WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
 
-                    SingleWorld worldTC = new SingleWorld("external");
+                    ForgeWorld worldTC = new ForgeWorld("external");
                     WorldConfig config = new WorldConfig(stream, worldTC);
 
                     worldTC.InitM(worldMC, config);
