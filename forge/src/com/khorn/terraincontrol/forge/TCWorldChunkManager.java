@@ -20,9 +20,9 @@ public class TCWorldChunkManager extends WorldChunkManager
     private BiomeGenerator biomeManager;
     private ArrayList<BiomeGenBase> biomesToSpawnIn = new ArrayList<BiomeGenBase>();
 
-    private SingleWorld localWorld;
+    private ForgeWorld localWorld;
 
-    public TCWorldChunkManager(SingleWorld world)
+    public TCWorldChunkManager(ForgeWorld world)
     {
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.FOREST.Id]);
         this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.PLAINS.Id]);
