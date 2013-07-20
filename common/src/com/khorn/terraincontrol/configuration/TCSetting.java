@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public interface TCSetting
 {
@@ -9,6 +10,7 @@ public interface TCSetting
         String,
         Boolean,
         Int,
+        IntSet,
         Long,
         Enum,
         Double,
@@ -34,6 +36,8 @@ public interface TCSetting
     public String stringValue();
 
     public ArrayList<String> stringArrayListValue();
+    
+    public HashSet<Integer> IntSetValue();
 
     public boolean booleanValue();
 }

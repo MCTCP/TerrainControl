@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.configuration;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 
 public enum TCDefaultValues implements TCSetting
 {
@@ -306,13 +307,20 @@ public enum TCDefaultValues implements TCSetting
     private Enum<?> eValue;
     private SettingsType returnType;
     private ArrayList<String> sArrayValue;
+    private HashSet<Integer> iSetValue;
 
     private TCDefaultValues(int i)
     {
         this.iValue = i;
         this.returnType = SettingsType.Int;
     }
-
+    
+    private TCDefaultValues(HashSet<Integer> i)
+    {
+        this.iSetValue = i;
+        this.returnType = SettingsType.IntSet;
+    }
+    
     private TCDefaultValues(double d)
     {
         this.dValue = d;
@@ -410,6 +418,10 @@ public enum TCDefaultValues implements TCSetting
     public boolean booleanValue()
     {
         return this.bValue;
+    }
+
+    public HashSet<Integer> IntSetValue() {
+        return this.iSetValue;
     }
 
 }

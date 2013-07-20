@@ -1,7 +1,9 @@
 package com.khorn.terraincontrol.configuration;
 
+import static com.khorn.terraincontrol.configuration.TCSetting.SettingsType.Int;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.TCSetting.SettingsType;
 
 import java.awt.Color;
 import java.io.*;
@@ -145,6 +147,25 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
+    protected HashSet<Integer> readModSettings(String settingsName, HashSet<Integer> defaultValue)
+    {
+        settingsName = settingsName.toLowerCase();
+        if (this.settingsCache.containsKey(settingsName))
+        {
+            HashSet<Integer> out = new HashSet<Integer>();
+            if (this.settingsCache.get(settingsName).trim().equals("") || this.settingsCache.get(settingsName).equals("None"))
+            {
+                return out;
+            }
+            for (String string : this.settingsCache.get(settingsName).split(",")) {
+                out.add(Integer.parseInt(string));
+            }
+            return out;
+        }
+        logSettingNotFound(settingsName);
+        return defaultValue;
+    }
+    
     protected ArrayList<String> readModSettings(String settingsName, ArrayList<String> defaultValue)
     {
         settingsName = settingsName.toLowerCase();
@@ -342,6 +363,9 @@ public abstract class ConfigFile
             case Int:
                 obj = readModSettings(value.name(), value.intValue());
                 break;
+            case IntSet:
+                obj = readModSettings(value.name(), value.IntSetValue());
+                break;
             case Long:
                 obj = readModSettings(value.name(), value.longValue());
                 break;
@@ -360,6 +384,11 @@ public abstract class ConfigFile
             case Color:
                 obj = readModSettingsColor(value.name(), value.stringValue());
                 break;
+            /* This prevents NPE if you happen to add a new type to
+               * TCSettings and cascade the change but forget to add it here 
+               */
+            default:
+                throw new EnumConstantNotPresentException(SettingsType.class, value.getReturnType().name());
         }
 
         return (T) obj;
@@ -407,6 +436,21 @@ public abstract class ConfigFile
     {
         String out = "";
         for (String key : settingsValue)
+        {
+            if (out.equals(""))
+                out += key;
+            else
+                out += "," + key;
+        }
+
+        this.settingsWriter.write(settingsName + ":" + out);
+        this.settingsWriter.newLine();
+    }
+    
+    protected void writeValue(String settingsName, HashSet<Integer> settingsValue) throws IOException
+    {
+        String out = "";
+        for (Integer key : settingsValue)
         {
             if (out.equals(""))
                 out += key;
@@ -554,6 +598,21 @@ public abstract class ConfigFile
         }
     }
 
+    protected HashSet<Integer> applyBounds(HashSet<Integer> values, int min, int max)
+    {
+        HashSet<Integer> output = new HashSet<Integer>();
+        String x = "";
+        for (Integer value : values) {
+            if (value > max)
+                output.add(max);
+            else if (value < min)
+                output.add(min);
+            else
+                output.add(value);
+        }
+        return output;
+    }
+    
     protected int applyBounds(int value, int min, int max)
     {
         if (value > max)
