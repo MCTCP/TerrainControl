@@ -18,14 +18,14 @@ import java.util.List;
 public class ChunkProvider implements IChunkProvider
 {
 
-    private SingleWorld world;
+    private ForgeWorld world;
     private World worldHandle;
     private boolean TestMode = false;
 
     private ChunkProviderTC generator;
     private ObjectSpawner spawner;
 
-    public ChunkProvider(SingleWorld _world)
+    public ChunkProvider(ForgeWorld _world)
     {
         // super(_world.getWorld(), _world.getSeed());
 

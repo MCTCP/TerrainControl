@@ -31,7 +31,7 @@ import java.util.Random;
  * A better name would be ForgeWorld.
  *
  */
-public class SingleWorld implements LocalWorld
+public class ForgeWorld implements LocalWorld
 {
     private ChunkProvider generator;
     private World world;
@@ -94,7 +94,7 @@ public class SingleWorld implements LocalWorld
         defaultBiomes.clear();
     }
 
-    public SingleWorld(String _name)
+    public ForgeWorld(String _name)
     {
         this.name = _name;
 

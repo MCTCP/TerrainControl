@@ -27,7 +27,7 @@ public class EventManager extends EventHandler
     @Override
     public boolean onResourceProcess(Resource resource, LocalWorld localWorld, Random random, boolean villageInChunk, int chunkX, int chunkZ, boolean isCancelled)
     {
-        final SingleWorld world = (SingleWorld) localWorld;
+        final ForgeWorld world = (ForgeWorld) localWorld;
 
         // Convert to Forge event and fire
         if (resource instanceof DungeonGen ||
@@ -67,7 +67,7 @@ public class EventManager extends EventHandler
     @Override
     public void onPopulateStart(LocalWorld localWorld, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
-        final SingleWorld world = (SingleWorld) localWorld;
+        final ForgeWorld world = (ForgeWorld) localWorld;
 
         // Reset states
         setDecorationBegun(world, false);
@@ -81,7 +81,7 @@ public class EventManager extends EventHandler
     @Override
     public void onPopulateEnd(LocalWorld localWorld, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
-        final SingleWorld world = (SingleWorld) localWorld;
+        final ForgeWorld world = (ForgeWorld) localWorld;
 
         // Fire all events
 
