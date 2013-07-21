@@ -11,10 +11,7 @@ import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightSetting
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BO3Config extends ConfigFile
 {
@@ -33,7 +30,7 @@ public class BO3Config extends ConfigFile
     public int maxHeight;
     public ArrayList<String> excludedBiomes;
 
-    public int sourceBlock;
+    public HashSet<Integer> sourceBlock;
     public int maxPercentageOutsideSourceBlock;
     public OutsideSourceBlock outsideSourceBlock;
 
