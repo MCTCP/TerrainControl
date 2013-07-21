@@ -24,6 +24,9 @@ public class BiomeConfig extends ConfigFile
     public short[][] replaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
     public int ReplaceCount = 0;
 
+    public float RiverHeight = 1;
+    public float RiverVolatility = 0;
+
     public int BiomeSize;
     public int BiomeRarity;
 
@@ -410,6 +413,10 @@ public class BiomeConfig extends ConfigFile
         this.maxAverageHeight = readSettings(TCDefaultValues.MaxAverageHeight);
         this.maxAverageDepth = readSettings(TCDefaultValues.MaxAverageDepth);
 
+        this.RiverHeight = readSettings(TCDefaultValues.RiverHeight);
+        this.RiverVolatility = readSettings(TCDefaultValues.RiverVolatility);
+
+
         this.strongholdsEnabled = readModSettings(TCDefaultValues.StrongholdsEnabled.name(), this.defaultStrongholds);
         this.netherFortressesEnabled = readModSettings(TCDefaultValues.NetherFortressesEnabled.name(), true);
         this.villageType = (VillageType) readModSettings(TCDefaultValues.VillageType.name(), this.defaultVillageType);
@@ -698,6 +705,14 @@ public class BiomeConfig extends ConfigFile
         writeComment("  CustomHeightControl:0.0,-2500.0,0.0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0");
         writeComment("Make empty layer above bedrock layer. ");
         WriteHeightSettings();
+
+        writeNewLine();
+        writeComment("blah blah blah");
+        writeValue(TCDefaultValues.RiverHeight.name(), this.RiverHeight);
+
+        writeNewLine();
+        writeComment("blah blah blah");
+        writeValue(TCDefaultValues.RiverVolatility.name(), this.RiverVolatility);
 
         this.writeBigTitle("Blocks");
 
@@ -996,7 +1011,6 @@ public class BiomeConfig extends ConfigFile
                     // So we have found the start of a new replace setting
                     yStart = y;
                     previousReplaceTo = currentReplaceTo;
-                    continue;
                 }
             }
         }
@@ -1113,7 +1127,7 @@ public class BiomeConfig extends ConfigFile
         }
         
         // BiomeRivers
-        if(readModSettings("BiomeRivers", true) == false) 
+        if(!readModSettings("BiomeRivers", true))
         {
             // If the rivers were disabled using the old setting, disable them also using the new setting
             this.settingsCache.put("riverbiome", "");
@@ -1287,7 +1301,7 @@ public class BiomeConfig extends ConfigFile
                 break;
             case 12: // Ice Plains
                 this.defaultColor = "0xCCCCCC";
-                if(worldConfig.readModSettings("FrozenRivers", true) == true)
+                if(worldConfig.readModSettings("FrozenRivers", true))
                 {
                     // Only make river frozen if there isn't some old setting that prevents it
                     this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
@@ -1295,7 +1309,7 @@ public class BiomeConfig extends ConfigFile
                 break;
             case 13: // Ice Mountains
                 this.defaultColor = "0xCC9966";
-                if(worldConfig.readModSettings("FrozenRivers", true) == true)
+                if(worldConfig.readModSettings("FrozenRivers", true))
                 {
                     // Only make river frozen if there isn't some old setting that prevents it
                     this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;

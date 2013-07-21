@@ -160,6 +160,9 @@ public enum TCDefaultValues implements TCSetting
 
     CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0", SettingsType.StringArray),
 
+    RiverHeight(-1.0F),
+    RiverVolatility(0.3F),
+
     // End biome settings
 
     // Resource settings
