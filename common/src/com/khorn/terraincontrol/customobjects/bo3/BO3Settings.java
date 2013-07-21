@@ -140,47 +140,56 @@ public enum BO3Settings implements TCSetting
         returnType = SettingsType.Boolean;
     }
 
+    @Override
     public int intValue()
     {
         return (Integer) value;
     }
     
     @SuppressWarnings("unchecked")
-    public HashSet<Integer> IntSetValue() {
+    @Override
+    public HashSet<Integer> intSetValue() {
         return (HashSet<Integer>) value;
     }
     
+    @Override
     public double doubleValue()
     {
         return (Double) value;
     }
 
+    @Override
     public float floatValue()
     {
         return (Float) value;
     }
 
+    @Override
     public Enum<?> enumValue()
     {
         return (Enum<?>) value;
     }
 
+    @Override
     public SettingsType getReturnType()
     {
         return returnType;
     }
 
+    @Override
     public String stringValue()
     {
         return (String) value;
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public ArrayList<String> stringArrayListValue()
     {
         return (ArrayList<String>) value;
     }
 
+    @Override
     public boolean booleanValue()
     {
         return (Boolean) value;

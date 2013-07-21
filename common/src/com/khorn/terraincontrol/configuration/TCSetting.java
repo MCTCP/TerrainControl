@@ -37,7 +37,7 @@ public interface TCSetting
 
     public ArrayList<String> stringArrayListValue();
     
-    public HashSet<Integer> IntSetValue();
+    public HashSet<Integer> intSetValue();
 
     public boolean booleanValue();
 }

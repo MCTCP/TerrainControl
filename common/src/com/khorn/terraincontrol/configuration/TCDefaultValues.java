@@ -375,52 +375,62 @@ public enum TCDefaultValues implements TCSetting
         this.returnType = SettingsType.Boolean;
     }
 
+    @Override
     public int intValue()
     {
         return this.iValue;
     }
 
+    @Override
     public long longValue()
     {
         return this.lValue;
     }
 
+    @Override
     public double doubleValue()
     {
         return this.dValue;
     }
 
+    @Override
     public float floatValue()
     {
         return this.fValue;
     }
 
+    @Override
     public Enum<?> enumValue()
     {
         return this.eValue;
     }
 
+    @Override
     public SettingsType getReturnType()
     {
         return this.returnType;
     }
 
+    @Override
     public String stringValue()
     {
         return this.sValue;
     }
 
+    @Override
     public ArrayList<String> stringArrayListValue()
     {
         return this.sArrayValue;
     }
 
+    @Override
     public boolean booleanValue()
     {
         return this.bValue;
     }
 
-    public HashSet<Integer> IntSetValue() {
+    @Override
+    public HashSet<Integer> intSetValue() {
         return this.iSetValue;
     }
 

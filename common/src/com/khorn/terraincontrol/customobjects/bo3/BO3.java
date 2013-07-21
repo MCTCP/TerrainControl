@@ -98,17 +98,7 @@ public class BO3 implements StructuredCustomObject
                 // Cannot spawn BO3, part of world is not loaded
                 return false;
             }
-            boolean insideSource = false;
-            int blockPresent = world.getTypeId(x + block.x, y + block.y, z + block.z);
-            for (Integer sblock : settings.sourceBlock) 
-            {
-                if (sblock == blockPresent)
-                {
-                    insideSource = true;
-                    break;
-                }
-            }
-            if (!insideSource)
+            if (!settings.sourceBlock.contains(world.getTypeId(x + block.x, y + block.y, z + block.z)))
             {
                 blocksOutsideSourceBlock++;
             }
@@ -144,16 +134,7 @@ public class BO3 implements StructuredCustomObject
         // Spawn
         for (BlockFunction block : blocks)
         {
-            int previousBlock = world.getTypeId(x + block.x, y + block.y, z + block.z);
-            boolean spawnAllowed = false;
-            for (Integer sblock : settings.sourceBlock) {
-                if (previousBlock == sblock)
-                {
-                    spawnAllowed = true;
-                    break;
-                }
-            }
-            if (spawnAllowed || settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway)
+            if (settings.sourceBlock.contains(world.getTypeId(x + block.x, y + block.y, z + block.z)) || settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway)
             {
                 block.spawn(world, random, x + block.x, y + block.y, z + block.z);
             }
