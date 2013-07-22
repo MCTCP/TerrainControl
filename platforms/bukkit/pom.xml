@@ -73,11 +73,11 @@
                         <include>src/**/CustomBiome.*</include>
                         <include>src/**/MapWriter.*</include>
                         <include>src/**/NullBiome.*</include>
-                        <include>src/**/TerrainBlockPopulator.*</include>
-                        <include>src/**/TerrainChunkGenerator.*</include>
-                        <include>src/**/TerrainPlugin.*</include>
-                        <include>src/**/TerrainWorldChunkManager.*</include>
-                        <include>src/**/TerrainWorldProvider.*</include>
+                        <include>src/**/TCBlockPopulator.*</include>
+                        <include>src/**/TCChunkGenerator.*</include>
+                        <include>src/**/TCPlugin.*</include>
+                        <include>src/**/TCWorldChunkManager.*</include>
+                        <include>src/**/TCWorldProvider.*</include>
                         <include>src/**/BiomeCommand.*</include>
                         <include>src/**/MapCommand.*</include>
                         <include>src/**/ReplaceBiomeCommand.*</include>
