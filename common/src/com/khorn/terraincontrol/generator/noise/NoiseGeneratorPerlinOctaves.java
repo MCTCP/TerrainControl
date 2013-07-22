@@ -1,14 +1,15 @@
-package com.khorn.terraincontrol.util;
+package com.khorn.terraincontrol.generator.noise;
 
+import com.khorn.terraincontrol.util.MathHelper;
 import java.util.Random;
 
-public class NoiseGeneratorOctaves
+public class NoiseGeneratorPerlinOctaves
 {
 
     private NoiseGeneratorPerlin[] a;
     private int b;
 
-    public NoiseGeneratorOctaves(Random random, int i)
+    public NoiseGeneratorPerlinOctaves(Random random, int i)
     {
         this.b = i;
         this.a = new NoiseGeneratorPerlin[i];

@@ -2,15 +2,15 @@ package com.khorn.terraincontrol.biomegenerators;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.util.NoiseGeneratorOctaves2;
+import com.khorn.terraincontrol.generator.noise.NoiseGeneratorOldOctaves;
 
 import java.util.Random;
 
 public class OldBiomeGenerator extends BiomeGenerator
 {
-    private NoiseGeneratorOctaves2 temperatureGenerator1;
-    private NoiseGeneratorOctaves2 wetnessGenerator;
-    private NoiseGeneratorOctaves2 temperatureGenerator2;
+    private NoiseGeneratorOldOctaves temperatureGenerator1;
+    private NoiseGeneratorOldOctaves wetnessGenerator;
+    private NoiseGeneratorOldOctaves temperatureGenerator2;
     public double[] oldTemperature1;
     public double[] oldWetness;
     private double[] oldTemperature2;
@@ -21,9 +21,9 @@ public class OldBiomeGenerator extends BiomeGenerator
     public OldBiomeGenerator(LocalWorld world, BiomeCache cache)
     {
         super(world, cache);
-        this.temperatureGenerator1 = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 9871L), 4);
-        this.wetnessGenerator = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 39811L), 4);
-        this.temperatureGenerator2 = new NoiseGeneratorOctaves2(new Random(world.getSeed() * 543321L), 2);
+        this.temperatureGenerator1 = new NoiseGeneratorOldOctaves(new Random(world.getSeed() * 9871L), 4);
+        this.wetnessGenerator = new NoiseGeneratorOldOctaves(new Random(world.getSeed() * 39811L), 4);
+        this.temperatureGenerator2 = new NoiseGeneratorOldOctaves(new Random(world.getSeed() * 543321L), 2);
 
         if (!hasGeneratedBiomeDiagram)
         {

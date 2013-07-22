@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.util;
+package com.khorn.terraincontrol.generator.noise;
 
 import java.util.Random;
 

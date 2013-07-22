@@ -1,18 +1,18 @@
-package com.khorn.terraincontrol.util;
+package com.khorn.terraincontrol.generator.noise;
 
 import java.util.Random;
 
-public class NoiseGeneratorOctaves2
+public class NoiseGeneratorOldOctaves
 {
-    private NoiseGenerator2[] a;
+    private NoiseGeneratorOld[] a;
     private int b;
 
-    public NoiseGeneratorOctaves2(Random paramRandom, int paramInt)
+    public NoiseGeneratorOldOctaves(Random paramRandom, int paramInt)
     {
         this.b = paramInt;
-        this.a = new NoiseGenerator2[paramInt];
+        this.a = new NoiseGeneratorOld[paramInt];
         for (int i = 0; i < paramInt; i++)
-            this.a[i] = new NoiseGenerator2(paramRandom);
+            this.a[i] = new NoiseGeneratorOld(paramRandom);
     }
 
     public double[] a(double[] paramArrayOfDouble, double paramDouble1, double paramDouble2, int paramInt1, int paramInt2, double paramDouble3, double paramDouble4, double paramDouble5)

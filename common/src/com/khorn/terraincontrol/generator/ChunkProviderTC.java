@@ -9,7 +9,7 @@ import com.khorn.terraincontrol.generator.terrainsgens.CanyonsGen;
 import com.khorn.terraincontrol.generator.terrainsgens.CavesGen;
 import com.khorn.terraincontrol.generator.terrainsgens.TerrainGenBase;
 import com.khorn.terraincontrol.util.MathHelper;
-import com.khorn.terraincontrol.util.NoiseGeneratorOctaves;
+import com.khorn.terraincontrol.generator.noise.NoiseGeneratorPerlinOctaves;
 
 import java.util.Random;
 
@@ -18,12 +18,12 @@ import java.util.Random;
 public class ChunkProviderTC
 {
     private Random rnd;
-    private NoiseGeneratorOctaves o;
-    private NoiseGeneratorOctaves p;
-    private NoiseGeneratorOctaves q;
-    private NoiseGeneratorOctaves r;
-    private NoiseGeneratorOctaves a;
-    private NoiseGeneratorOctaves b;
+    private NoiseGeneratorPerlinOctaves o;
+    private NoiseGeneratorPerlinOctaves p;
+    private NoiseGeneratorPerlinOctaves q;
+    private NoiseGeneratorPerlinOctaves r;
+    private NoiseGeneratorPerlinOctaves a;
+    private NoiseGeneratorPerlinOctaves b;
     private double[] u;
     private double[] v = new double[256];
 
@@ -68,13 +68,13 @@ public class ChunkProviderTC
 
         this.rnd = new Random(world.getSeed());
 
-        this.o = new NoiseGeneratorOctaves(this.rnd, 16);
-        this.p = new NoiseGeneratorOctaves(this.rnd, 16);
-        this.q = new NoiseGeneratorOctaves(this.rnd, 8);
-        this.r = new NoiseGeneratorOctaves(this.rnd, 4);
+        this.o = new NoiseGeneratorPerlinOctaves(this.rnd, 16);
+        this.p = new NoiseGeneratorPerlinOctaves(this.rnd, 16);
+        this.q = new NoiseGeneratorPerlinOctaves(this.rnd, 8);
+        this.r = new NoiseGeneratorPerlinOctaves(this.rnd, 4);
 
-        this.a = new NoiseGeneratorOctaves(this.rnd, 10);
-        this.b = new NoiseGeneratorOctaves(this.rnd, 16);
+        this.a = new NoiseGeneratorPerlinOctaves(this.rnd, 10);
+        this.b = new NoiseGeneratorPerlinOctaves(this.rnd, 16);
 
 
         this.CaveGen = new CavesGen(this.worldSettings, this.localWorld);
