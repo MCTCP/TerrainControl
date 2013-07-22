@@ -1,0 +1,167 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>com.khorn.minecraft</groupId>
+        <artifactId>terraincontrol</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../../</relativePath>
+    </parent>
+    
+    <!-- Basic Info -->
+    <groupId>com.khorn.minecraft</groupId>
+    <artifactId>terraincontrol-forge</artifactId>
+    <version>Forge-1.0.0-SNAPSHOT</version>
+    <name>TerrainControl::Forge</name>
+    <description>${project.name} contains the Forge specific elements of the TerrainControl Module Group</description>
+    
+    <url>http://www.github.org/Wickth/TerrainControl</url>
+    <!-- This tells Maven to make us a *.jar file -->
+    <packaging>jar</packaging>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- When build fails, check here for up to date minecraft and forge release version numbers    -->
+        <!-- http://www.minecraftforge.net/forum/index.php/board,3.0.html   -->
+        <minecraft.version>1.6.2</minecraft.version>
+        <forge.majorversion>9</forge.majorversion>
+        <forge.minorversion>10</forge.minorversion>
+        <forge.revisionversion>0</forge.revisionversion>
+        <forge.mainversion>${forge.majorversion}.${forge.minorversion}.${forge.revisionversion}</forge.mainversion>
+        <forgeapi.version>${minecraft.version}-${forge.mainversion}-SNAPSHOT</forgeapi.version>
+        <reobf.mappings>https://raw.github.com/agaricusb/MinecraftRemapping/8ca7ba25dfd67eae43b3c73d02603ff6c085a6d7/1.6.2/pkgmcp2numpkg.srg</reobf.mappings>
+    </properties>
+    
+    <scm>
+        <developerConnection>scm:git:git@github.com:Wickth/TerrainControl.git</developerConnection>
+        <connection>scm:git:git://github.com/Wickth/TerrainControl</connection>
+        <url>http://www.github.com/Wickth/TerrainControl/tree/master</url>
+    </scm>
+
+    
+    <build>
+        <defaultGoal>clean install</defaultGoal>
+        <directory>target/build</directory>
+        <outputDirectory>target/build/classes</outputDirectory>
+        <finalName>TerrainControl_${project.version}</finalName>
+        <testOutputDirectory>target/build/test-classes</testOutputDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>                
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>com.timethor.minecraft</groupId>
+                <artifactId>specialsource-maven-plugin</artifactId>
+                <version>1.2-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>reobfuscate</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>remap</goal>
+                        </goals>
+                        <configuration>
+                            <srgIn>${reobf.mappings}</srgIn> <!-- mcp csvnames -> mcp srgnames for version-independence -->
+                            <remappedDependencies>
+                                <param>com.timethor.minecraft:ForgeAPI:${forgeapi.version}:jar</param>
+                            </remappedDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <pluginRepositories>
+        <pluginRepository>
+            <id>sonatype-oss-public</id>
+            <url>https://oss.sonatype.org/content/groups/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+    
+    <repositories>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>   
+     
+    <dependencies>
+        <dependency>
+            <groupId>com.timethor.minecraft</groupId>
+            <artifactId>ForgeAPI</artifactId>
+            <version>1.6.2-9.10.0-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-all</artifactId>
+            <version>4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>14.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl.lwjgl</groupId>
+            <artifactId>lwjgl</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl.lwjgl</groupId>
+            <artifactId>lwjgl_util</artifactId>
+            <version>2.8.5</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.argo</groupId>
+            <artifactId>argo</artifactId>
+            <version>3.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.10.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.khorn.minecraft</groupId>
+            <artifactId>terraincontrol-common</artifactId>
+            <version>Common-1.0.0-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+</project>

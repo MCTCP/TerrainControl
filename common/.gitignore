@@ -18,6 +18,7 @@
 /build
 /bin
 /dist
+/target
 /out
 /localexport.jardesc
 
@@ -26,5 +27,3 @@
 
 # Windows filesystem dust
 desktop.ini
-/common/target/build/
-/platforms/bukkit/target/build/

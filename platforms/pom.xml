@@ -1,0 +1,87 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>com.khorn.minecraft</groupId>
+        <artifactId>terraincontrol</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+    
+    <!-- Basic Info -->
+    <groupId>com.khorn.minecraft</groupId>
+    <artifactId>terraincontrol-release</artifactId>
+    <version>Release-2.4.15-SNAPSHOT</version>    
+    <name>TerrainControl:::Release</name>
+    <description>${project.name} compiles a cross-platform TerrainControl Release</description>
+    
+    <url>http://www.github.org/Wickth/TerrainControl</url>
+    <!-- This tells Maven to make us a *.jar file -->
+    <packaging>jar</packaging>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    
+    <scm>
+        <developerConnection>scm:git:git@github.com:Wickth/TerrainControl.git</developerConnection>
+        <connection>scm:git:git://github.com/Wickth/TerrainControl</connection>
+        <url>http://www.github.com/Wickth/TerrainControl/tree/master</url>
+    </scm>
+
+    
+    <build>
+        <defaultGoal>clean install</defaultGoal>
+        <directory>target/build</directory>
+        <outputDirectory>target/build/classes</outputDirectory>
+        <finalName>TerrainControl_${project.version}</finalName>
+        <testOutputDirectory>target/build/test-classes</testOutputDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <minimizeJar>true</minimizeJar>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.khorn.minecraft</groupId>
+            <artifactId>terraincontrol-common</artifactId>
+            <version>Common.1.0.0-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.khorn.minecraft</groupId>
+            <artifactId>terraincontrol-bukkit</artifactId>
+            <version>Bukkit.1.0.0-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.khorn.minecraft</groupId>
+            <artifactId>terraincontrol-forge</artifactId>
+            <version>Forge.1.0.0-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>  
+        
+</project>
