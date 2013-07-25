@@ -55,6 +55,8 @@ public class ChunkProviderTC
 
     private int[] BiomeArray;
     private int[] RiverArray;
+    private int[] WaterLevelRaw = new int[25];
+    private int[] WaterLevel = new int[256];
 
     private int height;
     private int heightBits;
@@ -122,34 +124,59 @@ public class ChunkProviderTC
 
         this.BiomeArray = this.localWorld.getBiomes(this.BiomeArray, chunkX * 16, chunkZ * 16, ChunkMaxX, ChunkMaxZ);
 
-        double d1 = 0.125D;
-        double d10 = 0.25D;
+        double d1 = 0.125D;   // 1/i2
+        double d10 = 0.25D;   // 1/il
         int z_step = 1 << this.heightBits;
-        double d15 = 0.25D;
+        double d15 = 0.25D;   // 1/i1
 
         for (int x = 0; x < i1; x++)
             for (int z = 0; z < i1; z++)
+            {
+                double x0z0_1 = this.WaterLevelRaw[(x + 0) * noise_xSize + (z + 0)];
+                double x0z1_1 = this.WaterLevelRaw[(x + 0) * noise_xSize + (z + 1)];
+                double x1z0_1 = (this.WaterLevelRaw[(x + 1) * noise_xSize + (z + 0)] - x0z0_1) * d10;
+                double x1z1_1 = (this.WaterLevelRaw[(x + 1) * noise_xSize + (z + 1)] - x0z1_1) * d10;
+
+                for (int piece_x = 0; piece_x < 4; piece_x++)
+                {
+                    double d16_1 = x0z0_1;
+                    double d17_1 = (x0z1_1 - x0z0_1) * d15;
+
+                    for (int piece_z = 0; piece_z < 4; piece_z++)
+                    {
+                        WaterLevel[(z * 4 + piece_z) * 16 + (piece_x + x * 4)] = (int) d16_1;
+
+                        d16_1 += d17_1;
+
+                    }
+
+                    x0z0_1 += x1z0_1;
+                    x0z1_1 += x1z1_1;
+
+
+                }
+
                 for (int y = 0; y < i2; y++)
                 {
 
-                    double d2 = this.rawTerrain[(((x + 0) * noise_zSize + (z + 0)) * noise_ySize + (y + 0))];
-                    double d3 = this.rawTerrain[(((x + 0) * noise_zSize + (z + 1)) * noise_ySize + (y + 0))];
-                    double d4 = this.rawTerrain[(((x + 1) * noise_zSize + (z + 0)) * noise_ySize + (y + 0))];
-                    double d5 = this.rawTerrain[(((x + 1) * noise_zSize + (z + 1)) * noise_ySize + (y + 0))];
+                    double x0z0 = this.rawTerrain[(((x + 0) * noise_zSize + (z + 0)) * noise_ySize + (y + 0))];
+                    double x0z1 = this.rawTerrain[(((x + 0) * noise_zSize + (z + 1)) * noise_ySize + (y + 0))];
+                    double x1z0 = this.rawTerrain[(((x + 1) * noise_zSize + (z + 0)) * noise_ySize + (y + 0))];
+                    double x1z1 = this.rawTerrain[(((x + 1) * noise_zSize + (z + 1)) * noise_ySize + (y + 0))];
 
-                    double d6 = (this.rawTerrain[(((x + 0) * noise_zSize + (z + 0)) * noise_ySize + (y + 1))] - d2) * d1;
-                    double d7 = (this.rawTerrain[(((x + 0) * noise_zSize + (z + 1)) * noise_ySize + (y + 1))] - d3) * d1;
-                    double d8 = (this.rawTerrain[(((x + 1) * noise_zSize + (z + 0)) * noise_ySize + (y + 1))] - d4) * d1;
-                    double d9 = (this.rawTerrain[(((x + 1) * noise_zSize + (z + 1)) * noise_ySize + (y + 1))] - d5) * d1;
+                    double x0z0y1 = (this.rawTerrain[(((x + 0) * noise_zSize + (z + 0)) * noise_ySize + (y + 1))] - x0z0) * d1;
+                    double x0z1y1 = (this.rawTerrain[(((x + 0) * noise_zSize + (z + 1)) * noise_ySize + (y + 1))] - x0z1) * d1;
+                    double x1z0y1 = (this.rawTerrain[(((x + 1) * noise_zSize + (z + 0)) * noise_ySize + (y + 1))] - x1z0) * d1;
+                    double x1z1y1 = (this.rawTerrain[(((x + 1) * noise_zSize + (z + 1)) * noise_ySize + (y + 1))] - x1z1) * d1;
 
                     for (int piece_y = 0; piece_y < 8; piece_y++)
                     {
 
 
-                        double d11 = d2;
-                        double d12 = d3;
-                        double d13 = (d4 - d2) * d10;
-                        double d14 = (d5 - d3) * d10;
+                        double d11 = x0z0;
+                        double d12 = x0z1;
+                        double d13 = (x1z0 - x0z0) * d10;
+                        double d14 = (x1z1 - x0z1) * d10;
 
                         for (int piece_x = 0; piece_x < 4; piece_x++)
                         {
@@ -160,8 +187,9 @@ public class ChunkProviderTC
                             for (int piece_z = 0; piece_z < 4; piece_z++)
                             {
                                 int biomeId = BiomeArray[(z * 4 + piece_z) * 16 + (piece_x + x * 4)];
+                                int waterLevelMax = WaterLevel[(z * 4 + piece_z) * 16 + (piece_x + x * 4)];
                                 int i15 = 0;
-                                if (y * 8 + piece_y < this.worldSettings.biomeConfigs[biomeId].waterLevelMax && y * 8 + piece_y > this.worldSettings.biomeConfigs[biomeId].waterLevelMin)
+                                if (y * 8 + piece_y < waterLevelMax && y * 8 + piece_y > this.worldSettings.biomeConfigs[biomeId].waterLevelMin)
                                 {
                                     i15 = this.worldSettings.biomeConfigs[biomeId].waterBlock;
                                 }
@@ -179,12 +207,13 @@ public class ChunkProviderTC
                             d12 += d14;
                         }
 
-                        d2 += d6;
-                        d3 += d7;
-                        d4 += d8;
-                        d5 += d9;
+                        x0z0 += x0z0y1;
+                        x0z1 += x0z1y1;
+                        x1z0 += x1z0y1;
+                        x1z1 += x1z1y1;
                     }
                 }
+            }
 
     }
 
@@ -212,7 +241,7 @@ public class ChunkProviderTC
                 BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[biomeId];
                 int surfaceBlock = biomeConfig.SurfaceBlock;
                 int groundBlock = biomeConfig.GroundBlock;
-                int waterLevel = biomeConfig.waterLevelMax;
+                int waterLevel = WaterLevel[z + x * 16];
 
                 if (this.worldSettings.ceilingBedrock)
                 {
@@ -424,7 +453,11 @@ public class ChunkProviderTC
         float heightRiverSum = 0.0F;
         float riverWeightSum = 0.0F;
 
-        // TODO We may change that ???!!
+        float waterLevelWeightSum = 0.0F;
+        float waterLevelSum = 0.0F;
+
+
+        // TODO We may change biome scan radius for smooth terrain ???!!
         int lookRadius = 2;
 
         int biomeId = this.BiomeArray[(x + 2 + (z + 2) * (max_X + 5))];
@@ -432,6 +465,8 @@ public class ChunkProviderTC
         this.RiverFound = this.RiverArray[(x + 2 + (z + 2) * (max_X + 5))] == 1;
 
         float riverCenterHeight = this.RiverFound ? this.worldSettings.biomeConfigs[biomeId].RiverHeight : this.worldSettings.biomeConfigs[biomeId].BiomeHeight;
+
+        waterLevelSum = this.RiverFound ? this.worldSettings.biomeConfigs[biomeId].RiverWaterLevel : this.worldSettings.biomeConfigs[biomeId].waterLevelMax;
 
 
         for (int nextX = -lookRadius; nextX <= lookRadius; nextX++)
@@ -474,6 +509,21 @@ public class ChunkProviderTC
                 heightRiverSum += nextRiverHeight * riverWeight;
                 riverWeightSum += riverWeight;
 
+                //Dynamic water level
+
+                int nextWaterLevel = (isRiver) ? nextBiomeConfig.RiverWaterLevel : nextBiomeConfig.waterLevelMax;
+
+                /*float waterWight = this.NearBiomeWeight[(nextX + 2 + (nextZ + 2) * 5)] / (nextWaterLevel);
+                waterWight = Math.abs(waterWight);
+                if (nextWaterLevel < waterLevelCenter)
+                {
+                    nextWaterLevel /= 2.0F;         //?!
+                } */
+
+                if( nextWaterLevel < waterLevelSum )
+                    waterLevelSum = nextWaterLevel;
+
+
             }
         }
         volatilitySum /= biomeWeightSum;
@@ -481,6 +531,10 @@ public class ChunkProviderTC
 
         volRiverSum /= riverWeightSum;
         heightRiverSum /= riverWeightSum;
+
+        //waterLevelSum /= waterLevelWeightSum;
+
+        this.WaterLevelRaw[x * max_X + z] = (int) waterLevelSum;
 
         volatilitySum = volatilitySum * 0.9F + 0.1F;   // Must be != 0
         heightSum = (heightSum * 4.0F - 1.0F) / 8.0F;  // Fucking magic numbers

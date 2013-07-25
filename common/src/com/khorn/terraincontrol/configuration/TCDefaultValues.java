@@ -162,6 +162,7 @@ public enum TCDefaultValues implements TCSetting
 
     RiverHeight(-1.0F),
     RiverVolatility(0.3F),
+    RiverWaterLevel(63),
 
     // End biome settings
 
