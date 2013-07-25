@@ -119,33 +119,31 @@ public enum DefaultBiome
     }
 
     static
-      {
+    {
         // Declares and Defines the DefaultBiome lookup table
         lookupID = new DefaultBiome[DefaultBiome.values().length + 1];
         for (DefaultBiome biome : DefaultBiome.values())
-          {
+        {
             lookupID[biome.Id] = biome;
-          }
-      }
+        }
+    }
 
     /**
      * Returns a DefaultBiome object with the given biome ID
      * <p/>
      * @param id the ID of the DeafultBiome that is to be returned
      * <p/>
-     * @return A DefaultBiome with the ID
-     * <p/>
-     * @id
+     * @return A DefaultBiome with the given ID
      */
     public static DefaultBiome getBiome(int id)
     {
         if (id < lookupID.length)
-          {
+        {
             return lookupID[id];
-          } else
-          {
+        } else
+        {
             return null;
-          }
+        }
     }
 
     /**
@@ -154,17 +152,17 @@ public enum DefaultBiome
      * <p/>
      * @param name The string to test this.Name against
      * <p/>
-     * @return Boolean whether or not this DefaultBiome has the name @name
+     * @return Boolean whether or not this DefaultBiome has the given name
      */
     public static boolean Contain(String name)
     {
         for (DefaultBiome biome : DefaultBiome.values())
-          {
+        {
             if (biome.Name.equals(name))
-              {
+            {
                 return true;
-              }
-          }
+            }
+        }
         return false;
     }
 }
