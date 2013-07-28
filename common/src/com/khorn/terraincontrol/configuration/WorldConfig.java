@@ -166,12 +166,9 @@ public class WorldConfig extends ConfigFile
 
     public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
     {
-        this.file = settingsDir;
-        this.name = world.getName();
+        super(world.getName(), new File(settingsDir, TCDefaultValues.WorldSettingsName.stringValue()));
 
-        File settingsFile = new File(this.file, TCDefaultValues.WorldSettingsName.stringValue());
-
-        this.readSettingsFile(settingsFile);
+        this.readSettingsFile();
         this.renameOldSettings();
         this.readConfigSettings();
 
@@ -187,14 +184,14 @@ public class WorldConfig extends ConfigFile
 
         // Need add check to clashes
         if (this.SettingsMode != ConfigMode.WriteDisable)
-            this.writeSettingsFile(settingsFile, (this.SettingsMode == ConfigMode.WriteAll));
+            this.writeSettingsFile(this.SettingsMode == ConfigMode.WriteAll);
 
         world.setHeightBits(this.worldHeightBits);
 
-        File BiomeFolder = new File(file, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
-        if (!BiomeFolder.exists())
+        File biomeFolder = new File(settingsDir, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
+        if (!biomeFolder.exists())
         {
-            if (!BiomeFolder.mkdir())
+            if (!biomeFolder.mkdir())
             {
                 TerrainControl.log(Level.WARNING, "Error creating biome configs directory, working with defaults");
                 return;
@@ -223,7 +220,7 @@ public class WorldConfig extends ConfigFile
 
         for (LocalBiome localBiome : localBiomes)
         {
-            BiomeConfig config = new BiomeConfig(BiomeFolder, localBiome, this);
+            BiomeConfig config = new BiomeConfig(biomeFolder, localBiome, this);
             if (checkOnly)
                 continue;
 
@@ -971,7 +968,7 @@ public class WorldConfig extends ConfigFile
     public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
     {
         // General information
-        this.name = readStringFromStream(stream);
+        super(readStringFromStream(stream), null);
 
         this.WorldFog = stream.readInt();
         this.WorldNightFog = stream.readInt();

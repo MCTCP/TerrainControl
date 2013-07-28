@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.configuration;
 
-import static com.khorn.terraincontrol.configuration.TCSetting.SettingsType.Int;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.TCSetting.SettingsType;
@@ -13,9 +12,31 @@ import java.util.logging.Level;
 public abstract class ConfigFile
 {
     private BufferedWriter settingsWriter;
-    
-    public String name;
-    public File file;
+
+    public final String name;
+    public final File file;
+
+    /**
+     * Creates a new configuration file.
+     * @param name Name of the thing that is being read, 
+     *             like Plains or MyBO3. May not be null.
+     * @param file The file of the configuration. If this config
+     *             needs to read or written, this shouldn't be null.
+     *             Otherwise, if it's manually read from the network, this
+     *             can be null. The {@link #readSettingsFile()}
+     *             and {@link #writeSettingsFile(boolean)} methods must not be
+     *             used, otherwise they will throw a RuntimeException.
+     */
+    protected ConfigFile(String name, File file) throws IllegalArgumentException
+    {
+        this.name = name;
+        this.file = file;
+
+        if (name == null)
+        {
+            throw new IllegalArgumentException("Name may not be null");
+        }
+    }
 
     /**
      * Stores all the settings. Settings like Name:Value or Name=Value are stored as name, Value and settings like Function(a, b, c) are stored as function(a, b, c), lineNumber
@@ -24,15 +45,18 @@ public abstract class ConfigFile
 
     private boolean writeComments;
 
-    protected void readSettingsFile(File f)
+    protected void readSettingsFile() throws RuntimeException
     {
+        if (file == null)
+            throw new RuntimeException("Constructor called with null file.");
+
         BufferedReader settingsReader = null;
 
-        if (f.exists())
+        if (file.exists())
         {
             try
             {
-                settingsReader = new BufferedReader(new FileReader(f));
+                settingsReader = new BufferedReader(new FileReader(file));
                 String thisLine;
                 int lineNumber = 0;
                 while ((thisLine = settingsReader.readLine()) != null)
@@ -97,7 +121,7 @@ public abstract class ConfigFile
                 }
             }
         } else
-            logFileNotFound(f);
+            logFileNotFound(file);
     }
 
     // -------------------------------------------- //
@@ -106,22 +130,23 @@ public abstract class ConfigFile
 
     protected void logSettingNotFound(String settingsName)
     {
-        // TerrainControl.log("`"+settingsName + "` in `" + this.file.getName() + "` was not found.");
+        // Disabled, because it will spam a lot otherwise
+        // TerrainControl.log("`"+settingsName + "` in `" + this.file.getName()
+        // + "` was not found.");
     }
+
     protected void logSettingValueInvalid(String settingsName)
     {
-         TerrainControl.log(Level.WARNING, getSettingValueInvalidError(settingsName));
+        String error = "The value of " + settingsName + " (" + settingsCache.get(settingsName) + ") in file " + file.getName() + " is invalid.";
+        TerrainControl.log(Level.WARNING, error);
     }
+
     protected void logSettingValueInvalid(String settingsName, Exception e)
     {
-        TerrainControl.log(Level.WARNING, e.getClass().getSimpleName() + " :: " + getSettingValueInvalidError(settingsName));
+        String error = "The value of " + settingsName + " (" + settingsCache.get(settingsName) + ") in file " + file.getName() + " is invalid: " + e.getClass().getSimpleName();
+        TerrainControl.log(Level.WARNING, error);
     }
-    
-    private String getSettingValueInvalidError(String settingsName)
-    {
-        return "Value of "+settingsName + ": `"+this.settingsCache.get(settingsName)+"' in " + this.file.getName() + " is not valid.";
-    }
-    
+
     protected void logFileNotFound(File logFile)
     {
         TerrainControl.log("File not found: " + logFile.getName());
@@ -157,7 +182,8 @@ public abstract class ConfigFile
             {
                 return out;
             }
-            for (String string : this.settingsCache.get(settingsName).split(",")) {
+            for (String string : this.settingsCache.get(settingsName).split(","))
+            {
                 out.add(Integer.parseInt(string));
             }
             return out;
@@ -165,7 +191,7 @@ public abstract class ConfigFile
         logSettingNotFound(settingsName);
         return defaultValue;
     }
-    
+
     protected ArrayList<String> readModSettings(String settingsName, ArrayList<String> defaultValue)
     {
         settingsName = settingsName.toLowerCase();
@@ -384,9 +410,10 @@ public abstract class ConfigFile
             case Color:
                 obj = readModSettingsColor(value.name(), value.stringValue());
                 break;
-            /* This prevents NPE if you happen to add a new type to
-               * TCSettings and cascade the change but forget to add it here 
-               */
+            /*
+             * This prevents NPE if you happen to add a new type to TCSettings
+             * and cascade the change but forget to add it here
+             */
             default:
                 throw new EnumConstantNotPresentException(SettingsType.class, value.getReturnType().name());
         }
@@ -395,12 +422,29 @@ public abstract class ConfigFile
 
     }
 
+    /**
+     * Old write method. Because the file is now stored in the configFile,
+     * this parameter is no longer needed.
+     * @param settingsFile Previously, the file to write to. 
+     *                     Doesn't do anything anymore.
+     * @param comments     Whether comments should be written.
+     * @deprecated         28 July 2013, use method without file parameter.
+     */
+    @Deprecated
     public void writeSettingsFile(File settingsFile, boolean comments)
     {
+        writeSettingsFile(comments);
+    }
+
+    public void writeSettingsFile(boolean comments)
+    {
+        if (file == null)
+            throw new RuntimeException("Constructor called with null file.");
+
         this.writeComments = comments;
         try
         {
-            this.settingsWriter = new BufferedWriter(new FileWriter(settingsFile, false));
+            this.settingsWriter = new BufferedWriter(new FileWriter(file, false));
 
             this.writeConfigSettings();
         } catch (IOException e)
@@ -446,7 +490,7 @@ public abstract class ConfigFile
         this.settingsWriter.write(settingsName + ":" + out);
         this.settingsWriter.newLine();
     }
-    
+
     protected void writeValue(String settingsName, HashSet<Integer> settingsValue) throws IOException
     {
         String out = "";
@@ -601,8 +645,8 @@ public abstract class ConfigFile
     protected HashSet<Integer> applyBounds(HashSet<Integer> values, int min, int max)
     {
         HashSet<Integer> output = new HashSet<Integer>();
-        String x = "";
-        for (Integer value : values) {
+        for (int value : values)
+        {
             if (value > max)
                 output.add(max);
             else if (value < min)
@@ -612,7 +656,7 @@ public abstract class ConfigFile
         }
         return output;
     }
-    
+
     protected int applyBounds(int value, int min, int max)
     {
         if (value > max)
