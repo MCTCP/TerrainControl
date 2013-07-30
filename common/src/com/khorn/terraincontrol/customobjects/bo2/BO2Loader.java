@@ -9,7 +9,7 @@ public class BO2Loader implements CustomObjectLoader
 {
     public CustomObject loadFromFile(String objectName, File file)
     {
-        return new BO2(file, objectName);
+        return new BO2(objectName, file);
     }
 
     @Override

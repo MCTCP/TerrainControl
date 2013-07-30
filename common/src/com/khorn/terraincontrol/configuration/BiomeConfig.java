@@ -123,22 +123,20 @@ public class BiomeConfig extends ConfigFile
 
     public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
+        super(biome.getName(), new File(settingsDir, biome.getName() + TCDefaultValues.WorldBiomeConfigName.stringValue()));
         this.Biome = biome;
-        this.name = biome.getName();
         worldConfig = config;
         initDefaults();
 
-        File settingsFile = new File(settingsDir, this.name + TCDefaultValues.WorldBiomeConfigName.stringValue());
-
-        this.readSettingsFile(settingsFile);
+        this.readSettingsFile();
         this.renameOldSettings();
         this.readConfigSettings();
 
         this.correctSettings();
-        if (!settingsFile.exists())
+        if (!file.exists())
             this.createDefaultResources();
         if (config.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
-            this.writeSettingsFile(settingsFile, (config.SettingsMode == WorldConfig.ConfigMode.WriteAll));
+            this.writeSettingsFile(config.SettingsMode == WorldConfig.ConfigMode.WriteAll);
 
         if (this.UseWorldWaterLevel)
         {
@@ -1425,7 +1423,7 @@ public class BiomeConfig extends ConfigFile
 
     public BiomeConfig(DataInputStream stream, WorldConfig config, LocalBiome biome) throws IOException
     {
-        this.name = readStringFromStream(stream);
+        super(readStringFromStream(stream), null);
         this.Biome = biome;
         this.worldConfig = config;
 

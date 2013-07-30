@@ -10,20 +10,19 @@ import com.khorn.terraincontrol.generator.terrainsgens.CanyonsGen;
 import com.khorn.terraincontrol.generator.terrainsgens.CavesGen;
 import com.khorn.terraincontrol.generator.terrainsgens.TerrainGenBase;
 import com.khorn.terraincontrol.util.MathHelper;
-import com.khorn.terraincontrol.util.NoiseGeneratorOctaves;
+import com.khorn.terraincontrol.generator.noise.NoiseGeneratorPerlinOctaves;
 
 import java.util.Random;
 
 public class ChunkProviderTC
 {
-
     private final Random random;
-    private final NoiseGeneratorOctaves noiseGen1;
-    private final NoiseGeneratorOctaves noiseGen2;
-    private final NoiseGeneratorOctaves noiseGen3;
-    private final NoiseGeneratorOctaves noiseGen4;
-    private final NoiseGeneratorOctaves noiseGen5;
-    private final NoiseGeneratorOctaves noiseGen6;
+    private final NoiseGeneratorPerlinOctaves noiseGen1;
+    private final NoiseGeneratorPerlinOctaves noiseGen2;
+    private final NoiseGeneratorPerlinOctaves noiseGen3;
+    private final NoiseGeneratorPerlinOctaves noiseGen4;
+    private final NoiseGeneratorPerlinOctaves noiseGen5;
+    private final NoiseGeneratorPerlinOctaves noiseGen6;
     private double[] rawTerrain;
     private double[] noise4 = new double[256];
 
@@ -73,18 +72,19 @@ public class ChunkProviderTC
 
         this.random = new Random(world.getSeed());
 
-        this.noiseGen1 = new NoiseGeneratorOctaves(this.random, 16);
-        this.noiseGen2 = new NoiseGeneratorOctaves(this.random, 16);
-        this.noiseGen3 = new NoiseGeneratorOctaves(this.random, 8);
-        this.noiseGen4 = new NoiseGeneratorOctaves(this.random, 4);
-        this.noiseGen5 = new NoiseGeneratorOctaves(this.random, 10);
-        this.noiseGen6 = new NoiseGeneratorOctaves(this.random, 16);
+        this.noiseGen1 = new NoiseGeneratorPerlinOctaves(this.random, 16);
+        this.noiseGen2 = new NoiseGeneratorPerlinOctaves(this.random, 16);
+        this.noiseGen3 = new NoiseGeneratorPerlinOctaves(this.random, 8);
+        this.noiseGen4 = new NoiseGeneratorPerlinOctaves(this.random, 4);
+        this.noiseGen5 = new NoiseGeneratorPerlinOctaves(this.random, 10);
+        this.noiseGen6 = new NoiseGeneratorPerlinOctaves(this.random, 16);
 
         this.caveGen = new CavesGen(this.worldSettings, this.localWorld);
         this.canyonGen = new CanyonsGen(this.worldSettings, this.localWorld);
 
         // Contains 2d array 5*5. Maximum weight is in array center.
         this.nearBiomeWeightArray = new float[25];
+        
         for (int x = -2; x <= 2; x++)
         {
             for (int z = -2; z <= 2; z++)

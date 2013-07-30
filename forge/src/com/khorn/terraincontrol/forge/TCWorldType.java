@@ -16,7 +16,7 @@ import java.io.File;
 
 public class TCWorldType extends WorldType
 {
-    public SingleWorld worldTC;
+    public ForgeWorld worldTC;
     private TCPlugin plugin;
     private String worldType;
 
@@ -52,7 +52,7 @@ public class TCWorldType extends WorldType
         }
 
         // Restore old biomes
-        SingleWorld.restoreBiomes();
+        ForgeWorld.restoreBiomes();
 
         // Load everything
         File worldDirectory = new File(plugin.terrainControlDirectory, "worlds" + File.separator + world.getSaveHandler().getWorldDirectoryName());
@@ -65,7 +65,7 @@ public class TCWorldType extends WorldType
                 System.out.println("TerrainControl: cant create folder " + worldDirectory.getAbsolutePath());
         }
 
-        this.worldTC = new SingleWorld(world.getSaveHandler().getWorldDirectoryName());
+        this.worldTC = new ForgeWorld(world.getSaveHandler().getWorldDirectoryName());
         WorldConfig config = new WorldConfig(worldDirectory, worldTC, false);
         this.worldTC.Init(world, config);
 

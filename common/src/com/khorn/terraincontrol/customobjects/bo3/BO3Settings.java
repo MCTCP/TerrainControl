@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.configuration.TCSetting;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 
 public enum BO3Settings implements TCSetting
 {
@@ -26,7 +27,7 @@ public enum BO3Settings implements TCSetting
     excludedBiomes("All", SettingsType.StringArray),
 
     // Source block settings
-    sourceBlock(DefaultMaterial.AIR.id),
+    sourceBlock(DefaultMaterial.AIR.id, SettingsType.IntSet),
     outsideSourceBlock(OutsideSourceBlock.placeAnyway),
     maxPercentageOutsideSourceBlock(100);
 
@@ -65,7 +66,26 @@ public enum BO3Settings implements TCSetting
         value = i;
         returnType = SettingsType.Int;
     }
-
+    
+    private BO3Settings(int i, SettingsType type)
+    {
+        if (type == SettingsType.IntSet){
+            HashSet<Integer> x = new HashSet<Integer>();
+            x.add(i);
+            value = x;
+            returnType = SettingsType.IntSet;
+        } else {
+            value = i;
+            returnType = SettingsType.Int;
+        }
+    }
+    
+    private BO3Settings(HashSet<Integer> set, SettingsType type)
+    {
+        value = set;
+        returnType = SettingsType.IntSet;
+    }
+    
     private BO3Settings(long i)
     {
         value = i;
@@ -105,7 +125,6 @@ public enum BO3Settings implements TCSetting
             return;
         }
         value = s;
-
     }
 
     private BO3Settings(Enum<?> e)
@@ -121,42 +140,56 @@ public enum BO3Settings implements TCSetting
         returnType = SettingsType.Boolean;
     }
 
+    @Override
     public int intValue()
     {
         return (Integer) value;
     }
-
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public HashSet<Integer> intSetValue() {
+        return (HashSet<Integer>) value;
+    }
+    
+    @Override
     public double doubleValue()
     {
         return (Double) value;
     }
 
+    @Override
     public float floatValue()
     {
         return (Float) value;
     }
 
+    @Override
     public Enum<?> enumValue()
     {
         return (Enum<?>) value;
     }
 
+    @Override
     public SettingsType getReturnType()
     {
         return returnType;
     }
 
+    @Override
     public String stringValue()
     {
         return (String) value;
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public ArrayList<String> stringArrayListValue()
     {
         return (ArrayList<String>) value;
     }
 
+    @Override
     public boolean booleanValue()
     {
         return (Boolean) value;

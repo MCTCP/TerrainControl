@@ -11,10 +11,7 @@ import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightSetting
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BO3Config extends ConfigFile
 {
@@ -33,7 +30,7 @@ public class BO3Config extends ConfigFile
     public int maxHeight;
     public ArrayList<String> excludedBiomes;
 
-    public int sourceBlock;
+    public HashSet<Integer> sourceBlock;
     public int maxPercentageOutsideSourceBlock;
     public OutsideSourceBlock outsideSourceBlock;
 
@@ -46,16 +43,16 @@ public class BO3Config extends ConfigFile
     /**
      * Creates a BO3Config from a file.
      *
-     * @param name
-     * @param file
+     * @param name The name of the BO3 without the extension.
+     * @param file The file of the BO3.
      */
     public BO3Config(String name, File file, Map<String, CustomObject> otherObjectsInDirectory)
     {
-        this.file = file;
-        this.name = name;
+        super(name, file);
+
         this.otherObjectsInDirectory = otherObjectsInDirectory;
 
-        readSettingsFile(file);
+        readSettingsFile();
 
         init();
     }
@@ -64,14 +61,12 @@ public class BO3Config extends ConfigFile
      * Creates a BO3Config with the specified settings. Ignores the settings in the
      * settings file.
      *
-     * @param name
-     * @param file
-     * @param settings
+     * @param oldObject The old BO3 object. It's settings will be copied.
+     * @param extraSettings The extra settings.
      */
     public BO3Config(BO3 oldObject, Map<String, String> extraSettings)
     {
-        this.file = oldObject.getSettings().file;
-        this.name = oldObject.getName();
+        super(oldObject.getSettings().name, oldObject.getSettings().file);
 
         this.settingsCache = oldObject.getSettings().settingsCache;
         this.settingsCache.putAll(extraSettings);
@@ -88,7 +83,7 @@ public class BO3Config extends ConfigFile
         correctSettings();
         if (settingsMode != ConfigMode.WriteDisable)
         {
-            writeSettingsFile(file, settingsMode == ConfigMode.WriteAll);
+            writeSettingsFile(settingsMode == ConfigMode.WriteAll);
         }
 
         rotateBlocksAndChecks();
