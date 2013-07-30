@@ -24,9 +24,9 @@ public class BiomeConfig extends ConfigFile
     public short[][] replaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
     public int ReplaceCount = 0;
 
-    public float RiverHeight;
-    public float RiverVolatility;
-    public int RiverWaterLevel;
+    public float riverHeight;
+    public float riverVolatility;
+    public int riverWaterLevel;
 
     public int BiomeSize;
     public int BiomeRarity;
@@ -415,9 +415,9 @@ public class BiomeConfig extends ConfigFile
         this.maxAverageHeight = readSettings(TCDefaultValues.MaxAverageHeight);
         this.maxAverageDepth = readSettings(TCDefaultValues.MaxAverageDepth);
 
-        this.RiverHeight = readSettings(TCDefaultValues.RiverHeight);
-        this.RiverVolatility = readSettings(TCDefaultValues.RiverVolatility);
-        this.RiverWaterLevel = readSettings(TCDefaultValues.RiverWaterLevel);
+        this.riverHeight = readSettings(TCDefaultValues.RiverHeight);
+        this.riverVolatility = readSettings(TCDefaultValues.RiverVolatility);
+        this.riverWaterLevel = readSettings(TCDefaultValues.RiverWaterLevel);
 
 
         this.strongholdsEnabled = readModSettings(TCDefaultValues.StrongholdsEnabled.name(), this.defaultStrongholds);
@@ -711,15 +711,15 @@ public class BiomeConfig extends ConfigFile
 
         writeNewLine();
         writeComment("blah blah blah");
-        writeValue(TCDefaultValues.RiverHeight.name(), this.RiverHeight);
+        writeValue(TCDefaultValues.RiverHeight.name(), this.riverHeight);
 
         writeNewLine();
         writeComment("blah blah blah");
-        writeValue(TCDefaultValues.RiverVolatility.name(), this.RiverVolatility);
+        writeValue(TCDefaultValues.RiverVolatility.name(), this.riverVolatility);
 
         writeNewLine();
         writeComment("blah blah blah");
-        writeValue(TCDefaultValues.RiverWaterLevel.name(), this.RiverWaterLevel);
+        writeValue(TCDefaultValues.RiverWaterLevel.name(), this.riverWaterLevel);
 
         this.writeBigTitle("Blocks");
 

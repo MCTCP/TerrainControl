@@ -64,4 +64,19 @@ public class MathHelper
         for (int i = 0; i < 65536; i++)
             a[i] = (float) Math.sin(i * 3.141592653589793D * 2.0D / 65536.0D);
     }
+
+
+    public static double max(double first, double second, double third, double fourth)
+    {
+        if(first > second && first > third && first > fourth) {
+            return first;
+        }
+        if(second > third && second > fourth) {
+            return second;
+        }
+        if(third > fourth) {
+            return third;
+        }
+        return fourth;
+    }
 }
