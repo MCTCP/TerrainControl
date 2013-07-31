@@ -18,6 +18,8 @@ import java.util.logging.Level;
 
 public class WorldConfig extends ConfigFile
 {
+    protected final File settingsDir;
+    
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
     public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
 
@@ -174,6 +176,7 @@ public class WorldConfig extends ConfigFile
     public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
     {
         super(world.getName(), new File(settingsDir, TCDefaultValues.WorldSettingsName.stringValue()));
+        this.settingsDir = settingsDir;
 
         this.readSettingsFile();
         this.renameOldSettings();
@@ -282,11 +285,11 @@ public class WorldConfig extends ConfigFile
 
     private void ReadWorldCustomObjects()
     {
-        customObjectsDirectory = new File(this.file, TCDefaultValues.BO_WorldDirectoryName.stringValue());
+        customObjectsDirectory = new File(this.settingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
         
-        File oldCustomObjectsDirectory = new File(file, "BOBPlugins");
+        File oldCustomObjectsDirectory = new File(settingsDir, "BOBPlugins");
         if (oldCustomObjectsDirectory.exists()) {
-            if (!oldCustomObjectsDirectory.renameTo(new File(file, TCDefaultValues.BO_WorldDirectoryName.stringValue())))
+            if (!oldCustomObjectsDirectory.renameTo(new File(settingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue())))
             {
                 TerrainControl.log(Level.WARNING, "Fould old BOBPlugins folder, but it cannot be renamed to WorldObjects.");
                 TerrainControl.log(Level.WARNING, "Please move the BO2s manually and delete BOBPlugins afterwards.");
@@ -984,6 +987,7 @@ public class WorldConfig extends ConfigFile
     {
         // General information
         super(readStringFromStream(stream), null);
+        this.settingsDir = null;
 
         this.WorldFog = stream.readInt();
         this.WorldNightFog = stream.readInt();
