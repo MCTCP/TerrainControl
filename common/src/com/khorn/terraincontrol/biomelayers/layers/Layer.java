@@ -134,7 +134,7 @@ public abstract class Layer
 
             MainLayer = new LayerZoom(2001 + depth, MainLayer);
 
-            if (config.RandomRivers && riversStarted)
+            if (config.improvedRivers && riversStarted)
                 RiverLayer = new LayerZoom(2001 + depth, RiverLayer);
 
             if (config.LandSize == depth)
@@ -160,8 +160,8 @@ public abstract class Layer
             if (config.IceSize == depth)
                 MainLayer = new LayerIce(depth, MainLayer, config.IceRarity);
 
-            if (config.RiverRarity == depth)
-                if (config.RandomRivers)
+            if (config.riverRarity == depth)
+                if (config.improvedRivers)
                 {
                     RiverLayer = new LayerRiverInit(155, RiverLayer);
                     riversStarted = true;
@@ -169,9 +169,9 @@ public abstract class Layer
                     MainLayer = new LayerRiverInit(155, MainLayer);
 
 
-            if ((config.GenerationDepth - config.RiverSize) == depth)
+            if ((config.GenerationDepth - config.riverSize) == depth)
             {
-                if (config.RandomRivers)
+                if (config.improvedRivers)
                     RiverLayer = new LayerRiver(5 + depth, RiverLayer);
                 else
                     MainLayer = new LayerRiver(5 + depth, MainLayer);
@@ -229,7 +229,7 @@ public abstract class Layer
 
 
         }
-        if (config.RandomRivers)
+        if (config.improvedRivers)
             MainLayer = new LayerMixWithRiver(1L, MainLayer, RiverLayer, config, world);
         else
             MainLayer = new LayerMix(1L, MainLayer, config, world);

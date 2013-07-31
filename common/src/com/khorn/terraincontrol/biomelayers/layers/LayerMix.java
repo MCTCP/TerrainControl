@@ -20,10 +20,10 @@ public class LayerMix extends Layer
         {
             BiomeConfig biomeConfig = config.biomeConfigs[id];
 
-            if (biomeConfig == null || biomeConfig.RiverBiome.isEmpty())
+            if (biomeConfig == null || biomeConfig.riverBiome.isEmpty())
                 this.RiverBiomes[id] = -1;
             else
-                this.RiverBiomes[id] = world.getBiomeIdByName(biomeConfig.RiverBiome);
+                this.RiverBiomes[id] = world.getBiomeIdByName(biomeConfig.riverBiome);
 
         }
     }
@@ -54,7 +54,7 @@ public class LayerMix extends Layer
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
-                if (this.worldConfig.RiversEnabled && (currentPiece & RiverBits) != 0 && !this.worldConfig.biomeConfigs[cachedId].RiverBiome.isEmpty())
+                if (this.worldConfig.riversEnabled && (currentPiece & RiverBits) != 0 && !this.worldConfig.biomeConfigs[cachedId].riverBiome.isEmpty())
                     currentPiece = this.RiverBiomes[cachedId];
                 else
                     currentPiece = cachedId;

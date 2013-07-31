@@ -21,10 +21,10 @@ public class LayerMixWithRiver extends Layer
         {
             BiomeConfig biomeConfig = config.biomeConfigs[id];
 
-            if (biomeConfig == null || biomeConfig.RiverBiome.isEmpty())
+            if (biomeConfig == null || biomeConfig.riverBiome.isEmpty())
                 this.RiverBiomes[id] = -1;
             else
-                this.RiverBiomes[id] = world.getBiomeIdByName(biomeConfig.RiverBiome);
+                this.RiverBiomes[id] = world.getBiomeIdByName(biomeConfig.riverBiome);
 
         }
     }
@@ -91,7 +91,7 @@ public class LayerMixWithRiver extends Layer
             {
                 currentRiver = arrayOfInt2[(j + i * x_size)];
 
-                if (this.worldConfig.RiversEnabled && (currentRiver & RiverBits) != 0)
+                if (this.worldConfig.riversEnabled && (currentRiver & RiverBits) != 0)
                     currentRiver = 1;
                 else
                     currentRiver = 0;

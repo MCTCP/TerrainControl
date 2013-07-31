@@ -40,7 +40,7 @@ public enum TCDefaultValues implements TCSetting
     RiverRarity(4),
     RiverSize(0),
     RiversEnabled(true),
-    RandomRivers(false),
+    ImprovedRivers(false),
 
     FrozenOcean(true),
 
@@ -164,6 +164,7 @@ public enum TCDefaultValues implements TCSetting
     RiverHeight(-1.0F),
     RiverVolatility(0.3F),
     RiverWaterLevel(63),
+    RiverCustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0", SettingsType.StringArray),
 
     // End biome settings
 

@@ -101,21 +101,18 @@ public class ChunkProviderTC
 
         this.random.setSeed(x * 341873128712L + z * 132897987541L);
 
-        final byte[] arrayOfByte = new byte[chunkMaxX * this.height * chunkMaxZ];
+        final byte[] blockArray = new byte[chunkMaxX * this.height * chunkMaxZ];
 
-        generateTerrain(x, z, arrayOfByte);
+        generateTerrain(x, z, blockArray);
 
-        // this.BiomeArray = this.localWorld.getBiomes(this.BiomeArray, x * 16,
-        // z * 16, ChunkMaxX, ChunkMaxZ); now get it in generateTerrain
+        final boolean dry = addBiomeBlocksAndCheckWater(x, z, blockArray);
 
-        final boolean dry = addBiomeBlocksAndCheckWater(x, z, arrayOfByte);
-
-        this.caveGen.a(x, z, arrayOfByte);
-        this.canyonGen.a(x, z, arrayOfByte);
+        this.caveGen.a(x, z, blockArray);
+        this.canyonGen.a(x, z, blockArray);
 
         if (this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.Normal || this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
         {
-            this.localWorld.PrepareTerrainObjects(x, z, arrayOfByte, dry);
+            this.localWorld.PrepareTerrainObjects(x, z, blockArray, dry);
         }
 
         if (this.worldSettings.isDeprecated)
@@ -123,7 +120,7 @@ public class ChunkProviderTC
             this.worldSettings = this.worldSettings.newSettings;
         }
 
-        return arrayOfByte;
+        return blockArray;
 
     }
 
@@ -485,7 +482,11 @@ public class ChunkProviderTC
                         }
 
                     }
-                    output += biomeConfig.heightMatrix[y];
+                    if(!this.riverFound) {
+                        output += biomeConfig.heightMatrix[y];
+                    } else {
+                        output += biomeConfig.riverHeightMatrix[y];
+                    }
 
                     outArray[i3D] = output;
                     i3D++;

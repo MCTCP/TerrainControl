@@ -24,9 +24,11 @@ public class BiomeConfig extends ConfigFile
     public short[][] replaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
     public int ReplaceCount = 0;
 
+    public String riverBiome;
     public float riverHeight;
     public float riverVolatility;
     public int riverWaterLevel;
+    public double[] riverHeightMatrix;
 
     public int BiomeSize;
     public int BiomeRarity;
@@ -43,8 +45,6 @@ public class BiomeConfig extends ConfigFile
 
     public float BiomeTemperature;
     public float BiomeWetness;
-
-    public String RiverBiome;
 
     public byte SurfaceBlock;
     public byte GroundBlock;
@@ -92,7 +92,9 @@ public class BiomeConfig extends ConfigFile
 
     public enum VillageType
     {
-        disabled, wood, sandstone
+        disabled,
+        wood,
+        sandstone
     }
 
     public VillageType villageType;
@@ -100,7 +102,10 @@ public class BiomeConfig extends ConfigFile
 
     public enum RareBuildingType
     {
-        disabled, desertPyramid, jungleTemple, swampHut
+        disabled,
+        desertPyramid,
+        jungleTemple,
+        swampHut
     }
 
     public RareBuildingType rareBuildingType;
@@ -375,7 +380,7 @@ public class BiomeConfig extends ConfigFile
 
         this.BiomeColor = readModSettings(TCDefaultValues.BiomeColor.name(), this.defaultColor);
 
-        this.RiverBiome = readModSettings(TCDefaultValues.RiverBiome.name(), this.defaultRiverBiome);
+        this.riverBiome = readModSettings(TCDefaultValues.RiverBiome.name(), this.defaultRiverBiome);
 
         this.IsleInBiome = readModSettings(TCDefaultValues.IsleInBiome.name(), this.defaultIsle);
         this.BiomeIsBorder = readModSettings(TCDefaultValues.BiomeIsBorder.name(), this.defaultBorder);
@@ -417,7 +422,6 @@ public class BiomeConfig extends ConfigFile
         this.riverVolatility = readSettings(TCDefaultValues.RiverVolatility);
         this.riverWaterLevel = readSettings(TCDefaultValues.RiverWaterLevel);
 
-
         this.strongholdsEnabled = readModSettings(TCDefaultValues.StrongholdsEnabled.name(), this.defaultStrongholds);
         this.netherFortressesEnabled = readModSettings(TCDefaultValues.NetherFortressesEnabled.name(), true);
         this.villageType = (VillageType) readModSettings(TCDefaultValues.VillageType.name(), this.defaultVillageType);
@@ -440,24 +444,24 @@ public class BiomeConfig extends ConfigFile
         this.ReadCustomObjectSettings();
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
-        this.ReadHeightSettings();
+        this.heightMatrix = new double[this.worldConfig.WorldHeight / 8 + 1];
+        this.readHeightSettings(this.heightMatrix, TCDefaultValues.CustomHeightControl);
+        this.riverHeightMatrix = new double[this.worldConfig.WorldHeight / 8 + 1];
+        this.readHeightSettings(this.riverHeightMatrix, TCDefaultValues.RiverCustomHeightControl);
     }
 
-    private void ReadHeightSettings()
+    private void readHeightSettings(double[] heightMatrix, TCSetting setting)
     {
-        this.heightMatrix = new double[this.worldConfig.WorldHeight / 8 + 1];
-
-        ArrayList<String> keys = readSettings(TCDefaultValues.CustomHeightControl);
+        ArrayList<String> keys = readSettings(setting);
         try
         {
-            if (keys.size() != (this.worldConfig.WorldHeight / 8 + 1))
-                return;
-            for (int i = 0; i < this.worldConfig.WorldHeight / 8 + 1; i++)
-                this.heightMatrix[i] = Double.valueOf(keys.get(i));
-
+            for (int i = 0; i < heightMatrix.length && i < keys.size(); i++)
+            {
+                heightMatrix[i] = Double.parseDouble(keys.get(i));
+            }
         } catch (NumberFormatException e)
         {
-            System.out.println("Wrong height settings: '" + this.settingsCache.get(TCDefaultValues.CustomHeightControl.name().toLowerCase()) + "'");
+            logSettingValueInvalid(setting.name(), e);
         }
     }
 
@@ -483,7 +487,7 @@ public class BiomeConfig extends ConfigFile
                     if (values.length == 5)
                     {
                         // Replace in TC 2.3 style found
-                        values = new String[]{values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)};
+                        values = new String[] {values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)};
                     }
 
                     if (values.length != 2 && values.length != 4)
@@ -641,10 +645,6 @@ public class BiomeConfig extends ConfigFile
         writeValue(TCDefaultValues.BiomeColor.name(), this.BiomeColor);
         this.writeNewLine();
 
-        writeComment("Biome name used as river in this biome. Leave empty to disable rivers.");
-        writeValue(TCDefaultValues.RiverBiome.name(), this.RiverBiome);
-        this.writeNewLine();
-
         writeComment("Replace this biome to specified after all generations. Warning this will cause saplings and mob spawning work as in specified biome");
         writeValue(TCDefaultValues.ReplaceToBiomeName.name(), this.ReplaceBiomeName);
         this.writeNewLine();
@@ -705,19 +705,39 @@ public class BiomeConfig extends ConfigFile
         writeComment("Example:");
         writeComment("  CustomHeightControl:0.0,-2500.0,0.0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0");
         writeComment("Make empty layer above bedrock layer. ");
-        WriteHeightSettings();
+        writeHeightSettings(this.heightMatrix, TCDefaultValues.CustomHeightControl);
 
+        writeBigTitle("Rivers");
+        writeComment("There are two different river systems - the standard one and the improved one.");
+        writeComment("See the ImprovedRivers settting in the WorldConfig. Both modes have different");
+        writeComment("river settings, so carefully read the headers to know which settings you can use.");
         writeNewLine();
-        writeComment("blah blah blah");
+
+        writeSmallTitle("ImprovedRivers:false");
+        writeComment("Only available when ImprovedRivers is set to false in the WorldConfig.");
+        writeComment("Sets which biome is used as the river biome.");
+        writeValue(TCDefaultValues.RiverBiome.name(), this.riverBiome);
+        writeNewLine();
+
+        writeSmallTitle("ImprovedRivers:true");
+        writeComment("Only available when ImprovedRivers is set to true in the WorldConfig.");
+        writeComment("");
+        writeComment("Works the same as BiomeHeight (scroll up), but is used where a river is generated in this biome");
         writeValue(TCDefaultValues.RiverHeight.name(), this.riverHeight);
-
         writeNewLine();
-        writeComment("blah blah blah");
+
+        writeComment("Works the same as BiomeVolatility (scroll up), but is used where a river is generated in this biome");
         writeValue(TCDefaultValues.RiverVolatility.name(), this.riverVolatility);
-
         writeNewLine();
-        writeComment("blah blah blah");
+
+        writeComment("Works the same as WaterLevelMax (scroll down), but is used where a river is generated in this biome");
+        writeComment("Can be used to create elevated rivers");
         writeValue(TCDefaultValues.RiverWaterLevel.name(), this.riverWaterLevel);
+        writeNewLine();
+
+        writeComment("Works the same as CustomHeightControl (scroll up), but is used where a river is generated in this biome");
+        writeHeightSettings(this.riverHeightMatrix, TCDefaultValues.RiverCustomHeightControl);
+        writeNewLine();
 
         this.writeBigTitle("Blocks");
 
@@ -879,7 +899,6 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut or disabled.");
         this.writeValue(TCDefaultValues.RareBuildingType.name(), rareBuildingType.toString());
 
-
         this.writeNewLine();
         this.writeBigTitle("Mob spawning");
         if (DefaultBiome.getBiome(this.Biome.getId()) != null)
@@ -953,13 +972,13 @@ public class BiomeConfig extends ConfigFile
 
     }
 
-    private void WriteHeightSettings() throws IOException
+    private void writeHeightSettings(double[] heightMatrix, TCSetting setting) throws IOException
     {
-        String output = Double.toString(this.heightMatrix[0]);
-        for (int i = 1; i < this.heightMatrix.length; i++)
-            output = output + "," + Double.toString(this.heightMatrix[i]);
+        String output = Double.toString(heightMatrix[0]);
+        for (int i = 1; i < heightMatrix.length; i++)
+            output = output + "," + Double.toString(heightMatrix[i]);
 
-        this.writeValue(TCDefaultValues.CustomHeightControl.name(), output);
+        this.writeValue(setting.name(), output);
     }
 
     private void WriteModReplaceSettings() throws IOException
@@ -977,7 +996,8 @@ public class BiomeConfig extends ConfigFile
             if (replaceMatrixBlocks[blockIdFrom] == null)
                 continue;
 
-            int previousReplaceTo = -1; // What the y coord just below had it's replace setting set to
+            int previousReplaceTo = -1; // What the y coord just below had it's
+                                        // replace setting set to
             int yStart = 0;
 
             for (int y = 0; y <= replaceMatrixBlocks[blockIdFrom].length; y++)
@@ -1080,7 +1100,7 @@ public class BiomeConfig extends ConfigFile
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
 
         this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomes.contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
-        this.RiverBiome = (DefaultBiome.Contain(this.RiverBiome) || this.worldConfig.CustomBiomes.contains(this.RiverBiome)) ? this.RiverBiome : "";
+        this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.CustomBiomes.contains(this.riverBiome)) ? this.riverBiome : "";
 
     }
 
@@ -1134,7 +1154,8 @@ public class BiomeConfig extends ConfigFile
         // BiomeRivers
         if (!readModSettings("BiomeRivers", true))
         {
-            // If the rivers were disabled using the old setting, disable them also using the new setting
+            // If the rivers were disabled using the old setting, disable them
+            // also using the new setting
             this.settingsCache.put("riverbiome", "");
         }
 
@@ -1255,7 +1276,7 @@ public class BiomeConfig extends ConfigFile
                 this.defaultReed = 10;
                 this.defaultCactus = 10;
                 this.defaultColor = "0xFFCC33";
-                this.defaultWell = new Object[]{DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
+                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
                 this.defaultVillageType = VillageType.sandstone;
                 this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;
@@ -1308,7 +1329,8 @@ public class BiomeConfig extends ConfigFile
                 this.defaultColor = "0xCCCCCC";
                 if (worldConfig.readModSettings("FrozenRivers", true))
                 {
-                    // Only make river frozen if there isn't some old setting that prevents it
+                    // Only make river frozen if there isn't some old setting
+                    // that prevents it
                     this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
                 }
                 break;
@@ -1316,7 +1338,8 @@ public class BiomeConfig extends ConfigFile
                 this.defaultColor = "0xCC9966";
                 if (worldConfig.readModSettings("FrozenRivers", true))
                 {
-                    // Only make river frozen if there isn't some old setting that prevents it
+                    // Only make river frozen if there isn't some old setting
+                    // that prevents it
                     this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
                 }
                 break;
@@ -1363,7 +1386,7 @@ public class BiomeConfig extends ConfigFile
                 this.defaultReed = 50;
                 this.defaultCactus = 10;
                 this.defaultColor = "0x996600";
-                this.defaultWell = new Object[]{DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
+                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
                 this.defaultVillageType = VillageType.sandstone;
                 this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;
