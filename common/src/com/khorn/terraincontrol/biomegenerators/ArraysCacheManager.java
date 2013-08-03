@@ -1,31 +1,28 @@
-package com.khorn.terraincontrol.biomelayers;
+package com.khorn.terraincontrol.biomegenerators;
 
 @SuppressWarnings("rawtypes")
 public class ArraysCacheManager
 {
 
-    private static final ArrayCache[] ArrayCaches = new ArrayCache[4];
-    public static boolean NextRiver = false;
+    private static final ArraysCache[] ARRAYS_CACHes = new ArraysCache[4];
 
     static
     {
-        for (int i = 0; i < ArrayCaches.length; i++)
-            ArrayCaches[i] = new ArrayCache();
+        for (int i = 0; i < ARRAYS_CACHes.length; i++)
+            ARRAYS_CACHes[i] = new ArraysCache();
 
     }
 
-    public static ArrayCache GetCache()
+    public static ArraysCache GetCache()
     {
-        synchronized (ArrayCaches)
+        synchronized (ARRAYS_CACHes)
         {
-            for (ArrayCache ArrayCache : ArrayCaches)
+            for (ArraysCache ArraysCache : ARRAYS_CACHes)
             {
-                if (ArrayCache.isFree)
+                if (ArraysCache.isFree)
                 {
-                    ArrayCache.isFree = false;
-                    ArrayCache.ReturnRiver = NextRiver;
-                    NextRiver = false;
-                    return ArrayCache;
+                    ArraysCache.isFree = false;
+                    return ArraysCache;
                 }
             }
 
@@ -33,9 +30,9 @@ public class ArraysCacheManager
         return null; // Exception ??
     }
 
-    public static void ReleaseCache(ArrayCache cache)
+    public static void ReleaseCache(ArraysCache cache)
     {
-        synchronized (ArrayCaches)
+        synchronized (ARRAYS_CACHes)
         {
             cache.Release();
         }

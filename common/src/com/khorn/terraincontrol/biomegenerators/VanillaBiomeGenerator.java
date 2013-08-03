@@ -17,7 +17,7 @@ public class VanillaBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
+    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         return null;
     }
@@ -35,7 +35,7 @@ public class VanillaBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
+    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         return null;
     }

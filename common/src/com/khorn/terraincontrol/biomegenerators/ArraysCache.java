@@ -1,8 +1,8 @@
-package com.khorn.terraincontrol.biomelayers;
+package com.khorn.terraincontrol.biomegenerators;
 
 import java.util.ArrayList;
 
-public class ArrayCache
+public class ArraysCache
 {
 
     private final int[][] SmallArrays = new int[128][];
@@ -12,10 +12,10 @@ public class ArrayCache
 
     public boolean isFree = true;
 
-    public boolean ReturnRiver = false;
+    public OutputType outputType = OutputType.Full;
 
 
-    public ArrayCache()
+    public ArraysCache()
     {
 
     }
@@ -25,7 +25,7 @@ public class ArrayCache
         SmallArraysNext = 0;
         BigArraysNext = 0;
         isFree = true;
-        ReturnRiver = false;
+        outputType = OutputType.Full;
     }
 
     @SuppressWarnings({"unchecked"})

@@ -1,9 +1,9 @@
-package com.khorn.terraincontrol.biomelayers.layers;
+package com.khorn.terraincontrol.biomegenerators.biomelayers;
 
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.biomelayers.ArrayCache;
+import com.khorn.terraincontrol.biomegenerators.ArraysCache;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 
 
@@ -33,11 +33,11 @@ public class LayerBiomeBorder extends Layer
     }
 
     @Override
-    public int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size)
+    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
     {
-        int[] arrayOfInt1 = this.child.GetBiomes(arrayCache, x - 1, z - 1, x_size + 2, z_size + 2);
+        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x - 1, z - 1, x_size + 2, z_size + 2);
 
-        int[] arrayOfInt2 = arrayCache.GetArray(x_size * z_size);
+        int[] arrayOfInt2 = arraysCache.GetArray(x_size * z_size);
         for (int i = 0; i < z_size; i++)
         {
             for (int j = 0; j < x_size; j++)

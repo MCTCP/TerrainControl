@@ -1,7 +1,7 @@
-package com.khorn.terraincontrol.biomelayers.layers;
+package com.khorn.terraincontrol.biomegenerators.biomelayers;
 
 
-import com.khorn.terraincontrol.biomelayers.ArrayCache;
+import com.khorn.terraincontrol.biomegenerators.ArraysCache;
 
 public class LayerZoomVoronoi extends Layer
 {
@@ -11,7 +11,7 @@ public class LayerZoomVoronoi extends Layer
         this.child = paramGenLayer;
     }
 
-    public int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size)
+    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
     {
         x -= 2;
         z -= 2;
@@ -21,11 +21,11 @@ public class LayerZoomVoronoi extends Layer
         int m = z >> i;
         int n = (x_size >> i) + 3;
         int i1 = (z_size >> i) + 3;
-        int[] arrayOfInt1 = this.child.GetBiomes(arrayCache, k, m, n, i1);
+        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, k, m, n, i1);
 
         int i2 = n << i;
         int i3 = i1 << i;
-        int[] arrayOfInt2 = arrayCache.GetArray( i2 * i3);
+        int[] arrayOfInt2 = arraysCache.GetArray( i2 * i3);
         for (int i4 = 0; i4 < i1 - 1; i4++)
         {
             int i5 = arrayOfInt1[((i4) * n)];
@@ -76,7 +76,7 @@ public class LayerZoomVoronoi extends Layer
                 i6 = i9;
             }
         }
-        int[] arrayOfInt3 = arrayCache.GetArray( x_size * z_size);
+        int[] arrayOfInt3 = arraysCache.GetArray( x_size * z_size);
         for (int i5 = 0; i5 < z_size; i5++)
         {
             System.arraycopy(arrayOfInt2, (i5 + (z & j - 1)) * (n << i) + (x & j - 1), arrayOfInt3, i5 * x_size, x_size);

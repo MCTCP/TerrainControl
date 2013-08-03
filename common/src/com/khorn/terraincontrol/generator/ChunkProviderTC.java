@@ -3,17 +3,19 @@ package com.khorn.terraincontrol.generator;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.biomelayers.ArraysCacheManager;
+import com.khorn.terraincontrol.biomegenerators.OutputType;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.noise.NoiseGeneratorPerlinOctaves;
 import com.khorn.terraincontrol.generator.terrainsgens.CanyonsGen;
 import com.khorn.terraincontrol.generator.terrainsgens.CavesGen;
 import com.khorn.terraincontrol.generator.terrainsgens.TerrainGenBase;
 import com.khorn.terraincontrol.util.MathHelper;
-import com.khorn.terraincontrol.generator.noise.NoiseGeneratorPerlinOctaves;
 
 import java.util.Random;
 
+// Please don`t remove this. This disable warnings about x+0 arithmetic operations in my IDE.  Khorn.
+@SuppressWarnings("PointlessArithmeticExpression")
 public class ChunkProviderTC
 {
     private final Random random;
@@ -38,7 +40,7 @@ public class ChunkProviderTC
 
     private double riverVol;
     private double riverHeight;
-    private boolean riverFound = false;
+    private boolean riverFound = false;  // Always false if improved rivers disabled.
 
     private final LocalWorld localWorld;
     private double volatilityFactor;
@@ -84,7 +86,7 @@ public class ChunkProviderTC
 
         // Contains 2d array 5*5. Maximum weight is in array center.
         this.nearBiomeWeightArray = new float[25];
-        
+
         for (int x = -2; x <= 2; x++)
         {
             for (int z = -2; z <= 2; z++)
@@ -132,20 +134,21 @@ public class ChunkProviderTC
         final int noise_xSize = four + 1;
         final int noise_ySize = this.height / 8 + 1;
         final int noise_zSize = four + 1;
-        ArraysCacheManager.NextRiver = true;
-        this.riverArray = this.localWorld.getBiomesUnZoomed(this.riverArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5);
+
+        if (worldSettings.improvedRivers)
+            this.riverArray = this.localWorld.getBiomesUnZoomed(this.riverArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5, OutputType.OnlyRivers);
 
         if (this.worldSettings.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
         {
-            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 16, chunkZ * 16, 16, 16);
+            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 16, chunkZ * 16, 16, 16, null);
         } else
         {
-            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5);
+            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5, null);
         }
 
         this.rawTerrain = generateTerrainNoise(this.rawTerrain, chunkX * four, 0, chunkZ * four, noise_xSize, noise_ySize, noise_zSize);
 
-        this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * 16, chunkZ * 16, chunkMaxX, chunkMaxZ);
+        this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * 16, chunkZ * 16, chunkMaxX, chunkMaxZ, null);
 
         final double oneEight = 0.125D;
         final int z_step = 1 << this.heightBits;
@@ -426,13 +429,15 @@ public class ChunkProviderTC
                     noiseHeight /= 8.0D;
                 }
 
-                if (this.worldSettings.oldTerrainGenerator)
+                if (!this.worldSettings.oldTerrainGenerator)
                 {
-                    this.oldTerrainNoise(x, z, i2D, max_X, max_Y, noiseHeight);
+                    if (this.worldSettings.improvedRivers)
+                        this.biomeFactorWithRivers(x, z, max_X, max_Y, noiseHeight);
+                    else
+                        this.biomeFactor(x, z, max_X, max_Y, noiseHeight);
                 } else
-                {
-                    this.newTerrainNoise(x, z, max_X, max_Y, noiseHeight);
-                }
+                    this.oldBiomeFactor(x, z, i2D, max_X, max_Y, noiseHeight);
+
 
                 i2D++;
 
@@ -442,12 +447,12 @@ public class ChunkProviderTC
 
                     double d8;
 
-                    if (!this.riverFound)
-                    {
-                        d8 = (this.heightFactor - y) * 12.0D * 128.0D / this.height / this.volatilityFactor;
-                    } else
+                    if (this.riverFound)
                     {
                         d8 = (this.riverHeight - y) * 12.0D * 128.0D / this.height / this.riverVol;
+                    } else
+                    {
+                        d8 = (this.heightFactor - y) * 12.0D * 128.0D / this.height / this.volatilityFactor;
                     }
 
                     if (d8 > 0.0D)
@@ -482,10 +487,12 @@ public class ChunkProviderTC
                         }
 
                     }
-                    if(!this.riverFound) {
-                        output += biomeConfig.heightMatrix[y];
-                    } else {
+                    if (this.riverFound)
+                    {
                         output += biomeConfig.riverHeightMatrix[y];
+                    } else
+                    {
+                        output += biomeConfig.heightMatrix[y];
                     }
 
                     outArray[i3D] = output;
@@ -497,7 +504,7 @@ public class ChunkProviderTC
 
     }
 
-    private void oldTerrainNoise(int x, int z, int i4, int max_X, int max_Y, double noiseHeight)
+    private void oldBiomeFactor(int x, int z, int i4, int max_X, int max_Y, double noiseHeight)
     {
         if (this.worldSettings.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
         {
@@ -525,14 +532,64 @@ public class ChunkProviderTC
         this.heightFactor = max_Y * (2.0D + noiseHeight) / 4.0D;
     }
 
-    private void newTerrainNoise(int x, int z, int max_X, int max_Y, double noiseHeight)
+    private void biomeFactor(int x, int z, int max_X, int max_Y, double noiseHeight)
     {
         float volatilitySum = 0.0F;
         float heightSum = 0.0F;
         float biomeWeightSum = 0.0F;
 
-        float volRiverSum = 0.0F;
-        float heightRiverSum = 0.0F;
+
+        // TODO We may change biome scan radius for smooth terrain
+        final int lookRadius = 2;
+
+        final int biomeId = this.biomeArray[(x + 2 + (z + 2) * (max_X + 5))];
+
+        BiomeConfig nextBiomeConfig;
+        float nextBiomeHeight, biomeWeight;
+
+        for (int nextX = -lookRadius; nextX <= lookRadius; nextX++)
+        {
+            for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
+            {
+                final int nextBiomeId = this.biomeArray[(x + nextX + 2 + (z + nextZ + 2) * (max_X + 5))];
+
+                nextBiomeConfig = this.worldSettings.biomeConfigs[nextBiomeId];
+                nextBiomeHeight = nextBiomeConfig.BiomeHeight;
+
+                biomeWeight = this.nearBiomeWeightArray[(nextX + 2 + (nextZ + 2) * 5)] / (nextBiomeHeight + 2.0F);
+                biomeWeight = Math.abs(biomeWeight);
+                if (nextBiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
+                {
+                    biomeWeight /= 2.0F;
+                }
+                volatilitySum += nextBiomeConfig.BiomeVolatility * biomeWeight;
+                heightSum += nextBiomeHeight * biomeWeight;
+                biomeWeightSum += biomeWeight;
+
+            }
+        }
+
+        volatilitySum /= biomeWeightSum;
+        heightSum /= biomeWeightSum;
+
+        this.waterLevelRaw[x * max_X + z] = (byte) this.worldSettings.biomeConfigs[biomeId].waterLevelMax;
+
+        volatilitySum = volatilitySum * 0.9F + 0.1F;   // Must be != 0
+        heightSum = (heightSum * 4.0F - 1.0F) / 8.0F;  // Silly magic numbers
+
+        this.volatilityFactor = volatilitySum;
+        this.heightFactor = max_Y * (2.0D + heightSum + noiseHeight * 0.2D) / 4.0D;
+
+    }
+
+    private void biomeFactorWithRivers(int x, int z, int max_X, int max_Y, double noiseHeight)
+    {
+        float volatilitySum = 0.0F;
+        float heightSum = 0.0F;
+        float WeightSum = 0.0F;
+
+        float riverVolatilitySum = 0.0F;
+        float riverHeightSum = 0.0F;
         float riverWeightSum = 0.0F;
 
         // TODO We may change biome scan radius for smooth terrain
@@ -544,16 +601,19 @@ public class ChunkProviderTC
 
         final float riverCenterHeight = this.riverFound ? this.worldSettings.biomeConfigs[biomeId].riverHeight : this.worldSettings.biomeConfigs[biomeId].BiomeHeight;
 
+        BiomeConfig nextBiomeConfig;
+        float nextBiomeHeight, biomeWeight, nextRiverHeight, riverWeight;
+
+
         for (int nextX = -lookRadius; nextX <= lookRadius; nextX++)
         {
             for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
             {
-                final int nextBiomeId = this.biomeArray[(x + nextX + 2 + (z + nextZ + 2) * (max_X + 5))];
 
-                final BiomeConfig nextBiomeConfig = this.worldSettings.biomeConfigs[nextBiomeId];
-                final float nextBiomeHeight = nextBiomeConfig.BiomeHeight;
+                nextBiomeConfig = this.worldSettings.biomeConfigs[this.biomeArray[(x + nextX + 2 + (z + nextZ + 2) * (max_X + 5))]];
+                nextBiomeHeight = nextBiomeConfig.BiomeHeight;
+                biomeWeight = this.nearBiomeWeightArray[(nextX + 2 + (nextZ + 2) * 5)] / (nextBiomeHeight + 2.0F);
 
-                float biomeWeight = this.nearBiomeWeightArray[(nextX + 2 + (nextZ + 2) * 5)] / (nextBiomeHeight + 2.0F);
                 biomeWeight = Math.abs(biomeWeight);
                 if (nextBiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
                 {
@@ -561,7 +621,7 @@ public class ChunkProviderTC
                 }
                 volatilitySum += nextBiomeConfig.BiomeVolatility * biomeWeight;
                 heightSum += nextBiomeHeight * biomeWeight;
-                biomeWeightSum += biomeWeight;
+                WeightSum += biomeWeight;
 
                 // River part
 
@@ -572,25 +632,25 @@ public class ChunkProviderTC
                     isRiver = true;
                 }
 
-                float nextRiverHeight = (isRiver) ? nextBiomeConfig.riverHeight : nextBiomeHeight;
+                nextRiverHeight = (isRiver) ? nextBiomeConfig.riverHeight : nextBiomeHeight;
+                riverWeight = this.nearBiomeWeightArray[(nextX + 2 + (nextZ + 2) * 5)] / (nextRiverHeight + 2.0F);
 
-                float riverWeight = this.nearBiomeWeightArray[(nextX + 2 + (nextZ + 2) * 5)] / (nextRiverHeight + 2.0F);
                 riverWeight = Math.abs(riverWeight);
                 if (nextRiverHeight > riverCenterHeight)
                 {
                     nextRiverHeight /= 2.0F;
                 }
-                volRiverSum += (isRiver ? nextBiomeConfig.riverVolatility : nextBiomeConfig.BiomeVolatility) * riverWeight;
-                heightRiverSum += nextRiverHeight * riverWeight;
+                riverVolatilitySum += (isRiver ? nextBiomeConfig.riverVolatility : nextBiomeConfig.BiomeVolatility) * riverWeight;
+                riverHeightSum += nextRiverHeight * riverWeight;
                 riverWeightSum += riverWeight;
             }
         }
 
-        volatilitySum /= biomeWeightSum;
-        heightSum /= biomeWeightSum;
+        volatilitySum /= WeightSum;
+        heightSum /= WeightSum;
 
-        volRiverSum /= riverWeightSum;
-        heightRiverSum /= riverWeightSum;
+        riverVolatilitySum /= riverWeightSum;
+        riverHeightSum /= riverWeightSum;
 
         float waterLevelSum = this.riverFound ? this.worldSettings.biomeConfigs[biomeId].riverWaterLevel : this.worldSettings.biomeConfigs[biomeId].waterLevelMax;
         this.waterLevelRaw[x * max_X + z] = (byte) waterLevelSum;
@@ -601,12 +661,12 @@ public class ChunkProviderTC
         this.volatilityFactor = volatilitySum;
         this.heightFactor = max_Y * (2.0D + heightSum + noiseHeight * 0.2D) / 4.0D;
 
-        volRiverSum = volRiverSum * 0.9F + 0.1F; // Must be != 0
-        heightRiverSum = (heightRiverSum * 4.0F - 1.0F) / 8.0F; // Silly magic
-                                                                // numbers
+        riverVolatilitySum = riverVolatilitySum * 0.9F + 0.1F; // Must be != 0
+        riverHeightSum = (riverHeightSum * 4.0F - 1.0F) / 8.0F; // Silly magic
+        // numbers
 
-        this.riverVol = volRiverSum;
-        this.riverHeight = max_Y * (2.0D + heightRiverSum + noiseHeight * 0.2D) / 4.0D;
+        this.riverVol = riverVolatilitySum;
+        this.riverHeight = max_Y * (2.0D + riverHeightSum + noiseHeight * 0.2D) / 4.0D;
 
     }
 

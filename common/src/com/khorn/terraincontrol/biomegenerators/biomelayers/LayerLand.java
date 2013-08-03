@@ -1,7 +1,7 @@
-package com.khorn.terraincontrol.biomelayers.layers;
+package com.khorn.terraincontrol.biomegenerators.biomelayers;
 
 
-import com.khorn.terraincontrol.biomelayers.ArrayCache;
+import com.khorn.terraincontrol.biomegenerators.ArraysCache;
 
 public class LayerLand extends Layer
 {
@@ -15,12 +15,12 @@ public class LayerLand extends Layer
     public int chance = 5;
 
     @Override
-    public int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size)
+    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
     {
 
-        int[] arrayOfInt1 = this.child.GetBiomes(arrayCache, x, z, x_size, z_size);
+        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
 
-        int[] arrayOfInt2 = arrayCache.GetArray( x_size * z_size);
+        int[] arrayOfInt2 = arraysCache.GetArray( x_size * z_size);
         for (int i = 0; i < z_size; i++)
         {
             for (int j = 0; j < x_size; j++)

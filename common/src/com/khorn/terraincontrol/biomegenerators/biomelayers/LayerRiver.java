@@ -1,7 +1,7 @@
-package com.khorn.terraincontrol.biomelayers.layers;
+package com.khorn.terraincontrol.biomegenerators.biomelayers;
 
 
-import com.khorn.terraincontrol.biomelayers.ArrayCache;
+import com.khorn.terraincontrol.biomegenerators.ArraysCache;
 
 public class LayerRiver extends Layer
 {
@@ -11,15 +11,15 @@ public class LayerRiver extends Layer
         this.child = paramGenLayer;
     }
 
-    public int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size)
+    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
     {
         int i = x - 1;
         int j = z - 1;
         int k = x_size + 2;
         int m = z_size + 2;
-        int[] arrayOfInt1 = this.child.GetBiomes(arrayCache, i, j, k, m);
+        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, i, j, k, m);
 
-        int[] arrayOfInt2 = arrayCache.GetArray( x_size * z_size);
+        int[] arrayOfInt2 = arraysCache.GetArray( x_size * z_size);
         for (int n = 0; n < z_size; n++)
         {
             for (int i1 = 0; i1 < x_size; i1++)

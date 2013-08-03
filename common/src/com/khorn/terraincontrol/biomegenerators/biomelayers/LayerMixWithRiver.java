@@ -1,0 +1,163 @@
+package com.khorn.terraincontrol.biomegenerators.biomelayers;
+
+
+import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.biomegenerators.ArraysCache;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+
+public class LayerMixWithRiver extends Layer
+{
+    public LayerMixWithRiver(long paramLong, Layer paramGenLayer, Layer riverLayer, WorldConfig config, LocalWorld world)
+    {
+        super(paramLong);
+        this.child = paramGenLayer;
+        this.worldConfig = config;
+        this.riverLayer = riverLayer;
+        this.riverBiomes = new int[world.getMaxBiomesCount()];
+
+        for (int id = 0; id < this.riverBiomes.length; id++)
+        {
+            BiomeConfig biomeConfig = config.biomeConfigs[id];
+
+            if (biomeConfig == null || biomeConfig.riverBiome.isEmpty())
+                this.riverBiomes[id] = -1;
+            else
+                this.riverBiomes[id] = world.getBiomeIdByName(biomeConfig.riverBiome);
+
+        }
+    }
+
+    private WorldConfig worldConfig;
+    private int[] riverBiomes;
+    private Layer riverLayer;
+
+    public void SetWorldSeed(long seed)
+    {
+        super.SetWorldSeed(seed);
+        riverLayer.SetWorldSeed(seed + 31337);
+    }
+
+    @Override
+    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    {
+        switch (arraysCache.outputType)
+        {
+            case Full:
+                return this.GetFull(arraysCache, x, z, x_size, z_size);
+            case WithoutRivers:
+                return this.GetWithoutRivers(arraysCache, x, z, x_size, z_size);
+            case OnlyRivers:
+                return this.GetOnlyRivers(arraysCache, x, z, x_size, z_size);
+            default:
+                return null;
+        }
+    }
+
+    private int[] GetFull(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    {
+        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
+        int[] arrayOfInt2 = this.riverLayer.GetBiomes(arraysCache, x, z, x_size, z_size);
+        int[] arrayOfInt3 = arraysCache.GetArray(x_size * z_size);
+
+        int currentPiece;
+        int currentRiver;
+        int cachedId;
+        for (int i = 0; i < z_size; i++)
+        {
+            for (int j = 0; j < x_size; j++)
+            {
+                currentPiece = arrayOfInt1[(j + i * x_size)];
+                currentRiver = arrayOfInt2[(j + i * x_size)];
+
+                if ((currentPiece & LandBit) != 0)
+                    cachedId = currentPiece & BiomeBits;
+                else if (this.worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                    cachedId = DefaultBiome.FROZEN_OCEAN.Id;
+                else
+                    cachedId = DefaultBiome.OCEAN.Id;
+
+                if (this.worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !this.worldConfig.biomeConfigs[cachedId].riverBiome.isEmpty())
+                    currentPiece = this.riverBiomes[cachedId];
+                else
+                    currentPiece = cachedId;
+
+                arrayOfInt3[(j + i * x_size)] = currentPiece;
+            }
+        }
+
+        return arrayOfInt3;
+
+    }
+
+    private int[] GetWithoutRivers(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    {
+        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
+        //int[] arrayOfInt2 = this.riverLayer.GetBiomes(arraysCache, x, z, x_size, z_size);
+        int[] arrayOfInt3 = arraysCache.GetArray(x_size * z_size);
+
+        int currentPiece;
+        // int currentRiver;
+        int cachedId;
+        for (int i = 0; i < z_size; i++)
+        {
+            for (int j = 0; j < x_size; j++)
+            {
+                currentPiece = arrayOfInt1[(j + i * x_size)];
+                // currentRiver = arrayOfInt2[(j + i * x_size)];
+
+                if ((currentPiece & LandBit) != 0)
+                    cachedId = currentPiece & BiomeBits;
+                else if (this.worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                    cachedId = DefaultBiome.FROZEN_OCEAN.Id;
+                else
+                    cachedId = DefaultBiome.OCEAN.Id;
+
+                /*if (this.worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !this.worldConfig.biomeConfigs[cachedId].riverBiome.isEmpty())
+                    currentPiece = this.riverBiomes[cachedId];
+                else*/
+                currentPiece = cachedId;
+
+                arrayOfInt3[(j + i * x_size)] = currentPiece;
+            }
+        }
+
+        return arrayOfInt3;
+    }
+
+    private int[] GetOnlyRivers(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    {
+        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
+        int[] arrayOfInt2 = this.riverLayer.GetBiomes(arraysCache, x, z, x_size, z_size);
+        int[] arrayOfInt3 = arraysCache.GetArray(x_size * z_size);
+
+        int currentPiece;
+        int currentRiver;
+        int cachedId;
+        for (int i = 0; i < z_size; i++)
+        {
+            for (int j = 0; j < x_size; j++)
+            {
+                currentPiece = arrayOfInt1[(j + i * x_size)];
+                currentRiver = arrayOfInt2[(j + i * x_size)];
+
+                if ((currentPiece & LandBit) != 0)
+                    cachedId = currentPiece & BiomeBits;
+                else if (this.worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                    cachedId = DefaultBiome.FROZEN_OCEAN.Id;
+                else
+                    cachedId = DefaultBiome.OCEAN.Id;
+
+                if (this.worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !this.worldConfig.biomeConfigs[cachedId].riverBiome.isEmpty())
+                    currentPiece = 1;
+                else
+                    currentPiece = 0;
+
+                arrayOfInt3[(j + i * x_size)] = currentPiece;
+            }
+        }
+
+        return arrayOfInt3;
+    }
+}

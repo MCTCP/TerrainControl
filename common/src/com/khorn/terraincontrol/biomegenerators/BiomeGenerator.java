@@ -15,20 +15,28 @@ public abstract class BiomeGenerator
         this.worldConfig = world.getSettings();
         this.cache = cache;
     }
-    
-    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int xSize, int zSize)
+    /*public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int xSize, int zSize)
     {
         // Fall back on getBiomes
         return getBiomes(biomeArray, x, z, xSize, zSize);
+    }*/
+    
+    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int xSize, int zSize, OutputType type)
+    {
+        // Fall back on getBiomes
+        return getBiomes(biomeArray, x, z, xSize, zSize, type);
     }
 
     public abstract float[] getTemperatures(float[] paramArrayOfFloat, int x, int z, int xSize, int zSize);
     
     public abstract float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int xSize, int zSize);
 
-    public abstract int[] getBiomes(int[] biomeArray, int x, int z, int xSize, int zSize);
+    //public abstract int[] getBiomes(int[] biomeArray, int x, int z, int xSize, int zSize);
+
+    public abstract int[] getBiomes(int[] biomeArray, int x, int z, int xSize, int zSize, OutputType type);
 
     public abstract int getBiome(int x, int z);
     
     public abstract void cleanupCache();
+
 }

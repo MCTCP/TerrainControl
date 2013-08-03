@@ -78,7 +78,7 @@ public class OldBiomeGenerator extends BiomeGenerator
             temp_out = new float[x_size * z_size];
         }
         int[] temp_biomeBases = new int[x_size * z_size];
-        temp_biomeBases = this.getBiomes(temp_biomeBases, x, z, x_size, z_size, false);
+        this.getBiomes(temp_biomeBases, x, z, x_size, z_size, false);
 
         for (int i = 0; i < temp_out.length; i++)
             temp_out[i] = (float) this.oldWetness[i];
@@ -143,7 +143,7 @@ public class OldBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
+    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         return getBiomes(biomeArray, x, z, x_size, z_size, false);
     }

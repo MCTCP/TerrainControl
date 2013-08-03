@@ -1,10 +1,10 @@
-package com.khorn.terraincontrol.biomelayers.layers;
+package com.khorn.terraincontrol.biomegenerators.biomelayers;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.biomelayers.ArrayCache;
+import com.khorn.terraincontrol.biomegenerators.ArraysCache;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
@@ -134,7 +134,7 @@ public abstract class Layer
 
             MainLayer = new LayerZoom(2001 + depth, MainLayer);
 
-            if (config.improvedRivers && riversStarted)
+            if (config.randomRivers && riversStarted)
                 RiverLayer = new LayerZoom(2001 + depth, RiverLayer);
 
             if (config.LandSize == depth)
@@ -161,7 +161,7 @@ public abstract class Layer
                 MainLayer = new LayerIce(depth, MainLayer, config.IceRarity);
 
             if (config.riverRarity == depth)
-                if (config.improvedRivers)
+                if (config.randomRivers)
                 {
                     RiverLayer = new LayerRiverInit(155, RiverLayer);
                     riversStarted = true;
@@ -171,7 +171,7 @@ public abstract class Layer
 
             if ((config.GenerationDepth - config.riverSize) == depth)
             {
-                if (config.improvedRivers)
+                if (config.randomRivers)
                     RiverLayer = new LayerRiver(5 + depth, RiverLayer);
                 else
                     MainLayer = new LayerRiver(5 + depth, MainLayer);
@@ -229,7 +229,7 @@ public abstract class Layer
 
 
         }
-        if (config.improvedRivers)
+        if (config.randomRivers)
             MainLayer = new LayerMixWithRiver(1L, MainLayer, RiverLayer, config, world);
         else
             MainLayer = new LayerMix(1L, MainLayer, config, world);
@@ -252,8 +252,8 @@ public abstract class Layer
 
         ZoomedLayer.SetWorldSeed(paramLong);
 
-        MainLayer = new LayerCacheInit(1, MainLayer);
-        ZoomedLayer = new LayerCacheInit(1, ZoomedLayer);
+        //MainLayer = new LayerCacheInit(1, MainLayer);
+        //ZoomedLayer = new LayerCacheInit(1, ZoomedLayer);
 
         return new Layer[]{MainLayer, ZoomedLayer};
     }
@@ -305,11 +305,6 @@ public abstract class Layer
         return i;
     }
 
-    protected abstract int[] GetBiomes(ArrayCache arrayCache, int x, int z, int x_size, int z_size);
-
-    public int[] Calculate(int x, int z, int x_size, int z_size)
-    {
-        return new int[0];
-    }
+    public abstract int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size);
 
 }

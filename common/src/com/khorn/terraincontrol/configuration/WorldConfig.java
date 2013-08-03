@@ -64,6 +64,7 @@ public class WorldConfig extends ConfigFile
     public int riverSize;
     public boolean riversEnabled;
     public boolean improvedRivers;
+    public boolean randomRivers;
 
     // Biome image
 
@@ -423,6 +424,7 @@ public class WorldConfig extends ConfigFile
         this.riverSize = readSettings(TCDefaultValues.RiverSize);
         this.riversEnabled = readSettings(TCDefaultValues.RiversEnabled);
         this.improvedRivers = readSettings(TCDefaultValues.ImprovedRivers);
+        this.randomRivers = readSettings(TCDefaultValues.RandomRivers);
 
         // Biomes
         this.NormalBiomes = readSettings(TCDefaultValues.NormalBiomes);
@@ -680,6 +682,10 @@ public class WorldConfig extends ConfigFile
         writeComment("river will also won't use a technical biome in your world anymore, instead you can");
         writeComment("control them using the river settings in the BiomeConfigs.");
         writeValue(TCDefaultValues.ImprovedRivers.name(), this.improvedRivers);
+        writeNewLine();
+
+        // Need comment here.
+        writeValue(TCDefaultValues.RandomRivers.name(), this.randomRivers);
         writeNewLine();
 
         // Settings for BiomeMode:FromImage
