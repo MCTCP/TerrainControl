@@ -14,7 +14,8 @@ import com.khorn.terraincontrol.util.MathHelper;
 
 import java.util.Random;
 
-// Please don`t remove this. This disable warnings about x+0 arithmetic operations in my IDE.  Khorn.
+// Please don`t remove this. This disable warnings about x+0 arithmetic
+// operations in my IDE. Khorn.
 @SuppressWarnings("PointlessArithmeticExpression")
 public class ChunkProviderTC
 {
@@ -40,7 +41,8 @@ public class ChunkProviderTC
 
     private double riverVol;
     private double riverHeight;
-    private boolean riverFound = false;  // Always false if improved rivers disabled.
+    // Always false if improved rivers disabled
+    private boolean riverFound = false;
 
     private final LocalWorld localWorld;
     private double volatilityFactor;
@@ -136,19 +138,21 @@ public class ChunkProviderTC
         final int noise_zSize = four + 1;
 
         if (worldSettings.improvedRivers)
-            this.riverArray = this.localWorld.getBiomesUnZoomed(this.riverArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5, OutputType.OnlyRivers);
+            this.riverArray = this.localWorld.getBiomesUnZoomed(this.riverArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5, OutputType.ONLY_RIVERS);
 
-        if (this.worldSettings.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
+        if (this.localWorld.canBiomeManagerGenerateUnzoomed())
         {
-            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 16, chunkZ * 16, 16, 16, null);
+            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5, OutputType.DEFAULT_FOR_WORLD);
         } else
         {
-            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5, null);
+            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 16, chunkZ * 16, 16, 16, OutputType.DEFAULT_FOR_WORLD);
         }
 
         this.rawTerrain = generateTerrainNoise(this.rawTerrain, chunkX * four, 0, chunkZ * four, noise_xSize, noise_ySize, noise_zSize);
 
-        this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * 16, chunkZ * 16, chunkMaxX, chunkMaxZ, null);
+        // Now that the raw terrain is generated, replace raw biome array with
+        // fine-tuned one.
+        this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * 16, chunkZ * 16, chunkMaxX, chunkMaxZ, OutputType.DEFAULT_FOR_WORLD);
 
         final double oneEight = 0.125D;
         final int z_step = 1 << this.heightBits;
@@ -438,7 +442,6 @@ public class ChunkProviderTC
                 } else
                     this.oldBiomeFactor(x, z, i2D, max_X, max_Y, noiseHeight);
 
-
                 i2D++;
 
                 for (int y = 0; y < max_Y; y++)
@@ -538,7 +541,6 @@ public class ChunkProviderTC
         float heightSum = 0.0F;
         float biomeWeightSum = 0.0F;
 
-
         // TODO We may change biome scan radius for smooth terrain
         final int lookRadius = 2;
 
@@ -603,7 +605,6 @@ public class ChunkProviderTC
 
         BiomeConfig nextBiomeConfig;
         float nextBiomeHeight, biomeWeight, nextRiverHeight, riverWeight;
-
 
         for (int nextX = -lookRadius; nextX <= lookRadius; nextX++)
         {

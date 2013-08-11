@@ -12,8 +12,7 @@ public class ArraysCache
 
     public boolean isFree = true;
 
-    public OutputType outputType = OutputType.Full;
-
+    public OutputType outputType = OutputType.FULL;
 
     public ArraysCache()
     {
@@ -25,7 +24,7 @@ public class ArraysCache
         SmallArraysNext = 0;
         BigArraysNext = 0;
         isFree = true;
-        outputType = OutputType.Full;
+        outputType = OutputType.FULL;
     }
 
     @SuppressWarnings({"unchecked"})

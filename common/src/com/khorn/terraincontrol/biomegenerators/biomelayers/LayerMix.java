@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.biomegenerators.biomelayers;
 
-
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.biomegenerators.ArraysCache;
@@ -36,18 +35,17 @@ public class LayerMix extends Layer
     {
         switch (arraysCache.outputType)
         {
-            case Full:
+            case FULL:
                 return this.GetFull(arraysCache, x, z, x_size, z_size);
-            case WithoutRivers:
+            case WITHOUT_RIVERS:
                 return this.GetWithoutRivers(arraysCache, x, z, x_size, z_size);
-            case OnlyRivers:
+            case ONLY_RIVERS:
                 return this.GetOnlyRivers(arraysCache, x, z, x_size, z_size);
             default:
-                return null;
+                throw new UnsupportedOperationException("Unknown/invalid output type: " + arraysCache.outputType);
         }
 
     }
-
 
     private int[] GetFull(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
     {
@@ -103,9 +101,6 @@ public class LayerMix extends Layer
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
-                /*if (this.worldConfig.riversEnabled && (currentPiece & RiverBits) != 0 && !this.worldConfig.biomeConfigs[cachedId].riverBiome.isEmpty())
-                    currentPiece = this.riverBiomes[cachedId];
-                else*/
                 currentPiece = cachedId;
 
                 arrayOfInt2[(j + i * x_size)] = currentPiece;

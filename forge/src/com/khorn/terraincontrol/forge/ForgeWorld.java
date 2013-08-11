@@ -24,13 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-/**
- * The name of this class is a relic from when it could only
- * be used for singleplayer. Shortly after Terrain Control
- * was converted to use Forge instead of ModLoader, it also
- * worked on multiplayer. However, the name was unchanged.
- * A better name would be ForgeWorld.
- */
 public class ForgeWorld implements LocalWorld
 {
     private ChunkProvider generator;
@@ -725,5 +718,13 @@ public class ForgeWorld implements LocalWorld
     public CustomObjectStructureCache getStructureCache()
     {
         return this.structureCache;
+    }
+
+    @Override
+    public boolean canBiomeManagerGenerateUnzoomed()
+    {
+        if(this.biomeManager != null)
+            return biomeManager.canGenerateUnZoomed();
+        return true;
     }
 }

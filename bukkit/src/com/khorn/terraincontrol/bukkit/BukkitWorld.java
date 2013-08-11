@@ -756,4 +756,12 @@ public class BukkitWorld implements LocalWorld
     {
         return this.structureCache;
     }
+
+    @Override
+    public boolean canBiomeManagerGenerateUnzoomed()
+    {
+        if(this.biomeManager != null)
+            return biomeManager.canGenerateUnZoomed();
+        return true;
+    }
 }

@@ -678,13 +678,12 @@ public class WorldConfig extends ConfigFile
         writeComment("This means that a technical biome, determined by the RiverBiome setting of the biome");
         writeComment("the river is flowing through, will be used to generate the river.");
         writeComment("");
-        writeComment("When enabled, rivers will no longer follow the biome borders most of the time. The");
-        writeComment("river will also won't use a technical biome in your world anymore, instead you can");
-        writeComment("control them using the river settings in the BiomeConfigs.");
+        writeComment("When enabled, the rivers won't use a technical biome in your world anymore, instead");
+        writeComment("you can control them using the river settings in the BiomeConfigs.");
         writeValue(TCDefaultValues.ImprovedRivers.name(), this.improvedRivers);
         writeNewLine();
 
-        // Need comment here.
+        writeComment("When set to true the rivers will no longer follow biome border most of the time.");
         writeValue(TCDefaultValues.RandomRivers.name(), this.randomRivers);
         writeNewLine();
 

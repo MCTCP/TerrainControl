@@ -10,7 +10,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
 {
     private Layer unZoomedLayer;
     private Layer biomeLayer;
-    private OutputType defaultOutputType = OutputType.Full;
+    private OutputType defaultOutputType = OutputType.FULL;
 
     public NormalBiomeGenerator(LocalWorld world, BiomeCache cache)
     {
@@ -19,7 +19,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
         Layer[] layers = Layer.Init(world.getSeed(), world);
 
         if (worldConfig.improvedRivers)
-            defaultOutputType = OutputType.WithoutRivers;
+            defaultOutputType = OutputType.WITHOUT_RIVERS;
 
         this.unZoomedLayer = layers[0];
         this.biomeLayer = layers[1];
@@ -33,7 +33,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
             biomeArray = new int[x_size * z_size];
         }
         ArraysCache cache = ArraysCacheManager.GetCache();
-        if (outputType == null)
+        if (outputType == OutputType.DEFAULT_FOR_WORLD)
             cache.outputType = defaultOutputType;
         else
             cache.outputType = outputType;
@@ -115,7 +115,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
             return biomeArray;
         }
         ArraysCache cache = ArraysCacheManager.GetCache();
-        if (outputType == null)
+        if (outputType == OutputType.DEFAULT_FOR_WORLD)
             cache.outputType = defaultOutputType;
         else
             cache.outputType = outputType;
@@ -138,5 +138,11 @@ public class NormalBiomeGenerator extends BiomeGenerator
     public void cleanupCache()
     {
         cache.cleanupCache();
+    }
+
+    @Override
+    public boolean canGenerateUnZoomed()
+    {
+        return true;
     }
 }

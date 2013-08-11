@@ -44,14 +44,14 @@ public class LayerMixWithRiver extends Layer
     {
         switch (arraysCache.outputType)
         {
-            case Full:
+            case FULL:
                 return this.GetFull(arraysCache, x, z, x_size, z_size);
-            case WithoutRivers:
+            case WITHOUT_RIVERS:
                 return this.GetWithoutRivers(arraysCache, x, z, x_size, z_size);
-            case OnlyRivers:
+            case ONLY_RIVERS:
                 return this.GetOnlyRivers(arraysCache, x, z, x_size, z_size);
             default:
-                return null;
+                throw new UnsupportedOperationException("Unknown/invalid output type: " + arraysCache.outputType);
         }
     }
 

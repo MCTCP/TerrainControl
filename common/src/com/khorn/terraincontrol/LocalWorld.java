@@ -29,7 +29,8 @@ public interface LocalWorld
     public ArrayList<LocalBiome> getDefaultBiomes();
 
     // Biome manager
-    //public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size);
+    // public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int
+    // x_size, int z_size);
 
     /**
      * Calculate biome ids array used in terrain generation.
@@ -42,12 +43,9 @@ public interface LocalWorld
      * @param type Output type. May be Full, WithOutRivers, OnlyRivers and null.
      * @return Array filled by biome ids.
      */
-
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
 
     public float[] getTemperatures(int x, int z, int x_size, int z_size);
-
-    //public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size);
 
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
 
@@ -138,6 +136,8 @@ public interface LocalWorld
     public CustomObjectStructureCache getStructureCache();
 
     public String getName();
+
+    public boolean canBiomeManagerGenerateUnzoomed();
 
     // Terrain init
     public long getSeed();
