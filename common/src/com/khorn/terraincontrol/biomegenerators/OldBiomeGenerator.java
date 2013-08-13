@@ -8,9 +8,9 @@ import java.util.Random;
 
 public class OldBiomeGenerator extends BiomeGenerator
 {
-    private final NoiseGeneratorOldOctaves temperatureGenerator1;
-    private final NoiseGeneratorOldOctaves wetnessGenerator;
-    private final NoiseGeneratorOldOctaves temperatureGenerator2;
+    private NoiseGeneratorOldOctaves temperatureGenerator1;
+    private NoiseGeneratorOldOctaves wetnessGenerator;
+    private NoiseGeneratorOldOctaves temperatureGenerator2;
     public double[] oldTemperature1;
     public double[] oldWetness;
     private double[] oldTemperature2;
@@ -48,10 +48,10 @@ public class OldBiomeGenerator extends BiomeGenerator
         {
             for (int k = 0; k < z_size; k++)
             {
-                final double d1 = this.oldTemperature2[i] * 1.1D + 0.5D;
+                double d1 = this.oldTemperature2[i] * 1.1D + 0.5D;
 
-                final double d2 = 0.01D;
-                final double d3 = 1.0D - d2;
+                double d2 = 0.01D;
+                double d3 = 1.0D - d2;
                 double d4 = (temp_out[i] * 0.15D + 0.7D) * d3 + d1 * d2;
                 d4 = 1.0D - (1.0D - d4) * (1.0D - d4);
 
@@ -83,7 +83,7 @@ public class OldBiomeGenerator extends BiomeGenerator
         {
             temp_out = new float[x_size * z_size];
         }
-        final int[] temp_biomeBases = new int[x_size * z_size];
+        int[] temp_biomeBases = new int[x_size * z_size];
         this.getBiomes(temp_biomeBases, x, z, x_size, z_size, false);
 
         for (int i = 0; i < temp_out.length; i++)
@@ -102,7 +102,7 @@ public class OldBiomeGenerator extends BiomeGenerator
         }
         if ((useCache) && (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
-            final int[] localObject = this.cache.getCachedBiomes(x, z);
+            int[] localObject = this.cache.getCachedBiomes(x, z);
             System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, x_size * z_size);
             return paramArrayOfBiomeBase;
         }
@@ -116,7 +116,7 @@ public class OldBiomeGenerator extends BiomeGenerator
         {
             for (int k = 0; k < z_size; k++)
             {
-                final double d1 = this.oldTemperature2[i] * 1.1D + 0.5D;
+                double d1 = this.oldTemperature2[i] * 1.1D + 0.5D;
 
                 double d2 = 0.01D;
                 double d3 = 1.0D - d2;
@@ -178,8 +178,8 @@ public class OldBiomeGenerator extends BiomeGenerator
 
     private static int getBiomeFromDiagram(double temp, double rain)
     {
-        final int i = (int) (temp * 63.0D);
-        final int j = (int) (rain * 63.0D);
+        int i = (int) (temp * 63.0D);
+        int j = (int) (rain * 63.0D);
         return biomeDiagram[(i + j * 64)];
     }
 

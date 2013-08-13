@@ -145,7 +145,7 @@ public class ChunkProviderTC
             this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5, OutputType.DEFAULT_FOR_WORLD);
         } else
         {
-            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 16, chunkZ * 16, 16, 16, OutputType.DEFAULT_FOR_WORLD);
+            this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * 16, chunkZ * 16, 16, 16, OutputType.DEFAULT_FOR_WORLD);
         }
 
         this.rawTerrain = generateTerrainNoise(this.rawTerrain, chunkX * four, 0, chunkZ * four, noise_xSize, noise_ySize, noise_zSize);
