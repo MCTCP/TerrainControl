@@ -45,7 +45,7 @@ public class TCPlugin implements TerrainControlEngine
 
         // Set the directory
         TerrainControl.setEngine(this);
-        LOGS = TCLogManager.getLogger(this);
+        LOGS = TCLogManager.prepLogger(FMLCommonHandler.instance().getFMLLogger());
 
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
