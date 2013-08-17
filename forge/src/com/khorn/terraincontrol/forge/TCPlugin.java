@@ -144,12 +144,6 @@ public class TCPlugin implements TerrainControlEngine
     }
 
     @Override
-    public void log(String... messages)
-    {
-        this.log(Level.INFO, messages);
-    }
-
-    @Override
     public void log(Level level, String... messages)
     {
         this.log(level, "{0}", new Object[]

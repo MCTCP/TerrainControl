@@ -170,17 +170,6 @@ public class TerrainControl
         }
         return world.getBiome(x, z).getName();
     }
-
-    /**
-     * Logs the message(s) with a Level.INFO importance. Message will be
-     * prefixed with [TerrainControl], so don't do that yourself.
-     * <p/>
-     * @param message The messages to log.
-     */
-    public static void log(String... message)
-    {
-        engine.log(Level.INFO, message);
-    }
     
     /**
      * Logs the message(s) with the given importance. Message will be

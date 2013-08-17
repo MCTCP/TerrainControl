@@ -1,17 +1,20 @@
 package com.khorn.terraincontrol.biomelayers.layers;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.biomelayers.ArraysCache;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
 public class LayerFromImage extends Layer
 {
+
     private int[] biomeMap;
     private int mapHeight;
     private int mapWidth;
@@ -53,11 +56,10 @@ public class LayerFromImage extends Layer
             }
         } catch (IOException ioexception)
         {
-            ioexception.printStackTrace();
+            TerrainControl.log(Level.SEVERE, ioexception.getStackTrace().toString());
         }
 
     }
-
 
     @Override
     protected int[] GetBiomes(int cacheId, int x, int z, int x_size, int z_size)
@@ -102,4 +104,5 @@ public class LayerFromImage extends Layer
 
         return arrayOfInt1;
     }
+
 }

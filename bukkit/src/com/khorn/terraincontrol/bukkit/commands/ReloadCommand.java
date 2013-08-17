@@ -9,9 +9,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.logging.Level;
 
 public class ReloadCommand extends BaseCommand
 {
+    
     public ReloadCommand(TCPlugin _plugin)
     {
         super(_plugin);
@@ -37,8 +39,12 @@ public class ReloadCommand extends BaseCommand
         sender.sendMessage(MESSAGE_COLOR + "Configs for world '" + world.getName() + "' reloaded");
         if (sender instanceof Player)
         {
-            TerrainControl.log(sender.getName() + " reloaded the config files for world '" + world.getName() + "'.");
+            TerrainControl.log(Level.INFO, "{0} reloaded the config files for world '{1}'.", new Object[]
+            {
+                sender.getName(), world.getName()
+            });
         }
         return true;
     }
+    
 }

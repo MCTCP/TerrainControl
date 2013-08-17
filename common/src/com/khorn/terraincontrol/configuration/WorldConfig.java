@@ -250,7 +250,10 @@ public class WorldConfig extends ConfigFile
                 biomesCount++;
             } else
             {
-                TerrainControl.log(Level.WARNING, "Duplicate biome id " + localBiome.getId() + " (" + this.biomeConfigs[localBiome.getId()].name + " and " + config.name + ")!");
+                TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]
+                {
+                    localBiome.getId(), this.biomeConfigs[localBiome.getId()].name, config.name
+                });
             }
             this.biomeConfigs[localBiome.getId()] = config;
 
@@ -271,9 +274,8 @@ public class WorldConfig extends ConfigFile
 
             }
         }
-
-        TerrainControl.log("Loaded biomes - " + LoadedBiomeNames);
-
+        TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[]{biomesCount});
+        TerrainControl.logIfLevel(Level.ALL, Level.CONFIG, LoadedBiomeNames);
     }
 
     private void ReadWorldCustomObjects()
@@ -300,7 +302,7 @@ public class WorldConfig extends ConfigFile
 
         customObjects = new ArrayList<CustomObject>(TerrainControl.getCustomObjectManager().loadObjects(customObjectsDirectory).values());
 
-        TerrainControl.log(customObjects.size() + " world custom objects loaded.");
+        TerrainControl.log(Level.INFO, "{0} world custom objects loaded.", customObjects.size());
 
     }
 
@@ -342,7 +344,7 @@ public class WorldConfig extends ConfigFile
             File mapFile = new File(file, imageFile);
             if (!mapFile.exists())
             {
-                TerrainControl.log("Biome map file not found. Switching BiomeMode to Normal");
+                TerrainControl.log(Level.WARNING, "Biome map file not found. Switching BiomeMode to Normal");
                 this.biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
             }
         }
@@ -381,7 +383,7 @@ public class WorldConfig extends ConfigFile
         
         if (this.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && this.ModeTerrain != TerrainMode.OldGenerator)
         {
-            TerrainControl.log("Old biome generator works only with old terrain generator!");
+            TerrainControl.log(Level.WARNING, "Old biome generator works only with old terrain generator!");
             this.biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
 
         }
@@ -989,7 +991,6 @@ public class WorldConfig extends ConfigFile
         int count = stream.readInt();
         while (count-- > 0)
         {
-            String name = readStringFromStream(stream);
             int id = stream.readInt();
             world.AddBiome(name, id);
             this.CustomBiomes.add(name);

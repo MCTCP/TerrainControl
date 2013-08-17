@@ -10,14 +10,6 @@ public interface LoggableEngine
 {
 
     /**
-     * Logs the message(s) with a Level.INFO importance. Message will be
-     * prefixed with [TerrainControl], so don't do that yourself.
-     * <p/>
-     * @param message The messages to log
-     */
-    public void log(String... message);
-
-    /**
      * Logs the message(s) with the given importance. Message will be
      * prefixed with [TerrainControl], so don't do that yourself.
      * <p/>

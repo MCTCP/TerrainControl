@@ -9,9 +9,11 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
 
 import java.util.Random;
+import java.util.logging.Level;
 
 public class ObjectSpawner
 {
+
     private WorldConfig worldSettings;
     private Random rand;
     private LocalWorld world;
@@ -36,7 +38,10 @@ public class ObjectSpawner
         // Null check
         if (localBiomeConfig == null)
         {
-            TerrainControl.log("Unknown biome id " + biomeId + " at " + (x + 15) + "," + (z + 15) + "  (chunk " + chunkX + "," + chunkZ + "). Population failed.");
+            TerrainControl.log(Level.CONFIG, "Unknown biome id {0} at {1},{2}  (chunk {3},{4}). Population failed.", new Object[]
+            {
+                biomeId, (x + 15), (z + 15), chunkX, chunkZ
+            });
             return;
         }
 
@@ -118,4 +123,5 @@ public class ObjectSpawner
             }
         }
     }
+
 }

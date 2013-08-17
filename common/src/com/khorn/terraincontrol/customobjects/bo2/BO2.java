@@ -18,6 +18,7 @@ import java.util.*;
  */
 public class BO2 extends ConfigFile implements CustomObject
 {
+    
     public ObjectCoordinate[][] data = new ObjectCoordinate[4][];
 
     public BO2[] groupObjects = null;
@@ -71,9 +72,10 @@ public class BO2 extends ConfigFile implements CustomObject
         readConfigSettings();
         correctSettings();
     }
-    
+
     @Override
-    public void onEnable(Map<String,CustomObject> otherObjectsInDirectory) {
+    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
+    {
         readConfigSettings();
         correctSettings();
     }
@@ -95,7 +97,7 @@ public class BO2 extends ConfigFile implements CustomObject
     {
         return true;
     }
-    
+
     @Override
     public boolean canRotateRandomly()
     {
@@ -121,6 +123,7 @@ public class BO2 extends ConfigFile implements CustomObject
         return true;
     }
 
+    @Override
     public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {
         // Basic checks
@@ -157,12 +160,12 @@ public class BO2 extends ConfigFile implements CustomObject
         if (!spawnOnBlockType.contains(world.getTypeId(x, y - 1, z)))
             return false;
 
-        ObjectCoordinate[] data = this.data[rotation.getRotationId()];
+        ObjectCoordinate[] objData = this.data[rotation.getRotationId()];
 
         // Check all blocks
         int faultCounter = 0;
 
-        for (ObjectCoordinate point : data)
+        for (ObjectCoordinate point : objData)
         {
             if (!world.isLoaded((x + point.x), (y + point.y), (z + point.z)))
                 return false;
@@ -172,7 +175,7 @@ public class BO2 extends ConfigFile implements CustomObject
                 if (collisionBlockType.contains(world.getTypeId((x + point.x), (y + point.y), (z + point.z))))
                 {
                     faultCounter++;
-                    if (faultCounter > (data.length * (collisionPercentage / 100)))
+                    if (faultCounter > (objData.length * (collisionPercentage / 100)))
                     {
                         return false;
                     }
@@ -453,4 +456,5 @@ public class BO2 extends ConfigFile implements CustomObject
     {
         return spawnInBiome.contains(biome.getName()) || spawnInBiome.contains("All");
     }
+
 }

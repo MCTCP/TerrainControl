@@ -107,11 +107,11 @@ public class WeightedMobSpawnGroup
             }
         } catch (NumberFormatException e)
         {
-            TerrainControl.log(Level.WARNING, "Incorrect number in JSON: " + originalJson);
-            e.printStackTrace();
+            TerrainControl.log(Level.WARNING, "Incorrect number in JSON: {0}", originalJson);
+            TerrainControl.log(Level.WARNING, e.getStackTrace().toString());
         } catch (ArrayIndexOutOfBoundsException e)
         {
-            TerrainControl.log(Level.WARNING, "Incorrect JSON: " + originalJson);
+            TerrainControl.log(Level.WARNING, "Incorrect JSON: {0}", originalJson);
         }
 
         return mobGroups;

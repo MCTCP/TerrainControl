@@ -93,7 +93,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             this.listener = new TCListener(this);
             Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
 
-            TerrainControl.log("Global objects loaded, waiting for worlds to load");
+            TerrainControl.log(Level.INFO, "Global objects loaded, waiting for worlds to load");
 
             // Start metrics
             new BukkitMetricsHelper(this);
@@ -111,7 +111,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
         if (worldName.equals(""))
         {
-            TerrainControl.log("Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
+            TerrainControl.log(Level.CONFIG, "Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
             return new TCChunkGenerator(this);
         }
         if (worldName.equals("test"))
@@ -128,12 +128,12 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         {
             if (world.getName().equals(worldName))
             {
-                TerrainControl.log("Already enabled for '" + worldName + "'");
+                TerrainControl.log(Level.CONFIG, "Already enabled for ''{0}''", worldName);
                 return world.getChunkGenerator();
             }
         }
 
-        TerrainControl.log("Starting to enable world '" + worldName + "'...");
+        TerrainControl.log(Level.INFO, "Starting to enable world ''{0}''...", worldName);
 
         // Create BukkitWorld instance
         BukkitWorld localWorld = new BukkitWorld(worldName);
@@ -175,7 +175,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         File baseFolder = new File(this.getDataFolder(), "worlds" + File.separator + worldName);
         if (!baseFolder.exists())
         {
-            TerrainControl.log("settings does not exist, creating defaults");
+            TerrainControl.log(Level.SEVERE, "TC was not allowed to create folder {0}", baseFolder.getName());
 
             if (!baseFolder.mkdirs())
                 TerrainControl.log(Level.SEVERE, "cant create folder " + baseFolder.getName());
@@ -195,7 +195,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             this.worlds.put(world.getUID(), bukkitWorld);
 
             // Show message
-            TerrainControl.log("World " + bukkitWorld.getName() + " is now enabled!");
+            TerrainControl.log(Level.INFO, "World {0} is now enabled!", bukkitWorld.getName());
         }
     }
 
@@ -233,12 +233,6 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         {
             this.log(max, messages);
         }
-    }
-
-    @Override
-    public void log(String... messages)
-    {
-        this.log(Level.INFO, messages);
     }
     
     @Override

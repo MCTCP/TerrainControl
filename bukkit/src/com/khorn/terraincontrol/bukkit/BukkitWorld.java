@@ -16,6 +16,7 @@ import org.bukkit.craftbukkit.v1_6_R2.CraftWorld;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class BukkitWorld implements LocalWorld
 {
@@ -430,9 +431,10 @@ public class BukkitWorld implements LocalWorld
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
         /*
-         * This method usually breaks on every Minecraft update. Always check
-         * whether the names are still correct. Often, you'll also need to
-         * rewrite parts of this method for newer block place logic.
+         * This method usually breaks on every Minecraft update. Always
+         * check whether the names are still correct. Often, you'll also
+         * need to rewrite parts of this method for newer block place
+         * logic.
          */
 
         if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
@@ -577,7 +579,9 @@ public class BukkitWorld implements LocalWorld
     }
 
     /**
-     * Sets the new settings and deprecates any references to the old settings, if any.
+     * Sets the new settings and deprecates any references to the old
+     * settings, if any.
+     * <p/>
      * @param worldConfig The new settings.
      */
     public void setSettings(WorldConfig worldConfig)
@@ -591,9 +595,10 @@ public class BukkitWorld implements LocalWorld
     }
 
     /**
-     * Enables/reloads this BukkitWorld. If you are reloading, 
-     * don't forget to set the new settings first using 
+     * Enables/reloads this BukkitWorld. If you are reloading,
+     * don't forget to set the new settings first using
      * {@link #setSettings(WorldConfig)}.
+     * <p/>
      * @param world The world that needs to be enabled.
      */
     public void enable(org.bukkit.World world)
@@ -728,7 +733,10 @@ public class BukkitWorld implements LocalWorld
             tileEntity.a(nmsTag); // tileEntity.load
         } else
         {
-            TerrainControl.log("Skipping tile entity with id " + nmsTag.getString("id") + ", cannot be placed at " + x + "," + y + "," + z + " on id " + world.getTypeId(x, y, z));
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[]
+            {
+                nmsTag.getString("id"), x, y, z, world.getTypeId(x, y, z)
+            });
         }
     }
 
@@ -753,4 +761,5 @@ public class BukkitWorld implements LocalWorld
     {
         return this.structureCache;
     }
+    
 }

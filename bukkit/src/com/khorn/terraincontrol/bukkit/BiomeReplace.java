@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import net.minecraft.server.v1_6_R2.*;
 import org.bukkit.command.CommandSender;
@@ -7,6 +8,7 @@ import org.bukkit.craftbukkit.v1_6_R2.CraftWorld;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.util.logging.Level;
 
 
 public class BiomeReplace implements Runnable
@@ -33,6 +35,7 @@ public class BiomeReplace implements Runnable
 
 
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+    @Override
     public void run()
     {
 
@@ -168,13 +171,13 @@ public class BiomeReplace implements Runnable
 
         } catch (NoSuchFieldException e)
         {
-            e.printStackTrace();
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
         } catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
         } catch (IOException e)
         {
-            e.printStackTrace();
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
         }
 
         sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Done. " + chunksRewritten + " chunks rewritten.");
