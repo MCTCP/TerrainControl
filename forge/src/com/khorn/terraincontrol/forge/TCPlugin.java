@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
+import com.khorn.terraincontrol.configuration.TCLogManager;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.util.StringHelper;
@@ -19,6 +20,8 @@ import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
@@ -27,29 +30,22 @@ import java.util.logging.Level;
 @NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")
 public class TCPlugin implements TerrainControlEngine
 {
+    
     @Instance("TerrainControl")
     public static TCPlugin instance;
 
     public File terrainControlDirectory;
     private TCWorldType worldType;
-
+    private static Logger LOGS;
+    
     @EventHandler
     public void load(FMLInitializationEvent event)
     {
         // This is the place where the mod starts loading
 
         // Set the directory
-        try
-        {
-            Field minecraftDir = Loader.class.getDeclaredField("minecraftDir");
-            minecraftDir.setAccessible(true);
-            terrainControlDirectory = new File((File) minecraftDir.get(null), "mods" + File.separator + "TerrainControl");
-        } catch (Throwable e)
-        {
-            terrainControlDirectory = new File("mods" + File.separator + "TerrainControl");
-            System.out.println("Could not reflect the Minecraft directory, save location may be unpredicatble.");
-            e.printStackTrace();
-        }
+        TerrainControl.setEngine(this);
+        LOGS = TCLogManager.getLogger(this);
 
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
@@ -100,8 +96,11 @@ public class TCPlugin implements TerrainControlEngine
     /**
      * Gets the world loaded by Terrain Control.
      * <p />
-     * Note: this method may be removed in the future, when multiworld support is introduced.
-     * @return The world loaded by Terrain Control, or null if no world is loaded.
+     * Note: this method may be removed in the future, when multiworld
+     * support is introduced.
+     * <p/>
+     * @return The world loaded by Terrain Control, or null if no world is
+     *         loaded.
      */
     public LocalWorld getWorld()
     {
@@ -109,15 +108,104 @@ public class TCPlugin implements TerrainControlEngine
     }
 
     @Override
+    public void logIfLevel(Level ifLevel, String... messages)
+    {
+        if (LOGS.getLevel().intValue() == ifLevel.intValue())
+        {
+            this.log(ifLevel, messages);
+        }
+    }
+
+    @Override
+    public void logIfLevel(Level ifLevel, String messages, Object[] params)
+    {
+        if (LOGS.getLevel().intValue() == ifLevel.intValue())
+        {
+            this.log(ifLevel, messages, params);
+        }
+    }
+
+    @Override
+    public void logIfLevel(Level min, Level max, String... messages)
+    {
+        if (LOGS.getLevel().intValue() <= max.intValue() && LOGS.getLevel().intValue() >= min.intValue())
+        {
+            this.log(max, messages);
+        }
+    }
+
+    @Override
+    public void logIfLevel(Level min, Level max, String messages, Object[] params)
+    {
+        if (LOGS.getLevel().intValue() <= max.intValue() && LOGS.getLevel().intValue() >= min.intValue())
+        {
+            this.log(max, messages);
+        }
+    }
+
+    @Override
+    public void log(String... messages)
+    {
+        this.log(Level.INFO, messages);
+    }
+
+    @Override
     public void log(Level level, String... messages)
     {
-        FMLCommonHandler.instance().getFMLLogger().log(level, "TerrainControl: " + StringHelper.join(messages, ","));
+        this.log(level, "{0}", new Object[]
+        {
+            StringHelper.join(messages, " ")
+        });
+    }
+
+    @Override
+    public void log(Level level, String message, Object param)
+    {
+        LogRecord lr = new LogRecord(level, message);
+        lr.setMessage(TCLogManager.formatter.format(lr));
+        lr.setParameters(new Object[]
+        {
+            param
+        });
+        this.log(lr);
+    }
+
+    @Override
+    public void log(Level level, String message, Object[] params)
+    {
+        LogRecord lr = new LogRecord(level, message);
+        lr.setMessage(TCLogManager.formatter.format(lr));
+        lr.setParameters(params);
+        this.log(lr);
+    }
+
+    private void log(LogRecord lr)
+    {
+        LOGS.log(lr);
+    }
+
+    @Override
+    public File getTCDataFolder()
+    {
+        File dataFolder;
+        try
+        {
+            Field minecraftDir = Loader.class.getDeclaredField("minecraftDir");
+            minecraftDir.setAccessible(true);
+            dataFolder = new File((File) minecraftDir.get(null), "mods" + File.separator + "TerrainControl");
+        } catch (Throwable e)
+        {
+            dataFolder = new File("mods" + File.separator + "TerrainControl");
+            System.out.println("Could not reflect the Minecraft directory, save location may be unpredicatble.");
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+        }
+        return dataFolder;
     }
 
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(terrainControlDirectory, BODefaultValues.BO_GlobalDirectoryName.stringValue());
+        return new File(this.getTCDataFolder(), BODefaultValues.BO_GlobalDirectoryName.stringValue());
     }
 
     @Override
@@ -138,4 +226,5 @@ public class TCPlugin implements TerrainControlEngine
         }
         return true;
     }
+
 }

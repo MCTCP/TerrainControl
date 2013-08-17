@@ -6,6 +6,7 @@ import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.bukkit.util.BukkitMetricsHelper;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
+import com.khorn.terraincontrol.configuration.TCLogManager;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.util.StringHelper;
@@ -23,21 +24,24 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public class TCPlugin extends JavaPlugin implements TerrainControlEngine
 {
-    private final HashMap<String, BukkitWorld> notInitedWorlds = new HashMap<String, BukkitWorld>();
-
     public TCListener listener;
     public TCCommandExecutor commandExecutor;
 
-    // Debug setting. Set it to true to make Terrain Control try to disable
-    // itself. However, terrain generators aren't cleaned up properly by Bukkit,
-    // so this won't really work until that bug is fixed.
+    /* Debug setting. Set it to true to make Terrain Control try to disable
+     * itself. However, terrain generators aren't cleaned up properly by
+     * Bukkit, so this won't really work until that bug is fixed.
+     */
     public boolean cleanupOnDisable = false;
 
     public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
+    
+    private final HashMap<String, BukkitWorld> notInitedWorlds = new HashMap<String, BukkitWorld>();
+    private static Logger LOGS;
 
     @Override
     public void onDisable()
@@ -58,16 +62,21 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     @Override
     public void onEnable()
     {
+
+        TerrainControl.setEngine(this);
+        LOGS = TCLogManager.getLogger(this);
+
         if (Bukkit.getWorlds().size() != 0 && !cleanupOnDisable)
         {
             // Reload "handling"
             // (worlds are already loaded and TC didn't clean up itself)
-            log(Level.SEVERE, "The server was just /reloaded! Terrain Control has problems handling this,");
-            log(Level.SEVERE, "as old parts from before the reload have not been cleaned up.");
-            log(Level.SEVERE, "Unexpected things may happen! Please restart the server!");
-            log(Level.SEVERE, "In the future, instead of /reloading, please restart the server,");
-            log(Level.SEVERE, "or reload a plugin using it's built-in command (like /tc reload),");
-            log(Level.SEVERE, "or use a plugin managing plugin that can reload one plugin at a time.");
+            TerrainControl.log(Level.SEVERE,
+                               "The server was just /reloaded! Terrain Control has problems handling this, ",
+                               "as old parts from before the reload have not been cleaned up. ",
+                               "Unexpected things may happen! Please restart the server! ",
+                               "In the future, instead of /reloading, please restart the server, ",
+                               "or reload a plugin using it's built-in command (like /tc reload), ",
+                               "or use a plugin managing plugin that can reload one plugin at a time.");
             setEnabled(false);
         } else
         {
@@ -75,7 +84,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             {
                 // We're on MCPC+, so enable the extra block ids.
                 TerrainControl.supportedBlockIds = 4095;
-                log(Level.INFO, "MCPC+ detected, enabling extended block id support.");
+                this.log(Level.INFO, "MCPC+ detected, enabling extended block id support.");
             }
 
             // Start the engine
@@ -107,9 +116,10 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         }
         if (worldName.equals("test"))
         {
-            TerrainControl.log("Ignoring world with the name \"test\". This is not a valid world name,");
-            TerrainControl.log("as it's used by Multiverse to check if \"TerrainControl\" a valid generator name.");
-            TerrainControl.log("So if you were just using /mv create, don't worry about this message.");
+            TerrainControl.log(Level.CONFIG,
+                               "Ignoring world with the name \"test\". This is not a valid world name, ",
+                               "as it's used by Multiverse to check if \"TerrainControl\" a valid generator name. ",
+                               "So if you were just using /mv create, don't worry about this message.");
             return new TCChunkGenerator(this);
         }
 
@@ -190,9 +200,83 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     }
 
     @Override
-    public void log(Level level, String... msg)
+    public void logIfLevel(Level ifLevel, String... messages)
     {
-        Logger.getLogger("Minecraft").log(level, "[TerrainControl] " + StringHelper.join(msg, " "));
+        if (LOGS.getLevel().intValue() == ifLevel.intValue())
+        {
+            this.log(ifLevel, messages);
+        }
+    }
+
+    @Override
+    public void logIfLevel(Level ifLevel, String messages, Object[] params)
+    {
+        if (LOGS.getLevel().intValue() == ifLevel.intValue())
+        {
+            this.log(ifLevel, messages, params);
+        }
+    }
+
+    @Override
+    public void logIfLevel(Level min, Level max, String... messages)
+    {
+        if (LOGS.getLevel().intValue() <= max.intValue() && LOGS.getLevel().intValue() >= min.intValue())
+        {
+            this.log(max, messages);
+        }
+    }
+
+    @Override
+    public void logIfLevel(Level min, Level max, String messages, Object[] params)
+    {
+        if (LOGS.getLevel().intValue() <= max.intValue() && LOGS.getLevel().intValue() >= min.intValue())
+        {
+            this.log(max, messages);
+        }
+    }
+
+    @Override
+    public void log(String... messages)
+    {
+        this.log(Level.INFO, messages);
+    }
+    
+    @Override
+    public void log(Level level, String... messages)
+    {
+        this.log(level, "{0}", new Object[]
+        {
+            StringHelper.join(messages, " ")
+        });
+    }
+
+    @Override
+    public void log(Level level, String message, Object param)
+    {
+        LogRecord lr = new LogRecord(level, message);
+        lr.setMessage(TCLogManager.formatter.format(lr));
+        lr.setParameters(new Object[]
+        {
+            param
+        });
+        this.log(lr);
+    }
+
+    @Override
+    public void log(Level level, String message, Object[] params)
+    {
+        LogRecord lr = new LogRecord(level, message);
+        lr.setMessage(TCLogManager.formatter.format(lr));
+        lr.setParameters(params);
+        this.log(lr);
+    }
+
+    private void log(LogRecord lr)
+    {
+        if (LOGS == null){
+            LOGS = TCLogManager.getLogger();
+        }
+        LOGS.log(lr);
     }
 
     @Override
@@ -208,9 +292,15 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     }
 
     @Override
+    public File getTCDataFolder()
+    {
+        return this.getDataFolder();
+    }
+
+    @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getDataFolder(), BODefaultValues.BO_GlobalDirectoryName.stringValue());
+        return new File(this.getTCDataFolder(), BODefaultValues.BO_GlobalDirectoryName.stringValue());
     }
 
     @Override
@@ -231,4 +321,5 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         }
         return true;
     }
+
 }

@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.customobjects.CustomObjectManager;
 import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
+import java.io.File;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,8 @@ public class TerrainControl
     public static int worldHeight = 256;
 
     /**
-     * The world depth that the engine supports. Not the actual depth the world
-     * is capped at. 0 in Minecraft.
+     * The world depth that the engine supports. Not the actual depth the 
+     * world is capped at. 0 in Minecraft.
      */
     public static int worldDepth = 0;
 
@@ -33,7 +34,13 @@ public class TerrainControl
      */
     public static int supportedBlockIds = 255;
 
+    /**
+     * The directory that holds all TerrainControl data
+     */
+    public static File TCDirectory;
+    
     private static TerrainControlEngine engine;
+    private static boolean engineStarted = false;
     private static ConfigFunctionsManager configFunctionsManager;
     private static CustomObjectManager customObjectManager;
     private static BiomeModeManager biomeManagers;
@@ -48,18 +55,18 @@ public class TerrainControl
 
     /**
      * Starts the engine, making all API methods available.
-     *
+     * <p/>
      * @param engine The implementation of the engine.
      */
     public static void startEngine(TerrainControlEngine engine)
     {
-        if (TerrainControl.engine != null)
+        if (TerrainControl.engine != null && TerrainControl.engineStarted == true)
         {
             throw new UnsupportedOperationException("Engine is already set!");
         }
 
         // Start the engine
-        TerrainControl.engine = engine;
+        TerrainControl.setEngine(engine);
         configFunctionsManager = new ConfigFunctionsManager();
         customObjectManager = new CustomObjectManager();
         biomeManagers = new BiomeModeManager();
@@ -77,6 +84,7 @@ public class TerrainControl
         // Load global objects after the event has been fired, so that custom
         // object types are also taken into account
         customObjectManager.loadGlobalObjects();
+        TerrainControl.engineStarted = true;
     }
 
     /**
@@ -101,7 +109,7 @@ public class TerrainControl
 
     /**
      * Returns the engine, containing the API methods.
-     *
+     * <p/>
      * @return The engine
      */
     public static TerrainControlEngine getEngine()
@@ -110,8 +118,21 @@ public class TerrainControl
     }
 
     /**
+     * Sets the engine and initializes the root TerrainControl directory
+     * and global configs. This is done to prevent logging NPE's later in
+     * the plugin start sequence
+     * <p/>
+     * @param engine
+     */
+    public static void setEngine(TerrainControlEngine engine)
+    {
+        TerrainControl.engine = engine;
+        TerrainControl.TCDirectory = engine.getTCDataFolder();
+    }
+
+    /**
      * Returns the world object with the given name.
-     *
+     * <p/>
      * @param name The name of the world.
      * @return The world object.
      */
@@ -124,7 +145,7 @@ public class TerrainControl
      * Convienence method to quickly get the biome name at the given
      * coordinates. Will return null if the world isn't loaded by Terrain
      * Control.
-     *
+     * <p/>
      * @param worldName The world name.
      * @param x         The block x in the world.
      * @param z         The block z in the world.
@@ -143,30 +164,124 @@ public class TerrainControl
     }
 
     /**
-     * Logs the message(s) with normal importance. Message will be prefixed with
-     * TerrainControl, so don't do that yourself.
-     *
-     * @param messages The messages to log.
+     * Logs the message(s) with a Level.INFO importance. Message will be
+     * prefixed with [TerrainControl], so don't do that yourself.
+     * <p/>
+     * @param message The messages to log.
      */
-    public static void log(String... messages)
+    public static void log(String... message)
     {
-        engine.log(Level.INFO, messages);
+        engine.log(Level.INFO, message);
+    }
+    
+    /**
+     * Logs the message(s) with the given importance. Message will be
+     * prefixed with [TerrainControl], so don't do that yourself.
+     * <p/>
+     * @param message The messages to log.
+     * @param level   The severity of the message
+     */
+    public static void log(Level level, String... message)
+    {
+        engine.log(level, message);
     }
 
     /**
-     * Logs the message(s) with the given importance. Message will be prefixed
-     * with TerrainControl, so don't do that yourself.
-     *
+     * Logs a format string message with the given importance. Message will
+     * be prefixed with [TerrainControl], so don't do that yourself.
+     * <p/>
+     * @param message The messages to log formatted similar to Logger.log()
+     *                with the same args.
+     * @param level   The severity of the message
+     * @param param   The parameter belonging to {0} in the message string
+     */
+    public static void log(Level level, String message, Object param)
+    {
+        engine.log(level, message, param);
+    }
+
+    /**
+     * Logs a format string message with the given importance. Message will
+     * be prefixed with [TerrainControl], so don't do that yourself.
+     * <p/>
+     * @param message The messages to log formatted similar to Logger.log()
+     *                with the same args.
+     * @param level   The severity of the message
+     * @param params  The parameters belonging to {0...} in the message
+     *                string
+     */
+    public static void log(Level level, String message, Object[] params)
+    {
+        engine.log(level, message, params);
+    }
+
+    /**
+     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
+     * level matches the level provided. Message will be prefixed with
+     * [TerrainControl], so don't do that yourself.
+     * <p/>
+     * @param ifLevel  the Log level to test for
+     * @param declared The Log level that will be shown to the user
      * @param messages The messages to log.
      */
-    public static void log(Level level, String... messages)
+    public static void logIfLevel(Level ifLevel, String... messages)
     {
-        engine.log(level, messages);
+        engine.logIfLevel(ifLevel, messages);
+    }
+
+    /**
+     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
+     * level matches the level provided. Message will be prefixed with
+     * [TerrainControl], so don't do that yourself.
+     * <p/>
+     * @param ifLevel  the Log level to test for
+     * @param declared The Log level that will be shown to the user
+     * @param message  The messages to log formatted similar to
+     *                 Logger.log() with the same args.
+     * @param params   The parameters belonging to {0...} in the message
+     *                 string
+     */
+    public static void logIfLevel(Level ifLevel, String message, Object[] params)
+    {
+        engine.logIfLevel(ifLevel, message, params);
+    }
+
+    /**
+     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
+     * level is between the min/max provided. Message will be prefixed with
+     * [TerrainControl], so don't do that yourself.
+     * <p/>
+     * @param min      The minimum Log level to test for
+     * @param max      The maximum Log level to test for
+     * @param declared The Log level that will be shown to the user
+     * @param messages The messages to log.
+     */
+    public static void logIfLevel(Level min, Level max, String... messages)
+    {
+        engine.logIfLevel(min, max, messages);
+    }
+
+    /**
+     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
+     * level is between the min/max provided. Message will be prefixed with
+     * [TerrainControl], so don't do that yourself.
+     * <p/>
+     * @param min      The minimum Log level to test for
+     * @param max      The maximum Log level to test for
+     * @param declared The Log level that will be shown to the user
+     * @param message  The messages to log formatted similar to
+     *                 Logger.log() with the same args.
+     * @param params   The parameters belonging to {0...} in the message
+     *                 string
+     */
+    public static void logIfLevel(Level min, Level max, String message, Object[] params)
+    {
+        engine.logIfLevel(min, max, message, params);
     }
 
     /**
      * Returns the CustomObject manager, with hooks to spawn CustomObjects.
-     *
+     * <p/>
      * @return The CustomObject manager.
      */
     public static CustomObjectManager getCustomObjectManager()
@@ -176,7 +291,7 @@ public class TerrainControl
 
     /**
      * Returns the Resource manager.
-     *
+     * <p/>
      * @return The Resource manager.
      */
     public static ConfigFunctionsManager getConfigFunctionsManager()
@@ -186,7 +301,7 @@ public class TerrainControl
     
     /**
      * Returns the biome managers. Register your own biome manager here.
-     * 
+     * <p/>
      * @return The biome managers.
      */
     public static BiomeModeManager getBiomeModeManager()
@@ -197,9 +312,9 @@ public class TerrainControl
     // Events
 
     /**
-     * Register your event handler here with normal priority. You can do this
-     * before TerrainControl is started.
-     *
+     * Register your event handler here with normal priority. You can do 
+     * this before TerrainControl is started.
+     * <p/>
      * @param handler The handler that will receive the events.
      */
     public static void registerEventHandler(EventHandler handler)
@@ -208,9 +323,9 @@ public class TerrainControl
     }
 
     /**
-     * Register you event handler here with the given priority. You can do this
-     * before TerrainControl is started.
-     *
+     * Register you event handler here with the given priority. You can do 
+     * this before TerrainControl is started.
+     * <p/>
      * @param handler  The handler that will receive the events.
      * @param priority The priority of the event.
      */
@@ -225,11 +340,23 @@ public class TerrainControl
         }
     }
 
-    // Firing events
-    // All methods first call the cancelableEventHandlers, and then the monitoringEventHandlers.
-    // Only cancelableEventHandlers can cancel events.
-    // Cancelled events are still fired.
-
+    /** Firing events
+     * All methods first call the cancelableEventHandlers, and then the
+     * monitoringEventHandlers. Only cancelableEventHandlers can cancel
+     * events. Cancelled events are still fired.
+     */
+    
+    //t>>	
+    /**
+     * 
+     * @param object
+     * @param world
+     * @param x
+     * @param y
+     * @param z
+     * <p/>
+     * @return
+     */
     public static boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
     {
         boolean success = true;
@@ -247,6 +374,18 @@ public class TerrainControl
         return success;
     }
 
+    //t>>	
+    /**
+     *
+     * @param resource
+     * @param world
+     * @param random
+     * @param villageInChunk
+     * @param chunkX
+     * @param chunkZ
+     * <p/>
+     * @return
+     */
     public static boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         boolean success = true;
@@ -264,6 +403,15 @@ public class TerrainControl
         return success;
     }
 
+    //t>>	
+    /**
+     *
+     * @param world
+     * @param random
+     * @param villageInChunk
+     * @param chunkX
+     * @param chunkZ
+     */
     public static void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         for (EventHandler handler : cancelableEventHandlers)
@@ -272,6 +420,15 @@ public class TerrainControl
             handler.onPopulateStart(world, random, villageInChunk, chunkX, chunkZ);
     }
 
+    //t>>	
+    /**
+     *
+     * @param world
+     * @param random
+     * @param villageInChunk
+     * @param chunkX
+     * @param chunkZ
+     */
     public static void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         for (EventHandler handler : cancelableEventHandlers)
