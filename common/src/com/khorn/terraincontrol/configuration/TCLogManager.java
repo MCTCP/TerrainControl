@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.PluginConfig.LogLevels;
 import java.util.logging.*;
 
@@ -69,7 +70,7 @@ public class TCLogManager
 
     public static Logger prepLogger(Logger logger)
     {
-        return setLogLevels(logger, LogLevels.Standard, LogLevels.Standard);
+        return setLogLevels(logger, TerrainControl.TCPluginConfig.getConsoleHandlerLevel(), TerrainControl.TCPluginConfig.getFileHandlerLevel());
     }
 
     public static Logger setLogLevels(Logger logger, LogLevels consoleLogLevel, LogLevels fileLogLevel)

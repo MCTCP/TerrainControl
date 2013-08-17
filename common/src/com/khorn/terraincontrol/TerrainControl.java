@@ -2,6 +2,7 @@ package com.khorn.terraincontrol;
 
 import com.khorn.terraincontrol.biomegenerators.BiomeModeManager;
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
+import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
@@ -17,6 +18,7 @@ import java.util.logging.Level;
 
 public class TerrainControl
 {
+    
     /**
      * The world height that the engine supports. Not the actual height the
      * world is capped at. 256 in Minecraft.
@@ -38,9 +40,14 @@ public class TerrainControl
      * The directory that holds all TerrainControl data
      */
     public static File TCDirectory;
+    /**
+     * Global TC plugin configs
+     */
+    public static PluginConfig TCPluginConfig;
     
     private static TerrainControlEngine engine;
     private static boolean engineStarted = false;
+    
     private static ConfigFunctionsManager configFunctionsManager;
     private static CustomObjectManager customObjectManager;
     private static BiomeModeManager biomeManagers;
@@ -128,6 +135,7 @@ public class TerrainControl
     {
         TerrainControl.engine = engine;
         TerrainControl.TCDirectory = engine.getTCDataFolder();
+        TerrainControl.TCPluginConfig = new PluginConfig(TerrainControl.TCDirectory);
     }
 
     /**
