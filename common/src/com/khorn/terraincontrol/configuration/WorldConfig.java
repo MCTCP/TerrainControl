@@ -56,11 +56,15 @@ public class WorldConfig extends ConfigFile
     public int IceRarity;
     public int IceSize;
 
-    public int RiverRarity;
-    public int RiverSize;
-    public boolean RiversEnabled;
-
     public boolean FrozenOcean;
+
+    // Rivers
+
+    public int riverRarity;
+    public int riverSize;
+    public boolean riversEnabled;
+    public boolean improvedRivers;
+    public boolean randomRivers;
 
     // Biome image
 
@@ -329,8 +333,8 @@ public class WorldConfig extends ConfigFile
         this.IceRarity = applyBounds(this.IceRarity, 1, 100);
         this.IceSize = applyBounds(this.IceSize, 0, this.GenerationDepth);
 
-        this.RiverRarity = applyBounds(this.RiverRarity, 0, this.GenerationDepth);
-        this.RiverSize = applyBounds(this.RiverSize, 0, this.GenerationDepth - this.RiverRarity);
+        this.riverRarity = applyBounds(this.riverRarity, 0, this.GenerationDepth);
+        this.riverSize = applyBounds(this.riverSize, 0, this.GenerationDepth - this.riverRarity);
 
         this.NormalBiomes = filterBiomes(this.NormalBiomes, this.CustomBiomes);
         this.IceBiomes = filterBiomes(this.IceBiomes, this.CustomBiomes);
@@ -378,7 +382,7 @@ public class WorldConfig extends ConfigFile
         this.villageDistance = applyBounds(this.villageDistance, 9, Integer.MAX_VALUE);
         this.minimumDistanceBetweenRareBuildings = applyBounds(this.minimumDistanceBetweenRareBuildings, 1, Integer.MAX_VALUE);
         this.maximumDistanceBetweenRareBuildings = applyBounds(this.maximumDistanceBetweenRareBuildings, this.minimumDistanceBetweenRareBuildings, Integer.MAX_VALUE);
-        
+
         if (this.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && this.ModeTerrain != TerrainMode.OldGenerator)
         {
             TerrainControl.log("Old biome generator works only with old terrain generator!");
@@ -412,11 +416,15 @@ public class WorldConfig extends ConfigFile
         this.IceRarity = readSettings(TCDefaultValues.IceRarity);
         this.IceSize = readSettings(TCDefaultValues.IceSize);
 
-        this.RiverRarity = readSettings(TCDefaultValues.RiverRarity);
-        this.RiverSize = readSettings(TCDefaultValues.RiverSize);
-        this.RiversEnabled = readSettings(TCDefaultValues.RiversEnabled);
-
         this.FrozenOcean = readSettings(TCDefaultValues.FrozenOcean);
+
+        // Rivers
+
+        this.riverRarity = readSettings(TCDefaultValues.RiverRarity);
+        this.riverSize = readSettings(TCDefaultValues.RiverSize);
+        this.riversEnabled = readSettings(TCDefaultValues.RiversEnabled);
+        this.improvedRivers = readSettings(TCDefaultValues.ImprovedRivers);
+        this.randomRivers = readSettings(TCDefaultValues.RandomRivers);
 
         // Biomes
         this.NormalBiomes = readSettings(TCDefaultValues.NormalBiomes);
@@ -656,14 +664,27 @@ public class WorldConfig extends ConfigFile
         writeSmallTitle("River settings");
 
         writeComment("River rarity.Must be from 0 to GenerationDepth.");
-        writeValue(TCDefaultValues.RiverRarity.name(), this.RiverRarity);
+        writeValue(TCDefaultValues.RiverRarity.name(), this.riverRarity);
         writeNewLine();
 
         writeComment("River size from 0 to GenerationDepth - RiverRarity");
-        writeValue(TCDefaultValues.RiverSize.name(), this.RiverSize);
+        writeValue(TCDefaultValues.RiverSize.name(), this.riverSize);
         writeNewLine();
 
-        writeValue(TCDefaultValues.RiversEnabled.name(), this.RiversEnabled);
+        writeValue(TCDefaultValues.RiversEnabled.name(), this.riversEnabled);
+        writeNewLine();
+
+        writeComment("When this is set to false, the standard river generator of Minecraft will be used.");
+        writeComment("This means that a technical biome, determined by the RiverBiome setting of the biome");
+        writeComment("the river is flowing through, will be used to generate the river.");
+        writeComment("");
+        writeComment("When enabled, the rivers won't use a technical biome in your world anymore, instead");
+        writeComment("you can control them using the river settings in the BiomeConfigs.");
+        writeValue(TCDefaultValues.ImprovedRivers.name(), this.improvedRivers);
+        writeNewLine();
+
+        writeComment("When set to true the rivers will no longer follow biome border most of the time.");
+        writeValue(TCDefaultValues.RandomRivers.name(), this.randomRivers);
         writeNewLine();
 
         // Settings for BiomeMode:FromImage

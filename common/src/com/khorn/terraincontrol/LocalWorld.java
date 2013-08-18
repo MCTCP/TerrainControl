@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol;
 
+import com.khorn.terraincontrol.biomegenerators.OutputType;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
@@ -28,11 +29,25 @@ public interface LocalWorld
     public ArrayList<LocalBiome> getDefaultBiomes();
 
     // Biome manager
-    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size);
+    // public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int
+    // x_size, int z_size);
+
+    /**
+     * Calculate biome ids array used in terrain generation.
+     *
+     * @param biomeArray Output array. If it is null or wrong size return new array.
+     * @param x The block x.
+     * @param z The block z.
+     * @param x_size Size of block in x coordinate.
+     * @param z_size Size of blocks in z coordinate.
+     * @param type Output type. May be Full, WithOutRivers, OnlyRivers and null.
+     * @return Array filled by biome ids.
+     */
+    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
 
     public float[] getTemperatures(int x, int z, int x_size, int z_size);
 
-    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size);
+    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
 
     public int getCalculatedBiomeId(int x, int z);
 
@@ -43,6 +58,7 @@ public interface LocalWorld
      * @param z The block z.
      * @return The biome at the given coordinates.
      */
+    @SuppressWarnings("UnusedDeclaration")
     public LocalBiome getCalculatedBiome(int x, int z);
 
     public int getBiomeId(int x, int z);
@@ -92,6 +108,7 @@ public interface LocalWorld
 
     public void attachMetadata(int x, int y, int z, Tag tag);
 
+    @SuppressWarnings("UnusedDeclaration")
     public Tag getMetadata(int x, int y, int z);
 
     public int getLiquidHeight(int x, int z);
@@ -119,6 +136,8 @@ public interface LocalWorld
     public CustomObjectStructureCache getStructureCache();
 
     public String getName();
+
+    public boolean canBiomeManagerGenerateUnzoomed();
 
     // Terrain init
     public long getSeed();

@@ -1,36 +1,44 @@
 package com.khorn.terraincontrol.biomegenerators;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.biomelayers.layers.Layer;
+import com.khorn.terraincontrol.biomegenerators.biomelayers.Layer;
 
 /**
  * This is the normal biome mode, which has all of Terrain Control's features.
- *
  */
 public class NormalBiomeGenerator extends BiomeGenerator
 {
     private Layer unZoomedLayer;
     private Layer biomeLayer;
-    
+    private OutputType defaultOutputType = OutputType.FULL;
+
     public NormalBiomeGenerator(LocalWorld world, BiomeCache cache)
     {
         super(world, cache);
-        
+
         Layer[] layers = Layer.Init(world.getSeed(), world);
+
+        if (worldConfig.improvedRivers)
+            defaultOutputType = OutputType.WITHOUT_RIVERS;
 
         this.unZoomedLayer = layers[0];
         this.biomeLayer = layers[1];
     }
-    
+
     @Override
-    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
+    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         if ((biomeArray == null) || (biomeArray.length < x_size * z_size))
         {
             biomeArray = new int[x_size * z_size];
         }
-
-        int[] arrayOfInt = this.unZoomedLayer.Calculate(x, z, x_size, z_size);
+        ArraysCache cache = ArraysCacheManager.GetCache();
+        if (outputType == OutputType.DEFAULT_FOR_WORLD)
+            cache.outputType = defaultOutputType;
+        else
+            cache.outputType = outputType;
+        int[] arrayOfInt = this.unZoomedLayer.GetBiomes(cache, x, z, x_size, z_size);
+        ArraysCacheManager.ReleaseCache(cache);
 
         System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);
 
@@ -39,13 +47,17 @@ public class NormalBiomeGenerator extends BiomeGenerator
 
     @Override
     public float[] getTemperatures(float[] paramArrayOfFloat, int x, int z, int x_size, int z_size)
-    {       
+    {
         if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < x_size * z_size))
         {
             paramArrayOfFloat = new float[x_size * z_size];
         }
+        ArraysCache cache = ArraysCacheManager.GetCache();
+        cache.outputType = defaultOutputType;
 
-        int[] arrayOfInt = this.biomeLayer.Calculate(x, z, x_size, z_size);
+        int[] arrayOfInt = this.biomeLayer.GetBiomes(cache, x, z, x_size, z_size);
+
+        ArraysCacheManager.ReleaseCache(cache);
         for (int i = 0; i < x_size * z_size; i++)
         {
             float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getTemperature() / 65536.0F;
@@ -58,16 +70,19 @@ public class NormalBiomeGenerator extends BiomeGenerator
 
         return paramArrayOfFloat;
     }
-    
+
     @Override
     public float[] getRainfall(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
-    {  
+    {
         if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < paramInt3 * paramInt4))
         {
             paramArrayOfFloat = new float[paramInt3 * paramInt4];
         }
+        ArraysCache cache = ArraysCacheManager.GetCache();
+        cache.outputType = defaultOutputType;
 
-        int[] arrayOfInt = this.biomeLayer.Calculate(paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt = this.biomeLayer.GetBiomes(cache, paramInt1, paramInt2, paramInt3, paramInt4);
+        ArraysCacheManager.ReleaseCache(cache);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
             float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getWetness() / 65536.0F;
@@ -82,7 +97,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
+    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         boolean useCache = true;
         if ((biomeArray == null) || (biomeArray.length < x_size * z_size))
@@ -99,8 +114,13 @@ public class NormalBiomeGenerator extends BiomeGenerator
             }
             return biomeArray;
         }
-
-        int[] arrayOfInt = this.biomeLayer.Calculate(x, z, x_size, z_size);
+        ArraysCache cache = ArraysCacheManager.GetCache();
+        if (outputType == OutputType.DEFAULT_FOR_WORLD)
+            cache.outputType = defaultOutputType;
+        else
+            cache.outputType = outputType;
+        int[] arrayOfInt = this.biomeLayer.GetBiomes(cache, x, z, x_size, z_size);
+        ArraysCacheManager.ReleaseCache(cache);
 
         System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);
 
@@ -118,5 +138,11 @@ public class NormalBiomeGenerator extends BiomeGenerator
     public void cleanupCache()
     {
         cache.cleanupCache();
+    }
+
+    @Override
+    public boolean canGenerateUnZoomed()
+    {
+        return true;
     }
 }

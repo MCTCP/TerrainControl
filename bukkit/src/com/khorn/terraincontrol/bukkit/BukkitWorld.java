@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.bukkit;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
+import com.khorn.terraincontrol.biomegenerators.OutputType;
 import com.khorn.terraincontrol.bukkit.structuregens.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -133,10 +134,10 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
+    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size, outputType);
 
         biomeBaseArray = this.world.worldProvider.e.getBiomes(biomeBaseArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -155,10 +156,10 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
+    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size, outputType);
 
         biomeBaseArray = this.world.worldProvider.e.a(biomeBaseArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -578,6 +579,7 @@ public class BukkitWorld implements LocalWorld
 
     /**
      * Sets the new settings and deprecates any references to the old settings, if any.
+     *
      * @param worldConfig The new settings.
      */
     public void setSettings(WorldConfig worldConfig)
@@ -591,9 +593,10 @@ public class BukkitWorld implements LocalWorld
     }
 
     /**
-     * Enables/reloads this BukkitWorld. If you are reloading, 
-     * don't forget to set the new settings first using 
+     * Enables/reloads this BukkitWorld. If you are reloading,
+     * don't forget to set the new settings first using
      * {@link #setSettings(WorldConfig)}.
+     *
      * @param world The world that needs to be enabled.
      */
     public void enable(org.bukkit.World world)
@@ -752,5 +755,13 @@ public class BukkitWorld implements LocalWorld
     public CustomObjectStructureCache getStructureCache()
     {
         return this.structureCache;
+    }
+
+    @Override
+    public boolean canBiomeManagerGenerateUnzoomed()
+    {
+        if(this.biomeManager != null)
+            return biomeManager.canGenerateUnZoomed();
+        return true;
     }
 }
