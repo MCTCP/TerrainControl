@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.forge;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
+import com.khorn.terraincontrol.biomegenerators.OutputType;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
@@ -24,14 +25,6 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Level;
 
-/**
- * The name of this class is a relic from when it could only
- * be used for singleplayer. Shortly after Terrain Control
- * was converted to use Forge instead of ModLoader, it also
- * worked on multiplayer. However, the name was unchanged.
- * A better name would be ForgeWorld.
- *
- */
 public class ForgeWorld implements LocalWorld
 {
     
@@ -159,10 +152,10 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
+    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size, outputType);
 
         biomeGenBaseArray = this.world.provider.worldChunkMgr.getBiomesForGeneration(biomeGenBaseArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -181,10 +174,10 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
+    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         if (this.biomeManager != null)
-            return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size);
+            return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size, outputType);
 
         biomeGenBaseArray = this.world.provider.worldChunkMgr.getBiomeGenAt(biomeGenBaseArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
@@ -661,7 +654,7 @@ public class ForgeWorld implements LocalWorld
     {
 
         byte[] arrayOfByte2 = chunk.getBiomeArray();
-        biomeIntArray = this.getBiomes(biomeIntArray, x * 16, z * 16, 16, 16);
+        biomeIntArray = this.getBiomes(biomeIntArray, x * 16, z * 16, 16, 16, null);
 
         for (int i1 = 0; i1 < arrayOfByte2.length; i1++)
         {
@@ -731,5 +724,13 @@ public class ForgeWorld implements LocalWorld
     {
         return this.structureCache;
     }
-    
+
+    @Override
+    public boolean canBiomeManagerGenerateUnzoomed()
+    {
+        if(this.biomeManager != null)
+            return biomeManager.canGenerateUnZoomed();
+        return true;
+    }
+
 }

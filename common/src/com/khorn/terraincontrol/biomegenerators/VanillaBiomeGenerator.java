@@ -1,11 +1,10 @@
 package com.khorn.terraincontrol.biomegenerators;
 
-
 import com.khorn.terraincontrol.LocalWorld;
 
-
 /**
- * Dummy class. Handled by special if-statements in the code.
+ * Dummy class. Handled by special if-statements in the 
+ * implementations of LocalWorld.
  *
  */
 public class VanillaBiomeGenerator extends BiomeGenerator
@@ -17,39 +16,45 @@ public class VanillaBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size)
+    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
-        return null;
+        throw new UnsupportedOperationException("Dummy class");
     }
 
     @Override
     public float[] getTemperatures(float[] paramArrayOfFloat, int x, int z, int x_size, int z_size)
     {
-        return null;
+        throw new UnsupportedOperationException("Dummy class");
     }
 
     @Override
     public float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int x_size, int z_size)
     {
-        return null;
+        throw new UnsupportedOperationException("Dummy class");
     }
 
     @Override
-    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size)
+    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
-        return null;
+        throw new UnsupportedOperationException("Dummy class");
     }
 
     @Override
     public int getBiome(int x, int z)
     {
-        return 0;
+        throw new UnsupportedOperationException("Dummy class");
     }
 
     @Override
     public void cleanupCache()
     {
-        
+
     }
-    
+
+    @Override
+    public boolean canGenerateUnZoomed()
+    {
+        throw new UnsupportedOperationException("Dummy class");
+    }
+
 }

@@ -1,7 +1,7 @@
-package com.khorn.terraincontrol.biomelayers.layers;
+package com.khorn.terraincontrol.biomegenerators.biomelayers;
 
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.biomelayers.ArraysCache;
+import com.khorn.terraincontrol.biomegenerators.ArraysCache;
 
 
 public class LayerBiomeInBiome extends Layer
@@ -23,28 +23,28 @@ public class LayerBiomeInBiome extends Layer
     }
 
     @Override
-    public int[] GetBiomes(int cacheId, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
     {
-        int i = paramInt1 - 1;
-        int j = paramInt2 - 1;
-        int k = paramInt3 + 2;
-        int m = paramInt4 + 2;
-        int[] arrayOfInt1 = this.child.GetBiomes(cacheId, i, j, k, m);
+        int i = x - 1;
+        int j = z - 1;
+        int k = x_size + 2;
+        int m = z_size + 2;
+        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, i, j, k, m);
 
-        int[] arrayOfInt2 = ArraysCache.GetArray(cacheId, paramInt3 * paramInt4);
+        int[] arrayOfInt2 = arraysCache.GetArray( x_size * z_size);
 
-        for (int n = 0; n < paramInt4; n++)
+        for (int n = 0; n < z_size; n++)
         {
-            for (int i1 = 0; i1 < paramInt3; i1++)
+            for (int i1 = 0; i1 < x_size; i1++)
             {
-                SetSeed(i1 + paramInt1, n + paramInt2);
+                SetSeed(i1 + x, n + z);
                 int currentPiece = arrayOfInt1[(i1 + 1 + (n + 1) * k)];
 
                 boolean spawn = false;
                 if (inOcean)
                 {
-                    int i2 = arrayOfInt1[(i1 + 0 + (n + 0) * k)] & LandBit;
-                    int i3 = arrayOfInt1[(i1 + 2 + (n + 0) * k)] & LandBit;
+                    int i2 = arrayOfInt1[(i1 + 0 + (n) * k)] & LandBit;
+                    int i3 = arrayOfInt1[(i1 + 2 + (n) * k)] & LandBit;
                     int i4 = arrayOfInt1[(i1 + 0 + (n + 2) * k)] & LandBit;
                     int i5 = arrayOfInt1[(i1 + 2 + (n + 2) * k)] & LandBit;
 
@@ -57,8 +57,8 @@ public class LayerBiomeInBiome extends Layer
                 }
                 if (!spawn)
                 {
-                    int i2 = arrayOfInt1[(i1 + 0 + (n + 0) * k)] & BiomeBits;
-                    int i3 = arrayOfInt1[(i1 + 2 + (n + 0) * k)] & BiomeBits;
+                    int i2 = arrayOfInt1[(i1 + 0 + (n) * k)] & BiomeBits;
+                    int i3 = arrayOfInt1[(i1 + 2 + (n) * k)] & BiomeBits;
                     int i4 = arrayOfInt1[(i1 + 0 + (n + 2) * k)] & BiomeBits;
                     int i5 = arrayOfInt1[(i1 + 2 + (n + 2) * k)] & BiomeBits;
 
@@ -68,7 +68,7 @@ public class LayerBiomeInBiome extends Layer
 
                 }
 
-                arrayOfInt2[(i1 + n * paramInt3)] = currentPiece;
+                arrayOfInt2[(i1 + n * x_size)] = currentPiece;
             }
         }
         return arrayOfInt2;

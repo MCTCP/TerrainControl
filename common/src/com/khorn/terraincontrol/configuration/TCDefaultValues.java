@@ -45,6 +45,8 @@ public enum TCDefaultValues implements TCSetting
     RiverRarity(4),
     RiverSize(0),
     RiversEnabled(true),
+    RandomRivers(false),
+    ImprovedRivers(false),
 
     FrozenOcean(true),
 
@@ -164,6 +166,11 @@ public enum TCDefaultValues implements TCSetting
     MaxAverageDepth(0.0D),
 
     CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0", SettingsType.StringArray),
+
+    RiverHeight(-1.0F),
+    RiverVolatility(0.3F),
+    RiverWaterLevel(63),
+    RiverCustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0", SettingsType.StringArray),
 
     // End biome settings
 
@@ -320,12 +327,13 @@ public enum TCDefaultValues implements TCSetting
         this.returnType = SettingsType.Int;
     }
     
+    @SuppressWarnings("UnusedDeclaration")
     private TCDefaultValues(HashSet<Integer> i)
     {
         this.iSetValue = i;
         this.returnType = SettingsType.IntSet;
     }
-    
+
     private TCDefaultValues(double d)
     {
         this.dValue = d;
