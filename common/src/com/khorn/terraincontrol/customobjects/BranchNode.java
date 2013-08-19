@@ -16,7 +16,7 @@ public class BranchNode
     /**
      * The chance of a branch
      */
-    private Double chance;
+    private double chance;
     /**
      * The branch with associated rotation and chance values
      */
@@ -30,7 +30,7 @@ public class BranchNode
      * @param chance   The spawn chance of the branch
      * @param branch   The branch
      */
-    public BranchNode(Rotation rotation, Double chance, CustomObject branch)
+    public BranchNode(Rotation rotation, double chance, CustomObject branch)
     {
         this.rotation = rotation;
         this.chance = chance;
@@ -67,7 +67,7 @@ public class BranchNode
         @Override
         public int compare(BranchNode o1, BranchNode o2)
         {
-            return o1.chance.compareTo(o2.chance);
+            return (int) (o1.chance - o2.chance);
         }
 
     }

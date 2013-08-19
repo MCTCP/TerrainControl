@@ -89,7 +89,7 @@ public class BranchFunction extends BO3Function implements Branch
         for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
         {
             BranchNode branch = it.next();
-            Double randomChance = random.nextDouble() * 100;
+            double randomChance = random.nextDouble() * 100;
             TerrainControl.log(Level.FINEST, "  Needed: " + branch.getChance() + " Obtained: " + randomChance);
             if (randomChance < branch.getChance())
             {
@@ -111,7 +111,7 @@ public class BranchFunction extends BO3Function implements Branch
         return "Branch";
     }
 
-    protected Double readArgs(List<String> args, boolean accumulateChances) throws InvalidConfigException
+    protected double readArgs(List<String> args, boolean accumulateChances) throws InvalidConfigException
     {
         assureSize(6, args);
         x = readInt(args.get(0), -32, 32);
