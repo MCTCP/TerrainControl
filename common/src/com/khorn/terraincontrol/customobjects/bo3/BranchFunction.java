@@ -60,7 +60,7 @@ public class BranchFunction extends BO3Function implements Branch
     public void load(List<String> args) throws InvalidConfigException
     {
         branches = new TreeSet<BranchNode>(BranchNode.getComparator());
-        readArgs(args);
+        readArgs(args, false);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class BranchFunction extends BO3Function implements Branch
         return "Branch";
     }
 
-    protected Double readArgs(List<String> args) throws InvalidConfigException
+    protected Double readArgs(List<String> args, boolean accumulateChances) throws InvalidConfigException
     {
         assureSize(6, args);
         x = readInt(args.get(0), -32, 32);
@@ -129,9 +129,16 @@ public class BranchFunction extends BO3Function implements Branch
             {
                 TerrainControl.log(Level.FINER, object.getName() + " Initialized");
             }
-            cumulativeChance += readDouble(args.get(i + 2), 0, 100);
-            // CustomObjects are inserted into the Set in ascending chance order with Chance being cumulative.
-            branches.add(new BranchNode(Rotation.getRotation(args.get(i + 1)), cumulativeChance, object));
+            double branchChance = readDouble(args.get(i + 2), 0, Double.MAX_VALUE);
+            if (accumulateChances)
+            {
+                cumulativeChance += branchChance;
+                // CustomObjects are inserted into the Set in ascending chance order with Chance being cumulative.
+                branches.add(new BranchNode(Rotation.getRotation(args.get(i + 1)), cumulativeChance, object));
+            } else
+            {
+                branches.add(new BranchNode(Rotation.getRotation(args.get(i + 1)), branchChance, object));
+            }
         }
         TerrainControl.log(Level.FINEST, args.size() + ":" + i);
         if (i < args.size())
