@@ -15,12 +15,11 @@ import java.util.*;
 
 public class BO3Config extends ConfigFile
 {
-    public Map<String, CustomObject> otherObjectsInDirectory;
 
+    public Map<String, CustomObject> otherObjectsInDirectory;
     public String author;
     public String description;
     public ConfigMode settingsMode;
-
     public boolean tree;
     public int frequency;
     public double rarity;
@@ -29,14 +28,11 @@ public class BO3Config extends ConfigFile
     public int minHeight;
     public int maxHeight;
     public ArrayList<String> excludedBiomes;
-
     public HashSet<Integer> sourceBlock;
     public int maxPercentageOutsideSourceBlock;
     public OutsideSourceBlock outsideSourceBlock;
-
     public BlockFunction[][] blocks = new BlockFunction[4][]; // four rotations
     public BO3Check[][] bo3Checks = new BO3Check[4][];
-
     public int maxBranchDepth;
     public BranchFunction[][] branches = new BranchFunction[4][];
 
@@ -58,7 +54,8 @@ public class BO3Config extends ConfigFile
     }
 
     /**
-     * Creates a BO3Config with the specified settings. Ignores the settings in the
+     * Creates a BO3Config with the specified settings. Ignores the settings in
+     * the
      * settings file.
      *
      * @param oldObject The old BO3 object. It's settings will be copied.
@@ -219,6 +216,9 @@ public class BO3Config extends ConfigFile
                     } else if (res instanceof BO3Check)
                     {
                         tempChecksList.add((BO3Check) res);
+                    } else if (res instanceof WeightedBranchFunction)
+                    {
+                        tempBranchesList.add((WeightedBranchFunction) res);
                     } else if (res instanceof BranchFunction)
                     {
                         tempBranchesList.add((BranchFunction) res);
@@ -262,10 +262,29 @@ public class BO3Config extends ConfigFile
         writeBigTitle("Branches");
         writeComment("Branches are objects that will spawn when this object spawns when it is used in");
         writeComment("the CustomStructure resource. Branches can also have branches, making complex");
-        writeComment("structures possible.");
-        writeComment("Branch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]])");
+        writeComment("structures possible. See the wiki for more details.");
+        writeComment("");
+        writeComment("Regular Branches spawn each branch with an independent chance of spawning.");
+        writeComment("Branch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]][IndividualChance])");
         writeComment("branchName - name of the object to spawn.");
         writeComment("rotation - NORTH, SOUTH, EAST or WEST.");
+        writeComment("IndividualChance - The chance each branch has to spawn, assumed to be 100 when left blank");
+        writeComment("");
+        writeComment("Weighted Branches spawn branches with a dependent chance of spawning.");
+        writeComment("WeightedBranch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]][MaxChanceOutOf])");
+        writeComment("MaxChanceOutOf - The chance all branches have to spawn out of, assumed to be 100 when left blank");
+//        writeComment("Example1: WeightedBranch(0,0,0,branch1,NORTH,2,branch2,NORTH,6,10)");
+//        writeComment("   branch1 will have a 2 in 10 (20%) chance of spawning, branch2 will have a 6 in 10 (60%) chance to spawn,");
+//        writeComment("   and there is a 2 in 10 (20%) chance nothing will spawn");
+//        writeComment("Example1A: WeightedBranch(0,0,0,branch1,NORTH,10,branch2,NORTH,30,50)");
+//        writeComment("   Same chance as Example1");
+//        writeComment("   branch1 will have a 10 in 50 (20%) chance of spawning, branch2 will have a 30 in 50 (60%) chance to spawn,");
+//        writeComment("   and there is a 10 in 50 (20%) chance nothing will spawn");
+//        writeComment("Example2: WeightedBranch(0,0,0,branch1,NORTH,10,branch2,NORTH,30)");
+//        writeComment("   branch1 will have a 10 in 100 (10%) chance of spawning, branch2 will have a 30 in 100 (30%) chance to spawn,");
+//        writeComment("   and there is a 60 in 100 (60%) chance nothing will spawn");
+        
+            
         for (BranchFunction branch : branches[0])
         {
             writeValue(branch.makeString());

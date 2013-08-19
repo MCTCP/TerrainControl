@@ -13,12 +13,12 @@ import java.util.Random;
  */
 public class BlockFunction extends BO3Function
 {
+
     public int blockId;
     public int blockData;
     public int x;
     public int y;
     public int z;
-
     public boolean hasMetaData;
     public Tag metaDataTag;
     public String metaDataName;
@@ -46,12 +46,12 @@ public class BlockFunction extends BO3Function
     @Override
     protected String makeString()
     {
-        String start = "Block(" + x + "," + y + "," + z + "," + makeMaterial(blockId, blockData);
+        String start = "Block(" + x + ',' + y + ',' + z + ',' + makeMaterial(blockId, blockData);
         if (hasMetaData)
         {
-            start += "," + metaDataName;
+            start += ',' + metaDataName;
         }
-        return start + ")";
+        return start + ')';
     }
 
     @Override
@@ -73,12 +73,15 @@ public class BlockFunction extends BO3Function
     /**
      * Spawns this block at the position. The saved x, y and z in this block are
      * ignored.
-     * 
-     * @param world     The world to spawn in.
-     * @param random    The random number generator.
-     * @param x         The absolute x to spawn. The x-position in this object is ignored.
-     * @param y         The absolute y to spawn. The y-position in this object is ignored.
-     * @param z         The absolute z to spawn. The z-position in this object is ignored.
+     * <p/>
+     * @param world  The world to spawn in.
+     * @param random The random number generator.
+     * @param x      The absolute x to spawn. The x-position in this object is
+     *               ignored.
+     * @param y      The absolute y to spawn. The y-position in this object is
+     *               ignored.
+     * @param z      The absolute z to spawn. The z-position in this object is
+     *               ignored.
      */
     public void spawn(LocalWorld world, Random random, int x, int y, int z)
     {
@@ -88,4 +91,5 @@ public class BlockFunction extends BO3Function
             world.attachMetadata(x, y, z, metaDataTag);
         }
     }
+
 }
