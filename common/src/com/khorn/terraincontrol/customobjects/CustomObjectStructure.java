@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.RandomHelper;
 
@@ -19,7 +18,7 @@ public class CustomObjectStructure
     protected final Random random;
     protected LocalWorld world;
     protected CustomObjectCoordinate start;
-    protected SpawnHeight height;
+    protected StructurePartSpawnHeight height;
     protected Map<ChunkCoordinate, Set<CustomObjectCoordinate>> objectsToSpawn;
     protected int maxBranchDepth;
 
@@ -32,7 +31,7 @@ public class CustomObjectStructure
 
         this.world = world;
         this.start = start;
-        this.height = start.getStructuredObject().getSpawnHeight();
+        this.height = start.getStructuredObject().getStructurePartSpawnHeight();
         this.maxBranchDepth = start.getStructuredObject().getMaxBranchDepth();
         random = RandomHelper.getRandomForCoords(start.getX(), start.getY(), start.getZ(), world.getSeed());
 

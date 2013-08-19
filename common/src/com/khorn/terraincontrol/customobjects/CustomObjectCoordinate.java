@@ -10,15 +10,6 @@ import java.util.Random;
  */
 public class CustomObjectCoordinate
 {
-    public enum SpawnHeight
-    {
-        /** Use the y coord provided in this object */
-        PROVIDED,
-        /** Use the highest block on the x,z column */
-        HIGHEST_BLOCK,
-        /** Use the highest solid block on the x,z column */
-        HIGHEST_SOLID_BLOCK
-    }
 
     private final CustomObject object;
     private final Rotation rotation;
@@ -77,9 +68,9 @@ public class CustomObjectCoordinate
         return rotation;
     }
 
-    public boolean spawnWithChecks(LocalWorld world, SpawnHeight height, Random random)
+    public boolean spawnWithChecks(LocalWorld world, StructurePartSpawnHeight height, Random random)
     {
-        int y = getCorrectY(world, height);
+        int y = height.getCorrectY(world, x, this.y, z);
         if (!object.canSpawnAt(world, rotation, x, y, z))
         {
             return false;
@@ -124,18 +115,5 @@ public class CustomObjectCoordinate
     public int hashCode()
     {
         return (Integer.valueOf(x).hashCode() >> 13) ^ (Integer.valueOf(y).hashCode() >> 7) ^ Integer.valueOf(z).hashCode() ^ object.getName().hashCode() ^ rotation.toString().hashCode();
-    }
-
-    private int getCorrectY(LocalWorld world, SpawnHeight height)
-    {
-        if (height.equals(SpawnHeight.HIGHEST_BLOCK))
-        {
-            return world.getHighestBlockYAt(x, z);
-        }
-        if (height.equals(SpawnHeight.HIGHEST_SOLID_BLOCK))
-        {
-            return world.getSolidHeight(x, z);
-        }
-        return y;
     }
 }

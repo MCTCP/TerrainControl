@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.customobjects;
 
-import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
-
 import java.util.Random;
 
 /**
@@ -49,5 +47,5 @@ public interface StructuredCustomObject extends CustomObject
      * 
      * @return The height.
      */
-    public SpawnHeight getSpawnHeight();
+    public StructurePartSpawnHeight getStructurePartSpawnHeight();
 }
