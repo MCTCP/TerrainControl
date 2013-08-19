@@ -89,7 +89,7 @@ public class BranchFunction extends BO3Function implements Branch
         for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
         {
             BranchNode branch = it.next();
-            double randomChance = random.nextDouble() * 100;
+            double randomChance = random.nextDouble() * (totalChance != -1 ? totalChance : 100);
             TerrainControl.log(Level.FINEST, "  Needed: " + branch.getChance() + " Obtained: " + randomChance);
             if (randomChance < branch.getChance())
             {
