@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.forge;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
+import com.khorn.terraincontrol.biomegenerators.OutputType;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
@@ -13,7 +14,6 @@ import java.util.Random;
 
 /**
  * Actually a biome manager.
- *
  */
 public class TCWorldChunkManager extends WorldChunkManager
 {
@@ -70,7 +70,7 @@ public class TCWorldChunkManager extends WorldChunkManager
     @Override
     public BiomeGenBase[] getBiomesForGeneration(BiomeGenBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
-        int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
         if (paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
         {
             paramArrayOfBiomeBase = new BiomeGenBase[arrayOfInt.length];
@@ -87,7 +87,7 @@ public class TCWorldChunkManager extends WorldChunkManager
     @Override
     public BiomeGenBase[] getBiomeGenAt(BiomeGenBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
     {
-        int[] arrayOfInt = this.biomeManager.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt = this.biomeManager.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
         if (paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
         {
             paramArrayOfBiomeBase = new BiomeGenBase[arrayOfInt.length];
@@ -142,7 +142,7 @@ public class TCWorldChunkManager extends WorldChunkManager
 
         int n = k - i + 1;
         int i1 = m - j + 1;
-        int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, i, j, n, i1);
+        int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, i, j, n, i1, OutputType.DEFAULT_FOR_WORLD);
         ChunkPosition localChunkPosition = null;
         int i2 = 0;
         for (int i3 = 0; i3 < arrayOfInt.length; i3++)

@@ -4,7 +4,6 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.*;
-import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightSetting;
 import com.khorn.terraincontrol.util.MathHelper;
@@ -80,6 +79,12 @@ public class BO3 implements StructuredCustomObject
         BlockFunction[] blocks = settings.blocks[rotation.getRotationId()];
         BO3Check[] checks = settings.bo3Checks[rotation.getRotationId()];
 
+        // Height check
+        if (y < settings.minHeight || y > settings.maxHeight)
+        {
+            return false;
+        }
+
         // Check for spawning
         for (BO3Check check : checks)
         {
@@ -89,6 +94,7 @@ public class BO3 implements StructuredCustomObject
                 return false;
             }
         }
+
         // Check for source blocks
         int blocksOutsideSourceBlock = 0;
         for (BlockFunction block : blocks)
@@ -153,18 +159,10 @@ public class BO3 implements StructuredCustomObject
         if (settings.spawnHeight == SpawnHeightSetting.highestBlock)
         {
             y = world.getHighestBlockYAt(x, z);
-            if (y < settings.minHeight || y > settings.maxHeight)
-            {
-                return false;
-            }
         }
         if (settings.spawnHeight == SpawnHeightSetting.highestSolidBlock)
         {
             y = world.getSolidHeight(x, z);
-            if (y < settings.minHeight || y > settings.maxHeight)
-            {
-                return false;
-            }
         }
         if (!canSpawnAt(world, rotation, x, y, z))
         {
@@ -251,8 +249,8 @@ public class BO3 implements StructuredCustomObject
     }
 
     @Override
-    public SpawnHeight getSpawnHeight()
+    public StructurePartSpawnHeight getStructurePartSpawnHeight()
     {
-        return this.settings.spawnHeight.toSpawnHeight();
+        return this.settings.spawnHeight.toStructurePartSpawnHeight();
     }
 }

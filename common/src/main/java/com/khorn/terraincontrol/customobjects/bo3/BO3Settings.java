@@ -1,9 +1,8 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate.SpawnHeight;
-
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.configuration.TCSetting;
+import com.khorn.terraincontrol.customobjects.StructurePartSpawnHeight;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,18 +33,18 @@ public enum BO3Settings implements TCSetting
     // The spawn height
     public enum SpawnHeightSetting
     {
-        randomY(SpawnHeight.PROVIDED),
-        highestBlock(SpawnHeight.HIGHEST_BLOCK),
-        highestSolidBlock(SpawnHeight.HIGHEST_SOLID_BLOCK);
+        randomY(StructurePartSpawnHeight.PROVIDED),
+        highestBlock(StructurePartSpawnHeight.HIGHEST_BLOCK),
+        highestSolidBlock(StructurePartSpawnHeight.HIGHEST_SOLID_BLOCK);
 
-        private SpawnHeight height;
+        private StructurePartSpawnHeight height;
 
-        private SpawnHeightSetting(SpawnHeight height)
+        private SpawnHeightSetting(StructurePartSpawnHeight height)
         {
             this.height = height;
         }
 
-        public SpawnHeight toSpawnHeight()
+        public StructurePartSpawnHeight toStructurePartSpawnHeight()
         {
             return height;
         }

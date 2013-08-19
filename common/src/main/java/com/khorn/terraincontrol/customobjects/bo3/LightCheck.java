@@ -5,10 +5,19 @@ import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.List;
 
+/**
+ *
+ */
 public class LightCheck extends BO3Check
 {
-    // The minimum and maximum light levels, inclusive
+
+    /**
+     * The minimum Light level, inclusive
+     */
     public int minLightLevel;
+    /**
+     * The maximum Light level, inclusive
+     */
     public int maxLightLevel;
 
     @Override
@@ -38,7 +47,7 @@ public class LightCheck extends BO3Check
     @Override
     public String makeString()
     {
-        return "LightCheck(" + x + "," + y + "," + z + "," + minLightLevel + "," + maxLightLevel + ")";
+        return "LightCheck(" + x + ',' + y + ',' + z + ',' + minLightLevel + ',' + maxLightLevel + ')';
     }
 
     @Override

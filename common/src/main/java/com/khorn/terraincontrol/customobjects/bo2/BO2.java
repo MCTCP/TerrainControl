@@ -57,16 +57,16 @@ public class BO2 extends ConfigFile implements CustomObject
 
     public int branchLimit;
 
-    public BO2(File file, String name)
+    public BO2(String name, File file)
     {
-        readSettingsFile(file);
-        this.name = name;
+        super(name, file);
+        readSettingsFile();
     }
 
-    public BO2(Map<String, String> settings, String name)
+    public BO2(String name, File file, Map<String, String> settings)
     {
+        super(name, file);
         settingsCache = settings;
-        this.name = name;
         // Initialize immediately
         readConfigSettings();
         correctSettings();
@@ -258,7 +258,7 @@ public class BO2 extends ConfigFile implements CustomObject
         Map<String, String> newSettings = new HashMap<String, String>();
         newSettings.putAll(settingsCache);
         newSettings.putAll(extraSettings);
-        return new BO2(newSettings, getName());
+        return new BO2(name, file, newSettings);
     }
 
     @Override

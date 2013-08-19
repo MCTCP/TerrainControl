@@ -1,8 +1,8 @@
-package com.khorn.terraincontrol.util;
+package com.khorn.terraincontrol.generator.noise;
 
 import java.util.Random;
 
-public class NoiseGenerator2
+public class NoiseGeneratorOld
 {
     private static int[][] d = {{1, 1, 0}, {-1, 1, 0}, {1, -1, 0}, {-1, -1, 0}, {1, 0, 1}, {-1, 0, 1}, {1, 0, -1}, {-1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};
 
@@ -14,7 +14,7 @@ public class NoiseGenerator2
     private static final double g = (3.0D - Math.sqrt(3.0D)) / 6.0D;
 
 
-    public NoiseGenerator2(Random paramRandom)
+    public NoiseGeneratorOld(Random paramRandom)
     {
         this.a = (paramRandom.nextDouble() * 256.0D);
         this.b = (paramRandom.nextDouble() * 256.0D);

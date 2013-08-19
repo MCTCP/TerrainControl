@@ -1,9 +1,10 @@
-package com.khorn.terraincontrol.biomelayers.layers;
+package com.khorn.terraincontrol.biomegenerators.biomelayers;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.biomegenerators.ArraysCache;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
@@ -57,7 +58,7 @@ public abstract class Layer
 
     protected static final int BiomeBits = 255; // 255 63
     protected static final int LandBit = 256;   // 256 64
-    protected static final int RiverBits = 3072; //3072 768
+    public static final int RiverBits = 3072; //3072 768
     protected static final int IceBit = 512;   // 512  128
     protected static final int IslandBit = 4096; // 4096 1024
 
@@ -124,11 +125,17 @@ public abstract class Layer
 
         Layer MainLayer = new LayerEmpty(1L);
 
+        Layer RiverLayer = new LayerEmpty(1L);
+        boolean riversStarted = false;
+
 
         for (int depth = 0; depth <= config.GenerationDepth; depth++)
         {
 
             MainLayer = new LayerZoom(2001 + depth, MainLayer);
+
+            if (config.randomRivers && riversStarted)
+                RiverLayer = new LayerZoom(2001 + depth, RiverLayer);
 
             if (config.LandSize == depth)
             {
@@ -153,11 +160,22 @@ public abstract class Layer
             if (config.IceSize == depth)
                 MainLayer = new LayerIce(depth, MainLayer, config.IceRarity);
 
-            if (config.RiverRarity == depth)
-                MainLayer = new LayerRiverInit(155, MainLayer);
+            if (config.riverRarity == depth)
+                if (config.randomRivers)
+                {
+                    RiverLayer = new LayerRiverInit(155, RiverLayer);
+                    riversStarted = true;
+                } else
+                    MainLayer = new LayerRiverInit(155, MainLayer);
 
-            if ((config.GenerationDepth - config.RiverSize) == depth)
-                MainLayer = new LayerRiver(5 + depth, MainLayer);
+
+            if ((config.GenerationDepth - config.riverSize) == depth)
+            {
+                if (config.randomRivers)
+                    RiverLayer = new LayerRiver(5 + depth, RiverLayer);
+                else
+                    MainLayer = new LayerRiver(5 + depth, MainLayer);
+            }
 
             LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
             boolean haveBorder = false;
@@ -211,7 +229,10 @@ public abstract class Layer
 
 
         }
-        MainLayer = new LayerMix(1L, MainLayer, config, world);
+        if (config.randomRivers)
+            MainLayer = new LayerMixWithRiver(1L, MainLayer, RiverLayer, config, world);
+        else
+            MainLayer = new LayerMix(1L, MainLayer, config, world);
 
         MainLayer = new LayerSmooth(400L, MainLayer);
 
@@ -229,10 +250,10 @@ public abstract class Layer
 
         //TemperatureLayer = new LayerTemperatureMix(TemperatureLayer, ZoomedLayer, 0, config);
 
-        ZoomedLayer.b(paramLong);
+        ZoomedLayer.SetWorldSeed(paramLong);
 
-        MainLayer = new LayerCacheInit(1, MainLayer);
-        ZoomedLayer = new LayerCacheInit(1, ZoomedLayer);
+        //MainLayer = new LayerCacheInit(1, MainLayer);
+        //ZoomedLayer = new LayerCacheInit(1, ZoomedLayer);
 
         return new Layer[]{MainLayer, ZoomedLayer};
     }
@@ -248,11 +269,11 @@ public abstract class Layer
         this.d += paramLong;
     }
 
-    public void b(long paramLong)
+    public void SetWorldSeed(long paramLong)
     {
         this.b = paramLong;
         if (this.child != null)
-            this.child.b(paramLong);
+            this.child.SetWorldSeed(paramLong);
         this.b *= (this.b * 6364136223846793005L + 1442695040888963407L);
         this.b += this.d;
         this.b *= (this.b * 6364136223846793005L + 1442695040888963407L);
@@ -284,11 +305,6 @@ public abstract class Layer
         return i;
     }
 
-    protected abstract int[] GetBiomes(int cacheId, int x, int z, int x_size, int z_size);
-
-    public int[] Calculate(int x, int z, int x_size, int z_size)
-    {
-        return new int[0];
-    }
+    public abstract int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size);
 
 }

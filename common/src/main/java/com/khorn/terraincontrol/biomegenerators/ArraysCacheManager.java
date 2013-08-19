@@ -1,48 +1,44 @@
-package com.khorn.terraincontrol.biomelayers;
-
-import java.util.ArrayList;
+package com.khorn.terraincontrol.biomegenerators;
 
 @SuppressWarnings("rawtypes")
-public class ArraysCache
+public class ArraysCacheManager
 {
-    private static final int[][][] SmallArrays = new int[4][][];
-    private static final int[] SmallArraysNext = new int[4];
-    private static final ArrayList[] BigArrays = new ArrayList[4];
-    private static final int[] BigArraysNext = new int[4];
-    private static final boolean[] ArraysInUse = new boolean[4];
 
-    public static int GetCacheId()
+    private static final ArraysCache[] ARRAYS_CACHes = new ArraysCache[4];
+
+    static
     {
-        synchronized (ArraysInUse)
+        for (int i = 0; i < ARRAYS_CACHes.length; i++)
+            ARRAYS_CACHes[i] = new ArraysCache();
+
+    }
+
+    public static ArraysCache GetCache()
+    {
+        synchronized (ARRAYS_CACHes)
         {
-            for (int i = 0; i < ArraysInUse.length; i++)
+            for (ArraysCache ArraysCache : ARRAYS_CACHes)
             {
-                if (!ArraysInUse[i])
+                if (ArraysCache.isFree)
                 {
-
-                    ArraysInUse[i] = true;
-                    if (SmallArrays[i] == null)
-                        SmallArrays[i] = new int[128][];
-                    if (BigArrays[i] == null)
-                        BigArrays[i] = new ArrayList();
-
-                    return i;
+                    ArraysCache.isFree = false;
+                    return ArraysCache;
                 }
             }
+
         }
-        return 0; // Exception ??
+        return null; // Exception ??
     }
 
-    public static void ReleaseCacheId(int id)
+    public static void ReleaseCache(ArraysCache cache)
     {
-        synchronized (ArraysInUse)
+        synchronized (ARRAYS_CACHes)
         {
-            ArraysInUse[id] = false;
-            SmallArraysNext[id] = 0;
-            BigArraysNext[id] = 0;
+            cache.Release();
         }
     }
 
+    /*
     @SuppressWarnings({"unchecked"})
     public static int[] GetArray(int cacheId, int size)
     {
@@ -76,4 +72,5 @@ public class ArraysCache
         BigArraysNext[cacheId]++;
         return array;
     }
+    */
 }

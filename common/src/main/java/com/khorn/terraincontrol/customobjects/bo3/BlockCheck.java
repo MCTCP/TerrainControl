@@ -9,6 +9,7 @@ import java.util.List;
 
 public class BlockCheck extends BO3Check
 {
+
     public List<Integer> blockIds;
     public List<Byte> blockDatas;
 

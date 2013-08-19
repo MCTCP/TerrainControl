@@ -16,8 +16,10 @@ import java.util.logging.Level;
 
 public class BO3Loader implements CustomObjectLoader
 {
-    // A list of already loaded meta Tags. The path is the key, a NBT Tag
-    // is the value.
+
+    /** A list of already loaded meta Tags. The path is the key, a NBT Tag is
+     * the value.
+     */
     private static Map<String, Tag> loadedTags = new HashMap<String, Tag>();
 
     public BO3Loader()
@@ -25,11 +27,13 @@ public class BO3Loader implements CustomObjectLoader
         // Register BO3 ConfigFunctions
         TerrainControl.getConfigFunctionsManager().registerConfigFunction("Block", BlockFunction.class);
         TerrainControl.getConfigFunctionsManager().registerConfigFunction("Branch", BranchFunction.class);
+        TerrainControl.getConfigFunctionsManager().registerConfigFunction("WeightedBranch", WeightedBranchFunction.class);
         TerrainControl.getConfigFunctionsManager().registerConfigFunction("RandomBlock", RandomBlockFunction.class);
         TerrainControl.getConfigFunctionsManager().registerConfigFunction("BlockCheck", BlockCheck.class);
         TerrainControl.getConfigFunctionsManager().registerConfigFunction("LightCheck", LightCheck.class);
     }
 
+    @Override
     public CustomObject loadFromFile(String objectName, File file)
     {
         return new BO3(objectName, file);
@@ -108,6 +112,14 @@ public class BO3Loader implements CustomObjectLoader
 
     }
 
+    /**
+     * Caches and returns the provided Meta data
+     * <p/>
+     * @param pathOnDisk The path of the meta data
+     * @param metadata   The Tag object to be cached
+     * <p/>
+     * @return the meta data that was cached
+     */
     public static Tag registerMetadata(String pathOnDisk, Tag metadata)
     {
         // Add it to the cache
@@ -136,4 +148,5 @@ public class BO3Loader implements CustomObjectLoader
         // Clean up the cache
         loadedTags.clear();
     }
+
 }

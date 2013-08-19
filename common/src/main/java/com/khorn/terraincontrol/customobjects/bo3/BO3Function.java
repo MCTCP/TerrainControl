@@ -20,8 +20,9 @@ public abstract class BO3Function extends ConfigFunction<BO3Config>
      * <p/>
      * Note: the BO3Functons can have a magical link: if you change something on
      * the rotated one, it may also change on the original and vice versa.
-     *
+     * <p/>
      * @return A new BlockFunction that is rotated 90 degrees.
      */
     public abstract BO3Function rotate();
+
 }

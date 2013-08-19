@@ -147,44 +147,55 @@ public class CustomObjectManager
 
     /**
      * Returns a Map with all CustomObjects in a directory and its sub-directories
-     * in it. The Map will have the lowercase object name as a key.
+     * in it. The Map will have the lowercase object name as a key. All objects
+     * will have their onEnable method called after all objects are loaded.
      *
      * @param directory The directory to load from.
-     * @return
+     * @return The map, as described.
      */
     public Map<String, CustomObject> loadObjects(File directory)
     {
-        return loadObjects(directory, true);
+        // Load all the objects
+        Map<String, CustomObject> loadedObjects = loadObjectsRecursive(directory);
+
+        // Enable all the objects
+        for (CustomObject object : loadedObjects.values())
+        {
+            object.onEnable(loadedObjects);
+        }
+
+        return loadedObjects;
     }
-    
+
     /**
      * Returns a Map with all CustomObjects in a directory and its sub-directories
-     * in it. The Map will have the lowercase object name as a key.
+     * in it. The Map will have the lowercase object name as a key. The objects
+     * won't be enabled yet.
      *
      * @param directory The directory to load from.
      * @param enableObjects whether or not to enable objects 
-     * @return
+     * @return The map, as described.
      */
-    public Map<String, CustomObject> loadObjects(File directory, boolean enableObjects)
+    protected Map<String, CustomObject> loadObjectsRecursive(File directory)
     {
         if (!directory.isDirectory())
         {
             throw new IllegalArgumentException("Given file is not a directory: " + directory.getAbsolutePath());
         }
 
-        // Load all objects from the files and folders under @directory
+        // Load all objects from the files and folders under the directory
         Map<String, CustomObject> objects = new HashMap<String, CustomObject>();
         for (File file : directory.listFiles())
         {
             // Get name and extension
             String fileName = file.getName();
             int index = fileName.lastIndexOf('.');
-            // If we come across a directory decend into it without enabling the objects
-            if (file.isDirectory()) 
+            // If we come across a directory descend into it without enabling
+            // the objects
+            if (file.isDirectory())
             {
-                objects.putAll(this.loadObjects(file, false));
-            }
-            else if (index != -1)
+                objects.putAll(loadObjectsRecursive(file));
+            } else if (index != -1)
             {
                 String objectType = fileName.substring(index + 1, fileName.length());
                 String objectName = fileName.substring(0, index);
@@ -198,16 +209,6 @@ public class CustomObjectManager
             }
         }
 
-        // Enable all the objects if desired
-        if (enableObjects)
-        {
-            TerrainControl.log(Level.INFO, ("[BOB ENABLE INFO] {{BEGIN}} " + directory.getParentFile().getName().toUpperCase() + File.separator + directory.getName()).toUpperCase());
-            for (CustomObject object : objects.values())
-            {
-                object.onEnable(objects);
-            }
-            TerrainControl.log(Level.INFO, ("[BOB ENABLE INFO] {{ END }} " + directory.getParentFile().getName().toUpperCase() + File.separator + directory.getName()).toUpperCase());
-        }
         return objects;
     }
 
