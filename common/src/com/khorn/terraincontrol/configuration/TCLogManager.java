@@ -81,14 +81,8 @@ public class TCLogManager
          * determine the larger of the two alternate Log Levels and set the
          * log level to that.
          */
-        if (consoleLogLevel == LogLevels.Off || fileLogLevel == LogLevels.Off)
-        {
-            logger.setLevel(Level.WARNING);
-        } else
-        {
-            logger.setLevel((consoleLogLevel.getLevel().intValue() <= fileLogLevel.getLevel().intValue())
-                            ? consoleLogLevel.getLevel() : fileLogLevel.getLevel());
-        }
+        logger.setLevel((consoleLogLevel.getLevel().intValue() <= fileLogLevel.getLevel().intValue())
+                        ? consoleLogLevel.getLevel() : fileLogLevel.getLevel());
         consoleLogLevel = clampLevel(consoleLogLevel);
         fileLogLevel = clampLevel(fileLogLevel);
 
@@ -101,11 +95,18 @@ public class TCLogManager
                 handlerParentName = h.getClass().getSuperclass().getSimpleName();
                 if (handlerName.contains(ConsoleHandler.class.getSimpleName()) || handlerParentName.contains(ConsoleHandler.class.getSimpleName()))
                 {
-                    h.setLevel(consoleLogLevel.getLevel());
+                    if (consoleLogLevel == LogLevels.Off)
+                    {
+                        h.setLevel(Level.WARNING);
+                    }
+
                     logHandlerLevelSet(logger, h, consoleLogLevel);
                 } else if (handlerName.equals(FileHandler.class.getSimpleName()))
                 {
-                    h.setLevel(fileLogLevel.getLevel());
+                    if (fileLogLevel == LogLevels.Off)
+                    {
+                        h.setLevel(Level.WARNING);
+                    }
                     logHandlerLevelSet(logger, h, fileLogLevel);
                 }
             }

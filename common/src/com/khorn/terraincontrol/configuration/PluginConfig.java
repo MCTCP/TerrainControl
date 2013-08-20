@@ -39,7 +39,7 @@ public final class PluginConfig extends ConfigFile
 
     }
     public LogLevels fileHandlerLevel = LogLevels.XDebug;
-    public LogLevels consoleHandlerLevel = LogLevels.XXDebug;
+    public LogLevels consoleHandlerLevel = LogLevels.Debug;
     private static final Logger l = Logger.getLogger("Minecraft");
 
     public PluginConfig(File settingsDir)
@@ -76,18 +76,15 @@ public final class PluginConfig extends ConfigFile
         boolean hasOffLevel = false;
         if (this.consoleHandlerLevel == PluginConfig.LogLevels.Off)
         {
-            l.log(Level.INFO, "ACHIEVEMENT UNLOCKED: Console Silencer");
             hasOffLevel = true;
         }
         if (this.fileHandlerLevel == PluginConfig.LogLevels.Off)
         {
-            l.log(Level.INFO, "ACHIEVEMENT UNLOCKED: File Silencer");
             hasOffLevel = true;
         }
         if (hasOffLevel)
         {
-            l.log(Level.INFO, "You will no longer see INFO messages, but WARNING AND SEVERE level logs will still show");
-            l.log(Level.INFO, "We can't let you completely silence us :D");
+            l.log(Level.WARNING, "Quiet Mode: You will no longer see INFO messages, but WARNING AND SEVERE level logs will still show");
         }
     }
 
