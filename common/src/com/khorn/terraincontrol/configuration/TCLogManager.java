@@ -34,7 +34,7 @@ public class TCLogManager
                 if (levelName.equals(Level.ALL.getName()) || levelName.equals(Level.OFF.getName()))
                 {
                     spacer += "    ";
-                } else if (levelName.equals(Level.FINE.getName()) || levelName.equals(Level.INFO.getName()))
+                } else if (levelName.equals(Level.FINE.getName()))
                 {
                     spacer += "   ";
                 } else if (levelName.equals(Level.FINER.getName()))
@@ -70,7 +70,7 @@ public class TCLogManager
 
     public static Logger prepLogger(Logger logger)
     {
-        return setLogLevels(logger, TerrainControl.TCPluginConfig.getConsoleHandlerLevel(), TerrainControl.TCPluginConfig.getFileHandlerLevel());
+        return setLogLevels(logger, TerrainControl.getPluginConfig().getConsoleHandlerLevel(), TerrainControl.getPluginConfig().getFileHandlerLevel());
     }
 
     public static Logger setLogLevels(Logger logger, LogLevels consoleLogLevel, LogLevels fileLogLevel)

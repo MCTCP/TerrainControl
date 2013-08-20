@@ -9,7 +9,6 @@ import com.khorn.terraincontrol.customobjects.CustomObjectManager;
 import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
-import java.io.File;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,16 +36,11 @@ public class TerrainControl
     public static int supportedBlockIds = 255;
 
     /**
-     * The directory that holds all TerrainControl data
-     */
-    public static File TCDirectory;
-    /**
      * Global TC plugin configs
      */
-    public static PluginConfig TCPluginConfig;
+    private static PluginConfig pluginConfig;
     
     private static TerrainControlEngine engine;
-    private static boolean engineStarted = false;
     
     private static ConfigFunctionsManager configFunctionsManager;
     private static CustomObjectManager customObjectManager;
@@ -62,18 +56,16 @@ public class TerrainControl
 
     /**
      * Starts the engine, making all API methods available.
-     * <p/>
-     * @param engine The implementation of the engine.
+     * {@link #setEngine(TerrainControlEngine)} needs to be called first.
      */
-    public static void startEngine(TerrainControlEngine engine)
+    public static void startEngine()
     {
-        if (TerrainControl.engine != null && TerrainControl.engineStarted == true)
+        if (TerrainControl.engine == null)
         {
-            throw new UnsupportedOperationException("Engine is already set!");
+            throw new IllegalStateException("Engine is not set! Call setEngine first");
         }
 
         // Start the engine
-        TerrainControl.setEngine(engine);
         configFunctionsManager = new ConfigFunctionsManager();
         customObjectManager = new CustomObjectManager();
         biomeManagers = new BiomeModeManager();
@@ -91,12 +83,11 @@ public class TerrainControl
         // Load global objects after the event has been fired, so that custom
         // object types are also taken into account
         customObjectManager.loadGlobalObjects();
-        TerrainControl.engineStarted = true;
     }
 
     /**
      * Null out static references to free up memory. Should be called on
-     * shutdown.
+     * shutdown. Engine can be restarted after this.
      */
     public static void stopEngine()
     {
@@ -110,6 +101,7 @@ public class TerrainControl
         customObjectManager = null;
         configFunctionsManager = null;
         biomeManagers = null;
+        pluginConfig = null;
         cancelableEventHandlers.clear();
         monitoringEventHandlers.clear();
     }
@@ -126,16 +118,20 @@ public class TerrainControl
 
     /**
      * Sets the engine and initializes the root TerrainControl directory
-     * and global configs. This is done to prevent logging NPE's later in
+     * and global config. This is done to prevent logging NPE's later in
      * the plugin start sequence
      * <p/>
-     * @param engine
+     * @param engine The engine.
      */
     public static void setEngine(TerrainControlEngine engine)
     {
+        if (TerrainControl.engine != null)
+        {
+            throw new IllegalStateException("Engine is already set");
+        }
+        
         TerrainControl.engine = engine;
-        TerrainControl.TCDirectory = engine.getTCDataFolder();
-        TerrainControl.TCPluginConfig = new PluginConfig(TerrainControl.TCDirectory);
+        TerrainControl.pluginConfig = new PluginConfig(engine.getTCDataFolder());
     }
 
     /**
@@ -304,6 +300,15 @@ public class TerrainControl
     public static BiomeModeManager getBiomeModeManager()
     {
         return biomeManagers;
+    }
+    
+    /**
+     * Returns the global config file.
+     * @return The global config file.
+     */
+    public static PluginConfig getPluginConfig()
+    {
+        return pluginConfig;
     }
 
     // Events

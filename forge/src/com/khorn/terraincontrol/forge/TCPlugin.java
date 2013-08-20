@@ -36,7 +36,7 @@ public class TCPlugin implements TerrainControlEngine
 
     public File terrainControlDirectory;
     private TCWorldType worldType;
-    private static Logger LOGS;
+    private Logger logger;
     
     @EventHandler
     public void load(FMLInitializationEvent event)
@@ -45,11 +45,11 @@ public class TCPlugin implements TerrainControlEngine
 
         // Set the directory
         TerrainControl.setEngine(this);
-        LOGS = TCLogManager.prepLogger(FMLCommonHandler.instance().getFMLLogger());
+        logger = TCLogManager.prepLogger(FMLCommonHandler.instance().getFMLLogger());
 
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
-        TerrainControl.startEngine(this);
+        TerrainControl.startEngine();
 
         // Register localization
         LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
@@ -110,7 +110,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public void logIfLevel(Level ifLevel, String... messages)
     {
-        if (LOGS.getLevel().intValue() == ifLevel.intValue())
+        if (logger.getLevel().intValue() == ifLevel.intValue())
         {
             this.log(ifLevel, messages);
         }
@@ -119,7 +119,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public void logIfLevel(Level ifLevel, String messages, Object[] params)
     {
-        if (LOGS.getLevel().intValue() == ifLevel.intValue())
+        if (logger.getLevel().intValue() == ifLevel.intValue())
         {
             this.log(ifLevel, messages, params);
         }
@@ -128,7 +128,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public void logIfLevel(Level min, Level max, String... messages)
     {
-        if (LOGS.getLevel().intValue() <= max.intValue() && LOGS.getLevel().intValue() >= min.intValue())
+        if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
         {
             this.log(max, messages);
         }
@@ -137,7 +137,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public void logIfLevel(Level min, Level max, String messages, Object[] params)
     {
-        if (LOGS.getLevel().intValue() <= max.intValue() && LOGS.getLevel().intValue() >= min.intValue())
+        if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
         {
             this.log(max, messages);
         }
@@ -175,7 +175,7 @@ public class TCPlugin implements TerrainControlEngine
 
     private void log(LogRecord lr)
     {
-        LOGS.log(lr);
+        logger.log(lr);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -102,7 +103,7 @@ public final class PluginConfig extends ConfigFile
     protected void writeConfigSettings() throws IOException
     {
         // The modes
-        writeBigTitle("The (Long Awaited) TerrainControl Plugin Config File ");
+        writeBigTitle("The TerrainControl Plugin Config File ");
 
         writeComment("How this config file will be treated.");
         writeComment("Possible modes: WriteAll, WriteWithoutComments, WriteDisable");
@@ -117,9 +118,10 @@ public final class PluginConfig extends ConfigFile
         writeNewLine();
 
         writeSmallTitle("Possible Log Levels");
-        writeComment("   Standard    - Default Level, minimal logging; This is exactly what you are used to");
-        writeComment("   Debug       - Slightly more detail, this one is not too noisy");
-        writeComment("   XDebug      - Slightly even more detail, can be slightly noisy");
+        // writeComment("   Off         - Only warnings and errors are displayed."); // Shows warning when using this
+        writeComment("   Standard    - Default Level, minimal logging; This is exactly what you are used to.");
+        writeComment("   Debug       - Slightly more detail, this one is not too noisy.");
+        writeComment("   XDebug      - Slightly even more detail, can be slightly noisy.");
         writeComment("   XXDebug     - Use with caution, some large logs are possible.");
         writeComment("   Trace       - Only use this in dire circumstances and only for short periods of time, huge logs incoming.");
         writeNewLine();
@@ -135,8 +137,6 @@ public final class PluginConfig extends ConfigFile
         writeComment("See ``Possible Levels'' if you are lost.");
         writeValue(TCDefaultValues.FileLogLevel.name(), this.fileHandlerLevel.name());
         writeNewLine();
-
-        writeBigTitle("The End.");
 
     }
 

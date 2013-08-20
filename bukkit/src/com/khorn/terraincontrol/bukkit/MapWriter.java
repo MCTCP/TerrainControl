@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.sun.imageio.plugins.png.PNGImageWriter;
 import com.sun.imageio.plugins.png.PNGImageWriterSpi;
+
 import net.minecraft.server.v1_6_R2.BiomeBase;
 import net.minecraft.server.v1_6_R2.World;
 import org.bukkit.command.CommandSender;
@@ -96,7 +97,7 @@ public class MapWriter implements Runnable
                 }
             } else
             {
-                TerrainControl.log(Level.WARNING, "BukkitWorld is null :: Make sure you add `{0}` to bukkit.yml", bukkitWorld.getName());
+                TerrainControl.log(Level.WARNING, "BukkitWorld is null :: Make sure you add `{0}` to bukkit.yml", world.getWorld().getName());
             }
 
             sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Generating map...");
