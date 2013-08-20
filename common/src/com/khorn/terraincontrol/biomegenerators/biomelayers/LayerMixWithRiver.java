@@ -50,6 +50,8 @@ public class LayerMixWithRiver extends Layer
                 return this.GetWithoutRivers(arraysCache, x, z, x_size, z_size);
             case ONLY_RIVERS:
                 return this.GetOnlyRivers(arraysCache, x, z, x_size, z_size);
+            case BIOME_TEST:
+                return this.GetFull(arraysCache, x, z, x_size, z_size);
             default:
                 throw new UnsupportedOperationException("Unknown/invalid output type: " + arraysCache.outputType);
         }

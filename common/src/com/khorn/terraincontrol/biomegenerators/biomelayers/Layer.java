@@ -12,10 +12,10 @@ import java.util.ArrayList;
 
 public abstract class Layer
 {
-    protected long b;
+    protected long worldSeed;
     protected Layer child;
-    private long c;
-    protected long d;
+    private long coordinateSeed;
+    protected long layerSeed;
 
 
     /*
@@ -56,8 +56,8 @@ public abstract class Layer
     */
 
 
-    protected static final int BiomeBits = 255; // 255 63
-    protected static final int LandBit = 256;   // 256 64
+    public static final int BiomeBits = 255; // 255 63
+    public static final int LandBit = 256;   // 256 64
     public static final int RiverBits = 3072; //3072 768
     protected static final int IceBit = 512;   // 512  128
     protected static final int IslandBit = 4096; // 4096 1024
@@ -227,6 +227,8 @@ public abstract class Layer
                 MainLayer = layerBiomeBorder;
             }
 
+            MainLayer = new LayerTest(1L, MainLayer,false);
+
 
         }
         if (config.randomRivers)
@@ -234,7 +236,11 @@ public abstract class Layer
         else
             MainLayer = new LayerMix(1L, MainLayer, config, world);
 
+        MainLayer = new LayerTest(1L, MainLayer,true);
+
         MainLayer = new LayerSmooth(400L, MainLayer);
+
+        MainLayer = new LayerTest(1L, MainLayer,true);
 
         if (config.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
         {
@@ -247,6 +253,7 @@ public abstract class Layer
 
 
         Layer ZoomedLayer = new LayerZoomVoronoi(10L, MainLayer);
+        MainLayer = new LayerTest(1L, MainLayer,true);
 
         //TemperatureLayer = new LayerTemperatureMix(TemperatureLayer, ZoomedLayer, 0, config);
 
@@ -260,48 +267,48 @@ public abstract class Layer
 
     public Layer(long paramLong)
     {
-        this.d = paramLong;
-        this.d *= (this.d * 6364136223846793005L + 1442695040888963407L);
-        this.d += paramLong;
-        this.d *= (this.d * 6364136223846793005L + 1442695040888963407L);
-        this.d += paramLong;
-        this.d *= (this.d * 6364136223846793005L + 1442695040888963407L);
-        this.d += paramLong;
+        this.layerSeed = paramLong;
+        this.layerSeed *= (this.layerSeed * 6364136223846793005L + 1442695040888963407L);
+        this.layerSeed += paramLong;
+        this.layerSeed *= (this.layerSeed * 6364136223846793005L + 1442695040888963407L);
+        this.layerSeed += paramLong;
+        this.layerSeed *= (this.layerSeed * 6364136223846793005L + 1442695040888963407L);
+        this.layerSeed += paramLong;
     }
 
     public void SetWorldSeed(long paramLong)
     {
-        this.b = paramLong;
+        this.worldSeed = paramLong;
         if (this.child != null)
             this.child.SetWorldSeed(paramLong);
-        this.b *= (this.b * 6364136223846793005L + 1442695040888963407L);
-        this.b += this.d;
-        this.b *= (this.b * 6364136223846793005L + 1442695040888963407L);
-        this.b += this.d;
-        this.b *= (this.b * 6364136223846793005L + 1442695040888963407L);
-        this.b += this.d;
+        this.worldSeed *= (this.worldSeed * 6364136223846793005L + 1442695040888963407L);
+        this.worldSeed += this.layerSeed;
+        this.worldSeed *= (this.worldSeed * 6364136223846793005L + 1442695040888963407L);
+        this.worldSeed += this.layerSeed;
+        this.worldSeed *= (this.worldSeed * 6364136223846793005L + 1442695040888963407L);
+        this.worldSeed += this.layerSeed;
     }
 
     protected void SetSeed(long paramLong1, long paramLong2)
     {
-        this.c = this.b;
-        this.c *= (this.c * 6364136223846793005L + 1442695040888963407L);
-        this.c += paramLong1;
-        this.c *= (this.c * 6364136223846793005L + 1442695040888963407L);
-        this.c += paramLong2;
-        this.c *= (this.c * 6364136223846793005L + 1442695040888963407L);
-        this.c += paramLong1;
-        this.c *= (this.c * 6364136223846793005L + 1442695040888963407L);
-        this.c += paramLong2;
+        this.coordinateSeed = this.worldSeed;
+        this.coordinateSeed *= (this.coordinateSeed * 6364136223846793005L + 1442695040888963407L);
+        this.coordinateSeed += paramLong1;
+        this.coordinateSeed *= (this.coordinateSeed * 6364136223846793005L + 1442695040888963407L);
+        this.coordinateSeed += paramLong2;
+        this.coordinateSeed *= (this.coordinateSeed * 6364136223846793005L + 1442695040888963407L);
+        this.coordinateSeed += paramLong1;
+        this.coordinateSeed *= (this.coordinateSeed * 6364136223846793005L + 1442695040888963407L);
+        this.coordinateSeed += paramLong2;
     }
 
     protected int nextInt(int paramInt)
     {
-        int i = (int) ((this.c >> 24) % paramInt);
+        int i = (int) ((this.coordinateSeed >> 24) % paramInt);
         if (i < 0)
             i += paramInt;
-        this.c *= (this.c * 6364136223846793005L + 1442695040888963407L);
-        this.c += this.b;
+        this.coordinateSeed *= (this.coordinateSeed * 6364136223846793005L + 1442695040888963407L);
+        this.coordinateSeed += this.worldSeed;
         return i;
     }
 

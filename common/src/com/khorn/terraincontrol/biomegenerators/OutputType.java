@@ -8,5 +8,6 @@ public enum OutputType
     FULL,
     WITHOUT_RIVERS,
     ONLY_RIVERS,
-    DEFAULT_FOR_WORLD
+    DEFAULT_FOR_WORLD,
+    BIOME_TEST
 }

@@ -9,7 +9,7 @@ import com.khorn.terraincontrol.biomegenerators.biomelayers.Layer;
 public class NormalBiomeGenerator extends BiomeGenerator
 {
     private Layer unZoomedLayer;
-    private Layer biomeLayer;
+    public Layer biomeLayer;
     private OutputType defaultOutputType = OutputType.FULL;
 
     public NormalBiomeGenerator(LocalWorld world, BiomeCache cache)

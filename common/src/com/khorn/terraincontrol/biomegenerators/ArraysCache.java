@@ -5,10 +5,16 @@ import java.util.ArrayList;
 public class ArraysCache
 {
 
-    private final int[][] SmallArrays = new int[128][];
+    private final int[][] SmallArrays = new int[256][];
     private int SmallArraysNext = 0;
     private final ArrayList BigArrays = new ArrayList();
     private int BigArraysNext = 0;
+
+    public int [][] BiomeTestOutput = new int[32][];
+    public int []  BiomeTestSize = new int[32];
+    public int []  BiomeTestX = new int[32];
+    public int []  BiomeTestZ = new int[32];
+    public boolean [] BiomeTestConverted = new boolean[32];
 
     public boolean isFree = true;
 
@@ -25,6 +31,13 @@ public class ArraysCache
         BigArraysNext = 0;
         isFree = true;
         outputType = OutputType.FULL;
+        BiomeTestOutput = new int[32][];
+        BiomeTestSize = new int[32];
+        BiomeTestX = new int[32];
+        BiomeTestZ = new int[32];
+        BiomeTestConverted = new boolean[32];
+
+
     }
 
     @SuppressWarnings({"unchecked"})

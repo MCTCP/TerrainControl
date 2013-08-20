@@ -28,7 +28,7 @@ public class BukkitWorld implements LocalWorld
     private WorldConfig settings;
     private CustomObjectStructureCache structureCache;
     private String name;
-    private BiomeGenerator biomeManager;
+    public BiomeGenerator biomeManager;
 
     private static int nextBiomeId = DefaultBiome.values().length;
     private static int maxBiomeCount = 256;
