@@ -7,6 +7,7 @@ import java.util.HashSet;
 public enum TCDefaultValues implements TCSetting
 {
     // Files
+    pluginSettingsName("TerrainControl.ini"),
     WorldSettingsName("WorldConfig.ini"),
     BO_WorldDirectoryName("WorldObjects"),
     WorldBiomeConfigDirectoryName("BiomeConfigs"),
@@ -17,7 +18,11 @@ public enum TCDefaultValues implements TCSetting
     ChannelName("TerrainControl"),
     ProtocolVersion(5),
     // End network
-
+    
+    // Plugin settings
+    ConsoleLogLevel(PluginConfig.LogLevels.Standard),
+    FileLogLevel(PluginConfig.LogLevels.Standard),
+    
     snowAndIceMaxTemp(0.15F),
 
     // World settings

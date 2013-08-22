@@ -12,12 +12,13 @@ import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.gen.structure.ComponentVillageStartPiece;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class VillageStartPiece extends ComponentVillageStartPiece
 {
+
     public final WorldChunkManager worldChunkManager;
 
     @SuppressWarnings("rawtypes")
@@ -36,9 +37,11 @@ public class VillageStartPiece extends ComponentVillageStartPiece
     }
 
     /**
-     * Just sets the first boolean it can find in the WorldGenVillageStartPiece.class to sandstoneVillage.
-     *
-     * @param sandstoneVillage Whether the village should be a sandstone village.
+     * Just sets the first boolean it can find in the
+     * WorldGenVillageStartPiece.class to sandstoneVillage.
+     * <p/>
+     * @param sandstoneVillage Whether the village should be a sandstone
+     *                         village.
      */
     private void setSandstoneVillage(boolean sandstoneVillage)
     {
@@ -53,15 +56,17 @@ public class VillageStartPiece extends ComponentVillageStartPiece
                     break;
                 } catch (Exception e)
                 {
-                    TerrainControl.log("Cannot make village a sandstone village!");
-                    e.printStackTrace();
+                    TerrainControl.log(Level.SEVERE, "Cannot make village a sandstone village!");
+                    TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
                 }
             }
         }
     }
 
+    @Override
     public WorldChunkManager getWorldChunkManager()
     {
         return this.worldChunkManager;
     }
+
 }

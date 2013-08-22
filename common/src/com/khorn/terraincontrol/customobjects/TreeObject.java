@@ -8,9 +8,11 @@ import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class TreeObject implements CustomObject
 {
+
     private TreeType type;
     private int minHeight = TerrainControl.worldDepth;
     private int maxHeight = TerrainControl.worldHeight;
@@ -43,7 +45,10 @@ public class TreeObject implements CustomObject
                 }
             } catch (NumberFormatException e)
             {
-                TerrainControl.log("Cannot parse " + entry.getKey() + " of a " + type + " tree: invalid number!");
+                TerrainControl.log(Level.WARNING, "Cannot parse {0} of a {1} tree: invalid number!", new Object[]
+                {
+                    entry.getKey(), type
+                });
             }
 
         }
@@ -117,4 +122,5 @@ public class TreeObject implements CustomObject
         // Trees cannot be rotated
         return false;
     }
+
 }

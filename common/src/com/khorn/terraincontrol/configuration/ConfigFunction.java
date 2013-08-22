@@ -6,11 +6,12 @@ import com.khorn.terraincontrol.util.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public abstract class ConfigFunction<T>
 {
-    private T holder;
 
+    private T holder;
     // Error handling
     private boolean valid;
     private String error;
@@ -31,12 +32,14 @@ public abstract class ConfigFunction<T>
     public abstract Class<T> getHolderType();
 
     /**
-     * Convenience method for creating a config function. Used to create the
+     * Convenience method for creating a config function. Used to create
+     * the
      * default config functions.
      *
      * @param <T>
      * @param clazz
      * @param args
+     *              <p/>
      * @return
      */
     public static <T> ConfigFunction<?> create(T holder, Class<? extends ConfigFunction<T>> clazz, Object... args)
@@ -64,8 +67,11 @@ public abstract class ConfigFunction<T>
             configFunction.load(stringArgs);
         } catch (InvalidConfigException e)
         {
-            TerrainControl.log("Invalid default config function! Please report! " + clazz.getName() + ": " + e.getMessage());
-            e.printStackTrace();
+            TerrainControl.log(Level.SEVERE, "Invalid default config function! Please report! {0}: {1}", new Object[]
+            {
+                clazz.getName(), e.getMessage()
+            });
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
         }
 
         return configFunction;
@@ -74,8 +80,9 @@ public abstract class ConfigFunction<T>
     /**
      * Loads the settings. Will set the internal invalid flag to true
      * if something went wrong.
-     * 
+     * <p/>
      * @param args List of args
+     * <p/>
      * @throws InvalidConfigException If the syntax is invalid.
      */
     public final void read(String name, List<String> args) throws InvalidConfigException
@@ -99,20 +106,20 @@ public abstract class ConfigFunction<T>
      * Returns true if this ConfigFunction has a correct syntax.
      * Returns false if the read method hasn't been called yet,
      * or if the function has an incorrect syntax.
-     * 
+     * <p/>
      * @return Whether this ConfigFunction has a correct syntax.
      */
     public boolean isValid()
     {
         return valid;
     }
-    
+
     /**
-     * Forcibly sets the internal valid flag of this function to the 
+     * Forcibly sets the internal valid flag of this function to the
      * specified value. As long as you are using the read method you
      * shouldn't use this, as the read method will automatically set
      * it to the correct value.
-     * 
+     * <p/>
      * @param valid New value for the valid flag.
      */
     public void setValid(boolean valid)
@@ -134,30 +141,35 @@ public abstract class ConfigFunction<T>
     }
 
     /**
-     * Loads the settings. Returns false if one of the arguments contains an
-     * error.
-     *
+     * Loads the settings. Returns false if one of the arguments contains
+     * an error.
+     * <p/>
      * @param args List of args.
+     * <p/>
      * @return Returns false if one of the arguments contains an error,
      *         otherwise true.
+     * <p/>
      * @throws InvalidConfigException If the syntax is invalid.
      */
     protected abstract void load(List<String> args) throws InvalidConfigException;
 
     /**
      * Gets a String representation, like Tree(10,BigTree,50,Tree,100)
-     *
+     * <p/>
      * @return A String representation, like Tree(10,BigTree,50,Tree,100)
      */
     protected abstract String makeString();
 
     /**
-     * Parses the string and returns a number between minValue and maxValue.
-     *
+     * Parses the string and returns a number between minValue and
+     * maxValue.
+     * <p/>
      * @param string
      * @param minValue
      * @param maxValue
+     * <p/>
      * @return
+     * <p/>
      * @throws InvalidConfigException If the number is invalid.
      */
     protected int readInt(String string, int minValue, int maxValue) throws InvalidConfigException
@@ -166,12 +178,15 @@ public abstract class ConfigFunction<T>
     }
 
     /**
-     * Parses the string and returns a number between minValue and maxValue.
-     *
+     * Parses the string and returns a number between minValue and
+     * maxValue.
+     * <p/>
      * @param string   The string to parse.
      * @param minValue The minimum value.
      * @param maxValue The maximum value.
+     * <p/>
      * @return A double between min and max.
+     * <p/>
      * @throws InvalidConfigException If the number is invalid.
      */
     protected double readDouble(String string, double minValue, double maxValue) throws InvalidConfigException
@@ -180,10 +195,13 @@ public abstract class ConfigFunction<T>
     }
 
     /**
-     * Parses the string and returns the rarity between 0.000001 and 100 (inclusive)
-     * 
+     * Parses the string and returns the rarity between 0.000001 and 100
+     * (inclusive)
+     * <p/>
      * @param string The string to parse.
+     * <p/>
      * @return The rarity.
+     * <p/>
      * @throws InvalidConfigException If the number is invalid.
      */
     protected double readRarity(String string) throws InvalidConfigException
@@ -193,8 +211,9 @@ public abstract class ConfigFunction<T>
 
     /**
      * Returns the block id with the given name.
-     *
+     * <p/>
      * @param string
+     * <p/>
      * @return
      */
     protected int readBlockId(String string) throws InvalidConfigException
@@ -203,13 +222,17 @@ public abstract class ConfigFunction<T>
     }
 
     /**
-     * Reads all block ids from the start position until the end of the list.
-     * 
+     * Reads all block ids from the start position until the end of the
+     * list.
+     * <p/>
      * @param strings The input strings.
      * @param start   The position to start. The first element in the list
      *                has index 0, the last one size() - 1.
+     * <p/>
      * @return All block ids.
-     * @throws InvalidConfigException If one of the elements in the list is not a valid block id.
+     * <p/>
+     * @throws InvalidConfigException If one of the elements in the list is
+     *                                not a valid block id.
      */
     protected List<Integer> readBlockIds(List<String> strings, int start) throws InvalidConfigException
     {
@@ -224,9 +247,11 @@ public abstract class ConfigFunction<T>
 
     /**
      * Gets the block data from a material string.
-     *
+     * <p/>
      * @param string
+     * <p/>
      * @return
+     * <p/>
      * @throws InvalidConfigException
      */
     protected int readBlockData(String string) throws InvalidConfigException
@@ -247,6 +272,7 @@ public abstract class ConfigFunction<T>
      *
      * @param id   The block id
      * @param data The block data
+     * <p/>
      * @return String in the format blockname[.blockdata]
      */
     protected String makeMaterial(int id, int data)
@@ -256,8 +282,9 @@ public abstract class ConfigFunction<T>
 
     /**
      * Gets the material name back from the id.
-     *
+     * <p/>
      * @param id The block id
+     * <p/>
      * @return String in the format blockname
      */
     protected String makeMaterial(int id)
@@ -267,8 +294,9 @@ public abstract class ConfigFunction<T>
 
     /**
      * Returns a String in the format ",materialName,materialName,etc"
-     *
+     * <p/>
      * @param ids
+     * <p/>
      * @return
      */
     protected String makeMaterial(List<Integer> ids)
@@ -281,4 +309,5 @@ public abstract class ConfigFunction<T>
         }
         return string;
     }
+
 }

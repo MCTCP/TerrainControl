@@ -23,9 +23,11 @@ import net.minecraft.world.gen.feature.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class ForgeWorld implements LocalWorld
 {
+    
     private ChunkProvider generator;
     private World world;
     private WorldConfig settings;
@@ -445,11 +447,11 @@ public class ForgeWorld implements LocalWorld
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
         /*
-         * This method usually breaks on every Minecraft update. Always check
-         * whether the names are still correct. Often, you'll also need to
-         * rewrite parts of this method for newer block place logic.
+         * This method usually breaks on every Minecraft update. Always
+         * check whether the names are still correct. Often, you'll also
+         * need to rewrite parts of this method for newer block place
+         * logic.
          */
-
         if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
         {
             return;
@@ -694,7 +696,10 @@ public class ForgeWorld implements LocalWorld
             tileEntity.readFromNBT(nmsTag);
         } else
         {
-            TerrainControl.log("Skipping tile entity with id " + nmsTag.getString("id") + ", cannot be placed at " + x + "," + y + "," + z + " on id " + world.getBlockId(x, y, z));
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[]
+            {
+                nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z)
+            });
         }
     }
 
@@ -727,4 +732,5 @@ public class ForgeWorld implements LocalWorld
             return biomeManager.canGenerateUnZoomed();
         return true;
     }
+
 }

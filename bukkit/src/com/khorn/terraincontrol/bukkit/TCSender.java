@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import org.bukkit.World;
@@ -8,9 +9,11 @@ import org.bukkit.entity.Player;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class TCSender
 {
+    
     private TCPlugin plugin;
 
     public TCSender(TCPlugin plugin)
@@ -27,7 +30,7 @@ public class TCSender
         {
             WorldConfig config = plugin.worlds.get(world.getUID()).getSettings();
 
-            // TerrainControl.log("config sent to player for world " + config.WorldName); //debug
+            TerrainControl.log(Level.FINER, "Config sent to player for world {0}", config.name); //debug
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream stream = new DataOutputStream(outputStream);
 
@@ -38,7 +41,7 @@ public class TCSender
                 stream.flush();
             } catch (IOException e)
             {
-                e.printStackTrace();
+                TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
             }
 
             byte[] data = outputStream.toByteArray();

@@ -36,7 +36,7 @@ public class CustomBiome extends BiomeBase
         } catch (Exception e)
         {
             TerrainControl.log(Level.SEVERE, "Couldn't update Bukkit's biome mappings!");
-            e.printStackTrace();
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
         }
     }
 
@@ -76,7 +76,10 @@ public class CustomBiome extends BiomeBase
             } else
             {
                 // The .toLowerCase() is just a safeguard so that we get notified if this.y is no longer the biome name
-                TerrainControl.log(Level.WARNING, "Mob type " + mobGroup.getMobName() + " not found in " + this.y.toLowerCase());
+                TerrainControl.log(Level.WARNING, "Mob type {0} not found in {1}", new Object[]
+                {
+                    mobGroup.getMobName(), this.y.toLowerCase()
+                });
             }
         }
     }
@@ -95,7 +98,7 @@ public class CustomBiome extends BiomeBase
         } catch (Exception e)
         {
             TerrainControl.log(Level.SEVERE, "Someone forgot to update the mob spawning code! Please report!");
-            e.printStackTrace();
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
             return null;
         }
     }

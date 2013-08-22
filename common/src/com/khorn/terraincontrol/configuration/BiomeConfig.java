@@ -18,9 +18,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class BiomeConfig extends ConfigFile
 {
+
     public short[][] replaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
     public int ReplaceCount = 0;
 
@@ -29,20 +31,20 @@ public class BiomeConfig extends ConfigFile
     public float riverVolatility;
     public int riverWaterLevel;
     public double[] riverHeightMatrix;
-
+    
     public int BiomeSize;
     public int BiomeRarity;
-
+    
     public String BiomeColor;
-
+    
     public ArrayList<String> BiomeIsBorder;
     public ArrayList<String> IsleInBiome;
     public ArrayList<String> NotBorderNear;
-
+    
     // Surface config
     public float BiomeHeight;
     public float BiomeVolatility;
-
+    
     public float BiomeTemperature;
     public float BiomeWetness;
 
@@ -373,6 +375,7 @@ public class BiomeConfig extends ConfigFile
         }
     }
 
+    @Override
     protected void readConfigSettings()
     {
         this.BiomeSize = readModSettings(TCDefaultValues.BiomeSize.name(), this.defaultSize);
@@ -487,7 +490,10 @@ public class BiomeConfig extends ConfigFile
                     if (values.length == 5)
                     {
                         // Replace in TC 2.3 style found
-                        values = new String[] {values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)};
+                        values = new String[]
+                        {
+                            values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)
+                        };
                     }
 
                     if (values.length != 2 && values.length != 4)
@@ -524,10 +530,10 @@ public class BiomeConfig extends ConfigFile
 
         } catch (NumberFormatException e)
         {
-            TerrainControl.log("Wrong replace settings: '" + this.settingsCache.get(settingValue) + "'");
+            TerrainControl.log(Level.WARNING, "Wrong replace settings: ''{0}''", this.settingsCache.get(settingValue));
         } catch (InvalidConfigException e)
         {
-            TerrainControl.log("Wrong replace settings: '" + this.settingsCache.get(settingValue) + "'");
+            TerrainControl.log(Level.WARNING, "Wrong replace settings: ''{0}''", this.settingsCache.get(settingValue));
         }
 
     }
@@ -610,6 +616,7 @@ public class BiomeConfig extends ConfigFile
         }
     }
 
+    @Override
     protected void writeConfigSettings() throws IOException
     {
         if (DefaultBiome.getBiome(this.Biome.getId()) != null)
@@ -1100,14 +1107,17 @@ public class BiomeConfig extends ConfigFile
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
 
         this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomes.contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
+        
         this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.CustomBiomes.contains(this.riverBiome)) ? this.riverBiome : "";
-
     }
 
     protected void renameOldSettings()
     {
         // Old values from WorldConfig
-        TCDefaultValues[] copyFromWorld = {TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl};
+        TCDefaultValues[] copyFromWorld =
+        {
+            TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl
+        };
         for (TCDefaultValues value : copyFromWorld)
             if (this.worldConfig.settingsCache.containsKey(value.name().toLowerCase()))
             {
@@ -1204,7 +1214,6 @@ public class BiomeConfig extends ConfigFile
                         output = output + "(" + fromId + "," + toId + "),";
                 } catch (Exception ignored)
                 {
-
                 }
 
             }
@@ -1212,7 +1221,6 @@ public class BiomeConfig extends ConfigFile
             this.settingsCache.put("replacedblocks", output.substring(0, output.length() - 1));
         }
     }
-
     protected boolean defaultWaterLakes = true;
     protected int defaultTrees = 1;
     protected int defaultFlowers = 2;
@@ -1276,7 +1284,10 @@ public class BiomeConfig extends ConfigFile
                 this.defaultReed = 10;
                 this.defaultCactus = 10;
                 this.defaultColor = "0xFFCC33";
-                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
+                this.defaultWell = new Object[]
+                {
+                    DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND
+                };
                 this.defaultVillageType = VillageType.sandstone;
                 this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;
@@ -1386,7 +1397,10 @@ public class BiomeConfig extends ConfigFile
                 this.defaultReed = 50;
                 this.defaultCactus = 10;
                 this.defaultColor = "0x996600";
-                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
+                this.defaultWell = new Object[]
+                {
+                    DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND
+                };
                 this.defaultVillageType = VillageType.sandstone;
                 this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;
@@ -1459,4 +1473,5 @@ public class BiomeConfig extends ConfigFile
         this.FoliageColor = stream.readInt();
         this.FoliageColorIsMultiplier = stream.readBoolean();
     }
+
 }

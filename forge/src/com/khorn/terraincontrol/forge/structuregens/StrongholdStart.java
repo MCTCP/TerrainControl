@@ -6,7 +6,6 @@ import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.gen.structure.StructureStrongholdPieces;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 

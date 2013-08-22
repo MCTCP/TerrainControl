@@ -1,10 +1,12 @@
 package com.khorn.terraincontrol.forge.util;
 
 import com.khorn.terraincontrol.configuration.Tag;
+import com.khorn.terraincontrol.TerrainControl;
 import net.minecraft.nbt.*;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class NBTHelper
 {
@@ -31,7 +33,7 @@ public class NBTHelper
             nmsChildTags = (Map) mapField.get(nmsTag);
         } catch (Exception e)
         {
-            e.printStackTrace();
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
         }
 
         if (nmsChildTags == null)

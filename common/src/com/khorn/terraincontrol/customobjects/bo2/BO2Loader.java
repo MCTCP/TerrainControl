@@ -7,6 +7,7 @@ import java.io.File;
 
 public class BO2Loader implements CustomObjectLoader
 {
+    @Override
     public CustomObject loadFromFile(String objectName, File file)
     {
         return new BO2(objectName, file);
