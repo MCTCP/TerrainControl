@@ -9,7 +9,6 @@ import java.util.List;
 
 public class BlockCheck extends BO3Check
 {
-
     public List<Integer> blockIds;
     public List<Byte> blockDatas;
 
@@ -61,7 +60,18 @@ public class BlockCheck extends BO3Check
     @Override
     public String makeString()
     {
-        StringBuilder builder = new StringBuilder("BlockCheck(");
+        return makeString("BlockCheck");
+    }
+
+    /**
+     * Gets the string representation with the given check name.
+     * @param name Name of the check, like BlockCheck.
+     * @return The string representation.
+     */
+    protected String makeString(String name)
+    {
+        StringBuilder builder = new StringBuilder(name);
+        builder.append('(');
         builder.append(x);
         builder.append(',');
         builder.append(y);

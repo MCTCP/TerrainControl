@@ -8,13 +8,24 @@ import com.khorn.terraincontrol.LocalWorld;
  */
 public abstract class BO3Check extends BO3Function
 {
+    /** 
+     * X position relative to the object origin.
+     */
     public int x;
+    /** 
+     * Y position relative to the object origin.
+     */
     public int y;
+    /** 
+     * Z position relative to the object origin.
+     */
     public int z;
 
     /**
      * Returns whether this check would prevent spawning at the given position.
-     * The internal x, y and z values of this check are ignored.
+     * The given x, y and z positions are simply the relative coords in this
+     * object added to the coords of the origin of the BO3. The internal
+     * coords in this object should be ignored.
      *
      * @param world The world to check in
      * @param x     The x position
