@@ -11,9 +11,11 @@ import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class VillageStartPiece extends WorldGenVillageStartPiece
 {
+    
     public final WorldChunkManager worldChunkManager;
 
     @SuppressWarnings("rawtypes")
@@ -32,9 +34,11 @@ public class VillageStartPiece extends WorldGenVillageStartPiece
     }
 
     /**
-     * Just sets the first boolean it can find in the WorldGenVillageStartPiece.class to sandstoneVillage.
+     * Just sets the first boolean it can find in the
+     * WorldGenVillageStartPiece.class to sandstoneVillage.
      *
-     * @param sandstoneVillage Whether the village should be a sandstone village.
+     * @param sandstoneVillage Whether the village should be a sandstone
+     *                         village.
      */
     private void setSandstoneVillage(boolean sandstoneVillage)
     {
@@ -49,8 +53,8 @@ public class VillageStartPiece extends WorldGenVillageStartPiece
                     break;
                 } catch (Exception e)
                 {
-                    TerrainControl.log("Cannot make village a sandstone village!");
-                    e.printStackTrace();
+                    TerrainControl.log(Level.WARNING, "Cannot make village a sandstone village!");
+                    TerrainControl.log(Level.WARNING, e.getStackTrace().toString());
                 }
             }
         }

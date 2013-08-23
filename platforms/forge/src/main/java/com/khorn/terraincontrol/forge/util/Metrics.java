@@ -30,6 +30,7 @@
 
 package com.khorn.terraincontrol.forge.util;
 
+import com.khorn.terraincontrol.TerrainControl;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.Loader;
@@ -45,6 +46,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
 
 public class Metrics
@@ -562,7 +564,7 @@ public class Metrics
             gzos.write(input.getBytes("UTF-8"));
         } catch (IOException e)
         {
-            e.printStackTrace();
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
         } finally
         {
             if (gzos != null)

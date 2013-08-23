@@ -11,6 +11,7 @@ import java.util.logging.Level;
 
 public class ConfigFunctionsManager
 {
+
     private Map<String, Class<? extends ConfigFunction<?>>> configFunctions;
 
     public ConfigFunctionsManager()
@@ -46,12 +47,14 @@ public class ConfigFunctionsManager
 
     /**
      * Returns a config function with the given name.
-     *
+     * <p/>
      * @param name               The name of the config function.
-     * @param holder             The holder of the config function. WorldConfig or BO3.
-     * @param locationOfResource The location of the config function, for example
-     *                           TaigaBiomeConfig.ini.
+     * @param holder             The holder of the config function.
+     *                           WorldConfig or BO3.
+     * @param locationOfResource The location of the config function, for
+     *                           example TaigaBiomeConfig.ini.
      * @param args               The args of the function.
+     * <p/>
      * @return A config function with the given name, or null of it wasn't
      *         found.
      */
@@ -62,7 +65,10 @@ public class ConfigFunctionsManager
         // Check if config function exists
         if (!configFunctions.containsKey(name.toLowerCase()))
         {
-            TerrainControl.log("Invalid resource " + name + " in " + locationOfResource + ": resource type not found!");
+            TerrainControl.log(Level.WARNING, "Invalid resource {0} in {1}: resource type not found!", new Object[]
+            {
+                name, locationOfResource
+            });
             return null;
         }
 
@@ -75,13 +81,13 @@ public class ConfigFunctionsManager
             configFunction = clazz.newInstance();
         } catch (InstantiationException e)
         {
-            TerrainControl.log(Level.WARNING, "Reflection error (Instantiation) while loading the resources: " + e.getMessage());
-            e.printStackTrace();
+            TerrainControl.log(Level.WARNING, "Reflection error (Instantiation) while loading the resources: {0}", e.getMessage());
+            TerrainControl.log(Level.WARNING, e.getStackTrace().toString());
             return null;
         } catch (IllegalAccessException e)
         {
-            TerrainControl.log(Level.WARNING, "Reflection error (IllegalAccess) while loading the resources: " + e.getMessage());
-            e.printStackTrace();
+            TerrainControl.log(Level.WARNING, "Reflection error (IllegalAccess) while loading the resources: {0}", e.getMessage());
+            TerrainControl.log(Level.WARNING, e.getStackTrace().toString());
             return null;
         }
 
@@ -92,13 +98,19 @@ public class ConfigFunctionsManager
             matchingTypes = holder.getClass().isAssignableFrom((Class<?>) clazz.getMethod("getHolderType").invoke(configFunction));
         } catch (Exception e)
         {
-            TerrainControl.log(Level.WARNING, "Reflection error (" + e.getClass().getSimpleName() + ") while loading the resources: " + e.getMessage());
-            e.printStackTrace();
+            TerrainControl.log(Level.WARNING, "Reflection error ({0}) while loading the resources: ", new Object[]
+            {
+                e.getClass().getSimpleName(), e.getMessage()
+            });
+            TerrainControl.log(Level.WARNING, e.getStackTrace().toString());
             return null;
         }
         if (!matchingTypes)
         {
-            TerrainControl.log(Level.WARNING, "Invalid resource " + name + " in " + locationOfResource + ": cannot be placed in this config file!");
+            TerrainControl.log(Level.WARNING, "Invalid resource {0} in {1}: cannot be placed in this config file!", new Object[]
+            {
+                name, locationOfResource
+            });
             return null;
         }
 
@@ -111,7 +123,10 @@ public class ConfigFunctionsManager
             configFunction.read(name, args);
         } catch (InvalidConfigException e)
         {
-            TerrainControl.log(Level.WARNING, "Invalid resource " + name + " in " + locationOfResource + ": " + e.getMessage());
+            TerrainControl.log(Level.WARNING, "Invalid resource {0} in {1}: {2}", new Object[]
+            {
+                name, locationOfResource, e.getMessage()
+            });
         }
 
         // Return it

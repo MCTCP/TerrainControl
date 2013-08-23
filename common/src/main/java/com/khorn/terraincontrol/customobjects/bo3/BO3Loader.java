@@ -63,7 +63,7 @@ public class BO3Loader implements CustomObjectLoader
         } catch (FileNotFoundException e)
         {
             // File not found
-            TerrainControl.log(Level.WARNING, "NBT file " + path + " not found");
+            TerrainControl.log(Level.WARNING, "NBT file {0} not found", path);
             tryToClose(stream);
             return null;
         } catch (IOException e)
@@ -79,8 +79,8 @@ public class BO3Loader implements CustomObjectLoader
                 stream.close();
             } catch (IOException corruptFile)
             {
-                TerrainControl.log(Level.SEVERE, "Failed to read NBT meta file: " + e.getMessage());
-                e.printStackTrace();
+                TerrainControl.log(Level.SEVERE, "Failed to read NBT meta file: {0}", e.getMessage());
+                TerrainControl.log(Level.SEVERE, corruptFile.getStackTrace().toString());
                 tryToClose(stream);
                 return null;
             }
@@ -106,7 +106,7 @@ public class BO3Loader implements CustomObjectLoader
             return registerMetadata(path, ((Tag[]) metadata.getValue())[0]);
         } catch (Exception e)
         {
-            TerrainControl.log(Level.WARNING, "Structure of NBT file is incorrect: " + e.getMessage());
+            TerrainControl.log(Level.WARNING, "Structure of NBT file is incorrect: {0}", e.getMessage());
             return null;
         }
 

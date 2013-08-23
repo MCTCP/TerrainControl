@@ -16,6 +16,7 @@ import java.util.logging.Level;
 
 public class BiomeGenCustom extends BiomeGenBase
 {
+    
     private int skyColor;
     private int grassColor;
     private boolean grassColorIsMultiplier;
@@ -89,7 +90,10 @@ public class BiomeGenCustom extends BiomeGenBase
                 internalList.add(new SpawnListEntry(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
             } else
             {
-                TerrainControl.log(Level.WARNING, "Mob type " + mobGroup.getMobName() + " not found in " + this.biomeName);
+                TerrainControl.log(Level.WARNING, "Mob type {0} not found in {1}", new Object[]
+                {
+                    mobGroup.getMobName(), this.biomeName
+                });
             }
         }
     }
@@ -170,4 +174,5 @@ public class BiomeGenCustom extends BiomeGenBase
     {
         return "BiomeGenCustom of " + biomeName;
     }
+    
 }

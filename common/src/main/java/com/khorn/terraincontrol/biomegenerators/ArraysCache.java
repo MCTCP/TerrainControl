@@ -7,7 +7,7 @@ public class ArraysCache
 
     private final int[][] SmallArrays = new int[128][];
     private int SmallArraysNext = 0;
-    private final ArrayList BigArrays = new ArrayList();
+    private final ArrayList<int[]> BigArrays = new ArrayList<int[]>();
     private int BigArraysNext = 0;
 
     public boolean isFree = true;
@@ -27,7 +27,6 @@ public class ArraysCache
         outputType = OutputType.FULL;
     }
 
-    @SuppressWarnings({"unchecked"})
     public int[] GetArray(int size)
     {
 
