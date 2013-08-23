@@ -251,8 +251,9 @@ public class BO3Config extends ConfigFile
         // BO3Checks
         writeBigTitle("BO3 checks");
         writeComment("Require a condition at a certain location in order for the BO3 to be spawned.");
-        writeComment("BlockCheck(x,y,z,id[:data][,id[:data][,...]])");
-        writeComment("LightCheck(x,y,z,minLightLevel,maxLightLevel)");
+        writeComment("BlockCheck(x,y,z,id[:data][,id[:data][,...]]) - one of the blocks must be at the location");
+        writeComment("BlockCheckNot(x,y,z,id[:data][,id[:data][,...]]) - all the blocks must not be at the location");
+        writeComment("LightCheck(x,y,z,minLightLevel,maxLightLevel) - light must be between min and max (inclusive)");
         for (BO3Check check : bo3Checks[0])
         {
             writeValue(check.write());
@@ -283,8 +284,7 @@ public class BO3Config extends ConfigFile
 //        writeComment("Example2: WeightedBranch(0,0,0,branch1,NORTH,10,branch2,NORTH,30)");
 //        writeComment("   branch1 will have a 10 in 100 (10%) chance of spawning, branch2 will have a 30 in 100 (30%) chance to spawn,");
 //        writeComment("   and there is a 60 in 100 (60%) chance nothing will spawn");
-        
-            
+
         for (BranchFunction branch : branches[0])
         {
             writeValue(branch.makeString());

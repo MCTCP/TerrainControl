@@ -30,6 +30,7 @@ public class BO3Loader implements CustomObjectLoader
         TerrainControl.getConfigFunctionsManager().registerConfigFunction("WeightedBranch", WeightedBranchFunction.class);
         TerrainControl.getConfigFunctionsManager().registerConfigFunction("RandomBlock", RandomBlockFunction.class);
         TerrainControl.getConfigFunctionsManager().registerConfigFunction("BlockCheck", BlockCheck.class);
+        TerrainControl.getConfigFunctionsManager().registerConfigFunction("BlockCheckNot", BlockCheckNot.class);
         TerrainControl.getConfigFunctionsManager().registerConfigFunction("LightCheck", LightCheck.class);
     }
 
@@ -40,6 +41,7 @@ public class BO3Loader implements CustomObjectLoader
     }
 
     // Actually, we use tryToClose(..) to close the stream
+    @SuppressWarnings("resource")
     public static Tag loadMetadata(String name, File bo3File)
     {
         String path = bo3File.getParent() + File.separator + name;
