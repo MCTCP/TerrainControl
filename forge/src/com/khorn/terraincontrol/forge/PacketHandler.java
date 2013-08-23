@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import cpw.mods.fml.client.FMLClientHandler;
@@ -12,9 +13,11 @@ import net.minecraft.network.packet.Packet250CustomPayload;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class PacketHandler implements IPacketHandler
 {
+    
     TCPlugin plugin;
 
     public PacketHandler(TCPlugin plugin)
@@ -67,7 +70,7 @@ public class PacketHandler implements IPacketHandler
             }
         } catch (IOException e)
         {
-            e.printStackTrace();
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
         }
 
     }

@@ -28,6 +28,8 @@
  */
 package com.khorn.terraincontrol.bukkit.util;
 
+import com.khorn.terraincontrol.TerrainControl;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -269,14 +271,14 @@ public class Metrics
             {
                 if (debug)
                 {
-                    Bukkit.getLogger().log(Level.INFO, "[Metrics] " + ex.getMessage());
+                    Bukkit.getLogger().log(Level.INFO, "[Metrics] {0}", ex.getMessage());
                 }
                 return true;
             } catch (InvalidConfigurationException ex)
             {
                 if (debug)
                 {
-                    Bukkit.getLogger().log(Level.INFO, "[Metrics] " + ex.getMessage());
+                    Bukkit.getLogger().log(Level.INFO, "[Metrics] {0}", ex.getMessage());
                 }
                 return true;
             }
@@ -559,7 +561,7 @@ public class Metrics
             gzos.write(input.getBytes("UTF-8"));
         } catch (IOException e)
         {
-            e.printStackTrace();
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
         } finally
         {
             if (gzos != null)
@@ -670,7 +672,7 @@ public class Metrics
                     if (chr < ' ')
                     {
                         String t = "000" + Integer.toHexString(chr);
-                        builder.append("\\u" + t.substring(t.length() - 4));
+                        builder.append("\\u").append(t.substring(t.length() - 4));
                     } else
                     {
                         builder.append(chr);
@@ -855,4 +857,5 @@ public class Metrics
             return plotter.name.equals(name) && plotter.getValue() == getValue();
         }
     }
+    
 }

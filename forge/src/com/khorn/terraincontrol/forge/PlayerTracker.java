@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
@@ -12,6 +13,7 @@ import net.minecraft.network.packet.Packet250CustomPayload;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class PlayerTracker implements IPlayerTracker
 {
@@ -49,7 +51,7 @@ public class PlayerTracker implements IPlayerTracker
             config.Serialize(stream);
         } catch (IOException e)
         {
-            e.printStackTrace();
+            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
         }
 
         // Make the packet

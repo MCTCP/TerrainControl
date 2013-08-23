@@ -8,9 +8,11 @@ import java.util.Random;
 
 public class OldBiomeGenerator extends BiomeGenerator
 {
+
     private NoiseGeneratorOldOctaves temperatureGenerator1;
     private NoiseGeneratorOldOctaves wetnessGenerator;
     private NoiseGeneratorOldOctaves temperatureGenerator2;
+    
     public double[] oldTemperature1;
     public double[] oldWetness;
     private double[] oldTemperature2;
@@ -83,6 +85,7 @@ public class OldBiomeGenerator extends BiomeGenerator
         {
             temp_out = new float[x_size * z_size];
         }
+        //???>>	Is this needed? I cant find a usage...
         int[] temp_biomeBases = new int[x_size * z_size];
         this.getBiomes(temp_biomeBases, x, z, x_size, z_size, false);
 

@@ -11,14 +11,15 @@ import java.util.logging.Level;
 
 public abstract class ConfigFile
 {
-    private BufferedWriter settingsWriter;
 
+    private BufferedWriter settingsWriter;
     public final String name;
     public final File file;
 
     /**
      * Creates a new configuration file.
-     * @param name Name of the thing that is being read, 
+     * <p/>
+     * @param name Name of the thing that is being read,
      *             like Plains or MyBO3. May not be null.
      * @param file The file of the configuration. If this config
      *             needs to read or written, this shouldn't be null.
@@ -37,12 +38,12 @@ public abstract class ConfigFile
             throw new IllegalArgumentException("Name may not be null");
         }
     }
-
     /**
-     * Stores all the settings. Settings like Name:Value or Name=Value are stored as name, Value and settings like Function(a, b, c) are stored as function(a, b, c), lineNumber
+     * Stores all the settings. Settings like Name:Value or Name=Value are
+     * stored as name, Value and settings like Function(a, b, c) are stored
+     * as function(a, b, c), lineNumber
      */
     protected Map<String, String> settingsCache = new HashMap<String, String>();
-
     private boolean writeComments;
 
     protected void readSettingsFile() throws RuntimeException
@@ -127,35 +128,37 @@ public abstract class ConfigFile
     // -------------------------------------------- //
     // LOG STUFF
     // -------------------------------------------- //
-
     protected void logSettingNotFound(String settingsName)
     {
-        // Disabled, because it will spam a lot otherwise
-        // TerrainControl.log("`"+settingsName + "` in `" + this.file.getName()
-        // + "` was not found.");
+        TerrainControl.log(Level.FINEST, "Setting:`{0}` was not found \nin `{1}`.", new Object[]
+        {
+            settingsName,(this.file == null ? this.name + " Biome" : this.file.getName())
+        });
     }
 
     protected void logSettingValueInvalid(String settingsName)
     {
-        String error = "The value of " + settingsName + " (" + settingsCache.get(settingsName) + ") in file " + file.getName() + " is invalid.";
-        TerrainControl.log(Level.WARNING, error);
+        TerrainControl.log(Level.WARNING, getSettingValueInvalidError(settingsName));
     }
 
     protected void logSettingValueInvalid(String settingsName, Exception e)
     {
-        String error = "The value of " + settingsName + " (" + settingsCache.get(settingsName) + ") in file " + file.getName() + " is invalid: " + e.getClass().getSimpleName();
-        TerrainControl.log(Level.WARNING, error);
+        TerrainControl.log(Level.WARNING, e.getClass().getSimpleName() + " :: " + getSettingValueInvalidError(settingsName));
     }
+    
+     private String getSettingValueInvalidError(String settingsName)
+     {
+        return "Value of " + settingsName + ": `" + this.settingsCache.get(settingsName) + "' in " + this.file.getName() + " is not valid.";
+     }
 
     protected void logFileNotFound(File logFile)
     {
-        TerrainControl.log("File not found: " + logFile.getName());
+        TerrainControl.log(Level.WARNING, "File not found: " + logFile.getName());
     }
 
     // -------------------------------------------- //
     // ReadModSettings
     // -------------------------------------------- //
-
     protected List<WeightedMobSpawnGroup> readModSettings(String settingsName, List<WeightedMobSpawnGroup> defaultValue)
     {
         settingsName = settingsName.toLowerCase();
@@ -411,8 +414,8 @@ public abstract class ConfigFile
                 obj = readModSettingsColor(value.name(), value.stringValue());
                 break;
             /*
-             * This prevents NPE if you happen to add a new type to TCSettings
-             * and cascade the change but forget to add it here
+             * This prevents NPE if you happen to add a new type to
+             * TCSettings and cascade the change but forget to add it here
              */
             default:
                 throw new EnumConstantNotPresentException(SettingsType.class, value.getReturnType().name());
@@ -425,10 +428,12 @@ public abstract class ConfigFile
     /**
      * Old write method. Because the file is now stored in the configFile,
      * this parameter is no longer needed.
-     * @param settingsFile Previously, the file to write to. 
+     * <p/>
+     * @param settingsFile Previously, the file to write to.
      *                     Doesn't do anything anymore.
      * @param comments     Whether comments should be written.
-     * @deprecated         28 July 2013, use method without file parameter.
+     * <p/>
+     * @deprecated 28 July 2013, use method without file parameter.
      */
     @Deprecated
     public void writeSettingsFile(File settingsFile, boolean comments)
@@ -447,9 +452,12 @@ public abstract class ConfigFile
             this.settingsWriter = new BufferedWriter(new FileWriter(file, false));
 
             this.writeConfigSettings();
-        } catch (IOException e)
+        } catch (IOException localIOExceptionE)
         {
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.log(Level.SEVERE, "{0}:: {1}", new Object[]
+            {
+                "localIOExceptionE: ", localIOExceptionE.getStackTrace().toString()
+            });
 
             if (this.settingsWriter != null)
             {
@@ -458,7 +466,10 @@ public abstract class ConfigFile
                     this.settingsWriter.close();
                 } catch (IOException localIOException1)
                 {
-                    TerrainControl.log(Level.SEVERE, localIOException1.getStackTrace().toString());
+                    TerrainControl.log(Level.SEVERE, "{0}:: {1}", new Object[]
+                    {
+                        "localIOException1: ", localIOException1.getStackTrace().toString()
+                    });
                 }
             }
         } finally
@@ -470,7 +481,10 @@ public abstract class ConfigFile
                     this.settingsWriter.close();
                 } catch (IOException localIOException2)
                 {
-                    TerrainControl.log(Level.SEVERE, localIOException2.getStackTrace().toString());
+                    TerrainControl.log(Level.SEVERE, "{0}:: {1}", new Object[]
+                    {
+                        "localIOException2: ", localIOException2.getStackTrace().toString()
+                    });
                 }
             }
         }
@@ -487,7 +501,7 @@ public abstract class ConfigFile
                 out += "," + key;
         }
 
-        this.settingsWriter.write(settingsName + ":" + out);
+        this.settingsWriter.write(settingsName + ": " + out);
         this.settingsWriter.newLine();
     }
 
@@ -502,7 +516,7 @@ public abstract class ConfigFile
                 out += "," + key;
         }
 
-        this.settingsWriter.write(settingsName + ":" + out);
+        this.settingsWriter.write(settingsName + ": " + out);
         this.settingsWriter.newLine();
     }
 
@@ -514,37 +528,37 @@ public abstract class ConfigFile
 
     protected void writeValue(String settingsName, byte settingsValue) throws IOException
     {
-        this.settingsWriter.write(settingsName + ":" + (settingsValue & 0xFF));
+        this.settingsWriter.write(settingsName + ": " + (settingsValue & 0xFF));
         this.settingsWriter.newLine();
     }
 
     protected void writeValue(String settingsName, int settingsValue) throws IOException
     {
-        this.settingsWriter.write(settingsName + ":" + Integer.toString(settingsValue));
+        this.settingsWriter.write(settingsName + ": " + Integer.toString(settingsValue));
         this.settingsWriter.newLine();
     }
 
     protected void writeValue(String settingsName, double settingsValue) throws IOException
     {
-        this.settingsWriter.write(settingsName + ":" + Double.toString(settingsValue));
+        this.settingsWriter.write(settingsName + ": " + Double.toString(settingsValue));
         this.settingsWriter.newLine();
     }
 
     protected void writeValue(String settingsName, float settingsValue) throws IOException
     {
-        this.settingsWriter.write(settingsName + ":" + Float.toString(settingsValue));
+        this.settingsWriter.write(settingsName + ": " + Float.toString(settingsValue));
         this.settingsWriter.newLine();
     }
 
     protected void writeValue(String settingsName, boolean settingsValue) throws IOException
     {
-        this.settingsWriter.write(settingsName + ":" + Boolean.toString(settingsValue));
+        this.settingsWriter.write(settingsName + ": " + Boolean.toString(settingsValue));
         this.settingsWriter.newLine();
     }
 
     protected void writeValue(String settingsName, String settingsValue) throws IOException
     {
-        this.settingsWriter.write(settingsName + ":" + settingsValue);
+        this.settingsWriter.write(settingsName + ": " + settingsValue);
         this.settingsWriter.newLine();
     }
 
@@ -556,7 +570,7 @@ public abstract class ConfigFile
 
     protected void writeColorValue(String settingsName, int RGB) throws IOException
     {
-        this.settingsWriter.write(settingsName + ":0x" + Integer.toHexString((0xFFFFFF & RGB) | 0x1000000).substring(1));
+        this.settingsWriter.write(settingsName + ": 0x" + Integer.toHexString((0xFFFFFF & RGB) | 0x1000000).substring(1));
         this.settingsWriter.newLine();
     }
 
@@ -777,4 +791,5 @@ public abstract class ConfigFile
         return output;
 
     }
+
 }
