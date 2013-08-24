@@ -54,6 +54,8 @@ public final class PluginConfig extends ConfigFile
         if (this.file.exists())
         {
             this.readSettingsFile();
+        } else {
+            this.writeSettingsFile(true);
         }
         this.renameOldSettings();
         this.readConfigSettings();
