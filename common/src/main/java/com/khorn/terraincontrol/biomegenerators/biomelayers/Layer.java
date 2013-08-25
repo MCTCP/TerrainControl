@@ -109,12 +109,12 @@ public abstract class Layer
 
             }
 
-            if (normalBiomes.size() != 0)
+            if (!normalBiomes.isEmpty())
                 NormalBiomeMap[i] = normalBiomes.toArray(new LocalBiome[normalBiomes.size() + config.normalBiomesRarity]);
             else
                 NormalBiomeMap[i] = new LocalBiome[0];
 
-            if (iceBiomes.size() != 0)
+            if (!iceBiomes.isEmpty())
                 IceBiomeMap[i] = iceBiomes.toArray(new LocalBiome[iceBiomes.size() + config.iceBiomesRarity]);
             else
                 IceBiomeMap[i] = new LocalBiome[0];

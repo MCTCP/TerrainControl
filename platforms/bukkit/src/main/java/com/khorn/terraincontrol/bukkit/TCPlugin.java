@@ -66,7 +66,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         TerrainControl.setEngine(this);
         logger = TCLogManager.getLogger(this);
 
-        if (Bukkit.getWorlds().size() != 0 && !cleanupOnDisable)
+        if (!Bukkit.getWorlds().isEmpty() && !cleanupOnDisable)
         {
             // Reload "handling"
             // (worlds are already loaded and TC didn't clean up itself)
@@ -253,6 +253,9 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         {
             param
         });
+        if (logger == null){
+            logger = TCLogManager.getLogger();
+        }
         logger.log(lr);
     }
 
@@ -260,8 +263,11 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     public void log(Level level, String message, Object[] params)
     {
         LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.formatter.format(lr));
         lr.setParameters(params);
+        lr.setMessage(TCLogManager.formatter.format(lr));
+        if (logger == null){
+            logger = TCLogManager.getLogger();
+        }
         logger.log(lr);
     }
 
