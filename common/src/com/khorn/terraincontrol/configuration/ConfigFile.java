@@ -721,7 +721,7 @@ public abstract class ConfigFile
             return value;
     }
 
-    protected ArrayList<String> filterBiomes(ArrayList<String> biomes, ArrayList<String> customBiomes)
+    protected ArrayList<String> filterBiomes(ArrayList<String> biomes, Set<String> customBiomes)
     {
         ArrayList<String> output = new ArrayList<String>();
 

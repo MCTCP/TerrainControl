@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
@@ -13,14 +12,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 public class WorldConfig extends ConfigFile
 {
     protected final File settingsDir;
     
-    public ArrayList<String> CustomBiomes = new ArrayList<String>();
     public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
 
     // Holds all world CustomObjects.
@@ -33,7 +33,7 @@ public class WorldConfig extends ConfigFile
 
     public BiomeConfig[] biomeConfigs;  // Must be simple array for fast access. Beware! Some ids may contain null values;
     public int biomesCount; // Overall biome count in this world.
-
+    
     public byte[] ReplaceMatrixBiomes = new byte[256];
     public boolean HaveBiomeReplace = false;
 
@@ -170,116 +170,32 @@ public class WorldConfig extends ConfigFile
 
     public long resourcesSeed;
 
+    public BiomeConfigManager biomeConfigManager;
+    
     public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
     {
         super(world.getName(), new File(settingsDir, TCDefaultValues.WorldSettingsName.stringValue()));
         this.settingsDir = settingsDir;
 
+        //>>	Read the WorldConfig file
         this.readSettingsFile();
+        //>>	Fix older names 
         this.renameOldSettings();
+        //>>	Set the local fields based on what was read from the file
         this.readConfigSettings();
-
+        //>>	Clamp Settings to acceptable values
         this.correctSettings();
 
         ReadWorldCustomObjects();
 
-        // Check biome ids
-
-        for (String biomeName : CustomBiomes)
-            if (CustomBiomeIds.get(biomeName) == -1)
-                CustomBiomeIds.put(biomeName, world.getFreeBiomeId());
-
-        // Need add check to clashes
+        // Need add check to clashes ( what? )
         if (this.SettingsMode != ConfigMode.WriteDisable)
             this.writeSettingsFile(this.SettingsMode == ConfigMode.WriteAll);
 
         world.setHeightBits(this.worldHeightBits);
 
-        File biomeFolder = new File(settingsDir, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
-        if (!biomeFolder.exists())
-        {
-            if (!biomeFolder.mkdir())
-            {
-                TerrainControl.log(Level.WARNING, "Error creating biome configs directory, working with defaults");
-                return;
-            }
-        }
-
-        ArrayList<LocalBiome> localBiomes = new ArrayList<LocalBiome>(world.getDefaultBiomes());
-
-        // Add custom biomes to world
-        for (String biomeName : this.CustomBiomes)
-        {
-            if (checkOnly)
-                localBiomes.add(world.getNullBiome(biomeName));
-            else
-                localBiomes.add(world.AddBiome(biomeName, this.CustomBiomeIds.get(biomeName)));
-        }
-
-        // Build biome replace matrix
-        for (int i = 0; i < this.ReplaceMatrixBiomes.length; i++)
-            this.ReplaceMatrixBiomes[i] = (byte) i;
-
-        this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
-        this.biomesCount = 0;
-
-        String LoadedBiomeNames = "";
-
-        for (LocalBiome localBiome : localBiomes)
-        {
-            BiomeConfig config = new BiomeConfig(biomeFolder, localBiome, this);
-            if (checkOnly)
-                continue;
-
-            if (!config.ReplaceBiomeName.equals(""))
-            {
-                this.HaveBiomeReplace = true;
-                this.ReplaceMatrixBiomes[config.Biome.getId()] = (byte) world.getBiomeIdByName(config.ReplaceBiomeName);
-            }
-
-            if (this.NormalBiomes.contains(config.name))
-                this.normalBiomesRarity += config.BiomeRarity;
-            if (this.IceBiomes.contains(config.name))
-                this.iceBiomesRarity += config.BiomeRarity;
-
-            if (!this.BiomeConfigsHaveReplacement)
-                this.BiomeConfigsHaveReplacement = config.ReplaceCount > 0;
-            if (biomesCount != 0)
-                LoadedBiomeNames += ", ";
-            LoadedBiomeNames += localBiome.getName();
-            // Add biome to the biome array
-            if (this.biomeConfigs[localBiome.getId()] == null)
-            {
-                // Only if it won't overwrite another biome in the array
-                biomesCount++;
-            } else
-            {
-                TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]
-                {
-                    localBiome.getId(), this.biomeConfigs[localBiome.getId()].name, config.name
-                });
-            }
-            this.biomeConfigs[localBiome.getId()] = config;
-
-            if (this.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
-            {
-                if (this.biomeColorMap == null)
-                    this.biomeColorMap = new HashMap<Integer, Integer>();
-
-                try
-                {
-                    int color = Integer.decode(config.BiomeColor);
-                    if (color <= 0xFFFFFF)
-                        this.biomeColorMap.put(color, config.Biome.getId());
-                } catch (NumberFormatException ex)
-                {
-                    TerrainControl.log(Level.WARNING, "Wrong color in " + config.Biome.getName());
-                }
-
-            }
-        }
-        TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[]{biomesCount});
-        TerrainControl.logIfLevel(Level.ALL, Level.CONFIG, LoadedBiomeNames);
+        this.biomeConfigManager = new BiomeConfigManager(settingsDir, world, this, CustomBiomeIds, checkOnly);
+        
     }
 
     private void ReadWorldCustomObjects()
@@ -338,10 +254,10 @@ public class WorldConfig extends ConfigFile
         this.riverRarity = applyBounds(this.riverRarity, 0, this.GenerationDepth);
         this.riverSize = applyBounds(this.riverSize, 0, this.GenerationDepth - this.riverRarity);
 
-        this.NormalBiomes = filterBiomes(this.NormalBiomes, this.CustomBiomes);
-        this.IceBiomes = filterBiomes(this.IceBiomes, this.CustomBiomes);
-        this.IsleBiomes = filterBiomes(this.IsleBiomes, this.CustomBiomes);
-        this.BorderBiomes = filterBiomes(this.BorderBiomes, this.CustomBiomes);
+        this.NormalBiomes = filterBiomes(this.NormalBiomes, this.CustomBiomeIds.keySet());
+        this.IceBiomes = filterBiomes(this.IceBiomes, this.CustomBiomeIds.keySet());
+        this.IsleBiomes = filterBiomes(this.IsleBiomes, this.CustomBiomeIds.keySet());
+        this.BorderBiomes = filterBiomes(this.BorderBiomes, this.CustomBiomeIds.keySet());
 
         if (this.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
         {
@@ -353,7 +269,7 @@ public class WorldConfig extends ConfigFile
             }
         }
 
-        this.imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || CustomBiomes.contains(imageFillBiome)) ? imageFillBiome : TCDefaultValues.ImageFillBiome.stringValue();
+        this.imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || CustomBiomeIds.keySet().contains(imageFillBiome)) ? imageFillBiome : TCDefaultValues.ImageFillBiome.stringValue();
 
         this.minMoisture = applyBounds(this.minMoisture, 0, 1.0F);
         this.maxMoisture = applyBounds(this.maxMoisture, 0, 1.0F, this.minMoisture);
@@ -532,11 +448,7 @@ public class WorldConfig extends ConfigFile
             try
             {
                 String[] keys = biome.split(":");
-                int id = -1;
-                if (keys.length == 2)
-                    id = Integer.valueOf(keys[1]);
-                CustomBiomes.add(keys[0]);
-                CustomBiomeIds.put(keys[0], id);
+                CustomBiomeIds.put(keys[0], (keys.length == 2) ? Integer.valueOf(keys[1]) : -1);
 
             } catch (NumberFormatException e)
             {
@@ -914,15 +826,15 @@ public class WorldConfig extends ConfigFile
     {
         String output = "";
         boolean first = true;
-        for (String biome : CustomBiomes)
+        for (Iterator<Entry<String, Integer>> it = this.CustomBiomeIds.entrySet().iterator(); it.hasNext();)
         {
+            Entry<String, Integer> entry = it.next();
             if (!first)
                 output += ",";
             first = false;
-            output += biome + ":" + CustomBiomeIds.get(biome);
+            output += entry.getKey() + ":" + String.valueOf(entry.getValue());
         }
         writeValue(TCDefaultValues.CustomBiomes.name(), output);
-
     }
 
     public double getFractureHorizontal()
@@ -972,11 +884,12 @@ public class WorldConfig extends ConfigFile
         stream.writeInt(this.WorldNightFog);
 
         // Custom biomes + ids
-        stream.writeInt(this.CustomBiomes.size());
-        for (String name : this.CustomBiomes)
+        stream.writeInt(this.CustomBiomeIds.size());
+        for (Iterator<Entry<String, Integer>> it = this.CustomBiomeIds.entrySet().iterator(); it.hasNext();)
         {
-            writeStringToStream(stream, name);
-            stream.writeInt(this.CustomBiomeIds.get(name));
+            Entry<String, Integer> entry = it.next();
+            writeStringToStream(stream, entry.getKey());
+            stream.writeInt(entry.getValue());
         }
 
         // BiomeConfigs
@@ -990,7 +903,7 @@ public class WorldConfig extends ConfigFile
         }
     }
 
-    // Need for create world config from network packet
+    // Needed for creating world config from network packet
     public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
     {
         // General information
@@ -1012,10 +925,10 @@ public class WorldConfig extends ConfigFile
         int count = stream.readInt();
         while (count-- > 0)
         {
+            String biomeName = readStringFromStream(stream);
             int id = stream.readInt();
-            world.AddBiome(name, id);
-            this.CustomBiomes.add(name);
-            this.CustomBiomeIds.put(name, id);
+            world.AddBiome(biomeName, id);
+            this.CustomBiomeIds.put(biomeName, id);
         }
 
         // BiomeConfigs
