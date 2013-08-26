@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
@@ -25,7 +26,7 @@ public class BiomeConfigManager
     private boolean checkOnly;
     private String LoadedBiomeNames = "";
 
-    public BiomeConfigManager(File settingsDir, LocalWorld world, WorldConfig wConfig, HashMap<String, Integer> customBiomes, boolean checkOnly)
+    public BiomeConfigManager(File settingsDir, LocalWorld world, WorldConfig wConfig, Map<String, Integer> customBiomes, boolean checkOnly)
     {
 
         this.world = world;
@@ -69,7 +70,7 @@ public class BiomeConfigManager
         this.biomesCount = 0;
 
         //>>	This arrayList now contains all biomes listed in `DefaultBiome`
-        loadBiomes(new ArrayList<LocalBiome>(world.getDefaultBiomes()), globalBiomesDir);
+        populateBiomeConfigs(new ArrayList<LocalBiome>(world.getDefaultBiomes()), globalBiomesDir);
 
         ArrayList<LocalBiome> localBiomes = new ArrayList<LocalBiome>(customBiomes.size());
         //>>	This adds all custombiomes that have been listed in WorldConfig to the arrayList
@@ -81,7 +82,9 @@ public class BiomeConfigManager
             else
                 localBiomes.add(world.AddBiome(entry.getKey(), entry.getValue()));
         }
-        loadBiomes(localBiomes, worldBiomesDir);
+        populateBiomeConfigs(localBiomes, worldBiomesDir);
+
+        processBiomeConfigs();
 
         TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[]
         {
@@ -91,30 +94,63 @@ public class BiomeConfigManager
 
     }
 
-    private void loadBiomes(ArrayList<LocalBiome> biomesToLoad, File biomeFolder)
+    private void populateBiomeConfigs(ArrayList<LocalBiome> biomesToLoad, File biomeFolder)
     {
-
         for (LocalBiome localBiome : biomesToLoad)
         {
             BiomeConfig config = new BiomeConfig(biomeFolder, localBiome, this.worldConfig);
+            if (this.biomesCount != 0)
+                LoadedBiomeNames += ", ";
+            LoadedBiomeNames += localBiome.getName();
+            // Add biome to the biome array
+            if (this.worldConfig.biomeConfigs[localBiome.getId()] == null)
+            {
+                // Only if it won't overwrite another biome in the array
+                this.biomesCount++;
+            } else
+            {
+                TerrainControl.log(Level.WARNING, "Duplicate biome id " + localBiome.getId() + " (" + this.worldConfig.biomeConfigs[localBiome.getId()].name + " and " + config.name + ")!");
+            }
+            this.worldConfig.biomeConfigs[localBiome.getId()] = config;
+        }
+    }
 
-            //t>>	Should this be before or after inheritance checks?
-            if (this.checkOnly)
+    private void processBiomeConfigs()
+    {
+        int xbiome = 0;
+        for (BiomeConfig config : this.worldConfig.biomeConfigs)
+        {
+            if (config == null)
+            {
+                xbiome++;
                 continue;
+            }
+
+            TerrainControl.log(Level.WARNING, "Biome attempting to load: " + config.name + ":" + xbiome++);
 
             if (config.settingsCache.containsKey(TCDefaultValues.BiomeExtends.name()))
             {
-                /* Inheritance (Are we gonna need a BiomeLoader?? It would
-                 * probably clean the code up a bit...)
+                /*
                  * - Grab the settingsCache value for BiomeExtends
                  * - Get the id of the biome to be extended and find it in
                  * biomeConfigs
                  * - if not in biomeConfigs, pre-load it?
                  * - merge the two biomeConfig's
                  */
-                String biomeToExtend = config.settingsCache.get(TCDefaultValues.BiomeExtends.name());
+                String biomeToExtend_Name = config.settingsCache.get(TCDefaultValues.BiomeExtends.name());
+                Integer biomeToExtend_Id = this.worldConfig.CustomBiomeIds.get(biomeToExtend_Name);
+                if (biomeToExtend_Id == null)
+                {
+                    TerrainControl.log(Level.WARNING, "Biome2Extend(" + biomeToExtend_Name + ":null) not found. If you think this is in error, check your configs!");
+                } else
+                {
+                    BiomeConfig biomeToExtend_Config = this.worldConfig.biomeConfigs[biomeToExtend_Id];
+                    TerrainControl.log(Level.WARNING, "Biome2Extend( " + biomeToExtend_Name + ":" + biomeToExtend_Id + ") was found!");
+                }
             }
 
+            if (this.checkOnly)
+                continue;
 
             if (!config.ReplaceBiomeName.equals(""))
             {
@@ -129,19 +165,7 @@ public class BiomeConfigManager
 
             if (!this.worldConfig.BiomeConfigsHaveReplacement)
                 this.worldConfig.BiomeConfigsHaveReplacement = config.ReplaceCount > 0;
-            if (this.biomesCount != 0)
-                LoadedBiomeNames += ", ";
-            LoadedBiomeNames += localBiome.getName();
-            // Add biome to the biome array
-            if (this.worldConfig.biomeConfigs[localBiome.getId()] == null)
-            {
-                // Only if it won't overwrite another biome in the array
-                this.biomesCount++;
-            } else
-            {
-                TerrainControl.log(Level.WARNING, "Duplicate biome id " + localBiome.getId() + " (" + this.worldConfig.biomeConfigs[localBiome.getId()].name + " and " + config.name + ")!");
-            }
-            this.worldConfig.biomeConfigs[localBiome.getId()] = config;
+            //>>	OLD LOCATION OF SETTINGS CACHE POPULATION & BIOME COUNT INCREMENT
 
             if (this.worldConfig.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
             {
@@ -157,7 +181,6 @@ public class BiomeConfigManager
                 {
                     TerrainControl.log(Level.WARNING, "Wrong color in " + config.Biome.getName());
                 }
-
             }
         }
     }

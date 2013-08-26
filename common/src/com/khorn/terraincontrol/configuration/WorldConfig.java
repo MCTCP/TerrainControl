@@ -10,18 +10,22 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
 public class WorldConfig extends ConfigFile
 {
     protected final File settingsDir;
-    
-    public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
+    private final Comparator<Entry<String,Integer>> CBV = new Comparator<Entry<String, Integer>>() {
+
+        @Override
+        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2)
+        {
+            return o1.getValue().compareTo(o2.getValue());
+        }
+    };
+    public Map<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
 
     // Holds all world CustomObjects.
     public List<CustomObject> customObjects = new ArrayList<CustomObject>();
@@ -826,7 +830,9 @@ public class WorldConfig extends ConfigFile
     {
         String output = "";
         boolean first = true;
-        for (Iterator<Entry<String, Integer>> it = this.CustomBiomeIds.entrySet().iterator(); it.hasNext();)
+        List<Entry<String, Integer>> a = new ArrayList<Entry<String, Integer>>(this.CustomBiomeIds.entrySet());
+        Collections.sort(a, CBV);
+        for (Iterator<Entry<String, Integer>> it = a.iterator(); it.hasNext();)
         {
             Entry<String, Integer> entry = it.next();
             if (!first)
