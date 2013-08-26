@@ -161,7 +161,11 @@ public class TCPlugin implements TerrainControlEngine
         {
             param
         });
-        this.log(lr);
+        if (logger == null)
+        {
+            logger = TCLogManager.getLogger();
+        }
+        logger.log(lr);
     }
 
     @Override
@@ -170,11 +174,10 @@ public class TCPlugin implements TerrainControlEngine
         LogRecord lr = new LogRecord(level, message);
         lr.setMessage(TCLogManager.formatter.format(lr));
         lr.setParameters(params);
-        this.log(lr);
-    }
-
-    private void log(LogRecord lr)
-    {
+        if (logger == null)
+        {
+            logger = TCLogManager.getLogger();
+        }
         logger.log(lr);
     }
 
