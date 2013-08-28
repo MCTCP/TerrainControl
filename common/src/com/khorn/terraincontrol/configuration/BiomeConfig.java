@@ -48,8 +48,9 @@ public class BiomeConfig extends ConfigFile
     public float BiomeTemperature;
     public float BiomeWetness;
 
-    public byte SurfaceBlock;
-    public byte GroundBlock;
+    public int StoneBlock;
+    public int SurfaceBlock;
+    public int GroundBlock;
 
     public String ReplaceBiomeName;
 
@@ -397,6 +398,7 @@ public class BiomeConfig extends ConfigFile
         this.BiomeHeight = readModSettings(TCDefaultValues.BiomeHeight.name(), this.defaultBiomeSurface);
         this.BiomeVolatility = readModSettings(TCDefaultValues.BiomeVolatility.name(), this.defaultBiomeVolatility);
 
+        this.StoneBlock = readSettings(TCDefaultValues.StoneBlock);
         this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock.name(), this.defaultSurfaceBlock);
         this.GroundBlock = readModSettings(TCDefaultValues.GroundBlock.name(), this.defaultGroundBlock);
 
@@ -747,6 +749,10 @@ public class BiomeConfig extends ConfigFile
         writeNewLine();
 
         this.writeBigTitle("Blocks");
+
+        this.writeNewLine();
+        writeComment("Stone block id");
+        writeValue(TCDefaultValues.StoneBlock.name(), this.StoneBlock);
 
         this.writeNewLine();
         writeComment("Surface block id");

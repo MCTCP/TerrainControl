@@ -227,7 +227,7 @@ public class ChunkProviderTC
 
                                 if (d16 > 0.0D)
                                 {
-                                    blockId = DefaultMaterial.STONE.id;
+                                    blockId = this.worldSettings.biomeConfigs[biomeId].StoneBlock;
                                 }
 
                                 blockArray[position] = (byte) blockId;
@@ -307,7 +307,7 @@ public class ChunkProviderTC
                         {
                             // Reset when air is found
                             surfaceBlocksCount = -1;
-                        } else if (blockOnCurrentPos == DefaultMaterial.STONE.id)
+                        } else if (blockOnCurrentPos == biomeConfig.StoneBlock)
                         {
                             if (surfaceBlocksCount == -1)
                             {
@@ -315,7 +315,7 @@ public class ChunkProviderTC
                                 if (surfaceBlocksNoise <= 0 && !this.worldSettings.removeSurfaceStone)
                                 {
                                     currentSurfaceBlock = 0;
-                                    currentGroundBlock = (byte) DefaultMaterial.STONE.id;
+                                    currentGroundBlock = biomeConfig.StoneBlock;
                                 } else if ((y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1))
                                 {
                                     currentSurfaceBlock = biomeConfig.SurfaceBlock;
