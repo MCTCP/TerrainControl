@@ -117,7 +117,10 @@ public class BiomeConfigManager
 
     private void processBiomeConfigs()
     {
+
         int xbiome = 0;
+        String autosarcophagousBiomes = "";
+        TerrainControl.log(Level.INFO, "=============== Biome Processing START ===============");
         for (BiomeConfig config : this.worldConfig.biomeConfigs)
         {
             if (config == null)
@@ -125,10 +128,21 @@ public class BiomeConfigManager
                 xbiome++;
                 continue;
             }
+            if ("Avatar".equals(config.name))
+            {
+                String xtemp = "";
+                for (Entry<String, String> string : config.settingsCache.entrySet())
+                {
+                    if (!xtemp.isEmpty())
+                        xtemp += ", ";
+                    if (string.getKey().equals(TCDefaultValues.BiomeExtends.name().toLowerCase()))
+                        xtemp += string.getKey() + ":" + string.getValue();
+                }
+                TerrainControl.log(Level.CONFIG, "Settings: " + xtemp + "\n for " + config.name + "   :::   " + TCDefaultValues.BiomeExtends.name());
+            }
+            TerrainControl.log(Level.CONFIG, "Biome attempting to load: " + config.name + ":" + xbiome++);
 
-            TerrainControl.log(Level.WARNING, "Biome attempting to load: " + config.name + ":" + xbiome++);
-
-            if (config.settingsCache.containsKey(TCDefaultValues.BiomeExtends.name()))
+            if (config.settingsCache.containsKey(TCDefaultValues.BiomeExtends.name().toLowerCase()))
             {
                 /*
                  * - Grab the settingsCache value for BiomeExtends
@@ -137,17 +151,35 @@ public class BiomeConfigManager
                  * - if not in biomeConfigs, pre-load it?
                  * - merge the two biomeConfig's
                  */
-                String biomeToExtend_Name = config.settingsCache.get(TCDefaultValues.BiomeExtends.name());
-                Integer biomeToExtend_Id = this.worldConfig.CustomBiomeIds.get(biomeToExtend_Name);
-                if (biomeToExtend_Id == null)
+                String biomeToExtend_Name = config.settingsCache.get(TCDefaultValues.BiomeExtends.name().toLowerCase());
+                if (!biomeToExtend_Name.isEmpty())
                 {
-                    TerrainControl.log(Level.WARNING, "Biome2Extend(" + biomeToExtend_Name + ":null) not found. If you think this is in error, check your configs!");
-                } else
-                {
-                    BiomeConfig biomeToExtend_Config = this.worldConfig.biomeConfigs[biomeToExtend_Id];
-                    TerrainControl.log(Level.WARNING, "Biome2Extend( " + biomeToExtend_Name + ":" + biomeToExtend_Id + ") was found!");
+                    TerrainControl.log(Level.SEVERE, "Biome(" + biomeToExtend_Name + ") Processing!");
+                    //>>	anti-self-inheritance
+                    if (biomeToExtend_Name.equals(config.name))
+                    {
+                        if (!autosarcophagousBiomes.isEmpty())
+                        {
+                            autosarcophagousBiomes += ", ";
+                        }
+                        autosarcophagousBiomes += biomeToExtend_Name;
+                        TerrainControl.log(Level.CONFIG, "Biome(" + biomeToExtend_Name + ":null) being Autosarcophagous!");
+                    } else
+                    {
+                        Integer biomeToExtend_Id = this.worldConfig.CustomBiomeIds.get(biomeToExtend_Name);
+                        if (biomeToExtend_Id == null)
+                        {
+                            TerrainControl.log(Level.WARNING, "Biome2Extend(" + biomeToExtend_Name + ":null) not found. If you think this is in error, check your configs!");
+                        } else
+                        {
+                            BiomeConfig biomeToExtend_Config = this.worldConfig.biomeConfigs[biomeToExtend_Id];
+                            config = merge(biomeToExtend_Config, config);
+                            TerrainControl.log(Level.WARNING, "Biome2Extend( " + biomeToExtend_Name + ":" + biomeToExtend_Id + ") was found!");
+                        }
+                    }
                 }
             }
+            config.process();
 
             if (this.checkOnly)
                 continue;
@@ -183,15 +215,21 @@ public class BiomeConfigManager
                 }
             }
         }
+        if (!autosarcophagousBiomes.isEmpty())
+        {
+            TerrainControl.log(Level.WARNING, "A Biome can NOT extend itself, please fix the following biomes: " + autosarcophagousBiomes);
+        }
     }
 
     public static BiomeConfig merge(BiomeConfig baseBiome, BiomeConfig extendingBiome)
     {
+        TerrainControl.log(Level.SEVERE, "Starting Merge!");
         for (String key : baseBiome.settingsCache.keySet())
         {
             if (!extendingBiome.settingsCache.containsKey(key))
             {
                 extendingBiome.settingsCache.put(key, baseBiome.settingsCache.get(key));
+                TerrainControl.log(Level.SEVERE, "Setting(" + key + "," + baseBiome.settingsCache.get(key));
             }
         }
         return extendingBiome;

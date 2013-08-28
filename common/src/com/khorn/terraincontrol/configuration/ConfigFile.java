@@ -14,7 +14,7 @@ public abstract class ConfigFile
 
     private BufferedWriter settingsWriter;
     public final String name;
-    public final File file;
+    public  File file;
 
     /**
      * Creates a new configuration file.
@@ -438,7 +438,10 @@ public abstract class ConfigFile
     @Deprecated
     public void writeSettingsFile(File settingsFile, boolean comments)
     {
+        File fileTemp = this.file;
+        this.file = settingsFile;
         writeSettingsFile(comments);
+        this.file = fileTemp;
     }
 
     public void writeSettingsFile(boolean comments)

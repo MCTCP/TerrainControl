@@ -25,7 +25,7 @@ public final class BiomeConfig extends ConfigFile
     /*
      * Biome Inheritance: String name of the biome to extend
      */
-    public String biomeExtends;
+    public String BiomeExtends;
 
     public short[][] replaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
     public int ReplaceCount = 0;
@@ -140,14 +140,18 @@ public final class BiomeConfig extends ConfigFile
         initDefaults();
 
         this.readSettingsFile();
+    }
+
+    public void process()
+    {
         this.renameOldSettings();
         this.readConfigSettings();
 
         this.correctSettings();
         if (!file.exists())
             this.createDefaultResources();
-        if (config.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
-            this.writeSettingsFile(config.SettingsMode == WorldConfig.ConfigMode.WriteAll);
+        if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
+            this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfig.ConfigMode.WriteAll);
 
         if (this.UseWorldWaterLevel)
         {
@@ -157,8 +161,8 @@ public final class BiomeConfig extends ConfigFile
             this.iceBlock = worldConfig.iceBlock;
         }
 
-        if (biome.isCustom())
-            biome.setEffects(this);
+        if (this.Biome.isCustom())
+            this.Biome.setEffects(this);
     }
     
     public int getTemperature()
@@ -382,6 +386,7 @@ public final class BiomeConfig extends ConfigFile
     @Override
     protected void readConfigSettings()
     {
+        this.BiomeExtends = readModSettings(TCDefaultValues.BiomeExtends.name(), defaultExtends);
         this.BiomeSize = readModSettings(TCDefaultValues.BiomeSize.name(), this.defaultSize);
         this.BiomeRarity = readModSettings(TCDefaultValues.BiomeRarity.name(), this.defaultRarity);
 
@@ -636,7 +641,7 @@ public final class BiomeConfig extends ConfigFile
         writeComment("This should be the value of the biomeConfig you wish to extend.");
         writeComment("The extended config will be loaded, at which point the configs included below");
         writeComment("will overwrite any configs loaded from the extended config.");
-        writeValue(TCDefaultValues.BiomeExtends.name(), this.biomeExtends);
+        writeValue(TCDefaultValues.BiomeExtends.name(), this.BiomeExtends);
         writeNewLine();
         
         writeBigTitle("Biome placement");
@@ -1098,6 +1103,7 @@ public final class BiomeConfig extends ConfigFile
     @Override
     protected void correctSettings()
     {
+        this.BiomeExtends = (this.BiomeExtends.equals("null") || this.BiomeExtends == null) ? "" : this.BiomeExtends;
         this.BiomeSize = applyBounds(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
         this.BiomeHeight = (float) applyBounds(this.BiomeHeight, -10.0, 10.0);
         this.BiomeRarity = applyBounds(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
@@ -1234,6 +1240,7 @@ public final class BiomeConfig extends ConfigFile
             this.settingsCache.put("replacedblocks", output.substring(0, output.length() - 1));
         }
     }
+    protected String defaultExtends = "";
     protected boolean defaultWaterLakes = true;
     protected int defaultTrees = 1;
     protected int defaultFlowers = 2;
