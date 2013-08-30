@@ -35,7 +35,7 @@ public class LayerFromImage extends Layer
 
         try
         {
-            File image = new File(config.file, config.imageFile);
+            File image = new File(config.settingsDir, config.imageFile);
             BufferedImage map = ImageIO.read(image);
             this.mapHeight = map.getHeight(null);
             this.mapWidth = map.getWidth(null);

@@ -18,7 +18,7 @@ import java.util.logging.Level;
 
 public class WorldConfig extends ConfigFile
 {
-    protected final File settingsDir;
+    public final File settingsDir;
     
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
     public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
@@ -345,7 +345,7 @@ public class WorldConfig extends ConfigFile
 
         if (this.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
         {
-            File mapFile = new File(file, imageFile);
+            File mapFile = new File(settingsDir, imageFile);
             if (!mapFile.exists())
             {
                 TerrainControl.log(Level.WARNING, "Biome map file not found. Switching BiomeMode to Normal");
