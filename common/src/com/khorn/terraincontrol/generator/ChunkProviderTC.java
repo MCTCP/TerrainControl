@@ -301,7 +301,7 @@ public class ChunkProviderTC
                     } else
                     {
                         // Surface blocks logic (grass, dirt, sand, sandstone)
-                        final int blockOnCurrentPos = blocksArray[currentPos];
+                        final int blockOnCurrentPos = blocksArray[currentPos] & 0xff;
 
                         if (blockOnCurrentPos == 0)
                         {

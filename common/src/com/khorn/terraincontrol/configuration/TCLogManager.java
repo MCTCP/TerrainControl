@@ -24,29 +24,11 @@ public class TCLogManager
     {
         formatter = new Formatter()
         {
-            String spacer;
-
             @Override
             public String format(LogRecord record)
             {
-                spacer = "";
-                String levelName = record.getLevel().getName();
-                //>>	This part aligns the [TerrainControl] tags no matter what level of log we are displaying
-                if (levelName.equals(Level.ALL.getName()) || levelName.equals(Level.OFF.getName()))
-                {
-                    spacer = "    ";
-                } else if (levelName.equals(Level.FINE.getName()) || levelName.equals(Level.INFO.getName()))
-                {
-                    spacer = "   ";
-                } else if (levelName.equals(Level.FINER.getName()))
-                {
-                    spacer = "  ";
-                } else if (levelName.equals(Level.CONFIG.getName()) || levelName.equals(Level.FINEST.getName()) || levelName.equals(Level.SEVERE.getName()))
-                {
-                    spacer = " ";
-                }
                 return new StringBuilder()
-                    .append(spacer).append("[").append(prefix).append("] ")
+                    .append("[").append(prefix).append("] ")
                     .append(formatMessage(record)).toString();
             }
         };
