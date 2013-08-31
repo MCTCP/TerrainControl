@@ -19,7 +19,7 @@ import java.util.logging.Level;
 public class WorldConfig extends ConfigFile
 {
     public final File settingsDir;
-    
+
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
     public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
 
@@ -36,6 +36,8 @@ public class WorldConfig extends ConfigFile
 
     public byte[] ReplaceMatrixBiomes = new byte[256];
     public boolean HaveBiomeReplace = false;
+
+    public int maxSmoothRadius = 2;
 
     // For old biome generator
     public double oldBiomeSize;
@@ -124,7 +126,7 @@ public class WorldConfig extends ConfigFile
     // Pyramids (also swamp huts and jungle temples)
     public boolean rareBuildingsEnabled;
     public int minimumDistanceBetweenRareBuildings; // Minecraft's internal
-                                                    // value is 1 chunk lower
+    // value is 1 chunk lower
     public int maximumDistanceBetweenRareBuildings;
 
     // Other structures
@@ -244,6 +246,10 @@ public class WorldConfig extends ConfigFile
 
             if (!this.BiomeConfigsHaveReplacement)
                 this.BiomeConfigsHaveReplacement = config.ReplaceCount > 0;
+
+            if (this.maxSmoothRadius < config.SmoothRadius)
+                this.maxSmoothRadius = config.SmoothRadius;
+
             if (biomesCount != 0)
                 LoadedBiomeNames += ", ";
             LoadedBiomeNames += localBiome.getName();
@@ -254,10 +260,7 @@ public class WorldConfig extends ConfigFile
                 biomesCount++;
             } else
             {
-                TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]
-                {
-                    localBiome.getId(), this.biomeConfigs[localBiome.getId()].name, config.name
-                });
+                TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]{localBiome.getId(), this.biomeConfigs[localBiome.getId()].name, config.name});
             }
             this.biomeConfigs[localBiome.getId()] = config;
 
@@ -285,9 +288,10 @@ public class WorldConfig extends ConfigFile
     private void ReadWorldCustomObjects()
     {
         customObjectsDirectory = new File(this.settingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
-        
+
         File oldCustomObjectsDirectory = new File(settingsDir, "BOBPlugins");
-        if (oldCustomObjectsDirectory.exists()) {
+        if (oldCustomObjectsDirectory.exists())
+        {
             if (!oldCustomObjectsDirectory.renameTo(new File(settingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue())))
             {
                 TerrainControl.log(Level.WARNING, "Fould old BOBPlugins folder, but it cannot be renamed to WorldObjects.");

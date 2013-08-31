@@ -44,6 +44,7 @@ public class BiomeConfig extends ConfigFile
     // Surface config
     public float BiomeHeight;
     public float BiomeVolatility;
+    public int SmoothRadius;
     
     public float BiomeTemperature;
     public float BiomeWetness;
@@ -397,6 +398,7 @@ public class BiomeConfig extends ConfigFile
 
         this.BiomeHeight = readModSettings(TCDefaultValues.BiomeHeight.name(), this.defaultBiomeSurface);
         this.BiomeVolatility = readModSettings(TCDefaultValues.BiomeVolatility.name(), this.defaultBiomeVolatility);
+        this.SmoothRadius = readSettings(TCDefaultValues.SmoothRadius);
 
         this.StoneBlock = readSettings(TCDefaultValues.StoneBlock);
         this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock.name(), this.defaultSurfaceBlock);
@@ -683,6 +685,10 @@ public class BiomeConfig extends ConfigFile
         this.writeNewLine();
         writeComment("Biome volatility.");
         writeValue(TCDefaultValues.BiomeVolatility.name(), this.BiomeVolatility);
+
+        this.writeNewLine();
+        writeComment("Smooth radius. "); // Need cool comment here !!
+        writeValue(TCDefaultValues.SmoothRadius.name(), this.SmoothRadius);
 
         writeNewLine();
         writeComment("If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.");
@@ -1095,6 +1101,8 @@ public class BiomeConfig extends ConfigFile
         this.BiomeSize = applyBounds(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
         this.BiomeHeight = (float) applyBounds(this.BiomeHeight, -10.0, 10.0);
         this.BiomeRarity = applyBounds(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
+
+        this.SmoothRadius = applyBounds(this.SmoothRadius,0,32);
 
         this.BiomeTemperature = applyBounds(this.BiomeTemperature, 0.0F, 1.0F);
         this.BiomeWetness = applyBounds(this.BiomeWetness, 0.0F, 1.0F);
