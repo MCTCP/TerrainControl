@@ -687,7 +687,10 @@ public class BiomeConfig extends ConfigFile
         writeValue(TCDefaultValues.BiomeVolatility.name(), this.BiomeVolatility);
 
         this.writeNewLine();
-        writeComment("Smooth radius. "); // Need cool comment here !!
+        writeComment("Smooth radius between biomes. Must be between 0 and 32, inclusive. The resulting");
+        writeComment("smooth radius seems to be  (thisSmoothRadius + 1 + smoothRadiusOfBiomeOnOtherSide) * 4 .");
+        writeComment("So if two biomes next to each other have both a smooth radius of 2, the");
+        writeComment("resulting smooth area will be (2 + 1 + 2) * 4 = 20 blocks wide.");
         writeValue(TCDefaultValues.SmoothRadius.name(), this.SmoothRadius);
 
         writeNewLine();

@@ -251,28 +251,6 @@ public abstract class ConfigFile
         return defaultValue;
     }
 
-    protected byte readModSettings(String settingsName, byte defaultValue)
-    {
-        settingsName = settingsName.toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
-        {
-            try
-            {
-                short number = Short.valueOf(this.settingsCache.get(settingsName));
-                if (number < 0 || number > 255)
-                {
-                    throw new NumberFormatException();
-                }
-                return (byte) number;
-            } catch (NumberFormatException e)
-            {
-                logSettingValueInvalid(settingsName, e);
-            }
-        }
-        logSettingNotFound(settingsName);
-        return defaultValue;
-    }
-
     protected String readModSettings(String settingsName, String defaultValue)
     {
         settingsName = settingsName.toLowerCase();
@@ -523,12 +501,6 @@ public abstract class ConfigFile
     protected void writeValue(String settingsName, List<WeightedMobSpawnGroup> settingsValue) throws IOException
     {
         this.settingsWriter.write(settingsName + ": " + WeightedMobSpawnGroup.toJson(settingsValue));
-        this.settingsWriter.newLine();
-    }
-
-    protected void writeValue(String settingsName, byte settingsValue) throws IOException
-    {
-        this.settingsWriter.write(settingsName + ": " + (settingsValue & 0xFF));
         this.settingsWriter.newLine();
     }
 
