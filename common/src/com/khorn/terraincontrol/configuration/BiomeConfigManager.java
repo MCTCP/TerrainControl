@@ -117,7 +117,21 @@ public class BiomeConfigManager
 
     private void processBiomeConfigs()
     {
-
+       /***********************
+         * Proposed Algorithm
+         ***********************
+         * - Grab the settingsCache value for BiomeExtends
+         * - Get the id of the biome to be extended and find it in
+         * biomeConfigs
+         * - determine if need to extend what we found
+         * ---- decend until we find a non-extending biome
+         * - merge the two biomeConfig's
+         * ---- special treatment for resources
+         * - save results by overwritting approp. config
+         * - unset entend var to prevent multi-extending
+         * - ascend until no more extending can be done
+         * - Rinse / Repeat until done extending all biome configs
+         */
         int xbiome = 0;
         String autosarcophagousBiomes = "";
         TerrainControl.log(Level.INFO, "=============== Biome Processing START ===============");
@@ -144,13 +158,6 @@ public class BiomeConfigManager
 
             if (config.settingsCache.containsKey(TCDefaultValues.BiomeExtends.name().toLowerCase()))
             {
-                /*
-                 * - Grab the settingsCache value for BiomeExtends
-                 * - Get the id of the biome to be extended and find it in
-                 * biomeConfigs
-                 * - if not in biomeConfigs, pre-load it?
-                 * - merge the two biomeConfig's
-                 */
                 String biomeToExtend_Name = config.settingsCache.get(TCDefaultValues.BiomeExtends.name().toLowerCase());
                 if (!biomeToExtend_Name.isEmpty())
                 {
@@ -179,6 +186,17 @@ public class BiomeConfigManager
                     }
                 }
             }
+            //t>>	Process needs a special way of handling resource entries to avoid
+            //t>>	having both parent and child resources get saved. Need to figure 
+            //t>>	out how resource loading works. Comment that function in ConfigFile.
+            //>>	
+            //t>>	Also, another possbility:
+            //t>>	Look into using readConfigSettings() instead of the low level
+            //t>>	readSettingsFile() method, then write a merge method in BiomeConfigs
+            //t>>	that individually copies over all variables. This will be more fine
+            //t>>	tuned but less maintainable. If we can isolate the resource loading
+            //t>>	and give it special treatment, that is far more desirable from what
+            //t>>	I can see from the code....
             config.process();
 
             if (this.checkOnly)

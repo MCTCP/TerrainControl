@@ -438,10 +438,7 @@ public abstract class ConfigFile
     @Deprecated
     public void writeSettingsFile(File settingsFile, boolean comments)
     {
-        File fileTemp = this.file;
-        this.file = settingsFile;
         writeSettingsFile(comments);
-        this.file = fileTemp;
     }
 
     public void writeSettingsFile(boolean comments)
