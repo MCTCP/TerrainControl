@@ -48,12 +48,14 @@ public final class BiomeConfig extends ConfigFile
     // Surface config
     public float BiomeHeight;
     public float BiomeVolatility;
+    public int SmoothRadius;
     
     public float BiomeTemperature;
     public float BiomeWetness;
 
-    public byte SurfaceBlock;
-    public byte GroundBlock;
+    public int StoneBlock;
+    public int SurfaceBlock;
+    public int GroundBlock;
 
     public String ReplaceBiomeName;
 
@@ -405,7 +407,9 @@ public final class BiomeConfig extends ConfigFile
 
         this.BiomeHeight = readModSettings(TCDefaultValues.BiomeHeight.name(), this.defaultBiomeSurface);
         this.BiomeVolatility = readModSettings(TCDefaultValues.BiomeVolatility.name(), this.defaultBiomeVolatility);
+        this.SmoothRadius = readSettings(TCDefaultValues.SmoothRadius);
 
+        this.StoneBlock = readSettings(TCDefaultValues.StoneBlock);
         this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock.name(), this.defaultSurfaceBlock);
         this.GroundBlock = readModSettings(TCDefaultValues.GroundBlock.name(), this.defaultGroundBlock);
 
@@ -698,6 +702,13 @@ public final class BiomeConfig extends ConfigFile
         writeComment("Biome volatility.");
         writeValue(TCDefaultValues.BiomeVolatility.name(), this.BiomeVolatility);
 
+        this.writeNewLine();
+        writeComment("Smooth radius between biomes. Must be between 0 and 32, inclusive. The resulting");
+        writeComment("smooth radius seems to be  (thisSmoothRadius + 1 + smoothRadiusOfBiomeOnOtherSide) * 4 .");
+        writeComment("So if two biomes next to each other have both a smooth radius of 2, the");
+        writeComment("resulting smooth area will be (2 + 1 + 2) * 4 = 20 blocks wide.");
+        writeValue(TCDefaultValues.SmoothRadius.name(), this.SmoothRadius);
+
         writeNewLine();
         writeComment("If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.");
         writeComment("If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.");
@@ -763,6 +774,10 @@ public final class BiomeConfig extends ConfigFile
         writeNewLine();
 
         this.writeBigTitle("Blocks");
+
+        this.writeNewLine();
+        writeComment("Stone block id");
+        writeValue(TCDefaultValues.StoneBlock.name(), this.StoneBlock);
 
         this.writeNewLine();
         writeComment("Surface block id");
@@ -1107,6 +1122,8 @@ public final class BiomeConfig extends ConfigFile
         this.BiomeSize = applyBounds(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
         this.BiomeHeight = (float) applyBounds(this.BiomeHeight, -10.0, 10.0);
         this.BiomeRarity = applyBounds(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
+
+        this.SmoothRadius = applyBounds(this.SmoothRadius,0,32);
 
         this.BiomeTemperature = applyBounds(this.BiomeTemperature, 0.0F, 1.0F);
         this.BiomeWetness = applyBounds(this.BiomeWetness, 0.0F, 1.0F);

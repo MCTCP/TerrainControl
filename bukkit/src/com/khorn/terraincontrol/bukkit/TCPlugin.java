@@ -253,7 +253,8 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         {
             param
         });
-        if (logger == null){
+        if (logger == null)
+        {
             logger = TCLogManager.getLogger();
         }
         logger.log(lr);
@@ -265,7 +266,8 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         LogRecord lr = new LogRecord(level, message);
         lr.setParameters(params);
         lr.setMessage(TCLogManager.formatter.format(lr));
-        if (logger == null){
+        if (logger == null)
+        {
             logger = TCLogManager.getLogger();
         }
         logger.log(lr);

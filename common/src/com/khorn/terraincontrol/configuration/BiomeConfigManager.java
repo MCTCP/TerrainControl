@@ -109,7 +109,7 @@ public class BiomeConfigManager
                 this.biomesCount++;
             } else
             {
-                TerrainControl.log(Level.WARNING, "Duplicate biome id " + localBiome.getId() + " (" + this.worldConfig.biomeConfigs[localBiome.getId()].name + " and " + config.name + ")!");
+                 TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]{localBiome.getId(), this.worldConfig.biomeConfigs[localBiome.getId()].name, config.name});
             }
             this.worldConfig.biomeConfigs[localBiome.getId()] = config;
         }
@@ -215,6 +215,10 @@ public class BiomeConfigManager
 
             if (!this.worldConfig.BiomeConfigsHaveReplacement)
                 this.worldConfig.BiomeConfigsHaveReplacement = config.ReplaceCount > 0;
+
+            if (this.worldConfig.maxSmoothRadius < config.SmoothRadius)
+                this.worldConfig.maxSmoothRadius = config.SmoothRadius;
+
             //>>	OLD LOCATION OF SETTINGS CACHE POPULATION & BIOME COUNT INCREMENT
 
             if (this.worldConfig.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)

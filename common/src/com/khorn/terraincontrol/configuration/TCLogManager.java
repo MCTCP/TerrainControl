@@ -24,28 +24,11 @@ public class TCLogManager
     {
         formatter = new Formatter()
         {
-            String spacer;
-
             @Override
             public String format(LogRecord record)
             {
-                spacer = "";
-                String levelName = record.getLevel().getName();
-                if (levelName.equals(Level.ALL.getName()) || levelName.equals(Level.OFF.getName()))
-                {
-                    spacer += "    ";
-                } else if (levelName.equals(Level.FINE.getName()))
-                {
-                    spacer += "   ";
-                } else if (levelName.equals(Level.FINER.getName()))
-                {
-                    spacer += "  ";
-                } else if (levelName.equals(Level.CONFIG.getName()) || levelName.equals(Level.FINEST.getName()) || levelName.equals(Level.SEVERE.getName()))
-                {
-                    spacer += " ";
-                }
                 return new StringBuilder()
-                    .append(spacer).append("[").append(prefix).append("] ")
+                    .append("[").append(prefix).append("] ")
                     .append(formatMessage(record)).toString();
             }
         };
@@ -95,18 +78,11 @@ public class TCLogManager
                 handlerParentName = h.getClass().getSuperclass().getSimpleName();
                 if (handlerName.contains(ConsoleHandler.class.getSimpleName()) || handlerParentName.contains(ConsoleHandler.class.getSimpleName()))
                 {
-                    if (consoleLogLevel == LogLevels.Off)
-                    {
-                        h.setLevel(Level.WARNING);
-                    }
-
+                    h.setLevel(consoleLogLevel.getLevel());
                     logHandlerLevelSet(logger, h, consoleLogLevel);
                 } else if (handlerName.equals(FileHandler.class.getSimpleName()))
                 {
-                    if (fileLogLevel == LogLevels.Off)
-                    {
-                        h.setLevel(Level.WARNING);
-                    }
+                    h.setLevel(fileLogLevel.getLevel());
                     logHandlerLevelSet(logger, h, fileLogLevel);
                 }
             }
@@ -127,12 +103,8 @@ public class TCLogManager
     //t>>	Potential future site of addFileHandler(); to be configured by plugin config for plugin-specific Log file and level
     public static LogLevels clampLevel(LogLevels level)
     {
-        if (level.getLevel().intValue() > defaultLogLevel.getLevel().intValue())
+        if (level != PluginConfig.LogLevels.Off && level.getLevel().intValue() > defaultLogLevel.getLevel().intValue())
         {
-            TCLogManager.getLogger().log(Level.WARNING, " [{0}] FileLoglevel `{1}` is not a safe level, reverting to default.", new Object[]
-            {
-                TCDefaultValues.ChannelName.stringValue(), level.getLevel().getLocalizedName()
-            });
             return defaultLogLevel;
         }
         return level;
