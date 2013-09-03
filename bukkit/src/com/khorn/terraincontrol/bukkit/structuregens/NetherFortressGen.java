@@ -51,7 +51,7 @@ public class NetherFortressGen extends StructureGenerator
             {
                 LocalWorld world = WorldHelper.toLocalWorld(worldObj);
                 int biomeId = world.getCalculatedBiomeId(chunkX * 16 + 8, chunkZ * 16 + 8);
-                if (!world.getSettings().biomeConfigs[biomeId].netherFortressesEnabled)
+                if (!world.getSettings().biomeConfigManager.getBiomeConfigs()[biomeId].netherFortressesEnabled)
                 {
                     return false;
                 }

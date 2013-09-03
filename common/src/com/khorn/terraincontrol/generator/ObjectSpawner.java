@@ -33,7 +33,7 @@ public class ObjectSpawner
 
         // Get the BiomeConfig of the other corner
         int biomeId = world.getBiomeId(x + 15, z + 15);
-        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
+        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigManager.getBiomeConfigs()[biomeId];
 
         // Null check
         if (localBiomeConfig == null)
@@ -96,7 +96,7 @@ public class ObjectSpawner
             {
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
-                BiomeConfig biomeConfig = worldSettings.biomeConfigs[world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
+                BiomeConfig biomeConfig = worldSettings.biomeConfigManager.getBiomeConfigs()[world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
                 if (biomeConfig != null && biomeConfig.BiomeTemperature < TCDefaultValues.snowAndIceMaxTemp.floatValue())
                 {
                     int blockToFreezeY = world.getHighestBlockYAt(blockToFreezeX, blockToFreezeZ);

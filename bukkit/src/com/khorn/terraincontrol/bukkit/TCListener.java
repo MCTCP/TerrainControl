@@ -46,10 +46,10 @@ public class TCListener implements Listener
         int z = event.getLocation().getBlockZ();
 
         int biomeId = bukkitWorld.getCalculatedBiomeId(x, z);
-        if (bukkitWorld.getSettings().biomeConfigs[biomeId] == null)
+        if (bukkitWorld.getSettings().biomeConfigManager.getBiomeConfigs()[biomeId] == null)
             return;
 
-        BiomeConfig biomeConfig = bukkitWorld.getSettings().biomeConfigs[biomeId];
+        BiomeConfig biomeConfig = bukkitWorld.getSettings().biomeConfigManager.getBiomeConfigs()[biomeId];
         SaplingGen sapling;
 
         switch (event.getSpecies())

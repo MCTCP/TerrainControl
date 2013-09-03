@@ -34,9 +34,6 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> IceBiomes = new ArrayList<String>();
     public ArrayList<String> IsleBiomes = new ArrayList<String>();
     public ArrayList<String> BorderBiomes = new ArrayList<String>();
-
-    public BiomeConfig[] biomeConfigs;  // Must be simple array for fast access. Beware! Some ids may contain null values;
-    public int biomesCount; // Overall biome count in this world.
     
     public byte[] ReplaceMatrixBiomes = new byte[256];
     public boolean HaveBiomeReplace = false;
@@ -202,6 +199,42 @@ public class WorldConfig extends ConfigFile
 
         this.biomeConfigManager = new BiomeConfigManager(settingsDir, world, this, CustomBiomeIds, checkOnly);
         
+    }
+
+    /**
+     * @return the biomeConfigs
+     * @deprecated 
+     */
+    public BiomeConfig[] getBiomeConfigs()
+    {
+        return biomeConfigManager.getBiomeConfigs();
+    }
+
+    /**
+     * @param biomeConfigs the biomeConfigs to set
+     * @deprecated 
+     */
+    public void setBiomeConfigs(BiomeConfig[] biomeConfigs)
+    {
+        biomeConfigManager.setBiomeConfigs(biomeConfigs);
+    }
+
+    /**
+     * @return the biomesCount
+     * @deprecated 
+     */
+    public int getBiomesCount()
+    {
+        return biomeConfigManager.getBiomesCount();
+    }
+
+    /**
+     * @param biomesCount the biomesCount to set
+     * @deprecated 
+     */
+    public void setBiomesCount(int biomesCount)
+    {
+        biomeConfigManager.setBiomesCount(biomesCount);
     }
 
     private void ReadWorldCustomObjects()
@@ -902,8 +935,8 @@ public class WorldConfig extends ConfigFile
         }
 
         // BiomeConfigs
-        stream.writeInt(this.biomesCount);
-        for (BiomeConfig config : biomeConfigs)
+        stream.writeInt(this.getBiomesCount());
+        for (BiomeConfig config : biomeConfigManager.getBiomeConfigs())
         {
             if (config == null)
                 continue;
@@ -941,14 +974,14 @@ public class WorldConfig extends ConfigFile
         }
 
         // BiomeConfigs
-        this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
+        biomeConfigManager.setBiomeConfigs(new BiomeConfig[world.getMaxBiomesCount()]);
 
         count = stream.readInt();
         while (count-- > 0)
         {
             int id = stream.readInt();
             BiomeConfig config = new BiomeConfig(stream, this, world.getBiomeById(id));
-            this.biomeConfigs[id] = config;
+            biomeConfigManager.addBiomeConfig(id,config);
         }
 
     }

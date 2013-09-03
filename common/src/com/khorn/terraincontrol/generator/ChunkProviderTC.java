@@ -164,6 +164,7 @@ public class ChunkProviderTC
         final double oneEight = 0.125D;
         final int z_step = 1 << this.heightBits;
         final double oneFourth = 0.25D;
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.getBiomeConfigs();
 
         for (int x = 0; x < four; x++)
         {
@@ -227,14 +228,14 @@ public class ChunkProviderTC
                                 final int biomeId = this.biomeArray[(z * 4 + piece_z) * 16 + (piece_x + x * 4)];
                                 final int waterLevelMax = this.waterLevel[(z * 4 + piece_z) * 16 + (piece_x + x * 4)] & 0xFF;
                                 int blockId = 0;
-                                if (y * 8 + piece_y < waterLevelMax && y * 8 + piece_y > this.worldSettings.biomeConfigs[biomeId].waterLevelMin)
+                                if (y * 8 + piece_y < waterLevelMax && y * 8 + piece_y > biomeConfigs[biomeId].waterLevelMin)
                                 {
-                                    blockId = this.worldSettings.biomeConfigs[biomeId].waterBlock;
+                                    blockId = biomeConfigs[biomeId].waterBlock;
                                 }
 
                                 if (d16 > 0.0D)
                                 {
-                                    blockId = this.worldSettings.biomeConfigs[biomeId].StoneBlock;
+                                    blockId = biomeConfigs[biomeId].StoneBlock;
                                 }
 
                                 blockArray[position] = (byte) blockId;
@@ -282,7 +283,7 @@ public class ChunkProviderTC
                 final int surfaceBlocksNoise = (int) (this.noise4[(x + z * 16)] / 3.0D + 3.0D + this.random.nextDouble() * 0.25D);
 
                 // Get the current biome config
-                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.biomeArray[(z + x * 16)]];
+                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigManager.getBiomeConfigs()[this.biomeArray[(z + x * 16)]];
 
                 // Bedrock on the ceiling
                 if (this.worldSettings.ceilingBedrock)
@@ -411,7 +412,7 @@ public class ChunkProviderTC
             {
 
                 final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
-                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[biomeId];
+                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigManager.getBiomeConfigs()[biomeId];
 
                 double noiseHeight = this.noise6[i2D] / 8000.0D;
                 if (noiseHeight < 0.0D)
@@ -516,6 +517,7 @@ public class ChunkProviderTC
 
     private void oldBiomeFactor(int x, int z, int i4, int max_X, int max_Y, double noiseHeight)
     {
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.getBiomeConfigs();
         if (this.worldSettings.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
         {
             this.volatilityFactor = (1.0D - this.localWorld.getBiomeFactorForOldBM(z * 48 + 17 + x * 3));
@@ -523,7 +525,7 @@ public class ChunkProviderTC
         } else
         {
             final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
-            this.volatilityFactor = (1.0D - this.worldSettings.biomeConfigs[biomeId].BiomeTemperature * this.worldSettings.biomeConfigs[biomeId].BiomeWetness);
+            this.volatilityFactor = (1.0D - biomeConfigs[biomeId].BiomeTemperature * biomeConfigs[biomeId].BiomeWetness);
         }
         this.volatilityFactor *= this.volatilityFactor;
         this.volatilityFactor = 1.0D - this.volatilityFactor * this.volatilityFactor;
@@ -548,10 +550,11 @@ public class ChunkProviderTC
         float heightSum = 0.0F;
         float biomeWeightSum = 0.0F;
 
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.getBiomeConfigs();
 
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 
-        final int lookRadius = this.worldSettings.biomeConfigs[biomeId].SmoothRadius;
+        final int lookRadius = biomeConfigs[biomeId].SmoothRadius;
 
         BiomeConfig nextBiomeConfig;
         float nextBiomeHeight, biomeWeight;
@@ -562,12 +565,12 @@ public class ChunkProviderTC
             {
                 final int nextBiomeId = this.biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 
-                nextBiomeConfig = this.worldSettings.biomeConfigs[nextBiomeId];
+                nextBiomeConfig = biomeConfigs[nextBiomeId];
                 nextBiomeHeight = nextBiomeConfig.BiomeHeight;
 
                 biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextBiomeHeight + 2.0F);
                 biomeWeight = Math.abs(biomeWeight);
-                if (nextBiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
+                if (nextBiomeHeight > biomeConfigs[biomeId].BiomeHeight)
                 {
                     biomeWeight /= 2.0F;
                 }
@@ -581,7 +584,7 @@ public class ChunkProviderTC
         volatilitySum /= biomeWeightSum;
         heightSum /= biomeWeightSum;
 
-        this.waterLevelRaw[x * max_X + z] = (byte) this.worldSettings.biomeConfigs[biomeId].waterLevelMax;
+        this.waterLevelRaw[x * max_X + z] = (byte) biomeConfigs[biomeId].waterLevelMax;
 
         volatilitySum = volatilitySum * 0.9F + 0.1F;   // Must be != 0
         heightSum = (heightSum * 4.0F - 1.0F) / 8.0F;  // Silly magic numbers
@@ -601,14 +604,15 @@ public class ChunkProviderTC
         float riverHeightSum = 0.0F;
         float riverWeightSum = 0.0F;
 
-
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.getBiomeConfigs();
+        
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 
-        final int lookRadius = this.worldSettings.biomeConfigs[biomeId].SmoothRadius;
+        final int lookRadius = biomeConfigs[biomeId].SmoothRadius;
 
         this.riverFound = this.riverArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))] == 1;
 
-        final float riverCenterHeight = this.riverFound ? this.worldSettings.biomeConfigs[biomeId].riverHeight : this.worldSettings.biomeConfigs[biomeId].BiomeHeight;
+        final float riverCenterHeight = this.riverFound ? biomeConfigs[biomeId].riverHeight : biomeConfigs[biomeId].BiomeHeight;
 
         BiomeConfig nextBiomeConfig;
         float nextBiomeHeight, biomeWeight, nextRiverHeight, riverWeight;
@@ -618,12 +622,12 @@ public class ChunkProviderTC
             for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
             {
 
-                nextBiomeConfig = this.worldSettings.biomeConfigs[this.biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))]];
+                nextBiomeConfig = biomeConfigs[this.biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))]];
                 nextBiomeHeight = nextBiomeConfig.BiomeHeight;
                 biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextBiomeHeight + 2.0F);
 
                 biomeWeight = Math.abs(biomeWeight);
-                if (nextBiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
+                if (nextBiomeHeight > biomeConfigs[biomeId].BiomeHeight)
                 {
                     biomeWeight /= 2.0F;
                 }
@@ -660,7 +664,7 @@ public class ChunkProviderTC
         riverVolatilitySum /= riverWeightSum;
         riverHeightSum /= riverWeightSum;
 
-        float waterLevelSum = this.riverFound ? this.worldSettings.biomeConfigs[biomeId].riverWaterLevel : this.worldSettings.biomeConfigs[biomeId].waterLevelMax;
+        float waterLevelSum = this.riverFound ? biomeConfigs[biomeId].riverWaterLevel : biomeConfigs[biomeId].waterLevelMax;
         this.waterLevelRaw[x * max_X + z] = (byte) waterLevelSum;
 
         volatilitySum = volatilitySum * 0.9F + 0.1F;   // Must be != 0

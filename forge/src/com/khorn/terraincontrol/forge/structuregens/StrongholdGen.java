@@ -32,7 +32,7 @@ public class StrongholdGen extends MapGenStructure
 
         allowedBiomeGenBases = new ArrayList<BiomeGenBase>();
 
-        for (BiomeConfig biomeConfig : worldConfig.biomeConfigs)
+        for (BiomeConfig biomeConfig : worldConfig.biomeConfigManager.getBiomeConfigs())
         {
             if (biomeConfig == null)
                 continue;
