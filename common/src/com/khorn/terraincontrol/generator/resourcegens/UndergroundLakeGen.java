@@ -74,7 +74,7 @@ public class UndergroundLakeGen extends Resource
 
         assureSize(6, args);
         minSize = readInt(args.get(0), 1, 25);
-        maxSize = readInt(args.get(1), minSize, 60);
+        maxSize = readInt(args.get(1), minSize + 1, 60);
         frequency = readInt(args.get(2), 1, 100);
         rarity = readRarity(args.get(3));
         minAltitude = readInt(args.get(4), TerrainControl.worldDepth, TerrainControl.worldHeight);
