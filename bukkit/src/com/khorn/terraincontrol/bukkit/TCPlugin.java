@@ -231,7 +231,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
         if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
         {
-            this.log(max, messages);
+            this.log(max, messages, params);
         }
     }
     
