@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  */
 public final class PluginConfig extends ConfigFile
 {
-
+    
     public ConfigMode SettingsMode;
 
     public static enum LogLevels
@@ -39,8 +39,10 @@ public final class PluginConfig extends ConfigFile
         }
 
     }
-    public LogLevels fileHandlerLevel = LogLevels.Debug;
-    public LogLevels consoleHandlerLevel = LogLevels.Debug;
+    public LogLevels fileHandlerLevel;
+    public LogLevels consoleHandlerLevel;
+    public String worldDefaultBiomeConfigExtension;
+    public boolean BiomeConfigConvertToDefaultExtension;
     private static final Logger l = TCLogManager.getLogger();
 
     public PluginConfig(File settingsDir)
@@ -98,6 +100,7 @@ public final class PluginConfig extends ConfigFile
         this.SettingsMode = readSettings(TCDefaultValues.SettingsMode);
         this.consoleHandlerLevel = readSettings(TCDefaultValues.ConsoleLogLevel);
         this.fileHandlerLevel = readSettings(TCDefaultValues.FileLogLevel);
+        this.worldDefaultBiomeConfigExtension = readSettings(TCDefaultValues.DefaultBiomeConfigExtension);
     }
 
     @Override
@@ -107,10 +110,12 @@ public final class PluginConfig extends ConfigFile
         writeBigTitle("The TerrainControl Plugin Config File ");
 
         writeComment("How this config file will be treated.");
-        writeComment("Possible modes: WriteAll, WriteWithoutComments, WriteDisable");
-        writeComment("   WriteAll - default");
-        writeComment("   WriteWithoutComments - write config files without help comments");
-        writeComment("   WriteDisable - doesn't write to the config files, it only reads. Doesn't auto-update the configs. Use with care!");
+        writeComment("Possible Write Modes:");
+        writeComment("   WriteAll             - Write config files with help comments");
+        writeComment("   WriteWithoutComments - Write config files without help comments");
+        writeComment("   WriteDisable         - Doesn't write to the config files, it only reads.");
+        writeComment("                          Doesn't auto-update the configs. Use with care!");
+        writeComment("Defaults to: WriteAll");
         writeValue(TCDefaultValues.SettingsMode.name(), this.SettingsMode.name());
         writeNewLine();
 
@@ -130,13 +135,30 @@ public final class PluginConfig extends ConfigFile
         writeSmallTitle("Console Logging Level");
         writeComment("This is the level with which logs will be produced on the console. i.e. That black screen thing you see in windows.");
         writeComment("See ``Possible Log Levels'' if you are lost.");
+        writeComment(" ");
+        writeComment("Defaults to: Standard");
         writeValue(TCDefaultValues.ConsoleLogLevel.name(), this.consoleHandlerLevel.name());
         writeNewLine();
 
         writeSmallTitle("File Logging Level");
         writeComment("This is the level with which logs will be produced in the log file. i.e. server.log");
         writeComment("See ``Possible Log Levels'' if you are lost.");
+        writeComment(" ");
+        writeComment("Defaults to: Standard");
         writeValue(TCDefaultValues.FileLogLevel.name(), this.fileHandlerLevel.name());
+        writeNewLine();
+        
+        
+        writeBigTitle("File Extension Rules");
+        
+        writeSmallTitle("Default Biome File Extension");
+        writeComment("Pre-TC 2.5.0, biome config files were in the form BiomeNameBiomeConfig.ini");
+        writeComment("Now, biome config files are in the form BiomeName.bc.ini");
+        writeComment("You may change this by choosing between the following extensions:");
+        writeComment("BiomeConfig.ini, .biome, .bc, .bc.ini, and .biome.ini");
+        writeComment(" ");
+        writeComment("Defaults to: .bc");
+        writeValue(TCDefaultValues.DefaultBiomeConfigExtension.name(), this.worldDefaultBiomeConfigExtension);
         writeNewLine();
 
     }

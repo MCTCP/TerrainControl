@@ -14,7 +14,56 @@ public abstract class ConfigFile
 
     private BufferedWriter settingsWriter;
     public final String name;
-    public  File file;
+    public File file;
+    public boolean readSuccess;
+
+    /**
+     * Creates a new configuration file. Determines which extension to use out
+     * of a given ArrayList.
+     * <p/>
+     * @param name             Name of the thing that is being read, like Plains
+     *                         or MyBO3. May not be null.
+     * @param file             The parent file of the configuration. If this
+     *                         config needs to read or written, this shouldn't be 
+     *                         null. Otherwise, if it's manually read from the 
+     *                         network, this can be null. The 
+     *                         {@link #readSettingsFile()} and
+     *                         {@link #writeSettingsFile(boolean)} methods must
+     *                         not be used, otherwise they will throw a
+     *                         RuntimeException.
+     * @param ArrayList        This is a list of file extensions that should be
+     *                         tried for existence. The last element will be the
+     *                         default extension.
+     * @param defaultExtension The is the extension to be used when creating a
+     *                         file that does not yet exist
+     */
+    protected ConfigFile(String name, File settingsDir, ArrayList<String> extensions, String defaultExtension) throws IllegalArgumentException
+    {
+        File biomeConfigWithExtension = null;
+        for (String extension : extensions)
+        {
+            biomeConfigWithExtension = new File(settingsDir, name + extension);
+            if (biomeConfigWithExtension.exists())
+            {
+                break;
+            }
+        }
+        if (biomeConfigWithExtension.exists())
+        {
+            this.file = biomeConfigWithExtension;
+        } else
+        {
+            this.file = new File(settingsDir, name + defaultExtension);
+        }
+
+        this.name = name;
+
+
+        if (name == null)
+        {
+            throw new IllegalArgumentException("Name may not be null");
+        }
+    }
 
     /**
      * Creates a new configuration file.
@@ -48,6 +97,12 @@ public abstract class ConfigFile
 
     protected void readSettingsFile() throws RuntimeException
     {
+        readSettingsFile(true);
+    }
+
+    protected void readSettingsFile(boolean verbose) throws RuntimeException
+    {
+        this.readSuccess = false;
         if (file == null)
             throw new RuntimeException("Constructor called with null file.");
 
@@ -94,6 +149,7 @@ public abstract class ConfigFile
                         this.settingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
                     }
                 }
+                this.readSuccess = true;
             } catch (IOException e)
             {
                 TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
@@ -121,8 +177,10 @@ public abstract class ConfigFile
                     }
                 }
             }
-        } else
+        } else if (verbose)
+        {
             logFileNotFound(file);
+        }
     }
 
     // -------------------------------------------- //
@@ -132,7 +190,7 @@ public abstract class ConfigFile
     {
         TerrainControl.log(Level.FINEST, "Setting:`{0}` was not found \nin `{1}`.", new Object[]
         {
-            settingsName,(this.file == null ? this.name + " Biome" : this.file.getName())
+            settingsName, (this.file == null ? this.name + " Biome" : this.file.getName())
         });
     }
 
@@ -145,15 +203,24 @@ public abstract class ConfigFile
     {
         TerrainControl.log(Level.WARNING, e.getClass().getSimpleName() + " :: " + getSettingValueInvalidError(settingsName));
     }
-    
-     private String getSettingValueInvalidError(String settingsName)
-     {
+
+    private String getSettingValueInvalidError(String settingsName)
+    {
         return "Value of " + settingsName + ": `" + this.settingsCache.get(settingsName) + "' in " + this.file.getName() + " is not valid.";
-     }
+    }
 
     protected void logFileNotFound(File logFile)
     {
-        TerrainControl.log(Level.WARNING, "File not found: " + logFile.getName());
+        String logName = logFile.getName();
+        TerrainControl.logIfLevel(Level.CONFIG, Level.WARNING, "File not found: " + logName);
+        TerrainControl.logIfLevel(Level.FINER, Level.FINE, "File not found: {0} in {1}", new Object[]
+        {
+            logName, logFile.getParentFile().getName()
+        });
+        TerrainControl.logIfLevel(Level.FINEST, "File not found: {0} in {1}", new Object[]
+        {
+            logName, logFile.getAbsolutePath()
+        });
     }
 
     // -------------------------------------------- //

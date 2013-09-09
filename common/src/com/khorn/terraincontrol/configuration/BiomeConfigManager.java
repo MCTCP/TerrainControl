@@ -1,32 +1,72 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import java.io.DataInputStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
 /**
  *
  */
-public class BiomeConfigManager
+public final class BiomeConfigManager
 {
 
+    /*
+     *
+     */
     private final File worldBiomesDir;
+    /*
+     *
+     */
     private final File globalBiomesDir;
+    /*
+     *
+     */
+    private final File worldDefaultBiomesDir;
+    /*
+     *
+     */
     private byte[] ReplaceMatrixBiomes = new byte[256];
+    /*
+     *
+     */
     private LocalWorld world;
+    /*
+     *
+     */
     private WorldConfig worldConfig;
+    /*
+     *
+     */
     private boolean checkOnly;
+    /*
+     * A running list of biomes that have been processed during the loading
+     */
     private String LoadedBiomeNames = "";
-    private BiomeConfig[] biomeConfigs; // Must be simple array for fast access. Beware! Some ids may contain null values;
-    private int biomesCount; // Overall biome count in this world.
+    /*
+     * Must be simple array for fast access. Beware! Some ids may contain null
+     * values;
+     */
+    private BiomeConfig[] biomeConfigs;
+    /*
+     * Overall biome count in this world.
+     */
+    private int biomesCount;
 
+    /**
+     *
+     * @param settingsDir
+     * @param world
+     * @param wConfig
+     * @param customBiomes
+     * @param checkOnly
+     */
     public BiomeConfigManager(File settingsDir, LocalWorld world, WorldConfig wConfig, Map<String, Integer> customBiomes, boolean checkOnly)
     {
 
@@ -35,31 +75,21 @@ public class BiomeConfigManager
         this.checkOnly = checkOnly;
 
         // Check biome ids, These are the names from the worldConfig file
+        //>>	Corrects any instances of incorrect biome id.
         for (String biomeName : customBiomes.keySet())
             if (customBiomes.get(biomeName) == -1)
                 customBiomes.put(biomeName, world.getFreeBiomeId());
 
-        this.worldBiomesDir = new File(settingsDir, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
+        //>>	TerrainControl/GlobalBiomes
         this.globalBiomesDir = new File(TerrainControl.getEngine().getTCDataFolder(), TCDefaultValues.GlobalBiomeConfigDirectoryName.stringValue());
+        //>>	TerrainControl/worlds/<WorldName>/WorldBiomes
+        this.worldBiomesDir = new File(settingsDir, correctOldBiomeConfigFolder(settingsDir));
+        //>>	TerrainControl/worlds/<WorldName>/BiomeConfigs/Defaults
+        this.worldDefaultBiomesDir = new File(this.worldBiomesDir, TCDefaultValues.WorldDefaultBiomeConfigDirectoryName.stringValue());
 
-
-        if (!globalBiomesDir.exists())
-        {
-            if (!globalBiomesDir.mkdir())
-            {
-                TerrainControl.log(Level.WARNING, "Error creating global directory, working with defaults");
-                return;
-            }
-        }
-
-        if (!worldBiomesDir.exists())
-        {
-            if (!worldBiomesDir.mkdir())
-            {
-                TerrainControl.log(Level.WARNING, "Error creating biome configs directory, working with defaults");
-                return;
-            }
-        }
+        //>>	If there was an error in folder establishment
+        if (!makeBiomeFolders())
+            return;
 
         // Build biome replace matrix
         for (int i = 0; i < this.ReplaceMatrixBiomes.length; i++)
@@ -71,7 +101,7 @@ public class BiomeConfigManager
         biomesCount = 0;
 
         //>>	This arrayList now contains all biomes listed in `DefaultBiome`
-        populateBiomeConfigs(new ArrayList<LocalBiome>(world.getDefaultBiomes()), globalBiomesDir);
+        populateDefaultBiomeConfigs(new ArrayList<LocalBiome>(world.getDefaultBiomes()));
 
         ArrayList<LocalBiome> localBiomes = new ArrayList<LocalBiome>(customBiomes.size());
         //>>	This adds all custombiomes that have been listed in WorldConfig to the arrayList
@@ -83,34 +113,132 @@ public class BiomeConfigManager
             else
                 localBiomes.add(world.AddBiome(entry.getKey(), entry.getValue()));
         }
-        populateBiomeConfigs(localBiomes, worldBiomesDir);
+        populateCustomBiomeConfigs(localBiomes, worldBiomesDir);
+
+        for (int i = 0; i < biomeConfigs.length; i++)
+        {
+            BiomeConfig bc = biomeConfigs[i];
+            if (bc != null)
+            {
+                TerrainControl.log(Level.INFO, "Loaded ({0}:{1}) biome", new Object[]
+                {
+                    bc.name, i
+                });
+            }
+        }
 
         processBiomeConfigs();
 
-        TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[]{biomesCount});
+        TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[]
+        {
+            biomesCount
+        });
         TerrainControl.logIfLevel(Level.ALL, Level.CONFIG, LoadedBiomeNames);
 
     }
 
-    private void populateBiomeConfigs(ArrayList<LocalBiome> biomesToLoad, File biomeFolder)
+    private boolean makeBiomeFolders()
+    {
+        boolean allFoldersExist = true;
+
+        //>>	Create the folders if not present
+        if (!globalBiomesDir.exists())
+            if (!globalBiomesDir.mkdir())
+            {
+                TerrainControl.log(Level.WARNING, "Error creating Global directory.");
+                allFoldersExist = false;
+            }
+
+        if (!worldBiomesDir.exists())
+            if (!worldBiomesDir.mkdir())
+            {
+                TerrainControl.log(Level.WARNING, "Error creating World Biome configs directory.");
+                allFoldersExist = false;
+            }
+
+        if (!worldDefaultBiomesDir.exists())
+            if (!worldDefaultBiomesDir.mkdir())
+            {
+                TerrainControl.log(Level.WARNING, "Error creating World Default Biome configs directory.");
+                allFoldersExist = false;
+            }
+
+        if (!allFoldersExist)
+        {
+            TerrainControl.log(Level.WARNING, "Potentially working with defaults.");
+        }
+        return allFoldersExist;
+    }
+
+    private String correctOldBiomeConfigFolder(File settingsDir)
+    {
+        //>>	Rename the old folder
+        String biomeFolderName = TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue();
+        File oldBiomeConfigs = new File(settingsDir, "BiomeConfigs");
+        if (oldBiomeConfigs.exists())
+        {
+            if (!oldBiomeConfigs.renameTo(new File(settingsDir, biomeFolderName)))
+            {
+                TerrainControl.log(Level.WARNING, "========================");
+                TerrainControl.log(Level.WARNING, "Fould old `BiomeConfigs` folder, but it could not be renamed to `", biomeFolderName, "`!");
+                TerrainControl.log(Level.WARNING, "Please rename the folder manually.");
+                TerrainControl.log(Level.WARNING, "========================");
+                biomeFolderName = "BiomeConfigs";
+            }
+        }
+        return biomeFolderName;
+    }
+
+    private void populateDefaultBiomeConfigs(ArrayList<LocalBiome> biomesToLoad)
+    {
+        for (LocalBiome localBiome : biomesToLoad)
+        {
+            //>>	Upon loading a biome, check the worldDefault location first.
+            BiomeConfig config = new BiomeConfig(worldDefaultBiomesDir, localBiome, this.worldConfig);
+            if (!config.readSuccess)
+            {
+                //>>	If a config doesnt exist at that location try the usual BiomeConfigs folder
+                config = new BiomeConfig(worldBiomesDir, localBiome, this.worldConfig);
+            }
+            if (!config.readSuccess)
+            {
+                //>>	and if all else fails look in the globalBiomes folder
+                //>>	if the biome does not exist here, one will be created
+                config = new BiomeConfig(globalBiomesDir, localBiome, this.worldConfig);
+            }
+            TerrainControl.log(Level.FINER, config.file.getAbsolutePath());
+
+            pushBiomeConfig(localBiome, config);
+        }
+    }
+
+    private void populateCustomBiomeConfigs(ArrayList<LocalBiome> biomesToLoad, File biomeFolder)
     {
         for (LocalBiome localBiome : biomesToLoad)
         {
             BiomeConfig config = new BiomeConfig(biomeFolder, localBiome, this.worldConfig);
-            if (biomesCount != 0)
-                LoadedBiomeNames += ", ";
-            LoadedBiomeNames += localBiome.getName();
-            // Add biome to the biome array
-            if (biomeConfigs[localBiome.getId()] == null)
-            {
-                // Only if it won't overwrite another biome in the array
-                biomesCount++;
-            } else
-            {
-                TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]{localBiome.getId(), biomeConfigs[localBiome.getId()].name, config.name});
-            }
-            biomeConfigs[localBiome.getId()] = config;
+            pushBiomeConfig(localBiome, config);
         }
+    }
+
+    private void pushBiomeConfig(LocalBiome localBiome, BiomeConfig config)
+    {
+        if (biomesCount != 0)
+            LoadedBiomeNames += ", ";
+        LoadedBiomeNames += localBiome.getName();
+        // Add biome to the biome array
+        if (biomeConfigs[localBiome.getId()] == null)
+        {
+            // Only if it won't overwrite another biome in the array
+            biomesCount++;
+        } else
+        {
+            TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]
+            {
+                localBiome.getId(), biomeConfigs[localBiome.getId()].name, config.name
+            });
+        }
+        biomeConfigs[localBiome.getId()] = config;
     }
 
     private void processBiomeConfigs()
@@ -131,8 +259,9 @@ public class BiomeConfigManager
          * - Rinse / Repeat until done extending all biome configs
          */
         int xbiome = 0;
-        String autosarcophagousBiomes = "";
+        autosarcophagousBiomes = "";
         TerrainControl.log(Level.INFO, "=============== Biome Processing START ===============");
+
         for (BiomeConfig config : biomeConfigs)
         {
             if (config == null)
@@ -140,50 +269,46 @@ public class BiomeConfigManager
                 xbiome++;
                 continue;
             }
-            if ("Avatar".equals(config.name))
-            {
-                String xtemp = "";
-                for (Entry<String, String> string : config.settingsCache.entrySet())
-                {
-                    if (!xtemp.isEmpty())
-                        xtemp += ", ";
-                    if (string.getKey().equals(TCDefaultValues.BiomeExtends.name().toLowerCase()))
-                        xtemp += string.getKey() + ":" + string.getValue();
-                }
-                TerrainControl.log(Level.CONFIG, "Settings: " + xtemp + "\n for " + config.name + "   :::   " + TCDefaultValues.BiomeExtends.name());
-            }
-            TerrainControl.log(Level.CONFIG, "Biome attempting to load: " + config.name + ":" + xbiome++);
 
-            if (config.settingsCache.containsKey(TCDefaultValues.BiomeExtends.name().toLowerCase()))
+            //>>	
+            //>>	
+            //>>	
+
+//            if (config.name.contains("Beach"))
+//            {
+//                String xtemp = "";
+//                for (Entry<String, String> string : config.settingsCache.entrySet())
+//                {
+//                    if (!xtemp.isEmpty())
+//                        xtemp += ", ";
+//                    xtemp += string.getKey() + ":" + string.getValue();
+//                }
+//                TerrainControl.log(Level.CONFIG, "Settings BEFORE: " + xtemp + "\n for " + config.name + "   :::   " + TCDefaultValues.BiomeExtends.name());
+//            }
+
+            //>>	
+            //>>	
+            //>>	
+
+            TerrainControl.log(Level.CONFIG, "Biome attempting to load: " + config.name + ":" + xbiome++);
+            if (!config.BiomeExtendsProcessed)
             {
-                String biomeToExtend_Name = config.settingsCache.get(TCDefaultValues.BiomeExtends.name().toLowerCase());
-                if (!biomeToExtend_Name.isEmpty())
+                TerrainControl.log(Level.CONFIG, "======== Inheritance Starting ========");
+
+                populateInhertianceStack(config);
+                BiomeConfig parent = biomeLoadingStack.pop();
+
+                while (!biomeLoadingStack.isEmpty())
                 {
-                    TerrainControl.log(Level.SEVERE, "Biome(" + biomeToExtend_Name + ") Processing!");
-                    //>>	anti-self-inheritance
-                    if (biomeToExtend_Name.equals(config.name))
-                    {
-                        if (!autosarcophagousBiomes.isEmpty())
-                        {
-                            autosarcophagousBiomes += ", ";
-                        }
-                        autosarcophagousBiomes += biomeToExtend_Name;
-                        TerrainControl.log(Level.CONFIG, "Biome(" + biomeToExtend_Name + ":null) being Autosarcophagous!");
-                    } else
-                    {
-                        Integer biomeToExtend_Id = this.worldConfig.CustomBiomeIds.get(biomeToExtend_Name);
-                        if (biomeToExtend_Id == null)
-                        {
-                            TerrainControl.log(Level.WARNING, "Biome2Extend(" + biomeToExtend_Name + ":null) not found. If you think this is in error, check your configs!");
-                        } else
-                        {
-                            BiomeConfig biomeToExtend_Config = biomeConfigs[biomeToExtend_Id];
-                            config = merge(biomeToExtend_Config, config);
-                            TerrainControl.log(Level.WARNING, "Biome2Extend( " + biomeToExtend_Name + ":" + biomeToExtend_Id + ") was found!");
-                        }
-                    }
+                    BiomeConfig child = biomeLoadingStack.pop();
+                    TerrainControl.log(Level.CONFIG, "Merging Biomes (" + parent.name + ":" + child.name + ");");
+                    biomeConfigs[this.worldConfig.CustomBiomeIds.get(child.name)] = merge(parent, child);
                 }
+
+
+                TerrainControl.log(Level.CONFIG, "========= Inheritance Ending =========");
             }
+
             //t>>	Process needs a special way of handling resource entries to avoid
             //t>>	having both parent and child resources get saved. Need to figure 
             //t>>	out how resource loading works. Comment that function in ConfigFile.
@@ -237,10 +362,60 @@ public class BiomeConfigManager
         }
         if (!autosarcophagousBiomes.isEmpty())
         {
-            TerrainControl.log(Level.WARNING, "A Biome can NOT extend itself, please fix the following biomes: " + autosarcophagousBiomes);
+            TerrainControl.log(Level.WARNING, "A Biome can NOT extend itself, please fix the following biomes: {0}", new Object[]
+            {
+                autosarcophagousBiomes
+            });
+        }
+    }
+    private String autosarcophagousBiomes;
+    private LinkedList<BiomeConfig> biomeLoadingStack = new LinkedList<BiomeConfig>();
+
+    private void populateInhertianceStack(BiomeConfig config)
+    {
+        biomeLoadingStack.push(config);
+        if (!config.BiomeExtendsProcessed && config.settingsCache.containsKey(TCDefaultValues.BiomeExtends.name().toLowerCase()))
+        {
+            String biomeToExtend_Name = config.settingsCache.get(TCDefaultValues.BiomeExtends.name().toLowerCase());
+            if (!biomeToExtend_Name.isEmpty())
+            {
+                TerrainControl.log(Level.SEVERE, "Biome(" + biomeToExtend_Name + ") Processing!");
+                //>>	anti-self-inheritance
+                if (biomeToExtend_Name.equals(config.name))
+                {
+                    if (!autosarcophagousBiomes.isEmpty())
+                    {
+                        autosarcophagousBiomes += ", ";
+                    }
+                    autosarcophagousBiomes += biomeToExtend_Name;
+                    TerrainControl.log(Level.CONFIG, "Biome(" + biomeToExtend_Name + ":null) being Autosarcophagous!");
+                } else
+                {
+                    Integer biomeToExtend_Id = this.worldConfig.CustomBiomeIds.get(biomeToExtend_Name);
+                    if (biomeToExtend_Id == null) //>>	If not found as custom biome, look at the defaults
+                        biomeToExtend_Id = DefaultBiome.getId(biomeToExtend_Name);
+                    if (biomeToExtend_Id == null)
+                    {
+                        TerrainControl.log(Level.WARNING, "Biome2Extend(" + biomeToExtend_Name + ":null) not found. If you think this is in error, check your configs!");
+                    } else
+                    {
+                        TerrainControl.log(Level.WARNING, "Biome2Extend( " + biomeToExtend_Name + ":" + biomeToExtend_Id + ") was found!");
+                        populateInhertianceStack(biomeConfigs[biomeToExtend_Id]);
+                    }
+                }
+            }
+        } else
+        {
+            biomeLoadingStack.peek().BiomeExtendsProcessed = true;
         }
     }
 
+    /**
+     *
+     * @param baseBiome
+     * @param extendingBiome
+     * @return
+     */
     public static BiomeConfig merge(BiomeConfig baseBiome, BiomeConfig extendingBiome)
     {
         TerrainControl.log(Level.SEVERE, "Starting Merge!");
@@ -249,31 +424,57 @@ public class BiomeConfigManager
             if (!extendingBiome.settingsCache.containsKey(key))
             {
                 extendingBiome.settingsCache.put(key, baseBiome.settingsCache.get(key));
-                TerrainControl.log(Level.SEVERE, "Setting(" + key + "," + baseBiome.settingsCache.get(key));
+                TerrainControl.log(Level.SEVERE, "Setting({0},{1})", new Object[]
+                {
+                    key, baseBiome.settingsCache.get(key)
+                });
             }
         }
+        extendingBiome.BiomeExtendsProcessed = true;
         return extendingBiome;
     }
 
+    /**
+     *
+     * @return
+     */
     public BiomeConfig[] getBiomeConfigs()
     {
         return biomeConfigs;
     }
 
+    /**
+     *
+     * @param biomeConfigs
+     */
     public void setBiomeConfigs(BiomeConfig[] biomeConfigs)
     {
         this.biomeConfigs = biomeConfigs;
     }
-    
-    public void addBiomeConfig(int index, BiomeConfig biomeConfig){
+
+    /**
+     *
+     * @param index
+     * @param biomeConfig
+     */
+    public void addBiomeConfig(int index, BiomeConfig biomeConfig)
+    {
         this.biomeConfigs[index] = biomeConfig;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBiomesCount()
     {
         return biomesCount;
     }
 
+    /**
+     *
+     * @param biomesCount
+     */
     public void setBiomesCount(int biomesCount)
     {
         this.biomesCount = biomesCount;

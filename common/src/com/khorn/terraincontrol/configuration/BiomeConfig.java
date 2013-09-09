@@ -20,16 +20,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-public final class BiomeConfig extends ConfigFile
+public class BiomeConfig extends ConfigFile
 {
     /*
      * Biome Inheritance: String name of the biome to extend
      */
     public String BiomeExtends;
-
+    public boolean BiomeExtendsProcessed = false;
+    
     public short[][] replaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
     public int ReplaceCount = 0;
-
+    
     public String riverBiome;
     public float riverHeight;
     public float riverVolatility;
@@ -52,35 +53,35 @@ public final class BiomeConfig extends ConfigFile
     
     public float BiomeTemperature;
     public float BiomeWetness;
-
+    
     public int StoneBlock;
     public int SurfaceBlock;
     public int GroundBlock;
-
+    
     public String ReplaceBiomeName;
-
+    
     public boolean UseWorldWaterLevel;
     public int waterLevelMax;
     public int waterLevelMin;
     public int waterBlock;
     public int iceBlock;
-
+    
     public int SkyColor;
     public int WaterColor;
-
+    
     public int GrassColor;
     public boolean GrassColorIsMultiplier;
     public int FoliageColor;
     public boolean FoliageColorIsMultiplier;
-
+    
     public Resource[] ResourceSequence = new Resource[256];
     private SaplingGen[] saplingTypes = new SaplingGen[20];
     private SaplingGen saplingResource = null;
-
+    
     public ArrayList<CustomObject> biomeObjects;
     public CustomStructureGen structureGen;
     public ArrayList<String> biomeObjectStrings;
-
+    
     public double maxAverageHeight;
     public double maxAverageDepth;
     public double volatility1;
@@ -93,37 +94,39 @@ public final class BiomeConfig extends ConfigFile
     private double volatilityWeightRaw2;
     public boolean disableNotchHeightControl;
     public double[] heightMatrix;
-
+    
     // Structures
     public boolean strongholdsEnabled;
     public boolean netherFortressesEnabled;
 
     public enum VillageType
     {
+
         disabled,
         wood,
         sandstone
-    }
 
+    }
     public VillageType villageType;
     public double mineshaftsRarity;
 
     public enum RareBuildingType
     {
+
         disabled,
         desertPyramid,
         jungleTemple,
         swampHut
+
     }
-
     public RareBuildingType rareBuildingType;
-
+    
     public int ResourceCount = 0;
-
+    
     public LocalBiome Biome;
-
+    
     public WorldConfig worldConfig;
-
+    
     // Spawn Config
     public boolean spawnMonstersAddDefaults = true;
     public List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
@@ -136,12 +139,12 @@ public final class BiomeConfig extends ConfigFile
 
     public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
-        super(biome.getName(), new File(settingsDir, biome.getName() + TCDefaultValues.WorldBiomeConfigName.stringValue()));
+        super(biome.getName(), settingsDir, TCDefaultValues.BiomeConfigExtensions.stringArrayListValue(), TerrainControl.getPluginConfig().worldDefaultBiomeConfigExtension);
         this.Biome = biome;
         worldConfig = config;
         initDefaults();
 
-        this.readSettingsFile();
+        this.readSettingsFile(false);
     }
 
     public void process()
@@ -166,7 +169,7 @@ public final class BiomeConfig extends ConfigFile
         if (this.Biome.isCustom())
             this.Biome.setEffects(this);
     }
-    
+
     public int getTemperature()
     {
         return (int) (this.BiomeTemperature * 65536.0F);
@@ -647,7 +650,7 @@ public final class BiomeConfig extends ConfigFile
         writeComment("will overwrite any configs loaded from the extended config.");
         writeValue(TCDefaultValues.BiomeExtends.name(), this.BiomeExtends);
         writeNewLine();
-        
+
         writeBigTitle("Biome placement");
 
         writeComment("Biome size from 0 to GenerationDepth. Defines in which biome layer this biome will be generated (see GenerationDepth).");
@@ -1035,7 +1038,7 @@ public final class BiomeConfig extends ConfigFile
                 continue;
 
             int previousReplaceTo = -1; // What the y coord just below had it's
-                                        // replace setting set to
+            // replace setting set to
             int yStart = 0;
 
             for (int y = 0; y <= replaceMatrixBlocks[blockIdFrom].length; y++)
@@ -1123,7 +1126,7 @@ public final class BiomeConfig extends ConfigFile
         this.BiomeHeight = (float) applyBounds(this.BiomeHeight, -10.0, 10.0);
         this.BiomeRarity = applyBounds(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
 
-        this.SmoothRadius = applyBounds(this.SmoothRadius,0,32);
+        this.SmoothRadius = applyBounds(this.SmoothRadius, 0, 32);
 
         this.BiomeTemperature = applyBounds(this.BiomeTemperature, 0.0F, 1.0F);
         this.BiomeWetness = applyBounds(this.BiomeWetness, 0.0F, 1.0F);
@@ -1142,7 +1145,7 @@ public final class BiomeConfig extends ConfigFile
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
 
         this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomeIds.keySet().contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
-        
+
         this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.CustomBiomeIds.keySet().contains(this.riverBiome)) ? this.riverBiome : "";
     }
 

@@ -6,16 +6,24 @@ import java.util.HashSet;
 
 public enum TCDefaultValues implements TCSetting
 {
-    // Files
+    //>> Files
+    //>>  	Plugin
     pluginSettingsName("TerrainControl.ini"),
+    //>>  	World
     WorldSettingsName("WorldConfig.ini"),
-    BO_WorldDirectoryName("WorldObjects"),
-    GlobalBiomeConfigDirectoryName("GlobalBiomes"),
-    WorldBiomeConfigDirectoryName("BiomeConfigs"),
-    WorldBiomeConfigName("BiomeConfig.ini"),
+    //>>   Extensions & Related
+    BiomeConfigExtensions("BiomeConfig.ini,.biome,.bc,.bc.ini,.biome.ini", SettingsType.StringArray),
+    DefaultBiomeConfigExtension(".bc"),
+    DefaultWorldConfigExtension(".wc"),
     
-    WorldBiomeConfigExtension(".biome"),
-    // End files
+    //>> Folders
+    //>>  	Biomes
+    GlobalBiomeConfigDirectoryName("GlobalBiomes"),
+    
+    WorldBiomeConfigDirectoryName("WorldBiomes"),
+    WorldDefaultBiomeConfigDirectoryName("DefaultBiomes"),
+    //>>    Objects
+    BO_WorldDirectoryName("WorldObjects"),
 
     // Network
     ChannelName("TerrainControl"),
