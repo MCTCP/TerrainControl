@@ -246,17 +246,17 @@ public final class BiomeConfigManager
         /** *********************
          * Proposed Algorithm
          ***********************
-         * - Grab the settingsCache value for BiomeExtends
+         * - Grab the settingsCache value for BiomeExtends              check
          * - Get the id of the biome to be extended and find it in
-         * biomeConfigs
-         * - determine if need to extend what we found
-         * ---- decend until we find a non-extending biome
-         * - merge the two biomeConfig's
+         * biomeConfigs                                                 check
+         * - determine if need to extend what we found                  check
+         * ---- decend until we find a non-extending biome              check
+         * - merge the two biomeConfig's                                needs fix
          * ---- special treatment for resources
-         * - save results by overwritting approp. config
-         * - unset entend var to prevent multi-extending
-         * - ascend until no more extending can be done
-         * - Rinse / Repeat until done extending all biome configs
+         * - save results by overwritting approp. config                check
+         * - make sure we dont process already processed configs        check
+         * - ascend until no more extending can be done                 check
+         * - Rinse / Repeat until done extending all biome configs      check
          */
         int xbiome = 0;
         autosarcophagousBiomes = "";
@@ -269,26 +269,6 @@ public final class BiomeConfigManager
                 xbiome++;
                 continue;
             }
-
-            //>>	
-            //>>	
-            //>>	
-
-//            if (config.name.contains("Beach"))
-//            {
-//                String xtemp = "";
-//                for (Entry<String, String> string : config.settingsCache.entrySet())
-//                {
-//                    if (!xtemp.isEmpty())
-//                        xtemp += ", ";
-//                    xtemp += string.getKey() + ":" + string.getValue();
-//                }
-//                TerrainControl.log(Level.CONFIG, "Settings BEFORE: " + xtemp + "\n for " + config.name + "   :::   " + TCDefaultValues.BiomeExtends.name());
-//            }
-
-            //>>	
-            //>>	
-            //>>	
 
             TerrainControl.log(Level.CONFIG, "Biome attempting to load: " + config.name + ":" + xbiome++);
             if (!config.BiomeExtendsProcessed)
