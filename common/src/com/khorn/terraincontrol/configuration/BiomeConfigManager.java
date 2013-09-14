@@ -4,9 +4,7 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -115,18 +113,6 @@ public final class BiomeConfigManager
         }
         populateCustomBiomeConfigs(localBiomes, worldBiomesDir);
 
-        for (int i = 0; i < biomeConfigs.length; i++)
-        {
-            BiomeConfig bc = biomeConfigs[i];
-            if (bc != null)
-            {
-                TerrainControl.log(Level.INFO, "Loaded ({0}:{1}) biome", new Object[]
-                {
-                    bc.name, i
-                });
-            }
-        }
-
         processBiomeConfigs();
 
         TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[]
@@ -225,7 +211,7 @@ public final class BiomeConfigManager
     {
         if (biomesCount != 0)
             LoadedBiomeNames += ", ";
-        LoadedBiomeNames += localBiome.getName();
+        LoadedBiomeNames += localBiome.getName() + (TCLogManager.getLogger().isLoggable(Level.FINE) ? (":" + localBiome.getId()) : "");
         // Add biome to the biome array
         if (biomeConfigs[localBiome.getId()] == null)
         {

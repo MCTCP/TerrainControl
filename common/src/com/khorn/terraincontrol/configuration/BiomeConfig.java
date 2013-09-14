@@ -391,7 +391,7 @@ public class BiomeConfig extends ConfigFile
     @Override
     protected void readConfigSettings()
     {
-        this.BiomeExtends = readModSettings(TCDefaultValues.BiomeExtends.name(), defaultExtends);
+        this.BiomeExtends = readModSettings(TCDefaultValues.BiomeExtends.name(), this.defaultExtends);
         this.BiomeSize = readModSettings(TCDefaultValues.BiomeSize.name(), this.defaultSize);
         this.BiomeRarity = readModSettings(TCDefaultValues.BiomeRarity.name(), this.defaultRarity);
 
