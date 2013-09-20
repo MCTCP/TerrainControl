@@ -2,10 +2,11 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
-import net.minecraft.server.v1_6_R2.StructureGenerator;
-import net.minecraft.server.v1_6_R2.StructureStart;
-import net.minecraft.server.v1_6_R2.World;
-import net.minecraft.server.v1_6_R2.WorldGenMineshaftStart;
+import com.khorn.terraincontrol.util.StructureNames;
+import net.minecraft.server.v1_6_R3.StructureGenerator;
+import net.minecraft.server.v1_6_R3.StructureStart;
+import net.minecraft.server.v1_6_R3.World;
+import net.minecraft.server.v1_6_R3.WorldGenMineshaftStart;
 
 import java.util.Random;
 
@@ -46,6 +47,12 @@ public class MineshaftGen extends StructureGenerator
     public void place(World world, Random random, int chunkX, int chunkZ)
     {
         a(world, random, chunkX, chunkZ);
+    }
+
+    @Override
+    public String a()
+    {
+        return StructureNames.MINESHAFT;
     }
 
 }

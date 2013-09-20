@@ -1,9 +1,16 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
-import net.minecraft.server.v1_6_R2.*;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
+import net.minecraft.server.v1_6_R3.*;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class VillageStart extends StructureStart
 {
@@ -14,12 +21,25 @@ public class VillageStart extends StructureStart
     public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
         List<StructurePiece> villagePieces = WorldGenVillagePieces.a(random, size);
-        VillageStartPiece startPiece = new VillageStartPiece(world, 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, villagePieces, size);
+        
+        int startX = (chunkX << 4) + 2;
+        int startZ = (chunkZ << 4) + 2;
+        WorldGenVillageStartPiece startPiece = new WorldGenVillageStartPiece(world.getWorldChunkManager(), 0, random, startX, startZ, villagePieces, size);
 
+        // Apply the villageType setting
+        LocalWorld worldTC = WorldHelper.toLocalWorld(world);
+        int currentBiomeId = worldTC.getBiomeId(startX, startZ);
+        BiomeConfig config = worldTC.getSettings().biomeConfigs[currentBiomeId];
+        if (config != null)
+        {
+            // Ignore removed custom biomes
+            changeToSandstoneVillage(startPiece, config.villageType == VillageType.sandstone);
+        }
+        
         this.a.add(startPiece);
-        startPiece.buildComponent(startPiece, this.a, random);
-        List<StructurePiece> arraylist1 = startPiece.getPiecesListJ();
-        List<StructurePiece> arraylist2 = startPiece.getPiecesListI();
+        startPiece.a(startPiece, this.a, random);
+        List<StructurePiece> arraylist1 = startPiece.j;
+        List<StructurePiece> arraylist2 = startPiece.i;
 
         int componentCount;
 
@@ -54,6 +74,38 @@ public class VillageStart extends StructureStart
         }
 
         this.hasMoreThanTwoComponents = componentCount > 2;
+    }
+    
+    public VillageStart()
+    {
+        // Required by Minecraft's structure loading code
+    }
+    
+    /**
+     * Just sets the first boolean it can find in the
+     * WorldGenVillageStartPiece.class to sandstoneVillage.
+     * <p/>
+     * @param sandstoneVillage Whether the village should be a sandstone
+     *                         village.
+     */
+    private void changeToSandstoneVillage(WorldGenVillageStartPiece subject, boolean sandstoneVillage)
+    {
+        for (Field field : WorldGenVillageStartPiece.class.getFields())
+        {
+            if (field.getType().toString().equals("boolean"))
+            {
+                try
+                {
+                    field.setAccessible(true);
+                    field.setBoolean(subject, sandstoneVillage);
+                    break;
+                } catch (Exception e)
+                {
+                    TerrainControl.log(Level.SEVERE, "Cannot make village a sandstone village!");
+                    TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+                }
+            }
+        }
     }
 
     @Override

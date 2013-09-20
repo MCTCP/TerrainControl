@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.Biome;
+import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.SpawnListEntry;
@@ -109,5 +110,11 @@ public class RareBuildingGen extends MapGenStructure
     public List getScatteredFeatureSpawnList()
     {
         return this.scatteredFeatureSpawnList;
+    }
+
+    @Override
+    public String func_143025_a()
+    {
+        return StructureNames.RARE_BUILDING;
     }
 }

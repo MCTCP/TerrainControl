@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
-import net.minecraft.server.v1_6_R2.Block;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
@@ -52,8 +52,8 @@ public class TCChunkGenerator extends ChunkGenerator
     {
         this.plugin.onWorldInit(world);
 
-        int i = world.getHighestBlockAt(x, z).getTypeId();
-        return i != 0 && Block.byId[i].material.isSolid();
+        Material material = world.getHighestBlockAt(x, z).getType();
+        return material.isSolid();
     }
 
     @Override

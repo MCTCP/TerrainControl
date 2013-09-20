@@ -1,12 +1,12 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.Rotation;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -78,7 +78,7 @@ public class SpawnCommand extends BaseCommand
         while (itr.hasNext())
         {
             block = itr.next();
-            if (block.getTypeId() != DefaultMaterial.AIR.id && block.getTypeId() != DefaultMaterial.LONG_GRASS.id)
+            if (block.getType() != Material.AIR && block.getType() != Material.LONG_GRASS)
             {
                 return previousBlock;
             }

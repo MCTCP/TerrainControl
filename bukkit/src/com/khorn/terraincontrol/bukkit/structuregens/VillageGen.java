@@ -4,10 +4,11 @@ import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import net.minecraft.server.v1_6_R2.BiomeBase;
-import net.minecraft.server.v1_6_R2.StructureGenerator;
-import net.minecraft.server.v1_6_R2.StructureStart;
-import net.minecraft.server.v1_6_R2.World;
+import com.khorn.terraincontrol.util.StructureNames;
+import net.minecraft.server.v1_6_R3.BiomeBase;
+import net.minecraft.server.v1_6_R3.StructureGenerator;
+import net.minecraft.server.v1_6_R3.StructureStart;
+import net.minecraft.server.v1_6_R3.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,5 +110,11 @@ public class VillageGen extends StructureGenerator
     public boolean place(World world, Random random, int chunkX, int chunkZ)
     {
         return a(world, random, chunkX, chunkZ);
+    }
+
+    @Override
+    public String a()
+    {
+        return StructureNames.VILLAGE;
     }
 }

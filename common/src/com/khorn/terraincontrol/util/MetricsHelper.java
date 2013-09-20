@@ -1,11 +1,7 @@
 package com.khorn.terraincontrol.util;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.FromImageBiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.NormalBiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.VanillaBiomeGenerator;
+import com.khorn.terraincontrol.biomegenerators.*;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
 /**

@@ -27,7 +27,7 @@ import java.util.logging.Level;
 
 public class ForgeWorld implements LocalWorld
 {
-    
+
     private ChunkProvider generator;
     private World world;
     private WorldConfig settings;
@@ -447,10 +447,9 @@ public class ForgeWorld implements LocalWorld
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
         /*
-         * This method usually breaks on every Minecraft update. Always
-         * check whether the names are still correct. Often, you'll also
-         * need to rewrite parts of this method for newer block place
-         * logic.
+         * This method usually breaks on every Minecraft update. Always check
+         * whether the names are still correct. Often, you'll also need to
+         * rewrite parts of this method for newer block place logic.
          */
         if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
         {
@@ -654,7 +653,7 @@ public class ForgeWorld implements LocalWorld
     {
 
         byte[] arrayOfByte2 = chunk.getBiomeArray();
-        biomeIntArray = this.getBiomes(biomeIntArray, x * 16, z * 16, 16, 16, null);
+        biomeIntArray = this.getBiomes(biomeIntArray, x * 16, z * 16, 16, 16, OutputType.DEFAULT_FOR_WORLD);
 
         for (int i1 = 0; i1 < arrayOfByte2.length; i1++)
         {
@@ -696,10 +695,7 @@ public class ForgeWorld implements LocalWorld
             tileEntity.readFromNBT(nmsTag);
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[]
-            {
-                nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z)
-            });
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z)});
         }
     }
 
@@ -728,7 +724,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public boolean canBiomeManagerGenerateUnzoomed()
     {
-        if(this.biomeManager != null)
+        if (this.biomeManager != null)
             return biomeManager.canGenerateUnZoomed();
         return true;
     }
