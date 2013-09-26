@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import net.minecraft.server.v1_6_R2.*;
+import net.minecraft.server.v1_6_R3.*;
 
 import java.util.Random;
 
@@ -28,7 +28,8 @@ public class RareBuildingStart extends StructureStart
                 break;
             case disabled:
             default:
-                // Should never happen, but on biome borders there is chance that a
+                // Should never happen, but on biome borders there is chance
+                // that a
                 // structure gets started in a biome where it shouldn't.
                 building = null;
                 break;
@@ -42,5 +43,10 @@ public class RareBuildingStart extends StructureStart
 
         // Update boundingbox
         this.c();
+    }
+
+    public RareBuildingStart()
+    {
+        // Required by Minecraft's structure loading code
     }
 }

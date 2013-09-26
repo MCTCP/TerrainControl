@@ -2,12 +2,14 @@ package com.khorn.terraincontrol.forge.structuregens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
+import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityMagmaCube;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.world.biome.SpawnListEntry;
 import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.StructureNetherBridgeStart;
 import net.minecraft.world.gen.structure.StructureStart;
 
 import java.util.ArrayList;
@@ -61,6 +63,12 @@ public class NetherFortressGen extends MapGenStructure
 
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
-        return new NetherFortressStart(this.worldObj, this.rand, chunkX, chunkZ);
+        return new StructureNetherBridgeStart(this.worldObj, this.rand, chunkX, chunkZ);
+    }
+
+    @Override
+    public String func_143025_a()
+    {
+        return StructureNames.NETHER_FORTRESS;
     }
 }

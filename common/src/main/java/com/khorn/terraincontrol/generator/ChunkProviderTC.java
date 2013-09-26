@@ -65,6 +65,9 @@ public class ChunkProviderTC
     private final int heightBitsPlusFour;
     private final int heightMinusOne;
 
+    private final int maxSmoothDiameter;
+    private final int maxSmoothRadius;
+
     public ChunkProviderTC(WorldConfig config, LocalWorld world)
     {
         this.worldSettings = config;
@@ -86,15 +89,19 @@ public class ChunkProviderTC
         this.caveGen = new CavesGen(this.worldSettings, this.localWorld);
         this.canyonGen = new CanyonsGen(this.worldSettings, this.localWorld);
 
-        // Contains 2d array 5*5. Maximum weight is in array center.
-        this.nearBiomeWeightArray = new float[25];
+        // Contains 2d array maxSmoothDiameter*maxSmoothDiameter. Maximum weight is in array center.
 
-        for (int x = -2; x <= 2; x++)
+        this.maxSmoothDiameter = config.maxSmoothRadius * 2 + 1;
+        this.maxSmoothRadius = config.maxSmoothRadius;
+
+        this.nearBiomeWeightArray = new float[maxSmoothDiameter * maxSmoothDiameter];
+
+        for (int x = -maxSmoothRadius; x <= maxSmoothRadius; x++)
         {
-            for (int z = -2; z <= 2; z++)
+            for (int z = -maxSmoothRadius; z <= maxSmoothRadius; z++)
             {
                 final float f1 = 10.0F / MathHelper.sqrt(x * x + z * z + 0.2F);
-                this.nearBiomeWeightArray[(x + 2 + (z + 2) * 5)] = f1;
+                this.nearBiomeWeightArray[(x + maxSmoothRadius + (z + maxSmoothRadius) * maxSmoothDiameter)] = f1;
             }
         }
 
@@ -138,11 +145,11 @@ public class ChunkProviderTC
         final int noise_zSize = four + 1;
 
         if (worldSettings.improvedRivers)
-            this.riverArray = this.localWorld.getBiomesUnZoomed(this.riverArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5, OutputType.ONLY_RIVERS);
+            this.riverArray = this.localWorld.getBiomesUnZoomed(this.riverArray, chunkX * 4 - maxSmoothRadius, chunkZ * 4 - maxSmoothRadius, noise_xSize + maxSmoothDiameter, noise_zSize + maxSmoothDiameter, OutputType.ONLY_RIVERS);
 
         if (this.localWorld.canBiomeManagerGenerateUnzoomed())
         {
-            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 4 - 2, chunkZ * 4 - 2, noise_xSize + 5, noise_zSize + 5, OutputType.DEFAULT_FOR_WORLD);
+            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 4 - maxSmoothRadius, chunkZ * 4 - maxSmoothRadius, noise_xSize + maxSmoothDiameter, noise_zSize + maxSmoothDiameter, OutputType.DEFAULT_FOR_WORLD);
         } else
         {
             this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * 16, chunkZ * 16, 16, 16, OutputType.DEFAULT_FOR_WORLD);
@@ -227,7 +234,7 @@ public class ChunkProviderTC
 
                                 if (d16 > 0.0D)
                                 {
-                                    blockId = DefaultMaterial.STONE.id;
+                                    blockId = this.worldSettings.biomeConfigs[biomeId].StoneBlock;
                                 }
 
                                 blockArray[position] = (byte) blockId;
@@ -301,13 +308,13 @@ public class ChunkProviderTC
                     } else
                     {
                         // Surface blocks logic (grass, dirt, sand, sandstone)
-                        final int blockOnCurrentPos = blocksArray[currentPos];
+                        final int blockOnCurrentPos = blocksArray[currentPos] & 0xff;
 
                         if (blockOnCurrentPos == 0)
                         {
                             // Reset when air is found
                             surfaceBlocksCount = -1;
-                        } else if (blockOnCurrentPos == DefaultMaterial.STONE.id)
+                        } else if (blockOnCurrentPos == biomeConfig.StoneBlock)
                         {
                             if (surfaceBlocksCount == -1)
                             {
@@ -315,7 +322,7 @@ public class ChunkProviderTC
                                 if (surfaceBlocksNoise <= 0 && !this.worldSettings.removeSurfaceStone)
                                 {
                                     currentSurfaceBlock = 0;
-                                    currentGroundBlock = (byte) DefaultMaterial.STONE.id;
+                                    currentGroundBlock = biomeConfig.StoneBlock;
                                 } else if ((y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1))
                                 {
                                     currentSurfaceBlock = biomeConfig.SurfaceBlock;
@@ -403,7 +410,7 @@ public class ChunkProviderTC
             for (int z = 0; z < max_Z; z++)
             {
 
-                final int biomeId = this.biomeArray[(x + 2 + (z + 2) * (max_X + 5))];
+                final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
                 final BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
                 double noiseHeight = this.noise6[i2D] / 8000.0D;
@@ -515,7 +522,7 @@ public class ChunkProviderTC
 
         } else
         {
-            final int biomeId = this.biomeArray[(x + 2 + (z + 2) * (max_X + 5))];
+            final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
             this.volatilityFactor = (1.0D - this.worldSettings.biomeConfigs[biomeId].BiomeTemperature * this.worldSettings.biomeConfigs[biomeId].BiomeWetness);
         }
         this.volatilityFactor *= this.volatilityFactor;
@@ -541,10 +548,10 @@ public class ChunkProviderTC
         float heightSum = 0.0F;
         float biomeWeightSum = 0.0F;
 
-        // TODO We may change biome scan radius for smooth terrain
-        final int lookRadius = 2;
 
-        final int biomeId = this.biomeArray[(x + 2 + (z + 2) * (max_X + 5))];
+        final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
+
+        final int lookRadius = this.worldSettings.biomeConfigs[biomeId].SmoothRadius;
 
         BiomeConfig nextBiomeConfig;
         float nextBiomeHeight, biomeWeight;
@@ -553,12 +560,12 @@ public class ChunkProviderTC
         {
             for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
             {
-                final int nextBiomeId = this.biomeArray[(x + nextX + 2 + (z + nextZ + 2) * (max_X + 5))];
+                final int nextBiomeId = this.biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 
                 nextBiomeConfig = this.worldSettings.biomeConfigs[nextBiomeId];
                 nextBiomeHeight = nextBiomeConfig.BiomeHeight;
 
-                biomeWeight = this.nearBiomeWeightArray[(nextX + 2 + (nextZ + 2) * 5)] / (nextBiomeHeight + 2.0F);
+                biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextBiomeHeight + 2.0F);
                 biomeWeight = Math.abs(biomeWeight);
                 if (nextBiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
                 {
@@ -594,12 +601,12 @@ public class ChunkProviderTC
         float riverHeightSum = 0.0F;
         float riverWeightSum = 0.0F;
 
-        // TODO We may change biome scan radius for smooth terrain
-        final int lookRadius = 2;
 
-        final int biomeId = this.biomeArray[(x + 2 + (z + 2) * (max_X + 5))];
+        final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 
-        this.riverFound = this.riverArray[(x + 2 + (z + 2) * (max_X + 5))] == 1;
+        final int lookRadius = this.worldSettings.biomeConfigs[biomeId].SmoothRadius;
+
+        this.riverFound = this.riverArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))] == 1;
 
         final float riverCenterHeight = this.riverFound ? this.worldSettings.biomeConfigs[biomeId].riverHeight : this.worldSettings.biomeConfigs[biomeId].BiomeHeight;
 
@@ -611,9 +618,9 @@ public class ChunkProviderTC
             for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
             {
 
-                nextBiomeConfig = this.worldSettings.biomeConfigs[this.biomeArray[(x + nextX + 2 + (z + nextZ + 2) * (max_X + 5))]];
+                nextBiomeConfig = this.worldSettings.biomeConfigs[this.biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))]];
                 nextBiomeHeight = nextBiomeConfig.BiomeHeight;
-                biomeWeight = this.nearBiomeWeightArray[(nextX + 2 + (nextZ + 2) * 5)] / (nextBiomeHeight + 2.0F);
+                biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextBiomeHeight + 2.0F);
 
                 biomeWeight = Math.abs(biomeWeight);
                 if (nextBiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
@@ -627,14 +634,14 @@ public class ChunkProviderTC
                 // River part
 
                 boolean isRiver = false;
-                if (this.riverArray[(x + nextX + 2 + (z + nextZ + 2) * (max_X + 5))] == 1)
+                if (this.riverArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))] == 1)
                 {
                     this.riverFound = true;
                     isRiver = true;
                 }
 
                 nextRiverHeight = (isRiver) ? nextBiomeConfig.riverHeight : nextBiomeHeight;
-                riverWeight = this.nearBiomeWeightArray[(nextX + 2 + (nextZ + 2) * 5)] / (nextRiverHeight + 2.0F);
+                riverWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextRiverHeight + 2.0F);
 
                 riverWeight = Math.abs(riverWeight);
                 if (nextRiverHeight > riverCenterHeight)

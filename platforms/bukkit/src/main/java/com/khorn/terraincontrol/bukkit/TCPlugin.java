@@ -4,23 +4,28 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
+import com.khorn.terraincontrol.bukkit.structuregens.RareBuildingStart;
+import com.khorn.terraincontrol.bukkit.structuregens.VillageStart;
 import com.khorn.terraincontrol.bukkit.util.BukkitMetricsHelper;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.TCLogManager;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.util.StringHelper;
-import net.minecraft.server.v1_6_R2.BiomeBase;
-import net.minecraft.server.v1_6_R2.Block;
+import com.khorn.terraincontrol.util.StructureNames;
+import net.minecraft.server.v1_6_R3.BiomeBase;
+import net.minecraft.server.v1_6_R3.Block;
+import net.minecraft.server.v1_6_R3.WorldGenFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_6_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_6_R3.block.CraftBlock;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -32,14 +37,15 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     public TCListener listener;
     public TCCommandExecutor commandExecutor;
 
-    /* Debug setting. Set it to true to make Terrain Control try to disable
+    /*
+     * Debug setting. Set it to true to make Terrain Control try to disable
      * itself. However, terrain generators aren't cleaned up properly by
      * Bukkit, so this won't really work until that bug is fixed.
      */
     public boolean cleanupOnDisable = false;
 
     public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
-    
+
     private final HashMap<String, BukkitWorld> notInitedWorlds = new HashMap<String, BukkitWorld>();
     private Logger logger;
 
@@ -66,7 +72,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         TerrainControl.setEngine(this);
         logger = TCLogManager.getLogger(this);
 
-        if (!Bukkit.getWorlds().isEmpty() && !cleanupOnDisable)
+        if (Bukkit.getWorlds().size() != 0 && !cleanupOnDisable)
         {
             // Reload "handling"
             // (worlds are already loaded and TC didn't clean up itself)
@@ -85,6 +91,18 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
                 // We're on MCPC+, so enable the extra block ids.
                 TerrainControl.supportedBlockIds = 4095;
                 this.log(Level.INFO, "MCPC+ detected, enabling extended block id support.");
+            }
+
+            // Register structures
+            try
+            {
+                Method registerStructure = WorldGenFactory.class.getDeclaredMethod("b", Class.class, String.class);
+                registerStructure.setAccessible(true);
+                registerStructure.invoke(null, RareBuildingStart.class, StructureNames.RARE_BUILDING);
+                registerStructure.invoke(null, VillageStart.class, StructureNames.VILLAGE);
+            } catch (Exception e)
+            {
+                TerrainControl.log(Level.SEVERE, "Failed to register structures: {0}", e);
             }
 
             // Start the engine
@@ -234,14 +252,11 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             this.log(max, messages);
         }
     }
-    
+
     @Override
     public void log(Level level, String... messages)
     {
-        this.log(level, "{0}", new Object[]
-        {
-            StringHelper.join(messages, " ")
-        });
+        this.log(level, "{0}", new Object[] {StringHelper.join(messages, " ")});
     }
 
     @Override
@@ -249,11 +264,9 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
         LogRecord lr = new LogRecord(level, message);
         lr.setMessage(TCLogManager.formatter.format(lr));
-        lr.setParameters(new Object[]
+        lr.setParameters(new Object[] {param});
+        if (logger == null)
         {
-            param
-        });
-        if (logger == null){
             logger = TCLogManager.getLogger();
         }
         logger.log(lr);
@@ -263,9 +276,10 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     public void log(Level level, String message, Object[] params)
     {
         LogRecord lr = new LogRecord(level, message);
-        lr.setParameters(params);
         lr.setMessage(TCLogManager.formatter.format(lr));
-        if (logger == null){
+        lr.setParameters(params);
+        if (logger == null)
+        {
             logger = TCLogManager.getLogger();
         }
         logger.log(lr);

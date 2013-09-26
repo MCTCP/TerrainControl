@@ -3,7 +3,8 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import net.minecraft.server.v1_6_R2.*;
+import com.khorn.terraincontrol.util.StructureNames;
+import net.minecraft.server.v1_6_R3.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -112,11 +113,11 @@ public class StrongholdGen extends StructureGenerator
     @Override
     protected StructureStart b(int chunkX, int chunkZ)
     {
-        StrongholdStart strongholdStart = new StrongholdStart(this.c, this.b, chunkX, chunkZ);
+        WorldGenStronghold2Start strongholdStart = new WorldGenStronghold2Start(this.c, this.b, chunkX, chunkZ);
 
-        while (strongholdStart.getComponents().isEmpty() || (strongholdStart.getComponents().get(0)).b == null)
+        while (strongholdStart.b().isEmpty() || ((WorldGenStrongholdStart) strongholdStart.b().get(0)).b == null)
         {
-            strongholdStart = new StrongholdStart(this.c, this.b, chunkX, chunkZ);
+            strongholdStart = new WorldGenStronghold2Start(this.c, this.b, chunkX, chunkZ);
         }
 
         return strongholdStart;
@@ -132,5 +133,11 @@ public class StrongholdGen extends StructureGenerator
     public void place(World world, Random random, int chunkX, int chunkZ)
     {
         a(world, random, chunkX, chunkZ);
+    }
+
+    @Override
+    public String a()
+    {
+        return StructureNames.STRONGHOLD;
     }
 }

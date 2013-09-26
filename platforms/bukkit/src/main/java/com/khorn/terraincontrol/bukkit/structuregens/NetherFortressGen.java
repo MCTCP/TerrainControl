@@ -2,7 +2,8 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
-import net.minecraft.server.v1_6_R2.*;
+import com.khorn.terraincontrol.util.StructureNames;
+import net.minecraft.server.v1_6_R3.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class NetherFortressGen extends StructureGenerator
     }
 
     @SuppressWarnings("rawtypes")
-    public List a()
+    public List b()
     {
         return this.spawnList;
     }
@@ -63,7 +64,7 @@ public class NetherFortressGen extends StructureGenerator
     @Override
     protected StructureStart b(int i, int j)
     {
-        return new NetherFortressStart(this.c, this.b, i, j);
+        return new WorldGenNetherStart(this.c, this.b, i, j);
     }
 
     // Two methods to help MCPC+ dynamically rename things.
@@ -76,5 +77,11 @@ public class NetherFortressGen extends StructureGenerator
     public void place(World world, Random random, int chunkX, int chunkZ)
     {
         a(world, random, chunkX, chunkZ);
+    }
+
+    @Override
+    public String a()
+    {
+        return StructureNames.NETHER_FORTRESS;
     }
 }

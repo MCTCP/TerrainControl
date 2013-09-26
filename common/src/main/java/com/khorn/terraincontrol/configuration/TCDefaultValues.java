@@ -10,11 +10,8 @@ public enum TCDefaultValues implements TCSetting
     pluginSettingsName("TerrainControl.ini"),
     WorldSettingsName("WorldConfig.ini"),
     BO_WorldDirectoryName("WorldObjects"),
-    GlobalBiomeConfigDirectoryName("GlobalBiomes"),
     WorldBiomeConfigDirectoryName("BiomeConfigs"),
     WorldBiomeConfigName("BiomeConfig.ini"),
-    
-    WorldBiomeConfigExtension(".biome"),
     // End files
 
     // Network
@@ -132,7 +129,6 @@ public enum TCDefaultValues implements TCSetting
     // End world settings
 
     // Biome settings
-    BiomeExtends(""),
     BiomeSize(5),
     BiomeRarity(100),
     BiomeColor("", SettingsType.Color),
@@ -148,7 +144,9 @@ public enum TCDefaultValues implements TCSetting
 
     BiomeHeight(0.1D),
     BiomeVolatility(0.3D),
+    SmoothRadius(2),
 
+    StoneBlock(1),
     SurfaceBlock(2),
     GroundBlock(3),
 

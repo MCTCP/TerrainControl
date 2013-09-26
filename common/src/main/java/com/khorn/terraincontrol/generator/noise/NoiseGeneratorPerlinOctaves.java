@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.generator.noise;
 
 import com.khorn.terraincontrol.util.MathHelper;
+
 import java.util.Random;
 
 public class NoiseGeneratorPerlinOctaves

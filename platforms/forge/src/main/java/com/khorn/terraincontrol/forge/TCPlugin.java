@@ -7,7 +7,10 @@ import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.TCLogManager;
 import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.events.EventPriority;
+import com.khorn.terraincontrol.forge.structuregens.RareBuildingStart;
+import com.khorn.terraincontrol.forge.structuregens.VillageStart;
 import com.khorn.terraincontrol.util.StringHelper;
+import com.khorn.terraincontrol.util.StructureNames;
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -18,13 +21,14 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
+import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
 
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 @Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.5.0")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")
@@ -56,6 +60,10 @@ public class TCPlugin implements TerrainControlEngine
 
         // Register world type
         worldType = new TCWorldType(this, "TerrainControl");
+        
+        // Register village and rare building starts
+        MapGenStructureIO.func_143034_b(RareBuildingStart.class, StructureNames.RARE_BUILDING);
+        MapGenStructureIO.func_143034_b(VillageStart.class, StructureNames.VILLAGE);
 
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
@@ -161,7 +169,11 @@ public class TCPlugin implements TerrainControlEngine
         {
             param
         });
-        this.log(lr);
+        if (logger == null)
+        {
+            logger = TCLogManager.getLogger();
+        }
+        logger.log(lr);
     }
 
     @Override
@@ -170,11 +182,10 @@ public class TCPlugin implements TerrainControlEngine
         LogRecord lr = new LogRecord(level, message);
         lr.setMessage(TCLogManager.formatter.format(lr));
         lr.setParameters(params);
-        this.log(lr);
-    }
-
-    private void log(LogRecord lr)
-    {
+        if (logger == null)
+        {
+            logger = TCLogManager.getLogger();
+        }
         logger.log(lr);
     }
 
@@ -220,5 +231,5 @@ public class TCPlugin implements TerrainControlEngine
         }
         return true;
     }
-
+    
 }

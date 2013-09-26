@@ -20,12 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-public final class BiomeConfig extends ConfigFile
+public class BiomeConfig extends ConfigFile
 {
-    /*
-     * Biome Inheritance: String name of the biome to extend
-     */
-    public String biomeExtends;
 
     public short[][] replaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
     public int ReplaceCount = 0;
@@ -48,12 +44,14 @@ public final class BiomeConfig extends ConfigFile
     // Surface config
     public float BiomeHeight;
     public float BiomeVolatility;
+    public int SmoothRadius;
     
     public float BiomeTemperature;
     public float BiomeWetness;
 
-    public byte SurfaceBlock;
-    public byte GroundBlock;
+    public int StoneBlock;
+    public int SurfaceBlock;
+    public int GroundBlock;
 
     public String ReplaceBiomeName;
 
@@ -160,7 +158,7 @@ public final class BiomeConfig extends ConfigFile
         if (biome.isCustom())
             biome.setEffects(this);
     }
-    
+
     public int getTemperature()
     {
         return (int) (this.BiomeTemperature * 65536.0F);
@@ -400,7 +398,9 @@ public final class BiomeConfig extends ConfigFile
 
         this.BiomeHeight = readModSettings(TCDefaultValues.BiomeHeight.name(), this.defaultBiomeSurface);
         this.BiomeVolatility = readModSettings(TCDefaultValues.BiomeVolatility.name(), this.defaultBiomeVolatility);
+        this.SmoothRadius = readSettings(TCDefaultValues.SmoothRadius);
 
+        this.StoneBlock = readSettings(TCDefaultValues.StoneBlock);
         this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock.name(), this.defaultSurfaceBlock);
         this.GroundBlock = readModSettings(TCDefaultValues.GroundBlock.name(), this.defaultGroundBlock);
 
@@ -553,10 +553,10 @@ public final class BiomeConfig extends ConfigFile
             int end = key.lastIndexOf(")");
             if (start != -1 && end != -1)
             {
-                String resourceName = key.substring(0, start);
+                String name = key.substring(0, start);
                 String[] props = readComplexString(key.substring(start + 1, end));
 
-                ConfigFunction<BiomeConfig> res = TerrainControl.getConfigFunctionsManager().getConfigFunction(resourceName, this, this.name + " on line " + entry.getValue(), Arrays.asList(props));
+                ConfigFunction<BiomeConfig> res = TerrainControl.getConfigFunctionsManager().getConfigFunction(name, this, this.name + " on line " + entry.getValue(), Arrays.asList(props));
 
                 if (res != null)
                 {
@@ -632,13 +632,6 @@ public final class BiomeConfig extends ConfigFile
         }
         writeNewLine();
 
-        writeBigTitle("Biome Inheritance");
-        writeComment("This should be the value of the biomeConfig you wish to extend.");
-        writeComment("The extended config will be loaded, at which point the configs included below");
-        writeComment("will overwrite any configs loaded from the extended config.");
-        writeValue(TCDefaultValues.BiomeExtends.name(), this.biomeExtends);
-        writeNewLine();
-        
         writeBigTitle("Biome placement");
 
         writeComment("Biome size from 0 to GenerationDepth. Defines in which biome layer this biome will be generated (see GenerationDepth).");
@@ -692,6 +685,13 @@ public final class BiomeConfig extends ConfigFile
         this.writeNewLine();
         writeComment("Biome volatility.");
         writeValue(TCDefaultValues.BiomeVolatility.name(), this.BiomeVolatility);
+
+        this.writeNewLine();
+        writeComment("Smooth radius between biomes. Must be between 0 and 32, inclusive. The resulting");
+        writeComment("smooth radius seems to be  (thisSmoothRadius + 1 + smoothRadiusOfBiomeOnOtherSide) * 4 .");
+        writeComment("So if two biomes next to each other have both a smooth radius of 2, the");
+        writeComment("resulting smooth area will be (2 + 1 + 2) * 4 = 20 blocks wide.");
+        writeValue(TCDefaultValues.SmoothRadius.name(), this.SmoothRadius);
 
         writeNewLine();
         writeComment("If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.");
@@ -758,6 +758,10 @@ public final class BiomeConfig extends ConfigFile
         writeNewLine();
 
         this.writeBigTitle("Blocks");
+
+        this.writeNewLine();
+        writeComment("Stone block id");
+        writeValue(TCDefaultValues.StoneBlock.name(), this.StoneBlock);
 
         this.writeNewLine();
         writeComment("Surface block id");
@@ -1095,19 +1099,20 @@ public final class BiomeConfig extends ConfigFile
 
     }
 
-    @Override
     protected void correctSettings()
     {
         this.BiomeSize = applyBounds(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
         this.BiomeHeight = (float) applyBounds(this.BiomeHeight, -10.0, 10.0);
         this.BiomeRarity = applyBounds(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
 
+        this.SmoothRadius = applyBounds(this.SmoothRadius,0,32);
+
         this.BiomeTemperature = applyBounds(this.BiomeTemperature, 0.0F, 1.0F);
         this.BiomeWetness = applyBounds(this.BiomeWetness, 0.0F, 1.0F);
 
-        this.IsleInBiome = filterBiomes(this.IsleInBiome, this.worldConfig.CustomBiomeIds.keySet());
-        this.BiomeIsBorder = filterBiomes(this.BiomeIsBorder, this.worldConfig.CustomBiomeIds.keySet());
-        this.NotBorderNear = filterBiomes(this.NotBorderNear, this.worldConfig.CustomBiomeIds.keySet());
+        this.IsleInBiome = filterBiomes(this.IsleInBiome, this.worldConfig.CustomBiomes);
+        this.BiomeIsBorder = filterBiomes(this.BiomeIsBorder, this.worldConfig.CustomBiomes);
+        this.NotBorderNear = filterBiomes(this.NotBorderNear, this.worldConfig.CustomBiomes);
 
         this.volatility1 = this.volatilityRaw1 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw1) + 1.0D) : this.volatilityRaw1 + 1.0D;
         this.volatility2 = this.volatilityRaw2 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw2) + 1.0D) : this.volatilityRaw2 + 1.0D;
@@ -1118,12 +1123,11 @@ public final class BiomeConfig extends ConfigFile
         this.waterLevelMin = applyBounds(this.waterLevelMin, 0, this.worldConfig.WorldHeight - 1);
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
 
-        this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomeIds.keySet().contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
+        this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomes.contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
         
-        this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.CustomBiomeIds.keySet().contains(this.riverBiome)) ? this.riverBiome : "";
+        this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.CustomBiomes.contains(this.riverBiome)) ? this.riverBiome : "";
     }
 
-    @Override
     protected void renameOldSettings()
     {
         // Old values from WorldConfig

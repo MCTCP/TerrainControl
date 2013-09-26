@@ -3,10 +3,10 @@ package com.khorn.terraincontrol.bukkit;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OutputType;
-import net.minecraft.server.v1_6_R2.BiomeBase;
-import net.minecraft.server.v1_6_R2.ChunkPosition;
-import net.minecraft.server.v1_6_R2.WorldChunkManager;
-import net.minecraft.server.v1_6_R2.WorldGenVillage;
+import net.minecraft.server.v1_6_R3.BiomeBase;
+import net.minecraft.server.v1_6_R3.ChunkPosition;
+import net.minecraft.server.v1_6_R3.WorldChunkManager;
+import net.minecraft.server.v1_6_R3.WorldGenVillage;
 
 import java.util.List;
 import java.util.Random;

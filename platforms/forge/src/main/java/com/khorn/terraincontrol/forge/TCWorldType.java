@@ -5,7 +5,6 @@ import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.util.ForgeMetricsHelper;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
-
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;

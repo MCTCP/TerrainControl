@@ -1,24 +1,41 @@
 package com.khorn.terraincontrol.forge.structuregens;
 
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
+import com.khorn.terraincontrol.forge.util.WorldHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.structure.ComponentVillageRoadPiece;
-import net.minecraft.world.gen.structure.StructureComponent;
-import net.minecraft.world.gen.structure.StructureStart;
-import net.minecraft.world.gen.structure.StructureVillagePieces;
+import net.minecraft.world.gen.structure.*;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
-class StructureVillageStart extends StructureStart
+public class VillageStart extends StructureStart
 {
     // well ... thats what it does
     private boolean hasMoreThanTwoComponents = false;
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public StructureVillageStart(World world, Random random, int chunkX, int chunkZ, int size)
+    public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
         List<StructureComponent> villagePieces = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);
-        VillageStartPiece startPiece = new VillageStartPiece(world, 0, random, (chunkX << 4) + 2, (chunkZ << 4) + 2, villagePieces, size);
+
+        int startX = (chunkX << 4) + 2;
+        int startZ = (chunkZ << 4) + 2;
+        ComponentVillageStartPiece startPiece = new ComponentVillageStartPiece(world.getWorldChunkManager(), 0, random, startX, startZ, villagePieces, size);
+
+        // Apply the villageType setting
+        LocalWorld worldTC = WorldHelper.toLocalWorld(world);
+        int currentBiomeId = worldTC.getBiomeId(startX, startZ);
+        BiomeConfig config = worldTC.getSettings().biomeConfigs[currentBiomeId];
+        if (config != null)
+        {
+            // Ignore removed custom biomes
+            changeToSandstoneVillage(startPiece, config.villageType == VillageType.sandstone);
+        }
 
         this.components.add(startPiece);
         startPiece.buildComponent(startPiece, this.components, random);
@@ -60,10 +77,42 @@ class StructureVillageStart extends StructureStart
     }
 
     /**
+     * Just sets the first boolean it can find in the
+     * WorldGenVillageStartPiece.class to sandstoneVillage.
+     * <p/>
+     * @param sandstoneVillage Whether the village should be a sandstone
+     *                         village.
+     */
+    private void changeToSandstoneVillage(ComponentVillageStartPiece subject, boolean sandstoneVillage)
+    {
+        for (Field field : ComponentVillageStartPiece.class.getFields())
+        {
+            if (field.getType().toString().equals("boolean"))
+            {
+                try
+                {
+                    field.setAccessible(true);
+                    field.setBoolean(subject, sandstoneVillage);
+                    break;
+                } catch (Exception e)
+                {
+                    TerrainControl.log(Level.SEVERE, "Cannot make village a sandstone village!");
+                    TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+                }
+            }
+        }
+    }
+
+    /**
      * currently only defined for Villages, returns true if Village has more than 2 non-road components
      */
     public boolean isSizeableStructure()
     {
         return this.hasMoreThanTwoComponents;
+    }
+
+    public VillageStart()
+    {
+        // Required by Minecraft's structure loading code
     }
 }

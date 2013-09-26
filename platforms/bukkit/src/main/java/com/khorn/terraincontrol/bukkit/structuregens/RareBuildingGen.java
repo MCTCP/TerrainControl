@@ -4,7 +4,8 @@ import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import net.minecraft.server.v1_6_R2.*;
+import com.khorn.terraincontrol.util.StructureNames;
+import net.minecraft.server.v1_6_R3.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,5 +121,11 @@ public class RareBuildingGen extends StructureGenerator
     public void place(World world, Random random, int chunkX, int chunkZ)
     {
         a(world, random, chunkX, chunkZ);
+    }
+
+    @Override
+    public String a()
+    {
+        return StructureNames.RARE_BUILDING;
     }
 }

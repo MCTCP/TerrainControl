@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -19,7 +20,7 @@ public final class PluginConfig extends ConfigFile
     public static enum LogLevels
     {
 
-        Off(Level.OFF),
+        Off(Level.WARNING),
         Standard(Level.INFO),
         Debug(Level.CONFIG),
         XDebug(Level.FINE),
@@ -38,14 +39,16 @@ public final class PluginConfig extends ConfigFile
         }
 
     }
-    public LogLevels fileHandlerLevel = LogLevels.XDebug;
+    public LogLevels fileHandlerLevel = LogLevels.Debug;
     public LogLevels consoleHandlerLevel = LogLevels.Debug;
-    private static final Logger l = Logger.getLogger("Minecraft");
+    private static final Logger l = TCLogManager.getLogger();
 
     public PluginConfig(File settingsDir)
     {
-        super(TCDefaultValues.ChannelName.stringValue(), new File(settingsDir, TCDefaultValues.pluginSettingsName.stringValue()));
 
+        super(TCDefaultValues.ChannelName.stringValue(), new File(settingsDir, TCDefaultValues.pluginSettingsName.stringValue()));
+        if (!settingsDir.exists())
+            settingsDir.mkdirs();
         init();
     }
 
@@ -54,8 +57,6 @@ public final class PluginConfig extends ConfigFile
         if (this.file.exists())
         {
             this.readSettingsFile();
-        } else {
-            this.writeSettingsFile(true);
         }
         this.renameOldSettings();
         this.readConfigSettings();
@@ -86,7 +87,8 @@ public final class PluginConfig extends ConfigFile
         }
         if (hasOffLevel)
         {
-            l.log(Level.WARNING, "Quiet Mode: You will no longer see INFO messages, but WARNING AND SEVERE level logs will still show");
+            l.log(Level.WARNING, TCLogManager.formatter.format(new LogRecord(Level.WARNING, "Quiet Mode: You will no longer see INFO messages FOR ANY PLUGIN.")));
+            l.log(Level.WARNING, TCLogManager.formatter.format(new LogRecord(Level.WARNING, "WARNING AND SEVERE level logs will still show.")));
         }
     }
 
@@ -127,13 +129,13 @@ public final class PluginConfig extends ConfigFile
 
         writeSmallTitle("Console Logging Level");
         writeComment("This is the level with which logs will be produced on the console. i.e. That black screen thing you see in windows.");
-        writeComment("See ``Possible Levels'' if you are lost.");
+        writeComment("See ``Possible Log Levels'' if you are lost.");
         writeValue(TCDefaultValues.ConsoleLogLevel.name(), this.consoleHandlerLevel.name());
         writeNewLine();
 
         writeSmallTitle("File Logging Level");
         writeComment("This is the level with which logs will be produced in the log file. i.e. server.log");
-        writeComment("See ``Possible Levels'' if you are lost.");
+        writeComment("See ``Possible Log Levels'' if you are lost.");
         writeValue(TCDefaultValues.FileLogLevel.name(), this.fileHandlerLevel.name());
         writeNewLine();
 

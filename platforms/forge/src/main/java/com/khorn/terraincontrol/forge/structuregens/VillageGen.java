@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.Biome;
+import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
@@ -83,6 +84,12 @@ public class VillageGen extends MapGenStructure
 
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
-        return new StructureVillageStart(this.worldObj, this.rand, chunkX, chunkZ, this.size);
+        return new VillageStart(this.worldObj, this.rand, chunkX, chunkZ, this.size);
+    }
+
+    @Override
+    public String func_143025_a()
+    {
+        return StructureNames.VILLAGE;
     }
 }

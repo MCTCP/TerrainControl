@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.forge.structuregens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
+import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureMineshaftStart;
 import net.minecraft.world.gen.structure.StructureStart;
@@ -26,5 +27,11 @@ public class MineshaftGen extends MapGenStructure
     protected StructureStart getStructureStart(int par1, int par2)
     {
         return new StructureMineshaftStart(this.worldObj, this.rand, par1, par2);
+    }
+
+    @Override
+    public String func_143025_a()
+    {
+        return StructureNames.MINESHAFT;
     }
 }

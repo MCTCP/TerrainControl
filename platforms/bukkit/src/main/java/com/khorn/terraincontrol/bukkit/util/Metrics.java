@@ -29,7 +29,6 @@
 package com.khorn.terraincontrol.bukkit.util;
 
 import com.khorn.terraincontrol.TerrainControl;
-
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
