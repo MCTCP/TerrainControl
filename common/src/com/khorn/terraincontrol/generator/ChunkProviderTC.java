@@ -646,7 +646,7 @@ public class ChunkProviderTC
                 riverWeight = Math.abs(riverWeight);
                 if (nextRiverHeight > riverCenterHeight)
                 {
-                    nextRiverHeight /= 2.0F;
+                    nextRiverHeight = riverCenterHeight;
                 }
                 riverVolatilitySum += (isRiver ? nextBiomeConfig.riverVolatility : nextBiomeConfig.BiomeVolatility) * riverWeight;
                 riverHeightSum += nextRiverHeight * riverWeight;
