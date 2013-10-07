@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.Random;
 
@@ -32,6 +33,12 @@ public class TCListener implements Listener
     public void onWorldInit(WorldInitEvent event)
     {
         this.tcPlugin.onWorldInit(event.getWorld());
+    }
+    
+    @EventHandler
+    public void onWorldUnload(WorldUnloadEvent event)
+    {
+        this.tcPlugin.onWorldUnload(event.getWorld());
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
