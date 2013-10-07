@@ -1,144 +1,95 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
-    <parent>        
-        <groupId>com.khorn.minecraft</groupId>
+
+    <!-- POM for Forge version of Terrain Control -->
+
+    <!-- We need the parent project -->
+    <parent>
+        <groupId>com.khorn.terraincontrol</groupId>
         <artifactId>terraincontrol</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>2.5.1-SNAPSHOT</version>
         <relativePath>../../</relativePath>
     </parent>
-    
+
     <!-- Basic Info -->
-    <groupId>com.khorn.minecraft</groupId>
     <artifactId>terraincontrol-bukkit</artifactId>
-    <version>Bukkit-1.0.0-SNAPSHOT</version>
     <name>TerrainControl::Bukkit</name>
     <description>${project.name} contains the Bukkit specific elements of the TerrainControl Module Group</description>
-    
-    <url>http://www.github.com/Wickth/TerrainControl</url>
-    <!-- This tells Maven to make us a *.jar file -->
-    <packaging>jar</packaging>
+    <url>http://dev.bukkit.org/bukkit-plugins/terrain-control/</url>
 
+    <!-- Constants -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Change these values to the new and old version paths for MC and bukkit
-        EX: net.minecraft.server.v1_5_R2.* will change to net.minecraft.server.v1_5_R3.*
-        when you use v1_5_R2 for old and v1_5_R3 for new                           -->
-        <minecraft.import.ver.new>v1_6_R2</minecraft.import.ver.new>
-        <minecraft.import.ver.old>v1_6_R1</minecraft.import.ver.old>
+        <bukkitVersion>1.6.4-R0.1-SNAPSHOT</bukkitVersion>
     </properties>
 
+    <!-- We're open source, find us here -->
     <scm>
         <developerConnection>scm:git:git@github.com:Wickth/TerrainControl.git</developerConnection>
         <connection>scm:git:git://github.com/Wickth/TerrainControl</connection>
         <url>http://www.github.com/Wickth/TerrainControl/tree/master</url>
     </scm>
 
-
-    <build>
-        <defaultGoal>clean install</defaultGoal>
-        <directory>target/build</directory>
-        <outputDirectory>target/build/classes</outputDirectory>
-        <finalName>TerrainControl_${project.version}</finalName>
-        <testOutputDirectory>target/build/test-classes</testOutputDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-        <plugins>
-            <plugin>
-                <groupId>com.google.code.maven-replacer-plugin</groupId>
-                <artifactId>replacer</artifactId>
-                <version>1.5.2</version>
-                <executions>
-                    <execution>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>replace</goal>
-                        </goals>                   
-                    </execution>
-                </executions>
-                <configuration>
-                    <includes>
-                        <!-- Anything that contains the old version string 
-                        to be replaced needs to be included here or it will
-                        not be replaced-->
-                        <include>src/**/BiomeCacheWrapper.*</include>
-                        <include>src/**/BiomeReplace.*</include>
-                        <include>src/**/BukkitBiome.*</include>
-                        <include>src/**/BukkitWorld.*</include>
-                        <include>src/**/CustomBiome.*</include>
-                        <include>src/**/MapWriter.*</include>
-                        <include>src/**/NullBiome.*</include>
-                        <include>src/**/TCBlockPopulator.*</include>
-                        <include>src/**/TCChunkGenerator.*</include>
-                        <include>src/**/TCPlugin.*</include>
-                        <include>src/**/TCWorldChunkManager.*</include>
-                        <include>src/**/TCWorldProvider.*</include>
-                        <include>src/**/BiomeCommand.*</include>
-                        <include>src/**/MapCommand.*</include>
-                        <include>src/**/ReplaceBiomeCommand.*</include>
-                        <include>src/**/MineshaftGen.*</include>
-                        <include>src/**/NetherFortressGen.*</include>
-                        <include>src/**/RareBuildingGen.*</include>
-                        <include>src/**/StrongholdGen.*</include>
-                        <include>src/**/VillageGen.*</include>
-                        <include>src/**/NetherFortressStart.*</include>
-                        <include>src/**/RareBuildingStart.*</include>
-                        <include>src/**/StrongholdStart.*</include>
-                        <include>src/**/VillageStart.*</include>
-                        <include>src/**/VillageStartPiece.*</include>
-                        <include>src/**/NBTHelper.*</include>
-                        <include>src/**/WorldHelper.*</include>
-                    </includes>
-                    <regex>false</regex>
-                    <token>${minecraft.import.ver.old}</token>
-                    <value>${minecraft.import.ver.new}</value>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-    
-    <dependencies>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.6.4-R0.1-SNAPSHOT</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>com.khorn.minecraft</groupId>
-            <artifactId>terraincontrol-common</artifactId>
-            <version>Common-1.0.0-SNAPSHOT</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>     
-    </dependencies>
-
     <repositories>
+        <repository>
+            <id>rutger-repo</id>
+            <url>http://www.rutgerkok.nl/repo</url>
+        </repository>
         <repository>
             <id>bukkit-repo</id>
             <url>http://repo.bukkit.org/content/groups/public</url>
         </repository>
     </repositories>
-    
+
+    <build>
+        <plugins>
+            <!-- Puts all classes of "common" in the jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- We need Bukkit first, see http://forums.bukkit.org/threads/oops-i-didnt-break-your-plugins-ambiguous-gethealth.156975/#post-1733262 -->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>${bukkitVersion}</version>
+            <type>jar</type>
+            <!-- We don't need these classes in our jar -->
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Then CraftBukkit -->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>craftbukkit</artifactId>
+            <version>${bukkitVersion}</version>
+            <type>jar</type>
+            <!-- We don't need these classes in our jar -->
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- The "common" classes -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>terraincontrol-common</artifactId>
+            <version>${project.version}</version>
+            <!-- We need these classes in our jar -->
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>
 
 

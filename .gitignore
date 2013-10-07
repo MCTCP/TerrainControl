@@ -1,7 +1,7 @@
 # Eclipse stuff
-/.classpath
-/.project
-/.settings
+.classpath
+.project
+.settings
 
 # NetBeans
 /nbproject
@@ -15,7 +15,7 @@
 .*.sw[a-p]
 
 # various other potential build files
-/build
+target
 /bin
 /dist
 /out
@@ -26,5 +26,3 @@
 
 # Windows filesystem dust
 desktop.ini
-/common/target/build/
-/platforms/bukkit/target/build/

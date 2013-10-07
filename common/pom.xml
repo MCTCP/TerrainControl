@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Basic Info -->
-    <groupId>com.khorn.minecraft</groupId>
+    <groupId>com.khorn.terraincontrol</groupId>
     <artifactId>terraincontrol-common</artifactId>
-    <version>Common-1.0.0-SNAPSHOT</version>
+    <version>2.5.1-SNAPSHOT</version>
     <name>TerrainControl:Common</name>
     <description>${project.name} contains the common elements of the TerrainControl Module Group</description>
     
@@ -22,7 +22,6 @@
         <connection>scm:git:git://github.com/Wickth/TerrainControl</connection>
         <url>http://www.github.com/Wickth/TerrainControl/tree/master</url>
     </scm>
-
 
     <build>
         <defaultGoal>clean install</defaultGoal>
