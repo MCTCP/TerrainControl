@@ -231,7 +231,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             this.worlds.remove(world.getUID());
         }
         // Show message
-        TerrainControl.log(Level.INFO, "World {0} is now unloaded!", bukkitWorld.getName());
+        TerrainControl.log(Level.INFO, "World {0} is now unloaded!", world.getName());
     }
     
     @Override
