@@ -308,7 +308,10 @@ public enum TCDefaultValues implements TCSetting
     lavaSourceDepositRarity(100),
     lavaSourceDepositFrequency(10),
     lavaSourceDepositMinAltitude(8),
-    lavaSourceDepositMaxAltitude(128);
+    lavaSourceDepositMaxAltitude(128),
+    
+    ExtraBiomeHeight(0.0),
+    ExtraHeightConstrictWaist(0.0);
 
     // End resource settings
 

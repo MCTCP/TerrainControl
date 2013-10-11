@@ -456,13 +456,34 @@ public class ChunkProviderTC
                     double output;
 
                     double d8;
+                    if(this.riverFound)
+                    	d8 = this.riverHeight - y;
+                    else
+                    	d8 = this.heightFactor - y;
+                    
+                    //if(d8 >= 0.0) {d8 = d8;}	//We are good
+                    /*else*/if(d8 < -biomeConfig.ExtraBiomeHeight)
+                    {
+                    	d8 += biomeConfig.ExtraBiomeHeight;
+                    }
+                    else if(d8 < 0.0)
+                    {//-ExtraBiomeHeight, d8, 0
+                    	if(d8 * 2.0 < -biomeConfig.ExtraBiomeHeight)	//if (neg)d8 is outside of  
+                    	{//-ExtraBiomeHeight, d8, -ExtraBiomeHeight/2, 0
+                    		d8 += (d8 * 2.0) / biomeConfig.ExtraBiomeHeight * biomeConfig.ExtraHeightConstrictWaist;	//We
+                    	}
+                    	else
+                    	{//-ExtraBiomeHeight, -ExtraBiomeHeight/2, d8, 0
+                    		d8 += (2.0 - d8 * 2.0) / biomeConfig.ExtraBiomeHeight * biomeConfig.ExtraHeightConstrictWaist;	//We
+                    	}
+                    }
 
                     if (this.riverFound)
                     {
-                        d8 = (this.riverHeight - y) * 12.0D * 128.0D / this.height / this.riverVol;
+                        d8 = d8 * 12.0D * 128.0D / this.height / this.riverVol;
                     } else
                     {
-                        d8 = (this.heightFactor - y) * 12.0D * 128.0D / this.height / this.volatilityFactor;
+                        d8 = d8 * 12.0D * 128.0D / this.height / this.volatilityFactor;
                     }
 
                     if (d8 > 0.0D)

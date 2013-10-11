@@ -46,6 +46,9 @@ public class BiomeConfig extends ConfigFile
     public float BiomeVolatility;
     public int SmoothRadius;
     
+    public float ExtraBiomeHeight;
+    public float ExtraHeightConstrictWaist;
+    
     public float BiomeTemperature;
     public float BiomeWetness;
 
@@ -400,6 +403,9 @@ public class BiomeConfig extends ConfigFile
         this.BiomeVolatility = readModSettings(TCDefaultValues.BiomeVolatility.name(), this.defaultBiomeVolatility);
         this.SmoothRadius = readSettings(TCDefaultValues.SmoothRadius);
 
+        this.ExtraBiomeHeight = readModSettings(TCDefaultValues.ExtraBiomeHeight.name(), this.defaultExtraBiomeHeight);
+        this.ExtraHeightConstrictWaist = readModSettings(TCDefaultValues.ExtraHeightConstrictWaist.name(), this.defaultExtraHeightConstrictWaist);
+        
         this.StoneBlock = readSettings(TCDefaultValues.StoneBlock);
         this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock.name(), this.defaultSurfaceBlock);
         this.GroundBlock = readModSettings(TCDefaultValues.GroundBlock.name(), this.defaultGroundBlock);
@@ -685,6 +691,17 @@ public class BiomeConfig extends ConfigFile
         this.writeNewLine();
         writeComment("Biome volatility.");
         writeValue(TCDefaultValues.BiomeVolatility.name(), this.BiomeVolatility);
+
+        this.writeNewLine();
+        writeComment("Extra height that can be added to biome. Must be between 0.0(default) and 32.0, inclusive.");
+        writeComment("It adds approximately 8 x ExtraBiomeHeight range on top of biome \"height\" that can ");
+        writeComment("generate like the nether. There is no diffusion between biomes.");
+        writeValue(TCDefaultValues.ExtraBiomeHeight.name(), this.ExtraBiomeHeight);
+        
+        writeComment("Makes the middle region of the Extra height either less likely (constrict when positive),");
+        writeComment("or more likely (expand when negative) to generate. Is between -100.0 and 100.0 inclusive");
+        writeValue(TCDefaultValues.ExtraHeightConstrictWaist.name(), this.ExtraHeightConstrictWaist);
+
 
         this.writeNewLine();
         writeComment("Smooth radius between biomes. Must be between 0 and 32, inclusive. The resulting");
@@ -1105,6 +1122,9 @@ public class BiomeConfig extends ConfigFile
         this.BiomeHeight = (float) applyBounds(this.BiomeHeight, -10.0, 10.0);
         this.BiomeRarity = applyBounds(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
 
+        this.ExtraHeightConstrictWaist = (float) applyBounds(this.ExtraHeightConstrictWaist, -100.0,100.0);
+        this.ExtraBiomeHeight = (float) applyBounds(this.ExtraBiomeHeight, 0.0, 256.0);
+        
         this.SmoothRadius = applyBounds(this.SmoothRadius,0,32);
 
         this.BiomeTemperature = applyBounds(this.BiomeTemperature, 0.0F, 1.0F);
@@ -1268,6 +1288,8 @@ public class BiomeConfig extends ConfigFile
     protected boolean defaultStrongholds = true;
     protected VillageType defaultVillageType = VillageType.disabled;
     protected RareBuildingType defaultRareBuildingType = RareBuildingType.disabled;
+    protected float defaultExtraHeightConstrictWaist = 0.0f;
+    protected float defaultExtraBiomeHeight = 0.0f;
 
     protected void initDefaults()
     {
