@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-@Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.5.0")
+@Mod(modid = "TerrainControl", name = "TerrainControl")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")
 public class TCPlugin implements TerrainControlEngine
 {
