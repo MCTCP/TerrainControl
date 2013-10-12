@@ -48,6 +48,9 @@ public class ChunkProviderTC
     private double volatilityFactor;
     private double heightFactor;
 
+    private double[] heightValues;
+    private double[] riverHeightValues;    
+
     private WorldConfig worldSettings;
 
     private final TerrainGenBase caveGen;
@@ -480,10 +483,10 @@ public class ChunkProviderTC
 
                     if (this.riverFound)
                     {
-                        d8 = d8 * 12.0D * 128.0D / this.height / this.riverVol;
+                        d8 = riverHeightValues[y] * 12.0D * 128.0D / this.height / this.riverVol;
                     } else
                     {
-                        d8 = d8 * 12.0D * 128.0D / this.height / this.volatilityFactor;
+                        d8 = heightValues[y] * 12.0D * 128.0D / this.height / this.volatilityFactor;
                     }
 
                     if (d8 > 0.0D)
@@ -568,6 +571,16 @@ public class ChunkProviderTC
         float volatilitySum = 0.0F;
         float heightSum = 0.0F;
         float biomeWeightSum = 0.0F;
+        heightValues = new double[max_Y];
+        
+        double phi, alpha, beta;
+        alpha = max_Y * 0.25;
+        beta = 2 + 0.2*noiseHeight;
+        
+        for(int i = 0; i < max_Y; i++)
+        {
+        	heightValues[i] = 0.0;
+        }
 
 
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
@@ -595,12 +608,40 @@ public class ChunkProviderTC
                 volatilitySum += nextBiomeConfig.BiomeVolatility * biomeWeight;
                 heightSum += nextBiomeHeight * biomeWeight;
                 biomeWeightSum += biomeWeight;
+                
+                phi = (4 * nextBiomeHeight* biomeWeight + biomeWeight * (8 * beta - 1)) * alpha;
+                double tempBiomeHeight = phi / (8 * biomeWeight);  
+                
+                for(int nextY = 0; nextY < max_Y; nextY++)
+                {
+                	if(nextY < tempBiomeHeight)
+                	{
+                		heightValues[nextY] += phi - 8 * biomeWeight * nextY;
+                	}
+                	else if(nextY > tempBiomeHeight + nextBiomeConfig.ExtraBiomeHeight)
+                	{
+                		heightValues[nextY] += phi + 8 * biomeWeight * (nextBiomeConfig.ExtraBiomeHeight - nextY);
+                	}
+                	else if(nextY < tempBiomeHeight + 0.5 * nextBiomeConfig.ExtraBiomeHeight)
+                	{
+                		heightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * (phi - 8 * biomeWeight * nextY);
+                	}
+                	else
+                	{
+                		heightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * ( 8 * biomeWeight * (nextY - nextBiomeConfig.ExtraBiomeHeight) - phi);
+                	}
+                }
 
             }
         }
 
         volatilitySum /= biomeWeightSum;
         heightSum /= biomeWeightSum;
+        
+        for(int i = 0; i < max_Y; i++)
+        {
+        	heightValues[i] /= 8 * biomeWeightSum;
+        }
 
         this.waterLevelRaw[x * max_X + z] = (byte) this.worldSettings.biomeConfigs[biomeId].waterLevelMax;
 
@@ -621,6 +662,17 @@ public class ChunkProviderTC
         float riverVolatilitySum = 0.0F;
         float riverHeightSum = 0.0F;
         float riverWeightSum = 0.0F;
+        riverHeightValues = new double[max_Y];
+        heightValues = new double[max_Y];
+        
+        double phi, alpha, beta;
+        alpha = max_Y * 0.25;
+        beta = 2 + 0.2*noiseHeight;
+        
+        for(int i = 0; i < max_Y; i++)
+        {
+        	riverHeightValues[i] = heightValues[i] = 0.0;
+        }
 
 
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
@@ -651,6 +703,29 @@ public class ChunkProviderTC
                 volatilitySum += nextBiomeConfig.BiomeVolatility * biomeWeight;
                 heightSum += nextBiomeHeight * biomeWeight;
                 WeightSum += biomeWeight;
+                
+                phi = (4 * nextBiomeHeight* biomeWeight + biomeWeight * (8 * beta - 1)) * alpha;
+                double tempBiomeHeight = phi / (8 * biomeWeight);  
+                
+                for(int nextY = 0; nextY < max_Y; nextY++)
+                {
+                	if(nextY < tempBiomeHeight)
+                	{
+                		heightValues[nextY] += phi - 8 * biomeWeight * nextY;
+                	}
+                	else if(nextY > tempBiomeHeight + nextBiomeConfig.ExtraBiomeHeight)
+                	{
+                		heightValues[nextY] += phi + 8 * biomeWeight * (nextBiomeConfig.ExtraBiomeHeight - nextY);
+                	}
+                	else if(nextY < tempBiomeHeight + 0.5 * nextBiomeConfig.ExtraBiomeHeight)
+                	{
+                		heightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * (phi - 8 * biomeWeight * nextY);
+                	}
+                	else
+                	{
+                		heightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * ( 8 * biomeWeight * (nextY - nextBiomeConfig.ExtraBiomeHeight) - phi);
+                	}
+                }
 
                 // River part
 
@@ -672,6 +747,29 @@ public class ChunkProviderTC
                 riverVolatilitySum += (isRiver ? nextBiomeConfig.riverVolatility : nextBiomeConfig.BiomeVolatility) * riverWeight;
                 riverHeightSum += nextRiverHeight * riverWeight;
                 riverWeightSum += riverWeight;
+                
+                phi = (4 * nextRiverHeight* riverWeight + riverWeight * (8 * beta - 1)) * alpha;
+                tempBiomeHeight = phi / (8 * riverWeight);  
+                
+                for(int nextY = 0; nextY < max_Y; nextY++)
+                {
+                	if(nextY < tempBiomeHeight)
+                	{
+                		riverHeightValues[nextY] += phi - 8 * riverWeight * nextY;
+                	}
+                	else if(nextY > tempBiomeHeight + nextBiomeConfig.ExtraBiomeHeight)
+                	{
+                		riverHeightValues[nextY] += phi + 8 * riverWeight * (nextBiomeConfig.ExtraBiomeHeight - nextY);
+                	}
+                	else if(nextY < tempBiomeHeight + 0.5 * nextBiomeConfig.ExtraBiomeHeight)
+                	{
+                		riverHeightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * (phi - 8 * riverWeight * nextY);
+                	}
+                	else
+                	{
+                		riverHeightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * ( 8 * riverWeight * (nextY - nextBiomeConfig.ExtraBiomeHeight) - phi);
+                	}
+                }
             }
         }
 
@@ -680,6 +778,12 @@ public class ChunkProviderTC
 
         riverVolatilitySum /= riverWeightSum;
         riverHeightSum /= riverWeightSum;
+        
+        for(int i = 0; i < max_Y; i++)
+        {
+        	riverHeightValues[i] /= 8 * riverWeightSum;
+        	heightValues[i] /= 8 * WeightSum;
+        }
 
         float waterLevelSum = this.riverFound ? this.worldSettings.biomeConfigs[biomeId].riverWaterLevel : this.worldSettings.biomeConfigs[biomeId].waterLevelMax;
         this.waterLevelRaw[x * max_X + z] = (byte) waterLevelSum;
