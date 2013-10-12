@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.forge;
 
+import net.minecraft.crash.CrashReportCategory;
+
+import net.minecraft.crash.CrashReport;
+import net.minecraft.util.ReportedException;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
@@ -13,11 +17,12 @@ import net.minecraft.network.packet.Packet250CustomPayload;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 
 public class PacketHandler implements IPacketHandler
 {
-    
+
     TCPlugin plugin;
 
     public PacketHandler(TCPlugin plugin)
@@ -68,9 +73,14 @@ public class PacketHandler implements IPacketHandler
                 // Server or client is outdated
                 System.out.println("TerrainControl: server has different protocol version! " + "Client: " + TCDefaultValues.ProtocolVersion.intValue() + " Server: " + serverProtocolVersion);
             }
-        } catch (IOException e)
+        } catch (Exception e)
         {
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            CrashReport crashreport = CrashReport.makeCrashReport(e, "Exception reading biome packet");
+            CrashReportCategory details = crashreport.makeCategory("TerrainControl");
+            details.addCrashSection("Packet length", receivedPacket.data.length);
+            details.addCrashSection("Packet data", Arrays.toString(receivedPacket.data));
+            
+            throw new ReportedException(crashreport);
         }
 
     }
