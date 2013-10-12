@@ -21,7 +21,7 @@
     <!-- Constants -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <forgeVersion>9.11.1</forgeVersion>
+        <forgeVersion>9.11.1-SNAPSHOT</forgeVersion>
     </properties>
 
     <!-- We're open source, find us here -->
