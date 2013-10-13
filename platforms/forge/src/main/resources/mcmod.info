@@ -3,7 +3,8 @@
   "modid": "TerrainControl",
   "name": "Terrain Control",
   "description": "Advanced custom world generator. Based on R-T-B's PhoenixTerrainMod, which itself is based on Bucyruss' BiomeTerrainMod.",
-  "url": "http://dev.bukkit.org/server-mods/terrain-control/",
+  "url": "http://dev.bukkit.org/bukkit-plugins/terrain-control/",
+  "version": "${project.version}",
   "updateUrl": "",
   "authors": [
     "Khorn",

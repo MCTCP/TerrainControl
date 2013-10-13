@@ -1,0 +1,102 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- POM for Forge version of Terrain Control -->
+
+    <!-- We need the parent project -->
+    <parent>
+        <groupId>com.khorn.terraincontrol</groupId>
+        <artifactId>terraincontrol</artifactId>
+        <version>2.5.1-SNAPSHOT</version>
+        <relativePath>../../</relativePath>
+    </parent>
+
+    <!-- Basic Info -->
+    <artifactId>terraincontrol-forge</artifactId>
+    <name>TerrainControl::Forge</name>
+    <description>${project.name} contains the Forge specific elements of the TerrainControl Module Group</description>
+    <url>http://www.github.org/Wickth/TerrainControl</url>
+
+    <!-- Constants -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <forgeVersion>9.11.1-SNAPSHOT</forgeVersion>
+    </properties>
+
+    <!-- We're open source, find us here -->
+    <scm>
+        <developerConnection>scm:git:git@github.com:Wickth/TerrainControl.git</developerConnection>
+        <connection>scm:git:git://github.com/Wickth/TerrainControl</connection>
+        <url>http://www.github.com/Wickth/TerrainControl/tree/master</url>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>rutger-repo</id>
+            <url>http://www.rutgerkok.nl/repo</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>rutger-repo</id>
+            <url>http://www.rutgerkok.nl/repo</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+        <plugins>
+            <!-- Puts all classes of "common" in the jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Remaps the jar file to make it work with Minecraft -->
+            <plugin>
+                <groupId>nl.rutgerkok</groupId>
+                <artifactId>forgemodrenamer-maven-plugin</artifactId>
+                <version>${forgeVersion}</version>
+                <executions>
+                    <execution>
+                        <id>remap-mod</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>forgemodrenamer</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <dependencies>
+        <!-- Deobfuscated jar with all fields, methods and classes of Forge and Minecraft -->
+        <dependency>
+            <groupId>nl.rutgerkok</groupId>
+            <artifactId>forgejars</artifactId>
+            <version>${forgeVersion}</version>
+            <!-- We don't need these classes in our jar -->
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- The "common" classes -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>terraincontrol-common</artifactId>
+            <version>${project.version}</version>
+            <!-- We need these classes in our jar -->
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+</project>

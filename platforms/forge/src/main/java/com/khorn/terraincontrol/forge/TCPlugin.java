@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-@Mod(modid = "TerrainControl", name = "TerrainControl", version = "2.5.0")
+@Mod(modid = "TerrainControl", name = "TerrainControl")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")
 public class TCPlugin implements TerrainControlEngine
 {
@@ -68,7 +68,7 @@ public class TCPlugin implements TerrainControlEngine
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
-            NetworkRegistry.instance().registerChannel(new PacketHandler(this), TCDefaultValues.ChannelName.stringValue());
+            NetworkRegistry.instance().registerChannel(new PacketHandler(), TCDefaultValues.ChannelName.stringValue());
         }
 
         // Register player tracker, for sending configs.
