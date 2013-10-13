@@ -1017,10 +1017,11 @@ public class WorldConfig extends ConfigFile
         int count = stream.readInt();
         while (count-- > 0)
         {
+            String biomeName = readStringFromStream(stream);
             int id = stream.readInt();
-            world.AddBiome(name, id);
-            this.CustomBiomes.add(name);
-            this.CustomBiomeIds.put(name, id);
+            world.AddBiome(biomeName, id);
+            this.CustomBiomes.add(biomeName);
+            this.CustomBiomeIds.put(biomeName, id);
         }
 
         // BiomeConfigs
