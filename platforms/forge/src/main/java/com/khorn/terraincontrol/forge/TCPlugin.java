@@ -68,7 +68,7 @@ public class TCPlugin implements TerrainControlEngine
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
-            NetworkRegistry.instance().registerChannel(new PacketHandler(this), TCDefaultValues.ChannelName.stringValue());
+            NetworkRegistry.instance().registerChannel(new PacketHandler(), TCDefaultValues.ChannelName.stringValue());
         }
 
         // Register player tracker, for sending configs.

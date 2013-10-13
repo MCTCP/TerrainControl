@@ -1,34 +1,23 @@
 package com.khorn.terraincontrol.forge;
 
-import net.minecraft.crash.CrashReportCategory;
-
-import net.minecraft.crash.CrashReport;
-import net.minecraft.util.ReportedException;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.util.ReportedException;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.logging.Level;
 
 public class PacketHandler implements IPacketHandler
 {
-
-    TCPlugin plugin;
-
-    public PacketHandler(TCPlugin plugin)
-    {
-        this.plugin = plugin;
-    }
 
     @Override
     public void onPacketData(INetworkManager manager, Packet250CustomPayload receivedPacket, Player player)
@@ -79,7 +68,7 @@ public class PacketHandler implements IPacketHandler
             CrashReportCategory details = crashreport.makeCategory("TerrainControl");
             details.addCrashSection("Packet length", receivedPacket.data.length);
             details.addCrashSection("Packet data", Arrays.toString(receivedPacket.data));
-            
+
             throw new ReportedException(crashreport);
         }
 
