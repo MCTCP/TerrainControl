@@ -31,7 +31,9 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> IsleBiomes = new ArrayList<String>();
     public ArrayList<String> BorderBiomes = new ArrayList<String>();
 
-    public BiomeConfig[] biomeConfigs;  // Must be simple array for fast access. Beware! Some ids may contain null values;
+    public BiomeConfig[] biomeConfigs;  // Must be simple array for fast access.
+                                       // Beware! Some ids may contain null
+                                       // values;
     public int biomesCount; // Overall biome count in this world.
 
     public byte[] ReplaceMatrixBiomes = new byte[256];
@@ -260,7 +262,7 @@ public class WorldConfig extends ConfigFile
                 biomesCount++;
             } else
             {
-                TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]{localBiome.getId(), this.biomeConfigs[localBiome.getId()].name, config.name});
+                TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[] {localBiome.getId(), this.biomeConfigs[localBiome.getId()].name, config.name});
             }
             this.biomeConfigs[localBiome.getId()] = config;
 
@@ -281,7 +283,7 @@ public class WorldConfig extends ConfigFile
 
             }
         }
-        TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[]{biomesCount});
+        TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[] {biomesCount});
         TerrainControl.logIfLevel(Level.ALL, Level.CONFIG, LoadedBiomeNames);
     }
 
@@ -566,7 +568,7 @@ public class WorldConfig extends ConfigFile
 
         writeComment("Possible terrain modes: Normal, OldGenerator, TerrainTest, NotGenerate, Default");
         writeComment("   Normal - use all features");
-        writeComment("   OldGenerator - generate land like 1.7.3 generator");
+        writeComment("   OldGenerator - generate land like Beta 1.7.3 generator");
         writeComment("   TerrainTest - generate only terrain without any resources");
         writeComment("   NotGenerate - generate empty chunks");
         writeComment("   Default - use default terrain generator");
@@ -607,7 +609,7 @@ public class WorldConfig extends ConfigFile
         writeComment("Also applies if you are using BiomeMode:FromImage and ImageMode:ContinueNormal.");
         writeNewLine();
 
-        writeComment("IMPORTANT value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.");
+        writeComment("Important value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.");
         writeComment("Large %/total area biomes (Continents) must be set small, (limit=0)");
         writeComment("Small %/total area biomes (Oasis,Mountain Peaks) must be larger (limit=GenerationDepth)");
         writeComment("This could also represent \"Total number of biome sizes\" ");
@@ -625,19 +627,19 @@ public class WorldConfig extends ConfigFile
         writeComment("Don't forget to register your custom biomes first in CustomBiomes!");
         writeNewLine();
 
-        writeComment("Biomes which used in normal biome algorithm. Biome name is case sensitive.");
+        writeComment("Biomes generated normal way. Names are case sensitive.");
         writeValue(TCDefaultValues.NormalBiomes, this.NormalBiomes);
         writeNewLine();
 
-        writeComment("Biomes which used in ice biome algorithm. Biome name is case sensitive.");
+        writeComment("Biomes generated in \"ice areas\". Names are case sensitive.");
         writeValue(TCDefaultValues.IceBiomes, this.IceBiomes);
         writeNewLine();
 
-        writeComment("Biomes which used as isles. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.");
+        writeComment("Biomes used as isles in other biomes. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.");
         writeValue(TCDefaultValues.IsleBiomes, this.IsleBiomes);
         writeNewLine();
 
-        writeComment("Biomes which used as borders. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
+        writeComment("Biomes used as borders of other biomes. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
         writeValue(TCDefaultValues.BorderBiomes, this.BorderBiomes);
         writeNewLine();
 
@@ -657,7 +659,7 @@ public class WorldConfig extends ConfigFile
 
         writeSmallTitle("Ice area settings (for IceBiomes)");
 
-        writeComment("Ice areas rarity from 100 to 1. If you set smaller than 90 and IceSize near 0 beware ice world");
+        writeComment("Rarity of the \"ice areas\" from 100 to 1. 100 = ice world, 1 = no IceBiomes");
         writeValue(TCDefaultValues.IceRarity, this.IceRarity);
         writeNewLine();
 
@@ -665,12 +667,13 @@ public class WorldConfig extends ConfigFile
         writeValue(TCDefaultValues.IceSize, this.IceSize);
         writeNewLine();
 
+        writeComment("Set this to false to stop the ocean from freezing near when an \"ice area\" intersects with an ocean.");
         writeValue(TCDefaultValues.FrozenOcean, this.FrozenOcean);
         writeNewLine();
 
-        writeSmallTitle("River settings");
+        writeSmallTitle("Rivers");
 
-        writeComment("River rarity.Must be from 0 to GenerationDepth.");
+        writeComment("River rarity. Must be from 0 to GenerationDepth.");
         writeValue(TCDefaultValues.RiverRarity, this.riverRarity);
         writeNewLine();
 
@@ -678,6 +681,7 @@ public class WorldConfig extends ConfigFile
         writeValue(TCDefaultValues.RiverSize, this.riverSize);
         writeNewLine();
 
+        writeComment("Set this to false to prevent the river generator from doing anything.");
         writeValue(TCDefaultValues.RiversEnabled, this.riversEnabled);
         writeNewLine();
 
@@ -716,33 +720,27 @@ public class WorldConfig extends ConfigFile
         writeValue(TCDefaultValues.ImageXOffset, this.imageXOffset);
         writeValue(TCDefaultValues.ImageZOffset, this.imageZOffset);
 
-        // Terrain Generator Variables
-        writeBigTitle("Terrain Generator Variables");
-        writeComment("Height bits determinate generation height. Min 5, max 8");
-        writeComment("For example 7 = 128 height, 8 = 256 height");
+        // Terrain height and volatility
+        writeBigTitle("Terrain height and volatility");
+
+        writeComment("How many bits the generator uses for the height, from 5 to 8, inclusive.");
+        writeComment("This setting allows you to generate terrain above y=128.");
+        writeComment("Affects the height of the whole world.");
+        writeComment("7 bits gives 2^7 = 128 blocks and 8 gives 2^8 = 256 blocks.");
         writeValue(TCDefaultValues.WorldHeightBits, this.worldHeightBits);
         writeNewLine();
 
-        writeComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
-        writeValue(TCDefaultValues.WaterLevelMax, this.waterLevelMax);
-        writeValue(TCDefaultValues.WaterLevelMin, this.waterLevelMin);
-        writeNewLine();
-        writeComment("BlockId used as water in WaterLevel");
-        writeValue(TCDefaultValues.WaterBlock, this.waterBlock);
-        writeNewLine();
-        writeComment("BlockId used as ice");
-        writeValue(TCDefaultValues.IceBlock, this.iceBlock);
-
-        writeNewLine();
         writeComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured horizontally.");
         writeValue(TCDefaultValues.FractureHorizontal, this.fractureHorizontal);
-
         writeNewLine();
+
         writeComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured vertically.");
         writeComment("Positive values will lead to large cliffs/overhangs, floating islands, and/or a cavern world depending on other settings.");
         writeValue(TCDefaultValues.FractureVertical, this.fractureVertical);
 
-        writeNewLine();
+        // Blocks
+        writeBigTitle("Blocks");
+
         writeComment("Attempts to replace all surface stone with biome surface block");
         writeValue(TCDefaultValues.RemoveSurfaceStone, this.removeSurfaceStone);
 
@@ -761,6 +759,18 @@ public class WorldConfig extends ConfigFile
         writeNewLine();
         writeComment("BlockId used as bedrock");
         writeValue(TCDefaultValues.BedrockobBlock, this.bedrockBlock);
+        writeNewLine();
+
+        this.writeSmallTitle("Water and ice");
+        writeComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
+        writeValue(TCDefaultValues.WaterLevelMax, this.waterLevelMax);
+        writeValue(TCDefaultValues.WaterLevelMin, this.waterLevelMin);
+        writeNewLine();
+        writeComment("BlockId used as water in WaterLevel");
+        writeValue(TCDefaultValues.WaterBlock, this.waterBlock);
+        writeNewLine();
+        writeComment("BlockId used as ice");
+        writeValue(TCDefaultValues.IceBlock, this.iceBlock);
 
         writeNewLine();
         writeComment("Seed used for the resource generation. Can only be numeric. Leave blank to use the world seed.");
@@ -788,19 +798,29 @@ public class WorldConfig extends ConfigFile
             this.writeValue(TCDefaultValues.objectSpawnRatio, this.objectSpawnRatio);
         }
 
+        // Structures
+        writeBigTitle("Structures");
+        writeComment("Generate-structures in the server.properties file is ignored by Terrain Control. Use these settings instead.");
+
         // Strongholds
-        writeBigTitle("Strongholds");
-        writeComment("Not much is known about these settings. They are directly passed to the stronghold generator.");
+        writeSmallTitle("Strongholds");
+        writeComment("Set this to false to prevent the stronghold generator from doing anything.");
         writeValue(TCDefaultValues.StrongholdsEnabled, this.strongholdsEnabled);
         writeNewLine();
+        
+        writeComment("The number of strongholds in the world.");
         writeValue(TCDefaultValues.StrongholdCount, this.strongholdCount);
         writeNewLine();
+        
+        writeComment("How far strongholds are from the spawn and other strongholds (minimum is 1.0, default is 32.0).");
         writeValue(TCDefaultValues.StrongholdDistance, this.strongholdDistance);
         writeNewLine();
+        
+        writeComment("How concentrated strongholds are around the spawn (minimum is 1, default is 3). Lower number, lower concentration.");
         writeValue(TCDefaultValues.StrongholdSpread, this.strongholdSpread);
 
         // Villages
-        writeBigTitle("Villages");
+        writeSmallTitle("Villages");
         writeComment("Whether the villages are enabled or not.");
         writeValue(TCDefaultValues.VillagesEnabled, this.villagesEnabled);
         writeNewLine();
@@ -811,7 +831,7 @@ public class WorldConfig extends ConfigFile
         writeValue(TCDefaultValues.VillageDistance, this.villageDistance);
 
         // Rare buildings
-        writeBigTitle("Rare buildings");
+        writeSmallTitle("Rare buildings");
         writeComment("Rare buildings are either desert pyramids, jungle temples or swamp huts.");
         writeNewLine();
         writeComment("Whether rare buildings are enabled.");

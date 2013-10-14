@@ -31,21 +31,21 @@ public class BiomeConfig extends ConfigFile
     public float riverVolatility;
     public int riverWaterLevel;
     public double[] riverHeightMatrix;
-    
+
     public int BiomeSize;
     public int BiomeRarity;
-    
+
     public String BiomeColor;
-    
+
     public ArrayList<String> BiomeIsBorder;
     public ArrayList<String> IsleInBiome;
     public ArrayList<String> NotBorderNear;
-    
+
     // Surface config
     public float BiomeHeight;
     public float BiomeVolatility;
     public int SmoothRadius;
-    
+
     public float BiomeTemperature;
     public float BiomeWetness;
 
@@ -494,10 +494,7 @@ public class BiomeConfig extends ConfigFile
                     if (values.length == 5)
                     {
                         // Replace in TC 2.3 style found
-                        values = new String[]
-                        {
-                            values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)
-                        };
+                        values = new String[] {values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)};
                     }
 
                     if (values.length != 2 && values.length != 4)
@@ -628,6 +625,7 @@ public class BiomeConfig extends ConfigFile
         }
         writeNewLine();
 
+        // Biome placement
         writeBigTitle("Biome placement");
 
         writeComment("Biome size from 0 to GenerationDepth. Defines in which biome layer this biome will be generated (see GenerationDepth).");
@@ -637,7 +635,6 @@ public class BiomeConfig extends ConfigFile
         writeValue(TCDefaultValues.BiomeSize, this.BiomeSize);
         this.writeNewLine();
 
-        // TODO
         writeComment("Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.");
         writeComment("Example for normal biome :");
         writeComment("  100 rarity mean 1/6 chance than other ( with 6 default normal biomes).");
@@ -672,7 +669,9 @@ public class BiomeConfig extends ConfigFile
         writeValue(TCDefaultValues.NotBorderNear, this.NotBorderNear);
         this.writeNewLine();
 
-        writeBigTitle("Biome height and volatility");
+        // Terrain height and volatility
+        writeBigTitle("Terrain height and volatility");
+
         writeComment("BiomeHeight mean how much height will be added in terrain generation");
         writeComment("It is double value from -10.0 to 10.0");
         writeComment("Value 0.0 equivalent half of map height with all other default settings");
@@ -774,7 +773,7 @@ public class BiomeConfig extends ConfigFile
         writeComment("Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
         WriteModReplaceSettings();
 
-        this.writeBigTitle("Water and ice");
+        this.writeSmallTitle("Water and ice");
 
         writeComment("Set this to false to use the water and ice settings of this biome.");
         writeValue(TCDefaultValues.UseWorldWaterLevel, this.UseWorldWaterLevel);
@@ -1095,7 +1094,7 @@ public class BiomeConfig extends ConfigFile
         this.BiomeHeight = (float) applyBounds(this.BiomeHeight, -10.0, 10.0);
         this.BiomeRarity = applyBounds(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
 
-        this.SmoothRadius = applyBounds(this.SmoothRadius,0,32);
+        this.SmoothRadius = applyBounds(this.SmoothRadius, 0, 32);
 
         this.BiomeTemperature = applyBounds(this.BiomeTemperature, 0.0F, 1.0F);
         this.BiomeWetness = applyBounds(this.BiomeWetness, 0.0F, 1.0F);
@@ -1114,17 +1113,14 @@ public class BiomeConfig extends ConfigFile
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
 
         this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomes.contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
-        
+
         this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.CustomBiomes.contains(this.riverBiome)) ? this.riverBiome : "";
     }
 
     protected void renameOldSettings()
     {
         // Old values from WorldConfig
-        TCDefaultValues[] copyFromWorld =
-        {
-            TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl
-        };
+        TCDefaultValues[] copyFromWorld = {TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl};
         for (TCDefaultValues value : copyFromWorld)
             if (this.worldConfig.settingsCache.containsKey(value.name().toLowerCase()))
             {
@@ -1228,6 +1224,7 @@ public class BiomeConfig extends ConfigFile
             this.settingsCache.put("replacedblocks", output.substring(0, output.length() - 1));
         }
     }
+
     protected boolean defaultWaterLakes = true;
     protected int defaultTrees = 1;
     protected int defaultFlowers = 2;
@@ -1291,10 +1288,7 @@ public class BiomeConfig extends ConfigFile
                 this.defaultReed = 10;
                 this.defaultCactus = 10;
                 this.defaultColor = "0xFFCC33";
-                this.defaultWell = new Object[]
-                {
-                    DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND
-                };
+                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
                 this.defaultVillageType = VillageType.sandstone;
                 this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;
@@ -1404,10 +1398,7 @@ public class BiomeConfig extends ConfigFile
                 this.defaultReed = 50;
                 this.defaultCactus = 10;
                 this.defaultColor = "0x996600";
-                this.defaultWell = new Object[]
-                {
-                    DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND
-                };
+                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
                 this.defaultVillageType = VillageType.sandstone;
                 this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;
