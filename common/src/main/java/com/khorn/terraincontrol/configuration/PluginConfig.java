@@ -112,11 +112,9 @@ public final class PluginConfig extends ConfigFile
         writeComment("   WriteWithoutComments - write config files without help comments");
         writeComment("   WriteDisable - doesn't write to the config files, it only reads. Doesn't auto-update the configs. Use with care!");
         writeValue(TCDefaultValues.SettingsMode, this.SettingsMode.name());
-        writeNewLine();
 
         // Custom biomes
         writeBigTitle("Log Levels");
-        writeNewLine();
 
         writeSmallTitle("Possible Log Levels");
         // writeComment("   Off         - Only warnings and errors are displayed."); // Shows warning when using this
@@ -125,19 +123,17 @@ public final class PluginConfig extends ConfigFile
         writeComment("   XDebug      - Slightly even more detail, can be slightly noisy.");
         writeComment("   XXDebug     - Use with caution, some large logs are possible.");
         writeComment("   Trace       - Only use this in dire circumstances and only for short periods of time, huge logs incoming.");
-        writeNewLine();
+        writeComment("");
 
         writeSmallTitle("Console Logging Level");
         writeComment("This is the level with which logs will be produced on the console. i.e. That black screen thing you see in windows.");
         writeComment("See ``Possible Log Levels'' if you are lost.");
         writeValue(TCDefaultValues.ConsoleLogLevel, this.consoleHandlerLevel.name());
-        writeNewLine();
 
         writeSmallTitle("File Logging Level");
         writeComment("This is the level with which logs will be produced in the log file. i.e. server.log");
         writeComment("See ``Possible Log Levels'' if you are lost.");
         writeValue(TCDefaultValues.FileLogLevel, this.fileHandlerLevel.name());
-        writeNewLine();
 
     }
 

@@ -107,13 +107,13 @@ public class BO3Config extends ConfigFile
         writeComment("");
         writeComment("This is the creator of this BO3 object");
         writeValue(BO3Settings.Author, author);
-        writeNewLine();
+
         writeComment("A short description of this BO3 object");
         writeValue(BO3Settings.Description, description);
-        writeNewLine();
+
         writeComment("The BO3 version, don't change this! It can be used by external applications to do a version check.");
         writeValue(BO3Settings.Version, 3);
-        writeNewLine();
+
         writeComment("The settings mode, WriteAll, WriteWithoutComments or WriteDisable. See WorldConfig.");
         writeValue(TCDefaultValues.SettingsMode, settingsMode.toString());
 
@@ -121,30 +121,30 @@ public class BO3Config extends ConfigFile
         writeBigTitle("Main settings");
         writeComment("This needs to be set to true to spawn the object in the Tree and Sapling resources.");
         writeValue(BO3Settings.Tree, tree);
-        writeNewLine();
+
         writeComment("The frequency of the BO3 from 1 to 200. Tries this many times to spawn this BO3 when using the CustomObject(...) resource.");
         writeComment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
         writeValue(BO3Settings.Frequency, frequency);
-        writeNewLine();
+
         writeComment("The rarity of the BO3 from 0 to 100. Each spawn attempt has rarity% chance to succeed when using the CustomObject(...) resource.");
         writeComment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
         writeValue(BO3Settings.Rarity, rarity);
-        writeNewLine();
+
         writeComment("If you set this to true, the BO3 will be placed with a random rotation.");
         writeValue(BO3Settings.RotateRandomly, rotateRandomly);
-        writeNewLine();
+
         writeComment("The spawn height of the BO3 - randomY, highestBlock or highestSolidBlock.");
         writeValue(BO3Settings.SpawnHeight, spawnHeight.toString());
-        writeNewLine();
+
         writeComment("The height limits for the BO3.");
         writeValue(BO3Settings.MinHeight, minHeight);
         writeValue(BO3Settings.MaxHeight, maxHeight);
-        writeNewLine();
+
         writeComment("Objects can have other objects attacthed to it: branches. Branches can also");
         writeComment("have branches attached to it, which can also have branches, etc. This is the");
         writeComment("maximum branch depth for this objects.");
         writeValue(BO3Settings.MaxBranchDepth, maxBranchDepth);
-        writeNewLine();
+
         writeComment("When spawned with the UseWorld keyword, this BO3 should NOT spawn in the following biomes.");
         writeComment("If you write the BO3 name directly in the BiomeConfigs, this will be ignored.");
         writeValue(BO3Settings.ExcludedBiomes, excludedBiomes);
@@ -153,11 +153,11 @@ public class BO3Config extends ConfigFile
         writeBigTitle("Source block settings");
         writeComment("The block the BO3 should spawn in");
         writeValue(BO3Settings.SourceBlock, sourceBlock);
-        writeNewLine();
+
         writeComment("The maximum percentage of the BO3 that can be outside the SourceBlock.");
         writeComment("The BO3 won't be placed on a location with more blocks outside the SourceBlock than this percentage.");
         writeValue(BO3Settings.MaxPercentageOutsideSourceBlock, maxPercentageOutsideSourceBlock);
-        writeNewLine();
+
         writeComment("What to do when a block is about to be placed outside the SourceBlock? (dontPlace, placeAnyway)");
         writeValue(BO3Settings.OutsideSourceBlock, outsideSourceBlock.toString());
 

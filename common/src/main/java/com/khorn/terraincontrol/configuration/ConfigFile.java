@@ -481,6 +481,7 @@ public abstract class ConfigFile
 
         this.settingsWriter.write(setting.name() + ": " + out);
         this.settingsWriter.newLine();
+        this.settingsWriter.newLine();
     }
 
     protected void writeValue(TCSetting setting, HashSet<Integer> settingsValue) throws IOException
@@ -496,11 +497,13 @@ public abstract class ConfigFile
 
         this.settingsWriter.write(setting.name() + ": " + out);
         this.settingsWriter.newLine();
+        this.settingsWriter.newLine();
     }
 
     protected void writeValue(TCSetting setting, List<WeightedMobSpawnGroup> settingsValue) throws IOException
     {
         this.settingsWriter.write(setting.name() + ": " + WeightedMobSpawnGroup.toJson(settingsValue));
+        this.settingsWriter.newLine();
         this.settingsWriter.newLine();
     }
 
@@ -508,11 +511,13 @@ public abstract class ConfigFile
     {
         this.settingsWriter.write(setting.name() + ": " + Integer.toString(settingsValue));
         this.settingsWriter.newLine();
+        this.settingsWriter.newLine();
     }
 
     protected void writeValue(TCSetting setting, double settingsValue) throws IOException
     {
         this.settingsWriter.write(setting.name() + ": " + Double.toString(settingsValue));
+        this.settingsWriter.newLine();
         this.settingsWriter.newLine();
     }
 
@@ -520,17 +525,20 @@ public abstract class ConfigFile
     {
         this.settingsWriter.write(setting.name() + ": " + Float.toString(settingsValue));
         this.settingsWriter.newLine();
+        this.settingsWriter.newLine();
     }
 
     protected void writeValue(TCSetting setting, boolean settingsValue) throws IOException
     {
         this.settingsWriter.write(setting.name() + ": " + Boolean.toString(settingsValue));
         this.settingsWriter.newLine();
+        this.settingsWriter.newLine();
     }
 
     protected void writeValue(TCSetting setting, String settingsValue) throws IOException
     {
         this.settingsWriter.write(setting.name() + ": " + settingsValue);
+        this.settingsWriter.newLine();
         this.settingsWriter.newLine();
     }
 
@@ -543,6 +551,7 @@ public abstract class ConfigFile
     protected void writeColorValue(TCSetting setting, int RGB) throws IOException
     {
         this.settingsWriter.write(setting.name() + ": 0x" + Integer.toHexString((0xFFFFFF & RGB) | 0x1000000).substring(1));
+        this.settingsWriter.newLine();
         this.settingsWriter.newLine();
     }
 
@@ -597,11 +606,6 @@ public abstract class ConfigFile
             return;
         if (comment.length() > 0)
             this.settingsWriter.write("# " + comment);
-        this.settingsWriter.newLine();
-    }
-
-    protected void writeNewLine() throws IOException
-    {
         this.settingsWriter.newLine();
     }
 
