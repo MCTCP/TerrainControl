@@ -676,13 +676,6 @@ public abstract class ConfigFile
         this.settingsWriter.newLine();
     }
 
-    protected void writeNewLine() throws IOException
-    {
-        if (!this.writeComments)
-            return;
-        this.settingsWriter.newLine();
-    }
-
     protected abstract void writeConfigSettings() throws IOException;
 
     protected abstract void readConfigSettings();

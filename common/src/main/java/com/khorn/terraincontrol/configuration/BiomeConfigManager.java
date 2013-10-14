@@ -48,8 +48,8 @@ public final class BiomeConfigManager
      */
     private String LoadedBiomeNames = "";
     /*
-     * Must be simple array for fast access. Beware! Some ids may contain null
-     * values;
+     * Must be simple array for fast access. 
+     * ***** Beware! Some ids may contain null values; *****
      */
     private BiomeConfig[] biomeConfigs;
     /*
@@ -219,10 +219,7 @@ public final class BiomeConfigManager
             biomesCount++;
         } else
         {
-            TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]
-            {
-                localBiome.getId(), biomeConfigs[localBiome.getId()].name, config.name
-            });
+            TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]{localBiome.getId(), biomeConfigs[localBiome.getId()].name, config.name});
         }
         biomeConfigs[localBiome.getId()] = config;
     }

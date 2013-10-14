@@ -5,7 +5,6 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.BODefaultValues;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -240,12 +239,12 @@ public class WorldConfig extends ConfigFile
 
     private void ReadWorldCustomObjects()
     {
-        customObjectsDirectory = new File(this.settingsDir, BODefaultValues.BO_WorldDirectoryName.stringValue());
+        customObjectsDirectory = new File(this.settingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
 
         File oldCustomObjectsDirectory = new File(settingsDir, "BOBPlugins");
         if (oldCustomObjectsDirectory.exists())
         {
-            if (!oldCustomObjectsDirectory.renameTo(new File(settingsDir, BODefaultValues.BO_WorldDirectoryName.stringValue())))
+            if (!oldCustomObjectsDirectory.renameTo(new File(settingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue())))
             {
                 TerrainControl.log(Level.WARNING, "Fould old BOBPlugins folder, but it cannot be renamed to WorldObjects.");
                 TerrainControl.log(Level.WARNING, "Please move the BO2s manually and delete BOBPlugins afterwards.");

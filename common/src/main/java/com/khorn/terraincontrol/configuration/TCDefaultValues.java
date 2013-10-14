@@ -22,7 +22,9 @@ public enum TCDefaultValues implements TCSetting
     
     WorldBiomeConfigDirectoryName("WorldBiomes"),
     WorldDefaultBiomeConfigDirectoryName("DefaultBiomes"),
-
+    //>>	Objects
+    BO_WorldDirectoryName("WorldObjects"),
+    BO_GlobalDirectoryName("GlobalObjects"),
     // Network
     ChannelName("TerrainControl"),
     ProtocolVersion(5),

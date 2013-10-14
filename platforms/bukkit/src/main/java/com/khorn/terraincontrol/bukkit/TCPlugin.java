@@ -10,7 +10,6 @@ import com.khorn.terraincontrol.bukkit.util.BukkitMetricsHelper;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.TCLogManager;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.util.StringHelper;
 import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.server.v1_6_R3.BiomeBase;
@@ -323,7 +322,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getTCDataFolder(), BODefaultValues.BO_GlobalDirectoryName.stringValue());
+        return new File(this.getTCDataFolder(), TCDefaultValues.BO_GlobalDirectoryName.stringValue());
     }
 
     @Override

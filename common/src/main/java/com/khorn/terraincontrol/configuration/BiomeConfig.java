@@ -642,7 +642,6 @@ public class BiomeConfig extends ConfigFile
         writeComment("The extended config will be loaded, at which point the configs included below");
         writeComment("will overwrite any configs loaded from the extended config.");
         writeValue(TCDefaultValues.BiomeExtends, this.BiomeExtends);
-        writeNewLine();
 
         // Biome placement
         writeBigTitle("Biome placement");

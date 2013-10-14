@@ -5,7 +5,6 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.TCLogManager;
-import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.forge.structuregens.RareBuildingStart;
 import com.khorn.terraincontrol.forge.structuregens.VillageStart;
@@ -210,7 +209,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getTCDataFolder(), BODefaultValues.BO_GlobalDirectoryName.stringValue());
+        return new File(this.getTCDataFolder(), TCDefaultValues.BO_GlobalDirectoryName.stringValue());
     }
 
     @Override

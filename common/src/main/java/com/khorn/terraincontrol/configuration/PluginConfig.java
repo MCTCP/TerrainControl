@@ -116,7 +116,6 @@ public final class PluginConfig extends ConfigFile
         writeComment("                          Doesn't auto-update the configs. Use with care!");
         writeComment("Defaults to: WriteAll");
         writeValue(TCDefaultValues.SettingsMode, this.SettingsMode.name());
-        writeNewLine();
 
         // Custom biomes
         writeBigTitle("Log Levels");
@@ -129,14 +128,13 @@ public final class PluginConfig extends ConfigFile
         writeComment("   XXDebug     - Use with caution, some large logs are possible.");
         writeComment("   Trace       - Only use this in dire circumstances and only for short periods of time, huge logs incoming.");
         writeComment("");
-
+        
         writeSmallTitle("Console Logging Level");
         writeComment("This is the level with which logs will be produced on the console. i.e. That black screen thing you see in windows.");
         writeComment("See ``Possible Log Levels'' if you are lost.");
         writeComment(" ");
         writeComment("Defaults to: Standard");
         writeValue(TCDefaultValues.ConsoleLogLevel, this.consoleHandlerLevel.name());
-        writeNewLine();
 
         writeSmallTitle("File Logging Level");
         writeComment("This is the level with which logs will be produced in the log file. i.e. server.log");
@@ -144,7 +142,6 @@ public final class PluginConfig extends ConfigFile
         writeComment(" ");
         writeComment("Defaults to: Standard");
         writeValue(TCDefaultValues.FileLogLevel, this.fileHandlerLevel.name());
-        writeNewLine();
 
 
         writeBigTitle("File Extension Rules");
@@ -157,7 +154,6 @@ public final class PluginConfig extends ConfigFile
         writeComment(" ");
         writeComment("Defaults to: .bc");
         writeValue(TCDefaultValues.DefaultBiomeConfigExtension, this.worldDefaultBiomeConfigExtension);
-        writeNewLine();
     }
 
     public LogLevels getFileHandlerLevel()
