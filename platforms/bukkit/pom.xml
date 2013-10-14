@@ -1,0 +1,97 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- POM for Forge version of Terrain Control -->
+
+    <!-- We need the parent project -->
+    <parent>
+        <groupId>com.khorn.terraincontrol</groupId>
+        <artifactId>terraincontrol</artifactId>
+        <version>2.5.1-SNAPSHOT</version>
+        <relativePath>../../</relativePath>
+    </parent>
+
+    <!-- Basic Info -->
+    <artifactId>terraincontrol-bukkit</artifactId>
+    <name>TerrainControl::Bukkit</name>
+    <description>${project.name} contains the Bukkit specific elements of the TerrainControl Module Group</description>
+    <url>http://dev.bukkit.org/bukkit-plugins/terrain-control/</url>
+
+    <!-- Constants -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <bukkitVersion>1.6.4-R0.1-SNAPSHOT</bukkitVersion>
+    </properties>
+
+    <!-- We're open source, find us here -->
+    <scm>
+        <developerConnection>scm:git:git@github.com:Wickth/TerrainControl.git</developerConnection>
+        <connection>scm:git:git://github.com/Wickth/TerrainControl</connection>
+        <url>http://www.github.com/Wickth/TerrainControl/tree/master</url>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>rutger-repo</id>
+            <url>http://www.rutgerkok.nl/repo</url>
+        </repository>
+        <repository>
+            <id>bukkit-repo</id>
+            <url>http://repo.bukkit.org/content/groups/public</url>
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <!-- Puts all classes of "common" in the jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- We need Bukkit first, see http://forums.bukkit.org/threads/oops-i-didnt-break-your-plugins-ambiguous-gethealth.156975/#post-1733262 -->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>${bukkitVersion}</version>
+            <type>jar</type>
+            <!-- We don't need these classes in our jar -->
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Then CraftBukkit -->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>craftbukkit</artifactId>
+            <version>${bukkitVersion}</version>
+            <type>jar</type>
+            <!-- We don't need these classes in our jar -->
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- The "common" classes -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>terraincontrol-common</artifactId>
+            <version>${project.version}</version>
+            <!-- We need these classes in our jar -->
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+</project>
+
+
+
+
