@@ -9,6 +9,7 @@ public enum TCDefaultValues implements TCSetting
     // Files
     pluginSettingsName("TerrainControl.ini"),
     WorldSettingsName("WorldConfig.ini"),
+    BO_GlobalDirectoryName("GlobalObjects"),
     BO_WorldDirectoryName("WorldObjects"),
     WorldBiomeConfigDirectoryName("BiomeConfigs"),
     WorldBiomeConfigName("BiomeConfig.ini"),
@@ -149,6 +150,7 @@ public enum TCDefaultValues implements TCSetting
     StoneBlock(1),
     SurfaceBlock(2),
     GroundBlock(3),
+    ReplacedBlocks("None"),
 
     UseWorldWaterLevel(true),
 
@@ -166,13 +168,23 @@ public enum TCDefaultValues implements TCSetting
     DisableBiomeHeight(false),
     MaxAverageHeight(0.0D),
     MaxAverageDepth(0.0D),
-
     CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0", SettingsType.StringArray),
 
     RiverHeight(-1.0F),
     RiverVolatility(0.3F),
     RiverWaterLevel(63),
     RiverCustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0", SettingsType.StringArray),
+    
+    BiomeObjects("", SettingsType.StringArray),
+    
+    SpawnMonstersAddDefaults(true),
+    SpawnMonsters(""),
+    SpawnCreaturesAddDefaults(true),
+    SpawnCreatures(""),
+    SpawnWaterCreaturesAddDefaults(true),
+    SpawnWaterCreatures(""),
+    SpawnAmbientCreaturesAddDefaults(true),
+    SpawnAmbientCreatures(""),
 
     // End biome settings
 
@@ -308,9 +320,17 @@ public enum TCDefaultValues implements TCSetting
     lavaSourceDepositRarity(100),
     lavaSourceDepositFrequency(10),
     lavaSourceDepositMinAltitude(8),
-    lavaSourceDepositMaxAltitude(128);
+    lavaSourceDepositMaxAltitude(128),
 
     // End resource settings
+    
+    // Deprecated settings
+    BiomeRivers(true),
+    DisableNotchPonds(false),
+    FrozenRivers(true),
+    ;
+    
+    // End deprectated settings
 
     private int iValue;
     private long lValue;

@@ -6,8 +6,8 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightSetting;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlockEnum;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,13 +24,13 @@ public class BO3Config extends ConfigFile
     public int frequency;
     public double rarity;
     public boolean rotateRandomly;
-    public SpawnHeightSetting spawnHeight;
+    public SpawnHeightEnum spawnHeight;
     public int minHeight;
     public int maxHeight;
     public ArrayList<String> excludedBiomes;
     public HashSet<Integer> sourceBlock;
     public int maxPercentageOutsideSourceBlock;
-    public OutsideSourceBlock outsideSourceBlock;
+    public OutsideSourceBlockEnum outsideSourceBlock;
     public BlockFunction[][] blocks = new BlockFunction[4][]; // four rotations
     public BO3Check[][] bo3Checks = new BO3Check[4][];
     public int maxBranchDepth;
@@ -106,60 +106,60 @@ public class BO3Config extends ConfigFile
         writeComment("If you add this object correctly to your BiomeConfigs, it will spawn in the world.");
         writeComment("");
         writeComment("This is the creator of this BO3 object");
-        writeValue("Author", author);
+        writeValue(BO3Settings.Author, author);
         writeNewLine();
         writeComment("A short description of this BO3 object");
-        writeValue("Description", description);
+        writeValue(BO3Settings.Description, description);
         writeNewLine();
         writeComment("The BO3 version, don't change this! It can be used by external applications to do a version check.");
-        writeValue("Version", 3);
+        writeValue(BO3Settings.Version, 3);
         writeNewLine();
         writeComment("The settings mode, WriteAll, WriteWithoutComments or WriteDisable. See WorldConfig.");
-        writeValue("SettingsMode", settingsMode.toString());
+        writeValue(TCDefaultValues.SettingsMode, settingsMode.toString());
 
         // Main settings
         writeBigTitle("Main settings");
         writeComment("This needs to be set to true to spawn the object in the Tree and Sapling resources.");
-        writeValue("Tree", tree);
+        writeValue(BO3Settings.Tree, tree);
         writeNewLine();
         writeComment("The frequency of the BO3 from 1 to 200. Tries this many times to spawn this BO3 when using the CustomObject(...) resource.");
         writeComment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
-        writeValue("Frequency", frequency);
+        writeValue(BO3Settings.Frequency, frequency);
         writeNewLine();
         writeComment("The rarity of the BO3 from 0 to 100. Each spawn attempt has rarity% chance to succeed when using the CustomObject(...) resource.");
         writeComment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
-        writeValue("Rarity", rarity);
+        writeValue(BO3Settings.Rarity, rarity);
         writeNewLine();
         writeComment("If you set this to true, the BO3 will be placed with a random rotation.");
-        writeValue("RotateRandomly", rotateRandomly);
+        writeValue(BO3Settings.RotateRandomly, rotateRandomly);
         writeNewLine();
         writeComment("The spawn height of the BO3 - randomY, highestBlock or highestSolidBlock.");
-        writeValue("SpawnHeight", spawnHeight.toString());
+        writeValue(BO3Settings.SpawnHeight, spawnHeight.toString());
         writeNewLine();
         writeComment("The height limits for the BO3.");
-        writeValue("MinHeight", minHeight);
-        writeValue("MaxHeight", maxHeight);
+        writeValue(BO3Settings.MinHeight, minHeight);
+        writeValue(BO3Settings.MaxHeight, maxHeight);
         writeNewLine();
         writeComment("Objects can have other objects attacthed to it: branches. Branches can also");
         writeComment("have branches attached to it, which can also have branches, etc. This is the");
         writeComment("maximum branch depth for this objects.");
-        writeValue("MaxBranchDepth", maxBranchDepth);
+        writeValue(BO3Settings.MaxBranchDepth, maxBranchDepth);
         writeNewLine();
         writeComment("When spawned with the UseWorld keyword, this BO3 should NOT spawn in the following biomes.");
         writeComment("If you write the BO3 name directly in the BiomeConfigs, this will be ignored.");
-        writeValue("ExcludedBiomes", excludedBiomes);
+        writeValue(BO3Settings.ExcludedBiomes, excludedBiomes);
 
         // Sourceblock
         writeBigTitle("Source block settings");
         writeComment("The block the BO3 should spawn in");
-        writeValue("SourceBlock", sourceBlock);
+        writeValue(BO3Settings.SourceBlock, sourceBlock);
         writeNewLine();
         writeComment("The maximum percentage of the BO3 that can be outside the SourceBlock.");
         writeComment("The BO3 won't be placed on a location with more blocks outside the SourceBlock than this percentage.");
-        writeValue("MaxPercentageOutsideSourceBlock", maxPercentageOutsideSourceBlock);
+        writeValue(BO3Settings.MaxPercentageOutsideSourceBlock, maxPercentageOutsideSourceBlock);
         writeNewLine();
         writeComment("What to do when a block is about to be placed outside the SourceBlock? (dontPlace, placeAnyway)");
-        writeValue("OutsideSourceBlock", outsideSourceBlock.toString());
+        writeValue(BO3Settings.OutsideSourceBlock, outsideSourceBlock.toString());
 
         // Blocks and other things
         writeResources();
@@ -168,23 +168,23 @@ public class BO3Config extends ConfigFile
     @Override
     protected void readConfigSettings()
     {
-        author = readSettings(BO3Settings.author);
-        description = readSettings(BO3Settings.description);
+        author = readSettings(BO3Settings.Author);
+        description = readSettings(BO3Settings.Description);
         settingsMode = readSettings(TCDefaultValues.SettingsMode);
 
-        tree = readSettings(BO3Settings.tree);
-        frequency = readSettings(BO3Settings.frequency);
-        rarity = readSettings(BO3Settings.rarity);
-        rotateRandomly = readSettings(BO3Settings.rotateRandomly);
-        spawnHeight = readSettings(BO3Settings.spawnHeight);
-        minHeight = readSettings(BO3Settings.minHeight);
-        maxHeight = readSettings(BO3Settings.maxHeight);
-        maxBranchDepth = readSettings(BO3Settings.maxBranchDepth);
-        excludedBiomes = readSettings(BO3Settings.excludedBiomes);
+        tree = readSettings(BO3Settings.Tree);
+        frequency = readSettings(BO3Settings.Frequency);
+        rarity = readSettings(BO3Settings.Rarity);
+        rotateRandomly = readSettings(BO3Settings.RotateRandomly);
+        spawnHeight = readSettings(BO3Settings.SpawnHeight);
+        minHeight = readSettings(BO3Settings.MinHeight);
+        maxHeight = readSettings(BO3Settings.MaxHeight);
+        maxBranchDepth = readSettings(BO3Settings.MaxBranchDepth);
+        excludedBiomes = readSettings(BO3Settings.ExcludedBiomes);
 
-        sourceBlock = readSettings(BO3Settings.sourceBlock);
-        maxPercentageOutsideSourceBlock = readSettings(BO3Settings.maxPercentageOutsideSourceBlock);
-        outsideSourceBlock = readSettings(BO3Settings.outsideSourceBlock);
+        sourceBlock = readSettings(BO3Settings.SourceBlock);
+        maxPercentageOutsideSourceBlock = readSettings(BO3Settings.MaxPercentageOutsideSourceBlock);
+        outsideSourceBlock = readSettings(BO3Settings.OutsideSourceBlock);
 
         // Read the resources
         readResources();
@@ -245,7 +245,7 @@ public class BO3Config extends ConfigFile
         writeComment("fails, a 100% percent chance to have the contents of anotherchest.nbt.");
         for (BlockFunction block : blocks[0])
         {
-            writeValue(block.write());
+            writeFunction(block);
         }
 
         // BO3Checks
@@ -256,7 +256,7 @@ public class BO3Config extends ConfigFile
         writeComment("LightCheck(x,y,z,minLightLevel,maxLightLevel) - light must be between min and max (inclusive)");
         for (BO3Check check : bo3Checks[0])
         {
-            writeValue(check.write());
+            writeFunction(check);
         }
 
         // Branches
@@ -287,7 +287,7 @@ public class BO3Config extends ConfigFile
 
         for (BranchFunction branch : branches[0])
         {
-            writeValue(branch.makeString());
+            writeFunction(branch);
         }
 
     }

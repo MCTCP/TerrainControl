@@ -5,7 +5,6 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
-import com.khorn.terraincontrol.customobjects.BODefaultValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.Rotation;
 
@@ -270,43 +269,44 @@ public class BO2 extends ConfigFile implements CustomObject
         // It doesn't write.
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void readConfigSettings()
     {
-        this.version = readModSettings(BODefaultValues.version.name(), BODefaultValues.version.stringValue());
+        this.version = readModSettings(BO2Settings.version, BO2Settings.version.stringValue());
 
-        this.spawnOnBlockType = this.ReadBlockList(readModSettings(BODefaultValues.spawnOnBlockType.name(), BODefaultValues.spawnOnBlockType.StringArrayListValue()), BODefaultValues.spawnOnBlockType.name());
-        this.collisionBlockType = this.ReadBlockList(readModSettings(BODefaultValues.collisionBlockType.name(), BODefaultValues.collisionBlockType.StringArrayListValue()), BODefaultValues.collisionBlockType.name());
+        this.spawnOnBlockType = this.ReadBlockList((ArrayList<String>) readSettings(BO2Settings.spawnOnBlockType), BO2Settings.spawnOnBlockType.name());
+        this.collisionBlockType = this.ReadBlockList((ArrayList<String>) readSettings(BO2Settings.collisionBlockType), BO2Settings.collisionBlockType.name());
 
-        this.spawnInBiome = new HashSet<String>(readModSettings(BODefaultValues.spawnInBiome.name(), BODefaultValues.spawnInBiome.StringArrayListValue()));
+        this.spawnInBiome = new HashSet<String>((Collection<? extends String>) readSettings(BO2Settings.spawnInBiome));
 
-        this.spawnSunlight = readModSettings(BODefaultValues.spawnSunlight.name(), BODefaultValues.spawnSunlight.booleanValue());
-        this.spawnDarkness = readModSettings(BODefaultValues.spawnDarkness.name(), BODefaultValues.spawnDarkness.booleanValue());
-        this.spawnWater = readModSettings(BODefaultValues.spawnWater.name(), BODefaultValues.spawnWater.booleanValue());
-        this.spawnLava = readModSettings(BODefaultValues.spawnLava.name(), BODefaultValues.spawnLava.booleanValue());
-        this.spawnAboveGround = readModSettings(BODefaultValues.spawnAboveGround.name(), BODefaultValues.spawnAboveGround.booleanValue());
-        this.spawnUnderGround = readModSettings(BODefaultValues.spawnUnderGround.name(), BODefaultValues.spawnUnderGround.booleanValue());
+        this.spawnSunlight = readSettings(BO2Settings.spawnSunlight);
+        this.spawnDarkness = readSettings(BO2Settings.spawnDarkness);
+        this.spawnWater = readSettings(BO2Settings.spawnWater);
+        this.spawnLava = readSettings(BO2Settings.spawnLava);
+        this.spawnAboveGround = readSettings(BO2Settings.spawnAboveGround);
+        this.spawnUnderGround = readSettings(BO2Settings.spawnUnderGround);
 
-        this.underFill = readModSettings(BODefaultValues.underFill.name(), BODefaultValues.underFill.booleanValue());
+        this.underFill = readSettings(BO2Settings.underFill);
 
-        this.randomRotation = readModSettings(BODefaultValues.randomRotation.name(), BODefaultValues.randomRotation.booleanValue());
-        this.dig = readModSettings(BODefaultValues.dig.name(), BODefaultValues.dig.booleanValue());
-        this.tree = readModSettings(BODefaultValues.tree.name(), BODefaultValues.tree.booleanValue());
-        this.branch = readModSettings(BODefaultValues.branch.name(), BODefaultValues.branch.booleanValue());
-        this.diggingBranch = readModSettings(BODefaultValues.diggingBranch.name(), BODefaultValues.diggingBranch.booleanValue());
-        this.needsFoundation = readModSettings(BODefaultValues.needsFoundation.name(), BODefaultValues.needsFoundation.booleanValue());
-        this.rarity = readModSettings(BODefaultValues.rarity.name(), BODefaultValues.rarity.intValue());
-        this.collisionPercentage = readModSettings(BODefaultValues.collisionPercentage.name(), BODefaultValues.collisionPercentage.intValue());
-        this.spawnElevationMin = readModSettings(BODefaultValues.spawnElevationMin.name(), BODefaultValues.spawnElevationMin.intValue());
-        this.spawnElevationMax = readModSettings(BODefaultValues.spawnElevationMax.name(), BODefaultValues.spawnElevationMax.intValue());
+        this.randomRotation = readSettings(BO2Settings.randomRotation);
+        this.dig = readSettings(BO2Settings.dig);
+        this.tree = readSettings(BO2Settings.tree);
+        this.branch = readSettings(BO2Settings.branch);
+        this.diggingBranch = readSettings(BO2Settings.diggingBranch);
+        this.needsFoundation = readSettings(BO2Settings.needsFoundation);
+        this.rarity = readSettings(BO2Settings.rarity);
+        this.collisionPercentage = readSettings(BO2Settings.collisionPercentage);
+        this.spawnElevationMin = readSettings(BO2Settings.spawnElevationMin);
+        this.spawnElevationMax = readSettings(BO2Settings.spawnElevationMax);
 
-        this.groupFrequencyMin = readModSettings(BODefaultValues.groupFrequencyMin.name(), BODefaultValues.groupFrequencyMin.intValue());
-        this.groupFrequencyMax = readModSettings(BODefaultValues.groupFrequencyMax.name(), BODefaultValues.groupFrequencyMax.intValue());
-        this.groupSeparationMin = readModSettings(BODefaultValues.groupSeperationMin.name(), BODefaultValues.groupSeperationMin.intValue());
-        this.groupSeparationMax = readModSettings(BODefaultValues.groupSeperationMax.name(), BODefaultValues.groupSeperationMax.intValue());
-        this.groupId = readModSettings(BODefaultValues.groupId.name(), BODefaultValues.groupId.stringValue());
+        this.groupFrequencyMin = readSettings(BO2Settings.groupFrequencyMin);
+        this.groupFrequencyMax = readSettings(BO2Settings.groupFrequencyMax);
+        this.groupSeparationMin = readSettings(BO2Settings.groupSeperationMin);
+        this.groupSeparationMax = readSettings(BO2Settings.groupSeperationMax);
+        this.groupId = readSettings(BO2Settings.groupId);
 
-        this.branchLimit = readModSettings(BODefaultValues.branchLimit.name(), BODefaultValues.branchLimit.intValue());
+        this.branchLimit = readSettings(BO2Settings.branchLimit);
 
         this.ReadCoordinates();
     }
@@ -365,12 +365,12 @@ public class BO2 extends ConfigFile implements CustomObject
         for (String block : blocks)
         {
 
-            if (block.equals(BODefaultValues.BO_ALL_KEY.stringValue()))
+            if (block.equals(BO2Settings.BO_ALL_KEY.stringValue()))
             {
                 all = true;
                 continue;
             }
-            if (block.equals(BODefaultValues.BO_SolidKey.stringValue()))
+            if (block.equals(BO2Settings.BO_SolidKey.stringValue()))
             {
                 solid = true;
                 continue;
@@ -402,54 +402,6 @@ public class BO2 extends ConfigFile implements CustomObject
         return output;
 
     }
-
-    // Old branch code - is being rewritten
-/*    public void GenerateCustomObjectFromGroup(LocalWorld world, Random random, int x, int y, int z)
-    {
-        if (GroupObjects == null)
-            return;
-
-        int attempts = 3;
-        if ((GroupFrequencyMax - GroupFrequencyMin) > 0)
-            attempts = GroupFrequencyMin + random.nextInt(GroupFrequencyMax - GroupFrequencyMin);
-
-        while (attempts > 0)
-        {
-            attempts--;
-
-            int objIndex = random.nextInt(GroupObjects.length);
-            BO2 ObjectFromGroup = GroupObjects[objIndex];
-
-            if (Branch)
-                continue;
-
-            x = x + random.nextInt(GroupSeparationMax - GroupSeparationMin) + GroupSeparationMin;
-            z = z + random.nextInt(GroupSeparationMax - GroupSeparationMin) + GroupSeparationMin;
-            int _y;
-
-            if (SpawnAboveGround)
-                _y = world.getSolidHeight(x, z);
-            else if (SpawnUnderGround)
-            {
-                int solidHeight = world.getSolidHeight(x, z);
-                if (solidHeight < 1 || solidHeight <= SpawnElevationMin)
-                    continue;
-                if (solidHeight > SpawnElevationMax)
-                    solidHeight = SpawnElevationMax;
-                _y = random.nextInt(solidHeight - SpawnElevationMin) + SpawnElevationMin;
-            } else
-                _y = world.getHighestBlockYAt(x, z);
-
-            if (y < 0)
-                continue;
-
-            if ((y - _y) > 10 || (_y - y) > 10)
-                continue;
-
-            ObjectFromGroup.spawn(world, random, x, _y, z);
-        }
-
-    }*/
 
     @Override
     public boolean hasPreferenceToSpawnIn(LocalBiome biome)

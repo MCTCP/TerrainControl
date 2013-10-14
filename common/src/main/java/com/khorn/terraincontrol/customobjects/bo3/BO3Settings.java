@@ -11,27 +11,28 @@ import java.util.HashSet;
 public enum BO3Settings implements TCSetting
 {
     // BO3
-    author("Unknown"),
-    description("No description given"),
+    Author("Unknown"),
+    Description("No description given"),
+    Version(3),
 
     // Main settings
-    tree(true),
-    frequency(1),
-    rarity(100.0),
-    rotateRandomly(false),
-    spawnHeight(SpawnHeightSetting.highestBlock),
-    minHeight(0),
-    maxHeight(256),
-    maxBranchDepth(10),
-    excludedBiomes("All", SettingsType.StringArray),
+    Tree(true),
+    Frequency(1),
+    Rarity(100.0),
+    RotateRandomly(false),
+    SpawnHeight(SpawnHeightEnum.highestBlock),
+    MinHeight(0),
+    MaxHeight(256),
+    MaxBranchDepth(10),
+    ExcludedBiomes("All", SettingsType.StringArray),
 
     // Source block settings
-    sourceBlock(DefaultMaterial.AIR.id, SettingsType.IntSet),
-    outsideSourceBlock(OutsideSourceBlock.placeAnyway),
-    maxPercentageOutsideSourceBlock(100);
+    SourceBlock(DefaultMaterial.AIR.id, SettingsType.IntSet),
+    OutsideSourceBlock(OutsideSourceBlockEnum.placeAnyway),
+    MaxPercentageOutsideSourceBlock(100);
 
     // The spawn height
-    public enum SpawnHeightSetting
+    public enum SpawnHeightEnum
     {
         randomY(StructurePartSpawnHeight.PROVIDED),
         highestBlock(StructurePartSpawnHeight.HIGHEST_BLOCK),
@@ -39,7 +40,7 @@ public enum BO3Settings implements TCSetting
 
         private StructurePartSpawnHeight height;
 
-        private SpawnHeightSetting(StructurePartSpawnHeight height)
+        private SpawnHeightEnum(StructurePartSpawnHeight height)
         {
             this.height = height;
         }
@@ -51,7 +52,7 @@ public enum BO3Settings implements TCSetting
     }
 
     // What to do when outside the source block
-    public enum OutsideSourceBlock
+    public enum OutsideSourceBlockEnum
     {
         dontPlace,
         placeAnyway
