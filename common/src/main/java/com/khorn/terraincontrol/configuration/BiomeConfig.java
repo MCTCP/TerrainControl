@@ -36,21 +36,21 @@ public class BiomeConfig extends ConfigFile
     public float riverVolatility;
     public int riverWaterLevel;
     public double[] riverHeightMatrix;
-    
+
     public int BiomeSize;
     public int BiomeRarity;
-    
+
     public String BiomeColor;
-    
+
     public ArrayList<String> BiomeIsBorder;
     public ArrayList<String> IsleInBiome;
     public ArrayList<String> NotBorderNear;
-    
+
     // Surface config
     public float BiomeHeight;
     public float BiomeVolatility;
     public int SmoothRadius;
-    
+
     public float BiomeTemperature;
     public float BiomeWetness;
     
@@ -391,30 +391,31 @@ public class BiomeConfig extends ConfigFile
     @Override
     protected void readConfigSettings()
     {
-        this.BiomeExtends = readModSettings(TCDefaultValues.BiomeExtends.name(), this.defaultExtends);
-        this.BiomeSize = readModSettings(TCDefaultValues.BiomeSize.name(), this.defaultSize);
-        this.BiomeRarity = readModSettings(TCDefaultValues.BiomeRarity.name(), this.defaultRarity);
+        this.BiomeExtends = readModSettings(TCDefaultValues.BiomeExtends, this.defaultExtends);
+        this.BiomeSize = readModSettings(TCDefaultValues.BiomeSize, this.defaultSize);
+        this.BiomeRarity = readModSettings(TCDefaultValues.BiomeRarity, this.defaultRarity);
 
-        this.BiomeColor = readModSettings(TCDefaultValues.BiomeColor.name(), this.defaultColor);
 
-        this.riverBiome = readModSettings(TCDefaultValues.RiverBiome.name(), this.defaultRiverBiome);
+        this.BiomeColor = readModSettings(TCDefaultValues.BiomeColor, this.defaultColor);
 
-        this.IsleInBiome = readModSettings(TCDefaultValues.IsleInBiome.name(), this.defaultIsle);
-        this.BiomeIsBorder = readModSettings(TCDefaultValues.BiomeIsBorder.name(), this.defaultBorder);
-        this.NotBorderNear = readModSettings(TCDefaultValues.NotBorderNear.name(), this.defaultNotBorderNear);
+        this.riverBiome = readModSettings(TCDefaultValues.RiverBiome, this.defaultRiverBiome);
 
-        this.BiomeTemperature = readModSettings(TCDefaultValues.BiomeTemperature.name(), this.defaultBiomeTemperature);
-        this.BiomeWetness = readModSettings(TCDefaultValues.BiomeWetness.name(), this.defaultBiomeWetness);
+        this.IsleInBiome = readModSettings(TCDefaultValues.IsleInBiome, this.defaultIsle);
+        this.BiomeIsBorder = readModSettings(TCDefaultValues.BiomeIsBorder, this.defaultBorder);
+        this.NotBorderNear = readModSettings(TCDefaultValues.NotBorderNear, this.defaultNotBorderNear);
+
+        this.BiomeTemperature = readModSettings(TCDefaultValues.BiomeTemperature, this.defaultBiomeTemperature);
+        this.BiomeWetness = readModSettings(TCDefaultValues.BiomeWetness, this.defaultBiomeWetness);
 
         this.ReplaceBiomeName = readSettings(TCDefaultValues.ReplaceToBiomeName);
 
-        this.BiomeHeight = readModSettings(TCDefaultValues.BiomeHeight.name(), this.defaultBiomeSurface);
-        this.BiomeVolatility = readModSettings(TCDefaultValues.BiomeVolatility.name(), this.defaultBiomeVolatility);
+        this.BiomeHeight = readModSettings(TCDefaultValues.BiomeHeight, this.defaultBiomeSurface);
+        this.BiomeVolatility = readModSettings(TCDefaultValues.BiomeVolatility, this.defaultBiomeVolatility);
         this.SmoothRadius = readSettings(TCDefaultValues.SmoothRadius);
 
         this.StoneBlock = readSettings(TCDefaultValues.StoneBlock);
-        this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock.name(), this.defaultSurfaceBlock);
-        this.GroundBlock = readModSettings(TCDefaultValues.GroundBlock.name(), this.defaultGroundBlock);
+        this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock, this.defaultSurfaceBlock);
+        this.GroundBlock = readModSettings(TCDefaultValues.GroundBlock, this.defaultGroundBlock);
 
         this.UseWorldWaterLevel = readSettings(TCDefaultValues.UseWorldWaterLevel);
         this.waterLevelMax = readSettings(TCDefaultValues.WaterLevelMax);
@@ -423,10 +424,10 @@ public class BiomeConfig extends ConfigFile
         this.iceBlock = readSettings(TCDefaultValues.IceBlock);
 
         this.SkyColor = readSettings(TCDefaultValues.SkyColor);
-        this.WaterColor = readModSettingsColor(TCDefaultValues.WaterColor.name(), this.defaultWaterColorMultiplier);
-        this.GrassColor = readModSettingsColor(TCDefaultValues.GrassColor.name(), this.defaultGrassColor);
+        this.WaterColor = readModSettingsColor(TCDefaultValues.WaterColor, this.defaultWaterColorMultiplier);
+        this.GrassColor = readModSettingsColor(TCDefaultValues.GrassColor, this.defaultGrassColor);
         this.GrassColorIsMultiplier = readSettings(TCDefaultValues.GrassColorIsMultiplier);
-        this.FoliageColor = readModSettingsColor(TCDefaultValues.FoliageColor.name(), this.defaultFoliageColor);
+        this.FoliageColor = readModSettingsColor(TCDefaultValues.FoliageColor, this.defaultFoliageColor);
         this.FoliageColorIsMultiplier = readSettings(TCDefaultValues.FoliageColorIsMultiplier);
 
         this.volatilityRaw1 = readSettings(TCDefaultValues.Volatility1);
@@ -441,23 +442,23 @@ public class BiomeConfig extends ConfigFile
         this.riverVolatility = readSettings(TCDefaultValues.RiverVolatility);
         this.riverWaterLevel = readSettings(TCDefaultValues.RiverWaterLevel);
 
-        this.strongholdsEnabled = readModSettings(TCDefaultValues.StrongholdsEnabled.name(), this.defaultStrongholds);
-        this.netherFortressesEnabled = readModSettings(TCDefaultValues.NetherFortressesEnabled.name(), true);
-        this.villageType = (VillageType) readModSettings(TCDefaultValues.VillageType.name(), this.defaultVillageType);
+        this.strongholdsEnabled = readModSettings(TCDefaultValues.StrongholdsEnabled, this.defaultStrongholds);
+        this.netherFortressesEnabled = readModSettings(TCDefaultValues.NetherFortressesEnabled, true);
+        this.villageType = (VillageType) readModSettings(TCDefaultValues.VillageType, this.defaultVillageType);
         this.mineshaftsRarity = readSettings(TCDefaultValues.MineshaftRarity);
-        this.rareBuildingType = (RareBuildingType) readModSettings(TCDefaultValues.RareBuildingType.name(), this.defaultRareBuildingType);
+        this.rareBuildingType = (RareBuildingType) readModSettings(TCDefaultValues.RareBuildingType, this.defaultRareBuildingType);
 
         if (DefaultBiome.getBiome(this.Biome.getId()) == null)
         {
             // Only for custom biomes
-            this.spawnMonstersAddDefaults = readModSettings("spawnMonstersAddDefaults", true);
-            this.spawnMonsters = readModSettings("spawnMonsters", new ArrayList<WeightedMobSpawnGroup>());
-            this.spawnCreaturesAddDefaults = readModSettings("spawnCreaturesAddDefaults", true);
-            this.spawnCreatures = readModSettings("spawnCreatures", new ArrayList<WeightedMobSpawnGroup>());
-            this.spawnWaterCreaturesAddDefaults = readModSettings("spawnWaterCreaturesAddDefaults", true);
-            this.spawnWaterCreatures = readModSettings("spawnWaterCreatures", new ArrayList<WeightedMobSpawnGroup>());
-            this.spawnAmbientCreaturesAddDefaults = readModSettings("spawnAmbientCreaturesAddDefaults", true);
-            this.spawnAmbientCreatures = readModSettings("spawnAmbientCreatures", new ArrayList<WeightedMobSpawnGroup>());
+            this.spawnMonstersAddDefaults = readSettings(TCDefaultValues.SpawnMonstersAddDefaults);
+            this.spawnMonsters = readModSettings(TCDefaultValues.SpawnMonsters, new ArrayList<WeightedMobSpawnGroup>());
+            this.spawnCreaturesAddDefaults = readSettings(TCDefaultValues.SpawnCreaturesAddDefaults);
+            this.spawnCreatures = readModSettings(TCDefaultValues.SpawnCreatures, new ArrayList<WeightedMobSpawnGroup>());
+            this.spawnWaterCreaturesAddDefaults = readSettings(TCDefaultValues.SpawnWaterCreaturesAddDefaults);
+            this.spawnWaterCreatures = readModSettings(TCDefaultValues.SpawnWaterCreatures, new ArrayList<WeightedMobSpawnGroup>());
+            this.spawnAmbientCreaturesAddDefaults = readSettings(TCDefaultValues.SpawnAmbientCreaturesAddDefaults);
+            this.spawnAmbientCreatures = readModSettings(TCDefaultValues.SpawnAmbientCreatures, new ArrayList<WeightedMobSpawnGroup>());
         }
 
         this.ReadCustomObjectSettings();
@@ -486,7 +487,7 @@ public class BiomeConfig extends ConfigFile
 
     private void ReadReplaceSettings()
     {
-        String settingValue = readModSettings("ReplacedBlocks", "None");
+        String settingValue = readSettings(TCDefaultValues.ReplacedBlocks);
 
         if (settingValue.equals("") || settingValue.equals("None"))
             return;
@@ -506,10 +507,7 @@ public class BiomeConfig extends ConfigFile
                     if (values.length == 5)
                     {
                         // Replace in TC 2.3 style found
-                        values = new String[]
-                        {
-                            values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)
-                        };
+                        values = new String[] {values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)};
                     }
 
                     if (values.length != 2 && values.length != 4)
@@ -616,18 +614,14 @@ public class BiomeConfig extends ConfigFile
         biomeObjectStrings = new ArrayList<String>();
 
         // Read from BiomeObjects setting
-        String biomeObjectsValue = readModSettings("biomeobjects", "");
-        if (biomeObjectsValue.length() > 0)
+        List<String> customObjectStrings = readSettings(TCDefaultValues.BiomeObjects);
+        for (String customObjectString : customObjectStrings)
         {
-            String[] customObjectStrings = biomeObjectsValue.split(",");
-            for (String customObjectString : customObjectStrings)
+            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(customObjectString, worldConfig);
+            if (object != null && !(object instanceof UseBiome))
             {
-                CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(customObjectString, worldConfig);
-                if (object != null && !(object instanceof UseBiome))
-                {
-                    biomeObjects.add(object);
-                    biomeObjectStrings.add(customObjectString);
-                }
+                biomeObjects.add(object);
+                biomeObjectStrings.add(customObjectString);
             }
         }
     }
@@ -642,101 +636,88 @@ public class BiomeConfig extends ConfigFile
         {
             writeComment("This is the biome config file of the " + this.name + " biome, which is a custom biome.");
         }
-        writeNewLine();
 
         writeBigTitle("Biome Inheritance");
         writeComment("This should be the value of the biomeConfig you wish to extend.");
         writeComment("The extended config will be loaded, at which point the configs included below");
         writeComment("will overwrite any configs loaded from the extended config.");
-        writeValue(TCDefaultValues.BiomeExtends.name(), this.BiomeExtends);
+        writeValue(TCDefaultValues.BiomeExtends, this.BiomeExtends);
         writeNewLine();
 
+        // Biome placement
         writeBigTitle("Biome placement");
 
         writeComment("Biome size from 0 to GenerationDepth. Defines in which biome layer this biome will be generated (see GenerationDepth).");
         writeComment("Higher numbers give a smaller biome, lower numbers a larger biome.");
         writeComment("Oceans and rivers are generated using a dirrerent algorithm in the default settings,");
         writeComment("(they aren't in one of the biome lists), so this setting won't affect them.");
-        writeValue(TCDefaultValues.BiomeSize.name(), this.BiomeSize);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.BiomeSize, this.BiomeSize);
 
-        // TODO
         writeComment("Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.");
         writeComment("Example for normal biome :");
         writeComment("  100 rarity mean 1/6 chance than other ( with 6 default normal biomes).");
         writeComment("  50 rarity mean 1/11 chance than other");
         writeComment("For isle biome this is chance to spawn isle in good place.");
         writeComment("Don`t work on Ocean and River (frozen versions too) biomes until not added as normal biome.");
-        writeValue(TCDefaultValues.BiomeRarity.name(), this.BiomeRarity);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.BiomeRarity, this.BiomeRarity);
 
         writeComment("The hexadecimal color value of this biome. Used in the output of the /tc map command,");
         writeComment("and used in the input of BiomeMode:FromImage.");
-        writeValue(TCDefaultValues.BiomeColor.name(), this.BiomeColor);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.BiomeColor, this.BiomeColor);
 
         writeComment("Replace this biome to specified after all generations. Warning this will cause saplings and mob spawning work as in specified biome");
-        writeValue(TCDefaultValues.ReplaceToBiomeName.name(), this.ReplaceBiomeName);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.ReplaceToBiomeName, this.ReplaceBiomeName);
 
         writeSmallTitle("Isle biomes only");
 
         writeComment("Biome name list where this biome will be spawned as isle. Like Mushroom isle in Ocean.  This work only if this biome is in IsleBiomes in world config");
-        writeValue(TCDefaultValues.IsleInBiome.name(), this.IsleInBiome);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.IsleInBiome, this.IsleInBiome);
 
         writeSmallTitle("Border biomes only");
 
         writeComment("Biome name list where this biome will be border.Like Mushroom isle shore. Use is compared as IsleInBiome");
-        writeValue(TCDefaultValues.BiomeIsBorder.name(), this.BiomeIsBorder);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.BiomeIsBorder, this.BiomeIsBorder);
 
         writeComment("Biome name list near border is not applied. ");
-        writeValue(TCDefaultValues.NotBorderNear.name(), this.NotBorderNear);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.NotBorderNear, this.NotBorderNear);
 
-        writeBigTitle("Biome height and volatility");
+        // Terrain height and volatility
+        writeBigTitle("Terrain height and volatility");
+
         writeComment("BiomeHeight mean how much height will be added in terrain generation");
         writeComment("It is double value from -10.0 to 10.0");
         writeComment("Value 0.0 equivalent half of map height with all other default settings");
-        writeValue(TCDefaultValues.BiomeHeight.name(), this.BiomeHeight);
+        writeValue(TCDefaultValues.BiomeHeight, this.BiomeHeight);
 
-        this.writeNewLine();
         writeComment("Biome volatility.");
-        writeValue(TCDefaultValues.BiomeVolatility.name(), this.BiomeVolatility);
+        writeValue(TCDefaultValues.BiomeVolatility, this.BiomeVolatility);
 
-        this.writeNewLine();
         writeComment("Smooth radius between biomes. Must be between 0 and 32, inclusive. The resulting");
         writeComment("smooth radius seems to be  (thisSmoothRadius + 1 + smoothRadiusOfBiomeOnOtherSide) * 4 .");
         writeComment("So if two biomes next to each other have both a smooth radius of 2, the");
         writeComment("resulting smooth area will be (2 + 1 + 2) * 4 = 20 blocks wide.");
-        writeValue(TCDefaultValues.SmoothRadius.name(), this.SmoothRadius);
+        writeValue(TCDefaultValues.SmoothRadius, this.SmoothRadius);
 
-        writeNewLine();
         writeComment("If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.");
         writeComment("If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.");
-        writeValue(TCDefaultValues.MaxAverageHeight.name(), this.maxAverageHeight);
+        writeValue(TCDefaultValues.MaxAverageHeight, this.maxAverageHeight);
 
-        writeNewLine();
         writeComment("If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the ottom of the ocean) will fall before leveling off when it begins to decrease in elevation. ");
         writeComment("If the value is less than 0, then it will cause the terrain to either fall to a lesser depth before leveling out or increase in height if the value is a large enough negative.");
-        writeValue(TCDefaultValues.MaxAverageDepth.name(), this.maxAverageDepth);
+        writeValue(TCDefaultValues.MaxAverageDepth, this.maxAverageDepth);
 
-        writeNewLine();
         writeComment("Another type of noise. This noise is independent from biomes. The larger the values the more chaotic/volatile landscape generation becomes.");
         writeComment("Setting the values to negative will have the opposite effect and make landscape generation calmer/gentler.");
-        writeValue(TCDefaultValues.Volatility1.name(), this.volatilityRaw1);
-        writeValue(TCDefaultValues.Volatility2.name(), this.volatilityRaw2);
+        writeValue(TCDefaultValues.Volatility1, this.volatilityRaw1);
+        writeValue(TCDefaultValues.Volatility2, this.volatilityRaw2);
 
-        writeNewLine();
         writeComment("Adjust the weight of the corresponding volatility settings. This allows you to change how prevalent you want either of the volatility settings to be in the terrain.");
-        writeValue(TCDefaultValues.VolatilityWeight1.name(), this.volatilityWeightRaw1);
-        writeValue(TCDefaultValues.VolatilityWeight2.name(), this.volatilityWeightRaw2);
+        writeValue(TCDefaultValues.VolatilityWeight1, this.volatilityWeightRaw1);
+        writeValue(TCDefaultValues.VolatilityWeight2, this.volatilityWeightRaw2);
 
-        writeNewLine();
         writeComment("Disable all noises except Volatility1 and Volatility2. Also disable default block chance from height.");
-        writeValue(TCDefaultValues.DisableBiomeHeight.name(), this.disableNotchHeightControl);
-        writeNewLine();
+        writeValue(TCDefaultValues.DisableBiomeHeight, this.disableNotchHeightControl);
+
         writeComment("List of custom height factor, 17 double entries, each entire control of about 7 blocks height from down. Positive entry - better chance of spawn blocks, negative - smaller");
         writeComment("Values which affect your configuration may be found only experimental. That may be very big, like ~3000.0 depends from height");
         writeComment("Example:");
@@ -748,108 +729,90 @@ public class BiomeConfig extends ConfigFile
         writeComment("There are two different river systems - the standard one and the improved one.");
         writeComment("See the ImprovedRivers settting in the WorldConfig. Both modes have different");
         writeComment("river settings, so carefully read the headers to know which settings you can use.");
-        writeNewLine();
+        writeComment("");
 
         writeSmallTitle("ImprovedRivers:false");
         writeComment("Only available when ImprovedRivers is set to false in the WorldConfig.");
         writeComment("Sets which biome is used as the river biome.");
-        writeValue(TCDefaultValues.RiverBiome.name(), this.riverBiome);
-        writeNewLine();
+        writeValue(TCDefaultValues.RiverBiome, this.riverBiome);
 
         writeSmallTitle("ImprovedRivers:true");
         writeComment("Only available when ImprovedRivers is set to true in the WorldConfig.");
         writeComment("");
         writeComment("Works the same as BiomeHeight (scroll up), but is used where a river is generated in this biome");
-        writeValue(TCDefaultValues.RiverHeight.name(), this.riverHeight);
-        writeNewLine();
+        writeValue(TCDefaultValues.RiverHeight, this.riverHeight);
 
         writeComment("Works the same as BiomeVolatility (scroll up), but is used where a river is generated in this biome");
-        writeValue(TCDefaultValues.RiverVolatility.name(), this.riverVolatility);
-        writeNewLine();
+        writeValue(TCDefaultValues.RiverVolatility, this.riverVolatility);
 
         writeComment("Works the same as WaterLevelMax (scroll down), but is used where a river is generated in this biome");
         writeComment("Can be used to create elevated rivers");
-        writeValue(TCDefaultValues.RiverWaterLevel.name(), this.riverWaterLevel);
-        writeNewLine();
+        writeValue(TCDefaultValues.RiverWaterLevel, this.riverWaterLevel);
 
         writeComment("Works the same as CustomHeightControl (scroll up), but is used where a river is generated in this biome");
         writeHeightSettings(this.riverHeightMatrix, TCDefaultValues.RiverCustomHeightControl);
-        writeNewLine();
 
         this.writeBigTitle("Blocks");
 
-        this.writeNewLine();
         writeComment("Stone block id");
-        writeValue(TCDefaultValues.StoneBlock.name(), this.StoneBlock);
+        writeValue(TCDefaultValues.StoneBlock, this.StoneBlock);
 
-        this.writeNewLine();
         writeComment("Surface block id");
-        writeValue(TCDefaultValues.SurfaceBlock.name(), this.SurfaceBlock);
+        writeValue(TCDefaultValues.SurfaceBlock, this.SurfaceBlock);
 
-        this.writeNewLine();
         writeComment("Block id from stone to surface, like dirt in plain biome ");
-        writeValue(TCDefaultValues.GroundBlock.name(), this.GroundBlock);
+        writeValue(TCDefaultValues.GroundBlock, this.GroundBlock);
 
-        this.writeNewLine();
         writeComment("Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])");
         writeComment("Example :");
         writeComment("  ReplacedBlocks:(GRASS,DIRT,100,127),(GRAVEL,GLASS)");
         writeComment("Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
         WriteModReplaceSettings();
 
-        this.writeBigTitle("Water and ice");
+        this.writeSmallTitle("Water and ice");
 
         writeComment("Set this to false to use the water and ice settings of this biome.");
-        writeValue(TCDefaultValues.UseWorldWaterLevel.name(), this.UseWorldWaterLevel);
-        writeNewLine();
+        writeValue(TCDefaultValues.UseWorldWaterLevel, this.UseWorldWaterLevel);
 
         writeComment("Set water level. Every empty between this levels will be fill water or another block from WaterBlock.");
-        writeValue(TCDefaultValues.WaterLevelMax.name(), this.waterLevelMax);
-        writeValue(TCDefaultValues.WaterLevelMin.name(), this.waterLevelMin);
-        writeNewLine();
+        writeValue(TCDefaultValues.WaterLevelMax, this.waterLevelMax);
+        writeValue(TCDefaultValues.WaterLevelMin, this.waterLevelMin);
+
         writeComment("BlockId used as water in WaterLevelMax");
-        writeValue(TCDefaultValues.WaterBlock.name(), this.waterBlock);
-        writeNewLine();
+        writeValue(TCDefaultValues.WaterBlock, this.waterBlock);
+
         writeComment("BlockId used as ice. Ice only spawns if the BiomeTemperture is low enough.");
-        writeValue(TCDefaultValues.IceBlock.name(), this.iceBlock);
+        writeValue(TCDefaultValues.IceBlock, this.iceBlock);
 
         this.writeBigTitle("Visuals and weather");
         this.writeComment("Most of the settings here only have an effect on players with the client version of Terrain Control installed.");
 
         writeComment("Biome temperature. Float value from 0.0 to 1.0.");
-        writeValue(TCDefaultValues.BiomeTemperature.name(), this.BiomeTemperature);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.BiomeTemperature, this.BiomeTemperature);
 
         writeComment("Biome wetness. Float value from 0.0 to 1.0.");
-        writeValue(TCDefaultValues.BiomeWetness.name(), this.BiomeWetness);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.BiomeWetness, this.BiomeWetness);
 
         this.writeComment("Biome sky color.");
-        this.writeColorValue(TCDefaultValues.SkyColor.name(), this.SkyColor);
+        this.writeColorValue(TCDefaultValues.SkyColor, this.SkyColor);
 
-        this.writeNewLine();
         this.writeComment("Biome water color multiplier.");
-        this.writeColorValue(TCDefaultValues.WaterColor.name(), this.WaterColor);
+        this.writeColorValue(TCDefaultValues.WaterColor, this.WaterColor);
 
-        this.writeNewLine();
         this.writeComment("Biome grass color.");
-        this.writeColorValue(TCDefaultValues.GrassColor.name(), this.GrassColor);
+        this.writeColorValue(TCDefaultValues.GrassColor, this.GrassColor);
 
-        this.writeNewLine();
         this.writeComment("Whether the grass color is a multiplier.");
         this.writeComment("If you set it to true, the color will be based on this value, the BiomeTemperature and the BiomeWetness.");
         this.writeComment("If you set it to false, the grass color will be just this color.");
-        this.writeValue(TCDefaultValues.GrassColorIsMultiplier.name(), this.GrassColorIsMultiplier);
+        this.writeValue(TCDefaultValues.GrassColorIsMultiplier, this.GrassColorIsMultiplier);
 
-        this.writeNewLine();
         this.writeComment("Biome foliage color.");
-        this.writeColorValue(TCDefaultValues.FoliageColor.name(), this.FoliageColor);
+        this.writeColorValue(TCDefaultValues.FoliageColor, this.FoliageColor);
 
-        this.writeNewLine();
         this.writeComment("Whether the foliage color is a multiplier. See GrassColorIsMultiplier for details.");
-        this.writeValue(TCDefaultValues.FoliageColorIsMultiplier.name(), this.FoliageColorIsMultiplier);
+        this.writeValue(TCDefaultValues.FoliageColorIsMultiplier, this.FoliageColorIsMultiplier);
 
-        this.writeNewLine();
         this.writeBigTitle("Resource queue");
         this.writeComment("This section control all resources spawning after terrain generation.");
         this.writeComment("The resources will be placed in this order.");
@@ -900,7 +863,6 @@ public class BiomeConfig extends ConfigFile
 
         this.WriteResources();
 
-        this.writeNewLine();
         this.writeBigTitle("Sapling resource");
         this.writeComment("Terrain Control allows you to grow your custom objects from saplings, instead");
         this.writeComment("of the vanilla trees. Add one or more Sapling functions here to override vanilla");
@@ -923,24 +885,23 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("Here you can change, enable or disable the stuctures.");
         this.writeComment("If you have disabled the structure in the WorldConfig, it won't spawn,");
         this.writeComment("regardless of these settings.");
-        this.writeNewLine();
+
         this.writeComment("Disables strongholds for this biome. If there is no suitable biome nearby,");
         this.writeComment("Minecraft will ignore this setting.");
-        this.writeValue(TCDefaultValues.StrongholdsEnabled.name(), strongholdsEnabled);
-        this.writeNewLine();
-        this.writeComment("Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
-        this.writeValue(TCDefaultValues.NetherFortressesEnabled.name(), netherFortressesEnabled);
-        this.writeNewLine();
-        this.writeComment("The village type in this biome. Can be wood, sandstone or disabled.");
-        this.writeValue(TCDefaultValues.VillageType.name(), villageType.toString());
-        this.writeNewLine();
-        this.writeComment("The mineshaft rarity from 0 to 100. 0 = no mineshafts, 1 = default rarity, 100 = a wooden chaos.");
-        this.writeValue(TCDefaultValues.MineshaftRarity.name(), mineshaftsRarity);
-        this.writeNewLine();
-        this.writeComment("The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut or disabled.");
-        this.writeValue(TCDefaultValues.RareBuildingType.name(), rareBuildingType.toString());
+        this.writeValue(TCDefaultValues.StrongholdsEnabled, strongholdsEnabled);
 
-        this.writeNewLine();
+        this.writeComment("Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
+        this.writeValue(TCDefaultValues.NetherFortressesEnabled, netherFortressesEnabled);
+
+        this.writeComment("The village type in this biome. Can be wood, sandstone or disabled.");
+        this.writeValue(TCDefaultValues.VillageType, villageType.toString());
+
+        this.writeComment("The mineshaft rarity from 0 to 100. 0 = no mineshafts, 1 = default rarity, 100 = a wooden chaos.");
+        this.writeValue(TCDefaultValues.MineshaftRarity, mineshaftsRarity);
+
+        this.writeComment("The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut or disabled.");
+        this.writeValue(TCDefaultValues.RareBuildingType, rareBuildingType.toString());
+
         this.writeBigTitle("Mob spawning");
         if (DefaultBiome.getBiome(this.Biome.getId()) != null)
         {
@@ -984,32 +945,27 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("");
         this.writeComment("So for example ocelots wont spawn unless you add them below.");
 
-        this.writeNewLine();
         this.writeComment("========<CONFIGURATION>========");
 
         this.writeComment("Should we add the default monster spawn groups?");
-        writeValue("spawnMonstersAddDefaults", this.spawnMonstersAddDefaults);
+        writeValue(TCDefaultValues.SpawnMonstersAddDefaults, this.spawnMonstersAddDefaults);
         this.writeComment("Add extra monster spawn groups here");
-        writeValue("spawnMonsters", this.spawnMonsters);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.SpawnMonsters, this.spawnMonsters);
 
         this.writeComment("Should we add the default creature spawn groups?");
-        writeValue("spawnCreaturesAddDefaults", this.spawnCreaturesAddDefaults);
+        writeValue(TCDefaultValues.SpawnCreaturesAddDefaults, this.spawnCreaturesAddDefaults);
         this.writeComment("Add extra creature spawn groups here");
-        writeValue("spawnCreatures", this.spawnCreatures);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.SpawnCreatures, this.spawnCreatures);
 
         this.writeComment("Should we add the default watercreature spawn groups?");
-        writeValue("spawnWaterCreaturesAddDefaults", this.spawnWaterCreaturesAddDefaults);
+        writeValue(TCDefaultValues.SpawnWaterCreaturesAddDefaults, this.spawnWaterCreaturesAddDefaults);
         this.writeComment("Add extra watercreature spawn groups here");
-        writeValue("spawnWaterCreatures", this.spawnWaterCreatures);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.SpawnWaterCreatures, this.spawnWaterCreatures);
 
         this.writeComment("Should we add the default ambient creature spawn groups? (Currently only bats)");
-        writeValue("spawnAmbientCreaturesAddDefaults", this.spawnAmbientCreaturesAddDefaults);
+        writeValue(TCDefaultValues.SpawnAmbientCreaturesAddDefaults, this.spawnAmbientCreaturesAddDefaults);
         this.writeComment("Add extra ambient creature spawn groups here");
-        writeValue("spawnAmbientCreatures", this.spawnAmbientCreatures);
-        this.writeNewLine();
+        writeValue(TCDefaultValues.SpawnAmbientCreatures, this.spawnAmbientCreatures);
 
     }
 
@@ -1019,14 +975,14 @@ public class BiomeConfig extends ConfigFile
         for (int i = 1; i < heightMatrix.length; i++)
             output = output + "," + Double.toString(heightMatrix[i]);
 
-        this.writeValue(setting.name(), output);
+        this.writeValue(setting, output);
     }
 
     private void WriteModReplaceSettings() throws IOException
     {
         if (this.ReplaceCount == 0)
         {
-            this.writeValue("ReplacedBlocks", "None");
+            this.writeValue(TCDefaultValues.ReplacedBlocks, "None");
             return;
         }
         String output = "";
@@ -1080,41 +1036,35 @@ public class BiomeConfig extends ConfigFile
                 }
             }
         }
-        this.writeValue("ReplacedBlocks", output.substring(0, output.length() - 1));
+        this.writeValue(TCDefaultValues.ReplacedBlocks, output.substring(0, output.length() - 1));
     }
 
     private void WriteResources() throws IOException
     {
         for (int i = 0; i < this.ResourceCount; i++)
         {
-            this.writeValue(this.ResourceSequence[i].write());
+            this.writeFunction(this.ResourceSequence[i]);
         }
     }
 
     private void WriteCustomObjects() throws IOException
     {
-        StringBuilder builder = new StringBuilder();
+        ArrayList<String> objectStrings = new ArrayList<String>(biomeObjectStrings.size());
         for (String objectString : biomeObjectStrings)
         {
-            builder.append(objectString);
-            builder.append(',');
+            objectStrings.add(objectString);
         }
-        if (builder.length() > 0)
-        {
-            // Delete last char
-            builder.deleteCharAt(builder.length() - 1);
-        }
-        this.writeValue("BiomeObjects", builder.toString());
+        this.writeValue(TCDefaultValues.BiomeObjects, objectStrings);
     }
 
     private void WriteSaplingSettings() throws IOException
     {
         if (this.saplingResource != null)
-            this.writeValue(saplingResource.write());
+            this.writeFunction(saplingResource);
 
         for (SaplingGen res : this.saplingTypes)
             if (res != null)
-                this.writeValue(res.write());
+                this.writeFunction(res);
 
     }
 
@@ -1153,10 +1103,7 @@ public class BiomeConfig extends ConfigFile
     protected void renameOldSettings()
     {
         // Old values from WorldConfig
-        TCDefaultValues[] copyFromWorld =
-        {
-            TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl
-        };
+        TCDefaultValues[] copyFromWorld = {TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl};
         for (TCDefaultValues value : copyFromWorld)
             if (this.worldConfig.settingsCache.containsKey(value.name().toLowerCase()))
             {
@@ -1168,7 +1115,7 @@ public class BiomeConfig extends ConfigFile
         // disableNotchPonds
         if (this.settingsCache.containsKey("disableNotchPonds".toLowerCase()))
         {
-            if (!readModSettings("disableNotchPonds".toLowerCase(), false))
+            if (!readModSettings(TCDefaultValues.DisableNotchPonds, false))
             {
                 this.settingsCache.put("SmallLake(WATER,4,7,8," + this.worldConfig.WorldHeight + ")", "0");
                 this.settingsCache.put("SmallLake(LAVA,2,3,8," + (this.worldConfig.WorldHeight - 8) + ")", "1");
@@ -1201,7 +1148,7 @@ public class BiomeConfig extends ConfigFile
         }
 
         // BiomeRivers
-        if (!readModSettings("BiomeRivers", true))
+        if (!(Boolean) readSettings(TCDefaultValues.BiomeRivers))
         {
             // If the rivers were disabled using the old setting, disable them
             // also using the new setting
@@ -1209,7 +1156,7 @@ public class BiomeConfig extends ConfigFile
         }
 
         // ReplacedBlocks
-        String replacedBlocksValue = readModSettings("ReplacedBlocks", "None");
+        String replacedBlocksValue = readSettings(TCDefaultValues.ReplacedBlocks);
 
         if (replacedBlocksValue.contains("="))
         {
@@ -1324,10 +1271,7 @@ public class BiomeConfig extends ConfigFile
                 this.defaultReed = 10;
                 this.defaultCactus = 10;
                 this.defaultColor = "0xFFCC33";
-                this.defaultWell = new Object[]
-                {
-                    DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND
-                };
+                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
                 this.defaultVillageType = VillageType.sandstone;
                 this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;
@@ -1378,7 +1322,7 @@ public class BiomeConfig extends ConfigFile
                 break;
             case 12: // Ice Plains
                 this.defaultColor = "0xCCCCCC";
-                if (worldConfig.readModSettings("FrozenRivers", true))
+                if (worldConfig.readModSettings(TCDefaultValues.FrozenRivers, true))
                 {
                     // Only make river frozen if there isn't some old setting
                     // that prevents it
@@ -1387,7 +1331,7 @@ public class BiomeConfig extends ConfigFile
                 break;
             case 13: // Ice Mountains
                 this.defaultColor = "0xCC9966";
-                if (worldConfig.readModSettings("FrozenRivers", true))
+                if (worldConfig.readModSettings(TCDefaultValues.FrozenRivers, true))
                 {
                     // Only make river frozen if there isn't some old setting
                     // that prevents it
@@ -1437,10 +1381,7 @@ public class BiomeConfig extends ConfigFile
                 this.defaultReed = 50;
                 this.defaultCactus = 10;
                 this.defaultColor = "0x996600";
-                this.defaultWell = new Object[]
-                {
-                    DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND
-                };
+                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
                 this.defaultVillageType = VillageType.sandstone;
                 this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;

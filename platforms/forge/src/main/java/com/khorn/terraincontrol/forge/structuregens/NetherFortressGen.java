@@ -33,6 +33,7 @@ public class NetherFortressGen extends MapGenStructure
         return this.spawnList;
     }
 
+    @Override
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)
     {
         int var3 = chunkX >> 4;
@@ -61,6 +62,7 @@ public class NetherFortressGen extends MapGenStructure
         }
     }
 
+    @Override
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
         return new StructureNetherBridgeStart(this.worldObj, this.rand, chunkX, chunkZ);

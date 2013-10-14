@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  */
 public final class PluginConfig extends ConfigFile
 {
-    
+
     public ConfigMode SettingsMode;
 
     public static enum LogLevels
@@ -42,7 +42,6 @@ public final class PluginConfig extends ConfigFile
     public LogLevels fileHandlerLevel;
     public LogLevels consoleHandlerLevel;
     public String worldDefaultBiomeConfigExtension;
-    public boolean BiomeConfigConvertToDefaultExtension;
     private static final Logger l = TCLogManager.getLogger();
 
     public PluginConfig(File settingsDir)
@@ -116,12 +115,11 @@ public final class PluginConfig extends ConfigFile
         writeComment("   WriteDisable         - Doesn't write to the config files, it only reads.");
         writeComment("                          Doesn't auto-update the configs. Use with care!");
         writeComment("Defaults to: WriteAll");
-        writeValue(TCDefaultValues.SettingsMode.name(), this.SettingsMode.name());
+        writeValue(TCDefaultValues.SettingsMode, this.SettingsMode.name());
         writeNewLine();
 
         // Custom biomes
         writeBigTitle("Log Levels");
-        writeNewLine();
 
         writeSmallTitle("Possible Log Levels");
         // writeComment("   Off         - Only warnings and errors are displayed."); // Shows warning when using this
@@ -130,14 +128,14 @@ public final class PluginConfig extends ConfigFile
         writeComment("   XDebug      - Slightly even more detail, can be slightly noisy.");
         writeComment("   XXDebug     - Use with caution, some large logs are possible.");
         writeComment("   Trace       - Only use this in dire circumstances and only for short periods of time, huge logs incoming.");
-        writeNewLine();
+        writeComment("");
 
         writeSmallTitle("Console Logging Level");
         writeComment("This is the level with which logs will be produced on the console. i.e. That black screen thing you see in windows.");
         writeComment("See ``Possible Log Levels'' if you are lost.");
         writeComment(" ");
         writeComment("Defaults to: Standard");
-        writeValue(TCDefaultValues.ConsoleLogLevel.name(), this.consoleHandlerLevel.name());
+        writeValue(TCDefaultValues.ConsoleLogLevel, this.consoleHandlerLevel.name());
         writeNewLine();
 
         writeSmallTitle("File Logging Level");
@@ -145,12 +143,12 @@ public final class PluginConfig extends ConfigFile
         writeComment("See ``Possible Log Levels'' if you are lost.");
         writeComment(" ");
         writeComment("Defaults to: Standard");
-        writeValue(TCDefaultValues.FileLogLevel.name(), this.fileHandlerLevel.name());
+        writeValue(TCDefaultValues.FileLogLevel, this.fileHandlerLevel.name());
         writeNewLine();
-        
-        
+
+
         writeBigTitle("File Extension Rules");
-        
+
         writeSmallTitle("Default Biome File Extension");
         writeComment("Pre-TC 2.5.0, biome config files were in the form BiomeNameBiomeConfig.ini");
         writeComment("Now, biome config files are in the form BiomeName.bc.ini");
@@ -158,9 +156,8 @@ public final class PluginConfig extends ConfigFile
         writeComment("BiomeConfig.ini, .biome, .bc, .bc.ini, and .biome.ini");
         writeComment(" ");
         writeComment("Defaults to: .bc");
-        writeValue(TCDefaultValues.DefaultBiomeConfigExtension.name(), this.worldDefaultBiomeConfigExtension);
+        writeValue(TCDefaultValues.DefaultBiomeConfigExtension, this.worldDefaultBiomeConfigExtension);
         writeNewLine();
-
     }
 
     public LogLevels getFileHandlerLevel()

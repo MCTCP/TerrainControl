@@ -46,6 +46,7 @@ public class VillageGen extends MapGenStructure
         }
     }
 
+    @Override
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)
     {
         int var3 = chunkX;
@@ -82,6 +83,7 @@ public class VillageGen extends MapGenStructure
         return false;
     }
 
+    @Override
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
         return new VillageStart(this.worldObj, this.rand, chunkX, chunkZ, this.size);

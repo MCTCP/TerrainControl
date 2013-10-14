@@ -9,6 +9,7 @@ import net.minecraft.world.gen.structure.StructureStart;
 
 public class MineshaftGen extends MapGenStructure
 {
+    @Override
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)
     {
         if (rand.nextInt(80) < Math.max(Math.abs(chunkX), Math.abs(chunkZ)))
@@ -24,6 +25,7 @@ public class MineshaftGen extends MapGenStructure
         return false;
     }
 
+    @Override
     protected StructureStart getStructureStart(int par1, int par2)
     {
         return new StructureMineshaftStart(this.worldObj, this.rand, par1, par2);

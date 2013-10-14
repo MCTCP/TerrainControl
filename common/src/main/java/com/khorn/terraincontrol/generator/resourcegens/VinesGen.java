@@ -27,7 +27,7 @@ public class VinesGen extends Resource
                 for (int direction = 2; direction <= 5; direction++)
                     if (canPlace(world, _x, y, _z, direction))
                     {
-                        world.setBlock(_x, y, _z, DefaultMaterial.VINE.id, 1 << d[OPPOSITE_FACING[direction]]);
+                        world.setBlock(_x, y, _z, DefaultMaterial.VINE.id, 1 << d[OPPOSITE_FACING[direction]], true, false, true);
                         break;
                     }
             } else

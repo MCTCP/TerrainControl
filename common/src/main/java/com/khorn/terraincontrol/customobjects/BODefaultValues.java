@@ -8,6 +8,7 @@ import java.util.Map;
 public enum BODefaultValues
 {
 
+    BO_WorldDirectoryName("WorldObjects"),
     BO_GlobalDirectoryName("GlobalObjects"),
     BO_Use_World("UseWorld"),
     BO_Use_Biome("UseBiome"),

@@ -46,6 +46,7 @@ public class StrongholdGen extends MapGenStructure
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
+    @Override
     protected boolean canSpawnStructureAtCoords(int par1, int par2)
     {
         if (!this.ranBiomeCheck)
@@ -83,9 +84,9 @@ public class StrongholdGen extends MapGenStructure
             this.ranBiomeCheck = true;
         }
 
-        ChunkCoordIntPair[] structureCoords = this.structureCoords;
+        ChunkCoordIntPair[] structureCoordsLocal = this.structureCoords;
 
-        for (ChunkCoordIntPair structureCoord : structureCoords)
+        for (ChunkCoordIntPair structureCoord : structureCoordsLocal)
         {
             if (par1 == structureCoord.chunkXPos && par2 == structureCoord.chunkZPos)
             {
@@ -100,6 +101,7 @@ public class StrongholdGen extends MapGenStructure
      * Returns a list of other locations at which the structure generation has
      * been run, or null if not relevant to this structure generator.
      */
+    @Override
     protected List<ChunkPosition> getCoordList()
     {
         ArrayList<ChunkPosition> chunkPositions = new ArrayList<ChunkPosition>();
@@ -115,6 +117,7 @@ public class StrongholdGen extends MapGenStructure
         return chunkPositions;
     }
 
+    @Override
     protected StructureStart getStructureStart(int par1, int par2)
     {
         StructureStrongholdStart start = new StructureStrongholdStart(this.worldObj, this.rand, par1, par2);

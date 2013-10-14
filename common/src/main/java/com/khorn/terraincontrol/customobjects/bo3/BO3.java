@@ -4,8 +4,8 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.*;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightSetting;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlockEnum;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.khorn.terraincontrol.util.MathHelper;
 
 import java.io.File;
@@ -140,7 +140,7 @@ public class BO3 implements StructuredCustomObject
         // Spawn
         for (BlockFunction block : blocks)
         {
-            if (settings.sourceBlock.contains(world.getTypeId(x + block.x, y + block.y, z + block.z)) || settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway)
+            if (settings.sourceBlock.contains(world.getTypeId(x + block.x, y + block.y, z + block.z)) || settings.outsideSourceBlock == OutsideSourceBlockEnum.placeAnyway)
             {
                 block.spawn(world, random, x + block.x, y + block.y, z + block.z);
             }
@@ -152,15 +152,15 @@ public class BO3 implements StructuredCustomObject
     {
         Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int y = 0;
-        if (settings.spawnHeight == SpawnHeightSetting.randomY)
+        if (settings.spawnHeight == SpawnHeightEnum.randomY)
         {
             y = MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight);
         }
-        if (settings.spawnHeight == SpawnHeightSetting.highestBlock)
+        if (settings.spawnHeight == SpawnHeightEnum.highestBlock)
         {
             y = world.getHighestBlockYAt(x, z);
         }
-        if (settings.spawnHeight == SpawnHeightSetting.highestSolidBlock)
+        if (settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
         {
             y = world.getSolidHeight(x, z);
         }
