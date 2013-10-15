@@ -44,7 +44,7 @@ public class LayerFromImage extends Layer
                 BufferedImage rotated = new BufferedImage(map.getHeight(), map.getWidth(), map.getType());
                 for(int y = 0; y < map.getHeight(); y++)
                    for(int x = 0; x < map.getWidth(); x++)
-                       rotated.setRGB(y, x, map.getRGB(x, y));
+                       rotated.setRGB(map.getHeight() - 1 - y, x, map.getRGB(x, y));
                 map = rotated;
             }
 
