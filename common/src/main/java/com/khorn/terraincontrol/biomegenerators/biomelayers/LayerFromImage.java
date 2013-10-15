@@ -37,6 +37,17 @@ public class LayerFromImage extends Layer
         {
             File image = new File(config.settingsDir, config.imageFile);
             BufferedImage map = ImageIO.read(image);
+
+            //rotate image if need
+            if(config.imageIsNorth)
+            {
+                BufferedImage rotated = new BufferedImage(map.getHeight(), map.getWidth(), map.getType());
+                for(int y = 0; y < map.getHeight(); y++)
+                   for(int x = 0; x < map.getWidth(); x++)
+                       rotated.setRGB(y, x, map.getRGB(x, y));
+                map = rotated;
+            }
+
             this.mapHeight = map.getHeight(null);
             this.mapWidth = map.getWidth(null);
             int[] colorMap = new int[this.mapHeight * this.mapWidth];

@@ -60,6 +60,7 @@ public enum TCDefaultValues implements TCSetting
 
     ImageMode(WorldConfig.ImageMode.Repeat),
     ImageFile("map.png"),
+    ImageIsNorth(false),
     ImageFillBiome("Ocean"),
     ImageXOffset(0),
     ImageZOffset(0),
