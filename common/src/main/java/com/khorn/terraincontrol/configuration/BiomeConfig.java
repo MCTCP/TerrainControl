@@ -47,7 +47,7 @@ public class BiomeConfig extends ConfigFile
     public float ExtraBiomeHeight;
     public float ExtraHeightConstrictWaist;
     public int SmoothRadius;
-    
+
     public float BiomeTemperature;
     public float BiomeWetness;
 
@@ -404,7 +404,7 @@ public class BiomeConfig extends ConfigFile
 
         this.ExtraBiomeHeight = readSettings(TCDefaultValues.ExtraBiomeHeight);
         this.ExtraHeightConstrictWaist = readSettings(TCDefaultValues.ExtraHeightConstrictWaist);
-        
+
         this.StoneBlock = readSettings(TCDefaultValues.StoneBlock);
         this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock, this.defaultSurfaceBlock);
         this.GroundBlock = readModSettings(TCDefaultValues.GroundBlock, this.defaultGroundBlock);
@@ -1070,7 +1070,7 @@ public class BiomeConfig extends ConfigFile
 
         this.ExtraHeightConstrictWaist = (float) applyBounds(this.ExtraHeightConstrictWaist, -100.0, 100.0);
         this.ExtraBiomeHeight = (float) applyBounds(this.ExtraBiomeHeight, 0.0, 256.0);
-        
+
         this.SmoothRadius = applyBounds(this.SmoothRadius, 0, 32);
 
         this.BiomeTemperature = applyBounds(this.BiomeTemperature, 0.0F, 1.0F);
