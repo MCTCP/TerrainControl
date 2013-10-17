@@ -54,14 +54,9 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
      */
     public final void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
-        if (!isValid())
-        {
-            // Don't process invalid resources
-            return;
-        }
 
-        // Fire event
-        if (!TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkX, chunkZ))
+        // Don't process invalid resources OR Fire event
+        if (!isValid() || !TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkX, chunkZ))
         {
             return;
         }
@@ -127,10 +122,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
             resource.setValid(true);
         } catch (InvalidConfigException e)
         {
-            TerrainControl.log(Level.SEVERE, "Invalid default resource! Please report! {0}: {1}", new Object[]
-            {
-                clazz.getName(), e.getMessage()
-            });
+            TerrainControl.log(Level.SEVERE, "Invalid default resource! Please report! {0}: {1}", new Object[]{ clazz.getName(), e.getMessage() });
             TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
             throw new RuntimeException(e);
         }
@@ -147,6 +139,23 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     public int getBlockId()
     {
         return blockId;
+    }
+
+    /**
+     * Merges two sets of resources. The child set will override any element of
+     * the parent that it can.
+     * <p/>
+     * @param parent
+     * @param child
+     * <p/>
+     * @return
+     */
+    public static Resource[] mergeSet(Resource[] parent, Resource[] child)
+    {
+        for (Resource resource : parent)
+        {
+        }
+        return null;
     }
 
 }
