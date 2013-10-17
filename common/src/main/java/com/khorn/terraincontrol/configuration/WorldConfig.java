@@ -72,6 +72,7 @@ public class WorldConfig extends ConfigFile
     // Biome image
 
     public String imageFile;
+    public boolean imageIsNorth;
     public ImageMode imageMode;
     // public int imageZoom;
     public String imageFillBiome;
@@ -394,6 +395,7 @@ public class WorldConfig extends ConfigFile
         // Images
         this.imageMode = readSettings(TCDefaultValues.ImageMode);
         this.imageFile = this.readSettings(TCDefaultValues.ImageFile);
+        this.imageIsNorth = this.readSettings(TCDefaultValues.ImageIsNorth);
         this.imageFillBiome = this.readSettings(TCDefaultValues.ImageFillBiome);
         this.imageXOffset = this.readSettings(TCDefaultValues.ImageXOffset);
         this.imageZOffset = this.readSettings(TCDefaultValues.ImageZOffset);
@@ -634,6 +636,9 @@ public class WorldConfig extends ConfigFile
 
         writeComment("Source png file for FromImage biome mode.");
         writeValue(TCDefaultValues.ImageFile, this.imageFile);
+		  
+        writeComment("True if this png file is north-oriented (north at the top of picture)");
+        writeValue(TCDefaultValues.ImageIsNorth, this.imageIsNorth);
 
         writeComment("Biome name for fill outside image boundaries with FillEmpty mode.");
         writeValue(TCDefaultValues.ImageFillBiome, this.imageFillBiome);
