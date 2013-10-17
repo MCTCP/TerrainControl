@@ -53,7 +53,7 @@ public class BO2 extends ConfigFile implements CustomObject
     public int groupFrequencyMax;
     public int groupSeparationMin;
     public int groupSeparationMax;
-    public String groupId;
+    public HashSet<String>  groupId;
 
     public int branchLimit;
 
@@ -278,7 +278,7 @@ public class BO2 extends ConfigFile implements CustomObject
         this.spawnOnBlockType = this.ReadBlockList((ArrayList<String>) readSettings(BO2Settings.spawnOnBlockType), BO2Settings.spawnOnBlockType.name());
         this.collisionBlockType = this.ReadBlockList((ArrayList<String>) readSettings(BO2Settings.collisionBlockType), BO2Settings.collisionBlockType.name());
 
-        this.spawnInBiome = new HashSet<String>((Collection<? extends String>) readSettings(BO2Settings.spawnInBiome));
+        this.spawnInBiome = readSettings(BO2Settings.spawnInBiome);
 
         this.spawnSunlight = readSettings(BO2Settings.spawnSunlight);
         this.spawnDarkness = readSettings(BO2Settings.spawnDarkness);
@@ -304,8 +304,10 @@ public class BO2 extends ConfigFile implements CustomObject
         this.groupFrequencyMax = readSettings(BO2Settings.groupFrequencyMax);
         this.groupSeparationMin = readSettings(BO2Settings.groupSeperationMin);
         this.groupSeparationMax = readSettings(BO2Settings.groupSeperationMax);
-        this.groupId = readSettings(BO2Settings.groupId);
-
+        //>>	Is this not used anymore? Netbeans finds no references to it
+        //>>	Nothing other than this line references BO2Settings.groupId either...
+        this.groupId = readSettings(BO2Settings.groupId);        
+        
         this.branchLimit = readSettings(BO2Settings.branchLimit);
 
         this.ReadCoordinates();
@@ -353,7 +355,7 @@ public class BO2 extends ConfigFile implements CustomObject
         }
 
     }
-
+    
     private HashSet<Integer> ReadBlockList(ArrayList<String> blocks, String settingName)
     {
         HashSet<Integer> output = new HashSet<Integer>();
@@ -394,7 +396,6 @@ public class BO2 extends ConfigFile implements CustomObject
                 if (solid && !material.isSolid())
                     continue;
                 output.add(material.id);
-
             }
         if (nonIntegerValues)
             System.out.println("TerrainControl: Custom object " + this.name + " has wrong value " + settingName);

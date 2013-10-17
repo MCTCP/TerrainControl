@@ -10,19 +10,20 @@ import com.khorn.terraincontrol.configuration.TCSetting;
 
 public enum BO2Settings implements TCSetting
 {
+
     BO_ALL_KEY("All"),
     BO_SolidKey("Solid"),
-
+    
     // Custom object settings
     version("2.0"),
-    spawnOnBlockType("2"),
+    spawnOnBlockType("2", SettingsType.StringArray),
     spawnSunlight(true),
     spawnDarkness(true),
     spawnWater(false),
     spawnLava(false),
     spawnAboveGround(false),
     spawnUnderGround(false),
-
+    
     underFill(true),
     randomRotation(true),
     dig(false),
@@ -32,54 +33,80 @@ public enum BO2Settings implements TCSetting
     needsFoundation(true),
     rarity(100),
     collisionPercentage(2),
-    collisionBlockType("All"),
+    collisionBlockType("All", SettingsType.StringArray),
     spawnElevationMin(0),
     spawnElevationMax(128),
-
+    
     groupFrequencyMin(1),
     groupFrequencyMax(5),
     groupSeperationMin(0), // Seperation - lol.
     groupSeperationMax(5),
-
+    
     branchLimit(6),
-
-    groupId(""),
-
-    spawnInBiome("All");
-
-    private int iValue;
-    private String sValue;
-    private boolean bValue;
-    private final SettingsType type;
+    groupId("", SettingsType.StringArray),
+    spawnInBiome("All", SettingsType.StringArray);
+    
+    private Object value;
+    private final SettingsType returnType;
 
     private BO2Settings(int i)
     {
-        this.iValue = i;
-        this.type = SettingsType.Int;
+        value = i;
+        returnType = SettingsType.Int;
+    }
+
+    private BO2Settings(HashSet<Integer> set, SettingsType type)
+    {
+        value = set;
+        returnType = SettingsType.IntSet;
+    }
+
+    private BO2Settings(long i)
+    {
+        value = i;
+        returnType = SettingsType.Long;
+    }
+
+    private BO2Settings(double d)
+    {
+        value = d;
+        returnType = SettingsType.Double;
+    }
+
+    private BO2Settings(float f)
+    {
+        value = f;
+        returnType = SettingsType.Float;
     }
 
     private BO2Settings(String s)
     {
-        this.sValue = s;
-        this.type = SettingsType.String;
+        value = s;
+        returnType = SettingsType.String;
     }
 
-    private BO2Settings(boolean b)
+    private BO2Settings(String s, SettingsType type)
     {
-        this.bValue = b;
-        this.type = SettingsType.Boolean;
+        returnType = type;
+
+        if (type == SettingsType.StringArray)
+        {
+            ArrayList<String> list = new ArrayList<String>();
+            if (s.contains(","))
+                Collections.addAll(list, s.split(","));
+            else if (!s.equals(""))
+                list.add(s);
+            value = list;
+            return;
+        }
+        value = s;
     }
 
-    public int intValue()
+    private BO2Settings(Boolean b)
     {
-        return this.iValue;
+        value = b;
+        returnType = SettingsType.Boolean;
     }
-
-    public String stringValue()
-    {
-        return this.sValue;
-    }
-
     private static Map<String, BO2Settings> lookupName;
 
     static
@@ -100,21 +127,21 @@ public enum BO2Settings implements TCSetting
     @Override
     public long longValue()
     {
-        return this.iValue;
+        return (Long) value;
     }
 
     @Override
     public float floatValue()
     {
-        return this.iValue;
+        return (Float) value;
     }
 
     @Override
     public double doubleValue()
     {
-        return this.iValue;
+        return (Double) value;
     }
-
+    
     @Override
     public Enum<?> enumValue()
     {
@@ -124,29 +151,37 @@ public enum BO2Settings implements TCSetting
     @Override
     public SettingsType getReturnType()
     {
-        return type;
+        return returnType;
     }
-
+    
+    @SuppressWarnings("unchecked")
     @Override
     public ArrayList<String> stringArrayListValue()
     {
-        ArrayList<String> out = new ArrayList<String>();
-        if (this.sValue.contains(","))
-            Collections.addAll(out, this.sValue.split(","));
-        else if (!this.sValue.equals(""))
-            out.add(this.sValue);
-        return out;
+        return (ArrayList<String>) value;
     }
-
-    @Override
+    
+     @Override
     public HashSet<Integer> intSetValue()
     {
         throw new UnsupportedOperationException("Int sets are not used in BO2s");
+    }   
+     
+    @Override
+    public int intValue()
+    {
+        return (Integer) value;
+    }
+
+    @Override
+    public String stringValue()
+    {
+        return (String) value;
     }
 
     @Override
     public boolean booleanValue()
     {
-        return this.bValue;
+        return (Boolean) value;
     }
 }
