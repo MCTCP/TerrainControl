@@ -145,8 +145,8 @@ public enum TCDefaultValues implements TCSetting
 
     BiomeHeight(0.1D),
     BiomeVolatility(0.3D),
-    ExtraBiomeHeight(0.0),
-    ExtraHeightConstrictWaist(0.0),
+    ExtraBiomeHeight(0.0F),
+    ExtraHeightConstrictWaist(0.0F),
     SmoothRadius(2),
 
     StoneBlock(1),

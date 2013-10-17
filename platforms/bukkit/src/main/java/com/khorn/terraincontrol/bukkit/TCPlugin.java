@@ -85,17 +85,20 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             setEnabled(false);
         } else
         {
+            boolean mcpc = false;
             if (Bukkit.getVersion().contains("MCPC-Plus"))
             {
                 // We're on MCPC+, so enable the extra block ids.
                 TerrainControl.supportedBlockIds = 4095;
+                mcpc = true;
                 this.log(Level.INFO, "MCPC+ detected, enabling extended block id support.");
             }
 
             // Register structures
             try
             {
-                Method registerStructure = WorldGenFactory.class.getDeclaredMethod("b", Class.class, String.class);
+                String methodName = mcpc? "func_143034_b" : "b";
+                Method registerStructure = WorldGenFactory.class.getDeclaredMethod(methodName, Class.class, String.class);
                 registerStructure.setAccessible(true);
                 registerStructure.invoke(null, RareBuildingStart.class, StructureNames.RARE_BUILDING);
                 registerStructure.invoke(null, VillageStart.class, StructureNames.VILLAGE);
