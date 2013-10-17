@@ -32,7 +32,7 @@ public enum BO2Settings implements TCSetting
     diggingBranch(false),
     needsFoundation(true),
     rarity(100),
-    collisionPercentage(2),
+    collisionPercentage(2D),
     collisionBlockType("All", SettingsType.StringArray),
     spawnElevationMin(0),
     spawnElevationMax(128),

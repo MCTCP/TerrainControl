@@ -22,12 +22,12 @@ public class BO2 extends ConfigFile implements CustomObject
 
     public BO2[] groupObjects = null;
 
-    public HashSet<String> spawnInBiome;
+    public List<String> spawnInBiome;
 
     public String version;
-    public HashSet<Integer> spawnOnBlockType;
+    public Set<Integer> spawnOnBlockType;
 
-    public HashSet<Integer> collisionBlockType;
+    public Set<Integer> collisionBlockType;
 
     public boolean spawnWater;
     public boolean spawnLava;
@@ -53,7 +53,7 @@ public class BO2 extends ConfigFile implements CustomObject
     public int groupFrequencyMax;
     public int groupSeparationMin;
     public int groupSeparationMax;
-    public HashSet<String>  groupId;
+    public List<String>  groupId;
 
     public int branchLimit;
 
