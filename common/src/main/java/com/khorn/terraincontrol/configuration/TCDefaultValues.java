@@ -145,6 +145,8 @@ public enum TCDefaultValues implements TCSetting
 
     BiomeHeight(0.1D),
     BiomeVolatility(0.3D),
+    ExtraBiomeHeight(0.0),
+    ExtraHeightConstrictWaist(0.0),
     SmoothRadius(2),
 
     StoneBlock(1),
@@ -321,7 +323,6 @@ public enum TCDefaultValues implements TCSetting
     lavaSourceDepositFrequency(10),
     lavaSourceDepositMinAltitude(8),
     lavaSourceDepositMaxAltitude(128),
-
     // End resource settings
     
     // Deprecated settings
