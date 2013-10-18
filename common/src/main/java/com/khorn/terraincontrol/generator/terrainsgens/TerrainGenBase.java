@@ -6,34 +6,36 @@ import java.util.Random;
 
 public class TerrainGenBase
 {
-    protected int b = 8;
-    protected Random c = new Random();
-    protected LocalWorld d;
+    protected int checkAreaSize = 8;
+    protected Random random = new Random();
+    protected LocalWorld world;
+    private final long worldLong1;
+    private final long worldLong2;
+
 
     public TerrainGenBase(LocalWorld world)
     {
-        this.d = world;
+        this.world = world;
+        this.random.setSeed(this.world.getSeed());
+        worldLong1 = this.random.nextLong();
+        worldLong2 = this.random.nextLong();
     }
 
-    public void a(int chunk_x, int chunk_z, byte[] paramArrayOfByte)
+    public void generate(int chunk_x, int chunk_z, byte[] paramArrayOfByte)
     {
-        int i = this.b;
+        int i = this.checkAreaSize;
 
-        this.c.setSeed(this.d.getSeed());
-        long l1 = this.c.nextLong();
-        long l2 = this.c.nextLong();
-
-        for (int j = chunk_x - i; j <= chunk_x + i; j++)
-            for (int k = chunk_z - i; k <= chunk_z + i; k++)
+        for (int x = chunk_x - i; x <= chunk_x + i; x++)
+            for (int z = chunk_z - i; z <= chunk_z + i; z++)
             {
-                long l3 = j * l1;
-                long l4 = k * l2;
-                this.c.setSeed(l3 ^ l4 ^ this.d.getSeed());
-                a(j, k, chunk_x, chunk_z, paramArrayOfByte);
+                long l3 = x * worldLong1;
+                long l4 = z * worldLong2;
+                this.random.setSeed(l3 ^ l4 ^ this.world.getSeed());
+                generateChunk(x, z, chunk_x, chunk_z, paramArrayOfByte);
             }
     }
 
-    protected void a(int paramInt1, int paramInt2, int chunk_x, int chunk_z, byte[] paramArrayOfByte)
+    protected void generateChunk(int chunk_x, int chunk_z, int real_chunk_x, int real_chunk_z, byte[] paramArrayOfByte)
     {
     }
 }

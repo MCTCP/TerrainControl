@@ -17,47 +17,47 @@ public class CavesGen extends TerrainGenBase
         this.worldSettings = wrk;
     }
 
-    protected void a(long paramLong, int paramInt1, int paramInt2, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3)
+    protected void generateLargeCaveNode(long seed, int real_chunk_x, int real_chunk_z, byte[] chunkArray, double x, double y, double z)
     {
-        a(paramLong, paramInt1, paramInt2, paramArrayOfByte, paramDouble1, paramDouble2, paramDouble3, 1.0F + this.c.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
+        generateCaveNode(seed, real_chunk_x, real_chunk_z, chunkArray, x, y, z, 1.0F + this.random.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
     }
 
-    protected void a(long paramLong, int paramInt1, int paramInt2, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int paramInt3, int paramInt4, double paramDouble4)
+    protected void generateCaveNode(long seed, int real_chunk_x, int real_chunk_z, byte[] chunkArray, double x, double y, double z, float paramFloat1, float paramFloat2, float paramFloat3, int angle, int maxAngle, double paramDouble4)
     {
-        double d1 = paramInt1 * 16 + 8;
-        double d2 = paramInt2 * 16 + 8;
+        double real_x = real_chunk_x * 16 + 8;
+        double real_z = real_chunk_z * 16 + 8;
 
         float f1 = 0.0F;
         float f2 = 0.0F;
 
-        Random localRandom = new Random(paramLong);
+        Random localRandom = new Random(seed);
 
-        if (paramInt4 <= 0)
+        if (maxAngle <= 0)
         {
-            int i = this.b * 16 - 16;
-            paramInt4 = i - localRandom.nextInt(i / 4);
+            int checkAreaSize = this.checkAreaSize * 16 - 16;
+            maxAngle = checkAreaSize - localRandom.nextInt(checkAreaSize / 4);
         }
-        int i = 0;
+        boolean isLargeCave = false;
 
-        if (paramInt3 == -1)
+        if (angle == -1)
         {
-            paramInt3 = paramInt4 / 2;
-            i = 1;
+            angle = maxAngle / 2;
+            isLargeCave = true;
         }
 
-        int j = localRandom.nextInt(paramInt4 / 2) + paramInt4 / 4;
+        int j = localRandom.nextInt(maxAngle / 2) + maxAngle / 4;
         int k = localRandom.nextInt(6) == 0 ? 1 : 0;
 
-        for (; paramInt3 < paramInt4; paramInt3++)
+        for (; angle < maxAngle; angle++)
         {
-            double d3 = 1.5D + MathHelper.sin(paramInt3 * 3.141593F / paramInt4) * paramFloat1 * 1.0F;
+            double d3 = 1.5D + MathHelper.sin(angle * 3.141593F / maxAngle) * paramFloat1 * 1.0F;
             double d4 = d3 * paramDouble4;
 
             float f3 = MathHelper.cos(paramFloat3);
             float f4 = MathHelper.sin(paramFloat3);
-            paramDouble1 += MathHelper.cos(paramFloat2) * f3;
-            paramDouble2 += f4;
-            paramDouble3 += MathHelper.sin(paramFloat2) * f3;
+            x += MathHelper.cos(paramFloat2) * f3;
+            y += f4;
+            z += MathHelper.sin(paramFloat2) * f3;
 
             if (k != 0)
                 paramFloat3 *= 0.92F;
@@ -73,35 +73,40 @@ public class CavesGen extends TerrainGenBase
             f2 += (localRandom.nextFloat() - localRandom.nextFloat()) * localRandom.nextFloat() * 2.0F;
             f1 += (localRandom.nextFloat() - localRandom.nextFloat()) * localRandom.nextFloat() * 4.0F;
 
-            if ((i == 0) && (paramInt3 == j) && (paramFloat1 > 1.0F) && (paramInt4 > 0))
+            if ((!isLargeCave) && (angle == j) && (paramFloat1 > 1.0F) && (maxAngle > 0))
             {
-                a(localRandom.nextLong(), paramInt1, paramInt2, paramArrayOfByte, paramDouble1, paramDouble2, paramDouble3, localRandom.nextFloat() * 0.5F + 0.5F, paramFloat2 - 1.570796F, paramFloat3 / 3.0F, paramInt3, paramInt4, 1.0D);
-                a(localRandom.nextLong(), paramInt1, paramInt2, paramArrayOfByte, paramDouble1, paramDouble2, paramDouble3, localRandom.nextFloat() * 0.5F + 0.5F, paramFloat2 + 1.570796F, paramFloat3 / 3.0F, paramInt3, paramInt4, 1.0D);
+                generateCaveNode(localRandom.nextLong(), real_chunk_x, real_chunk_z, chunkArray, x, y, z, localRandom.nextFloat() * 0.5F + 0.5F, paramFloat2 - 1.570796F, paramFloat3 / 3.0F, angle, maxAngle, 1.0D);
+                generateCaveNode(localRandom.nextLong(), real_chunk_x, real_chunk_z, chunkArray, x, y, z, localRandom.nextFloat() * 0.5F + 0.5F, paramFloat2 + 1.570796F, paramFloat3 / 3.0F, angle, maxAngle, 1.0D);
                 return;
             }
-            if ((i == 0) && (localRandom.nextInt(4) == 0))
+            if ((!isLargeCave) && (localRandom.nextInt(4) == 0))
             {
                 continue;
             }
-            double d5 = paramDouble1 - d1;
-            double d6 = paramDouble3 - d2;
-            double d7 = paramInt4 - paramInt3;
+
+            // Check if distance to working point (x and z) too larger than working radius (maybe ??)
+            double d5 = x - real_x;
+            double d6 = z - real_z;
+            double d7 = maxAngle - angle;
             double d8 = paramFloat1 + 2.0F + 16.0F;
             if (d5 * d5 + d6 * d6 - d7 * d7 > d8 * d8)
             {
                 return;
             }
 
-            if ((paramDouble1 < d1 - 16.0D - d3 * 2.0D) || (paramDouble3 < d2 - 16.0D - d3 * 2.0D) || (paramDouble1 > d1 + 16.0D + d3 * 2.0D) || (paramDouble3 > d2 + 16.0D + d3 * 2.0D))
+            //Boundaries check.
+            if ((x < real_x - 16.0D - d3 * 2.0D) || (z < real_z - 16.0D - d3 * 2.0D) || (x > real_x + 16.0D + d3 * 2.0D) || (z > real_z + 16.0D + d3 * 2.0D))
                 continue;
-            int m = MathHelper.floor(paramDouble1 - d3) - paramInt1 * 16 - 1;
-            int n = MathHelper.floor(paramDouble1 + d3) - paramInt1 * 16 + 1;
 
-            int i1 = MathHelper.floor(paramDouble2 - d4) - 1;
-            int i2 = MathHelper.floor(paramDouble2 + d4) + 1;
 
-            int i3 = MathHelper.floor(paramDouble3 - d3) - paramInt2 * 16 - 1;
-            int i4 = MathHelper.floor(paramDouble3 + d3) - paramInt2 * 16 + 1;
+            int m = MathHelper.floor(x - d3) - real_chunk_x * 16 - 1;
+            int n = MathHelper.floor(x + d3) - real_chunk_x * 16 + 1;
+
+            int i1 = MathHelper.floor(y - d4) - 1;
+            int i2 = MathHelper.floor(y + d4) + 1;
+
+            int i3 = MathHelper.floor(z - d3) - real_chunk_z * 16 - 1;
+            int i4 = MathHelper.floor(z + d3) - real_chunk_z * 16 + 1;
 
             if (m < 0)
                 m = 0;
@@ -119,61 +124,63 @@ public class CavesGen extends TerrainGenBase
             if (i4 > 16)
                 i4 = 16;
 
-            int i5 = 0;
-            int i9;
-            for (int i6 = m; (i5 == 0) && (i6 < n); i6++)
+
+            boolean waterFound = false;
+            int arrayPosition;
+            for (int local_x = m; (!waterFound) && (local_x < n); local_x++)
             {
-                for (int i7 = i3; (i5 == 0) && (i7 < i4); i7++)
+                for (int local_z = i3; (!waterFound) && (local_z < i4); local_z++)
                 {
-                    for (int i8 = i2 + 1; (i5 == 0) && (i8 >= i1 - 1); i8--)
+                    for (int local_y = i2 + 1; (!waterFound) && (local_y >= i1 - 1); local_y--)
                     {
-                        i9 = (i6 * 16 + i7) * this.worldSettings.WorldHeight + i8;
-                        if (i8 < 0)
+                        arrayPosition = (local_x * 16 + local_z) * this.worldSettings.WorldHeight + local_y;
+                        if (local_y < 0)
                             continue;
 
-                        if (i8 < this.worldSettings.WorldHeight)
+                        if (local_y < this.worldSettings.WorldHeight)
                         {
-                            if ((paramArrayOfByte[i9] == DefaultMaterial.WATER.id) || (paramArrayOfByte[i9] == DefaultMaterial.STATIONARY_WATER.id))
+                            if ((chunkArray[arrayPosition] == DefaultMaterial.WATER.id) || (chunkArray[arrayPosition] == DefaultMaterial.STATIONARY_WATER.id))
                             {
-                                i5 = 1;
+                                waterFound = true;
                             }
-                            if ((i8 != i1 - 1) && (i6 != m) && (i6 != n - 1) && (i7 != i3) && (i7 != i4 - 1))
-                                i8 = i1;
+                            if ((local_y != i1 - 1) && (local_x != m) && (local_x != n - 1) && (local_z != i3) && (local_z != i4 - 1))
+                                local_y = i1;
                         }
                     }
                 }
             }
-            if (i5 != 0)
+            if (waterFound)
                 continue;
-            for (int i6 = m; i6 < n; i6++)
-            {
-                double d9 = (i6 + paramInt1 * 16 + 0.5D - paramDouble1) / d3;
-                for (i9 = i3; i9 < i4; i9++)
-                {
-                    double d10 = (i9 + paramInt2 * 16 + 0.5D - paramDouble3) / d3;
 
-                    int i10 = (i6 * 16 + i9) * this.worldSettings.WorldHeight + i2;
-                    int i11 = 0;
+            for (int local_x = m; local_x < n; local_x++)
+            {
+                double d9 = (local_x + real_chunk_x * 16 + 0.5D - x) / d3;
+                for (int local_z = i3; local_z < i4; local_z++)
+                {
+                    double d10 = (local_z + real_chunk_z * 16 + 0.5D - z) / d3;
+
+                    int i10 = (local_x * 16 + local_z) * this.worldSettings.WorldHeight + i2;
+                    boolean grassFound = false;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
-                        for (int i12 = i2 - 1; i12 >= i1; i12--)
+                        for (int local_y = i2 - 1; local_y >= i1; local_y--)
                         {
-                            double d11 = (i12 + 0.5D - paramDouble2) / d4;
+                            double d11 = (local_y + 0.5D - y) / d4;
                             if ((d11 > -0.7D) && (d9 * d9 + d11 * d11 + d10 * d10 < 1.0D))
                             {
-                                int i13 = paramArrayOfByte[i10];
+                                int i13 = chunkArray[i10];
                                 if (i13 == DefaultMaterial.GRASS.id)
-                                    i11 = 1;
+                                    grassFound = true;
                                 if ((i13 == DefaultMaterial.STONE.id) || (i13 == DefaultMaterial.DIRT.id) || (i13 == DefaultMaterial.GRASS.id))
                                 {
-                                    if (i12 < 10)
+                                    if (local_y < 10)
                                     {
-                                        paramArrayOfByte[i10] = (byte) DefaultMaterial.LAVA.id;
+                                        chunkArray[i10] = (byte) DefaultMaterial.LAVA.id;
                                     } else
                                     {
-                                        paramArrayOfByte[i10] = 0;
-                                        if ((i11 != 0) && (paramArrayOfByte[(i10 - 1)] == DefaultMaterial.DIRT.id))
-                                            paramArrayOfByte[(i10 - 1)] = (byte) DefaultMaterial.GRASS.id;
+                                        chunkArray[i10] = 0;
+                                        if ((!grassFound) && (chunkArray[(i10 - 1)] == DefaultMaterial.DIRT.id))
+                                            chunkArray[(i10 - 1)] = (byte) DefaultMaterial.GRASS.id;
                                     }
                                 }
                             }
@@ -182,50 +189,52 @@ public class CavesGen extends TerrainGenBase
                     }
                 }
             }
-            if (i != 0)
+            if (isLargeCave)
                 break;
         }
     }
 
-    protected void a(int paramInt1, int paramInt2, int paramInt3, int paramInt4, byte[] paramArrayOfByte)
+    protected void generateChunk(int chunk_x, int chunk_z, int real_chunk_x, int real_chunk_z, byte[] paramArrayOfByte)
     {
-        int i = this.c.nextInt(this.c.nextInt(this.c.nextInt(this.worldSettings.caveFrequency) + 1) + 1);
+        int i = this.random.nextInt(this.random.nextInt(this.random.nextInt(this.worldSettings.caveFrequency) + 1) + 1);
         if (this.worldSettings.evenCaveDistribution)
             i = this.worldSettings.caveFrequency;
-        if (this.c.nextInt(100) >= this.worldSettings.caveRarity)
+        if (this.random.nextInt(100) >= this.worldSettings.caveRarity)
             i = 0;
 
         for (int j = 0; j < i; j++)
         {
-            double d1 = paramInt1 * 16 + this.c.nextInt(16);
+            double x = chunk_x * 16 + this.random.nextInt(16);
 
-            double d2;
+            double y;
 
             if (this.worldSettings.evenCaveDistribution)
-                d2 = this.c.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude) + this.worldSettings.caveMinAltitude;
+                y = this.random.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude) + this.worldSettings.caveMinAltitude;
             else
-                d2 = this.c.nextInt(this.c.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude) + 1) + this.worldSettings.caveMinAltitude;
-            double d3 = paramInt2 * 16 + this.c.nextInt(16);
+                y = this.random.nextInt(this.random.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude) + 1) + this.worldSettings.caveMinAltitude;
 
-            int k = this.worldSettings.caveSystemFrequency;
-            boolean l = false;
-            if (this.c.nextInt(100) <= this.worldSettings.individualCaveRarity)
+            double z = chunk_z * 16 + this.random.nextInt(16);
+
+            int count = this.worldSettings.caveSystemFrequency;
+            boolean largeCaveSpawned = false;
+            if (this.random.nextInt(100) <= this.worldSettings.individualCaveRarity)
             {
-                a(this.c.nextLong(), paramInt3, paramInt4, paramArrayOfByte, d1, d2, d3);
-                l = true;
+                generateLargeCaveNode(this.random.nextLong(), real_chunk_x, real_chunk_z, paramArrayOfByte, x, y, z);
+                largeCaveSpawned = true;
             }
 
-            if ((l) || (this.c.nextInt(100) <= this.worldSettings.caveSystemPocketChance - 1))
+            if ((largeCaveSpawned) || (this.random.nextInt(100) <= this.worldSettings.caveSystemPocketChance - 1))
             {
-                k += this.c.nextInt(this.worldSettings.caveSystemPocketMaxSize - this.worldSettings.caveSystemPocketMinSize) + this.worldSettings.caveSystemPocketMinSize;
+                count += this.random.nextInt(this.worldSettings.caveSystemPocketMaxSize - this.worldSettings.caveSystemPocketMinSize) + this.worldSettings.caveSystemPocketMinSize;
             }
-            for (int m = 0; m < k; m++)
+            while (count > 0)
             {
-                float f1 = this.c.nextFloat() * 3.141593F * 2.0F;
-                float f2 = (this.c.nextFloat() - 0.5F) * 2.0F / 8.0F;
-                float f3 = this.c.nextFloat() * 2.0F + this.c.nextFloat();
+                count--;
+                float f1 = this.random.nextFloat() * 3.141593F * 2.0F;
+                float f2 = (this.random.nextFloat() - 0.5F) * 2.0F / 8.0F;
+                float f3 = this.random.nextFloat() * 2.0F + this.random.nextFloat();
 
-                a(this.c.nextLong(), paramInt3, paramInt4, paramArrayOfByte, d1, d2, d3, f3, f1, f2, 0, 0, 1.0D);
+                generateCaveNode(this.random.nextLong(), real_chunk_x, real_chunk_z, paramArrayOfByte, x, y, z, f3, f1, f2, 0, 0, 1.0D);
             }
         }
     }

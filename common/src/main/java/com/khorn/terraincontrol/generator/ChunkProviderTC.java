@@ -122,8 +122,8 @@ public class ChunkProviderTC
 
         final boolean dry = addBiomeBlocksAndCheckWater(x, z, blockArray);
 
-        this.caveGen.a(x, z, blockArray);
-        this.canyonGen.a(x, z, blockArray);
+        this.caveGen.generate(x, z, blockArray);
+        this.canyonGen.generate(x, z, blockArray);
 
         if (this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.Normal || this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
         {
