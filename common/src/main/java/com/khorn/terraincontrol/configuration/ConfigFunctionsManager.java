@@ -82,12 +82,12 @@ public class ConfigFunctionsManager
         } catch (InstantiationException e)
         {
             TerrainControl.log(Level.WARNING, "Reflection error (Instantiation) while loading the resources: {0}", e.getMessage());
-            TerrainControl.log(Level.WARNING, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.WARNING, e);
             return null;
         } catch (IllegalAccessException e)
         {
             TerrainControl.log(Level.WARNING, "Reflection error (IllegalAccess) while loading the resources: {0}", e.getMessage());
-            TerrainControl.log(Level.WARNING, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.WARNING, e);
             return null;
         }
 
@@ -102,7 +102,7 @@ public class ConfigFunctionsManager
             {
                 e.getClass().getSimpleName(), e.getMessage()
             });
-            TerrainControl.log(Level.WARNING, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.WARNING, e);
             return null;
         }
         if (!matchingTypes)

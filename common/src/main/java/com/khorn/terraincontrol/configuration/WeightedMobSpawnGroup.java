@@ -108,7 +108,7 @@ public class WeightedMobSpawnGroup
         } catch (NumberFormatException e)
         {
             TerrainControl.log(Level.WARNING, "Incorrect number in JSON: {0}", originalJson);
-            TerrainControl.log(Level.WARNING, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.WARNING, e);
         } catch (ArrayIndexOutOfBoundsException e)
         {
             TerrainControl.log(Level.WARNING, "Incorrect JSON: {0}", originalJson);

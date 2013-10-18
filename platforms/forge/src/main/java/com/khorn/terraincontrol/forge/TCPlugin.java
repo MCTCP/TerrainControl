@@ -201,7 +201,7 @@ public class TCPlugin implements TerrainControlEngine
         {
             dataFolder = new File("mods" + File.separator + "TerrainControl");
             System.out.println("Could not reflect the Minecraft directory, save location may be unpredicatble.");
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         }
         return dataFolder;
     }

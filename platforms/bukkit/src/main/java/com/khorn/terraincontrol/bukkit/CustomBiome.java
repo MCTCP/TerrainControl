@@ -36,7 +36,7 @@ public class CustomBiome extends BiomeBase
         } catch (Exception e)
         {
             TerrainControl.log(Level.SEVERE, "Couldn't update Bukkit's biome mappings!");
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         }
     }
 
@@ -96,7 +96,7 @@ public class CustomBiome extends BiomeBase
         } catch (Exception e)
         {
             TerrainControl.log(Level.SEVERE, "Someone forgot to update the mob spawning code! Please report!");
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
             return null;
         }
     }

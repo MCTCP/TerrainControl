@@ -41,7 +41,7 @@ public class TCSender
                 stream.flush();
             } catch (IOException e)
             {
-                TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+                TerrainControl.printStackTrace(Level.SEVERE, e);
             }
 
             byte[] data = outputStream.toByteArray();

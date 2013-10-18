@@ -79,7 +79,7 @@ public class BiomeModeManager
         } catch (Exception e)
         {
             TerrainControl.log(Level.SEVERE, "Cannot properly reflect biome manager, falling back on BiomeMode:Normal");
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
             return new NormalBiomeGenerator(world, cache);
         }
     }

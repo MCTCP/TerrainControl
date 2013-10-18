@@ -33,7 +33,7 @@ public class NBTHelper
             nmsChildTags = (Map) mapField.get(nmsTag);
         } catch (Exception e)
         {
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         }
 
         if (nmsChildTags == null)

@@ -55,7 +55,7 @@ public class LayerFromImage extends Layer
             }
         } catch (IOException ioexception)
         {
-            TerrainControl.log(Level.SEVERE, ioexception.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, ioexception);
         }
 
     }

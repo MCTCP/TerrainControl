@@ -131,7 +131,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
             {
                 clazz.getName(), e.getMessage()
             });
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
             throw new RuntimeException(e);
         }
 
