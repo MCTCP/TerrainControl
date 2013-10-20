@@ -15,7 +15,7 @@ public enum BO2Settings implements TCSetting
 
     // Custom object settings
     version("2.0"),
-    spawnOnBlockType("2"),
+    spawnOnBlockType("2", SettingsType.StringArray),
     spawnSunlight(true),
     spawnDarkness(true),
     spawnWater(false),
@@ -31,8 +31,8 @@ public enum BO2Settings implements TCSetting
     diggingBranch(false),
     needsFoundation(true),
     rarity(100),
-    collisionPercentage(2),
-    collisionBlockType("All"),
+    collisionPercentage(2.0D),
+    collisionBlockType("All", SettingsType.StringArray),
     spawnElevationMin(0),
     spawnElevationMax(128),
 
@@ -45,11 +45,12 @@ public enum BO2Settings implements TCSetting
 
     groupId(""),
 
-    spawnInBiome("All");
+    spawnInBiome("All", SettingsType.StringArray);
 
     private int iValue;
     private String sValue;
     private boolean bValue;
+    private double dValue;
     private final SettingsType type;
 
     private BO2Settings(int i)
@@ -68,6 +69,18 @@ public enum BO2Settings implements TCSetting
     {
         this.bValue = b;
         this.type = SettingsType.Boolean;
+    }
+    
+    private BO2Settings(double d)
+    {
+        this.dValue = d;
+        this.type = SettingsType.Double;
+    }
+    
+    private BO2Settings(String s, SettingsType type)
+    {
+        this.sValue = s;
+        this.type = type;
     }
 
     public int intValue()
@@ -106,13 +119,13 @@ public enum BO2Settings implements TCSetting
     @Override
     public float floatValue()
     {
-        return this.iValue;
+        return (float) this.dValue;
     }
 
     @Override
     public double doubleValue()
     {
-        return this.iValue;
+        return this.dValue;
     }
 
     @Override
