@@ -40,13 +40,11 @@ public class ChunkProviderTC
     private static int chunkMaxZ = 16;
 
     private double riverVol;
-    private double riverHeight;
     // Always false if improved rivers disabled
     private boolean riverFound = false;
 
     private final LocalWorld localWorld;
     private double volatilityFactor;
-    private double heightFactor;
 
     private double[] heightValues;
     private double[] riverHeightValues;
@@ -458,30 +456,7 @@ public class ChunkProviderTC
                 for (int y = 0; y < max_Y; y++)
                 {
                     double output;
-
                     double d8;
-                    if (this.riverFound)
-                        d8 = this.riverHeight - y;
-                    else
-                        d8 = this.heightFactor - y;
-
-                    if (d8 < -biomeConfig.ExtraBiomeHeight)
-                    {
-                        d8 += biomeConfig.ExtraBiomeHeight;
-                    } else if (d8 < 0.0)
-                    {
-                        // -ExtraBiomeHeight, d8, 0
-                        if (d8 * 2.0 < -biomeConfig.ExtraBiomeHeight) 
-                        // if (neg)d8 is outside of
-                        {
-                            // -ExtraBiomeHeight, d8, -ExtraBiomeHeight/2, 0
-                            d8 += (d8 * 2.0) / biomeConfig.ExtraBiomeHeight * biomeConfig.ExtraHeightConstrictWaist;	// We
-                        } else
-                        {
-                            // -ExtraBiomeHeight, -ExtraBiomeHeight/2, d8, 0
-                            d8 += (2.0 - d8 * 2.0) / biomeConfig.ExtraBiomeHeight * biomeConfig.ExtraHeightConstrictWaist;	// We
-                        }
-                    }
 
                     if (this.riverFound)
                     {
@@ -565,7 +540,6 @@ public class ChunkProviderTC
         }
 
         this.volatilityFactor += 0.5D;
-        this.heightFactor = max_Y * (2.0D + noiseHeight) / 4.0D;
     }
 
     private void biomeFactor(int x, int z, int max_X, int max_Y, double noiseHeight)
@@ -647,7 +621,6 @@ public class ChunkProviderTC
         heightSum = (heightSum * 4.0F - 1.0F) / 8.0F;  // Silly magic numbers
 
         this.volatilityFactor = volatilitySum;
-        this.heightFactor = max_Y * (2.0D + heightSum + noiseHeight * 0.2D) / 4.0D;
 
     }
 
@@ -666,11 +639,6 @@ public class ChunkProviderTC
         double phi, alpha, beta;
         alpha = max_Y * 0.25;
         beta = 2 + 0.2 * noiseHeight;
-
-        for (int i = 0; i < max_Y; i++)
-        {
-            riverHeightValues[i] = heightValues[i] = 0.0;
-        }
 
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 
@@ -721,7 +689,12 @@ public class ChunkProviderTC
                     }
                 }
 
-                // River part
+                // Code for improved rivers
+                if (worldSettings.improvedRivers)
+                {
+                    // Skip the improved river code when disabled
+                    continue;
+                }
 
                 boolean isRiver = false;
                 if (this.riverArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))] == 1)
@@ -783,14 +756,11 @@ public class ChunkProviderTC
         heightSum = (heightSum * 4.0F - 1.0F) / 8.0F;  // Silly magic numbers
 
         this.volatilityFactor = volatilitySum;
-        this.heightFactor = max_Y * (2.0D + heightSum + noiseHeight * 0.2D) / 4.0D;
 
         riverVolatilitySum = riverVolatilitySum * 0.9F + 0.1F; // Must be != 0
-        riverHeightSum = (riverHeightSum * 4.0F - 1.0F) / 8.0F; // Silly magic
-        // numbers
+        riverHeightSum = (riverHeightSum * 4.0F - 1.0F) / 8.0F;
 
         this.riverVol = riverVolatilitySum;
-        this.riverHeight = max_Y * (2.0D + riverHeightSum + noiseHeight * 0.2D) / 4.0D;
 
     }
 
