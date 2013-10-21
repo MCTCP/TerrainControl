@@ -44,8 +44,6 @@ public class BiomeConfig extends ConfigFile
     // Surface config
     public float BiomeHeight;
     public float BiomeVolatility;
-    public float ExtraBiomeHeight;
-    public float ExtraHeightConstrictWaist;
     public int SmoothRadius;
 
     public float BiomeTemperature;
@@ -402,9 +400,6 @@ public class BiomeConfig extends ConfigFile
         this.BiomeVolatility = readModSettings(TCDefaultValues.BiomeVolatility, this.defaultBiomeVolatility);
         this.SmoothRadius = readSettings(TCDefaultValues.SmoothRadius);
 
-        this.ExtraBiomeHeight = readSettings(TCDefaultValues.ExtraBiomeHeight);
-        this.ExtraHeightConstrictWaist = readSettings(TCDefaultValues.ExtraHeightConstrictWaist);
-
         this.StoneBlock = readSettings(TCDefaultValues.StoneBlock);
         this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock, this.defaultSurfaceBlock);
         this.GroundBlock = readModSettings(TCDefaultValues.GroundBlock, this.defaultGroundBlock);
@@ -676,15 +671,6 @@ public class BiomeConfig extends ConfigFile
 
         writeComment("Biome volatility.");
         writeValue(TCDefaultValues.BiomeVolatility, this.BiomeVolatility);
-
-        writeComment("Extra height that can be added to biome. Must be between 0.0(default) and 32.0, inclusive.");
-        writeComment("It adds approximately 8 x ExtraBiomeHeight range on top of biome \"height\" that can ");
-        writeComment("generate like the nether. There is no diffusion between biomes.");
-        writeValue(TCDefaultValues.ExtraBiomeHeight, this.ExtraBiomeHeight);
-
-        writeComment("Makes the middle region of the Extra height either less likely (constrict when positive),");
-        writeComment("or more likely (expand when negative) to generate. Is between -100.0 and 100.0 inclusive");
-        writeValue(TCDefaultValues.ExtraHeightConstrictWaist, this.ExtraHeightConstrictWaist);
 
         writeComment("Smooth radius between biomes. Must be between 0 and 32, inclusive. The resulting");
         writeComment("smooth radius seems to be  (thisSmoothRadius + 1 + smoothRadiusOfBiomeOnOtherSide) * 4 .");
@@ -1067,9 +1053,6 @@ public class BiomeConfig extends ConfigFile
         this.BiomeSize = applyBounds(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
         this.BiomeHeight = (float) applyBounds(this.BiomeHeight, -10.0, 10.0);
         this.BiomeRarity = applyBounds(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
-
-        this.ExtraHeightConstrictWaist = (float) applyBounds(this.ExtraHeightConstrictWaist, -100.0, 100.0);
-        this.ExtraBiomeHeight = (float) applyBounds(this.ExtraBiomeHeight, 0.0, 256.0);
 
         this.SmoothRadius = applyBounds(this.SmoothRadius, 0, 32);
 

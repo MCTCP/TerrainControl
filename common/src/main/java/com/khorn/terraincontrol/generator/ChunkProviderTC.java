@@ -40,14 +40,13 @@ public class ChunkProviderTC
     private static int chunkMaxZ = 16;
 
     private double riverVol;
+    private double riverHeight;
     // Always false if improved rivers disabled
     private boolean riverFound = false;
 
     private final LocalWorld localWorld;
     private double volatilityFactor;
-
-    private double[] heightValues;
-    private double[] riverHeightValues;
+    private double heightFactor;
 
     private WorldConfig worldSettings;
 
@@ -460,10 +459,10 @@ public class ChunkProviderTC
 
                     if (this.riverFound)
                     {
-                        d8 = riverHeightValues[y] * 12.0D * 128.0D / this.height / this.riverVol;
+                        d8 = (this.riverHeight - y) * 12.0D * 128.0D / this.height / this.riverVol;
                     } else
                     {
-                        d8 = heightValues[y] * 12.0D * 128.0D / this.height / this.volatilityFactor;
+                        d8 = (this.heightFactor - y) * 12.0D * 128.0D / this.height / this.volatilityFactor;
                     }
 
                     if (d8 > 0.0D)
@@ -540,6 +539,7 @@ public class ChunkProviderTC
         }
 
         this.volatilityFactor += 0.5D;
+        this.heightFactor = max_Y * (2.0D + noiseHeight) / 4.0D;
     }
 
     private void biomeFactor(int x, int z, int max_X, int max_Y, double noiseHeight)
@@ -547,16 +547,7 @@ public class ChunkProviderTC
         float volatilitySum = 0.0F;
         float heightSum = 0.0F;
         float biomeWeightSum = 0.0F;
-        heightValues = new double[max_Y];
 
-        double phi, alpha, beta;
-        alpha = max_Y * 0.25;
-        beta = 2 + 0.2 * noiseHeight;
-
-        for (int i = 0; i < max_Y; i++)
-        {
-            heightValues[i] = 0.0;
-        }
 
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 
@@ -584,36 +575,11 @@ public class ChunkProviderTC
                 heightSum += nextBiomeHeight * biomeWeight;
                 biomeWeightSum += biomeWeight;
 
-                phi = (4 * nextBiomeHeight * biomeWeight + biomeWeight * (8 * beta - 1)) * alpha;
-                double tempBiomeHeight = phi / (8 * biomeWeight);
-
-                for (int nextY = 0; nextY < max_Y; nextY++)
-                {
-                    if (nextY < tempBiomeHeight)
-                    {
-                        heightValues[nextY] += phi - 8 * biomeWeight * nextY;
-                    } else if (nextY > tempBiomeHeight + nextBiomeConfig.ExtraBiomeHeight)
-                    {
-                        heightValues[nextY] += phi + 8 * biomeWeight * (nextBiomeConfig.ExtraBiomeHeight - nextY);
-                    } else if (nextY < tempBiomeHeight + 0.5 * nextBiomeConfig.ExtraBiomeHeight)
-                    {
-                        heightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * (phi - 8 * biomeWeight * nextY);
-                    } else
-                    {
-                        heightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * (8 * biomeWeight * (nextY - nextBiomeConfig.ExtraBiomeHeight) - phi);
-                    }
-                }
-
             }
         }
 
         volatilitySum /= biomeWeightSum;
         heightSum /= biomeWeightSum;
-
-        for (int i = 0; i < max_Y; i++)
-        {
-            heightValues[i] /= 8 * biomeWeightSum;
-        }
 
         this.waterLevelRaw[x * max_X + z] = (byte) this.worldSettings.biomeConfigs[biomeId].waterLevelMax;
 
@@ -621,6 +587,7 @@ public class ChunkProviderTC
         heightSum = (heightSum * 4.0F - 1.0F) / 8.0F;  // Silly magic numbers
 
         this.volatilityFactor = volatilitySum;
+        this.heightFactor = max_Y * (2.0D + heightSum + noiseHeight * 0.2D) / 4.0D;
 
     }
 
@@ -633,12 +600,7 @@ public class ChunkProviderTC
         float riverVolatilitySum = 0.0F;
         float riverHeightSum = 0.0F;
         float riverWeightSum = 0.0F;
-        riverHeightValues = new double[max_Y];
-        heightValues = new double[max_Y];
 
-        double phi, alpha, beta;
-        alpha = max_Y * 0.25;
-        beta = 2 + 0.2 * noiseHeight;
 
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 
@@ -669,32 +631,7 @@ public class ChunkProviderTC
                 heightSum += nextBiomeHeight * biomeWeight;
                 WeightSum += biomeWeight;
 
-                phi = (4 * nextBiomeHeight * biomeWeight + biomeWeight * (8 * beta - 1)) * alpha;
-                double tempBiomeHeight = phi / (8 * biomeWeight);
-
-                for (int nextY = 0; nextY < max_Y; nextY++)
-                {
-                    if (nextY < tempBiomeHeight)
-                    {
-                        heightValues[nextY] += phi - 8 * biomeWeight * nextY;
-                    } else if (nextY > tempBiomeHeight + nextBiomeConfig.ExtraBiomeHeight)
-                    {
-                        heightValues[nextY] += phi + 8 * biomeWeight * (nextBiomeConfig.ExtraBiomeHeight - nextY);
-                    } else if (nextY < tempBiomeHeight + 0.5 * nextBiomeConfig.ExtraBiomeHeight)
-                    {
-                        heightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * (phi - 8 * biomeWeight * nextY);
-                    } else
-                    {
-                        heightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * (8 * biomeWeight * (nextY - nextBiomeConfig.ExtraBiomeHeight) - phi);
-                    }
-                }
-
-                // Code for improved rivers
-                if (worldSettings.improvedRivers)
-                {
-                    // Skip the improved river code when disabled
-                    continue;
-                }
+                // River part
 
                 boolean isRiver = false;
                 if (this.riverArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))] == 1)
@@ -714,26 +651,6 @@ public class ChunkProviderTC
                 riverVolatilitySum += (isRiver ? nextBiomeConfig.riverVolatility : nextBiomeConfig.BiomeVolatility) * riverWeight;
                 riverHeightSum += nextRiverHeight * riverWeight;
                 riverWeightSum += riverWeight;
-
-                phi = (4 * nextRiverHeight * riverWeight + riverWeight * (8 * beta - 1)) * alpha;
-                tempBiomeHeight = phi / (8 * riverWeight);
-
-                for (int nextY = 0; nextY < max_Y; nextY++)
-                {
-                    if (nextY < tempBiomeHeight)
-                    {
-                        riverHeightValues[nextY] += phi - 8 * riverWeight * nextY;
-                    } else if (nextY > tempBiomeHeight + nextBiomeConfig.ExtraBiomeHeight)
-                    {
-                        riverHeightValues[nextY] += phi + 8 * riverWeight * (nextBiomeConfig.ExtraBiomeHeight - nextY);
-                    } else if (nextY < tempBiomeHeight + 0.5 * nextBiomeConfig.ExtraBiomeHeight)
-                    {
-                        riverHeightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * (phi - 8 * riverWeight * nextY);
-                    } else
-                    {
-                        riverHeightValues[nextY] += 2 * nextBiomeConfig.ExtraHeightConstrictWaist / nextBiomeConfig.ExtraBiomeHeight * (8 * riverWeight * (nextY - nextBiomeConfig.ExtraBiomeHeight) - phi);
-                    }
-                }
             }
         }
 
@@ -743,12 +660,6 @@ public class ChunkProviderTC
         riverVolatilitySum /= riverWeightSum;
         riverHeightSum /= riverWeightSum;
 
-        for (int i = 0; i < max_Y; i++)
-        {
-            riverHeightValues[i] /= 8 * riverWeightSum;
-            heightValues[i] /= 8 * WeightSum;
-        }
-
         float waterLevelSum = this.riverFound ? this.worldSettings.biomeConfigs[biomeId].riverWaterLevel : this.worldSettings.biomeConfigs[biomeId].waterLevelMax;
         this.waterLevelRaw[x * max_X + z] = (byte) waterLevelSum;
 
@@ -756,11 +667,13 @@ public class ChunkProviderTC
         heightSum = (heightSum * 4.0F - 1.0F) / 8.0F;  // Silly magic numbers
 
         this.volatilityFactor = volatilitySum;
+        this.heightFactor = max_Y * (2.0D + heightSum + noiseHeight * 0.2D) / 4.0D;
 
         riverVolatilitySum = riverVolatilitySum * 0.9F + 0.1F; // Must be != 0
         riverHeightSum = (riverHeightSum * 4.0F - 1.0F) / 8.0F;
 
         this.riverVol = riverVolatilitySum;
+        this.riverHeight = max_Y * (2.0D + riverHeightSum + noiseHeight * 0.2D) / 4.0D;
 
     }
 
