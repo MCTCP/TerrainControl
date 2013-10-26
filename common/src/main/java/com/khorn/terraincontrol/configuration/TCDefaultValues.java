@@ -29,11 +29,11 @@ public enum TCDefaultValues implements TCSetting
     ChannelName("TerrainControl"),
     ProtocolVersion(5),
     // End network
-    
+
     // Plugin settings
     ConsoleLogLevel(PluginConfig.LogLevels.Standard),
     FileLogLevel(PluginConfig.LogLevels.Standard),
-    
+
     snowAndIceMaxTemp(0.15F),
 
     // World settings
@@ -156,6 +156,8 @@ public enum TCDefaultValues implements TCSetting
 
     BiomeHeight(0.1D),
     BiomeVolatility(0.3D),
+    ExtraBiomeHeight(0.0F),
+    ExtraHeightConstrictWaist(0.0F),
     SmoothRadius(2),
 
     StoneBlock(1),
@@ -185,9 +187,9 @@ public enum TCDefaultValues implements TCSetting
     RiverVolatility(0.3F),
     RiverWaterLevel(63),
     RiverCustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0", SettingsType.StringArray),
-    
+
     BiomeObjects("", SettingsType.StringArray),
-    
+
     SpawnMonstersAddDefaults(true),
     SpawnMonsters(""),
     SpawnCreaturesAddDefaults(true),
@@ -332,15 +334,13 @@ public enum TCDefaultValues implements TCSetting
     lavaSourceDepositFrequency(10),
     lavaSourceDepositMinAltitude(8),
     lavaSourceDepositMaxAltitude(128),
-
     // End resource settings
-    
+
     // Deprecated settings
     BiomeRivers(true),
     DisableNotchPonds(false),
-    FrozenRivers(true),
-    ;
-    
+    FrozenRivers(true);
+
     // End deprectated settings
 
     private int iValue;
@@ -359,7 +359,7 @@ public enum TCDefaultValues implements TCSetting
         this.iValue = i;
         this.returnType = SettingsType.Int;
     }
-    
+
     @SuppressWarnings("UnusedDeclaration")
     private TCDefaultValues(HashSet<Integer> i)
     {
@@ -476,7 +476,8 @@ public enum TCDefaultValues implements TCSetting
     }
 
     @Override
-    public HashSet<Integer> intSetValue() {
+    public HashSet<Integer> intSetValue()
+    {
         return this.iSetValue;
     }
 

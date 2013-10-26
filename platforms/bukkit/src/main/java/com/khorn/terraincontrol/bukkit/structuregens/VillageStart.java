@@ -102,7 +102,7 @@ public class VillageStart extends StructureStart
                 } catch (Exception e)
                 {
                     TerrainControl.log(Level.SEVERE, "Cannot make village a sandstone village!");
-                    TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+                    TerrainControl.printStackTrace(Level.SEVERE, e);
                 }
             }
         }

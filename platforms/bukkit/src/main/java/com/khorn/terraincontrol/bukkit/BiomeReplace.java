@@ -171,13 +171,13 @@ public class BiomeReplace implements Runnable
 
         } catch (NoSuchFieldException e)
         {
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         } catch (IllegalAccessException e)
         {
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         } catch (IOException e)
         {
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         }
 
         sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Done. " + chunksRewritten + " chunks rewritten.");

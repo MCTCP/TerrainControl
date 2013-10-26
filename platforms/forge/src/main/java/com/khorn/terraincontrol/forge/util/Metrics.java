@@ -564,7 +564,7 @@ public class Metrics
             gzos.write(input.getBytes("UTF-8"));
         } catch (IOException e)
         {
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         } finally
         {
             if (gzos != null)

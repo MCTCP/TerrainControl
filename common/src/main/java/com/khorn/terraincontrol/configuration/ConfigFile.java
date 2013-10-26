@@ -152,7 +152,7 @@ public abstract class ConfigFile
                 this.readSuccess = true;
             } catch (IOException e)
             {
-                TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+                TerrainControl.printStackTrace(Level.SEVERE, e);
 
                 if (settingsReader != null)
                 {
@@ -161,7 +161,7 @@ public abstract class ConfigFile
                         settingsReader.close();
                     } catch (IOException localIOException1)
                     {
-                        TerrainControl.log(Level.SEVERE, localIOException1.getStackTrace().toString());
+                        TerrainControl.printStackTrace(Level.SEVERE, localIOException1);
                     }
                 }
             } finally
@@ -173,7 +173,7 @@ public abstract class ConfigFile
                         settingsReader.close();
                     } catch (IOException localIOException2)
                     {
-                        TerrainControl.log(Level.SEVERE, localIOException2.getStackTrace().toString());
+                        TerrainControl.printStackTrace(Level.SEVERE, localIOException2);
                     }
                 }
             }

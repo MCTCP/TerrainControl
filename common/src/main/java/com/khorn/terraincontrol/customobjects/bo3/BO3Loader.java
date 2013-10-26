@@ -78,7 +78,7 @@ public class BO3Loader implements CustomObjectLoader
             } catch (IOException corruptFile)
             {
                 TerrainControl.log(Level.SEVERE, "Failed to read NBT meta file: {0}", e.getMessage());
-                TerrainControl.log(Level.SEVERE, corruptFile.getStackTrace().toString());
+                TerrainControl.printStackTrace(Level.SEVERE, corruptFile);
                 tryToClose(stream);
                 return null;
             }

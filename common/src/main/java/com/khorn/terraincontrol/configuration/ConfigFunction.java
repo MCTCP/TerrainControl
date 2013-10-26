@@ -71,7 +71,7 @@ public abstract class ConfigFunction<T>
             {
                 clazz.getName(), e.getMessage()
             });
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         }
 
         return configFunction;

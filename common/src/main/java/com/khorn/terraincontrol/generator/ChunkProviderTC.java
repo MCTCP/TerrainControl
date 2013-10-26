@@ -89,7 +89,8 @@ public class ChunkProviderTC
         this.caveGen = new CavesGen(this.worldSettings, this.localWorld);
         this.canyonGen = new CanyonsGen(this.worldSettings, this.localWorld);
 
-        // Contains 2d array maxSmoothDiameter*maxSmoothDiameter. Maximum weight is in array center.
+        // Contains 2d array maxSmoothDiameter*maxSmoothDiameter.
+        // Maximum weight is in array center.
 
         this.maxSmoothDiameter = config.maxSmoothRadius * 2 + 1;
         this.maxSmoothRadius = config.maxSmoothRadius;
@@ -455,7 +456,6 @@ public class ChunkProviderTC
                 for (int y = 0; y < max_Y; y++)
                 {
                     double output;
-
                     double d8;
 
                     if (this.riverFound)
@@ -674,8 +674,7 @@ public class ChunkProviderTC
         this.heightFactor = max_Y * (2.0D + heightSum + noiseHeight * 0.2D) / 4.0D;
 
         riverVolatilitySum = riverVolatilitySum * 0.9F + 0.1F; // Must be != 0
-        riverHeightSum = (riverHeightSum * 4.0F - 1.0F) / 8.0F; // Silly magic
-        // numbers
+        riverHeightSum = (riverHeightSum * 4.0F - 1.0F) / 8.0F;
 
         this.riverVol = riverVolatilitySum;
         this.riverHeight = max_Y * (2.0D + riverHeightSum + noiseHeight * 0.2D) / 4.0D;

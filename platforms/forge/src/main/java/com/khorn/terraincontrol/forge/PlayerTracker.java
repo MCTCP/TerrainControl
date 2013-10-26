@@ -51,7 +51,7 @@ public class PlayerTracker implements IPlayerTracker
             config.Serialize(stream);
         } catch (IOException e)
         {
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         }
 
         // Make the packet

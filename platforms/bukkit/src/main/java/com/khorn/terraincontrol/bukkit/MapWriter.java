@@ -204,7 +204,7 @@ public class MapWriter implements Runnable
 
         } catch (Exception e)
         {
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         }
         MapWriter.isWorking = false;
     }

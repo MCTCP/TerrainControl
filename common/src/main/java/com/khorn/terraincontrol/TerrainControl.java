@@ -271,6 +271,38 @@ public class TerrainControl
     {
         engine.logIfLevel(min, max, message, params);
     }
+    
+    /**
+     * Prints the stackTrace of the provided Throwable object
+     * @param level The log level to log this stack trace at
+     * @param e The Throwable object to obtain stack trace information from
+     */
+    public static void printStackTrace(Level level, Throwable e)
+    {
+        printStackTrace(level, e, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Prints the stackTrace of the provided Throwable object to a certain depth
+     * @param level The log level to log this stack trace at
+     * @param e The Throwable object to obtain stack trace information from
+     * @param maxDepth The max number of trace elements to print
+     */
+    public static void printStackTrace(Level level, Throwable e, int maxDepth)
+    {
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
+        for (StackTraceElement element : e.getStackTrace())
+        {
+            sb.append(element.toString());
+            sb.append("\n");
+            if (++count > maxDepth)
+            {
+                break;
+            }
+        }
+        TerrainControl.log(level, sb.toString());
+    }
 
     /**
      * Returns the CustomObject manager, with hooks to spawn CustomObjects.

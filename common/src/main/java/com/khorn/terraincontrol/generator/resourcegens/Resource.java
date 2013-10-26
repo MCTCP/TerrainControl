@@ -122,8 +122,11 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
             resource.setValid(true);
         } catch (InvalidConfigException e)
         {
-            TerrainControl.log(Level.SEVERE, "Invalid default resource! Please report! {0}: {1}", new Object[]{ clazz.getName(), e.getMessage() });
-            TerrainControl.log(Level.SEVERE, e.getStackTrace().toString());
+            TerrainControl.log(Level.SEVERE, "Invalid default resource! Please report! {0}: {1}", new Object[]
+            {
+                clazz.getName(), e.getMessage()
+            });
+            TerrainControl.printStackTrace(Level.SEVERE, e);
             throw new RuntimeException(e);
         }
 
