@@ -22,21 +22,53 @@ public class LayerFromImage extends Layer
     private int zOffset;
     private WorldConfig.ImageMode imageMode;
 
-    public LayerFromImage(long paramLong, Layer _child, WorldConfig config, LocalWorld world)
+    public LayerFromImage(long paramLong, Layer child, WorldConfig config, LocalWorld world)
     {
         super(paramLong);
-        this.child = _child;
+        this.child = child;
         xOffset = config.imageXOffset;
         zOffset = config.imageZOffset;
         this.imageMode = config.imageMode;
         this.fillBiome = world.getBiomeIdByName(config.imageFillBiome);
 
-        //read from file
-
+        // Read from file
         try
         {
             File image = new File(config.settingsDir, config.imageFile);
             BufferedImage map = ImageIO.read(image);
+
+            // Rotate image if need
+            switch(config.imageOrientation)
+            {
+               case West:
+                  // Default TC behavior
+                  break;
+               case North:
+                  // Rotate picture CW
+                  BufferedImage rotatedCW = new BufferedImage(map.getHeight(), map.getWidth(), map.getType());
+                  for(int y = 0; y < map.getHeight(); y++)
+                     for(int x = 0; x < map.getWidth(); x++)
+                        rotatedCW.setRGB(map.getHeight() - 1 - y, x, map.getRGB(x, y));
+                  map = rotatedCW;
+                  break;
+               case South:
+                  // Rotate picture CCW
+                  BufferedImage rotatedCCW = new BufferedImage(map.getHeight(), map.getWidth(), map.getType());
+                  for(int y = 0; y < map.getHeight(); y++)
+                     for(int x = 0; x < map.getWidth(); x++)
+                        rotatedCCW.setRGB(y, map.getWidth() - 1 - x, map.getRGB(x, y));
+                  map = rotatedCCW;
+                  break;
+               case East:
+                  // Rotate picture 180 degrees
+                  BufferedImage rotated180 = new BufferedImage(map.getWidth(), map.getHeight(), map.getType());
+                  for(int y = 0; y < map.getHeight(); y++)
+                     for(int x = 0; x < map.getWidth(); x++)
+                        rotated180.setRGB(map.getWidth() - 1 - x, map.getHeight() - 1 - y, map.getRGB(x, y));
+                  map = rotated180;
+                  break;
+            }
+
             this.mapHeight = map.getHeight(null);
             this.mapWidth = map.getWidth(null);
             int[] colorMap = new int[this.mapHeight * this.mapWidth];
@@ -53,55 +85,48 @@ public class LayerFromImage extends Layer
                 else
                     this.biomeMap[i] = fillBiome;
             }
-        } catch (IOException ioexception)
-        {
-            TerrainControl.printStackTrace(Level.SEVERE, ioexception);
+        } catch (IOException ioexception) {
+            TerrainControl.log(Level.SEVERE, ioexception.getStackTrace().toString());
         }
-
     }
 
     @Override
     public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
     {
-        int[] arrayOfInt1 = arraysCache.GetArray( x_size * z_size);
-        int[] arrayOfInt2 = null;
-
-        if (this.child != null)
-            arrayOfInt2 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
-
-        int Buffer_x;
-        int Buffer_z;
-
-        for (int i = 0; i < z_size; i++)
+        int[] resultBiomes = arraysCache.GetArray(x_size * z_size);
+        
+        if (this.imageMode == WorldConfig.ImageMode.Repeat)
         {
-            for (int t = 0; t < x_size; t++)
+            for (int iz = 0; iz < z_size; iz++)
             {
-                //SetSeed(t + x, i + z);
-
-                if (this.imageMode == WorldConfig.ImageMode.Repeat)
+                for (int ix = 0; ix < x_size; ix++)
                 {
-                    Buffer_x = this.mapWidth - 1 - Math.abs((z + i - zOffset) % this.mapWidth);
-                    Buffer_z = Math.abs((x + t - xOffset) % this.mapHeight);
-                    arrayOfInt1[(t + i * x_size)] = this.biomeMap[Buffer_x + Buffer_z * this.mapWidth];
-                } else
-                {
-                    Buffer_x = this.mapWidth - (z + i - zOffset);
-                    Buffer_z = (x + t - xOffset);
-                    if (Buffer_x < 0 || Buffer_x >= this.mapWidth || Buffer_z < 0 || Buffer_z >= this.mapHeight)
-                        if (arrayOfInt2 != null)
-                            arrayOfInt1[(t + i * x_size)] = arrayOfInt2[(t + i * x_size)];
-                        else
-                            arrayOfInt1[(t + i * x_size)] = this.fillBiome;
-                    else
-                        arrayOfInt1[(t + i * x_size)] = this.biomeMap[Buffer_x + Buffer_z * this.mapWidth];
-
+                    int Buffer_x = this.mapWidth - 1 - Math.abs((z + iz - zOffset) % this.mapWidth);
+                    int Buffer_z = Math.abs((x + ix - xOffset) % this.mapHeight);
+                    resultBiomes[(ix + iz * x_size)] = this.biomeMap[Buffer_x + Buffer_z * this.mapWidth];
                 }
             }
-
+        } else {
+            int[] childBiomes = null;
+            if (this.child != null)
+                childBiomes = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
+            for (int iz = 0; iz < z_size; iz++)
+            {
+                for (int ix = 0; ix < x_size; ix++)
+                {
+                    int Buffer_x = this.mapWidth - (z + iz - zOffset);
+                    int Buffer_z = (x + ix - xOffset);
+                    if (Buffer_x < 0 || Buffer_x >= this.mapWidth || Buffer_z < 0 || Buffer_z >= this.mapHeight)
+                    {
+                        if (childBiomes != null)
+                            resultBiomes[(ix + iz * x_size)] = childBiomes[(ix + iz * x_size)];
+                        else
+                            resultBiomes[(ix + iz * x_size)] = this.fillBiome;
+                    } else
+                        resultBiomes[(ix + iz * x_size)] = this.biomeMap[Buffer_x + Buffer_z * this.mapWidth];
+                }
+            }
         }
-
-
-        return arrayOfInt1;
+        return resultBiomes;
     }
-
 }
