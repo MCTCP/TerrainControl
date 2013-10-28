@@ -58,7 +58,7 @@ public enum TCDefaultValues implements TCSetting
 
     CustomBiomes("", SettingsType.StringArray),
 
-    ImageMode(WorldConfig.ImageMode.Repeat),
+    ImageMode(WorldConfig.ImageMode.Mirror),
     ImageFile("map.png"),
     ImageOrientation(WorldConfig.ImageOrientation.West),
     ImageFillBiome("Ocean"),

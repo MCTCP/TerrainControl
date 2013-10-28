@@ -17,44 +17,32 @@ public abstract class Layer
     private long c;
     protected long d;
 
-
     /*
+    LayerIsland - chance to big land
+    LayerLandRandom - a(3) - chance to increase big land
+    GenLayerIcePlains - chance to ice
+    GenLayerMushroomIsland - chance to mushroom island
 
-   LayerIsland - chance to big land
-   LayerLandRandom - a(3) - chance to increase big land
-   GenLayerIcePlains - chance to ice
-   GenLayerMushroomIsland - chance to mushroom island
+    biome:
+    1) is island
+    2) size
+    3) chance
+    4) is shore
+    5) color
+    6) temperature
+    7) downfall
+    8) is snow biome
+    9) Have rivers
 
-
-
-
-   biome:
-   1) is island
-   2) size
-   3) chance
-   4) is shore
-   5) color
-   6) temperature
-   7) downfall
-   8) is snow biome
-   9) Have rivers
-
-
-   world
-   1) chance to lands
-   2) size of big lands
-   3) chance to increase lands
-   4) Chance for ice area
-   5) Ice area size
-   6) Rivers
-   7) Rivers size
-
-
-
-
-
+    world
+    1) chance to lands
+    2) size of big lands
+    3) chance to increase lands
+    4) Chance for ice area
+    5) Ice area size
+    6) Rivers
+    7) Rivers size
     */
-
 
     protected static final int BiomeBits = 255; // 255 63
     protected static final int LandBit = 256;   // 256 64

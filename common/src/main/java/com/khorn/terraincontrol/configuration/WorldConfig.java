@@ -684,6 +684,7 @@ public class WorldConfig extends ConfigFile
 
         writeComment("Possible modes when generator outside image boundaries: Repeat, ContinueNormal, FillEmpty");
         writeComment("   Repeat - repeat image");
+        writeComment("   Mirror - advanced repeat image mode");
         writeComment("   ContinueNormal - continue normal generation");
         writeComment("   FillEmpty - fill by biome in \"ImageFillBiome settings\" ");
         writeValue(TCDefaultValues.ImageMode, this.imageMode.name());
@@ -692,10 +693,10 @@ public class WorldConfig extends ConfigFile
         writeValue(TCDefaultValues.ImageFile, this.imageFile);
 
         writeComment("Where the png's north is oriented? Possible values: North, East, South, West");
-		  writeComment("   North - the top of your picture if north (no any rotation)");
-		  writeComment("   West - previous behavior (you should rotate png CCW manually)");
-		  writeComment("   East - png should be rotated CW manually");
-		  writeComment("   South - rotate png 180 degrees before generating world");
+        writeComment("   North - the top of your picture if north (no any rotation)");
+        writeComment("   West - previous behavior (you should rotate png CCW manually)");
+        writeComment("   East - png should be rotated CW manually");
+        writeComment("   South - rotate png 180 degrees before generating world");
         writeValue(TCDefaultValues.ImageOrientation, this.imageOrientation.name());
 
         writeComment("Biome name for fill outside image boundaries with FillEmpty mode.");
@@ -943,17 +944,18 @@ public class WorldConfig extends ConfigFile
     public enum ImageMode
     {
         Repeat,
+        Mirror,
         ContinueNormal,
         FillEmpty,
     }
-	 
-	 public enum ImageOrientation
-	 {
-		 North,
-		 East,
-		 South,
-		 West,
-	 }
+     
+     public enum ImageOrientation
+     {
+         North,
+         East,
+         South,
+         West,
+     }
 
     public enum ConfigMode
     {
