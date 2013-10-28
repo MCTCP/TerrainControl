@@ -573,7 +573,7 @@ public class WorldConfig extends ConfigFile
         writeComment("   Default - use default terrain generator");
         writeValue(TCDefaultValues.TerrainMode, this.ModeTerrain.name());
 
-        writeComment("Possible biome modes: Normal, OldGenerator, Default");
+        writeComment("Possible biome modes: Normal, FromImage, OldGenerator, Default");
         writeComment("   Normal - use all features");
         writeComment("   FromImage - get biomes from image file");
         writeComment("   OldGenerator - generate biome like the Beta 1.7.3 generator");
