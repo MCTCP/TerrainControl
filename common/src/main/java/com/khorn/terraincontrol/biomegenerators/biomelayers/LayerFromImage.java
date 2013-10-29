@@ -34,45 +34,48 @@ public class LayerFromImage extends Layer
         // Read from file
         try
         {
-            File image = new File(config.settingsDir, config.imageFile);
-            BufferedImage map = ImageIO.read(image);
+            final File image = new File(config.settingsDir, config.imageFile);
+            final BufferedImage map = ImageIO.read(image);
 
             this.mapWidth = map.getWidth(null);
             this.mapHeight = map.getHeight(null);
             int[] colorMap = new int[this.mapHeight * this.mapWidth];
 
             map.getRGB(0, 0, this.mapWidth, this.mapHeight, colorMap, 0, this.mapWidth);
-            map = null;
 
             // Rotate RGBs if need
             switch(config.imageOrientation)
             {
-                case West:
-                    // Rotate picture CW
-                    int[] colorMapCW = new int[colorMap.length];
-                    for (int y = 0; y < this.mapHeight; y++)
-                        for (int x = 0; x < this.mapWidth; x++)
-                            colorMapCW[x * this.mapHeight + map.getHeight() - 1 - y] = colorMap[y * this.mapWidth + x];
-                    colorMap = colorMapCW;
-                    break;
                 case North:
                     // Default behavior - nothing to rotate
                     break;
                 case South:
                     // Rotate picture 180 degrees
                     int[] colorMap180 = new int[colorMap.length];
-                    for (int y = 0; y < map.getHeight(); y++)
-                        for (int x = 0; x < map.getWidth(); x++)
-                            colorMap180[(map.getHeight() - 1 - y) * this.mapWidth + map.getWidth() - 1 - x] = colorMap[y * this.mapWidth + x];
+                    for (int y = 0; y < this.mapHeight; y++)
+                        for (int x = 0; x < this.mapWidth; x++)
+                            colorMap180[(this.mapHeight - 1 - y) * this.mapWidth + this.mapWidth - 1 - x] = colorMap[y * this.mapWidth + x];
                     colorMap = colorMap180;
+                    break;
+                case West:
+                    // Rotate picture CW
+                    int[] colorMapCW = new int[colorMap.length];
+                    for (int y = 0; y < this.mapHeight; y++)
+                        for (int x = 0; x < this.mapWidth; x++)
+                            colorMapCW[x * this.mapHeight + this.mapHeight - 1 - y] = colorMap[y * this.mapWidth + x];
+                    colorMap = colorMapCW;
+                    this.mapWidth = map.getHeight(null);
+                    this.mapHeight = map.getWidth(null);
                     break;
                 case East:
                     // Rotate picture CCW
                     int[] colorMapCCW = new int[colorMap.length];
-                    for (int y = 0; y < map.getHeight(); y++)
-                        for (int x = 0; x < map.getWidth(); x++)
-                            colorMapCCW[(map.getWidth() - 1 - x) * this.mapHeight + y] = colorMap[y * this.mapWidth + x];
+                    for (int y = 0; y < this.mapHeight; y++)
+                        for (int x = 0; x < this.mapWidth; x++)
+                            colorMapCCW[(this.mapWidth - 1 - x) * this.mapHeight + y] = colorMap[y * this.mapWidth + x];
                     colorMap = colorMapCCW;
+                    this.mapWidth = map.getHeight(null);
+                    this.mapHeight = map.getWidth(null);
                     break;
             }
 
@@ -118,9 +121,9 @@ public class LayerFromImage extends Layer
                 {
                     int Buffer_xq = (x + ix - xOffset) % (2 * this.mapWidth);
                     int Buffer_zq = (z + iz - zOffset) % (2 * this.mapHeight);
-                    if (Buffer_xq < 0)
+						  if (Buffer_xq < 0)
                         Buffer_xq += 2 * this.mapWidth;
-                    if (Buffer_zq < 0)
+						  if (Buffer_zq < 0)
                         Buffer_zq += 2 * this.mapHeight;
                     int Buffer_x = Buffer_xq % this.mapWidth;
                     int Buffer_z = Buffer_zq % this.mapHeight;
