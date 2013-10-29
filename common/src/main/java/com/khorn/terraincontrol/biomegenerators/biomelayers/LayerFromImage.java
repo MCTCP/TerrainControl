@@ -37,59 +37,60 @@ public class LayerFromImage extends Layer
             File image = new File(config.settingsDir, config.imageFile);
             BufferedImage map = ImageIO.read(image);
 
-            // Rotate image if need
-            switch(config.imageOrientation)
-            {
-            case West:
-                // Rotate picture CW
-                BufferedImage rotatedCW = new BufferedImage(map.getHeight(), map.getWidth(), map.getType());
-                for(int y = 0; y < map.getHeight(); y++)
-                    for(int x = 0; x < map.getWidth(); x++)
-                        rotatedCW.setRGB(map.getHeight() - 1 - y, x, map.getRGB(x, y));
-                map = rotatedCW;
-                break;
-            case North:
-                // Default behavior
-                break;
-            case South:
-                // Rotate picture 180 degrees
-                BufferedImage rotated180 = new BufferedImage(map.getWidth(), map.getHeight(), map.getType());
-                for(int y = 0; y < map.getHeight(); y++)
-                    for(int x = 0; x < map.getWidth(); x++)
-                        rotated180.setRGB(map.getWidth() - 1 - x, map.getHeight() - 1 - y, map.getRGB(x, y));
-                map = rotated180;
-                break;
-            case East:
-                // Rotate picture CCW
-                BufferedImage rotatedCCW = new BufferedImage(map.getHeight(), map.getWidth(), map.getType());
-                for(int y = 0; y < map.getHeight(); y++)
-                    for(int x = 0; x < map.getWidth(); x++)
-                        rotatedCCW.setRGB(y, map.getWidth() - 1 - x, map.getRGB(x, y));
-                map = rotatedCCW;
-                break;
-            }
-
+				this.mapWidth = map.getWidth(null);
             this.mapHeight = map.getHeight(null);
-            this.mapWidth = map.getWidth(null);
             int[] colorMap = new int[this.mapHeight * this.mapWidth];
-            this.biomeMap = new int[this.mapHeight * this.mapWidth];
 
             map.getRGB(0, 0, this.mapWidth, this.mapHeight, colorMap, 0, this.mapWidth);
+            map = null;
 
-            for (int i = 0; i < colorMap.length; i++)
+            // Rotate RGBs if need
+            switch(config.imageOrientation)
             {
-                int color = colorMap[i] & 0xFFFFFF;
+                case West:
+                    // Rotate picture CW
+                    int[] colorMapCW = new int[colorMap.length];
+                    for (int y = 0; y < this.mapHeight; y++)
+                        for (int x = 0; x < this.mapWidth; x++)
+                            colorMapCW[x * this.mapHeight + map.getHeight() - 1 - y] = colorMap[y * this.mapWidth + x];
+                    colorMap = colorMapCW;
+                    break;
+                case North:
+                    // Default behavior - nothing to rotate
+                    break;
+                case South:
+                    // Rotate picture 180 degrees
+                    int[] colorMap180 = new int[colorMap.length];
+                    for (int y = 0; y < map.getHeight(); y++)
+                        for (int x = 0; x < map.getWidth(); x++)
+                            colorMap180[(map.getHeight() - 1 - y) * this.mapWidth + map.getWidth() - 1 - x] = colorMap[y * this.mapWidth + x];
+                    colorMap = colorMap180;
+                    break;
+                case East:
+                    // Rotate picture CCW
+                    int[] colorMapCCW = new int[colorMap.length];
+                    for (int y = 0; y < map.getHeight(); y++)
+                        for (int x = 0; x < map.getWidth(); x++)
+                            colorMapCCW[(map.getWidth() - 1 - x) * this.mapHeight + y] = colorMap[y * this.mapWidth + x];
+                    colorMap = colorMapCCW;
+                    break;
+            }
+
+            this.biomeMap = new int[colorMap.length];
+
+            for (int nColor = 0; nColor < colorMap.length; nColor++)
+            {
+                int color = colorMap[nColor] & 0x00FFFFFF;
 
                 if (config.biomeColorMap.containsKey(color))
-                    this.biomeMap[i] = config.biomeColorMap.get(color);
+                    this.biomeMap[nColor] = config.biomeColorMap.get(color);
                 else
-                    this.biomeMap[i] = fillBiome;
+                    this.biomeMap[nColor] = fillBiome;
             }
         } catch (IOException ioexception) {
             TerrainControl.log(Level.SEVERE, ioexception.getStackTrace().toString());
         }
     }
-
     @Override
     public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
     {
@@ -98,30 +99,30 @@ public class LayerFromImage extends Layer
         switch(this.imageMode)
         {
         case Repeat:
-            for(int iz = 0; iz < z_size; iz++)
-                for(int ix = 0; ix < x_size; ix++)
+            for (int iz = 0; iz < z_size; iz++)
+                for (int ix = 0; ix < x_size; ix++)
                 {
                     int Buffer_x = (x + ix - xOffset) % this.mapWidth;
                     int Buffer_z = (z + iz - zOffset) % this.mapHeight;
-                    if(Buffer_x < this.mapWidth)
+                    if (Buffer_x < this.mapWidth)
                           Buffer_x += this.mapWidth;
-                    if(Buffer_z < this.mapHeight)
+                    if (Buffer_z < this.mapHeight)
                           Buffer_z += this.mapHeight;
                     resultBiomes[(ix + iz * x_size)] = this.biomeMap[Buffer_x + Buffer_z * this.mapWidth];
                 }
             return resultBiomes;
         case Mirror:
             // Improved repead mode
-            for(int iz = 0; iz < z_size; iz++)
-                for(int ix = 0; ix < x_size; ix++)
+            for (int iz = 0; iz < z_size; iz++)
+                for (int ix = 0; ix < x_size; ix++)
                 {
                     int Buffer_xq = (x + ix - xOffset) % (2 * this.mapWidth);
                     int Buffer_zq = (z + iz - zOffset) % (2 * this.mapHeight);
                     int Buffer_x = Buffer_xq % this.mapWidth;
                     int Buffer_z = Buffer_zq % this.mapHeight;
-                    if(Buffer_xq >= this.mapWidth)
+                    if (Buffer_xq >= this.mapWidth)
                         Buffer_x = this.mapWidth - 1 - Buffer_x;
-                    if(Buffer_zq >= this.mapHeight)
+                    if (Buffer_zq >= this.mapHeight)
                         Buffer_z = this.mapHeight - 1 - Buffer_z;
                     resultBiomes[(ix + iz * x_size)] = this.biomeMap[Buffer_x + Buffer_z * this.mapWidth];
                 }
