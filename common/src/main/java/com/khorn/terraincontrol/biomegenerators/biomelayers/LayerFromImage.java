@@ -118,9 +118,9 @@ public class LayerFromImage extends Layer
                 {
                     int Buffer_xq = (x + ix - xOffset) % (2 * this.mapWidth);
                     int Buffer_zq = (z + iz - zOffset) % (2 * this.mapHeight);
-					if (Buffer_xq < 0)
+                    if (Buffer_xq < 0)
                         Buffer_xq += 2 * this.mapWidth;
-					if (Buffer_zq < 0)
+                    if (Buffer_zq < 0)
                         Buffer_zq += 2 * this.mapHeight;
                     int Buffer_x = Buffer_xq % this.mapWidth;
                     int Buffer_z = Buffer_zq % this.mapHeight;
