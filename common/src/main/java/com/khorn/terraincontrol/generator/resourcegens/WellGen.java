@@ -130,4 +130,10 @@ public class WellGen extends Resource
         output += frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + this.makeMaterial(sourceBlocks) + ")";
         return output;
     }
+
+    @Override
+    public boolean isAnalogousTo(Resource other)
+    {
+        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+    }
 }

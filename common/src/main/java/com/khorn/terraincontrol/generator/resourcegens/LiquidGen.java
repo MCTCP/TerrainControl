@@ -82,4 +82,10 @@ public class LiquidGen extends Resource
     {
         return "Liquid(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
     }
+
+    @Override
+    public boolean isAnalogousTo(Resource other)
+    {
+        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+    }
 }

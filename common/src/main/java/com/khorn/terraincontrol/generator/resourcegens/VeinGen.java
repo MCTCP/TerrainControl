@@ -95,4 +95,10 @@ public class VeinGen extends Resource
 
         return null;
     }
+
+    @Override
+    public boolean isAnalogousTo(Resource other)
+    {
+        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+    }
 }

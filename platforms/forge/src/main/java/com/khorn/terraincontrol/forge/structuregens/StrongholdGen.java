@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.forge.structuregens;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.Biome;
+import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.ChunkPosition;
@@ -40,7 +40,7 @@ public class StrongholdGen extends MapGenStructure
                 continue;
             if (biomeConfig.strongholdsEnabled)
             {
-                allowedBiomeGenBases.add(((Biome) biomeConfig.Biome).getHandle());
+                allowedBiomeGenBases.add(((ForgeBiome) biomeConfig.Biome).getHandle());
             }
         }
     }

@@ -4,11 +4,11 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import net.minecraft.world.biome.BiomeGenBase;
 
-public class Biome implements LocalBiome
+public class ForgeBiome implements LocalBiome
 {
     private BiomeGenCustom biomeBase;
 
-    public Biome(BiomeGenCustom biome)
+    public ForgeBiome(BiomeGenCustom biome)
     {
         this.biomeBase = biome;
     }

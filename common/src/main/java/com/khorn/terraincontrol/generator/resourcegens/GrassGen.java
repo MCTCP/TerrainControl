@@ -60,4 +60,10 @@ public class GrassGen extends Resource
     {
         return "Grass(" + makeMaterial(blockId) + "," + blockData + "," + frequency + "," + rarity + makeMaterial(sourceBlocks) + ")";
     }
+
+    @Override
+    public boolean isAnalogousTo(Resource other)
+    {
+        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+    }
 }

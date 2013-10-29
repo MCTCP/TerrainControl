@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.util.StringHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class CustomObjectGen extends Resource
 {
@@ -18,7 +19,7 @@ public class CustomObjectGen extends Resource
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
-        if (args.size() == 0 || (args.size() == 1 && args.get(0).trim().equals("")))
+        if (args.isEmpty() || (args.size() == 1 && args.get(0).trim().equals("")))
         {
             // Backwards compability
             args = new ArrayList<String>();
@@ -57,6 +58,20 @@ public class CustomObjectGen extends Resource
     public String makeString()
     {
         return "CustomObject(" + StringHelper.join(objectNames, ",") + ")";
+    }
+
+    @Override
+    public boolean isAnalogousTo(Resource other)
+    {
+        if (other.getClass().getName().equals(this.getClass().getName())){
+            try {
+                CustomObjectGen otherO = (CustomObjectGen) other;
+                return otherO.objectNames.size() == this.objectNames.size() && otherO.objectNames.containsAll(this.objectNames);
+            } catch (Exception ex){
+                TerrainControl.log(Level.WARNING, ex.getMessage());
+            }
+        }
+        return false;
     }
 
 }

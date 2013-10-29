@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.forge.structuregens;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.Biome;
+import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -46,7 +46,7 @@ public class RareBuildingGen extends MapGenStructure
                 continue;
             if (biomeConfig.rareBuildingType != RareBuildingType.disabled)
             {
-                biomeList.add(((Biome) biomeConfig.Biome).getHandle());
+                biomeList.add(((ForgeBiome) biomeConfig.Biome).getHandle());
             }
         }
 

@@ -9,6 +9,7 @@ import java.util.Random;
 
 public class DungeonGen extends Resource
 {
+
     private int minAltitude;
     private int maxAltitude;
 
@@ -35,4 +36,11 @@ public class DungeonGen extends Resource
     {
         return "Dungeon(" + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
     }
+
+    @Override
+    public boolean isAnalogousTo(Resource other)
+    {
+        return other.getClass().getName().equals(this.getClass().getName());
+    }
+
 }

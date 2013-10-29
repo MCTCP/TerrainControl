@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.forge.structuregens;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.Biome;
+import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.structure.MapGenStructure;
@@ -41,7 +41,7 @@ public class VillageGen extends MapGenStructure
                 continue;
             if (config.villageType != VillageType.disabled)
             {
-                villageSpawnBiomes.add(((Biome) config.Biome).getHandle());
+                villageSpawnBiomes.add(((ForgeBiome) config.Biome).getHandle());
             }
         }
     }

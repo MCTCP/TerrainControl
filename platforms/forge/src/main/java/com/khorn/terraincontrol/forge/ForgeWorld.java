@@ -40,7 +40,7 @@ public class ForgeWorld implements LocalWorld
     
     //>>	This will likely change in 1.7
     private static final int maxBiomeCount = (Byte.MIN_VALUE * -2);
-    private static Biome[] biomes = new Biome[maxBiomeCount];
+    private static ForgeBiome[] biomes = new ForgeBiome[maxBiomeCount];
     private static BiomeGenBase[] biomesToRestore = new BiomeGenBase[maxBiomeCount];
 
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
@@ -101,7 +101,7 @@ public class ForgeWorld implements LocalWorld
             biomesToRestore[i] = oldBiome;
             BiomeGenCustom custom = new BiomeGenCustom(nextBiomeId++, oldBiome.biomeName);
             custom.CopyBiome(oldBiome);
-            Biome biome = new Biome(custom);
+            ForgeBiome biome = new ForgeBiome(custom);
             biomes[biome.getId()] = biome;
             defaultBiomes.add(biome);
             this.biomeNames.put(biome.getName(), biome);
@@ -117,7 +117,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome AddBiome(String name, int id)
     {
-        Biome biome = new Biome(new BiomeGenCustom(id, name));
+        ForgeBiome biome = new ForgeBiome(new BiomeGenCustom(id, name));
         biomes[biome.getId()] = biome;
         this.biomeNames.put(biome.getName(), biome);
         return biome;
@@ -343,7 +343,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public void placePopulationMobs(BiomeConfig config, Random random, int chunkX, int chunkZ)
     {
-        SpawnerAnimals.performWorldGenSpawning(this.getWorld(), ((Biome) config.Biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
+        SpawnerAnimals.performWorldGenSpawning(this.getWorld(), ((ForgeBiome) config.Biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
     }
 
     public void LoadChunk(int x, int z)
@@ -593,7 +593,7 @@ public class ForgeWorld implements LocalWorld
         this.settings = config;
         this.world = world;
         this.seed = world.getSeed();
-        for (Biome biome : biomes)
+        for (ForgeBiome biome : biomes)
         {
             // Apply settings for biomes
             if (biome != null && config.biomeConfigManager.getBiomeConfigs()[biome.getId()] != null)

@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.exception.InvalidConfigException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class CustomStructureGen extends Resource
 {
@@ -73,7 +74,7 @@ public class CustomStructureGen extends Resource
     @Override
     public String makeString()
     {
-        if (objects.size() == 0)
+        if (objects.isEmpty())
         {
             return "CustomStructure()";
         }
@@ -87,7 +88,7 @@ public class CustomStructureGen extends Resource
 
     public CustomObjectCoordinate getRandomObjectCoordinate(Random random, int chunkX, int chunkZ)
     {
-        if (objects.size() == 0)
+        if (objects.isEmpty())
         {
             return null;
         }
@@ -99,6 +100,20 @@ public class CustomStructureGen extends Resource
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean isAnalogousTo(Resource other)
+    {
+        if (other.getClass().getName().equals(this.getClass().getName())){
+            try {
+                CustomStructureGen otherO = (CustomStructureGen) other;
+                return otherO.objectNames.size() == this.objectNames.size() && otherO.objectNames.containsAll(this.objectNames);
+            } catch (Exception ex){
+                TerrainControl.log(Level.WARNING, ex.getMessage());
+            }
+        }
+        return false;
     }
 
 }

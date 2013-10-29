@@ -86,4 +86,10 @@ public class VinesGen extends Resource
     {
         return "Vines(" + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
     }
+
+    @Override
+    public boolean isAnalogousTo(Resource other)
+    {
+        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+    }
 }

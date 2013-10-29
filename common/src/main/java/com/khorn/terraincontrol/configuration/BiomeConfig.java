@@ -20,13 +20,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import static com.khorn.terraincontrol.configuration.ConfigFile.readComplexString;
+
 public class BiomeConfig extends ConfigFile
 {
     /*
      * Biome Inheritance: String name of the biome to extend
      */
+
     public String BiomeExtends;
     public boolean BiomeExtendsProcessed = false;
+    public boolean BiomeExtendsSeen = false;
+    
+    private boolean processHasRun = false;
+    private boolean doResourceInheritance = true;
     
     public short[][] replaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
     public int ReplaceCount = 0;
@@ -36,21 +43,21 @@ public class BiomeConfig extends ConfigFile
     public float riverVolatility;
     public int riverWaterLevel;
     public double[] riverHeightMatrix;
-
+    
     public int BiomeSize;
     public int BiomeRarity;
-
+    
     public String BiomeColor;
-
+    
     public ArrayList<String> BiomeIsBorder;
     public ArrayList<String> IsleInBiome;
     public ArrayList<String> NotBorderNear;
-
+    
     // Surface config
     public float BiomeHeight;
     public float BiomeVolatility;
     public int SmoothRadius;
-
+    
     public float BiomeTemperature;
     public float BiomeWetness;
     
@@ -74,6 +81,7 @@ public class BiomeConfig extends ConfigFile
     public int FoliageColor;
     public boolean FoliageColorIsMultiplier;
     
+    public int ResourceCount = 0;
     public Resource[] ResourceSequence = new Resource[256];
     private SaplingGen[] saplingTypes = new SaplingGen[20];
     private SaplingGen saplingResource = null;
@@ -121,8 +129,6 @@ public class BiomeConfig extends ConfigFile
     }
     public RareBuildingType rareBuildingType;
     
-    public int ResourceCount = 0;
-    
     public LocalBiome Biome;
     
     public WorldConfig worldConfig;
@@ -149,25 +155,29 @@ public class BiomeConfig extends ConfigFile
 
     public void process()
     {
-        this.renameOldSettings();
-        this.readConfigSettings();
-
-        this.correctSettings();
-        if (!file.exists())
-            this.createDefaultResources();
-        if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
-            this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfig.ConfigMode.WriteAll);
-
-        if (this.UseWorldWaterLevel)
+        if (!processHasRun)
         {
-            this.waterLevelMax = worldConfig.waterLevelMax;
-            this.waterLevelMin = worldConfig.waterLevelMin;
-            this.waterBlock = worldConfig.waterBlock;
-            this.iceBlock = worldConfig.iceBlock;
-        }
+            this.processHasRun = true;
+            this.renameOldSettings();
+            this.readConfigSettings();
 
-        if (this.Biome.isCustom())
-            this.Biome.setEffects(this);
+            this.correctSettings();
+            if (!file.exists())
+                this.createDefaultResources();
+            if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
+                this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfig.ConfigMode.WriteAll);
+
+            if (this.UseWorldWaterLevel)
+            {
+                this.waterLevelMax = worldConfig.waterLevelMax;
+                this.waterLevelMin = worldConfig.waterLevelMin;
+                this.waterBlock = worldConfig.waterBlock;
+                this.iceBlock = worldConfig.iceBlock;
+            }
+
+            if (this.Biome.isCustom())
+                this.Biome.setEffects(this);
+        }
     }
 
     public int getTemperature()
@@ -507,7 +517,10 @@ public class BiomeConfig extends ConfigFile
                     if (values.length == 5)
                     {
                         // Replace in TC 2.3 style found
-                        values = new String[] {values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)};
+                        values = new String[]
+                        {
+                            values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)
+                        };
                     }
 
                     if (values.length != 2 && values.length != 4)
@@ -552,38 +565,72 @@ public class BiomeConfig extends ConfigFile
 
     }
 
+    private ConfigFunction<BiomeConfig> getResource(Map.Entry<String, String> entry)
+    {
+        String key = entry.getKey();
+        int start = key.indexOf("(");
+        int end = key.lastIndexOf(")");
+        ConfigFunction<BiomeConfig> resource = null;
+        if (start != -1 && end != -1)
+        {
+            String rName = key.substring(0, start);
+            String[] props = readComplexString(key.substring(start + 1, end));
+            if (rName.equalsIgnoreCase("DoResourceInheritance") && props[0].equalsIgnoreCase("false"))
+            {
+                this.doResourceInheritance = false;
+                //>>	make resource non-null so it doesnt get copied as a child, 
+                //>>	but set the return value of getHolderType to null so we can 
+                //>>	check for it. Not sure if there is a better way to do this?
+                resource = new ConfigFunction<BiomeConfig>()
+                {
+                    @Override
+                    protected void load(List<String> args) throws InvalidConfigException
+                    {
+                        throw new UnsupportedOperationException("This class is a placeholder");
+                    }
+
+                    @Override
+                    protected String makeString()
+                    {
+                        throw new UnsupportedOperationException("This class is a placeholder");
+                    }
+
+                    @Override
+                    public Class<BiomeConfig> getHolderType()
+                    {
+                        return null;
+                    }
+                };
+            } else
+            {
+                resource = TerrainControl.getConfigFunctionsManager().getConfigFunction(rName, this, this.name + " on line " + entry.getValue(), Arrays.asList(props));
+            }
+        }
+        return resource;
+    }
+
     private void ReadResourceSettings()
     {
         ArrayList<Integer> LineNumbers = new ArrayList<Integer>();
-
+        this.doResourceInheritance = false;
         for (Map.Entry<String, String> entry : this.settingsCache.entrySet())
         {
-            String key = entry.getKey();
-            int start = key.indexOf("(");
-            int end = key.lastIndexOf(")");
-            if (start != -1 && end != -1)
+            ConfigFunction<BiomeConfig> res = getResource(entry);
+            //>>	Do not include DoResourceInheritance() as a resource
+            if (res != null && res.getHolderType() != null)
             {
-                String resourceName = key.substring(0, start);
-                String[] props = readComplexString(key.substring(start + 1, end));
-
-                ConfigFunction<BiomeConfig> res = TerrainControl.getConfigFunctionsManager().getConfigFunction(resourceName, this, this.name + " on line " + entry.getValue(), Arrays.asList(props));
-
-                if (res != null)
+                if (res instanceof SaplingGen && res.isValid())
                 {
+                    SaplingGen sapling = (SaplingGen) res;
+                    if (sapling.saplingType == SaplingType.All)
+                        this.saplingResource = sapling;
+                    else
+                        this.saplingTypes[sapling.saplingType.getSaplingId()] = sapling;
 
-                    if (res instanceof SaplingGen && res.isValid())
-                    {
-                        SaplingGen sapling = (SaplingGen) res;
-                        if (sapling.saplingType == SaplingType.All)
-                            this.saplingResource = sapling;
-                        else
-                            this.saplingTypes[sapling.saplingType.getSaplingId()] = sapling;
-
-                    } else if (res instanceof Resource)
-                    {
-                        LineNumbers.add(Integer.valueOf(entry.getValue()));
-                        this.ResourceSequence[this.ResourceCount++] = (Resource) res;
-                    }
+                } else if (res instanceof Resource)
+                {
+                    LineNumbers.add(Integer.valueOf(entry.getValue()));
+                    this.ResourceSequence[this.ResourceCount++] = (Resource) res;
                 }
             }
         }
@@ -606,6 +653,81 @@ public class BiomeConfig extends ConfigFile
             this.ResourceSequence[minimal] = buffer;
             LineNumbers.set(minimal, LineNumbers.get(i));
         }
+    }
+
+    /**
+     * Merges two sets of resources. The child set will override any element of
+     * the parent that it can.
+     * <p/>
+     * @param parent
+     * @param child
+     * <p/>
+     * @return
+     */
+    public BiomeConfig merge(BiomeConfig parent)
+    {
+        //>>	Run down the list of parent settings from config
+        for (Map.Entry<String, String> parentEntry : parent.settingsCache.entrySet())
+        {
+            //>>	As long as the child does not have the setting and it isnt a resource
+            if (!this.settingsCache.containsKey(parentEntry.getKey()) && getResource(parentEntry) == null)
+            {
+                //>>	Give it to the child from the parent
+                this.settingsCache.put(parentEntry.getKey(), parentEntry.getValue());
+                //>>	And let us know if we are producing FINE logs
+                TerrainControl.log(Level.FINE, "Setting({0},{1})", new Object[]{ parentEntry.getKey(), parent.settingsCache.get(parentEntry.getKey()) });
+            }
+        }
+        //>>	Now really process both parent and child so that both have their final non-resource properties
+        this.process();
+        parent.process();
+        //>>	We dont want to merge resources unless the child allows it.
+        TerrainControl.log(Level.FINE, "=====Doing Resource Inheritance====");
+        if (this.doResourceInheritance)
+        {
+            //>>	Then do the resource merge! Start with Resource Sequence.
+            int T_ResourceCount = parent.ResourceCount;
+            Resource[] T_ResourceSequence = Arrays.copyOf(parent.ResourceSequence, 256);
+            for (int i = 0; i < this.ResourceSequence.length; i++)
+            {
+                boolean analagous = false;
+                for (int j = 0; j < T_ResourceSequence.length; j++)
+                {
+                    if (this.ResourceSequence[i].isAnalogousTo(T_ResourceSequence[j]))
+                    {
+                        TerrainControl.log(Level.FINE, "Merging Resources\nP: {0}\nC: {1}", new Object[]{ T_ResourceSequence[j].makeString(), this.ResourceSequence[i].makeString()});
+                        T_ResourceSequence[j] = this.ResourceSequence[i];
+                        analagous = true;
+                        break;
+                    }
+
+                }
+                if (!analagous)
+                {
+                    TerrainControl.log(Level.FINE, "Adding Child Resource\n{0}", new Object[]{ this.ResourceSequence[i].makeString()});
+                    T_ResourceSequence[T_ResourceCount++] = this.ResourceSequence[i];
+                }
+            }
+            this.ResourceSequence = T_ResourceSequence;
+            this.ReplaceCount = T_ResourceCount;
+            //>>	if the child is using All saplings then we dont need to merge
+            if (this.saplingResource.saplingType != SaplingType.All)
+            {
+                //>>	take all parent sapling types and if child doesnt have them, insert
+                for (SaplingGen sap : parent.saplingTypes)
+                {
+                    if (this.saplingTypes[sap.saplingType.getSaplingId()] == null){
+                        TerrainControl.log(Level.FINE, "Sapling added to Child: {0}", new Object[]{ sap.saplingType.getSaplingId()});
+                        this.saplingTypes[sap.saplingType.getSaplingId()] = sap;
+                    }
+                }
+            } else {
+                TerrainControl.log(Level.FINE, "No Sapling merge needed!");
+            }
+        }
+        this.BiomeExtendsProcessed = true;
+        TerrainControl.log(Level.FINE, "=====END Resource Inheritance====");
+        return this;
     }
 
     private void ReadCustomObjectSettings()
@@ -819,6 +941,7 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("Keep in mind that a high size, frequency or rarity might slow down terrain generation.");
         this.writeComment("");
         this.writeComment("Possible resources:");
+        this.writeComment("DoResourceInheritance(true|false)");
         this.writeComment("SmallLake(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.writeComment("Dungeon(Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.writeComment("UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)");
@@ -1102,7 +1225,10 @@ public class BiomeConfig extends ConfigFile
     protected void renameOldSettings()
     {
         // Old values from WorldConfig
-        TCDefaultValues[] copyFromWorld = {TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl};
+        TCDefaultValues[] copyFromWorld =
+        {
+            TCDefaultValues.MaxAverageHeight, TCDefaultValues.MaxAverageDepth, TCDefaultValues.Volatility1, TCDefaultValues.Volatility2, TCDefaultValues.VolatilityWeight1, TCDefaultValues.VolatilityWeight2, TCDefaultValues.DisableBiomeHeight, TCDefaultValues.CustomHeightControl
+        };
         for (TCDefaultValues value : copyFromWorld)
             if (this.worldConfig.settingsCache.containsKey(value.name().toLowerCase()))
             {
@@ -1270,7 +1396,10 @@ public class BiomeConfig extends ConfigFile
                 this.defaultReed = 10;
                 this.defaultCactus = 10;
                 this.defaultColor = "0xFFCC33";
-                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
+                this.defaultWell = new Object[]
+                {
+                    DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND
+                };
                 this.defaultVillageType = VillageType.sandstone;
                 this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;
@@ -1380,7 +1509,10 @@ public class BiomeConfig extends ConfigFile
                 this.defaultReed = 50;
                 this.defaultCactus = 10;
                 this.defaultColor = "0x996600";
-                this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND};
+                this.defaultWell = new Object[]
+                {
+                    DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2, worldConfig.WorldHeight, DefaultMaterial.SAND
+                };
                 this.defaultVillageType = VillageType.sandstone;
                 this.defaultRareBuildingType = RareBuildingType.desertPyramid;
                 break;

@@ -43,4 +43,10 @@ public class AboveWaterGen extends Resource
         return "AboveWaterRes(" + makeMaterial(blockId) + "," + frequency + "," + rarity + ")";
     }
 
+    @Override
+    public boolean isAnalogousTo(Resource other)
+    {
+        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+    }
+
 }

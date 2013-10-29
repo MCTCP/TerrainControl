@@ -10,6 +10,7 @@ import java.util.Random;
 
 public class CactusGen extends Resource
 {
+
     private int minAltitude;
     private int maxAltitude;
     private List<Integer> sourceBlocks;
@@ -62,4 +63,11 @@ public class CactusGen extends Resource
             sourceBlocks.add(readBlockId(args.get(i)));
         }
     }
+
+    @Override
+    public boolean isAnalogousTo(Resource other)
+    {
+        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+    }
+
 }

@@ -144,21 +144,14 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
         return blockId;
     }
 
+    
     /**
-     * Merges two sets of resources. The child set will override any element of
-     * the parent that it can.
-     * <p/>
-     * @param parent
-     * @param child
-     * <p/>
+     * Returns whether or not the two resources are similar to each other.
+     * This should return true if two resources are of the same class and if
+     * critical element are the same. For example source blocks. This will be
+     * used to test if a resource should be overridden via inheritance.
      * @return
      */
-    public static Resource[] mergeSet(Resource[] parent, Resource[] child)
-    {
-        for (Resource resource : parent)
-        {
-        }
-        return null;
-    }
-
+    public abstract boolean isAnalogousTo(Resource other);
+    
 }
