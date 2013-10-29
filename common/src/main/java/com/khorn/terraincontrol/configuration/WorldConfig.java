@@ -73,6 +73,7 @@ public class WorldConfig extends ConfigFile
     // Biome image
 
     public String imageFile;
+    public ImageOrientation imageOrientation;
     public ImageMode imageMode;
     // public int imageZoom;
     public String imageFillBiome;
@@ -444,6 +445,7 @@ public class WorldConfig extends ConfigFile
         // Images
         this.imageMode = readSettings(TCDefaultValues.ImageMode);
         this.imageFile = this.readSettings(TCDefaultValues.ImageFile);
+        this.imageOrientation = this.readSettings(TCDefaultValues.ImageOrientation);
         this.imageFillBiome = this.readSettings(TCDefaultValues.ImageFillBiome);
         this.imageXOffset = this.readSettings(TCDefaultValues.ImageXOffset);
         this.imageZOffset = this.readSettings(TCDefaultValues.ImageZOffset);
@@ -682,12 +684,20 @@ public class WorldConfig extends ConfigFile
 
         writeComment("Possible modes when generator outside image boundaries: Repeat, ContinueNormal, FillEmpty");
         writeComment("   Repeat - repeat image");
+        writeComment("   Mirror - advanced repeat image mode");
         writeComment("   ContinueNormal - continue normal generation");
         writeComment("   FillEmpty - fill by biome in \"ImageFillBiome settings\" ");
         writeValue(TCDefaultValues.ImageMode, this.imageMode.name());
 
         writeComment("Source png file for FromImage biome mode.");
         writeValue(TCDefaultValues.ImageFile, this.imageFile);
+
+        writeComment("Where the png's north is oriented? Possible values: North, East, South, West");
+        writeComment("   North - the top of your picture if north (no any rotation)");
+        writeComment("   West - previous behavior (you should rotate png CCW manually)");
+        writeComment("   East - png should be rotated CW manually");
+        writeComment("   South - rotate png 180 degrees before generating world");
+        writeValue(TCDefaultValues.ImageOrientation, this.imageOrientation.name());
 
         writeComment("Biome name for fill outside image boundaries with FillEmpty mode.");
         writeValue(TCDefaultValues.ImageFillBiome, this.imageFillBiome);
@@ -934,9 +944,18 @@ public class WorldConfig extends ConfigFile
     public enum ImageMode
     {
         Repeat,
+        Mirror,
         ContinueNormal,
         FillEmpty,
     }
+     
+     public enum ImageOrientation
+     {
+         North,
+         East,
+         South,
+         West,
+     }
 
     public enum ConfigMode
     {
