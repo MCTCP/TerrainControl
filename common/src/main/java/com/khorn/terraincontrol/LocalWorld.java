@@ -13,7 +13,9 @@ import java.util.Random;
 public interface LocalWorld
 {
     // Biome init
-    public LocalBiome AddBiome(String name, int id);
+    public LocalBiome AddCustomBiome(String name, int id);
+
+    public LocalBiome AddVirtualBiome(String name, int id, int virtualId);
 
     public LocalBiome getNullBiome(String name);
 

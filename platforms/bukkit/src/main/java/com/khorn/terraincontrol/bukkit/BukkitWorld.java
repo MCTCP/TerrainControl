@@ -32,8 +32,12 @@ public class BukkitWorld implements LocalWorld
     private BiomeGenerator biomeManager;
 
     private static int nextBiomeId = DefaultBiome.values().length;
-    private static int maxBiomeCount = 256;
+    private static int maxBiomeCount = 1024;
     private static LocalBiome[] biomes = new LocalBiome[maxBiomeCount];
+
+    public int[] virtualBiomesMatrix = new int[maxBiomeCount];
+    public boolean haveVirtualBiomes = false;
+
 
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
     private static ArrayList<LocalBiome> defaultBiomes = new ArrayList<LocalBiome>();
@@ -68,6 +72,7 @@ public class BukkitWorld implements LocalWorld
     private int worldHeight = 256;
     private int heightBits = 8;
 
+    // Need for compatibility with old configs. It is start index for custom biomes count used only for isle biomes.
     private int customBiomesCount = 21;
 
     static
@@ -95,12 +100,28 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome AddBiome(String name, int id)
+    public LocalBiome AddCustomBiome(String name, int id)
     {
-        BukkitBiome biome = new BukkitBiome(new CustomBiome(id, name));
-        biome.setCustomID(customBiomesCount++);
+        BukkitBiome biome = new BukkitBiome(new CustomBiome(id, name), customBiomesCount++);
+
         biomes[biome.getId()] = biome;
         this.biomeNames.put(biome.getName(), biome);
+        return biome;
+    }
+
+    @Override
+    public LocalBiome AddVirtualBiome(String name, int id, int virtualId)
+    {
+        BukkitBiome biome = new BukkitBiome(BiomeBase.biomes[id], name, customBiomesCount++, virtualId);
+        biomes[biome.getId()] = biome;
+        this.biomeNames.put(biome.getName(), biome);
+        if (!this.haveVirtualBiomes)
+        {
+            this.haveVirtualBiomes = true;
+            for (int i = 0; i < maxBiomeCount; i++)
+                this.virtualBiomesMatrix[i] = i;
+        }
+        this.virtualBiomesMatrix[virtualId] = id;
         return biome;
     }
 
@@ -313,7 +334,7 @@ public class BukkitWorld implements LocalWorld
             byte[] ChunkBiomes = this.chunkCache[0].m();
 
             for (int i = 0; i < ChunkBiomes.length; i++)
-                ChunkBiomes[i] = (byte) (this.settings.ReplaceMatrixBiomes[ChunkBiomes[i] & 0xFF] & 0xFF);
+                ChunkBiomes[i] = (byte) (this.settings.ReplaceBiomesMatrix[ChunkBiomes[i] & 0xFF] & 0xFF);
         }
 
     }
@@ -583,6 +604,7 @@ public class BukkitWorld implements LocalWorld
      * Sets the new settings and deprecates any references to the old
      * settings, if any.
      * <p/>
+     *
      * @param worldConfig The new settings.
      */
     public void setSettings(WorldConfig worldConfig)
@@ -600,6 +622,7 @@ public class BukkitWorld implements LocalWorld
      * don't forget to set the new settings first using
      * {@link #setSettings(WorldConfig)}.
      * <p/>
+     *
      * @param world The world that needs to be enabled.
      */
     public void enable(org.bukkit.World world)
@@ -734,10 +757,7 @@ public class BukkitWorld implements LocalWorld
             tileEntity.a(nmsTag); // tileEntity.load
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[]
-            {
-                nmsTag.getString("id"), x, y, z, world.getTypeId(x, y, z)
-            });
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[]{nmsTag.getString("id"), x, y, z, world.getTypeId(x, y, z)});
         }
     }
 
@@ -766,9 +786,9 @@ public class BukkitWorld implements LocalWorld
     @Override
     public boolean canBiomeManagerGenerateUnzoomed()
     {
-        if(this.biomeManager != null)
+        if (this.biomeManager != null)
             return biomeManager.canGenerateUnZoomed();
         return true;
     }
-    
+
 }

@@ -161,7 +161,7 @@ public class BiomeConfig extends ConfigFile
             this.iceBlock = worldConfig.iceBlock;
         }
 
-        if (biome.isCustom())
+        if (biome.isCustom() && !biome.isVirtual())
             biome.setEffects(this);
     }
 
@@ -911,7 +911,7 @@ public class BiomeConfig extends ConfigFile
         }
 
         // FrozenRivers
-        if (this.worldConfig.readModSettings(TCDefaultValues.FrozenRivers, true) == false)
+        if (!this.worldConfig.readModSettings(TCDefaultValues.FrozenRivers, true))
         {
             // User had disabled frozen rivers in the old WorldConfig
             // So ignore the default value of RiverBiome

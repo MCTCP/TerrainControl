@@ -113,12 +113,18 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome AddBiome(String name, int id)
+    public LocalBiome AddCustomBiome(String name, int id)
     {
         Biome biome = new Biome(new BiomeGenCustom(id, name));
         biomes[biome.getId()] = biome;
         this.biomeNames.put(biome.getName(), biome);
         return biome;
+    }
+
+    @Override
+    public LocalBiome AddVirtualBiome(String name, int id, int virtualId)
+    {
+        return null;
     }
 
     @Override
@@ -333,7 +339,7 @@ public class ForgeWorld implements LocalWorld
             byte[] ChunkBiomes = this.chunkCache[0].getBiomeArray();
 
             for (int i = 0; i < ChunkBiomes.length; i++)
-                ChunkBiomes[i] = (byte) (this.settings.ReplaceMatrixBiomes[ChunkBiomes[i] & 0xFF] & 0xFF);
+                ChunkBiomes[i] = (byte) (this.settings.ReplaceBiomesMatrix[ChunkBiomes[i] & 0xFF] & 0xFF);
         }
 
     }

@@ -22,6 +22,8 @@ public class WorldConfig extends ConfigFile
 
     public ArrayList<String> CustomBiomes = new ArrayList<String>();
     public HashMap<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
+    public HashMap<String, Integer> VirtualBiomeIds = new HashMap<String, Integer>();
+    public HashMap<Integer, Integer> VirtualBiomeRealIds = new HashMap<Integer, Integer>();
 
     // Holds all world CustomObjects.
     public List<CustomObject> customObjects = new ArrayList<CustomObject>();
@@ -32,11 +34,11 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> BorderBiomes = new ArrayList<String>();
 
     public BiomeConfig[] biomeConfigs;  // Must be simple array for fast access.
-                                       // Beware! Some ids may contain null
-                                       // values;
+    // Beware! Some ids may contain null
+    // values;
     public int biomesCount; // Overall biome count in this world.
 
-    public byte[] ReplaceMatrixBiomes = new byte[256];
+    public byte[] ReplaceBiomesMatrix = new byte[256];
     public boolean HaveBiomeReplace = false;
 
     public int maxSmoothRadius = 2;
@@ -188,18 +190,13 @@ public class WorldConfig extends ConfigFile
 
         ReadWorldCustomObjects();
 
-        // Check biome ids
-
-        for (String biomeName : CustomBiomes)
-            if (CustomBiomeIds.get(biomeName) == -1)
-                CustomBiomeIds.put(biomeName, world.getFreeBiomeId());
+        world.setHeightBits(this.worldHeightBits);
 
         // Need add check to clashes
         if (this.SettingsMode != ConfigMode.WriteDisable)
             this.writeSettingsFile(this.SettingsMode == ConfigMode.WriteAll);
 
-        world.setHeightBits(this.worldHeightBits);
-
+        // Check biomes folder
         File biomeFolder = new File(settingsDir, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
         if (!biomeFolder.exists())
         {
@@ -213,17 +210,42 @@ public class WorldConfig extends ConfigFile
         ArrayList<LocalBiome> localBiomes = new ArrayList<LocalBiome>(world.getDefaultBiomes());
 
         // Add custom biomes to world
-        for (String biomeName : this.CustomBiomes)
+        for (String biomeName : this.CustomBiomeIds.keySet())
         {
             if (checkOnly)
                 localBiomes.add(world.getNullBiome(biomeName));
             else
-                localBiomes.add(world.AddBiome(biomeName, this.CustomBiomeIds.get(biomeName)));
+            {
+                int id = this.CustomBiomeIds.get(biomeName);
+                if (id == -1)
+                    id = world.getFreeBiomeId();
+                localBiomes.add(world.AddCustomBiome(biomeName, id));
+            }
+        }
+
+        // Add virtual biomes to world
+
+        for (String biomeName : this.VirtualBiomeIds.keySet())
+        {
+            if (checkOnly)
+                localBiomes.add(world.getNullBiome(biomeName));
+            else
+            {
+                int virtualId = this.VirtualBiomeIds.get(biomeName);
+                int realId = VirtualBiomeRealIds.get(virtualId);
+                if (world.getBiomeById(realId) == null)
+                {
+                    TerrainControl.log(Level.WARNING, "Wrong real id for virtual biome {0}!", new Object[]{biomeName});
+                    continue;
+                }
+
+                localBiomes.add(world.AddVirtualBiome(biomeName, realId, virtualId));
+            }
         }
 
         // Build biome replace matrix
-        for (int i = 0; i < this.ReplaceMatrixBiomes.length; i++)
-            this.ReplaceMatrixBiomes[i] = (byte) i;
+        for (int i = 0; i < this.ReplaceBiomesMatrix.length; i++)
+            this.ReplaceBiomesMatrix[i] = (byte) i;
 
         this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
         this.biomesCount = 0;
@@ -239,7 +261,7 @@ public class WorldConfig extends ConfigFile
             if (!config.ReplaceBiomeName.equals(""))
             {
                 this.HaveBiomeReplace = true;
-                this.ReplaceMatrixBiomes[config.Biome.getId()] = (byte) world.getBiomeIdByName(config.ReplaceBiomeName);
+                this.ReplaceBiomesMatrix[config.Biome.getId()] = (byte) world.getBiomeIdByName(config.ReplaceBiomeName);
             }
 
             if (this.NormalBiomes.contains(config.name))
@@ -263,7 +285,7 @@ public class WorldConfig extends ConfigFile
                 biomesCount++;
             } else
             {
-                TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[] {localBiome.getId(), this.biomeConfigs[localBiome.getId()].name, config.name});
+                TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]{localBiome.getId(), this.biomeConfigs[localBiome.getId()].name, config.name});
             }
             this.biomeConfigs[localBiome.getId()] = config;
 
@@ -284,7 +306,7 @@ public class WorldConfig extends ConfigFile
 
             }
         }
-        TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[] {biomesCount});
+        TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[]{biomesCount});
         TerrainControl.logIfLevel(Level.ALL, Level.CONFIG, LoadedBiomeNames);
     }
 
@@ -540,11 +562,16 @@ public class WorldConfig extends ConfigFile
             try
             {
                 String[] keys = biome.split(":");
-                int id = -1;
-                if (keys.length == 2)
-                    id = Integer.valueOf(keys[1]);
                 CustomBiomes.add(keys[0]);
-                CustomBiomeIds.put(keys[0], id);
+                if (keys.length == 2)
+                    CustomBiomeIds.put(keys[0], Integer.valueOf(keys[1]));
+                else if (keys.length == 3)
+                {
+                    VirtualBiomeIds.put(keys[0], Integer.valueOf(keys[2]));
+                    VirtualBiomeRealIds.put(Integer.valueOf(keys[2]), Integer.valueOf(keys[1]));
+                } else
+                    CustomBiomeIds.put(keys[0], -1);
+
 
             } catch (NumberFormatException e)
             {
@@ -911,7 +938,10 @@ public class WorldConfig extends ConfigFile
             if (!first)
                 output += ",";
             first = false;
-            output += biome + ":" + CustomBiomeIds.get(biome);
+            if(CustomBiomeIds.containsKey(biome))
+                output += biome + ":" + CustomBiomeIds.get(biome);
+            else
+                output += biome + ":" + VirtualBiomeRealIds.get(VirtualBiomeIds.get(biome)) + ":"+ VirtualBiomeIds.get(biome);
         }
         writeValue(TCDefaultValues.CustomBiomes, output);
 
@@ -948,14 +978,14 @@ public class WorldConfig extends ConfigFile
         ContinueNormal,
         FillEmpty,
     }
-     
-     public enum ImageOrientation
-     {
-         North,
-         East,
-         South,
-         West,
-     }
+
+    public enum ImageOrientation
+    {
+        North,
+        East,
+        South,
+        West,
+    }
 
     public enum ConfigMode
     {
@@ -1015,11 +1045,11 @@ public class WorldConfig extends ConfigFile
         {
             String biomeName = readStringFromStream(stream);
             int id = stream.readInt();
-            world.AddBiome(biomeName, id);
+            world.AddCustomBiome(biomeName, id);
             this.CustomBiomes.add(biomeName);
             this.CustomBiomeIds.put(biomeName, id);
         }
-
+        //TODO Check all this code.
         // BiomeConfigs
         this.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
