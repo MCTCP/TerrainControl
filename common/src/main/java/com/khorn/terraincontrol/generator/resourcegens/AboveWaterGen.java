@@ -46,7 +46,7 @@ public class AboveWaterGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
     }
 
 }

@@ -11,6 +11,7 @@ import java.util.Random;
 
 public class VeinGen extends Resource
 {
+
     public double veinRarity; // Chance for the vein to spawn in a chunk
     public int minRadius; // Minimum size of the vein in blocks (inclusive)
     public int maxRadius; // Maximum size of the vein in blocks (inclusive)
@@ -24,7 +25,6 @@ public class VeinGen extends Resource
     @Override
     public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
     {
-
     }
 
     @Override
@@ -74,10 +74,11 @@ public class VeinGen extends Resource
 
     /**
      * Returns the vein that starts in the chunk.
-     * 
+     * <p/>
      * @param chunkX The x of the chunk.
      * @param chunkZ The z of the chunk.
-     * @return The vein that starts in the chunk, or null if there is no starting vein.
+     * @return The vein that starts in the chunk, or null if there is no
+     *         starting vein.
      */
     public Vein getVeinStartInChunk(LocalWorld world, int chunkX, int chunkZ)
     {
@@ -99,6 +100,48 @@ public class VeinGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
     }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final VeinGen compare = (VeinGen) other;
+        return this.veinRarity == compare.veinRarity
+               && this.minRadius == compare.minRadius
+               && this.maxRadius == compare.maxRadius
+               && this.oreSize == compare.oreSize
+               && this.oreFrequency == compare.oreFrequency
+               && this.oreRarity == compare.oreRarity
+               && this.minAltitude == compare.minAltitude
+               && this.maxAltitude == compare.maxAltitude
+               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
+                   : this.sourceBlocks.equals(compare.sourceBlocks));
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        hash = 29 * hash + super.hashCode();
+        hash = 29 * hash + (int) (Double.doubleToLongBits(this.veinRarity) ^ (Double.doubleToLongBits(this.veinRarity) >>> 32));
+        hash = 29 * hash + this.minRadius;
+        hash = 29 * hash + this.maxRadius;
+        hash = 29 * hash + this.oreSize;
+        hash = 29 * hash + this.oreFrequency;
+        hash = 29 * hash + this.oreRarity;
+        hash = 29 * hash + this.minAltitude;
+        hash = 29 * hash + this.maxAltitude;
+        hash = 29 * hash + (this.sourceBlocks != null ? this.sourceBlocks.hashCode() : 0);
+        return hash;
+    }
+
 }

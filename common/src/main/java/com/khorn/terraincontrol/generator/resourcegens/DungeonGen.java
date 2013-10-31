@@ -40,7 +40,33 @@ public class DungeonGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return other.getClass().getName().equals(this.getClass().getName());
+        return getClass() == other.getClass();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 61 * hash + super.hashCode();
+        hash = 61 * hash + this.minAltitude;
+        hash = 61 * hash + this.maxAltitude;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final DungeonGen compare = (DungeonGen) other;
+        return this.minAltitude == compare.minAltitude
+               && this.maxAltitude == compare.maxAltitude;
     }
 
 }

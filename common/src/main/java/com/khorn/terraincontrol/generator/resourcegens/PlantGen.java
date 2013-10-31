@@ -58,6 +58,36 @@ public class PlantGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
     }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 71 * hash + super.hashCode();
+        hash = 71 * hash + this.minAltitude;
+        hash = 71 * hash + this.maxAltitude;
+        hash = 71 * hash + (this.sourceBlocks != null ? this.sourceBlocks.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final PlantGen compare = (PlantGen) other;
+        return this.minAltitude == compare.minAltitude
+               && this.maxAltitude == compare.maxAltitude
+               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
+                   : this.sourceBlocks.equals(compare.sourceBlocks));
+    }
+
 }

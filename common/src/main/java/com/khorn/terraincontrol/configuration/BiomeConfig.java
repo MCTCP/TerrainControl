@@ -164,8 +164,17 @@ public class BiomeConfig extends ConfigFile
             this.correctSettings();
             if (!file.exists())
                 this.createDefaultResources();
-            if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
-                this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfig.ConfigMode.WriteAll);
+            if (!this.BiomeExtends.isEmpty())
+            {
+                if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable){
+                    this.file = new File(this.file.getParentFile(), this.file.getName()+".inherit");
+                    this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfig.ConfigMode.WriteAll);
+                }
+            } else
+            {
+                if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
+                    this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfig.ConfigMode.WriteAll);
+            }
 
             if (this.UseWorldWaterLevel)
             {
@@ -486,9 +495,7 @@ public class BiomeConfig extends ConfigFile
         try
         {
             for (int i = 0; i < heightMatrix.length && i < keys.size(); i++)
-            {
                 heightMatrix[i] = Double.parseDouble(keys.get(i));
-            }
         } catch (NumberFormatException e)
         {
             logSettingValueInvalid(setting.name(), e);
@@ -517,10 +524,7 @@ public class BiomeConfig extends ConfigFile
                     if (values.length == 5)
                     {
                         // Replace in TC 2.3 style found
-                        values = new String[]
-                        {
-                            values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)
-                        };
+                        values = new String[]{ values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1) };
                     }
 
                     if (values.length != 2 && values.length != 4)
@@ -612,7 +616,7 @@ public class BiomeConfig extends ConfigFile
     private void ReadResourceSettings()
     {
         ArrayList<Integer> LineNumbers = new ArrayList<Integer>();
-        this.doResourceInheritance = false;
+        this.doResourceInheritance = true;
         for (Map.Entry<String, String> entry : this.settingsCache.entrySet())
         {
             ConfigFunction<BiomeConfig> res = getResource(entry);
@@ -675,27 +679,27 @@ public class BiomeConfig extends ConfigFile
                 //>>	Give it to the child from the parent
                 this.settingsCache.put(parentEntry.getKey(), parentEntry.getValue());
                 //>>	And let us know if we are producing FINE logs
-                TerrainControl.log(Level.FINE, "Setting({0},{1})", new Object[]{ parentEntry.getKey(), parent.settingsCache.get(parentEntry.getKey()) });
+                TerrainControl.log(Level.INFO, "Setting({0},{1})", new Object[]{ parentEntry.getKey(), parent.settingsCache.get(parentEntry.getKey()) });
             }
         }
         //>>	Now really process both parent and child so that both have their final non-resource properties
         this.process();
         parent.process();
         //>>	We dont want to merge resources unless the child allows it.
-        TerrainControl.log(Level.FINE, "=====Doing Resource Inheritance====");
+        TerrainControl.log(Level.CONFIG, "=====Doing Resource Inheritance====");
         if (this.doResourceInheritance)
         {
             //>>	Then do the resource merge! Start with Resource Sequence.
             int T_ResourceCount = parent.ResourceCount;
             Resource[] T_ResourceSequence = Arrays.copyOf(parent.ResourceSequence, 256);
-            for (int i = 0; i < this.ResourceSequence.length; i++)
+            for (int i = 0; i < this.ResourceCount; i++)
             {
                 boolean analagous = false;
-                for (int j = 0; j < T_ResourceSequence.length; j++)
+                for (int j = 0; j < T_ResourceCount; j++)
                 {
                     if (this.ResourceSequence[i].isAnalogousTo(T_ResourceSequence[j]))
                     {
-                        TerrainControl.log(Level.FINE, "Merging Resources\nP: {0}\nC: {1}", new Object[]{ T_ResourceSequence[j].makeString(), this.ResourceSequence[i].makeString()});
+                        TerrainControl.log(Level.CONFIG, "Merging Resources\nP: {0}\nC: {1}", new Object[]{ T_ResourceSequence[j].makeString(), this.ResourceSequence[i].makeString()});
                         T_ResourceSequence[j] = this.ResourceSequence[i];
                         analagous = true;
                         break;
@@ -704,29 +708,29 @@ public class BiomeConfig extends ConfigFile
                 }
                 if (!analagous)
                 {
-                    TerrainControl.log(Level.FINE, "Adding Child Resource\n{0}", new Object[]{ this.ResourceSequence[i].makeString()});
+                    TerrainControl.log(Level.CONFIG, "Adding Child Resource\n{0}", new Object[]{ this.ResourceSequence[i].makeString()});
                     T_ResourceSequence[T_ResourceCount++] = this.ResourceSequence[i];
                 }
             }
             this.ResourceSequence = T_ResourceSequence;
             this.ReplaceCount = T_ResourceCount;
             //>>	if the child is using All saplings then we dont need to merge
-            if (this.saplingResource.saplingType != SaplingType.All)
+            if (this.saplingResource != null && this.saplingResource.saplingType != SaplingType.All)
             {
                 //>>	take all parent sapling types and if child doesnt have them, insert
                 for (SaplingGen sap : parent.saplingTypes)
                 {
                     if (this.saplingTypes[sap.saplingType.getSaplingId()] == null){
-                        TerrainControl.log(Level.FINE, "Sapling added to Child: {0}", new Object[]{ sap.saplingType.getSaplingId()});
+                        TerrainControl.log(Level.CONFIG, "Sapling added to Child: {0}", new Object[]{ sap.saplingType.getSaplingId()});
                         this.saplingTypes[sap.saplingType.getSaplingId()] = sap;
                     }
                 }
             } else {
-                TerrainControl.log(Level.FINE, "No Sapling merge needed!");
+                TerrainControl.log(Level.CONFIG, "No Sapling merge needed!");
             }
         }
         this.BiomeExtendsProcessed = true;
-        TerrainControl.log(Level.FINE, "=====END Resource Inheritance====");
+        TerrainControl.log(Level.CONFIG, "=====END Resource Inheritance====");
         return this;
     }
 

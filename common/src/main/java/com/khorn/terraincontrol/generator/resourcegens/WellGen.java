@@ -9,6 +9,7 @@ import java.util.Random;
 
 public class WellGen extends Resource
 {
+
     private int minAltitude;
     private int maxAltitude;
 
@@ -134,6 +135,44 @@ public class WellGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
     }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        hash = 17 * hash + super.hashCode();
+        hash = 17 * hash + this.minAltitude;
+        hash = 17 * hash + this.maxAltitude;
+        hash = 17 * hash + this.slabId;
+        hash = 17 * hash + this.slabData;
+        hash = 17 * hash + this.waterId;
+        hash = 17 * hash + this.waterData;
+        hash = 17 * hash + (this.sourceBlocks != null ? this.sourceBlocks.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final WellGen compare = (WellGen) other;
+        return this.maxAltitude == compare.maxAltitude
+               && this.minAltitude == compare.minAltitude
+               && this.slabData == compare.slabData
+               && this.slabId == compare.slabId
+               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
+                   : this.sourceBlocks.equals(compare.sourceBlocks))
+               && this.waterData == compare.waterData
+               && this.waterId == compare.waterId;
+    }
+
 }

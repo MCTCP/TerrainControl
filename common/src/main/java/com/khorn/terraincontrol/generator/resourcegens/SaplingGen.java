@@ -85,4 +85,35 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         }
         return false;
     }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 37 * hash + (this.trees != null ? this.trees.hashCode() : 0);
+        hash = 37 * hash + (this.treeNames != null ? this.treeNames.hashCode() : 0);
+        hash = 37 * hash + (this.treeChances != null ? this.treeChances.hashCode() : 0);
+        hash = 37 * hash + (this.saplingType != null ? this.saplingType.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final SaplingGen compare = (SaplingGen) other;
+        return this.saplingType == compare.saplingType
+               && (this.treeNames == null ? this.treeNames == compare.treeNames
+                   : this.treeNames.equals(compare.treeNames))
+               && (this.treeNames == null ? this.treeNames == compare.treeNames
+                   : this.treeNames.equals(compare.treeNames))
+               && (this.treeChances == null ? this.treeChances == compare.treeChances
+                   : this.treeChances.equals(compare.treeChances));
+    }
+    
 }

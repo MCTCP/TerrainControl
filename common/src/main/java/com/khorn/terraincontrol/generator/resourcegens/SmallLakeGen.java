@@ -4,9 +4,11 @@ import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import java.util.Arrays;
 
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class SmallLakeGen extends Resource
 {
@@ -135,6 +137,38 @@ public class SmallLakeGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
     }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        hash = 41 * hash + super.hashCode();
+        hash = 41 * hash + Arrays.hashCode(this.BooleanBuffer);
+        hash = 41 * hash + this.minAltitude;
+        hash = 41 * hash + this.maxAltitude;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final SmallLakeGen compare = (SmallLakeGen) other;
+        TerrainControl.log(Level.CONFIG, "Equals::{0}", new Object[]{this.minAltitude == compare.minAltitude
+               && this.maxAltitude == compare.maxAltitude
+               && Arrays.equals(this.BooleanBuffer, compare.BooleanBuffer)});
+        return this.minAltitude == compare.minAltitude
+               && this.maxAltitude == compare.maxAltitude
+               && Arrays.equals(this.BooleanBuffer, compare.BooleanBuffer);
+    }
+    
 }

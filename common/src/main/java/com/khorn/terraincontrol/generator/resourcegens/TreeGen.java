@@ -85,7 +85,7 @@ public class TreeGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        if (other.getClass().getName().equals(this.getClass().getName())){
+        if (getClass() == other.getClass()){
             try {
                 TreeGen otherO = (TreeGen) other;
                 return otherO.treeNames.size() == this.treeNames.size() && otherO.treeNames.containsAll(this.treeNames);
@@ -94,6 +94,37 @@ public class TreeGen extends Resource
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        hash = 53 * hash + super.hashCode();
+        hash = 53 * hash + (this.trees != null ? this.trees.hashCode() : 0);
+        hash = 53 * hash + (this.treeNames != null ? this.treeNames.hashCode() : 0);
+        hash = 53 * hash + (this.treeChances != null ? this.treeChances.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final TreeGen compare = (TreeGen) other;
+        return (this.treeNames == null ? this.treeNames == compare.treeNames
+                : this.treeNames.equals(compare.treeNames))
+               && (this.treeNames == null ? this.treeNames == compare.treeNames
+                   : this.treeNames.equals(compare.treeNames))
+               && (this.treeChances == null ? this.treeChances == compare.treeChances
+                   : this.treeChances.equals(compare.treeChances));
     }
     
     

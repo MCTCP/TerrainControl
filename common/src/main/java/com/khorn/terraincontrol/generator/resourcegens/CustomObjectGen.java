@@ -63,7 +63,7 @@ public class CustomObjectGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        if (other.getClass().getName().equals(this.getClass().getName())){
+        if (getClass() == other.getClass()){
             try {
                 CustomObjectGen otherO = (CustomObjectGen) other;
                 return otherO.objectNames.size() == this.objectNames.size() && otherO.objectNames.containsAll(this.objectNames);
@@ -72,6 +72,34 @@ public class CustomObjectGen extends Resource
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 41 * hash + super.hashCode();
+        hash = 41 * hash + (this.objects != null ? this.objects.hashCode() : 0);
+        hash = 41 * hash + (this.objectNames != null ? this.objectNames.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final CustomObjectGen compare = (CustomObjectGen) other;
+        return (this.objects == null ? this.objects == compare.objects
+                : this.objects.equals(compare.objects))
+               && (this.objectNames == null ? this.objectNames == compare.objectNames
+                   : this.objectNames.equals(compare.objectNames));
     }
 
 }

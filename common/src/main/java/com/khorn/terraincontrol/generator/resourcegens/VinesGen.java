@@ -10,6 +10,7 @@ import java.util.Random;
 
 public class VinesGen extends Resource
 {
+
     private int minAltitude;
     private int maxAltitude;
 
@@ -65,9 +66,14 @@ public class VinesGen extends Resource
         }
         return DefaultMaterial.getMaterial(id).isSolid();
     }
-
-    public static final int[] d = {-1, -1, 2, 0, 1, 3};
-    public static final int[] OPPOSITE_FACING = {1, 0, 3, 2, 5, 4};
+    public static final int[] d =
+    {
+        -1, -1, 2, 0, 1, 3
+    };
+    public static final int[] OPPOSITE_FACING =
+    {
+        1, 0, 3, 2, 5, 4
+    };
 
     @Override
     public void load(List<String> args) throws InvalidConfigException
@@ -90,6 +96,33 @@ public class VinesGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
     }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final VinesGen compare = (VinesGen) other;
+        return this.maxAltitude == compare.maxAltitude
+               && this.minAltitude == compare.minAltitude;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 17 * hash + super.hashCode();
+        hash = 17 * hash + this.minAltitude;
+        hash = 17 * hash + this.maxAltitude;
+        return hash;
+    }
+
 }

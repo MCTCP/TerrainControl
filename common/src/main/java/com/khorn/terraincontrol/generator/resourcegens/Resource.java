@@ -146,12 +146,44 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
 
     
     /**
-     * Returns whether or not the two resources are similar to each other.
-     * This should return true if two resources are of the same class and if
-     * critical element are the same. For example source blocks. This will be
-     * used to test if a resource should be overridden via inheritance.
+     * Returns whether or not the two resources are similar to each other AND
+     * not equal. This should return true if two resources are of the same class
+     * and if critical element are the same. For example source blocks. This 
+     * will be used to test if a resource should be overridden via inheritance.
      * @return
      */
     public abstract boolean isAnalogousTo(Resource other);
+
+    /**
+     * Returns whether or not the two resources are property-wise equal.
+     * <p/>
+     * @return
+     */
+    @Override
+    public boolean equals(Object other)
+    {
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final Resource compare = (Resource) other;
+        return this.blockData == compare.blockData
+               && this.blockId == compare.blockData
+               && this.frequency == compare.frequency
+               && this.rarity == compare.rarity;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 53 * hash + this.blockId;
+        hash = 53 * hash + this.blockData;
+        hash = 53 * hash + this.frequency;
+        hash = 53 * hash + (int) (Double.doubleToLongBits(this.rarity) ^ (Double.doubleToLongBits(this.rarity) >>> 32));
+        return hash;
+    }
     
 }

@@ -48,7 +48,7 @@ public abstract class ConfigFile
                 break;
             }
         }
-        if (biomeConfigWithExtension.exists())
+        if (biomeConfigWithExtension != null && biomeConfigWithExtension.exists())
         {
             this.file = biomeConfigWithExtension;
         } else

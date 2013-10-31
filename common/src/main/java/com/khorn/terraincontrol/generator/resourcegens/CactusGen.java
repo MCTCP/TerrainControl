@@ -67,7 +67,36 @@ public class CactusGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 79 * hash + super.hashCode();
+        hash = 79 * hash + this.minAltitude;
+        hash = 79 * hash + this.maxAltitude;
+        hash = 79 * hash + (this.sourceBlocks != null ? this.sourceBlocks.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final CactusGen compare = (CactusGen) other;
+        return this.minAltitude == compare.minAltitude
+               && this.maxAltitude == compare.maxAltitude
+               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
+                   : this.sourceBlocks.equals(compare.sourceBlocks));
     }
 
 }

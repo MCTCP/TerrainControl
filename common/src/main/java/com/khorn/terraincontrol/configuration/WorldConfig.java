@@ -489,7 +489,6 @@ public class WorldConfig extends ConfigFile
             {
                 String[] keys = biome.split(":");
                 CustomBiomeIds.put(keys[0], (keys.length == 2) ? Integer.valueOf(keys[1]) : -1);
-
             } catch (NumberFormatException e)
             {
                 System.out.println("Wrong custom biome id settings: '" + biome + "'");

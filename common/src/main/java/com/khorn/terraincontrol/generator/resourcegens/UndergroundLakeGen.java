@@ -11,6 +11,7 @@ import java.util.Random;
 
 public class UndergroundLakeGen extends Resource
 {
+
     private int minSize;
     private int maxSize;
     private int minAltitude;
@@ -90,6 +91,37 @@ public class UndergroundLakeGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return other.getClass().getName().equals(this.getClass().getName()) && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
     }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        hash = 29 * hash + super.hashCode();
+        hash = 29 * hash + this.minSize;
+        hash = 29 * hash + this.maxSize;
+        hash = 29 * hash + this.minAltitude;
+        hash = 29 * hash + this.maxAltitude;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final UndergroundLakeGen compare = (UndergroundLakeGen) other;
+        return this.maxAltitude == compare.maxAltitude
+               && this.minAltitude == compare.minAltitude
+               && this.minSize == compare.minSize
+               && this.maxSize == compare.maxSize;
+    }
+
 }
