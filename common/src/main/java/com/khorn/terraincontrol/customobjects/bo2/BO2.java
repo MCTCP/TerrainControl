@@ -302,8 +302,8 @@ public class BO2 extends ConfigFile implements CustomObject
 
         this.groupFrequencyMin = readSettings(BO2Settings.groupFrequencyMin);
         this.groupFrequencyMax = readSettings(BO2Settings.groupFrequencyMax);
-        this.groupSeparationMin = readSettings(BO2Settings.groupSeperationMin);
-        this.groupSeparationMax = readSettings(BO2Settings.groupSeperationMax);
+        this.groupSeparationMin = readSettings(BO2Settings.groupSeparationMin);
+        this.groupSeparationMax = readSettings(BO2Settings.groupSeparationMax);
         //>>	Is this not used anymore? Netbeans finds no references to it
         //>>	Nothing other than this line references BO2Settings.groupId either...
         this.groupId = readSettings(BO2Settings.groupId);        
