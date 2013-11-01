@@ -39,8 +39,8 @@ public enum BO2Settings implements TCSetting
     
     groupFrequencyMin(1),
     groupFrequencyMax(5),
-    groupSeperationMin(0), // Seperation - lol.
-    groupSeperationMax(5),
+    groupSeparationMin(0),
+    groupSeparationMax(5),
     
     branchLimit(6),
     groupId("", SettingsType.StringArray),
