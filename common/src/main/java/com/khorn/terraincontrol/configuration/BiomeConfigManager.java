@@ -284,6 +284,7 @@ public final class BiomeConfigManager
             //>>	where all resource types have a method of detecting if they can 
             //>>	be merged or not. Still work in progress, but much cleaner than before.
             config.process();
+            config.outputToFile();
 
             if (this.checkOnly)
                 continue;
