@@ -14,10 +14,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 import static com.khorn.terraincontrol.configuration.ConfigFile.readComplexString;
@@ -189,12 +186,12 @@ public class BiomeConfig extends ConfigFile
             //>>	Child Inheritance Biomes 
             if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
             {
-                this.file = new File(this.file.getParentFile(), this.file.getName() + ".inherit");
+                this.file = new File(this.file.getParentFile(), this.file.getName() + ".inherited");
                 this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfig.ConfigMode.WriteAll);
             }
         } else
         {
-            //>>	Normal 
+            //>>	Normal config saving
             if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
                 this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfig.ConfigMode.WriteAll);
         }
@@ -690,39 +687,43 @@ public class BiomeConfig extends ConfigFile
                 //>>	Give it to the child from the parent
                 this.settingsCache.put(parentEntry.getKey(), parentEntry.getValue());
                 //>>	And let us know if we are producing FINE logs
-                TerrainControl.log(Level.FINE, "Setting({0},{1})", new Object[]{ parentEntry.getKey(), parent.settingsCache.get(parentEntry.getKey()) });
+                TerrainControl.log(Level.FINER, "Setting({0},{1})", new Object[]{ parentEntry.getKey(), parent.settingsCache.get(parentEntry.getKey()) });
             }
         }
         //>>	Now really process both parent and child so that both have their final non-resource properties
         this.process();
         parent.process();
         //>>	We dont want to merge resources unless the child allows it.
-        TerrainControl.log(Level.CONFIG, "=====Doing Resource Inheritance====");
+        TerrainControl.log(Level.FINER, "=====Doing Resource Inheritance====");
         if (this.doResourceInheritance)
         {
             //>>	Then do the resource merge! Start with Resource Sequence.
             int T_ResourceCount = 0;
             Resource[] T_ResourceSequence = new Resource[256];
-            for (int i = 0; i < parent.ResourceCount; i++)
+            ArrayList<Resource> childRes = new ArrayList<Resource>(Arrays.asList(this.ResourceSequence));
+            ArrayList<Resource> parentRes = new ArrayList<Resource>(Arrays.asList(parent.ResourceSequence));
+            childRes.removeAll(Collections.singleton(null));
+            parentRes.removeAll(Collections.singleton(null));
+            for (Resource pr : parentRes)
             {
                 boolean analagous = false;
-                TerrainControl.log(Level.CONFIG, "BASE:: Checking against: {0}", new Object[]{parent.ResourceSequence[i].makeString()});
-                for (int j = 0; j < this.ResourceCount; j++)
+                TerrainControl.log(Level.FINEST, "BASE:: Checking against: {0}", new Object[]{ pr.makeString() });
+                for (Resource cr : childRes)
                 {
-                    TerrainControl.log(Level.CONFIG, "CHCK:: Checking against: {0}", new Object[]{this.ResourceSequence[j].makeString()});
-                    if (this.ResourceSequence[j].isAnalogousTo(parent.ResourceSequence[i]))
+                    TerrainControl.log(Level.FINEST, "CHCK:: Checking against: {0}", new Object[]{ cr.makeString() });
+                    if (cr.isAnalogousTo(pr))
                     {
-                        TerrainControl.log(Level.CONFIG, "Adding Child Resource\nC: {0}\nP: {1}", new Object[]{ this.ResourceSequence[j].makeString(), parent.ResourceSequence[i].makeString()});
-                        T_ResourceSequence[T_ResourceCount++] = this.ResourceSequence[j];
+                        TerrainControl.log(Level.FINER, "Adding Child Resource\nC: {0}\nP: {1}", new Object[]{ cr.makeString(), pr.makeString() });
+                        T_ResourceSequence[T_ResourceCount++] = cr;
+                        childRes.remove(cr);
                         analagous = true;
                         break;
                     }
-
                 }
                 if (!analagous)
                 {
-                    TerrainControl.log(Level.CONFIG, "Adding Parent Resource\n{0}", new Object[]{ parent.ResourceSequence[i].makeString()});
-                    T_ResourceSequence[T_ResourceCount++] = parent.ResourceSequence[i];
+                    TerrainControl.log(Level.FINER, "Adding Parent Resource\n{0}", new Object[]{ pr.makeString() });
+                    T_ResourceSequence[T_ResourceCount++] = pr;
                 }
             }
             this.ResourceSequence = Arrays.copyOf(T_ResourceSequence, 256);
@@ -734,17 +735,17 @@ public class BiomeConfig extends ConfigFile
                 for (SaplingGen sap : parent.saplingTypes)
                 {
                     if (this.saplingTypes[sap.saplingType.getSaplingId()] == null){
-                        TerrainControl.log(Level.CONFIG, "Sapling added to Child: {0}", new Object[]{ sap.saplingType.getSaplingId()});
+                        TerrainControl.log(Level.FINER, "Sapling added to Child: {0}", new Object[]{ sap.saplingType.getSaplingId()});
                         this.saplingTypes[sap.saplingType.getSaplingId()] = sap;
                     }
                 }
             } else {
-                TerrainControl.log(Level.CONFIG, "No Sapling merge needed!");
+                TerrainControl.log(Level.FINER, "No Sapling merge needed!");
             }
         }
         
         this.BiomeExtendsProcessed = true;
-        TerrainControl.log(Level.CONFIG, "=====END Resource Inheritance====");
+        TerrainControl.log(Level.FINER, "=====END Resource Inheritance====");
         return this;
     }
 

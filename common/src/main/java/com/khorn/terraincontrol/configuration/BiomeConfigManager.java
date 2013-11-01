@@ -230,24 +230,9 @@ public final class BiomeConfigManager
 
     private void processBiomeConfigs()
     {
-        /** *********************
-         * Proposed Algorithm
-         ***********************
-         * - Grab the settingsCache value for BiomeExtends              check
-         * - Get the id of the biome to be extended and find it in
-         *  biomeConfigs                                                check
-         * - determine if need to extend what we found                  check
-         * ---- decend until we find a non-extending biome              check
-         * - merge the two biomeConfig's                                getting close
-         * ---- special treatment for resources                             getting some out of bounds exceptions
-         * - save results by overwritting approp. config                check
-         * - make sure we dont process already processed configs        check
-         * - ascend until no more extending can be done                 check
-         * - Rinse / Repeat until done extending all biome configs      check
-         */
         int xbiome = 0;
         selfInheritanceErrors = "";
-        TerrainControl.log(Level.CONFIG, "=============== Biome Processing START ===============");
+        TerrainControl.log(Level.FINER, "=============== Biome Processing START ===============");
 
         for (BiomeConfig config : biomeConfigs)
         {
@@ -257,32 +242,15 @@ public final class BiomeConfigManager
                 continue;
             }
 
-            TerrainControl.log(Level.CONFIG, "Processing Biome: " + config.name + ":" + xbiome++);
+            TerrainControl.log(Level.FINE, "Processing Biome: " + config.name + ":" + xbiome++);
             if (!config.BiomeExtendsProcessed)
             {
-                TerrainControl.log(Level.CONFIG, "======== Inheritance Starting ========");
+                TerrainControl.log(Level.FINER, "======== Inheritance Starting ========");
 
                 doInheritance(config, true);
 
-                TerrainControl.log(Level.CONFIG, "========= Inheritance Ending =========");
+                TerrainControl.log(Level.FINER, "========= Inheritance Ending =========");
             }
-
-            //t>>	Process needs a special way of handling resource entries to avoid
-            //t>>	having both parent and child resources get saved. Need to figure 
-            //t>>	out how resource loading works. Comment that function in ConfigFile.
-            //>>	
-            //t>>	Also, another possbility:
-            //t>>	Look into using readConfigSettings() instead of the low level
-            //t>>	readSettingsFile() method, then write a merge method in BiomeConfigs
-            //t>>	that individually copies over all variables. This will be more fine
-            //t>>	tuned but less maintainable. If we can isolate the resource loading
-            //t>>	and give it special treatment, that is far more desirable from what
-            //t>>	I can see from the code....
-            //>>	EDIT: I found a much better solution for merging. Rather than
-            //>>	Doing an either/or approach, I use the raw settings cache to merge
-            //>>	non-resources, then run process, and do a special resource merge
-            //>>	where all resource types have a method of detecting if they can 
-            //>>	be merged or not. Still work in progress, but much cleaner than before.
             config.process();
             config.outputToFile();
 
@@ -356,12 +324,12 @@ public final class BiomeConfigManager
 
     private void doInheritance(BiomeConfig config, boolean isParent)
     {
-        TerrainControl.log(Level.CONFIG, "GOGO: {0} DO INHERITANCE", new Object[]{config.name});
+        TerrainControl.log(Level.FINER, "DO INHERITANCE: {0}", new Object[]{config.name});
         if (!config.BiomeExtendsSeen)
         {
             config.BiomeExtendsSeen = true;
             biomeLoadingStack.push(config);
-            TerrainControl.log(Level.CONFIG, "\tSTACK:::Pushing config; New Size: {0}", new Object[]{biomeLoadingStack.size()});
+            TerrainControl.log(Level.FINEST, "\tSTACK:::Pushing config; New Size: {0}", new Object[]{biomeLoadingStack.size()});
             if (!config.BiomeExtendsProcessed)
             {
                 if (config.settingsCache.containsKey(TCDefaultValues.BiomeExtends.name().toLowerCase()))
@@ -369,7 +337,7 @@ public final class BiomeConfigManager
                     String biomeToExtend_Name = config.settingsCache.get(TCDefaultValues.BiomeExtends.name().toLowerCase());
                     if (!biomeToExtend_Name.isEmpty())
                     {
-                        TerrainControl.log(Level.CONFIG, "\tBiome(" + biomeToExtend_Name + ") Processing!");
+                        TerrainControl.log(Level.FINER, "\tBiome(" + biomeToExtend_Name + ") Processing!");
                         //>>	anti-self-inheritance
                         if (biomeToExtend_Name.equals(config.name))
                         {
@@ -378,7 +346,7 @@ public final class BiomeConfigManager
                                 selfInheritanceErrors += ", ";
                             }
                             selfInheritanceErrors += biomeToExtend_Name;
-                            TerrainControl.log(Level.CONFIG, "\t\tBiome(" + biomeToExtend_Name + ":null) being Autosarcophagous!");
+                            TerrainControl.log(Level.FINER, "\t\tBiome(" + biomeToExtend_Name + ":null) being Autosarcophagous!");
                             return;
                         } else
                         {
@@ -387,27 +355,27 @@ public final class BiomeConfigManager
                                 biomeToExtend_Id = DefaultBiome.getId(biomeToExtend_Name);
                             if (biomeToExtend_Id == null)
                             {
-                                TerrainControl.log(Level.WARNING, "\t\tBiome2Extend(" + biomeToExtend_Name + ":null) not found. If you think this is in error, check your configs!");
+                                TerrainControl.log(Level.WARNING, "\t\tBiomeExtends(" + biomeToExtend_Name + ":null) not found. If you think this is in error, check your configs!");
                             } else
                             {
-                                TerrainControl.log(Level.CONFIG, "\t\tBiome2Extend( " + biomeToExtend_Name + ":" + biomeToExtend_Id + ") was found!");
+                                TerrainControl.log(Level.FINER, "\t\tBiome2Extend( " + biomeToExtend_Name + ":" + biomeToExtend_Id + ") was found!");
                                 doInheritance(biomeConfigs[biomeToExtend_Id], false);
                                 if (isParent == true)
                                 {
                                     if (!this.cycleFound)
                                     {
-                                        TerrainControl.log(Level.CONFIG, "\t\t\tSTACK:::Popping_A");
+                                        TerrainControl.log(Level.FINEST, "\t\t\tSTACK:::Popping_A");
                                         BiomeConfig parentConfig = biomeLoadingStack.pop();
 
                                         while (!biomeLoadingStack.isEmpty())
                                         {
-                                            TerrainControl.log(Level.CONFIG, "\t\t\tSTACK:::Popping_B");
+                                            TerrainControl.log(Level.FINEST, "\t\t\tSTACK:::Popping_B");
                                             BiomeConfig child = biomeLoadingStack.pop();
-                                            TerrainControl.log(Level.CONFIG, "\t\t\t\tMerging Biomes (" + parentConfig.name + ":" + child.name + ");");
+                                            TerrainControl.log(Level.FINEST, "\t\t\t\tMerging Biomes (" + parentConfig.name + ":" + child.name + ");");
                                             BiomeConfig merged = child.merge(parentConfig);
                                             if (merged == null)
                                             {
-                                                TerrainControl.log(Level.SEVERE, "\t\tMerging returned null!!");
+                                                TerrainControl.log(Level.SEVERE, "\t\tBiomeConfig merging returned null!!");
                                             } else
                                             {
                                                 //>>	check in the CustomBiomes for the ID
@@ -416,7 +384,8 @@ public final class BiomeConfigManager
                                                 mergedIndex = (mergedIndex == null) ? DefaultBiome.getId(child.name) : mergedIndex;
                                                 if (mergedIndex == null)
                                                 {
-                                                    TerrainControl.log(Level.SEVERE, "\t\tPlease make sure you include {0} in the `Biome Lists` portion of the WorldConfig", new Object[]{ child.name });
+                                                    //>>	If nothing found, something is configured wrong
+                                                    TerrainControl.log(Level.SEVERE, "\t\tPlease make sure you include {0} in the `Custom biomes` and `Biome Lists` portions of the WorldConfig", new Object[]{ child.name });
                                                 } else
                                                 {
                                                     biomeConfigs[mergedIndex] = merged;
@@ -435,23 +404,24 @@ public final class BiomeConfigManager
                         }
                     } else
                     {
-                        TerrainControl.log(Level.CONFIG, "\t\t -A- Biome Does not extend other");
+                        TerrainControl.log(Level.FINEST, "\t\t -A- Biome Does not extend other");
                         biomeLoadingStack.peek().BiomeExtendsProcessed = true;
                     }
                 } else
                 {
-                    TerrainControl.log(Level.CONFIG, "\t\t -B- Biome Does not extend other");
+                    TerrainControl.log(Level.FINEST, "\t\t -B- Biome Does not extend other");
                     biomeLoadingStack.peek().BiomeExtendsProcessed = true;
                 }
             }
-            
             if (isParent)
             {
-                TerrainControl.log(Level.CONFIG, "\t\t\tSTACK:::Clearing");
+                TerrainControl.log(Level.FINEST, "\t\t\tSTACK:::Clearing");
                 biomeLoadingStack.clear();
             }
         } else if (biomeLoadingStack.size() >= 2)
         {
+            //>>	This forms the cyclical reference chain for output later and
+            //>>	adds it to a queue of errors
             StringBuilder cycle = new StringBuilder(" ... <- ");
             BiomeConfig first = biomeLoadingStack.pollLast();
             cycle.append(first.name);
@@ -466,7 +436,9 @@ public final class BiomeConfigManager
             this.cycleFound = true;
         } else
         {
-            TerrainControl.log(Level.CONFIG, "\t\t -- Biome Already Processed");
+            TerrainControl.log(Level.FINEST, "\t\t -- Biome Already Processed");
+            //>>	Make sure we count Biomes that have already been processed
+            //>>	Without this, pre-processed configs dont get merged.
             biomeLoadingStack.push(config);
         }
     }
