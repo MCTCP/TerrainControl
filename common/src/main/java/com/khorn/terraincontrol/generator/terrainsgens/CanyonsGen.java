@@ -173,25 +173,25 @@ public class CanyonsGen extends TerrainGenBase
         }
     }
 
-    protected void a(int paramInt1, int paramInt2, int chunk_x, int chunk_z, byte[] paramArrayOfByte)
+    protected void generateChunk(int chunk_x, int chunk_z, int real_chunk_x, int real_chunk_z, byte[] paramArrayOfByte)
     {
-        if (this.c.nextInt(100) >= this.worldSettings.canyonRarity)
+        if (this.random.nextInt(100) >= this.worldSettings.canyonRarity)
             return;
-        double d1 = paramInt1 * 16 + this.c.nextInt(16);
-        double d2 = this.c.nextInt(this.worldSettings.canyonMaxAltitude - this.worldSettings.canyonMinAltitude) + this.worldSettings.canyonMinAltitude;
-        double d3 = paramInt2 * 16 + this.c.nextInt(16);
+        double d1 = chunk_x * 16 + this.random.nextInt(16);
+        double d2 = this.random.nextInt(this.worldSettings.canyonMaxAltitude - this.worldSettings.canyonMinAltitude) + this.worldSettings.canyonMinAltitude;
+        double d3 = chunk_z * 16 + this.random.nextInt(16);
 
         int i = 1;
 
         for (int j = 0; j < i; j++)
         {
-            float f1 = this.c.nextFloat() * 3.141593F * 2.0F;
-            float f2 = (this.c.nextFloat() - 0.5F) * 2.0F / 8.0F;
-            float f3 = (this.c.nextFloat() * 2.0F + this.c.nextFloat()) * 2.0F;
+            float f1 = this.random.nextFloat() * 3.141593F * 2.0F;
+            float f2 = (this.random.nextFloat() - 0.5F) * 2.0F / 8.0F;
+            float f3 = (this.random.nextFloat() * 2.0F + this.random.nextFloat()) * 2.0F;
 
-            int size = this.c.nextInt(this.worldSettings.canyonMaxLength - this.worldSettings.canyonMinLength) + this.worldSettings.canyonMinLength;
+            int size = this.random.nextInt(this.worldSettings.canyonMaxLength - this.worldSettings.canyonMinLength) + this.worldSettings.canyonMinLength;
 
-            a(this.c.nextLong(), chunk_x, chunk_z, paramArrayOfByte, d1, d2, d3, f3, f1, f2, size, this.worldSettings.canyonDepth);
+            a(this.random.nextLong(), real_chunk_x, real_chunk_z, paramArrayOfByte, d1, d2, d3, f3, f1, f2, size, this.worldSettings.canyonDepth);
         }
     }
 }

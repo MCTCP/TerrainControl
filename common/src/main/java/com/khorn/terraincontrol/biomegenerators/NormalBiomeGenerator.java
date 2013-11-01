@@ -72,18 +72,18 @@ public class NormalBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public float[] getRainfall(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public float[] getRainfall(float[] paramArrayOfFloat, int x, int y, int x_size, int z_size)
     {
-        if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < paramInt3 * paramInt4))
+        if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < x_size * z_size))
         {
-            paramArrayOfFloat = new float[paramInt3 * paramInt4];
+            paramArrayOfFloat = new float[x_size * z_size];
         }
         ArraysCache cache = ArraysCacheManager.GetCache();
         cache.outputType = defaultOutputType;
 
-        int[] arrayOfInt = this.biomeLayer.GetBiomes(cache, paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt = this.biomeLayer.GetBiomes(cache, x, y, x_size, z_size);
         ArraysCacheManager.ReleaseCache(cache);
-        for (int i = 0; i < paramInt3 * paramInt4; i++)
+        for (int i = 0; i < x_size * z_size; i++)
         {
             float f1 = worldConfig.biomeConfigManager.getBiomeConfigs()[arrayOfInt[i]].getWetness() / 65536.0F;
             if (f1 < worldConfig.minMoisture)

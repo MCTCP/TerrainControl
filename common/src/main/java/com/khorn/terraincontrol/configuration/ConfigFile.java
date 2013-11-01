@@ -90,9 +90,11 @@ public abstract class ConfigFile
     /**
      * Stores all the settings. Settings like Name:Value or Name=Value are
      * stored as name, Value and settings like Function(a, b, c) are stored
-     * as function(a, b, c), lineNumber
+     * as function(a, b, c), lineNumber. Because this is a linked hashmap,
+     * you're guaranteed that the lines will be read in order when iterating
+     * over this map.
      */
-    protected Map<String, String> settingsCache = new HashMap<String, String>();
+    protected Map<String, String> settingsCache = new LinkedHashMap<String, String>();
     private boolean writeComments;
 
     protected void readSettingsFile() throws RuntimeException
