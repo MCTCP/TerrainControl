@@ -21,7 +21,6 @@ public enum TCDefaultValues implements TCSetting
     GlobalBiomeConfigDirectoryName("GlobalBiomes"),
     
     WorldBiomeConfigDirectoryName("WorldBiomes"),
-    WorldDefaultBiomeConfigDirectoryName("DefaultBiomes"),
     //>>	Objects
     BO_WorldDirectoryName("WorldObjects"),
     BO_GlobalDirectoryName("GlobalObjects"),
