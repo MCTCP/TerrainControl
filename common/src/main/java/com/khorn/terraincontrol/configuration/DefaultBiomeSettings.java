@@ -20,7 +20,7 @@ public class DefaultBiomeSettings
 {
     // Simple registry for the default settings
     @SuppressWarnings("unchecked")
-    private static final Class<? extends DefaultBiomeSettings>[] defaultSettings = (Class<? extends DefaultBiomeSettings>[]) new Class<?>[256];
+    private static final Class<? extends DefaultBiomeSettings>[] defaultSettings = (Class<? extends DefaultBiomeSettings>[]) new Class<?>[1024];
 
     /**
      * Gets the default settings for a biome. If no default settings are find

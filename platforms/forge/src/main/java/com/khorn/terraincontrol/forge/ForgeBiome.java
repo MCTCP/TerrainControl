@@ -20,6 +20,12 @@ public class ForgeBiome implements LocalBiome
     }
 
     @Override
+    public boolean isVirtual()
+    {
+        return false;
+    }
+
+    @Override
     public int getCustomId()
     {
         return getId();

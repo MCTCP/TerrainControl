@@ -26,7 +26,7 @@ public final class BiomeConfigManager
     /*
      *
      */
-    private byte[] ReplaceMatrixBiomes = new byte[256];
+    public byte[] ReplaceBiomesMatrix = new byte[256];
     /*
      *
      */
@@ -86,8 +86,8 @@ public final class BiomeConfigManager
             return;
 
         // Build biome replace matrix
-        for (int i = 0; i < this.ReplaceMatrixBiomes.length; i++)
-            this.ReplaceMatrixBiomes[i] = (byte) i;
+        for (int i = 0; i < this.ReplaceBiomesMatrix.length; i++)
+            this.ReplaceBiomesMatrix[i] = (byte) i;
 
         //>>	Init the biomeConfigs Array
         biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
@@ -105,8 +105,33 @@ public final class BiomeConfigManager
             if (checkOnly)
                 localBiomes.add(world.getNullBiome(entry.getKey()));
             else
-                localBiomes.add(world.AddBiome(entry.getKey(), entry.getValue()));
+            {
+                int id = worldConfig.CustomBiomeIds.get(entry.getKey());
+                if (id == -1)
+                    id = world.getFreeBiomeId();
+                localBiomes.add(world.AddCustomBiome(entry.getKey(), id));
+            }
         }
+        // Add virtual biomes to world
+        for (Iterator<Entry<String, Integer>> it = worldConfig.VirtualBiomeIds.entrySet().iterator(); it.hasNext();)
+        {
+            Entry<String, Integer> entry = it.next();
+            if (checkOnly)
+                localBiomes.add(world.getNullBiome(entry.getKey()));
+            else
+            {
+                int realId = worldConfig.VirtualBiomeRealIds.get(entry.getValue());
+                if (world.getBiomeById(realId) == null)
+                {
+                    TerrainControl.log(Level.WARNING, "Wrong real id for virtual biome {0}!", new Object[]{entry.getKey()});
+                    continue;
+                }
+
+                localBiomes.add(world.AddVirtualBiome(entry.getKey(), realId, entry.getValue()));
+            }
+        }
+        
+        
         populateCustomBiomeConfigs(localBiomes, worldBiomesDir);
 
         processBiomeConfigs();
@@ -237,7 +262,7 @@ public final class BiomeConfigManager
             if (!config.ReplaceBiomeName.equals(""))
             {
                 this.worldConfig.HaveBiomeReplace = true;
-                this.ReplaceMatrixBiomes[config.Biome.getId()] = (byte) world.getBiomeIdByName(config.ReplaceBiomeName);
+                this.ReplaceBiomesMatrix[config.Biome.getId()] = (byte) world.getBiomeIdByName(config.ReplaceBiomeName);
             }
 
             if (this.worldConfig.NormalBiomes.contains(config.name))

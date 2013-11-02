@@ -20,6 +20,12 @@ public class NullBiome extends BukkitBiome
     }
 
     @Override
+    public boolean isVirtual()
+    {
+        return false;
+    }
+
+    @Override
     public int getId()
     {
         return 255;

@@ -27,7 +27,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultRiverBiome = "";
             this.defaultTree = new Object[] {1, TreeType.BigTree, 1, TreeType.Tree, 9};
         }
-    };
+    }
 
     public static class Plains extends DefaultBiomeSettings
     {
@@ -41,7 +41,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultStrongholds = false;
             this.defaultVillageType = VillageType.wood;
         }
-    };
+    }
 
     public static class Desert extends DefaultBiomeSettings
     {
@@ -59,7 +59,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultVillageType = VillageType.sandstone;
             this.defaultRareBuildingType = RareBuildingType.desertPyramid;
         }
-    };
+    }
 
     public static class ExtremeHills extends DefaultBiomeSettings
     {
@@ -71,7 +71,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultEmeraldOre = TCDefaultValues.emeraldDepositFrequency.intValue();
             this.defaultTree = new Object[] {1, TreeType.BigTree, 1, TreeType.Tree, 9};
         }
-    };
+    }
 
     public static class Forest extends DefaultBiomeSettings
     {
@@ -83,7 +83,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0x00FF00";
             this.defaultTree = new Object[] {10, TreeType.Forest, 20, TreeType.BigTree, 10, TreeType.Tree, 100};
         }
-    };
+    }
 
     public static class Taiga extends DefaultBiomeSettings
     {
@@ -95,7 +95,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0x007700";
             this.defaultTree = new Object[] {10, TreeType.Taiga1, 35, TreeType.Taiga2, 100};
         }
-    };
+    }
 
     public static class Swampland extends DefaultBiomeSettings
     {
@@ -110,13 +110,13 @@ public class VanillaBiomesDefaultSettings
             this.defaultClay = 1;
             this.defaultWaterLily = 1;
             this.defaultColor = "0x99CC66";
-            this.defaultWaterColorMultiplier = "0xe0ffae";
+            this.defaultWaterColorMultiplier = "0xE0FFAE";
             this.defaultGrassColor = "0x7E6E7E";
             this.defaultFoliageColor = "0x7E6E7E";
             this.defaultRareBuildingType = RareBuildingType.swampHut;
             this.defaultTree = new Object[] {2, TreeType.SwampTree, 100};
         }
-    };
+    }
 
     public static class River extends DefaultBiomeSettings
     {
@@ -131,7 +131,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultStrongholds = false;
             this.defaultTree = new Object[] {1, TreeType.BigTree, 1, TreeType.Tree, 9};
         }
-    };
+    }
 
     public static class Hell extends DefaultBiomeSettings
     {
@@ -139,7 +139,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
         }
-    };
+    }
 
     public static class Sky extends DefaultBiomeSettings
     {
@@ -147,7 +147,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
         }
-    };
+    }
 
     public static class FrozenOcean extends DefaultBiomeSettings
     {
@@ -159,7 +159,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultStrongholds = false;
             this.defaultRiverBiome = "";
         }
-    };
+    }
 
     public static class FrozenRiver extends DefaultBiomeSettings
     {
@@ -170,7 +170,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0x66FFFF";
             this.defaultStrongholds = false;
         }
-    };
+    }
 
     public static class IcePlains extends DefaultBiomeSettings
     {
@@ -181,7 +181,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0xCCCCCC";
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
         }
-    };
+    }
 
     public static class IceMountains extends DefaultBiomeSettings
     {
@@ -192,7 +192,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0xCC9966";
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
         }
-    };
+    }
 
     public static class MushroomIsland extends DefaultBiomeSettings
     {
@@ -213,7 +213,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultStrongholds = false;
             this.defaultTree = new Object[] {1, TreeType.HugeMushroom, 100};
         }
-    };
+    }
 
     public static class MushroomIslandShore extends MushroomIsland
     {
@@ -226,7 +226,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0xFF9999";
             this.defaultTree = null; // No mushrooms on the shore
         }
-    };
+    }
 
     public static class Beach extends DefaultBiomeSettings
     {
@@ -243,7 +243,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0xFFFF00";
             this.defaultStrongholds = false;
         }
-    };
+    }
 
     public static class DesertHills extends Desert
     {
@@ -264,7 +264,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultVillageType = VillageType.sandstone;
             this.defaultRareBuildingType = RareBuildingType.desertPyramid;
         }
-    };
+    }
 
     public static class ForestHills extends Forest
     {
@@ -278,7 +278,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultGrass = 15;
             this.defaultColor = "0x009900";
         }
-    };
+    }
 
     public static class TaigaHills extends Taiga
     {
@@ -293,7 +293,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0x003300";
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
         }
-    };
+    }
 
     public static class ExtremeHillsEdge extends ExtremeHills
     {
@@ -305,7 +305,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultBorder.add(DefaultBiome.EXTREME_HILLS.Name);
             this.defaultColor = "0x666600";
         }
-    };
+    }
 
     public static class Jungle extends DefaultBiomeSettings
     {
@@ -319,7 +319,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultRareBuildingType = RareBuildingType.jungleTemple;
             this.defaultTree = new Object[] {50, TreeType.BigTree, 10, TreeType.GroundBush, 50, TreeType.JungleTree, 35, TreeType.CocoaTree, 100};
         }
-    };
+    }
 
     public static class JungleHills extends Jungle
     {
@@ -330,5 +330,5 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0x663300";
             this.defaultIsle.add(DefaultBiome.JUNGLE.Name);
         }
-    };
+    }
 }

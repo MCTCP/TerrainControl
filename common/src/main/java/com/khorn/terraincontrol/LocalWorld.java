@@ -12,16 +12,11 @@ import java.util.Random;
 
 public interface LocalWorld
 {
-    
-    /**
-     * Biome init. Sets biome custom id. Caches biome
-     * <p/>
-     * @param name The name of the Biome
-     * @param id   The id of the Biome
-     * <p/>
-     * @return A LocalBiome object initialized with name and id
-     */
-    public LocalBiome AddBiome(String name, int id);
+
+    // Biome init
+    public LocalBiome AddCustomBiome(String name, int id);
+
+    public LocalBiome AddVirtualBiome(String name, int id, int virtualId);
 
     public LocalBiome getNullBiome(String name);
 

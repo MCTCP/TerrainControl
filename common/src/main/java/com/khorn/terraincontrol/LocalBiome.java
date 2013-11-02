@@ -16,6 +16,9 @@ public interface LocalBiome
      */
     boolean isCustom();
 
+
+    boolean isVirtual();
+
     /**
      * Sets the post generator effects. For the client it are things like
      * colors. For the server it are things like mob spawning.

@@ -18,7 +18,6 @@ public class WorldConfig extends ConfigFile
 {
     public final File settingsDir;
     private final Comparator<Entry<String,Integer>> CBV = new Comparator<Entry<String, Integer>>() {
-
         @Override
         public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2)
         {
@@ -26,6 +25,8 @@ public class WorldConfig extends ConfigFile
         }
     };
     public Map<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
+    public HashMap<String, Integer> VirtualBiomeIds = new HashMap<String, Integer>();
+    public HashMap<Integer, Integer> VirtualBiomeRealIds = new HashMap<Integer, Integer>();
 
     // Holds all world CustomObjects.
     public List<CustomObject> customObjects = new ArrayList<CustomObject>();
@@ -35,7 +36,6 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> IsleBiomes = new ArrayList<String>();
     public ArrayList<String> BorderBiomes = new ArrayList<String>();
 
-    public byte[] ReplaceMatrixBiomes = new byte[256];
     public boolean HaveBiomeReplace = false;
 
     public int maxSmoothRadius = 2;
@@ -199,7 +199,6 @@ public class WorldConfig extends ConfigFile
         world.setHeightBits(this.worldHeightBits);
 
         this.biomeConfigManager = new BiomeConfigManager(settingsDir, world, this, CustomBiomeIds, checkOnly);
-        
     }
 
     private void ReadWorldCustomObjects()
@@ -454,7 +453,15 @@ public class WorldConfig extends ConfigFile
             try
             {
                 String[] keys = biome.split(":");
-                CustomBiomeIds.put(keys[0], (keys.length == 2) ? Integer.valueOf(keys[1]) : -1);
+                if (keys.length == 2)
+                    CustomBiomeIds.put(keys[0], Integer.valueOf(keys[1]));
+                else if (keys.length == 3)
+                {
+                    VirtualBiomeIds.put(keys[0], Integer.valueOf(keys[2]));
+                    VirtualBiomeRealIds.put(Integer.valueOf(keys[2]), Integer.valueOf(keys[1]));
+                } else
+                    CustomBiomeIds.put(keys[0], -1);
+                
             } catch (NumberFormatException e)
             {
                 System.out.println("Wrong custom biome id settings: '" + biome + "'");
@@ -815,15 +822,29 @@ public class WorldConfig extends ConfigFile
     {
         String output = "";
         boolean first = true;
-        List<Entry<String, Integer>> a = new ArrayList<Entry<String, Integer>>(this.CustomBiomeIds.entrySet());
-        Collections.sort(a, CBV);
-        for (Iterator<Entry<String, Integer>> it = a.iterator(); it.hasNext();)
+        List<Entry<String, Integer>> cbi = new ArrayList<Entry<String, Integer>>(this.CustomBiomeIds.entrySet());
+        Collections.sort(cbi, CBV);
+        List<Entry<String, Integer>> vbi = new ArrayList<Entry<String, Integer>>(this.VirtualBiomeIds.entrySet());
+        Collections.sort(vbi, CBV);
+        //>>	Print all custom Biomes first
+        for (Iterator<Entry<String, Integer>> it = cbi.iterator(); it.hasNext();)
         {
             Entry<String, Integer> entry = it.next();
             if (!first)
                 output += ",";
-            first = false;
+            else
+                first = false;
             output += entry.getKey() + ":" + String.valueOf(entry.getValue());
+        }
+        //>>	Then Print all virtual Biomes
+        for (Iterator<Entry<String, Integer>> it = vbi.iterator(); it.hasNext();)
+        {
+            Entry<String, Integer> entry = it.next();
+            if (!first)
+                output += ",";
+            else
+                first = false;
+            output += entry.getKey() + ":" + VirtualBiomeRealIds.get(entry.getValue()) + ":" + entry.getValue();
         }
         writeValue(TCDefaultValues.CustomBiomes, output);
     }
@@ -859,14 +880,14 @@ public class WorldConfig extends ConfigFile
         ContinueNormal,
         FillEmpty,
     }
-     
-     public enum ImageOrientation
-     {
-         North,
-         East,
-         South,
-         West,
-     }
+
+    public enum ImageOrientation
+    {
+        North,
+        East,
+        South,
+        West,
+    }
 
     public enum ConfigMode
     {
@@ -927,10 +948,10 @@ public class WorldConfig extends ConfigFile
         {
             String biomeName = readStringFromStream(stream);
             int id = stream.readInt();
-            world.AddBiome(biomeName, id);
+            world.AddCustomBiome(biomeName, id);
             this.CustomBiomeIds.put(biomeName, id);
         }
-
+        //TODO Check all this code.
         // BiomeConfigs
         biomeConfigManager.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 

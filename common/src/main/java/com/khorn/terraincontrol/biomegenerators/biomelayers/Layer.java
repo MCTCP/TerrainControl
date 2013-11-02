@@ -44,11 +44,13 @@ public abstract class Layer
     7) Rivers size
     */
 
-    protected static final int BiomeBits = 255; // 255 63
-    protected static final int LandBit = 256;   // 256 64
-    public static final int RiverBits = 3072; //3072 768
-    protected static final int IceBit = 512;   // 512  128
-    protected static final int IslandBit = 4096; // 4096 1024
+    protected static final int BiomeBits = 1023; // 255 63
+    protected static final int LandBit = 1024;   // 256 64
+    protected static final int RiverBits = 12288; //3072 768
+    protected static final int RiverBitOne = 4096;
+    protected static final int RiverBitTwo = 8192;
+    protected static final int IceBit = 2048;   // 512  128
+    protected static final int IslandBit = 16384; // 4096 1024
 
     protected static int GetBiomeFromLayer(int BiomeAndLand)
     {

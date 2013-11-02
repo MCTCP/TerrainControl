@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import net.minecraft.server.v1_6_R3.BiomeBase;
@@ -12,8 +11,12 @@ import net.minecraft.server.v1_6_R3.BiomeBase;
 public class BukkitBiome implements LocalBiome
 {
     private BiomeBase biomeBase;
-    private boolean isCustom;
+    private boolean isCustom = false;
     private int customID;
+
+    private boolean isVirtual = false;
+    private int id;
+    private String name;
 
     private float temperature;
     private float humidity;
@@ -21,14 +24,40 @@ public class BukkitBiome implements LocalBiome
     public BukkitBiome(BiomeBase biome)
     {
         this.biomeBase = biome;
-        if (DefaultBiome.getBiome(biome.id) == null)
-        {
-            this.isCustom = true;
-        }
-        customID = biomeBase.id;
+        this.id = biomeBase.id;
+        this.name = biome.y;
 
         this.temperature = biome.temperature;
         this.humidity = biome.humidity;
+    }
+
+    public BukkitBiome(BiomeBase biome, int customId)
+    {
+        this.biomeBase = biome;
+        this.id = biomeBase.id;
+        this.isCustom = true;
+        this.customID = customId;
+        this.name = biome.y;
+
+
+        this.temperature = biome.temperature;
+        this.humidity = biome.humidity;
+
+    }
+
+    public BukkitBiome(BiomeBase biome,String _name, int customId, int virtualId)
+    {
+        this.biomeBase = biome;
+        this.isVirtual = true;
+        this.id = virtualId;
+        this.isCustom = true;
+        this.customID = customId;
+        this.name = _name;
+
+
+        this.temperature = biome.temperature;
+        this.humidity = biome.humidity;
+
     }
 
     @Override
@@ -38,15 +67,17 @@ public class BukkitBiome implements LocalBiome
     }
 
     @Override
+    public boolean isVirtual()
+    {
+        return isVirtual;
+    }
+
+    @Override
     public int getCustomId()
     {
         return customID;
     }
 
-    public void setCustomID(int id)
-    {
-        customID = id;
-    }
 
     public BiomeBase getHandle()
     {
@@ -62,13 +93,13 @@ public class BukkitBiome implements LocalBiome
     @Override
     public String getName()
     {
-        return this.biomeBase.y;
+        return this.name;
     }
 
     @Override
     public int getId()
     {
-        return this.biomeBase.id;
+        return this.id;
     }
 
     @Override

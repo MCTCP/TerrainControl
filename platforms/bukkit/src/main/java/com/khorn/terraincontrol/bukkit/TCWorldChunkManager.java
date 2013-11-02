@@ -54,10 +54,17 @@ public class TCWorldChunkManager extends WorldChunkManager
         }
 
         int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
-        for (int i = 0; i < paramInt3 * paramInt4; i++)
-        {
-            paramArrayOfBiomeBase[i] = BiomeBase.biomes[arrayOfInt[i]];
-        }
+
+        if (localWorld.haveVirtualBiomes)
+            for (int i = 0; i < paramInt3 * paramInt4; i++)
+            {
+                paramArrayOfBiomeBase[i] = BiomeBase.biomes[localWorld.virtualBiomesMatrix[arrayOfInt[i]]];
+            }
+        else
+            for (int i = 0; i < paramInt3 * paramInt4; i++)
+            {
+                paramArrayOfBiomeBase[i] = BiomeBase.biomes[arrayOfInt[i]];
+            }
 
         return paramArrayOfBiomeBase;
     }
@@ -71,10 +78,17 @@ public class TCWorldChunkManager extends WorldChunkManager
         }
 
         int[] localObject = this.biomeManager.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
-        for (int i = 0; i < paramInt3 * paramInt4; i++)
-        {
-            paramArrayOfBiomeBase[i] = BiomeBase.biomes[localObject[i]];
-        }
+
+        if (localWorld.haveVirtualBiomes)
+            for (int i = 0; i < paramInt3 * paramInt4; i++)
+            {
+                paramArrayOfBiomeBase[i] = BiomeBase.biomes[localWorld.virtualBiomesMatrix[localObject[i]]];
+            }
+        else
+            for (int i = 0; i < paramInt3 * paramInt4; i++)
+            {
+                paramArrayOfBiomeBase[i] = BiomeBase.biomes[localObject[i]];
+            }
 
         return paramArrayOfBiomeBase;
     }

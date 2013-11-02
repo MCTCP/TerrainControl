@@ -10,7 +10,7 @@ public class LayerBiomeInBiome extends Layer
     public int chance = 10;
     public boolean inOcean = false;
 
-    public boolean[] BiomeIsles = new boolean[256];
+    public boolean[] BiomeIsles = new boolean[1024];
 
 
     public LayerBiomeInBiome(long paramLong, Layer paramGenLayer)
