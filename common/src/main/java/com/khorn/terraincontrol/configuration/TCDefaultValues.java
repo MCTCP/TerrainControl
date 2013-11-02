@@ -6,40 +6,38 @@ import java.util.HashSet;
 
 public enum TCDefaultValues implements TCSetting
 {
-    //>> Files
+  //>> Files
     //>>  	Plugin
     pluginSettingsName("TerrainControl.ini"),
     //>>  	World
     WorldSettingsName("WorldConfig.ini"),
-    //>>   Extensions & Related
+    //>>   Biome Extensions & Related
     BiomeConfigExtensions("BiomeConfig.ini,.biome,.bc,.bc.ini,.biome.ini", SettingsType.StringArray),
     DefaultBiomeConfigExtension(".bc"),
-    DefaultWorldConfigExtension(".wc"),
     
-    //>> Folders
+  //>> Folders
     //>>  	Biomes
     GlobalBiomeConfigDirectoryName("GlobalBiomes"),
-    
     WorldBiomeConfigDirectoryName("WorldBiomes"),
     //>>	Objects
-    BO_WorldDirectoryName("WorldObjects"),
     BO_GlobalDirectoryName("GlobalObjects"),
-    // Network
+    BO_WorldDirectoryName("WorldObjects"),
+    
+  //>>  Network
     ChannelName("TerrainControl"),
     ProtocolVersion(5),
-    // End network
-
-    // Plugin settings
+    
+  //>>  Plugin Defaults
     ConsoleLogLevel(PluginConfig.LogLevels.Standard),
     FileLogLevel(PluginConfig.LogLevels.Standard),
-
-    snowAndIceMaxTemp(0.15F),
-
-    // World settings
+    
+  //>>  World Defaults
     SettingsMode(WorldConfig.ConfigMode.WriteAll),
     TerrainMode(WorldConfig.TerrainMode.Normal),
+    
     BiomeMode("Normal"),
 
+    snowAndIceMaxTemp(0.15F),
     WorldHeightBits(7),
 
     GenerationDepth(10),
