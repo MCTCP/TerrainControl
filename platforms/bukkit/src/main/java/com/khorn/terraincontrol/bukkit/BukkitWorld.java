@@ -282,7 +282,7 @@ public class BukkitWorld implements LocalWorld
                 {
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigManager.getBiomeConfigs()[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
+                        BiomeConfig biomeConfig = this.settings.biomeConfigManager.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
                         if (biomeConfig != null && biomeConfig.ReplaceCount > 0)
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)

@@ -53,7 +53,7 @@ public class NetherFortressGen extends MapGenStructure
             {
                 LocalWorld world = WorldHelper.toLocalWorld(worldObj);
                 int biomeId = world.getCalculatedBiomeId(chunkX * 16 + 8, chunkZ * 16 + 8);
-                if (!world.getSettings().biomeConfigManager.getBiomeConfigs()[biomeId].netherFortressesEnabled)
+                if (!world.getSettings().biomeConfigManager.biomeConfigs[biomeId].netherFortressesEnabled)
                 {
                     return false;
                 }

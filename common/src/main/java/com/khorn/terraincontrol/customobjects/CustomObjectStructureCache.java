@@ -47,7 +47,7 @@ public class CustomObjectStructureCache
         }
         // No structure found, create one
         Random random = RandomHelper.getRandomForCoords(chunkX ^ 2, (chunkZ + 1) * 2, world.getSeed());
-        CustomStructureGen structureGen = world.getSettings().biomeConfigManager.getBiomeConfigs()[world.getBiomeId(chunkX * 16 + 15, chunkZ * 16 + 15)].structureGen;
+        CustomStructureGen structureGen = world.getSettings().biomeConfigManager.biomeConfigs[world.getBiomeId(chunkX * 16 + 15, chunkZ * 16 + 15)].structureGen;
         if (structureGen != null)
         {
             CustomObjectCoordinate customObject = structureGen.getRandomObjectCoordinate(random, chunkX, chunkZ);

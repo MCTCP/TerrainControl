@@ -16,7 +16,7 @@ public class UseBiome implements CustomObject
 {
     public ArrayList<CustomObject> getPossibleObjectsAt(LocalWorld world, int x, int z)
     {
-        return world.getSettings().biomeConfigManager.getBiomeConfigs()[world.getBiome(x, z).getId()].biomeObjects;
+        return world.getSettings().biomeConfigManager.biomeConfigs[world.getBiome(x, z).getId()].biomeObjects;
     }
 
     @Override

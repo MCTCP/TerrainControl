@@ -301,7 +301,7 @@ public class ForgeWorld implements LocalWorld
                 {
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigManager.getBiomeConfigs()[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
+                        BiomeConfig biomeConfig = this.settings.biomeConfigManager.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
 
                         if (biomeConfig.ReplaceCount > 0)
                         {
@@ -596,9 +596,9 @@ public class ForgeWorld implements LocalWorld
         for (ForgeBiome biome : biomes)
         {
             // Apply settings for biomes
-            if (biome != null && config.biomeConfigManager.getBiomeConfigs()[biome.getId()] != null)
+            if (biome != null && config.biomeConfigManager.biomeConfigs[biome.getId()] != null)
             {
-                biome.setEffects(config.biomeConfigManager.getBiomeConfigs()[biome.getId()]);
+                biome.setEffects(config.biomeConfigManager.biomeConfigs[biome.getId()]);
             }
         }
     }

@@ -28,7 +28,7 @@ public class StrongholdGen extends StructureGenerator
 
         allowedBiomes = new ArrayList<BiomeBase>();
 
-        for (BiomeConfig biomeConfig : worldConfig.biomeConfigManager.getBiomeConfigs())
+        for (BiomeConfig biomeConfig : worldConfig.biomeConfigManager.biomeConfigs)
         {
             if (biomeConfig == null)
                 continue;

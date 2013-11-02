@@ -60,7 +60,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
         ArraysCacheManager.ReleaseCache(cache);
         for (int i = 0; i < x_size * z_size; i++)
         {
-            float f1 = worldConfig.biomeConfigManager.getBiomeConfigs()[arrayOfInt[i]].getTemperature() / 65536.0F;
+            float f1 = worldConfig.biomeConfigManager.biomeConfigs[arrayOfInt[i]].getTemperature() / 65536.0F;
             if (f1 < worldConfig.minTemperature)
                 f1 = worldConfig.minTemperature;
             if (f1 > worldConfig.maxTemperature)
@@ -85,7 +85,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
         ArraysCacheManager.ReleaseCache(cache);
         for (int i = 0; i < x_size * z_size; i++)
         {
-            float f1 = worldConfig.biomeConfigManager.getBiomeConfigs()[arrayOfInt[i]].getWetness() / 65536.0F;
+            float f1 = worldConfig.biomeConfigManager.biomeConfigs[arrayOfInt[i]].getWetness() / 65536.0F;
             if (f1 < worldConfig.minMoisture)
                 f1 = worldConfig.minMoisture;
             if (f1 > worldConfig.maxMoisture)

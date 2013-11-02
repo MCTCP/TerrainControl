@@ -202,42 +202,6 @@ public class WorldConfig extends ConfigFile
         
     }
 
-    /**
-     * @return the biomeConfigs
-     * @deprecated 
-     */
-    public BiomeConfig[] getBiomeConfigs()
-    {
-        return biomeConfigManager.getBiomeConfigs();
-    }
-
-    /**
-     * @param biomeConfigs the biomeConfigs to set
-     * @deprecated 
-     */
-    public void setBiomeConfigs(BiomeConfig[] biomeConfigs)
-    {
-        biomeConfigManager.setBiomeConfigs(biomeConfigs);
-    }
-
-    /**
-     * @return the biomesCount
-     * @deprecated 
-     */
-    public int getBiomesCount()
-    {
-        return biomeConfigManager.getBiomesCount();
-    }
-
-    /**
-     * @param biomesCount the biomesCount to set
-     * @deprecated 
-     */
-    public void setBiomesCount(int biomesCount)
-    {
-        biomeConfigManager.setBiomesCount(biomesCount);
-    }
-
     private void ReadWorldCustomObjects()
     {
         customObjectsDirectory = new File(this.settingsDir, TCDefaultValues.BO_WorldDirectoryName.stringValue());
@@ -929,8 +893,8 @@ public class WorldConfig extends ConfigFile
         }
 
         // BiomeConfigs
-        stream.writeInt(this.getBiomesCount());
-        for (BiomeConfig config : biomeConfigManager.getBiomeConfigs())
+        stream.writeInt(biomeConfigManager.biomesCount);
+        for (BiomeConfig config : biomeConfigManager.biomeConfigs)
         {
             if (config == null)
                 continue;
@@ -968,14 +932,14 @@ public class WorldConfig extends ConfigFile
         }
 
         // BiomeConfigs
-        biomeConfigManager.setBiomeConfigs(new BiomeConfig[world.getMaxBiomesCount()]);
+        biomeConfigManager.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
         count = stream.readInt();
         while (count-- > 0)
         {
             int id = stream.readInt();
             BiomeConfig config = new BiomeConfig(stream, this, world.getBiomeById(id));
-            biomeConfigManager.addBiomeConfig(id,config);
+            biomeConfigManager.biomeConfigs[id] = config;
         }
 
     }

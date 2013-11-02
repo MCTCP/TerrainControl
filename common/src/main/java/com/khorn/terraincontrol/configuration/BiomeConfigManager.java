@@ -26,10 +26,6 @@ public final class BiomeConfigManager
     /*
      *
      */
-    private final File worldDefaultBiomesDir;
-    /*
-     *
-     */
     private byte[] ReplaceMatrixBiomes = new byte[256];
     /*
      *
@@ -51,11 +47,11 @@ public final class BiomeConfigManager
      * Must be simple array for fast access.
      * ***** Beware! Some ids may contain null values; *****
      */
-    private BiomeConfig[] biomeConfigs;
+    public BiomeConfig[] biomeConfigs;
     /*
      * Overall biome count in this world.
      */
-    private int biomesCount;
+    public int biomesCount;
 
     /**
      *
@@ -84,8 +80,6 @@ public final class BiomeConfigManager
         this.globalBiomesDir = new File(TerrainControl.getEngine().getTCDataFolder(), TCDefaultValues.GlobalBiomeConfigDirectoryName.stringValue());
         //>>	TerrainControl/worlds/<WorldName>/<WorldBiomes/
         this.worldBiomesDir = new File(settingsDir, correctOldBiomeConfigFolder(settingsDir));
-        //>>	TerrainControl/worlds/<WorldName>/WorldBiomes/Defaults/
-        this.worldDefaultBiomesDir = new File(this.worldBiomesDir, TCDefaultValues.WorldDefaultBiomeConfigDirectoryName.stringValue());
 
         //>>	If there was an error in folder establishment, return.
         if (!makeBiomeFolders())
@@ -141,13 +135,6 @@ public final class BiomeConfigManager
                 allFoldersExist = false;
             }
 
-        if (!worldDefaultBiomesDir.exists())
-            if (!worldDefaultBiomesDir.mkdir())
-            {
-                TerrainControl.log(Level.WARNING, "Error creating World Default Biome configs directory.");
-                allFoldersExist = false;
-            }
-
         if (!allFoldersExist)
         {
             TerrainControl.log(Level.WARNING, "Potentially working with defaults.");
@@ -178,22 +165,12 @@ public final class BiomeConfigManager
     {
         for (LocalBiome localBiome : world.getDefaultBiomes())
         {
-            //>>	Upon loading a biome, check the worldDefault location first.
-            BiomeConfig config = new BiomeConfig(worldDefaultBiomesDir, localBiome, this.worldConfig);
-
-            //t>>   ========  TESTING: BASE BIOMES NO INHERITANCE =======
-            config.BiomeExtends = "";
-            config.BiomeExtendsProcessed = false;
-            //t>>   ========  TESTING: BASE BIOMES NO INHERITANCE =======
+            //>>	Upon loading a biome, check the usual BiomeConfigs folder
+            BiomeConfig config = new BiomeConfig(worldBiomesDir, localBiome, this.worldConfig);
 
             if (!config.readSuccess)
             {
-                //>>	If a config doesnt exist at that location try the usual BiomeConfigs folder
-                config = new BiomeConfig(worldBiomesDir, localBiome, this.worldConfig);
-            }
-            if (!config.readSuccess)
-            {
-                //>>	and if all else fails look in the globalBiomes folder
+                //>>	and if that fails look in the globalBiomes folder
                 //>>	if the biome does not exist here, one will be created
                 config = new BiomeConfig(globalBiomesDir, localBiome, this.worldConfig);
             }
@@ -441,52 +418,6 @@ public final class BiomeConfigManager
             //>>	Without this, pre-processed configs dont get merged.
             biomeLoadingStack.push(config);
         }
-    }
-
-    /**
-     *
-     * @return
-     */
-    public BiomeConfig[] getBiomeConfigs()
-    {
-        return biomeConfigs;
-    }
-
-    /**
-     *
-     * @param biomeConfigs
-     */
-    public void setBiomeConfigs(BiomeConfig[] biomeConfigs)
-    {
-        this.biomeConfigs = biomeConfigs;
-    }
-
-    /**
-     *
-     * @param index
-     * @param biomeConfig
-     */
-    public void addBiomeConfig(int index, BiomeConfig biomeConfig)
-    {
-        this.biomeConfigs[index] = biomeConfig;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getBiomesCount()
-    {
-        return biomesCount;
-    }
-
-    /**
-     *
-     * @param biomesCount
-     */
-    public void setBiomesCount(int biomesCount)
-    {
-        this.biomesCount = biomesCount;
     }
 
 }

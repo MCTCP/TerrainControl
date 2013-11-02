@@ -165,7 +165,7 @@ public class ChunkProviderTC
         final double oneEight = 0.125D;
         final int z_step = 1 << this.heightBits;
         final double oneFourth = 0.25D;
-        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.getBiomeConfigs();
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.biomeConfigs;
 
         for (int x = 0; x < four; x++)
         {
@@ -284,7 +284,7 @@ public class ChunkProviderTC
                 final int surfaceBlocksNoise = (int) (this.noise4[(x + z * 16)] / 3.0D + 3.0D + this.random.nextDouble() * 0.25D);
 
                 // Get the current biome config
-                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigManager.getBiomeConfigs()[this.biomeArray[(z + x * 16)]];
+                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigManager.biomeConfigs[this.biomeArray[(z + x * 16)]];
 
                 // Bedrock on the ceiling
                 if (this.worldSettings.ceilingBedrock)
@@ -413,7 +413,7 @@ public class ChunkProviderTC
             {
 
                 final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
-                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigManager.getBiomeConfigs()[biomeId];
+                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigManager.biomeConfigs[biomeId];
 
                 double noiseHeight = this.noise6[i2D] / 8000.0D;
                 if (noiseHeight < 0.0D)
@@ -517,7 +517,7 @@ public class ChunkProviderTC
 
     private void oldBiomeFactor(int x, int z, int i4, int max_X, int max_Y, double noiseHeight)
     {
-        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.getBiomeConfigs();
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.biomeConfigs;
         if (this.worldSettings.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
         {
             this.volatilityFactor = (1.0D - this.localWorld.getBiomeFactorForOldBM(z * 48 + 17 + x * 3));
@@ -550,7 +550,7 @@ public class ChunkProviderTC
         float heightSum = 0.0F;
         float biomeWeightSum = 0.0F;
 
-        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.getBiomeConfigs();
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.biomeConfigs;
 
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 
@@ -604,7 +604,7 @@ public class ChunkProviderTC
         float riverHeightSum = 0.0F;
         float riverWeightSum = 0.0F;
 
-        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.getBiomeConfigs();
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.biomeConfigs;
         
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 

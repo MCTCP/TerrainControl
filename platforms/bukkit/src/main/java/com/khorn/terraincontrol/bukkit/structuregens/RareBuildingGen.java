@@ -36,7 +36,7 @@ public class RareBuildingGen extends StructureGenerator
     {
         biomeList = new ArrayList<BiomeBase>();
 
-        for (BiomeConfig biomeConfig : worldConfig.biomeConfigManager.getBiomeConfigs())
+        for (BiomeConfig biomeConfig : worldConfig.biomeConfigManager.biomeConfigs)
         {
             if (biomeConfig == null)
                 continue;
