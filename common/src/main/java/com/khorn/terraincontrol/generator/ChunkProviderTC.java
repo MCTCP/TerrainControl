@@ -170,10 +170,10 @@ public class ChunkProviderTC
             {
                 // Water level (fill final array based on smaller, non-smoothed
                 // array)
-                double waterLevel_x0z0 = this.waterLevelRaw[(x + 0) * noise_xSize + (z + 0)];
-                double waterLevel_x0z1 = this.waterLevelRaw[(x + 0) * noise_xSize + (z + 1)];
-                final double waterLevel_x1z0 = (this.waterLevelRaw[(x + 1) * noise_xSize + (z + 0)] - waterLevel_x0z0) * oneFourth;
-                final double waterLevel_x1z1 = (this.waterLevelRaw[(x + 1) * noise_xSize + (z + 1)] - waterLevel_x0z1) * oneFourth;
+                double waterLevel_x0z0 = this.waterLevelRaw[(x + 0) * noise_xSize + (z + 0)] & 0xFF;
+                double waterLevel_x0z1 = this.waterLevelRaw[(x + 0) * noise_xSize + (z + 1)] & 0xFF;
+                final double waterLevel_x1z0 = ((this.waterLevelRaw[(x + 1) * noise_xSize + (z + 0)] & 0xFF) - waterLevel_x0z0) * oneFourth;
+                final double waterLevel_x1z1 = ((this.waterLevelRaw[(x + 1) * noise_xSize + (z + 1)] & 0xFF) - waterLevel_x0z1) * oneFourth;
 
                 for (int piece_x = 0; piece_x < 4; piece_x++)
                 {
@@ -665,7 +665,7 @@ public class ChunkProviderTC
         riverVolatilitySum /= riverWeightSum;
         riverHeightSum /= riverWeightSum;
 
-        float waterLevelSum = this.riverFound ? biomeConfigs[biomeId].riverWaterLevel : biomeConfigs[biomeId].waterLevelMax;
+        int waterLevelSum = this.riverFound ? biomeConfigs[biomeId].riverWaterLevel : biomeConfigs[biomeId].waterLevelMax;
         this.waterLevelRaw[x * max_X + z] = (byte) waterLevelSum;
 
         volatilitySum = volatilitySum * 0.9F + 0.1F;   // Must be != 0
