@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.biomegenerators;
 
+import com.khorn.terraincontrol.configuration.WorldConfig;
+
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorOldOctaves;
@@ -41,9 +43,11 @@ public class OldBiomeGenerator extends BiomeGenerator
         {
             temp_out = new float[x_size * z_size];
         }
+        
+        WorldConfig worldConfig = world.getSettings().worldConfig;
 
-        this.oldTemperature1 = this.temperatureGenerator1.a(this.oldTemperature1, x, z, x_size, z_size, 0.025000000372529D / this.worldConfig.oldBiomeSize, 0.025000000372529D / this.worldConfig.oldBiomeSize, 0.25D);
-        this.oldTemperature2 = this.temperatureGenerator2.a(this.oldTemperature2, x, z, x_size, z_size, 0.25D / this.worldConfig.oldBiomeSize, 0.25D / this.worldConfig.oldBiomeSize, 0.5882352941176471D);
+        this.oldTemperature1 = this.temperatureGenerator1.a(this.oldTemperature1, x, z, x_size, z_size, 0.025000000372529D / worldConfig.oldBiomeSize, 0.025000000372529D / worldConfig.oldBiomeSize, 0.25D);
+        this.oldTemperature2 = this.temperatureGenerator2.a(this.oldTemperature2, x, z, x_size, z_size, 0.25D / worldConfig.oldBiomeSize, 0.25D / worldConfig.oldBiomeSize, 0.5882352941176471D);
 
         int i = 0;
         for (int j = 0; j < x_size; j++)
@@ -57,22 +61,18 @@ public class OldBiomeGenerator extends BiomeGenerator
                 double d4 = (temp_out[i] * 0.15D + 0.7D) * d3 + d1 * d2;
                 d4 = 1.0D - (1.0D - d4) * (1.0D - d4);
 
-                if (d4 < this.worldConfig.minTemperature)
+                if (d4 < worldConfig.minTemperature)
                 {
-                    d4 = this.worldConfig.minTemperature;
+                    d4 = worldConfig.minTemperature;
                 }
-                if (d4 > this.worldConfig.maxTemperature)
+                if (d4 > worldConfig.maxTemperature)
                 {
-                    d4 = this.worldConfig.maxTemperature;
+                    d4 = worldConfig.maxTemperature;
                 }
                 temp_out[i] = (float) d4;
                 i++;
             }
 
-        }
-        if (this.worldConfig.isDeprecated)
-        {
-            this.worldConfig = this.worldConfig.newSettings;
         }
 
         return temp_out;
@@ -110,9 +110,10 @@ public class OldBiomeGenerator extends BiomeGenerator
             return paramArrayOfBiomeBase;
         }
 
-        this.oldTemperature1 = this.temperatureGenerator1.a(this.oldTemperature1, x, z, x_size, x_size, 0.025000000372529D / this.worldConfig.oldBiomeSize, 0.025000000372529D / this.worldConfig.oldBiomeSize, 0.25D);
-        this.oldWetness = this.wetnessGenerator.a(this.oldWetness, x, z, x_size, x_size, 0.0500000007450581D / this.worldConfig.oldBiomeSize, 0.0500000007450581D / this.worldConfig.oldBiomeSize, 0.3333333333333333D);
-        this.oldTemperature2 = this.temperatureGenerator2.a(this.oldTemperature2, x, z, x_size, x_size, 0.25D / this.worldConfig.oldBiomeSize, 0.25D / this.worldConfig.oldBiomeSize, 0.5882352941176471D);
+        WorldConfig worldConfig = world.getSettings().worldConfig;
+        this.oldTemperature1 = this.temperatureGenerator1.a(this.oldTemperature1, x, z, x_size, x_size, 0.025000000372529D / worldConfig.oldBiomeSize, 0.025000000372529D / worldConfig.oldBiomeSize, 0.25D);
+        this.oldWetness = this.wetnessGenerator.a(this.oldWetness, x, z, x_size, x_size, 0.0500000007450581D / worldConfig.oldBiomeSize, 0.0500000007450581D / worldConfig.oldBiomeSize, 0.3333333333333333D);
+        this.oldTemperature2 = this.temperatureGenerator2.a(this.oldTemperature2, x, z, x_size, x_size, 0.25D / worldConfig.oldBiomeSize, 0.25D / worldConfig.oldBiomeSize, 0.5882352941176471D);
 
         int i = 0;
         for (int j = 0; j < x_size; j++)
@@ -129,21 +130,21 @@ public class OldBiomeGenerator extends BiomeGenerator
                 double d5 = (this.oldWetness[i] * 0.15D + 0.5D) * d3 + d1 * d2;
                 d4 = 1.0D - (1.0D - d4) * (1.0D - d4);
 
-                if (d4 < this.worldConfig.minTemperature)
+                if (d4 < worldConfig.minTemperature)
                 {
-                    d4 = this.worldConfig.minTemperature;
+                    d4 = worldConfig.minTemperature;
                 }
-                if (d5 < this.worldConfig.minMoisture)
+                if (d5 < worldConfig.minMoisture)
                 {
-                    d5 = this.worldConfig.minMoisture;
+                    d5 = worldConfig.minMoisture;
                 }
-                if (d4 > this.worldConfig.maxTemperature)
+                if (d4 > worldConfig.maxTemperature)
                 {
-                    d4 = this.worldConfig.maxTemperature;
+                    d4 = worldConfig.maxTemperature;
                 }
-                if (d5 > this.worldConfig.maxMoisture)
+                if (d5 > worldConfig.maxMoisture)
                 {
-                    d5 = this.worldConfig.maxMoisture;
+                    d5 = worldConfig.maxMoisture;
                 }
                 this.oldTemperature1[i] = d4;
                 this.oldWetness[i] = d5;
@@ -151,11 +152,6 @@ public class OldBiomeGenerator extends BiomeGenerator
                 paramArrayOfBiomeBase[(i++)] = OldBiomeGenerator.getBiomeFromDiagram(d4, d5);
             }
 
-        }
-
-        if (this.worldConfig.isDeprecated)
-        {
-            this.worldConfig = this.worldConfig.newSettings;
         }
 
         return paramArrayOfBiomeBase;

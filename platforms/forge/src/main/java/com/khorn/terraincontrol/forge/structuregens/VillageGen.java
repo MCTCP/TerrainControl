@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.forge.structuregens;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -27,15 +27,15 @@ public class VillageGen extends MapGenStructure
     private int distance;
     private int minimumDistance;
 
-    public VillageGen(WorldConfig worldConfig)
+    public VillageGen(WorldSettings configs)
     {
-        size = worldConfig.villageSize;
-        distance = worldConfig.villageDistance;
+        size = configs.worldConfig.villageSize;
+        distance = configs.worldConfig.villageDistance;
         minimumDistance = 8;
 
         // Add all village biomes to the list
         villageSpawnBiomes = new ArrayList<BiomeGenBase>();
-        for (BiomeConfig config : worldConfig.biomeConfigManager.biomeConfigs)
+        for (BiomeConfig config : configs.biomeConfigs)
         {
             if (config == null)
                 continue;

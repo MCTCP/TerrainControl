@@ -32,7 +32,7 @@ public class ChunkProvider implements IChunkProvider
         this.world = _world;
         this.worldHandle = _world.getWorld();
 
-        this.TestMode = world.getSettings().ModeTerrain == WorldConfig.TerrainMode.TerrainTest;
+        this.TestMode = world.getSettings().worldConfig.ModeTerrain == WorldConfig.TerrainMode.TerrainTest;
 
         this.generator = new ChunkProviderTC(this.world.getSettings(), this.world);
         this.spawner = new ObjectSpawner(this.world.getSettings(), this.world);

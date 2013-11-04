@@ -6,8 +6,6 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -173,21 +171,24 @@ public class WorldConfig extends ConfigFile
     public int WorldHeight;
 
     public long resourcesSeed;
-
-    public BiomeConfigManager biomeConfigManager;
     
-    public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
+    /**
+     * Creates a WorldConfig from the WorldConfig.ini file found in the given directory.
+     * @param settingsDir The settings directory where the WorldConfig.ini is in.
+     * @param world The LocalWorld instance of the world.
+     */
+    public WorldConfig(File settingsDir, LocalWorld world)
     {
         super(world.getName(), new File(settingsDir, TCDefaultValues.WorldSettingsName.stringValue()));
         this.settingsDir = settingsDir;
 
-        //>>	Read the WorldConfig file
+        // Read the WorldConfig file
         this.readSettingsFile();
-        //>>	Fix older names 
+        // Fix older names 
         this.renameOldSettings();
-        //>>	Set the local fields based on what was read from the file
+        // Set the local fields based on what was read from the file
         this.readConfigSettings();
-        //>>	Clamp Settings to acceptable values
+        // Clamp Settings to acceptable values
         this.correctSettings();
 
         ReadWorldCustomObjects();
@@ -197,8 +198,17 @@ public class WorldConfig extends ConfigFile
             this.writeSettingsFile(this.SettingsMode == ConfigMode.WriteAll);
 
         world.setHeightBits(this.worldHeightBits);
-
-        this.biomeConfigManager = new BiomeConfigManager(settingsDir, world, this, CustomBiomeIds, checkOnly);
+    }
+    
+    /**
+     * Creates an empty WorldConfig with no settings initialized.
+     * Used to read the WorldConfig from the TC network packet.
+     * @param world The LocalWorld instance.
+     */
+    public WorldConfig(LocalWorld world)
+    {
+        super(world.getName(), null);
+        this.settingsDir = null;
     }
 
     private void ReadWorldCustomObjects()
@@ -894,74 +904,5 @@ public class WorldConfig extends ConfigFile
         WriteAll,
         WriteDisable,
         WriteWithoutComments
-    }
-
-    public void Serialize(DataOutputStream stream) throws IOException
-    {
-        // General information
-        writeStringToStream(stream, this.name);
-
-        stream.writeInt(this.WorldFog);
-        stream.writeInt(this.WorldNightFog);
-
-        // Custom biomes + ids
-        stream.writeInt(this.CustomBiomeIds.size());
-        for (Iterator<Entry<String, Integer>> it = this.CustomBiomeIds.entrySet().iterator(); it.hasNext();)
-        {
-            Entry<String, Integer> entry = it.next();
-            writeStringToStream(stream, entry.getKey());
-            stream.writeInt(entry.getValue());
-        }
-
-        // BiomeConfigs
-        stream.writeInt(biomeConfigManager.biomesCount);
-        for (BiomeConfig config : biomeConfigManager.biomeConfigs)
-        {
-            if (config == null)
-                continue;
-            stream.writeInt(config.Biome.getId());
-            config.Serialize(stream);
-        }
-    }
-
-    // Needed for creating world config from network packet
-    public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
-    {
-        // General information
-        super(readStringFromStream(stream), null);
-        this.settingsDir = null;
-
-        this.WorldFog = stream.readInt();
-        this.WorldNightFog = stream.readInt();
-
-        this.WorldFogR = ((WorldFog & 0xFF0000) >> 16) / 255F;
-        this.WorldFogG = ((WorldFog & 0xFF00) >> 8) / 255F;
-        this.WorldFogB = (WorldFog & 0xFF) / 255F;
-
-        this.WorldNightFogR = ((WorldNightFog & 0xFF0000) >> 16) / 255F;
-        this.WorldNightFogG = ((WorldNightFog & 0xFF00) >> 8) / 255F;
-        this.WorldNightFogB = (WorldNightFog & 0xFF) / 255F;
-
-        // Custom biomes + ids
-        int count = stream.readInt();
-        while (count-- > 0)
-        {
-            String biomeName = readStringFromStream(stream);
-            int id = stream.readInt();
-            world.AddCustomBiome(biomeName, id);
-            this.CustomBiomeIds.put(biomeName, id);
-        }
-        //TODO Check all this code.
-        // BiomeConfigs
-        biomeConfigManager.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
-
-        count = stream.readInt();
-        while (count-- > 0)
-        {
-            int id = stream.readInt();
-            BiomeConfig config = new BiomeConfig(stream, this, world.getBiomeById(id));
-            biomeConfigManager.biomeConfigs[id] = config;
-        }
-
     }
 }

@@ -16,7 +16,7 @@ public class UseWorldAll extends UseWorld
     @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
     {
-        for (CustomObject object : world.getSettings().customObjects)
+        for (CustomObject object : world.getSettings().worldConfig.customObjects)
         {
             if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
@@ -32,7 +32,7 @@ public class UseWorldAll extends UseWorld
     @Override
     public boolean process(LocalWorld world, Random rand, int chunkX, int chunkZ)
     {
-        WorldConfig worldSettings = world.getSettings();
+        WorldConfig worldSettings = world.getSettings().worldConfig;
         boolean spawnedAtLeastOneObject = false;
 
         if (worldSettings.customObjects.size() == 0)

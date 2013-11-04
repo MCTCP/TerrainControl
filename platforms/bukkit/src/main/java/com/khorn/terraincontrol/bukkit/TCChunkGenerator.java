@@ -31,7 +31,7 @@ public class TCChunkGenerator extends ChunkGenerator
         this.heightBitsPlusFour = heightBits + 4;
         this.chunkProviderTC = new ChunkProviderTC(_world.getSettings(), _world);
 
-        WorldConfig.TerrainMode mode = _world.getSettings().ModeTerrain;
+        WorldConfig.TerrainMode mode = _world.getSettings().worldConfig.ModeTerrain;
 
         if (mode == WorldConfig.TerrainMode.Normal || mode == WorldConfig.TerrainMode.OldGenerator)
             this.BlockPopulator.add(new TCBlockPopulator(_world));

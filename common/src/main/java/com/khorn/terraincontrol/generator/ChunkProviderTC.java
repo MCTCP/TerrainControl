@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.generator;
 
+import com.khorn.terraincontrol.configuration.WorldSettings;
+
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -48,7 +50,7 @@ public class ChunkProviderTC
     private double volatilityFactor;
     private double heightFactor;
 
-    private WorldConfig worldSettings;
+    private WorldSettings worldSettings;
 
     private final TerrainGenBase caveGen;
     private final TerrainGenBase canyonGen;
@@ -68,9 +70,9 @@ public class ChunkProviderTC
     private final int maxSmoothDiameter;
     private final int maxSmoothRadius;
 
-    public ChunkProviderTC(WorldConfig config, LocalWorld world)
+    public ChunkProviderTC(WorldSettings configs, LocalWorld world)
     {
-        this.worldSettings = config;
+        this.worldSettings = configs;
         this.localWorld = world;
         this.height = world.getHeight();
         this.heightBits = world.getHeightBits();
@@ -86,14 +88,14 @@ public class ChunkProviderTC
         this.noiseGen5 = new NoiseGeneratorPerlinOctaves(this.random, 10);
         this.noiseGen6 = new NoiseGeneratorPerlinOctaves(this.random, 16);
 
-        this.caveGen = new CavesGen(this.worldSettings, this.localWorld);
-        this.canyonGen = new CanyonsGen(this.worldSettings, this.localWorld);
+        this.caveGen = new CavesGen(configs.worldConfig, this.localWorld);
+        this.canyonGen = new CanyonsGen(configs.worldConfig, this.localWorld);
 
         // Contains 2d array maxSmoothDiameter*maxSmoothDiameter.
         // Maximum weight is in array center.
 
-        this.maxSmoothDiameter = config.maxSmoothRadius * 2 + 1;
-        this.maxSmoothRadius = config.maxSmoothRadius;
+        this.maxSmoothDiameter = configs.worldConfig.maxSmoothRadius * 2 + 1;
+        this.maxSmoothRadius = configs.worldConfig.maxSmoothRadius;
 
         this.nearBiomeWeightArray = new float[maxSmoothDiameter * maxSmoothDiameter];
 
@@ -122,14 +124,9 @@ public class ChunkProviderTC
         this.caveGen.generate(x, z, blockArray);
         this.canyonGen.generate(x, z, blockArray);
 
-        if (this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.Normal || this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
+        if (this.worldSettings.worldConfig.ModeTerrain == WorldConfig.TerrainMode.Normal || this.worldSettings.worldConfig.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
         {
             this.localWorld.PrepareTerrainObjects(x, z, blockArray, dry);
-        }
-
-        if (this.worldSettings.isDeprecated)
-        {
-            this.worldSettings = this.worldSettings.newSettings;
         }
 
         return blockArray;
@@ -145,7 +142,7 @@ public class ChunkProviderTC
         final int noise_ySize = this.height / 8 + 1;
         final int noise_zSize = four + 1;
 
-        if (worldSettings.improvedRivers)
+        if (worldSettings.worldConfig.improvedRivers)
             this.riverArray = this.localWorld.getBiomesUnZoomed(this.riverArray, chunkX * 4 - maxSmoothRadius, chunkZ * 4 - maxSmoothRadius, noise_xSize + maxSmoothDiameter, noise_zSize + maxSmoothDiameter, OutputType.ONLY_RIVERS);
 
         if (this.localWorld.canBiomeManagerGenerateUnzoomed())
@@ -165,7 +162,7 @@ public class ChunkProviderTC
         final double oneEight = 0.125D;
         final int z_step = 1 << this.heightBits;
         final double oneFourth = 0.25D;
-        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.biomeConfigs;
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigs;
 
         for (int x = 0; x < four; x++)
         {
@@ -274,6 +271,8 @@ public class ChunkProviderTC
         final double d1 = 0.03125D;
         this.noise4 = this.noiseGen4.Noise3D(this.noise4, chunkX * 16, chunkZ * 16, 0, 16, 16, 1, d1 * 2.0D, d1 * 2.0D, d1 * 2.0D);
         final float[] temperatureArray = this.localWorld.getTemperatures(chunkX * 16, chunkZ * 16, 16, 16);
+        
+        WorldConfig worldConfig = this.worldSettings.worldConfig;
 
         for (int x = 0; x < 16; x++)
         {
@@ -284,13 +283,13 @@ public class ChunkProviderTC
                 final int surfaceBlocksNoise = (int) (this.noise4[(x + z * 16)] / 3.0D + 3.0D + this.random.nextDouble() * 0.25D);
 
                 // Get the current biome config
-                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigManager.biomeConfigs[this.biomeArray[(z + x * 16)]];
+                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.biomeArray[(z + x * 16)]];
 
                 // Bedrock on the ceiling
-                if (this.worldSettings.ceilingBedrock)
+                if (worldConfig.ceilingBedrock)
                 {
                     // Moved one block lower to fix lighting issues
-                    blocksArray[(z * 16 + x) * this.height + this.heightMinusOne - 1] = (byte) this.worldSettings.bedrockBlock;
+                    blocksArray[(z * 16 + x) * this.height + this.heightMinusOne - 1] = (byte) worldConfig.bedrockBlock;
                 }
 
                 // Loop from map height to zero to place bedrock and surface
@@ -303,10 +302,10 @@ public class ChunkProviderTC
                 {
                     final int currentPos = (z * 16 + x) * this.height + y;
 
-                    if (y < 5 && (this.worldSettings.createAdminium(y)) && y <= this.random.nextInt(5))
+                    if (y < 5 && (worldConfig.createAdminium(y)) && y <= this.random.nextInt(5))
                     {
                         // Place bottom bedrock
-                        blocksArray[currentPos] = (byte) this.worldSettings.bedrockBlock;
+                        blocksArray[currentPos] = (byte) worldConfig.bedrockBlock;
                     } else
                     {
                         // Surface blocks logic (grass, dirt, sand, sandstone)
@@ -321,7 +320,7 @@ public class ChunkProviderTC
                             if (surfaceBlocksCount == -1)
                             {
                                 // Set when variable was reset
-                                if (surfaceBlocksNoise <= 0 && !this.worldSettings.removeSurfaceStone)
+                                if (surfaceBlocksNoise <= 0 && !worldConfig.removeSurfaceStone)
                                 {
                                     currentSurfaceBlock = 0;
                                     currentGroundBlock = biomeConfig.StoneBlock;
@@ -333,7 +332,7 @@ public class ChunkProviderTC
 
                                 // Use blocks for the top of the water instead
                                 // when on water
-                                if ((y < currentWaterLevel) && (y > this.worldSettings.waterLevelMin) && (currentSurfaceBlock == 0))
+                                if ((y < currentWaterLevel) && (y > worldConfig.waterLevelMin) && (currentSurfaceBlock == 0))
                                 {
                                     if (currentTemperature < 0.15F)
                                     {
@@ -390,11 +389,13 @@ public class ChunkProviderTC
         {
             outArray = new double[max_X * max_Y * max_Z];
         }
+        
+        WorldConfig worldConfig = this.worldSettings.worldConfig;
 
-        final double xzScale = 684.41200000000003D * this.worldSettings.getFractureHorizontal();
-        final double yScale = 684.41200000000003D * this.worldSettings.getFractureVertical();
+        final double xzScale = 684.41200000000003D * worldConfig.getFractureHorizontal();
+        final double yScale = 684.41200000000003D * worldConfig.getFractureVertical();
 
-        if (this.worldSettings.oldTerrainGenerator)
+        if (worldConfig.oldTerrainGenerator)
         {
             this.noise5 = this.noiseGen5.Noise2D(this.noise5, xOffset, zOffset, max_X, max_Z, 1.121D, 1.121D);
         }
@@ -413,7 +414,7 @@ public class ChunkProviderTC
             {
 
                 final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
-                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigManager.biomeConfigs[biomeId];
+                final BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
                 double noiseHeight = this.noise6[i2D] / 8000.0D;
                 if (noiseHeight < 0.0D)
@@ -442,9 +443,9 @@ public class ChunkProviderTC
                     noiseHeight /= 8.0D;
                 }
 
-                if (!this.worldSettings.oldTerrainGenerator)
+                if (!worldConfig.oldTerrainGenerator)
                 {
-                    if (this.worldSettings.improvedRivers)
+                    if (worldConfig.improvedRivers)
                         this.biomeFactorWithRivers(x, z, max_X, max_Y, noiseHeight);
                     else
                         this.biomeFactor(x, z, max_X, max_Y, noiseHeight);
@@ -517,8 +518,8 @@ public class ChunkProviderTC
 
     private void oldBiomeFactor(int x, int z, int i4, int max_X, int max_Y, double noiseHeight)
     {
-        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.biomeConfigs;
-        if (this.worldSettings.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigs;
+        if (this.worldSettings.worldConfig.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
         {
             this.volatilityFactor = (1.0D - this.localWorld.getBiomeFactorForOldBM(z * 48 + 17 + x * 3));
 
@@ -550,7 +551,7 @@ public class ChunkProviderTC
         float heightSum = 0.0F;
         float biomeWeightSum = 0.0F;
 
-        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.biomeConfigs;
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigs;
 
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 
@@ -604,7 +605,7 @@ public class ChunkProviderTC
         float riverHeightSum = 0.0F;
         float riverWeightSum = 0.0F;
 
-        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigManager.biomeConfigs;
+        final BiomeConfig[] biomeConfigs = this.worldSettings.biomeConfigs;
         
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (max_X + this.maxSmoothDiameter))];
 

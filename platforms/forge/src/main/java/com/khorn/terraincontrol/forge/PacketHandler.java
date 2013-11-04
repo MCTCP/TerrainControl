@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
@@ -51,7 +51,7 @@ public class PacketHandler implements IPacketHandler
                     WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
 
                     ForgeWorld worldTC = new ForgeWorld("external");
-                    WorldConfig config = new WorldConfig(stream, worldTC);
+                    WorldSettings config = new WorldSettings(stream, worldTC);
 
                     worldTC.InitM(worldMC, config);
                 }

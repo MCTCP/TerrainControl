@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.biomegenerators;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.biomegenerators.biomelayers.Layer;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 
 /**
  * This is the normal biome mode, which has all of Terrain Control's features.
@@ -18,7 +19,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
 
         Layer[] layers = Layer.Init(world.getSeed(), world);
 
-        if (worldConfig.improvedRivers)
+        if (world.getSettings().worldConfig.improvedRivers)
             defaultOutputType = OutputType.WITHOUT_RIVERS;
 
         this.unZoomedLayer = layers[0];
@@ -58,9 +59,10 @@ public class NormalBiomeGenerator extends BiomeGenerator
         int[] arrayOfInt = this.biomeLayer.GetBiomes(cache, x, z, x_size, z_size);
 
         ArraysCacheManager.ReleaseCache(cache);
+        WorldConfig worldConfig = world.getSettings().worldConfig;
         for (int i = 0; i < x_size * z_size; i++)
         {
-            float f1 = worldConfig.biomeConfigManager.biomeConfigs[arrayOfInt[i]].getTemperature() / 65536.0F;
+            float f1 = world.getSettings().biomeConfigs[arrayOfInt[i]].getTemperature() / 65536.0F;
             if (f1 < worldConfig.minTemperature)
                 f1 = worldConfig.minTemperature;
             if (f1 > worldConfig.maxTemperature)
@@ -83,9 +85,10 @@ public class NormalBiomeGenerator extends BiomeGenerator
 
         int[] arrayOfInt = this.biomeLayer.GetBiomes(cache, x, y, x_size, z_size);
         ArraysCacheManager.ReleaseCache(cache);
+        WorldConfig worldConfig = world.getSettings().worldConfig;
         for (int i = 0; i < x_size * z_size; i++)
         {
-            float f1 = worldConfig.biomeConfigManager.biomeConfigs[arrayOfInt[i]].getWetness() / 65536.0F;
+            float f1 = world.getSettings().biomeConfigs[arrayOfInt[i]].getWetness() / 65536.0F;
             if (f1 < worldConfig.minMoisture)
                 f1 = worldConfig.minMoisture;
             if (f1 > worldConfig.maxMoisture)

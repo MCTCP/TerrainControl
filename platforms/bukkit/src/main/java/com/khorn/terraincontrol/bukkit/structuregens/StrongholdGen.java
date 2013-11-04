@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.server.v1_6_R3.*;
 
@@ -20,15 +20,15 @@ public class StrongholdGen extends StructureGenerator
     private double distance;
     private int spread;
 
-    public StrongholdGen(WorldConfig worldConfig)
+    public StrongholdGen(WorldSettings configs)
     {
-        this.distance = worldConfig.strongholdDistance;
-        this.structureCoords = new ChunkCoordIntPair[worldConfig.strongholdCount];
-        this.spread = worldConfig.strongholdSpread;
+        this.distance = configs.worldConfig.strongholdDistance;
+        this.structureCoords = new ChunkCoordIntPair[configs.worldConfig.strongholdCount];
+        this.spread = configs.worldConfig.strongholdSpread;
 
         allowedBiomes = new ArrayList<BiomeBase>();
 
-        for (BiomeConfig biomeConfig : worldConfig.biomeConfigManager.biomeConfigs)
+        for (BiomeConfig biomeConfig : configs.biomeConfigs)
         {
             if (biomeConfig == null)
                 continue;

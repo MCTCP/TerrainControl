@@ -5,7 +5,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
 
 import java.util.Random;
@@ -14,13 +14,13 @@ import java.util.logging.Level;
 public class ObjectSpawner
 {
 
-    private WorldConfig worldSettings;
+    private WorldSettings worldSettings;
     private Random rand;
     private LocalWorld world;
 
-    public ObjectSpawner(WorldConfig wrk, LocalWorld localWorld)
+    public ObjectSpawner(WorldSettings configs, LocalWorld localWorld)
     {
-        this.worldSettings = wrk;
+        this.worldSettings = configs;
         this.rand = new Random();
         this.world = localWorld;
     }
@@ -33,7 +33,7 @@ public class ObjectSpawner
 
         // Get the BiomeConfig of the other corner
         int biomeId = world.getBiomeId(x + 15, z + 15);
-        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigManager.biomeConfigs[biomeId];
+        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
         // Null check
         if (localBiomeConfig == null)
@@ -46,7 +46,7 @@ public class ObjectSpawner
         }
 
         // Get the random generator
-        long resourcesSeed = worldSettings.resourcesSeed != 0L ? worldSettings.resourcesSeed : world.getSeed();
+        long resourcesSeed = worldSettings.worldConfig.resourcesSeed != 0L ? worldSettings.worldConfig.resourcesSeed : world.getSeed();
         this.rand.setSeed(resourcesSeed);
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
@@ -77,10 +77,6 @@ public class ObjectSpawner
         // Replace biomes
         world.replaceBiomes();
 
-        // Replace settings after Reload command
-        if (this.worldSettings.isDeprecated)
-            this.worldSettings = this.worldSettings.newSettings;
-
         // Fire event
         TerrainControl.firePopulationEndEvent(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
     }
@@ -95,7 +91,7 @@ public class ObjectSpawner
             {
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
-                BiomeConfig biomeConfig = worldSettings.biomeConfigManager.biomeConfigs[world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
+                BiomeConfig biomeConfig = worldSettings.biomeConfigs[world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
                 if (biomeConfig != null && biomeConfig.BiomeTemperature < TCDefaultValues.snowAndIceMaxTemp.floatValue())
                 {
                     int blockToFreezeY = world.getHighestBlockYAt(blockToFreezeX, blockToFreezeZ);

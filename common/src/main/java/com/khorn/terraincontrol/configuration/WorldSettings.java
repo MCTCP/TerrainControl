@@ -4,40 +4,26 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
 /**
- *
+ * Holds the WorldConfig and all BiomeConfigs.
  */
-public final class BiomeConfigManager
+public final class WorldSettings
 {
 
-    /*
-     *
-     */
     private final File worldBiomesDir;
-    /*
-     *
-     */
     private final File globalBiomesDir;
-    /*
-     *
-     */
     public byte[] ReplaceBiomesMatrix = new byte[256];
-    /*
-     *
-     */
     private LocalWorld world;
-    /*
-     *
-     */
-    private WorldConfig worldConfig;
-    /*
-     *
-     */
+    public WorldConfig worldConfig;
     private boolean checkOnly;
     /*
      * A running list of biomes that have been processed during the loading
@@ -61,15 +47,16 @@ public final class BiomeConfigManager
      * @param customBiomes
      * @param checkOnly
      */
-    public BiomeConfigManager(File settingsDir, LocalWorld world, WorldConfig wConfig, Map<String, Integer> customBiomes, boolean checkOnly)
+    public WorldSettings(File settingsDir, LocalWorld world, boolean checkOnly)
     {
 
         this.world = world;
-        this.worldConfig = wConfig;
+        this.worldConfig = new WorldConfig(settingsDir, world);
         this.checkOnly = checkOnly;
 
         // Check biome ids, These are the names from the worldConfig file
         //>>	Corrects any instances of incorrect biome id.
+        Map<String, Integer> customBiomes = worldConfig.CustomBiomeIds;
         for (String biomeName : customBiomes.keySet())
             if (customBiomes.get(biomeName) == -1)
                 customBiomes.put(biomeName, world.getFreeBiomeId());
@@ -443,6 +430,77 @@ public final class BiomeConfigManager
             //>>	Without this, pre-processed configs dont get merged.
             biomeLoadingStack.push(config);
         }
+    }
+    
+    public void writeToStream(DataOutputStream stream) throws IOException
+    {
+        // General information
+        ConfigFile.writeStringToStream(stream, worldConfig.name);
+
+        stream.writeInt(worldConfig.WorldFog);
+        stream.writeInt(worldConfig.WorldNightFog);
+
+        // Custom biomes + ids
+        stream.writeInt(worldConfig.CustomBiomeIds.size());
+        for (Iterator<Entry<String, Integer>> it = worldConfig.CustomBiomeIds.entrySet().iterator(); it.hasNext();)
+        {
+            Entry<String, Integer> entry = it.next();
+            ConfigFile.writeStringToStream(stream, entry.getKey());
+            stream.writeInt(entry.getValue());
+        }
+
+        // BiomeConfigs
+        stream.writeInt(biomesCount);
+        for (BiomeConfig config : biomeConfigs)
+        {
+            if (config == null)
+                continue;
+            stream.writeInt(config.Biome.getId());
+            config.Serialize(stream);
+        }
+    }
+
+    // Needed for creating world config from network packet
+    public WorldSettings(DataInputStream stream, LocalWorld world) throws IOException
+    {
+        this.worldBiomesDir = null;
+        this.globalBiomesDir = null;
+
+        // General information
+        worldConfig = new WorldConfig(world);
+
+        worldConfig.WorldFog = stream.readInt();
+        worldConfig.WorldNightFog = stream.readInt();
+
+        worldConfig.WorldFogR = ((worldConfig.WorldFog & 0xFF0000) >> 16) / 255F;
+        worldConfig.WorldFogG = ((worldConfig.WorldFog & 0xFF00) >> 8) / 255F;
+        worldConfig.WorldFogB = (worldConfig.WorldFog & 0xFF) / 255F;
+
+        worldConfig.WorldNightFogR = ((worldConfig.WorldNightFog & 0xFF0000) >> 16) / 255F;
+        worldConfig.WorldNightFogG = ((worldConfig.WorldNightFog & 0xFF00) >> 8) / 255F;
+        worldConfig.WorldNightFogB = (worldConfig.WorldNightFog & 0xFF) / 255F;
+
+        // Custom biomes + ids
+        int count = stream.readInt();
+        while (count-- > 0)
+        {
+            String biomeName = ConfigFile.readStringFromStream(stream);
+            int id = stream.readInt();
+            world.AddCustomBiome(biomeName, id);
+            worldConfig.CustomBiomeIds.put(biomeName, id);
+        }
+        //TODO Check all this code.
+        // BiomeConfigs
+        biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
+
+        count = stream.readInt();
+        while (count-- > 0)
+        {
+            int id = stream.readInt();
+            BiomeConfig config = new BiomeConfig(stream, worldConfig, world.getBiomeById(id));
+            biomeConfigs[id] = config;
+        }
+
     }
 
 }

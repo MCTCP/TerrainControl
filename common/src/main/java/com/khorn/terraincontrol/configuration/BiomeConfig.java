@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
-import static com.khorn.terraincontrol.configuration.ConfigFile.readComplexString;
-
 public class BiomeConfig extends ConfigFile
 {
     /*

@@ -14,10 +14,10 @@ public class TCBlockPopulator extends BlockPopulator
     private BukkitWorld world;
     private ObjectSpawner spawner;
 
-    public TCBlockPopulator(BukkitWorld _world)
+    public TCBlockPopulator(BukkitWorld world)
     {
-        this.world = _world;
-        this.spawner = new ObjectSpawner(_world.getSettings(), _world);
+        this.world = world;
+        this.spawner = new ObjectSpawner(world.getSettings(), world);
     }
 
     @Override

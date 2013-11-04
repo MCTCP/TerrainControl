@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.server.v1_6_R3.BiomeBase;
 import net.minecraft.server.v1_6_R3.StructureGenerator;
@@ -29,15 +29,15 @@ public class VillageGen extends StructureGenerator
     private int distance;
     private int minimumDistance;
 
-    public VillageGen(WorldConfig worldConfig)
+    public VillageGen(WorldSettings configs)
     {
-        size = worldConfig.villageSize;
-        distance = worldConfig.villageDistance;
+        size = configs.worldConfig.villageSize;
+        distance = configs.worldConfig.villageDistance;
         minimumDistance = 8;
 
         // Add all village biomes to the list
         villageSpawnBiomes = new ArrayList<BiomeBase>();
-        for (BiomeConfig config : worldConfig.biomeConfigManager.biomeConfigs)
+        for (BiomeConfig config : configs.biomeConfigs)
         {
             if (config == null)
                 continue;

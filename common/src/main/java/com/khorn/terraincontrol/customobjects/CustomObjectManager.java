@@ -121,7 +121,7 @@ public class CustomObjectManager
      */
     public CustomObject getCustomObject(String name, LocalWorld world)
     {
-        return getCustomObject(name, world.getSettings());
+        return getCustomObject(name, world.getSettings().worldConfig);
     }
 
     /**
@@ -222,7 +222,7 @@ public class CustomObjectManager
      */
     public CustomObject getObjectFromString(String string, LocalWorld world)
     {
-        return this.getObjectFromString(string, world.getSettings());
+        return this.getObjectFromString(string, world.getSettings().worldConfig);
     }
 
     /**

@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OutputType;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.forge.structuregens.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
@@ -30,7 +30,7 @@ public class ForgeWorld implements LocalWorld
 
     private ChunkProvider generator;
     private World world;
-    private WorldConfig settings;
+    private WorldSettings settings;
     private CustomObjectStructureCache structureCache;
     private String name;
     private long seed;
@@ -213,15 +213,15 @@ public class ForgeWorld implements LocalWorld
     @Override
     public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry)
     {
-        if (this.settings.strongholdsEnabled)
+        if (this.settings.worldConfig.strongholdsEnabled)
             this.strongholdGen.generate(null, this.world, x, z, chunkArray);
-        if (this.settings.mineshaftsEnabled)
+        if (this.settings.worldConfig.mineshaftsEnabled)
             this.mineshaftGen.generate(null, this.world, x, z, chunkArray);
-        if (this.settings.villagesEnabled && dry)
+        if (this.settings.worldConfig.villagesEnabled && dry)
             this.villageGen.generate(null, this.world, x, z, chunkArray);
-        if (this.settings.rareBuildingsEnabled)
+        if (this.settings.worldConfig.rareBuildingsEnabled)
             this.rareBuildingGen.generate(null, this.world, x, z, chunkArray);
-        if (this.settings.netherFortressesEnabled)
+        if (this.settings.worldConfig.netherFortressesEnabled)
             this.netherFortressGen.generate(null, this.world, x, z, chunkArray);
 
     }
@@ -269,15 +269,15 @@ public class ForgeWorld implements LocalWorld
     public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
     {
         boolean isVillagePlaced = false;
-        if (this.settings.strongholdsEnabled)
+        if (this.settings.worldConfig.strongholdsEnabled)
             this.strongholdGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.mineshaftsEnabled)
+        if (this.settings.worldConfig.mineshaftsEnabled)
             this.mineshaftGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.villagesEnabled)
+        if (this.settings.worldConfig.villagesEnabled)
             isVillagePlaced = this.villageGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.rareBuildingsEnabled)
+        if (this.settings.worldConfig.rareBuildingsEnabled)
             this.rareBuildingGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
-        if (this.settings.netherFortressesEnabled)
+        if (this.settings.worldConfig.netherFortressesEnabled)
             this.netherFortressGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
 
         return isVillagePlaced;
@@ -286,7 +286,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public void replaceBlocks()
     {
-        if (this.settings.BiomeConfigsHaveReplacement)
+        if (this.settings.worldConfig.BiomeConfigsHaveReplacement)
         {
 
             Chunk rawChunk = this.chunkCache[0];
@@ -307,7 +307,7 @@ public class ForgeWorld implements LocalWorld
                 {
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigManager.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
 
                         if (biomeConfig.ReplaceCount > 0)
                         {
@@ -336,12 +336,12 @@ public class ForgeWorld implements LocalWorld
     @Override
     public void replaceBiomes()
     {
-        if (this.settings.HaveBiomeReplace)
+        if (this.settings.worldConfig.HaveBiomeReplace)
         {
             byte[] ChunkBiomes = this.chunkCache[0].getBiomeArray();
 
             for (int i = 0; i < ChunkBiomes.length; i++)
-                ChunkBiomes[i] = (byte) (this.settings.biomeConfigManager.ReplaceBiomesMatrix[ChunkBiomes[i] & 0xFF] & 0xFF);
+                ChunkBiomes[i] = (byte) (this.settings.ReplaceBiomesMatrix[ChunkBiomes[i] & 0xFF] & 0xFF);
         }
 
     }
@@ -560,7 +560,7 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public WorldConfig getSettings()
+    public WorldSettings getSettings()
     {
         return this.settings;
     }
@@ -594,7 +594,7 @@ public class ForgeWorld implements LocalWorld
         return this.generator;
     }
 
-    public void InitM(World world, WorldConfig config)
+    public void InitM(World world, WorldSettings config)
     {
         this.settings = config;
         this.world = world;
@@ -602,27 +602,27 @@ public class ForgeWorld implements LocalWorld
         for (ForgeBiome biome : biomes)
         {
             // Apply settings for biomes
-            if (biome != null && config.biomeConfigManager.biomeConfigs[biome.getId()] != null)
+            if (biome != null && config.biomeConfigs[biome.getId()] != null)
             {
-                biome.setEffects(config.biomeConfigManager.biomeConfigs[biome.getId()]);
+                biome.setEffects(config.biomeConfigs[biome.getId()]);
             }
         }
     }
 
-    public void Init(World world, WorldConfig config)
+    public void Init(World world, WorldSettings configs)
     {
-        this.settings = config;
+        this.settings = configs;
 
         this.world = world;
         this.seed = world.getSeed();
         this.structureCache = new CustomObjectStructureCache(this);
 
         this.dungeonGen = new WorldGenDungeons();
-        this.strongholdGen = new StrongholdGen(config);
+        this.strongholdGen = new StrongholdGen(configs);
 
-        this.villageGen = new VillageGen(config);
+        this.villageGen = new VillageGen(configs);
         this.mineshaftGen = new MineshaftGen();
-        this.rareBuildingGen = new RareBuildingGen(config);
+        this.rareBuildingGen = new RareBuildingGen(configs);
         this.netherFortressGen = new NetherFortressGen();
 
         this.tree = new WorldGenTrees(false);
