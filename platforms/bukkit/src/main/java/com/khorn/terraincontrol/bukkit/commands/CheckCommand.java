@@ -23,7 +23,7 @@ public class CheckCommand extends BaseCommand
     @Override
     public boolean onCommand(CommandSender sender, List<String> args)
     {
-        if (args.size() == 0)
+        if (args.isEmpty())
         {
             sender.sendMessage(ERROR_COLOR + "You need to select world");
             return true;

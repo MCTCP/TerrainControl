@@ -35,7 +35,7 @@ public class SpawnCommand extends BaseCommand
 
         BukkitWorld bukkitWorld = this.getWorld(me, args.size() > 1 ? args.get(1) : "");
 
-        if (args.size() == 0)
+        if (args.isEmpty())
         {
             me.sendMessage(ERROR_COLOR + "You must enter the name of the BO2.");
             return true;

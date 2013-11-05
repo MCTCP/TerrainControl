@@ -61,7 +61,7 @@ public class UseWorld implements CustomObject
 
         WorldConfig worldSettings = world.getSettings();
 
-        if (worldSettings.customObjects.size() == 0)
+        if (worldSettings.customObjects.isEmpty())
             return false;
 
         boolean objectSpawned = false;
@@ -93,7 +93,7 @@ public class UseWorld implements CustomObject
 
         WorldConfig worldSettings = world.getSettings();
 
-        if (worldSettings.customObjects.size() == 0)
+        if (worldSettings.customObjects.isEmpty())
             return false;
 
         boolean objectSpawned = false;

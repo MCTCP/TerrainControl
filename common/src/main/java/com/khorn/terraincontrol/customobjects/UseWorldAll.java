@@ -35,7 +35,7 @@ public class UseWorldAll extends UseWorld
         WorldConfig worldSettings = world.getSettings();
         boolean spawnedAtLeastOneObject = false;
 
-        if (worldSettings.customObjects.size() == 0)
+        if (worldSettings.customObjects.isEmpty())
             return false;
 
         for (CustomObject selectedObject : worldSettings.customObjects)

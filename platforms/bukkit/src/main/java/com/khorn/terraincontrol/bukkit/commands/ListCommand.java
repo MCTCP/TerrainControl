@@ -45,7 +45,7 @@ public class ListCommand extends BaseCommand
 
             if (world != null)
             {
-                if (world.getSettings().customObjects.size() == 0)
+                if (world.getSettings().customObjects.isEmpty())
                     sender.sendMessage(MESSAGE_COLOR + "This world does not have custom objects");
 
                 List<String> pluginList = new ArrayList<String>();
@@ -74,7 +74,7 @@ public class ListCommand extends BaseCommand
 
         Collection<CustomObject> globalObjects = TerrainControl.getCustomObjectManager().globalObjects.values();
 
-        if (globalObjects.size() == 0)
+        if (globalObjects.isEmpty())
             sender.sendMessage(MESSAGE_COLOR + "This global directory does not have custom objects");
 
         List<String> pluginList = new ArrayList<String>();
