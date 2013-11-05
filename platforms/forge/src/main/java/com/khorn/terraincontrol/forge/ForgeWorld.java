@@ -1,24 +1,28 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
-import com.khorn.terraincontrol.forge.generator.structure.VillageGen;
-import com.khorn.terraincontrol.forge.generator.structure.MineshaftGen;
-import com.khorn.terraincontrol.forge.generator.structure.NetherFortressGen;
-import com.khorn.terraincontrol.forge.generator.structure.RareBuildingGen;
-import com.khorn.terraincontrol.forge.generator.structure.StrongholdGen;
-import com.khorn.terraincontrol.forge.generator.ChunkProvider;
-import com.khorn.terraincontrol.*;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
+import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
+import com.khorn.terraincontrol.forge.generator.ChunkProvider;
+import com.khorn.terraincontrol.forge.generator.structure.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.logging.Level;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.SpawnerAnimals;
@@ -27,11 +31,6 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.feature.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.logging.Level;
 
 public class ForgeWorld implements LocalWorld
 {

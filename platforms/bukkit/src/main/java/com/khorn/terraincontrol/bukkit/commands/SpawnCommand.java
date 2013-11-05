@@ -6,15 +6,16 @@ import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.util.Rotation;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
 
 public class SpawnCommand extends BaseCommand
 {

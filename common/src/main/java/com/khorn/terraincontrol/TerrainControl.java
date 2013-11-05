@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol;
 
-import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.customobjects.CustomObject;
@@ -8,6 +7,7 @@ import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
 import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
+import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
 import com.khorn.terraincontrol.generator.resource.Resource;
 
 import java.util.ArrayList;

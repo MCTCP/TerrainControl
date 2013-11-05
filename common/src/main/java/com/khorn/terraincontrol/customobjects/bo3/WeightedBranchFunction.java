@@ -2,10 +2,15 @@ package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.customobjects.*;
+import com.khorn.terraincontrol.customobjects.Branch;
+import com.khorn.terraincontrol.customobjects.BranchNode;
+import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.TreeSet;
 import java.util.logging.Level;
 
 public class WeightedBranchFunction extends BranchFunction implements Branch

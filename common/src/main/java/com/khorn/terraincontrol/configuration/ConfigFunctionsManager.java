@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.generator.resource.*;
 
 import java.util.HashMap;
 import java.util.List;

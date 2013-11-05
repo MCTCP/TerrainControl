@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 
 import java.util.List;

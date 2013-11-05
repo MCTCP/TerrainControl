@@ -1,11 +1,11 @@
 package com.khorn.terraincontrol;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
+import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.util.ArrayList;

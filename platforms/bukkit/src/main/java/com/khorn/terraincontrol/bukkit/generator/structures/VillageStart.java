@@ -5,12 +5,13 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
-import net.minecraft.server.v1_6_R3.*;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
+
+import net.minecraft.server.v1_6_R3.*;
 
 public class VillageStart extends StructureStart
 {

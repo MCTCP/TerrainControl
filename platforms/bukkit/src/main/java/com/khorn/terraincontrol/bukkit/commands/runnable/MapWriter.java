@@ -7,17 +7,18 @@ import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.sun.imageio.plugins.png.PNGImageWriter;
 import com.sun.imageio.plugins.png.PNGImageWriterSpi;
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.World;
-import org.bukkit.command.CommandSender;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.util.logging.Level;
-
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
+
+import net.minecraft.server.v1_6_R3.BiomeBase;
+import net.minecraft.server.v1_6_R3.World;
+
+import org.bukkit.command.CommandSender;
 
 public class MapWriter implements Runnable
 {

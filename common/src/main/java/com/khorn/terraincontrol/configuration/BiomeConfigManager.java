@@ -1,13 +1,14 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.logging.LogManager;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.logging.LogManager;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+
 import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;

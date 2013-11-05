@@ -5,6 +5,9 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.resource.SaplingGen;
 import com.khorn.terraincontrol.generator.resource.SaplingType;
+
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.world.World;
@@ -12,8 +15,6 @@ import net.minecraftforge.event.Event.Result;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
-
-import java.util.Random;
 
 public class SaplingListener
 {

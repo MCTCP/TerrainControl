@@ -1,10 +1,13 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.customobjects.*;
+import com.khorn.terraincontrol.customobjects.Branch;
+import com.khorn.terraincontrol.customobjects.BranchNode;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.*;
 import java.util.logging.Level;

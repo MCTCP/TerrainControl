@@ -1,12 +1,11 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

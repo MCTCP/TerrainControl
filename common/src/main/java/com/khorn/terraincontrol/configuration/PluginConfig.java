@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
-import com.khorn.terraincontrol.logging.LogManager;
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
+import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.logging.LogManager;
 
 import java.io.File;
 import java.io.IOException;

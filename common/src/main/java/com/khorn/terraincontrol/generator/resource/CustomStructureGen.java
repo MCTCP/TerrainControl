@@ -1,10 +1,13 @@
 package com.khorn.terraincontrol.generator.resource;
 
-import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.customobjects.*;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
+import com.khorn.terraincontrol.customobjects.CustomObjectStructure;
+import com.khorn.terraincontrol.customobjects.StructuredCustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -5,11 +5,12 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_6_R3.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import net.minecraft.server.v1_6_R3.*;
 
 public class RareBuildingGen extends StructureGenerator
 {

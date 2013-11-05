@@ -1,20 +1,23 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.forge.events.PlayerTracker;
-import com.khorn.terraincontrol.forge.events.SaplingListener;
-import com.khorn.terraincontrol.forge.events.PacketHandler;
-import com.khorn.terraincontrol.forge.events.EventManager;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.events.EventPriority;
+import com.khorn.terraincontrol.forge.events.EventManager;
+import com.khorn.terraincontrol.forge.events.PacketHandler;
+import com.khorn.terraincontrol.forge.events.PlayerTracker;
+import com.khorn.terraincontrol.forge.events.SaplingListener;
 import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
 import com.khorn.terraincontrol.logging.LogManager;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import cpw.mods.fml.common.*;
+
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -23,15 +26,16 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
-import net.minecraft.block.Block;
-import net.minecraft.world.gen.structure.MapGenStructureIO;
-import net.minecraftforge.common.MinecraftForge;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import net.minecraft.block.Block;
+import net.minecraft.world.gen.structure.MapGenStructureIO;
+import net.minecraftforge.common.MinecraftForge;
 
 @Mod(modid = "TerrainControl", name = "TerrainControl")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")

@@ -5,14 +5,15 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.StructureGenerator;
-import net.minecraft.server.v1_6_R3.StructureStart;
-import net.minecraft.server.v1_6_R3.World;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import net.minecraft.server.v1_6_R3.BiomeBase;
+import net.minecraft.server.v1_6_R3.StructureGenerator;
+import net.minecraft.server.v1_6_R3.StructureStart;
+import net.minecraft.server.v1_6_R3.World;
 
 public class VillageGen extends StructureGenerator
 {

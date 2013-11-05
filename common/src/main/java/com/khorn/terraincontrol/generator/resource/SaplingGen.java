@@ -5,8 +5,8 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.ArrayList;
 import java.util.List;

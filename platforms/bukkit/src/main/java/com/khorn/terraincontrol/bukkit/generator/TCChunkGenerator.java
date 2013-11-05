@@ -4,14 +4,15 @@ import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.generator.BlockPopulator;
-import org.bukkit.generator.ChunkGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.generator.BlockPopulator;
+import org.bukkit.generator.ChunkGenerator;
 
 public class TCChunkGenerator extends ChunkGenerator
 {

@@ -2,14 +2,14 @@ package com.khorn.terraincontrol.generator.biome.layers;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.generator.biome.ArraysCache;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.biome.ArraysCache;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
+import javax.imageio.ImageIO;
 
 public class LayerFromImage extends Layer
 {

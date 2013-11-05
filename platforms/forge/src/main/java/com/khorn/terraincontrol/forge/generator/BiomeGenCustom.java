@@ -4,15 +4,16 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
+
+import java.util.List;
+import java.util.logging.Level;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.SpawnListEntry;
-
-import java.util.List;
-import java.util.logging.Level;
 
 public class BiomeGenCustom extends BiomeGenBase
 {

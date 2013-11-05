@@ -4,13 +4,14 @@ import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.server.v1_6_R3.BiomeBase;
 import net.minecraft.server.v1_6_R3.ChunkPosition;
 import net.minecraft.server.v1_6_R3.WorldChunkManager;
 import net.minecraft.server.v1_6_R3.WorldGenVillage;
-
-import java.util.List;
-import java.util.Random;
 
 public class TCWorldChunkManager extends WorldChunkManager
 {

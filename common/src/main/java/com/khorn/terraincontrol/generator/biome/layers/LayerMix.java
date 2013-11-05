@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.generator.biome.ArraysCache;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.biome.ArraysCache;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 public class LayerMix extends Layer
 {

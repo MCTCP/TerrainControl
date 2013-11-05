@@ -4,17 +4,19 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.BiomeMeta;
-import net.minecraft.server.v1_6_R3.Entity;
-import net.minecraft.server.v1_6_R3.EntityTypes;
-import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_6_R3.block.CraftBlock;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import net.minecraft.server.v1_6_R3.BiomeBase;
+import net.minecraft.server.v1_6_R3.BiomeMeta;
+import net.minecraft.server.v1_6_R3.Entity;
+import net.minecraft.server.v1_6_R3.EntityTypes;
+
+import org.bukkit.block.Biome;
+import org.bukkit.craftbukkit.v1_6_R3.block.CraftBlock;
 
 public class CustomBiome extends BiomeBase
 {

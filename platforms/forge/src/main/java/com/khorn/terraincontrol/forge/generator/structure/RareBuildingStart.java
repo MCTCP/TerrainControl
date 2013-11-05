@@ -3,10 +3,11 @@ package com.khorn.terraincontrol.forge.generator.structure;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.structure.*;
 
 import java.util.Random;
+
+import net.minecraft.world.World;
+import net.minecraft.world.gen.structure.*;
 
 public class RareBuildingStart extends StructureStart
 {

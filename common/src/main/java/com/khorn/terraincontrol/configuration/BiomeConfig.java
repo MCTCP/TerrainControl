@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.util.MultiTypedSetting;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
@@ -13,7 +11,9 @@ import com.khorn.terraincontrol.generator.resource.CustomStructureGen;
 import com.khorn.terraincontrol.generator.resource.Resource;
 import com.khorn.terraincontrol.generator.resource.SaplingGen;
 import com.khorn.terraincontrol.generator.resource.SaplingType;
+import com.khorn.terraincontrol.util.MultiTypedSetting;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

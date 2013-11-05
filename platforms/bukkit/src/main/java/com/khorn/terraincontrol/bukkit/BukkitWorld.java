@@ -1,15 +1,13 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.generator.BiomeCacheWrapper;
-import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
-import com.khorn.terraincontrol.bukkit.generator.TCWorldChunkManager;
-import com.khorn.terraincontrol.bukkit.generator.structures.StrongholdGen;
-import com.khorn.terraincontrol.bukkit.generator.structures.RareBuildingGen;
-import com.khorn.terraincontrol.bukkit.generator.structures.VillageGen;
-import com.khorn.terraincontrol.bukkit.generator.structures.MineshaftGen;
-import com.khorn.terraincontrol.bukkit.generator.structures.NetherFortressGen;
 import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
-import com.khorn.terraincontrol.*;
+import com.khorn.terraincontrol.bukkit.generator.TCWorldChunkManager;
+import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
+import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
@@ -17,17 +15,19 @@ import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
-import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import net.minecraft.server.v1_6_R3.*;
-import org.bukkit.craftbukkit.v1_6_R3.CraftWorld;
+import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Level;
+
+import net.minecraft.server.v1_6_R3.*;
+
+import org.bukkit.craftbukkit.v1_6_R3.CraftWorld;
 
 public class BukkitWorld implements LocalWorld
 {

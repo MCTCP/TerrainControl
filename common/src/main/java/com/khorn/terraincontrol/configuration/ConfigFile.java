@@ -1,10 +1,9 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
-import com.khorn.terraincontrol.util.MultiTypedSetting;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.util.MultiTypedSetting;
 import com.khorn.terraincontrol.util.MultiTypedSetting.SettingsType;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.awt.Color;
 import java.io.*;

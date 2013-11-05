@@ -2,10 +2,11 @@ package com.khorn.terraincontrol.forge.util;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
 
 import java.util.NoSuchElementException;
+
+import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
 
 public abstract class WorldHelper
 {

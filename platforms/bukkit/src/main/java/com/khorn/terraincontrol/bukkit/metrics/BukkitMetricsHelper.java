@@ -3,9 +3,10 @@ package com.khorn.terraincontrol.bukkit.metrics;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.bukkit.metrics.Metrics.Graph;
 import com.khorn.terraincontrol.util.helpers.MetricsHelper;
-import org.bukkit.Bukkit;
 
 import java.io.IOException;
+
+import org.bukkit.Bukkit;
 
 /**
  * Create an instance of this during onEnable. After some time,

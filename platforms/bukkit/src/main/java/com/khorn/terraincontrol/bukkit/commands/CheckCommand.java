@@ -4,10 +4,11 @@ import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import org.bukkit.command.CommandSender;
 
 import java.io.File;
 import java.util.List;
+
+import org.bukkit.command.CommandSender;
 
 public class CheckCommand extends BaseCommand
 {

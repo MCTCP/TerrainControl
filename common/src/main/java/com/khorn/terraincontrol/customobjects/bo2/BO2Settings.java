@@ -1,12 +1,8 @@
 package com.khorn.terraincontrol.customobjects.bo2;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
 import com.khorn.terraincontrol.util.MultiTypedSetting;
+
+import java.util.*;
 
 public enum BO2Settings implements MultiTypedSetting
 {

@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 import com.khorn.terraincontrol.util.MultiTypedSetting.SettingsType;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;

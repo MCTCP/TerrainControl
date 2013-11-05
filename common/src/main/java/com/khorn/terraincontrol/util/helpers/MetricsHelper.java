@@ -1,12 +1,8 @@
 package com.khorn.terraincontrol.util.helpers;
 
-import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
-import com.khorn.terraincontrol.generator.biome.FromImageBiomeGenerator;
-import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
-import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
-import com.khorn.terraincontrol.generator.biome.NormalBiomeGenerator;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.biome.*;
 
 /**
  * Counts how much each biome mode is used.

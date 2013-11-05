@@ -5,11 +5,12 @@ import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.bukkit.command.CommandSender;
 
 public class ListCommand extends BaseCommand
 {

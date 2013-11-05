@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.generator.resource;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.ArrayList;
 import java.util.List;

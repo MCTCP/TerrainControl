@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.forge.generator.structure;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureMineshaftStart;
 import net.minecraft.world.gen.structure.StructureStart;

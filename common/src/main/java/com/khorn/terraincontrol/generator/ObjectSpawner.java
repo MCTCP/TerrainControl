@@ -1,12 +1,12 @@
 package com.khorn.terraincontrol.generator;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.generator.resource.Resource;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Random;
 import java.util.logging.Level;

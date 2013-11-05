@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.configuration.standard;
 
 import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;

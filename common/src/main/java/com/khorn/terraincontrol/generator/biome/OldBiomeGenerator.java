@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.generator.biome;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorOldOctaves;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.util.Random;
 

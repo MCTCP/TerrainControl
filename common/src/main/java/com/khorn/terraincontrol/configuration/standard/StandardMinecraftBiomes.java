@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.configuration.standard;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 /**

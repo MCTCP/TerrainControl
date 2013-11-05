@@ -5,16 +5,21 @@ import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+
 import cpw.mods.fml.common.registry.GameRegistry;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.terraingen.*;
-import net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate;
-import net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable;
-import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
+import net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate;
+import net.minecraftforge.event.terraingen.OreGenEvent;
+import net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate;
+import net.minecraftforge.event.terraingen.TerrainGen;
 
 /**
  * Translates TerrainControl events into MinecraftForge terrain events

@@ -1,11 +1,11 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.bukkit.events.TCListener;
-import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
+import com.khorn.terraincontrol.bukkit.events.TCListener;
+import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
 import com.khorn.terraincontrol.bukkit.generator.structures.RareBuildingStart;
 import com.khorn.terraincontrol.bukkit.generator.structures.VillageStart;
 import com.khorn.terraincontrol.bukkit.metrics.BukkitMetricsHelper;
@@ -14,16 +14,6 @@ import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.logging.LogManager;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.Block;
-import net.minecraft.server.v1_6_R3.WorldGenFactory;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_6_R3.block.CraftBlock;
-import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -32,6 +22,18 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import net.minecraft.server.v1_6_R3.BiomeBase;
+import net.minecraft.server.v1_6_R3.Block;
+import net.minecraft.server.v1_6_R3.WorldGenFactory;
+
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_6_R3.block.CraftBlock;
+import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class TCPlugin extends JavaPlugin implements TerrainControlEngine
 {

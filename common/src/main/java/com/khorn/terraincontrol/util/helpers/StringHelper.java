@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.util.helpers;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Collection;
 import java.util.List;

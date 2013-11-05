@@ -1,12 +1,13 @@
 package com.khorn.terraincontrol.forge.util;
 
-import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.TerrainControl;
-import net.minecraft.nbt.*;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.logging.Level;
+
+import net.minecraft.nbt.*;
 
 public class NBTHelper
 {
