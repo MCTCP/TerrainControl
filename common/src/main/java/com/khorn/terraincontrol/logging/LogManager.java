@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.logging;
 
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.PluginConfig;
-import com.khorn.terraincontrol.configuration.PluginConfig.LogLevels;
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
+import com.khorn.terraincontrol.configuration.PluginConfigFile;
+import com.khorn.terraincontrol.configuration.PluginConfigFile.LogLevels;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import java.util.logging.*;
 
 /**
@@ -13,9 +13,9 @@ import java.util.logging.*;
 public class LogManager
 {
 
-    public static final String prefix = TCDefaultValues.ChannelName.stringValue();
+    public static final String prefix = PluginStandardValues.ChannelName.stringValue();
     public static Formatter formatter;
-    public static final LogLevels defaultLogLevel = PluginConfig.LogLevels.Standard;
+    public static final LogLevels defaultLogLevel = PluginConfigFile.LogLevels.Standard;
     public static Logger stdLogger;
 
     private LogManager()
@@ -96,7 +96,7 @@ public class LogManager
     {
         logger.log(Level.FINE, "   [{0}] Handler::{1} Level Set to {2}", new Object[]
         {
-            TCDefaultValues.ChannelName.stringValue(),
+            PluginStandardValues.ChannelName.stringValue(),
             h.getClass().getSimpleName(),
             level.getLevel().getLocalizedName()
         });
@@ -105,7 +105,7 @@ public class LogManager
     //t>>	Potential future site of addFileHandler(); to be configured by plugin config for plugin-specific Log file and level
     public static LogLevels clampLevel(LogLevels level)
     {
-        if (level != PluginConfig.LogLevels.Off && level.getLevel().intValue() > defaultLogLevel.getLevel().intValue())
+        if (level != PluginConfigFile.LogLevels.Off && level.getLevel().intValue() > defaultLogLevel.getLevel().intValue())
         {
             return defaultLogLevel;
         }

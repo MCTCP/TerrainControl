@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import com.khorn.terraincontrol.configuration.TCSetting;
+import com.khorn.terraincontrol.util.MultiTypedSetting;
 
-public enum BO2Settings implements TCSetting
+public enum BO2Settings implements MultiTypedSetting
 {
 
     BO_ALL_KEY("All"),

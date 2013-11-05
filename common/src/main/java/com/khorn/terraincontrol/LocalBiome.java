@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeConfigFile;
 
 /**
  * Class to access the properties of Minecraft's Biome(Gen)Base class.
@@ -25,7 +25,7 @@ public interface LocalBiome
      * 
      * @param config The BiomeConfig of the biome.
      */
-    void setEffects(BiomeConfig config);
+    void setEffects(BiomeConfigFile config);
 
     /**
      * Gets the name of this biome, like Plains. For vanilla biomes, this is the

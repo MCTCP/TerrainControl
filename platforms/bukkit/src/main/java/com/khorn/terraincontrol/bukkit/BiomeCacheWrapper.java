@@ -4,7 +4,7 @@ import net.minecraft.server.v1_6_R3.BiomeBase;
 import net.minecraft.server.v1_6_R3.BiomeCache;
 import net.minecraft.server.v1_6_R3.WorldChunkManager;
 
-public class BiomeCacheWrapper implements com.khorn.terraincontrol.biomegenerators.BiomeCache
+public class BiomeCacheWrapper implements com.khorn.terraincontrol.generator.biome.BiomeCache
 {
     private BiomeCache handle;
 

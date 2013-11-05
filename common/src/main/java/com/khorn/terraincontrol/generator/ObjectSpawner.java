@@ -3,10 +3,10 @@ package com.khorn.terraincontrol.generator;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.generator.resourcegens.Resource;
+import com.khorn.terraincontrol.configuration.BiomeConfigFile;
+import com.khorn.terraincontrol.configuration.WorldConfigFile;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.generator.resource.Resource;
 
 import java.util.Random;
 import java.util.logging.Level;
@@ -14,11 +14,11 @@ import java.util.logging.Level;
 public class ObjectSpawner
 {
 
-    private WorldConfig worldSettings;
+    private WorldConfigFile worldSettings;
     private Random rand;
     private LocalWorld world;
 
-    public ObjectSpawner(WorldConfig wrk, LocalWorld localWorld)
+    public ObjectSpawner(WorldConfigFile wrk, LocalWorld localWorld)
     {
         this.worldSettings = wrk;
         this.rand = new Random();
@@ -33,7 +33,7 @@ public class ObjectSpawner
 
         // Get the BiomeConfig of the other corner
         int biomeId = world.getBiomeId(x + 15, z + 15);
-        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigManager.biomeConfigs[biomeId];
+        BiomeConfigFile localBiomeConfig = this.worldSettings.biomeConfigManager.biomeConfigs[biomeId];
 
         // Null check
         if (localBiomeConfig == null)
@@ -95,8 +95,8 @@ public class ObjectSpawner
             {
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
-                BiomeConfig biomeConfig = worldSettings.biomeConfigManager.biomeConfigs[world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
-                if (biomeConfig != null && biomeConfig.BiomeTemperature < TCDefaultValues.snowAndIceMaxTemp.floatValue())
+                BiomeConfigFile biomeConfig = worldSettings.biomeConfigManager.biomeConfigs[world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
+                if (biomeConfig != null && biomeConfig.BiomeTemperature < WorldStandardValues.snowAndIceMaxTemp.floatValue())
                 {
                     int blockToFreezeY = world.getHighestBlockYAt(blockToFreezeX, blockToFreezeZ);
                     if (blockToFreezeY > 0)

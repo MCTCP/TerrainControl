@@ -3,13 +3,14 @@ package com.khorn.terraincontrol.forge;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
-import com.khorn.terraincontrol.configuration.TCLogManager;
+import com.khorn.terraincontrol.configuration.PluginConfig;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.forge.structuregens.RareBuildingStart;
 import com.khorn.terraincontrol.forge.structuregens.VillageStart;
-import com.khorn.terraincontrol.util.StringHelper;
+import com.khorn.terraincontrol.logging.LogManager;
 import com.khorn.terraincontrol.util.StructureNames;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -48,7 +49,7 @@ public class TCPlugin implements TerrainControlEngine
 
         // Set the directory
         TerrainControl.setEngine(this);
-        logger = TCLogManager.prepLogger(FMLCommonHandler.instance().getFMLLogger());
+        logger = LogManager.prepLogger(FMLCommonHandler.instance().getFMLLogger());
 
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
@@ -67,7 +68,7 @@ public class TCPlugin implements TerrainControlEngine
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
-            NetworkRegistry.instance().registerChannel(new PacketHandler(), TCDefaultValues.ChannelName.stringValue());
+            NetworkRegistry.instance().registerChannel(new PacketHandler(), PluginStandardValues.ChannelName.stringValue());
         }
 
         // Register player tracker, for sending configs.
@@ -163,14 +164,14 @@ public class TCPlugin implements TerrainControlEngine
     public void log(Level level, String message, Object param)
     {
         LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.formatter.format(lr));
+        lr.setMessage(LogManager.formatter.format(lr));
         lr.setParameters(new Object[]
         {
             param
         });
         if (logger == null)
         {
-            logger = TCLogManager.getLogger();
+            logger = LogManager.getLogger();
         }
         logger.log(lr);
     }
@@ -179,11 +180,11 @@ public class TCPlugin implements TerrainControlEngine
     public void log(Level level, String message, Object[] params)
     {
         LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.formatter.format(lr));
+        lr.setMessage(LogManager.formatter.format(lr));
         lr.setParameters(params);
         if (logger == null)
         {
-            logger = TCLogManager.getLogger();
+            logger = LogManager.getLogger();
         }
         logger.log(lr);
     }
@@ -209,7 +210,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getTCDataFolder(), TCDefaultValues.BO_GlobalDirectoryName.stringValue());
+        return new File(this.getTCDataFolder(), PluginStandardValues.BO_GlobalDirectoryName.stringValue());
     }
 
     @Override

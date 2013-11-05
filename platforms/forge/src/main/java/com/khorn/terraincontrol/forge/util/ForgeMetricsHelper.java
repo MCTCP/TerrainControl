@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.forge.util;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.forge.TCPlugin;
 import com.khorn.terraincontrol.forge.util.Metrics.Graph;
-import com.khorn.terraincontrol.util.MetricsHelper;
+import com.khorn.terraincontrol.util.helpers.MetricsHelper;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ModContainer;
 

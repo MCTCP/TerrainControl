@@ -5,6 +5,9 @@ import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
@@ -35,7 +38,7 @@ public final class BiomeConfigManager
     /*
      *
      */
-    private WorldConfig worldConfig;
+    private WorldConfigFile worldConfig;
     /*
      *
      */
@@ -48,7 +51,7 @@ public final class BiomeConfigManager
      * Must be simple array for fast access.
      * ***** Beware! Some ids may contain null values; *****
      */
-    public BiomeConfig[] biomeConfigs;
+    public BiomeConfigFile[] biomeConfigs;
     /*
      * Overall biome count in this world.
      */
@@ -62,7 +65,7 @@ public final class BiomeConfigManager
      * @param customBiomes
      * @param checkOnly
      */
-    public BiomeConfigManager(File settingsDir, LocalWorld world, WorldConfig wConfig, Map<String, Integer> customBiomes, boolean checkOnly)
+    public BiomeConfigManager(File settingsDir, LocalWorld world, WorldConfigFile wConfig, Map<String, Integer> customBiomes, boolean checkOnly)
     {
 
         this.world = world;
@@ -78,7 +81,7 @@ public final class BiomeConfigManager
 
         //>> -- ESTRABLISH FOLDERS -- <<//
         //>>	TerrainControl/GlobalBiomes/
-        this.globalBiomesDir = new File(TerrainControl.getEngine().getTCDataFolder(), TCDefaultValues.GlobalBiomeConfigDirectoryName.stringValue());
+        this.globalBiomesDir = new File(TerrainControl.getEngine().getTCDataFolder(), PluginStandardValues.GlobalBiomeConfigDirectoryName.stringValue());
         //>>	TerrainControl/worlds/<WorldName>/<WorldBiomes/
         this.worldBiomesDir = new File(settingsDir, correctOldBiomeConfigFolder(settingsDir));
 
@@ -91,7 +94,7 @@ public final class BiomeConfigManager
             this.ReplaceBiomesMatrix[i] = (byte) i;
 
         //>>	Init the biomeConfigs Array
-        biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
+        biomeConfigs = new BiomeConfigFile[world.getMaxBiomesCount()];
         //>>	Set variable for biomeCount, MIGHT NOT NEED
         biomesCount = 0;
 
@@ -171,7 +174,7 @@ public final class BiomeConfigManager
     private String correctOldBiomeConfigFolder(File settingsDir)
     {
         //>>	Rename the old folder
-        String biomeFolderName = TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue();
+        String biomeFolderName = WorldStandardValues.BiomeConfigDirectoryName.stringValue();
         File oldBiomeConfigs = new File(settingsDir, "BiomeConfigs");
         if (oldBiomeConfigs.exists())
         {
@@ -192,13 +195,13 @@ public final class BiomeConfigManager
         for (LocalBiome localBiome : world.getDefaultBiomes())
         {
             //>>	Upon loading a biome, check the usual BiomeConfigs folder
-            BiomeConfig config = new BiomeConfig(worldBiomesDir, localBiome, this.worldConfig);
+            BiomeConfigFile config = new BiomeConfigFile(worldBiomesDir, localBiome, this.worldConfig);
 
             if (!config.readSuccess)
             {
                 //>>	and if that fails look in the globalBiomes folder
                 //>>	if the biome does not exist here, one will be created
-                config = new BiomeConfig(globalBiomesDir, localBiome, this.worldConfig);
+                config = new BiomeConfigFile(globalBiomesDir, localBiome, this.worldConfig);
             }
             TerrainControl.log(Level.FINER, config.file.getAbsolutePath());
             pushBiomeConfig(localBiome, config);
@@ -209,12 +212,12 @@ public final class BiomeConfigManager
     {
         for (LocalBiome localBiome : biomesToLoad)
         {
-            BiomeConfig config = new BiomeConfig(biomeFolder, localBiome, this.worldConfig);
+            BiomeConfigFile config = new BiomeConfigFile(biomeFolder, localBiome, this.worldConfig);
             pushBiomeConfig(localBiome, config);
         }
     }
 
-    private void pushBiomeConfig(LocalBiome localBiome, BiomeConfig config)
+    private void pushBiomeConfig(LocalBiome localBiome, BiomeConfigFile config)
     {
         if (biomesCount != 0)
             LoadedBiomeNames += ", ";
@@ -237,7 +240,7 @@ public final class BiomeConfigManager
         selfInheritanceErrors = "";
         TerrainControl.log(Level.FINER, "=============== Biome Processing START ===============");
 
-        for (BiomeConfig config : biomeConfigs)
+        for (BiomeConfigFile config : biomeConfigs)
         {
             if (config == null)
             {
@@ -321,11 +324,11 @@ public final class BiomeConfigManager
     //>>	
     //>>	
     private String selfInheritanceErrors;
-    private LinkedList<BiomeConfig> biomeLoadingStack = new LinkedList<BiomeConfig>();
+    private LinkedList<BiomeConfigFile> biomeLoadingStack = new LinkedList<BiomeConfigFile>();
     private boolean cycleFound = false;
     private ArrayList<StringBuilder> inheritanceErrors = new ArrayList<StringBuilder>(10);
 
-    private void doInheritance(BiomeConfig config, boolean isParent)
+    private void doInheritance(BiomeConfigFile config, boolean isParent)
     {
         TerrainControl.log(Level.FINER, "DO INHERITANCE: {0}", new Object[]{config.name});
         if (!config.BiomeExtendsSeen)
@@ -335,9 +338,9 @@ public final class BiomeConfigManager
             TerrainControl.log(Level.FINEST, "\tSTACK:::Pushing config; New Size: {0}", new Object[]{biomeLoadingStack.size()});
             if (!config.BiomeExtendsProcessed)
             {
-                if (config.settingsCache.containsKey(TCDefaultValues.BiomeExtends.name().toLowerCase()))
+                if (config.settingsCache.containsKey(BiomeStandardValues.BiomeExtends.name().toLowerCase()))
                 {
-                    String biomeToExtend_Name = config.settingsCache.get(TCDefaultValues.BiomeExtends.name().toLowerCase());
+                    String biomeToExtend_Name = config.settingsCache.get(BiomeStandardValues.BiomeExtends.name().toLowerCase());
                     if (!biomeToExtend_Name.isEmpty())
                     {
                         TerrainControl.log(Level.FINER, "\tBiome(" + biomeToExtend_Name + ") Processing!");
@@ -368,14 +371,14 @@ public final class BiomeConfigManager
                                     if (!this.cycleFound)
                                     {
                                         TerrainControl.log(Level.FINEST, "\t\t\tSTACK:::Popping_A");
-                                        BiomeConfig parentConfig = biomeLoadingStack.pop();
+                                        BiomeConfigFile parentConfig = biomeLoadingStack.pop();
 
                                         while (!biomeLoadingStack.isEmpty())
                                         {
                                             TerrainControl.log(Level.FINEST, "\t\t\tSTACK:::Popping_B");
-                                            BiomeConfig child = biomeLoadingStack.pop();
+                                            BiomeConfigFile child = biomeLoadingStack.pop();
                                             TerrainControl.log(Level.FINEST, "\t\t\t\tMerging Biomes (" + parentConfig.name + ":" + child.name + ");");
-                                            BiomeConfig merged = child.merge(parentConfig);
+                                            BiomeConfigFile merged = child.merge(parentConfig);
                                             if (merged == null)
                                             {
                                                 TerrainControl.log(Level.SEVERE, "\t\tBiomeConfig merging returned null!!");
@@ -426,7 +429,7 @@ public final class BiomeConfigManager
             //>>	This forms the cyclical reference chain for output later and
             //>>	adds it to a queue of errors
             StringBuilder cycle = new StringBuilder(" ... <- ");
-            BiomeConfig first = biomeLoadingStack.pollLast();
+            BiomeConfigFile first = biomeLoadingStack.pollLast();
             cycle.append(first.name);
             cycle.append(" <- ");
             while (!biomeLoadingStack.isEmpty()){

@@ -1,15 +1,15 @@
 package com.khorn.terraincontrol.forge;
 
 import com.khorn.terraincontrol.*;
-import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.OutputType;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Tag;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.forge.structuregens.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
+import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
+import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -688,7 +688,7 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void attachMetadata(int x, int y, int z, Tag tag)
+    public void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
     {
         // Convert Tag to a native nms tag
         NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
@@ -708,7 +708,7 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public Tag getMetadata(int x, int y, int z)
+    public NamedBinaryTag getMetadata(int x, int y, int z)
     {
         TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
         if (tileEntity == null)

@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldConfigFile;
 
 import java.util.Random;
 
@@ -32,7 +32,7 @@ public class UseWorldAll extends UseWorld
     @Override
     public boolean process(LocalWorld world, Random rand, int chunkX, int chunkZ)
     {
-        WorldConfig worldSettings = world.getSettings();
+        WorldConfigFile worldSettings = world.getSettings();
         boolean spawnedAtLeastOneObject = false;
 
         if (worldSettings.customObjects.size() == 0)

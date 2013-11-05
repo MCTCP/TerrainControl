@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.MobAlternativeNames;
+import com.khorn.terraincontrol.util.MobNames;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
@@ -102,7 +102,7 @@ public class BiomeGenCustom extends BiomeGenBase
     @SuppressWarnings("unchecked")
     protected Class<? extends Entity> getEntityClass(WeightedMobSpawnGroup mobGroup)
     {
-        String mobName = MobAlternativeNames.getInternalMinecraftName(mobGroup.getMobName());
+        String mobName = MobNames.getInternalMinecraftName(mobGroup.getMobName());
         return (Class<? extends Entity>) EntityList.stringToClassMapping.get(mobName);
     }
 

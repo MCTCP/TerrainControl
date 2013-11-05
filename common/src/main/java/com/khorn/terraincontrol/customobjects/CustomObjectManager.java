@@ -2,10 +2,10 @@ package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldConfigFile;
 import com.khorn.terraincontrol.customobjects.bo2.BO2Loader;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Loader;
-import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import com.khorn.terraincontrol.generator.resource.TreeType;
 
 import java.io.File;
 import java.util.HashMap;
@@ -133,7 +133,7 @@ public class CustomObjectManager
      *               objects.
      * @return The CustomObject, or null if there isn't one with that name.
      */
-    public CustomObject getCustomObject(String name, WorldConfig config)
+    public CustomObject getCustomObject(String name, WorldConfigFile config)
     {
         for (CustomObject object : config.customObjects)
         {
@@ -233,7 +233,7 @@ public class CustomObjectManager
      * @param config The config to search in
      * @return A CustomObject, or null if no one was found.
      */
-    public CustomObject getObjectFromString(String string, WorldConfig config)
+    public CustomObject getObjectFromString(String string, WorldConfigFile config)
     {
         String[] parts = new String[] {string, ""};
 

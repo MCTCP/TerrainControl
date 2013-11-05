@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit.util;
 
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.bukkit.util.Metrics.Graph;
-import com.khorn.terraincontrol.util.MetricsHelper;
+import com.khorn.terraincontrol.util.helpers.MetricsHelper;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.generator.resourcegens.CustomStructureGen;
+import com.khorn.terraincontrol.generator.resource.CustomStructureGen;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.helpers.RandomHelper;
 

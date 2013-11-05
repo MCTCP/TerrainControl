@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.bukkit.util;
 
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.Tag;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 import net.minecraft.server.v1_6_R3.*;
 
 import java.lang.reflect.Field;
@@ -19,9 +19,9 @@ public class NBTHelper
      * @return
      */
     @SuppressWarnings("rawtypes")
-    public static Tag getNBTFromNMSTagCompound(NBTTagCompound nmsTag)
+    public static NamedBinaryTag getNBTFromNMSTagCompound(NBTTagCompound nmsTag)
     {
-        Tag compoundTag = new Tag(Tag.Type.TAG_Compound, nmsTag.getName(), new Tag[]{new Tag(Tag.Type.TAG_End, null, null)});
+        NamedBinaryTag compoundTag = new NamedBinaryTag(NamedBinaryTag.Type.TAG_Compound, nmsTag.getName(), new NamedBinaryTag[]{new NamedBinaryTag(NamedBinaryTag.Type.TAG_End, null, null)});
 
         // Get the child tags using some reflection magic
         Field mapField;
@@ -46,7 +46,7 @@ public class NBTHelper
         for (Object nmsChildTagName : nmsChildTags.keySet())
         {
             NBTBase nmsChildTag = (NBTBase) nmsChildTags.get(nmsChildTagName);
-            Tag.Type type = Tag.Type.values()[nmsChildTag.getTypeId()];
+            NamedBinaryTag.Type type = NamedBinaryTag.Type.values()[nmsChildTag.getTypeId()];
             switch (type)
             {
                 case TAG_End:
@@ -60,10 +60,10 @@ public class NBTHelper
                 case TAG_Byte_Array:
                 case TAG_String:
                 case TAG_Int_Array:
-                    compoundTag.addTag(new Tag(type, nmsChildTag.getName(), getValueFromNms(nmsChildTag)));
+                    compoundTag.addTag(new NamedBinaryTag(type, nmsChildTag.getName(), getValueFromNms(nmsChildTag)));
                     break;
                 case TAG_List:
-                    Tag listChildTag = getNBTFromNMSTagList((NBTTagList) nmsChildTag);
+                    NamedBinaryTag listChildTag = getNBTFromNMSTagList((NBTTagList) nmsChildTag);
                     if (listChildTag != null)
                     {
                         compoundTag.addTag(listChildTag);
@@ -87,7 +87,7 @@ public class NBTHelper
      * @param nmsListTag
      * @return
      */
-    private static Tag getNBTFromNMSTagList(NBTTagList nmsListTag)
+    private static NamedBinaryTag getNBTFromNMSTagList(NBTTagList nmsListTag)
     {
         if (nmsListTag.size() == 0)
         {
@@ -95,8 +95,8 @@ public class NBTHelper
             return null;
         }
 
-        Tag.Type listType = Tag.Type.values()[nmsListTag.get(0).getTypeId()];
-        Tag listTag = new Tag(nmsListTag.getName(), listType);
+        NamedBinaryTag.Type listType = NamedBinaryTag.Type.values()[nmsListTag.get(0).getTypeId()];
+        NamedBinaryTag listTag = new NamedBinaryTag(nmsListTag.getName(), listType);
 
         // Add all child tags
         for (int i = 0; i < nmsListTag.size(); i++)
@@ -115,10 +115,10 @@ public class NBTHelper
                 case TAG_Byte_Array:
                 case TAG_String:
                 case TAG_Int_Array:
-                    listTag.addTag(new Tag(listType, nmsChildTag.getName(), getValueFromNms(nmsChildTag)));
+                    listTag.addTag(new NamedBinaryTag(listType, nmsChildTag.getName(), getValueFromNms(nmsChildTag)));
                     break;
                 case TAG_List:
-                    Tag listChildTag = getNBTFromNMSTagList((NBTTagList) nmsChildTag);
+                    NamedBinaryTag listChildTag = getNBTFromNMSTagList((NBTTagList) nmsChildTag);
                     if (listChildTag != null)
                     {
                         listTag.addTag(listChildTag);
@@ -145,7 +145,7 @@ public class NBTHelper
      */
     private static Object getValueFromNms(NBTBase nmsTag)
     {
-        Tag.Type type = Tag.Type.values()[nmsTag.getTypeId()];
+        NamedBinaryTag.Type type = NamedBinaryTag.Type.values()[nmsTag.getTypeId()];
         switch (type)
         {
             case TAG_Byte:
@@ -179,11 +179,11 @@ public class NBTHelper
      * @param compoundTag
      * @return
      */
-    public static NBTTagCompound getNMSFromNBTTagCompound(Tag compoundTag)
+    public static NBTTagCompound getNMSFromNBTTagCompound(NamedBinaryTag compoundTag)
     {
         NBTTagCompound nmsTag = new NBTTagCompound(compoundTag.getName());
-        Tag[] childTags = (Tag[]) compoundTag.getValue();
-        for (Tag tag : childTags)
+        NamedBinaryTag[] childTags = (NamedBinaryTag[]) compoundTag.getValue();
+        for (NamedBinaryTag tag : childTags)
         {
             switch (tag.getType())
             {
@@ -220,11 +220,11 @@ public class NBTHelper
      * @param listTag
      * @return
      */
-    private static NBTTagList getNMSFromNBTTagList(Tag listTag)
+    private static NBTTagList getNMSFromNBTTagList(NamedBinaryTag listTag)
     {
         NBTTagList nmsTag = new NBTTagList(listTag.getName());
-        Tag[] childTags = (Tag[]) listTag.getValue();
-        for (Tag tag : childTags)
+        NamedBinaryTag[] childTags = (NamedBinaryTag[]) listTag.getValue();
+        for (NamedBinaryTag tag : childTags)
         {
             switch (tag.getType())
             {
@@ -263,7 +263,7 @@ public class NBTHelper
      * @param value
      * @return
      */
-    private static NBTBase createTagNms(Tag.Type type, String name, Object value)
+    private static NBTBase createTagNms(NamedBinaryTag.Type type, String name, Object value)
     {
         switch (type)
         {

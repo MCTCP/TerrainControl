@@ -2,8 +2,8 @@ package com.khorn.terraincontrol.forge;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import cpw.mods.fml.common.IPlayerTracker;
 import net.minecraft.entity.player.EntityPlayer;
@@ -47,7 +47,7 @@ public class PlayerTracker implements IPlayerTracker
         DataOutputStream stream = new DataOutputStream(outputStream);
         try
         {
-            stream.writeInt(TCDefaultValues.ProtocolVersion.intValue());
+            stream.writeInt(PluginStandardValues.ProtocolVersion.intValue());
             config.Serialize(stream);
         } catch (IOException e)
         {
@@ -56,7 +56,7 @@ public class PlayerTracker implements IPlayerTracker
 
         // Make the packet
         Packet250CustomPayload packet = new Packet250CustomPayload();
-        packet.channel = TCDefaultValues.ChannelName.stringValue();
+        packet.channel = PluginStandardValues.ChannelName.stringValue();
         packet.data = outputStream.toByteArray();
         packet.length = outputStream.size();
 

@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -36,7 +36,7 @@ public class TCSender
 
             try
             {
-                stream.writeInt(TCDefaultValues.ProtocolVersion.intValue());
+                stream.writeInt(PluginStandardValues.ProtocolVersion.intValue());
                 config.Serialize(stream);
                 stream.flush();
             } catch (IOException e)
@@ -46,7 +46,7 @@ public class TCSender
 
             byte[] data = outputStream.toByteArray();
 
-            player.sendPluginMessage(plugin, TCDefaultValues.ChannelName.stringValue(), data);
+            player.sendPluginMessage(plugin, PluginStandardValues.ChannelName.stringValue(), data);
         }
     }
 

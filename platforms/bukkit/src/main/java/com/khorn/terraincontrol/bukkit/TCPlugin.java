@@ -7,11 +7,11 @@ import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.bukkit.structuregens.RareBuildingStart;
 import com.khorn.terraincontrol.bukkit.structuregens.VillageStart;
 import com.khorn.terraincontrol.bukkit.util.BukkitMetricsHelper;
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
-import com.khorn.terraincontrol.configuration.TCLogManager;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.util.StringHelper;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import com.khorn.terraincontrol.logging.LogManager;
 import com.khorn.terraincontrol.util.StructureNames;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
 import net.minecraft.server.v1_6_R3.BiomeBase;
 import net.minecraft.server.v1_6_R3.Block;
 import net.minecraft.server.v1_6_R3.WorldGenFactory;
@@ -69,7 +69,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
 
         TerrainControl.setEngine(this);
-        logger = TCLogManager.getLogger(this);
+        logger = LogManager.getLogger(this);
 
         if (!Bukkit.getWorlds().isEmpty() && !cleanupOnDisable)
         {
@@ -111,7 +111,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             TerrainControl.startEngine();
             this.commandExecutor = new TCCommandExecutor(this);
             this.listener = new TCListener(this);
-            Bukkit.getMessenger().registerOutgoingPluginChannel(this, TCDefaultValues.ChannelName.stringValue());
+            Bukkit.getMessenger().registerOutgoingPluginChannel(this, PluginStandardValues.ChannelName.stringValue());
 
             TerrainControl.log(Level.INFO, "Global objects loaded, waiting for worlds to load");
 
@@ -282,11 +282,11 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     public void log(Level level, String message, Object param)
     {
         LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.formatter.format(lr));
+        lr.setMessage(LogManager.formatter.format(lr));
         lr.setParameters(new Object[] {param});
         if (logger == null)
         {
-            logger = TCLogManager.getLogger();
+            logger = LogManager.getLogger();
         }
         logger.log(lr);
     }
@@ -296,10 +296,10 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
         LogRecord lr = new LogRecord(level, message);
         lr.setParameters(params);
-        lr.setMessage(TCLogManager.formatter.format(lr));
+        lr.setMessage(LogManager.formatter.format(lr));
         if (logger == null)
         {
-            logger = TCLogManager.getLogger();
+            logger = LogManager.getLogger();
         }
         logger.log(lr);
     }
@@ -325,7 +325,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getTCDataFolder(), TCDefaultValues.BO_GlobalDirectoryName.stringValue());
+        return new File(this.getTCDataFolder(), PluginStandardValues.BO_GlobalDirectoryName.stringValue());
     }
 
     @Override

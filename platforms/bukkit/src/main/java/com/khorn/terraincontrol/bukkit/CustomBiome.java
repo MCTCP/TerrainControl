@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.MobAlternativeNames;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+import com.khorn.terraincontrol.util.MobNames;
 import net.minecraft.server.v1_6_R3.BiomeBase;
 import net.minecraft.server.v1_6_R3.BiomeMeta;
 import net.minecraft.server.v1_6_R3.Entity;
@@ -86,7 +86,7 @@ public class CustomBiome extends BiomeBase
     @SuppressWarnings("unchecked")
     protected Class<? extends Entity> getEntityClass(WeightedMobSpawnGroup mobGroup)
     {
-        String mobName = MobAlternativeNames.getInternalMinecraftName(mobGroup.getMobName());
+        String mobName = MobNames.getInternalMinecraftName(mobGroup.getMobName());
         try
         {
             Field entitiesField = EntityTypes.class.getDeclaredField("b");

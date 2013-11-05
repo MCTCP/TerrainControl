@@ -1,14 +1,14 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.configuration.TCSetting;
+import com.khorn.terraincontrol.util.MultiTypedSetting;
 import com.khorn.terraincontrol.customobjects.StructurePartSpawnHeight;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
-public enum BO3Settings implements TCSetting
+public enum BO3Settings implements MultiTypedSetting
 {
     // BO3
     Author("Unknown"),

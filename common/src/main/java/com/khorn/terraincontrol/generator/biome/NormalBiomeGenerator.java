@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.generator.biome;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.generators.biome.layers.Layer;
+import com.khorn.terraincontrol.generator.biome.layers.Layer;
 
 /**
  * This is the normal biome mode, which has all of Terrain Control's features.

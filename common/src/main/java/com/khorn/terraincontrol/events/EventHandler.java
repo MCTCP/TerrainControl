@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.events;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.generator.resourcegens.Resource;
+import com.khorn.terraincontrol.generator.resource.Resource;
 
 import java.util.Random;
 

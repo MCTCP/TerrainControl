@@ -1,16 +1,16 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.*;
-import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.OutputType;
 import com.khorn.terraincontrol.bukkit.structuregens.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
+import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
+import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 import net.minecraft.server.v1_6_R3.*;
 import org.bukkit.craftbukkit.v1_6_R3.CraftWorld;
 
@@ -744,9 +744,9 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void attachMetadata(int x, int y, int z, Tag tag)
+    public void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
     {
-        // Convert Tag to a native nms tag
+        // Convert NamedBinaryTag to a native nms tag
         NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
         // Add the x, y and z position to it
         nmsTag.setInt("x", x);
@@ -764,7 +764,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public Tag getMetadata(int x, int y, int z)
+    public NamedBinaryTag getMetadata(int x, int y, int z)
     {
         TileEntity tileEntity = world.getTileEntity(x, y, z);
         if (tileEntity == null)

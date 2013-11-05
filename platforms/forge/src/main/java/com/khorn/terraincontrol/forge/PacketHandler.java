@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
@@ -25,7 +25,7 @@ public class PacketHandler implements IPacketHandler
         // This method receives the TerrainControl packet with the custom biome
         // colors and weather.
 
-        if (!receivedPacket.channel.equals(TCDefaultValues.ChannelName.stringValue()))
+        if (!receivedPacket.channel.equals(PluginStandardValues.ChannelName.stringValue()))
         {
             // Make sure that the right channel is being received
             return;
@@ -37,7 +37,7 @@ public class PacketHandler implements IPacketHandler
         try
         {
             int serverProtocolVersion = stream.readInt();
-            int clientProtocolVersion = TCDefaultValues.ProtocolVersion.intValue();
+            int clientProtocolVersion = PluginStandardValues.ProtocolVersion.intValue();
             if (serverProtocolVersion == clientProtocolVersion)
             {
                 // Server sent config
@@ -60,7 +60,7 @@ public class PacketHandler implements IPacketHandler
             } else
             {
                 // Server or client is outdated
-                System.out.println("TerrainControl: server has different protocol version! " + "Client: " + TCDefaultValues.ProtocolVersion.intValue() + " Server: " + serverProtocolVersion);
+                System.out.println("TerrainControl: server has different protocol version! " + "Client: " + PluginStandardValues.ProtocolVersion.intValue() + " Server: " + serverProtocolVersion);
             }
         } catch (Exception e)
         {

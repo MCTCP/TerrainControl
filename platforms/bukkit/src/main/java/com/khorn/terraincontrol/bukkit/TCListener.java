@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingType;
 import org.bukkit.Bukkit;
@@ -117,7 +117,7 @@ public class TCListener implements Listener
     public void onPlayerRegisterChannel(PlayerRegisterChannelEvent event)
     {
         // Sends custom colors on join
-        if (event.getChannel().equals(TCDefaultValues.ChannelName.stringValue()))
+        if (event.getChannel().equals(PluginStandardValues.ChannelName.stringValue()))
         {
             tcSender.send(event.getPlayer());
         }
@@ -128,7 +128,7 @@ public class TCListener implements Listener
     {
         // Resends the packet so that the biomes are right again
         Player player = event.getPlayer();
-        if (player.getListeningPluginChannels().contains(TCDefaultValues.ChannelName.stringValue()))
+        if (player.getListeningPluginChannels().contains(PluginStandardValues.ChannelName.stringValue()))
         {
             tcSender.send(player);
         }

@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.generator.biome;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldConfigFile;
 
 /**
  * The biome generator. External plugins are allowed to implement this class on their own.
@@ -9,7 +9,7 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
  */
 public abstract class BiomeGenerator
 {
-    protected WorldConfig worldConfig;
+    protected WorldConfigFile worldConfig;
     protected BiomeCache cache;
     public final Object lockObject = new Object();
 

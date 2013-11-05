@@ -2,13 +2,13 @@ package com.khorn.terraincontrol;
 
 import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
-import com.khorn.terraincontrol.configuration.PluginConfig;
+import com.khorn.terraincontrol.configuration.PluginConfigFile;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
 import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
-import com.khorn.terraincontrol.generator.resourcegens.Resource;
+import com.khorn.terraincontrol.generator.resource.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class TerrainControl
     /**
      * Global TC plugin configs
      */
-    private static PluginConfig pluginConfig;
+    private static PluginConfigFile pluginConfig;
     
     private static TerrainControlEngine engine;
     
@@ -131,7 +131,7 @@ public class TerrainControl
         }
         
         TerrainControl.engine = engine;
-        TerrainControl.pluginConfig = new PluginConfig(engine.getTCDataFolder());
+        TerrainControl.pluginConfig = new PluginConfigFile(engine.getTCDataFolder());
     }
 
     /**
@@ -338,7 +338,7 @@ public class TerrainControl
      * Returns the global config file.
      * @return The global config file.
      */
-    public static PluginConfig getPluginConfig()
+    public static PluginConfigFile getPluginConfig()
     {
         return pluginConfig;
     }

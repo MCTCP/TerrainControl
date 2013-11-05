@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol;
 
-import com.khorn.terraincontrol.configuration.DefaultBiomeSettings;
-import com.khorn.terraincontrol.configuration.VanillaBiomesDefaultSettings.*;
+import com.khorn.terraincontrol.configuration.standard.StandardBiomeFactory;
+import com.khorn.terraincontrol.configuration.standard.StandardMinecraftBiomes.*;
 
 /**
  * Enumeration containing the Proper names and IDs of the default Minecraft
@@ -114,13 +114,13 @@ public enum DefaultBiome
      * Default settings of this biome. Access this using
      * {@link DefaultBiomeSettings#getDefaultSettings(com.khorn.terraincontrol.LocalBiome, int)}
      */
-    private final Class<? extends DefaultBiomeSettings> defaultSettingsClass;
+    private final Class<? extends StandardBiomeFactory> defaultSettingsClass;
     /**
      * A DefaultBiome lookup table with the biome ID being the array index
      */
     private static DefaultBiome[] lookupID;
 
-    private DefaultBiome(int i, String name, Class<? extends DefaultBiomeSettings> defaultSettings)
+    private DefaultBiome(int i, String name, Class<? extends StandardBiomeFactory> defaultSettings)
     {
         this.Id = i;
         this.Name = name;
@@ -137,7 +137,7 @@ public enum DefaultBiome
             lookupID[biome.Id] = biome;
 
             // Register the default settings
-            DefaultBiomeSettings.registerDefaultSettings(biome.Id, biome.defaultSettingsClass);
+            StandardBiomeFactory.registerDefaultSettings(biome.Id, biome.defaultSettingsClass);
         }
     }
 

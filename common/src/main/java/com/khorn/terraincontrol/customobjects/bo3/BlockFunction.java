@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.Tag;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 
@@ -20,7 +20,7 @@ public class BlockFunction extends BO3Function
     public int y;
     public int z;
     public boolean hasMetaData;
-    public Tag metaDataTag;
+    public NamedBinaryTag metaDataTag;
     public String metaDataName;
 
     @Override
@@ -44,7 +44,7 @@ public class BlockFunction extends BO3Function
     }
 
     @Override
-    protected String makeString()
+    public String makeString()
     {
         String start = "Block(" + x + ',' + y + ',' + z + ',' + makeMaterial(blockId, blockData);
         if (hasMetaData)

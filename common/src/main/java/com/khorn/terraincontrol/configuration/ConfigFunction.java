@@ -158,7 +158,7 @@ public abstract class ConfigFunction<T>
      * <p/>
      * @return A String representation, like Tree(10,BigTree,50,Tree,100)
      */
-    protected abstract String makeString();
+    public abstract String makeString();
 
     /**
      * Parses the string and returns a number between minValue and
