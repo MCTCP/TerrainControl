@@ -1,21 +1,6 @@
 package com.khorn.terraincontrol.configuration.standard;
 
-import com.khorn.terraincontrol.generator.resource.TreeGen;
-import com.khorn.terraincontrol.generator.resource.OreGen;
-import com.khorn.terraincontrol.generator.resource.WellGen;
-import com.khorn.terraincontrol.generator.resource.GrassGen;
-import com.khorn.terraincontrol.generator.resource.PlantGen;
-import com.khorn.terraincontrol.generator.resource.CactusGen;
-import com.khorn.terraincontrol.generator.resource.VinesGen;
-import com.khorn.terraincontrol.generator.resource.ReedGen;
-import com.khorn.terraincontrol.generator.resource.UnderWaterOreGen;
-import com.khorn.terraincontrol.generator.resource.UndergroundLakeGen;
-import com.khorn.terraincontrol.generator.resource.Resource;
-import com.khorn.terraincontrol.generator.resource.SmallLakeGen;
-import com.khorn.terraincontrol.generator.resource.DungeonGen;
-import com.khorn.terraincontrol.generator.resource.LiquidGen;
-import com.khorn.terraincontrol.generator.resource.AboveWaterGen;
-import com.khorn.terraincontrol.generator.resource.CustomObjectGen;
+import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;

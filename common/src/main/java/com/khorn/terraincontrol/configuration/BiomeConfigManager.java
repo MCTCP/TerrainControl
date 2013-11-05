@@ -81,7 +81,7 @@ public final class BiomeConfigManager
 
         //>> -- ESTRABLISH FOLDERS -- <<//
         //>>	TerrainControl/GlobalBiomes/
-        this.globalBiomesDir = new File(TerrainControl.getEngine().getTCDataFolder(), PluginStandardValues.GlobalBiomeConfigDirectoryName.stringValue());
+        this.globalBiomesDir = new File(TerrainControl.getEngine().getTCDataFolder(), PluginStandardValues.BiomeConfigDirectoryName.stringValue());
         //>>	TerrainControl/worlds/<WorldName>/<WorldBiomes/
         this.worldBiomesDir = new File(settingsDir, correctOldBiomeConfigFolder(settingsDir));
 

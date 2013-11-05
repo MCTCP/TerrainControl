@@ -14,7 +14,7 @@ public enum WorldStandardValues implements MultiTypedSetting
     ConfigFilename("WorldConfig.ini"),
     //>> Folders
     BiomeConfigDirectoryName("WorldBiomes"),
-    BO_WorldDirectoryName("WorldObjects"),
+    BO_DirectoryName("WorldObjects"),
   //>>  World Defaults
     SettingsMode(WorldConfig.ConfigMode.WriteAll),
     TerrainMode(WorldConfig.TerrainMode.Normal),

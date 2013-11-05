@@ -205,12 +205,12 @@ public class WorldConfig extends ConfigFile
 
     private void ReadWorldCustomObjects()
     {
-        customObjectsDirectory = new File(this.settingsDir, WorldStandardValues.BO_WorldDirectoryName.stringValue());
+        customObjectsDirectory = new File(this.settingsDir, WorldStandardValues.BO_DirectoryName.stringValue());
 
         File oldCustomObjectsDirectory = new File(settingsDir, "BOBPlugins");
         if (oldCustomObjectsDirectory.exists())
         {
-            if (!oldCustomObjectsDirectory.renameTo(new File(settingsDir, WorldStandardValues.BO_WorldDirectoryName.stringValue())))
+            if (!oldCustomObjectsDirectory.renameTo(new File(settingsDir, WorldStandardValues.BO_DirectoryName.stringValue())))
             {
                 TerrainControl.log(Level.WARNING, "Fould old BOBPlugins folder, but it cannot be renamed to WorldObjects.");
                 TerrainControl.log(Level.WARNING, "Please move the BO2s manually and delete BOBPlugins afterwards.");

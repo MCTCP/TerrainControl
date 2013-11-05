@@ -13,8 +13,8 @@ public enum PluginStandardValues implements MultiTypedSetting
     ConfigFilename("TerrainControl.ini"),
     
   //>> Folders
-    GlobalBiomeConfigDirectoryName("GlobalBiomes"),
-    BO_GlobalDirectoryName("GlobalObjects"),
+    BiomeConfigDirectoryName("GlobalBiomes"),
+    BO_DirectoryName("GlobalObjects"),
     
   //>>  Network
     ChannelName("TerrainControl"),
