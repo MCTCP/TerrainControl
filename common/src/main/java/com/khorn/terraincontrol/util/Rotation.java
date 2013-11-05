@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.customobjects;
+package com.khorn.terraincontrol.util;
 
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 

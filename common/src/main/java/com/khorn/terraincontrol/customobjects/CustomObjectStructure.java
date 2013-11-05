@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
-import com.khorn.terraincontrol.util.RandomHelper;
+import com.khorn.terraincontrol.util.helpers.RandomHelper;
 
 import java.util.*;
 

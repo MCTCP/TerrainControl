@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.generator.resourcegens;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.util.MathHelper;
+import com.khorn.terraincontrol.util.helpers.MathHelper;
 
 import java.util.ArrayList;
 import java.util.List;

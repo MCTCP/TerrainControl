@@ -10,7 +10,7 @@ import com.khorn.terraincontrol.generator.resourcegens.CustomStructureGen;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
 import com.khorn.terraincontrol.generator.resourcegens.SaplingType;
-import com.khorn.terraincontrol.util.StringHelper;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

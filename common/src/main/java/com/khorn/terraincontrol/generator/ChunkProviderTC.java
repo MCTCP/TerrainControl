@@ -10,7 +10,7 @@ import com.khorn.terraincontrol.generator.noise.NoiseGeneratorPerlinOctaves;
 import com.khorn.terraincontrol.generator.terrainsgens.CanyonsGen;
 import com.khorn.terraincontrol.generator.terrainsgens.CavesGen;
 import com.khorn.terraincontrol.generator.terrainsgens.TerrainGenBase;
-import com.khorn.terraincontrol.util.MathHelper;
+import com.khorn.terraincontrol.util.helpers.MathHelper;
 
 import java.util.Random;
 

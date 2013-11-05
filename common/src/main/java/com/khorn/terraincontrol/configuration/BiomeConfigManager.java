@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.logging.LogManager;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
@@ -217,7 +218,7 @@ public final class BiomeConfigManager
     {
         if (biomesCount != 0)
             LoadedBiomeNames += ", ";
-        LoadedBiomeNames += localBiome.getName() + (TCLogManager.getLogger().isLoggable(Level.FINE) ? (":" + localBiome.getId()) : "");
+        LoadedBiomeNames += localBiome.getName() + (LogManager.getLogger().isLoggable(Level.FINE) ? (":" + localBiome.getId()) : "");
         // Add biome to the biome array
         if (biomeConfigs[localBiome.getId()] == null)
         {

@@ -1,14 +1,16 @@
-package com.khorn.terraincontrol.configuration;
+package com.khorn.terraincontrol.logging;
 
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.configuration.PluginConfig.LogLevels;
+import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import java.util.logging.*;
 
 /**
  * `Static` Class that provides a centralized way of obtaining a properly
  * configured logger class based on the static TerrainControl PluginConfig
  */
-public class TCLogManager
+public class LogManager
 {
 
     public static final String prefix = TCDefaultValues.ChannelName.stringValue();
@@ -16,7 +18,7 @@ public class TCLogManager
     public static final LogLevels defaultLogLevel = PluginConfig.LogLevels.Standard;
     public static Logger stdLogger;
 
-    private TCLogManager()
+    private LogManager()
     { //>>	Shouldnt be instantiated
     }
 

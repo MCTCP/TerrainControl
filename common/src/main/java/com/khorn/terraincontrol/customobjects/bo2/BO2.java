@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.Rotation;
+import com.khorn.terraincontrol.util.Rotation;
 
 import java.io.File;
 import java.io.IOException;

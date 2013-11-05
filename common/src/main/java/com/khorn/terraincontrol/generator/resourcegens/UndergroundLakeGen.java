@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.util.MathHelper;
+import com.khorn.terraincontrol.util.helpers.MathHelper;
 
 import java.util.List;
 import java.util.Random;

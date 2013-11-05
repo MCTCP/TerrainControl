@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol;
+package com.khorn.terraincontrol.util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ import java.util.Map;
  * this names, along with the other names that are available on the current
  * platform.
  */
-public enum MobAlternativeNames
+public enum MobNames
 {
     // All entities sorted by the network ID
     CREEPER("Creeper", "creeper"),
@@ -47,7 +47,7 @@ public enum MobAlternativeNames
     private String internalMinecraftName;
     private String[] aliases;
 
-    private MobAlternativeNames(String internalMinecraftName, String... aliases)
+    private MobNames(String internalMinecraftName, String... aliases)
     {
         this.internalMinecraftName = internalMinecraftName;
         this.aliases = aliases;
@@ -56,7 +56,7 @@ public enum MobAlternativeNames
     // Auto-register all aliases in the enum
     static
     {
-        for (MobAlternativeNames alt : MobAlternativeNames.values())
+        for (MobNames alt : MobNames.values())
         {
             register(alt.internalMinecraftName, alt.aliases);
         }

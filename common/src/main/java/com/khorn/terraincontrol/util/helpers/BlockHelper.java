@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.util;
+package com.khorn.terraincontrol.util.helpers;
 
 import com.khorn.terraincontrol.DefaultMaterial;
 

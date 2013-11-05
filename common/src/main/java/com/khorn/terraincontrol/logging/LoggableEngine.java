@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol;
+package com.khorn.terraincontrol.logging;
 
 import java.util.logging.Level;
 

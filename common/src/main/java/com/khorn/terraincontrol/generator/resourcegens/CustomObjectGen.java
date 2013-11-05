@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.util.StringHelper;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;

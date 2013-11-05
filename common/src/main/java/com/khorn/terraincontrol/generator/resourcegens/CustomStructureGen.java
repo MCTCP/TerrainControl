@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.generator.resourcegens;
 
+import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.*;

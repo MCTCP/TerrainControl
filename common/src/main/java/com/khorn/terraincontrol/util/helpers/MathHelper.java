@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.util;
+package com.khorn.terraincontrol.util.helpers;
 
 import java.util.Random;
 
