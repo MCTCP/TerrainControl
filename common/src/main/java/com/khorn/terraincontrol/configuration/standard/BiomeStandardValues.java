@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.configuration.standard;
 
-import com.khorn.terraincontrol.configuration.BiomeConfigFile;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -222,9 +222,9 @@ public enum BiomeStandardValues implements MultiTypedSetting
     
     NetherFortressesEnabled(false),
     StrongholdsEnabled(true),
-    VillageType(BiomeConfigFile.VillageType.disabled),
+    VillageType(BiomeConfig.VillageType.disabled),
     MineshaftRarity(1D),
-    RareBuildingType(BiomeConfigFile.RareBuildingType.disabled);
+    RareBuildingType(BiomeConfig.RareBuildingType.disabled);
     
     // End deprectated settings
 

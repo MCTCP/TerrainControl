@@ -1,12 +1,12 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
-import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
-import com.khorn.terraincontrol.configuration.BiomeConfigFile;
-import com.khorn.terraincontrol.configuration.WorldConfigFile;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 
 import java.util.ArrayList;
 
@@ -66,7 +66,7 @@ public abstract class Layer
         int ChanceToIncreaseLand = 6; //default 4
         int MaxDepth = 10;     */
 
-        WorldConfigFile config = world.getSettings();
+        WorldConfig config = world.getSettings();
 
         LocalBiome[][] NormalBiomeMap = new LocalBiome[config.GenerationDepth + 1][];
         LocalBiome[][] IceBiomeMap = new LocalBiome[config.GenerationDepth + 1][];
@@ -76,7 +76,7 @@ public abstract class Layer
         {
             ArrayList<LocalBiome> normalBiomes = new ArrayList<LocalBiome>();
             ArrayList<LocalBiome> iceBiomes = new ArrayList<LocalBiome>();
-            for (BiomeConfigFile biomeConfig : config.biomeConfigManager.biomeConfigs)
+            for (BiomeConfig biomeConfig : config.biomeConfigManager.biomeConfigs)
             {
                 if (biomeConfig == null)
                     continue;
@@ -169,7 +169,7 @@ public abstract class Layer
 
             LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
             boolean haveBorder = false;
-            for (BiomeConfigFile biomeConfig : config.biomeConfigManager.biomeConfigs)
+            for (BiomeConfig biomeConfig : config.biomeConfigManager.biomeConfigs)
             {
                 if (biomeConfig == null)
                     continue;
@@ -229,7 +229,7 @@ public abstract class Layer
         if (config.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
         {
 
-            if (config.imageMode == WorldConfigFile.ImageMode.ContinueNormal)
+            if (config.imageMode == WorldConfig.ImageMode.ContinueNormal)
                 MainLayer = new LayerFromImage(1L, MainLayer, config, world);
             else
                 MainLayer = new LayerFromImage(1L, null, config, world);

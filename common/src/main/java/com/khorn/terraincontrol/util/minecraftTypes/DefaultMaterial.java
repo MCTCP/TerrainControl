@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol;
+package com.khorn.terraincontrol.util.minecraftTypes;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,17 +1,17 @@
 package com.khorn.terraincontrol.generator.terrain;
 
-import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.WorldConfigFile;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 
 import java.util.Random;
 
 public class CavesGen extends TerrainGenBase
 {
-    private WorldConfigFile worldSettings;
+    private WorldConfig worldSettings;
 
-    public CavesGen(WorldConfigFile wrk, LocalWorld world)
+    public CavesGen(WorldConfig wrk, LocalWorld world)
     {
         super(world);
         this.worldSettings = wrk;

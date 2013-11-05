@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.configuration.standard;
 
-import com.khorn.terraincontrol.configuration.BiomeConfigFile;
-import com.khorn.terraincontrol.configuration.WorldConfigFile;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 import com.khorn.terraincontrol.util.MultiTypedSetting.SettingsType;
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ public enum WorldStandardValues implements MultiTypedSetting
     BiomeConfigDirectoryName("WorldBiomes"),
     BO_WorldDirectoryName("WorldObjects"),
   //>>  World Defaults
-    SettingsMode(WorldConfigFile.ConfigMode.WriteAll),
-    TerrainMode(WorldConfigFile.TerrainMode.Normal),
+    SettingsMode(WorldConfig.ConfigMode.WriteAll),
+    TerrainMode(WorldConfig.TerrainMode.Normal),
     
     BiomeMode("Normal"),
     
@@ -54,9 +54,9 @@ public enum WorldStandardValues implements MultiTypedSetting
 
     CustomBiomes("", SettingsType.StringArray),
 
-    ImageMode(WorldConfigFile.ImageMode.Mirror),
+    ImageMode(WorldConfig.ImageMode.Mirror),
     ImageFile("map.png"),
-    ImageOrientation(WorldConfigFile.ImageOrientation.West),
+    ImageOrientation(WorldConfig.ImageOrientation.West),
     ImageFillBiome("Ocean"),
     ImageXOffset(0),
     ImageZOffset(0),
@@ -110,7 +110,7 @@ public enum WorldStandardValues implements MultiTypedSetting
     VillagesEnabled(true),
     VillageDistance(32),
     VillageSize(0),
-    VillageType(BiomeConfigFile.VillageType.disabled),
+    VillageType(BiomeConfig.VillageType.disabled),
 
     MineshaftsEnabled(true),
     MineshaftRarity(1D),
@@ -118,7 +118,7 @@ public enum WorldStandardValues implements MultiTypedSetting
     RareBuildingsEnabled(true),
     MinimumDistanceBetweenRareBuildings(9),
     MaximumDistanceBetweenRareBuildings(32),
-    RareBuildingType(BiomeConfigFile.RareBuildingType.disabled);
+    RareBuildingType(BiomeConfig.RareBuildingType.disabled);
     
     
     // End world settings

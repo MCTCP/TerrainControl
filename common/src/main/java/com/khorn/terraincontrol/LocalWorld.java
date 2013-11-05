@@ -1,11 +1,12 @@
 package com.khorn.terraincontrol;
 
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.generator.biome.OutputType;
-import com.khorn.terraincontrol.configuration.BiomeConfigFile;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
-import com.khorn.terraincontrol.configuration.WorldConfigFile;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
-import com.khorn.terraincontrol.generator.resource.TreeType;
+import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -95,7 +96,7 @@ public interface LocalWorld
     /**
      * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the terrain generation.
      */
-    public void placePopulationMobs(BiomeConfigFile config, Random random, int chunkX, int chunkZ);
+    public void placePopulationMobs(BiomeConfig config, Random random, int chunkX, int chunkZ);
 
     // Blocks
 
@@ -134,7 +135,7 @@ public interface LocalWorld
 
     public boolean isLoaded(int x, int y, int z);
 
-    public WorldConfigFile getSettings();
+    public WorldConfig getSettings();
 
     public CustomObjectStructureCache getStructureCache();
 

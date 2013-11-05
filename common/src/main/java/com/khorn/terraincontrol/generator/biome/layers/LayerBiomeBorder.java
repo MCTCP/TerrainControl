@@ -4,7 +4,7 @@ package com.khorn.terraincontrol.generator.biome.layers;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
-import com.khorn.terraincontrol.configuration.BiomeConfigFile;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 
 
 public class LayerBiomeBorder extends Layer
@@ -20,7 +20,7 @@ public class LayerBiomeBorder extends Layer
     private int[] BordersTo;
 
 
-    public void AddBiome(BiomeConfigFile ReplaceTo, int ReplaceFrom, LocalWorld world)
+    public void AddBiome(BiomeConfig ReplaceTo, int ReplaceFrom, LocalWorld world)
     {
         this.BordersFrom[ReplaceFrom] = new boolean[world.getMaxBiomesCount()];
 

@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol;
+package com.khorn.terraincontrol.util.minecraftTypes;
 
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeFactory;
 import com.khorn.terraincontrol.configuration.standard.StandardMinecraftBiomes.*;

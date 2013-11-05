@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.generator.terrain;
 
-import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.WorldConfigFile;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 
 import java.util.Random;
@@ -10,9 +10,9 @@ import java.util.Random;
 public class CanyonsGen extends TerrainGenBase
 {
     private float[] a = new float[1024];
-    private WorldConfigFile worldSettings;
+    private WorldConfig worldSettings;
 
-    public CanyonsGen(WorldConfigFile wrk, LocalWorld world)
+    public CanyonsGen(WorldConfig wrk, LocalWorld world)
     {
         super(world);
         this.worldSettings = wrk;

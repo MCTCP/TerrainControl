@@ -2,8 +2,8 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
-import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
-import com.khorn.terraincontrol.generator.resourcegens.SaplingType;
+import com.khorn.terraincontrol.generator.resource.SaplingGen;
+import com.khorn.terraincontrol.generator.resource.SaplingType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

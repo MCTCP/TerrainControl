@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.logging.LogManager;
-import com.khorn.terraincontrol.configuration.WorldConfigFile.ConfigMode;
+import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * Temporarily pre-configured Class that will eventually represent the file
  * containing any and all plugin-specific settings
  */
-public final class PluginConfigFile extends ConfigFile
+public final class PluginConfig extends ConfigFile
 {
 
     public ConfigMode SettingsMode;
@@ -48,7 +48,7 @@ public final class PluginConfigFile extends ConfigFile
     public String worldDefaultBiomeConfigExtension;
     private static final Logger l = LogManager.getLogger();
 
-    public PluginConfigFile(File settingsDir)
+    public PluginConfig(File settingsDir)
     {
 
         super(PluginStandardValues.ChannelName.stringValue(), new File(settingsDir, PluginStandardValues.ConfigFilename.stringValue()));
@@ -82,11 +82,11 @@ public final class PluginConfigFile extends ConfigFile
     protected void correctSettings()
     {
         boolean hasOffLevel = false;
-        if (this.consoleHandlerLevel == PluginConfigFile.LogLevels.Off)
+        if (this.consoleHandlerLevel == PluginConfig.LogLevels.Off)
         {
             hasOffLevel = true;
         }
-        if (this.fileHandlerLevel == PluginConfigFile.LogLevels.Off)
+        if (this.fileHandlerLevel == PluginConfig.LogLevels.Off)
         {
             hasOffLevel = true;
         }

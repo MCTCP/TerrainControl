@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.configuration.standard;
 
-import com.khorn.terraincontrol.configuration.PluginConfigFile;
+import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,8 +21,8 @@ public enum PluginStandardValues implements MultiTypedSetting
     ProtocolVersion(5),
     
   //>>  Plugin Defaults
-    ConsoleLogLevel(PluginConfigFile.LogLevels.Standard),
-    FileLogLevel(PluginConfigFile.LogLevels.Standard);
+    ConsoleLogLevel(PluginConfig.LogLevels.Standard),
+    FileLogLevel(PluginConfig.LogLevels.Standard);
     
 
     private int iValue;

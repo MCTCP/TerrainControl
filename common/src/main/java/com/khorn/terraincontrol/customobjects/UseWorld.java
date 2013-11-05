@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.customobjects;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.WorldConfigFile;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 
 import java.util.Map;
 import java.util.Random;
@@ -59,7 +59,7 @@ public class UseWorld implements CustomObject
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
 
-        WorldConfigFile worldSettings = world.getSettings();
+        WorldConfig worldSettings = world.getSettings();
 
         if (worldSettings.customObjects.size() == 0)
             return false;
@@ -91,7 +91,7 @@ public class UseWorld implements CustomObject
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
 
-        WorldConfigFile worldSettings = world.getSettings();
+        WorldConfig worldSettings = world.getSettings();
 
         if (worldSettings.customObjects.size() == 0)
             return false;

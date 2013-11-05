@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.events.EventHandler;
-import com.khorn.terraincontrol.generator.resourcegens.*;
+import com.khorn.terraincontrol.generator.resource.*;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.*;

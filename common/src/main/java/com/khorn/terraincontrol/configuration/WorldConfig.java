@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
-public class WorldConfigFile extends ConfigFile
+public class WorldConfig extends ConfigFile
 {
     public final File settingsDir;
     private final Comparator<Entry<String,Integer>> CBV = new Comparator<Entry<String, Integer>>() {
@@ -161,7 +161,7 @@ public class WorldConfigFile extends ConfigFile
     public ConfigMode SettingsMode;
 
     public boolean isDeprecated = false;
-    public WorldConfigFile newSettings = null;
+    public WorldConfig newSettings = null;
 
     public TerrainMode ModeTerrain;
     public Class<? extends BiomeGenerator> biomeMode;
@@ -178,7 +178,7 @@ public class WorldConfigFile extends ConfigFile
 
     public BiomeConfigManager biomeConfigManager;
     
-    public WorldConfigFile(File settingsDir, LocalWorld world, boolean checkOnly)
+    public WorldConfig(File settingsDir, LocalWorld world, boolean checkOnly)
     {
         super(world.getName(), new File(settingsDir, WorldStandardValues.ConfigFilename.stringValue()));
         this.settingsDir = settingsDir;
@@ -917,7 +917,7 @@ public class WorldConfigFile extends ConfigFile
 
         // BiomeConfigs
         stream.writeInt(biomeConfigManager.biomesCount);
-        for (BiomeConfigFile config : biomeConfigManager.biomeConfigs)
+        for (BiomeConfig config : biomeConfigManager.biomeConfigs)
         {
             if (config == null)
                 continue;
@@ -927,7 +927,7 @@ public class WorldConfigFile extends ConfigFile
     }
 
     // Needed for creating world config from network packet
-    public WorldConfigFile(DataInputStream stream, LocalWorld world) throws IOException
+    public WorldConfig(DataInputStream stream, LocalWorld world) throws IOException
     {
         // General information
         super(readStringFromStream(stream), null);
@@ -955,13 +955,13 @@ public class WorldConfigFile extends ConfigFile
         }
         //TODO Check all this code.
         // BiomeConfigs
-        biomeConfigManager.biomeConfigs = new BiomeConfigFile[world.getMaxBiomesCount()];
+        biomeConfigManager.biomeConfigs = new BiomeConfig[world.getMaxBiomesCount()];
 
         count = stream.readInt();
         while (count-- > 0)
         {
             int id = stream.readInt();
-            BiomeConfigFile config = new BiomeConfigFile(stream, this, world.getBiomeById(id));
+            BiomeConfig config = new BiomeConfig(stream, this, world.getBiomeById(id));
             biomeConfigManager.biomeConfigs[id] = config;
         }
 

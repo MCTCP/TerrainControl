@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 import com.khorn.terraincontrol.customobjects.StructurePartSpawnHeight;
 

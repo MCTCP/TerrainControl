@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.NormalBiomeGenerator;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.WorldConfigFile;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 
 /**
  * Counts how much each biome mode is used.
@@ -28,7 +28,7 @@ public abstract class MetricsHelper
     {
         for (LocalWorld world : worlds)
         {
-            WorldConfigFile config = world.getSettings();
+            WorldConfig config = world.getSettings();
             if (config != null)
             {
                 Class<? extends BiomeGenerator> clazz = config.biomeMode;

@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.forge.structuregens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
-import com.khorn.terraincontrol.util.StructureNames;
+import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityMagmaCube;
 import net.minecraft.entity.monster.EntityPigZombie;

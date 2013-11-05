@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.generator.biome.layers;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
-import com.khorn.terraincontrol.configuration.WorldConfigFile;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -20,9 +20,9 @@ public class LayerFromImage extends Layer
     private int fillBiome = 0;
     private int xOffset;
     private int zOffset;
-    private WorldConfigFile.ImageMode imageMode;
+    private WorldConfig.ImageMode imageMode;
 
-    public LayerFromImage(long paramLong, Layer child, WorldConfigFile config, LocalWorld world)
+    public LayerFromImage(long paramLong, Layer child, WorldConfig config, LocalWorld world)
     {
         super(paramLong);
         this.child = child;

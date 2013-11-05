@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.util.MultiTypedSetting;
-import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
@@ -24,7 +24,7 @@ import java.util.logging.Level;
 
 import static com.khorn.terraincontrol.configuration.ConfigFile.readComplexString;
 
-public class BiomeConfigFile extends ConfigFile
+public class BiomeConfig extends ConfigFile
 {
     /*
      * Biome Inheritance: String name of the biome to extend
@@ -133,7 +133,7 @@ public class BiomeConfigFile extends ConfigFile
     public LocalBiome Biome;
     public StandardBiomeFactory defaultSettings;
 
-    public WorldConfigFile worldConfig;
+    public WorldConfig worldConfig;
     
     // Spawn Config
     public boolean spawnMonstersAddDefaults = true;
@@ -145,7 +145,7 @@ public class BiomeConfigFile extends ConfigFile
     public boolean spawnAmbientCreaturesAddDefaults = true;
     public List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
-    public BiomeConfigFile(File settingsDir, LocalBiome biome, WorldConfigFile config)
+    public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
     {
         super(biome.getName(), settingsDir, BiomeStandardValues.BiomeConfigExtensions.stringArrayListValue(), TerrainControl.getPluginConfig().worldDefaultBiomeConfigExtension);
         this.Biome = biome;
@@ -193,16 +193,16 @@ public class BiomeConfigFile extends ConfigFile
         if (!this.BiomeExtends.isEmpty())
         {
             //>>	Child Inheritance Biomes 
-            if (this.worldConfig.SettingsMode != WorldConfigFile.ConfigMode.WriteDisable)
+            if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
             {
                 this.file = new File(this.file.getParentFile(), this.file.getName() + ".inherited");
-                this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfigFile.ConfigMode.WriteAll);
+                this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfig.ConfigMode.WriteAll);
             }
         } else
         {
             //>>	Normal config saving
-            if (this.worldConfig.SettingsMode != WorldConfigFile.ConfigMode.WriteDisable)
-                this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfigFile.ConfigMode.WriteAll);
+            if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
+                this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfig.ConfigMode.WriteAll);
         }
     }
 
@@ -387,12 +387,12 @@ public class BiomeConfigFile extends ConfigFile
 
     }
 
-    private ConfigFunction<BiomeConfigFile> getResource(Map.Entry<String, String> entry)
+    private ConfigFunction<BiomeConfig> getResource(Map.Entry<String, String> entry)
     {
         String key = entry.getKey();
         int start = key.indexOf("(");
         int end = key.lastIndexOf(")");
-        ConfigFunction<BiomeConfigFile> resource = null;
+        ConfigFunction<BiomeConfig> resource = null;
         if (start != -1 && end != -1)
         {
             String rName = key.substring(0, start);
@@ -403,7 +403,7 @@ public class BiomeConfigFile extends ConfigFile
                 //>>	make resource non-null so it doesnt get copied as a child, 
                 //>>	but set the return value of getHolderType to null so we can 
                 //>>	check for it. Not sure if there is a better way to do this?
-                resource = new ConfigFunction<BiomeConfigFile>()
+                resource = new ConfigFunction<BiomeConfig>()
                 {
                     @Override
                     protected void load(List<String> args) throws InvalidConfigException
@@ -418,7 +418,7 @@ public class BiomeConfigFile extends ConfigFile
                     }
 
                     @Override
-                    public Class<BiomeConfigFile> getHolderType()
+                    public Class<BiomeConfig> getHolderType()
                     {
                         return null;
                     }
@@ -436,7 +436,7 @@ public class BiomeConfigFile extends ConfigFile
         this.doResourceInheritance = true;
         for (Map.Entry<String, String> entry : this.settingsCache.entrySet())
         {
-            ConfigFunction<BiomeConfigFile> res = getResource(entry);
+            ConfigFunction<BiomeConfig> res = getResource(entry);
             //>>	Do not include DoResourceInheritance() as a resource
             if (res != null && res.getHolderType() != null)
             {
@@ -465,7 +465,7 @@ public class BiomeConfigFile extends ConfigFile
      * <p/>
      * @return
      */
-    public BiomeConfigFile merge(BiomeConfigFile parent)
+    public BiomeConfig merge(BiomeConfig parent)
     {
         //>>	Run down the list of parent settings from config
         for (Map.Entry<String, String> parentEntry : parent.settingsCache.entrySet())
@@ -1163,7 +1163,7 @@ public class BiomeConfigFile extends ConfigFile
         stream.writeBoolean(this.FoliageColorIsMultiplier);
     }
 
-    public BiomeConfigFile(DataInputStream stream, WorldConfigFile config, LocalBiome biome) throws IOException
+    public BiomeConfig(DataInputStream stream, WorldConfig config, LocalBiome biome) throws IOException
     {
         super(readStringFromStream(stream), null);
         this.Biome = biome;

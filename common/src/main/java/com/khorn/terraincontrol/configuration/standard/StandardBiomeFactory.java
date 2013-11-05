@@ -16,13 +16,13 @@ import com.khorn.terraincontrol.generator.resource.DungeonGen;
 import com.khorn.terraincontrol.generator.resource.LiquidGen;
 import com.khorn.terraincontrol.generator.resource.AboveWaterGen;
 import com.khorn.terraincontrol.generator.resource.CustomObjectGen;
-import com.khorn.terraincontrol.configuration.BiomeConfigFile;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.DefaultBiome;
-import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.configuration.BiomeConfigFile.RareBuildingType;
-import com.khorn.terraincontrol.configuration.BiomeConfigFile.VillageType;
+import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
+import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,7 +143,7 @@ public class StandardBiomeFactory
      * @param config The biome config. Custom objects must already be loaded.
      * @return The default resources for this biome.
      */
-    public List<Resource> createDefaultResources(BiomeConfigFile config)
+    public List<Resource> createDefaultResources(BiomeConfig config)
     {
         List<Resource> resources = new ArrayList<Resource>(32);
 

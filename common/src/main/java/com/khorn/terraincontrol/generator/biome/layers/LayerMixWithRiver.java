@@ -1,15 +1,15 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
 
-import com.khorn.terraincontrol.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
-import com.khorn.terraincontrol.configuration.BiomeConfigFile;
-import com.khorn.terraincontrol.configuration.WorldConfigFile;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 
 public class LayerMixWithRiver extends Layer
 {
-    public LayerMixWithRiver(long paramLong, Layer paramGenLayer, Layer riverLayer, WorldConfigFile config, LocalWorld world)
+    public LayerMixWithRiver(long paramLong, Layer paramGenLayer, Layer riverLayer, WorldConfig config, LocalWorld world)
     {
         super(paramLong);
         this.child = paramGenLayer;
@@ -19,7 +19,7 @@ public class LayerMixWithRiver extends Layer
 
         for (int id = 0; id < this.riverBiomes.length; id++)
         {
-            BiomeConfigFile biomeConfig = config.biomeConfigManager.biomeConfigs[id];
+            BiomeConfig biomeConfig = config.biomeConfigManager.biomeConfigs[id];
 
             if (biomeConfig == null || biomeConfig.riverBiome.isEmpty())
                 this.riverBiomes[id] = -1;
@@ -29,7 +29,7 @@ public class LayerMixWithRiver extends Layer
         }
     }
 
-    private WorldConfigFile worldConfig;
+    private WorldConfig worldConfig;
     private int[] riverBiomes;
     private Layer riverLayer;
 

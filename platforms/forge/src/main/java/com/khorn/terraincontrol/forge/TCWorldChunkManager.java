@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;

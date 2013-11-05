@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.generator.resource;
+package com.khorn.terraincontrol.util.minecraftTypes;
 
 public enum TreeType
 {

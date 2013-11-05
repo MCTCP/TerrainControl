@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.util.helpers;
 
-import com.khorn.terraincontrol.DefaultMaterial;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 public class BlockHelper
 {

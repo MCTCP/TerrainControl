@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.util;
+package com.khorn.terraincontrol.util.minecraftTypes;
 
 /**
  * Terrain Control replaces some of the standard Minecraft structure generator.

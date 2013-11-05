@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit.structuregens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
-import com.khorn.terraincontrol.util.StructureNames;
+import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.server.v1_6_R3.*;
 
 import java.util.ArrayList;

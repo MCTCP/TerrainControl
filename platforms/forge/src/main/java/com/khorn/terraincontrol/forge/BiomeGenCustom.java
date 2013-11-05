@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.util.MobNames;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;

@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.generator.resource;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.BiomeConfigFile;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.util.Rotation;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class SaplingGen extends ConfigFunction<BiomeConfigFile>
+public class SaplingGen extends ConfigFunction<BiomeConfig>
 {
     public List<CustomObject> trees;
     public List<String> treeNames;
@@ -20,9 +20,9 @@ public class SaplingGen extends ConfigFunction<BiomeConfigFile>
     public SaplingType saplingType;
 
     @Override
-    public Class<BiomeConfigFile> getHolderType()
+    public Class<BiomeConfig> getHolderType()
     {
-        return BiomeConfigFile.class;
+        return BiomeConfig.class;
     }
 
     @Override

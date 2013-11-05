@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.forge.structuregens;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.ForgeBiome;
-import com.khorn.terraincontrol.util.StructureNames;
+import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeGenBase;

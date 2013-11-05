@@ -9,8 +9,10 @@ import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
-import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.server.v1_6_R3.*;
 import org.bukkit.craftbukkit.v1_6_R3.CraftWorld;
 
