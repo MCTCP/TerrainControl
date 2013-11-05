@@ -194,7 +194,7 @@ public class BiomeReplace implements Runnable
     {
         String ext;
 
-        public MCAFileFilter(String extension)
+        MCAFileFilter(String extension)
         {
             this.ext = extension.toLowerCase();
         }

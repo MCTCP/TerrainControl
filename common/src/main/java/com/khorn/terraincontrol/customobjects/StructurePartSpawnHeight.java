@@ -23,7 +23,7 @@ import com.khorn.terraincontrol.LocalWorld;
  * position.
  *
  */
-public abstract class StructurePartSpawnHeight
+public interface StructurePartSpawnHeight
 {
     /** 
      * Use the y position provided in this object .
@@ -78,5 +78,5 @@ public abstract class StructurePartSpawnHeight
      * @param z     The z position the object is spawning on.
      * @return The y position the object should spawn on instead.
      */
-    public abstract int getCorrectY(LocalWorld world, int x, int y, int z);
+    public int getCorrectY(LocalWorld world, int x, int y, int z);
 }

@@ -14,7 +14,7 @@ class Vein
 {
     private int x, y, z, size;
 
-    public Vein(int blockX, int blockY, int blockZ, int size)
+    Vein(int blockX, int blockY, int blockZ, int size)
     {
         this.x = blockX;
         this.y = blockY;

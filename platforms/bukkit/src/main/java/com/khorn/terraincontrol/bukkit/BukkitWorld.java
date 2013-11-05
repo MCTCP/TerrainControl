@@ -373,8 +373,8 @@ public class BukkitWorld implements LocalWorld
         if (y < 0 || y >= worldHeight)
             return null;
 
-        x = x >> 4;
-        z = z >> 4;
+        x >>= 4;
+        z >>= 4;
 
         if (this.cachedChunk != null && this.cachedChunk.x == x && this.cachedChunk.z == z)
             return this.cachedChunk;
@@ -396,8 +396,8 @@ public class BukkitWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
         for (int y = worldHeight - 1; y > 0; y--)
         {
             int id = chunk.getTypeId(x, y, z);
@@ -440,8 +440,8 @@ public class BukkitWorld implements LocalWorld
             return 0;
         }
 
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
 
         return chunk.getTypeId(x, y, z);
     }
@@ -455,8 +455,8 @@ public class BukkitWorld implements LocalWorld
             return 0;
         }
 
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
 
         return (byte) chunk.getData(x, y, z);
     }
@@ -536,8 +536,8 @@ public class BukkitWorld implements LocalWorld
         {
             return -1;
         }
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
         int y = chunk.b(x, z);
         while (chunk.getTypeId(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight)
         {

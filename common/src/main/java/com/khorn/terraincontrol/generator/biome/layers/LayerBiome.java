@@ -35,12 +35,12 @@ public class LayerBiome extends Layer
                     {
                         LocalBiome biome = this.biomes[nextInt(this.biomes.length)];
                         if (biome != null)
-                            currentPiece = currentPiece | biome.getId();
+                            currentPiece |= biome.getId();
                     } else if (this.ice_biomes.length > 0 && (currentPiece & IceBit) != 0) //Ice biome
                     {
                         LocalBiome biome = this.ice_biomes[nextInt(this.ice_biomes.length)];
                         if (biome != null)
-                            currentPiece = currentPiece | biome.getId();
+                            currentPiece |= biome.getId();
                     }
                 }
 

@@ -375,8 +375,8 @@ public class ForgeWorld implements LocalWorld
         if (y < 0 || y >= this.worldHeight)
             return null;
 
-        x = x >> 4;
-        z = z >> 4;
+        x >>= 4;
+        z >>= 4;
         if (this.cachedChunk != null && this.cachedChunk.xPosition == x && this.cachedChunk.zPosition == z)
             return this.cachedChunk;
 
@@ -397,8 +397,8 @@ public class ForgeWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
         for (int y = worldHeight - 1; y > 0; y--)
         {
             int id = chunk.getBlockID(x, y, z);
@@ -439,8 +439,8 @@ public class ForgeWorld implements LocalWorld
             return 0;
         }
 
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
 
         return chunk.getBlockID(x, y, z);
     }
@@ -452,8 +452,8 @@ public class ForgeWorld implements LocalWorld
         if (chunk == null)
             return 0;
 
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
 
         return (byte) chunk.getBlockMetadata(x, y, z);
     }
@@ -529,8 +529,8 @@ public class ForgeWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
         int y = chunk.getHeightValue(x, z);
         while (chunk.getBlockID(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight)
         {
