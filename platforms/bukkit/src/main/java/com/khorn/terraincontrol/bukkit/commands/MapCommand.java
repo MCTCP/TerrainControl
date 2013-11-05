@@ -32,7 +32,7 @@ public class MapCommand extends BaseCommand
         MapWriter.Angle angle = MapWriter.Angle.d0;
         String label = "";
 
-        if (args.size() != 0 && !args.get(0).startsWith("-"))
+        if (!args.isEmpty() && !args.get(0).startsWith("-"))
         {
             world = (CraftWorld) Bukkit.getWorld(args.get(0));
             args.remove(0);

@@ -23,12 +23,13 @@ public class TCCommandExecutor implements CommandExecutor
         this.RegisterCommands();
     }
 
+    @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings)
     {
         ArrayList<String> arg = new ArrayList<String>(Arrays.asList(strings));
 
         BaseCommand cmd = helpCommand;
-        if (arg.size() != 0 && commandHashMap.containsKey(arg.get(0)))
+        if (!arg.isEmpty() && commandHashMap.containsKey(arg.get(0)))
         {
             cmd = commandHashMap.get(arg.get(0));
             arg.remove(0);
