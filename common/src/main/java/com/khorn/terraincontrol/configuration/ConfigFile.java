@@ -122,7 +122,7 @@ public abstract class ConfigFile
                 {
                     lineNumber++;
 
-                    if (thisLine.trim().equals(""))
+                    if (thisLine.trim().isEmpty())
                     {
                         // Empty line, ignore
                     } else if (thisLine.startsWith("#") || thisLine.startsWith("<"))
@@ -131,7 +131,7 @@ public abstract class ConfigFile
                     } else if (thisLine.contains(":") || thisLine.toLowerCase().contains("("))
                     {
                         // Setting or resource
-                        if (thisLine.contains("(") && (!thisLine.contains(":") || thisLine.indexOf('(') < thisLine.indexOf(":")))
+                        if (thisLine.contains("(") && (!thisLine.contains(":") || thisLine.indexOf('(') < thisLine.indexOf(':')))
                         {
                             // ( is first, so it's a resource
                             this.settingsCache.put(thisLine.trim(), Integer.toString(lineNumber));
@@ -251,7 +251,7 @@ public abstract class ConfigFile
         if (this.settingsCache.containsKey(settingsName))
         {
             HashSet<Integer> out = new HashSet<Integer>();
-            if (this.settingsCache.get(settingsName).trim().equals("") || this.settingsCache.get(settingsName).equals("None"))
+            if (this.settingsCache.get(settingsName).trim().isEmpty() || this.settingsCache.get(settingsName).equals("None"))
             {
                 return out;
             }
@@ -271,7 +271,7 @@ public abstract class ConfigFile
         if (this.settingsCache.containsKey(settingsName))
         {
             ArrayList<String> out = new ArrayList<String>();
-            if (this.settingsCache.get(settingsName).trim().equals("") || this.settingsCache.get(settingsName).equals("None"))
+            if (this.settingsCache.get(settingsName).trim().isEmpty() || this.settingsCache.get(settingsName).equals("None"))
             {
                 return out;
             }
@@ -543,7 +543,7 @@ public abstract class ConfigFile
         String out = "";
         for (String key : settingsValue)
         {
-            if (out.equals(""))
+            if (out.isEmpty())
                 out += key;
             else
                 out += "," + key;
@@ -559,7 +559,7 @@ public abstract class ConfigFile
         String out = "";
         for (Integer key : settingsValue)
         {
-            if (out.equals(""))
+            if (out.isEmpty())
                 out += key;
             else
                 out += "," + key;

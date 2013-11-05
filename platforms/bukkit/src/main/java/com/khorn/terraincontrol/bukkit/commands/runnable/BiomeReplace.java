@@ -199,6 +199,7 @@ public class BiomeReplace implements Runnable
             this.ext = extension.toLowerCase();
         }
 
+        @Override
         public boolean accept(File file)
         {
             return (file.exists() && file.isFile() && file.getName().toLowerCase().endsWith(ext));

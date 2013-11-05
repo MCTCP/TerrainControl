@@ -119,7 +119,7 @@ public enum BO3Settings implements MultiTypedSetting
             ArrayList<String> list = new ArrayList<String>();
             if (s.contains(","))
                 Collections.addAll(list, s.split(","));
-            else if (!s.equals(""))
+            else if (!s.isEmpty())
                 list.add(s);
             value = list;
             return;

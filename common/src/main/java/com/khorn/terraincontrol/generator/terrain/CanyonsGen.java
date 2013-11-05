@@ -173,6 +173,7 @@ public class CanyonsGen extends TerrainGenBase
         }
     }
 
+    @Override
     protected void generateChunk(int chunk_x, int chunk_z, int real_chunk_x, int real_chunk_z, byte[] paramArrayOfByte)
     {
         if (this.random.nextInt(100) >= this.worldSettings.canyonRarity)

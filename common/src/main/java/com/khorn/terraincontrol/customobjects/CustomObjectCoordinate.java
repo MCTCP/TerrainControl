@@ -79,6 +79,7 @@ public class CustomObjectCoordinate
         return object.spawnForced(world, random, rotation, x, y, z);
     }
 
+    @Override
     public boolean equals(Object otherObject)
     {
         if (otherObject == null)
@@ -113,6 +114,7 @@ public class CustomObjectCoordinate
         return true;
     }
 
+    @Override
     public int hashCode()
     {
         return (Integer.valueOf(x).hashCode() >> 13) ^ (Integer.valueOf(y).hashCode() >> 7) ^ Integer.valueOf(z).hashCode() ^ object.getName().hashCode() ^ rotation.toString().hashCode();

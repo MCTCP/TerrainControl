@@ -19,7 +19,7 @@ public class CustomObjectGen extends Resource
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
-        if (args.isEmpty() || (args.size() == 1 && args.get(0).trim().equals("")))
+        if (args.isEmpty() || (args.size() == 1 && args.get(0).trim().isEmpty()))
         {
             // Backwards compability
             args = new ArrayList<String>();

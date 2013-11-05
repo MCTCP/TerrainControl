@@ -38,4 +38,8 @@ public abstract class WorldHelper
         return TerrainControl.getWorld(worldName);
     }
 
+    private WorldHelper()
+    {
+    }
+
 }

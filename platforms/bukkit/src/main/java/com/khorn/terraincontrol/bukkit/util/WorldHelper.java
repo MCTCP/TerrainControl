@@ -19,4 +19,8 @@ public abstract class WorldHelper
     {
         return ((TCPlugin) TerrainControl.getEngine()).worlds.get(world.getWorld().getUID());
     }
+
+    private WorldHelper()
+    {
+    }
 }

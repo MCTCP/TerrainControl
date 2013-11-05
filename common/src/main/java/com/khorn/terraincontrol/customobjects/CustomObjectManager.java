@@ -237,8 +237,8 @@ public class CustomObjectManager
     {
         String[] parts = new String[] {string, ""};
 
-        int start = string.indexOf("(");
-        int end = string.lastIndexOf(")");
+        int start = string.indexOf('(');
+        int end = string.lastIndexOf(')');
         if (start != -1 && end != -1)
         {
             parts[0] = string.substring(0, start);

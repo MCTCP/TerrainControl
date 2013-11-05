@@ -207,6 +207,7 @@ public class Metrics
 
                 private boolean firstPost = true;
 
+                @Override
                 public void run()
                 {
                     try
@@ -244,7 +245,7 @@ public class Metrics
                     {
                         if (debug)
                         {
-                            Bukkit.getLogger().log(Level.INFO, "[Metrics] " + e.getMessage());
+                            Bukkit.getLogger().log(Level.INFO, "[Metrics] {0}", e.getMessage());
                         }
                     }
                 }

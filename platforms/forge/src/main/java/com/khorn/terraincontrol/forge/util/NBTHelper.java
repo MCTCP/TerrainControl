@@ -291,4 +291,8 @@ public class NBTHelper
                 throw new IllegalArgumentException(type + "doesn't have a simple value!");
         }
     }
+
+    private NBTHelper()
+    {
+    }
 }

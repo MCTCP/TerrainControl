@@ -324,7 +324,7 @@ public class BiomeConfig extends ConfigFile
     {
         String settingValue = readSettings(BiomeStandardValues.ReplacedBlocks);
 
-        if (settingValue.equals("") || settingValue.equals("None"))
+        if (settingValue.isEmpty() || settingValue.equals("None"))
             return;
 
         String[] keys = readComplexString(settingValue);
@@ -333,8 +333,8 @@ public class BiomeConfig extends ConfigFile
             for (String key : keys)
             {
 
-                int start = key.indexOf("(");
-                int end = key.lastIndexOf(")");
+                int start = key.indexOf('(');
+                int end = key.lastIndexOf(')');
                 if (start != -1 && end != -1)
                 {
                     key = key.substring(start + 1, end);
@@ -390,8 +390,8 @@ public class BiomeConfig extends ConfigFile
     private ConfigFunction<BiomeConfig> getResource(Map.Entry<String, String> entry)
     {
         String key = entry.getKey();
-        int start = key.indexOf("(");
-        int end = key.lastIndexOf(")");
+        int start = key.indexOf('(');
+        int end = key.lastIndexOf(')');
         ConfigFunction<BiomeConfig> resource = null;
         if (start != -1 && end != -1)
         {
@@ -1117,8 +1117,8 @@ public class BiomeConfig extends ConfigFile
 
                     boolean longForm = false;
 
-                    int start = toId.indexOf("(");
-                    int end = toId.indexOf(")");
+                    int start = toId.indexOf('(');
+                    int end = toId.indexOf(')');
                     if (start != -1 && end != -1)
                     {
                         String[] ranges = toId.substring(start + 1, end).split("-");

@@ -16,4 +16,8 @@ public class StructureNames
     public static final String VILLAGE = "TCVillage";
     public static final String STRONGHOLD = "Stronghold";
     public static final String RARE_BUILDING = "TCTemple";
+
+    private StructureNames()
+    {
+    }
 }

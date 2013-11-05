@@ -73,4 +73,8 @@ public class ArraysCacheManager
         return array;
     }
     */
+
+    private ArraysCacheManager()
+    {
+    }
 }

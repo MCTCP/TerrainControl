@@ -264,7 +264,7 @@ public final class BiomeConfigManager
             if (this.checkOnly)
                 continue;
 
-            if (!config.ReplaceBiomeName.equals(""))
+            if (!config.ReplaceBiomeName.isEmpty())
             {
                 this.worldConfig.HaveBiomeReplace = true;
                 this.ReplaceBiomesMatrix[config.Biome.getId()] = (byte) world.getBiomeIdByName(config.ReplaceBiomeName);

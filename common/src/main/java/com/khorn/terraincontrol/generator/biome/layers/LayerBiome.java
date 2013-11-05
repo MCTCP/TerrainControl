@@ -15,6 +15,7 @@ public class LayerBiome extends Layer
         this.child = paramGenLayer;
     }
 
+    @Override
     public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
     {
         int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);

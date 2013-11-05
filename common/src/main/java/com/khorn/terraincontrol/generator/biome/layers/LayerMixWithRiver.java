@@ -33,6 +33,7 @@ public class LayerMixWithRiver extends Layer
     private int[] riverBiomes;
     private Layer riverLayer;
 
+    @Override
     public void SetWorldSeed(long seed)
     {
         super.SetWorldSeed(seed);

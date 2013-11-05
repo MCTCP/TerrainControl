@@ -133,7 +133,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
     {
-        if (worldName.equals(""))
+        if (worldName.isEmpty())
         {
             TerrainControl.log(Level.CONFIG, "Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
             return new TCChunkGenerator(this);

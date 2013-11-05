@@ -286,7 +286,7 @@ public enum BiomeStandardValues implements MultiTypedSetting
             this.sArrayValue = new ArrayList<String>();
             if (s.contains(","))
                 Collections.addAll(this.sArrayValue, s.split(","));
-            else if (!s.equals(""))
+            else if (!s.isEmpty())
                 this.sArrayValue.add(s);
             return;
         }

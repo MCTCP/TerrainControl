@@ -30,7 +30,7 @@ public abstract class BaseCommand
 
     protected BukkitWorld getWorld(CommandSender sender, String arg)
     {
-        if (arg.equals(""))
+        if (arg.isEmpty())
         {
             if (sender instanceof ConsoleCommandSender)
             {

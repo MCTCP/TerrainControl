@@ -43,4 +43,8 @@ public class RandomHelper
         random.setSeed(random.nextInt() * y);
         return random;
     }
+
+    private RandomHelper()
+    {
+    }
 }

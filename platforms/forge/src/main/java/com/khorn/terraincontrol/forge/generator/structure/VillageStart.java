@@ -107,6 +107,7 @@ public class VillageStart extends StructureStart
     /**
      * currently only defined for Villages, returns true if Village has more than 2 non-road components
      */
+    @Override
     public boolean isSizeableStructure()
     {
         return this.hasMoreThanTwoComponents;

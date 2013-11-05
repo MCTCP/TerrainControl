@@ -79,4 +79,8 @@ public class MathHelper
         }
         return fourth;
     }
+
+    private MathHelper()
+    {
+    }
 }

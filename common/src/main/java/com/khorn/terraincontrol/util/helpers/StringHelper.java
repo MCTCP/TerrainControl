@@ -206,4 +206,8 @@ public abstract class StringHelper
         }
         return string;
     }
+
+    private StringHelper()
+    {
+    }
 }

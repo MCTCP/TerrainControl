@@ -301,4 +301,8 @@ public class BlockHelper
         return data;
     }
 
+    private BlockHelper()
+    {
+    }
+
 }

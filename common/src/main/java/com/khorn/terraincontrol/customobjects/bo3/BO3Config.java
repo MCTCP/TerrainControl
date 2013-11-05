@@ -199,8 +199,8 @@ public class BO3Config extends ConfigFile
         for (Map.Entry<String, String> entry : this.settingsCache.entrySet())
         {
             String key = entry.getKey();
-            int start = key.indexOf("(");
-            int end = key.lastIndexOf(")");
+            int start = key.indexOf('(');
+            int end = key.lastIndexOf(')');
             if (start != -1 && end != -1)
             {
                 String name = key.substring(0, start);

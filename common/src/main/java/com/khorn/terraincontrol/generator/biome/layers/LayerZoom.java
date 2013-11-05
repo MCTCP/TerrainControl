@@ -11,6 +11,7 @@ public class LayerZoom extends Layer
         this.child = paramGenLayer;
     }
 
+    @Override
     public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
     {
         int i = x >> 1;
