@@ -1,12 +1,16 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.forge.events.PlayerTracker;
+import com.khorn.terraincontrol.forge.events.SaplingListener;
+import com.khorn.terraincontrol.forge.events.PacketHandler;
+import com.khorn.terraincontrol.forge.events.EventManager;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.events.EventPriority;
-import com.khorn.terraincontrol.forge.structuregens.RareBuildingStart;
-import com.khorn.terraincontrol.forge.structuregens.VillageStart;
+import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
+import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
 import com.khorn.terraincontrol.logging.LogManager;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
@@ -209,7 +213,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getTCDataFolder(), PluginStandardValues.BO_GlobalDirectoryName.stringValue());
+        return new File(this.getTCDataFolder(), PluginStandardValues.BO_DirectoryName.stringValue());
     }
 
     @Override

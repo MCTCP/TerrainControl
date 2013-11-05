@@ -1,8 +1,10 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.forge.generator.TCWorldChunkManager;
+import com.khorn.terraincontrol.forge.generator.BiomeCacheWrapper;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.util.ForgeMetricsHelper;
+import com.khorn.terraincontrol.forge.metrics.ForgeMetricsHelper;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.*;
 import net.minecraft.client.multiplayer.WorldClient;

@@ -1,12 +1,14 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.bukkit.events.TCListener;
+import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
-import com.khorn.terraincontrol.bukkit.structuregens.RareBuildingStart;
-import com.khorn.terraincontrol.bukkit.structuregens.VillageStart;
-import com.khorn.terraincontrol.bukkit.util.BukkitMetricsHelper;
+import com.khorn.terraincontrol.bukkit.generator.structures.RareBuildingStart;
+import com.khorn.terraincontrol.bukkit.generator.structures.VillageStart;
+import com.khorn.terraincontrol.bukkit.metrics.BukkitMetricsHelper;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.logging.LogManager;
@@ -325,7 +327,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getTCDataFolder(), PluginStandardValues.BO_GlobalDirectoryName.stringValue());
+        return new File(this.getTCDataFolder(), PluginStandardValues.BO_DirectoryName.stringValue());
     }
 
     @Override

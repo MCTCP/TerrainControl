@@ -1,11 +1,17 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
+import com.khorn.terraincontrol.forge.generator.structure.VillageGen;
+import com.khorn.terraincontrol.forge.generator.structure.MineshaftGen;
+import com.khorn.terraincontrol.forge.generator.structure.NetherFortressGen;
+import com.khorn.terraincontrol.forge.generator.structure.RareBuildingGen;
+import com.khorn.terraincontrol.forge.generator.structure.StrongholdGen;
+import com.khorn.terraincontrol.forge.generator.ChunkProvider;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
-import com.khorn.terraincontrol.forge.structuregens.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;

@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import com.khorn.terraincontrol.bukkit.MapWriter;
+import com.khorn.terraincontrol.bukkit.commands.runnable.MapWriter;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import org.bukkit.Bukkit;

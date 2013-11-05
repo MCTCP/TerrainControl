@@ -1,7 +1,15 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.bukkit.generator.BiomeCacheWrapper;
+import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
+import com.khorn.terraincontrol.bukkit.generator.TCWorldChunkManager;
+import com.khorn.terraincontrol.bukkit.generator.structures.StrongholdGen;
+import com.khorn.terraincontrol.bukkit.generator.structures.RareBuildingGen;
+import com.khorn.terraincontrol.bukkit.generator.structures.VillageGen;
+import com.khorn.terraincontrol.bukkit.generator.structures.MineshaftGen;
+import com.khorn.terraincontrol.bukkit.generator.structures.NetherFortressGen;
+import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
 import com.khorn.terraincontrol.*;
-import com.khorn.terraincontrol.bukkit.structuregens.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
