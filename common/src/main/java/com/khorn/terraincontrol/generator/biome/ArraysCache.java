@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.biomegenerators;
+package com.khorn.terraincontrol.generator.biome;
 
 import java.util.ArrayList;
 

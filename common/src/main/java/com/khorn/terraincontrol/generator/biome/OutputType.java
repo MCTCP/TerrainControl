@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.biomegenerators;
+package com.khorn.terraincontrol.generator.biome;
 
 /**
  * Created by Wicked on 01.08.13.

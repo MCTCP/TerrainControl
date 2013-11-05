@@ -1,8 +1,8 @@
-package com.khorn.terraincontrol.biomegenerators.biomelayers;
+package com.khorn.terraincontrol.generators.biome.layers;
 
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.biomegenerators.ArraysCache;
+import com.khorn.terraincontrol.generator.biome.ArraysCache;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 

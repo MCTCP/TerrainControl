@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol;
 
-import com.khorn.terraincontrol.biomegenerators.OutputType;
+import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;

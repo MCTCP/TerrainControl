@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.generator;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.biomegenerators.OutputType;
+import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorPerlinOctaves;

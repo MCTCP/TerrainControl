@@ -1,7 +1,7 @@
-package com.khorn.terraincontrol.biomegenerators.biomelayers;
+package com.khorn.terraincontrol.generators.biome.layers;
 
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.biomegenerators.ArraysCache;
+import com.khorn.terraincontrol.generator.biome.ArraysCache;
 
 
 public class LayerBiomeInBiome extends Layer
