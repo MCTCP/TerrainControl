@@ -27,8 +27,21 @@ public class TCLogManager
             @Override
             public String format(LogRecord record)
             {
+                //>>	It would be cool to align all TC logs in the future
+                //>>	And switch the formatting up a bit...
+                //>>	Ex: [WARNING] [TerrainControl] This is a Log
+                //>>	    [SEVERE] [TerrainControl] This is another Log
+                //>>	    [INFO] [TerrainControl] More Logs!
+                //>>	    [CONFIG] [TerrainControl] This is not very readable
+                //>>	doesnt look as nice as:
+                //>>	Ex: [TerrainControl] [WARNING] This is a Log
+                //>>	    [TerrainControl]  [SEVERE] This is another Log
+                //>>	    [TerrainControl]    [INFO] More Logs!
+                //>>	    [TerrainControl]  [CONFIG] This is so much more readable
+                
+                //>>	Personally, I dont see why all logs arent written like that...
                 return new StringBuilder()
-                    .append("[").append(prefix).append("] ")
+                    .append('[').append(prefix).append(']').append(' ')
                     .append(formatMessage(record)).toString();
             }
         };
@@ -63,6 +76,9 @@ public class TCLogManager
          * so if the user specifies a log level, set it to that, otherwise
          * determine the larger of the two alternate Log Levels and set the
          * log level to that.
+         * //t>>
+         * It looks like alot of what I was trying to do here might be possible with
+         * the new Log4j 2 logging used by MC 1.7+, still waiting for MCP so Bukkit and Forge and update :\
          */
         logger.setLevel((consoleLogLevel.getLevel().intValue() <= fileLogLevel.getLevel().intValue())
                         ? consoleLogLevel.getLevel() : fileLogLevel.getLevel());

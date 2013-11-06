@@ -136,8 +136,8 @@ public final class BiomeConfigManager
 
         processBiomeConfigs();
 
-        TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[]{ biomesCount });
-        TerrainControl.logIfLevel(Level.ALL, Level.CONFIG, LoadedBiomeNames);
+        TerrainControl.logIfLevel(Level.INFO, Level.OFF, "{0} Biomes Loaded", new Object[]{ biomesCount });
+        TerrainControl.logIfLevel(Level.ALL, Level.CONFIG, "{0} Biomes Loaded:\n{1}", new Object[]{ biomesCount, LoadedBiomeNames });
 
     }
 
@@ -217,7 +217,7 @@ public final class BiomeConfigManager
     {
         if (biomesCount != 0)
             LoadedBiomeNames += ", ";
-        LoadedBiomeNames += localBiome.getName() + (TCLogManager.getLogger().isLoggable(Level.FINE) ? (":" + localBiome.getId()) : "");
+        LoadedBiomeNames += localBiome.getName() + (TCLogManager.getLogger().isLoggable(Level.FINE) ? (":" + localBiome.getId() + (localBiome.isVirtual() ? config.worldConfig.VirtualBiomeIds.get(localBiome.getName()) + ":" : "") ) : "");
         // Add biome to the biome array
         if (biomeConfigs[localBiome.getId()] == null)
         {

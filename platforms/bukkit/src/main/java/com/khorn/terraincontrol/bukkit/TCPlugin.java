@@ -259,7 +259,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
         if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
         {
-            this.log(max, messages);
+            this.log((min == Level.ALL ? max : (max == Level.OFF ? min : max)), messages);
         }
     }
 
@@ -268,14 +268,14 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
         if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
         {
-            this.log(max, messages, params);
+            this.log((min == Level.ALL ? max : (max == Level.OFF ? min : max)), messages, params);
         }
     }
 
     @Override
     public void log(Level level, String... messages)
     {
-        this.log(level, "{0}", new Object[] {StringHelper.join(messages, " ")});
+        this.log(level, "{0}", new Object[]{ StringHelper.join(messages, " ") });
     }
 
     @Override
@@ -283,11 +283,8 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
         LogRecord lr = new LogRecord(level, message);
         lr.setMessage(TCLogManager.formatter.format(lr));
-        lr.setParameters(new Object[] {param});
-        if (logger == null)
-        {
-            logger = TCLogManager.getLogger();
-        }
+        lr.setParameters(new Object[]{ param });
+        if (logger == null) logger = TCLogManager.getLogger();
         logger.log(lr);
     }
 
@@ -297,10 +294,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         LogRecord lr = new LogRecord(level, message);
         lr.setParameters(params);
         lr.setMessage(TCLogManager.formatter.format(lr));
-        if (logger == null)
-        {
-            logger = TCLogManager.getLogger();
-        }
+        if (logger == null) logger = TCLogManager.getLogger();
         logger.log(lr);
     }
 
