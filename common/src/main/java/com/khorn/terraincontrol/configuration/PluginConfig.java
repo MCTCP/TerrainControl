@@ -1,16 +1,14 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.logging.LogManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 /**
  * Temporarily pre-configured Class that will eventually represent the file
@@ -20,7 +18,7 @@ public final class PluginConfig extends ConfigFile
 {
 
     public ConfigMode SettingsMode;
-
+    
     public static enum LogLevels
     {
 
@@ -46,8 +44,7 @@ public final class PluginConfig extends ConfigFile
     public LogLevels fileHandlerLevel;
     public LogLevels consoleHandlerLevel;
     public String worldDefaultBiomeConfigExtension;
-    private static final Logger l = LogManager.getLogger();
-
+    
     public PluginConfig(File settingsDir)
     {
 
@@ -92,8 +89,8 @@ public final class PluginConfig extends ConfigFile
         }
         if (hasOffLevel)
         {
-            l.log(Level.WARNING, LogManager.formatter.format(new LogRecord(Level.WARNING, "Quiet Mode: You will no longer see INFO messages FOR ANY PLUGIN.")));
-            l.log(Level.WARNING, LogManager.formatter.format(new LogRecord(Level.WARNING, "WARNING AND SEVERE level logs will still show.")));
+            TerrainControl.log(Level.WARNING, "Quiet Mode: You will no longer see INFO messages FOR ANY PLUGIN.");
+            TerrainControl.log(Level.WARNING, "WARNING AND SEVERE level logs will still show.");
         }
     }
 

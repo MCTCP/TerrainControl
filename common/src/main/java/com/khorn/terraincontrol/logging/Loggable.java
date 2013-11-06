@@ -1,12 +1,13 @@
 package com.khorn.terraincontrol.logging;
 
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 /**
  * When implemented, the implementing class will have a suite of available
  * options for detailed, configurable logging
  */
-public interface LoggableEngine
+public interface Loggable
 {
 
     /**
@@ -88,5 +89,22 @@ public interface LoggableEngine
      *                string
      */
     public void logIfLevel(Level min, Level max, String message, Object[] params);
+    
+    /**
+     * Logs the LogRecord. Message will be prefixed with [TerrainControl], so 
+     * don't do that yourself.
+     * @param lr The LogRecord you wish to publish with this logger
+     */
+    public void log(LogRecord lr);
+    
+    /**
+     * Informs whether or not a Log of `level` will be logged on the current 
+     * Logger
+     * <p/>
+     * @param level The level to test if loggable
+     * <p/>
+     * @return Whether `level` will be logged on the current Logger
+     */
+    public boolean isLoggable(Level level);
 
 }

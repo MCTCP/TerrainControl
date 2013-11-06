@@ -11,8 +11,6 @@ import com.khorn.terraincontrol.forge.events.PlayerTracker;
 import com.khorn.terraincontrol.forge.events.SaplingListener;
 import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
-import com.khorn.terraincontrol.logging.LogManager;
-import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -30,8 +28,6 @@ import cpw.mods.fml.relauncher.Side;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
@@ -47,16 +43,15 @@ public class TCPlugin implements TerrainControlEngine
 
     public File terrainControlDirectory;
     private TCWorldType worldType;
-    private Logger logger;
     
     @EventHandler
     public void load(FMLInitializationEvent event)
     {
         // This is the place where the mod starts loading
-
+        
         // Set the directory
         TerrainControl.setEngine(this);
-        logger = LogManager.prepLogger(FMLCommonHandler.instance().getFMLLogger());
+        TerrainControl.setupLogging(FMLCommonHandler.instance().getFMLLogger());
 
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
@@ -120,68 +115,6 @@ public class TCPlugin implements TerrainControlEngine
     public LocalWorld getWorld()
     {
         return worldType.worldTC;
-    }
-
-    @Override
-    public void logIfLevel(Level ifLevel, String... messages)
-    {
-        if (logger.getLevel().intValue() == ifLevel.intValue())
-        {
-            this.log(ifLevel, messages);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level ifLevel, String messages, Object[] params)
-    {
-        if (logger.getLevel().intValue() == ifLevel.intValue())
-        {
-            this.log(ifLevel, messages, params);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level min, Level max, String... messages)
-    {
-        if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
-        {
-            this.log((min == Level.ALL ? max : (max == Level.OFF ? min : max)), messages);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level min, Level max, String messages, Object[] params)
-    {
-        if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
-        {
-            this.log((min == Level.ALL ? max : (max == Level.OFF ? min : max)), messages, params);
-        }
-    }
-
-    @Override
-    public void log(Level level, String... messages)
-    {
-        this.log(level, "{0}", new Object[]{ StringHelper.join(messages, " ") });
-    }
-
-    @Override
-    public void log(Level level, String message, Object param)
-    {
-        LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(LogManager.formatter.format(lr));
-        lr.setParameters(new Object[]{ param });
-        if (logger == null) logger = LogManager.getLogger();
-        logger.log(lr);
-    }
-
-    @Override
-    public void log(Level level, String message, Object[] params)
-    {
-        LogRecord lr = new LogRecord(level, message);
-        lr.setParameters(params);
-        lr.setMessage(LogManager.formatter.format(lr));
-        if (logger == null) logger = LogManager.getLogger();
-        logger.log(lr);
     }
 
     @Override

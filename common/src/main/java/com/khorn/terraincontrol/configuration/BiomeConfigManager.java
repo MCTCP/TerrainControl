@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.logging.LogManager;
+import com.khorn.terraincontrol.logging.LogManagerFactory;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.io.File;
@@ -222,7 +222,8 @@ public final class BiomeConfigManager
     {
         if (biomesCount != 0)
             LoadedBiomeNames += ", ";
-        LoadedBiomeNames += localBiome.getName() + (LogManager.getLogger().isLoggable(Level.FINE) ? (":" + localBiome.getId() + (localBiome.isVirtual() ? config.worldConfig.VirtualBiomeIds.get(localBiome.getName()) + ":" : "") ) : "");
+        //t>>	I dont really like the getLogger.isLoggable() call here, might try to find a better solution.
+        LoadedBiomeNames += localBiome.getName() + (TerrainControl.getLogger().isLoggable(Level.FINE) ? (":" + localBiome.getId() + (localBiome.isVirtual() ? config.worldConfig.VirtualBiomeIds.get(localBiome.getName()) + ":" : "") ) : "");
         // Add biome to the biome array
         if (biomeConfigs[localBiome.getId()] == null)
         {

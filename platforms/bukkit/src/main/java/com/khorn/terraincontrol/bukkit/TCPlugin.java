@@ -11,8 +11,6 @@ import com.khorn.terraincontrol.bukkit.generator.structures.VillageStart;
 import com.khorn.terraincontrol.bukkit.metrics.BukkitMetricsHelper;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
-import com.khorn.terraincontrol.logging.LogManager;
-import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 
 import java.io.File;
@@ -20,8 +18,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 import net.minecraft.server.v1_6_R3.BiomeBase;
 import net.minecraft.server.v1_6_R3.Block;
@@ -50,7 +46,6 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
 
     private final HashMap<String, BukkitWorld> notInitedWorlds = new HashMap<String, BukkitWorld>();
-    private Logger logger;
 
     @Override
     public void onDisable()
@@ -73,8 +68,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
 
         TerrainControl.setEngine(this);
-        logger = LogManager.getLogger(this);
-
+        TerrainControl.setupLogging(getLogger());
         if (!Bukkit.getWorlds().isEmpty() && !cleanupOnDisable)
         {
             // Reload "handling"
@@ -95,7 +89,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
                 // We're on MCPC+, so enable the extra block ids.
                 TerrainControl.supportedBlockIds = 4095;
                 mcpc = true;
-                this.log(Level.INFO, "MCPC+ detected, enabling extended block id support.");
+                TerrainControl.log(Level.INFO, "MCPC+ detected, enabling extended block id support.");
             }
 
             // Register structures
@@ -240,68 +234,6 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         TerrainControl.log(Level.INFO, "World {0} is now unloaded!", world.getName());
     }
     
-    @Override
-    public void logIfLevel(Level ifLevel, String... messages)
-    {
-        if (logger.getLevel().intValue() == ifLevel.intValue())
-        {
-            this.log(ifLevel, messages);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level ifLevel, String messages, Object[] params)
-    {
-        if (logger.getLevel().intValue() == ifLevel.intValue())
-        {
-            this.log(ifLevel, messages, params);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level min, Level max, String... messages)
-    {
-        if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
-        {
-            this.log((min == Level.ALL ? max : (max == Level.OFF ? min : max)), messages);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level min, Level max, String messages, Object[] params)
-    {
-        if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
-        {
-            this.log((min == Level.ALL ? max : (max == Level.OFF ? min : max)), messages, params);
-        }
-    }
-
-    @Override
-    public void log(Level level, String... messages)
-    {
-        this.log(level, "{0}", new Object[]{ StringHelper.join(messages, " ") });
-    }
-
-    @Override
-    public void log(Level level, String message, Object param)
-    {
-        LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(LogManager.formatter.format(lr));
-        lr.setParameters(new Object[]{ param });
-        if (logger == null) logger = LogManager.getLogger();
-        logger.log(lr);
-    }
-
-    @Override
-    public void log(Level level, String message, Object[] params)
-    {
-        LogRecord lr = new LogRecord(level, message);
-        lr.setParameters(params);
-        lr.setMessage(LogManager.formatter.format(lr));
-        if (logger == null) logger = LogManager.getLogger();
-        logger.log(lr);
-    }
-
     @Override
     public LocalWorld getWorld(String name)
     {

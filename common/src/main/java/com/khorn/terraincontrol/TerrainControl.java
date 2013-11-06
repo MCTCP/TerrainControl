@@ -9,11 +9,16 @@ import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
 import com.khorn.terraincontrol.generator.resource.Resource;
+import com.khorn.terraincontrol.logging.LogManagerFactory;
+import com.khorn.terraincontrol.logging.LogManager;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 public class TerrainControl
 {
@@ -41,6 +46,7 @@ public class TerrainControl
     private static PluginConfig pluginConfig;
     
     private static TerrainControlEngine engine;
+    private static LogManager logMan;
     
     private static ConfigFunctionsManager configFunctionsManager;
     private static CustomObjectManager customObjectManager;
@@ -62,9 +68,12 @@ public class TerrainControl
     {
         if (TerrainControl.engine == null)
         {
-            throw new IllegalStateException("Engine is not set! Call setEngine first");
+            throw new IllegalStateException("Engine is not set! Call setEngine first.");
         }
-
+        if (TerrainControl.logMan == null)
+        {
+            throw new IllegalStateException("Logging is not setup! Call setupLogging first.");
+        }
         // Start the engine
         configFunctionsManager = new ConfigFunctionsManager();
         customObjectManager = new CustomObjectManager();
@@ -127,11 +136,36 @@ public class TerrainControl
     {
         if (TerrainControl.engine != null)
         {
-            throw new IllegalStateException("Engine is already set");
+            throw new IllegalStateException("Engine is already set.");
         }
-        
+
         TerrainControl.engine = engine;
-        TerrainControl.pluginConfig = new PluginConfig(engine.getTCDataFolder());
+        //>>	Do pluginConfig loading and then log anything that happened
+        //>>	LogManager and PluginConfig are now decoupled, thank the lord!
+        pluginConfig = new PluginConfig(engine.getTCDataFolder());
+    }
+
+    /**
+     * Returns the engine, containing the API methods.
+     * <p/>
+     * @return The engine
+     */
+    public static LogManager getLogger()
+    {
+        return logMan;
+    }
+
+    public static void setupLogging(Logger engineLogger)
+    {
+        if (TerrainControl.logMan != null)
+        {
+            throw new IllegalStateException("LogManager is already setup.");
+        }
+        if (engineLogger == null)
+        {
+            throw new IllegalArgumentException("Your Logger must not be null.");
+        }
+        TerrainControl.logMan = LogManagerFactory.makeLogManager(engineLogger);
     }
 
     /**
@@ -176,7 +210,11 @@ public class TerrainControl
      */
     public static void log(Level level, String... message)
     {
-        engine.log(level, message);
+        if (logMan == null)
+        {
+            LogManager.backLog(new LogRecord(level, StringHelper.join(message, " ")));
+        }
+        logMan.log(level, message);
     }
 
     /**
@@ -190,7 +228,13 @@ public class TerrainControl
      */
     public static void log(Level level, String message, Object param)
     {
-        engine.log(level, message, param);
+        if (logMan == null)
+        {
+            LogRecord lr = new LogRecord(level, message);
+            lr.setParameters(new Object[]{ param });
+            LogManager.backLog(lr);
+        }
+        logMan.log(level, message, param);
     }
 
     /**
@@ -205,7 +249,13 @@ public class TerrainControl
      */
     public static void log(Level level, String message, Object[] params)
     {
-        engine.log(level, message, params);
+        if (logMan == null)
+        {
+            LogRecord lr = new LogRecord(level, message);
+            lr.setParameters(params);
+            LogManager.backLog(lr);
+        }
+        logMan.log(level, message, params);
     }
 
     /**
@@ -219,7 +269,11 @@ public class TerrainControl
      */
     public static void logIfLevel(Level ifLevel, String... messages)
     {
-        engine.logIfLevel(ifLevel, messages);
+        if (logMan == null)
+        {
+            throw new UnsupportedOperationException("Only basic logs are supported while TerrainControl is getting started");
+        } else
+            logMan.logIfLevel(ifLevel, messages);
     }
 
     /**
@@ -236,7 +290,11 @@ public class TerrainControl
      */
     public static void logIfLevel(Level ifLevel, String message, Object[] params)
     {
-        engine.logIfLevel(ifLevel, message, params);
+        if (logMan == null)
+        {
+            throw new UnsupportedOperationException("Only basic logs are supported while TerrainControl is getting started");
+        } else
+            logMan.logIfLevel(ifLevel, message, params);
     }
 
     /**
@@ -251,7 +309,11 @@ public class TerrainControl
      */
     public static void logIfLevel(Level min, Level max, String... messages)
     {
-        engine.logIfLevel(min, max, messages);
+        if (logMan == null)
+        {
+            throw new UnsupportedOperationException("Only basic logs are supported while TerrainControl is getting started");
+        } else
+            logMan.logIfLevel(min, max, messages);
     }
 
     /**
@@ -269,8 +331,13 @@ public class TerrainControl
      */
     public static void logIfLevel(Level min, Level max, String message, Object[] params)
     {
-        engine.logIfLevel(min, max, message, params);
+        if (logMan == null)
+        {
+            throw new UnsupportedOperationException("Only basic logs are supported while TerrainControl is getting started");
+        } else
+            logMan.logIfLevel(min, max, message, params);
     }
+
     
     /**
      * Prints the stackTrace of the provided Throwable object
