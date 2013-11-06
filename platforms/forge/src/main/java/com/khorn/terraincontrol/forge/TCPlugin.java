@@ -145,7 +145,7 @@ public class TCPlugin implements TerrainControlEngine
     {
         if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
         {
-            this.log(max, messages);
+            this.log((min == Level.ALL ? max : (max == Level.OFF ? min : max)), messages);
         }
     }
 
@@ -154,17 +154,14 @@ public class TCPlugin implements TerrainControlEngine
     {
         if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
         {
-            this.log(max, messages);
+            this.log((min == Level.ALL ? max : (max == Level.OFF ? min : max)), messages, params);
         }
     }
 
     @Override
     public void log(Level level, String... messages)
     {
-        this.log(level, "{0}", new Object[]
-        {
-            StringHelper.join(messages, " ")
-        });
+        this.log(level, "{0}", new Object[]{ StringHelper.join(messages, " ") });
     }
 
     @Override
@@ -172,14 +169,8 @@ public class TCPlugin implements TerrainControlEngine
     {
         LogRecord lr = new LogRecord(level, message);
         lr.setMessage(LogManager.formatter.format(lr));
-        lr.setParameters(new Object[]
-        {
-            param
-        });
-        if (logger == null)
-        {
-            logger = LogManager.getLogger();
-        }
+        lr.setParameters(new Object[]{ param });
+        if (logger == null) logger = LogManager.getLogger();
         logger.log(lr);
     }
 
@@ -187,12 +178,9 @@ public class TCPlugin implements TerrainControlEngine
     public void log(Level level, String message, Object[] params)
     {
         LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(LogManager.formatter.format(lr));
         lr.setParameters(params);
-        if (logger == null)
-        {
-            logger = LogManager.getLogger();
-        }
+        lr.setMessage(LogManager.formatter.format(lr));
+        if (logger == null) logger = LogManager.getLogger();
         logger.log(lr);
     }
 
