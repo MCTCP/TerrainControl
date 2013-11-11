@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 
 import java.io.*;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ public class BO3Loader implements CustomObjectLoader
     /** A list of already loaded meta Tags. The path is the key, a NBT Tag is
      * the value.
      */
-    private static Map<String, Tag> loadedTags = new HashMap<String, Tag>();
+    private static Map<String, NamedBinaryTag> loadedTags = new HashMap<String, NamedBinaryTag>();
 
     public BO3Loader()
     {
@@ -38,7 +38,7 @@ public class BO3Loader implements CustomObjectLoader
 
     // Actually, we use tryToClose(..) to close the stream
     @SuppressWarnings("resource")
-    public static Tag loadMetadata(String name, File bo3File)
+    public static NamedBinaryTag loadMetadata(String name, File bo3File)
     {
         String path = bo3File.getParent() + File.separator + name;
 
@@ -49,14 +49,14 @@ public class BO3Loader implements CustomObjectLoader
         }
 
         // Load from file
-        Tag metadata;
+        NamedBinaryTag metadata;
         FileInputStream stream = null;
         try
         {
             // Read it from a file next to the BO3
             stream = new FileInputStream(path);
             // Get the tag
-            metadata = Tag.readFrom(stream, true);
+            metadata = NamedBinaryTag.readFrom(stream, true);
             stream.close();
         } catch (FileNotFoundException e)
         {
@@ -73,7 +73,7 @@ public class BO3Loader implements CustomObjectLoader
                 // Read it from a file next to the BO3
                 stream = new FileInputStream(path);
                 // Get the tag
-                metadata = Tag.readFrom(stream, false);
+                metadata = NamedBinaryTag.readFrom(stream, false);
                 stream.close();
             } catch (IOException corruptFile)
             {
@@ -89,10 +89,10 @@ public class BO3Loader implements CustomObjectLoader
         // 2. chest.nbt with a Compound tag in it with all the data
 
         // Check for type 1 by searching for an id tag
-        Tag[] values = (Tag[]) metadata.getValue();
-        for (Tag subTag : values)
+        NamedBinaryTag[] values = (NamedBinaryTag[]) metadata.getValue();
+        for (NamedBinaryTag subTag : values)
         {
-            if (subTag.getName() != null && subTag.getName().equals("id") && subTag.getType().equals(Tag.Type.TAG_String))
+            if (subTag.getName() != null && subTag.getName().equals("id") && subTag.getType().equals(NamedBinaryTag.Type.TAG_String))
             {
                 // Found id tag, so return the root tag
                 return metadata;
@@ -101,7 +101,7 @@ public class BO3Loader implements CustomObjectLoader
         // No id tag found, so check for type 2
         try
         {
-            return registerMetadata(path, ((Tag[]) metadata.getValue())[0]);
+            return registerMetadata(path, ((NamedBinaryTag[]) metadata.getValue())[0]);
         } catch (Exception e)
         {
             TerrainControl.log(Level.WARNING, "Structure of NBT file is incorrect: {0}", e.getMessage());
@@ -118,7 +118,7 @@ public class BO3Loader implements CustomObjectLoader
      * <p/>
      * @return the meta data that was cached
      */
-    public static Tag registerMetadata(String pathOnDisk, Tag metadata)
+    public static NamedBinaryTag registerMetadata(String pathOnDisk, NamedBinaryTag metadata)
     {
         // Add it to the cache
         loadedTags.put(pathOnDisk, metadata);

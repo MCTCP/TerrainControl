@@ -3,14 +3,21 @@ package com.khorn.terraincontrol.forge;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
-import com.khorn.terraincontrol.configuration.TCLogManager;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.events.EventPriority;
-import com.khorn.terraincontrol.forge.structuregens.RareBuildingStart;
-import com.khorn.terraincontrol.forge.structuregens.VillageStart;
-import com.khorn.terraincontrol.util.StringHelper;
-import com.khorn.terraincontrol.util.StructureNames;
-import cpw.mods.fml.common.*;
+import com.khorn.terraincontrol.forge.events.EventManager;
+import com.khorn.terraincontrol.forge.events.PacketHandler;
+import com.khorn.terraincontrol.forge.events.PlayerTracker;
+import com.khorn.terraincontrol.forge.events.SaplingListener;
+import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
+import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
+import com.khorn.terraincontrol.logging.LogManager;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
+import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -19,15 +26,16 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
-import net.minecraft.block.Block;
-import net.minecraft.world.gen.structure.MapGenStructureIO;
-import net.minecraftforge.common.MinecraftForge;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import net.minecraft.block.Block;
+import net.minecraft.world.gen.structure.MapGenStructureIO;
+import net.minecraftforge.common.MinecraftForge;
 
 @Mod(modid = "TerrainControl", name = "TerrainControl")
 @NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")
@@ -48,7 +56,7 @@ public class TCPlugin implements TerrainControlEngine
 
         // Set the directory
         TerrainControl.setEngine(this);
-        logger = TCLogManager.prepLogger(FMLCommonHandler.instance().getFMLLogger());
+        logger = LogManager.prepLogger(FMLCommonHandler.instance().getFMLLogger());
 
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
@@ -67,7 +75,7 @@ public class TCPlugin implements TerrainControlEngine
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
-            NetworkRegistry.instance().registerChannel(new PacketHandler(), TCDefaultValues.ChannelName.stringValue());
+            NetworkRegistry.instance().registerChannel(new PacketHandler(), PluginStandardValues.ChannelName.stringValue());
         }
 
         // Register player tracker, for sending configs.
@@ -137,7 +145,7 @@ public class TCPlugin implements TerrainControlEngine
     {
         if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
         {
-            this.log(max, messages);
+            this.log((min == Level.ALL ? max : (max == Level.OFF ? min : max)), messages);
         }
     }
 
@@ -146,32 +154,23 @@ public class TCPlugin implements TerrainControlEngine
     {
         if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
         {
-            this.log(max, messages);
+            this.log((min == Level.ALL ? max : (max == Level.OFF ? min : max)), messages, params);
         }
     }
 
     @Override
     public void log(Level level, String... messages)
     {
-        this.log(level, "{0}", new Object[]
-        {
-            StringHelper.join(messages, " ")
-        });
+        this.log(level, "{0}", new Object[]{ StringHelper.join(messages, " ") });
     }
 
     @Override
     public void log(Level level, String message, Object param)
     {
         LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.formatter.format(lr));
-        lr.setParameters(new Object[]
-        {
-            param
-        });
-        if (logger == null)
-        {
-            logger = TCLogManager.getLogger();
-        }
+        lr.setMessage(LogManager.formatter.format(lr));
+        lr.setParameters(new Object[]{ param });
+        if (logger == null) logger = LogManager.getLogger();
         logger.log(lr);
     }
 
@@ -179,12 +178,9 @@ public class TCPlugin implements TerrainControlEngine
     public void log(Level level, String message, Object[] params)
     {
         LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.formatter.format(lr));
         lr.setParameters(params);
-        if (logger == null)
-        {
-            logger = TCLogManager.getLogger();
-        }
+        lr.setMessage(LogManager.formatter.format(lr));
+        if (logger == null) logger = LogManager.getLogger();
         logger.log(lr);
     }
 
@@ -209,7 +205,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getTCDataFolder(), TCDefaultValues.BO_GlobalDirectoryName.stringValue());
+        return new File(this.getTCDataFolder(), PluginStandardValues.BO_DirectoryName.stringValue());
     }
 
     @Override

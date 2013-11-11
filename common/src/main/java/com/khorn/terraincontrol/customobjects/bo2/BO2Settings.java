@@ -1,14 +1,10 @@
 package com.khorn.terraincontrol.customobjects.bo2;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import com.khorn.terraincontrol.util.MultiTypedSetting;
 
-import com.khorn.terraincontrol.configuration.TCSetting;
+import java.util.*;
 
-public enum BO2Settings implements TCSetting
+public enum BO2Settings implements MultiTypedSetting
 {
 
     BO_ALL_KEY("All"),
@@ -94,7 +90,7 @@ public enum BO2Settings implements TCSetting
             ArrayList<String> list = new ArrayList<String>();
             if (s.contains(","))
                 Collections.addAll(list, s.split(","));
-            else if (!s.equals(""))
+            else if (!s.isEmpty())
                 list.add(s);
             value = list;
             return;

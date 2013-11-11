@@ -1,15 +1,16 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import com.khorn.terraincontrol.bukkit.MapWriter;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.commands.runnable.MapWriter;
+
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_6_R3.CraftWorld;
 import org.bukkit.entity.Player;
-
-import java.util.List;
 
 public class MapCommand extends BaseCommand
 {
@@ -32,7 +33,7 @@ public class MapCommand extends BaseCommand
         MapWriter.Angle angle = MapWriter.Angle.d0;
         String label = "";
 
-        if (args.size() != 0 && !args.get(0).startsWith("-"))
+        if (!args.isEmpty() && !args.get(0).startsWith("-"))
         {
             world = (CraftWorld) Bukkit.getWorld(args.get(0));
             args.remove(0);

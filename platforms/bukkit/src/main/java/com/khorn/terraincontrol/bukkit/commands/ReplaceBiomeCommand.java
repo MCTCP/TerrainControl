@@ -1,15 +1,16 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import com.khorn.terraincontrol.bukkit.BiomeReplace;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.commands.runnable.BiomeReplace;
+
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_6_R3.CraftWorld;
 import org.bukkit.entity.Player;
-
-import java.util.List;
 
 public class ReplaceBiomeCommand extends BaseCommand
 {

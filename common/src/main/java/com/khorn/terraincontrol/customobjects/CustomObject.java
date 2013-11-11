@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.Map;
 import java.util.Random;

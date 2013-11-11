@@ -1,11 +1,12 @@
 package com.khorn.terraincontrol;
 
-import com.khorn.terraincontrol.biomegenerators.OutputType;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
-import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -109,10 +110,10 @@ public interface LocalWorld
 
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data);
 
-    public void attachMetadata(int x, int y, int z, Tag tag);
+    public void attachMetadata(int x, int y, int z, NamedBinaryTag tag);
 
     @SuppressWarnings("UnusedDeclaration")
-    public Tag getMetadata(int x, int y, int z);
+    public NamedBinaryTag getMetadata(int x, int y, int z);
 
     public int getLiquidHeight(int x, int z);
 

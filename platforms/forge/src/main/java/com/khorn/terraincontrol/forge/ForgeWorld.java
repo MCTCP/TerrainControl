@@ -1,16 +1,22 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.*;
-import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.OutputType;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
-import com.khorn.terraincontrol.forge.structuregens.*;
+import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
+import com.khorn.terraincontrol.forge.generator.ChunkProvider;
+import com.khorn.terraincontrol.forge.generator.structure.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
-import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
+import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.SpawnerAnimals;
@@ -368,8 +374,8 @@ public class ForgeWorld implements LocalWorld
         if (y < 0 || y >= this.worldHeight)
             return null;
 
-        x = x >> 4;
-        z = z >> 4;
+        x >>= 4;
+        z >>= 4;
         if (this.cachedChunk != null && this.cachedChunk.xPosition == x && this.cachedChunk.zPosition == z)
             return this.cachedChunk;
 
@@ -390,8 +396,8 @@ public class ForgeWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
         for (int y = worldHeight - 1; y > 0; y--)
         {
             int id = chunk.getBlockID(x, y, z);
@@ -432,8 +438,8 @@ public class ForgeWorld implements LocalWorld
             return 0;
         }
 
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
 
         return chunk.getBlockID(x, y, z);
     }
@@ -445,8 +451,8 @@ public class ForgeWorld implements LocalWorld
         if (chunk == null)
             return 0;
 
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
 
         return (byte) chunk.getBlockMetadata(x, y, z);
     }
@@ -522,8 +528,8 @@ public class ForgeWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
         int y = chunk.getHeightValue(x, z);
         while (chunk.getBlockID(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight)
         {
@@ -688,7 +694,7 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void attachMetadata(int x, int y, int z, Tag tag)
+    public void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
     {
         // Convert Tag to a native nms tag
         NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
@@ -708,7 +714,7 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public Tag getMetadata(int x, int y, int z)
+    public NamedBinaryTag getMetadata(int x, int y, int z)
     {
         TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
         if (tileEntity == null)

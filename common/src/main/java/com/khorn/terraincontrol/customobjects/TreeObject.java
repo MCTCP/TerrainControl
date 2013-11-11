@@ -3,7 +3,8 @@ package com.khorn.terraincontrol.customobjects;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import com.khorn.terraincontrol.util.Rotation;
+import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.util.Map;
 import java.util.Map.Entry;

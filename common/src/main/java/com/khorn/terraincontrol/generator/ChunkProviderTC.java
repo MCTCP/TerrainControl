@@ -1,18 +1,17 @@
 package com.khorn.terraincontrol.generator;
 
-import com.khorn.terraincontrol.configuration.WorldSettings;
-
-import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.biomegenerators.OutputType;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorPerlinOctaves;
-import com.khorn.terraincontrol.generator.terrainsgens.CanyonsGen;
-import com.khorn.terraincontrol.generator.terrainsgens.CavesGen;
-import com.khorn.terraincontrol.generator.terrainsgens.TerrainGenBase;
-import com.khorn.terraincontrol.util.MathHelper;
+import com.khorn.terraincontrol.generator.terrain.CanyonsGen;
+import com.khorn.terraincontrol.generator.terrain.CavesGen;
+import com.khorn.terraincontrol.generator.terrain.TerrainGenBase;
+import com.khorn.terraincontrol.util.helpers.MathHelper;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Random;
 

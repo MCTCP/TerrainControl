@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.customobjects.bo2;
 
-import com.khorn.terraincontrol.util.BlockHelper;
+import com.khorn.terraincontrol.util.helpers.BlockHelper;
 
 public class ObjectCoordinate
 {

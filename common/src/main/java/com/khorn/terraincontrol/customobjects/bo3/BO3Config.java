@@ -3,8 +3,8 @@ package com.khorn.terraincontrol.customobjects.bo3;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlockEnum;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
@@ -69,7 +69,7 @@ public class BO3Config extends ConfigFile
         this.settingsCache.putAll(extraSettings);
 
         // Make sure that the BO3 file won't get overwritten
-        this.settingsCache.put(TCDefaultValues.SettingsMode.toString().toLowerCase(), ConfigMode.WriteDisable.toString());
+        this.settingsCache.put(WorldStandardValues.SettingsMode.toString().toLowerCase(), ConfigMode.WriteDisable.toString());
 
         init();
     }
@@ -115,7 +115,7 @@ public class BO3Config extends ConfigFile
         writeValue(BO3Settings.Version, 3);
 
         writeComment("The settings mode, WriteAll, WriteWithoutComments or WriteDisable. See WorldConfig.");
-        writeValue(TCDefaultValues.SettingsMode, settingsMode.toString());
+        writeValue(WorldStandardValues.SettingsMode, settingsMode.toString());
 
         // Main settings
         writeBigTitle("Main settings");
@@ -170,7 +170,7 @@ public class BO3Config extends ConfigFile
     {
         author = readSettings(BO3Settings.Author);
         description = readSettings(BO3Settings.Description);
-        settingsMode = readSettings(TCDefaultValues.SettingsMode);
+        settingsMode = readSettings(WorldStandardValues.SettingsMode);
 
         tree = readSettings(BO3Settings.Tree);
         frequency = readSettings(BO3Settings.Frequency);
@@ -199,8 +199,8 @@ public class BO3Config extends ConfigFile
         for (Map.Entry<String, String> entry : this.settingsCache.entrySet())
         {
             String key = entry.getKey();
-            int start = key.indexOf("(");
-            int end = key.lastIndexOf(")");
+            int start = key.indexOf('(');
+            int end = key.lastIndexOf(')');
             if (start != -1 && end != -1)
             {
                 String name = key.substring(0, start);

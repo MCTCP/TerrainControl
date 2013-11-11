@@ -1,17 +1,25 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.*;
-import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
-import com.khorn.terraincontrol.biomegenerators.OutputType;
-import com.khorn.terraincontrol.bukkit.structuregens.*;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.bukkit.generator.BiomeCacheWrapper;
+import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
+import com.khorn.terraincontrol.bukkit.generator.TCWorldChunkManager;
+import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
+import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
-import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
+import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.server.v1_6_R3.*;
 import org.bukkit.craftbukkit.v1_6_R3.CraftWorld;
 
@@ -364,8 +372,8 @@ public class BukkitWorld implements LocalWorld
         if (y < 0 || y >= worldHeight)
             return null;
 
-        x = x >> 4;
-        z = z >> 4;
+        x >>= 4;
+        z >>= 4;
 
         if (this.cachedChunk != null && this.cachedChunk.x == x && this.cachedChunk.z == z)
             return this.cachedChunk;
@@ -387,8 +395,8 @@ public class BukkitWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
             return -1;
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
         for (int y = worldHeight - 1; y > 0; y--)
         {
             int id = chunk.getTypeId(x, y, z);
@@ -431,8 +439,8 @@ public class BukkitWorld implements LocalWorld
             return 0;
         }
 
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
 
         return chunk.getTypeId(x, y, z);
     }
@@ -446,8 +454,8 @@ public class BukkitWorld implements LocalWorld
             return 0;
         }
 
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
 
         return (byte) chunk.getData(x, y, z);
     }
@@ -527,8 +535,8 @@ public class BukkitWorld implements LocalWorld
         {
             return -1;
         }
-        z = z & 0xF;
-        x = x & 0xF;
+        z &= 0xF;
+        x &= 0xF;
         int y = chunk.b(x, z);
         while (chunk.getTypeId(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight)
         {
@@ -757,9 +765,9 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void attachMetadata(int x, int y, int z, Tag tag)
+    public void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
     {
-        // Convert Tag to a native nms tag
+        // Convert NamedBinaryTag to a native nms tag
         NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
         // Add the x, y and z position to it
         nmsTag.setInt("x", x);
@@ -777,7 +785,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public Tag getMetadata(int x, int y, int z)
+    public NamedBinaryTag getMetadata(int x, int y, int z)
     {
         TileEntity tileEntity = world.getTileEntity(x, y, z);
         if (tileEntity == null)

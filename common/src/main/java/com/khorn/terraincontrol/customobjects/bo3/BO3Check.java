@@ -35,5 +35,6 @@ public abstract class BO3Check extends BO3Function
      */
     public abstract boolean preventsSpawn(LocalWorld world, int x, int y, int z);
 
+    @Override
     public abstract BO3Check rotate();
 }

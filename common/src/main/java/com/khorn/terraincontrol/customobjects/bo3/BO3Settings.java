@@ -1,14 +1,14 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.DefaultMaterial;
-import com.khorn.terraincontrol.configuration.TCSetting;
 import com.khorn.terraincontrol.customobjects.StructurePartSpawnHeight;
+import com.khorn.terraincontrol.util.MultiTypedSetting;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
-public enum BO3Settings implements TCSetting
+public enum BO3Settings implements MultiTypedSetting
 {
     // BO3
     Author("Unknown"),
@@ -119,7 +119,7 @@ public enum BO3Settings implements TCSetting
             ArrayList<String> list = new ArrayList<String>();
             if (s.contains(","))
                 Collections.addAll(list, s.split(","));
-            else if (!s.equals(""))
+            else if (!s.isEmpty())
                 list.add(s);
             value = list;
             return;

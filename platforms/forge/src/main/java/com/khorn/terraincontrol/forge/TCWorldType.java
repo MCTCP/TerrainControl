@@ -3,17 +3,20 @@ package com.khorn.terraincontrol.forge;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.util.ForgeMetricsHelper;
+import com.khorn.terraincontrol.forge.generator.BiomeCacheWrapper;
+import com.khorn.terraincontrol.forge.generator.TCWorldChunkManager;
+import com.khorn.terraincontrol.forge.metrics.ForgeMetricsHelper;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
+import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+
+import java.io.File;
+
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.chunk.IChunkProvider;
-
-import java.io.File;
 
 public class TCWorldType extends WorldType
 {

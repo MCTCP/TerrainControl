@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.generator.noise;
 
-import com.khorn.terraincontrol.util.MathHelper;
+import com.khorn.terraincontrol.util.helpers.MathHelper;
 
 import java.util.Random;
 

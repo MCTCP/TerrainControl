@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,7 @@ public class UseBiome implements CustomObject
         // object, as long as the objectSpawnRatio cap isn't reached.
         int objectSpawnRatio = world.getSettings().worldConfig.objectSpawnRatio;
 
-        if (possibleObjects.size() == 0)
+        if (possibleObjects.isEmpty())
             return false;
 
         boolean objectSpawned = false;
@@ -95,7 +96,7 @@ public class UseBiome implements CustomObject
         // object, as long as the objectSpawnRatio cap isn't reached.
         int objectSpawnRatio = world.getSettings().worldConfig.objectSpawnRatio;
 
-        if (possibleObjects.size() == 0)
+        if (possibleObjects.isEmpty())
             return false;
 
         boolean objectSpawned = false;
@@ -134,7 +135,7 @@ public class UseBiome implements CustomObject
     public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {
         List<CustomObject> objects = getPossibleObjectsAt(world, x, z);
-        if (objects.size() == 0)
+        if (objects.isEmpty())
         {
             // No objects to spawn
             return false;

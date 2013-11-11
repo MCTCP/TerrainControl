@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.Tag;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.util.BlockHelper;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
+import com.khorn.terraincontrol.util.helpers.BlockHelper;
 
 import java.util.List;
 import java.util.Random;
@@ -14,7 +14,7 @@ public class RandomBlockFunction extends BlockFunction
     public byte[] blockDatas;
     public byte[] blockChances;
     public String[] metaDataNames;
-    public Tag[] metaDataTags;
+    public NamedBinaryTag[] metaDataTags;
 
     public int blockCount = 0;
 
@@ -35,7 +35,7 @@ public class RandomBlockFunction extends BlockFunction
         blockDatas = new byte[size / 2 + 1];
         blockChances = new byte[size / 2 + 1];
         metaDataNames = new String[size / 2 + 1];
-        metaDataTags = new Tag[size / 2 + 1];
+        metaDataTags = new NamedBinaryTag[size / 2 + 1];
 
         while (i < size)
         {
@@ -53,7 +53,7 @@ public class RandomBlockFunction extends BlockFunction
                 // Maybe it's a NBT file?
 
                 // Get the file
-                Tag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().file);
+                NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().file);
                 if (metaData != null)
                 {
                     metaDataNames[blockCount] = args.get(i);

@@ -1,9 +1,13 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.logging.LogManager;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -64,7 +68,7 @@ public final class WorldSettings
 
         //>> -- ESTRABLISH FOLDERS -- <<//
         //>>	TerrainControl/GlobalBiomes/
-        this.globalBiomesDir = new File(TerrainControl.getEngine().getTCDataFolder(), TCDefaultValues.GlobalBiomeConfigDirectoryName.stringValue());
+        this.globalBiomesDir = new File(TerrainControl.getEngine().getTCDataFolder(), PluginStandardValues.BiomeConfigDirectoryName.stringValue());
         //>>	TerrainControl/worlds/<WorldName>/<WorldBiomes/
         this.worldBiomesDir = new File(settingsDir, correctOldBiomeConfigFolder(settingsDir));
 
@@ -123,8 +127,8 @@ public final class WorldSettings
 
         processBiomeConfigs();
 
-        TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[]{ biomesCount });
-        TerrainControl.logIfLevel(Level.ALL, Level.CONFIG, LoadedBiomeNames);
+        TerrainControl.logIfLevel(Level.INFO, Level.OFF, "{0} Biomes Loaded", new Object[]{ biomesCount });
+        TerrainControl.logIfLevel(Level.ALL, Level.CONFIG, "{0} Biomes Loaded:\n{1}", new Object[]{ biomesCount, LoadedBiomeNames });
 
     }
 
@@ -157,7 +161,7 @@ public final class WorldSettings
     private String correctOldBiomeConfigFolder(File settingsDir)
     {
         //>>	Rename the old folder
-        String biomeFolderName = TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue();
+        String biomeFolderName = WorldStandardValues.BiomeConfigDirectoryName.stringValue();
         File oldBiomeConfigs = new File(settingsDir, "BiomeConfigs");
         if (oldBiomeConfigs.exists())
         {
@@ -204,7 +208,7 @@ public final class WorldSettings
     {
         if (biomesCount != 0)
             LoadedBiomeNames += ", ";
-        LoadedBiomeNames += localBiome.getName() + (TCLogManager.getLogger().isLoggable(Level.FINE) ? (":" + localBiome.getId()) : "");
+        LoadedBiomeNames += localBiome.getName() + (LogManager.getLogger().isLoggable(Level.FINE) ? (":" + localBiome.getId() + (localBiome.isVirtual() ? config.worldConfig.VirtualBiomeIds.get(localBiome.getName()) + ":" : "") ) : "");
         // Add biome to the biome array
         if (biomeConfigs[localBiome.getId()] == null)
         {
@@ -246,7 +250,7 @@ public final class WorldSettings
             if (this.checkOnly)
                 continue;
 
-            if (!config.ReplaceBiomeName.equals(""))
+            if (!config.ReplaceBiomeName.isEmpty())
             {
                 this.worldConfig.HaveBiomeReplace = true;
                 this.ReplaceBiomesMatrix[config.Biome.getId()] = (byte) world.getBiomeIdByName(config.ReplaceBiomeName);
@@ -321,9 +325,9 @@ public final class WorldSettings
             TerrainControl.log(Level.FINEST, "\tSTACK:::Pushing config; New Size: {0}", new Object[]{biomeLoadingStack.size()});
             if (!config.BiomeExtendsProcessed)
             {
-                if (config.settingsCache.containsKey(TCDefaultValues.BiomeExtends.name().toLowerCase()))
+                if (config.settingsCache.containsKey(BiomeStandardValues.BiomeExtends.name().toLowerCase()))
                 {
-                    String biomeToExtend_Name = config.settingsCache.get(TCDefaultValues.BiomeExtends.name().toLowerCase());
+                    String biomeToExtend_Name = config.settingsCache.get(BiomeStandardValues.BiomeExtends.name().toLowerCase());
                     if (!biomeToExtend_Name.isEmpty())
                     {
                         TerrainControl.log(Level.FINER, "\tBiome(" + biomeToExtend_Name + ") Processing!");

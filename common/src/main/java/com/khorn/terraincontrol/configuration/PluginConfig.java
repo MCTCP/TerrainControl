@@ -1,6 +1,10 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
+import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.logging.LogManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,12 +46,12 @@ public final class PluginConfig extends ConfigFile
     public LogLevels fileHandlerLevel;
     public LogLevels consoleHandlerLevel;
     public String worldDefaultBiomeConfigExtension;
-    private static final Logger l = TCLogManager.getLogger();
+    private static final Logger l = LogManager.getLogger();
 
     public PluginConfig(File settingsDir)
     {
 
-        super(TCDefaultValues.ChannelName.stringValue(), new File(settingsDir, TCDefaultValues.pluginSettingsName.stringValue()));
+        super(PluginStandardValues.ChannelName.stringValue(), new File(settingsDir, PluginStandardValues.ConfigFilename.stringValue()));
         if (!settingsDir.exists())
             settingsDir.mkdirs();
         init();
@@ -88,18 +92,18 @@ public final class PluginConfig extends ConfigFile
         }
         if (hasOffLevel)
         {
-            l.log(Level.WARNING, TCLogManager.formatter.format(new LogRecord(Level.WARNING, "Quiet Mode: You will no longer see INFO messages FOR ANY PLUGIN.")));
-            l.log(Level.WARNING, TCLogManager.formatter.format(new LogRecord(Level.WARNING, "WARNING AND SEVERE level logs will still show.")));
+            l.log(Level.WARNING, LogManager.formatter.format(new LogRecord(Level.WARNING, "Quiet Mode: You will no longer see INFO messages FOR ANY PLUGIN.")));
+            l.log(Level.WARNING, LogManager.formatter.format(new LogRecord(Level.WARNING, "WARNING AND SEVERE level logs will still show.")));
         }
     }
 
     @Override
     protected void readConfigSettings()
     {
-        this.SettingsMode = readSettings(TCDefaultValues.SettingsMode);
-        this.consoleHandlerLevel = readSettings(TCDefaultValues.ConsoleLogLevel);
-        this.fileHandlerLevel = readSettings(TCDefaultValues.FileLogLevel);
-        this.worldDefaultBiomeConfigExtension = readSettings(TCDefaultValues.DefaultBiomeConfigExtension);
+        this.SettingsMode = readSettings(WorldStandardValues.SettingsMode);
+        this.consoleHandlerLevel = readSettings(PluginStandardValues.ConsoleLogLevel);
+        this.fileHandlerLevel = readSettings(PluginStandardValues.FileLogLevel);
+        this.worldDefaultBiomeConfigExtension = readSettings(BiomeStandardValues.DefaultBiomeConfigExtension);
     }
 
     @Override
@@ -115,7 +119,7 @@ public final class PluginConfig extends ConfigFile
         writeComment("   WriteDisable         - Doesn't write to the config files, it only reads.");
         writeComment("                          Doesn't auto-update the configs. Use with care!");
         writeComment("Defaults to: WriteAll");
-        writeValue(TCDefaultValues.SettingsMode, this.SettingsMode.name());
+        writeValue(WorldStandardValues.SettingsMode, this.SettingsMode.name());
 
         // Custom biomes
         writeBigTitle("Log Levels");
@@ -134,14 +138,14 @@ public final class PluginConfig extends ConfigFile
         writeComment("See ``Possible Log Levels'' if you are lost.");
         writeComment(" ");
         writeComment("Defaults to: Standard");
-        writeValue(TCDefaultValues.ConsoleLogLevel, this.consoleHandlerLevel.name());
+        writeValue(PluginStandardValues.ConsoleLogLevel, this.consoleHandlerLevel.name());
 
         writeSmallTitle("File Logging Level");
         writeComment("This is the level with which logs will be produced in the log file. i.e. server.log");
         writeComment("See ``Possible Log Levels'' if you are lost.");
         writeComment(" ");
         writeComment("Defaults to: Standard");
-        writeValue(TCDefaultValues.FileLogLevel, this.fileHandlerLevel.name());
+        writeValue(PluginStandardValues.FileLogLevel, this.fileHandlerLevel.name());
 
 
         writeBigTitle("File Extension Rules");
@@ -153,7 +157,7 @@ public final class PluginConfig extends ConfigFile
         writeComment("BiomeConfig.ini, .biome, .bc, .bc.ini, and .biome.ini");
         writeComment(" ");
         writeComment("Defaults to: .bc");
-        writeValue(TCDefaultValues.DefaultBiomeConfigExtension, this.worldDefaultBiomeConfigExtension);
+        writeValue(BiomeStandardValues.DefaultBiomeConfigExtension, this.worldDefaultBiomeConfigExtension);
     }
 
     public LogLevels getFileHandlerLevel()

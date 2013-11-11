@@ -1,12 +1,12 @@
 package com.khorn.terraincontrol.generator;
 
-import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldSettings;
-import com.khorn.terraincontrol.generator.resourcegens.Resource;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.generator.resource.Resource;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Random;
 import java.util.logging.Level;
@@ -92,7 +92,7 @@ public class ObjectSpawner
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
                 BiomeConfig biomeConfig = worldSettings.biomeConfigs[world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
-                if (biomeConfig != null && biomeConfig.BiomeTemperature < TCDefaultValues.snowAndIceMaxTemp.floatValue())
+                if (biomeConfig != null && biomeConfig.BiomeTemperature < WorldStandardValues.snowAndIceMaxTemp.floatValue())
                 {
                     int blockToFreezeY = world.getHighestBlockYAt(blockToFreezeX, blockToFreezeZ);
                     if (blockToFreezeY > 0)

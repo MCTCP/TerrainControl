@@ -1,14 +1,15 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 
 public class TCCommandExecutor implements CommandExecutor
 {
@@ -23,12 +24,13 @@ public class TCCommandExecutor implements CommandExecutor
         this.RegisterCommands();
     }
 
+    @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings)
     {
         ArrayList<String> arg = new ArrayList<String>(Arrays.asList(strings));
 
         BaseCommand cmd = helpCommand;
-        if (arg.size() != 0 && commandHashMap.containsKey(arg.get(0)))
+        if (!arg.isEmpty() && commandHashMap.containsKey(arg.get(0)))
         {
             cmd = commandHashMap.get(arg.get(0));
             arg.remove(0);

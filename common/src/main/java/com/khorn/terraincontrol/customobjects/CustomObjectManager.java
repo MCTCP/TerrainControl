@@ -5,7 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.bo2.BO2Loader;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Loader;
-import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.io.File;
 import java.util.HashMap;
@@ -72,8 +72,9 @@ public class CustomObjectManager
         // Load all global objects (they can overwrite special objects)
         TerrainControl.getEngine().getGlobalObjectsDirectory().mkdirs();
         Map<String, CustomObject> loadedGlobalObjects = loadObjects(TerrainControl.getEngine().getGlobalObjectsDirectory());
-        TerrainControl.log(Level.INFO, "{0} global custom objects loaded.", loadedGlobalObjects.size());
+        TerrainControl.logIfLevel(Level.INFO, Level.OFF, "{0} Global custom objects loaded", new Object[]{loadedGlobalObjects.size()});
         this.globalObjects.putAll(loadedGlobalObjects);
+        TerrainControl.logIfLevel(Level.ALL, Level.CONFIG, "{0} Global custom objects loaded; {1} Total", new Object[]{loadedGlobalObjects.size(),this.globalObjects.size()});
     }
 
     /**
@@ -237,8 +238,8 @@ public class CustomObjectManager
     {
         String[] parts = new String[] {string, ""};
 
-        int start = string.indexOf("(");
-        int end = string.lastIndexOf(")");
+        int start = string.indexOf('(');
+        int end = string.lastIndexOf(')');
         if (start != -1 && end != -1)
         {
             parts[0] = string.substring(0, start);

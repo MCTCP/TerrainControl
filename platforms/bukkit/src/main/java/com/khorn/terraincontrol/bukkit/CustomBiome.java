@@ -1,20 +1,22 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.MobAlternativeNames;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.BiomeMeta;
-import net.minecraft.server.v1_6_R3.Entity;
-import net.minecraft.server.v1_6_R3.EntityTypes;
-import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_6_R3.block.CraftBlock;
+import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import net.minecraft.server.v1_6_R3.BiomeBase;
+import net.minecraft.server.v1_6_R3.BiomeMeta;
+import net.minecraft.server.v1_6_R3.Entity;
+import net.minecraft.server.v1_6_R3.EntityTypes;
+
+import org.bukkit.block.Biome;
+import org.bukkit.craftbukkit.v1_6_R3.block.CraftBlock;
 
 public class CustomBiome extends BiomeBase
 {
@@ -86,7 +88,7 @@ public class CustomBiome extends BiomeBase
     @SuppressWarnings("unchecked")
     protected Class<? extends Entity> getEntityClass(WeightedMobSpawnGroup mobGroup)
     {
-        String mobName = MobAlternativeNames.getInternalMinecraftName(mobGroup.getMobName());
+        String mobName = MobNames.getInternalMinecraftName(mobGroup.getMobName());
         try
         {
             Field entitiesField = EntityTypes.class.getDeclaredField("b");

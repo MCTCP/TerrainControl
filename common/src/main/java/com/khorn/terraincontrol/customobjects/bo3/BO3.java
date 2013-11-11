@@ -6,7 +6,8 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.*;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlockEnum;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
-import com.khorn.terraincontrol.util.MathHelper;
+import com.khorn.terraincontrol.util.Rotation;
+import com.khorn.terraincontrol.util.helpers.MathHelper;
 
 import java.io.File;
 import java.util.Map;
