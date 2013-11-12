@@ -14,39 +14,17 @@ import java.util.logging.*;
 public class LogManagerFactory
 {
 
+    /**
+     * Holds the name of the Plugin to be prefixed to all logs records
+     */
     public static final String prefix = PluginStandardValues.ChannelName.stringValue();
+    /**
+     * The default log level of the Plugin
+     */
     public static final LogLevels defaultLogLevel = PluginConfig.LogLevels.Standard;
-    public static Formatter formatter;
 
     private LogManagerFactory()
     { //>>	Shouldnt be instantiated
-    }
-
-    static
-    {
-        formatter = new Formatter()
-        {
-            @Override
-            public String format(LogRecord record)
-            {
-                //>>	It would be cool to align all TC logs in the future
-                //>>	And switch the formatting up a bit...
-                //>>	Ex: [WARNING] [TerrainControl] This is a Log
-                //>>	    [SEVERE] [TerrainControl] This is another Log
-                //>>	    [INFO] [TerrainControl] More Logs!
-                //>>	    [CONFIG] [TerrainControl] This is not very readable
-                //>>	doesnt look as nice as:
-                //>>	Ex: [TerrainControl] [WARNING] This is a Log
-                //>>	    [TerrainControl]  [SEVERE] This is another Log
-                //>>	    [TerrainControl]    [INFO] More Logs!
-                //>>	    [TerrainControl]  [CONFIG] This is so much more readable
-                
-                //>>	Personally, I dont see why all logs arent written like that...
-                return new StringBuilder()
-                    .append('[').append(prefix).append(']').append(' ')
-                    .append(formatMessage(record)).toString();
-            }
-        };
     }
 
     public static LogManager makeLogManager(Logger logger)
