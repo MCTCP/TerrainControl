@@ -40,7 +40,7 @@ public class UseWorld implements CustomObject
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-        for (CustomObject object : world.getSettings().customObjects)
+        for (CustomObject object : world.getSettings().worldConfig.customObjects)
         {
             if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
@@ -59,7 +59,7 @@ public class UseWorld implements CustomObject
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
 
-        WorldConfig worldSettings = world.getSettings();
+        WorldConfig worldSettings = world.getSettings().worldConfig;
 
         if (worldSettings.customObjects.isEmpty())
             return false;
@@ -91,7 +91,7 @@ public class UseWorld implements CustomObject
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
 
-        WorldConfig worldSettings = world.getSettings();
+        WorldConfig worldSettings = world.getSettings().worldConfig;
 
         if (worldSettings.customObjects.isEmpty())
             return false;

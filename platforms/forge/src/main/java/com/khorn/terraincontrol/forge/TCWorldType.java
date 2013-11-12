@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.configuration.WorldSettings;
+
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.generator.BiomeCacheWrapper;
@@ -68,12 +70,12 @@ public class TCWorldType extends WorldType
         }
 
         this.worldTC = new ForgeWorld(world.getSaveHandler().getWorldDirectoryName());
-        WorldConfig config = new WorldConfig(worldDirectory, worldTC, false);
+        WorldSettings config = new WorldSettings(worldDirectory, worldTC, false);
         this.worldTC.Init(world, config);
 
         WorldChunkManager chunkManager = null;
 
-        Class<? extends BiomeGenerator> biomeManagerClass = this.worldTC.getSettings().biomeMode;
+        Class<? extends BiomeGenerator> biomeManagerClass = this.worldTC.getSettings().worldConfig.biomeMode;
 
         if (biomeManagerClass == TerrainControl.getBiomeModeManager().VANILLA)
         {
@@ -98,7 +100,7 @@ public class TCWorldType extends WorldType
     @Override
     public IChunkProvider getChunkGenerator(World world, String generatorOptions)
     {
-        if (this.worldTC.getSettings().ModeTerrain != WorldConfig.TerrainMode.Default)
+        if (this.worldTC.getSettings().worldConfig.ModeTerrain != WorldConfig.TerrainMode.Default)
         {
             return this.worldTC.getChunkGenerator();
         } else
@@ -108,6 +110,6 @@ public class TCWorldType extends WorldType
     @Override
     public int getMinimumSpawnHeight(World world)
     {
-        return WorldHelper.toLocalWorld(world).getSettings().waterLevelMax;
+        return WorldHelper.toLocalWorld(world).getSettings().worldConfig.waterLevelMax;
     }
 }

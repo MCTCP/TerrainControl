@@ -9,7 +9,7 @@ import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
 import com.khorn.terraincontrol.bukkit.generator.structures.RareBuildingStart;
 import com.khorn.terraincontrol.bukkit.generator.structures.VillageStart;
 import com.khorn.terraincontrol.bukkit.metrics.BukkitMetricsHelper;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 
@@ -163,15 +163,15 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
 
         // Load settings
         File baseFolder = getWorldSettingsFolder(worldName);
-        WorldConfig worldConfig = new WorldConfig(baseFolder, localWorld, false);
-        localWorld.setSettings(worldConfig);
+        WorldSettings configs = new WorldSettings(baseFolder, localWorld, false);
+        localWorld.setSettings(configs);
 
         // Add the world to the to-do list
         this.notInitedWorlds.put(worldName, localWorld);
 
         // Get the right chunk generator
         TCChunkGenerator generator = null;
-        switch (worldConfig.ModeTerrain)
+        switch (configs.worldConfig.ModeTerrain)
         {
             case Normal:
             case TerrainTest:

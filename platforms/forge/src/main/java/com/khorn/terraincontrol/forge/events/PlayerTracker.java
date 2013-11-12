@@ -2,21 +2,19 @@ package com.khorn.terraincontrol.forge.events;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.TCPlugin;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
-
 import cpw.mods.fml.common.IPlayerTracker;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.packet.Packet250CustomPayload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.packet.Packet250CustomPayload;
 
 public class PlayerTracker implements IPlayerTracker
 {
@@ -43,7 +41,7 @@ public class PlayerTracker implements IPlayerTracker
             // World not loaded
             return;
         }
-        WorldConfig config = worldTC.getSettings();
+        WorldSettings configs = worldTC.getSettings();
 
         // Serialize it
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -51,7 +49,7 @@ public class PlayerTracker implements IPlayerTracker
         try
         {
             stream.writeInt(PluginStandardValues.ProtocolVersion.intValue());
-            config.Serialize(stream);
+            configs.writeToStream(stream);
         } catch (IOException e)
         {
             TerrainControl.printStackTrace(Level.SEVERE, e);

@@ -4,13 +4,12 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.logging.Level;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class ReloadCommand extends BaseCommand
 {
@@ -34,7 +33,7 @@ public class ReloadCommand extends BaseCommand
             return false;
         }
 
-        WorldConfig newSettings = new WorldConfig(plugin.getWorldSettingsFolder(world.getName()), world, false);
+        WorldSettings newSettings = new WorldSettings(plugin.getWorldSettingsFolder(world.getName()), world, false);
         world.setSettings(newSettings);
 
         sender.sendMessage(MESSAGE_COLOR + "Configs for world '" + world.getName() + "' reloaded");

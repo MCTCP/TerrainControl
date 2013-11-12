@@ -46,11 +46,11 @@ public class ListCommand extends BaseCommand
 
             if (world != null)
             {
-                if (world.getSettings().customObjects.isEmpty())
+                if (world.getSettings().worldConfig.customObjects.isEmpty())
                     sender.sendMessage(MESSAGE_COLOR + "This world does not have custom objects");
 
                 List<String> pluginList = new ArrayList<String>();
-                for (CustomObject object : world.getSettings().customObjects)
+                for (CustomObject object : world.getSettings().worldConfig.customObjects)
                 {
                     pluginList.add(VALUE_COLOR + object.getName());
                 }

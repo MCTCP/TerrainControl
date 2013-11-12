@@ -1,25 +1,25 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 public class LayerMixWithRiver extends Layer
 {
-    public LayerMixWithRiver(long paramLong, Layer paramGenLayer, Layer riverLayer, WorldConfig config, LocalWorld world)
+    public LayerMixWithRiver(long paramLong, Layer paramGenLayer, Layer riverLayer, WorldSettings configs, LocalWorld world)
     {
         super(paramLong);
         this.child = paramGenLayer;
-        this.worldConfig = config;
+        this.configs = configs;
         this.riverLayer = riverLayer;
         this.riverBiomes = new int[world.getMaxBiomesCount()];
 
         for (int id = 0; id < this.riverBiomes.length; id++)
         {
-            BiomeConfig biomeConfig = config.biomeConfigManager.biomeConfigs[id];
+            BiomeConfig biomeConfig = configs.biomeConfigs[id];
 
             if (biomeConfig == null || biomeConfig.riverBiome.isEmpty())
                 this.riverBiomes[id] = -1;
@@ -29,7 +29,7 @@ public class LayerMixWithRiver extends Layer
         }
     }
 
-    private WorldConfig worldConfig;
+    private WorldSettings configs;
     private int[] riverBiomes;
     private Layer riverLayer;
 
@@ -61,6 +61,7 @@ public class LayerMixWithRiver extends Layer
         int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
         int[] arrayOfInt2 = this.riverLayer.GetBiomes(arraysCache, x, z, x_size, z_size);
         int[] arrayOfInt3 = arraysCache.GetArray(x_size * z_size);
+        WorldConfig worldConfig = this.configs.worldConfig;
 
         int currentPiece;
         int currentRiver;
@@ -74,12 +75,12 @@ public class LayerMixWithRiver extends Layer
 
                 if ((currentPiece & LandBit) != 0)
                     cachedId = currentPiece & BiomeBits;
-                else if (this.worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
                     cachedId = DefaultBiome.FROZEN_OCEAN.Id;
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
-                if (this.worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !this.worldConfig.biomeConfigManager.biomeConfigs[cachedId].riverBiome.isEmpty())
+                if (worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !this.configs.biomeConfigs[cachedId].riverBiome.isEmpty())
                     currentPiece = this.riverBiomes[cachedId];
                 else
                     currentPiece = cachedId;
@@ -97,6 +98,7 @@ public class LayerMixWithRiver extends Layer
         int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
         //int[] arrayOfInt2 = this.riverLayer.GetBiomes(arraysCache, x, z, x_size, z_size);
         int[] arrayOfInt3 = arraysCache.GetArray(x_size * z_size);
+        WorldConfig worldConfig = this.configs.worldConfig;
 
         int currentPiece;
         // int currentRiver;
@@ -110,7 +112,7 @@ public class LayerMixWithRiver extends Layer
 
                 if ((currentPiece & LandBit) != 0)
                     cachedId = currentPiece & BiomeBits;
-                else if (this.worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
                     cachedId = DefaultBiome.FROZEN_OCEAN.Id;
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
@@ -132,6 +134,7 @@ public class LayerMixWithRiver extends Layer
         int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
         int[] arrayOfInt2 = this.riverLayer.GetBiomes(arraysCache, x, z, x_size, z_size);
         int[] arrayOfInt3 = arraysCache.GetArray(x_size * z_size);
+        WorldConfig worldConfig = this.configs.worldConfig;
 
         int currentPiece;
         int currentRiver;
@@ -145,12 +148,12 @@ public class LayerMixWithRiver extends Layer
 
                 if ((currentPiece & LandBit) != 0)
                     cachedId = currentPiece & BiomeBits;
-                else if (this.worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
                     cachedId = DefaultBiome.FROZEN_OCEAN.Id;
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
-                if (this.worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !this.worldConfig.biomeConfigManager.biomeConfigs[cachedId].riverBiome.isEmpty())
+                if (worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !this.configs.biomeConfigs[cachedId].riverBiome.isEmpty())
                     currentPiece = 1;
                 else
                     currentPiece = 0;

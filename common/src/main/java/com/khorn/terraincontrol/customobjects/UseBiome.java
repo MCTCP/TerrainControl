@@ -17,7 +17,7 @@ public class UseBiome implements CustomObject
 {
     public ArrayList<CustomObject> getPossibleObjectsAt(LocalWorld world, int x, int z)
     {
-        return world.getSettings().biomeConfigManager.biomeConfigs[world.getBiome(x, z).getId()].biomeObjects;
+        return world.getSettings().biomeConfigs[world.getBiome(x, z).getId()].biomeObjects;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class UseBiome implements CustomObject
 
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
-        int objectSpawnRatio = world.getSettings().objectSpawnRatio;
+        int objectSpawnRatio = world.getSettings().worldConfig.objectSpawnRatio;
 
         if (possibleObjects.isEmpty())
             return false;
@@ -94,7 +94,7 @@ public class UseBiome implements CustomObject
 
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
-        int objectSpawnRatio = world.getSettings().objectSpawnRatio;
+        int objectSpawnRatio = world.getSettings().worldConfig.objectSpawnRatio;
 
         if (possibleObjects.isEmpty())
             return false;

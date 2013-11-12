@@ -11,6 +11,7 @@ import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
@@ -19,15 +20,13 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
+import net.minecraft.server.v1_6_R3.*;
+import org.bukkit.craftbukkit.v1_6_R3.CraftWorld;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Level;
-
-import net.minecraft.server.v1_6_R3.*;
-
-import org.bukkit.craftbukkit.v1_6_R3.CraftWorld;
 
 public class BukkitWorld implements LocalWorld
 {
@@ -36,7 +35,7 @@ public class BukkitWorld implements LocalWorld
 
     private TCChunkGenerator generator;
     private WorldServer world;
-    private WorldConfig settings;
+    private WorldSettings settings;
     private CustomObjectStructureCache structureCache;
     private String name;
     private BiomeGenerator biomeManager;
@@ -221,15 +220,15 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void PrepareTerrainObjects(int chunkX, int chunkZ, byte[] chunkArray, boolean dry)
     {
-        if (this.settings.strongholdsEnabled)
+        if (this.settings.worldConfig.strongholdsEnabled)
             this.strongholdGen.prepare(this.world, chunkX, chunkZ, chunkArray);
-        if (this.settings.mineshaftsEnabled)
+        if (this.settings.worldConfig.mineshaftsEnabled)
             this.mineshaftGen.prepare(this.world, chunkX, chunkZ, chunkArray);
-        if (this.settings.villagesEnabled && dry)
+        if (this.settings.worldConfig.villagesEnabled && dry)
             this.villageGen.prepare(this.world, chunkX, chunkZ, chunkArray);
-        if (this.settings.rareBuildingsEnabled)
+        if (this.settings.worldConfig.rareBuildingsEnabled)
             this.pyramidsGen.prepare(this.world, chunkX, chunkZ, chunkArray);
-        if (this.settings.netherFortressesEnabled)
+        if (this.settings.worldConfig.netherFortressesEnabled)
             this.netherFortress.prepare(this.world, chunkX, chunkZ, chunkArray);
     }
 
@@ -274,15 +273,15 @@ public class BukkitWorld implements LocalWorld
     public boolean PlaceTerrainObjects(Random random, int chunkX, int chunkZ)
     {
         boolean villageGenerated = false;
-        if (this.settings.strongholdsEnabled)
+        if (this.settings.worldConfig.strongholdsEnabled)
             this.strongholdGen.place(this.world, random, chunkX, chunkZ);
-        if (this.settings.mineshaftsEnabled)
+        if (this.settings.worldConfig.mineshaftsEnabled)
             this.mineshaftGen.place(this.world, random, chunkX, chunkZ);
-        if (this.settings.villagesEnabled)
+        if (this.settings.worldConfig.villagesEnabled)
             villageGenerated = this.villageGen.place(this.world, random, chunkX, chunkZ);
-        if (this.settings.rareBuildingsEnabled)
+        if (this.settings.worldConfig.rareBuildingsEnabled)
             this.pyramidsGen.place(this.world, random, chunkX, chunkZ);
-        if (this.settings.netherFortressesEnabled)
+        if (this.settings.worldConfig.netherFortressesEnabled)
             this.netherFortress.place(this.world, random, chunkX, chunkZ);
 
         return villageGenerated;
@@ -293,7 +292,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void replaceBlocks()
     {
-        if (this.settings.BiomeConfigsHaveReplacement)
+        if (this.settings.worldConfig.BiomeConfigsHaveReplacement)
         {
             Chunk rawChunk = this.chunkCache[0];
 
@@ -313,7 +312,7 @@ public class BukkitWorld implements LocalWorld
                 {
                     for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigManager.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
+                        BiomeConfig biomeConfig = this.settings.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
                         if (biomeConfig != null && biomeConfig.ReplaceCount > 0)
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)
@@ -341,12 +340,12 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void replaceBiomes()
     {
-        if (this.settings.HaveBiomeReplace)
+        if (this.settings.worldConfig.HaveBiomeReplace)
         {
             byte[] ChunkBiomes = this.chunkCache[0].m();
 
             for (int i = 0; i < ChunkBiomes.length; i++)
-                ChunkBiomes[i] = (byte) (this.settings.biomeConfigManager.ReplaceBiomesMatrix[ChunkBiomes[i] & 0xFF] & 0xFF);
+                ChunkBiomes[i] = (byte) (this.settings.ReplaceBiomesMatrix[ChunkBiomes[i] & 0xFF] & 0xFF);
         }
 
     }
@@ -573,7 +572,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public WorldConfig getSettings()
+    public WorldSettings getSettings()
     {
         return this.settings;
     }
@@ -617,16 +616,28 @@ public class BukkitWorld implements LocalWorld
      * settings, if any.
      * <p/>
      *
+     * @param baseFolder The folder the WorldConfig is in.
      * @param worldConfig The new settings.
      */
-    public void setSettings(WorldConfig worldConfig)
+    public void setSettings(WorldSettings newSettings)
     {
-        if (this.settings != null)
+        if (this.settings == null)
         {
-            this.settings.newSettings = worldConfig;
-            this.settings.isDeprecated = true;
+            this.settings = newSettings;
         }
-        this.settings = worldConfig;
+        else
+        {
+            // This is an ugly hack. It is a much better idea to give
+            // the WorldSettings a proper reload method.
+            this.settings.biomeConfigs = newSettings.biomeConfigs;
+            this.settings.biomesCount = newSettings.biomesCount;
+            this.settings.ReplaceBiomesMatrix = newSettings.ReplaceBiomesMatrix;
+
+            // Deprecate old WorldConfig and replace with new
+            this.settings.worldConfig.newSettings = newSettings.worldConfig;
+            this.settings.worldConfig.isDeprecated = true;
+            this.settings.worldConfig = newSettings.worldConfig;
+        }
     }
 
     /**
@@ -655,7 +666,7 @@ public class BukkitWorld implements LocalWorld
         }
 
         // Inject our own BiomeManager (called WorldChunkManager)
-        Class<? extends BiomeGenerator> biomeModeClass = this.settings.biomeMode;
+        Class<? extends BiomeGenerator> biomeModeClass = this.settings.worldConfig.biomeMode;
         if (biomeModeClass != TerrainControl.getBiomeModeManager().VANILLA)
         {
             TCWorldChunkManager worldChunkManager = new TCWorldChunkManager(this);
@@ -671,7 +682,7 @@ public class BukkitWorld implements LocalWorld
             // Things that need to be done only when enabling for the first time
             this.structureCache = new CustomObjectStructureCache(this);
 
-            switch (this.settings.ModeTerrain)
+            switch (this.settings.worldConfig.ModeTerrain)
             {
                 case Normal:
                 case OldGenerator:

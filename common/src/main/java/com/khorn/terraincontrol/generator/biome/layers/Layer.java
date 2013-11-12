@@ -1,10 +1,12 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
+
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
@@ -62,50 +64,53 @@ public abstract class Layer
     public static Layer[] Init(long paramLong, LocalWorld world)
     {
 
-        /*int BigLandSize = 2;  //default 0, more - smaller
+        /*
+        int BigLandSize = 2;  //default 0, more - smaller
         int ChanceToIncreaseLand = 6; //default 4
-        int MaxDepth = 10;     */
+        int MaxDepth = 10;
+        */
 
-        WorldConfig config = world.getSettings();
+        WorldSettings configs = world.getSettings();
+        WorldConfig worldConfig = configs.worldConfig;
 
-        LocalBiome[][] NormalBiomeMap = new LocalBiome[config.GenerationDepth + 1][];
-        LocalBiome[][] IceBiomeMap = new LocalBiome[config.GenerationDepth + 1][];
+        LocalBiome[][] NormalBiomeMap = new LocalBiome[worldConfig.GenerationDepth + 1][];
+        LocalBiome[][] IceBiomeMap = new LocalBiome[worldConfig.GenerationDepth + 1][];
 
 
-        for (int i = 0; i < config.GenerationDepth + 1; i++)
+        for (int i = 0; i < worldConfig.GenerationDepth + 1; i++)
         {
             ArrayList<LocalBiome> normalBiomes = new ArrayList<LocalBiome>();
             ArrayList<LocalBiome> iceBiomes = new ArrayList<LocalBiome>();
-            for (BiomeConfig biomeConfig : config.biomeConfigManager.biomeConfigs)
+            for (BiomeConfig biomeConfig : configs.biomeConfigs)
             {
                 if (biomeConfig == null)
                     continue;
 
                 if (biomeConfig.BiomeSize != i)
                     continue;
-                if (config.NormalBiomes.contains(biomeConfig.name))
+                if (worldConfig.NormalBiomes.contains(biomeConfig.name))
                 {
                     for (int t = 0; t < biomeConfig.BiomeRarity; t++)
                         normalBiomes.add(biomeConfig.Biome);
-                    config.normalBiomesRarity -= biomeConfig.BiomeRarity;
+                    worldConfig.normalBiomesRarity -= biomeConfig.BiomeRarity;
                 }
 
-                if (config.IceBiomes.contains(biomeConfig.name))
+                if (worldConfig.IceBiomes.contains(biomeConfig.name))
                 {
                     for (int t = 0; t < biomeConfig.BiomeRarity; t++)
                         iceBiomes.add(biomeConfig.Biome);
-                    config.iceBiomesRarity -= biomeConfig.BiomeRarity;
+                    worldConfig.iceBiomesRarity -= biomeConfig.BiomeRarity;
                 }
 
             }
 
             if (!normalBiomes.isEmpty())
-                NormalBiomeMap[i] = normalBiomes.toArray(new LocalBiome[normalBiomes.size() + config.normalBiomesRarity]);
+                NormalBiomeMap[i] = normalBiomes.toArray(new LocalBiome[normalBiomes.size() + worldConfig.normalBiomesRarity]);
             else
                 NormalBiomeMap[i] = new LocalBiome[0];
 
             if (!iceBiomes.isEmpty())
-                IceBiomeMap[i] = iceBiomes.toArray(new LocalBiome[iceBiomes.size() + config.iceBiomesRarity]);
+                IceBiomeMap[i] = iceBiomes.toArray(new LocalBiome[iceBiomes.size() + worldConfig.iceBiomesRarity]);
             else
                 IceBiomeMap[i] = new LocalBiome[0];
 
@@ -119,21 +124,21 @@ public abstract class Layer
         boolean riversStarted = false;
 
 
-        for (int depth = 0; depth <= config.GenerationDepth; depth++)
+        for (int depth = 0; depth <= worldConfig.GenerationDepth; depth++)
         {
 
             MainLayer = new LayerZoom(2001 + depth, MainLayer);
 
-            if (config.randomRivers && riversStarted)
+            if (worldConfig.randomRivers && riversStarted)
                 RiverLayer = new LayerZoom(2001 + depth, RiverLayer);
 
-            if (config.LandSize == depth)
+            if (worldConfig.LandSize == depth)
             {
-                MainLayer = new LayerLand(1L, MainLayer, config.LandRarity);
+                MainLayer = new LayerLand(1L, MainLayer, worldConfig.LandRarity);
                 MainLayer = new LayerZoomFuzzy(2000L, MainLayer);
             }
 
-            if (depth < (config.LandSize + config.LandFuzzy))
+            if (depth < (worldConfig.LandSize + worldConfig.LandFuzzy))
                 MainLayer = new LayerLandRandom(depth, MainLayer);
 
 
@@ -147,11 +152,11 @@ public abstract class Layer
             }
 
 
-            if (config.IceSize == depth)
-                MainLayer = new LayerIce(depth, MainLayer, config.IceRarity);
+            if (worldConfig.IceSize == depth)
+                MainLayer = new LayerIce(depth, MainLayer, worldConfig.IceRarity);
 
-            if (config.riverRarity == depth)
-                if (config.randomRivers)
+            if (worldConfig.riverRarity == depth)
+                if (worldConfig.randomRivers)
                 {
                     RiverLayer = new LayerRiverInit(155, RiverLayer);
                     riversStarted = true;
@@ -159,9 +164,9 @@ public abstract class Layer
                     MainLayer = new LayerRiverInit(155, MainLayer);
 
 
-            if ((config.GenerationDepth - config.riverSize) == depth)
+            if ((worldConfig.GenerationDepth - worldConfig.riverSize) == depth)
             {
-                if (config.randomRivers)
+                if (worldConfig.randomRivers)
                     RiverLayer = new LayerRiver(5 + depth, RiverLayer);
                 else
                     MainLayer = new LayerRiver(5 + depth, MainLayer);
@@ -169,13 +174,13 @@ public abstract class Layer
 
             LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
             boolean haveBorder = false;
-            for (BiomeConfig biomeConfig : config.biomeConfigManager.biomeConfigs)
+            for (BiomeConfig biomeConfig : configs.biomeConfigs)
             {
                 if (biomeConfig == null)
                     continue;
                 if (biomeConfig.BiomeSize != depth)
                     continue;
-                if (config.IsleBiomes.contains(biomeConfig.name) && biomeConfig.IsleInBiome != null)
+                if (worldConfig.IsleBiomes.contains(biomeConfig.name) && biomeConfig.IsleInBiome != null)
                 {
                     int id = biomeConfig.Biome.getId();
                     if (biomeConfig.Biome.isCustom())
@@ -192,11 +197,11 @@ public abstract class Layer
                             layerBiome.BiomeIsles[islandIn] = true;
                     }
 
-                    layerBiome.chance = (config.BiomeRarityScale + 1) - biomeConfig.BiomeRarity;
+                    layerBiome.chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.BiomeRarity;
                     MainLayer = layerBiome;
                 }
 
-                if (config.BorderBiomes.contains(biomeConfig.name) && biomeConfig.BiomeIsBorder != null)
+                if (worldConfig.BorderBiomes.contains(biomeConfig.name) && biomeConfig.BiomeIsBorder != null)
                 {
                     haveBorder = true;
 
@@ -219,20 +224,20 @@ public abstract class Layer
 
 
         }
-        if (config.randomRivers)
-            MainLayer = new LayerMixWithRiver(1L, MainLayer, RiverLayer, config, world);
+        if (worldConfig.randomRivers)
+            MainLayer = new LayerMixWithRiver(1L, MainLayer, RiverLayer, configs, world);
         else
-            MainLayer = new LayerMix(1L, MainLayer, config, world);
+            MainLayer = new LayerMix(1L, MainLayer, configs, world);
 
         MainLayer = new LayerSmooth(400L, MainLayer);
 
-        if (config.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
+        if (worldConfig.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
         {
 
-            if (config.imageMode == WorldConfig.ImageMode.ContinueNormal)
-                MainLayer = new LayerFromImage(1L, MainLayer, config, world);
+            if (worldConfig.imageMode == WorldConfig.ImageMode.ContinueNormal)
+                MainLayer = new LayerFromImage(1L, MainLayer, worldConfig, world);
             else
-                MainLayer = new LayerFromImage(1L, null, config, world);
+                MainLayer = new LayerFromImage(1L, null, worldConfig, world);
         }
 
 

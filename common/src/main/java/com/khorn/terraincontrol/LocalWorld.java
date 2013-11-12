@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
@@ -135,7 +135,7 @@ public interface LocalWorld
 
     public boolean isLoaded(int x, int y, int z);
 
-    public WorldConfig getSettings();
+    public WorldSettings getSettings();
 
     public CustomObjectStructureCache getStructureCache();
 

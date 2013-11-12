@@ -20,7 +20,6 @@ public class TCWorldChunkManager extends WorldChunkManager
 
     public TCWorldChunkManager(BukkitWorld world)
     {
-        super();
         localWorld = world;
     }
 
