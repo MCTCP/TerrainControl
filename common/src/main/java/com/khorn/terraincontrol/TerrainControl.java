@@ -213,8 +213,8 @@ public class TerrainControl
         if (logMan == null)
         {
             LogManager.backLog(new LogRecord(level, StringHelper.join(message, " ")));
-        }
-        logMan.log(level, message);
+        } else
+            logMan.log(level, message);
     }
 
     /**
@@ -233,8 +233,8 @@ public class TerrainControl
             LogRecord lr = new LogRecord(level, message);
             lr.setParameters(new Object[]{ param });
             LogManager.backLog(lr);
-        }
-        logMan.log(level, message, param);
+        } else
+            logMan.log(level, message, param);
     }
 
     /**
@@ -254,8 +254,8 @@ public class TerrainControl
             LogRecord lr = new LogRecord(level, message);
             lr.setParameters(params);
             LogManager.backLog(lr);
-        }
-        logMan.log(level, message, params);
+        } else
+            logMan.log(level, message, params);
     }
 
     /**
