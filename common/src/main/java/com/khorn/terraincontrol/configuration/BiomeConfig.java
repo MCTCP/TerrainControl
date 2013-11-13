@@ -153,6 +153,16 @@ public class BiomeConfig extends ConfigFile
         this.readSettingsFile(false);
     }
 
+    public BiomeConfig(String name, File biomeFile, LocalBiome biome, WorldConfig config)
+    {
+        super(biome.getName(), biomeFile);
+        this.Biome = biome;
+        this.worldConfig = config;
+        this.defaultSettings = StandardBiomeFactory.getDefaultSettings(biome, config.WorldHeight);
+
+        this.readSettingsFile(false);
+    }
+
     public void process()
     {
         if (!processHasRun)

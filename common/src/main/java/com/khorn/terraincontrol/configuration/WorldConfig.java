@@ -833,8 +833,10 @@ public class WorldConfig extends ConfigFile
     {
         String output = "";
         boolean first = true;
+        //>>	Custom Biome Id
         List<Entry<String, Integer>> cbi = new ArrayList<Entry<String, Integer>>(this.CustomBiomeIds.entrySet());
         Collections.sort(cbi, CBV);
+        //>>	Virutal Biome Id
         List<Entry<String, Integer>> vbi = new ArrayList<Entry<String, Integer>>(this.VirtualBiomeIds.entrySet());
         Collections.sort(vbi, CBV);
         //>>	Print all custom Biomes first
