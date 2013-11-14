@@ -22,7 +22,7 @@ import java.util.logging.Level;
 public final class WorldSettings
 {
 
-    private Map<String, File> BiomeDirs = new HashMap<String, File>(4);
+    private Map<String, File> BiomeDirs = new LinkedHashMap<String, File>(4);
     public byte[] ReplaceBiomesMatrix = new byte[256];
     private LocalWorld world;
     public WorldConfig worldConfig;
@@ -65,10 +65,11 @@ public final class WorldSettings
         this.worldConfig.CustomBiomeIds = customBiomes;
 
         //>> -- ESTRABLISH FOLDERS -- <<//
-        //>>	TerrainControl/GlobalBiomes/
-        this.BiomeDirs.put("global", new File(TerrainControl.getEngine().getTCDataFolder(), PluginStandardValues.BiomeConfigDirectoryName.stringValue()));
         //>>	TerrainControl/worlds/<WorldName>/<WorldBiomes/
         this.BiomeDirs.put("world", new File(settingsDir, correctOldBiomeConfigFolder(settingsDir)));
+        //>>	TerrainControl/GlobalBiomes/
+        this.BiomeDirs.put("global", new File(TerrainControl.getEngine().getTCDataFolder(), PluginStandardValues.BiomeConfigDirectoryName.stringValue()));
+        
         //>>	If there was an error in folder establishment, return.
         if (!makeBiomeFolders())
             return;
