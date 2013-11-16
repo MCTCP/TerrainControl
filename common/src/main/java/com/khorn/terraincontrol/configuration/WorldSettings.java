@@ -215,7 +215,7 @@ public final class WorldSettings
      * @return A Map<String, LocalBiome> of biomes that were not loaded
      *         during the recursive directory loading process
      */
-    protected Map<String, LocalBiome> loadBiomesRecursive(File directory, ArrayList<LocalBiome> biomesToLoad)
+    private Map<String, LocalBiome> loadBiomesRecursive(File directory, ArrayList<LocalBiome> biomesToLoad)
     {
         //>>	We need a faster way of looking up biomeNames, so a hashmap will
         //>>	be created for you if you only have an arraylist
@@ -239,7 +239,7 @@ public final class WorldSettings
      * @return  A Map<String, LocalBiome> of biomes that were not loaded
      *         during the recursive directory loading process
      */
-    protected Map<String, LocalBiome> loadBiomesRecursive(File directory, Map<String, LocalBiome> biomesToLoad)
+    private Map<String, LocalBiome> loadBiomesRecursive(File directory, Map<String, LocalBiome> biomesToLoad)
     {
         if (!directory.isDirectory())
             throw new IllegalArgumentException("Given file is not a directory: " + directory.getAbsolutePath());
@@ -296,12 +296,7 @@ public final class WorldSettings
             // Only if it won't overwrite another biome in the array
             biomesCount++;
         } else
-        {
-            TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]
-            {
-                localBiome.getId(), biomeConfigs[localBiome.getId()].name, config.name
-            });
-        }
+            TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[]{ localBiome.getId(), biomeConfigs[localBiome.getId()].name, config.name });
         //>>	This will, by default, treat the last biome of a specific localBiome.getId() as the one we save.
         biomeConfigs[localBiome.getId()] = config;
     }
@@ -376,22 +371,16 @@ public final class WorldSettings
             TerrainControl.log(Level.SEVERE, "======= ACTION REQUIRED =======");
             if (!selfInheritanceErrors.isEmpty())
             {
-                TerrainControl.log(Level.WARNING, "A Biome can NOT extend itself, please fix the following biomes:\n{0}", new Object[]
-                {
-                    selfInheritanceErrors
-                });
+                TerrainControl.log(Level.WARNING, "A Biome can NOT extend itself, please fix the following biomes:\n{0}", new Object[]{ selfInheritanceErrors });
             }
             if (!inheritanceErrors.isEmpty())
             {
-                String tempIE = "";
+                StringBuilder tempIE = new StringBuilder(200);
                 for (StringBuilder cycle : inheritanceErrors)
                 {
-                    tempIE += cycle.toString() + "\n";
+                    tempIE.append(cycle.toString()).append("\n");
                 }
-                tempIE += "We will ignore the above biomes for inheritance purposes...";
-
-                TerrainControl.log(Level.SEVERE, "Cyclical Inheritance(s) Found:\n{0}", tempIE);
-
+                TerrainControl.log(Level.SEVERE, "Cyclical Inheritance(s) Found:\n{0}", tempIE.append("We will ignore the above biomes for inheritance purposes...").toString());
             }
             TerrainControl.log(Level.SEVERE, "======= ACTION REQUIRED =======");
         }
@@ -405,18 +394,12 @@ public final class WorldSettings
 
     private void doInheritance(BiomeConfig config, boolean isParent)
     {
-        TerrainControl.log(Level.FINER, "DO INHERITANCE: {0}", new Object[]
-        {
-            config.name
-        });
+        TerrainControl.log(Level.FINER, "DO INHERITANCE: {0}", new Object[]{ config.name });
         if (!config.BiomeExtendsSeen)
         {
             config.BiomeExtendsSeen = true;
             biomeLoadingStack.push(config);
-            TerrainControl.log(Level.FINEST, "\tSTACK:::Pushing config; New Size: {0}", new Object[]
-            {
-                biomeLoadingStack.size()
-            });
+            TerrainControl.log(Level.FINEST, "\tSTACK:::Pushing config; New Size: {0}", new Object[]{ biomeLoadingStack.size() });
             if (!config.BiomeExtendsProcessed)
             {
                 if (config.settingsCache.containsKey(BiomeStandardValues.BiomeExtends.name().toLowerCase()))
@@ -472,10 +455,7 @@ public final class WorldSettings
                                                 if (mergedIndex == null)
                                                 {
                                                     //>>	If nothing found, something is configured wrong
-                                                    TerrainControl.log(Level.SEVERE, "\t\tPlease make sure you include {0} in the `Custom biomes` and `Biome Lists` portions of the WorldConfig", new Object[]
-                                                    {
-                                                        child.name
-                                                    });
+                                                    TerrainControl.log(Level.SEVERE, "\t\tPlease make sure you include {0} in the `Custom biomes` and `Biome Lists` portions of the WorldConfig", new Object[]{ child.name });
                                                 } else
                                                 {
                                                     biomeConfigs[mergedIndex] = merged;

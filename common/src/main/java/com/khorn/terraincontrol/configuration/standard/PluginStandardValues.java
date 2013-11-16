@@ -9,6 +9,10 @@ import java.util.HashSet;
 
 public enum PluginStandardValues implements MultiTypedSetting
 {
+    //>>	Feature flags
+    developer_name(""),
+    Feature_BiomeInheritanceVariables_Timethor(false),
+    
   //>> Files
     //>>	Main Plugin Config
     ConfigFilename("TerrainControl.ini"),

@@ -44,6 +44,9 @@ public final class PluginConfig extends ConfigFile
     public LogLevels fileHandlerLevel;
     public LogLevels consoleHandlerLevel;
     public String worldDefaultBiomeConfigExtension;
+    //>>	Feature Flags (Temporary)
+    public String developer_name;
+    public boolean feature_BiomeInheritanceVariables_Timethor;
     
     public PluginConfig(File settingsDir)
     {
@@ -101,6 +104,19 @@ public final class PluginConfig extends ConfigFile
         this.consoleHandlerLevel = readSettings(PluginStandardValues.ConsoleLogLevel);
         this.fileHandlerLevel = readSettings(PluginStandardValues.FileLogLevel);
         this.worldDefaultBiomeConfigExtension = readSettings(BiomeStandardValues.DefaultBiomeConfigExtension);
+        //>>	Feature flags here
+        this.developer_name = readSettings(PluginStandardValues.developer_name);
+        if (!developer_name.isEmpty())
+        {
+            TerrainControl.log(Level.INFO, "Now Useing --- Timethor's Dev Features ---");
+            this.feature_BiomeInheritanceVariables_Timethor = readSettings(PluginStandardValues.Feature_BiomeInheritanceVariables_Timethor);
+            if (this.feature_BiomeInheritanceVariables_Timethor)
+            {
+                TerrainControl.log(Level.INFO, "\t <<< Activating: Feature_Biome_Inheritance_Variables.");
+            }
+        }
+
+        
     }
 
     @Override
@@ -155,6 +171,14 @@ public final class PluginConfig extends ConfigFile
         writeComment(" ");
         writeComment("Defaults to: .bc");
         writeValue(BiomeStandardValues.DefaultBiomeConfigExtension, this.worldDefaultBiomeConfigExtension);
+        //>>	Feature flags here
+        if (this.developer_name.trim().equalsIgnoreCase("Timethor"))
+        {
+            writeComment(" ");
+            writeValue(PluginStandardValues.developer_name, this.developer_name);
+            writeComment(" ");
+            writeValue(PluginStandardValues.Feature_BiomeInheritanceVariables_Timethor, this.feature_BiomeInheritanceVariables_Timethor);
+        }
     }
 
     public LogLevels getFileHandlerLevel()

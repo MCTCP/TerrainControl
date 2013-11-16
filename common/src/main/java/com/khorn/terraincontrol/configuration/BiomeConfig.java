@@ -12,6 +12,7 @@ import com.khorn.terraincontrol.generator.resource.Resource;
 import com.khorn.terraincontrol.generator.resource.SaplingGen;
 import com.khorn.terraincontrol.generator.resource.SaplingType;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
+import com.khorn.terraincontrol.util.helpers.InheritanceHelper;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
@@ -359,7 +360,7 @@ public class BiomeConfig extends ConfigFile
                     short fromBlockId = (short) StringHelper.readBlockId(values[0]);
                     short toBlockId = (short) StringHelper.readBlockId(values[1]);
                     short blockData = (short) StringHelper.readBlockData(values[1]);
-
+                    
                     int minY = 0;
                     int maxY = worldConfig.WorldHeight - 1;
 
@@ -475,6 +476,30 @@ public class BiomeConfig extends ConfigFile
      */
     public BiomeConfig merge(BiomeConfig parent)
     {
+        //>>	INHERITANCE VARIABLES -- START
+        if (TerrainControl.getPluginConfig().feature_BiomeInheritanceVariables_Timethor){
+            //>>	Run down the list of child settings from config
+            for (Map.Entry<String, String> childEntry : this.settingsCache.entrySet())
+            { //>>	As long as setting value contains `Interited` and it isnt a resource
+                String childValue = childEntry.getValue();
+                if (childValue.toLowerCase().contains("inherited") && getResource(childEntry) == null)
+                { //>>	if the parent has the setting
+                    if (parent.settingsCache.containsKey(childEntry.getKey()))
+                    {
+                        String parentValue = parent.settingsCache.get(childEntry.getKey());
+                        if (parentValue.toLowerCase().contains("inherited"))
+                        {
+                            TerrainControl.log(Level.SEVERE, "Parent has `Inherited` keyword. Something is wrong. Please report this.");
+                            continue;
+                        }
+                        childEntry.setValue(InheritanceHelper.evaluate(childValue, parentValue));
+                        TerrainControl.log(Level.SEVERE, "Setting `{0}` replaced with `{1}`", new Object[]{childEntry.getKey(), InheritanceHelper.evaluate(childValue, parentValue)});
+                    }
+                }
+            }
+        }
+        //>>	INHERITANCE VARIABLES -- END
+        
         //>>	Run down the list of parent settings from config
         for (Map.Entry<String, String> parentEntry : parent.settingsCache.entrySet())
         {
