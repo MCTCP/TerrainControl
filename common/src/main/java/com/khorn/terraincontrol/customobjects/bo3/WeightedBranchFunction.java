@@ -20,7 +20,7 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
-        branches = new TreeSet<BranchNode>(BranchNode.getComparator());
+        branches = new TreeSet<BranchNode>();
         cumulativeChance = readArgs(args, true);
     }
 
@@ -50,7 +50,7 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
     @Override
     protected String getConfigName()
     {
-        return "Weighted" + super.getConfigName();
+        return "WeightedBranch";
     }
 
 }

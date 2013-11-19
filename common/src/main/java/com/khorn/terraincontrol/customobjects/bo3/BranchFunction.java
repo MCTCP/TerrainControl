@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 /**
- *
+ * Represents the Branch(..) function in the BO3 files.
  *
  */
 public class BranchFunction extends BO3Function implements Branch
@@ -46,10 +46,9 @@ public class BranchFunction extends BO3Function implements Branch
         rotatedBranch.x = z;
         rotatedBranch.y = y;
         rotatedBranch.z = -x;
-        rotatedBranch.branches = branches;
-        for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
+        rotatedBranch.branches = new TreeSet<BranchNode>();
+        for (BranchNode holder : this.branches)
         {
-            BranchNode holder = it.next();
             rotatedBranch.branches.add(new BranchNode(Rotation.next(holder.getRotation()), holder.getChance(), holder.getCustomObject()));
         }
         return rotatedBranch;
@@ -58,7 +57,7 @@ public class BranchFunction extends BO3Function implements Branch
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
-        branches = new TreeSet<BranchNode>(BranchNode.getComparator());
+        branches = new TreeSet<BranchNode>();
         readArgs(args, false);
     }
 
