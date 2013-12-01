@@ -3,10 +3,10 @@ package com.khorn.terraincontrol.bukkit;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OutputType;
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.ChunkPosition;
-import net.minecraft.server.v1_6_R3.WorldChunkManager;
-import net.minecraft.server.v1_6_R3.WorldGenVillage;
+import net.minecraft.server.v1_7_R1.BiomeBase;
+import net.minecraft.server.v1_7_R1.ChunkPosition;
+import net.minecraft.server.v1_7_R1.WorldChunkManager;
+import net.minecraft.server.v1_7_R1.WorldGenVillage;
 
 import java.util.List;
 import java.util.Random;
@@ -29,19 +29,13 @@ public class TCWorldChunkManager extends WorldChunkManager
     @Override
     public BiomeBase getBiome(int paramInt1, int paramInt2)
     {
-        return BiomeBase.biomes[biomeManager.getBiome(paramInt1, paramInt2)];
+        return BiomeBase.getBiome(biomeManager.getBiome(paramInt1, paramInt2));
     }
 
     @Override
     public float[] getWetness(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         return biomeManager.getRainfall(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
-    }
-
-    @Override
-    public float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
-    {
-        return biomeManager.getTemperatures(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
     }
 
     @Override
@@ -55,7 +49,7 @@ public class TCWorldChunkManager extends WorldChunkManager
         int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = BiomeBase.biomes[arrayOfInt[i]];
+            paramArrayOfBiomeBase[i] = BiomeBase.getBiome(arrayOfInt[i]);
         }
 
         return paramArrayOfBiomeBase;
@@ -72,7 +66,7 @@ public class TCWorldChunkManager extends WorldChunkManager
         int[] localObject = this.biomeManager.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = BiomeBase.biomes[localObject[i]];
+            paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localObject[i]);
         }
 
         return paramArrayOfBiomeBase;
@@ -129,7 +123,7 @@ public class TCWorldChunkManager extends WorldChunkManager
                 continue;
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            BiomeBase localBiomeBase = BiomeBase.biomes[arrayOfInt[i3]];
+            BiomeBase localBiomeBase = BiomeBase.getBiome(arrayOfInt[i3]);
             if ((!paramList.contains(localBiomeBase)) || ((localChunkPosition != null) && (paramRandom.nextInt(i2 + 1) != 0)))
                 continue;
             localChunkPosition = new ChunkPosition(i4, 0, i5);

@@ -272,18 +272,17 @@ public class ChunkProviderTC
 
         final double d1 = 0.03125D;
         this.noise4 = this.noiseGen4.Noise3D(this.noise4, chunkX * 16, chunkZ * 16, 0, 16, 16, 1, d1 * 2.0D, d1 * 2.0D, d1 * 2.0D);
-        final float[] temperatureArray = this.localWorld.getTemperatures(chunkX * 16, chunkZ * 16, 16, 16);
 
         for (int x = 0; x < 16; x++)
         {
             for (int z = 0; z < 16; z++)
             {
                 // The following code is executed for each column in the chunk
-                final float currentTemperature = temperatureArray[(z + x * 16)];
-                final int surfaceBlocksNoise = (int) (this.noise4[(x + z * 16)] / 3.0D + 3.0D + this.random.nextDouble() * 0.25D);
 
-                // Get the current biome config
+                // Get the current biome config and some properties
                 final BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.biomeArray[(z + x * 16)]];
+                final float currentTemperature = biomeConfig.BiomeTemperature;
+                final int surfaceBlocksNoise = (int) (this.noise4[(x + z * 16)] / 3.0D + 3.0D + this.random.nextDouble() * 0.25D);
 
                 // Bedrock on the ceiling
                 if (this.worldSettings.ceilingBedrock)

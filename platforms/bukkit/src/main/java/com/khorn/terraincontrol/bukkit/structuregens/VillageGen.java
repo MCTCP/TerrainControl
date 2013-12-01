@@ -1,14 +1,15 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
+import net.minecraft.server.v1_7_R1.World;
+
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.StructureNames;
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.StructureGenerator;
-import net.minecraft.server.v1_6_R3.StructureStart;
-import net.minecraft.server.v1_6_R3.World;
+import net.minecraft.server.v1_7_R1.BiomeBase;
+import net.minecraft.server.v1_7_R1.StructureGenerator;
+import net.minecraft.server.v1_7_R1.StructureStart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +67,7 @@ public class VillageGen extends StructureGenerator
 
         int i1 = chunkX / this.distance;
         int j1 = chunkZ / this.distance;
-        Random random = this.c.H(i1, j1, 10387312);
+        Random random = this.c.A(i1, j1, 10387312);
 
         i1 *= this.distance;
         j1 *= this.distance;
@@ -95,7 +96,8 @@ public class VillageGen extends StructureGenerator
     // It has problems with classes that extend native Minecraft classes
     public void prepare(World world, int chunkX, int chunkZ, byte[] chunkArray)
     {
-        a(null, world, chunkX, chunkZ, chunkArray);
+        // TODO Re-enable this
+        // a(null, world, chunkX, chunkZ, chunkArray);
     }
 
     /**

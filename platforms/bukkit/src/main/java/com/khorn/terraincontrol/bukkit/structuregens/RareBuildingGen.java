@@ -5,7 +5,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.StructureNames;
-import net.minecraft.server.v1_6_R3.*;
+import net.minecraft.server.v1_7_R1.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +73,7 @@ public class RareBuildingGen extends StructureGenerator
 
         int var5 = chunkX / this.maxDistanceBetweenScatteredFeatures;
         int var6 = chunkZ / this.maxDistanceBetweenScatteredFeatures;
-        Random random = this.c.H(var5, var6, 14357617);
+        Random random = this.c.A(var5, var6, 14357617);
         var5 *= this.maxDistanceBetweenScatteredFeatures;
         var6 *= this.maxDistanceBetweenScatteredFeatures;
         var5 += random.nextInt(this.maxDistanceBetweenScatteredFeatures - this.minDistanceBetweenScatteredFeatures);
@@ -115,7 +115,8 @@ public class RareBuildingGen extends StructureGenerator
     // It has problems with classes that extend native Minecraft classes
     public void prepare(World world, int chunkX, int chunkZ, byte[] chunkArray)
     {
-        a(null, world, chunkX, chunkZ, chunkArray);
+        // TODO Re-enable this
+        // a(null, world, chunkX, chunkZ, chunkArray);
     }
 
     public void place(World world, Random random, int chunkX, int chunkZ)

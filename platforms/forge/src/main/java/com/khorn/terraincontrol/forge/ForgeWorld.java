@@ -166,14 +166,6 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public float[] getTemperatures(int x, int z, int x_size, int z_size)
-    {
-        if (this.biomeManager != null)
-            return this.biomeManager.getTemperatures(null, x, z, x_size, z_size);
-        return this.world.provider.worldChunkMgr.getTemperatures(new float[0], x, z, x_size, z_size);
-    }
-
-    @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         if (this.biomeManager != null)

@@ -1,12 +1,13 @@
 package com.khorn.terraincontrol.bukkit.structuregens;
 
+import net.minecraft.server.v1_7_R1.World;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.util.StructureNames;
-import net.minecraft.server.v1_6_R3.StructureGenerator;
-import net.minecraft.server.v1_6_R3.StructureStart;
-import net.minecraft.server.v1_6_R3.World;
-import net.minecraft.server.v1_6_R3.WorldGenMineshaftStart;
+import net.minecraft.server.v1_7_R1.StructureGenerator;
+import net.minecraft.server.v1_7_R1.StructureStart;
+import net.minecraft.server.v1_7_R1.WorldGenMineshaftStart;
 
 import java.util.Random;
 
@@ -41,7 +42,8 @@ public class MineshaftGen extends StructureGenerator
     // It has problems with classes that extend native Minecraft classes
     public void prepare(World world, int chunkX, int chunkZ, byte[] chunkArray)
     {
-        a(null, world, chunkX, chunkZ, chunkArray);
+        // TODO Re-enable this
+        // a(null, world, chunkX, chunkZ, chunkArray);
     }
 
     public void place(World world, Random random, int chunkX, int chunkZ)

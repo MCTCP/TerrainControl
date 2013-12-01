@@ -1,9 +1,11 @@
 package com.khorn.terraincontrol.bukkit;
 
+import net.minecraft.server.v1_7_R1.Block;
+
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import net.minecraft.server.v1_6_R3.BiomeBase;
+import net.minecraft.server.v1_7_R1.BiomeBase;
 
 /**
  * The BukkitBiome is basically a wrapper for the BiomeBase.
@@ -62,7 +64,7 @@ public class BukkitBiome implements LocalBiome
     @Override
     public String getName()
     {
-        return this.biomeBase.y;
+        return this.biomeBase.af;
     }
 
     @Override
@@ -86,24 +88,24 @@ public class BukkitBiome implements LocalBiome
     @Override
     public float getSurfaceHeight()
     {
-        return this.biomeBase.D;
+        return this.biomeBase.am;
     }
 
     @Override
     public float getSurfaceVolatility()
     {
-        return this.biomeBase.E;
+        return this.biomeBase.an;
     }
 
     @Override
     public byte getSurfaceBlock()
     {
-        return this.biomeBase.A;
+        return (byte) Block.b(this.biomeBase.ai);
     }
 
     @Override
     public byte getGroundBlock()
     {
-        return this.biomeBase.B;
+        return (byte) Block.b(this.biomeBase.ak);
     }
 }

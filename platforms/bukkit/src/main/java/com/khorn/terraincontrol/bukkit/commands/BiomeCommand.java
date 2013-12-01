@@ -2,12 +2,12 @@ package com.khorn.terraincontrol.bukkit.commands;
 
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.WorldChunkManager;
+import net.minecraft.server.v1_7_R1.BiomeBase;
+import net.minecraft.server.v1_7_R1.WorldChunkManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_6_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class BiomeCommand extends BaseCommand
         player.sendMessage(ChatColor.AQUA.toString() + "You are in: ");
         WorldChunkManager biomeManager = ((CraftWorld) player.getLocation().getWorld()).getHandle().getWorldChunkManager();
 
-        player.sendMessage(VALUE_COLOR + biomeManager.getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16).y + MESSAGE_COLOR + " chunk biome!");
+        player.sendMessage(VALUE_COLOR + biomeManager.getBiome(chunk.getX() * 16 + 16, chunk.getZ() * 16 + 16).af + MESSAGE_COLOR + " chunk biome!");
 
         if (args.size() == 1 && args.get(0).equals("-f"))
         {
@@ -43,11 +43,10 @@ public class BiomeCommand extends BaseCommand
             float[] humidity = new float[1];
 
             biomeManager.getBiomeBlock(biome, (int) player.getLocation().getX(), (int) player.getLocation().getZ(), 1, 1);
-            biomeManager.getTemperatures(temp, (int) player.getLocation().getX(), (int) player.getLocation().getZ(), 1, 1);
             biomeManager.getWetness(humidity, (int) player.getLocation().getX(), (int) player.getLocation().getZ(), 1, 1);
 
 
-            player.sendMessage(VALUE_COLOR + biome[0].y + MESSAGE_COLOR + " block biome!");
+            player.sendMessage(VALUE_COLOR + biome[0].af + MESSAGE_COLOR + " block biome!");
             player.sendMessage(VALUE_COLOR + humidity[0] + MESSAGE_COLOR + " block humidity!");
             //double notchTemp = biomeManager.temperature[0] - (((CraftWorld) player.getLocation().getWorld()).getHandle().e((int) player.getLocation().getX(), (int) player.getLocation().getZ()) - 64) / 64.0D * 0.3D;
             player.sendMessage(VALUE_COLOR + temp[0] + MESSAGE_COLOR + " block temperature!");

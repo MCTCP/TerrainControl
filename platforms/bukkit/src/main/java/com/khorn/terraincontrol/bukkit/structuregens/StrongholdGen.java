@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.StructureNames;
-import net.minecraft.server.v1_6_R3.*;
+import net.minecraft.server.v1_7_R1.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,7 +94,7 @@ public class StrongholdGen extends StructureGenerator
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    protected List p_()
+    protected List o_()
     {
         ArrayList arraylist = new ArrayList();
         ChunkCoordIntPair[] achunkcoordintpair = this.structureCoords;
@@ -127,7 +127,8 @@ public class StrongholdGen extends StructureGenerator
     // It has problems with classes that extend native Minecraft classes
     public void prepare(World world, int chunkX, int chunkZ, byte[] chunkArray)
     {
-        a(null, world, chunkX, chunkZ, chunkArray);
+        // TODO Re-enable this
+        // a(null, world, chunkX, chunkZ, chunkArray);
     }
 
     public void place(World world, Random random, int chunkX, int chunkZ)

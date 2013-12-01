@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
+import net.minecraft.server.v1_7_R1.Block;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -12,14 +14,13 @@ import com.khorn.terraincontrol.configuration.TCLogManager;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.StringHelper;
 import com.khorn.terraincontrol.util.StructureNames;
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.Block;
-import net.minecraft.server.v1_6_R3.WorldGenFactory;
+import net.minecraft.server.v1_7_R1.BiomeBase;
+import net.minecraft.server.v1_7_R1.WorldGenFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_6_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_7_R1.block.CraftBlock;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -331,20 +332,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     @Override
     public boolean isValidBlockId(int id)
     {
-        if (id == 0)
-        {
-            // Air is a special case
-            return true;
-        }
-        if (id < 0 || id > TerrainControl.supportedBlockIds)
-        {
-            return false;
-        }
-        if (Block.byId[id] == null)
-        {
-            return false;
-        }
-        return true;
+        return (Block.e(id) != null);
     }
 
 }

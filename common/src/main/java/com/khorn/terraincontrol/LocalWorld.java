@@ -29,8 +29,6 @@ public interface LocalWorld
     public ArrayList<LocalBiome> getDefaultBiomes();
 
     // Biome manager
-    // public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int
-    // x_size, int z_size);
 
     /**
      * Calculate biome ids array used in terrain generation.
@@ -44,8 +42,6 @@ public interface LocalWorld
      * @return Array filled by biome ids.
      */
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
-
-    public float[] getTemperatures(int x, int z, int x_size, int z_size);
 
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
 

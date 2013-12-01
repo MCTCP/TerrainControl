@@ -5,8 +5,8 @@ import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.sun.imageio.plugins.png.PNGImageWriter;
 import com.sun.imageio.plugins.png.PNGImageWriterSpi;
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.World;
+import net.minecraft.server.v1_7_R1.BiomeBase;
+import net.minecraft.server.v1_7_R1.World;
 import org.bukkit.command.CommandSender;
 
 import java.awt.Color;
@@ -100,7 +100,6 @@ public class MapWriter implements Runnable
             }
 
             sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Generating map...");
-            float[] tempArray = new float[256];
             BiomeBase[] BiomeBuffer = new BiomeBase[256];
 
             long time = System.currentTimeMillis();
@@ -130,7 +129,6 @@ public class MapWriter implements Runnable
                     }
 
                     BiomeBuffer = world.getWorldChunkManager().getBiomeBlock(BiomeBuffer, offsetX + x * 16, offsetZ + z * 16, 16, 16);
-                    tempArray = world.getWorldChunkManager().getTemperatures(tempArray, offsetX + x * 16, offsetZ + z * 16, 16, 16);
                     for (int x1 = 0; x1 < 16; x1++)
                     {
                         for (int z1 = 0; z1 < 16; z1++)
@@ -163,7 +161,7 @@ public class MapWriter implements Runnable
                             {
                                 biomeImage.setRGB(image_x, image_y, colors[bbid]);
 
-                                Color tempColor = Color.getHSBColor(0.7f - tempArray[t] * 0.7f, 0.9f, tempArray[t] * 0.7f + 0.3f);
+                                Color tempColor = Color.getHSBColor(0.7f - BiomeBuffer[t].temperature * 0.7f, 0.9f, BiomeBuffer[t].temperature * 0.7f + 0.3f);
 
                                 tempImage.setRGB(image_x, image_y, tempColor.getRGB());
                             } catch (ArrayIndexOutOfBoundsException ex)
