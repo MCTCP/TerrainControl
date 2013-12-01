@@ -103,6 +103,7 @@ public enum DefaultMaterial
     DIODE_BLOCK_OFF(93, false),
     DIODE_BLOCK_ON(94, false),
     LOCKED_CHEST(95, false),
+    STAINED_GLASS(95, false),
     TRAP_DOOR(96, false),
     MONSTER_EGGS(97),
     SMOOTH_BRICK(98),
@@ -167,10 +168,17 @@ public enum DefaultMaterial
     ACTIVATOR_RAIL(157, false),
     DROPPER(158),
     STAINED_CLAY(159),
+    STAINED_GLASS_PANE(160, false),
+    LEAVES_2(161, false),
+    LOG_2(162),
+    ACACIA_STAIRS(163, false),
+    DARK_OAK_STAIRS(164, false),
     HAY_BLOCK(170),
     CARPET(171, false),
     HARD_CLAY(172),
     COAL_BLOCK(173),
+    PACKED_ICE(174, false),
+    DOUBLE_PLANT(175, false),
     UNKNOWN_BLOCK(255);
     /**
      * The ID of the material

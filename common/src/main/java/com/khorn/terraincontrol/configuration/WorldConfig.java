@@ -598,9 +598,8 @@ public class WorldConfig extends ConfigFile
         writeComment("but the server can think it is another biome with the same id. This will cause saplings,");
         writeComment("snowfall and mobs to work as in the other biome.");
         writeComment("");
-        writeComment("The available ids range from 0 to 255 and the ids 0 to " + (DefaultBiome.values().length - 1) + " are occupied by vanilla minecraft");
-        writeComment("biomes. Minecraft 1.7 will take most ids in the range 23-39 and 129-167.");
-        // TODO: update above message when MC 1.7 is out
+        writeComment("The available ids range from 0 to 255 and the ids 0-39 and 129-167 are taken by vanilla.");
+        writeComment("Avoid those ids for your custom biomes.");
 
         WriteCustomBiomes();
 

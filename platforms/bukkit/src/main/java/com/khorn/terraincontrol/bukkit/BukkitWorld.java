@@ -74,10 +74,11 @@ public class BukkitWorld implements LocalWorld
 
     static
     {
-        for (int i = 0; i < DefaultBiome.values().length; i++)
+        for (DefaultBiome defaultBiome : DefaultBiome.values())
         {
-            biomes[i] = new BukkitBiome(BiomeBase.getBiome(i));
-            defaultBiomes.add(biomes[i]);
+            int id = defaultBiome.Id;
+            biomes[id] = new BukkitBiome(BiomeBase.getBiome(id));
+            defaultBiomes.add(biomes[id]);
         }
     }
 

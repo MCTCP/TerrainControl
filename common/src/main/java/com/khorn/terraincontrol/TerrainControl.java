@@ -10,6 +10,8 @@ import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -290,18 +292,10 @@ public class TerrainControl
      */
     public static void printStackTrace(Level level, Throwable e, int maxDepth)
     {
-        StringBuilder sb = new StringBuilder();
-        int count = 0;
-        for (StackTraceElement element : e.getStackTrace())
-        {
-            sb.append(element.toString());
-            sb.append("\n");
-            if (++count > maxDepth)
-            {
-                break;
-            }
-        }
-        TerrainControl.log(level, sb.toString());
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        e.printStackTrace(printWriter);
+        TerrainControl.log(level, stringWriter.toString());
     }
 
     /**

@@ -331,4 +331,309 @@ public class VanillaBiomesDefaultSettings
             this.defaultIsle.add(DefaultBiome.JUNGLE.Name);
         }
     };
+
+    public static class JungleEdge extends Jungle
+    {
+        public JungleEdge(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class DeepOcean extends Ocean
+    {
+        public DeepOcean(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class StoneBeach extends Beach
+    {
+        public StoneBeach(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class ColdBeach extends Beach
+    {
+        public ColdBeach(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class BirchForest extends DefaultBiomeSettings
+    {
+        public BirchForest(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class BirchForestHills extends BirchForest
+    {
+        public BirchForestHills(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class RoofedForest extends DefaultBiomeSettings
+    {
+        public RoofedForest(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class ColdTaiga extends Taiga
+    {
+        public ColdTaiga(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class ColdTaigaHills extends ColdTaiga
+    {
+        public ColdTaigaHills(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class MegaTaiga extends DefaultBiomeSettings
+    {
+        public MegaTaiga(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class MegaTaigaHills extends MegaTaiga
+    {
+        public MegaTaigaHills(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class ExtremeHillsPlus extends ExtremeHills
+    {
+        public ExtremeHillsPlus(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class Savanna extends DefaultBiomeSettings
+    {
+        public Savanna(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class SavannaPlateau extends Savanna
+    {
+        public SavannaPlateau(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class Mesa extends DefaultBiomeSettings
+    {
+        public Mesa(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class MesaPlateauForest extends MesaPlateau
+    {
+        public MesaPlateauForest(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class MesaPlateau extends Mesa
+    {
+        public MesaPlateau(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class SunflowerPlains extends Plains
+    {
+        public SunflowerPlains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class DesertMountains extends Desert
+    {
+        public DesertMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class ExtremeHillsMountains extends ExtremeHills
+    {
+        public ExtremeHillsMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class FlowerForest extends Forest
+    {
+        public FlowerForest(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class TaigaMountains extends Taiga
+    {
+        public TaigaMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class SwamplandMountains extends Swampland
+    {
+        public SwamplandMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class IcePlainsSpikes extends IcePlains
+    {
+        public IcePlainsSpikes(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class JungleMountains extends Jungle
+    {
+        public JungleMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class JungleEdgeMountains extends JungleEdge
+    {
+        public JungleEdgeMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class BirchForestMountains extends BirchForest
+    {
+        public BirchForestMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class BirchForestHillsMountains extends BirchForestHills
+    {
+        public BirchForestHillsMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class RoofedForestMountains extends RoofedForest
+    {
+        public RoofedForestMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class ColdTaigaMountains extends ColdTaiga
+    {
+        public ColdTaigaMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class MegaSpruceTaiga extends MegaTaiga
+    {
+        public MegaSpruceTaiga(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class MegaSpruceTaigaHills extends MegaTaigaHills
+    {
+        public MegaSpruceTaigaHills(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class ExtremeHillsPlusMountains extends ExtremeHillsPlus
+    {
+        public ExtremeHillsPlusMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class SavannaMountains extends Savanna
+    {
+        public SavannaMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class SavannaPlateauMountains extends SavannaPlateau
+    {
+        public SavannaPlateauMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class MesaBryce extends Mesa
+    {
+        public MesaBryce(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class MesaPlateauForestMountains extends MesaPlateauForest
+    {
+        public MesaPlateauForestMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+    
+    public static class MesaPlateauMountains extends MesaPlateau
+    {
+        public MesaPlateauMountains(LocalBiome minecraftBiome, int worldHeight)
+        {
+            super(minecraftBiome, worldHeight);
+        }
+    }
+
 }
