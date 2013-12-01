@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.bukkit;
 
-import net.minecraft.server.v1_7_R1.Block;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -15,6 +13,7 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.StringHelper;
 import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.server.v1_7_R1.BiomeBase;
+import net.minecraft.server.v1_7_R1.Block;
 import net.minecraft.server.v1_7_R1.WorldGenFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.World;

@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.bukkit;
 
-import net.minecraft.server.v1_7_R1.Block;
+import net.minecraft.server.v1_7_R1.WorldGenJungleTree;
 
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
@@ -54,7 +54,7 @@ public class BukkitWorld implements LocalWorld
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
     private WorldGenHugeMushroom hugeMushroom;
-    private WorldGenMegaTree jungleTree;
+    private WorldGenJungleTree jungleTree;
     private WorldGenGroundBush groundBush;
 
     private boolean createNewChunks;
@@ -648,7 +648,7 @@ public class BukkitWorld implements LocalWorld
                     this.taigaTree1 = new WorldGenTaiga1();
                     this.taigaTree2 = new WorldGenTaiga2(false);
                     this.hugeMushroom = new WorldGenHugeMushroom();
-                    this.jungleTree = new WorldGenMegaTree(false, false);
+                    this.jungleTree = new WorldGenJungleTree(false, 10, 20, 3, 3);
                     this.groundBush = new WorldGenGroundBush(3, 0);
                 case TerrainTest:
                     this.generator.Init(this);

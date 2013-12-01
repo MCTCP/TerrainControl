@@ -1,11 +1,10 @@
 package com.khorn.terraincontrol.bukkit;
 
-import net.minecraft.server.v1_7_R1.Block;
-
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import net.minecraft.server.v1_7_R1.BiomeBase;
+import net.minecraft.server.v1_7_R1.Block;
 
 /**
  * The BukkitBiome is basically a wrapper for the BiomeBase.
