@@ -66,6 +66,7 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+        <!-- Disabled for now, as there is no Minecraft Forge for 1.7 yet
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>terraincontrol-forge</artifactId>
@@ -73,6 +74,7 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+        -->
     </dependencies>  
         
 </project>

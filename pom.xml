@@ -27,7 +27,9 @@
     <modules>
         <module>common</module>
         <module>platforms/bukkit</module>
+        <!-- Disabled for now, as there is no Minecraft Forge for 1.7 yet
         <module>platforms/forge</module>
+        -->
         <module>platforms</module>
     </modules>
         
