@@ -41,7 +41,6 @@ public final class PluginConfig extends ConfigFile
     }
     public LogLevels fileHandlerLevel = LogLevels.Debug;
     public LogLevels consoleHandlerLevel = LogLevels.Debug;
-    private static final Logger l = TCLogManager.getLogger();
 
     public PluginConfig(File settingsDir)
     {
@@ -87,6 +86,7 @@ public final class PluginConfig extends ConfigFile
         }
         if (hasOffLevel)
         {
+            Logger l = Logger.getLogger("Minecraft");
             l.log(Level.WARNING, TCLogManager.formatter.format(new LogRecord(Level.WARNING, "Quiet Mode: You will no longer see INFO messages FOR ANY PLUGIN.")));
             l.log(Level.WARNING, TCLogManager.formatter.format(new LogRecord(Level.WARNING, "WARNING AND SEVERE level logs will still show.")));
         }

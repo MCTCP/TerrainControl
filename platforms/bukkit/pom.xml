@@ -89,6 +89,14 @@
             <!-- We need these classes in our jar -->
             <scope>compile</scope>
         </dependency>
+        
+        <dependency>
+    		<groupId>org.apache.logging.log4j</groupId>
+    		<artifactId>log4j-api</artifactId>
+    		<version>2.0-beta9</version>
+    		<!-- Provided by Minecraft, no need to put these classes in our jar -->
+            <scope>provided</scope>
+		</dependency>
     </dependencies>
 </project>
 

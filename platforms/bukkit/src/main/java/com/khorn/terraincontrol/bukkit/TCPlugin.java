@@ -12,9 +12,13 @@ import com.khorn.terraincontrol.configuration.TCLogManager;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.StringHelper;
 import com.khorn.terraincontrol.util.StructureNames;
+
 import net.minecraft.server.v1_7_R1.BiomeBase;
 import net.minecraft.server.v1_7_R1.Block;
 import net.minecraft.server.v1_7_R1.WorldGenFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -29,7 +33,6 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 public class TCPlugin extends JavaPlugin implements TerrainControlEngine
 {
@@ -46,7 +49,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
 
     private final HashMap<String, BukkitWorld> notInitedWorlds = new HashMap<String, BukkitWorld>();
-    private Logger logger;
+    private final Logger logger = LogManager.getLogger(getClass());
 
     @Override
     public void onDisable()
@@ -69,7 +72,6 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     {
 
         TerrainControl.setEngine(this);
-        logger = TCLogManager.getLogger(this);
 
         if (Bukkit.getWorlds().size() != 0 && !cleanupOnDisable)
         {
@@ -235,42 +237,6 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         // Show message
         TerrainControl.log(Level.INFO, "World {0} is now unloaded!", world.getName());
     }
-    
-    @Override
-    public void logIfLevel(Level ifLevel, String... messages)
-    {
-        if (logger.getLevel().intValue() == ifLevel.intValue())
-        {
-            this.log(ifLevel, messages);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level ifLevel, String messages, Object[] params)
-    {
-        if (logger.getLevel().intValue() == ifLevel.intValue())
-        {
-            this.log(ifLevel, messages, params);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level min, Level max, String... messages)
-    {
-        if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
-        {
-            this.log(max, messages);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level min, Level max, String messages, Object[] params)
-    {
-        if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
-        {
-            this.log(max, messages);
-        }
-    }
 
     @Override
     public void log(Level level, String... messages)
@@ -281,27 +247,29 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     @Override
     public void log(Level level, String message, Object param)
     {
-        LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.formatter.format(lr));
-        lr.setParameters(new Object[] {param});
-        if (logger == null)
-        {
-            logger = TCLogManager.getLogger();
-        }
-        logger.log(lr);
+        log(level, message, new Object[] {param});
+        
     }
 
     @Override
     public void log(Level level, String message, Object[] params)
     {
-        LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.formatter.format(lr));
-        lr.setParameters(params);
-        if (logger == null)
-        {
-            logger = TCLogManager.getLogger();
+        LogRecord logRecord = new LogRecord(level, message);
+        logRecord.setParameters(params);
+
+        String formattedMessage = TCLogManager.formatter.format(logRecord);
+        
+        if (level == Level.SEVERE) {
+            logger.log(org.apache.logging.log4j.Level.ERROR, formattedMessage);
+        } else if (level == Level.WARNING) {
+            logger.log(org.apache.logging.log4j.Level.WARN, formattedMessage);
+        } else if (level == Level.INFO) {
+            logger.log(org.apache.logging.log4j.Level.INFO, formattedMessage);
+        } else if (level == Level.CONFIG || level == Level.FINE) {
+            logger.log(org.apache.logging.log4j.Level.DEBUG, formattedMessage);
+        } else { // so level == Level.FINER || level == FINEST
+            logger.log(org.apache.logging.log4j.Level.TRACE, formattedMessage);
         }
-        logger.log(lr);
     }
 
     @Override

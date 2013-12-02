@@ -285,7 +285,7 @@ public class WorldConfig extends ConfigFile
             }
         }
         TerrainControl.log(Level.INFO, "Loaded {0} biomes", new Object[] {biomesCount});
-        TerrainControl.logIfLevel(Level.ALL, Level.CONFIG, LoadedBiomeNames);
+        TerrainControl.log(Level.CONFIG, LoadedBiomeNames);
     }
 
     private void ReadWorldCustomObjects()

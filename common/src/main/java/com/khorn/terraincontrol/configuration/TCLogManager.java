@@ -14,7 +14,6 @@ public class TCLogManager
     public static final String prefix = TCDefaultValues.ChannelName.stringValue();
     public static Formatter formatter;
     public static final LogLevels defaultLogLevel = PluginConfig.LogLevels.Standard;
-    public static Logger stdLogger;
 
     private TCLogManager()
     { //>>	Shouldnt be instantiated
@@ -32,23 +31,6 @@ public class TCLogManager
                     .append(formatMessage(record)).toString();
             }
         };
-    }
-
-    public static Logger getLogger()
-    {
-        if (stdLogger == null)
-        {
-            return Logger.getLogger("Minecraft");
-        } else
-        {
-            return stdLogger;
-        }
-    }
-
-    public static Logger getLogger(Object context)
-    {
-        stdLogger = prepLogger(Logger.getLogger(context.getClass().getCanonicalName()));
-        return stdLogger;
     }
 
     public static Logger prepLogger(Logger logger)
