@@ -288,7 +288,7 @@ public class BukkitWorld implements LocalWorld
                                 int replaceToId = biomeConfig.replaceMatrixBlocks[blockId][section.getYPosition() + sectionY];
                                 if (replaceToId == -1 || (replaceToId >> 4) == blockId)
                                     continue;
-                                
+
                                 Block replaceTo = Block.e(replaceToId >> 4);
 
                                 section.setTypeId(sectionX, sectionY, sectionZ, replaceTo);
@@ -440,7 +440,7 @@ public class BukkitWorld implements LocalWorld
         {
             return;
         }
-        
+
         Block block = Block.e(typeId);
 
         // Get chunk from (faster) custom cache
@@ -577,7 +577,6 @@ public class BukkitWorld implements LocalWorld
     /**
      * Sets the new settings and deprecates any references to the old
      * settings, if any.
-     * <p/>
      * @param worldConfig The new settings.
      */
     public void setSettings(WorldConfig worldConfig)
@@ -594,7 +593,6 @@ public class BukkitWorld implements LocalWorld
      * Enables/reloads this BukkitWorld. If you are reloading,
      * don't forget to set the new settings first using
      * {@link #setSettings(WorldConfig)}.
-     * <p/>
      * @param world The world that needs to be enabled.
      */
     public void enable(org.bukkit.World world)
@@ -624,6 +622,16 @@ public class BukkitWorld implements LocalWorld
             BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeModeClass, this, new BiomeCacheWrapper(worldChunkManager));
             worldChunkManager.setBiomeManager(biomeManager);
             setBiomeManager(biomeManager);
+        } else
+        {
+            // It seems that the WorldChunkManager isn't initialized correctly
+            // when using a custom chunk generator, so we have to initialize it
+            // ourselves for now
+
+            // Test it for yourself using this line
+//          TerrainControl.log(Level.INFO, "WorldChunkManager: " + mcWorld.worldProvider.e.getClass().getName());
+
+            mcWorld.worldProvider.e = new WorldChunkManager(mcWorld);
         }
 
         if (!initialized)
@@ -761,9 +769,9 @@ public class BukkitWorld implements LocalWorld
     @Override
     public boolean canBiomeManagerGenerateUnzoomed()
     {
-        if(this.biomeManager != null)
+        if (this.biomeManager != null)
             return biomeManager.canGenerateUnZoomed();
         return true;
     }
-    
+
 }
