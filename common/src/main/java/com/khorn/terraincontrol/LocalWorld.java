@@ -73,13 +73,13 @@ public interface LocalWorld
 
     // Default generators
 
-    public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry);
+    public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry);
 
     public void PlaceDungeons(Random rand, int x, int y, int z);
 
     public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z);
 
-    public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z);
+    public boolean placeDefaultStructures(Random rand, int chunkX, int chunkZ);
 
     public void replaceBlocks();
 

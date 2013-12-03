@@ -94,10 +94,9 @@ public class VillageGen extends StructureGenerator
 
     // Two methods to help MCPC+ dynamically rename things.
     // It has problems with classes that extend native Minecraft classes
-    public void prepare(World world, int chunkX, int chunkZ, byte[] chunkArray)
+    public void prepare(World world, int chunkX, int chunkZ)
     {
-        // TODO Re-enable this
-        // a(null, world, chunkX, chunkZ, chunkArray);
+        a(null, world, chunkX, chunkZ, null);
     }
 
     /**

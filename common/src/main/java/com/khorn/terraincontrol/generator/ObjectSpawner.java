@@ -53,7 +53,7 @@ public class ObjectSpawner
         this.rand.setSeed(chunkX * l1 + chunkZ * l2 ^ resourcesSeed);
 
         // Generate structures
-        boolean hasGeneratedAVillage = world.PlaceTerrainObjects(rand, chunkX, chunkZ);
+        boolean hasGeneratedAVillage = world.placeDefaultStructures(rand, chunkX, chunkZ);
 
         // Fire event
         TerrainControl.firePopulationStartEvent(world, rand, hasGeneratedAVillage, chunkX, chunkZ);

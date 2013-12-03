@@ -124,7 +124,7 @@ public class ChunkProviderTC
 
         if (this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.Normal || this.worldSettings.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
         {
-            this.localWorld.PrepareTerrainObjects(x, z, blockArray, dry);
+            this.localWorld.prepareDefaultStructures(x, z, dry);
         }
 
         if (this.worldSettings.isDeprecated)

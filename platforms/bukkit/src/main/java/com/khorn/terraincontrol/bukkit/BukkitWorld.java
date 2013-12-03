@@ -181,18 +181,18 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void PrepareTerrainObjects(int chunkX, int chunkZ, byte[] chunkArray, boolean dry)
+    public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
     {
         if (this.settings.strongholdsEnabled)
-            this.strongholdGen.prepare(this.world, chunkX, chunkZ, chunkArray);
+            this.strongholdGen.prepare(this.world, chunkX, chunkZ);
         if (this.settings.mineshaftsEnabled)
-            this.mineshaftGen.prepare(this.world, chunkX, chunkZ, chunkArray);
+            this.mineshaftGen.prepare(this.world, chunkX, chunkZ);
         if (this.settings.villagesEnabled && dry)
-            this.villageGen.prepare(this.world, chunkX, chunkZ, chunkArray);
+            this.villageGen.prepare(this.world, chunkX, chunkZ);
         if (this.settings.rareBuildingsEnabled)
-            this.pyramidsGen.prepare(this.world, chunkX, chunkZ, chunkArray);
+            this.pyramidsGen.prepare(this.world, chunkX, chunkZ);
         if (this.settings.netherFortressesEnabled)
-            this.netherFortress.prepare(this.world, chunkX, chunkZ, chunkArray);
+            this.netherFortress.prepare(this.world, chunkX, chunkZ);
     }
 
     @Override
@@ -233,7 +233,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public boolean PlaceTerrainObjects(Random random, int chunkX, int chunkZ)
+    public boolean placeDefaultStructures(Random random, int chunkX, int chunkZ)
     {
         boolean villageGenerated = false;
         if (this.settings.strongholdsEnabled)
