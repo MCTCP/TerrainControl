@@ -31,9 +31,9 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> IsleBiomes = new ArrayList<String>();
     public ArrayList<String> BorderBiomes = new ArrayList<String>();
 
-    public BiomeConfig[] biomeConfigs;  // Must be simple array for fast access.
-                                       // Beware! Some ids may contain null
-                                       // values;
+    // Must be simple array for fast access.
+    // Beware! Some ids may contain null values;
+    public BiomeConfig[] biomeConfigs; 
     public int biomesCount; // Overall biome count in this world.
 
     public byte[] ReplaceMatrixBiomes = new byte[256];
@@ -276,7 +276,14 @@ public class WorldConfig extends ConfigFile
                 {
                     int color = Integer.decode(config.BiomeColor);
                     if (color <= 0xFFFFFF)
-                        this.biomeColorMap.put(color, config.Biome.getId());
+                    {
+                        Integer previousBiome = this.biomeColorMap.put(color, config.Biome.getId());
+                        if (previousBiome != null)
+                        {
+                            TerrainControl.log(Level.WARNING, "The biome {0} has the same BiomeColor value as the biome {1}.", new Object[] {config.name, this.biomeConfigs[previousBiome].name});
+                            TerrainControl.log(Level.WARNING, "It is unpredictable which biome will spawn when using the color {0}", new Object[] {config.BiomeColor});
+                        }
+                    }
                 } catch (NumberFormatException ex)
                 {
                     TerrainControl.log(Level.WARNING, "Wrong color in " + config.Biome.getName());
@@ -947,14 +954,14 @@ public class WorldConfig extends ConfigFile
         ContinueNormal,
         FillEmpty,
     }
-     
-     public enum ImageOrientation
-     {
-         North,
-         East,
-         South,
-         West,
-     }
+
+    public enum ImageOrientation
+    {
+        North,
+        East,
+        South,
+        West,
+    }
 
     public enum ConfigMode
     {

@@ -493,7 +493,7 @@ public class VanillaBiomesDefaultSettings
         public SunflowerPlains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x8DB360";
+            this.defaultColor = "0xDEFF00";
         }
     }
 
@@ -502,7 +502,7 @@ public class VanillaBiomesDefaultSettings
         public DesertMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0xFA9418";
+            this.defaultColor = "0xE58208";
         }
     }
 
@@ -511,7 +511,7 @@ public class VanillaBiomesDefaultSettings
         public ExtremeHillsMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x606060";
+            this.defaultColor = "0x525252";
         }
     }
 
@@ -529,7 +529,7 @@ public class VanillaBiomesDefaultSettings
         public TaigaMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x0B6659";
+            this.defaultColor = "0x0A5B4F";
         }
     }
 
@@ -538,7 +538,7 @@ public class VanillaBiomesDefaultSettings
         public SwamplandMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x07F9B2";
+            this.defaultColor = "0x28D29F";
         }
     }
 
@@ -556,7 +556,7 @@ public class VanillaBiomesDefaultSettings
         public JungleMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x537B09";
+            this.defaultColor = "0x4C7009";
         }
     }
 
@@ -565,7 +565,7 @@ public class VanillaBiomesDefaultSettings
         public JungleEdgeMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x628B17";
+            this.defaultColor = "0x5A8015";
         }
     }
 
@@ -574,7 +574,7 @@ public class VanillaBiomesDefaultSettings
         public BirchForestMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x307444";
+            this.defaultColor = "0x4E6E58";
         }
     }
 
@@ -583,7 +583,7 @@ public class VanillaBiomesDefaultSettings
         public BirchForestHillsMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x1F5F32";
+            this.defaultColor = "0x1F502E";
         }
     }
 
@@ -592,7 +592,7 @@ public class VanillaBiomesDefaultSettings
         public RoofedForestMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x40511A";
+            this.defaultColor = "0x364416";
         }
     }
 
@@ -601,7 +601,7 @@ public class VanillaBiomesDefaultSettings
         public ColdTaigaMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x31554A";
+            this.defaultColor = "0x2E5046";
         }
     }
 
@@ -610,7 +610,7 @@ public class VanillaBiomesDefaultSettings
         public MegaSpruceTaiga(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x628B17";
+            this.defaultColor = "0x598110";
         }
     }
 
@@ -619,7 +619,7 @@ public class VanillaBiomesDefaultSettings
         public MegaSpruceTaigaHills(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x596651";
+            this.defaultColor = "0x475141";
         }
     }
 
@@ -628,7 +628,7 @@ public class VanillaBiomesDefaultSettings
         public ExtremeHillsPlusMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x507050";
+            this.defaultColor = "0x466246";
         }
     }
 
@@ -637,7 +637,7 @@ public class VanillaBiomesDefaultSettings
         public SavannaMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0x628B17";
+            this.defaultColor = "0x5B8015";
         }
     }
 
@@ -646,7 +646,7 @@ public class VanillaBiomesDefaultSettings
         public SavannaPlateauMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0xA79D64";
+            this.defaultColor = "0x99905C";
         }
     }
 
@@ -655,7 +655,7 @@ public class VanillaBiomesDefaultSettings
         public MesaBryce(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0xD94515";
+            this.defaultColor = "0xE45627";
         }
     }
 
@@ -664,7 +664,7 @@ public class VanillaBiomesDefaultSettings
         public MesaPlateauForestMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0xB09765";
+            this.defaultColor = "0xA68F5F";
         }
     }
 
@@ -673,7 +673,7 @@ public class VanillaBiomesDefaultSettings
         public MesaPlateauMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
-            this.defaultColor = "0xCA8C65";
+            this.defaultColor = "0xB77F5C";
         }
     }
 
