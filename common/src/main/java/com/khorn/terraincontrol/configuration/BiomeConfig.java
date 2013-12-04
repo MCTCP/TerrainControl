@@ -608,8 +608,10 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("Rarity: chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass");
         this.writeComment("MinAltitude and MaxAltitude: height limits");
         this.writeComment("BlockSource: mean where or whereupon resource will be placed ");
-        this.writeComment("TreeType: Tree - BigTree - Forest (a birch tree) - HugeMushroom (not a tree but still counts)");
-        this.writeComment("   Taiga1 - Taiga2 - JungleTree (the huge jungle tree) - GroundBush - CocoaTree");
+        this.writeComment("TreeType: Tree (original oak tree) - BigTree - Birch - TallBirch - SwampTree");
+        this.writeComment("   HugeMushroom (not a tree but still counts) - Taiga1 - Taiga2 - HugeTaiga1 - HugeTaiga2");
+        this.writeComment("   JungleTree (the huge jungle tree) - GroundBush - CocoaTree (smaller jungle tree)");
+        this.writeComment("   DarkOak (from the roofed forest biome) - Acacia");
         this.writeComment("   You can also use your own custom objects, as long as they have set Tree to true in their settings.");
         this.writeComment("TreeType_Chance: similar Rarity. Example:");
         this.writeComment("  Tree(10,Taiga1,35,Taiga2,100) - plugin tries 10 times, for each attempt it tries to place Taiga1 (35% chance),");

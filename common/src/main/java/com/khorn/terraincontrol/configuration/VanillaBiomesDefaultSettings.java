@@ -81,7 +81,7 @@ public class VanillaBiomesDefaultSettings
 
             this.defaultGrass = 15;
             this.defaultColor = "0x056621";
-            this.defaultTree = new Object[] {10, TreeType.Forest, 20, TreeType.BigTree, 10, TreeType.Tree, 100};
+            this.defaultTree = new Object[] {10, TreeType.Birch, 20, TreeType.BigTree, 10, TreeType.Tree, 100};
         }
     };
 

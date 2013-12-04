@@ -1,7 +1,10 @@
 package com.khorn.terraincontrol.bukkit;
 
-import net.minecraft.server.v1_7_R1.WorldGenJungleTree;
+import net.minecraft.server.v1_7_R1.WorldGenMegaTree;
 
+import net.minecraft.server.v1_7_R1.WorldGenAcaciaTree;
+import net.minecraft.server.v1_7_R1.WorldGenForestTree;
+import net.minecraft.server.v1_7_R1.WorldGenJungleTree;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
@@ -46,16 +49,22 @@ public class BukkitWorld implements LocalWorld
     public RareBuildingGen pyramidsGen;
     public NetherFortressGen netherFortress;
 
+
     private WorldGenTrees tree;
-    private WorldGenTrees cocoaTree;
+    private WorldGenAcaciaTree acaciaTree;
     private WorldGenBigTree bigTree;
-    private WorldGenForest forest;
+    private WorldGenForest birchTree;
+    private WorldGenTrees cocoaTree;
+    private WorldGenForestTree darkOakTree;
+    private WorldGenGroundBush groundBush;
+    private WorldGenHugeMushroom hugeMushroom;
+    private WorldGenMegaTree hugeTaigaTree1;
+    private WorldGenMegaTree hugeTaigaTree2;
+    private WorldGenJungleTree jungleTree;
+    private WorldGenForest longBirchTree;
     private WorldGenSwampTree swampTree;
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
-    private WorldGenHugeMushroom hugeMushroom;
-    private WorldGenJungleTree jungleTree;
-    private WorldGenGroundBush groundBush;
 
     private boolean createNewChunks;
     private Chunk[] chunkCache;
@@ -212,7 +221,10 @@ public class BukkitWorld implements LocalWorld
                 bigTree.a(1.0D, 1.0D, 1.0D);
                 return bigTree.a(this.world, rand, x, y, z);
             case Forest:
-                return forest.a(this.world, rand, x, y, z);
+            case Birch:
+                return birchTree.a(this.world, rand, x, y, z);
+            case TallBirch:
+                return longBirchTree.a(this.world, rand, x, y, z);
             case HugeMushroom:
                 hugeMushroom.a(1.0D, 1.0D, 1.0D);
                 return hugeMushroom.a(this.world, rand, x, y, z);
@@ -228,8 +240,17 @@ public class BukkitWorld implements LocalWorld
                 return groundBush.a(this.world, rand, x, y, z);
             case CocoaTree:
                 return cocoaTree.a(this.world, rand, x, y, z);
+            case Acacia:
+                return acaciaTree.a(this.world, rand, x, y, z);
+            case DarkOak:
+                return darkOakTree.a(this.world, rand, x, y, z);
+            case HugeTaiga1:
+                return hugeTaigaTree1.a(this.world, rand, x, y, z);
+            case HugeTaiga2:
+                return hugeTaigaTree2.a(this.world, rand, x, y, z);
+            default:
+                throw new AssertionError("Failed to handle tree of type " + type.toString());
         }
-        return false;
     }
 
     @Override
@@ -622,16 +643,6 @@ public class BukkitWorld implements LocalWorld
             BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeModeClass, this, new BiomeCacheWrapper(worldChunkManager));
             worldChunkManager.setBiomeManager(biomeManager);
             setBiomeManager(biomeManager);
-        } else
-        {
-            // It seems that the WorldChunkManager isn't initialized correctly
-            // when using a custom chunk generator, so we have to initialize it
-            // ourselves for now
-
-            // Test it for yourself using this line
-//          TerrainControl.log(Level.INFO, "WorldChunkManager: " + mcWorld.worldProvider.e.getClass().getName());
-
-            mcWorld.worldProvider.e = new WorldChunkManager(mcWorld);
         }
 
         if (!initialized)
@@ -649,22 +660,28 @@ public class BukkitWorld implements LocalWorld
                     this.pyramidsGen = new RareBuildingGen(settings);
                     this.netherFortress = new NetherFortressGen();
                 case NotGenerate:
-                    this.tree = new WorldGenTrees(false);
-                    this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
-                    this.bigTree = new WorldGenBigTree(false);
-                    this.forest = new WorldGenForest(false, false);
-                    this.swampTree = new WorldGenSwampTree();
-                    this.taigaTree1 = new WorldGenTaiga1();
-                    this.taigaTree2 = new WorldGenTaiga2(false);
-                    this.hugeMushroom = new WorldGenHugeMushroom();
-                    this.jungleTree = new WorldGenJungleTree(false, 10, 20, 3, 3);
-                    this.groundBush = new WorldGenGroundBush(3, 0);
                 case TerrainTest:
                     this.generator.Init(this);
                     break;
                 case Default:
                     break;
             }
+            
+            this.tree = new WorldGenTrees(false);
+            this.acaciaTree = new WorldGenAcaciaTree(false);
+            this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
+            this.bigTree = new WorldGenBigTree(false);
+            this.birchTree = new WorldGenForest(false, false);
+            this.darkOakTree = new WorldGenForestTree(false);
+            this.longBirchTree = new WorldGenForest(false, true);
+            this.swampTree = new WorldGenSwampTree();
+            this.taigaTree1 = new WorldGenTaiga1();
+            this.taigaTree2 = new WorldGenTaiga2(false);
+            this.hugeMushroom = new WorldGenHugeMushroom();
+            this.hugeTaigaTree1 = new WorldGenMegaTree(false, false);
+            this.hugeTaigaTree2 = new WorldGenMegaTree(false, true);
+            this.jungleTree = new WorldGenJungleTree(false, 10, 20, 3, 3);
+            this.groundBush = new WorldGenGroundBush(3, 0);
 
             this.initialized = true;
         } else
