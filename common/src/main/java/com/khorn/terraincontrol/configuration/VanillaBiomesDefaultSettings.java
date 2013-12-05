@@ -449,6 +449,8 @@ public class VanillaBiomesDefaultSettings
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0xBDB25F";
             this.defaultVillageType = VillageType.wood;
+            this.defaultGrass = 200;
+            this.defaultTree = new Object[] {1, TreeType.Acacia, 80, TreeType.Tree, 100};
         }
     }
 

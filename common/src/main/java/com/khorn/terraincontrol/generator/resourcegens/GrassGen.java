@@ -46,7 +46,7 @@ public class GrassGen extends Resource
             int y = world.getHighestBlockYAt(x, z);
 
             int i;
-            while ((((i = world.getTypeId(x, y, z)) == 0) || (i == DefaultMaterial.LEAVES.id)) && (y > 0))
+            while (((i = world.getTypeId(x, y, z)) == 0 || i == DefaultMaterial.LEAVES.id || i == DefaultMaterial.LEAVES_2.id) && (y > 0))
                 y--;
 
             if ((!world.isEmpty(x, y + 1, z)) || (!sourceBlocks.contains(world.getTypeId(x, y, z))))
