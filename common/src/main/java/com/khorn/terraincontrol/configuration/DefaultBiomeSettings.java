@@ -201,31 +201,31 @@ public class DefaultBiomeSettings
         if (this.defaultFlowers > 0)
         {
             // Red flower
-            resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.RED_ROSE.id, this.defaultFlowers, TCDefaultValues.roseDepositRarity.intValue(), TCDefaultValues.roseDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
+            resources.add(Resource.createResource(config, PlantGen.class, "Poppy", this.defaultFlowers, TCDefaultValues.roseDepositRarity.intValue(), TCDefaultValues.roseDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
 
             // Yellow flower
-            resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.YELLOW_FLOWER.id, this.defaultFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
+            resources.add(Resource.createResource(config, PlantGen.class, "Dandelion", this.defaultFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
         }
 
         if (this.defaultMushroom > 0)
         {
             // Red mushroom
-            resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.RED_MUSHROOM.id, this.defaultMushroom, TCDefaultValues.redMushroomDepositRarity.intValue(), TCDefaultValues.redMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id));
+            resources.add(Resource.createResource(config, PlantGen.class, "RedMushroom", this.defaultMushroom, TCDefaultValues.redMushroomDepositRarity.intValue(), TCDefaultValues.redMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id));
 
             // Brown mushroom
-            resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.BROWN_MUSHROOM.id, this.defaultMushroom, TCDefaultValues.brownMushroomDepositRarity.intValue(), TCDefaultValues.brownMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id));
+            resources.add(Resource.createResource(config, PlantGen.class, "BrownMushroom", this.defaultMushroom, TCDefaultValues.brownMushroomDepositRarity.intValue(), TCDefaultValues.brownMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id));
         }
 
         if (this.defaultGrass > 0)
         {
             // Grass
-            resources.add(Resource.createResource(config, GrassGen.class, DefaultMaterial.LONG_GRASS.id, 1, this.defaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+            resources.add(Resource.createResource(config, GrassGen.class, "Tallgrass", "", this.defaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
         }
 
         if (this.defaultDeadBrush > 0)
         {
             // Dead Bush
-            resources.add(Resource.createResource(config, GrassGen.class, DefaultMaterial.DEAD_BUSH.id, 0, this.defaultDeadBrush, TCDefaultValues.deadBushDepositRarity.intValue(), DefaultMaterial.SAND.id));
+            resources.add(Resource.createResource(config, GrassGen.class, "Deadbush", 0, this.defaultDeadBrush, TCDefaultValues.deadBushDepositRarity.intValue(), DefaultMaterial.SAND.id));
         }
 
         // Pumpkin

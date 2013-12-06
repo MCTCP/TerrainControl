@@ -10,15 +10,32 @@ import java.util.Random;
 
 public class GrassGen extends Resource
 {
+    private static final String UNUSED_SECOND_ARGUMENT = "-unusedArgument-";
+    
     private List<Integer> sourceBlocks;
+    private PlantType plant;
 
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(5, args);
+        
+        try {
+            // Test whether the old second argument is a number
+            readInt(args.get(1), 0, 16);
+            // If yes, parse it
+            plant = PlantType.getPlant(args.get(0) + ":" + args.get(1));
+        } catch(InvalidConfigException e) {
+            // Nope, old second argument is indeed unused
+            plant = PlantType.getPlant(args.get(0));
+        }
 
-        blockId = readBlockId(args.get(0));
-        blockData = readInt(args.get(1), 0, 16);
+        // Not used for terrain generation, they are used by the Forge
+        // implementation to fire Forge events. We'll probably want to rewrite
+        // this in the future to not use block ids
+        blockId = plant.getBlockId();
+        blockData = plant.getBottomBlockData();
+
         frequency = readInt(args.get(2), 1, 500);
         rarity = readRarity(args.get(3));
         sourceBlocks = new ArrayList<Integer>();
@@ -51,13 +68,13 @@ public class GrassGen extends Resource
 
             if ((!world.isEmpty(x, y + 1, z)) || (!sourceBlocks.contains(world.getTypeId(x, y, z))))
                 continue;
-            world.setBlock(x, y + 1, z, blockId, blockData, false, false, false);
+            plant.spawn(world, x, y + 1, z);
         }
     }
 
     @Override
     public String makeString()
     {
-        return "Grass(" + makeMaterial(blockId) + "," + blockData + "," + frequency + "," + rarity + makeMaterial(sourceBlocks) + ")";
+        return "Grass(" + plant.getName() + ","+UNUSED_SECOND_ARGUMENT+"," + frequency + "," + rarity + makeMaterial(sourceBlocks) + ")";
     }
 }

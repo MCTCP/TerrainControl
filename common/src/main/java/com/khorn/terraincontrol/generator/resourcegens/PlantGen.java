@@ -10,6 +10,8 @@ import java.util.Random;
 
 public class PlantGen extends Resource
 {
+    private PlantType plant;
+
     private int minAltitude;
     private int maxAltitude;
     private List<Integer> sourceBlocks;
@@ -27,7 +29,7 @@ public class PlantGen extends Resource
             if ((!world.isEmpty(j, k, m)) || (!sourceBlocks.contains(world.getTypeId(j, k - 1, m))))
                 continue;
 
-            world.setBlock(j, k, m, blockId, blockData, false, false, false);
+            plant.spawn(world, j, k, m);
         }
     }
 
@@ -36,8 +38,14 @@ public class PlantGen extends Resource
     {
         assureSize(6, args);
 
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
+        plant = PlantType.getPlant(args.get(0));
+        
+        // Not used for terrain generation, they are used by the Forge
+        // implementation to fire Forge events. We'll probably want to rewrite
+        // this in the future to not use block ids
+        blockId = plant.getBlockId();
+        blockData = plant.getBottomBlockData();
+
         frequency = readInt(args.get(1), 1, 100);
         rarity = readRarity(args.get(2));
         minAltitude = readInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
@@ -52,6 +60,6 @@ public class PlantGen extends Resource
     @Override
     public String makeString()
     {
-        return "Plant(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
+        return "Plant(" + plant.getName() + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
     }
 }

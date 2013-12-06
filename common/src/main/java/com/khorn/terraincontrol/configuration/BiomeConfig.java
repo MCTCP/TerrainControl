@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.generator.resourcegens.PlantType;
+
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
@@ -594,8 +596,8 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("CustomObject(Object[,AnotherObject[,...]])");
         this.writeComment("CustomStructure([Object,Object_Chance[,AnotherObject,Object_Chance[,...]]])");
         this.writeComment("Tree(Frequency,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
-        this.writeComment("Plant(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.writeComment("Grass(Block,BlockData,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Plant(PlantType,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Grass(PlantType,Unused,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
         this.writeComment("Reed(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.writeComment("Cactus(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.writeComment("Liquid(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
@@ -616,11 +618,14 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("TreeType_Chance: similar Rarity. Example:");
         this.writeComment("  Tree(10,Taiga1,35,Taiga2,100) - plugin tries 10 times, for each attempt it tries to place Taiga1 (35% chance),");
         this.writeComment("  if that fails, it attempts to place Taiga2 (100% chance).");
+        this.writeComment("PlantType: one of the plant types: " + StringHelper.join(PlantType.values(), ", "));
+        this.writeComment("           or simply Block[:Data]");
         this.writeComment("Object: can be a any kind of custom object (bo2 or bo3) but without the file extension. You can");
         this.writeComment("also use UseWorld to spawn one of the object in the WorldObjects folder and UseBiome to spawn");
         this.writeComment("one of the objects in the BiomeObjects setting. When using BO2s for UseWorld, the BO2 must have");
         this.writeComment("this biome in their spawnInBiome setting.");
         this.writeComment("Object_Chance: Like TreeType_Chance.");
+        this.writeComment("Unused: Not used anymore. Ignore it.");
         this.writeComment("");
         this.writeComment("Plant and Grass resource: both a resource of one block. Plant can place blocks underground, Grass cannot.");
         this.writeComment("Liquid resource: a one-block water or lava source");

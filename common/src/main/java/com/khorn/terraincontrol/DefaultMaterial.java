@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public enum DefaultMaterial
@@ -186,18 +186,18 @@ public enum DefaultMaterial
     public final int id;
     /**
      * Whether or not a material is solid. If set to false, it will prevent
-     * snowfall.
-     * Note: this isn't always equal to what Minecraft calls solid.
+     * snowfall. Note: this isn't always equal to what Minecraft calls solid.
      */
     private final boolean solid;
 
     /**
      * Creates a new material.
      * <p/>
-     * @param id    Id of the material.
+     * 
+     * @param id Id of the material.
      * @param solid Whether the material is solid. If set to false, it will
-     *              prevent snowfall.
-     *              Note: this isn't always equal to what Minecraft calls solid.
+     *            prevent snowfall. Note: this isn't always equal to what
+     *            Minecraft calls solid.
      */
     private DefaultMaterial(int id, boolean solid)
     {
@@ -208,6 +208,7 @@ public enum DefaultMaterial
     /**
      * Creates a new solid material where snow will fall on.
      * <p/>
+     * 
      * @param id Id of the material.
      */
     private DefaultMaterial(int id)
@@ -219,8 +220,9 @@ public enum DefaultMaterial
     /**
      * Returns true only if this material is flowing or stationary Water
      * <p/>
-     * @return boolean whether or not this material is flowing or
-     *         stationary Water
+     * 
+     * @return boolean whether or not this material is flowing or stationary
+     *         Water
      */
     public boolean isLiquid()
     {
@@ -229,15 +231,17 @@ public enum DefaultMaterial
 
     /**
      * Returns the solid value of the material. When returns false, it will
-     * prevent snowfall.
-     * Note: this isn't always equal to what Minecraft calls solid.
+     * prevent snowfall. Note: this isn't always equal to what Minecraft calls
+     * solid.
      * <p/>
+     * 
      * @return boolean Whether or not the material is considered solid
      */
     public boolean isSolid()
     {
         return this.solid;
     }
+
     /**
      * A DefaultMaterial lookup table with the material ID as the index
      */
@@ -250,7 +254,7 @@ public enum DefaultMaterial
     static
     {
         lookupID = new DefaultMaterial[256];
-        lookupName = new HashMap<String, DefaultMaterial>();
+        lookupName = new TreeMap<String, DefaultMaterial>(String.CASE_INSENSITIVE_ORDER);
 
         for (DefaultMaterial material : DefaultMaterial.values())
         {
@@ -260,10 +264,11 @@ public enum DefaultMaterial
     }
 
     /**
-     * Returns a DefaultMaterial object with the given material name
-     * <p/>
+     * Returns a DefaultMaterial object with the given material name. Name is
+     * case insensitive.
+     * 
      * @param name the Name of the DefaultMaterial that is to be returned
-     * <p/>
+     *            <p/>
      * @return A DefaultMaterial with the given name
      */
     public static DefaultMaterial getMaterial(String name)
@@ -275,8 +280,9 @@ public enum DefaultMaterial
      * Returns true or false depending on if this DefaultMaterial has the
      * given name
      * <p/>
+     * 
      * @param name The string name to test this.Name against
-     * <p/>
+     *            <p/>
      * @return Boolean whether or not this DefaultMaterial has the given name
      */
     public static boolean contains(String name)
@@ -287,8 +293,9 @@ public enum DefaultMaterial
     /**
      * Returns a DefaultMaterial object with the given material ID
      * <p/>
+     * 
      * @param id the ID of the DefaultMaterial that is to be returned
-     * <p/>
+     *            <p/>
      * @return A DefaultMaterial with the given ID
      */
     public static DefaultMaterial getMaterial(int id)
@@ -304,8 +311,9 @@ public enum DefaultMaterial
      * Returns true or false depending on if this DefaultMaterial has the
      * given ID
      * <p/>
+     * 
      * @param id The integer ID to test this.id against
-     * <p/>
+     *            <p/>
      * @return Boolean whether or not this DefaultMaterial has the given id
      */
     public static boolean contains(int id)
