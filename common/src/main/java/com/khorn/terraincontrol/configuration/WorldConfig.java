@@ -263,7 +263,10 @@ public class WorldConfig extends ConfigFile
                 biomesCount++;
             } else
             {
-                TerrainControl.log(Level.WARNING, "Duplicate biome id {0} ({1} and {2})!", new Object[] {localBiome.getId(), this.biomeConfigs[localBiome.getId()].name, config.name});
+                TerrainControl.log(Level.SEVERE, "Duplicate biome id {0} ({1} and {2})!", new Object[] {localBiome.getId(), this.biomeConfigs[localBiome.getId()].name, config.name});
+                TerrainControl.log(Level.SEVERE, "This may cause serious issues in your world and other worlds on the server.");
+                TerrainControl.log(Level.INFO, "If you are updating an old pre-Minecraft 1.7 world, please read this wiki page:");
+                TerrainControl.log(Level.INFO, "https://github.com/Wickth/TerrainControl/wiki/Upgrading-an-old-map-to-Minecraft-1.7");
             }
             this.biomeConfigs[localBiome.getId()] = config;
 
