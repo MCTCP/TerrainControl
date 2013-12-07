@@ -7,8 +7,8 @@ import net.minecraft.server.v1_7_R1.BiomeBase;
 import net.minecraft.server.v1_7_R1.Block;
 
 /**
- * The BukkitBiome is basically a wrapper for the BiomeBase.
- * If you look at the constructor and the method you will see that this is the case.
+ * The BukkitBiome is basically a wrapper for the BiomeBase. If you look at
+ * the constructor and the method you will see that this is the case.
  */
 public class BukkitBiome implements LocalBiome
 {
@@ -106,5 +106,11 @@ public class BukkitBiome implements LocalBiome
     public byte getGroundBlock()
     {
         return (byte) Block.b(this.biomeBase.ak);
+    }
+
+    @Override
+    public float getTemperatureAt(int x, int y, int z)
+    {
+        return this.biomeBase.a(x, y, z);
     }
 }
