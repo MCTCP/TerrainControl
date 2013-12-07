@@ -97,15 +97,15 @@ public class BukkitBiome implements LocalBiome
     }
 
     @Override
-    public byte getSurfaceBlock()
+    public int getSurfaceBlock()
     {
-        return (byte) Block.b(this.biomeBase.ai);
+        return Block.b(this.biomeBase.ai);
     }
 
     @Override
-    public byte getGroundBlock()
+    public int getGroundBlock()
     {
-        return (byte) Block.b(this.biomeBase.ak);
+        return Block.b(this.biomeBase.ak);
     }
 
     @Override

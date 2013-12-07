@@ -84,8 +84,8 @@ public class DefaultBiomeSettings
     public Object[] defaultWell; // Parameters for well resource
     public float defaultBiomeSurface = 0.1F;
     public float defaultBiomeVolatility = 0.3F;
-    public byte defaultSurfaceBlock = (byte) DefaultMaterial.GRASS.id;
-    public byte defaultGroundBlock = (byte) DefaultMaterial.DIRT.id;
+    public int defaultSurfaceBlock = DefaultMaterial.GRASS.id;
+    public int defaultGroundBlock = DefaultMaterial.DIRT.id;
     public float defaultBiomeTemperature = 0.5F;
     public float defaultBiomeWetness = 0.5F;
     public ArrayList<String> defaultIsle = new ArrayList<String>();
