@@ -22,12 +22,6 @@ public class VanillaBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public float[] getTemperatures(float[] paramArrayOfFloat, int x, int z, int x_size, int z_size)
-    {
-        throw new UnsupportedOperationException("Dummy class");
-    }
-
-    @Override
     public float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int x_size, int z_size)
     {
         throw new UnsupportedOperationException("Dummy class");

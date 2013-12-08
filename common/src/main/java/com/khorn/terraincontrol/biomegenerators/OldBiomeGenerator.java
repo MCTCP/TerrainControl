@@ -35,50 +35,6 @@ public class OldBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public float[] getTemperatures(float[] temp_out, int x, int z, int x_size, int z_size)
-    {
-        if ((temp_out == null) || (temp_out.length < x_size * z_size))
-        {
-            temp_out = new float[x_size * z_size];
-        }
-
-        this.oldTemperature1 = this.temperatureGenerator1.a(this.oldTemperature1, x, z, x_size, z_size, 0.025000000372529D / this.worldConfig.oldBiomeSize, 0.025000000372529D / this.worldConfig.oldBiomeSize, 0.25D);
-        this.oldTemperature2 = this.temperatureGenerator2.a(this.oldTemperature2, x, z, x_size, z_size, 0.25D / this.worldConfig.oldBiomeSize, 0.25D / this.worldConfig.oldBiomeSize, 0.5882352941176471D);
-
-        int i = 0;
-        for (int j = 0; j < x_size; j++)
-        {
-            for (int k = 0; k < z_size; k++)
-            {
-                double d1 = this.oldTemperature2[i] * 1.1D + 0.5D;
-
-                double d2 = 0.01D;
-                double d3 = 1.0D - d2;
-                double d4 = (temp_out[i] * 0.15D + 0.7D) * d3 + d1 * d2;
-                d4 = 1.0D - (1.0D - d4) * (1.0D - d4);
-
-                if (d4 < this.worldConfig.minTemperature)
-                {
-                    d4 = this.worldConfig.minTemperature;
-                }
-                if (d4 > this.worldConfig.maxTemperature)
-                {
-                    d4 = this.worldConfig.maxTemperature;
-                }
-                temp_out[i] = (float) d4;
-                i++;
-            }
-
-        }
-        if (this.worldConfig.isDeprecated)
-        {
-            this.worldConfig = this.worldConfig.newSettings;
-        }
-
-        return temp_out;
-    }
-
-    @Override
     public float[] getRainfall(float[] temp_out, int x, int z, int x_size, int z_size)
     {
         if ((temp_out == null) || (temp_out.length < x_size * z_size))

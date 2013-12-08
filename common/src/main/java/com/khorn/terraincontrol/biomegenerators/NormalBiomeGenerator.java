@@ -46,32 +46,6 @@ public class NormalBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public float[] getTemperatures(float[] paramArrayOfFloat, int x, int z, int x_size, int z_size)
-    {
-        if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < x_size * z_size))
-        {
-            paramArrayOfFloat = new float[x_size * z_size];
-        }
-        ArraysCache cache = ArraysCacheManager.GetCache();
-        cache.outputType = defaultOutputType;
-
-        int[] arrayOfInt = this.biomeLayer.GetBiomes(cache, x, z, x_size, z_size);
-
-        ArraysCacheManager.ReleaseCache(cache);
-        for (int i = 0; i < x_size * z_size; i++)
-        {
-            float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getTemperature() / 65536.0F;
-            if (f1 < worldConfig.minTemperature)
-                f1 = worldConfig.minTemperature;
-            if (f1 > worldConfig.maxTemperature)
-                f1 = worldConfig.maxTemperature;
-            paramArrayOfFloat[i] = f1;
-        }
-
-        return paramArrayOfFloat;
-    }
-
-    @Override
     public float[] getRainfall(float[] paramArrayOfFloat, int x, int y, int x_size, int z_size)
     {
         if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < x_size * z_size))
