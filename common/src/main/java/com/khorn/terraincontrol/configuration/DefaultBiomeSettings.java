@@ -75,6 +75,7 @@ public class DefaultBiomeSettings
     public boolean defaultWaterLakes = true;
     public Object[] defaultTree; // Parameters for tree resource
     public int defaultFlowers = 2;
+    public int defaultTallFlowers = 0;
     public int defaultGrass = 10;
     public int defaultDeadBrush = 0;
     public int defaultMushroom = 0;
@@ -200,11 +201,23 @@ public class DefaultBiomeSettings
 
         if (this.defaultFlowers > 0)
         {
-            // Red flower
+            // Poppy
             resources.add(Resource.createResource(config, PlantGen.class, "Poppy", this.defaultFlowers, TCDefaultValues.roseDepositRarity.intValue(), TCDefaultValues.roseDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
 
-            // Yellow flower
+            // Dandelion
             resources.add(Resource.createResource(config, PlantGen.class, "Dandelion", this.defaultFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
+        }
+
+        if (this.defaultTallFlowers > 0)
+        {
+            // Lilac
+            resources.add(Resource.createResource(config, PlantGen.class, "Lilac", this.defaultTallFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
+
+            // Rose bush
+            resources.add(Resource.createResource(config, PlantGen.class, "RoseBush", this.defaultTallFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
+
+            // Peony
+            resources.add(Resource.createResource(config, PlantGen.class, "Peony", this.defaultTallFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
         }
 
         if (this.defaultMushroom > 0)

@@ -82,6 +82,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultGrass = 15;
             this.defaultColor = "0x056621";
             this.defaultTree = new Object[] {10, TreeType.Birch, 20, TreeType.BigTree, 10, TreeType.Tree, 100};
+            this.defaultTallFlowers = 1;
         }
     };
 
@@ -376,6 +377,9 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x307444";
+            this.defaultGrass = 20;
+            this.defaultTree = new Object[] {10, TreeType.Birch, 80};
+            this.defaultTallFlowers = 1;
         }
     }
 
@@ -505,6 +509,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0xE58208";
+            this.defaultWaterLakes = true;
         }
     }
 
@@ -577,6 +582,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x4E6E58";
+            this.defaultTree = new Object[] {10, TreeType.TallBirch, 80};
         }
     }
 
@@ -586,6 +592,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x1F502E";
+            this.defaultTree = new Object[] {10, TreeType.TallBirch, 80};
         }
     }
 
