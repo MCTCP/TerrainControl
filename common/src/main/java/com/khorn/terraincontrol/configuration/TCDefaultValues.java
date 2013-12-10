@@ -31,7 +31,8 @@ public enum TCDefaultValues implements TCSetting
     TerrainMode(WorldConfig.TerrainMode.Normal),
     BiomeMode("Normal"),
 
-    WorldHeightBits(7),
+    WorldHeightScaleBits(7),
+    WorldHeightCapBits(8),
 
     GenerationDepth(10),
 

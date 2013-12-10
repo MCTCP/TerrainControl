@@ -138,7 +138,7 @@ public class BiomeConfig extends ConfigFile
         super(biome.getName(), new File(settingsDir, biome.getName() + TCDefaultValues.WorldBiomeConfigName.stringValue()));
         this.Biome = biome;
         this.worldConfig = config;
-        this.defaultSettings = DefaultBiomeSettings.getDefaultSettings(biome, config.WorldHeight);
+        this.defaultSettings = DefaultBiomeSettings.getDefaultSettings(biome, config.worldHeightCap);
 
         this.readSettingsFile();
         this.renameOldSettings();
@@ -261,9 +261,9 @@ public class BiomeConfig extends ConfigFile
         this.ReadCustomObjectSettings();
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
-        this.heightMatrix = new double[this.worldConfig.WorldHeight / 8 + 1];
+        this.heightMatrix = new double[this.worldConfig.worldHeightCap / 8 + 1];
         this.readHeightSettings(this.heightMatrix, TCDefaultValues.CustomHeightControl);
-        this.riverHeightMatrix = new double[this.worldConfig.WorldHeight / 8 + 1];
+        this.riverHeightMatrix = new double[this.worldConfig.worldHeightCap / 8 + 1];
         this.readHeightSettings(this.riverHeightMatrix, TCDefaultValues.RiverCustomHeightControl);
     }
 
@@ -315,20 +315,20 @@ public class BiomeConfig extends ConfigFile
                     short blockData = (short) StringHelper.readBlockData(values[1]);
 
                     int minY = 0;
-                    int maxY = worldConfig.WorldHeight - 1;
+                    int maxY = worldConfig.worldHeightCap - 1;
 
                     if (values.length == 4)
                     {
                         minY = Integer.valueOf(values[2]);
                         maxY = Integer.valueOf(values[3]);
-                        minY = applyBounds(minY, 0, worldConfig.WorldHeight - 1);
-                        maxY = applyBounds(maxY, minY, worldConfig.WorldHeight - 1);
+                        minY = applyBounds(minY, 0, worldConfig.worldHeightCap - 1);
+                        maxY = applyBounds(maxY, minY, worldConfig.worldHeightCap - 1);
                     }
 
                     if (this.replaceMatrixBlocks[fromBlockId] == null)
                     {
-                        this.replaceMatrixBlocks[fromBlockId] = new short[worldConfig.WorldHeight];
-                        for (int i = 0; i < worldConfig.WorldHeight; i++)
+                        this.replaceMatrixBlocks[fromBlockId] = new short[worldConfig.worldHeightCap];
+                        for (int i = 0; i < worldConfig.worldHeightCap; i++)
                             this.replaceMatrixBlocks[fromBlockId][i] = -1;
                     }
                     for (int y = minY; y <= maxY; y++)
@@ -862,8 +862,8 @@ public class BiomeConfig extends ConfigFile
         this.volatilityWeight1 = (this.volatilityWeightRaw1 - 0.5D) * 24.0D;
         this.volatilityWeight2 = (0.5D - this.volatilityWeightRaw2) * 24.0D;
 
-        this.waterLevelMin = applyBounds(this.waterLevelMin, 0, this.worldConfig.WorldHeight - 1);
-        this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
+        this.waterLevelMin = applyBounds(this.waterLevelMin, 0, this.worldConfig.worldHeightCap - 1);
+        this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.worldHeightCap - 1, this.waterLevelMin);
 
         this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomes.contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
 
@@ -887,8 +887,8 @@ public class BiomeConfig extends ConfigFile
         {
             if (!readModSettings(TCDefaultValues.DisableNotchPonds, false))
             {
-                this.settingsCache.put("SmallLake(WATER,4,7,8," + this.worldConfig.WorldHeight + ")", "0");
-                this.settingsCache.put("SmallLake(LAVA,2,3,8," + (this.worldConfig.WorldHeight - 8) + ")", "1");
+                this.settingsCache.put("SmallLake(WATER,4,7,8," + this.worldConfig.worldHeightCap + ")", "0");
+                this.settingsCache.put("SmallLake(LAVA,2,3,8," + (this.worldConfig.worldHeightCap - 8) + ")", "1");
             }
 
         }
@@ -951,7 +951,7 @@ public class BiomeConfig extends ConfigFile
 
                     String toData = "0";
                     String minHeight = "0";
-                    int maxHeight = worldConfig.WorldHeight;
+                    int maxHeight = worldConfig.worldHeightCap;
 
                     boolean longForm = false;
 

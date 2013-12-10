@@ -38,7 +38,7 @@ public interface LocalWorld
      * @param z The block z.
      * @param x_size Size of block in x coordinate.
      * @param z_size Size of blocks in z coordinate.
-     * @param type Output type. May be Full, WithOutRivers, OnlyRivers and null.
+     * @param type Output type. May be FULL, WITHOUT_RIVERS, ONLY_RIVERS or DEFAULT_FOR_WORLD.
      * @return Array filled by biome ids.
      */
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
@@ -138,9 +138,20 @@ public interface LocalWorld
     // Terrain init
     public long getSeed();
 
-    public int getHeight();
+    /**
+     * Gets the height the base terrain of the world is capped at. Resources
+     * ignore this limit.
+     *
+     * @return The height the base terrain of the world is capped at.
+     */
+    public int getHeightCap();
 
-    public int getHeightBits();
-
-    public void setHeightBits(int heightBits);
+    /**
+     * Returns the vertical scale of the world. 128 blocks is the normal
+     * scale, 256 doubles the scale, 64 halves the scale, etc. Only powers of
+     * two will be returned.
+     *
+     * @return The vertical scale of the world.
+     */
+    public int getHeightScale();
 }

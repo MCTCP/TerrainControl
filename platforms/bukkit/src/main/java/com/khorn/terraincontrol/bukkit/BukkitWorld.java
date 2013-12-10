@@ -75,10 +75,6 @@ public class BukkitWorld implements LocalWorld
 
     private BiomeBase[] biomeBaseArray;
 
-    // TODO do something with that when bukkit allow custom world height.
-    private int worldHeight = 256;
-    private int heightBits = 8;
-
     private int customBiomesCount = 21;
 
     static
@@ -356,7 +352,7 @@ public class BukkitWorld implements LocalWorld
 
     private Chunk getChunk(int x, int y, int z)
     {
-        if (y < 0 || y >= worldHeight)
+        if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
             return null;
 
         x = x >> 4;
@@ -384,7 +380,7 @@ public class BukkitWorld implements LocalWorld
             return -1;
         z = z & 0xF;
         x = x & 0xF;
-        for (int y = worldHeight - 1; y > 0; y--)
+        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
             Block block = chunk.getType(x, y, z);
             if (block instanceof BlockFluids)
@@ -574,15 +570,15 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public int getHeight()
+    public int getHeightCap()
     {
-        return worldHeight;
+        return settings.worldHeightCap;
     }
 
     @Override
-    public int getHeightBits()
+    public int getHeightScale()
     {
-        return heightBits;
+        return settings.worldScale;
     }
 
     public TCChunkGenerator getChunkGenerator()
@@ -711,13 +707,6 @@ public class BukkitWorld implements LocalWorld
     public void setBiomeManager(BiomeGenerator manager)
     {
         this.biomeManager = manager;
-    }
-
-    @Override
-    public void setHeightBits(int heightBits)
-    {
-        this.heightBits = heightBits;
-        this.worldHeight = 1 << heightBits;
     }
 
     @Override

@@ -170,8 +170,10 @@ public class WorldConfig extends ConfigFile
     public int normalBiomesRarity;
     public int iceBiomesRarity;
 
-    public int worldHeightBits;
-    public int WorldHeight;
+    public int worldHeightScaleBits;
+    public int worldScale;
+    public int worldHeightCapBits;
+    public int worldHeightCap;
 
     public long resourcesSeed;
 
@@ -197,8 +199,6 @@ public class WorldConfig extends ConfigFile
         // Need add check to clashes
         if (this.SettingsMode != ConfigMode.WriteDisable)
             this.writeSettingsFile(this.SettingsMode == ConfigMode.WriteAll);
-
-        world.setHeightBits(this.worldHeightBits);
 
         File biomeFolder = new File(settingsDir, TCDefaultValues.WorldBiomeConfigDirectoryName.stringValue());
         if (!biomeFolder.exists())
@@ -335,6 +335,9 @@ public class WorldConfig extends ConfigFile
         renameOldSetting("ModeBiome", TCDefaultValues.BiomeMode);
         renameOldSetting("NetherFortressEnabled", TCDefaultValues.NetherFortressesEnabled);
         renameOldSetting("PyramidsEnabled", TCDefaultValues.RareBuildingsEnabled);
+        // WorldHeightBits was split into two different settings
+        renameOldSetting("WorldHeightBits", TCDefaultValues.WorldHeightScaleBits);
+        renameOldSetting("WorldHeightBits", TCDefaultValues.WorldHeightCapBits);
     }
 
     @Override
@@ -380,8 +383,8 @@ public class WorldConfig extends ConfigFile
 
         this.caveRarity = applyBounds(this.caveRarity, 0, 100);
         this.caveFrequency = applyBounds(this.caveFrequency, 0, 200);
-        this.caveMinAltitude = applyBounds(this.caveMinAltitude, 0, WorldHeight);
-        this.caveMaxAltitude = applyBounds(this.caveMaxAltitude, 0, WorldHeight, this.caveMinAltitude);
+        this.caveMinAltitude = applyBounds(this.caveMinAltitude, 0, worldHeightCap);
+        this.caveMaxAltitude = applyBounds(this.caveMaxAltitude, 0, worldHeightCap, this.caveMinAltitude);
         this.individualCaveRarity = applyBounds(this.individualCaveRarity, 0, 100);
         this.caveSystemFrequency = applyBounds(this.caveSystemFrequency, 0, 200);
         this.caveSystemPocketChance = applyBounds(this.caveSystemPocketChance, 0, 100);
@@ -389,14 +392,14 @@ public class WorldConfig extends ConfigFile
         this.caveSystemPocketMaxSize = applyBounds(this.caveSystemPocketMaxSize, 0, 100, this.caveSystemPocketMinSize);
 
         this.canyonRarity = applyBounds(this.canyonRarity, 0, 100);
-        this.canyonMinAltitude = applyBounds(this.canyonMinAltitude, 0, WorldHeight);
-        this.canyonMaxAltitude = applyBounds(this.canyonMaxAltitude, 0, WorldHeight, this.canyonMinAltitude);
+        this.canyonMinAltitude = applyBounds(this.canyonMinAltitude, 0, worldHeightCap);
+        this.canyonMaxAltitude = applyBounds(this.canyonMaxAltitude, 0, worldHeightCap, this.canyonMinAltitude);
         this.canyonMinLength = applyBounds(this.canyonMinLength, 1, 500);
         this.canyonMaxLength = applyBounds(this.canyonMaxLength, 1, 500, this.canyonMinLength);
         this.canyonDepth = applyBounds(this.canyonDepth, 0.1D, 15D);
 
-        this.waterLevelMin = applyBounds(this.waterLevelMin, 0, WorldHeight - 1);
-        this.waterLevelMax = applyBounds(this.waterLevelMax, 0, WorldHeight - 1, this.waterLevelMin);
+        this.waterLevelMin = applyBounds(this.waterLevelMin, 0, worldHeightCap - 1);
+        this.waterLevelMax = applyBounds(this.waterLevelMax, 0, worldHeightCap - 1, this.waterLevelMin);
 
         this.villageDistance = applyBounds(this.villageDistance, 9, Integer.MAX_VALUE);
         this.minimumDistanceBetweenRareBuildings = applyBounds(this.minimumDistanceBetweenRareBuildings, 1, Integer.MAX_VALUE);
@@ -419,10 +422,13 @@ public class WorldConfig extends ConfigFile
         this.biomeMode = TerrainControl.getBiomeModeManager().getBiomeManager((String) readSettings(TCDefaultValues.BiomeMode));
 
         // World and water height
-        this.worldHeightBits = readSettings(TCDefaultValues.WorldHeightBits);
-        this.worldHeightBits = applyBounds(this.worldHeightBits, 5, 8);
-        this.WorldHeight = 1 << worldHeightBits;
-        this.waterLevelMax = WorldHeight / 2 - 1;
+        this.worldHeightScaleBits = readSettings(TCDefaultValues.WorldHeightScaleBits);
+        this.worldHeightScaleBits = applyBounds(this.worldHeightScaleBits, 5, 8);
+        this.worldScale = 1 << this.worldHeightScaleBits;
+        this.worldHeightCapBits = readSettings(TCDefaultValues.WorldHeightCapBits);
+        this.worldHeightCapBits = applyBounds(this.worldHeightCapBits, this.worldHeightScaleBits, 8);
+        this.worldHeightCap = 1 << this.worldHeightCapBits;
+        this.waterLevelMax = worldHeightCap / 2 - 1;
 
         // Biome placement
         this.GenerationDepth = readSettings(TCDefaultValues.GenerationDepth);
@@ -718,11 +724,16 @@ public class WorldConfig extends ConfigFile
         // Terrain height and volatility
         writeBigTitle("Terrain height and volatility");
 
-        writeComment("How many bits the generator uses for the height, from 5 to 8, inclusive.");
-        writeComment("This setting allows you to generate terrain above y=128.");
-        writeComment("Affects the height of the whole world.");
-        writeComment("7 bits gives 2^7 = 128 blocks and 8 gives 2^8 = 256 blocks.");
-        writeValue(TCDefaultValues.WorldHeightBits, this.worldHeightBits);
+        writeComment("Scales the height of the world. Adding 1 to this doubles the");
+        writeComment("height of the terrain, substracting 1 to this halves the height");
+        writeComment("of the terrain. Values must be between 5 and 8, inclusive.");
+        writeValue(TCDefaultValues.WorldHeightScaleBits, this.worldHeightScaleBits);
+
+        writeComment("Height cap of the base terrain. Setting this to 7 makes no terrain");
+        writeComment("generate above y = 2 ^ 7 = 128. Doesn't affect resources (trees, objects, etc.).");
+        writeComment("Values must be between 5 and 8, inclusive. Values may not be lower");
+        writeComment("than WorldHeightScaleBits.");
+        writeValue(TCDefaultValues.WorldHeightCapBits, this.worldHeightCapBits);
 
         writeComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured horizontally.");
         writeValue(TCDefaultValues.FractureHorizontal, this.fractureHorizontal);

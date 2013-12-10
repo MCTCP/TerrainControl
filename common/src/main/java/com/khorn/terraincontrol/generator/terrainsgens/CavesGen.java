@@ -115,9 +115,9 @@ public class CavesGen extends TerrainGenBase
 
             if (i1 < 1)
                 i1 = 1;
-            if (i2 > this.worldSettings.WorldHeight - 8)
+            if (i2 > this.worldSettings.worldHeightCap - 8)
             {
-                i2 = this.worldSettings.WorldHeight - 8;
+                i2 = this.worldSettings.worldHeightCap - 8;
             }
             if (i3 < 0)
                 i3 = 0;
@@ -133,11 +133,11 @@ public class CavesGen extends TerrainGenBase
                 {
                     for (int local_y = i2 + 1; (!waterFound) && (local_y >= i1 - 1); local_y--)
                     {
-                        arrayPosition = (local_x * 16 + local_z) * this.worldSettings.WorldHeight + local_y;
+                        arrayPosition = (local_x * 16 + local_z) * this.worldSettings.worldHeightCap + local_y;
                         if (local_y < 0)
                             continue;
 
-                        if (local_y < this.worldSettings.WorldHeight)
+                        if (local_y < this.worldSettings.worldHeightCap)
                         {
                             if ((chunkArray[arrayPosition] == DefaultMaterial.WATER.id) || (chunkArray[arrayPosition] == DefaultMaterial.STATIONARY_WATER.id))
                             {
@@ -159,7 +159,7 @@ public class CavesGen extends TerrainGenBase
                 {
                     double d10 = (local_z + real_chunk_z * 16 + 0.5D - z) / d3;
 
-                    int i10 = (local_x * 16 + local_z) * this.worldSettings.WorldHeight + i2;
+                    int i10 = (local_x * 16 + local_z) * this.worldSettings.worldHeightCap + i2;
                     boolean grassFound = false;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {

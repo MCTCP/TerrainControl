@@ -17,9 +17,6 @@ public class TCChunkGenerator extends ChunkGenerator
     private ArrayList<BlockPopulator> BlockPopulator = new ArrayList<BlockPopulator>();
     private boolean NotGenerate = false;
     private TCPlugin plugin;
-    private int heightBits;
-    private int heightBitsPlusFour;
-
     public TCChunkGenerator(TCPlugin _plugin)
     {
         this.plugin = _plugin;
@@ -27,8 +24,6 @@ public class TCChunkGenerator extends ChunkGenerator
 
     public void Init(BukkitWorld _world)
     {
-        this.heightBits = _world.getHeightBits();
-        this.heightBitsPlusFour = heightBits + 4;
         this.chunkProviderTC = new ChunkProviderTC(_world.getSettings(), _world);
 
         WorldConfig.TerrainMode mode = _world.getSettings().ModeTerrain;
@@ -71,7 +66,7 @@ public class TCChunkGenerator extends ChunkGenerator
             for (int _z = 0; _z < 16; _z++)
                 for (int y = 0; y < max_y; y++)
                 {
-                    byte block = BlockArray[(_x << heightBitsPlusFour | _z << heightBits | y)];
+                    byte block = BlockArray[(_x << ChunkProviderTC.HEIGHT_BITS_PLUS_FOUR | _z << ChunkProviderTC.HEIGHT_BITS | y)];
                     if (block != 0)
                     {
                         int sectionId = y >> 4;
