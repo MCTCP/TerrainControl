@@ -494,9 +494,9 @@ public class ChunkProviderTC
                     {
                         output += d8;
 
-                        if (y > maxYSections - 4)
+                        if (y > usedYSections - 4)
                         {
-                            final double d12 = (y - (maxYSections - 4)) / 3.0F;
+                            final double d12 = (y - (usedYSections - 4)) / 3.0F;
                             // Reduce last three layers
                             output = output * (1.0D - d12) + -10.0D * d12;
                         }
@@ -554,24 +554,26 @@ public class ChunkProviderTC
         final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))];
         final int lookRadius = this.worldSettings.biomeConfigs[biomeId].SmoothRadius;
 
+        BiomeConfig nextBiomeConfig;
+        float nextBiomeHeight, biomeWeight;
+
         for (int nextX = -lookRadius; nextX <= lookRadius; nextX++)
         {
             for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
             {
                 final int nextBiomeId = this.biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))];
-                BiomeConfig nextBiomeConfig = this.worldSettings.biomeConfigs[nextBiomeId];
-                float biomeMinHeight = nextBiomeConfig.BiomeHeight;
-                float biomeMaxHeight = nextBiomeConfig.BiomeVolatility;
 
-                float biomeWeight = this.nearBiomeWeightArray[nextX + 2 + (nextZ + 2) * 5] / (biomeMinHeight + 2.0F);
+                nextBiomeConfig = this.worldSettings.biomeConfigs[nextBiomeId];
+                nextBiomeHeight = nextBiomeConfig.BiomeHeight;
 
-                if (nextBiomeConfig.BiomeHeight > nextBiomeConfig.BiomeVolatility)
+                biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextBiomeHeight + 2.0F);
+                biomeWeight = Math.abs(biomeWeight);
+                if (nextBiomeHeight > this.worldSettings.biomeConfigs[biomeId].BiomeHeight)
                 {
                     biomeWeight /= 2.0F;
                 }
-
-                volatilitySum += biomeMaxHeight * biomeWeight;
-                heightSum += biomeMinHeight * biomeWeight;
+                volatilitySum += nextBiomeConfig.BiomeVolatility * biomeWeight;
+                heightSum += nextBiomeHeight * biomeWeight;
                 biomeWeightSum += biomeWeight;
             }
         }
