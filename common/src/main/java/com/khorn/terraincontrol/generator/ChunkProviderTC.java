@@ -457,7 +457,7 @@ public class ChunkProviderTC
 
                 i2D++;
 
-                for (int y = 0; y < usedYSections; y++)
+                for (int y = 0; y < maxYSections; y++)
                 {
                     double output;
                     double d8;
@@ -494,9 +494,9 @@ public class ChunkProviderTC
                     {
                         output += d8;
 
-                        if (y > usedYSections - 4)
+                        if (y > maxYSections - 4)
                         {
-                            final double d12 = (y - (usedYSections - 4)) / 3.0F;
+                            final double d12 = (y - (maxYSections - 4)) / 3.0F;
                             // Reduce last three layers
                             output = output * (1.0D - d12) + -10.0D * d12;
                         }
@@ -511,14 +511,6 @@ public class ChunkProviderTC
                     }
 
                     this.rawTerrain[i3D] = output;
-                    i3D++;
-                }
-                // Above the used y sections but below the map height
-                // the noise array needs to be negative to make sure
-                // no terrain will generate
-                for (int y = usedYSections; y < maxYSections; y++)
-                {
-                    this.rawTerrain[i3D] = -10;
                     i3D++;
                 }
             }
