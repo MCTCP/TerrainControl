@@ -74,9 +74,12 @@ public class DefaultBiomeSettings
 
     public boolean defaultWaterLakes = true;
     public Object[] defaultTree; // Parameters for tree resource
-    public int defaultFlowers = 2;
+    public int defaultDandelions = 2;
+    public int defaultPoppies = 2;
     public int defaultTallFlowers = 0;
     public int defaultGrass = 10;
+    public int defaultFerns = 0;
+    public int defaultLargeFerns = 0;
     public int defaultDeadBrush = 0;
     public int defaultMushroom = 0;
     public int defaultReed = 0;
@@ -104,7 +107,9 @@ public class DefaultBiomeSettings
     public VillageType defaultVillageType = VillageType.disabled;
     public RareBuildingType defaultRareBuildingType = RareBuildingType.disabled;
     public int defaultEmeraldOre = 0;
-    private boolean defaultHasVines;
+    public boolean defaultHasVines;
+    public int defaultBoulder = 0;
+    public String defaultSurfaceLayer = "";
 
     public DefaultBiomeSettings(LocalBiome minecraftBiome, int worldHeight)
     {
@@ -188,6 +193,12 @@ public class DefaultBiomeSettings
         // Custom objects
         resources.add(Resource.createResource(config, CustomObjectGen.class, "UseWorld"));
 
+        // Boulders
+        if (this.defaultBoulder != 0)
+        {
+            resources.add(Resource.createResource(config, BoulderGen.class, DefaultMaterial.MOSSY_COBBLESTONE, defaultBoulder, TCDefaultValues.boulderDepositRarity.intValue(), TCDefaultValues.boulderDepositMinAltitude.intValue(), TCDefaultValues.boulderDepositMaxAltitude.intValue(), DefaultMaterial.GRASS, DefaultMaterial.DIRT, DefaultMaterial.STONE));
+        }
+
         // Trees
         if (this.defaultTree != null)
         {
@@ -196,64 +207,79 @@ public class DefaultBiomeSettings
 
         if (this.defaultWaterLily > 0)
         {
-            resources.add(Resource.createResource(config, AboveWaterGen.class, DefaultMaterial.WATER_LILY.id, this.defaultWaterLily, 100));
+            resources.add(Resource.createResource(config, AboveWaterGen.class, DefaultMaterial.WATER_LILY, this.defaultWaterLily, 100));
         }
 
-        if (this.defaultFlowers > 0)
+        if (this.defaultPoppies > 0)
         {
             // Poppy
-            resources.add(Resource.createResource(config, PlantGen.class, "Poppy", this.defaultFlowers, TCDefaultValues.roseDepositRarity.intValue(), TCDefaultValues.roseDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Poppy, this.defaultPoppies, TCDefaultValues.roseDepositRarity.intValue(), TCDefaultValues.roseDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
+        }
 
+        if (this.defaultDandelions > 0)
+        {
             // Dandelion
-            resources.add(Resource.createResource(config, PlantGen.class, "Dandelion", this.defaultFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Dandelion, this.defaultDandelions, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
         }
 
         if (this.defaultTallFlowers > 0)
         {
             // Lilac
-            resources.add(Resource.createResource(config, PlantGen.class, "Lilac", this.defaultTallFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Lilac, this.defaultTallFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
 
             // Rose bush
-            resources.add(Resource.createResource(config, PlantGen.class, "RoseBush", this.defaultTallFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.RoseBush, this.defaultTallFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
 
             // Peony
-            resources.add(Resource.createResource(config, PlantGen.class, "Peony", this.defaultTallFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Peony, this.defaultTallFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SOIL.id));
         }
 
         if (this.defaultMushroom > 0)
         {
             // Red mushroom
-            resources.add(Resource.createResource(config, PlantGen.class, "RedMushroom", this.defaultMushroom, TCDefaultValues.redMushroomDepositRarity.intValue(), TCDefaultValues.redMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.RedMushroom, this.defaultMushroom, TCDefaultValues.redMushroomDepositRarity.intValue(), TCDefaultValues.redMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id));
 
             // Brown mushroom
-            resources.add(Resource.createResource(config, PlantGen.class, "BrownMushroom", this.defaultMushroom, TCDefaultValues.brownMushroomDepositRarity.intValue(), TCDefaultValues.brownMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.BrownMushroom, this.defaultMushroom, TCDefaultValues.brownMushroomDepositRarity.intValue(), TCDefaultValues.brownMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id));
+        }
+
+        if (this.defaultFerns > 0)
+        {
+            // Ferns
+            resources.add(Resource.createResource(config, GrassGen.class, PlantType.Fern, "", this.defaultFerns, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
         }
 
         if (this.defaultGrass > 0)
         {
             // Grass
-            resources.add(Resource.createResource(config, GrassGen.class, "Tallgrass", "", this.defaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+            resources.add(Resource.createResource(config, GrassGen.class, PlantType.Tallgrass, "", this.defaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+        }
+
+        if (this.defaultLargeFerns > 0)
+        {
+            // Large ferns
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.LargeFern, this.defaultLargeFerns, 90, 30, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         if (this.defaultDeadBrush > 0)
         {
             // Dead Bush
-            resources.add(Resource.createResource(config, GrassGen.class, "Deadbush", 0, this.defaultDeadBrush, TCDefaultValues.deadBushDepositRarity.intValue(), DefaultMaterial.SAND.id));
+            resources.add(Resource.createResource(config, GrassGen.class, PlantType.DeadBush, 0, this.defaultDeadBrush, TCDefaultValues.deadBushDepositRarity.intValue(), DefaultMaterial.SAND.id));
         }
 
         // Pumpkin
-        resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.PUMPKIN.id, TCDefaultValues.pumpkinDepositFrequency.intValue(), TCDefaultValues.pumpkinDepositRarity.intValue(), TCDefaultValues.pumpkinDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id));
+        resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.PUMPKIN, TCDefaultValues.pumpkinDepositFrequency.intValue(), TCDefaultValues.pumpkinDepositRarity.intValue(), TCDefaultValues.pumpkinDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id));
 
         if (this.defaultReed > 0)
         {
             // Reed
-            resources.add(Resource.createResource(config, ReedGen.class, DefaultMaterial.SUGAR_CANE_BLOCK.id, this.defaultReed, TCDefaultValues.reedDepositRarity.intValue(), TCDefaultValues.reedDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SAND.id));
+            resources.add(Resource.createResource(config, ReedGen.class, DefaultMaterial.SUGAR_CANE_BLOCK, this.defaultReed, TCDefaultValues.reedDepositRarity.intValue(), TCDefaultValues.reedDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SAND.id));
         }
 
         if (this.defaultCactus > 0)
         {
             // Cactus
-            resources.add(Resource.createResource(config, CactusGen.class, DefaultMaterial.CACTUS.id, this.defaultCactus, TCDefaultValues.cactusDepositRarity.intValue(), TCDefaultValues.cactusDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.SAND.id));
+            resources.add(Resource.createResource(config, CactusGen.class, DefaultMaterial.CACTUS, this.defaultCactus, TCDefaultValues.cactusDepositRarity.intValue(), TCDefaultValues.cactusDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.SAND.id));
         }
         if (this.defaultHasVines)
         {

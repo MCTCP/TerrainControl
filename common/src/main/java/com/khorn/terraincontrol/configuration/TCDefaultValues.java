@@ -153,6 +153,7 @@ public enum TCDefaultValues implements TCSetting
 
     StoneBlock(1),
     SurfaceBlock(2),
+    SurfaceLayer(""),
     GroundBlock(3),
     ReplacedBlocks("None"),
 
@@ -325,14 +326,17 @@ public enum TCDefaultValues implements TCSetting
     lavaSourceDepositFrequency(10),
     lavaSourceDepositMinAltitude(8),
     lavaSourceDepositMaxAltitude(128),
+    
+    boulderDepositRarity(30),
+    boulderDepositMinAltitude(0),
+    boulderDepositMaxAltitude(256),
     // End resource settings
 
     // Deprecated settings
     BiomeRivers(true),
     DisableNotchPonds(false),
     FrozenRivers(true);
-
-    // End deprectated settings
+    // End deprecated settings
 
     private int iValue;
     private long lValue;

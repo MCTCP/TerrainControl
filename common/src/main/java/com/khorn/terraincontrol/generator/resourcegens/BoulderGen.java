@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.generator.resourcegens;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.util.MathHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,10 @@ public class BoulderGen extends Resource
     @Override
     public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
     {
-        int y = MathHelper.getRandomNumberInRange(random, minAltitude, maxAltitude);
+        int y = world.getHighestBlockYAt(x, z);
+        if (y < this.minAltitude || y > this.maxAltitude) {
+            return;
+        }
 
         while (y > 3)
         {

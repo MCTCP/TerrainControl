@@ -21,6 +21,7 @@ public class ConfigFunctionsManager
 
         // Add vanilla resources
         registerConfigFunction("AboveWaterRes", AboveWaterGen.class);
+        registerConfigFunction("Boulder", BoulderGen.class);
         registerConfigFunction("Cactus", CactusGen.class);
         registerConfigFunction("CustomObject", CustomObjectGen.class);
         registerConfigFunction("CustomStructure", CustomStructureGen.class);

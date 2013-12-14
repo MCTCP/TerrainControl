@@ -42,8 +42,8 @@ public class CustomBiome extends BiomeBase
     {
         this.am = config.BiomeHeight;
         this.an = config.BiomeVolatility;
-        this.ai = Block.e(config.SurfaceBlock);
-        this.ak = Block.e(config.GroundBlock);
+        this.ai = Block.e(config.surfaceBlock);
+        this.ak = Block.e(config.groundBlock);
         this.temperature = config.BiomeTemperature;
         this.humidity = config.BiomeWetness;
         if (this.humidity == 0)

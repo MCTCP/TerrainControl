@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.noise.NoiseGeneratorNewOctaves;
 import com.khorn.terraincontrol.generator.resourcegens.Resource;
 
 import java.util.Random;
@@ -18,12 +19,15 @@ public class ObjectSpawner
     private WorldConfig worldSettings;
     private Random rand;
     private LocalWorld world;
+    private NoiseGeneratorNewOctaves noiseGen;
+    private double[] reusableChunkNoiseArray;
 
     public ObjectSpawner(WorldConfig wrk, LocalWorld localWorld)
     {
         this.worldSettings = wrk;
         this.rand = new Random();
         this.world = localWorld;
+        this.noiseGen = new NoiseGeneratorNewOctaves(new Random(world.getSeed()), 4);
     }
 
     public void populate(int chunkX, int chunkZ)
@@ -55,6 +59,9 @@ public class ObjectSpawner
 
         // Fire event
         TerrainControl.firePopulationStartEvent(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
+        
+        // Complex surface blocks
+        placeComplexSurfaceBlocks(chunkX, chunkZ);
 
         // Resource sequence
         for (Resource res : localBiomeConfig.resourceSequence)
@@ -81,6 +88,28 @@ public class ObjectSpawner
 
         // Fire event
         TerrainControl.firePopulationEndEvent(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
+    }
+    
+    protected void placeComplexSurfaceBlocks(int chunkX, int chunkZ)
+    {
+        this.reusableChunkNoiseArray = this.noiseGen.a(this.reusableChunkNoiseArray, chunkX * 16, chunkZ * 16, 16, 16, 0.0625D, 0.0625D, 1.0D);
+
+        int x = chunkX * 16 + 8;
+        int z = chunkZ * 16 + 8;
+        for (int i = 0; i < 16; i++)
+        {
+            for (int j = 0; j < 16; j++)
+            {
+                int blockToFreezeX = x + i;
+                int blockToFreezeZ = z + j;
+                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
+                if (biomeConfig != null && biomeConfig.surfaceLayer != null)
+                {
+                    double noise = this.reusableChunkNoiseArray[i + j * 16];
+                    biomeConfig.surfaceLayer.spawn(world, noise, blockToFreezeX, blockToFreezeZ);
+                }
+            }
+        }
     }
 
     protected void freezeChunk(int chunkX, int chunkZ)
@@ -117,7 +146,7 @@ public class ObjectSpawner
                     // block that accepts snow in the world
                     if (world.getMaterial(x, blockToFreezeY, z) == DefaultMaterial.AIR)
                     {
-                        if (world.getMaterial(x, blockToFreezeY - 1, z).isSolid())
+                        if (world.getMaterial(x, blockToFreezeY - 1, z).canSnowFallOn())
                         {
                             world.setBlock(x, blockToFreezeY, z, DefaultMaterial.SNOW.id, 0);
                         }

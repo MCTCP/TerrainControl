@@ -35,7 +35,8 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
 
-            this.defaultFlowers = 4;
+            this.defaultDandelions = 4;
+            this.defaultPoppies = 4;
             this.defaultGrass = 100;
             this.defaultColor = "0x8DB360";
             this.defaultStrongholds = false;
@@ -104,7 +105,8 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
 
-            this.defaultFlowers = -999;
+            this.defaultDandelions = 0;
+            this.defaultPoppies = 0;
             this.defaultDeadBrush = 1;
             this.defaultMushroom = 8;
             this.defaultReed = 10;
@@ -206,7 +208,8 @@ public class VanillaBiomesDefaultSettings
             this.defaultSurfaceBlock = (byte) DefaultMaterial.MYCEL.id;
             this.defaultMushroom = 1;
             this.defaultGrass = 0;
-            this.defaultFlowers = 0;
+            this.defaultPoppies = 0;
+            this.defaultDandelions = 0;
             this.defaultRarity = 1;
             this.defaultRiverBiome = "";
             this.defaultSize = 6;
@@ -317,7 +320,8 @@ public class VanillaBiomesDefaultSettings
             super(minecraftBiome, worldHeight);
 
             this.defaultGrass = 25;
-            this.defaultFlowers = 4;
+            this.defaultPoppies = 4;
+            this.defaultDandelions = 4;
             this.defaultColor = "0x537B09";
             this.defaultRareBuildingType = RareBuildingType.jungleTemple;
             this.defaultTree = new Object[] {50, TreeType.BigTree, 10, TreeType.GroundBush, 50, TreeType.JungleTree, 35, TreeType.CocoaTree, 100};
@@ -425,6 +429,14 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x596651";
+            this.defaultTree = new Object[] {10, TreeType.HugeTaiga1, 33, TreeType.Taiga1, 33, TreeType.Taiga2, 100 };
+            this.defaultBoulder = 2;
+            this.defaultGrass = 16;
+            this.defaultFerns = 80;
+            this.defaultMushroom = 8;
+            this.defaultLargeFerns = 60;
+            this.defaultPoppies = 0;
+            this.defaultSurfaceLayer = "DIRT:2,-0.95,DIRT:1,1.75";
         }
     }
 
@@ -620,10 +632,11 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x598110";
+            this.defaultTree = new Object[] {10, TreeType.HugeTaiga2, 8, TreeType.HugeTaiga1, 30, TreeType.Taiga1, 33, TreeType.Taiga2, 100 };
         }
     }
 
-    public static class MegaSpruceTaigaHills extends MegaTaigaHills
+    public static class MegaSpruceTaigaHills extends MegaSpruceTaiga
     {
         public MegaSpruceTaigaHills(LocalBiome minecraftBiome, int worldHeight)
         {

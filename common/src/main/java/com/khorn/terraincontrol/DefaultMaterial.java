@@ -25,7 +25,7 @@ public enum DefaultMaterial
     IRON_ORE(15),
     COAL_ORE(16),
     LOG(17),
-    LEAVES(18),
+    LEAVES(18, false),
     SPONGE(19),
     GLASS(20),
     LAPIS_ORE(21),
@@ -192,8 +192,7 @@ public enum DefaultMaterial
 
     /**
      * Creates a new material.
-     * <p/>
-     * 
+     *
      * @param id Id of the material.
      * @param solid Whether the material is solid. If set to false, it will
      *            prevent snowfall. Note: this isn't always equal to what
@@ -207,8 +206,7 @@ public enum DefaultMaterial
 
     /**
      * Creates a new solid material where snow will fall on.
-     * <p/>
-     * 
+     *
      * @param id Id of the material.
      */
     private DefaultMaterial(int id)
@@ -219,8 +217,7 @@ public enum DefaultMaterial
 
     /**
      * Returns true only if this material is flowing or stationary Water
-     * <p/>
-     * 
+     *
      * @return boolean whether or not this material is flowing or stationary
      *         Water
      */
@@ -230,16 +227,28 @@ public enum DefaultMaterial
     }
 
     /**
-     * Returns the solid value of the material. When returns false, it will
-     * prevent snowfall. Note: this isn't always equal to what Minecraft calls
-     * solid.
-     * <p/>
-     * 
+     * Gets whether this material is solid. Materials that aren't solid are
+     * nonexistant for {@link LocalWorld#getSolidHeight(int, int)}. Note: this
+     * isn't always equal to what Minecraft calls solid.
+     *
      * @return boolean Whether or not the material is considered solid
      */
     public boolean isSolid()
     {
         return this.solid;
+    }
+
+    /**
+     * Gets whether snow can fall on this block.
+     *
+     * @return Whether snow can fall on this block.
+     */
+    public boolean canSnowFallOn()
+    {
+        // Exceptions for nonsolid leaves
+        // IF we get much more exceptions, we may want to make this a
+        // parameter in the constructor instead.
+        return this == LEAVES || this == LEAVES_2 || this.solid;
     }
 
     /**

@@ -113,7 +113,7 @@ public class BO2 extends ConfigFile implements CustomObject
         {
             if (world.getTypeId(x + point.x, y + point.y, z + point.z) == 0)
             {
-                world.setBlock((x + point.x), y + point.y, z + point.z, point.blockId, point.blockData, true, false, true);
+                world.setBlock((x + point.x), y + point.y, z + point.z, point.blockId, point.blockData);
             } else if (dig)
             {
                 world.setBlock((x + point.x), y + point.y, z + point.z, point.blockId, point.blockData, true, false, true);

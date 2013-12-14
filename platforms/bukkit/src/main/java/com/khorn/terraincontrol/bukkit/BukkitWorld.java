@@ -392,14 +392,10 @@ public class BukkitWorld implements LocalWorld
     @Override
     public int getSolidHeight(int x, int z)
     {
-        Chunk chunk = this.getChunk(x, 0, z);
-        if (chunk == null)
-            return -1;
-
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            Block block = chunk.getType(x & 0xF, y, z & 0xF);
-            if (block.getMaterial().isSolid())
+            DefaultMaterial material = getMaterial(x, y, z);
+            if (material.isSolid())
             {
                 return y + 1;
             }

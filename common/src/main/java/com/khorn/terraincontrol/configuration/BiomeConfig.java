@@ -1,7 +1,8 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.generator.resourcegens.PlantType;
+import com.khorn.terraincontrol.generator.SurfaceLayer;
 
+import com.khorn.terraincontrol.generator.resourcegens.PlantType;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
@@ -53,9 +54,10 @@ public class BiomeConfig extends ConfigFile
     public float BiomeTemperature;
     public float BiomeWetness;
 
-    public int StoneBlock;
-    public int SurfaceBlock;
-    public int GroundBlock;
+    public int stoneBlock;
+    public int surfaceBlock;
+    public int groundBlock;
+    public SurfaceLayer surfaceLayer;
 
     public String ReplaceBiomeName;
 
@@ -145,7 +147,7 @@ public class BiomeConfig extends ConfigFile
         this.readConfigSettings();
 
         this.correctSettings();
-        
+
         // Add default resources when needed
         if (!file.exists())
         {
@@ -210,9 +212,10 @@ public class BiomeConfig extends ConfigFile
         this.BiomeVolatility = readModSettings(TCDefaultValues.BiomeVolatility, defaultSettings.defaultBiomeVolatility);
         this.SmoothRadius = readSettings(TCDefaultValues.SmoothRadius);
 
-        this.StoneBlock = readSettings(TCDefaultValues.StoneBlock);
-        this.SurfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock, defaultSettings.defaultSurfaceBlock);
-        this.GroundBlock = readModSettings(TCDefaultValues.GroundBlock, defaultSettings.defaultGroundBlock);
+        this.stoneBlock = readSettings(TCDefaultValues.StoneBlock);
+        this.surfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock, defaultSettings.defaultSurfaceBlock);
+        this.surfaceLayer = readSurfaceLayerSettings();
+        this.groundBlock = readModSettings(TCDefaultValues.GroundBlock, defaultSettings.defaultGroundBlock);
 
         this.UseWorldWaterLevel = readSettings(TCDefaultValues.UseWorldWaterLevel);
         this.waterLevelMax = readSettings(TCDefaultValues.WaterLevelMax);
@@ -280,6 +283,23 @@ public class BiomeConfig extends ConfigFile
         {
             logSettingValueInvalid(setting.name(), e);
         }
+    }
+
+    private SurfaceLayer readSurfaceLayerSettings()
+    {
+        String settingValue = readModSettings(TCDefaultValues.SurfaceLayer, defaultSettings.defaultSurfaceLayer);
+        if (settingValue.length() > 0)
+        {
+            try
+            {
+                String[] parts = readComplexString(settingValue);
+                return surfaceLayer = new SurfaceLayer(parts);
+            } catch (InvalidConfigException e)
+            {
+                logSettingValueInvalid(TCDefaultValues.SurfaceLayer.name());
+            }
+        }
+        return null;
     }
 
     private void ReadReplaceSettings()
@@ -522,14 +542,24 @@ public class BiomeConfig extends ConfigFile
 
         this.writeBigTitle("Blocks");
 
-        writeComment("Stone block id");
-        writeValue(TCDefaultValues.StoneBlock, this.StoneBlock);
+        writeComment("Change this to generate something else than stone in the biome. Doesn't support block data.");
+        writeValue(TCDefaultValues.StoneBlock, this.stoneBlock);
 
-        writeComment("Surface block id");
-        writeValue(TCDefaultValues.SurfaceBlock, this.SurfaceBlock);
+        writeComment("Surface block id, usually 2, the id of grass. Doesn't support block data.");
+        writeValue(TCDefaultValues.SurfaceBlock, this.surfaceBlock);
+        
+        writeComment("Setting for biomes with more complex surface blocks.");
+        writeComment("Each column in the world has a noise value from what appears to be -7 to 7.");
+        writeComment("Values near 0 are more common than values near 7 and -7. This setting is");
+        writeComment("used to change the surface block based on the noise value for the column.");
+        writeComment("Syntax: Block[:Data],MaxNoise,[AnotherBlock[:Data],MaxNoise[,...]]");
+        writeComment("Example: "+TCDefaultValues.SurfaceLayer+": STONE,-0.8,DIRT,0,GRASS,1");
+        writeComment("  When the noise is below -0.8, stone is the surface block, between -0.8 and 0");
+        writeComment("  dirt and between 0 and 1 grass. Above that the normal "+TCDefaultValues.SurfaceBlock+" is used.");
+        writeValue(TCDefaultValues.SurfaceLayer, this.surfaceLayer == null? "" : this.surfaceLayer.toString());
 
-        writeComment("Block id from stone to surface, like dirt in plain biome ");
-        writeValue(TCDefaultValues.GroundBlock, this.GroundBlock);
+        writeComment("Block id from stone to surface, like dirt in most biomes. Doesn't support block data.");
+        writeValue(TCDefaultValues.GroundBlock, this.groundBlock);
 
         writeComment("Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])");
         writeComment("Example :");
@@ -605,6 +635,7 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("Vines(Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.writeComment("Vein(Block[:Data],MinRadius,MaxRadius,Rarity,OreSize,OreFrequency,OreRarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..])");
         this.writeComment("Well(BaseBlock[:Data],HalfSlabBlock[:Data],WaterBlock[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..])");
+        this.writeComment("Boulder(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..]");
         this.writeComment("");
         this.writeComment("Block and BlockSource: can be id or name, Frequency - is count of attempts for place resource");
         this.writeComment("Rarity: chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass");
@@ -766,7 +797,8 @@ public class BiomeConfig extends ConfigFile
             if (replaceMatrixBlocks[blockIdFrom] == null)
                 continue;
 
-            int previousReplaceTo = -1; // What the y coord just below had it's
+            int previousReplaceTo = -1; // What the y coord just below had
+                                        // it's
                                         // replace setting set to
             int yStart = 0;
 
@@ -780,7 +812,8 @@ public class BiomeConfig extends ConfigFile
                     continue;
                 }
 
-                // Not the same as the previous entry, previous entry wasn't -1
+                // Not the same as the previous entry, previous entry wasn't
+                // -1
                 // So we have found the end of a replace setting
                 if (previousReplaceTo != -1)
                 {
@@ -802,7 +835,8 @@ public class BiomeConfig extends ConfigFile
 
                 if (previousReplaceTo == -1)
                 {
-                    // Not the same as the previous entry, previous entry was -1
+                    // Not the same as the previous entry, previous entry was
+                    // -1
                     // So we have found the start of a new replace setting
                     yStart = y;
                     previousReplaceTo = currentReplaceTo;

@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.biomegenerators.OutputType;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.generator.noise.NoiseGeneratorOldOctaves;
+import com.khorn.terraincontrol.generator.noise.NoiseGeneratorNewOctaves;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorPerlinOctaves;
 import com.khorn.terraincontrol.generator.terrainsgens.CanyonsGen;
 import com.khorn.terraincontrol.generator.terrainsgens.CavesGen;
@@ -35,7 +35,7 @@ public class ChunkProviderTC
     private final NoiseGeneratorPerlinOctaves noiseGen1;
     private final NoiseGeneratorPerlinOctaves noiseGen2;
     private final NoiseGeneratorPerlinOctaves noiseGen3;
-    private final NoiseGeneratorOldOctaves noiseGen4;
+    private final NoiseGeneratorNewOctaves noiseGen4;
     private final NoiseGeneratorPerlinOctaves noiseGen5;
     private final NoiseGeneratorPerlinOctaves noiseGen6;
     private double[] rawTerrain;
@@ -87,7 +87,7 @@ public class ChunkProviderTC
         this.noiseGen1 = new NoiseGeneratorPerlinOctaves(this.random, 16);
         this.noiseGen2 = new NoiseGeneratorPerlinOctaves(this.random, 16);
         this.noiseGen3 = new NoiseGeneratorPerlinOctaves(this.random, 8);
-        this.noiseGen4 = new NoiseGeneratorOldOctaves(this.random, 4);
+        this.noiseGen4 = new NoiseGeneratorNewOctaves(this.random, 4);
         this.noiseGen5 = new NoiseGeneratorPerlinOctaves(this.random, 10);
         this.noiseGen6 = new NoiseGeneratorPerlinOctaves(this.random, 16);
 
@@ -240,7 +240,7 @@ public class ChunkProviderTC
 
                                 if (d16 > 0.0D)
                                 {
-                                    blockId = this.worldSettings.biomeConfigs[biomeId].StoneBlock;
+                                    blockId = this.worldSettings.biomeConfigs[biomeId].stoneBlock;
                                 }
 
                                 blockArray[position] = (byte) blockId;
@@ -299,8 +299,8 @@ public class ChunkProviderTC
 
                 // Loop from map height to zero to place bedrock and surface
                 // blocks
-                int currentSurfaceBlock = biomeConfig.SurfaceBlock;
-                int currentGroundBlock = biomeConfig.GroundBlock;
+                int currentSurfaceBlock = biomeConfig.surfaceBlock;
+                int currentGroundBlock = biomeConfig.groundBlock;
                 int surfaceBlocksCount = -1;
                 final int currentWaterLevel = this.waterLevel[z + x * 16];
                 for (int y = CHUNK_MAX_Y - 1; y >= 0; y--)
@@ -320,7 +320,7 @@ public class ChunkProviderTC
                         {
                             // Reset when air is found
                             surfaceBlocksCount = -1;
-                        } else if (blockOnCurrentPos == biomeConfig.StoneBlock)
+                        } else if (blockOnCurrentPos == biomeConfig.stoneBlock)
                         {
                             if (surfaceBlocksCount == -1)
                             {
@@ -328,11 +328,11 @@ public class ChunkProviderTC
                                 if (surfaceBlocksNoise <= 0 && !this.worldSettings.removeSurfaceStone)
                                 {
                                     currentSurfaceBlock = 0;
-                                    currentGroundBlock = biomeConfig.StoneBlock;
+                                    currentGroundBlock = biomeConfig.stoneBlock;
                                 } else if ((y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1))
                                 {
-                                    currentSurfaceBlock = biomeConfig.SurfaceBlock;
-                                    currentGroundBlock = biomeConfig.GroundBlock;
+                                    currentSurfaceBlock = biomeConfig.surfaceBlock;
+                                    currentGroundBlock = biomeConfig.groundBlock;
                                 }
 
                                 // Use blocks for the top of the water instead
