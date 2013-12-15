@@ -11,21 +11,25 @@ import java.util.List;
 
 public class SurfaceLayer
 {
-    public static class GroundLayerChoice implements Comparable<GroundLayerChoice>
+    public static class LayerChoice implements Comparable<LayerChoice>
     {
-        public final byte blockData;
-        public final int blockId;
+        public final int surfaceBlockId;
+        public final byte surfaceBlockData;
+        public final int groundBlockId;
+        public final byte groundBlockData;
         public final float maxNoise;
 
-        public GroundLayerChoice(int blockId, byte blockData, float maxNoise)
+        public LayerChoice(int surfaceBlockId, byte surfaceBlockData, int groundBlockId, byte groundBlockData, float maxNoise)
         {
-            this.blockId = blockId;
-            this.blockData = blockData;
+            this.surfaceBlockId = surfaceBlockId;
+            this.surfaceBlockData = surfaceBlockData;
+            this.groundBlockId = groundBlockId;
+            this.groundBlockData = groundBlockData;
             this.maxNoise = maxNoise;
         }
 
         @Override
-        public int compareTo(GroundLayerChoice that)
+        public int compareTo(LayerChoice that)
         {
             float delta = this.maxNoise - that.maxNoise;
             // The number 65565 is just randomly chosen, any positive number
@@ -36,7 +40,7 @@ public class SurfaceLayer
     }
 
     // Must be sorted based on the noise field
-    private List<GroundLayerChoice> surfaceLayerChoices;
+    private List<LayerChoice> layerChoices;
 
     public SurfaceLayer(String[] args) throws InvalidConfigException
     {
@@ -45,15 +49,17 @@ public class SurfaceLayer
             throw new InvalidConfigException("Needs at least two arguments");
         }
         
-        surfaceLayerChoices = new ArrayList<GroundLayerChoice>();
-        for (int i = 0; i < args.length - 1; i += 2)
+        layerChoices = new ArrayList<LayerChoice>();
+        for (int i = 0; i < args.length - 2; i += 3)
         {
-            int blockId = StringHelper.readBlockId(args[i]);
-            byte blockData = (byte) StringHelper.readBlockData(args[i]);
-            float maxNoise = (float) StringHelper.readDouble(args[i + 1], -20, 20);
-            surfaceLayerChoices.add(new GroundLayerChoice(blockId, blockData, maxNoise));
+            int surfaceBlockId = StringHelper.readBlockId(args[i]);
+            byte surfaceBlockData = (byte) StringHelper.readBlockData(args[i]);
+            int groundBlockId = StringHelper.readBlockId(args[i+1]);
+            byte groundBlockData = (byte) StringHelper.readBlockData(args[i+1]);
+            float maxNoise = (float) StringHelper.readDouble(args[i + 2], -20, 20);
+            layerChoices.add(new LayerChoice(surfaceBlockId, surfaceBlockData, groundBlockId, groundBlockData, maxNoise));
         }
-        Collections.sort(surfaceLayerChoices);
+        Collections.sort(layerChoices);
     }
 
     /**
@@ -74,11 +80,15 @@ public class SurfaceLayer
             return;
         }
 
-        for (GroundLayerChoice groundLayer : this.surfaceLayerChoices)
+        for (LayerChoice layer : this.layerChoices)
         {
-            if (noise <= groundLayer.maxNoise)
+            if (noise <= layer.maxNoise)
             {
-                world.setBlock(x, y, z, groundLayer.blockId, groundLayer.blockData);
+                world.setBlock(x, y, z, layer.surfaceBlockId, layer.surfaceBlockData);
+                for (int i = 1; i < 4; i++)
+                {
+                    world.setBlock(x, y - i, z, layer.groundBlockId, layer.groundBlockData);
+                }
                 return;
             }
         }
@@ -88,13 +98,16 @@ public class SurfaceLayer
     public String toString()
     {
         StringBuilder stringBuilder = new StringBuilder();
-        for (GroundLayerChoice groundLayer : this.surfaceLayerChoices)
+        for (LayerChoice groundLayer : this.layerChoices)
         {
-            stringBuilder.append(StringHelper.makeMaterial(groundLayer.blockId, groundLayer.blockData));
+            stringBuilder.append(StringHelper.makeMaterial(groundLayer.surfaceBlockId, groundLayer.surfaceBlockData));
+            stringBuilder.append(',');
+            stringBuilder.append(StringHelper.makeMaterial(groundLayer.groundBlockId, groundLayer.groundBlockData));
             stringBuilder.append(',');
             stringBuilder.append(groundLayer.maxNoise);
             stringBuilder.append(',');
         }
+        // Delete last ','
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         return stringBuilder.toString();
     }

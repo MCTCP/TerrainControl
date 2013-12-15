@@ -10,8 +10,8 @@ import com.khorn.terraincontrol.generator.resourcegens.TreeType;
 /**
  * Class to hold all default settings of all default biomes.
  * 
- * Because most vanilla biomes just have a few changes, it isn't needed to give
- * each their own class, a simple inner class is enough.
+ * Because most vanilla biomes just have a few changes, it isn't needed to
+ * give each their own class, a simple inner class is enough.
  */
 public class VanillaBiomesDefaultSettings
 {
@@ -69,8 +69,10 @@ public class VanillaBiomesDefaultSettings
             super(minecraftBiome, worldHeight);
 
             this.defaultColor = "0x606060";
+            this.defaultPoppies = 0;
             this.defaultEmeraldOre = TCDefaultValues.emeraldDepositFrequency.intValue();
-            this.defaultTree = new Object[] {1, TreeType.BigTree, 1, TreeType.Tree, 9};
+            this.defaultTree = new Object[] {1, TreeType.Taiga2, 10, TreeType.BigTree, 1, TreeType.Tree, 9};
+            this.defaultSurfaceSurfaceAndGroundControl = DefaultMaterial.GRASS + "," + DefaultMaterial.DIRT + ",1.0," + DefaultMaterial.STONE + "," + DefaultMaterial.STONE + ",10.0";
         }
     };
 
@@ -310,6 +312,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultSize = 8;
             this.defaultBorder.add(DefaultBiome.EXTREME_HILLS.Name);
             this.defaultColor = "0x72789A";
+            this.defaultSurfaceSurfaceAndGroundControl = "";
         }
     };
 
@@ -429,14 +432,14 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x596651";
-            this.defaultTree = new Object[] {10, TreeType.HugeTaiga1, 33, TreeType.Taiga1, 33, TreeType.Taiga2, 100 };
+            this.defaultTree = new Object[] {10, TreeType.HugeTaiga1, 33, TreeType.Taiga1, 33, TreeType.Taiga2, 100};
             this.defaultBoulder = 2;
             this.defaultGrass = 16;
             this.defaultFerns = 80;
             this.defaultMushroom = 8;
             this.defaultLargeFerns = 60;
             this.defaultPoppies = 0;
-            this.defaultSurfaceLayer = "DIRT:2,-0.95,DIRT:1,1.75";
+            this.defaultSurfaceSurfaceAndGroundControl = DefaultMaterial.DIRT + ":2," + DefaultMaterial.DIRT + ",-0.95," + DefaultMaterial.DIRT + ":1," + DefaultMaterial.DIRT + ",1.75";
         }
     }
 
@@ -455,6 +458,8 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x507050";
+            this.defaultSurfaceSurfaceAndGroundControl = "";
+            this.defaultTree = new Object[] {1, TreeType.Taiga2, 66, TreeType.BigTree, 10, TreeType.Tree, 100};
         }
     }
 
@@ -531,6 +536,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x525252";
+            this.defaultSurfaceSurfaceAndGroundControl = DefaultMaterial.GRAVEL + "," + DefaultMaterial.GRAVEL + ",-1.0," + DefaultMaterial.GRASS + "," + DefaultMaterial.DIRT + ",2.0," + DefaultMaterial.GRAVEL + "," + DefaultMaterial.GRAVEL + ",10.0";
         }
     }
 
@@ -632,7 +638,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x598110";
-            this.defaultTree = new Object[] {10, TreeType.HugeTaiga2, 8, TreeType.HugeTaiga1, 30, TreeType.Taiga1, 33, TreeType.Taiga2, 100 };
+            this.defaultTree = new Object[] {10, TreeType.HugeTaiga2, 8, TreeType.HugeTaiga1, 30, TreeType.Taiga1, 33, TreeType.Taiga2, 100};
         }
     }
 
@@ -651,6 +657,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x466246";
+            this.defaultSurfaceSurfaceAndGroundControl = DefaultMaterial.GRAVEL + "," + DefaultMaterial.GRAVEL + ",-1.0," + DefaultMaterial.GRASS + "," + DefaultMaterial.DIRT + ",2.0," + DefaultMaterial.GRAVEL + "," + DefaultMaterial.GRAVEL + ",10.0";
         }
     }
 

@@ -153,7 +153,7 @@ public enum TCDefaultValues implements TCSetting
 
     StoneBlock(1),
     SurfaceBlock(2),
-    SurfaceLayer(""),
+    SurfaceAndGroundControl(""),
     GroundBlock(3),
     ReplacedBlocks("None"),
 

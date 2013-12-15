@@ -57,7 +57,7 @@ public class BiomeConfig extends ConfigFile
     public int stoneBlock;
     public int surfaceBlock;
     public int groundBlock;
-    public SurfaceLayer surfaceLayer;
+    public SurfaceLayer surfaceAndGroundControl;
 
     public String ReplaceBiomeName;
 
@@ -204,8 +204,8 @@ public class BiomeConfig extends ConfigFile
 
         this.stoneBlock = readSettings(TCDefaultValues.StoneBlock);
         this.surfaceBlock = readModSettings(TCDefaultValues.SurfaceBlock, defaultSettings.defaultSurfaceBlock);
-        this.surfaceLayer = readSurfaceLayerSettings();
         this.groundBlock = readModSettings(TCDefaultValues.GroundBlock, defaultSettings.defaultGroundBlock);
+        this.surfaceAndGroundControl = readSurfaceAndGroundControlSettings();
 
         this.UseWorldWaterLevel = readSettings(TCDefaultValues.UseWorldWaterLevel);
         this.waterLevelMax = readSettings(TCDefaultValues.WaterLevelMax);
@@ -275,18 +275,18 @@ public class BiomeConfig extends ConfigFile
         }
     }
 
-    private SurfaceLayer readSurfaceLayerSettings()
+    private SurfaceLayer readSurfaceAndGroundControlSettings()
     {
-        String settingValue = readModSettings(TCDefaultValues.SurfaceLayer, defaultSettings.defaultSurfaceLayer);
+        String settingValue = readModSettings(TCDefaultValues.SurfaceAndGroundControl, defaultSettings.defaultSurfaceSurfaceAndGroundControl);
         if (settingValue.length() > 0)
         {
             try
             {
                 String[] parts = readComplexString(settingValue);
-                return surfaceLayer = new SurfaceLayer(parts);
+                return surfaceAndGroundControl = new SurfaceLayer(parts);
             } catch (InvalidConfigException e)
             {
-                logSettingValueInvalid(TCDefaultValues.SurfaceLayer.name());
+                logSettingValueInvalid(TCDefaultValues.SurfaceAndGroundControl.name());
             }
         }
         return null;
@@ -538,18 +538,19 @@ public class BiomeConfig extends ConfigFile
         writeComment("Surface block id, usually 2, the id of grass. Doesn't support block data.");
         writeValue(TCDefaultValues.SurfaceBlock, this.surfaceBlock);
 
-        writeComment("Setting for biomes with more complex surface blocks.");
-        writeComment("Each column in the world has a noise value from what appears to be -7 to 7.");
-        writeComment("Values near 0 are more common than values near 7 and -7. This setting is");
-        writeComment("used to change the surface block based on the noise value for the column.");
-        writeComment("Syntax: Block[:Data],MaxNoise,[AnotherBlock[:Data],MaxNoise[,...]]");
-        writeComment("Example: " + TCDefaultValues.SurfaceLayer + ": STONE,-0.8,DIRT,0,GRASS,1");
-        writeComment("  When the noise is below -0.8, stone is the surface block, between -0.8 and 0");
-        writeComment("  dirt and between 0 and 1 grass. Above that the normal " + TCDefaultValues.SurfaceBlock + " is used.");
-        writeValue(TCDefaultValues.SurfaceLayer, this.surfaceLayer == null ? "" : this.surfaceLayer.toString());
-
         writeComment("Block id from stone to surface, like dirt in most biomes. Doesn't support block data.");
         writeValue(TCDefaultValues.GroundBlock, this.groundBlock);
+
+        writeComment("Setting for biomes with more complex surface and ground blocks.");
+        writeComment("Each column in the world has a noise value from what appears to be -7 to 7.");
+        writeComment("Values near 0 are more common than values near -7 and 7. This setting is");
+        writeComment("used to change the surface block based on the noise value for the column.");
+        writeComment("Syntax: Block[:Data],MaxNoise,[AnotherBlock[:Data],MaxNoise[,...]]");
+        writeComment("Example: " + TCDefaultValues.SurfaceAndGroundControl + ": STONE,STONE,-0.8,DIRT,DIRT,0.0,GRASS,DIRT,1.0");
+        writeComment("  When the noise is below -0.8, stone is the surface and ground block, between -0.8 and 0");
+        writeComment("  dirt and between 0.0 and 1.0 grass with dirt just below the grass.");
+        writeComment("  Above 1.0 the normal " + TCDefaultValues.SurfaceBlock + " and " + TCDefaultValues.GroundBlock + " are used.");
+        writeValue(TCDefaultValues.SurfaceAndGroundControl, this.surfaceAndGroundControl == null ? "" : this.surfaceAndGroundControl.toString());
 
         writeComment("Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])");
         writeComment("Example :");

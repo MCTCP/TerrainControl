@@ -103,10 +103,10 @@ public class ObjectSpawner
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
                 BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
-                if (biomeConfig != null && biomeConfig.surfaceLayer != null)
+                if (biomeConfig != null && biomeConfig.surfaceAndGroundControl != null)
                 {
                     double noise = this.reusableChunkNoiseArray[i + j * 16];
-                    biomeConfig.surfaceLayer.spawn(world, noise, blockToFreezeX, blockToFreezeZ);
+                    biomeConfig.surfaceAndGroundControl.spawn(world, noise, blockToFreezeX, blockToFreezeZ);
                 }
             }
         }

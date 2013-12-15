@@ -109,7 +109,7 @@ public class DefaultBiomeSettings
     public int defaultEmeraldOre = 0;
     public boolean defaultHasVines;
     public int defaultBoulder = 0;
-    public String defaultSurfaceLayer = "";
+    public String defaultSurfaceSurfaceAndGroundControl = "";
 
     public DefaultBiomeSettings(LocalBiome minecraftBiome, int worldHeight)
     {
