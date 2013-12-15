@@ -51,8 +51,8 @@ public class BiomeConfig extends ConfigFile
     public float BiomeVolatility;
     public int SmoothRadius;
 
-    public float BiomeTemperature;
-    public float BiomeWetness;
+    public float biomeTemperature;
+    public float biomeWetness;
 
     public int stoneBlock;
     public int surfaceBlock;
@@ -169,16 +169,6 @@ public class BiomeConfig extends ConfigFile
             biome.setEffects(this);
     }
 
-    public int getTemperature()
-    {
-        return (int) (this.BiomeTemperature * 65536.0F);
-    }
-
-    public int getWetness()
-    {
-        return (int) (this.BiomeWetness * 65536.0F);
-    }
-
     public SaplingGen getSaplingGen(SaplingType type)
     {
         SaplingGen gen = this.saplingTypes[type.getSaplingId()];
@@ -203,8 +193,8 @@ public class BiomeConfig extends ConfigFile
         this.BiomeIsBorder = readModSettings(TCDefaultValues.BiomeIsBorder, defaultSettings.defaultBorder);
         this.NotBorderNear = readModSettings(TCDefaultValues.NotBorderNear, defaultSettings.defaultNotBorderNear);
 
-        this.BiomeTemperature = readModSettings(TCDefaultValues.BiomeTemperature, defaultSettings.defaultBiomeTemperature);
-        this.BiomeWetness = readModSettings(TCDefaultValues.BiomeWetness, defaultSettings.defaultBiomeWetness);
+        this.biomeTemperature = readModSettings(TCDefaultValues.BiomeTemperature, defaultSettings.defaultBiomeTemperature);
+        this.biomeWetness = readModSettings(TCDefaultValues.BiomeWetness, defaultSettings.defaultBiomeWetness);
 
         this.ReplaceBiomeName = readSettings(TCDefaultValues.ReplaceToBiomeName);
 
@@ -547,16 +537,16 @@ public class BiomeConfig extends ConfigFile
 
         writeComment("Surface block id, usually 2, the id of grass. Doesn't support block data.");
         writeValue(TCDefaultValues.SurfaceBlock, this.surfaceBlock);
-        
+
         writeComment("Setting for biomes with more complex surface blocks.");
         writeComment("Each column in the world has a noise value from what appears to be -7 to 7.");
         writeComment("Values near 0 are more common than values near 7 and -7. This setting is");
         writeComment("used to change the surface block based on the noise value for the column.");
         writeComment("Syntax: Block[:Data],MaxNoise,[AnotherBlock[:Data],MaxNoise[,...]]");
-        writeComment("Example: "+TCDefaultValues.SurfaceLayer+": STONE,-0.8,DIRT,0,GRASS,1");
+        writeComment("Example: " + TCDefaultValues.SurfaceLayer + ": STONE,-0.8,DIRT,0,GRASS,1");
         writeComment("  When the noise is below -0.8, stone is the surface block, between -0.8 and 0");
-        writeComment("  dirt and between 0 and 1 grass. Above that the normal "+TCDefaultValues.SurfaceBlock+" is used.");
-        writeValue(TCDefaultValues.SurfaceLayer, this.surfaceLayer == null? "" : this.surfaceLayer.toString());
+        writeComment("  dirt and between 0 and 1 grass. Above that the normal " + TCDefaultValues.SurfaceBlock + " is used.");
+        writeValue(TCDefaultValues.SurfaceLayer, this.surfaceLayer == null ? "" : this.surfaceLayer.toString());
 
         writeComment("Block id from stone to surface, like dirt in most biomes. Doesn't support block data.");
         writeValue(TCDefaultValues.GroundBlock, this.groundBlock);
@@ -585,11 +575,26 @@ public class BiomeConfig extends ConfigFile
         this.writeBigTitle("Visuals and weather");
         this.writeComment("Most of the settings here only have an effect on players with the client version of Terrain Control installed.");
 
-        writeComment("Biome temperature. Float value from 0.0 to 1.0.");
-        writeValue(TCDefaultValues.BiomeTemperature, this.BiomeTemperature);
+        writeComment("Biome temperature. Float value from 0.0 to 2.0.");
+        if (this.Biome.isCustom())
+        {
+            writeComment("When this value is around 0.2, snow will fall on mountain peaks above y=90.");
+            writeComment("When this value is around 0.1, the whole biome will be covered in snow and ice.");
+        } else
+        {
+            writeComment("On default biomes, this won't do anything except changing the grass and leaves colors slightly.");
+        }
+        writeValue(TCDefaultValues.BiomeTemperature, this.biomeTemperature);
 
         writeComment("Biome wetness. Float value from 0.0 to 1.0.");
-        writeValue(TCDefaultValues.BiomeWetness, this.BiomeWetness);
+        if (this.Biome.isCustom())
+        {
+            writeComment("When this is set to 0, no rain will fall.");
+        } else
+        {
+            writeComment("On default biomes, this won't do anything except changing the grass and leaves colors slightly.");
+        }
+        writeValue(TCDefaultValues.BiomeWetness, this.biomeWetness);
 
         this.writeComment("Biome sky color.");
         this.writeColorValue(TCDefaultValues.SkyColor, this.SkyColor);
@@ -883,8 +888,8 @@ public class BiomeConfig extends ConfigFile
 
         this.SmoothRadius = applyBounds(this.SmoothRadius, 0, 32);
 
-        this.BiomeTemperature = applyBounds(this.BiomeTemperature, 0.0F, 1.0F);
-        this.BiomeWetness = applyBounds(this.BiomeWetness, 0.0F, 1.0F);
+        this.biomeTemperature = applyBounds(this.biomeTemperature, 0.0F, 2.0F);
+        this.biomeWetness = applyBounds(this.biomeWetness, 0.0F, 1.0F);
 
         this.IsleInBiome = filterBiomes(this.IsleInBiome, this.worldConfig.CustomBiomes);
         this.BiomeIsBorder = filterBiomes(this.BiomeIsBorder, this.worldConfig.CustomBiomes);
@@ -1025,8 +1030,8 @@ public class BiomeConfig extends ConfigFile
     {
         writeStringToStream(stream, this.name);
 
-        stream.writeFloat(this.BiomeTemperature);
-        stream.writeFloat(this.BiomeWetness);
+        stream.writeFloat(this.biomeTemperature);
+        stream.writeFloat(this.biomeWetness);
         stream.writeInt(this.SkyColor);
         stream.writeInt(this.WaterColor);
         stream.writeInt(this.GrassColor);
@@ -1041,8 +1046,8 @@ public class BiomeConfig extends ConfigFile
         this.Biome = biome;
         this.worldConfig = config;
 
-        this.BiomeTemperature = stream.readFloat();
-        this.BiomeWetness = stream.readFloat();
+        this.biomeTemperature = stream.readFloat();
+        this.biomeWetness = stream.readFloat();
         this.SkyColor = stream.readInt();
         this.WaterColor = stream.readInt();
         this.GrassColor = stream.readInt();

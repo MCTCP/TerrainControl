@@ -287,7 +287,7 @@ public class ChunkProviderTC
 
                 // Get the current biome config and some properties
                 final BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.biomeArray[(z + x * 16)]];
-                final float currentTemperature = biomeConfig.BiomeTemperature;
+                final float currentTemperature = biomeConfig.biomeTemperature;
                 final int surfaceBlocksNoise = (int) (this.noise4[(x + z * 16)] / 3.0D + 3.0D + this.random.nextDouble() * 0.25D);
 
                 // Bedrock on the ceiling
@@ -526,7 +526,7 @@ public class ChunkProviderTC
         } else
         {
             final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))];
-            this.volatilityFactor = (1.0D - this.worldSettings.biomeConfigs[biomeId].BiomeTemperature * this.worldSettings.biomeConfigs[biomeId].BiomeWetness);
+            this.volatilityFactor = (1.0D - Math.min(1, this.worldSettings.biomeConfigs[biomeId].biomeTemperature) * this.worldSettings.biomeConfigs[biomeId].biomeWetness);
         }
         this.volatilityFactor *= this.volatilityFactor;
         this.volatilityFactor = 1.0D - this.volatilityFactor * this.volatilityFactor;

@@ -59,7 +59,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
         ArraysCacheManager.ReleaseCache(cache);
         for (int i = 0; i < x_size * z_size; i++)
         {
-            float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].getWetness() / 65536.0F;
+            float f1 = worldConfig.biomeConfigs[arrayOfInt[i]].biomeWetness;
             if (f1 < worldConfig.minMoisture)
                 f1 = worldConfig.minMoisture;
             if (f1 > worldConfig.maxMoisture)
