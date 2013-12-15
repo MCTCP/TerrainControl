@@ -277,7 +277,7 @@ public class BiomeConfig extends ConfigFile
 
     private SurfaceLayer readSurfaceAndGroundControlSettings()
     {
-        String settingValue = readModSettings(TCDefaultValues.SurfaceAndGroundControl, defaultSettings.defaultSurfaceSurfaceAndGroundControl);
+        String settingValue = readModSettings(TCDefaultValues.SurfaceAndGroundControl, StringHelper.join(defaultSettings.defaultSurfaceSurfaceAndGroundControl, ","));
         if (settingValue.length() > 0)
         {
             try
@@ -545,7 +545,7 @@ public class BiomeConfig extends ConfigFile
         writeComment("Each column in the world has a noise value from what appears to be -7 to 7.");
         writeComment("Values near 0 are more common than values near -7 and 7. This setting is");
         writeComment("used to change the surface block based on the noise value for the column.");
-        writeComment("Syntax: Block[:Data],MaxNoise,[AnotherBlock[:Data],MaxNoise[,...]]");
+        writeComment("Syntax: SurfaceBlock[:Data],GroundBlock[:Data],MaxNoise,[AnotherSurfaceBlock[:Data],[AnotherGroundBlock[:Data],MaxNoise[,...]]");
         writeComment("Example: " + TCDefaultValues.SurfaceAndGroundControl + ": STONE,STONE,-0.8,DIRT,DIRT,0.0,GRASS,DIRT,1.0");
         writeComment("  When the noise is below -0.8, stone is the surface and ground block, between -0.8 and 0");
         writeComment("  dirt and between 0.0 and 1.0 grass with dirt just below the grass.");

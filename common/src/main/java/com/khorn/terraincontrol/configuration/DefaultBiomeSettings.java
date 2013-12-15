@@ -78,6 +78,7 @@ public class DefaultBiomeSettings
     public int defaultPoppies = 2;
     public int defaultTallFlowers = 0;
     public int defaultGrass = 10;
+    public int defaultDoubleGrass = 0;
     public int defaultFerns = 0;
     public int defaultLargeFerns = 0;
     public int defaultDeadBrush = 0;
@@ -109,7 +110,7 @@ public class DefaultBiomeSettings
     public int defaultEmeraldOre = 0;
     public boolean defaultHasVines;
     public int defaultBoulder = 0;
-    public String defaultSurfaceSurfaceAndGroundControl = "";
+    public Object[] defaultSurfaceSurfaceAndGroundControl = new Object[0];
 
     public DefaultBiomeSettings(LocalBiome minecraftBiome, int worldHeight)
     {
@@ -249,9 +250,15 @@ public class DefaultBiomeSettings
             resources.add(Resource.createResource(config, GrassGen.class, PlantType.Fern, "", this.defaultFerns, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
         }
 
+        if (this.defaultDoubleGrass > 0)
+        {
+            // Double tall grass
+            resources.add(Resource.createResource(config, GrassGen.class, PlantType.DoubleTallgrass, "", this.defaultDoubleGrass, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+        }
+
         if (this.defaultGrass > 0)
         {
-            // Grass
+            // Tall grass
             resources.add(Resource.createResource(config, GrassGen.class, PlantType.Tallgrass, "", this.defaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
         }
 

@@ -70,9 +70,10 @@ public class VanillaBiomesDefaultSettings
 
             this.defaultColor = "0x606060";
             this.defaultPoppies = 0;
+            this.defaultDandelions = 4;
             this.defaultEmeraldOre = TCDefaultValues.emeraldDepositFrequency.intValue();
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 10, TreeType.BigTree, 1, TreeType.Tree, 9};
-            this.defaultSurfaceSurfaceAndGroundControl = DefaultMaterial.GRASS + "," + DefaultMaterial.DIRT + ",1.0," + DefaultMaterial.STONE + "," + DefaultMaterial.STONE + ",10.0";
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRASS, DefaultMaterial.DIRT, 1.0, DefaultMaterial.STONE, DefaultMaterial.STONE, 10.0};
         }
     };
 
@@ -84,7 +85,7 @@ public class VanillaBiomesDefaultSettings
 
             this.defaultGrass = 15;
             this.defaultColor = "0x056621";
-            this.defaultTree = new Object[] {10, TreeType.Birch, 20, TreeType.BigTree, 10, TreeType.Tree, 100};
+            this.defaultTree = new Object[] {10, TreeType.Birch, 20, TreeType.Tree, 100};
             this.defaultTallFlowers = 1;
         }
     };
@@ -312,7 +313,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultSize = 8;
             this.defaultBorder.add(DefaultBiome.EXTREME_HILLS.Name);
             this.defaultColor = "0x72789A";
-            this.defaultSurfaceSurfaceAndGroundControl = "";
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[0];
         }
     };
 
@@ -405,6 +406,9 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x40511A";
+            this.defaultGrass = 15;
+            this.defaultTree = new Object[] {20, TreeType.HugeMushroom, 3, TreeType.DarkOak, 66, TreeType.Birch, 20, TreeType.Tree, 100};
+            this.defaultTallFlowers = 1;
         }
     }
 
@@ -439,7 +443,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultMushroom = 8;
             this.defaultLargeFerns = 60;
             this.defaultPoppies = 0;
-            this.defaultSurfaceSurfaceAndGroundControl = DefaultMaterial.DIRT + ":2," + DefaultMaterial.DIRT + ",-0.95," + DefaultMaterial.DIRT + ":1," + DefaultMaterial.DIRT + ",1.75";
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.DIRT + ":2", DefaultMaterial.DIRT, -0.95, DefaultMaterial.DIRT + ":1", DefaultMaterial.DIRT, 1.75};
         }
     }
 
@@ -458,7 +462,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x507050";
-            this.defaultSurfaceSurfaceAndGroundControl = "";
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[0];
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 66, TreeType.BigTree, 10, TreeType.Tree, 100};
         }
     }
@@ -471,6 +475,9 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0xBDB25F";
             this.defaultVillageType = VillageType.wood;
             this.defaultGrass = 200;
+            this.defaultDoubleGrass = 4;
+            this.defaultDandelions = 4;
+            this.defaultPoppies = 0;
             this.defaultTree = new Object[] {1, TreeType.Acacia, 80, TreeType.Tree, 100};
         }
     }
@@ -536,7 +543,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x525252";
-            this.defaultSurfaceSurfaceAndGroundControl = DefaultMaterial.GRAVEL + "," + DefaultMaterial.GRAVEL + ",-1.0," + DefaultMaterial.GRASS + "," + DefaultMaterial.DIRT + ",2.0," + DefaultMaterial.GRAVEL + "," + DefaultMaterial.GRAVEL + ",10.0";
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, -1.0, DefaultMaterial.GRASS, DefaultMaterial.DIRT, 2.0, DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, 10.0};
         }
     }
 
@@ -657,7 +664,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x466246";
-            this.defaultSurfaceSurfaceAndGroundControl = DefaultMaterial.GRAVEL + "," + DefaultMaterial.GRAVEL + ",-1.0," + DefaultMaterial.GRASS + "," + DefaultMaterial.DIRT + ",2.0," + DefaultMaterial.GRAVEL + "," + DefaultMaterial.GRAVEL + ",10.0";
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, -1.0, DefaultMaterial.GRASS, DefaultMaterial.DIRT, 2.0, DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, 10.0};
         }
     }
 
@@ -667,10 +674,13 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x5B8015";
+            this.defaultGrass = 60;
+            this.defaultDoubleGrass = 0;
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRASS, DefaultMaterial.DIRT, -0.5, DefaultMaterial.DIRT + ":1", DefaultMaterial.DIRT, 1.75, DefaultMaterial.STONE, DefaultMaterial.STONE, 10};
         }
     }
 
-    public static class SavannaPlateauMountains extends SavannaPlateau
+    public static class SavannaPlateauMountains extends SavannaMountains
     {
         public SavannaPlateauMountains(LocalBiome minecraftBiome, int worldHeight)
         {
