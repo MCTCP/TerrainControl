@@ -519,6 +519,20 @@ public class BukkitWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
         int y = chunk.b(x, z);
+        
+        // Fix for incorrect light map
+        boolean incorrectHeightMap = false;
+        while (y < getHeightCap() && chunk.getType(x, y, z).getMaterial().blocksLight())
+        {
+            y++;
+            incorrectHeightMap = true;
+        }
+        if (incorrectHeightMap)
+        {
+            // Let Minecraft know that it made an error
+            world.A(x, y, z); // world.relight
+        }
+
         return y;
     }
 
