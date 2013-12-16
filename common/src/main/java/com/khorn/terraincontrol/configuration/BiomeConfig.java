@@ -1,18 +1,15 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.generator.SurfaceLayer;
-
-import com.khorn.terraincontrol.generator.resourcegens.PlantType;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.UseBiome;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.generator.resourcegens.CustomStructureGen;
-import com.khorn.terraincontrol.generator.resourcegens.Resource;
-import com.khorn.terraincontrol.generator.resourcegens.SaplingGen;
-import com.khorn.terraincontrol.generator.resourcegens.SaplingType;
+import com.khorn.terraincontrol.generator.resourcegens.*;
+import com.khorn.terraincontrol.generator.surfacegens.MesaSurfaceGenerator;
+import com.khorn.terraincontrol.generator.surfacegens.SimpleSurfaceGenerator;
+import com.khorn.terraincontrol.generator.surfacegens.SurfaceGenerator;
 import com.khorn.terraincontrol.util.StringHelper;
 
 import java.io.DataInputStream;
@@ -57,7 +54,7 @@ public class BiomeConfig extends ConfigFile
     public int stoneBlock;
     public int surfaceBlock;
     public int groundBlock;
-    public SurfaceLayer surfaceAndGroundControl;
+    public SurfaceGenerator surfaceAndGroundControl;
 
     public String ReplaceBiomeName;
 
@@ -275,15 +272,19 @@ public class BiomeConfig extends ConfigFile
         }
     }
 
-    private SurfaceLayer readSurfaceAndGroundControlSettings()
+    private SurfaceGenerator readSurfaceAndGroundControlSettings()
     {
         String settingValue = readModSettings(TCDefaultValues.SurfaceAndGroundControl, StringHelper.join(defaultSettings.defaultSurfaceSurfaceAndGroundControl, ","));
         if (settingValue.length() > 0)
         {
+            SurfaceGenerator mesa = MesaSurfaceGenerator.getFor(settingValue);
+            if (mesa != null) {
+                return mesa;
+            }
             try
             {
                 String[] parts = readComplexString(settingValue);
-                return surfaceAndGroundControl = new SurfaceLayer(parts);
+                return new SimpleSurfaceGenerator(parts);
             } catch (InvalidConfigException e)
             {
                 logSettingValueInvalid(TCDefaultValues.SurfaceAndGroundControl.name());
@@ -546,15 +547,19 @@ public class BiomeConfig extends ConfigFile
         writeComment("Values near 0 are more common than values near -7 and 7. This setting is");
         writeComment("used to change the surface block based on the noise value for the column.");
         writeComment("Syntax: SurfaceBlock[:Data],GroundBlock[:Data],MaxNoise,[AnotherSurfaceBlock[:Data],[AnotherGroundBlock[:Data],MaxNoise[,...]]");
-        writeComment("Example: " + TCDefaultValues.SurfaceAndGroundControl + ": STONE,STONE,-0.8,DIRT,DIRT,0.0,GRASS,DIRT,1.0");
+        writeComment("Example: " + TCDefaultValues.SurfaceAndGroundControl + ": STONE,STONE,-0.8,GRAVEL,STONE,0.0,DIRT,DIRT,10.0");
         writeComment("  When the noise is below -0.8, stone is the surface and ground block, between -0.8 and 0");
-        writeComment("  dirt and between 0.0 and 1.0 grass with dirt just below the grass.");
-        writeComment("  Above 1.0 the normal " + TCDefaultValues.SurfaceBlock + " and " + TCDefaultValues.GroundBlock + " are used.");
+        writeComment("  gravel with stone just below and between 0.0 and 10.0 there's only dirt.");
+        writeComment("  Because 10.0 is higher than the noise can ever get, the normal " + TCDefaultValues.SurfaceBlock);
+        writeComment("  and " + TCDefaultValues.GroundBlock + " will never appear in this biome.");
+        writeComment("");
+        writeComment("Alternatively, you can use Mesa, MesaForest or MesaBryce to get blocks");
+        writeComment("like the blocks found in the Mesa biomes.");
         writeValue(TCDefaultValues.SurfaceAndGroundControl, this.surfaceAndGroundControl == null ? "" : this.surfaceAndGroundControl.toString());
 
         writeComment("Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])");
         writeComment("Example :");
-        writeComment("  ReplacedBlocks:(GRASS,DIRT,100,127),(GRAVEL,GLASS)");
+        writeComment("  ReplacedBlocks: (GRASS,DIRT,100,127),(GRAVEL,GLASS)");
         writeComment("Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
         WriteModReplaceSettings();
 

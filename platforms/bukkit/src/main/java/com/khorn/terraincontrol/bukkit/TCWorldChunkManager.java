@@ -80,7 +80,7 @@ public class TCWorldChunkManager extends WorldChunkManager
         // Hack for villages in other biomes
         // (The alternative would be to completely override the village spawn
         // code)
-        if (paramList == WorldGenVillage.e)
+        if (paramList == WorldGenVillage.e && localWorld.villageGen != null)
         {
             paramList = localWorld.villageGen.villageSpawnBiomes;
         }

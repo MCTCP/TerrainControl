@@ -6,6 +6,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import com.khorn.terraincontrol.generator.surfacegens.MesaSurfaceGenerator;
 
 /**
  * Class to hold all default settings of all default biomes.
@@ -51,7 +52,7 @@ public class VanillaBiomesDefaultSettings
             super(minecraftBiome, worldHeight);
 
             this.defaultWaterLakes = false;
-            this.defaultDeadBrush = 4;
+            this.defaultDeadBush = 4;
             this.defaultGrass = 0;
             this.defaultReed = 10;
             this.defaultCactus = 10;
@@ -110,7 +111,7 @@ public class VanillaBiomesDefaultSettings
 
             this.defaultDandelions = 0;
             this.defaultPoppies = 0;
-            this.defaultDeadBrush = 1;
+            this.defaultDeadBush = 1;
             this.defaultMushroom = 8;
             this.defaultReed = 10;
             this.defaultClay = 1;
@@ -264,7 +265,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultSize = 6;
             this.defaultRarity = 97;
             this.defaultIsle.add(DefaultBiome.DESERT.Name);
-            this.defaultDeadBrush = 4;
+            this.defaultDeadBush = 4;
             this.defaultGrass = 0;
             this.defaultReed = 50;
             this.defaultCactus = 10;
@@ -497,6 +498,13 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0xD94515";
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {MesaSurfaceGenerator.NAME_NORMAL};
+            this.defaultDandelions = 0;
+            this.defaultPoppies = 0;
+            this.defaultDeadBush = 7;
+            this.defaultReed = 5;
+            this.defaultCactus = 10;
+            this.defaultGrass = 0;
         }
     }
 
@@ -506,6 +514,17 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0xB09765";
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {MesaSurfaceGenerator.NAME_FOREST};
+            this.defaultTree = new Object[] {1, TreeType.Tree, 100};
+            this.defaultGrass = 10;
+
+            // Minecraft has chosen sand and stained clay as the surface and
+            // ground blocks. It then places hardcoded grass and dirt.
+            // Terrain Control does it the other way round: it places
+            // hardcoded sand and stained clay and lets the user change the
+            // grass and dirt blocks.
+            this.defaultSurfaceBlock = DefaultMaterial.GRASS.id;
+            this.defaultGroundBlock = DefaultMaterial.DIRT.id;
         }
     }
 
@@ -695,6 +714,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0xE45627";
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {MesaSurfaceGenerator.NAME_BRYCE};
         }
     }
 

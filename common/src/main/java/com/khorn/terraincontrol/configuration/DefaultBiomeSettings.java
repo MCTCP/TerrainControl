@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.generator.resourcegens.*;
@@ -81,7 +81,7 @@ public class DefaultBiomeSettings
     public int defaultDoubleGrass = 0;
     public int defaultFerns = 0;
     public int defaultLargeFerns = 0;
-    public int defaultDeadBrush = 0;
+    public int defaultDeadBush = 0;
     public int defaultMushroom = 0;
     public int defaultReed = 0;
     public int defaultCactus = 0;
@@ -268,10 +268,10 @@ public class DefaultBiomeSettings
             resources.add(Resource.createResource(config, PlantGen.class, PlantType.LargeFern, this.defaultLargeFerns, 90, 30, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
-        if (this.defaultDeadBrush > 0)
+        if (this.defaultDeadBush > 0)
         {
             // Dead Bush
-            resources.add(Resource.createResource(config, GrassGen.class, PlantType.DeadBush, 0, this.defaultDeadBrush, TCDefaultValues.deadBushDepositRarity.intValue(), DefaultMaterial.SAND.id));
+            resources.add(Resource.createResource(config, GrassGen.class, PlantType.DeadBush, 0, this.defaultDeadBush, TCDefaultValues.deadBushDepositRarity.intValue(), DefaultMaterial.SAND, DefaultMaterial.HARD_CLAY, DefaultMaterial.STAINED_CLAY, DefaultMaterial.DIRT));
         }
 
         // Pumpkin

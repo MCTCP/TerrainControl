@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.generator;
+package com.khorn.terraincontrol.generator.surfacegens;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SurfaceLayer
+public class SimpleSurfaceGenerator implements SurfaceGenerator
 {
     public static class LayerChoice implements Comparable<LayerChoice>
     {
@@ -42,7 +42,7 @@ public class SurfaceLayer
     // Must be sorted based on the noise field
     private List<LayerChoice> layerChoices;
 
-    public SurfaceLayer(String[] args) throws InvalidConfigException
+    public SimpleSurfaceGenerator(String[] args) throws InvalidConfigException
     {
         if (args.length < 2)
         {
@@ -62,13 +62,7 @@ public class SurfaceLayer
         Collections.sort(layerChoices);
     }
 
-    /**
-     * Spawns this surface layer in the world.
-     * @param world The world to spawn in.
-     * @param noise The noise value, from -1 to 1.
-     * @param x X position in the world.
-     * @param z Z position in the world.
-     */
+    @Override
     public void spawn(LocalWorld world, double noise, int x, int z)
     {
         int y = world.getSolidHeight(x, z) - 1;
