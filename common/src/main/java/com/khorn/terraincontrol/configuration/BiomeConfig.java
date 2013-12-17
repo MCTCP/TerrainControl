@@ -146,7 +146,7 @@ public class BiomeConfig extends ConfigFile
         this.correctSettings();
 
         // Add default resources when needed
-        if (!file.exists())
+        if (isNewConfig)
         {
             this.resourceSequence.addAll(defaultSettings.createDefaultResources(this));
         }
@@ -274,7 +274,8 @@ public class BiomeConfig extends ConfigFile
 
     private SurfaceGenerator readSurfaceAndGroundControlSettings()
     {
-        String settingValue = readModSettings(TCDefaultValues.SurfaceAndGroundControl, StringHelper.join(defaultSettings.defaultSurfaceSurfaceAndGroundControl, ","));
+        String defaultValue = this.isNewConfig? StringHelper.join(defaultSettings.defaultSurfaceSurfaceAndGroundControl, ",") : "";
+        String settingValue = readModSettings(TCDefaultValues.SurfaceAndGroundControl, defaultValue);
         if (settingValue.length() > 0)
         {
             SurfaceGenerator mesa = MesaSurfaceGenerator.getFor(settingValue);

@@ -15,6 +15,12 @@ public abstract class ConfigFile
     private BufferedWriter settingsWriter;
     public final String name;
     public final File file;
+    /**
+     * True if the file does not exist yet on disk, false otherwise. Used to
+     * provide backwards compatible default settings.
+     */
+    protected final boolean isNewConfig;
+
 
     /**
      * Creates a new configuration file.
@@ -32,6 +38,7 @@ public abstract class ConfigFile
     {
         this.name = name;
         this.file = file;
+        this.isNewConfig = !file.exists();
 
         if (name == null)
         {
