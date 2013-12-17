@@ -70,7 +70,6 @@ public class VanillaBiomesDefaultSettings
             super(minecraftBiome, worldHeight);
 
             this.defaultColor = "0x606060";
-            this.defaultPoppies = 0;
             this.defaultDandelions = 4;
             this.defaultEmeraldOre = TCDefaultValues.emeraldDepositFrequency.intValue();
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 10, TreeType.BigTree, 1, TreeType.Tree, 9};
@@ -84,10 +83,13 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
 
-            this.defaultGrass = 15;
+            this.defaultGrass = 30;
             this.defaultColor = "0x056621";
             this.defaultTree = new Object[] {10, TreeType.Birch, 20, TreeType.Tree, 100};
-            this.defaultTallFlowers = 1;
+            this.defaultTallFlowers = 2;
+            this.defaultPoppies = 4;
+            this.defaultReed = 3;
+            this.defaultMushroom = 1;
         }
     };
 
@@ -110,16 +112,17 @@ public class VanillaBiomesDefaultSettings
             super(minecraftBiome, worldHeight);
 
             this.defaultDandelions = 0;
-            this.defaultPoppies = 0;
-            this.defaultDeadBush = 1;
-            this.defaultMushroom = 8;
+            this.defaultMushroom = 16;
             this.defaultReed = 10;
             this.defaultClay = 1;
             this.defaultWaterLily = 1;
+            this.defaultDandelions = 0;
+            this.defaultBlueOrchids = 2;
             this.defaultColor = "0x07F9B2";
             this.defaultWaterColorMultiplier = "0xe0ffae";
             this.defaultGrassColor = "0x7E6E7E";
             this.defaultFoliageColor = "0x7E6E7E";
+            this.defaultGrass = 30;
             this.defaultRareBuildingType = RareBuildingType.swampHut;
             this.defaultTree = new Object[] {2, TreeType.SwampTree, 100};
         }
@@ -189,6 +192,7 @@ public class VanillaBiomesDefaultSettings
 
             this.defaultColor = "0xFFFFFF";
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
+            this.defaultPoppies = 2;
         }
     };
 
@@ -210,9 +214,8 @@ public class VanillaBiomesDefaultSettings
             super(minecraftBiome, worldHeight);
 
             this.defaultSurfaceBlock = (byte) DefaultMaterial.MYCEL.id;
-            this.defaultMushroom = 1;
+            this.defaultMushroom = 2;
             this.defaultGrass = 0;
-            this.defaultPoppies = 0;
             this.defaultDandelions = 0;
             this.defaultRarity = 1;
             this.defaultRiverBiome = "";
@@ -380,15 +383,13 @@ public class VanillaBiomesDefaultSettings
         }
     }
 
-    public static class BirchForest extends DefaultBiomeSettings
+    public static class BirchForest extends Forest
     {
         public BirchForest(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x307444";
-            this.defaultGrass = 20;
             this.defaultTree = new Object[] {10, TreeType.Birch, 80};
-            this.defaultTallFlowers = 1;
         }
     }
 
@@ -443,7 +444,6 @@ public class VanillaBiomesDefaultSettings
             this.defaultFerns = 80;
             this.defaultMushroom = 8;
             this.defaultLargeFerns = 60;
-            this.defaultPoppies = 0;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.DIRT + ":2", DefaultMaterial.DIRT, -0.95, DefaultMaterial.DIRT + ":1", DefaultMaterial.DIRT, 1.75};
         }
     }
@@ -478,7 +478,6 @@ public class VanillaBiomesDefaultSettings
             this.defaultGrass = 200;
             this.defaultDoubleGrass = 4;
             this.defaultDandelions = 4;
-            this.defaultPoppies = 0;
             this.defaultTree = new Object[] {1, TreeType.Acacia, 80, TreeType.Tree, 100};
         }
     }
@@ -500,7 +499,6 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0xD94515";
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {MesaSurfaceGenerator.NAME_NORMAL};
             this.defaultDandelions = 0;
-            this.defaultPoppies = 0;
             this.defaultDeadBush = 7;
             this.defaultReed = 5;
             this.defaultCactus = 10;
@@ -543,6 +541,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0xDEFF00";
+            this.defaultSunflowers = 30;
         }
     }
 
@@ -572,6 +571,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x2D8E49";
+            this.defaultDandelions = 0;
         }
     }
 

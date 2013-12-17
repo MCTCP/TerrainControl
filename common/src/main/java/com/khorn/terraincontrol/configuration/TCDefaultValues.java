@@ -284,15 +284,18 @@ public enum TCDefaultValues implements TCSetting
     roseDepositMinAltitude(0),
     roseDepositMaxAltitude(128),
 
+    blueOrchidDepositRarity(100),
+    blueOrchidDepositMinAltitude(0),
+
     flowerDepositRarity(100),
     flowerDepositMinAltitude(0),
     flowerDepositMaxAltitude(128),
 
-    redMushroomDepositRarity(100),
+    redMushroomDepositRarity(50),
     redMushroomDepositMinAltitude(0),
     redMushroomDepositMaxAltitude(128),
 
-    brownMushroomDepositRarity(100),
+    brownMushroomDepositRarity(50),
     brownMushroomDepositMinAltitude(0),
     brownMushroomDepositMaxAltitude(128),
 

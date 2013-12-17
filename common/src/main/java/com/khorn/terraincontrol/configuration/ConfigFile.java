@@ -38,7 +38,7 @@ public abstract class ConfigFile
     {
         this.name = name;
         this.file = file;
-        this.isNewConfig = !file.exists();
+        this.isNewConfig = (file == null || !file.exists());
 
         if (name == null)
         {
