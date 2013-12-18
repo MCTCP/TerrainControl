@@ -192,7 +192,9 @@ public class VanillaBiomesDefaultSettings
 
             this.defaultColor = "0xFFFFFF";
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
-            this.defaultPoppies = 2;
+            this.defaultPoppies = 3;
+            this.defaultGrass = 6;
+            this.defaultTree = new Object[] {1, TreeType.Taiga2, 15};
         }
     };
 
@@ -411,6 +413,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultGrass = 15;
             this.defaultTree = new Object[] {20, TreeType.HugeMushroom, 3, TreeType.DarkOak, 66, TreeType.Birch, 20, TreeType.Tree, 100};
             this.defaultTallFlowers = 1;
+            this.defaultPoppies = 4;
         }
     }
 
@@ -599,6 +602,10 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x8CB4B4";
+            this.defaultTree = null;
+            this.defaultDandelions = 0;
+            this.defaultGrass = 0;
+            this.defaultIceSpikes = true;
         }
     }
 

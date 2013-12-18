@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.generator.resourcegens.IceSpikeGen.SpikeType;
+
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalBiome;
@@ -113,6 +115,7 @@ public class DefaultBiomeSettings
     public boolean defaultHasVines;
     public int defaultBoulder = 0;
     public Object[] defaultSurfaceSurfaceAndGroundControl = new Object[0];
+    public boolean defaultIceSpikes;
 
     public DefaultBiomeSettings(LocalBiome minecraftBiome, int worldHeight)
     {
@@ -202,6 +205,14 @@ public class DefaultBiomeSettings
             resources.add(Resource.createResource(config, BoulderGen.class, DefaultMaterial.MOSSY_COBBLESTONE, defaultBoulder, TCDefaultValues.boulderDepositRarity.intValue(), TCDefaultValues.boulderDepositMinAltitude.intValue(), TCDefaultValues.boulderDepositMaxAltitude.intValue(), DefaultMaterial.GRASS, DefaultMaterial.DIRT, DefaultMaterial.STONE));
         }
 
+        // Ice spikes
+        if (this.defaultIceSpikes)
+        {
+            resources.add(Resource.createResource(config, IceSpikeGen.class, DefaultMaterial.PACKED_ICE, SpikeType.HugeSpike, 3, 1.66, TCDefaultValues.iceSpikeDepositMinHeight.intValue(), TCDefaultValues.iceSpikeDepositMaxHeight.intValue(), DefaultMaterial.ICE, DefaultMaterial.DIRT, DefaultMaterial.SNOW_BLOCK));
+            resources.add(Resource.createResource(config, IceSpikeGen.class, DefaultMaterial.PACKED_ICE, SpikeType.SmallSpike, 3, 98.33, TCDefaultValues.iceSpikeDepositMinHeight.intValue(), TCDefaultValues.iceSpikeDepositMaxHeight.intValue(), DefaultMaterial.ICE, DefaultMaterial.DIRT, DefaultMaterial.SNOW_BLOCK));
+            resources.add(Resource.createResource(config, IceSpikeGen.class, DefaultMaterial.PACKED_ICE, SpikeType.Basement, 2, 100, TCDefaultValues.iceSpikeDepositMinHeight.intValue(), TCDefaultValues.iceSpikeDepositMaxHeight.intValue(), DefaultMaterial.ICE, DefaultMaterial.DIRT, DefaultMaterial.SNOW_BLOCK));
+        }
+
         // Trees
         if (this.defaultTree != null)
         {
@@ -218,7 +229,7 @@ public class DefaultBiomeSettings
             // Poppy
             resources.add(Resource.createResource(config, PlantGen.class, PlantType.Poppy, this.defaultPoppies, TCDefaultValues.roseDepositRarity.intValue(), TCDefaultValues.roseDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
-        
+
         if (this.defaultBlueOrchids > 0)
         {
             // Blue orchid
@@ -242,7 +253,7 @@ public class DefaultBiomeSettings
             // Peony
             resources.add(Resource.createResource(config, PlantGen.class, PlantType.Peony, this.defaultTallFlowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
-        
+
         if (this.defaultSunflowers > 0)
         {
             // Sunflowers

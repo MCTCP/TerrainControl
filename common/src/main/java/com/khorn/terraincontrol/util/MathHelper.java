@@ -33,10 +33,10 @@ public class MathHelper
         long l = (long) d;
         return d >= (double) l ? l : l - 1L;
     }
-    
+
     public static int abs(int number)
     {
-        if(number > 0)
+        if (number > 0)
         {
             return number;
         } else
@@ -44,13 +44,13 @@ public class MathHelper
             return -number;
         }
     }
-    
+
     /**
      * Returns a random number between min and max, inclusive.
      * 
      * @param random The random number generator.
-     * @param min    The minimum value.
-     * @param max    The maximum value.
+     * @param min The minimum value.
+     * @param max The maximum value.
      * @return A random number between min and max, inclusive.
      */
     public static int getRandomNumberInRange(Random random, int min, int max)
@@ -58,25 +58,32 @@ public class MathHelper
         return min + random.nextInt(max - min + 1);
     }
 
-
     static
     {
         for (int i = 0; i < 65536; i++)
             a[i] = (float) Math.sin(i * 3.141592653589793D * 2.0D / 65536.0D);
     }
 
-
     public static double max(double first, double second, double third, double fourth)
     {
-        if(first > second && first > third && first > fourth) {
+        if (first > second && first > third && first > fourth)
+        {
             return first;
         }
-        if(second > third && second > fourth) {
+        if (second > third && second > fourth)
+        {
             return second;
         }
-        if(third > fourth) {
+        if (third > fourth)
+        {
             return third;
         }
         return fourth;
+    }
+
+    public static int ceil(float floatNumber)
+    {
+        int truncated = (int) floatNumber;
+        return floatNumber > truncated ? truncated + 1 : truncated;
     }
 }

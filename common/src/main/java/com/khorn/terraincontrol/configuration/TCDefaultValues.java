@@ -333,6 +333,9 @@ public enum TCDefaultValues implements TCSetting
     boulderDepositRarity(30),
     boulderDepositMinAltitude(0),
     boulderDepositMaxAltitude(256),
+    
+    iceSpikeDepositMinHeight(60),
+    iceSpikeDepositMaxHeight(128),
     // End resource settings
 
     // Deprecated settings

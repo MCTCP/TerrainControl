@@ -648,6 +648,7 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("Vein(Block[:Data],MinRadius,MaxRadius,Rarity,OreSize,OreFrequency,OreRarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..])");
         this.writeComment("Well(BaseBlock[:Data],HalfSlabBlock[:Data],WaterBlock[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..])");
         this.writeComment("Boulder(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..]");
+        this.writeComment("IceSpike(Block[:Data],IceSpikeType,Frequency,Rarity,MinAltitude,MaxAltitude,Blocksource[,BlockSource2,...])");
         this.writeComment("");
         this.writeComment("Block and BlockSource: can be id or name, Frequency - is count of attempts for place resource");
         this.writeComment("Rarity: chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass");
@@ -659,10 +660,11 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("   DarkOak (from the roofed forest biome) - Acacia");
         this.writeComment("   You can also use your own custom objects, as long as they have set Tree to true in their settings.");
         this.writeComment("TreeType_Chance: similar Rarity. Example:");
-        this.writeComment("  Tree(10,Taiga1,35,Taiga2,100) - plugin tries 10 times, for each attempt it tries to place Taiga1 (35% chance),");
-        this.writeComment("  if that fails, it attempts to place Taiga2 (100% chance).");
+        this.writeComment("   Tree(10,Taiga1,35,Taiga2,100) - plugin tries 10 times, for each attempt it tries to place Taiga1 (35% chance),");
+        this.writeComment("   if that fails, it attempts to place Taiga2 (100% chance).");
         this.writeComment("PlantType: one of the plant types: " + StringHelper.join(PlantType.values(), ", "));
-        this.writeComment("           or simply Block[:Data]");
+        this.writeComment("   or simply Block[:Data]");
+        this.writeComment("IceSpikeType: TODO");
         this.writeComment("Object: can be a any kind of custom object (bo2 or bo3) but without the file extension. You can");
         this.writeComment("also use UseWorld to spawn one of the object in the WorldObjects folder and UseBiome to spawn");
         this.writeComment("one of the objects in the BiomeObjects setting. When using BO2s for UseWorld, the BO2 must have");
