@@ -664,7 +664,7 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("   if that fails, it attempts to place Taiga2 (100% chance).");
         this.writeComment("PlantType: one of the plant types: " + StringHelper.join(PlantType.values(), ", "));
         this.writeComment("   or simply Block[:Data]");
-        this.writeComment("IceSpikeType: TODO");
+        this.writeComment("IceSpikeType: one of the ice spike types: " + StringHelper.join(IceSpikeGen.SpikeType.values(), ","));
         this.writeComment("Object: can be a any kind of custom object (bo2 or bo3) but without the file extension. You can");
         this.writeComment("also use UseWorld to spawn one of the object in the WorldObjects folder and UseBiome to spawn");
         this.writeComment("one of the objects in the BiomeObjects setting. When using BO2s for UseWorld, the BO2 must have");
