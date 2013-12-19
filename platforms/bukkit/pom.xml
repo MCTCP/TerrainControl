@@ -21,7 +21,7 @@
     <!-- Constants -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bukkitVersion>1.7.2-R0.1-SNAPSHOT</bukkitVersion>
+        <bukkitVersion>1.7.2-R0.2-SNAPSHOT</bukkitVersion>
     </properties>
 
     <!-- We're open source, find us here -->

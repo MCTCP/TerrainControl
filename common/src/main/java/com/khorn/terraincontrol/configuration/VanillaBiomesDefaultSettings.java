@@ -193,7 +193,8 @@ public class VanillaBiomesDefaultSettings
             this.defaultColor = "0xFFFFFF";
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
             this.defaultPoppies = 3;
-            this.defaultGrass = 6;
+            this.defaultGrass = 20;
+            this.defaultGrassIsGrouped = true;
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 15};
         }
     };

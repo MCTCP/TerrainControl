@@ -639,7 +639,7 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("CustomStructure([Object,Object_Chance[,AnotherObject,Object_Chance[,...]]])");
         this.writeComment("Tree(Frequency,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
         this.writeComment("Plant(PlantType,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.writeComment("Grass(PlantType,Unused,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Grass(PlantType,Grouped/NotGrouped,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
         this.writeComment("Reed(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.writeComment("Cactus(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.writeComment("Liquid(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
@@ -670,7 +670,6 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("one of the objects in the BiomeObjects setting. When using BO2s for UseWorld, the BO2 must have");
         this.writeComment("this biome in their spawnInBiome setting.");
         this.writeComment("Object_Chance: Like TreeType_Chance.");
-        this.writeComment("Unused: Not used anymore. Ignore it.");
         this.writeComment("");
         this.writeComment("Plant and Grass resource: both a resource of one block. Plant can place blocks underground, Grass cannot.");
         this.writeComment("Liquid resource: a one-block water or lava source");

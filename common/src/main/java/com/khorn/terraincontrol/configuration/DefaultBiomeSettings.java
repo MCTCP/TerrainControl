@@ -82,6 +82,7 @@ public class DefaultBiomeSettings
     public int defaultTallFlowers = 0;
     public int defaultSunflowers = 0;
     public int defaultGrass = 10;
+    public boolean defaultGrassIsGrouped = false;
     public int defaultDoubleGrass = 0;
     public int defaultFerns = 0;
     public int defaultLargeFerns = 0;
@@ -284,7 +285,13 @@ public class DefaultBiomeSettings
         if (this.defaultGrass > 0)
         {
             // Tall grass
-            resources.add(Resource.createResource(config, GrassGen.class, PlantType.Tallgrass, "", this.defaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+            if (this.defaultGrassIsGrouped)
+            {
+                resources.add(Resource.createResource(config, GrassGen.class, PlantType.Tallgrass, GrassGen.GroupOption.Grouped, this.defaultGrass, TCDefaultValues.longGrassGroupedDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+            } else
+            {
+                resources.add(Resource.createResource(config, GrassGen.class, PlantType.Tallgrass, GrassGen.GroupOption.NotGrouped, this.defaultGrass, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+            }
         }
 
         if (this.defaultLargeFerns > 0)

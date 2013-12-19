@@ -300,6 +300,7 @@ public enum TCDefaultValues implements TCSetting
     brownMushroomDepositMaxAltitude(128),
 
     longGrassDepositRarity(100),
+    longGrassGroupedDepositRarity(60),
 
     deadBushDepositRarity(100),
 
