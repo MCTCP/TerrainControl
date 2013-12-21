@@ -41,8 +41,8 @@ public enum TCDefaultValues implements TCSetting
     LandSize(0),
     LandFuzzy(6),
 
-    IceRarity(90),
-    IceSize(3),
+    IceRarity(99),
+    IceSize(2),
 
     RiverRarity(4),
     RiverSize(0),
@@ -50,10 +50,10 @@ public enum TCDefaultValues implements TCSetting
     RandomRivers(false),
     ImprovedRivers(false),
 
-    FrozenOcean(true),
+    FrozenOcean(false),
 
-    NormalBiomes("Desert,Forest,Extreme Hills,Swampland,Plains,Taiga,Jungle", SettingsType.StringArray),
-    IceBiomes("Ice Plains", SettingsType.StringArray),
+    NormalBiomes("Plains,Sunflower Plains,Forest,Flower Forest,Swampland,Swampland M,Jungle,Jungle M,Birch Forest,Birch Forest M,Roofed Forest,Roofed Forest M,Desert,Desert M,Savanna,Savanna M,Mesa,Mesa (Bryce)", SettingsType.StringArray),
+    IceBiomes("Ice Plains,Ice Plains Spikes,Taiga,Taiga M,Cold Taiga,Cold Taiga M,Extreme Hills,Extreme Hills M,Extreme Hills+,Extreme Hills+ M,Mega Taiga,Mega Spruce Taiga", SettingsType.StringArray),
     IsleBiomes("MushroomIsland,Ice Mountains,DesertHills,ForestHills,TaigaHills,River,JungleHills,Deep Ocean", SettingsType.StringArray),
     BorderBiomes("MushroomIslandShore,Beach,Extreme Hills Edge", SettingsType.StringArray),
 
