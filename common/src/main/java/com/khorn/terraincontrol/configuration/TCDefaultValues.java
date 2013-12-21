@@ -37,7 +37,7 @@ public enum TCDefaultValues implements TCSetting
     GenerationDepth(10),
 
     BiomeRarityScale(100),
-    LandRarity(97),
+    LandRarity(98),
     LandSize(0),
     LandFuzzy(6),
 
@@ -54,7 +54,7 @@ public enum TCDefaultValues implements TCSetting
 
     NormalBiomes("Desert,Forest,Extreme Hills,Swampland,Plains,Taiga,Jungle", SettingsType.StringArray),
     IceBiomes("Ice Plains", SettingsType.StringArray),
-    IsleBiomes("MushroomIsland,Ice Mountains,DesertHills,ForestHills,TaigaHills,River,JungleHills", SettingsType.StringArray),
+    IsleBiomes("MushroomIsland,Ice Mountains,DesertHills,ForestHills,TaigaHills,River,JungleHills,Deep Ocean", SettingsType.StringArray),
     BorderBiomes("MushroomIslandShore,Beach,Extreme Hills Edge", SettingsType.StringArray),
 
     CustomBiomes("", SettingsType.StringArray),

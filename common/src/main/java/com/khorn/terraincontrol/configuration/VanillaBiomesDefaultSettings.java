@@ -230,6 +230,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultRiverBiome = "";
             this.defaultSize = 6;
             this.defaultIsle.add(DefaultBiome.OCEAN.Name);
+            this.defaultIsle.add(DefaultBiome.DEEP_OCEAN.Name);
             this.defaultColor = "0xFF00FF";
             this.defaultWaterLily = 1;
             this.defaultStrongholds = false;
@@ -262,6 +263,7 @@ public class VanillaBiomesDefaultSettings
             this.defaultNotBorderNear.add(DefaultBiome.SWAMPLAND.Name);
             this.defaultNotBorderNear.add(DefaultBiome.EXTREME_HILLS.Name);
             this.defaultNotBorderNear.add(DefaultBiome.MUSHROOM_ISLAND.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.DEEP_OCEAN.Name);
             this.defaultColor = "0xFADE55";
             this.defaultStrongholds = false;
         }
@@ -372,6 +374,8 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x000030";
+            this.defaultIsle.add(DefaultBiome.OCEAN.Name);
+            this.defaultSize = 3;
         }
     }
 
