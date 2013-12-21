@@ -290,6 +290,8 @@ public enum TCDefaultValues implements TCSetting
     flowerDepositRarity(100),
     flowerDepositMinAltitude(0),
     flowerDepositMaxAltitude(128),
+    
+    tulipDepositRarity(25),
 
     redMushroomDepositRarity(50),
     redMushroomDepositMinAltitude(0),
@@ -301,6 +303,9 @@ public enum TCDefaultValues implements TCSetting
 
     longGrassDepositRarity(100),
     longGrassGroupedDepositRarity(60),
+
+    doubleGrassDepositRarity(100),
+    doubleGrassGroupedDepositRarity(15),
 
     deadBushDepositRarity(100),
 
@@ -330,11 +335,11 @@ public enum TCDefaultValues implements TCSetting
     lavaSourceDepositFrequency(10),
     lavaSourceDepositMinAltitude(8),
     lavaSourceDepositMaxAltitude(128),
-    
+
     boulderDepositRarity(30),
     boulderDepositMinAltitude(0),
     boulderDepositMaxAltitude(256),
-    
+
     iceSpikeDepositMinHeight(60),
     iceSpikeDepositMaxHeight(128),
     // End resource settings

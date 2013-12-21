@@ -36,12 +36,18 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
 
-            this.defaultDandelions = 4;
-            this.defaultPoppies = 4;
+            this.defaultDandelions = 3;
+            this.defaultPoppies = 1;
+            this.defaultAzureBluets = 1;
+            this.defaultOxeyeDaisies = 1;
+            this.defaultTulips = 3;
             this.defaultGrass = 100;
             this.defaultColor = "0x8DB360";
             this.defaultStrongholds = false;
             this.defaultVillageType = VillageType.wood;
+            this.defaultDoubleGrass = 10;
+            this.defaultDoubleGrassIsGrouped = true;
+            this.defaultReed = 5;
         }
     };
 
@@ -330,7 +336,8 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
 
-            this.defaultGrass = 25;
+            this.defaultGrass = 20;
+            this.defaultFerns = 20;
             this.defaultPoppies = 4;
             this.defaultDandelions = 4;
             this.defaultColor = "0x537B09";
@@ -574,8 +581,18 @@ public class VanillaBiomesDefaultSettings
         public FlowerForest(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
+            int flowerMultiplier = 20;
+
             this.defaultColor = "0x2D8E49";
             this.defaultDandelions = 0;
+            this.defaultTallFlowers = 6;
+            this.defaultPoppies = flowerMultiplier * 2;
+            this.defaultAlliums = flowerMultiplier;
+            this.defaultAzureBluets = flowerMultiplier;
+            // Four different tulip colors, so each tulip now
+            // generates as much as the other flowers
+            this.defaultTulips = flowerMultiplier * 4;
+            this.defaultOxeyeDaisies = flowerMultiplier;
         }
     }
 

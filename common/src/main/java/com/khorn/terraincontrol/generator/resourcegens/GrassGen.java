@@ -111,7 +111,7 @@ public class GrassGen extends Resource
                 int z = centerZ + random.nextInt(8) - random.nextInt(8);
                 if (world.isEmpty(x, y, z) && this.sourceBlocks.contains(world.getTypeId(x, y - 1, z)))
                 {
-                    world.setBlock(x, y, z, this.blockId, this.blockData);
+                    plant.spawn(world, x, y, z);
                 }
 
             }

@@ -1,7 +1,8 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.generator.resourcegens.IceSpikeGen.SpikeType;
+import com.khorn.terraincontrol.generator.resourcegens.PlantType;
 
+import com.khorn.terraincontrol.generator.resourcegens.IceSpikeGen.SpikeType;
 import com.khorn.terraincontrol.DefaultBiome;
 import com.khorn.terraincontrol.DefaultMaterial;
 import com.khorn.terraincontrol.LocalBiome;
@@ -81,9 +82,14 @@ public class DefaultBiomeSettings
     public int defaultBlueOrchids = 0;
     public int defaultTallFlowers = 0;
     public int defaultSunflowers = 0;
+    public int defaultTulips = 0;
+    public int defaultAzureBluets = 0;
+    public int defaultOxeyeDaisies = 0;
+    public int defaultAlliums = 0;
     public int defaultGrass = 10;
     public boolean defaultGrassIsGrouped = false;
     public int defaultDoubleGrass = 0;
+    public boolean defaultDoubleGrassIsGrouped = false;
     public int defaultFerns = 0;
     public int defaultLargeFerns = 0;
     public int defaultDeadBush = 0;
@@ -257,8 +263,38 @@ public class DefaultBiomeSettings
 
         if (this.defaultSunflowers > 0)
         {
-            // Sunflowers
+            // Sunflower
             resources.add(Resource.createResource(config, PlantGen.class, PlantType.Sunflower, this.defaultSunflowers, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+        }
+        
+        if (this.defaultTulips > 0)
+        {
+            // Tulip
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.OrangeTulip, this.defaultTulips, TCDefaultValues.tulipDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.RedTulip, this.defaultTulips, TCDefaultValues.tulipDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.WhiteTulip, this.defaultTulips, TCDefaultValues.tulipDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.PinkTulip, this.defaultTulips, TCDefaultValues.tulipDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+        }
+        
+        if (this.defaultAzureBluets > 0)
+        {
+            // Azure bluet
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.AzureBluet, this.defaultDandelions, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+        
+        }
+        
+        if (this.defaultAlliums > 0)
+        {
+            // Allium
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Allium, this.defaultDandelions, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+        
+        }
+        
+        if (this.defaultOxeyeDaisies > 0)
+        {
+            // Oxeye Daisy
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.OxeyeDaisy, this.defaultDandelions, TCDefaultValues.flowerDepositRarity.intValue(), TCDefaultValues.flowerDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+        
         }
 
         if (this.defaultMushroom > 0)
@@ -273,13 +309,19 @@ public class DefaultBiomeSettings
         if (this.defaultFerns > 0)
         {
             // Ferns
-            resources.add(Resource.createResource(config, GrassGen.class, PlantType.Fern, "", this.defaultFerns, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+            resources.add(Resource.createResource(config, GrassGen.class, PlantType.Fern, GrassGen.GroupOption.NotGrouped, this.defaultFerns, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
         }
 
         if (this.defaultDoubleGrass > 0)
         {
             // Double tall grass
-            resources.add(Resource.createResource(config, GrassGen.class, PlantType.DoubleTallgrass, "", this.defaultDoubleGrass, TCDefaultValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+            if (this.defaultDoubleGrassIsGrouped)
+            {
+                resources.add(Resource.createResource(config, GrassGen.class, PlantType.DoubleTallgrass, GrassGen.GroupOption.Grouped, this.defaultDoubleGrass, TCDefaultValues.doubleGrassGroupedDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+            } else
+            {
+                resources.add(Resource.createResource(config, GrassGen.class, PlantType.DoubleTallgrass, GrassGen.GroupOption.NotGrouped, this.defaultDoubleGrass, TCDefaultValues.doubleGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+            }
         }
 
         if (this.defaultGrass > 0)
