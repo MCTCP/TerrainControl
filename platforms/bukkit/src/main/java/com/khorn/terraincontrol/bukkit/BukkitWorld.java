@@ -49,7 +49,6 @@ public class BukkitWorld implements LocalWorld
     public RareBuildingGen pyramidsGen;
     public NetherFortressGen netherFortress;
 
-
     private WorldGenTrees tree;
     private WorldGenAcaciaTree acaciaTree;
     private WorldGenBigTree bigTree;
@@ -325,12 +324,37 @@ public class BukkitWorld implements LocalWorld
     {
         if (this.settings.HaveBiomeReplace)
         {
-            byte[] ChunkBiomes = this.chunkCache[0].m();
-
-            for (int i = 0; i < ChunkBiomes.length; i++)
-                ChunkBiomes[i] = (byte) (this.settings.ReplaceMatrixBiomes[ChunkBiomes[i] & 0xFF] & 0xFF);
+            // Like all other populators, this populator uses an offset of 8
+            // blocks from the chunk start.
+            // This is what happens when the top left chunk has it's biome
+            // replaced:
+            // +--------+--------+ . = no changes in biome for now
+            // |........|........| # = biome is replaced
+            // |....####|####....|
+            // |....####|####....| The top left chunk is saved as chunk 0
+            // +--------+--------+ in the cache, the top right chunk as 1,
+            // |....####|####....| the bottom left as 2 and the bottom
+            // |....####|####....| right chunk as 3.
+            // |........|........|
+            // +--------+--------+
+            replaceBiomes(this.chunkCache[0].m(), 8, 8);
+            replaceBiomes(this.chunkCache[1].m(), 0, 8);
+            replaceBiomes(this.chunkCache[2].m(), 8, 0);
+            replaceBiomes(this.chunkCache[3].m(), 0, 0);
         }
+    }
 
+    private void replaceBiomes(byte[] biomeArray, int startXInChunk, int startZInChunk)
+    {
+        int endXInChunk = startXInChunk + 8;
+        int endZInChunkTimes16 = (startZInChunk + 8) * 16;
+        for (int xInChunk = startXInChunk; xInChunk < endXInChunk; xInChunk++)
+        {
+            for (int zInChunkTimes16 = startZInChunk * 16; zInChunkTimes16 < endZInChunkTimes16; zInChunkTimes16 += 16)
+            {
+                biomeArray[zInChunkTimes16 | xInChunk] = (byte) (this.settings.ReplaceMatrixBiomes[biomeArray[zInChunkTimes16 | xInChunk] & 0xFF] & 0xFF);
+            }
+        }
     }
 
     @Override
@@ -443,10 +467,9 @@ public class BukkitWorld implements LocalWorld
     public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
     {
         /*
-         * This method usually breaks on every Minecraft update. Always
-         * check whether the names are still correct. Often, you'll also
-         * need to rewrite parts of this method for newer block place
-         * logic.
+         * This method usually breaks on every Minecraft update. Always check
+         * whether the names are still correct. Often, you'll also need to
+         * rewrite parts of this method for newer block place logic.
          */
 
         if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
@@ -519,7 +542,7 @@ public class BukkitWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
         int y = chunk.b(x, z);
-        
+
         // Fix for incorrect light map
         boolean incorrectHeightMap = false;
         while (y < getHeightCap() && chunk.getType(x, y, z).getMaterial().blocksLight())
@@ -604,6 +627,7 @@ public class BukkitWorld implements LocalWorld
     /**
      * Sets the new settings and deprecates any references to the old
      * settings, if any.
+     * 
      * @param worldConfig The new settings.
      */
     public void setSettings(WorldConfig worldConfig)
@@ -617,17 +641,17 @@ public class BukkitWorld implements LocalWorld
     }
 
     /**
-     * Enables/reloads this BukkitWorld. If you are reloading,
-     * don't forget to set the new settings first using
-     * {@link #setSettings(WorldConfig)}.
+     * Enables/reloads this BukkitWorld. If you are reloading, don't forget to
+     * set the new settings first using {@link #setSettings(WorldConfig)}.
+     * 
      * @param world The world that needs to be enabled.
      */
     public void enable(org.bukkit.World world)
     {
         WorldServer mcWorld = ((CraftWorld) world).getHandle();
 
-        // Do the things that always need to happen, whether we are enabling for
-        // the first time or reloading
+        // Do the things that always need to happen, whether we are enabling
+        // for the first time or reloading
         this.world = mcWorld;
         this.chunkCache = new Chunk[4];
 
@@ -672,7 +696,7 @@ public class BukkitWorld implements LocalWorld
                 case Default:
                     break;
             }
-            
+
             this.tree = new WorldGenTrees(false);
             this.acaciaTree = new WorldGenAcaciaTree(false);
             this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
@@ -753,10 +777,7 @@ public class BukkitWorld implements LocalWorld
             tileEntity.a(nmsTag); // tileEntity.load
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[]
-            {
-                nmsTag.getString("id"), x, y, z, world.getTypeId(x, y, z)
-            });
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, world.getTypeId(x, y, z)});
         }
     }
 

@@ -103,7 +103,7 @@ public class ObjectSpawner
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
                 // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
-                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.world.getCalculatedBiomeId(blockToFreezeX, blockToFreezeZ)];
+                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
                 if (biomeConfig != null && biomeConfig.surfaceAndGroundControl != null)
                 {
                     double noise = this.reusableChunkNoiseArray[i + j * 16];
@@ -131,7 +131,7 @@ public class ObjectSpawner
     protected void freezeColumn(int x, int z)
     {
         // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
-        BiomeConfig biomeConfig = world.getSettings().biomeConfigs[world.getCalculatedBiomeId(x, z)];
+        BiomeConfig biomeConfig = world.getSettings().biomeConfigs[world.getBiomeId(x, z)];
         if (biomeConfig != null)
         {
             LocalBiome biome = biomeConfig.Biome;
