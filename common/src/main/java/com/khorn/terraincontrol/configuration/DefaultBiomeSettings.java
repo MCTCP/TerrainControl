@@ -147,6 +147,7 @@ public class DefaultBiomeSettings
      */
     public List<Resource> createDefaultResources(BiomeConfig config)
     {
+        int worldOreHeight = 128; // Should we make this dynamic for 8-bits scale worlds?
         List<Resource> resources = new ArrayList<Resource>(32);
 
         // Small water lakes
@@ -165,33 +166,33 @@ public class DefaultBiomeSettings
         resources.add(Resource.createResource(config, DungeonGen.class, TCDefaultValues.dungeonFrequency.intValue(), TCDefaultValues.dungeonRarity.intValue(), TCDefaultValues.dungeonMinAltitude.intValue(), this.worldHeight));
 
         // Dirt
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIRT.id, TCDefaultValues.dirtDepositSize.intValue(), TCDefaultValues.dirtDepositFrequency.intValue(), TCDefaultValues.dirtDepositRarity.intValue(), TCDefaultValues.dirtDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIRT.id, TCDefaultValues.dirtDepositSize.intValue(), TCDefaultValues.dirtDepositFrequency.intValue(), TCDefaultValues.dirtDepositRarity.intValue(), TCDefaultValues.dirtDepositMinAltitude.intValue(), worldOreHeight, DefaultMaterial.STONE.id));
 
         // Gravel
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GRAVEL.id, TCDefaultValues.gravelDepositSize.intValue(), TCDefaultValues.gravelDepositFrequency.intValue(), TCDefaultValues.gravelDepositRarity.intValue(), TCDefaultValues.gravelDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GRAVEL.id, TCDefaultValues.gravelDepositSize.intValue(), TCDefaultValues.gravelDepositFrequency.intValue(), TCDefaultValues.gravelDepositRarity.intValue(), TCDefaultValues.gravelDepositMinAltitude.intValue(), worldOreHeight, DefaultMaterial.STONE.id));
 
         // Coal
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.COAL_ORE.id, TCDefaultValues.coalDepositSize.intValue(), TCDefaultValues.coalDepositFrequency.intValue(), TCDefaultValues.coalDepositRarity.intValue(), TCDefaultValues.coalDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.COAL_ORE.id, TCDefaultValues.coalDepositSize.intValue(), TCDefaultValues.coalDepositFrequency.intValue(), TCDefaultValues.coalDepositRarity.intValue(), TCDefaultValues.coalDepositMinAltitude.intValue(), worldOreHeight, DefaultMaterial.STONE.id));
 
         // Iron
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.IRON_ORE.id, TCDefaultValues.ironDepositSize.intValue(), TCDefaultValues.ironDepositFrequency.intValue(), TCDefaultValues.ironDepositRarity.intValue(), TCDefaultValues.ironDepositMinAltitude.intValue(), this.worldHeight / 2, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.IRON_ORE.id, TCDefaultValues.ironDepositSize.intValue(), TCDefaultValues.ironDepositFrequency.intValue(), TCDefaultValues.ironDepositRarity.intValue(), TCDefaultValues.ironDepositMinAltitude.intValue(), worldOreHeight / 2, DefaultMaterial.STONE.id));
 
         // Gold
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GOLD_ORE.id, TCDefaultValues.goldDepositSize.intValue(), TCDefaultValues.goldDepositFrequency.intValue(), TCDefaultValues.goldDepositRarity.intValue(), TCDefaultValues.goldDepositMinAltitude.intValue(), this.worldHeight / 4, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GOLD_ORE.id, TCDefaultValues.goldDepositSize.intValue(), TCDefaultValues.goldDepositFrequency.intValue(), TCDefaultValues.goldDepositRarity.intValue(), TCDefaultValues.goldDepositMinAltitude.intValue(), worldOreHeight / 4, DefaultMaterial.STONE.id));
 
         // Redstone
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.REDSTONE_ORE.id, TCDefaultValues.redstoneDepositSize.intValue(), TCDefaultValues.redstoneDepositFrequency.intValue(), TCDefaultValues.redstoneDepositRarity.intValue(), TCDefaultValues.redstoneDepositMinAltitude.intValue(), this.worldHeight / 8, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.REDSTONE_ORE.id, TCDefaultValues.redstoneDepositSize.intValue(), TCDefaultValues.redstoneDepositFrequency.intValue(), TCDefaultValues.redstoneDepositRarity.intValue(), TCDefaultValues.redstoneDepositMinAltitude.intValue(), worldOreHeight / 8, DefaultMaterial.STONE.id));
 
         // Diamond
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIAMOND_ORE.id, TCDefaultValues.diamondDepositSize.intValue(), TCDefaultValues.diamondDepositFrequency.intValue(), TCDefaultValues.diamondDepositRarity.intValue(), TCDefaultValues.diamondDepositMinAltitude.intValue(), this.worldHeight / 8, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIAMOND_ORE.id, TCDefaultValues.diamondDepositSize.intValue(), TCDefaultValues.diamondDepositFrequency.intValue(), TCDefaultValues.diamondDepositRarity.intValue(), TCDefaultValues.diamondDepositMinAltitude.intValue(), worldOreHeight / 8, DefaultMaterial.STONE.id));
 
         // Lapislazuli
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.LAPIS_ORE.id, TCDefaultValues.lapislazuliDepositSize.intValue(), TCDefaultValues.lapislazuliDepositFrequency.intValue(), TCDefaultValues.lapislazuliDepositRarity.intValue(), TCDefaultValues.lapislazuliDepositMinAltitude.intValue(), this.worldHeight / 8, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.LAPIS_ORE.id, TCDefaultValues.lapislazuliDepositSize.intValue(), TCDefaultValues.lapislazuliDepositFrequency.intValue(), TCDefaultValues.lapislazuliDepositRarity.intValue(), TCDefaultValues.lapislazuliDepositMinAltitude.intValue(), worldOreHeight / 8, DefaultMaterial.STONE.id));
 
         // Emerald ore
         if (defaultEmeraldOre > 0)
         {
-            resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.EMERALD_ORE.id, TCDefaultValues.emeraldDepositSize.intValue(), this.defaultEmeraldOre, TCDefaultValues.emeraldDepositRarity.intValue(), TCDefaultValues.emeraldDepositMinAltitude.intValue(), this.worldHeight / 4, DefaultMaterial.STONE.id));
+            resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.EMERALD_ORE.id, TCDefaultValues.emeraldDepositSize.intValue(), this.defaultEmeraldOre, TCDefaultValues.emeraldDepositRarity.intValue(), TCDefaultValues.emeraldDepositMinAltitude.intValue(), worldOreHeight / 4, DefaultMaterial.STONE.id));
         }
 
         // Under water sand
