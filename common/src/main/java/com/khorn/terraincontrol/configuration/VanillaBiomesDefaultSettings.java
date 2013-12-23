@@ -212,6 +212,9 @@ public class VanillaBiomesDefaultSettings
             super(minecraftBiome, worldHeight);
 
             this.defaultColor = "0xA0A0A0";
+            this.defaultSize = 6;
+            this.defaultRarity = 97;
+            this.defaultIsle.add(DefaultBiome.ICE_PLAINS.Name);
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
         }
     };
@@ -264,6 +267,8 @@ public class VanillaBiomesDefaultSettings
             this.defaultNotBorderNear.add(DefaultBiome.EXTREME_HILLS.Name);
             this.defaultNotBorderNear.add(DefaultBiome.MUSHROOM_ISLAND.Name);
             this.defaultNotBorderNear.add(DefaultBiome.DEEP_OCEAN.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.COLD_BEACH.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.STONE_BEACH.Name);
             this.defaultColor = "0xFADE55";
             this.defaultStrongholds = false;
         }
@@ -365,6 +370,8 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x628B17";
+            this.defaultSize = 8;
+            this.defaultBorder.add(DefaultBiome.JUNGLE.Name);
         }
     }
 
@@ -379,7 +386,7 @@ public class VanillaBiomesDefaultSettings
         }
     }
 
-    public static class StoneBeach extends Beach
+    public static class StoneBeach extends DefaultBiomeSettings
     {
         public StoneBeach(LocalBiome minecraftBiome, int worldHeight)
         {
@@ -388,7 +395,7 @@ public class VanillaBiomesDefaultSettings
         }
     }
 
-    public static class ColdBeach extends Beach
+    public static class ColdBeach extends DefaultBiomeSettings
     {
         public ColdBeach(LocalBiome minecraftBiome, int worldHeight)
         {
@@ -413,6 +420,9 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x1F5F32";
+            this.defaultSize = 6;
+            this.defaultRarity = 97;
+            this.defaultIsle.add(DefaultBiome.BIRCH_FOREST.Name);
         }
     }
 
@@ -444,6 +454,9 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x243F36";
+            this.defaultSize = 6;
+            this.defaultRarity = 97;
+            this.defaultIsle.add(DefaultBiome.COLD_TAIGA.Name);
         }
     }
 
@@ -469,6 +482,9 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x454F3E";
+            this.defaultSize = 6;
+            this.defaultRarity = 97;
+            this.defaultIsle.add(DefaultBiome.MEGA_TAIGA.Name);
         }
     }
 
@@ -503,6 +519,9 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0xA79D64";
+            this.defaultSize = 6;
+            this.defaultRarity = 97;
+            this.defaultIsle.add(DefaultBiome.SAVANNA.Name);
         }
     }
 
@@ -557,6 +576,7 @@ public class VanillaBiomesDefaultSettings
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0xDEFF00";
             this.defaultSunflowers = 30;
+            this.defaultRarity = 10;
         }
     }
 
@@ -567,6 +587,7 @@ public class VanillaBiomesDefaultSettings
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0xE58208";
             this.defaultWaterLakes = true;
+            this.defaultRarity = 10;
         }
     }
 
@@ -577,6 +598,7 @@ public class VanillaBiomesDefaultSettings
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x525252";
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, -1.0, DefaultMaterial.GRASS, DefaultMaterial.DIRT, 2.0, DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, 10.0};
+            this.defaultRarity = 10;
         }
     }
 
@@ -588,6 +610,8 @@ public class VanillaBiomesDefaultSettings
             int flowerMultiplier = 20;
 
             this.defaultColor = "0x2D8E49";
+            this.defaultRarity = 10;
+            
             this.defaultDandelions = 0;
             this.defaultTallFlowers = 6;
             this.defaultPoppies = flowerMultiplier * 2;
@@ -606,6 +630,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x0A5B4F";
+            this.defaultRarity = 10;
         }
     }
 
@@ -615,6 +640,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x28D29F";
+            this.defaultRarity = 10;
         }
     }
 
@@ -624,6 +650,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x8CB4B4";
+            this.defaultRarity = 10;
             this.defaultTree = null;
             this.defaultDandelions = 0;
             this.defaultGrass = 0;
@@ -637,15 +664,18 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x4C7009";
+            this.defaultRarity = 10;
         }
     }
 
-    public static class JungleEdgeMountains extends JungleEdge
+    public static class JungleEdgeMountains extends JungleMountains
     {
         public JungleEdgeMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x5A8015";
+            this.defaultSize = 8;
+            this.defaultBorder.add(DefaultBiome.JUNGLE_MOUNTAINS.Name);
         }
     }
 
@@ -655,17 +685,21 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x4E6E58";
+            this.defaultRarity = 10;
             this.defaultTree = new Object[] {10, TreeType.TallBirch, 80};
         }
     }
 
-    public static class BirchForestHillsMountains extends BirchForestHills
+    public static class BirchForestHillsMountains extends BirchForestMountains
     {
         public BirchForestHillsMountains(LocalBiome minecraftBiome, int worldHeight)
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x1F502E";
             this.defaultTree = new Object[] {10, TreeType.TallBirch, 80};
+            this.defaultSize = 6;
+            this.defaultRarity = 97;
+            this.defaultIsle.add(DefaultBiome.BIRCH_FOREST_MOUNTAINS.Name);
         }
     }
 
@@ -675,6 +709,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x364416";
+            this.defaultRarity = 10;
         }
     }
 
@@ -684,6 +719,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x2E5046";
+            this.defaultRarity = 10;
         }
     }
 
@@ -693,6 +729,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x598110";
+            this.defaultRarity = 10;
             this.defaultTree = new Object[] {10, TreeType.HugeTaiga2, 8, TreeType.HugeTaiga1, 30, TreeType.Taiga1, 33, TreeType.Taiga2, 100};
         }
     }
@@ -712,6 +749,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x466246";
+            this.defaultRarity = 10;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, -1.0, DefaultMaterial.GRASS, DefaultMaterial.DIRT, 2.0, DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, 10.0};
         }
     }
@@ -722,6 +760,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x5B8015";
+            this.defaultRarity = 10;
             this.defaultGrass = 60;
             this.defaultDoubleGrass = 0;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRASS, DefaultMaterial.DIRT, -0.5, DefaultMaterial.DIRT + ":1", DefaultMaterial.DIRT, 1.75, DefaultMaterial.STONE, DefaultMaterial.STONE, 10};
@@ -734,6 +773,9 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0x99905C";
+            this.defaultSize = 6;
+            this.defaultRarity = 97;
+            this.defaultIsle.add(DefaultBiome.SAVANNA_MOUNTAINS.Name);
         }
     }
 
@@ -743,6 +785,7 @@ public class VanillaBiomesDefaultSettings
         {
             super(minecraftBiome, worldHeight);
             this.defaultColor = "0xE45627";
+            this.defaultRarity = 10;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {MesaSurfaceGenerator.NAME_BRYCE};
         }
     }
