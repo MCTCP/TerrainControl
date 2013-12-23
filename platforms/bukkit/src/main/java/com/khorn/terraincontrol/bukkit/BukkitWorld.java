@@ -288,9 +288,6 @@ public class BukkitWorld implements LocalWorld
 
         byte[] chunkBiomes = rawChunk.m();
 
-        int x = this.currentChunkX * 16;
-        int z = this.currentChunkZ * 16;
-
         for (ChunkSection section : sectionsArray)
         {
             if (section == null)
@@ -405,16 +402,17 @@ public class BukkitWorld implements LocalWorld
     @Override
     public int getLiquidHeight(int x, int z)
     {
-        Chunk chunk = this.getChunk(x, 0, z);
-        if (chunk == null)
-            return -1;
-        z = z & 0xF;
-        x = x & 0xF;
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            Block block = chunk.getType(x, y, z);
-            if (block instanceof BlockFluids)
-                return y;
+            DefaultMaterial material = getMaterial(x, y, z);
+            if (material.isLiquid())
+            {
+                return y + 1;
+            } else if (material.isSolid())
+            {
+                // Failed to find a liquid
+                return -1;
+            }
         }
         return -1;
     }
