@@ -318,8 +318,6 @@ public class BukkitWorld implements LocalWorld
 
                             section.setTypeId(sectionX, sectionY, sectionZ, replaceTo);
                             section.setData(sectionX, sectionY, sectionZ, replaceToId & 0xF);
-                            world.notify((x + sectionX), (section.getYPosition() + sectionY), (z + sectionZ));
-
                         }
                     }
                 }
