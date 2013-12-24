@@ -107,15 +107,17 @@ public class LayerFromImage extends Layer
                 {
                     int Buffer_x = (x + ix - xOffset) % this.mapWidth;
                     int Buffer_z = (z + iz - zOffset) % this.mapHeight;
-                    if (Buffer_x < this.mapWidth)
+                    
+                    // Take care of negatives
+                    if (Buffer_x < 0)
                           Buffer_x += this.mapWidth;
-                    if (Buffer_z < this.mapHeight)
+                    if (Buffer_z < 0)
                           Buffer_z += this.mapHeight;
                     resultBiomes[(ix + iz * x_size)] = this.biomeMap[Buffer_x + Buffer_z * this.mapWidth];
                 }
             return resultBiomes;
         case Mirror:
-            // Improved repead mode
+            // Improved repeat mode
             for (int iz = 0; iz < z_size; iz++)
                 for (int ix = 0; ix < x_size; ix++)
                 {
