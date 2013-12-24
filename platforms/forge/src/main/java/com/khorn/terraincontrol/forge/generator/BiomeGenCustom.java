@@ -42,8 +42,8 @@ public class BiomeGenCustom extends BiomeGenBase
     @SuppressWarnings("unchecked")
     public void setEffects(BiomeConfig config)
     {
-        this.temperature = config.BiomeTemperature;
-        this.rainfall = config.BiomeWetness;
+        this.temperature = config.biomeTemperature;
+        this.rainfall = config.biomeWetness;
         if (this.rainfall == 0)
         {
             this.setDisableRain();

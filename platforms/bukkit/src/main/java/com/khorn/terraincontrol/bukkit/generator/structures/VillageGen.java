@@ -5,10 +5,10 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.StructureGenerator;
-import net.minecraft.server.v1_6_R3.StructureStart;
-import net.minecraft.server.v1_6_R3.World;
+import net.minecraft.server.v1_7_R1.BiomeBase;
+import net.minecraft.server.v1_7_R1.StructureGenerator;
+import net.minecraft.server.v1_7_R1.StructureStart;
+import net.minecraft.server.v1_7_R1.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class VillageGen extends StructureGenerator
 
         int i1 = chunkX / this.distance;
         int j1 = chunkZ / this.distance;
-        Random random = this.c.H(i1, j1, 10387312);
+        Random random = this.c.A(i1, j1, 10387312);
 
         i1 *= this.distance;
         j1 *= this.distance;
@@ -93,9 +93,9 @@ public class VillageGen extends StructureGenerator
 
     // Two methods to help MCPC+ dynamically rename things.
     // It has problems with classes that extend native Minecraft classes
-    public void prepare(World world, int chunkX, int chunkZ, byte[] chunkArray)
+    public void prepare(World world, int chunkX, int chunkZ)
     {
-        a(null, world, chunkX, chunkZ, chunkArray);
+        a(null, world, chunkX, chunkZ, null);
     }
 
     /**

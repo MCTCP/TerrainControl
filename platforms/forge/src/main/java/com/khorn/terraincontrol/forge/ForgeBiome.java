@@ -81,14 +81,20 @@ public class ForgeBiome implements LocalBiome
     }
 
     @Override
-    public byte getSurfaceBlock()
+    public int getSurfaceBlock()
     {
         return biomeBase.topBlock;
     }
 
     @Override
-    public byte getGroundBlock()
+    public int getGroundBlock()
     {
         return biomeBase.fillerBlock;
+    }
+
+    @Override
+    public float getTemperatureAt(int x, int y, int z) {
+        // TODO Waiting on 1.7
+        return getTemperature();
     }
 }

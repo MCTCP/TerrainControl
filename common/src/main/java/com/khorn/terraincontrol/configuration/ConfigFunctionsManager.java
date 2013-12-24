@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.generator.resource.IceSpikeGen;
+
+import com.khorn.terraincontrol.generator.resource.BoulderGen;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resource.*;
@@ -21,11 +24,13 @@ public class ConfigFunctionsManager
 
         // Add vanilla resources
         registerConfigFunction("AboveWaterRes", AboveWaterGen.class);
+        registerConfigFunction("Boulder", BoulderGen.class);
         registerConfigFunction("Cactus", CactusGen.class);
         registerConfigFunction("CustomObject", CustomObjectGen.class);
         registerConfigFunction("CustomStructure", CustomStructureGen.class);
         registerConfigFunction("Dungeon", DungeonGen.class);
         registerConfigFunction("Grass", GrassGen.class);
+        registerConfigFunction("IceSpike", IceSpikeGen.class);
         registerConfigFunction("Liquid", LiquidGen.class);
         registerConfigFunction("Ore", OreGen.class);
         registerConfigFunction("Plant", PlantGen.class);

@@ -66,7 +66,18 @@ public class TCWorldChunkManager extends WorldChunkManager
     @Override
     public float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
-        return biomeManager.getTemperatures(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
+        int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
+        if (paramArrayOfFloat == null || paramArrayOfFloat.length < arrayOfInt.length)
+        {
+            paramArrayOfFloat = new float[arrayOfInt.length];
+        }
+
+        for (int i = 0; i < paramInt3 * paramInt4; i++)
+        {
+            paramArrayOfFloat[i] = BiomeGenBase.biomeList[arrayOfInt[i]].getFloatTemperature();
+        }
+
+        return paramArrayOfFloat;
     }
 
     @Override

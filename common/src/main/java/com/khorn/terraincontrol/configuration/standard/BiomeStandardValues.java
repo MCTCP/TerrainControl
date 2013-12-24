@@ -12,7 +12,7 @@ public enum BiomeStandardValues implements MultiTypedSetting
     //>>   Biome Extensions & Related
     BiomeConfigExtensions("BiomeConfig.ini,.biome,.bc,.bc.ini,.biome.ini", SettingsType.StringArray),
     DefaultBiomeConfigExtension(".bc"),
-    
+   
     // Biome settings
     BiomeExtends(""),
     BiomeSize(5),
@@ -36,6 +36,7 @@ public enum BiomeStandardValues implements MultiTypedSetting
 
     StoneBlock(1),
     SurfaceBlock(2),
+    SurfaceAndGroundControl(""),
     GroundBlock(3),
     ReplacedBlocks("None"),
 
@@ -166,19 +167,28 @@ public enum BiomeStandardValues implements MultiTypedSetting
     roseDepositMinAltitude(0),
     roseDepositMaxAltitude(128),
 
+    blueOrchidDepositRarity(100),
+    blueOrchidDepositMinAltitude(0),
+
     flowerDepositRarity(100),
     flowerDepositMinAltitude(0),
     flowerDepositMaxAltitude(128),
+    
+    tulipDepositRarity(25),
 
-    redMushroomDepositRarity(100),
+    redMushroomDepositRarity(50),
     redMushroomDepositMinAltitude(0),
     redMushroomDepositMaxAltitude(128),
 
-    brownMushroomDepositRarity(100),
+    brownMushroomDepositRarity(50),
     brownMushroomDepositMinAltitude(0),
     brownMushroomDepositMaxAltitude(128),
 
     longGrassDepositRarity(100),
+    longGrassGroupedDepositRarity(60),
+
+    doubleGrassDepositRarity(100),
+    doubleGrassGroupedDepositRarity(15),
 
     deadBushDepositRarity(100),
 
@@ -208,14 +218,20 @@ public enum BiomeStandardValues implements MultiTypedSetting
     lavaSourceDepositFrequency(10),
     lavaSourceDepositMinAltitude(8),
     lavaSourceDepositMaxAltitude(128),
+
+    boulderDepositRarity(30),
+    boulderDepositMinAltitude(0),
+    boulderDepositMaxAltitude(256),
+
+    iceSpikeDepositMinHeight(60),
+    iceSpikeDepositMaxHeight(128),
     // End resource settings
 
     // Deprecated settings
     BiomeRivers(true),
     DisableNotchPonds(false),
-    FrozenRivers(true),
 
-    //>>	Values related to WorldStandardValues
+    //>>    Values related to WorldStandardValues
     WaterLevelMax(63),
     WaterLevelMin(0),
     WaterBlock(9),
@@ -226,8 +242,6 @@ public enum BiomeStandardValues implements MultiTypedSetting
     VillageType(BiomeConfig.VillageType.disabled),
     MineshaftRarity(1D),
     RareBuildingType(BiomeConfig.RareBuildingType.disabled);
-    
-    // End deprectated settings
 
     private int iValue;
     private long lValue;

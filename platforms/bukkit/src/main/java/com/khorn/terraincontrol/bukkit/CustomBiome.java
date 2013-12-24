@@ -4,19 +4,14 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
+import net.minecraft.server.v1_7_R1.*;
+import org.bukkit.block.Biome;
+import org.bukkit.craftbukkit.v1_7_R1.block.CraftBlock;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.BiomeMeta;
-import net.minecraft.server.v1_6_R3.Entity;
-import net.minecraft.server.v1_6_R3.EntityTypes;
-
-import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_6_R3.block.CraftBlock;
 
 public class CustomBiome extends BiomeBase
 {
@@ -45,22 +40,22 @@ public class CustomBiome extends BiomeBase
     @SuppressWarnings("unchecked")
     public void setEffects(BiomeConfig config)
     {
-        this.D = config.BiomeHeight;
-        this.E = config.BiomeVolatility;
-        this.A = (byte) config.SurfaceBlock;
-        this.B = (byte) config.GroundBlock;
-        this.temperature = config.BiomeTemperature;
-        this.humidity = config.BiomeWetness;
+        this.am = config.BiomeHeight;
+        this.an = config.BiomeVolatility;
+        this.ai = Block.e(config.surfaceBlock);
+        this.ak = Block.e(config.groundBlock);
+        this.temperature = config.biomeTemperature;
+        this.humidity = config.biomeWetness;
         if (this.humidity == 0)
         {
             this.b(); // this.disableRain()
         }
 
         // Mob spawning
-        addMobs(this.J, config.spawnMonstersAddDefaults, config.spawnMonsters);
-        addMobs(this.K, config.spawnCreaturesAddDefaults, config.spawnCreatures);
-        addMobs(this.L, config.spawnWaterCreaturesAddDefaults, config.spawnWaterCreatures);
-        addMobs(this.M, config.spawnAmbientCreaturesAddDefaults, config.spawnAmbientCreatures);
+        addMobs(this.as, config.spawnMonstersAddDefaults, config.spawnMonsters);
+        addMobs(this.at, config.spawnCreaturesAddDefaults, config.spawnCreatures);
+        addMobs(this.au, config.spawnWaterCreaturesAddDefaults, config.spawnWaterCreatures);
+        addMobs(this.av, config.spawnAmbientCreaturesAddDefaults, config.spawnAmbientCreatures);
     }
 
     // Adds the mobs to the internal list. Displays a warning for each mob type it doesn't understand
@@ -78,8 +73,8 @@ public class CustomBiome extends BiomeBase
                 internalList.add(new BiomeMeta(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
             } else
             {
-                // The .toLowerCase() is just a safeguard so that we get notified if this.y is no longer the biome name
-                TerrainControl.log(Level.WARNING, "Mob type {0} not found in {1}", new Object[]{mobGroup.getMobName(), this.y.toLowerCase()});
+                // The .toLowerCase() is just a safeguard so that we get notified if this.af is no longer the biome name
+                TerrainControl.log(Level.WARNING, "Mob type {0} not found in {1}", new Object[]{mobGroup.getMobName(), this.af.toLowerCase()});
             }
         }
     }
@@ -91,7 +86,7 @@ public class CustomBiome extends BiomeBase
         String mobName = MobNames.getInternalMinecraftName(mobGroup.getMobName());
         try
         {
-            Field entitiesField = EntityTypes.class.getDeclaredField("b");
+            Field entitiesField = EntityTypes.class.getDeclaredField("c");
             entitiesField.setAccessible(true);
             Map<String, Class<? extends Entity>> entitiesList = (Map<String, Class<? extends Entity>>) entitiesField.get(null);
             return entitiesList.get(mobName);

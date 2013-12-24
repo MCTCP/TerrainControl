@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.util.helpers.StringHelper;
+
+import com.khorn.terraincontrol.logging.TCLogManager;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -12,7 +15,6 @@ import com.khorn.terraincontrol.forge.events.SaplingListener;
 import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
@@ -28,6 +30,8 @@ import cpw.mods.fml.relauncher.Side;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
@@ -40,6 +44,8 @@ public class TCPlugin implements TerrainControlEngine
     
     @Instance("TerrainControl")
     public static TCPlugin instance;
+    
+    private static Logger logger;
 
     public File terrainControlDirectory;
     private TCWorldType worldType;
@@ -48,10 +54,10 @@ public class TCPlugin implements TerrainControlEngine
     public void load(FMLInitializationEvent event)
     {
         // This is the place where the mod starts loading
+        logger = FMLCommonHandler.instance().getFMLLogger();
         
         // Set the directory
         TerrainControl.setEngine(this);
-        TerrainControl.setupLogging(FMLCommonHandler.instance().getFMLLogger());
 
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
@@ -159,5 +165,38 @@ public class TCPlugin implements TerrainControlEngine
         }
         return true;
     }
+
+    @Override
+    public void log(Level level, String... messages)
+    {
+        this.log(level, "{0}", new Object[]
+        {
+            StringHelper.join(messages, " ")
+        });
+    }
+
+
+    @Override
+    public void log(Level level, String message, Object param)
+    {
+        LogRecord lr = new LogRecord(level, message);
+        lr.setMessage(TCLogManager.FORMATTER.format(lr));
+        lr.setParameters(new Object[]
+        {
+            param
+        });
+        logger.log(lr);
+    }
+
+
+    @Override
+    public void log(Level level, String message, Object[] params)
+    {
+        LogRecord lr = new LogRecord(level, message);
+        lr.setMessage(TCLogManager.FORMATTER.format(lr));
+        lr.setParameters(params);
+        logger.log(lr);
+    }
+
     
 }

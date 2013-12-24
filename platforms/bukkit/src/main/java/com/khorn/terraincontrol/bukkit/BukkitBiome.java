@@ -2,11 +2,12 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import net.minecraft.server.v1_6_R3.BiomeBase;
+import net.minecraft.server.v1_7_R1.BiomeBase;
+import net.minecraft.server.v1_7_R1.Block;
 
 /**
- * The BukkitBiome is basically a wrapper for the BiomeBase.
- * If you look at the constructor and the method you will see that this is the case.
+ * The BukkitBiome is basically a wrapper for the BiomeBase. If you look at
+ * the constructor and the method you will see that this is the case.
  */
 public class BukkitBiome implements LocalBiome
 {
@@ -25,7 +26,7 @@ public class BukkitBiome implements LocalBiome
     {
         this.biomeBase = biome;
         this.id = biomeBase.id;
-        this.name = biome.y;
+        this.name = biome.af;
 
         this.temperature = biome.temperature;
         this.humidity = biome.humidity;
@@ -37,7 +38,7 @@ public class BukkitBiome implements LocalBiome
         this.id = biomeBase.id;
         this.isCustom = true;
         this.customID = customId;
-        this.name = biome.y;
+        this.name = biome.af;
 
 
         this.temperature = biome.temperature;
@@ -117,24 +118,30 @@ public class BukkitBiome implements LocalBiome
     @Override
     public float getSurfaceHeight()
     {
-        return this.biomeBase.D;
+        return this.biomeBase.am;
     }
 
     @Override
     public float getSurfaceVolatility()
     {
-        return this.biomeBase.E;
+        return this.biomeBase.an;
     }
 
     @Override
-    public byte getSurfaceBlock()
+    public int getSurfaceBlock()
     {
-        return this.biomeBase.A;
+        return Block.b(this.biomeBase.ai);
     }
 
     @Override
-    public byte getGroundBlock()
+    public int getGroundBlock()
     {
-        return this.biomeBase.B;
+        return Block.b(this.biomeBase.ak);
+    }
+
+    @Override
+    public float getTemperatureAt(int x, int y, int z)
+    {
+        return this.biomeBase.a(x, y, z);
     }
 }

@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Temporarily pre-configured Class that will eventually represent the file
@@ -41,13 +42,14 @@ public final class PluginConfig extends ConfigFile
         }
 
     }
+
     public LogLevels fileHandlerLevel;
     public LogLevels consoleHandlerLevel;
     public String worldDefaultBiomeConfigExtension;
     //>>	Feature Flags (Temporary)
     public String developer_name;
     public boolean feature_BiomeInheritanceVariables_Timethor;
-    
+
     public PluginConfig(File settingsDir)
     {
 
@@ -92,8 +94,9 @@ public final class PluginConfig extends ConfigFile
         }
         if (hasOffLevel)
         {
-            TerrainControl.log(Level.WARNING, "Quiet Mode: You will no longer see INFO messages FOR ANY PLUGIN.");
-            TerrainControl.log(Level.WARNING, "WARNING AND SEVERE level logs will still show.");
+            Logger l = Logger.getLogger("Minecraft");
+            l.log(Level.WARNING, "Quiet Mode: You will no longer see INFO messages FOR ANY PLUGIN.");
+            l.log(Level.WARNING, "WARNING AND SEVERE level logs will still show.");
         }
     }
 

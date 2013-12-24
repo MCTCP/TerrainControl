@@ -1,8 +1,10 @@
 package com.khorn.terraincontrol;
 
+import com.khorn.terraincontrol.logging.Loggable;
+
 import java.io.File;
 
-public interface TerrainControlEngine
+public interface TerrainControlEngine extends Loggable
 {
 
     /**

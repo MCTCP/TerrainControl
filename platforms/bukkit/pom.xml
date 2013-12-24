@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.khorn.terraincontrol</groupId>
         <artifactId>terraincontrol</artifactId>
-        <version>2.5.1-SNAPSHOT</version>
+        <version>2.5.2-SNAPSHOT</version>
         <relativePath>../../</relativePath>
     </parent>
 
@@ -21,7 +21,7 @@
     <!-- Constants -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bukkitVersion>1.6.4-R0.1-SNAPSHOT</bukkitVersion>
+        <bukkitVersion>1.7.2-R0.2</bukkitVersion>
     </properties>
 
     <!-- We're open source, find us here -->
@@ -89,6 +89,14 @@
             <!-- We need these classes in our jar -->
             <scope>compile</scope>
         </dependency>
+        
+        <dependency>
+    		<groupId>org.apache.logging.log4j</groupId>
+    		<artifactId>log4j-api</artifactId>
+    		<version>2.0-beta9</version>
+    		<!-- Provided by Minecraft, no need to put these classes in our jar -->
+            <scope>provided</scope>
+		</dependency>
     </dependencies>
 </project>
 

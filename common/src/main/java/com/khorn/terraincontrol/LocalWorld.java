@@ -33,8 +33,6 @@ public interface LocalWorld
     public ArrayList<LocalBiome> getDefaultBiomes();
 
     // Biome manager
-    // public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int
-    // x_size, int z_size);
 
     /**
      * Calculate biome ids array used in terrain generation.
@@ -44,12 +42,10 @@ public interface LocalWorld
      * @param z The block z.
      * @param x_size Size of block in x coordinate.
      * @param z_size Size of blocks in z coordinate.
-     * @param type Output type. May be Full, WithOutRivers, OnlyRivers and null.
+     * @param type Output type. May be FULL, WITHOUT_RIVERS, ONLY_RIVERS or DEFAULT_FOR_WORLD.
      * @return Array filled by biome ids.
      */
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
-
-    public float[] getTemperatures(int x, int z, int x_size, int z_size);
 
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
 
@@ -81,13 +77,13 @@ public interface LocalWorld
 
     // Default generators
 
-    public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry);
+    public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry);
 
     public void PlaceDungeons(Random rand, int x, int y, int z);
 
     public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z);
 
-    public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z);
+    public boolean placeDefaultStructures(Random rand, int chunkX, int chunkZ);
 
     public void replaceBlocks();
 
@@ -146,9 +142,20 @@ public interface LocalWorld
     // Terrain init
     public long getSeed();
 
-    public int getHeight();
+    /**
+     * Gets the height the base terrain of the world is capped at. Resources
+     * ignore this limit.
+     *
+     * @return The height the base terrain of the world is capped at.
+     */
+    public int getHeightCap();
 
-    public int getHeightBits();
-
-    public void setHeightBits(int heightBits);
+    /**
+     * Returns the vertical scale of the world. 128 blocks is the normal
+     * scale, 256 doubles the scale, 64 halves the scale, etc. Only powers of
+     * two will be returned.
+     *
+     * @return The vertical scale of the world.
+     */
+    public int getHeightScale();
 }

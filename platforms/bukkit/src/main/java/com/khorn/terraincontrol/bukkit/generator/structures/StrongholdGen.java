@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_6_R3.*;
+import net.minecraft.server.v1_7_R1.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,7 +94,7 @@ public class StrongholdGen extends StructureGenerator
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    protected List p_()
+    protected List o_()
     {
         ArrayList arraylist = new ArrayList();
         ChunkCoordIntPair[] achunkcoordintpair = this.structureCoords;
@@ -125,9 +125,9 @@ public class StrongholdGen extends StructureGenerator
 
     // Two methods to help MCPC+ dynamically rename things.
     // It has problems with classes that extend native Minecraft classes
-    public void prepare(World world, int chunkX, int chunkZ, byte[] chunkArray)
+    public void prepare(World world, int chunkX, int chunkZ)
     {
-        a(null, world, chunkX, chunkZ, chunkArray);
+        a(null, world, chunkX, chunkZ, null);
     }
 
     public void place(World world, Random random, int chunkX, int chunkZ)

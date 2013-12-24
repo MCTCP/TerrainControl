@@ -27,8 +27,6 @@ public abstract class BiomeGenerator
         return getBiomes(biomeArray, x, z, xSize, zSize, type);
     }
 
-    public abstract float[] getTemperatures(float[] paramArrayOfFloat, int x, int z, int xSize, int zSize);
-
     public abstract float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int xSize, int zSize);
 
     public abstract int[] getBiomes(int[] biomeArray, int x, int z, int xSize, int zSize, OutputType type);

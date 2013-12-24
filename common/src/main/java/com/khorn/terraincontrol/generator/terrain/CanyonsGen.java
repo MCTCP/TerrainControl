@@ -33,7 +33,7 @@ public class CanyonsGen extends TerrainGenBase
         float f3 = 1.0F;
         for (int j = 0; ; j++)
         {
-            if (j >= worldSettings.WorldHeight)
+            if (j >= worldSettings.worldHeightCap)
                 break;
             if ((j == 0) || (localRandom.nextInt(3) == 0))
             {
@@ -97,8 +97,8 @@ public class CanyonsGen extends TerrainGenBase
 
             if (n < 1)
                 n = 1;
-            if (i1 > worldSettings.WorldHeight - 8)
-                i1 = worldSettings.WorldHeight - 8;
+            if (i1 > worldSettings.worldHeightCap - 8)
+                i1 = worldSettings.worldHeightCap - 8;
 
             if (i2 < 0)
                 i2 = 0;
@@ -113,10 +113,10 @@ public class CanyonsGen extends TerrainGenBase
                 {
                     for (int i7 = i1 + 1; (i4 == 0) && (i7 >= n - 1); i7--)
                     {
-                        i8 = (i5 * 16 + i6) * worldSettings.WorldHeight + i7;
+                        i8 = (i5 * 16 + i6) * worldSettings.worldHeightCap + i7;
                         if (i7 < 0)
                             continue;
-                        if (i7 < worldSettings.WorldHeight)
+                        if (i7 < worldSettings.worldHeightCap)
                         {
                             if ((paramArrayOfByte[i8] == DefaultMaterial.WATER.id) || (paramArrayOfByte[i8] == DefaultMaterial.STATIONARY_WATER.id))
                             {
@@ -138,7 +138,7 @@ public class CanyonsGen extends TerrainGenBase
                 for (i8 = i2; i8 < i3; i8++)
                 {
                     double d10 = (i8 + chunk_z * 16 + 0.5D - paramDouble3) / d3;
-                    int i9 = (i5 * 16 + i8) * worldSettings.WorldHeight + i1;
+                    int i9 = (i5 * 16 + i8) * worldSettings.worldHeightCap + i1;
                     int i10 = 0;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {

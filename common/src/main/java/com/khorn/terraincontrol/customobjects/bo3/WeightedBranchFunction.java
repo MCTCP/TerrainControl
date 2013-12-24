@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.customobjects.bo3;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.Branch;
-import com.khorn.terraincontrol.customobjects.BranchNode;
 import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 
@@ -25,7 +24,7 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
-        branches = new TreeSet<BranchNode>(BranchNode.getComparator());
+        branches = new TreeSet<BranchNode>();
         cumulativeChance = readArgs(args, true);
     }
 
@@ -55,7 +54,7 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
     @Override
     protected String getConfigName()
     {
-        return "Weighted" + super.getConfigName();
+        return "WeightedBranch";
     }
 
 }

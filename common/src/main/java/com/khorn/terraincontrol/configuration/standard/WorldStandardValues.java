@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.configuration.standard;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
-import com.khorn.terraincontrol.util.MultiTypedSetting.SettingsType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +22,8 @@ public enum WorldStandardValues implements MultiTypedSetting
     BiomeMode("Normal"),
     
     snowAndIceMaxTemp(0.15F),
-    WorldHeightBits(7),
+    WorldHeightScaleBits(7),
+    WorldHeightCapBits(8),
 
     GenerationDepth(10),
 
@@ -119,12 +119,12 @@ public enum WorldStandardValues implements MultiTypedSetting
     RareBuildingsEnabled(true),
     MinimumDistanceBetweenRareBuildings(9),
     MaximumDistanceBetweenRareBuildings(32),
-    RareBuildingType(BiomeConfig.RareBuildingType.disabled);
-    
-    
+    RareBuildingType(BiomeConfig.RareBuildingType.disabled),
     // End world settings
 
-    // End deprectated settings
+    // Begin deprecated settings
+    FrozenRivers(true);
+    // End deprecated settings
 
     private int iValue;
     private long lValue;

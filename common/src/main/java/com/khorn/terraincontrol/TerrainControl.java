@@ -9,16 +9,13 @@ import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
 import com.khorn.terraincontrol.generator.resource.Resource;
-import com.khorn.terraincontrol.logging.LogManagerFactory;
-import com.khorn.terraincontrol.logging.LogManager;
-import com.khorn.terraincontrol.util.helpers.StringHelper;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 public class TerrainControl
 {
@@ -46,7 +43,6 @@ public class TerrainControl
     private static PluginConfig pluginConfig;
     
     private static TerrainControlEngine engine;
-    private static LogManager logMan;
     
     private static ConfigFunctionsManager configFunctionsManager;
     private static CustomObjectManager customObjectManager;
@@ -69,10 +65,6 @@ public class TerrainControl
         if (TerrainControl.engine == null)
         {
             throw new IllegalStateException("Engine is not set! Call setEngine first.");
-        }
-        if (TerrainControl.logMan == null)
-        {
-            throw new IllegalStateException("Logging is not setup! Call setupLogging first.");
         }
         // Start the engine
         configFunctionsManager = new ConfigFunctionsManager();
@@ -146,29 +138,6 @@ public class TerrainControl
     }
 
     /**
-     * Returns the engine, containing the API methods.
-     * <p/>
-     * @return The engine
-     */
-    public static LogManager getLogger()
-    {
-        return logMan;
-    }
-
-    public static void setupLogging(Logger engineLogger)
-    {
-        if (TerrainControl.logMan != null)
-        {
-            throw new IllegalStateException("LogManager is already setup.");
-        }
-        if (engineLogger == null)
-        {
-            throw new IllegalArgumentException("Your Logger must not be null.");
-        }
-        TerrainControl.logMan = LogManagerFactory.makeLogManager(engineLogger);
-    }
-
-    /**
      * Returns the world object with the given name.
      * <p/>
      * @param name The name of the world.
@@ -210,12 +179,9 @@ public class TerrainControl
      */
     public static void log(Level level, String... message)
     {
-        if (logMan == null)
-        {
-            LogManager.backLog(new LogRecord(level, StringHelper.join(message, " ")));
-        } else
-            logMan.log(level, message);
+        engine.log(level, message);
     }
+
 
     /**
      * Logs a format string message with the given importance. Message will
@@ -228,14 +194,9 @@ public class TerrainControl
      */
     public static void log(Level level, String message, Object param)
     {
-        if (logMan == null)
-        {
-            LogRecord lr = new LogRecord(level, message);
-            lr.setParameters(new Object[]{ param });
-            LogManager.backLog(lr);
-        } else
-            logMan.log(level, message, param);
+        engine.log(level, message, param);
     }
+
 
     /**
      * Logs a format string message with the given importance. Message will
@@ -249,95 +210,8 @@ public class TerrainControl
      */
     public static void log(Level level, String message, Object[] params)
     {
-        if (logMan == null)
-        {
-            LogRecord lr = new LogRecord(level, message);
-            lr.setParameters(params);
-            LogManager.backLog(lr);
-        } else
-            logMan.log(level, message, params);
+        engine.log(level, message, params);
     }
-
-    /**
-     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
-     * level matches the level provided. Message will be prefixed with
-     * [TerrainControl], so don't do that yourself.
-     * <p/>
-     * @param ifLevel  the Log level to test for
-     * @param declared The Log level that will be shown to the user
-     * @param messages The messages to log.
-     */
-    public static void logIfLevel(Level ifLevel, String... messages)
-    {
-        if (logMan == null)
-        {
-            throw new UnsupportedOperationException("Only basic logs are supported while TerrainControl is getting started");
-        } else
-            logMan.logIfLevel(ifLevel, messages);
-    }
-
-    /**
-     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
-     * level matches the level provided. Message will be prefixed with
-     * [TerrainControl], so don't do that yourself.
-     * <p/>
-     * @param ifLevel  the Log level to test for
-     * @param declared The Log level that will be shown to the user
-     * @param message  The messages to log formatted similar to
-     *                 Logger.log() with the same args.
-     * @param params   The parameters belonging to {0...} in the message
-     *                 string
-     */
-    public static void logIfLevel(Level ifLevel, String message, Object[] params)
-    {
-        if (logMan == null)
-        {
-            throw new UnsupportedOperationException("Only basic logs are supported while TerrainControl is getting started");
-        } else
-            logMan.logIfLevel(ifLevel, message, params);
-    }
-
-    /**
-     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
-     * level is between the min/max provided. Message will be prefixed with
-     * [TerrainControl], so don't do that yourself.
-     * <p/>
-     * @param min      The minimum Log level to test for
-     * @param max      The maximum Log level to test for
-     * @param declared The Log level that will be shown to the user
-     * @param messages The messages to log.
-     */
-    public static void logIfLevel(Level min, Level max, String... messages)
-    {
-        if (logMan == null)
-        {
-            throw new UnsupportedOperationException("Only basic logs are supported while TerrainControl is getting started");
-        } else
-            logMan.logIfLevel(min, max, messages);
-    }
-
-    /**
-     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
-     * level is between the min/max provided. Message will be prefixed with
-     * [TerrainControl], so don't do that yourself.
-     * <p/>
-     * @param min      The minimum Log level to test for
-     * @param max      The maximum Log level to test for
-     * @param declared The Log level that will be shown to the user
-     * @param message  The messages to log formatted similar to
-     *                 Logger.log() with the same args.
-     * @param params   The parameters belonging to {0...} in the message
-     *                 string
-     */
-    public static void logIfLevel(Level min, Level max, String message, Object[] params)
-    {
-        if (logMan == null)
-        {
-            throw new UnsupportedOperationException("Only basic logs are supported while TerrainControl is getting started");
-        } else
-            logMan.logIfLevel(min, max, message, params);
-    }
-
     
     /**
      * Prints the stackTrace of the provided Throwable object
@@ -349,6 +223,7 @@ public class TerrainControl
         printStackTrace(level, e, Integer.MAX_VALUE);
     }
 
+
     /**
      * Prints the stackTrace of the provided Throwable object to a certain depth
      * @param level The log level to log this stack trace at
@@ -357,18 +232,10 @@ public class TerrainControl
      */
     public static void printStackTrace(Level level, Throwable e, int maxDepth)
     {
-        StringBuilder sb = new StringBuilder();
-        int count = 0;
-        for (StackTraceElement element : e.getStackTrace())
-        {
-            sb.append(element.toString());
-            sb.append("\n");
-            if (++count > maxDepth)
-            {
-                break;
-            }
-        }
-        TerrainControl.log(level, sb.toString());
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        e.printStackTrace(printWriter);
+        TerrainControl.log(level, stringWriter.toString());
     }
 
     /**

@@ -15,8 +15,15 @@ public abstract class ConfigFile
 
     private BufferedWriter settingsWriter;
     public final String name;
+
     public File file;
     public boolean readSuccess;
+    
+    /**
+     * True if the file does not exist yet on disk, false otherwise. Used to
+     * provide backwards compatible default settings.
+     */
+    protected final boolean isNewConfig;
 
     /**
      * Creates a new configuration file. Determines which extension to use out
@@ -58,7 +65,7 @@ public abstract class ConfigFile
         }
 
         this.name = name;
-
+        this.isNewConfig = !file.exists();
 
         if (name == null)
         {
@@ -82,6 +89,7 @@ public abstract class ConfigFile
     {
         this.name = name;
         this.file = file;
+        this.isNewConfig = (file == null || !file.exists());
 
         if (name == null)
         {
@@ -215,12 +223,7 @@ public abstract class ConfigFile
     protected void logFileNotFound(File logFile)
     {
         String logName = logFile.getName();
-        TerrainControl.logIfLevel(Level.CONFIG, Level.WARNING, "File not found: " + logName);
-        TerrainControl.logIfLevel(Level.FINER, Level.FINE, "File not found: {0} in {1}", new Object[]
-        {
-            logName, logFile.getParentFile().getName()
-        });
-        TerrainControl.logIfLevel(Level.FINEST, "File not found: {0} in {1}", new Object[]
+        TerrainControl.log(Level.CONFIG, "File not found: {0} in {1}", new Object[]
         {
             logName, logFile.getAbsolutePath()
         });

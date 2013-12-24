@@ -1,0 +1,109 @@
+package com.khorn.terraincontrol.generator.surface;
+
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class SimpleSurfaceGenerator implements SurfaceGenerator
+{
+    public static class LayerChoice implements Comparable<LayerChoice>
+    {
+        public final int surfaceBlockId;
+        public final byte surfaceBlockData;
+        public final int groundBlockId;
+        public final byte groundBlockData;
+        public final float maxNoise;
+
+        public LayerChoice(int surfaceBlockId, byte surfaceBlockData, int groundBlockId, byte groundBlockData, float maxNoise)
+        {
+            this.surfaceBlockId = surfaceBlockId;
+            this.surfaceBlockData = surfaceBlockData;
+            this.groundBlockId = groundBlockId;
+            this.groundBlockData = groundBlockData;
+            this.maxNoise = maxNoise;
+        }
+
+        @Override
+        public int compareTo(LayerChoice that)
+        {
+            float delta = this.maxNoise - that.maxNoise;
+            // The number 65565 is just randomly chosen, any positive number
+            // works fine as long as it can represent the floating point delta
+            // as an integer
+            return (int) (delta * 65565);
+        }
+    }
+
+    // Must be sorted based on the noise field
+    private List<LayerChoice> layerChoices;
+
+    public SimpleSurfaceGenerator(String[] args) throws InvalidConfigException
+    {
+        if (args.length < 2)
+        {
+            throw new InvalidConfigException("Needs at least two arguments");
+        }
+        
+        layerChoices = new ArrayList<LayerChoice>();
+        for (int i = 0; i < args.length - 2; i += 3)
+        {
+            int surfaceBlockId = StringHelper.readBlockId(args[i]);
+            byte surfaceBlockData = (byte) StringHelper.readBlockData(args[i]);
+            int groundBlockId = StringHelper.readBlockId(args[i+1]);
+            byte groundBlockData = (byte) StringHelper.readBlockData(args[i+1]);
+            float maxNoise = (float) StringHelper.readDouble(args[i + 2], -20, 20);
+            layerChoices.add(new LayerChoice(surfaceBlockId, surfaceBlockData, groundBlockId, groundBlockData, maxNoise));
+        }
+        Collections.sort(layerChoices);
+    }
+
+    @Override
+    public void spawn(LocalWorld world, double noise, int x, int z)
+    {
+        int y = world.getSolidHeight(x, z) - 1;
+        BiomeConfig config = world.getSettings().biomeConfigs[world.getBiomeId(x, z)];
+        if (config == null || world.getTypeId(x, y, z) != config.surfaceBlock)
+        {
+            // Not the correct surface block here, so don't replace it
+            // This can happen when another chunk populated part of this chunk
+            return;
+        }
+
+        for (LayerChoice layer : this.layerChoices)
+        {
+            if (noise <= layer.maxNoise)
+            {
+                world.setBlock(x, y, z, layer.surfaceBlockId, layer.surfaceBlockData);
+                for (int i = 1; i < 4; i++)
+                {
+                    world.setBlock(x, y - i, z, layer.groundBlockId, layer.groundBlockData);
+                }
+                return;
+            }
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (LayerChoice groundLayer : this.layerChoices)
+        {
+            stringBuilder.append(StringHelper.makeMaterial(groundLayer.surfaceBlockId, groundLayer.surfaceBlockData));
+            stringBuilder.append(',');
+            stringBuilder.append(StringHelper.makeMaterial(groundLayer.groundBlockId, groundLayer.groundBlockData));
+            stringBuilder.append(',');
+            stringBuilder.append(groundLayer.maxNoise);
+            stringBuilder.append(',');
+        }
+        // Delete last ','
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        return stringBuilder.toString();
+    }
+
+}

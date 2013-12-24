@@ -2,16 +2,13 @@ package com.khorn.terraincontrol.bukkit.commands.runnable;
 
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
+import net.minecraft.server.v1_7_R1.*;
+import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
 
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
-
-import net.minecraft.server.v1_6_R3.*;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_6_R3.CraftWorld;
-
 
 public class BiomeReplace implements Runnable
 {

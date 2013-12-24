@@ -3,12 +3,11 @@ package com.khorn.terraincontrol.bukkit.generator.structures;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+import net.minecraft.server.v1_7_R1.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import net.minecraft.server.v1_6_R3.*;
 
 public class NetherFortressGen extends StructureGenerator
 {
@@ -70,9 +69,9 @@ public class NetherFortressGen extends StructureGenerator
 
     // Two methods to help MCPC+ dynamically rename things.
     // It has problems with classes that extend native Minecraft classes
-    public void prepare(World world, int chunkX, int chunkZ, byte[] chunkArray)
+    public void prepare(World world, int chunkX, int chunkZ)
     {
-        a(null, world, chunkX, chunkZ, chunkArray);
+        a(null, world, chunkX, chunkZ, null);
     }
 
     public void place(World world, Random random, int chunkX, int chunkZ)

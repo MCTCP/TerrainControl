@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import net.minecraft.server.v1_7_R1.BiomeBase;
 
-import net.minecraft.server.v1_6_R3.BiomeBase;
 
 public class NullBiome extends BukkitBiome
 {

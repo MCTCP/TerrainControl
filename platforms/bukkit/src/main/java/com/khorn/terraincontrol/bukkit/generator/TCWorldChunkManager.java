@@ -4,14 +4,14 @@ import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+import net.minecraft.server.v1_7_R1.BiomeBase;
+import net.minecraft.server.v1_7_R1.ChunkPosition;
+import net.minecraft.server.v1_7_R1.WorldChunkManager;
+import net.minecraft.server.v1_7_R1.WorldGenVillage;
 
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.server.v1_6_R3.BiomeBase;
-import net.minecraft.server.v1_6_R3.ChunkPosition;
-import net.minecraft.server.v1_6_R3.WorldChunkManager;
-import net.minecraft.server.v1_6_R3.WorldGenVillage;
 
 public class TCWorldChunkManager extends WorldChunkManager
 {
@@ -31,19 +31,13 @@ public class TCWorldChunkManager extends WorldChunkManager
     @Override
     public BiomeBase getBiome(int paramInt1, int paramInt2)
     {
-        return BiomeBase.biomes[biomeManager.getBiome(paramInt1, paramInt2)];
+        return BiomeBase.getBiome(biomeManager.getBiome(paramInt1, paramInt2));
     }
 
     @Override
     public float[] getWetness(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         return biomeManager.getRainfall(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
-    }
-
-    @Override
-    public float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
-    {
-        return biomeManager.getTemperatures(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
     }
 
     @Override
@@ -55,16 +49,15 @@ public class TCWorldChunkManager extends WorldChunkManager
         }
 
         int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
-
         if (localWorld.haveVirtualBiomes)
             for (int i = 0; i < paramInt3 * paramInt4; i++)
             {
-                paramArrayOfBiomeBase[i] = BiomeBase.biomes[localWorld.virtualBiomesMatrix[arrayOfInt[i]]];
+                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localWorld.virtualBiomesMatrix[arrayOfInt[i]]);
             }
         else
             for (int i = 0; i < paramInt3 * paramInt4; i++)
             {
-                paramArrayOfBiomeBase[i] = BiomeBase.biomes[arrayOfInt[i]];
+                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(arrayOfInt[i]);
             }
 
         return paramArrayOfBiomeBase;
@@ -83,12 +76,12 @@ public class TCWorldChunkManager extends WorldChunkManager
         if (localWorld.haveVirtualBiomes)
             for (int i = 0; i < paramInt3 * paramInt4; i++)
             {
-                paramArrayOfBiomeBase[i] = BiomeBase.biomes[localWorld.virtualBiomesMatrix[localObject[i]]];
+                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localWorld.virtualBiomesMatrix[localObject[i]]);
             }
         else
             for (int i = 0; i < paramInt3 * paramInt4; i++)
             {
-                paramArrayOfBiomeBase[i] = BiomeBase.biomes[localObject[i]];
+                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localObject[i]);
             }
 
         return paramArrayOfBiomeBase;
@@ -102,7 +95,7 @@ public class TCWorldChunkManager extends WorldChunkManager
         // Hack for villages in other biomes
         // (The alternative would be to completely override the village spawn
         // code)
-        if (paramList == WorldGenVillage.e)
+        if (paramList == WorldGenVillage.e && localWorld.villageGen != null)
         {
             paramList = localWorld.villageGen.villageSpawnBiomes;
         }
@@ -145,7 +138,7 @@ public class TCWorldChunkManager extends WorldChunkManager
                 continue;
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            BiomeBase localBiomeBase = BiomeBase.biomes[arrayOfInt[i3]];
+            BiomeBase localBiomeBase = BiomeBase.getBiome(arrayOfInt[i3]);
             if ((!paramList.contains(localBiomeBase)) || ((localChunkPosition != null) && (paramRandom.nextInt(i2 + 1) != 0)))
                 continue;
             localChunkPosition = new ChunkPosition(i4, 0, i5);

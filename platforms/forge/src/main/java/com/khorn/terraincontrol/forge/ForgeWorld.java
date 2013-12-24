@@ -43,8 +43,8 @@ public class ForgeWorld implements LocalWorld
     private BiomeGenerator biomeManager;
 
     private static int nextBiomeId = 0;
-    
-    //>>	This will likely change in 1.7
+
+    // >> This will likely change in 1.7
     private static final int maxBiomeCount = (Byte.MIN_VALUE * -2);
     private static ForgeBiome[] biomes = new ForgeBiome[maxBiomeCount];
     private static BiomeGenBase[] biomesToRestore = new BiomeGenBase[maxBiomeCount];
@@ -81,9 +81,6 @@ public class ForgeWorld implements LocalWorld
 
     private BiomeGenBase[] biomeGenBaseArray;
     private int[] biomeIntArray;
-
-    private int worldHeight = 128;
-    private int heightBits = 7;
 
     public static void restoreBiomes()
     {
@@ -180,14 +177,6 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public float[] getTemperatures(int x, int z, int x_size, int z_size)
-    {
-        if (this.biomeManager != null)
-            return this.biomeManager.getTemperatures(null, x, z, x_size, z_size);
-        return this.world.provider.worldChunkMgr.getTemperatures(new float[0], x, z, x_size, z_size);
-    }
-
-    @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         if (this.biomeManager != null)
@@ -217,18 +206,18 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry)
+    public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
     {
         if (this.settings.worldConfig.strongholdsEnabled)
-            this.strongholdGen.generate(null, this.world, x, z, chunkArray);
+            this.strongholdGen.generate(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.mineshaftsEnabled)
-            this.mineshaftGen.generate(null, this.world, x, z, chunkArray);
+            this.mineshaftGen.generate(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.villagesEnabled && dry)
-            this.villageGen.generate(null, this.world, x, z, chunkArray);
+            this.villageGen.generate(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.rareBuildingsEnabled)
-            this.rareBuildingGen.generate(null, this.world, x, z, chunkArray);
+            this.rareBuildingGen.generate(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.netherFortressesEnabled)
-            this.netherFortressGen.generate(null, this.world, x, z, chunkArray);
+            this.netherFortressGen.generate(null, this.world, chunkX, chunkZ, null);
 
     }
 
@@ -272,19 +261,19 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
+    public boolean placeDefaultStructures(Random rand, int chunkX, int chunkZ)
     {
         boolean isVillagePlaced = false;
         if (this.settings.worldConfig.strongholdsEnabled)
-            this.strongholdGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            this.strongholdGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
         if (this.settings.worldConfig.mineshaftsEnabled)
-            this.mineshaftGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            this.mineshaftGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
         if (this.settings.worldConfig.villagesEnabled)
-            isVillagePlaced = this.villageGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            isVillagePlaced = this.villageGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
         if (this.settings.worldConfig.rareBuildingsEnabled)
-            this.rareBuildingGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            this.rareBuildingGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
         if (this.settings.worldConfig.netherFortressesEnabled)
-            this.netherFortressGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            this.netherFortressGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
 
         return isVillagePlaced;
     }
@@ -371,7 +360,7 @@ public class ForgeWorld implements LocalWorld
 
     private Chunk getChunk(int x, int y, int z)
     {
-        if (y < 0 || y >= this.worldHeight)
+        if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
             return null;
 
         x >>= 4;
@@ -398,7 +387,7 @@ public class ForgeWorld implements LocalWorld
             return -1;
         z &= 0xF;
         x &= 0xF;
-        for (int y = worldHeight - 1; y > 0; y--)
+        for (int y = 255; y > 0; y--)
         {
             int id = chunk.getBlockID(x, y, z);
             if (DefaultMaterial.getMaterial(id).isLiquid())
@@ -531,7 +520,7 @@ public class ForgeWorld implements LocalWorld
         z &= 0xF;
         x &= 0xF;
         int y = chunk.getHeightValue(x, z);
-        while (chunk.getBlockID(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight)
+        while (chunk.getBlockID(x, y, z) != DefaultMaterial.AIR.id && y <= 256)
         {
             // Fix for incorrect lightmap
             y += 1;
@@ -584,15 +573,15 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public int getHeight()
+    public int getHeightCap()
     {
-        return this.worldHeight;
+        return settings.worldConfig.worldHeightCap;
     }
 
     @Override
-    public int getHeightBits()
+    public int getHeightScale()
     {
-        return heightBits;
+        return settings.worldConfig.worldScale;
     }
 
     public ChunkProvider getChunkGenerator()
@@ -654,13 +643,6 @@ public class ForgeWorld implements LocalWorld
     public World getWorld()
     {
         return this.world;
-    }
-
-    @Override
-    public void setHeightBits(int heightBits)
-    {
-        this.heightBits = heightBits;
-        this.worldHeight = 1 << heightBits;
     }
 
     public void FillChunkForBiomes(Chunk chunk, int x, int z)

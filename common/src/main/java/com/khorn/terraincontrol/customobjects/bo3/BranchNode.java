@@ -1,14 +1,15 @@
-package com.khorn.terraincontrol.customobjects;
+package com.khorn.terraincontrol.customobjects.bo3;
 
+
+import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.util.Rotation;
 
-import java.util.Comparator;
 
 /**
- * A Node class to be used in collections to represent a branch that comes with
- * an associated rotation and chance.
+ * Simple class to hold the spawn chance and rotation of a BO3 in the Branch or
+ * WeightedBranch function in the BO3 file.
  */
-public class BranchNode
+public class BranchNode implements Comparable<BranchNode>
 {
 
     /**
@@ -28,9 +29,10 @@ public class BranchNode
      * Creates an instance of BranchNode with given rotation, chance, and branch
      * fields
      * <p/>
+     * 
      * @param rotation The rotation of the branch
-     * @param chance   The spawn chance of the branch
-     * @param branch   The branch
+     * @param chance The spawn chance of the branch
+     * @param branch The branch
      */
     public BranchNode(Rotation rotation, double chance, CustomObject branch)
     {
@@ -63,32 +65,18 @@ public class BranchNode
         return customObject;
     }
 
-    private static class BranchChanceComparator implements Comparator<BranchNode>
-    {
-
-        @Override
-        public int compare(BranchNode o1, BranchNode o2)
-        {
-            return (int) (o1.chance - o2.chance);
-        }
-
-    }
-
-    /**
-     * @return a BranchNode comparator that compares each Node based on the
-     *         chance field
-     */
-    public static Comparator<BranchNode> getComparator()
-    {
-        return new BranchChanceComparator();
-    }
-
     /**
      * @return The string representation of this branch as seen in BO3 configs
      */
     public String toBranchString()
     {
         return ',' + customObject.getName() + ',' + rotation.name() + ',' + chance;
+    }
+
+    @Override
+    public int compareTo(BranchNode that)
+    {
+        return (int) (this.chance - that.chance);
     }
 
 }

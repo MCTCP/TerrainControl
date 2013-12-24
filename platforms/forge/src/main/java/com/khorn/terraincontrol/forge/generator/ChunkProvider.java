@@ -60,7 +60,7 @@ public class ChunkProvider implements IChunkProvider
             for (int blockZ = 0; blockZ < 16; blockZ++)
                 for (int blockY = 0; blockY < i1; blockY++)
                 {
-                    int block = BlockArray[(blockX << world.getHeightBits() + 4 | blockZ << world.getHeightBits() | blockY)];
+                    int block = BlockArray[(blockX << ChunkProviderTC.HEIGHT_BITS_PLUS_FOUR | blockZ << ChunkProviderTC.HEIGHT_BITS | blockY)];
                     if (block != 0)
                     {
                         int sectionId = blockY >> 4;

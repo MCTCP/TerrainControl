@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.util.minecraftTypes;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public enum DefaultMaterial
@@ -25,7 +25,7 @@ public enum DefaultMaterial
     IRON_ORE(15),
     COAL_ORE(16),
     LOG(17),
-    LEAVES(18),
+    LEAVES(18, false),
     SPONGE(19),
     GLASS(20),
     LAPIS_ORE(21),
@@ -103,6 +103,7 @@ public enum DefaultMaterial
     DIODE_BLOCK_OFF(93, false),
     DIODE_BLOCK_ON(94, false),
     LOCKED_CHEST(95, false),
+    STAINED_GLASS(95, false),
     TRAP_DOOR(96, false),
     MONSTER_EGGS(97),
     SMOOTH_BRICK(98),
@@ -167,10 +168,17 @@ public enum DefaultMaterial
     ACTIVATOR_RAIL(157, false),
     DROPPER(158),
     STAINED_CLAY(159),
+    STAINED_GLASS_PANE(160, false),
+    LEAVES_2(161, false),
+    LOG_2(162),
+    ACACIA_STAIRS(163, false),
+    DARK_OAK_STAIRS(164, false),
     HAY_BLOCK(170),
     CARPET(171, false),
     HARD_CLAY(172),
     COAL_BLOCK(173),
+    PACKED_ICE(174, false),
+    DOUBLE_PLANT(175, false),
     UNKNOWN_BLOCK(255);
     /**
      * The ID of the material
@@ -178,18 +186,17 @@ public enum DefaultMaterial
     public final int id;
     /**
      * Whether or not a material is solid. If set to false, it will prevent
-     * snowfall.
-     * Note: this isn't always equal to what Minecraft calls solid.
+     * snowfall. Note: this isn't always equal to what Minecraft calls solid.
      */
     private final boolean solid;
 
     /**
      * Creates a new material.
-     * <p/>
-     * @param id    Id of the material.
+     *
+     * @param id Id of the material.
      * @param solid Whether the material is solid. If set to false, it will
-     *              prevent snowfall.
-     *              Note: this isn't always equal to what Minecraft calls solid.
+     *            prevent snowfall. Note: this isn't always equal to what
+     *            Minecraft calls solid.
      */
     private DefaultMaterial(int id, boolean solid)
     {
@@ -199,7 +206,7 @@ public enum DefaultMaterial
 
     /**
      * Creates a new solid material where snow will fall on.
-     * <p/>
+     *
      * @param id Id of the material.
      */
     private DefaultMaterial(int id)
@@ -210,9 +217,9 @@ public enum DefaultMaterial
 
     /**
      * Returns true only if this material is flowing or stationary Water
-     * <p/>
-     * @return boolean whether or not this material is flowing or
-     *         stationary Water
+     *
+     * @return boolean whether or not this material is flowing or stationary
+     *         Water
      */
     public boolean isLiquid()
     {
@@ -220,16 +227,30 @@ public enum DefaultMaterial
     }
 
     /**
-     * Returns the solid value of the material. When returns false, it will
-     * prevent snowfall.
-     * Note: this isn't always equal to what Minecraft calls solid.
-     * <p/>
+     * Gets whether this material is solid. Materials that aren't solid are
+     * nonexistant for {@link LocalWorld#getSolidHeight(int, int)}. Note: this
+     * isn't always equal to what Minecraft calls solid.
+     *
      * @return boolean Whether or not the material is considered solid
      */
     public boolean isSolid()
     {
         return this.solid;
     }
+
+    /**
+     * Gets whether snow can fall on this block.
+     *
+     * @return Whether snow can fall on this block.
+     */
+    public boolean canSnowFallOn()
+    {
+        // Exceptions for nonsolid leaves
+        // IF we get much more exceptions, we may want to make this a
+        // parameter in the constructor instead.
+        return this == LEAVES || this == LEAVES_2 || this.solid;
+    }
+
     /**
      * A DefaultMaterial lookup table with the material ID as the index
      */
@@ -242,7 +263,7 @@ public enum DefaultMaterial
     static
     {
         lookupID = new DefaultMaterial[256];
-        lookupName = new HashMap<String, DefaultMaterial>();
+        lookupName = new TreeMap<String, DefaultMaterial>(String.CASE_INSENSITIVE_ORDER);
 
         for (DefaultMaterial material : DefaultMaterial.values())
         {
@@ -252,10 +273,11 @@ public enum DefaultMaterial
     }
 
     /**
-     * Returns a DefaultMaterial object with the given material name
-     * <p/>
+     * Returns a DefaultMaterial object with the given material name. Name is
+     * case insensitive.
+     * 
      * @param name the Name of the DefaultMaterial that is to be returned
-     * <p/>
+     *            <p/>
      * @return A DefaultMaterial with the given name
      */
     public static DefaultMaterial getMaterial(String name)
@@ -267,8 +289,9 @@ public enum DefaultMaterial
      * Returns true or false depending on if this DefaultMaterial has the
      * given name
      * <p/>
+     * 
      * @param name The string name to test this.Name against
-     * <p/>
+     *            <p/>
      * @return Boolean whether or not this DefaultMaterial has the given name
      */
     public static boolean contains(String name)
@@ -279,8 +302,9 @@ public enum DefaultMaterial
     /**
      * Returns a DefaultMaterial object with the given material ID
      * <p/>
+     * 
      * @param id the ID of the DefaultMaterial that is to be returned
-     * <p/>
+     *            <p/>
      * @return A DefaultMaterial with the given ID
      */
     public static DefaultMaterial getMaterial(int id)
@@ -296,8 +320,9 @@ public enum DefaultMaterial
      * Returns true or false depending on if this DefaultMaterial has the
      * given ID
      * <p/>
+     * 
      * @param id The integer ID to test this.id against
-     * <p/>
+     *            <p/>
      * @return Boolean whether or not this DefaultMaterial has the given id
      */
     public static boolean contains(int id)

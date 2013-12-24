@@ -1,5 +1,12 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+
+import com.khorn.terraincontrol.generator.surface.MesaSurfaceGenerator;
+import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
+import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
+import com.khorn.terraincontrol.generator.resource.IceSpikeGen;
+import com.khorn.terraincontrol.generator.resource.PlantType;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
@@ -58,13 +65,14 @@ public class BiomeConfig extends ConfigFile
     public float BiomeHeight;
     public float BiomeVolatility;
     public int SmoothRadius;
-    
-    public float BiomeTemperature;
-    public float BiomeWetness;
-    
-    public int StoneBlock;
-    public int SurfaceBlock;
-    public int GroundBlock;
+
+    public float biomeTemperature;
+    public float biomeWetness;
+
+    public int stoneBlock;
+    public int surfaceBlock;
+    public int groundBlock;
+    public SurfaceGenerator surfaceAndGroundControl;
     
     public String ReplaceBiomeName;
     
@@ -149,7 +157,7 @@ public class BiomeConfig extends ConfigFile
         super(biome.getName(), settingsDir, BiomeStandardValues.BiomeConfigExtensions.stringArrayListValue(), TerrainControl.getPluginConfig().worldDefaultBiomeConfigExtension);
         this.Biome = biome;
         this.worldConfig = config;
-        this.defaultSettings = StandardBiomeFactory.getDefaultSettings(biome, config.WorldHeight);
+        this.defaultSettings = StandardBiomeFactory.getDefaultSettings(biome, config.worldHeightCap);
 
         this.readSettingsFile(false);
     }
@@ -159,7 +167,7 @@ public class BiomeConfig extends ConfigFile
         super(biome.getName(), biomeFile);
         this.Biome = biome;
         this.worldConfig = config;
-        this.defaultSettings = StandardBiomeFactory.getDefaultSettings(biome, config.WorldHeight);
+        this.defaultSettings = StandardBiomeFactory.getDefaultSettings(biome, config.worldHeightCap);
 
         this.readSettingsFile(false);
     }
@@ -167,6 +175,11 @@ public class BiomeConfig extends ConfigFile
     public void process()
     {
         if (!processHasRun)
+        {
+        this.correctSettings();
+
+        // Add default resources when needed
+        if (isNewConfig)
         {
             this.processHasRun = true;
             this.renameOldSettings();
@@ -191,6 +204,7 @@ public class BiomeConfig extends ConfigFile
             if (Biome.isCustom() && !Biome.isVirtual())
                 Biome.setEffects(this);
         }
+        }
     }
     
     public void outputToFile()
@@ -213,16 +227,6 @@ public class BiomeConfig extends ConfigFile
             if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
                 this.writeSettingsFile(this.worldConfig.SettingsMode == WorldConfig.ConfigMode.WriteAll);
         }
-    }
-
-    public int getTemperature()
-    {
-        return (int) (this.BiomeTemperature * 65536.0F);
-    }
-
-    public int getWetness()
-    {
-        return (int) (this.BiomeWetness * 65536.0F);
     }
 
     public SaplingGen getSaplingGen(SaplingType type)
@@ -250,8 +254,8 @@ public class BiomeConfig extends ConfigFile
         this.BiomeIsBorder = readModSettings(BiomeStandardValues.BiomeIsBorder, defaultSettings.defaultBorder);
         this.NotBorderNear = readModSettings(BiomeStandardValues.NotBorderNear, defaultSettings.defaultNotBorderNear);
 
-        this.BiomeTemperature = readModSettings(BiomeStandardValues.BiomeTemperature, defaultSettings.defaultBiomeTemperature);
-        this.BiomeWetness = readModSettings(BiomeStandardValues.BiomeWetness, defaultSettings.defaultBiomeWetness);
+        this.biomeTemperature = readModSettings(BiomeStandardValues.BiomeTemperature, defaultSettings.defaultBiomeTemperature);
+        this.biomeWetness = readModSettings(BiomeStandardValues.BiomeWetness, defaultSettings.defaultBiomeWetness);
 
         this.ReplaceBiomeName = readSettings(BiomeStandardValues.ReplaceToBiomeName);
 
@@ -259,9 +263,10 @@ public class BiomeConfig extends ConfigFile
         this.BiomeVolatility = readModSettings(BiomeStandardValues.BiomeVolatility, defaultSettings.defaultBiomeVolatility);
         this.SmoothRadius = readSettings(BiomeStandardValues.SmoothRadius);
 
-        this.StoneBlock = readSettings(BiomeStandardValues.StoneBlock);
-        this.SurfaceBlock = readModSettings(BiomeStandardValues.SurfaceBlock, defaultSettings.defaultSurfaceBlock);
-        this.GroundBlock = readModSettings(BiomeStandardValues.GroundBlock, defaultSettings.defaultGroundBlock);
+        this.stoneBlock = readSettings(BiomeStandardValues.StoneBlock);
+        this.surfaceBlock = readModSettings(BiomeStandardValues.SurfaceBlock, defaultSettings.defaultSurfaceBlock);
+        this.groundBlock = readModSettings(BiomeStandardValues.GroundBlock, defaultSettings.defaultGroundBlock);
+        this.surfaceAndGroundControl = readSurfaceAndGroundControlSettings();
 
         this.UseWorldWaterLevel = readSettings(BiomeStandardValues.UseWorldWaterLevel);
         this.waterLevelMax = readSettings(BiomeStandardValues.WaterLevelMax);
@@ -310,9 +315,10 @@ public class BiomeConfig extends ConfigFile
         this.ReadCustomObjectSettings();
         this.ReadReplaceSettings();
         this.ReadResourceSettings();
-        this.heightMatrix = new double[this.worldConfig.WorldHeight / 8 + 1];
+
+        this.heightMatrix = new double[this.worldConfig.worldHeightCap / 8 + 1];
         this.readHeightSettings(this.heightMatrix, BiomeStandardValues.CustomHeightControl);
-        this.riverHeightMatrix = new double[this.worldConfig.WorldHeight / 8 + 1];
+        this.riverHeightMatrix = new double[this.worldConfig.worldHeightCap / 8 + 1];
         this.readHeightSettings(this.riverHeightMatrix, BiomeStandardValues.RiverCustomHeightControl);
     }
 
@@ -327,6 +333,28 @@ public class BiomeConfig extends ConfigFile
         {
             logSettingValueInvalid(setting.name(), e);
         }
+    }
+
+    private SurfaceGenerator readSurfaceAndGroundControlSettings()
+    {
+        String defaultValue = this.isNewConfig? StringHelper.join(defaultSettings.defaultSurfaceSurfaceAndGroundControl, ",") : "";
+        String settingValue = readModSettings(BiomeStandardValues.SurfaceAndGroundControl, defaultValue);
+        if (settingValue.length() > 0)
+        {
+            SurfaceGenerator mesa = MesaSurfaceGenerator.getFor(settingValue);
+            if (mesa != null) {
+                return mesa;
+            }
+            try
+            {
+                String[] parts = readComplexString(settingValue);
+                return new SimpleSurfaceGenerator(parts);
+            } catch (InvalidConfigException e)
+            {
+                logSettingValueInvalid(BiomeStandardValues.SurfaceAndGroundControl.name());
+            }
+        }
+        return null;
     }
 
     private void ReadReplaceSettings()
@@ -362,20 +390,20 @@ public class BiomeConfig extends ConfigFile
                     short blockData = (short) StringHelper.readBlockData(values[1]);
                     
                     int minY = 0;
-                    int maxY = worldConfig.WorldHeight - 1;
+                    int maxY = worldConfig.worldHeightCap - 1;
 
                     if (values.length == 4)
                     {
                         minY = Integer.valueOf(values[2]);
                         maxY = Integer.valueOf(values[3]);
-                        minY = applyBounds(minY, 0, worldConfig.WorldHeight - 1);
-                        maxY = applyBounds(maxY, minY, worldConfig.WorldHeight - 1);
+                        minY = applyBounds(minY, 0, worldConfig.worldHeightCap - 1);
+                        maxY = applyBounds(maxY, minY, worldConfig.worldHeightCap - 1);
                     }
 
                     if (this.replaceMatrixBlocks[fromBlockId] == null)
                     {
-                        this.replaceMatrixBlocks[fromBlockId] = new short[worldConfig.WorldHeight];
-                        for (int i = 0; i < worldConfig.WorldHeight; i++)
+                        this.replaceMatrixBlocks[fromBlockId] = new short[worldConfig.worldHeightCap];
+                        for (int i = 0; i < worldConfig.worldHeightCap; i++)
                             this.replaceMatrixBlocks[fromBlockId][i] = -1;
                     }
                     for (int y = minY; y <= maxY; y++)
@@ -715,18 +743,33 @@ public class BiomeConfig extends ConfigFile
 
         this.writeBigTitle("Blocks");
 
-        writeComment("Stone block id");
-        writeValue(BiomeStandardValues.StoneBlock, this.StoneBlock);
+        writeComment("Change this to generate something else than stone in the biome. Doesn't support block data.");
+        writeValue(BiomeStandardValues.StoneBlock, this.stoneBlock);
 
-        writeComment("Surface block id");
-        writeValue(BiomeStandardValues.SurfaceBlock, this.SurfaceBlock);
+        writeComment("Surface block id, usually 2, the id of grass. Doesn't support block data.");
+        writeValue(BiomeStandardValues.SurfaceBlock, this.surfaceBlock);
 
-        writeComment("Block id from stone to surface, like dirt in plain biome ");
-        writeValue(BiomeStandardValues.GroundBlock, this.GroundBlock);
+        writeComment("Block id from stone to surface, like dirt in most biomes. Doesn't support block data.");
+        writeValue(BiomeStandardValues.GroundBlock, this.groundBlock);
+
+        writeComment("Setting for biomes with more complex surface and ground blocks.");
+        writeComment("Each column in the world has a noise value from what appears to be -7 to 7.");
+        writeComment("Values near 0 are more common than values near -7 and 7. This setting is");
+        writeComment("used to change the surface block based on the noise value for the column.");
+        writeComment("Syntax: SurfaceBlock[:Data],GroundBlock[:Data],MaxNoise,[AnotherSurfaceBlock[:Data],[AnotherGroundBlock[:Data],MaxNoise[,...]]");
+        writeComment("Example: " + BiomeStandardValues.SurfaceAndGroundControl + ": STONE,STONE,-0.8,GRAVEL,STONE,0.0,DIRT,DIRT,10.0");
+        writeComment("  When the noise is below -0.8, stone is the surface and ground block, between -0.8 and 0");
+        writeComment("  gravel with stone just below and between 0.0 and 10.0 there's only dirt.");
+        writeComment("  Because 10.0 is higher than the noise can ever get, the normal " + BiomeStandardValues.SurfaceBlock);
+        writeComment("  and " + BiomeStandardValues.GroundBlock + " will never appear in this biome.");
+        writeComment("");
+        writeComment("Alternatively, you can use Mesa, MesaForest or MesaBryce to get blocks");
+        writeComment("like the blocks found in the Mesa biomes.");
+        writeValue(BiomeStandardValues.SurfaceAndGroundControl, this.surfaceAndGroundControl == null ? "" : this.surfaceAndGroundControl.toString());
 
         writeComment("Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])");
         writeComment("Example :");
-        writeComment("  ReplacedBlocks:(GRASS,DIRT,100,127),(GRAVEL,GLASS)");
+        writeComment("  ReplacedBlocks: (GRASS,DIRT,100,127),(GRAVEL,GLASS)");
         writeComment("Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
         WriteModReplaceSettings();
 
@@ -748,11 +791,26 @@ public class BiomeConfig extends ConfigFile
         this.writeBigTitle("Visuals and weather");
         this.writeComment("Most of the settings here only have an effect on players with the client version of Terrain Control installed.");
 
-        writeComment("Biome temperature. Float value from 0.0 to 1.0.");
-        writeValue(BiomeStandardValues.BiomeTemperature, this.BiomeTemperature);
+        writeComment("Biome temperature. Float value from 0.0 to 2.0.");
+        if (this.Biome.isCustom())
+        {
+            writeComment("When this value is around 0.2, snow will fall on mountain peaks above y=90.");
+            writeComment("When this value is around 0.1, the whole biome will be covered in snow and ice.");
+        } else
+        {
+            writeComment("On default biomes, this won't do anything except changing the grass and leaves colors slightly.");
+        }
+        writeValue(BiomeStandardValues.BiomeTemperature, this.biomeTemperature);
 
         writeComment("Biome wetness. Float value from 0.0 to 1.0.");
-        writeValue(BiomeStandardValues.BiomeWetness, this.BiomeWetness);
+        if (this.Biome.isCustom())
+        {
+            writeComment("When this is set to 0, no rain will fall.");
+        } else
+        {
+            writeComment("On default biomes, this won't do anything except changing the grass and leaves colors slightly.");
+        }
+        writeValue(BiomeStandardValues.BiomeWetness, this.biomeWetness);
 
         this.writeComment("Biome sky color.");
         this.writeColorValue(BiomeStandardValues.SkyColor, this.SkyColor);
@@ -790,8 +848,8 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("CustomObject(Object[,AnotherObject[,...]])");
         this.writeComment("CustomStructure([Object,Object_Chance[,AnotherObject,Object_Chance[,...]]])");
         this.writeComment("Tree(Frequency,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])");
-        this.writeComment("Plant(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
-        this.writeComment("Grass(Block,BlockData,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Plant(PlantType,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
+        this.writeComment("Grass(PlantType,Grouped/NotGrouped,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
         this.writeComment("Reed(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.writeComment("Cactus(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         this.writeComment("Liquid(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
@@ -799,17 +857,24 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("Vines(Frequency,Rarity,MinAltitude,MaxAltitude)");
         this.writeComment("Vein(Block[:Data],MinRadius,MaxRadius,Rarity,OreSize,OreFrequency,OreRarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..])");
         this.writeComment("Well(BaseBlock[:Data],HalfSlabBlock[:Data],WaterBlock[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..])");
+        this.writeComment("Boulder(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..]");
+        this.writeComment("IceSpike(Block[:Data],IceSpikeType,Frequency,Rarity,MinAltitude,MaxAltitude,Blocksource[,BlockSource2,...])");
         this.writeComment("");
         this.writeComment("Block and BlockSource: can be id or name, Frequency - is count of attempts for place resource");
         this.writeComment("Rarity: chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass");
         this.writeComment("MinAltitude and MaxAltitude: height limits");
         this.writeComment("BlockSource: mean where or whereupon resource will be placed ");
-        this.writeComment("TreeType: Tree - BigTree - Forest (a birch tree) - HugeMushroom (not a tree but still counts)");
-        this.writeComment("   Taiga1 - Taiga2 - JungleTree (the huge jungle tree) - GroundBush - CocoaTree");
+        this.writeComment("TreeType: Tree (original oak tree) - BigTree - Birch - TallBirch - SwampTree");
+        this.writeComment("   HugeMushroom (not a tree but still counts) - Taiga1 - Taiga2 - HugeTaiga1 - HugeTaiga2");
+        this.writeComment("   JungleTree (the huge jungle tree) - GroundBush - CocoaTree (smaller jungle tree)");
+        this.writeComment("   DarkOak (from the roofed forest biome) - Acacia");
         this.writeComment("   You can also use your own custom objects, as long as they have set Tree to true in their settings.");
         this.writeComment("TreeType_Chance: similar Rarity. Example:");
-        this.writeComment("  Tree(10,Taiga1,35,Taiga2,100) - plugin tries 10 times, for each attempt it tries to place Taiga1 (35% chance),");
-        this.writeComment("  if that fails, it attempts to place Taiga2 (100% chance).");
+        this.writeComment("   Tree(10,Taiga1,35,Taiga2,100) - plugin tries 10 times, for each attempt it tries to place Taiga1 (35% chance),");
+        this.writeComment("   if that fails, it attempts to place Taiga2 (100% chance).");
+        this.writeComment("PlantType: one of the plant types: " + StringHelper.join(PlantType.values(), ", "));
+        this.writeComment("   or simply Block[:Data]");
+        this.writeComment("IceSpikeType: one of the ice spike types: " + StringHelper.join(IceSpikeGen.SpikeType.values(), ","));
         this.writeComment("Object: can be a any kind of custom object (bo2 or bo3) but without the file extension. You can");
         this.writeComment("also use UseWorld to spawn one of the object in the WorldObjects folder and UseBiome to spawn");
         this.writeComment("one of the objects in the BiomeObjects setting. When using BO2s for UseWorld, the BO2 must have");
@@ -955,8 +1020,8 @@ public class BiomeConfig extends ConfigFile
             if (replaceMatrixBlocks[blockIdFrom] == null)
                 continue;
 
-            int previousReplaceTo = -1; // What the y coord just below had it's
-            // replace setting set to
+            // What the y coord just below had it's replace setting set to
+            int previousReplaceTo = -1; // 
             int yStart = 0;
 
             for (int y = 0; y <= replaceMatrixBlocks[blockIdFrom].length; y++)
@@ -969,7 +1034,8 @@ public class BiomeConfig extends ConfigFile
                     continue;
                 }
 
-                // Not the same as the previous entry, previous entry wasn't -1
+                // Not the same as the previous entry, previous entry wasn't
+                // -1
                 // So we have found the end of a replace setting
                 if (previousReplaceTo != -1)
                 {
@@ -991,7 +1057,8 @@ public class BiomeConfig extends ConfigFile
 
                 if (previousReplaceTo == -1)
                 {
-                    // Not the same as the previous entry, previous entry was -1
+                    // Not the same as the previous entry, previous entry was
+                    // -1
                     // So we have found the start of a new replace setting
                     yStart = y;
                     previousReplaceTo = currentReplaceTo;
@@ -1033,15 +1100,15 @@ public class BiomeConfig extends ConfigFile
     @Override
     protected void correctSettings()
     {
-        this.BiomeExtends = (this.BiomeExtends.equals("null") || this.BiomeExtends == null) ? "" : this.BiomeExtends;
+        this.BiomeExtends = (this.BiomeExtends == null || this.BiomeExtends.equals("null")) ? "" : this.BiomeExtends;
         this.BiomeSize = applyBounds(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
         this.BiomeHeight = (float) applyBounds(this.BiomeHeight, -10.0, 10.0);
         this.BiomeRarity = applyBounds(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
 
         this.SmoothRadius = applyBounds(this.SmoothRadius, 0, 32);
 
-        this.BiomeTemperature = applyBounds(this.BiomeTemperature, 0.0F, 1.0F);
-        this.BiomeWetness = applyBounds(this.BiomeWetness, 0.0F, 1.0F);
+        this.biomeTemperature = applyBounds(this.biomeTemperature, 0.0F, 2.0F);
+        this.biomeWetness = applyBounds(this.biomeWetness, 0.0F, 1.0F);
 
         this.IsleInBiome = filterBiomes(this.IsleInBiome, this.worldConfig.CustomBiomeIds.keySet());
         this.BiomeIsBorder = filterBiomes(this.BiomeIsBorder, this.worldConfig.CustomBiomeIds.keySet());
@@ -1053,8 +1120,8 @@ public class BiomeConfig extends ConfigFile
         this.volatilityWeight1 = (this.volatilityWeightRaw1 - 0.5D) * 24.0D;
         this.volatilityWeight2 = (0.5D - this.volatilityWeightRaw2) * 24.0D;
 
-        this.waterLevelMin = applyBounds(this.waterLevelMin, 0, this.worldConfig.WorldHeight - 1);
-        this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.WorldHeight - 1, this.waterLevelMin);
+        this.waterLevelMin = applyBounds(this.waterLevelMin, 0, this.worldConfig.worldHeightCap - 1);
+        this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.worldHeightCap - 1, this.waterLevelMin);
 
         this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomeIds.keySet().contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
 
@@ -1082,8 +1149,8 @@ public class BiomeConfig extends ConfigFile
         {
             if (!readModSettings(BiomeStandardValues.DisableNotchPonds, false))
             {
-                this.settingsCache.put("SmallLake(WATER,4,7,8," + this.worldConfig.WorldHeight + ")", "0");
-                this.settingsCache.put("SmallLake(LAVA,2,3,8," + (this.worldConfig.WorldHeight - 8) + ")", "1");
+                this.settingsCache.put("SmallLake(WATER,4,7,8," + this.worldConfig.worldHeightCap + ")", "0");
+                this.settingsCache.put("SmallLake(LAVA,2,3,8," + (this.worldConfig.worldHeightCap - 8) + ")", "1");
             }
 
         }
@@ -1113,7 +1180,7 @@ public class BiomeConfig extends ConfigFile
         }
 
         // FrozenRivers
-        if (!this.worldConfig.readModSettings(BiomeStandardValues.FrozenRivers, true))
+        if (!this.worldConfig.readModSettings(WorldStandardValues.FrozenRivers, true))
         {
             // User had disabled frozen rivers in the old WorldConfig
             // So ignore the default value of RiverBiome
@@ -1146,7 +1213,7 @@ public class BiomeConfig extends ConfigFile
 
                     String toData = "0";
                     String minHeight = "0";
-                    int maxHeight = worldConfig.WorldHeight;
+                    int maxHeight = worldConfig.worldHeightCap;
 
                     boolean longForm = false;
 
@@ -1186,8 +1253,8 @@ public class BiomeConfig extends ConfigFile
     {
         writeStringToStream(stream, this.name);
 
-        stream.writeFloat(this.BiomeTemperature);
-        stream.writeFloat(this.BiomeWetness);
+        stream.writeFloat(this.biomeTemperature);
+        stream.writeFloat(this.biomeWetness);
         stream.writeInt(this.SkyColor);
         stream.writeInt(this.WaterColor);
         stream.writeInt(this.GrassColor);
@@ -1202,8 +1269,8 @@ public class BiomeConfig extends ConfigFile
         this.Biome = biome;
         this.worldConfig = config;
 
-        this.BiomeTemperature = stream.readFloat();
-        this.BiomeWetness = stream.readFloat();
+        this.biomeTemperature = stream.readFloat();
+        this.biomeWetness = stream.readFloat();
         this.SkyColor = stream.readInt();
         this.WaterColor = stream.readInt();
         this.GrassColor = stream.readInt();
