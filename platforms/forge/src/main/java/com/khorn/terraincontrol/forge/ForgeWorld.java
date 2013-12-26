@@ -581,7 +581,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getHeightScale()
     {
-        return settings.worldConfig.worldScale;
+        return settings.worldConfig.worldHeightScale;
     }
 
     public ChunkProvider getChunkGenerator()

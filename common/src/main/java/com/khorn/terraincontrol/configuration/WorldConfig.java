@@ -16,7 +16,8 @@ import java.util.logging.Level;
 public class WorldConfig extends ConfigFile
 {
     public final File settingsDir;
-    private final Comparator<Entry<String,Integer>> CBV = new Comparator<Entry<String, Integer>>() {
+    private final Comparator<Entry<String, Integer>> CBV = new Comparator<Entry<String, Integer>>()
+    {
         @Override
         public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2)
         {
@@ -169,15 +170,18 @@ public class WorldConfig extends ConfigFile
     public int iceBiomesRarity;
 
     public int worldHeightScaleBits;
-    public int worldScale;
+    public int worldHeightScale;
     public int worldHeightCapBits;
     public int worldHeightCap;
 
     public long resourcesSeed;
-    
+
     /**
-     * Creates a WorldConfig from the WorldConfig.ini file found in the given directory.
-     * @param settingsDir The settings directory where the WorldConfig.ini is in.
+     * Creates a WorldConfig from the WorldConfig.ini file found in the given
+     * directory.
+     * 
+     * @param settingsDir The settings directory where the WorldConfig.ini is
+     *            in.
      * @param world The LocalWorld instance of the world.
      */
     public WorldConfig(File settingsDir, LocalWorld world)
@@ -187,7 +191,7 @@ public class WorldConfig extends ConfigFile
 
         // Read the WorldConfig file
         this.readSettingsFile();
-        // Fix older names 
+        // Fix older names
         this.renameOldSettings();
         // Set the local fields based on what was read from the file
         this.readConfigSettings();
@@ -201,10 +205,11 @@ public class WorldConfig extends ConfigFile
             this.writeSettingsFile(this.SettingsMode == ConfigMode.WriteAll);
 
     }
-    
+
     /**
-     * Creates an empty WorldConfig with no settings initialized.
-     * Used to read the WorldConfig from the TC network packet.
+     * Creates an empty WorldConfig with no settings initialized. Used to read
+     * the WorldConfig from the TC network packet.
+     * 
      * @param world The LocalWorld instance.
      */
     public WorldConfig(LocalWorld world)
@@ -339,7 +344,7 @@ public class WorldConfig extends ConfigFile
         // World and water height
         this.worldHeightScaleBits = readSettings(WorldStandardValues.WorldHeightScaleBits);
         this.worldHeightScaleBits = applyBounds(this.worldHeightScaleBits, 5, 8);
-        this.worldScale = 1 << this.worldHeightScaleBits;
+        this.worldHeightScale = 1 << this.worldHeightScaleBits;
         this.worldHeightCapBits = readSettings(WorldStandardValues.WorldHeightCapBits);
         this.worldHeightCapBits = applyBounds(this.worldHeightCapBits, this.worldHeightScaleBits, 8);
         this.worldHeightCap = 1 << this.worldHeightCapBits;
@@ -479,7 +484,7 @@ public class WorldConfig extends ConfigFile
                     VirtualBiomeRealIds.put(Integer.valueOf(keys[2]), Integer.valueOf(keys[1]));
                 } else
                     CustomBiomeIds.put(keys[0], -1);
-                
+
             } catch (NumberFormatException e)
             {
                 System.out.println("Wrong custom biome id settings: '" + biome + "'");
@@ -844,13 +849,13 @@ public class WorldConfig extends ConfigFile
     {
         String output = "";
         boolean first = true;
-        //>>	Custom Biome Id
+        // Custom biome id
         List<Entry<String, Integer>> cbi = new ArrayList<Entry<String, Integer>>(this.CustomBiomeIds.entrySet());
         Collections.sort(cbi, CBV);
-        //>>	Virutal Biome Id
+        // Virtual biome id
         List<Entry<String, Integer>> vbi = new ArrayList<Entry<String, Integer>>(this.VirtualBiomeIds.entrySet());
         Collections.sort(vbi, CBV);
-        //>>	Print all custom Biomes first
+        // Print all custom biomes first
         for (Iterator<Entry<String, Integer>> it = cbi.iterator(); it.hasNext();)
         {
             Entry<String, Integer> entry = it.next();
@@ -860,7 +865,7 @@ public class WorldConfig extends ConfigFile
                 first = false;
             output += entry.getKey() + ":" + String.valueOf(entry.getValue());
         }
-        //>>	Then Print all virtual Biomes
+        // Then print all virtual biomes
         for (Iterator<Entry<String, Integer>> it = vbi.iterator(); it.hasNext();)
         {
             Entry<String, Integer> entry = it.next();
