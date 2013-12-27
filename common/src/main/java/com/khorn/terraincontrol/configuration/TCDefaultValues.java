@@ -95,8 +95,8 @@ public enum TCDefaultValues implements TCSetting
     MaximumDistanceBetweenRareBuildings(32),
     RareBuildingType(BiomeConfig.RareBuildingType.disabled),
 
-    caveRarity(7),
-    caveFrequency(40),
+    caveRarity(14),
+    caveFrequency(15),
     caveMinAltitude(8),
     caveMaxAltitude(128),
     individualCaveRarity(25),

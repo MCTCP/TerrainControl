@@ -175,7 +175,7 @@ public class CavesGen extends TerrainGenBase
                                 {
                                     if (local_y < 10)
                                     {
-                                        chunkArray[i10] = (byte) DefaultMaterial.LAVA.id;
+                                        chunkArray[i10] = (byte) DefaultMaterial.STATIONARY_LAVA.id;
                                     } else
                                     {
                                         chunkArray[i10] = 0;
