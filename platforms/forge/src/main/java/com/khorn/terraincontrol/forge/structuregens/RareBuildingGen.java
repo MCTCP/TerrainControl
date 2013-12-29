@@ -7,7 +7,7 @@ import com.khorn.terraincontrol.forge.Biome;
 import com.khorn.terraincontrol.util.StructureNames;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.SpawnListEntry;
+import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
 

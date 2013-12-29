@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge.structuregens;
 
+import net.minecraft.world.gen.structure.StructureVillagePieces;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -25,7 +27,7 @@ public class VillageStart extends StructureStart
 
         int startX = (chunkX << 4) + 2;
         int startZ = (chunkZ << 4) + 2;
-        ComponentVillageStartPiece startPiece = new ComponentVillageStartPiece(world.getWorldChunkManager(), 0, random, startX, startZ, villagePieces, size);
+        StructureVillagePieces.Start startPiece = new StructureVillagePieces.Start(world.getWorldChunkManager(), 0, random, startX, startZ, villagePieces, size);
 
         // Apply the villageType setting
         LocalWorld worldTC = WorldHelper.toLocalWorld(world);
@@ -67,7 +69,7 @@ public class VillageStart extends StructureStart
         {
             StructureComponent var12 = (StructureComponent) component;
 
-            if (!(var12 instanceof ComponentVillageRoadPiece))
+            if (!(var12 instanceof StructureVillagePieces.Road))
             {
                 ++var10;
             }
@@ -83,9 +85,9 @@ public class VillageStart extends StructureStart
      * @param sandstoneVillage Whether the village should be a sandstone
      *                         village.
      */
-    private void changeToSandstoneVillage(ComponentVillageStartPiece subject, boolean sandstoneVillage)
+    private void changeToSandstoneVillage(StructureVillagePieces.Start subject, boolean sandstoneVillage)
     {
-        for (Field field : ComponentVillageStartPiece.class.getFields())
+        for (Field field : StructureVillagePieces.Start.class.getFields())
         {
             if (field.getType().toString().equals("boolean"))
             {

@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.forge;
 
+import net.minecraft.init.Blocks;
+
+import net.minecraft.block.Block;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
@@ -74,16 +77,14 @@ public class ForgeWorld implements LocalWorld
     private BiomeGenBase[] biomeGenBaseArray;
     private int[] biomeIntArray;
 
-    private int worldHeight = 128;
-    private int heightBits = 7;
-
     public static void restoreBiomes()
     {
+        BiomeGenBase[] biomeList = BiomeGenBase.func_150565_n();
         for (BiomeGenBase oldBiome : biomesToRestore)
         {
             if (oldBiome == null)
                 continue;
-            BiomeGenBase.biomeList[oldBiome.biomeID] = oldBiome;
+            biomeList[oldBiome.biomeID] = oldBiome;
         }
         nextBiomeId = 0;
         defaultBiomes.clear();
@@ -95,7 +96,7 @@ public class ForgeWorld implements LocalWorld
 
         for (int i = 0; i < DefaultBiome.values().length; i++)
         {
-            BiomeGenBase oldBiome = BiomeGenBase.biomeList[i];
+            BiomeGenBase oldBiome = BiomeGenBase.func_150568_d(i);
             biomesToRestore[i] = oldBiome;
             BiomeGenCustom custom = new BiomeGenCustom(nextBiomeId++, oldBiome.biomeName);
             custom.CopyBiome(oldBiome);
@@ -195,18 +196,17 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void PrepareTerrainObjects(int x, int z, byte[] chunkArray, boolean dry)
-    {
+    public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry) {
         if (this.settings.strongholdsEnabled)
-            this.strongholdGen.generate(null, this.world, x, z, chunkArray);
+            this.strongholdGen.generate(null, this.world, chunkX, chunkZ, null);
         if (this.settings.mineshaftsEnabled)
-            this.mineshaftGen.generate(null, this.world, x, z, chunkArray);
+            this.mineshaftGen.generate(null, this.world, chunkX, chunkZ, null);
         if (this.settings.villagesEnabled && dry)
-            this.villageGen.generate(null, this.world, x, z, chunkArray);
+            this.villageGen.generate(null, this.world, chunkX, chunkZ, null);
         if (this.settings.rareBuildingsEnabled)
-            this.rareBuildingGen.generate(null, this.world, x, z, chunkArray);
+            this.rareBuildingGen.generate(null, this.world, chunkX, chunkZ, null);
         if (this.settings.netherFortressesEnabled)
-            this.netherFortressGen.generate(null, this.world, x, z, chunkArray);
+            this.netherFortressGen.generate(null, this.world, chunkX, chunkZ, null);
 
     }
 
@@ -250,19 +250,19 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public boolean PlaceTerrainObjects(Random rand, int chunk_x, int chunk_z)
-    {
+    public boolean placeDefaultStructures(Random rand, int chunkX, int chunkZ) {
+
         boolean isVillagePlaced = false;
         if (this.settings.strongholdsEnabled)
-            this.strongholdGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            this.strongholdGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
         if (this.settings.mineshaftsEnabled)
-            this.mineshaftGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            this.mineshaftGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
         if (this.settings.villagesEnabled)
-            isVillagePlaced = this.villageGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            isVillagePlaced = this.villageGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
         if (this.settings.rareBuildingsEnabled)
-            this.rareBuildingGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            this.rareBuildingGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
         if (this.settings.netherFortressesEnabled)
-            this.netherFortressGen.generateStructuresInChunk(this.world, rand, chunk_x, chunk_z);
+            this.netherFortressGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
 
         return isVillagePlaced;
     }
@@ -349,7 +349,7 @@ public class ForgeWorld implements LocalWorld
 
     private Chunk getChunk(int x, int y, int z)
     {
-        if (y < 0 || y >= this.worldHeight)
+        if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
             return null;
 
         x = x >> 4;
@@ -371,16 +371,17 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getLiquidHeight(int x, int z)
     {
-        Chunk chunk = this.getChunk(x, 0, z);
-        if (chunk == null)
-            return -1;
-        z = z & 0xF;
-        x = x & 0xF;
-        for (int y = worldHeight - 1; y > 0; y--)
+        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            int id = chunk.getBlockID(x, y, z);
-            if (DefaultMaterial.getMaterial(id).isLiquid())
-                return y;
+            DefaultMaterial material = getMaterial(x, y, z);
+            if (material.isLiquid())
+            {
+                return y + 1;
+            } else if (material.isSolid())
+            {
+                // Failed to find a liquid
+                return -1;
+            }
         }
         return -1;
     }
@@ -388,15 +389,13 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getSolidHeight(int x, int z)
     {
-        Chunk chunk = this.getChunk(x, 0, z);
-        if (chunk == null)
-            return -1;
-
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            int id = chunk.getBlockID(x & 0xF, y, z & 0xF);
-            if (DefaultMaterial.getMaterial(id).isSolid())
+            DefaultMaterial material = getMaterial(x, y, z);
+            if (material.isSolid())
+            {
                 return y + 1;
+            }
         }
         return -1;
     }
@@ -419,7 +418,8 @@ public class ForgeWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
 
-        return chunk.getBlockID(x, y, z);
+        Block block = chunk.func_150810_a(x, y, z);
+        return Block.func_149682_b(block);
     }
 
     @Override
@@ -458,22 +458,25 @@ public class ForgeWorld implements LocalWorld
         }
 
         // Get old block id (only needed for physics)
-        int oldBlockId = 0;
+        Block oldBlock = Blocks.air;
         if (applyPhysics)
         {
-            oldBlockId = chunk.getBlockID(x & 15, y, z & 15);
+            // oldBlock = chunk.getBlock(...)
+            oldBlock = chunk.func_150810_a(x & 15, y, z & 15);
         }
 
         // Place block
         if (applyPhysics)
         {
-            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
+            // chunk.setBlockAndMetadata(..., Block.getBlock(typeId), ..)
+            chunk.func_150807_a(x & 15, y, z & 15, Block.func_149729_e(typeId), data);
         } else
         {
             // Temporarily make remote, so that torches etc. don't pop off
             boolean oldStatic = world.isRemote;
             world.isRemote = true;
-            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
+            // chunk.setBlockAndMetadata(..., Block.getBlock(typeId), ..)
+            chunk.func_150807_a(x & 15, y, z & 15, Block.func_149729_e(typeId), data);
             world.isRemote = oldStatic;
         }
 
@@ -490,7 +493,7 @@ public class ForgeWorld implements LocalWorld
 
         if (!world.isRemote && applyPhysics)
         {
-            world.notifyBlockChange(x, y, z, oldBlockId);
+            world.notifyBlockChange(x, y, z, oldBlock);
         }
     }
 
@@ -509,6 +512,7 @@ public class ForgeWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
         int y = chunk.getHeightValue(x, z);
+        // while(chunk.getBlock(...) != ...)
         while (chunk.getBlockID(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight)
         {
             // Fix for incorrect lightmap
@@ -562,15 +566,13 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public int getHeight()
-    {
-        return this.worldHeight;
+    public int getHeightCap() {
+        return settings.worldHeightCap;
     }
 
     @Override
-    public int getHeightBits()
-    {
-        return heightBits;
+    public int getHeightScale() {
+        return settings.worldScale;
     }
 
     public ChunkProvider getChunkGenerator()
@@ -634,13 +636,6 @@ public class ForgeWorld implements LocalWorld
         return this.world;
     }
 
-    @Override
-    public void setHeightBits(int heightBits)
-    {
-        this.heightBits = heightBits;
-        this.worldHeight = 1 << heightBits;
-    }
-
     public void FillChunkForBiomes(Chunk chunk, int x, int z)
     {
 
@@ -681,20 +676,23 @@ public class ForgeWorld implements LocalWorld
         nmsTag.setInteger("y", y);
         nmsTag.setInteger("z", z);
         // Add that data to the current tile entity in the world
-        TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+        // TileEntity tileEntity = world.getTileEntity(x, y, z);
+        TileEntity tileEntity = world.func_147438_o(x, y, z);
         if (tileEntity != null)
         {
             tileEntity.readFromNBT(nmsTag);
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z)});
+            TerrainControl
+                    .log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] { nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z) });
         }
     }
 
     @Override
     public Tag getMetadata(int x, int y, int z)
     {
-        TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+        // TileEntity tileEntity = world.getTileEntity(x, y, z);
+        TileEntity tileEntity = world.func_147438_o(x, y, z);
         if (tileEntity == null)
         {
             return null;

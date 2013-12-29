@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.forge;
 
+import org.apache.logging.log4j.Logger;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -14,7 +15,6 @@ import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
@@ -27,10 +27,8 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 @Mod(modid = "TerrainControl", name = "TerrainControl")
-@NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")
 public class TCPlugin implements TerrainControlEngine
 {
     
@@ -48,7 +46,7 @@ public class TCPlugin implements TerrainControlEngine
 
         // Set the directory
         TerrainControl.setEngine(this);
-        logger = TCLogManager.prepLogger(FMLCommonHandler.instance().getFMLLogger());
+        logger = FMLCommonHandler.instance().getFMLLogger();
 
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
@@ -67,7 +65,7 @@ public class TCPlugin implements TerrainControlEngine
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
-            NetworkRegistry.instance().registerChannel(new PacketHandler(), TCDefaultValues.ChannelName.stringValue());
+            NetworkRegistry.INSTANCE.newChannel(TCDefaultValues.ChannelName.stringValue(), new PacketHandler());
         }
 
         // Register player tracker, for sending configs.
@@ -115,77 +113,37 @@ public class TCPlugin implements TerrainControlEngine
     }
 
     @Override
-    public void logIfLevel(Level ifLevel, String... messages)
-    {
-        if (logger.getLevel().intValue() == ifLevel.intValue())
-        {
-            this.log(ifLevel, messages);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level ifLevel, String messages, Object[] params)
-    {
-        if (logger.getLevel().intValue() == ifLevel.intValue())
-        {
-            this.log(ifLevel, messages, params);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level min, Level max, String... messages)
-    {
-        if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
-        {
-            this.log(max, messages);
-        }
-    }
-
-    @Override
-    public void logIfLevel(Level min, Level max, String messages, Object[] params)
-    {
-        if (logger.getLevel().intValue() <= max.intValue() && logger.getLevel().intValue() >= min.intValue())
-        {
-            this.log(max, messages);
-        }
-    }
-
-    @Override
     public void log(Level level, String... messages)
     {
-        this.log(level, "{0}", new Object[]
-        {
-            StringHelper.join(messages, " ")
-        });
+        this.log(level, "{0}", new Object[] {StringHelper.join(messages, " ")});
     }
 
     @Override
     public void log(Level level, String message, Object param)
     {
-        LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.formatter.format(lr));
-        lr.setParameters(new Object[]
-        {
-            param
-        });
-        if (logger == null)
-        {
-            logger = TCLogManager.getLogger();
-        }
-        logger.log(lr);
+        log(level, message, new Object[] {param});
+        
     }
 
     @Override
     public void log(Level level, String message, Object[] params)
     {
-        LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.formatter.format(lr));
-        lr.setParameters(params);
-        if (logger == null)
-        {
-            logger = TCLogManager.getLogger();
+        LogRecord logRecord = new LogRecord(level, message);
+        logRecord.setParameters(params);
+
+        String formattedMessage = TCLogManager.formatter.format(logRecord);
+        
+        if (level == Level.SEVERE) {
+            logger.log(org.apache.logging.log4j.Level.ERROR, formattedMessage);
+        } else if (level == Level.WARNING) {
+            logger.log(org.apache.logging.log4j.Level.WARN, formattedMessage);
+        } else if (level == Level.INFO) {
+            logger.log(org.apache.logging.log4j.Level.INFO, formattedMessage);
+        } else if (level == Level.CONFIG || level == Level.FINE) {
+            logger.log(org.apache.logging.log4j.Level.DEBUG, formattedMessage);
+        } else { // so level == Level.FINER || level == FINEST
+            logger.log(org.apache.logging.log4j.Level.TRACE, formattedMessage);
         }
-        logger.log(lr);
     }
 
     @Override
@@ -215,20 +173,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public boolean isValidBlockId(int id)
     {
-        if (id == 0)
-        {
-            // Air is a special case
-            return true;
-        }
-        if (id < 0 || id > TerrainControl.supportedBlockIds)
-        {
-            return false;
-        }
-        if (Block.blocksList[id] == null)
-        {
-            return false;
-        }
-        return true;
+        return Block.func_149729_e(id) != null;
     }
     
 }

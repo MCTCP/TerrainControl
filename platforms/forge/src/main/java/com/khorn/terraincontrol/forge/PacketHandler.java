@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.forge;
 
+import io.netty.channel.ChannelHandlerContext;
+
+import io.netty.channel.ChannelHandler;
+import net.minecraft.network.play.client.C17PacketCustomPayload;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import cpw.mods.fml.client.FMLClientHandler;
@@ -16,11 +20,11 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.util.Arrays;
 
-public class PacketHandler implements IPacketHandler
+public class PacketHandler implements ChannelHandler
 {
 
     @Override
-    public void onPacketData(INetworkManager manager, Packet250CustomPayload receivedPacket, Player player)
+    public void onPacketData(INetworkManager manager, C17PacketCustomPayload receivedPacket, Player player)
     {
         // This method receives the TerrainControl packet with the custom biome
         // colors and weather.

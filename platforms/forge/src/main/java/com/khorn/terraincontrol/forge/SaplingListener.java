@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.forge;
 
+import cpw.mods.fml.common.eventhandler.Event.Result;
+
+import net.minecraft.init.Blocks;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
@@ -8,8 +12,6 @@ import com.khorn.terraincontrol.generator.resourcegens.SaplingType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.world.World;
-import net.minecraftforge.event.Event.Result;
-import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
 
@@ -17,7 +19,7 @@ import java.util.Random;
 
 public class SaplingListener
 {
-    @ForgeSubscribe
+    @SubscribeEvent
     public void onSaplingGrow(SaplingGrowTreeEvent event)
     {
         int x = event.x;
@@ -32,10 +34,10 @@ public class SaplingListener
             return;
         }
 
-        int blockId = world.getBlockId(x, y, z);
-        BlockSapling saplingBlock = (BlockSapling) Block.sapling;
+        Block block = world.func_147439_a(x, y, z); // world.getBlock
+        BlockSapling saplingBlock = (BlockSapling) Blocks.sapling;
 
-        if (blockId != saplingBlock.blockID)
+        if (block != saplingBlock)
         {
             // Only vanilla saplings
             return;
@@ -107,13 +109,14 @@ public class SaplingListener
         // Remove saplings
         if (hugeJungleTreeHasGrown)
         {
-            world.setBlockToAir(x + jungleOffsetX, y, z + jungleOffsetZ);
-            world.setBlockToAir(x + jungleOffsetX + 1, y, z + jungleOffsetZ);
-            world.setBlockToAir(x + jungleOffsetX, y, z + jungleOffsetZ + 1);
-            world.setBlockToAir(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1);
+            // world.setBlock(...)
+            world.func_147444_c(x + jungleOffsetX, y, z + jungleOffsetZ, Blocks.air);
+            world.func_147444_c(x + jungleOffsetX + 1, y, z + jungleOffsetZ, Blocks.air);
+            world.func_147444_c(x + jungleOffsetX, y, z + jungleOffsetZ + 1, Blocks.air);
+            world.func_147444_c(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, Blocks.air);
         } else
         {
-            world.setBlockToAir(x, y, z);
+            world.func_147444_c(x, y, z, Blocks.air);
         }
 
         // Try ten times to grow sapling
@@ -132,19 +135,20 @@ public class SaplingListener
             // Restore sapling
             if (hugeJungleTreeHasGrown)
             {
-                world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ, blockId, blockData, 4);
-                world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ, blockId, blockData, 4);
-                world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ + 1, blockId, blockData, 4);
-                world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, blockId, blockData, 4);
+                // world.setBlock(...)
+                world.func_147446_b(x + jungleOffsetX, y, z + jungleOffsetZ, block, blockData, 4);
+                world.func_147446_b(x + jungleOffsetX + 1, y, z + jungleOffsetZ, block, blockData, 4);
+                world.func_147446_b(x + jungleOffsetX, y, z + jungleOffsetZ + 1, block, blockData, 4);
+                world.func_147446_b(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, block, blockData, 4);
             } else
             {
-                world.setBlock(x, y, z, blockId, blockData, 4);
+                world.func_147446_b(x, y, z, block, blockData, 4);
             }
         }
 
     }
 
-    @ForgeSubscribe
+    @SubscribeEvent
     public void onBonemealUse(BonemealEvent event)
     {
         LocalWorld localWorld = WorldHelper.toLocalWorld(event.world);
@@ -156,12 +160,12 @@ public class SaplingListener
 
         // Get sapling gen
         SaplingGen gen = null;
-        if (event.ID == Block.mushroomRed.blockID)
+        if (event.block == Blocks.red_mushroom_block)
         {
-            gen = getSaplingGen(localWorld, SaplingType.RedMushroom, event.X, event.Z);
-        } else if (event.ID == Block.mushroomBrown.blockID)
+            gen = getSaplingGen(localWorld, SaplingType.RedMushroom, event.x, event.z);
+        } else if (event.block == Blocks.brown_mushroom_block)
         {
-            gen = getSaplingGen(localWorld, SaplingType.BrownMushroom, event.X, event.Z);
+            gen = getSaplingGen(localWorld, SaplingType.BrownMushroom, event.x, event.z);
         }
         if (gen == null)
         {
@@ -171,13 +175,14 @@ public class SaplingListener
 
         // Generate mushroom
         event.setResult(Result.ALLOW);
-        event.world.setBlockToAir(event.X, event.Y, event.Z);
+        // event.world.setBlock
+        event.world.func_147444_c(event.x, event.y, event.z, Blocks.air);
 
         boolean mushroomGrown = false;
         Random random = new Random();
         for (int i = 0; i < 10; i++)
         {
-            if (gen.growSapling(localWorld, random, event.X, event.Y, event.Z))
+            if (gen.growSapling(localWorld, random, event.x, event.y, event.z))
             {
                 mushroomGrown = true;
                 break;
@@ -186,7 +191,8 @@ public class SaplingListener
         if (!mushroomGrown)
         {
             // Restore mushroom
-            event.world.setBlock(event.X, event.Y, event.Z, event.ID, 0, 2);
+            // event.world.setBlock(...)
+            event.world.func_147446_b(event.x, event.y, event.z, event.block, 0, 2);
         }
     }
 
