@@ -21,20 +21,34 @@ public class CactusGen extends Resource
 
         for (int i = 0; i < 10; i++)
         {
-            int j = x + rand.nextInt(8) - rand.nextInt(8);
-            int k = y + rand.nextInt(4) - rand.nextInt(4);
-            int m = z + rand.nextInt(8) - rand.nextInt(8);
-            if (world.isEmpty(j, k, m))
+            int cactusX = x + rand.nextInt(8) - rand.nextInt(8);
+            int cactusBaseY = y + rand.nextInt(4) - rand.nextInt(4);
+            int cactusZ = z + rand.nextInt(8) - rand.nextInt(8);
+
+            // Check position
+            if (!world.isEmpty(cactusX, cactusBaseY, cactusZ))
+                continue;
+
+            // Check foundation
+            int id = world.getTypeId(cactusX, cactusBaseY - 1, cactusZ);
+            if (!sourceBlocks.contains(id))
+                continue;
+
+            // Check neighbors
+            if (!world.isEmpty(cactusX - 1, cactusBaseY, cactusZ))
+                continue;
+            if (!world.isEmpty(cactusX + 1, cactusBaseY, cactusZ))
+                continue;
+            if (!world.isEmpty(cactusX, cactusBaseY, cactusZ + 1))
+                continue;
+            if (!world.isEmpty(cactusX, cactusBaseY, cactusZ + 1))
+                continue;
+
+            // Spawn cactus
+            int cactusHeight = 1 + rand.nextInt(rand.nextInt(3) + 1);
+            for (int dY = 0; dY < cactusHeight; dY++)
             {
-                int n = 1 + rand.nextInt(rand.nextInt(3) + 1);
-                for (int i1 = 0; i1 < n; i1++)
-                {
-                    int id = world.getTypeId(j, k + i1 - 1, m);
-                    if (sourceBlocks.contains(id))
-                    {
-                        world.setBlock(j, k + i1, m, blockId, blockData, false, false, false);
-                    }
-                }
+                world.setBlock(cactusX, cactusBaseY + dY, cactusZ, blockId, blockData, false, false, false);
             }
         }
     }
