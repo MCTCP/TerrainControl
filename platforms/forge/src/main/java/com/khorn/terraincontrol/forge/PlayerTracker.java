@@ -4,18 +4,16 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.util.WorldHelper;
-import cpw.mods.fml.common.IPlayerTracker;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.packet.Packet250CustomPayload;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
+import net.minecraft.network.play.server.S3FPacketCustomPayload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 
-public class PlayerTracker implements IPlayerTracker
+public class PlayerTracker
 {
 
     TCPlugin plugin;
@@ -25,15 +23,16 @@ public class PlayerTracker implements IPlayerTracker
         this.plugin = plugin;
     }
 
-    @Override
-    public void onPlayerLogin(EntityPlayer player)
+    @SubscribeEvent
+    public void onPlayerLogin(ClientConnectedToServerEvent event)
     {
         // Server-side - called whenever a player logs in
         // I couldn't find a way to detect if the client has TerrainControl,
         // so for now the configs are sent anyway.
 
         // Get the config
-        LocalWorld worldTC = WorldHelper.toLocalWorld(player.worldObj);
+        // TODO only send the configs when the player is in the main world
+        LocalWorld worldTC = plugin.getWorld();
 
         if (worldTC == null)
         {
@@ -55,32 +54,11 @@ public class PlayerTracker implements IPlayerTracker
         }
 
         // Make the packet
-        Packet250CustomPayload packet = new Packet250CustomPayload();
-        packet.channel = TCDefaultValues.ChannelName.stringValue();
-        packet.data = outputStream.toByteArray();
-        packet.length = outputStream.size();
+        S3FPacketCustomPayload packet = new S3FPacketCustomPayload(TCDefaultValues.ChannelName.stringValue(), outputStream.toByteArray());
 
         // Send the packet
-        ((EntityPlayerMP) player).playerNetServerHandler.sendPacketToPlayer(packet);
+        event.handler.func_147240_a(packet);
         System.out.println("TerrainControl: sent config");
-    }
-
-    @Override
-    public void onPlayerLogout(EntityPlayer player)
-    {
-        // Stub method
-    }
-
-    @Override
-    public void onPlayerChangedDimension(EntityPlayer player)
-    {
-        // Stub method
-    }
-
-    @Override
-    public void onPlayerRespawn(EntityPlayer player)
-    {
-        // Stub method
     }
 
 }
