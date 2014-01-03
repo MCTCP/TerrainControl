@@ -89,10 +89,10 @@ public class ChunkProvider implements IChunkProvider
     {
         if (this.TestMode)
             return;
-        BlockSand.fallInstantly = true;
+        BlockSand.field_149832_M = true; // BlockSand.fallInstantly
         this.world.LoadChunk(x, z);
         this.spawner.populate(x, z);
-        BlockSand.fallInstantly = false;
+        BlockSand.field_149832_M = false;
     }
 
     @Override
@@ -131,8 +131,9 @@ public class ChunkProvider implements IChunkProvider
         return Biome.getSpawnableList(paramaca);
     }
 
+    
     @Override
-    public ChunkPosition findClosestStructure(World world, String s, int x, int y, int z)
+    public ChunkPosition func_147416_a(World world, String s, int x, int y, int z)
     {
         if (("Stronghold".equals(s)) && (this.world.strongholdGen != null))
         {

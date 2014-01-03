@@ -21,7 +21,7 @@
     <!-- Constants -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <forgeVersion>9.11.1-SNAPSHOT</forgeVersion>
+        <forgeVersion>10.12.0-SNAPSHOT</forgeVersion>
     </properties>
 
     <!-- We're open source, find us here -->
@@ -97,6 +97,22 @@
             <!-- We need these classes in our jar -->
             <scope>compile</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.0-beta9</version>
+            <!-- Provided by Minecraft, no need to put these classes in our jar -->
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.0.10.Final</version>
+            <!-- Provided by Minecraft, no need to put these classes in our jar -->
+            <scope>provided</scope>
+        </dependency>  
     </dependencies>
 
 </project>

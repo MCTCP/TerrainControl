@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
+import net.minecraft.block.Block;
+
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
@@ -83,18 +85,17 @@ public class ForgeBiome implements LocalBiome
     @Override
     public int getSurfaceBlock()
     {
-        return biomeBase.topBlock;
+        return Block.func_149682_b(biomeBase.topBlock);
     }
 
     @Override
     public int getGroundBlock()
     {
-        return biomeBase.fillerBlock;
+        return Block.func_149682_b(biomeBase.fillerBlock);
     }
 
     @Override
     public float getTemperatureAt(int x, int y, int z) {
-        // TODO Waiting on 1.7
-        return getTemperature();
+        return biomeBase.func_150564_a(x, y, z);
     }
 }

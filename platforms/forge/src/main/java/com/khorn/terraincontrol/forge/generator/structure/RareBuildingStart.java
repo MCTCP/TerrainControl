@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
+import net.minecraft.world.gen.structure.ComponentScatteredFeaturePieces;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
@@ -20,13 +22,13 @@ public class RareBuildingStart extends StructureStart
         switch (biomeConfig.rareBuildingType)
         {
             case desertPyramid:
-                building = new ComponentScatteredFeatureDesertPyramid(random, chunkX * 16, chunkZ * 16);
+                building = new ComponentScatteredFeaturePieces.DesertPyramid(random, chunkX * 16, chunkZ * 16);
                 break;
             case jungleTemple:
-                building = new ComponentScatteredFeatureJunglePyramid(random, chunkX * 16, chunkZ * 16);
+                building = new ComponentScatteredFeaturePieces.JunglePyramid(random, chunkX * 16, chunkZ * 16);
                 break;
             case swampHut:
-                building = new ComponentScatteredFeatureSwampHut(random, chunkX * 16, chunkZ * 16);
+                building = new ComponentScatteredFeaturePieces.SwampHut(random, chunkX * 16, chunkZ * 16);
                 break;
             case disabled:
             default:

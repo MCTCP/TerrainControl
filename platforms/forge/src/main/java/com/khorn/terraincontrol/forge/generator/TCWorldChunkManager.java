@@ -26,13 +26,13 @@ public class TCWorldChunkManager extends WorldChunkManager
 
     public TCWorldChunkManager(ForgeWorld world)
     {
-        this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.FOREST.Id]);
-        this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.PLAINS.Id]);
-        this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.TAIGA.Id]);
-        this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.DESERT_HILLS.Id]);
-        this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.FOREST_HILLS.Id]);
-        this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.JUNGLE.Id]);
-        this.biomesToSpawnIn.add(BiomeGenBase.biomeList[DefaultBiome.JUNGLE_HILLS.Id]);
+        this.biomesToSpawnIn.add(BiomeGenBase.func_150568_d(DefaultBiome.FOREST.Id));
+        this.biomesToSpawnIn.add(BiomeGenBase.func_150568_d(DefaultBiome.PLAINS.Id));
+        this.biomesToSpawnIn.add(BiomeGenBase.func_150568_d(DefaultBiome.TAIGA.Id));
+        this.biomesToSpawnIn.add(BiomeGenBase.func_150568_d(DefaultBiome.DESERT_HILLS.Id));
+        this.biomesToSpawnIn.add(BiomeGenBase.func_150568_d(DefaultBiome.FOREST_HILLS.Id));
+        this.biomesToSpawnIn.add(BiomeGenBase.func_150568_d(DefaultBiome.JUNGLE.Id));
+        this.biomesToSpawnIn.add(BiomeGenBase.func_150568_d(DefaultBiome.JUNGLE_HILLS.Id));
 
         this.localWorld = world;
     }
@@ -52,7 +52,7 @@ public class TCWorldChunkManager extends WorldChunkManager
     @Override
     public BiomeGenBase getBiomeGenAt(int paramInt1, int paramInt2)
     {
-        return BiomeGenBase.biomeList[biomeManager.getBiome(paramInt1, paramInt2)];
+        return BiomeGenBase.func_150568_d(biomeManager.getBiome(paramInt1, paramInt2));
     }
 
     // rain
@@ -60,24 +60,6 @@ public class TCWorldChunkManager extends WorldChunkManager
     public float[] getRainfall(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         return biomeManager.getRainfall(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
-    }
-
-    // Temperature
-    @Override
-    public float[] getTemperatures(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
-    {
-        int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
-        if (paramArrayOfFloat == null || paramArrayOfFloat.length < arrayOfInt.length)
-        {
-            paramArrayOfFloat = new float[arrayOfInt.length];
-        }
-
-        for (int i = 0; i < paramInt3 * paramInt4; i++)
-        {
-            paramArrayOfFloat[i] = BiomeGenBase.biomeList[arrayOfInt[i]].getFloatTemperature();
-        }
-
-        return paramArrayOfFloat;
     }
 
     @Override
@@ -91,7 +73,7 @@ public class TCWorldChunkManager extends WorldChunkManager
 
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = BiomeGenBase.biomeList[arrayOfInt[i]];
+            paramArrayOfBiomeBase[i] = BiomeGenBase.func_150568_d(arrayOfInt[i]);
         }
 
         return paramArrayOfBiomeBase;
@@ -108,7 +90,7 @@ public class TCWorldChunkManager extends WorldChunkManager
 
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = BiomeGenBase.biomeList[arrayOfInt[i]];
+            paramArrayOfBiomeBase[i] = BiomeGenBase.func_150568_d(arrayOfInt[i]);
         }
 
         return paramArrayOfBiomeBase;
@@ -146,8 +128,9 @@ public class TCWorldChunkManager extends WorldChunkManager
 
     @Override
     @SuppressWarnings("rawtypes")
-    public ChunkPosition findBiomePosition(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
+    public ChunkPosition func_150795_a(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
     {
+        // This method used to be called findBiomePositions
         int i = paramInt1 - paramInt3 >> 2;
         int j = paramInt2 - paramInt3 >> 2;
         int k = paramInt1 + paramInt3 >> 2;
@@ -164,7 +147,7 @@ public class TCWorldChunkManager extends WorldChunkManager
                 continue;
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            BiomeGenBase localBiomeBase = BiomeGenBase.biomeList[arrayOfInt[i3]];
+            BiomeGenBase localBiomeBase = BiomeGenBase.func_150568_d(arrayOfInt[i3]);
             if ((!paramList.contains(localBiomeBase)) || ((localChunkPosition != null) && (paramRandom.nextInt(i2 + 1) != 0)))
                 continue;
             localChunkPosition = new ChunkPosition(i4, 0, i5);

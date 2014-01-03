@@ -12,7 +12,7 @@ public enum BiomeStandardValues implements MultiTypedSetting
     //>>   Biome Extensions & Related
     BiomeConfigExtensions("BiomeConfig.ini,.biome,.bc,.bc.ini,.biome.ini", SettingsType.StringArray),
     DefaultBiomeConfigExtension(".bc"),
-   
+
     // Biome settings
     BiomeExtends(""),
     BiomeSize(5),

@@ -1,8 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.util.helpers.StringHelper;
-
-import com.khorn.terraincontrol.logging.TCLogManager;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -14,31 +11,27 @@ import com.khorn.terraincontrol.forge.events.PlayerTracker;
 import com.khorn.terraincontrol.forge.events.SaplingListener;
 import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
+import com.khorn.terraincontrol.logging.TCLogManager;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.block.Block;
+import net.minecraft.world.gen.structure.MapGenStructureIO;
+import net.minecraftforge.common.MinecraftForge;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-
-import net.minecraft.block.Block;
-import net.minecraft.world.gen.structure.MapGenStructureIO;
-import net.minecraftforge.common.MinecraftForge;
 
 @Mod(modid = "TerrainControl", name = "TerrainControl")
-@NetworkMod(clientSideRequired = false, serverSideRequired = false, versionBounds = "*")
 public class TCPlugin implements TerrainControlEngine
 {
     
@@ -76,11 +69,11 @@ public class TCPlugin implements TerrainControlEngine
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
-            NetworkRegistry.instance().registerChannel(new PacketHandler(), PluginStandardValues.ChannelName.stringValue());
+            NetworkRegistry.INSTANCE.newChannel(PluginStandardValues.ChannelName.stringValue(), new PacketHandler());
         }
 
         // Register player tracker, for sending configs.
-        GameRegistry.registerPlayerTracker(new PlayerTracker(this));
+        MinecraftForge.EVENT_BUS.register(new PlayerTracker(this));
 
         // Register sapling tracker, for custom tree growth.
         SaplingListener saplingListener = new SaplingListener();
@@ -124,6 +117,41 @@ public class TCPlugin implements TerrainControlEngine
     }
 
     @Override
+    public void log(Level level, String... messages)
+    {
+        this.log(level, "{0}", new Object[] {StringHelper.join(messages, " ")});
+    }
+
+
+    @Override
+    public void log(Level level, String message, Object param)
+    {
+        log(level, message, new Object[] {param});
+    }
+
+
+    @Override
+    public void log(Level level, String message, Object[] params)
+    {
+        LogRecord logRecord = new LogRecord(level, message);
+        logRecord.setParameters(params);
+
+        String formattedMessage = TCLogManager.FORMATTER.format(logRecord);
+        
+        if (level == Level.SEVERE) {
+            logger.log(org.apache.logging.log4j.Level.ERROR, formattedMessage);
+        } else if (level == Level.WARNING) {
+            logger.log(org.apache.logging.log4j.Level.WARN, formattedMessage);
+        } else if (level == Level.INFO) {
+            logger.log(org.apache.logging.log4j.Level.INFO, formattedMessage);
+        } else if (level == Level.CONFIG || level == Level.FINE) {
+            logger.log(org.apache.logging.log4j.Level.DEBUG, formattedMessage);
+        } else { // so level == Level.FINER || level == FINEST
+            logger.log(org.apache.logging.log4j.Level.TRACE, formattedMessage);
+        }
+    }
+
+    @Override
     public File getTCDataFolder()
     {
         File dataFolder;
@@ -150,53 +178,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public boolean isValidBlockId(int id)
     {
-        if (id == 0)
-        {
-            // Air is a special case
-            return true;
-        }
-        if (id < 0 || id > TerrainControl.supportedBlockIds)
-        {
-            return false;
-        }
-        if (Block.blocksList[id] == null)
-        {
-            return false;
-        }
-        return true;
+        return Block.func_149729_e(id) != null;
     }
-
-    @Override
-    public void log(Level level, String... messages)
-    {
-        this.log(level, "{0}", new Object[]
-        {
-            StringHelper.join(messages, " ")
-        });
-    }
-
-
-    @Override
-    public void log(Level level, String message, Object param)
-    {
-        LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.FORMATTER.format(lr));
-        lr.setParameters(new Object[]
-        {
-            param
-        });
-        logger.log(lr);
-    }
-
-
-    @Override
-    public void log(Level level, String message, Object[] params)
-    {
-        LogRecord lr = new LogRecord(level, message);
-        lr.setMessage(TCLogManager.FORMATTER.format(lr));
-        lr.setParameters(params);
-        logger.log(lr);
-    }
-
     
 }

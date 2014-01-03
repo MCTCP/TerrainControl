@@ -17,6 +17,8 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.SpawnerAnimals;
@@ -84,11 +86,12 @@ public class ForgeWorld implements LocalWorld
 
     public static void restoreBiomes()
     {
+        BiomeGenBase[] biomeList = BiomeGenBase.func_150565_n();
         for (BiomeGenBase oldBiome : biomesToRestore)
         {
             if (oldBiome == null)
                 continue;
-            BiomeGenBase.biomeList[oldBiome.biomeID] = oldBiome;
+            biomeList[oldBiome.biomeID] = oldBiome;
         }
         nextBiomeId = 0;
         defaultBiomes.clear();
@@ -100,7 +103,7 @@ public class ForgeWorld implements LocalWorld
 
         for (int i = 0; i < DefaultBiome.values().length; i++)
         {
-            BiomeGenBase oldBiome = BiomeGenBase.biomeList[i];
+            BiomeGenBase oldBiome = BiomeGenBase.func_150568_d(i);
             biomesToRestore[i] = oldBiome;
             BiomeGenCustom custom = new BiomeGenCustom(nextBiomeId++, oldBiome.biomeName);
             custom.CopyBiome(oldBiome);
@@ -218,7 +221,6 @@ public class ForgeWorld implements LocalWorld
             this.rareBuildingGen.generate(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.netherFortressesEnabled)
             this.netherFortressGen.generate(null, this.world, chunkX, chunkZ, null);
-
     }
 
     @Override
@@ -382,16 +384,17 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getLiquidHeight(int x, int z)
     {
-        Chunk chunk = this.getChunk(x, 0, z);
-        if (chunk == null)
-            return -1;
-        z &= 0xF;
-        x &= 0xF;
-        for (int y = 255; y > 0; y--)
+        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            int id = chunk.getBlockID(x, y, z);
-            if (DefaultMaterial.getMaterial(id).isLiquid())
-                return y;
+            DefaultMaterial material = getMaterial(x, y, z);
+            if (material.isLiquid())
+            {
+                return y + 1;
+            } else if (material.isSolid())
+            {
+                // Failed to find a liquid
+                return -1;
+            }
         }
         return -1;
     }
@@ -399,15 +402,13 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getSolidHeight(int x, int z)
     {
-        Chunk chunk = this.getChunk(x, 0, z);
-        if (chunk == null)
-            return -1;
-
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            int id = chunk.getBlockID(x & 0xF, y, z & 0xF);
-            if (DefaultMaterial.getMaterial(id).isSolid())
+            DefaultMaterial material = getMaterial(x, y, z);
+            if (material.isSolid())
+            {
                 return y + 1;
+            }
         }
         return -1;
     }
@@ -430,7 +431,8 @@ public class ForgeWorld implements LocalWorld
         z &= 0xF;
         x &= 0xF;
 
-        return chunk.getBlockID(x, y, z);
+        Block block = chunk.func_150810_a(x, y, z);
+        return Block.func_149682_b(block);
     }
 
     @Override
@@ -469,22 +471,25 @@ public class ForgeWorld implements LocalWorld
         }
 
         // Get old block id (only needed for physics)
-        int oldBlockId = 0;
+        Block oldBlock = Blocks.air;
         if (applyPhysics)
         {
-            oldBlockId = chunk.getBlockID(x & 15, y, z & 15);
+            // oldBlock = chunk.getBlock(...)
+            oldBlock = chunk.func_150810_a(x & 15, y, z & 15);
         }
 
         // Place block
         if (applyPhysics)
         {
-            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
+            // chunk.setBlockAndMetadata(..., Block.getBlock(typeId), ..)
+            chunk.func_150807_a(x & 15, y, z & 15, Block.func_149729_e(typeId), data);
         } else
         {
             // Temporarily make remote, so that torches etc. don't pop off
             boolean oldStatic = world.isRemote;
             world.isRemote = true;
-            chunk.setBlockIDWithMetadata(x & 15, y, z & 15, typeId, data);
+            // chunk.setBlockAndMetadata(..., Block.getBlock(typeId), ..)
+            chunk.func_150807_a(x & 15, y, z & 15, Block.func_149729_e(typeId), data);
             world.isRemote = oldStatic;
         }
 
@@ -501,7 +506,7 @@ public class ForgeWorld implements LocalWorld
 
         if (!world.isRemote && applyPhysics)
         {
-            world.notifyBlockChange(x, y, z, oldBlockId);
+            world.notifyBlockChange(x, y, z, oldBlock);
         }
     }
 
@@ -685,20 +690,23 @@ public class ForgeWorld implements LocalWorld
         nmsTag.setInteger("y", y);
         nmsTag.setInteger("z", z);
         // Add that data to the current tile entity in the world
-        TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+        // TileEntity tileEntity = world.getTileEntity(x, y, z);
+        TileEntity tileEntity = world.func_147438_o(x, y, z);
         if (tileEntity != null)
         {
             tileEntity.readFromNBT(nmsTag);
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z)});
+            TerrainControl
+                    .log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] { nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z) });
         }
     }
 
     @Override
     public NamedBinaryTag getMetadata(int x, int y, int z)
     {
-        TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+        // TileEntity tileEntity = world.getTileEntity(x, y, z);
+        TileEntity tileEntity = world.func_147438_o(x, y, z);
         if (tileEntity == null)
         {
             return null;

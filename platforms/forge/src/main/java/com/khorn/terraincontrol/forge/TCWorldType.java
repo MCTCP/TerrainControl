@@ -26,7 +26,7 @@ public class TCWorldType extends WorldType
 
     public TCWorldType(TCPlugin plugin, String paramString)
     {
-        super(WorldHelper.getNextWorldTypeID(), paramString);
+        super(paramString);
         this.plugin = plugin;
         this.worldType = paramString;
     }
