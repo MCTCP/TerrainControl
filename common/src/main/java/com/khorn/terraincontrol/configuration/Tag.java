@@ -50,8 +50,8 @@ public class Tag
     }
 
     /**
-     * Create a new TAG_List with an empty list. Use {@link Tag#addTag(Tag)} to
-     * add tags later.
+     * Create a new TAG_List with an empty list. Use {@link Tag#addTag(Tag)}
+     * to add tags later.
      *
      * @param name     name for this tag or null to create an unnamed tag.
      * @param listType type of the elements in this empty list.
@@ -66,8 +66,8 @@ public class Tag
      *
      * @param type  any value from the {@link Type} enum.
      * @param name  name for the new tag or null to create an unnamed tag.
-     * @param value an object that fits the tag type or a {@link Type} to create
-     *              an empty TAG_List with this list type.
+     * @param value an object that fits the tag type or a {@link Type} to
+     *              create an empty TAG_List with this list type.
      */
     public Tag(Type type, String name, Object value)
     {
@@ -133,7 +133,7 @@ public class Tag
                 throw new IllegalArgumentException();
         }
         this.type = type;
-        this.name = name;
+        this.name = name == null ? "" : name;
         this.value = value;
     }
 
@@ -282,8 +282,8 @@ public class Tag
     }
 
     /**
-     * Remove a tag from a TAG_List or a TAG_Compound. If the tag is not a child
-     * of this tag then nested tags are searched.
+     * Remove a tag from a TAG_List or a TAG_Compound. If the tag is not a
+     * child of this tag then nested tags are searched.
      *
      * @param tag tag to look for
      */
@@ -311,46 +311,49 @@ public class Tag
     }
 
     /**
-     * Find the first nested tag with specified name in a TAG_Compound.
+     * Find the tag with specified name in a TAG_Compound. If this tag has any
+     * other type this method returns null. If no child tag exists with this
+     * name this method returns null.
      *
      * @param name the name to look for. May be null to look for unnamed tags.
      * @return the first nested tag that has the specified name.
      */
-    public Tag findTagByName(String name)
+    public Tag getTag(String name)
     {
-        return findNextTagByName(name, null);
-    }
-
-    /**
-     * Find the first nested tag with specified name in a TAG_List or
-     * TAG_Compound after a tag with the same name.
-     *
-     * @param name  the name to look for. May be null to look for unnamed tags.
-     * @param found the previously found tag with the same name.
-     * @return the first nested tag that has the specified name after the
-     *         previously found tag.
-     */
-    public Tag findNextTagByName(String name, Tag found)
-    {
-        if (type != Type.TAG_List && type != Type.TAG_Compound)
-            return null;
-        Tag[] subtags = (Tag[]) value;
-        for (Tag subtag : subtags)
+        if (type != Type.TAG_Compound)
         {
-            if ((subtag.name == null && name == null) || (subtag.name != null && subtag.name.equals(name)))
+            return null;
+        }
+
+        if (name == null)
+        {
+            name = "";
+        }
+
+        for (Tag subTag : values())
+        {
+            if (subTag.name.equals(name))
             {
-                return subtag;
-            } else
-            {
-                Tag newFound = subtag.findTagByName(name);
-                if (newFound != null)
-                    if (newFound != found)
-                    {
-                        return newFound;
-                    }
+                return subTag;
             }
         }
         return null;
+    }
+
+    /**
+     * Get all child tags of this tag. If the type of this tag isn't
+     * TAG_Compound or TAG_List, an emtpy array is returned. Changing the
+     * array will change the structure of this tag.
+     *
+     * @return All child tags of this tag.
+     */
+    public Tag[] values()
+    {
+        if (type != Type.TAG_Compound && type != Type.TAG_List)
+        {
+            return new Tag[0];
+        }
+        return (Tag[]) value;
     }
 
     /**
@@ -358,8 +361,8 @@ public class Tag
      *
      * @param is stream to read from, like a FileInputStream
      * @return NBT tag or structure read from the InputStream
-     * @throws IOException if there was no valid NBT structure in the InputStream or if
-     *                     another IOException occurred.
+     * @throws IOException if there was no valid NBT structure in the
+     *             InputStream or if another IOException occurred.
      */
     public static Tag readFrom(InputStream is, boolean compressed) throws IOException
     {
@@ -457,8 +460,8 @@ public class Tag
      * Read a tag and its nested tags from an InputStream.
      *
      * @param os stream to write to, like a FileOutputStream
-     * @throws IOException if this is not a valid NBT structure or if any IOException
-     *                     occurred.
+     * @throws IOException if this is not a valid NBT structure or if any
+     *             IOException occurred.
      */
     public void writeTo(OutputStream os) throws IOException
     {
