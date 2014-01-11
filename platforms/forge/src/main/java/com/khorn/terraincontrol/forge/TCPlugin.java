@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-import org.apache.logging.log4j.Logger;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -16,29 +15,30 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 @Mod(modid = "TerrainControl", name = "TerrainControl")
 public class TCPlugin implements TerrainControlEngine
 {
-    
+
     @Instance("TerrainControl")
     public static TCPlugin instance;
 
     public File terrainControlDirectory;
     private TCWorldType worldType;
     private Logger logger;
-    
+
     @EventHandler
     public void load(FMLInitializationEvent event)
     {
@@ -57,10 +57,25 @@ public class TCPlugin implements TerrainControlEngine
 
         // Register world type
         worldType = new TCWorldType(this, "TerrainControl");
-        
+
         // Register village and rare building starts
-        MapGenStructureIO.func_143034_b(RareBuildingStart.class, StructureNames.RARE_BUILDING);
-        MapGenStructureIO.func_143034_b(VillageStart.class, StructureNames.VILLAGE);
+        try
+        {
+            Method registerStructure = null;
+            try
+            {
+                registerStructure = MapGenStructureIO.class.getMethod("b", Class.class, String.class);
+            } catch (Exception e)
+            {
+                registerStructure = MapGenStructureIO.class.getMethod("func_143034_b", Class.class, String.class);
+            }
+            registerStructure.invoke(null, RareBuildingStart.class, StructureNames.RARE_BUILDING);
+            registerStructure.invoke(null, VillageStart.class, StructureNames.VILLAGE);
+        } catch (Exception e)
+        {
+            TerrainControl.log(Level.SEVERE, "Failed to register structures");
+            TerrainControl.printStackTrace(Level.SEVERE, e);
+        }
 
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
@@ -76,10 +91,8 @@ public class TCPlugin implements TerrainControlEngine
         MinecraftForge.TERRAIN_GEN_BUS.register(saplingListener);
         MinecraftForge.EVENT_BUS.register(saplingListener);
 
-        // Register to our own events, so that they can be fired again as Forge
-        // events.
-        // TODO: make this optional for people who haven't installed other
-        // terrain mods, and don't want to lose performance.
+        // Register to our own events, so that they can be fired again as
+        // Forge events.
         TerrainControl.registerEventHandler(new EventManager(), EventPriority.CANCELABLE);
     }
 
@@ -101,9 +114,10 @@ public class TCPlugin implements TerrainControlEngine
     /**
      * Gets the world loaded by Terrain Control.
      * <p />
-     * Note: this method may be removed in the future, when multiworld
-     * support is introduced.
+     * Note: this method may be removed in the future, when multiworld support
+     * is introduced.
      * <p/>
+     * 
      * @return The world loaded by Terrain Control, or null if no world is
      *         loaded.
      */
@@ -122,7 +136,7 @@ public class TCPlugin implements TerrainControlEngine
     public void log(Level level, String message, Object param)
     {
         log(level, message, new Object[] {param});
-        
+
     }
 
     @Override
@@ -132,16 +146,21 @@ public class TCPlugin implements TerrainControlEngine
         logRecord.setParameters(params);
 
         String formattedMessage = TCLogManager.formatter.format(logRecord);
-        
-        if (level == Level.SEVERE) {
+
+        if (level == Level.SEVERE)
+        {
             logger.log(org.apache.logging.log4j.Level.ERROR, formattedMessage);
-        } else if (level == Level.WARNING) {
+        } else if (level == Level.WARNING)
+        {
             logger.log(org.apache.logging.log4j.Level.WARN, formattedMessage);
-        } else if (level == Level.INFO) {
+        } else if (level == Level.INFO)
+        {
             logger.log(org.apache.logging.log4j.Level.INFO, formattedMessage);
-        } else if (level == Level.CONFIG || level == Level.FINE) {
+        } else if (level == Level.CONFIG || level == Level.FINE)
+        {
             logger.log(org.apache.logging.log4j.Level.DEBUG, formattedMessage);
-        } else { // so level == Level.FINER || level == FINEST
+        } else
+        {   // so level == Level.FINER || level == FINEST
             logger.log(org.apache.logging.log4j.Level.TRACE, formattedMessage);
         }
     }
@@ -175,5 +194,5 @@ public class TCPlugin implements TerrainControlEngine
     {
         return Block.func_149729_e(id) != null;
     }
-    
+
 }

@@ -9,7 +9,6 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.SpawnListEntry;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -41,8 +40,8 @@ public class BiomeGenCustom extends BiomeGenBase
     @SuppressWarnings("unchecked")
     public void setEffects(BiomeConfig config)
     {
-        this.temperature = config.BiomeTemperature;
-        this.rainfall = config.BiomeWetness;
+        this.temperature = config.biomeTemperature;
+        this.rainfall = config.biomeWetness;
         if (this.rainfall == 0)
         {
             this.setDisableRain();
@@ -134,38 +133,32 @@ public class BiomeGenCustom extends BiomeGenBase
 
     // getGrassColorAtCoords
     @Override
-    public int getBiomeGrassColor()
+    public int getModdedBiomeGrassColor(int original)
     {
         if (!this.grassColorSet)
-            return super.getBiomeGrassColor();
+            return original;
         if (grassColorIsMultiplier)
         {
-            double temperature = getFloatTemperature();
-            double rainfall = getFloatRainfall();
-
-            return ((ColorizerFoliage.getFoliageColor(temperature, rainfall) & 0xFEFEFE) + this.grassColor) / 2;
+            return ((ColorizerFoliage.getFoliageColor(temperature, rainfall) & 0xFEFEFE) + grassColor) / 2;
         } else
         {
-            return this.grassColor;
+            return grassColor;
         }
 
     }
 
     // getFoliageColorAtCoords
     @Override
-    public int getBiomeFoliageColor()
+    public int getModdedBiomeFoliageColor(int original)
     {
         if (!this.foliageColorSet)
-            return super.getBiomeFoliageColor();
+            return original;
         if (foliageColorIsMultiplier)
         {
-            double temperature = getFloatTemperature();
-            double rainfall = getFloatRainfall();
-
-            return ((ColorizerFoliage.getFoliageColor(temperature, rainfall) & 0xFEFEFE) + this.foliageColor) / 2;
+            return ((ColorizerFoliage.getFoliageColor(temperature, rainfall) & 0xFEFEFE) + foliageColor) / 2;
         } else
         {
-            return this.foliageColor;
+            return foliageColor;
         }
     }
 

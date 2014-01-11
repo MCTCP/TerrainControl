@@ -198,15 +198,15 @@ public class ForgeWorld implements LocalWorld
     @Override
     public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry) {
         if (this.settings.strongholdsEnabled)
-            this.strongholdGen.generate(null, this.world, chunkX, chunkZ, null);
+            this.strongholdGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.mineshaftsEnabled)
-            this.mineshaftGen.generate(null, this.world, chunkX, chunkZ, null);
+            this.mineshaftGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.villagesEnabled && dry)
-            this.villageGen.generate(null, this.world, chunkX, chunkZ, null);
+            this.villageGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.rareBuildingsEnabled)
-            this.rareBuildingGen.generate(null, this.world, chunkX, chunkZ, null);
+            this.rareBuildingGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.netherFortressesEnabled)
-            this.netherFortressGen.generate(null, this.world, chunkX, chunkZ, null);
+            this.netherFortressGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
 
     }
 
