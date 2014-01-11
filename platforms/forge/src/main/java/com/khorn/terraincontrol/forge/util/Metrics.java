@@ -32,13 +32,10 @@ package com.khorn.terraincontrol.forge.util;
 
 import com.khorn.terraincontrol.TerrainControl;
 import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.TickType;
-import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 
 import java.io.*;
 import java.net.Proxy;

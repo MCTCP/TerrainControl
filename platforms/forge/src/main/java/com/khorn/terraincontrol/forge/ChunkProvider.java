@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
+import net.minecraft.block.Block;
+
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
 import com.khorn.terraincontrol.generator.ObjectSpawner;
@@ -58,7 +60,7 @@ public class ChunkProvider implements IChunkProvider
             for (int blockZ = 0; blockZ < 16; blockZ++)
                 for (int blockY = 0; blockY < i1; blockY++)
                 {
-                    int block = BlockArray[(blockX << world.getHeightBits() + 4 | blockZ << world.getHeightBits() | blockY)];
+                    int block = BlockArray[(blockX << ChunkProviderTC.HEIGHT_BITS_PLUS_FOUR | blockZ << ChunkProviderTC.HEIGHT_BITS | blockY)];
                     if (block != 0)
                     {
                         int sectionId = blockY >> 4;
@@ -67,7 +69,8 @@ public class ChunkProvider implements IChunkProvider
                             // Second argument is skylight
                             sections[sectionId] = new ExtendedBlockStorage(sectionId << 4, !chunk.worldObj.provider.hasNoSky);
                         }
-                        sections[sectionId].setExtBlockID(blockX, blockY & 0xF, blockZ, block & 0xFF);
+                        // We should optimize this
+                        sections[sectionId].func_150818_a(blockX, blockY & 0xF, blockZ, Block.func_149729_e(block & 0xFF));
                     }
                 }
         world.FillChunkForBiomes(chunk, chunkX, chunkZ);
@@ -151,23 +154,23 @@ public class ChunkProvider implements IChunkProvider
     {
         if (world.mineshaftGen != null)
         {
-            world.mineshaftGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+            world.mineshaftGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
         if (world.villageGen != null)
         {
-            world.villageGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+            world.villageGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
         if (world.strongholdGen != null)
         {
-            world.strongholdGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+            world.strongholdGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
         if (world.rareBuildingGen != null)
         {
-            world.rareBuildingGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+            world.rareBuildingGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
         if (world.netherFortressGen != null)
         {
-            world.netherFortressGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+            world.netherFortressGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
     }
 

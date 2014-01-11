@@ -297,7 +297,8 @@ public class ForgeWorld implements LocalWorld
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
-                                int blockId = section.getExtBlockID(sectionX, sectionY, sectionZ);
+                                Block block = section.func_150819_a(sectionX, sectionY, sectionZ);
+                                int blockId = Block.func_149682_b(block);
                                 if (biomeConfig.replaceMatrixBlocks[blockId] == null)
                                     continue;
 
@@ -305,7 +306,7 @@ public class ForgeWorld implements LocalWorld
                                 if (replaceTo == -1)
                                     continue;
 
-                                section.setExtBlockID(sectionX, sectionY, sectionZ, replaceTo >> 4);
+                                section.func_150818_a(sectionX, sectionY, sectionZ, Block.func_149729_e(replaceTo >> 4));
                                 section.setExtBlockMetadata(sectionX, sectionY, sectionZ, replaceTo & 0xF);
                                 world.getFullBlockLightValue((x + sectionX), (section.getYLocation() + sectionY), (z + sectionZ));
 
