@@ -13,10 +13,10 @@ import java.util.Random;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.gen.structure.ComponentStrongholdStairs2;
+import net.minecraft.world.gen.structure.MapGenStronghold;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
-import net.minecraft.world.gen.structure.StructureStrongholdStart;
+import net.minecraft.world.gen.structure.StructureStrongholdPieces;
 
 public class StrongholdGen extends MapGenStructure
 {
@@ -64,12 +64,14 @@ public class StrongholdGen extends MapGenStructure
                 int var11 = (int) Math.round(Math.sin(randomNumBetween0and2PI) * var8);
                 ArrayList var12 = new ArrayList();
                 Collections.addAll(var12, this.allowedBiomeGenBases);
-                ChunkPosition var13 = this.worldObj.getWorldChunkManager().findBiomePosition((var10 << 4) + 8, (var11 << 4) + 8, 112, var12, random);
+                ChunkPosition var13 = this.worldObj.getWorldChunkManager().func_150795_a((var10 << 4) + 8, (var11 << 4) + 8, 112, var12, random);
 
                 if (var13 != null)
                 {
-                    var10 = var13.x >> 4;
-                    var11 = var13.z >> 4;
+                    // var10 = var13.x >> 4;
+                    // var11 = var13.z >> 4;
+                    var10 = var13.field_151329_a >> 4;
+                    var11 = var13.field_151328_c >> 4;
                 }
 
                 this.structureCoords[i] = new ChunkCoordIntPair(var10, var11);
@@ -104,14 +106,14 @@ public class StrongholdGen extends MapGenStructure
      */
     @Override
     protected List<ChunkPosition> getCoordList()
-    {
+    {       
         ArrayList<ChunkPosition> chunkPositions = new ArrayList<ChunkPosition>();
 
         for (ChunkCoordIntPair structureCoord : structureCoords)
         {
             if (structureCoord != null)
             {
-                chunkPositions.add(structureCoord.getChunkPosition(64));
+                chunkPositions.add(structureCoord.func_151349_a(64));
             }
         }
 
@@ -121,11 +123,11 @@ public class StrongholdGen extends MapGenStructure
     @Override
     protected StructureStart getStructureStart(int par1, int par2)
     {
-        StructureStrongholdStart start = new StructureStrongholdStart(this.worldObj, this.rand, par1, par2);
+        MapGenStronghold.Start start = new MapGenStronghold.Start(this.worldObj, this.rand, par1, par2);
 
-        while (start.getComponents().isEmpty() || ((ComponentStrongholdStairs2) start.getComponents().get(0)).strongholdPortalRoom == null)
+        while (start.getComponents().isEmpty() || ((StructureStrongholdPieces.Stairs2) start.getComponents().get(0)).strongholdPortalRoom == null)
         {
-            start = new StructureStrongholdStart(this.worldObj, this.rand, par1, par2);
+            start = new MapGenStronghold.Start(this.worldObj, this.rand, par1, par2);
         }
 
         return start;

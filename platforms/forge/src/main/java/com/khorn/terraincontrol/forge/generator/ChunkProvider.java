@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge.generator;
 
+import net.minecraft.block.Block;
+
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
@@ -69,7 +71,8 @@ public class ChunkProvider implements IChunkProvider
                             // Second argument is skylight
                             sections[sectionId] = new ExtendedBlockStorage(sectionId << 4, !chunk.worldObj.provider.hasNoSky);
                         }
-                        sections[sectionId].setExtBlockID(blockX, blockY & 0xF, blockZ, block & 0xFF);
+                        // We should optimize this
+                        sections[sectionId].func_150818_a(blockX, blockY & 0xF, blockZ, Block.func_149729_e(block & 0xFF));
                     }
                 }
         world.FillChunkForBiomes(chunk, chunkX, chunkZ);
@@ -135,9 +138,10 @@ public class ChunkProvider implements IChunkProvider
     @Override
     public ChunkPosition func_147416_a(World world, String s, int x, int y, int z)
     {
+        // Gets the nearest stronghold
         if (("Stronghold".equals(s)) && (this.world.strongholdGen != null))
         {
-            return this.world.strongholdGen.getNearestInstance(world, x, y, z);
+            return this.world.strongholdGen.func_151545_a(world, x, y, z);
         }
         return null;
     }
@@ -153,23 +157,23 @@ public class ChunkProvider implements IChunkProvider
     {
         if (world.mineshaftGen != null)
         {
-            world.mineshaftGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+            world.mineshaftGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
         if (world.villageGen != null)
         {
-            world.villageGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+            world.villageGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
         if (world.strongholdGen != null)
         {
-            world.strongholdGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+            world.strongholdGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
         if (world.rareBuildingGen != null)
         {
-            world.rareBuildingGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+            world.rareBuildingGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
         if (world.netherFortressGen != null)
         {
-            world.netherFortressGen.generate(this, world.getWorld(), chunkX, chunkZ, (byte[]) null);
+            world.netherFortressGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
     }
 

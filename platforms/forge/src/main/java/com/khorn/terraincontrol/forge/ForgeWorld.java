@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.forge;
 
+
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -64,15 +65,20 @@ public class ForgeWorld implements LocalWorld
     private WorldGenDungeons dungeonGen;
 
     private WorldGenTrees tree;
-    private WorldGenTrees cocoaTree;
+    private WorldGenSavannaTree acaciaTree;
     private WorldGenBigTree bigTree;
-    private WorldGenForest forest;
+    private WorldGenForest birchTree;
+    private WorldGenTrees cocoaTree;
+    private WorldGenCanopyTree darkOakTree;
+    private WorldGenShrub groundBush;
+    private WorldGenBigMushroom hugeMushroom;
+    private WorldGenMegaPineTree hugeTaigaTree1;
+    private WorldGenMegaPineTree hugeTaigaTree2;
+    private WorldGenMegaJungle jungleTree;
+    private WorldGenForest longBirchTree;
     private WorldGenSwamp swampTree;
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
-    private WorldGenBigMushroom hugeMushroom;
-    private WorldGenHugeTrees jungleTree;
-    private WorldGenShrub groundBush;
 
     private boolean createNewChunks;
     private Chunk[] chunkCache;
@@ -212,15 +218,15 @@ public class ForgeWorld implements LocalWorld
     public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
     {
         if (this.settings.worldConfig.strongholdsEnabled)
-            this.strongholdGen.generate(null, this.world, chunkX, chunkZ, null);
+            this.strongholdGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.mineshaftsEnabled)
-            this.mineshaftGen.generate(null, this.world, chunkX, chunkZ, null);
+            this.mineshaftGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.villagesEnabled && dry)
-            this.villageGen.generate(null, this.world, chunkX, chunkZ, null);
+            this.villageGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.rareBuildingsEnabled)
-            this.rareBuildingGen.generate(null, this.world, chunkX, chunkZ, null);
+            this.rareBuildingGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.netherFortressesEnabled)
-            this.netherFortressGen.generate(null, this.world, chunkX, chunkZ, null);
+            this.netherFortressGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
     }
 
     @Override
@@ -240,7 +246,10 @@ public class ForgeWorld implements LocalWorld
                 bigTree.setScale(1.0D, 1.0D, 1.0D);
                 return bigTree.generate(this.world, rand, x, y, z);
             case Forest:
-                return forest.generate(this.world, rand, x, y, z);
+            case Birch:
+                return birchTree.generate(this.world, rand, x, y, z);
+            case TallBirch:
+                return longBirchTree.generate(this.world, rand, x, y, z);
             case HugeMushroom:
                 hugeMushroom.setScale(1.0D, 1.0D, 1.0D);
                 return hugeMushroom.generate(this.world, rand, x, y, z);
@@ -256,10 +265,17 @@ public class ForgeWorld implements LocalWorld
                 return groundBush.generate(this.world, rand, x, y, z);
             case CocoaTree:
                 return cocoaTree.generate(this.world, rand, x, y, z);
+            case Acacia:
+                return acaciaTree.generate(this.world, rand, x, y, z);
+            case DarkOak:
+                return darkOakTree.generate(this.world, rand, x, y, z);
+            case HugeTaiga1:
+                return hugeTaigaTree1.generate(this.world, rand, x, y, z);
+            case HugeTaiga2:
+                return hugeTaigaTree2.generate(this.world, rand, x, y, z);
             default:
-                break;
+                throw new AssertionError("Failed to handle tree of type " + type.toString());
         }
-        return false;
     }
 
     @Override
@@ -310,7 +326,8 @@ public class ForgeWorld implements LocalWorld
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
-                                int blockId = section.getExtBlockID(sectionX, sectionY, sectionZ);
+                                Block block = section.func_150819_a(sectionX, sectionY, sectionZ);
+                                int blockId = Block.func_149682_b(block);
                                 if (biomeConfig.replaceMatrixBlocks[blockId] == null)
                                     continue;
 
@@ -318,7 +335,7 @@ public class ForgeWorld implements LocalWorld
                                 if (replaceTo == -1)
                                     continue;
 
-                                section.setExtBlockID(sectionX, sectionY, sectionZ, replaceTo >> 4);
+                                section.func_150818_a(sectionX, sectionY, sectionZ, Block.func_149729_e(replaceTo >> 4));
                                 section.setExtBlockMetadata(sectionX, sectionY, sectionZ, replaceTo & 0xF);
                                 world.getFullBlockLightValue((x + sectionX), (section.getYLocation() + sectionY), (z + sectionZ));
 
@@ -525,7 +542,13 @@ public class ForgeWorld implements LocalWorld
         z &= 0xF;
         x &= 0xF;
         int y = chunk.getHeightValue(x, z);
+<<<<<<< HEAD
         while (chunk.getBlockID(x, y, z) != DefaultMaterial.AIR.id && y <= 256)
+=======
+        int maxSearchY = y + 5; // Don't search too far away
+        // while(chunk.getBlock(...) != ...)
+        while (chunk.func_150810_a(x, y, z) != Blocks.air && y <= maxSearchY)
+>>>>>>> origin/master
         {
             // Fix for incorrect lightmap
             y += 1;
@@ -626,14 +649,19 @@ public class ForgeWorld implements LocalWorld
         this.netherFortressGen = new NetherFortressGen();
 
         this.tree = new WorldGenTrees(false);
+        this.acaciaTree = new WorldGenSavannaTree(false);
         this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
         this.bigTree = new WorldGenBigTree(false);
-        this.forest = new WorldGenForest(false);
+        this.birchTree = new WorldGenForest(false, false);
+        this.darkOakTree = new WorldGenCanopyTree(false);
+        this.longBirchTree = new WorldGenForest(false, true);
         this.swampTree = new WorldGenSwamp();
         this.taigaTree1 = new WorldGenTaiga1();
         this.taigaTree2 = new WorldGenTaiga2(false);
         this.hugeMushroom = new WorldGenBigMushroom();
-        this.jungleTree = new WorldGenHugeTrees(false, 15, 3, 3);
+        this.hugeTaigaTree1 = new WorldGenMegaPineTree(false, false);
+        this.hugeTaigaTree2 = new WorldGenMegaPineTree(false, true);
+        this.jungleTree = new WorldGenMegaJungle(false, 10, 20, 3, 3);
         this.groundBush = new WorldGenShrub(3, 0);
 
         this.chunkCache = new Chunk[4];
@@ -697,8 +725,7 @@ public class ForgeWorld implements LocalWorld
             tileEntity.readFromNBT(nmsTag);
         } else
         {
-            TerrainControl
-                    .log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] { nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z) });
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z)});
         }
     }
 

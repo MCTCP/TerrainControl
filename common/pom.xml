@@ -5,7 +5,7 @@
     <!-- Basic Info -->
     <groupId>com.khorn.terraincontrol</groupId>
     <artifactId>terraincontrol-common</artifactId>
-    <version>2.5.2-SNAPSHOT</version>
+    <version>2.5.2</version>
     <name>TerrainControl:Common</name>
     <description>${project.name} contains the common elements of the TerrainControl Module Group</description>
     

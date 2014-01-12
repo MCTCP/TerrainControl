@@ -31,13 +31,11 @@
 package com.khorn.terraincontrol.forge.metrics;
 
 import com.khorn.terraincontrol.TerrainControl;
-
 import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.TickType;
-import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.config.Configuration;
 
 import java.io.*;
 import java.net.Proxy;
@@ -47,9 +45,6 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
-
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.Configuration;
 
 public class Metrics
 {
