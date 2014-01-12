@@ -1,8 +1,13 @@
 package com.khorn.terraincontrol.forge;
 
-import net.minecraft.init.Blocks;
-
-import net.minecraft.block.Block;
+import net.minecraft.world.gen.feature.WorldGenShrub;
+import net.minecraft.world.gen.feature.WorldGenMegaJungle;
+import net.minecraft.world.gen.feature.WorldGenMegaPineTree;
+import net.minecraft.world.gen.feature.WorldGenBigMushroom;
+import net.minecraft.world.gen.feature.WorldGenSwamp;
+import net.minecraft.world.gen.feature.WorldGenCanopyTree;
+import net.minecraft.world.gen.feature.WorldGenSavannaTree;
+import net.minecraft.server.v1_7_R1.*;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
@@ -14,6 +19,8 @@ import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.forge.structuregens.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.resourcegens.TreeType;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.SpawnerAnimals;
@@ -57,15 +64,20 @@ public class ForgeWorld implements LocalWorld
     private WorldGenDungeons dungeonGen;
 
     private WorldGenTrees tree;
-    private WorldGenTrees cocoaTree;
+    private WorldGenSavannaTree acaciaTree;
     private WorldGenBigTree bigTree;
-    private WorldGenForest forest;
+    private WorldGenForest birchTree;
+    private WorldGenTrees cocoaTree;
+    private WorldGenCanopyTree darkOakTree;
+    private WorldGenShrub groundBush;
+    private WorldGenBigMushroom hugeMushroom;
+    private WorldGenMegaPineTree hugeTaigaTree1;
+    private WorldGenMegaPineTree hugeTaigaTree2;
+    private WorldGenMegaJungle jungleTree;
+    private WorldGenForest longBirchTree;
     private WorldGenSwamp swampTree;
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
-    private WorldGenBigMushroom hugeMushroom;
-    private WorldGenHugeTrees jungleTree;
-    private WorldGenShrub groundBush;
 
     private boolean createNewChunks;
     private Chunk[] chunkCache;
@@ -196,7 +208,8 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry) {
+    public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
+    {
         if (this.settings.strongholdsEnabled)
             this.strongholdGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.mineshaftsEnabled)
@@ -227,7 +240,10 @@ public class ForgeWorld implements LocalWorld
                 bigTree.setScale(1.0D, 1.0D, 1.0D);
                 return bigTree.generate(this.world, rand, x, y, z);
             case Forest:
-                return forest.generate(this.world, rand, x, y, z);
+            case Birch:
+                return birchTree.generate(this.world, rand, x, y, z);
+            case TallBirch:
+                return longBirchTree.generate(this.world, rand, x, y, z);
             case HugeMushroom:
                 hugeMushroom.setScale(1.0D, 1.0D, 1.0D);
                 return hugeMushroom.generate(this.world, rand, x, y, z);
@@ -243,14 +259,22 @@ public class ForgeWorld implements LocalWorld
                 return groundBush.generate(this.world, rand, x, y, z);
             case CocoaTree:
                 return cocoaTree.generate(this.world, rand, x, y, z);
+            case Acacia:
+                return acaciaTree.generate(this.world, rand, x, y, z);
+            case DarkOak:
+                return darkOakTree.generate(this.world, rand, x, y, z);
+            case HugeTaiga1:
+                return hugeTaigaTree1.generate(this.world, rand, x, y, z);
+            case HugeTaiga2:
+                return hugeTaigaTree2.generate(this.world, rand, x, y, z);
             default:
-                break;
+                throw new AssertionError("Failed to handle tree of type " + type.toString());
         }
-        return false;
     }
 
     @Override
-    public boolean placeDefaultStructures(Random rand, int chunkX, int chunkZ) {
+    public boolean placeDefaultStructures(Random rand, int chunkX, int chunkZ)
+    {
 
         boolean isVillagePlaced = false;
         if (this.settings.strongholdsEnabled)
@@ -513,8 +537,9 @@ public class ForgeWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
         int y = chunk.getHeightValue(x, z);
+        int maxSearchY = y + 5; // Don't search too far away
         // while(chunk.getBlock(...) != ...)
-        while (chunk.getBlockID(x, y, z) != DefaultMaterial.AIR.id && y <= worldHeight)
+        while (chunk.func_150810_a(x, y, z) != Blocks.air && y <= maxSearchY)
         {
             // Fix for incorrect lightmap
             y += 1;
@@ -567,12 +592,14 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public int getHeightCap() {
+    public int getHeightCap()
+    {
         return settings.worldHeightCap;
     }
 
     @Override
-    public int getHeightScale() {
+    public int getHeightScale()
+    {
         return settings.worldScale;
     }
 
@@ -613,14 +640,19 @@ public class ForgeWorld implements LocalWorld
         this.netherFortressGen = new NetherFortressGen();
 
         this.tree = new WorldGenTrees(false);
+        this.acaciaTree = new WorldGenSavannaTree(false);
         this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
         this.bigTree = new WorldGenBigTree(false);
-        this.forest = new WorldGenForest(false);
+        this.birchTree = new WorldGenForest(false, false);
+        this.darkOakTree = new WorldGenCanopyTree(false);
+        this.longBirchTree = new WorldGenForest(false, true);
         this.swampTree = new WorldGenSwamp();
         this.taigaTree1 = new WorldGenTaiga1();
         this.taigaTree2 = new WorldGenTaiga2(false);
         this.hugeMushroom = new WorldGenBigMushroom();
-        this.jungleTree = new WorldGenHugeTrees(false, 15, 3, 3);
+        this.hugeTaigaTree1 = new WorldGenMegaPineTree(false, false);
+        this.hugeTaigaTree2 = new WorldGenMegaPineTree(false, true);
+        this.jungleTree = new WorldGenMegaJungle(false, 10, 20, 3, 3);
         this.groundBush = new WorldGenShrub(3, 0);
 
         this.chunkCache = new Chunk[4];
@@ -684,8 +716,7 @@ public class ForgeWorld implements LocalWorld
             tileEntity.readFromNBT(nmsTag);
         } else
         {
-            TerrainControl
-                    .log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] { nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z) });
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z)});
         }
     }
 

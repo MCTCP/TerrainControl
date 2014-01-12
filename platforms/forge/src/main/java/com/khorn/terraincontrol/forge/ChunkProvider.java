@@ -136,9 +136,10 @@ public class ChunkProvider implements IChunkProvider
     @Override
     public ChunkPosition func_147416_a(World world, String s, int x, int y, int z)
     {
+        // Gets the nearest stronghold
         if (("Stronghold".equals(s)) && (this.world.strongholdGen != null))
         {
-            return this.world.strongholdGen.getNearestInstance(world, x, y, z);
+            return this.world.strongholdGen.func_151545_a(world, x, y, z);
         }
         return null;
     }
