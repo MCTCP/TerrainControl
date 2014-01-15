@@ -56,7 +56,7 @@ public class TCPlugin implements TerrainControlEngine
         LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
 
         // Register world type
-        worldType = new TCWorldType(this, "TerrainControl");
+        worldType = new TCWorldType("TerrainControl");
 
         // Register village and rare building starts
         try

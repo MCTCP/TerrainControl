@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.forge;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.util.ForgeMetricsHelper;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
@@ -16,13 +15,11 @@ import java.io.File;
 public class TCWorldType extends WorldType
 {
     public ForgeWorld worldTC;
-    private TCPlugin plugin;
     private String worldType;
 
-    public TCWorldType(TCPlugin plugin, String paramString)
+    public TCWorldType(String paramString)
     {
         super(paramString);
-        this.plugin = plugin;
         this.worldType = paramString;
     }
 
@@ -36,7 +33,6 @@ public class TCWorldType extends WorldType
     @Override
     public WorldChunkManager getChunkManager(World world)
     {
-        boolean standAloneServer = false;
         try
         {
             if (world instanceof WorldClient)
@@ -47,7 +43,6 @@ public class TCWorldType extends WorldType
         {
             // There isn't a WorldClient class, so we are on a stand-alone
             // server. Continue normally.
-            standAloneServer = true;
         }
 
         // Restore old biomes
@@ -81,12 +76,6 @@ public class TCWorldType extends WorldType
             BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeManagerClass, worldTC, new BiomeCacheWrapper(chunkManager));
             ((TCWorldChunkManager) chunkManager).setBiomeManager(biomeManager);
             this.worldTC.setBiomeManager(biomeManager);
-        }
-
-        // Start metrics
-        if (standAloneServer)
-        {
-            new ForgeMetricsHelper(plugin);
         }
 
         return chunkManager;

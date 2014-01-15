@@ -67,7 +67,8 @@ public class SaplingListener
             {
                 for (jungleOffsetZ = 0; jungleOffsetZ >= -1; --jungleOffsetZ)
                 {
-                    if (saplingBlock.isSameSapling(world, x + jungleOffsetX, y, z + jungleOffsetZ, 3) && saplingBlock.isSameSapling(world, x + jungleOffsetX + 1, y, z + jungleOffsetZ, 3) && saplingBlock.isSameSapling(world, x + jungleOffsetX, y, z + jungleOffsetZ + 1, 3) && saplingBlock.isSameSapling(world, x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, 3))
+                    // if (saplingBlock.isSameSapling(..) ..
+                    if (saplingBlock.func_149880_a(world, x + jungleOffsetX, y, z + jungleOffsetZ, 3) && saplingBlock.func_149880_a(world, x + jungleOffsetX + 1, y, z + jungleOffsetZ, 3) && saplingBlock.func_149880_a(world, x + jungleOffsetX, y, z + jungleOffsetZ + 1, 3) && saplingBlock.func_149880_a(world, x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, 3))
                     {
                         treeToGrow = SaplingType.BigJungle;
                         hugeJungleTreeHasGrown = true;

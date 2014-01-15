@@ -1,13 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-import net.minecraft.world.gen.feature.WorldGenShrub;
-import net.minecraft.world.gen.feature.WorldGenMegaJungle;
-import net.minecraft.world.gen.feature.WorldGenMegaPineTree;
-import net.minecraft.world.gen.feature.WorldGenBigMushroom;
-import net.minecraft.world.gen.feature.WorldGenSwamp;
-import net.minecraft.world.gen.feature.WorldGenCanopyTree;
-import net.minecraft.world.gen.feature.WorldGenSavannaTree;
-import net.minecraft.server.v1_7_R1.*;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.biomegenerators.OldBiomeGenerator;
@@ -508,17 +500,17 @@ public class ForgeWorld implements LocalWorld
         // Relight and update
         if (updateLight)
         {
-            world.updateAllLightTypes(x, y, z);
+            world.func_147451_t(x, y, z); // world.updateAllLightTypes
         }
 
         if (notifyPlayers && !world.isRemote)
         {
-            world.markBlockForUpdate(x, y, z);
+            world.func_147471_g(x, y, z); // world.markBlockForUpdate
         }
 
         if (!world.isRemote && applyPhysics)
         {
-            world.notifyBlockChange(x, y, z, oldBlock);
+            world.func_147444_c(x, y, z, oldBlock); // world.notifyBlockChange
         }
     }
 
@@ -713,10 +705,10 @@ public class ForgeWorld implements LocalWorld
         TileEntity tileEntity = world.func_147438_o(x, y, z);
         if (tileEntity != null)
         {
-            tileEntity.readFromNBT(nmsTag);
+            tileEntity.func_145839_a(nmsTag); // tileEntity.readFromNBT
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z)});
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, getTypeId(x, y, z)});
         }
     }
 
@@ -730,11 +722,11 @@ public class ForgeWorld implements LocalWorld
             return null;
         }
         NBTTagCompound nmsTag = new NBTTagCompound();
-        tileEntity.writeToNBT(nmsTag);
+        tileEntity.func_145841_b(nmsTag); // tileEntity.saveToNBT
         nmsTag.removeTag("x");
         nmsTag.removeTag("y");
         nmsTag.removeTag("z");
-        return NBTHelper.getNBTFromNMSTagCompound(nmsTag);
+        return NBTHelper.getNBTFromNMSTagCompound(null, nmsTag);
     }
 
     @Override

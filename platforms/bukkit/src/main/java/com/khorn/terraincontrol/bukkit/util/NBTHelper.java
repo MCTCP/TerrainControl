@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.bukkit.util;
 
-import net.minecraft.server.v1_7_R1.NBTBase;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.Tag;
 import net.minecraft.server.v1_7_R1.*;
@@ -22,7 +21,7 @@ public class NBTHelper
      */
     @SuppressWarnings("unchecked")
     // ^ We know that NBTTagCompound.map is a Map<String, NBTBase>
-    //   So it is safe to suppress this warning
+    // So it is safe to suppress this warning
     public static Tag getNBTFromNMSTagCompound(String name, NBTTagCompound nmsTag)
     {
         Tag compoundTag = new Tag(Tag.Type.TAG_Compound, name, new Tag[] {new Tag(Tag.Type.TAG_End, null, null)});
@@ -99,39 +98,31 @@ public class NBTHelper
             return null;
         }
 
-        Tag.Type listType = Tag.Type.values()[nmsListTag.get(0).getTypeId()];
+        Tag.Type listType = Tag.Type.values()[nmsListTag.d()];
         Tag listTag = new Tag(name, listType);
 
         // Add all child tags
         for (int i = 0; i < nmsListTag.size(); i++)
         {
-            NBTBase nmsChildTag = nmsListTag.get(i);
             switch (listType)
             {
-                case TAG_End:
-                    break;
-                case TAG_Byte:
-                case TAG_Short:
-                case TAG_Int:
-                case TAG_Long:
-                case TAG_Float:
-                case TAG_Double:
-                case TAG_Byte_Array:
-                case TAG_String:
                 case TAG_Int_Array:
-                    listTag.addTag(new Tag(listType, name, getValueFromNms(nmsChildTag)));
+                    listTag.addTag(new Tag(listType, null, nmsListTag.c(i)));
                     break;
-                case TAG_List:
-                    Tag listChildTag = getNBTFromNMSTagList(name, (NBTTagList) nmsChildTag);
-                    if (listChildTag != null)
-                    {
-                        listTag.addTag(listChildTag);
-                    }
+                case TAG_Float:
+                    listTag.addTag(new Tag(listType, null, nmsListTag.e(i)));
+                    break;
+                case TAG_Double:
+                    listTag.addTag(new Tag(listType, null, nmsListTag.d(i)));
+                    break;
+                case TAG_String:
+                    listTag.addTag(new Tag(listType, null, nmsListTag.f(i)));
                     break;
                 case TAG_Compound:
-                    listTag.addTag(getNBTFromNMSTagCompound(name, (NBTTagCompound) nmsChildTag));
+                    listTag.addTag(getNBTFromNMSTagCompound(null, nmsListTag.get(i)));
                     break;
                 default:
+                    TerrainControl.log(Level.INFO, "Cannot convert list subtype {0} from it's NMS value", new Object[] {listType});
                     break;
             }
         }
@@ -259,8 +250,8 @@ public class NBTHelper
     }
 
     /**
-     * Creates a net.minecraft.server.NBTBase tag. Doesn't work for ends, lists
-     * and compounds.
+     * Creates a net.minecraft.server.NBTBase tag. Doesn't work for ends,
+     * lists and compounds.
      * 
      * @param type
      * @param value
