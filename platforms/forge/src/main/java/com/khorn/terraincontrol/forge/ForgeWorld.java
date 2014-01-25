@@ -98,10 +98,12 @@ public class ForgeWorld implements LocalWorld
     {
         this.name = _name;
 
-        for (int i = 0; i < DefaultBiome.values().length; i++)
+        // Save all original vanilla biomes, so that they can be restored later on
+        for (DefaultBiome defaultBiome : DefaultBiome.values())
         {
-            BiomeGenBase oldBiome = BiomeGenBase.func_150568_d(i);
-            biomesToRestore[i] = oldBiome;
+            int biomeId = defaultBiome.Id;
+            BiomeGenBase oldBiome = BiomeGenBase.func_150568_d(biomeId);
+            biomesToRestore[biomeId] = oldBiome;
             BiomeGenCustom custom = new BiomeGenCustom(nextBiomeId++, oldBiome.biomeName);
             custom.CopyBiome(oldBiome);
             Biome biome = new Biome(custom);

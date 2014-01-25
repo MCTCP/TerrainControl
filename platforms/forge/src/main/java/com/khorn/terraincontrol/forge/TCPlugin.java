@@ -10,16 +10,19 @@ import com.khorn.terraincontrol.forge.structuregens.RareBuildingStart;
 import com.khorn.terraincontrol.forge.structuregens.VillageStart;
 import com.khorn.terraincontrol.util.StringHelper;
 import com.khorn.terraincontrol.util.StructureNames;
+
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
+
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -45,8 +48,8 @@ public class TCPlugin implements TerrainControlEngine
         // This is the place where the mod starts loading
 
         // Set the directory
-        TerrainControl.setEngine(this);
         logger = FMLCommonHandler.instance().getFMLLogger();
+        TerrainControl.setEngine(this);
 
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
@@ -80,7 +83,8 @@ public class TCPlugin implements TerrainControlEngine
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
-            NetworkRegistry.INSTANCE.newChannel(TCDefaultValues.ChannelName.stringValue(), new PacketHandler());
+            FMLEventChannel eventDrivenChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(TCDefaultValues.ChannelName.stringValue());
+            eventDrivenChannel.register(new PacketHandler());
         }
 
         // Register player tracker, for sending configs.

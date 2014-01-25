@@ -1,43 +1,39 @@
 package com.khorn.terraincontrol.forge;
 
-import io.netty.channel.ChannelHandlerContext;
-
-import io.netty.channel.ChannelHandler;
-import net.minecraft.network.play.client.C17PacketCustomPayload;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.TCDefaultValues;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.network.IPacketHandler;
-import cpw.mods.fml.common.network.Player;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet250CustomPayload;
-import net.minecraft.util.ReportedException;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.util.Arrays;
+import java.util.logging.Level;
 
-public class PacketHandler implements ChannelHandler
+public class PacketHandler
 {
 
-    @Override
-    public void onPacketData(INetworkManager manager, C17PacketCustomPayload receivedPacket, Player player)
+    @SubscribeEvent
+    public void onServerPacket(ServerCustomPacketEvent event)
     {
-        // This method receives the TerrainControl packet with the custom biome
-        // colors and weather.
 
-        if (!receivedPacket.channel.equals(TCDefaultValues.ChannelName.stringValue()))
-        {
-            // Make sure that the right channel is being received
-            return;
-        }
+    }
+
+    @SubscribeEvent
+    public void onClientPacket(ClientCustomPacketEvent event)
+    {
+        // This method receives the TerrainControl packet with the custom
+        // biome colors and weather.
+        
+        FMLProxyPacket receivedPacket = event.packet;
 
         // We're on the client, receive the packet
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(receivedPacket.data);
-        DataInputStream stream = new DataInputStream(inputStream);
+        ByteBuf stream = receivedPacket.payload();
         try
         {
             int serverProtocolVersion = stream.readInt();
@@ -49,13 +45,15 @@ public class PacketHandler implements ChannelHandler
                 // Restore old biomes
                 ForgeWorld.restoreBiomes();
 
-                if (receivedPacket.length > 4)
+                if (stream.readableBytes() > 4)
                 {
                     // If the packet wasn't empty, add the new biomes
                     WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
 
                     ForgeWorld worldTC = new ForgeWorld("external");
-                    WorldConfig config = new WorldConfig(stream, worldTC);
+                    DataInputStream wrappedStream = new DataInputStream(new ByteBufInputStream(stream));
+                    WorldConfig config = new WorldConfig(wrappedStream, worldTC);
+                    wrappedStream.close();
 
                     worldTC.InitM(worldMC, config);
                 }
@@ -68,14 +66,9 @@ public class PacketHandler implements ChannelHandler
             }
         } catch (Exception e)
         {
-            CrashReport crashreport = CrashReport.makeCrashReport(e, "Exception reading biome packet");
-            CrashReportCategory details = crashreport.makeCategory("TerrainControl");
-            details.addCrashSection("Packet length", receivedPacket.data.length);
-            details.addCrashSection("Packet data", Arrays.toString(receivedPacket.data));
-
-            throw new ReportedException(crashreport);
+            TerrainControl.log(Level.SEVERE, "Failed to receive packet");
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         }
-
     }
 
 }
