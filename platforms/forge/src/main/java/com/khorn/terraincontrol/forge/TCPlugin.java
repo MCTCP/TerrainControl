@@ -18,6 +18,7 @@ import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -60,7 +61,7 @@ public class TCPlugin implements TerrainControlEngine
         LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
 
         // Register world type
-        worldType = new TCWorldType(this, "TerrainControl");
+        worldType = new TCWorldType("TerrainControl");
 
         // Register village and rare building starts
         try
@@ -84,7 +85,8 @@ public class TCPlugin implements TerrainControlEngine
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
-            NetworkRegistry.INSTANCE.newChannel(PluginStandardValues.ChannelName.stringValue(), new PacketHandler());
+            FMLEventChannel eventDrivenChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PluginStandardValues.ChannelName.stringValue());
+            eventDrivenChannel.register(new PacketHandler());
         }
 
         // Register player tracker, for sending configs.

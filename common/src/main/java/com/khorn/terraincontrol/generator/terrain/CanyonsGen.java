@@ -1,7 +1,9 @@
 package com.khorn.terraincontrol.generator.terrain;
 
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.ChunkProviderTC;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
@@ -113,7 +115,7 @@ public class CanyonsGen extends TerrainGenBase
                 {
                     for (int i7 = i1 + 1; (i4 == 0) && (i7 >= n - 1); i7--)
                     {
-                        i8 = (i5 * 16 + i6) * worldSettings.worldHeightCap + i7;
+                        i8 = (i5 * 16 + i6) * ChunkProviderTC.CHUNK_MAX_Y + i7;
                         if (i7 < 0)
                             continue;
                         if (i7 < worldSettings.worldHeightCap)
@@ -138,7 +140,7 @@ public class CanyonsGen extends TerrainGenBase
                 for (i8 = i2; i8 < i3; i8++)
                 {
                     double d10 = (i8 + chunk_z * 16 + 0.5D - paramDouble3) / d3;
-                    int i9 = (i5 * 16 + i8) * worldSettings.worldHeightCap + i1;
+                    int i9 = (i5 * 16 + i8) * ChunkProviderTC.CHUNK_MAX_Y + i1;
                     int i10 = 0;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {

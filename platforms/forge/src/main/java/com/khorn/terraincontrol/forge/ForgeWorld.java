@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -107,10 +106,12 @@ public class ForgeWorld implements LocalWorld
     {
         this.name = _name;
 
-        for (int i = 0; i < DefaultBiome.values().length; i++)
+        // Save all original vanilla biomes, so that they can be restored later on
+        for (DefaultBiome defaultBiome : DefaultBiome.values())
         {
-            BiomeGenBase oldBiome = BiomeGenBase.func_150568_d(i);
-            biomesToRestore[i] = oldBiome;
+            int biomeId = defaultBiome.Id;
+            BiomeGenBase oldBiome = BiomeGenBase.func_150568_d(biomeId);
+            biomesToRestore[biomeId] = oldBiome;
             BiomeGenCustom custom = new BiomeGenCustom(nextBiomeId++, oldBiome.biomeName);
             custom.CopyBiome(oldBiome);
             ForgeBiome biome = new ForgeBiome(custom);
@@ -513,17 +514,17 @@ public class ForgeWorld implements LocalWorld
         // Relight and update
         if (updateLight)
         {
-            world.updateAllLightTypes(x, y, z);
+            world.func_147451_t(x, y, z); // world.updateAllLightTypes
         }
 
         if (notifyPlayers && !world.isRemote)
         {
-            world.markBlockForUpdate(x, y, z);
+            world.func_147471_g(x, y, z); // world.markBlockForUpdate
         }
 
         if (!world.isRemote && applyPhysics)
         {
-            world.notifyBlockChange(x, y, z, oldBlock);
+            world.func_147444_c(x, y, z, oldBlock); // world.notifyBlockChange
         }
     }
 
@@ -542,13 +543,9 @@ public class ForgeWorld implements LocalWorld
         z &= 0xF;
         x &= 0xF;
         int y = chunk.getHeightValue(x, z);
-<<<<<<< HEAD
-        while (chunk.getBlockID(x, y, z) != DefaultMaterial.AIR.id && y <= 256)
-=======
         int maxSearchY = y + 5; // Don't search too far away
         // while(chunk.getBlock(...) != ...)
         while (chunk.func_150810_a(x, y, z) != Blocks.air && y <= maxSearchY)
->>>>>>> origin/master
         {
             // Fix for incorrect lightmap
             y += 1;
@@ -722,10 +719,10 @@ public class ForgeWorld implements LocalWorld
         TileEntity tileEntity = world.func_147438_o(x, y, z);
         if (tileEntity != null)
         {
-            tileEntity.readFromNBT(nmsTag);
+            tileEntity.func_145839_a(nmsTag); // tileEntity.readFromNBT
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, world.getBlockId(x, y, z)});
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, getTypeId(x, y, z)});
         }
     }
 
@@ -739,11 +736,11 @@ public class ForgeWorld implements LocalWorld
             return null;
         }
         NBTTagCompound nmsTag = new NBTTagCompound();
-        tileEntity.writeToNBT(nmsTag);
+        tileEntity.func_145841_b(nmsTag); // tileEntity.saveToNBT
         nmsTag.removeTag("x");
         nmsTag.removeTag("y");
         nmsTag.removeTag("z");
-        return NBTHelper.getNBTFromNMSTagCompound(nmsTag);
+        return NBTHelper.getNBTFromNMSTagCompound(null, nmsTag);
     }
 
     @Override

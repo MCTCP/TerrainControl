@@ -98,39 +98,31 @@ public class NBTHelper
             return null;
         }
 
-        NamedBinaryTag.Type listType = NamedBinaryTag.Type.values()[nmsListTag.get(0).getTypeId()];
+        NamedBinaryTag.Type listType = NamedBinaryTag.Type.values()[nmsListTag.d()];
         NamedBinaryTag listTag = new NamedBinaryTag(name, listType);
 
         // Add all child tags
         for (int i = 0; i < nmsListTag.size(); i++)
         {
-            NBTBase nmsChildTag = nmsListTag.get(i);
             switch (listType)
             {
-                case TAG_End:
-                    break;
-                case TAG_Byte:
-                case TAG_Short:
-                case TAG_Int:
-                case TAG_Long:
-                case TAG_Float:
-                case TAG_Double:
-                case TAG_Byte_Array:
-                case TAG_String:
                 case TAG_Int_Array:
-                    listTag.addTag(new NamedBinaryTag(listType, name, getValueFromNms(nmsChildTag)));
+                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.c(i)));
                     break;
-                case TAG_List:
-                    NamedBinaryTag listChildTag = getNBTFromNMSTagList(name, (NBTTagList) nmsChildTag);
-                    if (listChildTag != null)
-                    {
-                        listTag.addTag(listChildTag);
-                    }
+                case TAG_Float:
+                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.e(i)));
+                    break;
+                case TAG_Double:
+                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.d(i)));
+                    break;
+                case TAG_String:
+                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.f(i)));
                     break;
                 case TAG_Compound:
-                    listTag.addTag(getNBTFromNMSTagCompound(name, (NBTTagCompound) nmsChildTag));
+                    listTag.addTag(getNBTFromNMSTagCompound(null, nmsListTag.get(i)));
                     break;
                 default:
+                    TerrainControl.log(Level.INFO, "Cannot convert list subtype {0} from it's NMS value", new Object[] {listType});
                     break;
             }
         }
@@ -258,8 +250,8 @@ public class NBTHelper
     }
 
     /**
-     * Creates a net.minecraft.server.NBTBase tag. Doesn't work for ends, lists
-     * and compounds.
+     * Creates a net.minecraft.server.NBTBase tag. Doesn't work for ends,
+     * lists and compounds.
      * 
      * @param type
      * @param value

@@ -1,39 +1,40 @@
 package com.khorn.terraincontrol.forge.events;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import cpw.mods.fml.client.FMLClientHandler;
-import ibxm.Player;
-import io.netty.channel.ChannelHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.network.play.client.C17PacketCustomPayload;
-import net.minecraft.util.ReportedException;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.util.Arrays;
+import java.util.logging.Level;
 
-public class PacketHandler implements ChannelHandler
+public class PacketHandler
 {
 
-    @Override
-    public void onPacketData(INetworkManager manager, C17PacketCustomPayload receivedPacket, Player player)
+    @SubscribeEvent
+    public void onServerPacket(ServerCustomPacketEvent event)
     {
-        // This method receives the TerrainControl packet with the custom biome
-        // colors and weather.
 
-        if (!receivedPacket.channel.equals(PluginStandardValues.ChannelName.stringValue()))
-        {
-            // Make sure that the right channel is being received
-            return;
-        }
+    }
+
+    @SubscribeEvent
+    public void onClientPacket(ClientCustomPacketEvent event)
+    {
+        // This method receives the TerrainControl packet with the custom
+        // biome colors and weather.
+
+        FMLProxyPacket receivedPacket = event.packet;
 
         // We're on the client, receive the packet
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(receivedPacket.data);
-        DataInputStream stream = new DataInputStream(inputStream);
+        ByteBuf stream = receivedPacket.payload();
         try
         {
             int serverProtocolVersion = stream.readInt();
@@ -45,13 +46,15 @@ public class PacketHandler implements ChannelHandler
                 // Restore old biomes
                 ForgeWorld.restoreBiomes();
 
-                if (receivedPacket.length > 4)
+                if (stream.readableBytes() > 4)
                 {
                     // If the packet wasn't empty, add the new biomes
                     WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
 
                     ForgeWorld worldTC = new ForgeWorld("external");
-                    WorldSettings config = new WorldSettings(stream, worldTC);
+                    DataInputStream wrappedStream = new DataInputStream(new ByteBufInputStream(stream));
+                    WorldSettings config = new WorldSettings(wrappedStream, worldTC);
+                    wrappedStream.close();
 
                     worldTC.InitM(worldMC, config);
                 }
@@ -64,14 +67,9 @@ public class PacketHandler implements ChannelHandler
             }
         } catch (Exception e)
         {
-            CrashReport crashreport = CrashReport.makeCrashReport(e, "Exception reading biome packet");
-            CrashReportCategory details = crashreport.makeCategory("TerrainControl");
-            details.addCrashSection("Packet length", receivedPacket.data.length);
-            details.addCrashSection("Packet data", Arrays.toString(receivedPacket.data));
-
-            throw new ReportedException(crashreport);
+            TerrainControl.log(Level.SEVERE, "Failed to receive packet");
+            TerrainControl.printStackTrace(Level.SEVERE, e);
         }
-
     }
 
 }

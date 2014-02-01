@@ -23,9 +23,9 @@ import java.util.Random;
 public class ChunkProviderTC
 {
     // Several constants describing the chunk size of Minecraft
-    private static final int CHUNK_MAX_X = 16;
-    private static final int CHUNK_MAX_Y = 256;
-    private static final int CHUNK_MAX_Z = 16;
+    public static final int CHUNK_MAX_X = 16;
+    public static final int CHUNK_MAX_Y = 256;
+    public static final int CHUNK_MAX_Z = 16;
 
     private static final int NOISE_MAX_X = CHUNK_MAX_X / 4 + 1;
     private static final int NOISE_MAX_Z = CHUNK_MAX_Z / 4 + 1;

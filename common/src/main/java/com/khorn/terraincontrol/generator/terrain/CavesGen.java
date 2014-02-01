@@ -1,7 +1,9 @@
 package com.khorn.terraincontrol.generator.terrain;
 
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.ChunkProviderTC;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
@@ -133,7 +135,7 @@ public class CavesGen extends TerrainGenBase
                 {
                     for (int local_y = i2 + 1; (!waterFound) && (local_y >= i1 - 1); local_y--)
                     {
-                        arrayPosition = (local_x * 16 + local_z) * this.worldSettings.worldHeightCap + local_y;
+                        arrayPosition = (local_x * 16 + local_z) * ChunkProviderTC.CHUNK_MAX_Y + local_y;
                         if (local_y < 0)
                             continue;
 
@@ -159,7 +161,7 @@ public class CavesGen extends TerrainGenBase
                 {
                     double d10 = (local_z + real_chunk_z * 16 + 0.5D - z) / d3;
 
-                    int i10 = (local_x * 16 + local_z) * this.worldSettings.worldHeightCap + i2;
+                    int i10 = (local_x * 16 + local_z) * ChunkProviderTC.CHUNK_MAX_Y + i2;
                     boolean grassFound = false;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
