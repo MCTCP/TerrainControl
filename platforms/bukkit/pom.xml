@@ -1,10 +1,10 @@
 <!--
-  --
-  -- Deprecated. Use the Gradle files. See 
-  -- https://github.com/Wickth/TerrainControl/wiki/Developer-page#wiki-compiling
-  -- for information on how to compile Terrain Control using Gradle.
-  --
-  --
+  -
+  - Deprecated. Use the Gradle files. See 
+  - https://github.com/Wickth/TerrainControl/wiki/Developer-page#wiki-compiling
+  - for information on how to compile Terrain Control using Gradle.
+  -
+  -
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
