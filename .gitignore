@@ -4,25 +4,37 @@
 .settings
 
 # NetBeans
-/nbproject
-/build.xml
+nbproject
+build.xml
+nbbuild
 
 # Idea stuff 
 /.idea
 *.iml
+
+# Various IDEs like to add child .gitignore files
+**/.gitignore
 
 # vim
 .*.sw[a-p]
 
 # various other potential build files
 target
-/bin
-/dist
-/out
-/localexport.jardesc
+build
+.gradle
+bin
+dist
+out
+localexport.jardesc
+
+# Minecraft and Forge files
+assets
+*.log
+*.log.gz
+*.cfg
+
+# Ignore our own config files
+*.ini
 
 # Mac filesystem dust
 .DS_Store
-
-# Windows filesystem dust
-desktop.ini
