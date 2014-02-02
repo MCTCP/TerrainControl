@@ -1,15 +1,14 @@
+<!--
+  --
+  -- Deprecated. Use the Gradle files. See 
+  -- https://github.com/Wickth/TerrainControl/wiki/Developer-page#wiki-compiling
+  -- for information on how to compile Terrain Control using Gradle.
+  --
+  --
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
-    <!--    
-    We might eventually want to open up a repo and sonatype is a big name with some nice features
-        <parent>
-            <groupId>org.sonatype.oss</groupId>
-            <artifactId>oss-parent</artifactId>
-            <version>7</version>
-        </parent>
-    -->
     
     
     <!-- Basic Info -->
@@ -27,9 +26,6 @@
     <modules>
         <module>common</module>
         <module>platforms/bukkit</module>
-        <!-- Disabled for now, as there is no Minecraft Forge for 1.7 yet
-        <module>platforms/forge</module>
-        -->
         <module>platforms</module>
     </modules>
         
