@@ -1,0 +1,15 @@
+// Build script for the Common parts of Terrain Control
+
+apply plugin: 'java'
+
+// Project properties
+archivesBaseName = "terraincontrol-common"
+description = "Core files of TerrainControl"
+ext.ideProjectName = "TerrainControl-Common"
+
+repositories
+{
+	mavenLocal()
+    mavenCentral()
+}
+
