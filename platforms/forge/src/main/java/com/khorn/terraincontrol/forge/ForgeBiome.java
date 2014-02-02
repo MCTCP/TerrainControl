@@ -1,20 +1,22 @@
 package com.khorn.terraincontrol.forge;
 
-import net.minecraft.block.Block;
+import com.khorn.terraincontrol.BiomeIds;
 
+import net.minecraft.block.Block;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
-
 import net.minecraft.world.biome.BiomeGenBase;
 
 public class ForgeBiome implements LocalBiome
 {
     private BiomeGenCustom biomeBase;
+    private BiomeIds biomeIds;
 
     public ForgeBiome(BiomeGenCustom biome)
     {
         this.biomeBase = biome;
+        this.biomeIds = new BiomeIds(biome.biomeID);
     }
 
     @Override
@@ -24,15 +26,9 @@ public class ForgeBiome implements LocalBiome
     }
 
     @Override
-    public boolean isVirtual()
-    {
-        return false;
-    }
-
-    @Override
     public int getCustomId()
     {
-        return getId();
+        return biomeIds.getSavedId();
     }
 
     @Override
@@ -53,9 +49,9 @@ public class ForgeBiome implements LocalBiome
     }
 
     @Override
-    public int getId()
+    public BiomeIds getIds()
     {
-        return biomeBase.biomeID;
+        return biomeIds;
     }
 
     @Override

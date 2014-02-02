@@ -1,10 +1,13 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
+
 import net.minecraft.server.v1_7_R1.*;
+
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_7_R1.block.CraftBlock;
 
@@ -16,9 +19,9 @@ import java.util.logging.Level;
 public class CustomBiome extends BiomeBase
 {
     @SuppressWarnings("MismatchedReadAndWriteOfArray")
-    public CustomBiome(int id, String name)
+    public CustomBiome(BiomeIds biomeIds, String name)
     {
-        super(id);
+        super(biomeIds.getSavedId());
         this.a(name);
 
         // Insert the biome in CraftBukkit's biome mapping

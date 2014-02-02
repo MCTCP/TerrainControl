@@ -182,7 +182,7 @@ public abstract class Layer
                     continue;
                 if (worldConfig.IsleBiomes.contains(biomeConfig.name) && biomeConfig.IsleInBiome != null)
                 {
-                    int id = biomeConfig.Biome.getId();
+                    int id = biomeConfig.Biome.getIds().getGenerationId();
                     if (biomeConfig.Biome.isCustom())
                         id = biomeConfig.Biome.getCustomId();  // Must be decreased by count of new biomes since 1.1 for compatible 1.1 maps
 

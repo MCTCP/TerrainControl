@@ -29,7 +29,7 @@ public class LayerBiomeBorder extends Layer
             LocalBiome biome = world.getBiomeById(i);
             this.BordersFrom[ReplaceFrom][i] = biome == null || !ReplaceTo.NotBorderNear.contains(biome.getName());
         }
-        this.BordersTo[ReplaceFrom] = ReplaceTo.Biome.getId();
+        this.BordersTo[ReplaceFrom] = ReplaceTo.Biome.getIds().getGenerationId();
     }
 
     @Override

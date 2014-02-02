@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.forge.generator;
 
+import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
@@ -25,9 +26,9 @@ public class BiomeGenCustom extends BiomeGenBase
     private boolean grassColorSet = false;
     private boolean foliageColorSet = false;
 
-    public BiomeGenCustom(int id, String name)
+    public BiomeGenCustom(BiomeIds id, String name)
     {
-        super(id);
+        super(id.getSavedId());
         this.setBiomeName(name);
 
     }

@@ -38,7 +38,6 @@ public class BiomeConfig extends ConfigFile
 
     public String BiomeExtends;
     public boolean BiomeExtendsProcessed = false;
-    public boolean BiomeExtendsSeen = false;
 
     private boolean processHasRun = false;
     private boolean doResourceInheritance = true;
@@ -154,17 +153,7 @@ public class BiomeConfig extends ConfigFile
     public boolean spawnAmbientCreaturesAddDefaults = true;
     public List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
-    public BiomeConfig(File settingsDir, LocalBiome biome, WorldConfig config)
-    {
-        super(biome.getName(), settingsDir, BiomeStandardValues.BiomeConfigExtensions.stringArrayListValue(), TerrainControl.getPluginConfig().worldDefaultBiomeConfigExtension);
-        this.Biome = biome;
-        this.worldConfig = config;
-        this.defaultSettings = StandardBiomeFactory.getDefaultSettings(biome, config.worldHeightCap);
-
-        this.readSettingsFile(false);
-    }
-
-    public BiomeConfig(String name, File biomeFile, LocalBiome biome, WorldConfig config)
+    public BiomeConfig(File biomeFile, LocalBiome biome, WorldConfig config)
     {
         super(biome.getName(), biomeFile);
         this.Biome = biome;
@@ -172,6 +161,9 @@ public class BiomeConfig extends ConfigFile
         this.defaultSettings = StandardBiomeFactory.getDefaultSettings(biome, config.worldHeightCap);
 
         this.readSettingsFile(false);
+
+        // Read this setting early, before inheritance is applied
+        this.BiomeExtends = readSettings(BiomeStandardValues.BiomeExtends);
     }
 
     public void process()
@@ -185,7 +177,7 @@ public class BiomeConfig extends ConfigFile
             this.correctSettings();
 
             // Add default resources when needed
-            if (!file.exists())
+            if (this.isNewConfig)
             {
                 this.resourceSequence.addAll(defaultSettings.createDefaultResources(this));
             }
@@ -198,7 +190,7 @@ public class BiomeConfig extends ConfigFile
                 this.iceBlock = worldConfig.iceBlock;
             }
 
-            if (Biome.isCustom() && !Biome.isVirtual())
+            if (Biome.isCustom() && !Biome.getIds().isVirtual())
                 Biome.setEffects(this);
         }
     }
@@ -293,7 +285,8 @@ public class BiomeConfig extends ConfigFile
         this.netherFortressesEnabled = readModSettings(BiomeStandardValues.NetherFortressesEnabled, true);
         this.villageType = (VillageType) readModSettings(BiomeStandardValues.VillageType, defaultSettings.defaultVillageType);
         this.mineshaftsRarity = readSettings(BiomeStandardValues.MineshaftRarity);
-        this.rareBuildingType = (RareBuildingType) readModSettings(BiomeStandardValues.RareBuildingType, defaultSettings.defaultRareBuildingType);
+        this.rareBuildingType = (RareBuildingType) readModSettings(BiomeStandardValues.RareBuildingType,
+                defaultSettings.defaultRareBuildingType);
 
         if (this.Biome.isCustom())
         {
@@ -461,7 +454,8 @@ public class BiomeConfig extends ConfigFile
                 };
             } else
             {
-                resource = TerrainControl.getConfigFunctionsManager().getConfigFunction(rName, this, this.name + " on line " + entry.getValue(), Arrays.asList(props));
+                resource = TerrainControl.getConfigFunctionsManager().getConfigFunction(rName, this,
+                        this.name + " on line " + entry.getValue(), Arrays.asList(props));
             }
         }
         return resource;
@@ -504,29 +498,28 @@ public class BiomeConfig extends ConfigFile
     public BiomeConfig merge(BiomeConfig parent)
     {
         // INHERITANCE VARIABLES -- START
-        if (TerrainControl.getPluginConfig().feature_BiomeInheritanceVariables_Timethor)
-        {
-            // Run down the list of child settings from config
-            for (Map.Entry<String, String> childEntry : this.settingsCache.entrySet())
-            { // As long as setting value contains `Interited` and it isnt
-              // a resource
-                String childValue = childEntry.getValue();
-                if (childValue.toLowerCase().contains("inherited") && getResource(childEntry) == null)
-                { // if the parent has the setting
-                    if (parent.settingsCache.containsKey(childEntry.getKey()))
+        // Run down the list of child settings from config
+        for (Map.Entry<String, String> childEntry : this.settingsCache.entrySet())
+        { // As long as setting value contains `Interited` and it isnt
+          // a resource
+            String childValue = childEntry.getValue();
+            if (childValue.toLowerCase().contains("inherited") && getResource(childEntry) == null)
+            { // if the parent has the setting
+                if (parent.settingsCache.containsKey(childEntry.getKey()))
+                {
+                    String parentValue = parent.settingsCache.get(childEntry.getKey());
+                    if (parentValue.toLowerCase().contains("inherited"))
                     {
-                        String parentValue = parent.settingsCache.get(childEntry.getKey());
-                        if (parentValue.toLowerCase().contains("inherited"))
-                        {
-                            TerrainControl.log(Level.SEVERE, "Parent has `Inherited` keyword. Something is wrong. Please report this.");
-                            continue;
-                        }
-                        childEntry.setValue(InheritanceHelper.evaluate(childValue, parentValue));
-                        TerrainControl.log(Level.SEVERE, "Setting `{0}` replaced with `{1}`", new Object[] {childEntry.getKey(), InheritanceHelper.evaluate(childValue, parentValue)});
+                        TerrainControl.log(Level.SEVERE, "Parent has `Inherited` keyword. Something is wrong. Please report this.");
+                        continue;
                     }
+                    childEntry.setValue(InheritanceHelper.evaluate(childValue, parentValue));
+                    TerrainControl.log(Level.SEVERE, "Setting `{0}` replaced with `{1}`", new Object[] {childEntry.getKey(),
+                            InheritanceHelper.evaluate(childValue, parentValue)});
                 }
             }
         }
+
         // INHERITANCE VARIABLES -- END
 
         // Run down the list of parent settings from config
@@ -539,7 +532,8 @@ public class BiomeConfig extends ConfigFile
                 // Give it to the child from the parent
                 this.settingsCache.put(parentEntry.getKey(), parentEntry.getValue());
                 // And let us know if we are producing FINE logs
-                TerrainControl.log(Level.FINER, "Setting({0},{1})", new Object[] {parentEntry.getKey(), parent.settingsCache.get(parentEntry.getKey())});
+                TerrainControl.log(Level.FINER, "Setting({0},{1})",
+                        new Object[] {parentEntry.getKey(), parent.settingsCache.get(parentEntry.getKey())});
             }
         }
         // Now really process both parent and child so that both have their
@@ -565,7 +559,8 @@ public class BiomeConfig extends ConfigFile
                     TerrainControl.log(Level.FINEST, "CHCK:: Checking against: {0}", new Object[] {cr.makeString()});
                     if (cr.isAnalogousTo(pr))
                     {
-                        TerrainControl.log(Level.FINER, "Adding Child Resource\nC: {0}\nP: {1}", new Object[] {cr.makeString(), pr.makeString()});
+                        TerrainControl.log(Level.FINER, "Adding Child Resource\nC: {0}\nP: {1}",
+                                new Object[] {cr.makeString(), pr.makeString()});
                         T_ResourceSequence.add(cr);
                         childRes.remove(cr);
                         analagous = true;
@@ -770,7 +765,8 @@ public class BiomeConfig extends ConfigFile
         writeComment("");
         writeComment("Alternatively, you can use Mesa, MesaForest or MesaBryce to get blocks");
         writeComment("like the blocks found in the Mesa biomes.");
-        writeValue(BiomeStandardValues.SurfaceAndGroundControl, this.surfaceAndGroundControl == null ? "" : this.surfaceAndGroundControl.toString());
+        writeValue(BiomeStandardValues.SurfaceAndGroundControl,
+                this.surfaceAndGroundControl == null ? "" : this.surfaceAndGroundControl.toString());
 
         writeComment("Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])");
         writeComment("Example :");
@@ -935,7 +931,7 @@ public class BiomeConfig extends ConfigFile
         this.writeValue(BiomeStandardValues.RareBuildingType, rareBuildingType.toString());
 
         this.writeBigTitle("Mob spawning");
-        if (DefaultBiome.getBiome(this.Biome.getId()) != null)
+        if (DefaultBiome.getBiome(this.Biome.getIds().getSavedId()) != null)
         {
             // Stop in the default biomes
             this.writeComment("Mob spawning control doesn't work in default biomes.");
@@ -1128,16 +1124,20 @@ public class BiomeConfig extends ConfigFile
         this.waterLevelMin = applyBounds(this.waterLevelMin, 0, this.worldConfig.worldHeightCap - 1);
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.worldHeightCap - 1, this.waterLevelMin);
 
-        this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomeIds.keySet().contains(this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
+        this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomeIds.keySet().contains(
+                this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
 
-        this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.CustomBiomeIds.keySet().contains(this.riverBiome)) ? this.riverBiome : "";
+        this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.CustomBiomeIds.keySet().contains(this.riverBiome)) ? this.riverBiome
+                : "";
     }
 
     @Override
     protected void renameOldSettings()
     {
         // Old values from WorldConfig
-        BiomeStandardValues[] copyFromWorld = {BiomeStandardValues.MaxAverageHeight, BiomeStandardValues.MaxAverageDepth, BiomeStandardValues.Volatility1, BiomeStandardValues.Volatility2, BiomeStandardValues.VolatilityWeight1, BiomeStandardValues.VolatilityWeight2, BiomeStandardValues.DisableBiomeHeight, BiomeStandardValues.CustomHeightControl};
+        BiomeStandardValues[] copyFromWorld = {BiomeStandardValues.MaxAverageHeight, BiomeStandardValues.MaxAverageDepth,
+                BiomeStandardValues.Volatility1, BiomeStandardValues.Volatility2, BiomeStandardValues.VolatilityWeight1,
+                BiomeStandardValues.VolatilityWeight2, BiomeStandardValues.DisableBiomeHeight, BiomeStandardValues.CustomHeightControl};
         for (BiomeStandardValues value : copyFromWorld)
             if (this.worldConfig.settingsCache.containsKey(value.name().toLowerCase()))
             {

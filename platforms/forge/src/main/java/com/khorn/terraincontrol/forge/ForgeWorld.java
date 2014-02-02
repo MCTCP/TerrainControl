@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.BiomeIds;
+
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -112,10 +114,10 @@ public class ForgeWorld implements LocalWorld
             int biomeId = defaultBiome.Id;
             BiomeGenBase oldBiome = BiomeGenBase.func_150568_d(biomeId);
             biomesToRestore[biomeId] = oldBiome;
-            BiomeGenCustom custom = new BiomeGenCustom(nextBiomeId++, oldBiome.biomeName);
+            BiomeGenCustom custom = new BiomeGenCustom(new BiomeIds(biomeId), oldBiome.biomeName);
             custom.CopyBiome(oldBiome);
             ForgeBiome biome = new ForgeBiome(custom);
-            biomes[biome.getId()] = biome;
+            biomes[biome.getIds().getGenerationId()] = biome;
             defaultBiomes.add(biome);
             this.biomeNames.put(biome.getName(), biome);
         }
@@ -128,18 +130,12 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome AddCustomBiome(String name, int id)
+    public LocalBiome addCustomBiome(String name, BiomeIds id)
     {
         ForgeBiome biome = new ForgeBiome(new BiomeGenCustom(id, name));
-        biomes[biome.getId()] = biome;
+        biomes[biome.getIds().getGenerationId()] = biome;
         this.biomeNames.put(biome.getName(), biome);
         return biome;
-    }
-
-    @Override
-    public LocalBiome AddVirtualBiome(String name, int id, int virtualId)
-    {
-        return null;
     }
 
     @Override
@@ -163,7 +159,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getBiomeIdByName(String name)
     {
-        return this.biomeNames.get(name).getId();
+        return this.biomeNames.get(name).getIds().getGenerationId();
     }
 
     @Override
@@ -356,7 +352,7 @@ public class ForgeWorld implements LocalWorld
             byte[] ChunkBiomes = this.chunkCache[0].getBiomeArray();
 
             for (int i = 0; i < ChunkBiomes.length; i++)
-                ChunkBiomes[i] = (byte) (this.settings.ReplaceBiomesMatrix[ChunkBiomes[i] & 0xFF] & 0xFF);
+                ChunkBiomes[i] = (byte) (this.settings.replaceToBiomeNameMatrix[ChunkBiomes[i] & 0xFF] & 0xFF);
         }
 
     }
@@ -622,9 +618,9 @@ public class ForgeWorld implements LocalWorld
         for (ForgeBiome biome : biomes)
         {
             // Apply settings for biomes
-            if (biome != null && config.biomeConfigs[biome.getId()] != null)
+            if (biome != null && config.biomeConfigs[biome.getIds().getGenerationId()] != null)
             {
-                biome.setEffects(config.biomeConfigs[biome.getId()]);
+                biome.setEffects(config.biomeConfigs[biome.getIds().getGenerationId()]);
             }
         }
     }

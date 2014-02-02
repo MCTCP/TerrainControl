@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.bukkit;
 
-
+import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -21,7 +21,9 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
+
 import net.minecraft.server.v1_7_R1.*;
+
 import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
 
 import java.util.ArrayList;
@@ -42,14 +44,12 @@ public class BukkitWorld implements LocalWorld
     private BiomeGenerator biomeManager;
 
     private static int nextBiomeId = DefaultBiome.values().length;
-    
-    //>>	This will likely change in 1.7
-    private static final int maxBiomeCount = (Byte.MIN_VALUE * -2);
-    private static LocalBiome[] biomes = new LocalBiome[maxBiomeCount];
 
-    public int[] virtualBiomesMatrix = new int[maxBiomeCount];
+    private static final int MAX_BIOMES_COUNT = 1024;
+    private LocalBiome[] biomes = new LocalBiome[MAX_BIOMES_COUNT];
+
+    public int[] generationToSavedBiomeIds = new int[MAX_BIOMES_COUNT];
     public boolean haveVirtualBiomes = false;
-
 
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
     private static ArrayList<LocalBiome> defaultBiomes = new ArrayList<LocalBiome>();
@@ -85,7 +85,8 @@ public class BukkitWorld implements LocalWorld
 
     private BiomeBase[] biomeBaseArray;
 
-    // Need for compatibility with old configs. It is start index for custom biomes count used only for isle biomes.
+    // Need for compatibility with old configs. It is start index for custom
+    // biomes count used only for isle biomes.
     private int customBiomesCount = 21;
 
     static
@@ -93,8 +94,8 @@ public class BukkitWorld implements LocalWorld
         for (DefaultBiome defaultBiome : DefaultBiome.values())
         {
             int id = defaultBiome.Id;
-            biomes[id] = new BukkitBiome(BiomeBase.getBiome(id));
-            defaultBiomes.add(biomes[id]);
+            LocalBiome localBiome = BukkitBiome.forVanillaBiome(BiomeBase.getBiome(id));
+            defaultBiomes.add(localBiome);
         }
     }
 
@@ -104,6 +105,7 @@ public class BukkitWorld implements LocalWorld
         for (LocalBiome biome : defaultBiomes)
         {
             this.biomeNames.put(biome.getName(), biome);
+            this.biomes[biome.getIds().getGenerationId()] = biome;
         }
     }
 
@@ -114,35 +116,33 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome AddCustomBiome(String name, int id)
+    public LocalBiome addCustomBiome(String name, BiomeIds biomeIds)
     {
-        BukkitBiome biome = new BukkitBiome(new CustomBiome(id, name), customBiomesCount++);
+        BukkitBiome biome = BukkitBiome.forCustomBiome(new CustomBiome(biomeIds, name), name, biomeIds, customBiomesCount++);
 
-        biomes[biome.getId()] = biome;
+        biomes[biome.getIds().getGenerationId()] = biome;
         this.biomeNames.put(biome.getName(), biome);
-        return biome;
-    }
 
-    @Override
-    public LocalBiome AddVirtualBiome(String name, int id, int virtualId)
-    {
-        BukkitBiome biome = new BukkitBiome(BiomeBase.getBiome(id), name, customBiomesCount++, virtualId);
-        biomes[biome.getId()] = biome;
-        this.biomeNames.put(biome.getName(), biome);
-        if (!this.haveVirtualBiomes)
-        {
-            this.haveVirtualBiomes = true;
-            for (int i = 0; i < maxBiomeCount; i++)
-                this.virtualBiomesMatrix[i] = i;
+        if (biomeIds.isVirtual()) {
+            // Update generationToSavedBiomeIds array
+            
+            if (!this.haveVirtualBiomes)
+            {
+                // Initialize array first
+                this.haveVirtualBiomes = true;
+                for (int i = 0; i < MAX_BIOMES_COUNT; i++)
+                    this.generationToSavedBiomeIds[i] = i;
+            }
+            this.generationToSavedBiomeIds[biomeIds.getGenerationId()] = biomeIds.getSavedId();
         }
-        this.virtualBiomesMatrix[virtualId] = id;
+
         return biome;
     }
 
     @Override
     public int getMaxBiomesCount()
     {
-        return maxBiomeCount;
+        return MAX_BIOMES_COUNT;
     }
 
     @Override
@@ -160,7 +160,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public int getBiomeIdByName(String name)
     {
-        return this.biomeNames.get(name).getId();
+        return this.biomeNames.get(name).getIds().getGenerationId();
     }
 
     @Override
@@ -383,7 +383,7 @@ public class BukkitWorld implements LocalWorld
         {
             for (int zInChunkTimes16 = startZInChunk * 16; zInChunkTimes16 < endZInChunkTimes16; zInChunkTimes16 += 16)
             {
-                biomeArray[zInChunkTimes16 | xInChunk] = (byte) (this.settings.ReplaceBiomesMatrix[biomeArray[zInChunkTimes16 | xInChunk] & 0xFF] & 0xFF);
+                biomeArray[zInChunkTimes16 | xInChunk] = (byte) (this.settings.replaceToBiomeNameMatrix[biomeArray[zInChunkTimes16 | xInChunk] & 0xFF] & 0xFF);
             }
         }
     }
@@ -657,10 +657,11 @@ public class BukkitWorld implements LocalWorld
     }
 
     /**
-     * Sets the new settings and deprecates any references to the old
-     * settings, if any.
+     * Sets the new settings and deprecates any references to the old settings,
+     * if any.
      * 
-     * @param worldConfig The new settings.
+     * @param worldConfig
+     *            The new settings.
      */
     public void setSettings(WorldSettings newSettings)
     {
@@ -674,7 +675,7 @@ public class BukkitWorld implements LocalWorld
             // the WorldSettings a proper reload method.
             this.settings.biomeConfigs = newSettings.biomeConfigs;
             this.settings.biomesCount = newSettings.biomesCount;
-            this.settings.ReplaceBiomesMatrix = newSettings.ReplaceBiomesMatrix;
+            this.settings.replaceToBiomeNameMatrix = newSettings.replaceToBiomeNameMatrix;
 
             // Deprecate old WorldConfig and replace with new
             this.settings.worldConfig.newSettings = newSettings.worldConfig;
@@ -686,8 +687,9 @@ public class BukkitWorld implements LocalWorld
     /**
      * Enables/reloads this BukkitWorld. If you are reloading, don't forget to
      * set the new settings first using {@link #setSettings(WorldConfig)}.
-     *
-     * @param world The world that needs to be enabled.
+     * 
+     * @param world
+     *            The world that needs to be enabled.
      */
     public void enable(org.bukkit.World world)
     {
@@ -821,7 +823,7 @@ public class BukkitWorld implements LocalWorld
             tileEntity.a(nmsTag); // tileEntity.load
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, world.getTypeId(x, y, z)});
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] { nmsTag.getString("id"), x, y, z, world.getTypeId(x, y, z) });
         }
     }
 

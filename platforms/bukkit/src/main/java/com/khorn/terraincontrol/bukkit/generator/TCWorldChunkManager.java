@@ -12,7 +12,6 @@ import net.minecraft.server.v1_7_R1.WorldGenVillage;
 import java.util.List;
 import java.util.Random;
 
-
 public class TCWorldChunkManager extends WorldChunkManager
 {
     private BukkitWorld localWorld;
@@ -52,7 +51,7 @@ public class TCWorldChunkManager extends WorldChunkManager
         if (localWorld.haveVirtualBiomes)
             for (int i = 0; i < paramInt3 * paramInt4; i++)
             {
-                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localWorld.virtualBiomesMatrix[arrayOfInt[i]]);
+                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localWorld.generationToSavedBiomeIds[arrayOfInt[i]]);
             }
         else
             for (int i = 0; i < paramInt3 * paramInt4; i++)
@@ -74,15 +73,19 @@ public class TCWorldChunkManager extends WorldChunkManager
         int[] localObject = this.biomeManager.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
 
         if (localWorld.haveVirtualBiomes)
+        {
+            // Replace generation ids with saved ids
             for (int i = 0; i < paramInt3 * paramInt4; i++)
             {
-                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localWorld.virtualBiomesMatrix[localObject[i]]);
+                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localWorld.generationToSavedBiomeIds[localObject[i]]);
             }
-        else
+        } else
+        {
             for (int i = 0; i < paramInt3 * paramInt4; i++)
             {
                 paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localObject[i]);
             }
+        }
 
         return paramArrayOfBiomeBase;
     }

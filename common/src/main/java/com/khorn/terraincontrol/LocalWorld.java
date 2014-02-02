@@ -15,9 +15,7 @@ public interface LocalWorld
 {
 
     // Biome init
-    public LocalBiome AddCustomBiome(String name, int id);
-
-    public LocalBiome AddVirtualBiome(String name, int id, int virtualId);
+    public LocalBiome addCustomBiome(String name, BiomeIds id);
 
     public LocalBiome getNullBiome(String name);
 

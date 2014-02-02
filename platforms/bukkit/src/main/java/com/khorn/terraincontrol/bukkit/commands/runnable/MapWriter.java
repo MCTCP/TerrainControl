@@ -87,7 +87,7 @@ public class MapWriter implements Runnable
                             int color = Integer.decode(biomeConfig.BiomeColor);
                             if (color <= 0xFFFFFF)
                             {
-                                colors[biomeConfig.Biome.getId()] = color;
+                                colors[biomeConfig.Biome.getIds().getGenerationId()] = color;
                             }
                         } catch (NumberFormatException ex)
                         {

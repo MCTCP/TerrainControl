@@ -19,7 +19,7 @@ public final class PluginConfig extends ConfigFile
 {
 
     public ConfigMode SettingsMode;
-    
+
     public static enum LogLevels
     {
 
@@ -43,12 +43,9 @@ public final class PluginConfig extends ConfigFile
 
     }
 
-    public LogLevels fileHandlerLevel;
-    public LogLevels consoleHandlerLevel;
-    public String worldDefaultBiomeConfigExtension;
-    //>>	Feature Flags (Temporary)
-    public String developer_name;
-    public boolean feature_BiomeInheritanceVariables_Timethor;
+    public LogLevels fileHandlerLevel = LogLevels.Standard;
+    public LogLevels consoleHandlerLevel = LogLevels.Standard;
+    public String biomeConfigExtension;
 
     public PluginConfig(File settingsDir)
     {
@@ -69,7 +66,7 @@ public final class PluginConfig extends ConfigFile
         this.readConfigSettings();
 
         this.correctSettings();
-        // Need add check to clashes
+
         if (this.SettingsMode != ConfigMode.WriteDisable)
             this.writeSettingsFile(this.SettingsMode == ConfigMode.WriteAll);
     }
@@ -98,6 +95,15 @@ public final class PluginConfig extends ConfigFile
             l.log(Level.WARNING, "Quiet Mode: You will no longer see INFO messages FOR ANY PLUGIN.");
             l.log(Level.WARNING, "WARNING AND SEVERE level logs will still show.");
         }
+
+        if (!BiomeStandardValues.BiomeConfigExtensions.stringArrayListValue().contains(this.biomeConfigExtension))
+        {
+            String newExtension = BiomeStandardValues.DefaultBiomeConfigExtension.stringValue();
+            TerrainControl.log(Level.WARNING, "BiomeConfig file extension {0} is invalid, changing to {1}", new Object[] {
+                    this.biomeConfigExtension, newExtension});
+            this.biomeConfigExtension = newExtension;
+        }
+
     }
 
     @Override
@@ -106,20 +112,7 @@ public final class PluginConfig extends ConfigFile
         this.SettingsMode = readSettings(WorldStandardValues.SettingsMode);
         this.consoleHandlerLevel = readSettings(PluginStandardValues.ConsoleLogLevel);
         this.fileHandlerLevel = readSettings(PluginStandardValues.FileLogLevel);
-        this.worldDefaultBiomeConfigExtension = readSettings(BiomeStandardValues.DefaultBiomeConfigExtension);
-        //>>	Feature flags here
-        this.developer_name = readSettings(PluginStandardValues.developer_name);
-        if (!developer_name.isEmpty())
-        {
-            TerrainControl.log(Level.INFO, "Now Useing --- Timethor's Dev Features ---");
-            this.feature_BiomeInheritanceVariables_Timethor = readSettings(PluginStandardValues.Feature_BiomeInheritanceVariables_Timethor);
-            if (this.feature_BiomeInheritanceVariables_Timethor)
-            {
-                TerrainControl.log(Level.INFO, "\t <<< Activating: Feature_Biome_Inheritance_Variables.");
-            }
-        }
-
-        
+        this.biomeConfigExtension = readSettings(BiomeStandardValues.DefaultBiomeConfigExtension);
     }
 
     @Override
@@ -141,14 +134,15 @@ public final class PluginConfig extends ConfigFile
         writeBigTitle("Log Levels");
 
         writeSmallTitle("Possible Log Levels");
-        // writeComment("   Off         - Only warnings and errors are displayed."); // Shows warning when using this
+        // writeComment("   Off         - Only warnings and errors are displayed.");
+        // // Shows warning when using this
         writeComment("   Standard    - Default Level, minimal logging; This is exactly what you are used to.");
         writeComment("   Debug       - Slightly more detail, this one is not too noisy.");
         writeComment("   XDebug      - Slightly even more detail, can be slightly noisy.");
         writeComment("   XXDebug     - Use with caution, some large logs are possible.");
         writeComment("   Trace       - Only use this in dire circumstances and only for short periods of time, huge logs incoming.");
         writeComment("");
-        
+
         writeSmallTitle("Console Logging Level");
         writeComment("This is the level with which logs will be produced on the console. i.e. That black screen thing you see in windows.");
         writeComment("See ``Possible Log Levels'' if you are lost.");
@@ -163,7 +157,6 @@ public final class PluginConfig extends ConfigFile
         writeComment("Defaults to: Standard");
         writeValue(PluginStandardValues.FileLogLevel, this.fileHandlerLevel.name());
 
-
         writeBigTitle("File Extension Rules");
 
         writeSmallTitle("Default Biome File Extension");
@@ -173,15 +166,7 @@ public final class PluginConfig extends ConfigFile
         writeComment("BiomeConfig.ini, .biome, .bc, .bc.ini, and .biome.ini");
         writeComment(" ");
         writeComment("Defaults to: .bc");
-        writeValue(BiomeStandardValues.DefaultBiomeConfigExtension, this.worldDefaultBiomeConfigExtension);
-        //>>	Feature flags here
-        if (this.developer_name.trim().equalsIgnoreCase("Timethor"))
-        {
-            writeComment(" ");
-            writeValue(PluginStandardValues.developer_name, this.developer_name);
-            writeComment(" ");
-            writeValue(PluginStandardValues.Feature_BiomeInheritanceVariables_Timethor, this.feature_BiomeInheritanceVariables_Timethor);
-        }
+        writeValue(BiomeStandardValues.DefaultBiomeConfigExtension, this.biomeConfigExtension);
     }
 
     public LogLevels getFileHandlerLevel()

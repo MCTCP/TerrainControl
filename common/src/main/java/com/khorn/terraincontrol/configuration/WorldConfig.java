@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
@@ -16,17 +17,16 @@ import java.util.logging.Level;
 public class WorldConfig extends ConfigFile
 {
     public final File settingsDir;
-    private final Comparator<Entry<String, Integer>> CBV = new Comparator<Entry<String, Integer>>()
+    private final Comparator<Entry<String, BiomeIds>> CBV = new Comparator<Entry<String, BiomeIds>>()
     {
         @Override
-        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2)
+        public int compare(Entry<String, BiomeIds> o1, Entry<String, BiomeIds> o2)
         {
-            return o1.getValue().compareTo(o2.getValue());
+            return o1.getValue().getSavedId() - o2.getValue().getSavedId();
         }
     };
-    public Map<String, Integer> CustomBiomeIds = new HashMap<String, Integer>();
-    public HashMap<String, Integer> VirtualBiomeIds = new HashMap<String, Integer>();
-    public HashMap<Integer, Integer> VirtualBiomeRealIds = new HashMap<Integer, Integer>();
+
+    public Map<String, BiomeIds> CustomBiomeIds = new HashMap<String, BiomeIds>();
 
     // Holds all world CustomObjects.
     public List<CustomObject> customObjects = new ArrayList<CustomObject>();
@@ -204,6 +204,17 @@ public class WorldConfig extends ConfigFile
         if (this.SettingsMode != ConfigMode.WriteDisable)
             this.writeSettingsFile(this.SettingsMode == ConfigMode.WriteAll);
 
+        // Check biome ids, These are the names from the worldConfig file
+        // Corrects any instances of incorrect biome id.
+        for (String biomeName : CustomBiomeIds.keySet())
+        {
+            if (CustomBiomeIds.get(biomeName).getSavedId() == -1)
+            {
+                CustomBiomeIds.put(biomeName, new BiomeIds(world.getFreeBiomeId()));
+            }
+        }
+        
+        
     }
 
     /**
@@ -476,14 +487,15 @@ public class WorldConfig extends ConfigFile
             try
             {
                 String[] keys = biome.split(":");
+                int generationBiomeId = Integer.parseInt(keys[1]);
                 if (keys.length == 2)
-                    CustomBiomeIds.put(keys[0], Integer.valueOf(keys[1]));
+                    CustomBiomeIds.put(keys[0], new BiomeIds(generationBiomeId));
                 else if (keys.length == 3)
                 {
-                    VirtualBiomeIds.put(keys[0], Integer.valueOf(keys[2]));
-                    VirtualBiomeRealIds.put(Integer.valueOf(keys[2]), Integer.valueOf(keys[1]));
+                    int savedBiomeId = Integer.parseInt(keys[2]);
+                    CustomBiomeIds.put(keys[0], new BiomeIds(generationBiomeId, savedBiomeId));
                 } else
-                    CustomBiomeIds.put(keys[0], -1);
+                    CustomBiomeIds.put(keys[0], new BiomeIds(-1));
 
             } catch (NumberFormatException e)
             {
@@ -847,35 +859,25 @@ public class WorldConfig extends ConfigFile
 
     private void WriteCustomBiomes() throws IOException
     {
-        String output = "";
+        StringBuilder output = new StringBuilder();
         boolean first = true;
         // Custom biome id
-        List<Entry<String, Integer>> cbi = new ArrayList<Entry<String, Integer>>(this.CustomBiomeIds.entrySet());
+        List<Entry<String, BiomeIds>> cbi = new ArrayList<Entry<String, BiomeIds>>(this.CustomBiomeIds.entrySet());
         Collections.sort(cbi, CBV);
-        // Virtual biome id
-        List<Entry<String, Integer>> vbi = new ArrayList<Entry<String, Integer>>(this.VirtualBiomeIds.entrySet());
-        Collections.sort(vbi, CBV);
-        // Print all custom biomes first
-        for (Iterator<Entry<String, Integer>> it = cbi.iterator(); it.hasNext();)
+        // Print all custom biomes
+        for (Iterator<Entry<String, BiomeIds>> it = cbi.iterator(); it.hasNext();)
         {
-            Entry<String, Integer> entry = it.next();
+            Entry<String, BiomeIds> entry = it.next();
             if (!first)
-                output += ",";
-            else
+            {
+                output.append(",");
+            } else
+            {
                 first = false;
-            output += entry.getKey() + ":" + String.valueOf(entry.getValue());
+            }
+            output.append(entry.getKey()).append(":").append(entry.getValue().toString());
         }
-        // Then print all virtual biomes
-        for (Iterator<Entry<String, Integer>> it = vbi.iterator(); it.hasNext();)
-        {
-            Entry<String, Integer> entry = it.next();
-            if (!first)
-                output += ",";
-            else
-                first = false;
-            output += entry.getKey() + ":" + VirtualBiomeRealIds.get(entry.getValue()) + ":" + entry.getValue();
-        }
-        writeValue(WorldStandardValues.CustomBiomes, output);
+        writeValue(WorldStandardValues.CustomBiomes, output.toString());
     }
 
     public double getFractureHorizontal()

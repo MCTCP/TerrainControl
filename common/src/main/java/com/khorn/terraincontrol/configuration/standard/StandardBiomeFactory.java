@@ -39,7 +39,7 @@ public class StandardBiomeFactory
         try
         {
             // Try to get the default settings for a biome
-            Class<? extends StandardBiomeFactory> settingsClass = defaultSettings[biome.getId()];
+            Class<? extends StandardBiomeFactory> settingsClass = defaultSettings[biome.getIds().getGenerationId()];
             if (settingsClass != null)
             {
                 biomeDefaultSettings = (StandardBiomeFactory) settingsClass.getConstructors()[0].newInstance(biome, worldHeight);

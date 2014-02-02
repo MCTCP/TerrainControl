@@ -16,9 +16,6 @@ public interface LocalBiome
      */
     boolean isCustom();
 
-
-    boolean isVirtual();
-
     /**
      * Sets the post generator effects. For the client it are things like
      * colors. For the server it are things like mob spawning.
@@ -37,11 +34,12 @@ public interface LocalBiome
     String getName();
 
     /**
-     * Gets the id of this biome, saved to the map files.
+     * Gets the {@link BiomeIds biome ids} of this biome.
      * 
+     * @see BiomeIds
      * @return The id.
      */
-    int getId();
+    BiomeIds getIds();
 
     /**
      * If this biome is a custom biome, this gets an id for this biome that is
