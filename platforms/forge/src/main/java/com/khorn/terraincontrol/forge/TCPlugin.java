@@ -196,7 +196,7 @@ public class TCPlugin implements TerrainControlEngine
     @Override
     public boolean isValidBlockId(int id)
     {
-        return Block.func_149729_e(id) != null;
+        return Block.getBlockById(id) != null;
     }
 
 }

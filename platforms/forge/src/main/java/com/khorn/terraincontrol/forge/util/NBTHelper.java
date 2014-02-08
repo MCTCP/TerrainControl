@@ -116,10 +116,10 @@ public class NBTHelper
                     listTag.addTag(new Tag(listType, null, nmsListTag.func_150309_d(i)));
                     break;
                 case TAG_String:
-                    listTag.addTag(new Tag(listType, null, nmsListTag.func_150307_f(i)));
+                    listTag.addTag(new Tag(listType, null, nmsListTag.getStringTagAt(i)));
                     break;
                 case TAG_Compound:
-                    listTag.addTag(getNBTFromNMSTagCompound(null, nmsListTag.func_150305_b(i)));
+                    listTag.addTag(getNBTFromNMSTagCompound(null, nmsListTag.getCompoundTagAt(i)));
                     break;
                 default:
                     TerrainControl.log(Level.INFO, "Cannot convert list subtype {0} from it's NMS value", new Object[] {listType});

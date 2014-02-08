@@ -62,14 +62,12 @@ public class StrongholdGen extends MapGenStructure
                 int var11 = (int) Math.round(Math.sin(randomNumBetween0and2PI) * var8);
                 ArrayList var12 = new ArrayList();
                 Collections.addAll(var12, this.allowedBiomeGenBases);
-                ChunkPosition var13 = this.worldObj.getWorldChunkManager().func_150795_a((var10 << 4) + 8, (var11 << 4) + 8, 112, var12, random);
+                ChunkPosition var13 = this.worldObj.getWorldChunkManager().findBiomePosition((var10 << 4) + 8, (var11 << 4) + 8, 112, var12, random);
 
                 if (var13 != null)
                 {
-                    // var10 = var13.x >> 4;
-                    // var11 = var13.z >> 4;
-                    var10 = var13.field_151329_a >> 4;
-                    var11 = var13.field_151328_c >> 4;
+                    var10 = var13.chunkPosX >> 4;
+                    var11 = var13.chunkPosZ >> 4;
                 }
 
                 this.structureCoords[i] = new ChunkCoordIntPair(var10, var11);

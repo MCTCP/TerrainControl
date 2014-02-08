@@ -83,7 +83,7 @@ public class ForgeWorld implements LocalWorld
 
     public static void restoreBiomes()
     {
-        BiomeGenBase[] biomeList = BiomeGenBase.func_150565_n();
+        BiomeGenBase[] biomeList = BiomeGenBase.getBiomeGenArray();
         for (BiomeGenBase oldBiome : biomesToRestore)
         {
             if (oldBiome == null)
@@ -102,7 +102,7 @@ public class ForgeWorld implements LocalWorld
         for (DefaultBiome defaultBiome : DefaultBiome.values())
         {
             int biomeId = defaultBiome.Id;
-            BiomeGenBase oldBiome = BiomeGenBase.func_150568_d(biomeId);
+            BiomeGenBase oldBiome = BiomeGenBase.getBiome(biomeId);
             biomesToRestore[biomeId] = oldBiome;
             BiomeGenCustom custom = new BiomeGenCustom(nextBiomeId++, oldBiome.biomeName);
             custom.CopyBiome(oldBiome);
@@ -315,8 +315,8 @@ public class ForgeWorld implements LocalWorld
                         {
                             for (int sectionY = 0; sectionY < 16; sectionY++)
                             {
-                                Block block = section.func_150819_a(sectionX, sectionY, sectionZ);
-                                int blockId = Block.func_149682_b(block);
+                                Block block = section.getBlockByExtId(sectionX, sectionY, sectionZ);
+                                int blockId = Block.getIdFromBlock(block);
                                 if (biomeConfig.replaceMatrixBlocks[blockId] == null)
                                     continue;
 
@@ -324,7 +324,7 @@ public class ForgeWorld implements LocalWorld
                                 if (replaceTo == -1)
                                     continue;
 
-                                section.func_150818_a(sectionX, sectionY, sectionZ, Block.func_149729_e(replaceTo >> 4));
+                                section.func_150818_a(sectionX, sectionY, sectionZ, Block.getBlockById(replaceTo >> 4));
                                 section.setExtBlockMetadata(sectionX, sectionY, sectionZ, replaceTo & 0xF);
                                 world.getFullBlockLightValue((x + sectionX), (section.getYLocation() + sectionY), (z + sectionZ));
 
@@ -437,8 +437,8 @@ public class ForgeWorld implements LocalWorld
         z = z & 0xF;
         x = x & 0xF;
 
-        Block block = chunk.func_150810_a(x, y, z);
-        return Block.func_149682_b(block);
+        Block block = chunk.getBlock(x, y, z);
+        return Block.getIdFromBlock(block);
     }
 
     @Override
@@ -480,22 +480,21 @@ public class ForgeWorld implements LocalWorld
         Block oldBlock = Blocks.air;
         if (applyPhysics)
         {
-            // oldBlock = chunk.getBlock(...)
-            oldBlock = chunk.func_150810_a(x & 15, y, z & 15);
+            oldBlock = chunk.getBlock(x & 15, y, z & 15);
         }
 
         // Place block
         if (applyPhysics)
         {
-            // chunk.setBlockAndMetadata(..., Block.getBlock(typeId), ..)
-            chunk.func_150807_a(x & 15, y, z & 15, Block.func_149729_e(typeId), data);
+            // chunk.setBlockAndMetadata(..., Block.getBlockById(typeId), ..)
+            chunk.func_150807_a(x & 15, y, z & 15, Block.getBlockById(typeId), data);
         } else
         {
             // Temporarily make remote, so that torches etc. don't pop off
             boolean oldStatic = world.isRemote;
             world.isRemote = true;
-            // chunk.setBlockAndMetadata(..., Block.getBlock(typeId), ..)
-            chunk.func_150807_a(x & 15, y, z & 15, Block.func_149729_e(typeId), data);
+            // chunk.setBlockAndMetadata(..., Block.getBlockById(typeId), ..)
+            chunk.func_150807_a(x & 15, y, z & 15, Block.getBlockById(typeId), data);
             world.isRemote = oldStatic;
         }
 
@@ -507,12 +506,12 @@ public class ForgeWorld implements LocalWorld
 
         if (notifyPlayers && !world.isRemote)
         {
-            world.func_147471_g(x, y, z); // world.markBlockForUpdate
+            world.markBlockForUpdate(x, y, z);
         }
 
         if (!world.isRemote && applyPhysics)
         {
-            world.func_147444_c(x, y, z, oldBlock); // world.notifyBlockChange
+            world.notifyBlockChange(x, y, z, oldBlock); // world.notifyBlockChange
         }
     }
 
@@ -533,7 +532,7 @@ public class ForgeWorld implements LocalWorld
         int y = chunk.getHeightValue(x, z);
         int maxSearchY = y + 5; // Don't search too far away
         // while(chunk.getBlock(...) != ...)
-        while (chunk.func_150810_a(x, y, z) != Blocks.air && y <= maxSearchY)
+        while (chunk.getBlock(x, y, z) != Blocks.air && y <= maxSearchY)
         {
             // Fix for incorrect lightmap
             y += 1;
@@ -703,11 +702,10 @@ public class ForgeWorld implements LocalWorld
         nmsTag.setInteger("y", y);
         nmsTag.setInteger("z", z);
         // Add that data to the current tile entity in the world
-        // TileEntity tileEntity = world.getTileEntity(x, y, z);
-        TileEntity tileEntity = world.func_147438_o(x, y, z);
+        TileEntity tileEntity = world.getTileEntity(x, y, z);
         if (tileEntity != null)
         {
-            tileEntity.func_145839_a(nmsTag); // tileEntity.readFromNBT
+            tileEntity.readFromNBT(nmsTag);
         } else
         {
             TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, getTypeId(x, y, z)});
@@ -717,14 +715,13 @@ public class ForgeWorld implements LocalWorld
     @Override
     public Tag getMetadata(int x, int y, int z)
     {
-        // TileEntity tileEntity = world.getTileEntity(x, y, z);
-        TileEntity tileEntity = world.func_147438_o(x, y, z);
+        TileEntity tileEntity = world.getTileEntity(x, y, z);
         if (tileEntity == null)
         {
             return null;
         }
         NBTTagCompound nmsTag = new NBTTagCompound();
-        tileEntity.func_145841_b(nmsTag); // tileEntity.saveToNBT
+        tileEntity.writeToNBT(nmsTag);
         nmsTag.removeTag("x");
         nmsTag.removeTag("y");
         nmsTag.removeTag("z");

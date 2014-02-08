@@ -57,7 +57,7 @@ public class PlayerTracker
         S3FPacketCustomPayload packet = new S3FPacketCustomPayload(TCDefaultValues.ChannelName.stringValue(), outputStream.toByteArray());
 
         // Send the packet
-        event.handler.func_147240_a(packet);
+        event.handler.handleCustomPayload(packet);
         System.out.println("TerrainControl: sent config");
     }
 

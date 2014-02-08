@@ -70,7 +70,7 @@ public class ChunkProvider implements IChunkProvider
                             sections[sectionId] = new ExtendedBlockStorage(sectionId << 4, !chunk.worldObj.provider.hasNoSky);
                         }
                         // We should optimize this
-                        sections[sectionId].func_150818_a(blockX, blockY & 0xF, blockZ, Block.func_149729_e(block & 0xFF));
+                        sections[sectionId].func_150818_a(blockX, blockY & 0xF, blockZ, Block.getBlockById(block & 0xFF));
                     }
                 }
         world.FillChunkForBiomes(chunk, chunkX, chunkZ);
@@ -90,10 +90,10 @@ public class ChunkProvider implements IChunkProvider
     {
         if (this.TestMode)
             return;
-        BlockSand.field_149832_M = true; // BlockSand.fallInstantly
+        BlockSand.fallInstantly = true;
         this.world.LoadChunk(x, z);
         this.spawner.populate(x, z);
-        BlockSand.field_149832_M = false;
+        BlockSand.fallInstantly = false;
     }
 
     @Override
