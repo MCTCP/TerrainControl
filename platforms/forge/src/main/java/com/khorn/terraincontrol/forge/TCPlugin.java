@@ -20,7 +20,6 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
@@ -29,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -57,30 +55,12 @@ public class TCPlugin implements TerrainControlEngine
         TerrainControl.supportedBlockIds = 4095;
         TerrainControl.startEngine();
 
-        // Register localization
-        LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
-
         // Register world type
         worldType = new TCWorldType("TerrainControl");
 
         // Register village and rare building starts
-        try
-        {
-            Method registerStructure = null;
-            try
-            {
-                registerStructure = MapGenStructureIO.class.getMethod("b", Class.class, String.class);
-            } catch (Exception e)
-            {
-                registerStructure = MapGenStructureIO.class.getMethod("func_143034_b", Class.class, String.class);
-            }
-            registerStructure.invoke(null, RareBuildingStart.class, StructureNames.RARE_BUILDING);
-            registerStructure.invoke(null, VillageStart.class, StructureNames.VILLAGE);
-        } catch (Exception e)
-        {
-            TerrainControl.log(Level.SEVERE, "Failed to register structures");
-            TerrainControl.printStackTrace(Level.SEVERE, e);
-        }
+        MapGenStructureIO.registerStructure(RareBuildingStart.class, StructureNames.RARE_BUILDING);
+        MapGenStructureIO.registerStructure(VillageStart.class, StructureNames.VILLAGE);
 
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)

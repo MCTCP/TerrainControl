@@ -28,13 +28,14 @@ out
 localexport.jardesc
 
 # Minecraft and Forge files
-assets
-*.log
-*.log.gz
-*.cfg
+platforms/forge/crash-reports
+platforms/forge/logs
+platforms/forge/mods
+platforms/forge/config
+platforms/forge/options.txt
+platforms/forge/saves
+platforms/forge**/assets
 
-# Ignore our own config files
-*.ini
 
 # Mac filesystem dust
 .DS_Store
