@@ -69,29 +69,29 @@ public class ForgeBiome implements LocalBiome
     @Override
     public float getSurfaceHeight()
     {
-        return biomeBase.minHeight;
+        return biomeBase.rootHeight;
     }
 
     @Override
     public float getSurfaceVolatility()
     {
-        return biomeBase.maxHeight;
+        return biomeBase.heightVariation;
     }
 
     @Override
     public int getSurfaceBlock()
     {
-        return Block.func_149682_b(biomeBase.topBlock);
+        return Block.getIdFromBlock(biomeBase.topBlock);
     }
 
     @Override
     public int getGroundBlock()
     {
-        return Block.func_149682_b(biomeBase.fillerBlock);
+        return Block.getIdFromBlock(biomeBase.fillerBlock);
     }
 
     @Override
     public float getTemperatureAt(int x, int y, int z) {
-        return biomeBase.func_150564_a(x, y, z);
+        return biomeBase.getFloatTemperature(x, y, z);
     }
 }

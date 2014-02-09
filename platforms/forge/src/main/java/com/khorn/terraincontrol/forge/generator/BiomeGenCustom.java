@@ -112,8 +112,8 @@ public class BiomeGenCustom extends BiomeGenBase
         this.topBlock = baseBiome.topBlock;
         this.biomeName = baseBiome.biomeName;
         this.color = baseBiome.color;
-        this.minHeight = baseBiome.minHeight;
-        this.maxHeight = baseBiome.maxHeight;
+        this.rootHeight = baseBiome.rootHeight;
+        this.heightVariation = baseBiome.heightVariation;
         this.temperature = baseBiome.temperature;
 
         this.theBiomeDecorator = baseBiome.theBiomeDecorator;

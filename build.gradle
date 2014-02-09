@@ -1,0 +1,56 @@
+// Information for all projects
+
+// The default tasks for all projects
+defaultTasks 'build', 'shadowJar', 'install'
+
+allprojects
+{
+    version = "2.5.3-SNAPSHOT"
+    group = "com.khorn.terraincontrol"
+
+    // Give this a value in a child project to change the name in your IDE
+    // Otherwise it will use the default name. In the case of the project
+    // 'platforms/bukkit', the default name is invalid because it contains a slash
+    ext.ideProjectName = null
+}
+
+// Information for all subprojects
+// (common, forge and bukkit, but not this file)
+subprojects
+{   task ->
+
+    // Generate Eclipse config files when using "gradle eclipse"
+    apply plugin: 'eclipse'
+
+    // Generate IntelliJ IDEA config files
+    apply plugin: 'idea'
+
+    task.plugins.withType(org.gradle.api.plugins.JavaBasePlugin) {
+        // Change project name in Eclipse
+        // See comment above about the ideProjectName
+        task.eclipse.project.file.whenMerged
+        {   project ->
+
+            if (task.project.ext.ideProjectName != null)
+            {
+                project.name = task.project.ext.ideProjectName
+            }
+        }
+
+        // Since we're renaming projects, we need to rename the
+        // dependency 'common' to 'TerrainControl-Common'
+        task.eclipse.classpath.file.whenMerged
+        {   classpath ->
+            classpath.entries.findAll{ entry -> entry.path == "/common" }*.path = "/TerrainControl-Common"
+        }
+
+        // Fix project module name in IDEA (for example "platforms/forge.iml" -> "platforms_forge.iml")
+        idea.module.iml.beforeMerged
+        {   module ->
+            task.idea.module.name = task.idea.module.name.replace("/", "_")
+        }
+    }
+
+    // Generate a pom.xml, upload to local Maven repository
+    apply plugin: 'maven'
+}

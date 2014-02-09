@@ -190,6 +190,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
             }
         }
 
+        int waterLevel = biomeConfig.waterLevelMax;
         int currentGroundBlock = DefaultMaterial.STAINED_CLAY.id;
         int noisePlusRandomFactor = (int) (noise / 3.0D + 3.0D + random.nextDouble() * 0.25D);
         boolean cosNoiseIsLargerThanZero = MathHelper.cos((float) (noise / 3.0D * Math.PI)) > 0.0D;
@@ -197,7 +198,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         boolean belowSand = false;
 
         int maxHeight = world.getSolidHeight(x, z) - 1;
-        int minHeight = Math.min(maxHeight - 6, 59);
+        int minHeight = Math.min(maxHeight - 6, waterLevel - 4);
 
         // Max height needs to be increased for the bryce spikes
         if (this.isBryceMesa)
@@ -225,13 +226,13 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                 if (j1 == -1)
                 {
                     belowSand = false;
-                    if (y >= 59 && y <= 64)
+                    if (y >= waterLevel - 4 && y <= waterLevel + 1)
                     {
                         currentGroundBlock = DefaultMaterial.STAINED_CLAY.id;
                     }
 
-                    j1 = noisePlusRandomFactor + Math.max(0, y - 63);
-                    if (y >= 62)
+                    j1 = noisePlusRandomFactor + Math.max(0, y - waterLevel);
+                    if (y >= waterLevel - 1)
                     {
                         if (this.isForestMesa && y > 86 + noisePlusRandomFactor * 2)
                         {
@@ -242,7 +243,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                             {
                                 world.setBlock(x, y, z, biomeSurfaceBlock, 0);
                             }
-                        } else if (y > 66 + noisePlusRandomFactor)
+                        } else if (y > waterLevel + 3 + noisePlusRandomFactor)
                         {
                             blockData = 16;
                             if (y >= 64 && y <= 127)

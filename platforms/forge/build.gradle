@@ -23,14 +23,42 @@ buildscript
     }
 }
 
-apply plugin: 'shadow'
 apply plugin: 'forge'
 
 // Project properties
 archivesBaseName = "terraincontrol-forge"
 description = "TerrainControl for Minecraft Forge"
 ext.ideProjectName = "TerrainControl-Forge"
-minecraft.version = "1.7.2-10.12.0.1013"
+ext.forgeVersion = "1.7.2-10.12.0.1025"
+minecraft.version = ext.forgeVersion
+
+// The shadow plugin requires all dependencies to be present,
+// even though we have set it to only use the Terrain Control dependency.
+// When TC is build for the first time on a machine, not all
+// dependencies are present yet, because ForgeGradle needs to
+// dynamically create them. So we don't launch the Shadow plugin
+// when TC is build for the first time.
+
+// Would there be a way to let Shadow run after ForgeGradle has
+// completed its task? At the moment Shadow gets it's dependency
+// list before anything has a chance to run.
+File notFirstTimeBuild = new File("build/forgeInfo/hasUsed" + ext.forgeVersion + ".flag");
+if (notFirstTimeBuild.exists())
+{
+	apply plugin: 'shadow'
+	
+	// Include all Terrain Control files in the jar
+	shadow
+	{
+	    artifactAttached = false
+	    include 'com/khorn/terraincontrol/**'
+	}
+} else
+{
+	notFirstTimeBuild.getParentFile().mkdirs();
+	notFirstTimeBuild.createNewFile();
+	println(" Skipping Shadow for Forge version, see comment in platforms/forge/build.gradle")
+}
 
 repositories
 {
@@ -64,9 +92,3 @@ processResources
     }
 }
 
-// Include all Terrain Control files in the jar
-shadow
-{
-    artifactAttached = false
-    include 'com/khorn/terraincontrol/**'
-}

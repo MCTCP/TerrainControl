@@ -35,7 +35,7 @@ public class SaplingListener
             return;
         }
 
-        Block block = world.func_147439_a(x, y, z); // world.getBlock
+        Block block = world.getBlock(x, y, z);
         BlockSapling saplingBlock = (BlockSapling) Blocks.sapling;
 
         if (block != saplingBlock)
@@ -111,14 +111,13 @@ public class SaplingListener
         // Remove saplings
         if (hugeJungleTreeHasGrown)
         {
-            // world.setBlock(...)
-            world.func_147444_c(x + jungleOffsetX, y, z + jungleOffsetZ, Blocks.air);
-            world.func_147444_c(x + jungleOffsetX + 1, y, z + jungleOffsetZ, Blocks.air);
-            world.func_147444_c(x + jungleOffsetX, y, z + jungleOffsetZ + 1, Blocks.air);
-            world.func_147444_c(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, Blocks.air);
+            world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ, Blocks.air);
+            world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ, Blocks.air);
+            world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ + 1, Blocks.air);
+            world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, Blocks.air);
         } else
         {
-            world.func_147444_c(x, y, z, Blocks.air);
+            world.setBlockToAir(x, y, z);
         }
 
         // Try ten times to grow sapling
@@ -137,14 +136,13 @@ public class SaplingListener
             // Restore sapling
             if (hugeJungleTreeHasGrown)
             {
-                // world.setBlock(...)
-                world.func_147446_b(x + jungleOffsetX, y, z + jungleOffsetZ, block, blockData, 4);
-                world.func_147446_b(x + jungleOffsetX + 1, y, z + jungleOffsetZ, block, blockData, 4);
-                world.func_147446_b(x + jungleOffsetX, y, z + jungleOffsetZ + 1, block, blockData, 4);
-                world.func_147446_b(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, block, blockData, 4);
+                world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ, block, blockData, 4);
+                world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ, block, blockData, 4);
+                world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ + 1, block, blockData, 4);
+                world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, block, blockData, 4);
             } else
             {
-                world.func_147446_b(x, y, z, block, blockData, 4);
+                world.setBlock(x, y, z, block, blockData, 4);
             }
         }
 
@@ -177,8 +175,7 @@ public class SaplingListener
 
         // Generate mushroom
         event.setResult(Result.ALLOW);
-        // event.world.setBlock
-        event.world.func_147444_c(event.x, event.y, event.z, Blocks.air);
+        event.world.setBlock(event.x, event.y, event.z, Blocks.air);
 
         boolean mushroomGrown = false;
         Random random = new Random();
