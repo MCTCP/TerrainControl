@@ -10,19 +10,16 @@ import com.khorn.terraincontrol.forge.structuregens.RareBuildingStart;
 import com.khorn.terraincontrol.forge.structuregens.VillageStart;
 import com.khorn.terraincontrol.util.StringHelper;
 import com.khorn.terraincontrol.util.StructureNames;
-
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
-
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -54,9 +51,6 @@ public class TCPlugin implements TerrainControlEngine
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
         TerrainControl.startEngine();
-
-        // Register localization
-        LanguageRegistry.instance().addStringLocalization("generator.TerrainControl", "TerrainControl");
 
         // Register world type
         worldType = new TCWorldType("TerrainControl");

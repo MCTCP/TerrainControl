@@ -4,6 +4,9 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.biomegenerators.BiomeGenerator;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -15,18 +18,15 @@ import java.io.File;
 public class TCWorldType extends WorldType
 {
     public ForgeWorld worldTC;
-    private String worldType;
-
     public TCWorldType(String paramString)
     {
         super(paramString);
-        this.worldType = paramString;
     }
-
-    @Override
-    public String getTranslateName()
+    
+    @SideOnly(Side.CLIENT)
+    public boolean showWorldInfoNotice()
     {
-        return worldType;
+        return true;
     }
 
     // Actually: getBiomeManager
