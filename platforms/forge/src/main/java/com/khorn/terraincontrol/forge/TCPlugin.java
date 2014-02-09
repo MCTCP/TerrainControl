@@ -56,23 +56,8 @@ public class TCPlugin implements TerrainControlEngine
         worldType = new TCWorldType("TerrainControl");
 
         // Register village and rare building starts
-        try
-        {
-            Method registerStructure = null;
-            try
-            {
-                registerStructure = MapGenStructureIO.class.getMethod("b", Class.class, String.class);
-            } catch (Exception e)
-            {
-                registerStructure = MapGenStructureIO.class.getMethod("func_143034_b", Class.class, String.class);
-            }
-            registerStructure.invoke(null, RareBuildingStart.class, StructureNames.RARE_BUILDING);
-            registerStructure.invoke(null, VillageStart.class, StructureNames.VILLAGE);
-        } catch (Exception e)
-        {
-            TerrainControl.log(Level.SEVERE, "Failed to register structures");
-            TerrainControl.printStackTrace(Level.SEVERE, e);
-        }
+        MapGenStructureIO.registerStructure(RareBuildingStart.class, StructureNames.RARE_BUILDING);
+        MapGenStructureIO.registerStructure(VillageStart.class, StructureNames.VILLAGE);
 
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
