@@ -104,7 +104,8 @@ public class ForgeWorld implements LocalWorld
             int biomeId = defaultBiome.Id;
             BiomeGenBase oldBiome = BiomeGenBase.getBiome(biomeId);
             biomesToRestore[biomeId] = oldBiome;
-            BiomeGenCustom custom = new BiomeGenCustom(nextBiomeId++, oldBiome.biomeName);
+            BiomeGenCustom custom = new BiomeGenCustom(biomeId, oldBiome.biomeName);
+            nextBiomeId++;
             custom.CopyBiome(oldBiome);
             Biome biome = new Biome(custom);
             biomes[biome.getId()] = biome;
