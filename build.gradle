@@ -5,7 +5,7 @@ defaultTasks 'build', 'shadowJar', 'install'
 
 allprojects
 {
-    version = "2.5.3-SNAPSHOT"
+    version = "2.5.3"
     group = "com.khorn.terraincontrol"
 
     // Give this a value in a child project to change the name in your IDE
