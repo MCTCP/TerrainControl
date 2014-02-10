@@ -1,11 +1,11 @@
 // Information for all projects
 
 // The default tasks for all projects
-defaultTasks 'build', 'shadowJar', 'install'
+defaultTasks 'clean', 'build', 'shadowJar', 'install'
 
 allprojects
 {
-    version = "2.5.3"
+    version = "2.5.4-SNAPSHOT"
     group = "com.khorn.terraincontrol"
 
     // Give this a value in a child project to change the name in your IDE
