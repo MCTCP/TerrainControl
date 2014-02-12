@@ -29,7 +29,7 @@
     <!-- Constants -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bukkitVersion>1.7.2-R0.2</bukkitVersion>
+        <bukkitVersion>1.7.2-R0.3</bukkitVersion>
     </properties>
 
     <!-- We're open source, find us here -->
