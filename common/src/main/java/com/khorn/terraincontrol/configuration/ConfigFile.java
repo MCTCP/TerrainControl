@@ -452,22 +452,6 @@ public abstract class ConfigFile
 
     }
 
-    /**
-     * Old write method. Because the file is now stored in the configFile,
-     * this parameter is no longer needed.
-     * <p/>
-     * @param settingsFile Previously, the file to write to.
-     *                     Doesn't do anything anymore.
-     * @param comments     Whether comments should be written.
-     * <p/>
-     * @deprecated 28 July 2013, use method without file parameter.
-     */
-    @Deprecated
-    public void writeSettingsFile(File settingsFile, boolean comments)
-    {
-        writeSettingsFile(comments);
-    }
-
     public void writeSettingsFile(boolean comments)
     {
         if (file == null)

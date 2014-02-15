@@ -103,6 +103,9 @@ public class WorldSettings
         this.savedBiomes = new HashSet<BiomeConfig>();
         String loadedBiomeNames = readSettings();
 
+        // Save all settings
+        saveSettings();
+
         TerrainControl.log(Level.INFO, "{0} biomes Loaded", new Object[] {biomesCount});
         TerrainControl.log(Level.CONFIG, "{0}", new Object[] {loadedBiomeNames});
 
@@ -207,6 +210,17 @@ public class WorldSettings
             loadedBiomeNames.delete(loadedBiomeNames.length() - 2, loadedBiomeNames.length());
         }
         return loadedBiomeNames.toString();
+    }
+
+    private void saveSettings()
+    {
+        for (BiomeConfig biomeConfig : this.biomeConfigs)
+        {
+            if (biomeConfig != null)
+            {
+                biomeConfig.outputToFile();
+            }
+        }
     }
 
     private void processInheritance(BiomeConfig biomeConfig, int currentDepth)

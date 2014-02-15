@@ -139,7 +139,7 @@ public class ReplacedBlocksMatrix
             int end = key.lastIndexOf(')');
             if (start != -1 && end != -1)
             {
-                String keyWithoutBraces = key.substring(start, end);
+                String keyWithoutBraces = key.substring(start + 1, end);
                 instructions.add(new ReplacedBlocksInstruction(keyWithoutBraces, maxAllowedY));
             } else {
                 throw new InvalidConfigException("One of the parts is missing braces around it.");
