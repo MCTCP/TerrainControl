@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.util.MaterialSet;
+
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
@@ -210,19 +213,17 @@ public abstract class ConfigFunction<T>
     }
 
     /**
-     * Returns the block id with the given name.
-     * <p/>
-     * @param string
-     * <p/>
-     * @return
+     * Returns the material with the given name.
+     * @param string Name of the material, case insensitive.
+     * @return The material.
      */
-    protected int readBlockId(String string) throws InvalidConfigException
+    protected LocalMaterialData readMaterial(String string) throws InvalidConfigException
     {
-        return StringHelper.readBlockId(string);
+        return TerrainControl.readMaterial(string);
     }
 
     /**
-     * Reads all block ids from the start position until the end of the
+     * Reads all materials from the start position until the end of the
      * list.
      * <p/>
      * @param strings The input strings.
@@ -234,29 +235,15 @@ public abstract class ConfigFunction<T>
      * @throws InvalidConfigException If one of the elements in the list is
      *                                not a valid block id.
      */
-    protected List<Integer> readBlockIds(List<String> strings, int start) throws InvalidConfigException
+    protected MaterialSet readMaterials(List<String> strings, int start) throws InvalidConfigException
     {
-        List<Integer> blockIds = new ArrayList<Integer>();
+        MaterialSet materials = new MaterialSet();
         for (int i = start; i < strings.size(); i++)
         {
-            blockIds.add(StringHelper.readBlockId(strings.get(i)));
+            materials.parseAndAdd(strings.get(i));
         }
 
-        return blockIds;
-    }
-
-    /**
-     * Gets the block data from a material string.
-     * <p/>
-     * @param string
-     * <p/>
-     * @return
-     * <p/>
-     * @throws InvalidConfigException
-     */
-    protected int readBlockData(String string) throws InvalidConfigException
-    {
-        return StringHelper.readBlockData(string);
+        return materials;
     }
 
     protected void assureSize(int size, List<String> args) throws InvalidConfigException
@@ -268,46 +255,15 @@ public abstract class ConfigFunction<T>
     }
 
     /**
-     * Gets the material name back from the id and data.
-     *
-     * @param id   The block id
-     * @param data The block data
-     * <p/>
-     * @return String in the format blockname[.blockdata]
-     */
-    protected String makeMaterial(int id, int data)
-    {
-        return StringHelper.makeMaterial(id, data);
-    }
-
-    /**
-     * Gets the material name back from the id.
-     * <p/>
-     * @param id The block id
-     * <p/>
-     * @return String in the format blockname
-     */
-    protected String makeMaterial(int id)
-    {
-        return StringHelper.makeMaterial(id);
-    }
-
-    /**
      * Returns a String in the format ",materialName,materialName,etc"
      * <p/>
      * @param ids
      * <p/>
      * @return
      */
-    protected String makeMaterial(List<Integer> ids)
+    protected String makeMaterials(MaterialSet materials)
     {
-        String string = "";
-        for (int blockId : ids)
-        {
-            string += ",";
-            string += makeMaterial(blockId);
-        }
-        return string;
+        return "," + materials.toString();
     }
 
 }

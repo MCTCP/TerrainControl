@@ -1,9 +1,10 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -66,9 +67,8 @@ class Vein
     protected void spawnOre(LocalWorld world, Random rand, int x, int y, int z, VeinGen gen)
     {
         int maxSize = gen.oreSize;
-        int blockId = gen.blockId;
-        int blockData = gen.blockData;
-        List<Integer> sourceBlocks = gen.sourceBlocks;
+        LocalMaterialData material = gen.material;
+        MaterialSet sourceBlocks = gen.sourceBlocks;
 
         float f = rand.nextFloat() * 3.141593F;
 
@@ -111,9 +111,9 @@ class Vein
                             for (int i5 = m; i5 <= i2; i5++)
                             {
                                 double d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);
-                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(world.getTypeId(i3, i4, i5)))
+                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(world.getMaterial(i3, i4, i5)))
                                 {
-                                    world.setBlock(i3, i4, i5, blockId, blockData, false, false, false);
+                                    world.setBlock(i3, i4, i5, material);
                                 }
                             }
                         }

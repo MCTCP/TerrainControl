@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.util.helpers.StringHelper;
+
 import com.khorn.terraincontrol.TerrainControl;
 
 import java.util.ArrayList;
@@ -65,7 +67,7 @@ public class WeightedMobSpawnGroup
         json = json.replace('{', '(');
         json = json.replace('}', ')');
 
-        String[] groups = ConfigFile.readComplexString(json);
+        String[] groups = StringHelper.readCommaSeperatedString(json);
 
         try
         {

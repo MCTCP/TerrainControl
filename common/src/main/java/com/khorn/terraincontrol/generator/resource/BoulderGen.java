@@ -1,16 +1,17 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.MaterialSet;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class BoulderGen extends Resource
 {
-    private List<Integer> sourceBlocks;
+    private MaterialSet sourceBlocks;
     private int minAltitude;
     private int maxAltitude;
 
@@ -24,8 +25,8 @@ public class BoulderGen extends Resource
 
         while (y > 3)
         {
-            int blockId = world.getTypeId(x, y - 1, z);
-            if (sourceBlocks.contains(blockId)) {
+            LocalMaterialData material = world.getMaterial(x, y - 1, z);
+            if (sourceBlocks.contains(material)) {
                 break;
             }
             y--;
@@ -54,7 +55,7 @@ public class BoulderGen extends Resource
                         float f4 = i3 - y;
                         if (f2 * f2 + f3 * f3 + f4 * f4 <= f1 * f1)
                         {
-                            world.setBlock(i1, i3, i2, this.blockId, this.blockData);
+                            world.setBlock(i1, i3, i2, this.material);
                         }
                     }
                 }
@@ -71,28 +72,23 @@ public class BoulderGen extends Resource
     {
         assureSize(6, args);
 
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
+        material = readMaterial(args.get(0));
         frequency = readInt(args.get(1), 1, 5000);
         rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
-        sourceBlocks = new ArrayList<Integer>();
-        for (int i = 5; i < args.size(); i++)
-        {
-            sourceBlocks.add(readBlockId(args.get(i)));
-        }
+        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        sourceBlocks = readMaterials(args, 5);
     }
 
     @Override
     public String makeString()
     {
-        return "Boulder(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
+        return "Boulder(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
 
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return other.getClass() == BoulderGen.class && other.blockId == this.blockId && other.blockData == this.blockData;
+        return other.getClass() == BoulderGen.class && other.material.equals(this.material);
     }
 }

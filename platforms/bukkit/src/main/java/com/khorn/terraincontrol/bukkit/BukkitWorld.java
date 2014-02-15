@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.generator.BiomeCacheWrapper;
@@ -123,9 +124,10 @@ public class BukkitWorld implements LocalWorld
         biomes[biome.getIds().getGenerationId()] = biome;
         this.biomeNames.put(biome.getName(), biome);
 
-        if (biomeIds.isVirtual()) {
+        if (biomeIds.isVirtual())
+        {
             // Update generationToSavedBiomeIds array
-            
+
             if (!this.haveVirtualBiomes)
             {
                 // Initialize array first
@@ -326,23 +328,22 @@ public class BukkitWorld implements LocalWorld
                 for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
                 {
                     BiomeConfig biomeConfig = this.settings.biomeConfigs[chunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
-                    if (biomeConfig != null && biomeConfig.ReplaceCount > 0)
+                    if (biomeConfig != null && biomeConfig.replacedBlocks.hasReplaceSettings())
                     {
+                        LocalMaterialData[][] replaceArray = biomeConfig.replacedBlocks.compiledInstructions;
                         for (int sectionY = 0; sectionY < 16; sectionY++)
                         {
                             Block block = section.getTypeId(sectionX, sectionY, sectionZ);
                             int blockId = Block.b(block);
-                            if (biomeConfig.replaceMatrixBlocks[blockId] == null)
+                            if (replaceArray[blockId] == null)
                                 continue;
 
-                            int replaceToId = biomeConfig.replaceMatrixBlocks[blockId][section.getYPosition() + sectionY];
-                            if (replaceToId == -1 || (replaceToId >> 4) == blockId)
+                            BukkitMaterialData replaceTo = (BukkitMaterialData) replaceArray[blockId][section.getYPosition() + sectionY];
+                            if (replaceTo == null || replaceTo.getBlockId() == blockId)
                                 continue;
 
-                            Block replaceTo = Block.e(replaceToId >> 4);
-
-                            section.setTypeId(sectionX, sectionY, sectionZ, replaceTo);
-                            section.setData(sectionX, sectionY, sectionZ, replaceToId & 0xF);
+                            section.setTypeId(sectionX, sectionY, sectionZ, replaceTo.internalBlock());
+                            section.setData(sectionX, sectionY, sectionZ, replaceTo.getBlockData());
                         }
                     }
                 }
@@ -383,7 +384,8 @@ public class BukkitWorld implements LocalWorld
         {
             for (int zInChunkTimes16 = startZInChunk * 16; zInChunkTimes16 < endZInChunkTimes16; zInChunkTimes16 += 16)
             {
-                biomeArray[zInChunkTimes16 | xInChunk] = (byte) (this.settings.replaceToBiomeNameMatrix[biomeArray[zInChunkTimes16 | xInChunk] & 0xFF] & 0xFF);
+                biomeArray[zInChunkTimes16 | xInChunk] = (byte) (this.settings.replaceToBiomeNameMatrix[biomeArray[zInChunkTimes16
+                        | xInChunk] & 0xFF] & 0xFF);
             }
         }
     }
@@ -407,7 +409,7 @@ public class BukkitWorld implements LocalWorld
 
     private Chunk getChunk(int x, int y, int z)
     {
-        if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
+        if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
             return null;
 
         x >>= 4;
@@ -432,7 +434,7 @@ public class BukkitWorld implements LocalWorld
     {
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            DefaultMaterial material = getMaterial(x, y, z);
+            LocalMaterialData material = getMaterial(x, y, z);
             if (material.isLiquid())
             {
                 return y + 1;
@@ -450,7 +452,7 @@ public class BukkitWorld implements LocalWorld
     {
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            DefaultMaterial material = getMaterial(x, y, z);
+            LocalMaterialData material = getMaterial(x, y, z);
             if (material.isSolid())
             {
                 return y + 1;
@@ -462,41 +464,31 @@ public class BukkitWorld implements LocalWorld
     @Override
     public boolean isEmpty(int x, int y, int z)
     {
-        return this.getTypeId(x, y, z) == 0;
+        Chunk chunk = this.getChunk(x, y, z);
+        if (chunk == null)
+        {
+            return true;
+        }
+        return chunk.getType(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
     }
 
     @Override
-    public int getTypeId(int x, int y, int z)
+    public LocalMaterialData getMaterial(int x, int y, int z)
     {
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
         {
-            return 0;
+            return new BukkitMaterialData(DefaultMaterial.AIR, 0);
         }
 
         z &= 0xF;
         x &= 0xF;
 
-        return Block.b(chunk.getType(x, y, z));
+        return new BukkitMaterialData(chunk.getType(x, y, z), chunk.getData(x, y, z));
     }
 
     @Override
-    public byte getTypeData(int x, int y, int z)
-    {
-        Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null)
-        {
-            return 0;
-        }
-
-        z &= 0xF;
-        x &= 0xF;
-
-        return (byte) chunk.getData(x, y, z);
-    }
-
-    @Override
-    public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
+    public void setBlock(int x, int y, int z, LocalMaterialData material)
     {
         /*
          * This method usually breaks on every Minecraft update. Always check
@@ -504,12 +496,12 @@ public class BukkitWorld implements LocalWorld
          * rewrite parts of this method for newer block place logic.
          */
 
-        if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
+        if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
         {
             return;
         }
 
-        Block block = Block.e(typeId);
+        Block block = ((BukkitMaterialData) material).internalBlock();
 
         // Get chunk from (faster) custom cache
         Chunk chunk = this.getChunk(x, y, z);
@@ -519,48 +511,19 @@ public class BukkitWorld implements LocalWorld
             // Chunk is unloaded
             return;
         }
+        
+        // Temporarily make static, so that torches etc. don't pop off
+        boolean oldStatic = world.isStatic;
+        world.isStatic = true;
+        chunk.a(x & 15, y, z & 15, block, material.getBlockData());
+        world.isStatic = oldStatic;
 
-        // Get old block (only needed for physics)
-        Block oldBlockId = Blocks.AIR;
-        if (applyPhysics)
-        {
-            oldBlockId = chunk.getType(x & 15, y, z & 15);
-        }
-
-        // Place block
-        if (applyPhysics)
-        {
-            chunk.a(x & 15, y, z & 15, block, data);
-        } else
-        {
-            // Temporarily make static, so that torches etc. don't pop off
-            boolean oldStatic = world.isStatic;
-            world.isStatic = true;
-            chunk.a(x & 15, y, z & 15, block, data);
-            world.isStatic = oldStatic;
-        }
-
-        // Relight and update
-        if (updateLight)
-        {
-            world.A(x, y, z);
-        }
-
-        if (notifyPlayers && !world.isStatic)
+        // Relight and update players
+        world.A(x, y, z);
+        if (!world.isStatic)
         {
             world.notify(x, y, z);
         }
-
-        if (!world.isStatic && applyPhysics)
-        {
-            world.update(x, y, z, oldBlockId);
-        }
-    }
-
-    @Override
-    public void setBlock(final int x, final int y, final int z, final int typeId, final int data)
-    {
-        this.setBlock(x, y, z, typeId, data, true, false, true);
     }
 
     @Override
@@ -589,13 +552,6 @@ public class BukkitWorld implements LocalWorld
         }
 
         return y;
-    }
-
-    @Override
-    public DefaultMaterial getMaterial(int x, int y, int z)
-    {
-        int id = this.getTypeId(x, y, z);
-        return DefaultMaterial.getMaterial(id);
     }
 
     @Override
@@ -657,19 +613,17 @@ public class BukkitWorld implements LocalWorld
     }
 
     /**
-     * Sets the new settings and deprecates any references to the old settings,
-     * if any.
+     * Sets the new settings and deprecates any references to the old
+     * settings, if any.
      * 
-     * @param worldConfig
-     *            The new settings.
+     * @param worldConfig The new settings.
      */
     public void setSettings(WorldSettings newSettings)
     {
         if (this.settings == null)
         {
             this.settings = newSettings;
-        }
-        else
+        } else
         {
             // This is an ugly hack. It is a much better idea to give
             // the WorldSettings a proper reload method.
@@ -688,8 +642,7 @@ public class BukkitWorld implements LocalWorld
      * Enables/reloads this BukkitWorld. If you are reloading, don't forget to
      * set the new settings first using {@link #setSettings(WorldConfig)}.
      * 
-     * @param world
-     *            The world that needs to be enabled.
+     * @param world The world that needs to be enabled.
      */
     public void enable(org.bukkit.World world)
     {
@@ -715,7 +668,8 @@ public class BukkitWorld implements LocalWorld
             TCWorldChunkManager worldChunkManager = new TCWorldChunkManager(this);
             mcWorld.worldProvider.e = worldChunkManager;
 
-            BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeModeClass, this, new BiomeCacheWrapper(worldChunkManager));
+            BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeModeClass, this,
+                    new BiomeCacheWrapper(worldChunkManager));
             worldChunkManager.setBiomeManager(biomeManager);
             setBiomeManager(biomeManager);
         }
@@ -823,7 +777,8 @@ public class BukkitWorld implements LocalWorld
             tileEntity.a(nmsTag); // tileEntity.load
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] { nmsTag.getString("id"), x, y, z, world.getTypeId(x, y, z) });
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {
+                    nmsTag.getString("id"), x, y, z, getMaterial(x, y, z)});
         }
     }
 

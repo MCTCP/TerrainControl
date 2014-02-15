@@ -1,23 +1,18 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.generator.resource.IceSpikeGen;
-
-import com.khorn.terraincontrol.generator.resource.PlantType;
-import com.khorn.terraincontrol.generator.surface.MesaSurfaceGenerator;
-import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
-import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
-import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeFactory;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.UseBiome;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.generator.resource.CustomStructureGen;
-import com.khorn.terraincontrol.generator.resource.Resource;
-import com.khorn.terraincontrol.generator.resource.SaplingGen;
-import com.khorn.terraincontrol.generator.resource.SaplingType;
+import com.khorn.terraincontrol.generator.resource.*;
+import com.khorn.terraincontrol.generator.surface.MesaSurfaceGenerator;
+import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
+import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 import com.khorn.terraincontrol.util.helpers.InheritanceHelper;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
@@ -42,9 +37,6 @@ public class BiomeConfig extends ConfigFile
     private boolean processHasRun = false;
     private boolean doResourceInheritance = true;
 
-    public short[][] replaceMatrixBlocks = new short[TerrainControl.supportedBlockIds][];
-    public int ReplaceCount = 0;
-
     public String riverBiome;
     public float riverHeight;
     public float riverVolatility;
@@ -68,9 +60,10 @@ public class BiomeConfig extends ConfigFile
     public float biomeTemperature;
     public float biomeWetness;
 
-    public int stoneBlock;
-    public int surfaceBlock;
-    public int groundBlock;
+    public LocalMaterialData stoneBlock;
+    public LocalMaterialData surfaceBlock;
+    public LocalMaterialData groundBlock;
+    public ReplacedBlocksMatrix replacedBlocks;
     public SurfaceGenerator surfaceAndGroundControl;
 
     public String ReplaceBiomeName;
@@ -78,8 +71,8 @@ public class BiomeConfig extends ConfigFile
     public boolean UseWorldWaterLevel;
     public int waterLevelMax;
     public int waterLevelMin;
-    public int waterBlock;
-    public int iceBlock;
+    public LocalMaterialData waterBlock;
+    public LocalMaterialData iceBlock;
 
     public int SkyColor;
     public int WaterColor;
@@ -302,7 +295,7 @@ public class BiomeConfig extends ConfigFile
         }
 
         this.ReadCustomObjectSettings();
-        this.ReadReplaceSettings();
+        this.readReplaceSettings();
         this.ReadResourceSettings();
         this.heightMatrix = new double[this.worldConfig.worldHeightCap / 8 + 1];
         this.readHeightSettings(this.heightMatrix, BiomeStandardValues.CustomHeightControl);
@@ -336,7 +329,7 @@ public class BiomeConfig extends ConfigFile
             }
             try
             {
-                String[] parts = readComplexString(settingValue);
+                String[] parts = StringHelper.readCommaSeperatedString(settingValue);
                 return new SimpleSurfaceGenerator(parts);
             } catch (InvalidConfigException e)
             {
@@ -346,71 +339,20 @@ public class BiomeConfig extends ConfigFile
         return null;
     }
 
-    private void ReadReplaceSettings()
+    private void readReplaceSettings()
     {
         String settingValue = readSettings(BiomeStandardValues.ReplacedBlocks);
 
-        if (settingValue.isEmpty() || settingValue.equals("None"))
-            return;
-
-        String[] keys = readComplexString(settingValue);
-        try
-        {
-            for (String key : keys)
-            {
-
-                int start = key.indexOf('(');
-                int end = key.lastIndexOf(')');
-                if (start != -1 && end != -1)
-                {
-                    key = key.substring(start + 1, end);
-                    String[] values = key.split(",");
-                    if (values.length == 5)
-                    {
-                        // Replace in TC 2.3 style found
-                        values = new String[] {values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)};
-                    }
-
-                    if (values.length != 2 && values.length != 4)
-                        continue;
-
-                    short fromBlockId = (short) StringHelper.readBlockId(values[0]);
-                    short toBlockId = (short) StringHelper.readBlockId(values[1]);
-                    short blockData = (short) StringHelper.readBlockData(values[1]);
-
-                    int minY = 0;
-                    int maxY = worldConfig.worldHeightCap - 1;
-
-                    if (values.length == 4)
-                    {
-                        minY = Integer.valueOf(values[2]);
-                        maxY = Integer.valueOf(values[3]);
-                        minY = applyBounds(minY, 0, worldConfig.worldHeightCap - 1);
-                        maxY = applyBounds(maxY, minY, worldConfig.worldHeightCap - 1);
-                    }
-
-                    if (this.replaceMatrixBlocks[fromBlockId] == null)
-                    {
-                        this.replaceMatrixBlocks[fromBlockId] = new short[worldConfig.worldHeightCap];
-                        for (int i = 0; i < worldConfig.worldHeightCap; i++)
-                            this.replaceMatrixBlocks[fromBlockId][i] = -1;
-                    }
-                    for (int y = minY; y <= maxY; y++)
-                        this.replaceMatrixBlocks[fromBlockId][y] = (short) (toBlockId << 4 | blockData);
-                    ReplaceCount++;
-
-                }
-
-            }
-
-        } catch (NumberFormatException e)
-        {
-            TerrainControl.log(Level.WARNING, "Wrong replace settings: ''{0}''", this.settingsCache.get(settingValue));
+        try {
+            this.replacedBlocks = new ReplacedBlocksMatrix(settingValue, worldConfig.worldHeightScale - 1);
         } catch (InvalidConfigException e)
         {
-            TerrainControl.log(Level.WARNING, "Wrong replace settings: ''{0}''", this.settingsCache.get(settingValue));
+            // Make sure value is never null
+            this.replacedBlocks = ReplacedBlocksMatrix.createEmptyMatrix(worldConfig.worldHeightScale - 1);
+            
+            // Print warning
+            TerrainControl.log(Level.WARNING, "Wrong replace settings '{0}': {1}", this.settingsCache.get(settingValue), e.getMessage());
         }
-
     }
 
     private ConfigFunction<BiomeConfig> getResource(Map.Entry<String, String> entry)
@@ -422,7 +364,7 @@ public class BiomeConfig extends ConfigFile
         if (start != -1 && end != -1)
         {
             String rName = key.substring(0, start);
-            String[] props = readComplexString(key.substring(start + 1, end));
+            String[] props = StringHelper.readCommaSeperatedString(key.substring(start + 1, end));
             if (rName.equalsIgnoreCase("DoResourceInheritance") && props[0].equalsIgnoreCase("false"))
             {
                 this.doResourceInheritance = false;
@@ -746,10 +688,10 @@ public class BiomeConfig extends ConfigFile
         writeComment("Change this to generate something else than stone in the biome. Doesn't support block data.");
         writeValue(BiomeStandardValues.StoneBlock, this.stoneBlock);
 
-        writeComment("Surface block id, usually 2, the id of grass. Doesn't support block data.");
+        writeComment("Surface block, usually GRASS. Doesn't support block data.");
         writeValue(BiomeStandardValues.SurfaceBlock, this.surfaceBlock);
 
-        writeComment("Block id from stone to surface, like dirt in most biomes. Doesn't support block data.");
+        writeComment("Block from stone to surface, like dirt in most biomes. Doesn't support block data.");
         writeValue(BiomeStandardValues.GroundBlock, this.groundBlock);
 
         writeComment("Setting for biomes with more complex surface and ground blocks.");
@@ -772,7 +714,7 @@ public class BiomeConfig extends ConfigFile
         writeComment("Example :");
         writeComment("  ReplacedBlocks: (GRASS,DIRT,100,127),(GRAVEL,GLASS)");
         writeComment("Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
-        WriteModReplaceSettings();
+        writeValue(BiomeStandardValues.ReplacedBlocks, replacedBlocks.toString());
 
         this.writeSmallTitle("Water and ice");
 
@@ -783,10 +725,10 @@ public class BiomeConfig extends ConfigFile
         writeValue(BiomeStandardValues.WaterLevelMax, this.waterLevelMax);
         writeValue(BiomeStandardValues.WaterLevelMin, this.waterLevelMin);
 
-        writeComment("BlockId used as water in WaterLevelMax");
+        writeComment("Block used as water in WaterLevelMax");
         writeValue(BiomeStandardValues.WaterBlock, this.waterBlock);
 
-        writeComment("BlockId used as ice. Ice only spawns if the BiomeTemperture is low enough.");
+        writeComment("Block used as ice. Ice only spawns if the BiomeTemperture is low enough.");
         writeValue(BiomeStandardValues.IceBlock, this.iceBlock);
 
         this.writeBigTitle("Visuals and weather");
@@ -861,7 +803,7 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("Boulder(Block[:Data],Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..]");
         this.writeComment("IceSpike(Block[:Data],IceSpikeType,Frequency,Rarity,MinAltitude,MaxAltitude,Blocksource[,BlockSource2,...])");
         this.writeComment("");
-        this.writeComment("Block and BlockSource: can be id or name, Frequency - is count of attempts for place resource");
+        this.writeComment("Block and BlockSource: must be the block name, Frequency - is count of attempts for place resource");
         this.writeComment("Rarity: chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass");
         this.writeComment("MinAltitude and MaxAltitude: height limits");
         this.writeComment("BlockSource: mean where or whereupon resource will be placed ");
@@ -1004,69 +946,6 @@ public class BiomeConfig extends ConfigFile
             output = output + "," + Double.toString(heightMatrix[i]);
 
         this.writeValue(setting, output);
-    }
-
-    private void WriteModReplaceSettings() throws IOException
-    {
-        if (this.ReplaceCount == 0)
-        {
-            this.writeValue(BiomeStandardValues.ReplacedBlocks, "None");
-            return;
-        }
-        String output = "";
-
-        // Read all block ids
-        for (int blockIdFrom = 0; blockIdFrom < replaceMatrixBlocks.length; blockIdFrom++)
-        {
-            if (replaceMatrixBlocks[blockIdFrom] == null)
-                continue;
-
-            // What the y coord just below had it's replace setting set to
-            int previousReplaceTo = -1;
-            int yStart = 0;
-
-            for (int y = 0; y <= replaceMatrixBlocks[blockIdFrom].length; y++)
-            {
-                int currentReplaceTo = (y == replaceMatrixBlocks[blockIdFrom].length) ? -1 : replaceMatrixBlocks[blockIdFrom][y];
-
-                if (currentReplaceTo == previousReplaceTo)
-                {
-                    // Same as the previous entry, do nothing
-                    continue;
-                }
-
-                // Not the same as the previous entry, previous entry wasn't
-                // -1
-                // So we have found the end of a replace setting
-                if (previousReplaceTo != -1)
-                {
-                    output += "(" + StringHelper.makeMaterial(blockIdFrom) + ",";
-                    if (yStart != 0 || y != (replaceMatrixBlocks[blockIdFrom].length))
-                    {
-                        // Long form
-                        output += StringHelper.makeMaterial(previousReplaceTo >> 4, previousReplaceTo & 0xF) + "," + yStart + "," + (y - 1);
-                    } else
-                    {
-                        // Short form
-                        output += StringHelper.makeMaterial(previousReplaceTo >> 4, previousReplaceTo & 0xF);
-                    }
-                    output += "),";
-
-                    // Reset the previousReplaceTo
-                    previousReplaceTo = -1;
-                }
-
-                if (previousReplaceTo == -1)
-                {
-                    // Not the same as the previous entry, previous entry was
-                    // -1
-                    // So we have found the start of a new replace setting
-                    yStart = y;
-                    previousReplaceTo = currentReplaceTo;
-                }
-            }
-        }
-        this.writeValue(BiomeStandardValues.ReplacedBlocks, output.substring(0, output.length() - 1));
     }
 
     private void WriteResources() throws IOException

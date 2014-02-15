@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.customobjects.bo2;
 
+import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.MaterialSet;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -11,13 +14,14 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * The good old BO2.
  */
 public class BO2 extends ConfigFile implements CustomObject
 {
-    
+
     public ObjectCoordinate[][] data = new ObjectCoordinate[4][];
 
     public BO2[] groupObjects = null;
@@ -25,9 +29,8 @@ public class BO2 extends ConfigFile implements CustomObject
     public List<String> spawnInBiome;
 
     public String version;
-    public Set<Integer> spawnOnBlockType;
-
-    public Set<Integer> collisionBlockType;
+    public MaterialSet spawnOnBlockType;
+    public MaterialSet collisionBlockType;
 
     public boolean spawnWater;
     public boolean spawnLava;
@@ -53,7 +56,7 @@ public class BO2 extends ConfigFile implements CustomObject
     public int groupFrequencyMax;
     public int groupSeparationMin;
     public int groupSeparationMax;
-    public List<String>  groupId;
+    public List<String> groupId;
 
     public int branchLimit;
 
@@ -111,12 +114,12 @@ public class BO2 extends ConfigFile implements CustomObject
         // Spawn
         for (ObjectCoordinate point : data)
         {
-            if (world.getTypeId(x + point.x, y + point.y, z + point.z) == 0)
+            if (world.isEmpty(x + point.x, y + point.y, z + point.z))
             {
-                world.setBlock((x + point.x), y + point.y, z + point.z, point.blockId, point.blockData);
+                world.setBlock((x + point.x), y + point.y, z + point.z, point.material);
             } else if (dig)
             {
-                world.setBlock((x + point.x), y + point.y, z + point.z, point.blockId, point.blockData, true, false, true);
+                world.setBlock((x + point.x), y + point.y, z + point.z, point.material);
             }
         }
         return true;
@@ -126,37 +129,37 @@ public class BO2 extends ConfigFile implements CustomObject
     public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {
         // Basic checks
-        if ((world.getTypeId(x, y - 5, z) == 0) && (needsFoundation))
+        if (world.isEmpty(x, y - 5, z) && (needsFoundation))
             return false;
 
-        int checkBlock = world.getTypeId(x, y + 2, z);
+        LocalMaterialData checkBlock = world.getMaterial(x, y + 2, z);
         if (!spawnWater)
         {
-            if ((checkBlock == DefaultMaterial.WATER.id) || (checkBlock == DefaultMaterial.STATIONARY_WATER.id))
+            if (checkBlock.equals(DefaultMaterial.WATER) || checkBlock.equals(DefaultMaterial.STATIONARY_WATER))
                 return false;
         }
         if (!spawnLava)
         {
-            if ((checkBlock == DefaultMaterial.LAVA.id) || (checkBlock == DefaultMaterial.STATIONARY_LAVA.id))
+            if (checkBlock.equals(DefaultMaterial.LAVA) || checkBlock.equals(DefaultMaterial.STATIONARY_LAVA))
                 return false;
         }
 
-        checkBlock = world.getLightLevel(x, y + 2, z);
+        int checkLight = world.getLightLevel(x, y + 2, z);
         if (!spawnSunlight)
         {
-            if (checkBlock > 8)
+            if (checkLight > 8)
                 return false;
         }
         if (!spawnDarkness)
         {
-            if (checkBlock < 9)
+            if (checkLight < 9)
                 return false;
         }
 
         if ((y < spawnElevationMin) || (y > spawnElevationMax))
             return false;
 
-        if (!spawnOnBlockType.contains(world.getTypeId(x, y - 1, z)))
+        if (!spawnOnBlockType.contains(world.getMaterial(x, y - 1, z)))
             return false;
 
         ObjectCoordinate[] objData = this.data[rotation.getRotationId()];
@@ -171,7 +174,7 @@ public class BO2 extends ConfigFile implements CustomObject
 
             if (!dig)
             {
-                if (collisionBlockType.contains(world.getTypeId((x + point.x), (y + point.y), (z + point.z))))
+                if (collisionBlockType.contains(world.getMaterial((x + point.x), (y + point.y), (z + point.z))))
                 {
                     faultCounter++;
                     if (faultCounter > (objData.length * (collisionPercentage / 100)))
@@ -275,8 +278,10 @@ public class BO2 extends ConfigFile implements CustomObject
     {
         this.version = readModSettings(BO2Settings.version, BO2Settings.version.stringValue());
 
-        this.spawnOnBlockType = this.ReadBlockList((ArrayList<String>) readSettings(BO2Settings.spawnOnBlockType), BO2Settings.spawnOnBlockType.name());
-        this.collisionBlockType = this.ReadBlockList((ArrayList<String>) readSettings(BO2Settings.collisionBlockType), BO2Settings.collisionBlockType.name());
+        this.spawnOnBlockType = this.ReadBlockList((ArrayList<String>) readSettings(BO2Settings.spawnOnBlockType),
+                BO2Settings.spawnOnBlockType.name());
+        this.collisionBlockType = this.ReadBlockList((ArrayList<String>) readSettings(BO2Settings.collisionBlockType),
+                BO2Settings.collisionBlockType.name());
 
         this.spawnInBiome = readSettings(BO2Settings.spawnInBiome);
 
@@ -304,10 +309,11 @@ public class BO2 extends ConfigFile implements CustomObject
         this.groupFrequencyMax = readSettings(BO2Settings.groupFrequencyMax);
         this.groupSeparationMin = readSettings(BO2Settings.groupSeparationMin);
         this.groupSeparationMax = readSettings(BO2Settings.groupSeparationMax);
-        //>>	Is this not used anymore? Netbeans finds no references to it
-        //>>	Nothing other than this line references BO2Settings.groupId either...
-        this.groupId = readSettings(BO2Settings.groupId);        
-        
+        // >> Is this not used anymore? Netbeans finds no references to it
+        // >> Nothing other than this line references BO2Settings.groupId
+        // either...
+        this.groupId = readSettings(BO2Settings.groupId);
+
         this.branchLimit = readSettings(BO2Settings.branchLimit);
 
         this.ReadCoordinates();
@@ -355,50 +361,26 @@ public class BO2 extends ConfigFile implements CustomObject
         }
 
     }
-    
-    private HashSet<Integer> ReadBlockList(ArrayList<String> blocks, String settingName)
-    {
-        HashSet<Integer> output = new HashSet<Integer>();
 
-        boolean nonIntegerValues = false;
-        boolean all = false;
-        boolean solid = false;
+    private MaterialSet ReadBlockList(ArrayList<String> blocks, String settingName)
+    {
+        MaterialSet output = new MaterialSet();
+
+        boolean invalidValues = false;
 
         for (String block : blocks)
         {
-
-            if (block.equals(BO2Settings.BO_ALL_KEY.stringValue()))
-            {
-                all = true;
-                continue;
-            }
-            if (block.equals(BO2Settings.BO_SolidKey.stringValue()))
-            {
-                solid = true;
-                continue;
-            }
             try
             {
-                int blockID = Integer.decode(block);
-                if (blockID != 0)
-                    output.add(blockID);
-            } catch (NumberFormatException e)
+                output.parseAndAdd(block);
+            } catch (InvalidConfigException e)
             {
-                nonIntegerValues = true;
+                invalidValues = true;
             }
         }
 
-        if (all || solid)
-            for (DefaultMaterial material : DefaultMaterial.values())
-            {
-                if (material.id == 0)
-                    continue;
-                if (solid && !material.isSolid())
-                    continue;
-                output.add(material.id);
-            }
-        if (nonIntegerValues)
-            System.out.println("TerrainControl: Custom object " + this.name + " has wrong value " + settingName);
+        if (invalidValues)
+            TerrainControl.log(Level.WARNING, "Custom object {0} has wrong value {1}", new Object[] {this.name, settingName});
 
         return output;
 

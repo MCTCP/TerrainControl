@@ -2,7 +2,6 @@ package com.khorn.terraincontrol.bukkit.util;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
 import net.minecraft.server.v1_7_R1.World;
 
 public abstract class WorldHelper
@@ -16,7 +15,7 @@ public abstract class WorldHelper
      */
     public static LocalWorld toLocalWorld(World world)
     {
-        return ((TCPlugin) TerrainControl.getEngine()).worlds.get(world.getWorld().getUID());
+        return TerrainControl.getWorld(world.getWorld().getName());
     }
 
     private WorldHelper()

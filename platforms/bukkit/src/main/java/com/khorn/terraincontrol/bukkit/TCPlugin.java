@@ -1,13 +1,6 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.logging.TCLogManager;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import com.khorn.terraincontrol.util.helpers.StringHelper;
-import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.bukkit.events.TCListener;
 import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
@@ -18,7 +11,6 @@ import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.server.v1_7_R1.BiomeBase;
-import net.minecraft.server.v1_7_R1.Block;
 import net.minecraft.server.v1_7_R1.WorldGenFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -33,9 +25,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
-public class TCPlugin extends JavaPlugin implements TerrainControlEngine
+public class TCPlugin extends JavaPlugin
 {
     public TCListener listener;
     public TCCommandExecutor commandExecutor;
@@ -49,7 +40,6 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
 
     public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
     private final HashMap<String, BukkitWorld> notInitedWorlds = new HashMap<String, BukkitWorld>();
-    private final Logger logger = LogManager.getLogger(getClass());
 
     @Override
     public void onDisable()
@@ -71,7 +61,7 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
     public void onEnable()
     {
 
-        TerrainControl.setEngine(this);
+        TerrainControl.setEngine(new BukkitEngine(this));
         if (Bukkit.getWorlds().size() != 0 && !cleanupOnDisable)
         {
             // Reload "handling"
@@ -109,7 +99,6 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
             }
 
             // Start the engine
-            TerrainControl.startEngine();
             this.commandExecutor = new TCCommandExecutor(this);
             this.listener = new TCListener(this);
             Bukkit.getMessenger().registerOutgoingPluginChannel(this, PluginStandardValues.ChannelName.stringValue());
@@ -237,68 +226,6 @@ public class TCPlugin extends JavaPlugin implements TerrainControlEngine
         TerrainControl.log(Level.INFO, "World {0} is now unloaded!", world.getName());
     }
     
-    @Override
-    public void log(Level level, String... messages)
-    {
-        this.log(level, "{0}", new Object[] {StringHelper.join(messages, " ")});
-    }
-
-    @Override
-    public void log(Level level, String message, Object param)
-    {
-        log(level, message, new Object[] {param});
-        
-    }
-
-    @Override
-    public void log(Level level, String message, Object[] params)
-    {
-        LogRecord logRecord = new LogRecord(level, message);
-        logRecord.setParameters(params);
-
-        String formattedMessage = TCLogManager.FORMATTER.format(logRecord);
-        
-        if (level == Level.SEVERE) {
-            logger.log(org.apache.logging.log4j.Level.ERROR, formattedMessage);
-        } else if (level == Level.WARNING) {
-            logger.log(org.apache.logging.log4j.Level.WARN, formattedMessage);
-        } else if (level == Level.INFO) {
-            logger.log(org.apache.logging.log4j.Level.INFO, formattedMessage);
-        } else if (level == Level.CONFIG || level == Level.FINE) {
-            logger.log(org.apache.logging.log4j.Level.DEBUG, formattedMessage);
-        } else { // so level == Level.FINER || level == FINEST
-            logger.log(org.apache.logging.log4j.Level.TRACE, formattedMessage);
-        }
-    }
-
-    @Override
-    public LocalWorld getWorld(String name)
-    {
-        World world = Bukkit.getWorld(name);
-        if (world == null)
-        {
-            // World not loaded
-            return null;
-        }
-        return this.worlds.get(world.getUID());
-    }
-
-    @Override
-    public File getTCDataFolder()
-    {
-        return this.getDataFolder();
-    }
-
-    @Override
-    public File getGlobalObjectsDirectory()
-    {
-        return new File(this.getTCDataFolder(), PluginStandardValues.BO_DirectoryName.stringValue());
-    }
-
-    @Override
-    public boolean isValidBlockId(int id)
-    {
-        return (Block.e(id) != null);
-    }
+    
 
 }

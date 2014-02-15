@@ -1,10 +1,12 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.events.EventPriority;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.forge.events.EventManager;
 import com.khorn.terraincontrol.forge.events.PacketHandler;
 import com.khorn.terraincontrol.forge.events.PlayerTracker;
@@ -13,6 +15,7 @@ import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
 import com.khorn.terraincontrol.logging.TCLogManager;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -32,7 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 @Mod(modid = "TerrainControl", name = "TerrainControl")
-public class TCPlugin implements TerrainControlEngine
+public class TCPlugin extends TerrainControlEngine
 {
 
     @Instance("TerrainControl")
@@ -48,12 +51,9 @@ public class TCPlugin implements TerrainControlEngine
         // This is the place where the mod starts loading
         logger = FMLCommonHandler.instance().getFMLLogger();
 
-        // Set the directory
-        TerrainControl.setEngine(this);
-
         // Start TerrainControl engine
         TerrainControl.supportedBlockIds = 4095;
-        TerrainControl.startEngine();
+        TerrainControl.setEngine(this);
 
         // Register world type
         worldType = new TCWorldType("TerrainControl");
@@ -175,9 +175,66 @@ public class TCPlugin implements TerrainControlEngine
     }
 
     @Override
-    public boolean isValidBlockId(int id)
+    public LocalMaterialData readMaterial(String input) throws InvalidConfigException
     {
-        return Block.getBlockById(id) != null;
+        // Try parsing as an internal Minecraft name
+        // This is so that things like "minecraft:stone" aren't parsed
+        // as the block "minecraft" with data "stone", but instead as the
+        // block "minecraft:stone" with no block data.
+        Block block = Block.getBlockFromName(input);
+        if (block != null)
+        {
+            return new ForgeMaterialData(block, 0);
+        }
+
+        try
+        {
+            // Try block(:data) syntax
+            return getMaterial0(input);
+        } catch (NumberFormatException e)
+        {
+            throw new InvalidConfigException("Unknown material: " + input);
+        }
+
+    }
+
+    private LocalMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
+    {
+        String blockName = input;
+        int blockData = 0;
+
+        // When there is a . or a : in the name, extract block data
+        int splitIndex = input.lastIndexOf(":");
+        if (splitIndex == -1)
+        {
+            splitIndex = input.lastIndexOf(".");
+        }
+        if (splitIndex != -1)
+        {
+            blockName = input.substring(0, splitIndex);
+            blockData = Integer.parseInt(input.substring(splitIndex + 1));
+        }
+
+        // Get the material belonging to the block and data
+        Block block = Block.getBlockFromName(blockName);
+        if (block != null)
+        {
+            return new ForgeMaterialData(block, blockData);
+        }
+        DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
+        if (defaultMaterial != null)
+        {
+            return new ForgeMaterialData(defaultMaterial, blockData);
+        }
+
+        // Failed
+        throw new InvalidConfigException("Unkown material: " + input);
+    }
+
+    @Override
+    public LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
+    {
+        return new ForgeMaterialData(defaultMaterial, blockData);
     }
 
 }

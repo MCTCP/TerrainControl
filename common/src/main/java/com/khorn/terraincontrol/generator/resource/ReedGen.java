@@ -3,8 +3,8 @@ package com.khorn.terraincontrol.generator.resource;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.MaterialSet;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -12,7 +12,7 @@ public class ReedGen extends Resource
 {
     private int minAltitude;
     private int maxAltitude;
-    private List<Integer> sourceBlocks;
+    private MaterialSet sourceBlocks;
 
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
@@ -22,14 +22,14 @@ public class ReedGen extends Resource
         {
             return;
         }
-        if (!sourceBlocks.contains(world.getTypeId(x, y - 1, z)))
+        if (!sourceBlocks.contains(world.getMaterial(x, y - 1, z)))
         {
             return;
         }
 
         int n = 1 + rand.nextInt(2);
         for (int i1 = 0; i1 < n; i1++)
-            world.setBlock(x, y + i1, z, blockId, blockData, false, false, false);
+            world.setBlock(x, y + i1, z, material);
     }
 
     @Override
@@ -37,29 +37,24 @@ public class ReedGen extends Resource
     {
         assureSize(6, args);
 
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
+        material = readMaterial(args.get(0));
         frequency = readInt(args.get(1), 1, 100);
         rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
-        sourceBlocks = new ArrayList<Integer>();
-        for (int i = 5; i < args.size(); i++)
-        {
-            sourceBlocks.add(readBlockId(args.get(i)));
-        }
+        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        sourceBlocks = readMaterials(args, 5);
     }
 
     @Override
     public String makeString()
     {
-        return "Reed(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
+        return "Reed(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
 
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.material.equals(this.material);
     }
 
     @Override

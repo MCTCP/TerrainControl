@@ -27,7 +27,7 @@ public enum BO3Settings implements MultiTypedSetting
     ExcludedBiomes("All", SettingsType.StringArray),
 
     // Source block settings
-    SourceBlock(DefaultMaterial.AIR.id, SettingsType.IntSet),
+    SourceBlocks(DefaultMaterial.AIR.toString(), SettingsType.StringArray),
     OutsideSourceBlock(OutsideSourceBlockEnum.placeAnyway),
     MaxPercentageOutsideSourceBlock(100);
 
@@ -199,5 +199,11 @@ public enum BO3Settings implements MultiTypedSetting
     public long longValue()
     {
         return (Long) value;
+    }
+
+    @Override
+    public DefaultMaterial materialValue()
+    {
+        throw new UnsupportedOperationException();
     }
 }

@@ -5,7 +5,6 @@ import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.util.ArrayList;
@@ -34,13 +33,15 @@ public interface LocalWorld
 
     /**
      * Calculate biome ids array used in terrain generation.
-     *
-     * @param biomeArray Output array. If it is null or wrong size return new array.
+     * 
+     * @param biomeArray Output array. If it is null or wrong size return new
+     *            array.
      * @param x The block x.
      * @param z The block z.
      * @param x_size Size of block in x coordinate.
      * @param z_size Size of blocks in z coordinate.
-     * @param type Output type. May be FULL, WITHOUT_RIVERS, ONLY_RIVERS or DEFAULT_FOR_WORLD.
+     * @param type Output type. May be FULL, WITHOUT_RIVERS, ONLY_RIVERS or
+     *            DEFAULT_FOR_WORLD.
      * @return Array filled by biome ids.
      */
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
@@ -51,7 +52,7 @@ public interface LocalWorld
 
     /**
      * Calculates the biome that should generate at the given coordinates.
-     *
+     * 
      * @param x The block x.
      * @param z The block z.
      * @return The biome at the given coordinates.
@@ -63,7 +64,7 @@ public interface LocalWorld
 
     /**
      * Gets the (stored) biome at the given coordinates.
-     *
+     * 
      * @param x The block x.
      * @param z The block z.
      * @return The biome at the given coordinates.
@@ -74,7 +75,6 @@ public interface LocalWorld
     public double getBiomeFactorForOldBM(int index);
 
     // Default generators
-
     public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry);
 
     public void PlaceDungeons(Random rand, int x, int y, int z);
@@ -88,21 +88,17 @@ public interface LocalWorld
     public void replaceBiomes();
 
     /**
-     * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the terrain generation.
+     * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the
+     * terrain generation.
      */
     public void placePopulationMobs(BiomeConfig config, Random random, int chunkX, int chunkZ);
 
     // Blocks
-
-    public int getTypeId(int x, int y, int z);
-
-    public byte getTypeData(int x, int y, int z);
+    public LocalMaterialData getMaterial(int x, int y, int z);
 
     public boolean isEmpty(int x, int y, int z);
 
-    public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers);
-
-    public void setBlock(final int x, final int y, final int z, final int typeId, final int data);
+    public void setBlock(int x, int y, int z, LocalMaterialData material);
 
     public void attachMetadata(int x, int y, int z, NamedBinaryTag tag);
 
@@ -121,14 +117,13 @@ public interface LocalWorld
      */
     public int getHighestBlockYAt(int x, int z);
 
-    public DefaultMaterial getMaterial(int x, int y, int z);
-
     public void setChunksCreations(boolean createNew);
 
     public int getLightLevel(int x, int y, int z);
 
     public boolean isLoaded(int x, int y, int z);
 
+    // Other information
     public WorldSettings getSettings();
 
     public CustomObjectStructureCache getStructureCache();
@@ -137,13 +132,12 @@ public interface LocalWorld
 
     public boolean canBiomeManagerGenerateUnzoomed();
 
-    // Terrain init
     public long getSeed();
 
     /**
      * Gets the height the base terrain of the world is capped at. Resources
      * ignore this limit.
-     *
+     * 
      * @return The height the base terrain of the world is capped at.
      */
     public int getHeightCap();
@@ -152,7 +146,7 @@ public interface LocalWorld
      * Returns the vertical scale of the world. 128 blocks is the normal
      * scale, 256 doubles the scale, 64 halves the scale, etc. Only powers of
      * two will be returned.
-     *
+     * 
      * @return The vertical scale of the world.
      */
     public int getHeightScale();

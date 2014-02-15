@@ -15,8 +15,8 @@ public class TreeObject implements CustomObject
 {
 
     private TreeType type;
-    private int minHeight = TerrainControl.worldDepth;
-    private int maxHeight = TerrainControl.worldHeight;
+    private int minHeight = TerrainControl.WORLD_DEPTH;
+    private int maxHeight = TerrainControl.WORLD_HEIGHT;
 
     public TreeObject(TreeType type)
     {
@@ -38,11 +38,11 @@ public class TreeObject implements CustomObject
             {
                 if (entry.getKey().equalsIgnoreCase("MinHeight"))
                 {
-                    this.minHeight = Math.max(TerrainControl.worldDepth, Math.min(Integer.parseInt(entry.getValue()), TerrainControl.worldHeight));
+                    this.minHeight = Math.max(TerrainControl.WORLD_DEPTH, Math.min(Integer.parseInt(entry.getValue()), TerrainControl.WORLD_HEIGHT));
                 }
                 if (entry.getKey().equalsIgnoreCase("MaxHeight"))
                 {
-                    this.maxHeight = Math.max(minHeight, Math.min(Integer.parseInt(entry.getValue()), TerrainControl.worldHeight));
+                    this.maxHeight = Math.max(minHeight, Math.min(Integer.parseInt(entry.getValue()), TerrainControl.WORLD_HEIGHT));
                 }
             } catch (NumberFormatException e)
             {

@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
@@ -51,19 +53,25 @@ public class UndergroundLakeGen extends Resource
                 for (int yLake = (int) (yAdjusted - verticalSize / 2.0D); yLake <= (int) (yAdjusted + verticalSize / 2.0D); yLake++)
                     for (int zLake = (int) (zAdjusted - horizontalSize / 2.0D); zLake <= (int) (zAdjusted + horizontalSize / 2.0D); zLake++)
                     {
-                        if (world.getTypeId(xLake, yLake, zLake) == 0)
+                        if (world.isEmpty(xLake, yLake, zLake))
                             continue;
                         double xBounds = (xLake + 0.5D - xAdjusted) / (horizontalSize / 2.0D);
                         double yBounds = (yLake + 0.5D - yAdjusted) / (verticalSize / 2.0D);
                         double zBounds = (zLake + 0.5D - zAdjusted) / (horizontalSize / 2.0D);
                         if (xBounds * xBounds + yBounds * yBounds + zBounds * zBounds >= 1.0D)
                             continue;
-                        int uBlock = world.getTypeId(xLake, yLake - 1, zLake);
-                        if (uBlock != 0) // not air
-                            world.setBlock(xLake, yLake, zLake, DefaultMaterial.WATER.id, 0, false, false, false);
+                        LocalMaterialData uBlock = world.getMaterial(xLake, yLake - 1, zLake);
+                        if (!uBlock.isMaterial(DefaultMaterial.AIR))
+                        {
+                            // Not air, set position above to water
+                            world.setBlock(xLake, yLake, zLake, material);
+                        }  
                         else
-                            // Air block
-                            world.setBlock(xLake, yLake, zLake, 0, 0, false, false, false);
+                        {
+                            // Air block, also set position above to air
+                            world.setBlock(xLake, yLake, zLake, uBlock);
+                        }
+                            
                     }
         }
     }
@@ -71,15 +79,15 @@ public class UndergroundLakeGen extends Resource
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
-        blockId = DefaultMaterial.WATER.id; // Hardcoded for now
+        material = TerrainControl.toLocalMaterialData(DefaultMaterial.STATIONARY_WATER, 0);
 
         assureSize(6, args);
         minSize = readInt(args.get(0), 1, 25);
         maxSize = readInt(args.get(1), minSize + 1, 60);
         frequency = readInt(args.get(2), 1, 100);
         rarity = readRarity(args.get(3));
-        minAltitude = readInt(args.get(4), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(5), minAltitude + 1, TerrainControl.worldHeight);
+        minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(5), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override
@@ -91,7 +99,7 @@ public class UndergroundLakeGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.material.equals(this.material);
     }
 
     @Override

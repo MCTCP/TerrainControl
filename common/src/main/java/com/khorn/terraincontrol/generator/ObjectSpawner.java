@@ -1,7 +1,8 @@
 package com.khorn.terraincontrol.generator;
 
-import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.LocalMaterialData;
 
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -112,6 +113,7 @@ public class ObjectSpawner
 
     protected void freezeChunk(int chunkX, int chunkZ)
     {
+        LocalMaterialData snowMaterial = TerrainControl.toLocalMaterialData(DefaultMaterial.SNOW, 0);
         int x = chunkX * 16 + 8;
         int z = chunkZ * 16 + 8;
         for (int i = 0; i < 16; i++)
@@ -120,12 +122,12 @@ public class ObjectSpawner
             {
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
-                freezeColumn(blockToFreezeX, blockToFreezeZ);
+                freezeColumn(blockToFreezeX, blockToFreezeZ, snowMaterial);
             }
         }
     }
 
-    protected void freezeColumn(int x, int z)
+    protected void freezeColumn(int x, int z, LocalMaterialData snowMaterial)
     {
         // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
         BiomeConfig biomeConfig = world.getSettings().biomeConfigs[world.getBiomeId(x, z)];
@@ -136,18 +138,18 @@ public class ObjectSpawner
             if (blockToFreezeY > 0 && biome.getTemperatureAt(x, blockToFreezeY, z) < WorldStandardValues.snowAndIceMaxTemp.floatValue())
             {
                 // Ice has to be placed one block in the world
-                if (DefaultMaterial.getMaterial(world.getTypeId(x, blockToFreezeY - 1, z)).isLiquid())
+                if (world.getMaterial(x, blockToFreezeY - 1, z).isLiquid())
                 {
-                    world.setBlock(x, blockToFreezeY - 1, z, biomeConfig.iceBlock, 0);
+                    world.setBlock(x, blockToFreezeY - 1, z, biomeConfig.iceBlock);
                 } else
                 {
                     // Snow has to be placed on an empty space on a
                     // block that accepts snow in the world
-                    if (world.getMaterial(x, blockToFreezeY, z) == DefaultMaterial.AIR)
+                    if (world.isEmpty(x, blockToFreezeY, z))
                     {
                         if (world.getMaterial(x, blockToFreezeY - 1, z).canSnowFallOn())
                         {
-                            world.setBlock(x, blockToFreezeY, z, DefaultMaterial.SNOW.id, 0);
+                            world.setBlock(x, blockToFreezeY, z, snowMaterial);
                         }
                     }
                 }

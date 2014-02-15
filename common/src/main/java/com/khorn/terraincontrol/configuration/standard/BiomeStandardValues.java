@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.configuration.standard;
 
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 
@@ -30,14 +32,12 @@ public enum BiomeStandardValues implements MultiTypedSetting
 
     BiomeHeight(0.1D),
     BiomeVolatility(0.3D),
-    ExtraBiomeHeight(0.0F),
-    ExtraHeightConstrictWaist(0.0F),
     SmoothRadius(2),
 
-    StoneBlock(1),
-    SurfaceBlock(2),
+    StoneBlock(DefaultMaterial.STONE),
+    SurfaceBlock(DefaultMaterial.GRASS),
     SurfaceAndGroundControl(""),
-    GroundBlock(3),
+    GroundBlock(DefaultMaterial.DIRT),
     ReplacedBlocks("None"),
 
     UseWorldWaterLevel(true),
@@ -234,8 +234,8 @@ public enum BiomeStandardValues implements MultiTypedSetting
     //>>    Values related to WorldStandardValues
     WaterLevelMax(63),
     WaterLevelMin(0),
-    WaterBlock(9),
-    IceBlock(79),
+    WaterBlock(DefaultMaterial.STATIONARY_WATER),
+    IceBlock(DefaultMaterial.ICE),
     
     NetherFortressesEnabled(false),
     StrongholdsEnabled(true),
@@ -253,6 +253,7 @@ public enum BiomeStandardValues implements MultiTypedSetting
     private SettingsType returnType;
     private ArrayList<String> sArrayValue;
     private HashSet<Integer> iSetValue;
+    private DefaultMaterial mValue;
 
     private BiomeStandardValues(int i)
     {
@@ -321,6 +322,12 @@ public enum BiomeStandardValues implements MultiTypedSetting
         this.returnType = SettingsType.Boolean;
     }
 
+    private BiomeStandardValues(DefaultMaterial material)
+    {
+        this.mValue = material;
+        this.returnType = SettingsType.Material;
+    }
+
     @Override
     public int intValue()
     {
@@ -379,6 +386,12 @@ public enum BiomeStandardValues implements MultiTypedSetting
     public HashSet<Integer> intSetValue()
     {
         return this.iSetValue;
+    }
+
+    @Override
+    public DefaultMaterial materialValue()
+    {
+        return this.mValue;
     }
 
 }

@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
@@ -42,6 +44,7 @@ public class SmallLakeGen extends Resource
 
         synchronized (BooleanBuffer)
         {
+            LocalMaterialData air = TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0);
             boolean[] BooleanBuffer = new boolean[2048];
             int i = rand.nextInt(4) + 4;
             for (int j = 0; j < i; j++)
@@ -79,10 +82,10 @@ public class SmallLakeGen extends Resource
 
                         if (flag)
                         {
-                            DefaultMaterial localMaterial = world.getMaterial(x + j, y + i2, z + i1);
-                            if ((i2 >= 4) && (localMaterial.isLiquid()))
+                            LocalMaterialData localMaterialData = world.getMaterial(x + j, y + i2, z + i1);
+                            if ((i2 >= 4) && (localMaterialData.isLiquid()))
                                 return;
-                            if ((i2 < 4) && (!localMaterial.isSolid()) && (world.getTypeId(x + j, y + i2, z + i1) != blockId))
+                            if ((i2 < 4) && (!localMaterialData.isSolid()) && !world.getMaterial(x + j, y + i2, z + i1).equals(material))
                                 return;
                         }
                     }
@@ -98,7 +101,7 @@ public class SmallLakeGen extends Resource
                     {
                         if (BooleanBuffer[((j * 16 + i1) * 8 + i2)])
                         {
-                            world.setBlock(x + j, y + i2, z + i1, blockId, blockData);
+                            world.setBlock(x + j, y + i2, z + i1, material);
                             BooleanBuffer[((j * 16 + i1) * 8 + i2)] = false;
                         }
                     }
@@ -106,7 +109,7 @@ public class SmallLakeGen extends Resource
                     {
                         if (BooleanBuffer[((j * 16 + i1) * 8 + i2)])
                         {
-                            world.setBlock(x + j, y + i2, z + i1, 0, 0);
+                            world.setBlock(x + j, y + i2, z + i1, air);
                             BooleanBuffer[((j * 16 + i1) * 8 + i2)] = false;
                         }
                     }
@@ -120,24 +123,23 @@ public class SmallLakeGen extends Resource
     public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(5, args);
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
+        material = readMaterial(args.get(0));
         frequency = readInt(args.get(1), 1, 100);
         rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
+        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override
     public String makeString()
     {
-        return "SmallLake(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
+        return "SmallLake(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
     }
 
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.material.equals(this.material);
     }
 
     @Override

@@ -84,14 +84,14 @@ public interface LocalBiome
      * 
      * @return The default SurfaceBlock.
      */
-    int getSurfaceBlock();
+    LocalMaterialData getSurfaceBlock();
 
     /**
      * Gets the default value for the GroundBlock setting.
      * 
      * @return The default GroundBlock.
      */
-    int getGroundBlock();
+    LocalMaterialData getGroundBlock();
 
     /**
      * Gets the temperature at the given position, if this biome would be

@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.util;
 
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -16,7 +18,8 @@ public interface MultiTypedSetting
         Double,
         Float,
         StringArray,
-        Color
+        Color,
+        Material
     }
 
     public String name();
@@ -40,4 +43,6 @@ public interface MultiTypedSetting
     public HashSet<Integer> intSetValue();
 
     public boolean booleanValue();
+
+    public DefaultMaterial materialValue();
 }

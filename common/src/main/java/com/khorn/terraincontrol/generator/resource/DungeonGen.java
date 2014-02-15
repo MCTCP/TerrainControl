@@ -20,8 +20,8 @@ public class DungeonGen extends Resource
 
         frequency = readInt(args.get(0), 1, 100);
         rarity = readRarity(args.get(1));
-        minAltitude = readInt(args.get(2), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(3), minAltitude + 1, TerrainControl.worldHeight);
+        minAltitude = readInt(args.get(2), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(3), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override

@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.generator.surface;
 
+import com.khorn.terraincontrol.TerrainControl;
+
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorNewOctaves;
@@ -150,12 +153,15 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         }
 
         BiomeConfig biomeConfig = world.getSettings().biomeConfigs[world.getBiomeId(x, z)];
-        int biomeSurfaceBlock = biomeConfig.surfaceBlock;
-        int biomeGroundBlock = biomeConfig.groundBlock;
+        LocalMaterialData biomeSurfaceBlock = biomeConfig.surfaceBlock;
+        LocalMaterialData biomeGroundBlock = biomeConfig.groundBlock;
         // The following line prevents grass growing on dirt, but still allows
         // the user to change the ground block to something else without us
         // changing the block data
-        int biomeGroundBlockData = biomeGroundBlock == DefaultMaterial.DIRT.id ? 1 : 0;
+        if (biomeGroundBlock.isMaterial(DefaultMaterial.DIRT))
+        {
+            biomeGroundBlock = biomeGroundBlock.withBlockData(1);
+        }
 
         // Bryce spike calculations
         double bryceHeight = 0.0D;
@@ -191,7 +197,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         }
 
         int waterLevel = biomeConfig.waterLevelMax;
-        int currentGroundBlock = DefaultMaterial.STAINED_CLAY.id;
+        LocalMaterialData currentGroundBlock = TerrainControl.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 0);
         int noisePlusRandomFactor = (int) (noise / 3.0D + 3.0D + random.nextDouble() * 0.25D);
         boolean cosNoiseIsLargerThanZero = MathHelper.cos((float) (noise / 3.0D * Math.PI)) > 0.0D;
         int j1 = -1;
@@ -208,27 +214,26 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
 
         for (int y = maxHeight; y >= minHeight; y--)
         {
-            int blockAtPosition = world.getTypeId(x, y, z);
+            LocalMaterialData blockAtPosition = world.getMaterial(x, y, z);
 
-            if (blockAtPosition == 0 && y < bryceHeight)
+            if (blockAtPosition.isMaterial(DefaultMaterial.AIR) && y < bryceHeight)
             {
                 // Lie about the current block to generate the Bryce spikes
-                blockAtPosition = DefaultMaterial.STONE.id;
+                blockAtPosition = TerrainControl.toLocalMaterialData(DefaultMaterial.STONE, 0);
             }
 
-            if (blockAtPosition == 0)
+            if (blockAtPosition.isMaterial(DefaultMaterial.AIR))
             {
                 j1 = -1;
-            } else if (DefaultMaterial.getMaterial(blockAtPosition).isSolid())
+            } else if (blockAtPosition.isSolid())
             {
-                byte blockData;
 
                 if (j1 == -1)
                 {
                     belowSand = false;
                     if (y >= waterLevel - 4 && y <= waterLevel + 1)
                     {
-                        currentGroundBlock = DefaultMaterial.STAINED_CLAY.id;
+                        currentGroundBlock = TerrainControl.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 0);
                     }
 
                     j1 = noisePlusRandomFactor + Math.max(0, y - waterLevel);
@@ -238,14 +243,14 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                         {
                             if (cosNoiseIsLargerThanZero)
                             {
-                                world.setBlock(x, y, z, biomeGroundBlock, biomeGroundBlockData);
+                                world.setBlock(x, y, z, biomeGroundBlock);
                             } else
                             {
-                                world.setBlock(x, y, z, biomeSurfaceBlock, 0);
+                                world.setBlock(x, y, z, biomeSurfaceBlock);
                             }
                         } else if (y > waterLevel + 3 + noisePlusRandomFactor)
                         {
-                            blockData = 16;
+                            byte blockData = 16;
                             if (y >= 64 && y <= 127)
                             {
                                 if (!cosNoiseIsLargerThanZero)
@@ -259,24 +264,24 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
 
                             if (blockData < 16)
                             {
-                                world.setBlock(x, y, z, DefaultMaterial.STAINED_CLAY.id, blockData);
+                                world.setBlock(x, y, z, TerrainControl.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, blockData));
                             } else
                             {
-                                world.setBlock(x, y, z, DefaultMaterial.HARD_CLAY.id, 0);
+                                world.setBlock(x, y, z, TerrainControl.toLocalMaterialData(DefaultMaterial.HARD_CLAY, 0));
                             }
                         } else
                         {
-                            world.setBlock(x, y, z, DefaultMaterial.SAND.id, 1);
+                            world.setBlock(x, y, z, TerrainControl.toLocalMaterialData(DefaultMaterial.SAND, 1));
                             belowSand = true;
                         }
                     } else
                     {
-                        if (currentGroundBlock == DefaultMaterial.STAINED_CLAY.id)
+                        if (currentGroundBlock.isMaterial(DefaultMaterial.STAINED_CLAY))
                         {
-                            world.setBlock(x, y, z, currentGroundBlock, 1);
+                            world.setBlock(x, y, z, currentGroundBlock.withBlockData(1));
                         } else
                         {
-                            world.setBlock(x, y, z, currentGroundBlock, 0);
+                            world.setBlock(x, y, z, currentGroundBlock.withBlockData(0));
                         }
                     }
                 } else if (j1 > 0)
@@ -284,16 +289,17 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                     --j1;
                     if (belowSand)
                     {
-                        world.setBlock(x, y, z, DefaultMaterial.STAINED_CLAY.id, 1);
+                        world.setBlock(x, y, z, TerrainControl.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 1));
                     } else
                     {
-                        blockData = this.getBlockData(x, y, z);
-                        if (blockData < 16)
+                        LocalMaterialData blockInWorld = world.getMaterial(x, y, z);
+                        if (blockInWorld.getBlockData() < 16)
                         {
-                            world.setBlock(x, y, z, DefaultMaterial.STAINED_CLAY.id, blockData);
+                            world.setBlock(x, y, z,
+                                    TerrainControl.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, blockInWorld.getBlockData()));
                         } else
                         {
-                            world.setBlock(x, y, z, DefaultMaterial.HARD_CLAY.id, 0);
+                            world.setBlock(x, y, z, TerrainControl.toLocalMaterialData(DefaultMaterial.HARD_CLAY, 0));
                         }
                     }
                 }

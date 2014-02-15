@@ -152,7 +152,7 @@ public class WorldSettings
             // Indexing ReplacedBlocks
             if (!this.worldConfig.BiomeConfigsHaveReplacement)
             {
-                this.worldConfig.BiomeConfigsHaveReplacement = biomeConfig.ReplaceCount > 0;
+                this.worldConfig.BiomeConfigsHaveReplacement = biomeConfig.replacedBlocks.hasReplaceSettings();
             }
 
             // Indexing ReplaceToBiomeName

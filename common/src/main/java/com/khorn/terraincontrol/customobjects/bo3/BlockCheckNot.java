@@ -1,9 +1,6 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.util.helpers.BlockHelper;
-
-import java.util.ArrayList;
 
 public class BlockCheckNot extends BlockCheck
 {
@@ -28,21 +25,7 @@ public class BlockCheckNot extends BlockCheck
         rotatedCheck.x = z;
         rotatedCheck.y = y;
         rotatedCheck.z = -x;
-        rotatedCheck.blockIds = blockIds;
-
-        rotatedCheck.blockDatas = new ArrayList<Byte>();
-        for (int i = 0; i < blockDatas.size(); i++)
-        {
-            // Only try to rotate if some block data has been set.
-            if (blockDatas.get(i) == -1)
-            {
-                rotatedCheck.blockDatas.add((byte) -1);
-            } else
-            {
-                rotatedCheck.blockDatas.add((byte) BlockHelper.rotateData(blockIds.get(i), blockDatas.get(i)));
-            }
-        }
-
+        rotatedCheck.toCheck = toCheck.rotate();
         return rotatedCheck;
     }
 

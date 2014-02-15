@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
@@ -28,7 +30,7 @@ public class VinesGen extends Resource
                 for (int direction = 2; direction <= 5; direction++)
                     if (canPlace(world, _x, y, _z, direction))
                     {
-                        world.setBlock(_x, y, _z, DefaultMaterial.VINE.id, 1 << d[OPPOSITE_FACING[direction]], true, false, true);
+                        world.setBlock(_x, y, _z, TerrainControl.toLocalMaterialData(DefaultMaterial.VINE, 1 << d[OPPOSITE_FACING[direction]]));
                         break;
                     }
             } else
@@ -43,28 +45,28 @@ public class VinesGen extends Resource
 
     public boolean canPlace(LocalWorld world, int x, int y, int z, int paramInt4)
     {
-        int id;
+        LocalMaterialData sourceBlock;
         switch (paramInt4)
         {
             default:
                 return false;
             case 1:
-                id = (world.getTypeId(x, y + 1, z));
+                sourceBlock = world.getMaterial(x, y + 1, z);
                 break;
             case 2:
-                id = (world.getTypeId(x, y, z + 1));
+                sourceBlock = world.getMaterial(x, y, z + 1);
                 break;
             case 3:
-                id = (world.getTypeId(x, y, z - 1));
+                sourceBlock = world.getMaterial(x, y, z - 1);
                 break;
             case 5:
-                id = (world.getTypeId(x - 1, y, z));
+                sourceBlock = world.getMaterial(x - 1, y, z);
                 break;
             case 4:
-                id = (world.getTypeId(x + 1, y, z));
+                sourceBlock = world.getMaterial(x + 1, y, z);
                 break;
         }
-        return DefaultMaterial.getMaterial(id).isSolid();
+        return sourceBlock.isSolid();
     }
     public static final int[] d =
     {
@@ -78,13 +80,13 @@ public class VinesGen extends Resource
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
-        blockId = DefaultMaterial.VINE.id; // Hardcoded for now
+        material = TerrainControl.toLocalMaterialData(DefaultMaterial.VINE, 0);
 
         assureSize(4, args);
         frequency = readInt(args.get(0), 1, 100);
         rarity = readRarity(args.get(1));
-        minAltitude = readInt(args.get(2), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(3), minAltitude + 1, TerrainControl.worldHeight);
+        minAltitude = readInt(args.get(2), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(3), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override
@@ -96,7 +98,7 @@ public class VinesGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.material.equals(this.material);
     }
 
     @Override

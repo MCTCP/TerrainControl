@@ -1,9 +1,8 @@
 package com.khorn.terraincontrol.forge;
 
 import com.khorn.terraincontrol.BiomeIds;
-
-import net.minecraft.block.Block;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -79,15 +78,15 @@ public class ForgeBiome implements LocalBiome
     }
 
     @Override
-    public int getSurfaceBlock()
+    public LocalMaterialData getSurfaceBlock()
     {
-        return Block.getIdFromBlock(biomeBase.topBlock);
+        return new ForgeMaterialData(biomeBase.topBlock, 0);
     }
 
     @Override
-    public int getGroundBlock()
+    public LocalMaterialData getGroundBlock()
     {
-        return Block.getIdFromBlock(biomeBase.fillerBlock);
+        return new ForgeMaterialData(biomeBase.fillerBlock, 0);
     }
 
     @Override

@@ -13,8 +13,7 @@ public class AboveWaterGen extends Resource
     {
         assureSize(3, args);
 
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
+        material = readMaterial(args.get(0));
         frequency = readInt(args.get(1), 1, 100);
         rarity = readRarity(args.get(2));
     }
@@ -32,20 +31,20 @@ public class AboveWaterGen extends Resource
             int m = z + rand.nextInt(8) - rand.nextInt(8);
             if (!world.isEmpty(j, y, m) || !world.getMaterial(j, y - 1, m).isLiquid())
                 continue;
-            world.setBlock(j, y, m, blockId, blockData);
+            world.setBlock(j, y, m, material);
         }
     }
 
     @Override
     public String makeString()
     {
-        return "AboveWaterRes(" + makeMaterial(blockId) + "," + frequency + "," + rarity + ")";
+        return "AboveWaterRes(" + material + "," + frequency + "," + rarity + ")";
     }
 
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.material.equals(material);
     }
 
 }

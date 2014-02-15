@@ -1,17 +1,16 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
-import com.khorn.terraincontrol.util.helpers.BlockHelper;
 
 import java.util.List;
 import java.util.Random;
 
 public class RandomBlockFunction extends BlockFunction
 {
-    public int[] blockIds;
-    public byte[] blockDatas;
+    public LocalMaterialData[] blocks;
     public byte[] blockChances;
     public String[] metaDataNames;
     public NamedBinaryTag[] metaDataTags;
@@ -31,8 +30,7 @@ public class RandomBlockFunction extends BlockFunction
         int size = args.size();
 
         // The arrays are a little bit too large, just to be sure
-        blockIds = new int[size / 2 + 1];
-        blockDatas = new byte[size / 2 + 1];
+        blocks = new LocalMaterialData[size / 2 + 1];
         blockChances = new byte[size / 2 + 1];
         metaDataNames = new String[size / 2 + 1];
         metaDataTags = new NamedBinaryTag[size / 2 + 1];
@@ -40,8 +38,7 @@ public class RandomBlockFunction extends BlockFunction
         while (i < size)
         {
             // Parse block id and data
-            blockIds[blockCount] = readBlockId(args.get(i));
-            blockDatas[blockCount] = (byte) readBlockData(args.get(i));
+            blocks[blockCount] = readMaterial(args.get(i));
 
             // Parse chance and metadata
             i++;
@@ -78,10 +75,10 @@ public class RandomBlockFunction extends BlockFunction
         {
             if (metaDataTags[i] == null)
             {
-                text += "," + makeMaterial(blockIds[i], blockDatas[i]) + "," + blockChances[i];
+                text += "," + blocks[i] + "," + blockChances[i];
             } else
             {
-                text += "," + makeMaterial(blockIds[i], blockDatas[i]) + "," + metaDataNames[i] + "," + blockChances[i];
+                text += "," + blocks[i] + "," + metaDataNames[i] + "," + blockChances[i];
             }
         }
         return text + ")";
@@ -95,11 +92,10 @@ public class RandomBlockFunction extends BlockFunction
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.blockCount = blockCount;
-        rotatedBlock.blockIds = blockIds;
-        rotatedBlock.blockDatas = new byte[blockCount];
+        rotatedBlock.blocks = new LocalMaterialData[blockCount];
         for (int i = 0; i < blockCount; i++)
         {
-            rotatedBlock.blockDatas[i] = (byte) BlockHelper.rotateData(blockIds[i], blockDatas[i]);
+            rotatedBlock.blocks[i] = blocks[i].rotate();
         }
         rotatedBlock.blockChances = blockChances;
         rotatedBlock.metaDataTags = metaDataTags;
@@ -115,7 +111,7 @@ public class RandomBlockFunction extends BlockFunction
         {
             if (random.nextInt(100) < blockChances[i])
             {
-                world.setBlock(x, y, z, blockIds[i], blockDatas[i]);
+                world.setBlock(x, y, z, blocks[i]);
                 if (metaDataTags[i] != null)
                 {
                     world.attachMetadata(x, y, z, metaDataTags[i]);

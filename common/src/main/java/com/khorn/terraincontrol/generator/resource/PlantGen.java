@@ -3,8 +3,8 @@ package com.khorn.terraincontrol.generator.resource;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.MaterialSet;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -14,7 +14,7 @@ public class PlantGen extends Resource
 
     private int minAltitude;
     private int maxAltitude;
-    private List<Integer> sourceBlocks;
+    private MaterialSet sourceBlocks;
 
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
@@ -26,7 +26,7 @@ public class PlantGen extends Resource
             int j = x + rand.nextInt(8) - rand.nextInt(8);
             int k = y + rand.nextInt(4) - rand.nextInt(4);
             int m = z + rand.nextInt(8) - rand.nextInt(8);
-            if ((!world.isEmpty(j, k, m)) || (!sourceBlocks.contains(world.getTypeId(j, k - 1, m))))
+            if ((!world.isEmpty(j, k, m)) || (!sourceBlocks.contains(world.getMaterial(j, k - 1, m))))
                 continue;
 
             plant.spawn(world, j, k, m);
@@ -41,32 +41,26 @@ public class PlantGen extends Resource
         plant = PlantType.getPlant(args.get(0));
         
         // Not used for terrain generation, they are used by the Forge
-        // implementation to fire Forge events. We'll probably want to rewrite
-        // this in the future to not use block ids
-        blockId = plant.getBlockId();
-        blockData = plant.getBottomBlockData();
+        // implementation to fire Forge events.
+        material = plant.getBottomMaterial();
 
         frequency = readInt(args.get(1), 1, 100);
         rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
-        sourceBlocks = new ArrayList<Integer>();
-        for (int i = 5; i < args.size(); i++)
-        {
-            sourceBlocks.add(readBlockId(args.get(i)));
-        }
+        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        sourceBlocks = readMaterials(args, 5);
     }
 
     @Override
     public String makeString()
     {
-        return "Plant(" + plant.getName() + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
+        return "Plant(" + plant.getName() + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
 
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && ((PlantGen) other).plant.equals(this.plant);
     }
 
     @Override

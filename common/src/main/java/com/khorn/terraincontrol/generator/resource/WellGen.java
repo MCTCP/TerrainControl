@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.util.MaterialSet;
+
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
@@ -13,29 +16,24 @@ public class WellGen extends Resource
     private int minAltitude;
     private int maxAltitude;
 
-    private int slabId;
-    private int slabData; // 1
-    private int waterId;
-    private int waterData;
+    private LocalMaterialData slab;
+    private LocalMaterialData water;
 
-    private List<Integer> sourceBlocks;
+    private MaterialSet sourceBlocks;
 
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(8, args);
 
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
-        slabId = readBlockId(args.get(1));
-        slabData = readBlockData(args.get(1));
-        waterId = readBlockId(args.get(2));
-        waterData = readBlockData(args.get(2));
+        material = readMaterial(args.get(0));
+        slab = readMaterial(args.get(1));
+        water = readMaterial(args.get(2));
         frequency = readInt(args.get(3), 1, 100);
         rarity = readRarity(args.get(4));
-        minAltitude = readInt(args.get(5), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(6), minAltitude + 1, TerrainControl.worldHeight);
-        sourceBlocks = this.readBlockIds(args, 7);
+        minAltitude = readInt(args.get(5), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(6), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        sourceBlocks = readMaterials(args, 7);
     }
 
     @Override
@@ -48,7 +46,7 @@ public class WellGen extends Resource
             --y;
         }
 
-        int sourceBlock = world.getTypeId(x, y, z);
+        LocalMaterialData sourceBlock = world.getMaterial(x, y, z);
 
         if (!sourceBlocks.contains(sourceBlock))
         {
@@ -74,16 +72,16 @@ public class WellGen extends Resource
             {
                 for (int var9 = -2; var9 <= 2; ++var9)
                 {
-                    world.setBlock(x + j, y + i, z + var9, blockId, blockData);
+                    world.setBlock(x + j, y + i, z + var9, material);
                 }
             }
         }
 
-        world.setBlock(x, y, z, waterId, waterData);
-        world.setBlock(x - 1, y, z, waterId, waterData);
-        world.setBlock(x + 1, y, z, waterId, waterData);
-        world.setBlock(x, y, z - 1, waterId, waterData);
-        world.setBlock(x, y, z + 1, waterId, waterData);
+        world.setBlock(x, y, z, water);
+        world.setBlock(x - 1, y, z, water);
+        world.setBlock(x + 1, y, z, water);
+        world.setBlock(x, y, z - 1, water);
+        world.setBlock(x, y, z + 1, water);
 
         for (i = -2; i <= 2; ++i)
         {
@@ -91,15 +89,15 @@ public class WellGen extends Resource
             {
                 if (i == -2 || i == 2 || j == -2 || j == 2)
                 {
-                    world.setBlock(x + i, y + 1, z + j, blockId, blockData);
+                    world.setBlock(x + i, y + 1, z + j, material);
                 }
             }
         }
 
-        world.setBlock(x + 2, y + 1, z, slabId, slabData);
-        world.setBlock(x - 2, y + 1, z, slabId, slabData);
-        world.setBlock(x, y + 1, z + 2, slabId, slabData);
-        world.setBlock(x, y + 1, z - 2, slabId, slabData);
+        world.setBlock(x + 2, y + 1, z, slab);
+        world.setBlock(x - 2, y + 1, z, slab);
+        world.setBlock(x, y + 1, z + 2, slab);
+        world.setBlock(x, y + 1, z - 2, slab);
 
         for (i = -1; i <= 1; ++i)
         {
@@ -107,35 +105,35 @@ public class WellGen extends Resource
             {
                 if (i == 0 && j == 0)
                 {
-                    world.setBlock(x + i, y + 4, z + j, blockId, blockData);
+                    world.setBlock(x + i, y + 4, z + j, material);
                 } else
                 {
-                    world.setBlock(x + i, y + 4, z + j, slabId, slabData);
+                    world.setBlock(x + i, y + 4, z + j, slab);
                 }
             }
         }
 
         for (i = 1; i <= 3; ++i)
         {
-            world.setBlock(x - 1, y + i, z - 1, blockId, blockData);
-            world.setBlock(x - 1, y + i, z + 1, blockId, blockData);
-            world.setBlock(x + 1, y + i, z - 1, blockId, blockData);
-            world.setBlock(x + 1, y + i, z + 1, blockId, blockData);
+            world.setBlock(x - 1, y + i, z - 1, material);
+            world.setBlock(x - 1, y + i, z + 1, material);
+            world.setBlock(x + 1, y + i, z - 1, material);
+            world.setBlock(x + 1, y + i, z + 1, material);
         }
     }
 
     @Override
     public String makeString()
     {
-        String output = "Well(" + makeMaterial(blockId, blockData) + "," + makeMaterial(slabId, slabData) + "," + makeMaterial(waterId, waterData) + ",";
-        output += frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + this.makeMaterial(sourceBlocks) + ")";
+        String output = "Well(" + material + "," + slab + "," + water + ",";
+        output += frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + this.makeMaterials(sourceBlocks) + ")";
         return output;
     }
 
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.material.equals(material);
     }
 
     @Override
@@ -145,11 +143,9 @@ public class WellGen extends Resource
         hash = 17 * hash + super.hashCode();
         hash = 17 * hash + this.minAltitude;
         hash = 17 * hash + this.maxAltitude;
-        hash = 17 * hash + this.slabId;
-        hash = 17 * hash + this.slabData;
-        hash = 17 * hash + this.waterId;
-        hash = 17 * hash + this.waterData;
-        hash = 17 * hash + (this.sourceBlocks != null ? this.sourceBlocks.hashCode() : 0);
+        hash = 17 * hash + this.slab.hashCode();
+        hash = 17 * hash + this.water.hashCode();
+        hash = 17 * hash + this.sourceBlocks.hashCode();
         return hash;
     }
 
@@ -167,12 +163,9 @@ public class WellGen extends Resource
         final WellGen compare = (WellGen) other;
         return this.maxAltitude == compare.maxAltitude
                && this.minAltitude == compare.minAltitude
-               && this.slabData == compare.slabData
-               && this.slabId == compare.slabId
-               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
-                   : this.sourceBlocks.equals(compare.sourceBlocks))
-               && this.waterData == compare.waterData
-               && this.waterId == compare.waterId;
+               && this.slab.equals(compare.slab)
+               && this.sourceBlocks.equals(compare.sourceBlocks)
+               && this.water.equals(compare.water);
     }
 
 }

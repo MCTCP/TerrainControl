@@ -1,8 +1,15 @@
 package com.khorn.terraincontrol.util.minecraftTypes;
 
+import com.khorn.terraincontrol.LocalMaterialData;
+
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Enum of the materials the server will at least support.
+ * 
+ * @see LocalMaterialData
+ */
 @SuppressWarnings({"UnusedDeclaration"})
 public enum DefaultMaterial
 {
@@ -192,7 +199,7 @@ public enum DefaultMaterial
 
     /**
      * Creates a new material.
-     *
+     * 
      * @param id Id of the material.
      * @param solid Whether the material is solid. If set to false, it will
      *            prevent snowfall. Note: this isn't always equal to what
@@ -206,7 +213,7 @@ public enum DefaultMaterial
 
     /**
      * Creates a new solid material where snow will fall on.
-     *
+     * 
      * @param id Id of the material.
      */
     private DefaultMaterial(int id)
@@ -217,7 +224,7 @@ public enum DefaultMaterial
 
     /**
      * Returns true only if this material is flowing or stationary Water
-     *
+     * 
      * @return boolean whether or not this material is flowing or stationary
      *         Water
      */
@@ -230,7 +237,7 @@ public enum DefaultMaterial
      * Gets whether this material is solid. Materials that aren't solid are
      * nonexistant for {@link LocalWorld#getSolidHeight(int, int)}. Note: this
      * isn't always equal to what Minecraft calls solid.
-     *
+     * 
      * @return boolean Whether or not the material is considered solid
      */
     public boolean isSolid()
@@ -240,7 +247,7 @@ public enum DefaultMaterial
 
     /**
      * Gets whether snow can fall on this block.
-     *
+     * 
      * @return Whether snow can fall on this block.
      */
     public boolean canSnowFallOn()
@@ -276,13 +283,27 @@ public enum DefaultMaterial
      * Returns a DefaultMaterial object with the given material name. Name is
      * case insensitive.
      * 
-     * @param name the Name of the DefaultMaterial that is to be returned
-     *            <p/>
-     * @return A DefaultMaterial with the given name
+     * @param blockName the Name of the DefaultMaterial that is to be
+     *            returned. May not contain block data.
+     * @return A DefaultMaterial with the given name, or UNKNOWN_BLOCK if not
+     *         found.
      */
-    public static DefaultMaterial getMaterial(String name)
+    public static DefaultMaterial getMaterial(String blockName)
     {
-        return lookupName.get(name);
+        DefaultMaterial defaultMaterial = lookupName.get(blockName);
+        if (defaultMaterial != null)
+        {
+            return defaultMaterial;
+        }
+
+        // Try parsing it als id
+        try
+        {
+            return getMaterial(Integer.parseInt(blockName));
+        } catch (NumberFormatException e)
+        {
+            return UNKNOWN_BLOCK;
+        }
     }
 
     /**
@@ -329,4 +350,5 @@ public enum DefaultMaterial
     {
         return id < 256 && lookupID[id] != null;
     }
+
 }

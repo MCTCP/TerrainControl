@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
-import com.khorn.terraincontrol.util.helpers.BlockHelper;
 
 import java.util.List;
 import java.util.Random;
@@ -14,8 +14,7 @@ import java.util.Random;
 public class BlockFunction extends BO3Function
 {
 
-    public int blockId;
-    public int blockData;
+    public LocalMaterialData material;
     public int x;
     public int y;
     public int z;
@@ -30,8 +29,7 @@ public class BlockFunction extends BO3Function
         x = readInt(args.get(0), -100, 100);
         y = readInt(args.get(1), -100, 100);
         z = readInt(args.get(2), -100, 100);
-        blockId = readBlockId(args.get(3));
-        blockData = readBlockData(args.get(3));
+        material = readMaterial(args.get(3));
         if (args.size() == 5)
         {
             metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().file);
@@ -46,7 +44,7 @@ public class BlockFunction extends BO3Function
     @Override
     public String makeString()
     {
-        String start = "Block(" + x + ',' + y + ',' + z + ',' + makeMaterial(blockId, blockData);
+        String start = "Block(" + x + ',' + y + ',' + z + ',' + material;
         if (hasMetaData)
         {
             start += ',' + metaDataName;
@@ -61,8 +59,7 @@ public class BlockFunction extends BO3Function
         rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
-        rotatedBlock.blockId = blockId;
-        rotatedBlock.blockData = BlockHelper.rotateData(blockId, blockData);
+        rotatedBlock.material = material.rotate();
         rotatedBlock.hasMetaData = hasMetaData;
         rotatedBlock.metaDataTag = metaDataTag;
         rotatedBlock.metaDataName = metaDataName;
@@ -85,7 +82,7 @@ public class BlockFunction extends BO3Function
      */
     public void spawn(LocalWorld world, Random random, int x, int y, int z)
     {
-        world.setBlock(x, y, z, blockId, blockData);
+        world.setBlock(x, y, z, material);
         if (hasMetaData)
         {
             world.attachMetadata(x, y, z, metaDataTag);

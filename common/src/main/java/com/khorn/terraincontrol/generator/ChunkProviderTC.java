@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.generator;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -14,6 +12,7 @@ import com.khorn.terraincontrol.generator.terrain.CanyonsGen;
 import com.khorn.terraincontrol.generator.terrain.CavesGen;
 import com.khorn.terraincontrol.generator.terrain.TerrainGenBase;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Random;
 
@@ -233,12 +232,12 @@ public class ChunkProviderTC
                                 int blockId = 0;
                                 if (y * 8 + piece_y < waterLevelMax && y * 8 + piece_y > biomeConfigs[biomeId].waterLevelMin)
                                 {
-                                    blockId = biomeConfigs[biomeId].waterBlock;
+                                    blockId = biomeConfigs[biomeId].waterBlock.getBlockId();
                                 }
 
                                 if (d16 > 0.0D)
                                 {
-                                    blockId = this.worldSettings.biomeConfigs[biomeId].stoneBlock;
+                                    blockId = this.worldSettings.biomeConfigs[biomeId].stoneBlock.getBlockId();
                                 }
 
                                 blockArray[position] = (byte) blockId;
@@ -294,13 +293,13 @@ public class ChunkProviderTC
                 if (worldConfig.ceilingBedrock)
                 {
                     // Moved one block lower to fix lighting issues
-                    blocksArray[(z * 16 + x) * CHUNK_MAX_Y + this.heightCap - 2] = (byte) worldConfig.bedrockBlock;
+                    blocksArray[(z * 16 + x) * CHUNK_MAX_Y + this.heightCap - 2] = (byte) worldConfig.bedrockBlock.getBlockId();
                 }
 
                 // Loop from map height to zero to place bedrock and surface
                 // blocks
-                int currentSurfaceBlock = biomeConfig.surfaceBlock;
-                int currentGroundBlock = biomeConfig.groundBlock;
+                int currentSurfaceBlock = biomeConfig.surfaceBlock.getBlockId();
+                int currentGroundBlock = biomeConfig.groundBlock.getBlockId();
                 int surfaceBlocksCount = -1;
                 final int currentWaterLevel = this.waterLevel[z + x * 16];
                 for (int y = CHUNK_MAX_Y - 1; y >= 0; y--)
@@ -310,7 +309,7 @@ public class ChunkProviderTC
                     if (y < 5 && (worldConfig.createAdminium(y)) && y <= this.random.nextInt(5))
                     {
                         // Place bottom bedrock
-                        blocksArray[currentPos] = (byte) worldConfig.bedrockBlock;
+                        blocksArray[currentPos] = (byte) worldConfig.bedrockBlock.getBlockId();
                     } else
                     {
                         // Surface blocks logic (grass, dirt, sand, sandstone)
@@ -320,7 +319,7 @@ public class ChunkProviderTC
                         {
                             // Reset when air is found
                             surfaceBlocksCount = -1;
-                        } else if (blockOnCurrentPos == biomeConfig.stoneBlock)
+                        } else if (blockOnCurrentPos == biomeConfig.stoneBlock.getBlockId())
                         {
                             if (surfaceBlocksCount == -1)
                             {
@@ -328,11 +327,11 @@ public class ChunkProviderTC
                                 if (surfaceBlocksNoise <= 0 && !worldConfig.removeSurfaceStone)
                                 {
                                     currentSurfaceBlock = 0;
-                                    currentGroundBlock = biomeConfig.stoneBlock;
+                                    currentGroundBlock = biomeConfig.stoneBlock.getBlockId();
                                 } else if ((y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1))
                                 {
-                                    currentSurfaceBlock = biomeConfig.surfaceBlock;
-                                    currentGroundBlock = biomeConfig.groundBlock;
+                                    currentSurfaceBlock = biomeConfig.surfaceBlock.getBlockId();
+                                    currentGroundBlock = biomeConfig.groundBlock.getBlockId();
                                 }
 
                                 // Use blocks for the top of the water instead
@@ -341,10 +340,10 @@ public class ChunkProviderTC
                                 {
                                     if (currentTemperature < 0.15F)
                                     {
-                                        currentSurfaceBlock = (byte) biomeConfig.iceBlock;
+                                        currentSurfaceBlock = (byte) biomeConfig.iceBlock.getBlockId();
                                     } else
                                     {
-                                        currentSurfaceBlock = (byte) biomeConfig.waterBlock;
+                                        currentSurfaceBlock = (byte) biomeConfig.waterBlock.getBlockId();
                                     }
                                 }
 
@@ -376,7 +375,7 @@ public class ChunkProviderTC
                 }
 
                 // Count how many water there is
-                if (blocksArray[(z * 16 + x) * CHUNK_MAX_Y + biomeConfig.waterLevelMax] == biomeConfig.waterBlock)
+                if (blocksArray[(z * 16 + x) * CHUNK_MAX_Y + biomeConfig.waterLevelMax] == biomeConfig.waterBlock.getBlockId())
                 {
                     dryBlocksOnSurface--;
                 }

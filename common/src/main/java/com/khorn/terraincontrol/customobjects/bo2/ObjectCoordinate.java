@@ -1,6 +1,8 @@
 package com.khorn.terraincontrol.customobjects.bo2;
 
-import com.khorn.terraincontrol.util.helpers.BlockHelper;
+import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 public class ObjectCoordinate
 {
@@ -8,8 +10,7 @@ public class ObjectCoordinate
     public int y;
     public int z;
     private int hash;
-    public int blockId;
-    public int blockData;
+    public LocalMaterialData material;
     public int BranchDirection;
     public int BranchOdds;
 
@@ -20,7 +21,6 @@ public class ObjectCoordinate
         this.y = _y;
         this.z = _z;
         this.BranchDirection = -1;
-        this.blockData = 0;
         this.BranchOdds = -1;
 
         hash = x + z << 8 + y << 16;
@@ -47,8 +47,7 @@ public class ObjectCoordinate
     public ObjectCoordinate Rotate()
     {
         ObjectCoordinate newCoordinate = new ObjectCoordinate(this.z, this.y, (this.x * -1));
-        newCoordinate.blockId = this.blockId;
-        newCoordinate.blockData = BlockHelper.rotateData(this.blockId, this.blockData);
+        newCoordinate.material = material.rotate();
         newCoordinate.BranchOdds = this.BranchOdds;
 
         if (this.BranchDirection != -1)
@@ -95,13 +94,7 @@ public class ObjectCoordinate
                 newCoordinate.BranchOdds = Integer.parseInt(branchData[1]);
 
             }
-            if (workingDataString.contains("."))
-            {
-                String stringSet[] = workingDataString.split("\\.");
-                workingDataString = stringSet[0];
-                newCoordinate.blockData = Integer.parseInt(stringSet[1]);
-            }
-            newCoordinate.blockId = Integer.parseInt(workingDataString);
+            newCoordinate.material = TerrainControl.readMaterial(workingDataString);
 
             return newCoordinate;
 
@@ -109,6 +102,10 @@ public class ObjectCoordinate
         {
             return null;
 
+        } catch (InvalidConfigException e)
+        {
+            return null;
+            
         }
 
 

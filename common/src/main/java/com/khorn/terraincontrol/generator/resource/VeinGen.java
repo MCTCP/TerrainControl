@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.util.MaterialSet;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
@@ -20,7 +22,7 @@ public class VeinGen extends Resource
     public int oreRarity; // Rarity of the ores in the vein
     public int minAltitude; // Minimum altitude of the vein
     public int maxAltitude; // Maximum altitude of the vein
-    public List<Integer> sourceBlocks; // Blocks for the ore to spawn in
+    public MaterialSet sourceBlocks; // Blocks for the ore to spawn in
 
     @Override
     public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
@@ -51,24 +53,23 @@ public class VeinGen extends Resource
     {
         assureSize(9, args);
 
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
+        material = readMaterial(args.get(0));
         minRadius = readInt(args.get(1), 10, 200);
         maxRadius = readInt(args.get(2), minRadius, 201);
         veinRarity = readDouble(args.get(3), 0.0000001, 100);
         oreSize = readInt(args.get(4), 1, 64);
         oreFrequency = readInt(args.get(5), 1, 100);
         oreRarity = readInt(args.get(6), 1, 100);
-        minAltitude = readInt(args.get(7), TerrainControl.worldDepth, TerrainControl.worldHeight - 1);
-        maxAltitude = readInt(args.get(8), minAltitude + 1, TerrainControl.worldHeight);
-        sourceBlocks = readBlockIds(args, 9);
+        minAltitude = readInt(args.get(7), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT - 1);
+        maxAltitude = readInt(args.get(8), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        sourceBlocks = readMaterials(args, 9);
     }
 
     @Override
     public String makeString()
     {
-        String result = "Vein(" + makeMaterial(blockId, blockData) + "," + minRadius + "," + maxRadius + "," + veinRarity + ",";
-        result += oreSize + "," + oreFrequency + "," + oreRarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
+        String result = "Vein(" + material + "," + minRadius + "," + maxRadius + "," + veinRarity + ",";
+        result += oreSize + "," + oreFrequency + "," + oreRarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
         return result;
     }
 
@@ -83,7 +84,7 @@ public class VeinGen extends Resource
     public Vein getVeinStartInChunk(LocalWorld world, int chunkX, int chunkZ)
     {
         // Create a random generator that is constant for this chunk and vein
-        Random random = RandomHelper.getRandomForCoords(chunkX, chunkZ, (blockId * 16 + blockData) * (minRadius + maxRadius + 100) + world.getSeed());
+        Random random = RandomHelper.getRandomForCoords(chunkX, chunkZ, material.hashCode() * (minRadius + maxRadius + 100) + world.getSeed());
 
         if (random.nextDouble() * 100.0 < veinRarity)
         {
@@ -100,7 +101,7 @@ public class VeinGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.material.equals(this.material);
     }
 
     @Override

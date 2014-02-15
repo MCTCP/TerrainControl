@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -17,8 +19,7 @@ import java.util.logging.Level;
 public abstract class Resource extends ConfigFunction<BiomeConfig>
 {
 
-    protected int blockId = -1;
-    protected int blockData = -1;
+    protected LocalMaterialData material;
     protected int frequency;
     protected double rarity;
 
@@ -134,14 +135,13 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     }
 
     /**
-     * Returns the block id. Resources that don't have a block id should
-     * return -1.
+     * Returns the material. Resources that don't have a material will return null.
      * <p/>
-     * @return The block id of the resource this object represents.
+     * @return The material of the resource this object represents.
      */
-    public int getBlockId()
+    public LocalMaterialData getMaterial()
     {
-        return blockId;
+        return material;
     }
 
     
@@ -169,8 +169,17 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
         if (getClass() != other.getClass())
             return false;
         final Resource compare = (Resource) other;
-        return this.blockData == compare.blockData
-               && this.blockId == compare.blockData
+
+        // Check for null materials
+        if (this.material == null)
+        {
+            if (compare.material != null)
+            {
+                return false;
+            }
+        }
+
+        return this.material.equals(compare.material)
                && this.frequency == compare.frequency
                && this.rarity == compare.rarity;
     }
@@ -179,8 +188,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     public int hashCode()
     {
         int hash = 5;
-        hash = 53 * hash + this.blockId;
-        hash = 53 * hash + this.blockData;
+        hash = 53 * hash + (this.material == null? 0 : material.hashCode());
         hash = 53 * hash + this.frequency;
         hash = 53 * hash + (int) (Double.doubleToLongBits(this.rarity) ^ (Double.doubleToLongBits(this.rarity) >>> 32));
         return hash;

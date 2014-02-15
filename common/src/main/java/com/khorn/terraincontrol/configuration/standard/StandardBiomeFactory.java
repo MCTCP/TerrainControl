@@ -100,8 +100,8 @@ public class StandardBiomeFactory
     public Object[] defaultWell; // Parameters for well resource
     public float defaultBiomeSurface = 0.1F;
     public float defaultBiomeVolatility = 0.3F;
-    public int defaultSurfaceBlock = DefaultMaterial.GRASS.id;
-    public int defaultGroundBlock = DefaultMaterial.DIRT.id;
+    public DefaultMaterial defaultSurfaceBlock = DefaultMaterial.GRASS;
+    public DefaultMaterial defaultGroundBlock = DefaultMaterial.DIRT;
     public float defaultBiomeTemperature = 0.5F;
     public float defaultBiomeWetness = 0.5F;
     public ArrayList<String> defaultIsle = new ArrayList<String>();
@@ -133,8 +133,8 @@ public class StandardBiomeFactory
         // Minecraft
         this.defaultBiomeSurface = this.minecraftBiome.getSurfaceHeight();
         this.defaultBiomeVolatility = this.minecraftBiome.getSurfaceVolatility();
-        this.defaultSurfaceBlock = this.minecraftBiome.getSurfaceBlock();
-        this.defaultGroundBlock = this.minecraftBiome.getGroundBlock();
+        this.defaultSurfaceBlock = this.minecraftBiome.getSurfaceBlock().toDefaultMaterial();
+        this.defaultGroundBlock = this.minecraftBiome.getGroundBlock().toDefaultMaterial();
         this.defaultBiomeTemperature = this.minecraftBiome.getTemperature();
         this.defaultBiomeWetness = this.minecraftBiome.getWetness();
     }
@@ -153,11 +153,11 @@ public class StandardBiomeFactory
         // Small water lakes
         if (this.defaultWaterLakes)
         {
-            resources.add(Resource.createResource(config, SmallLakeGen.class, DefaultMaterial.WATER.id, BiomeStandardValues.SmallLakeWaterFrequency.intValue(), BiomeStandardValues.SmallLakeWaterRarity.intValue(), BiomeStandardValues.SmallLakeMinAltitude.intValue(), BiomeStandardValues.SmallLakeMaxAltitude.intValue()));
+            resources.add(Resource.createResource(config, SmallLakeGen.class, DefaultMaterial.WATER, BiomeStandardValues.SmallLakeWaterFrequency.intValue(), BiomeStandardValues.SmallLakeWaterRarity.intValue(), BiomeStandardValues.SmallLakeMinAltitude.intValue(), BiomeStandardValues.SmallLakeMaxAltitude.intValue()));
         }
 
         // Small lava lakes
-        resources.add(Resource.createResource(config, SmallLakeGen.class, DefaultMaterial.LAVA.id, BiomeStandardValues.SmallLakeLavaFrequency.intValue(), BiomeStandardValues.SmallLakeLavaRarity.intValue(), BiomeStandardValues.SmallLakeMinAltitude.intValue(), BiomeStandardValues.SmallLakeMaxAltitude.intValue()));
+        resources.add(Resource.createResource(config, SmallLakeGen.class, DefaultMaterial.LAVA, BiomeStandardValues.SmallLakeLavaFrequency.intValue(), BiomeStandardValues.SmallLakeLavaRarity.intValue(), BiomeStandardValues.SmallLakeMinAltitude.intValue(), BiomeStandardValues.SmallLakeMaxAltitude.intValue()));
 
         // Underground lakes
         resources.add(Resource.createResource(config, UndergroundLakeGen.class, BiomeStandardValues.undergroundLakeMinSize.intValue(), BiomeStandardValues.undergroundLakeMaxSize.intValue(), BiomeStandardValues.undergroundLakeFrequency.intValue(), BiomeStandardValues.undergroundLakeRarity.intValue(), BiomeStandardValues.undergroundLakeMinAltitude.intValue(), BiomeStandardValues.undergroundLakeMaxAltitude.intValue()));
@@ -166,42 +166,42 @@ public class StandardBiomeFactory
         resources.add(Resource.createResource(config, DungeonGen.class, BiomeStandardValues.dungeonFrequency.intValue(), BiomeStandardValues.dungeonRarity.intValue(), BiomeStandardValues.dungeonMinAltitude.intValue(), this.worldHeight));
 
         // Dirt
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIRT.id, BiomeStandardValues.dirtDepositSize.intValue(), BiomeStandardValues.dirtDepositFrequency.intValue(), BiomeStandardValues.dirtDepositRarity.intValue(), BiomeStandardValues.dirtDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIRT, BiomeStandardValues.dirtDepositSize.intValue(), BiomeStandardValues.dirtDepositFrequency.intValue(), BiomeStandardValues.dirtDepositRarity.intValue(), BiomeStandardValues.dirtDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.STONE));
 
         // Gravel
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GRAVEL.id, BiomeStandardValues.gravelDepositSize.intValue(), BiomeStandardValues.gravelDepositFrequency.intValue(), BiomeStandardValues.gravelDepositRarity.intValue(), BiomeStandardValues.gravelDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GRAVEL, BiomeStandardValues.gravelDepositSize.intValue(), BiomeStandardValues.gravelDepositFrequency.intValue(), BiomeStandardValues.gravelDepositRarity.intValue(), BiomeStandardValues.gravelDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.STONE));
 
         // Coal
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.COAL_ORE.id, BiomeStandardValues.coalDepositSize.intValue(), BiomeStandardValues.coalDepositFrequency.intValue(), BiomeStandardValues.coalDepositRarity.intValue(), BiomeStandardValues.coalDepositMinAltitude.intValue(), worldOreHeight, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.COAL_ORE, BiomeStandardValues.coalDepositSize.intValue(), BiomeStandardValues.coalDepositFrequency.intValue(), BiomeStandardValues.coalDepositRarity.intValue(), BiomeStandardValues.coalDepositMinAltitude.intValue(), worldOreHeight, DefaultMaterial.STONE));
 
         // Iron
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.IRON_ORE.id, BiomeStandardValues.ironDepositSize.intValue(), BiomeStandardValues.ironDepositFrequency.intValue(), BiomeStandardValues.ironDepositRarity.intValue(), BiomeStandardValues.ironDepositMinAltitude.intValue(), worldOreHeight / 2, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.IRON_ORE, BiomeStandardValues.ironDepositSize.intValue(), BiomeStandardValues.ironDepositFrequency.intValue(), BiomeStandardValues.ironDepositRarity.intValue(), BiomeStandardValues.ironDepositMinAltitude.intValue(), worldOreHeight / 2, DefaultMaterial.STONE));
 
         // Gold
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GOLD_ORE.id, BiomeStandardValues.goldDepositSize.intValue(), BiomeStandardValues.goldDepositFrequency.intValue(), BiomeStandardValues.goldDepositRarity.intValue(), BiomeStandardValues.goldDepositMinAltitude.intValue(), worldOreHeight / 4, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GOLD_ORE, BiomeStandardValues.goldDepositSize.intValue(), BiomeStandardValues.goldDepositFrequency.intValue(), BiomeStandardValues.goldDepositRarity.intValue(), BiomeStandardValues.goldDepositMinAltitude.intValue(), worldOreHeight / 4, DefaultMaterial.STONE));
 
         // Redstone
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.REDSTONE_ORE.id, BiomeStandardValues.redstoneDepositSize.intValue(), BiomeStandardValues.redstoneDepositFrequency.intValue(), BiomeStandardValues.redstoneDepositRarity.intValue(), BiomeStandardValues.redstoneDepositMinAltitude.intValue(), worldOreHeight / 8, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.REDSTONE_ORE, BiomeStandardValues.redstoneDepositSize.intValue(), BiomeStandardValues.redstoneDepositFrequency.intValue(), BiomeStandardValues.redstoneDepositRarity.intValue(), BiomeStandardValues.redstoneDepositMinAltitude.intValue(), worldOreHeight / 8, DefaultMaterial.STONE));
 
         // Diamond
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIAMOND_ORE.id, BiomeStandardValues.diamondDepositSize.intValue(), BiomeStandardValues.diamondDepositFrequency.intValue(), BiomeStandardValues.diamondDepositRarity.intValue(), BiomeStandardValues.diamondDepositMinAltitude.intValue(), worldOreHeight / 8, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIAMOND_ORE, BiomeStandardValues.diamondDepositSize.intValue(), BiomeStandardValues.diamondDepositFrequency.intValue(), BiomeStandardValues.diamondDepositRarity.intValue(), BiomeStandardValues.diamondDepositMinAltitude.intValue(), worldOreHeight / 8, DefaultMaterial.STONE));
 
         // Lapislazuli
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.LAPIS_ORE.id, BiomeStandardValues.lapislazuliDepositSize.intValue(), BiomeStandardValues.lapislazuliDepositFrequency.intValue(), BiomeStandardValues.lapislazuliDepositRarity.intValue(), BiomeStandardValues.lapislazuliDepositMinAltitude.intValue(), worldOreHeight / 8, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.LAPIS_ORE, BiomeStandardValues.lapislazuliDepositSize.intValue(), BiomeStandardValues.lapislazuliDepositFrequency.intValue(), BiomeStandardValues.lapislazuliDepositRarity.intValue(), BiomeStandardValues.lapislazuliDepositMinAltitude.intValue(), worldOreHeight / 8, DefaultMaterial.STONE));
 
         // Emerald ore
         if (defaultEmeraldOre > 0)
         {
-            resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.EMERALD_ORE.id, BiomeStandardValues.emeraldDepositSize.intValue(), this.defaultEmeraldOre, BiomeStandardValues.emeraldDepositRarity.intValue(), BiomeStandardValues.emeraldDepositMinAltitude.intValue(), worldOreHeight / 4, DefaultMaterial.STONE.id));
+            resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.EMERALD_ORE, BiomeStandardValues.emeraldDepositSize.intValue(), this.defaultEmeraldOre, BiomeStandardValues.emeraldDepositRarity.intValue(), BiomeStandardValues.emeraldDepositMinAltitude.intValue(), worldOreHeight / 4, DefaultMaterial.STONE));
         }
 
         // Under water sand
-        resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.SAND.id, BiomeStandardValues.waterSandDepositSize.intValue(), BiomeStandardValues.waterSandDepositFrequency.intValue(), BiomeStandardValues.waterSandDepositRarity.intValue(), DefaultMaterial.DIRT.id, DefaultMaterial.GRASS.id));
+        resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.SAND, BiomeStandardValues.waterSandDepositSize.intValue(), BiomeStandardValues.waterSandDepositFrequency.intValue(), BiomeStandardValues.waterSandDepositRarity.intValue(), DefaultMaterial.DIRT, DefaultMaterial.GRASS));
 
         // Under water clay
         if (this.defaultClay > 0)
         {
-            resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.CLAY.id, BiomeStandardValues.waterClayDepositSize.intValue(), this.defaultClay, BiomeStandardValues.waterClayDepositRarity.intValue(), DefaultMaterial.DIRT.id, DefaultMaterial.CLAY.id));
+            resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.CLAY, BiomeStandardValues.waterClayDepositSize.intValue(), this.defaultClay, BiomeStandardValues.waterClayDepositRarity.intValue(), DefaultMaterial.DIRT, DefaultMaterial.CLAY));
 
         }
         // Custom objects
@@ -300,16 +300,16 @@ public class StandardBiomeFactory
         if (this.defaultMushroom > 0)
         {
             // Red mushroom
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.RedMushroom, this.defaultMushroom, BiomeStandardValues.redMushroomDepositRarity.intValue(), BiomeStandardValues.redMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.RedMushroom, this.defaultMushroom, BiomeStandardValues.redMushroomDepositRarity.intValue(), BiomeStandardValues.redMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT));
 
             // Brown mushroom
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.BrownMushroom, this.defaultMushroom, BiomeStandardValues.brownMushroomDepositRarity.intValue(), BiomeStandardValues.brownMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT.id));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.BrownMushroom, this.defaultMushroom, BiomeStandardValues.brownMushroomDepositRarity.intValue(), BiomeStandardValues.brownMushroomDepositMinAltitude.intValue(), this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT));
         }
 
         if (this.defaultFerns > 0)
         {
             // Ferns
-            resources.add(Resource.createResource(config, GrassGen.class, PlantType.Fern, GrassGen.GroupOption.NotGrouped, this.defaultFerns, BiomeStandardValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+            resources.add(Resource.createResource(config, GrassGen.class, PlantType.Fern, GrassGen.GroupOption.NotGrouped, this.defaultFerns, BiomeStandardValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         if (this.defaultDoubleGrass > 0)
@@ -317,10 +317,10 @@ public class StandardBiomeFactory
             // Double tall grass
             if (this.defaultDoubleGrassIsGrouped)
             {
-                resources.add(Resource.createResource(config, GrassGen.class, PlantType.DoubleTallgrass, GrassGen.GroupOption.Grouped, this.defaultDoubleGrass, BiomeStandardValues.doubleGrassGroupedDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+                resources.add(Resource.createResource(config, GrassGen.class, PlantType.DoubleTallgrass, GrassGen.GroupOption.Grouped, this.defaultDoubleGrass, BiomeStandardValues.doubleGrassGroupedDepositRarity.intValue(), DefaultMaterial.GRASS, DefaultMaterial.DIRT));
             } else
             {
-                resources.add(Resource.createResource(config, GrassGen.class, PlantType.DoubleTallgrass, GrassGen.GroupOption.NotGrouped, this.defaultDoubleGrass, BiomeStandardValues.doubleGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+                resources.add(Resource.createResource(config, GrassGen.class, PlantType.DoubleTallgrass, GrassGen.GroupOption.NotGrouped, this.defaultDoubleGrass, BiomeStandardValues.doubleGrassDepositRarity.intValue(), DefaultMaterial.GRASS, DefaultMaterial.DIRT));
             }
         }
 
@@ -329,10 +329,10 @@ public class StandardBiomeFactory
             // Tall grass
             if (this.defaultGrassIsGrouped)
             {
-                resources.add(Resource.createResource(config, GrassGen.class, PlantType.Tallgrass, GrassGen.GroupOption.Grouped, this.defaultGrass, BiomeStandardValues.longGrassGroupedDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+                resources.add(Resource.createResource(config, GrassGen.class, PlantType.Tallgrass, GrassGen.GroupOption.Grouped, this.defaultGrass, BiomeStandardValues.longGrassGroupedDepositRarity.intValue(), DefaultMaterial.GRASS, DefaultMaterial.DIRT));
             } else
             {
-                resources.add(Resource.createResource(config, GrassGen.class, PlantType.Tallgrass, GrassGen.GroupOption.NotGrouped, this.defaultGrass, BiomeStandardValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id));
+                resources.add(Resource.createResource(config, GrassGen.class, PlantType.Tallgrass, GrassGen.GroupOption.NotGrouped, this.defaultGrass, BiomeStandardValues.longGrassDepositRarity.intValue(), DefaultMaterial.GRASS, DefaultMaterial.DIRT));
             }
         }
 
@@ -349,29 +349,29 @@ public class StandardBiomeFactory
         }
 
         // Pumpkin
-        resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.PUMPKIN, BiomeStandardValues.pumpkinDepositFrequency.intValue(), BiomeStandardValues.pumpkinDepositRarity.intValue(), BiomeStandardValues.pumpkinDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id));
+        resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.PUMPKIN, BiomeStandardValues.pumpkinDepositFrequency.intValue(), BiomeStandardValues.pumpkinDepositRarity.intValue(), BiomeStandardValues.pumpkinDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS));
 
         if (this.defaultReed > 0)
         {
             // Reed
-            resources.add(Resource.createResource(config, ReedGen.class, DefaultMaterial.SUGAR_CANE_BLOCK, this.defaultReed, BiomeStandardValues.reedDepositRarity.intValue(), BiomeStandardValues.reedDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS.id, DefaultMaterial.DIRT.id, DefaultMaterial.SAND.id));
+            resources.add(Resource.createResource(config, ReedGen.class, DefaultMaterial.SUGAR_CANE_BLOCK, this.defaultReed, BiomeStandardValues.reedDepositRarity.intValue(), BiomeStandardValues.reedDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT, DefaultMaterial.SAND));
         }
 
         if (this.defaultCactus > 0)
         {
             // Cactus
-            resources.add(Resource.createResource(config, CactusGen.class, DefaultMaterial.CACTUS, this.defaultCactus, BiomeStandardValues.cactusDepositRarity.intValue(), BiomeStandardValues.cactusDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.SAND.id));
+            resources.add(Resource.createResource(config, CactusGen.class, DefaultMaterial.CACTUS, this.defaultCactus, BiomeStandardValues.cactusDepositRarity.intValue(), BiomeStandardValues.cactusDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.SAND));
         }
         if (this.defaultHasVines)
         {
-            resources.add(Resource.createResource(config, VinesGen.class, BiomeStandardValues.vinesFrequency.intValue(), BiomeStandardValues.vinesRarity.intValue(), BiomeStandardValues.vinesMinAltitude.intValue(), this.worldHeight, DefaultMaterial.VINE.id));
+            resources.add(Resource.createResource(config, VinesGen.class, BiomeStandardValues.vinesFrequency.intValue(), BiomeStandardValues.vinesRarity.intValue(), BiomeStandardValues.vinesMinAltitude.intValue(), this.worldHeight, DefaultMaterial.VINE));
         }
 
         // Water source
-        resources.add(Resource.createResource(config, LiquidGen.class, DefaultMaterial.WATER.id, BiomeStandardValues.waterSourceDepositFrequency.intValue(), BiomeStandardValues.waterSourceDepositRarity.intValue(), BiomeStandardValues.waterSourceDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, LiquidGen.class, DefaultMaterial.WATER, BiomeStandardValues.waterSourceDepositFrequency.intValue(), BiomeStandardValues.waterSourceDepositRarity.intValue(), BiomeStandardValues.waterSourceDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.STONE));
 
         // Lava source
-        resources.add(Resource.createResource(config, LiquidGen.class, DefaultMaterial.LAVA.id, BiomeStandardValues.lavaSourceDepositFrequency.intValue(), BiomeStandardValues.lavaSourceDepositRarity.intValue(), BiomeStandardValues.lavaSourceDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.STONE.id));
+        resources.add(Resource.createResource(config, LiquidGen.class, DefaultMaterial.LAVA, BiomeStandardValues.lavaSourceDepositFrequency.intValue(), BiomeStandardValues.lavaSourceDepositRarity.intValue(), BiomeStandardValues.lavaSourceDepositMinAltitude.intValue(), this.worldHeight, DefaultMaterial.STONE));
 
         // Desert wells
         if (this.defaultWell != null)

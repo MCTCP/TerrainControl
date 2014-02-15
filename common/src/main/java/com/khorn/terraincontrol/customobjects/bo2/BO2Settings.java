@@ -1,14 +1,13 @@
 package com.khorn.terraincontrol.customobjects.bo2;
 
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 
 import java.util.*;
 
 public enum BO2Settings implements MultiTypedSetting
 {
-
-    BO_ALL_KEY("All"),
-    BO_SolidKey("Solid"),
     
     // Custom object settings
     version("2.0"),
@@ -179,5 +178,11 @@ public enum BO2Settings implements MultiTypedSetting
     public boolean booleanValue()
     {
         return (Boolean) value;
+    }
+
+    @Override
+    public DefaultMaterial materialValue()
+    {
+        throw new UnsupportedOperationException();
     }
 }

@@ -1,9 +1,11 @@
 package com.khorn.terraincontrol;
 
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
 import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
@@ -12,25 +14,16 @@ import com.khorn.terraincontrol.generator.resource.Resource;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 
 public class TerrainControl
 {
-    
-    /**
-     * The world height that the engine supports. Not the actual height the
-     * world is capped at. 256 in Minecraft.
-     */
-    public static int worldHeight = 256;
 
     /**
-     * The world depth that the engine supports. Not the actual depth the 
-     * world is capped at. 0 in Minecraft.
+     * The engine that powers Terrain Control.
      */
-    public static int worldDepth = 0;
+    private static TerrainControlEngine engine;
 
     /**
      * The maximum block id that is supported. 255 on CraftBukkit.
@@ -38,114 +31,63 @@ public class TerrainControl
     public static int supportedBlockIds = 255;
 
     /**
-     * Global TC plugin configs
+     * The world depth that the engine supports. Not the actual depth the
+     * world is capped at. 0 in Minecraft.
      */
-    private static PluginConfig pluginConfig;
-    
-    private static TerrainControlEngine engine;
-    
-    private static ConfigFunctionsManager configFunctionsManager;
-    private static CustomObjectManager customObjectManager;
-    private static BiomeModeManager biomeManagers;
+    public static final int WORLD_DEPTH = 0;
 
-    private static List<EventHandler> cancelableEventHandlers = new ArrayList<EventHandler>();
-    private static List<EventHandler> monitoringEventHandlers = new ArrayList<EventHandler>();
+    /**
+     * The world height that the engine supports. Not the actual height the
+     * world is capped at. 256 in Minecraft.
+     */
+    public static final int WORLD_HEIGHT = 256;
 
-    private TerrainControl()
+    /**
+     * @see TerrainControlEngine#fireCanCustomObjectSpawnEvent(CustomObject,
+     *      LocalWorld, int, int, int)
+     */
+    public static boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
     {
-        // Forbidden to instantiate.
+        return engine.fireCanCustomObjectSpawnEvent(object, world, x, y, z);
     }
 
     /**
-     * Starts the engine, making all API methods available.
-     * {@link #setEngine(TerrainControlEngine)} needs to be called first.
+     * @see TerrainControlEngine#firePopulationEndEvent(LocalWorld, Random,
+     *      boolean, int, int)
      */
-    public static void startEngine()
+    public static void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
-        if (TerrainControl.engine == null)
-        {
-            throw new IllegalStateException("Engine is not set! Call setEngine first.");
-        }
-        // Start the engine
-        configFunctionsManager = new ConfigFunctionsManager();
-        customObjectManager = new CustomObjectManager();
-        biomeManagers = new BiomeModeManager();
-
-        // Fire start event
-        for (EventHandler handler : cancelableEventHandlers)
-        {
-            handler.onStart();
-        }
-        for (EventHandler handler : monitoringEventHandlers)
-        {
-            handler.onStart();
-        }
-
-        // Load global objects after the event has been fired, so that custom
-        // object types are also taken into account
-        customObjectManager.loadGlobalObjects();
+        engine.firePopulationEndEvent(world, random, villageInChunk, chunkX, chunkZ);
     }
 
     /**
-     * Null out static references to free up memory. Should be called on
-     * shutdown. Engine can be restarted after this.
+     * @see TerrainControlEngine#firePopulationStartEvent(LocalWorld, Random,
+     *      boolean, int, int)
      */
-    public static void stopEngine()
+    public static void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
-        // Shutdown all loaders
-        for (CustomObjectLoader loader : customObjectManager.loaders.values())
-        {
-            loader.onShutdown();
-        }
-
-        engine = null;
-        customObjectManager = null;
-        configFunctionsManager = null;
-        biomeManagers = null;
-        pluginConfig = null;
-        cancelableEventHandlers.clear();
-        monitoringEventHandlers.clear();
+        engine.firePopulationStartEvent(world, random, villageInChunk, chunkX, chunkZ);
     }
 
     /**
-     * Returns the engine, containing the API methods.
+     * @see TerrainControlEngine#fireResourceProcessEvent(Resource,
+     *      LocalWorld, Random, boolean, int, int)
+     */
+    public static boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX,
+            int chunkZ)
+    {
+        return engine.fireResourceProcessEvent(resource, world, random, villageInChunk, chunkX, chunkZ);
+    }
+
+    /**
+     * Returns the biome managers. Register your own biome manager here.
      * <p/>
-     * @return The engine
+     * 
+     * @return The biome managers.
      */
-    public static TerrainControlEngine getEngine()
+    public static BiomeModeManager getBiomeModeManager()
     {
-        return engine;
-    }
-
-    /**
-     * Sets the engine and initializes the root TerrainControl directory
-     * and global config. This is done to prevent logging NPE's later in
-     * the plugin start sequence
-     * <p/>
-     * @param engine The engine.
-     */
-    public static void setEngine(TerrainControlEngine engine)
-    {
-        if (TerrainControl.engine != null)
-        {
-            throw new IllegalStateException("Engine is already set.");
-        }
-
-        TerrainControl.engine = engine;
-        //>>	Do pluginConfig loading and then log anything that happened
-        //>>	LogManager and PluginConfig are now decoupled, thank the lord!
-        pluginConfig = new PluginConfig(engine.getTCDataFolder());
-    }
-
-    /**
-     * Returns the world object with the given name.
-     * <p/>
-     * @param name The name of the world.
-     * @return The world object.
-     */
-    public static LocalWorld getWorld(String name)
-    {
-        return engine.getWorld(name);
+        return engine.getBiomeModeManager();
     }
 
     /**
@@ -153,9 +95,10 @@ public class TerrainControl
      * coordinates. Will return null if the world isn't loaded by Terrain
      * Control.
      * <p/>
+     * 
      * @param worldName The world name.
-     * @param x         The block x in the world.
-     * @param z         The block z in the world.
+     * @param x The block x in the world.
+     * @param z The block z in the world.
      * @return The biome name, or null if the world isn't managed by Terrain
      *         Control.
      */
@@ -169,52 +112,123 @@ public class TerrainControl
         }
         return world.getBiome(x, z).getName();
     }
-    
+
     /**
-     * Logs the message(s) with the given importance. Message will be
-     * prefixed with [TerrainControl], so don't do that yourself.
+     * Returns the Resource manager.
      * <p/>
+     * 
+     * @return The Resource manager.
+     */
+    public static ConfigFunctionsManager getConfigFunctionsManager()
+    {
+        return engine.getConfigFunctionsManager();
+    }
+
+    /**
+     * Returns the CustomObject manager, with hooks to spawn CustomObjects.
+     * <p/>
+     * 
+     * @return The CustomObject manager.
+     */
+    public static CustomObjectManager getCustomObjectManager()
+    {
+        return engine.getCustomObjectManager();
+    }
+
+    /**
+     * Returns the engine, containing the API methods.
+     * 
+     * @return The engine
+     */
+    public static TerrainControlEngine getEngine()
+    {
+        return engine;
+    }
+
+    /**
+     * @see TerrainControlEngine#readMaterial(String)
+     */
+    public static LocalMaterialData readMaterial(String name) throws InvalidConfigException
+    {
+        return engine.readMaterial(name);
+    }
+
+    /**
+     * @see TerrainControlEngine#toLocalMaterialData(DefaultMaterial, int)
+     */
+    public static LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
+    {
+        return engine.toLocalMaterialData(defaultMaterial, blockData);
+    }
+
+    /**
+     * Returns the global config file.
+     * 
+     * @return The global config file.
+     */
+    public static PluginConfig getPluginConfig()
+    {
+        return engine.getPluginConfig();
+    }
+
+    /**
+     * Returns the world object with the given name.
+     * <p/>
+     * 
+     * @param name The name of the world.
+     * @return The world object.
+     */
+    public static LocalWorld getWorld(String name)
+    {
+        return engine.getWorld(name);
+    }
+
+    /**
+     * Logs the message(s) with the given importance. Message will be prefixed
+     * with [TerrainControl], so don't do that yourself.
+     * <p/>
+     * 
      * @param message The messages to log.
-     * @param level   The severity of the message
+     * @param level The severity of the message
      */
     public static void log(Level level, String... message)
     {
         engine.log(level, message);
     }
 
-
     /**
-     * Logs a format string message with the given importance. Message will
-     * be prefixed with [TerrainControl], so don't do that yourself.
+     * Logs a format string message with the given importance. Message will be
+     * prefixed with [TerrainControl], so don't do that yourself.
      * <p/>
+     * 
      * @param message The messages to log formatted similar to Logger.log()
-     *                with the same args.
-     * @param level   The severity of the message
-     * @param param   The parameter belonging to {0} in the message string
+     *            with the same args.
+     * @param level The severity of the message
+     * @param param The parameter belonging to {0} in the message string
      */
     public static void log(Level level, String message, Object param)
     {
         engine.log(level, message, param);
     }
 
-
     /**
-     * Logs a format string message with the given importance. Message will
-     * be prefixed with [TerrainControl], so don't do that yourself.
+     * Logs a format string message with the given importance. Message will be
+     * prefixed with [TerrainControl], so don't do that yourself.
      * <p/>
+     * 
      * @param message The messages to log formatted similar to Logger.log()
-     *                with the same args.
-     * @param level   The severity of the message
-     * @param params  The parameters belonging to {0...} in the message
-     *                string
+     *            with the same args.
+     * @param level The severity of the message
+     * @param params The parameters belonging to {0...} in the message string
      */
     public static void log(Level level, String message, Object[] params)
     {
         engine.log(level, message, params);
     }
-    
+
     /**
      * Prints the stackTrace of the provided Throwable object
+     * 
      * @param level The log level to log this stack trace at
      * @param e The Throwable object to obtain stack trace information from
      */
@@ -223,9 +237,10 @@ public class TerrainControl
         printStackTrace(level, e, Integer.MAX_VALUE);
     }
 
-
     /**
-     * Prints the stackTrace of the provided Throwable object to a certain depth
+     * Prints the stackTrace of the provided Throwable object to a certain
+     * depth
+     * 
      * @param level The log level to log this stack trace at
      * @param e The Throwable object to obtain stack trace information from
      * @param maxDepth The max number of trace elements to print
@@ -239,170 +254,52 @@ public class TerrainControl
     }
 
     /**
-     * Returns the CustomObject manager, with hooks to spawn CustomObjects.
-     * <p/>
-     * @return The CustomObject manager.
-     */
-    public static CustomObjectManager getCustomObjectManager()
-    {
-        return customObjectManager;
-    }
-
-    /**
-     * Returns the Resource manager.
-     * <p/>
-     * @return The Resource manager.
-     */
-    public static ConfigFunctionsManager getConfigFunctionsManager()
-    {
-        return configFunctionsManager;
-    }
-    
-    /**
-     * Returns the biome managers. Register your own biome manager here.
-     * <p/>
-     * @return The biome managers.
-     */
-    public static BiomeModeManager getBiomeModeManager()
-    {
-        return biomeManagers;
-    }
-    
-    /**
-     * Returns the global config file.
-     * @return The global config file.
-     */
-    public static PluginConfig getPluginConfig()
-    {
-        return pluginConfig;
-    }
-
-    // Events
-
-    /**
-     * Register your event handler here with normal priority. You can do 
-     * this before TerrainControl is started.
-     * <p/>
-     * @param handler The handler that will receive the events.
+     * @see TerrainControlEngine#registerEventHandler(EventHandler)
      */
     public static void registerEventHandler(EventHandler handler)
     {
-        cancelableEventHandlers.add(handler);
+        engine.registerEventHandler(handler);
     }
 
     /**
-     * Register you event handler here with the given priority. You can do 
-     * this before TerrainControl is started.
-     * <p/>
-     * @param handler  The handler that will receive the events.
-     * @param priority The priority of the event.
+     * @see TerrainControlEngine#registerEventHandler(EventHandler,
+     *      EventPriority)
      */
     public static void registerEventHandler(EventHandler handler, EventPriority priority)
     {
-        if (priority == EventPriority.CANCELABLE)
-        {
-            cancelableEventHandlers.add(handler);
-        } else
-        {
-            monitoringEventHandlers.add(handler);
-        }
+        engine.registerEventHandler(handler, priority);
     }
 
-    /** Firing events
-     * All methods first call the cancelableEventHandlers, and then the
-     * monitoringEventHandlers. Only cancelableEventHandlers can cancel
-     * events. Cancelled events are still fired.
-     */
-    
-    //t>>	
     /**
+     * Sets the engine and calls its {@link TerrainControlEngine#onStart()
+     * onStart()} method.
      * 
-     * @param object
-     * @param world
-     * @param x
-     * @param y
-     * @param z
-     * <p/>
-     * @return
+     * @param engine The engine.
      */
-    public static boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
+    public static void setEngine(TerrainControlEngine engine)
     {
-        boolean success = true;
-        for (EventHandler handler : cancelableEventHandlers)
+        if (TerrainControl.engine != null)
         {
-            if (!handler.canCustomObjectSpawn(object, world, x, y, z, !success))
-            {
-                success = false;
-            }
+            throw new IllegalStateException("Engine is already set.");
         }
-        for (EventHandler handler : monitoringEventHandlers)
-        {
-            handler.canCustomObjectSpawn(object, world, x, y, z, !success);
-        }
-        return success;
+
+        TerrainControl.engine = engine;
+        engine.onStart();
     }
 
-    //t>>	
     /**
-     *
-     * @param resource
-     * @param world
-     * @param random
-     * @param villageInChunk
-     * @param chunkX
-     * @param chunkZ
-     * <p/>
-     * @return
+     * Nulls out static references to free up memory. Should be called on
+     * shutdown. Engine can be restarted after this.
      */
-    public static boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    public static void stopEngine()
     {
-        boolean success = true;
-        for (EventHandler handler : cancelableEventHandlers)
-        {
-            if (!handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, !success))
-            {
-                success = false;
-            }
-        }
-        for (EventHandler handler : monitoringEventHandlers)
-        {
-            handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, !success);
-        }
-        return success;
+        engine.onShutdown();
+        engine = null;
     }
 
-    //t>>	
-    /**
-     *
-     * @param world
-     * @param random
-     * @param villageInChunk
-     * @param chunkX
-     * @param chunkZ
-     */
-    public static void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    private TerrainControl()
     {
-        for (EventHandler handler : cancelableEventHandlers)
-            handler.onPopulateStart(world, random, villageInChunk, chunkX, chunkZ);
-        for (EventHandler handler : monitoringEventHandlers)
-            handler.onPopulateStart(world, random, villageInChunk, chunkX, chunkZ);
-    }
-
-    //t>>	
-    /**
-     *
-     * @param world
-     * @param random
-     * @param villageInChunk
-     * @param chunkX
-     * @param chunkZ
-     */
-    public static void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
-    {
-        for (EventHandler handler : cancelableEventHandlers)
-            handler.onPopulateEnd(world, random, villageInChunk, chunkX, chunkZ);
-        for (EventHandler handler : monitoringEventHandlers)
-            handler.onPopulateEnd(world, random, villageInChunk, chunkX, chunkZ);
+        // Forbidden to instantiate.
     }
 
 }

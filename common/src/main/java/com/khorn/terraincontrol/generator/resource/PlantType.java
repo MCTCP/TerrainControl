@@ -1,8 +1,9 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Collection;
@@ -53,10 +54,8 @@ public class PlantType
         PlantType plantType = LOOKUP_MAP.get(name);
         if (plantType == null)
         {
-            // Fall back on block id/name + data
-            int blockId = StringHelper.readBlockId(name);
-            int blockData = StringHelper.readBlockData(name);
-            plantType = new PlantType(StringHelper.makeMaterial(blockId, blockData), blockId, blockData);
+            // Fall back on block name + data
+            plantType = new PlantType(TerrainControl.readMaterial(name));
         }
         return plantType;
     }
@@ -85,24 +84,39 @@ public class PlantType
     }
 
     private final String name;
-    private final int blockId;
-    private final int topData;
-    private final int bottomData;
+    private final LocalMaterialData topBlock;
+    private final LocalMaterialData bottomBlock;
 
     /**
-     * Creates a single-block plant.
+     * Creates a single-block plant with the given name.
      * 
+     * @param name Custom name for this plant.
      * @param material The material of the block.
      * @param data The data value of the block.
      */
     protected PlantType(String name, DefaultMaterial material, int data)
     {
-        this(name, material.id, data);
+        this.name = name;
+        this.topBlock = null;
+        this.bottomBlock = TerrainControl.toLocalMaterialData(material, data);
     }
 
     /**
-     * Creates a two-block-high plant.
+     * Creates a single-block plant.
      * 
+     * @param material Material of the plant.
+     */
+    protected PlantType(LocalMaterialData material)
+    {
+        this.name = material.toString();
+        this.topBlock = null;
+        this.bottomBlock = material;
+    }
+
+    /**
+     * Creates a two-block-high plant with the given name.
+     * 
+     * @param name Name of the plant.
      * @param material The material of the plant.
      * @param bottomData Data value for the bottom.
      * @param topData Data value for the top.
@@ -110,33 +124,8 @@ public class PlantType
     protected PlantType(String name, DefaultMaterial material, int bottomData, int topData)
     {
         this.name = name;
-        this.blockId = material.id;
-        this.bottomData = bottomData;
-        this.topData = topData;
-    }
-
-    /**
-     * Creates a single-block plant.
-     * 
-     * @param id The id of the block.
-     * @param data The data value of the block.
-     */
-    protected PlantType(String name, int id, int data)
-    {
-        this.name = name;
-        this.blockId = id;
-        this.bottomData = data;
-        this.topData = -1;
-    }
-
-    int getBlockId()
-    {
-        return blockId;
-    }
-
-    int getBottomBlockData()
-    {
-        return bottomData;
+        this.topBlock = TerrainControl.toLocalMaterialData(material, topData);
+        this.bottomBlock = TerrainControl.toLocalMaterialData(material, bottomData);
     }
 
     /**
@@ -160,10 +149,10 @@ public class PlantType
      */
     public void spawn(LocalWorld world, int x, int y, int z)
     {
-        world.setBlock(x, y, z, blockId, bottomData);
-        if (topData != -1)
+        world.setBlock(x, y, z, bottomBlock);
+        if (topBlock != null)
         {
-            world.setBlock(x, y + 1, z, blockId, topData);
+            world.setBlock(x, y + 1, z, topBlock);
         }
     }
 
@@ -174,23 +163,72 @@ public class PlantType
     }
 
     @Override
-    public boolean equals(Object other)
+    public int hashCode()
     {
-        if (other == this)
-        {
-            return true;
-        }
-        if (!(other instanceof PlantType))
-        {
-            return false;
-        }
-        return ((PlantType) other).getName().equalsIgnoreCase(this.getName());
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((bottomBlock == null) ? 0 : bottomBlock.hashCode());
+        result = prime * result + ((topBlock == null) ? 0 : topBlock.hashCode());
+        return result;
     }
 
     @Override
-    public int hashCode()
+    public boolean equals(Object obj)
     {
-        return name.toLowerCase().hashCode() - 108;
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null)
+        {
+            return false;
+        }
+        if (!(obj instanceof PlantType))
+        {
+            return false;
+        }
+        PlantType other = (PlantType) obj;
+        if (bottomBlock == null)
+        {
+            if (other.bottomBlock != null)
+            {
+                return false;
+            }
+        } else if (!bottomBlock.equals(other.bottomBlock))
+        {
+            return false;
+        }
+        if (topBlock == null)
+        {
+            if (other.topBlock != null)
+            {
+                return false;
+            }
+        } else if (!topBlock.equals(other.topBlock))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Gets the bottom block of this plant.
+     * 
+     * @return The bottom block.
+     */
+    public LocalMaterialData getBottomMaterial()
+    {
+        return bottomBlock;
+    }
+
+    /**
+     * Gets the top block of this plant. May be null.
+     * 
+     * @return The top block, or null if this plant only has one block.
+     */
+    public LocalMaterialData getTopMaterial()
+    {
+        return topBlock;
     }
 
 }

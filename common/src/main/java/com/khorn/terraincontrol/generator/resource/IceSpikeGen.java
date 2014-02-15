@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
+
+import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
@@ -20,15 +23,14 @@ public class IceSpikeGen extends Resource
     private int maxAltitude;
     private int minAltitude;
     private SpikeType type;
-    private List<Integer> sourceBlocks;
+    private MaterialSet sourceBlocks;
 
     @Override
     protected void load(List<String> args) throws InvalidConfigException
     {
         assureSize(2, args);
 
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
+        material = readMaterial(args.get(0));
 
         // Read type
         String typeString = args.get(1);
@@ -47,16 +49,16 @@ public class IceSpikeGen extends Resource
 
         frequency = readInt(args.get(2), 1, 30);
         rarity = readRarity(args.get(3));
-        minAltitude = readInt(args.get(4), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(5), minAltitude, TerrainControl.worldHeight);
+        minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(5), minAltitude, TerrainControl.WORLD_HEIGHT);
 
-        sourceBlocks = this.readBlockIds(args, 6);
+        sourceBlocks = readMaterials(args, 6);
     }
 
     @Override
     public String makeString()
     {
-        return "IceSpike(" + makeMaterial(blockId, blockData) + "," + type + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
+        return "IceSpike(" + material + "," + type + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
 
     @Override
@@ -83,7 +85,7 @@ public class IceSpikeGen extends Resource
         {
             y--;
         }
-        if (!this.sourceBlocks.contains(world.getTypeId(x, y, z)))
+        if (!this.sourceBlocks.contains(world.getMaterial(x, y, z)))
         {
             return;
         }
@@ -99,10 +101,10 @@ public class IceSpikeGen extends Resource
                 {
                     for (int deltaY = y - one; deltaY <= y + one; deltaY++)
                     {
-                        int localBlock = world.getTypeId(actualX, deltaY, actualZ);
+                        LocalMaterialData localBlock = world.getMaterial(actualX, deltaY, actualZ);
                         if (this.sourceBlocks.contains(localBlock))
                         {
-                            world.setBlock(actualX, deltaY, actualZ, this.blockId, 0);
+                            world.setBlock(actualX, deltaY, actualZ, this.material);
                         }
                     }
                 }
@@ -118,7 +120,7 @@ public class IceSpikeGen extends Resource
             --y;
         }
 
-        if (!sourceBlocks.contains(par1World.getTypeId(x, y, z)))
+        if (!sourceBlocks.contains(par1World.getMaterial(x, y, z)))
         {
             return;
         }
@@ -151,20 +153,20 @@ public class IceSpikeGen extends Resource
 
                     if ((var11 == 0 && var13 == 0 || var12 * var12 + var14 * var14 <= var9 * var9) && (var11 != -var10 && var11 != var10 && var13 != -var10 && var13 != var10 || random.nextFloat() <= 0.75F))
                     {
-                        int var15 = par1World.getTypeId(x + var11, y + var8, z + var13);
+                        LocalMaterialData sourceBlock = par1World.getMaterial(x + var11, y + var8, z + var13);
 
-                        if (var15 == DefaultMaterial.AIR.id || sourceBlocks.contains(var15))
+                        if (sourceBlock.isMaterial(DefaultMaterial.AIR) || sourceBlocks.contains(sourceBlock))
                         {
-                            par1World.setBlock(x + var11, y + var8, z + var13, this.blockId, this.blockData);
+                            par1World.setBlock(x + var11, y + var8, z + var13, this.material);
                         }
 
                         if (var8 != 0 && var10 > 1)
                         {
-                            var15 = par1World.getTypeId(x + var11, y - var8, z + var13);
+                            sourceBlock = par1World.getMaterial(x + var11, y - var8, z + var13);
 
-                            if (var15 == DefaultMaterial.AIR.id || sourceBlocks.contains(var15))
+                            if (sourceBlock.isMaterial(DefaultMaterial.AIR) || sourceBlocks.contains(sourceBlock))
                             {
-                                par1World.setBlock(x + var11, y - var8, z + var13, this.blockId, this.blockData);
+                                par1World.setBlock(x + var11, y - var8, z + var13, this.material);
                             }
                         }
                     }
@@ -200,11 +202,11 @@ public class IceSpikeGen extends Resource
                 {
                     if (var11 > 50)
                     {
-                        int var18 = par1World.getTypeId(x + var16, var11, z + var10);
+                        LocalMaterialData var18 = par1World.getMaterial(x + var16, var11, z + var10);
 
-                        if (var18 == DefaultMaterial.AIR.id || sourceBlocks.contains(var18) || var18 == this.blockId)
+                        if (var18.isMaterial(DefaultMaterial.AIR) || sourceBlocks.contains(var18) || var18.equals(this.material))
                         {
-                            par1World.setBlock(x + var16, var11, z + var10, this.blockId, this.blockData);
+                            par1World.setBlock(x + var16, var11, z + var10, this.material);
                             --var11;
                             --var17;
 
@@ -228,7 +230,7 @@ public class IceSpikeGen extends Resource
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return other.getClass() == getClass() && other.blockId == this.blockId && other.blockData == this.blockData && ((IceSpikeGen) other).type == this.type;
+        return other.getClass() == getClass() && other.material.equals(this.material) && ((IceSpikeGen) other).type == this.type;
     }
 
 }

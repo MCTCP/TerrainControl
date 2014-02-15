@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.LocalMaterialData;
+
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -140,8 +142,8 @@ public class WorldConfig extends ConfigFile
 
     public int waterLevelMax;
     public int waterLevelMin;
-    public int waterBlock;
-    public int iceBlock;
+    public LocalMaterialData waterBlock;
+    public LocalMaterialData iceBlock;
 
     public double fractureHorizontal;
     public double fractureVertical;
@@ -149,7 +151,7 @@ public class WorldConfig extends ConfigFile
     public boolean disableBedrock;
     public boolean flatBedrock;
     public boolean ceilingBedrock;
-    public int bedrockBlock;
+    public LocalMaterialData bedrockBlock;
 
     public boolean removeSurfaceStone;
 
@@ -331,6 +333,11 @@ public class WorldConfig extends ConfigFile
 
         this.waterLevelMin = applyBounds(this.waterLevelMin, 0, worldHeightCap - 1);
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, worldHeightCap - 1, this.waterLevelMin);
+
+        // Remove illegal block data (the chunk generator will ignore block data)
+        this.waterBlock = this.waterBlock.withBlockData(0);
+        this.iceBlock = this.iceBlock.withBlockData(0);
+        this.bedrockBlock = this.bedrockBlock.withBlockData(0);
 
         this.villageDistance = applyBounds(this.villageDistance, 9, Integer.MAX_VALUE);
         this.minimumDistanceBetweenRareBuildings = applyBounds(this.minimumDistanceBetweenRareBuildings, 1, Integer.MAX_VALUE);
@@ -692,7 +699,7 @@ public class WorldConfig extends ConfigFile
         writeComment("Make bottom layer of bedrock flat");
         writeValue(WorldStandardValues.FlatBedrock, this.flatBedrock);
 
-        writeComment("BlockId used as bedrock");
+        writeComment("Block used as bedrock. No block data allowed.");
         writeValue(WorldStandardValues.BedrockobBlock, this.bedrockBlock);
 
         this.writeSmallTitle("Water and ice");
@@ -700,11 +707,11 @@ public class WorldConfig extends ConfigFile
         writeValue(WorldStandardValues.WaterLevelMax, this.waterLevelMax);
         writeValue(WorldStandardValues.WaterLevelMin, this.waterLevelMin);
 
-        writeComment("BlockId used as water in WaterLevel");
-        writeValue(WorldStandardValues.WaterBlock, this.waterBlock);
+        writeComment("Block used as water in WaterLevel. No block data allowed.");
+        writeValue(WorldStandardValues.WaterBlock, this.waterBlock.toString());
 
-        writeComment("BlockId used as ice");
-        writeValue(WorldStandardValues.IceBlock, this.iceBlock);
+        writeComment("BlockId used as ice. No block data allowed.");
+        writeValue(WorldStandardValues.IceBlock, this.iceBlock.toString());
 
         writeComment("Seed used for the resource generation. Can only be numeric. Leave blank to use the world seed.");
         if (this.resourcesSeed == 0)

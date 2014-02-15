@@ -2,9 +2,9 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import net.minecraft.server.v1_7_R1.BiomeBase;
-import net.minecraft.server.v1_7_R1.Block;
 
 /**
  * The BukkitBiome is basically a wrapper for the BiomeBase. If you look at
@@ -171,15 +171,15 @@ public class BukkitBiome implements LocalBiome
     }
 
     @Override
-    public int getSurfaceBlock()
+    public LocalMaterialData getSurfaceBlock()
     {
-        return Block.b(this.biomeBase.ai);
+        return new BukkitMaterialData(this.biomeBase.ai, 0);
     }
 
     @Override
-    public int getGroundBlock()
+    public LocalMaterialData getGroundBlock()
     {
-        return Block.b(this.biomeBase.ak);
+        return new BukkitMaterialData(this.biomeBase.ak, 0);
     }
 
     @Override

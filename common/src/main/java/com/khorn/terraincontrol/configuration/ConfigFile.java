@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.configuration;
 
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+
+import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 import com.khorn.terraincontrol.util.MultiTypedSetting.SettingsType;
@@ -378,6 +382,23 @@ public abstract class ConfigFile
         return defaultValue;
 
     }
+    
+    protected LocalMaterialData readModSettings(MultiTypedSetting setting, DefaultMaterial defaultValue)
+    {
+        String settingsName = setting.name().toLowerCase();
+        if (this.settingsCache.containsKey(settingsName))
+        {
+            try
+            {
+                return TerrainControl.readMaterial(this.settingsCache.get(settingsName));
+            } catch (InvalidConfigException e)
+            {
+                logSettingValueInvalid(settingsName);
+            }
+        }
+        logSettingNotFound(settingsName);
+        return TerrainControl.toLocalMaterialData(defaultValue, 0);
+    }
 
     @SuppressWarnings("unchecked")
     protected <T> T readSettings(MultiTypedSetting value)
@@ -415,6 +436,9 @@ public abstract class ConfigFile
                 break;
             case Color:
                 obj = readModSettingsColor(value, value.stringValue());
+                break;
+            case Material:
+                obj = readModSettings(value, value.materialValue());
                 break;
             /*
              * This prevents NPE if you happen to add a new type to
@@ -567,6 +591,13 @@ public abstract class ConfigFile
         this.settingsWriter.newLine();
     }
 
+    protected void writeValue(MultiTypedSetting setting, LocalMaterialData settingsValue) throws IOException
+    {
+        this.settingsWriter.write(setting.name() + ": " + settingsValue);
+        this.settingsWriter.newLine();
+        this.settingsWriter.newLine();
+    }
+
     protected void writeFunction(ConfigFunction<?> function) throws IOException
     {
         this.settingsWriter.write(function.write());
@@ -657,21 +688,6 @@ public abstract class ConfigFile
         }
     }
 
-    protected HashSet<Integer> applyBounds(HashSet<Integer> values, int min, int max)
-    {
-        HashSet<Integer> output = new HashSet<Integer>();
-        for (int value : values)
-        {
-            if (value > max)
-                output.add(max);
-            else if (value < min)
-                output.add(min);
-            else
-                output.add(value);
-        }
-        return output;
-    }
-
     protected int applyBounds(int value, int min, int max)
     {
         if (value > max)
@@ -756,41 +772,6 @@ public abstract class ConfigFile
             throw new EOFException();
 
         return new String(chars);
-    }
-
-    // Public access modifier, so that WeightedMobSpawnGroup can use it
-    public static String[] readComplexString(String line)
-    {
-        ArrayList<String> buffer = new ArrayList<String>();
-
-        int index = 0;
-        int lastFound = 0;
-        int inBracer = 0;
-
-        for (char c : line.toCharArray())
-        {
-            if (c == ',' && inBracer == 0)
-            {
-                buffer.add(line.substring(lastFound, index));
-                lastFound = index + 1;
-            }
-
-            if (c == '(')
-                inBracer++;
-            if (c == ')')
-                inBracer--;
-
-            index++;
-        }
-        buffer.add(line.substring(lastFound, index));
-
-        String[] output = new String[0];
-
-        if (inBracer == 0)
-            output = buffer.toArray(output);
-
-        return output;
-
     }
 
 }

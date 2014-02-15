@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.configuration.standard;
 
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
@@ -43,8 +45,8 @@ public enum WorldStandardValues implements MultiTypedSetting
 
     WaterLevelMax(63),
     WaterLevelMin(0),
-    WaterBlock(9),
-    IceBlock(79),
+    WaterBlock(DefaultMaterial.STATIONARY_WATER),
+    IceBlock(DefaultMaterial.ICE),
     
     FrozenOcean(true),
 
@@ -95,7 +97,7 @@ public enum WorldStandardValues implements MultiTypedSetting
     DisableBedrock(false),
     CeilingBedrock(false),
     FlatBedrock(false),
-    BedrockobBlock(7),
+    BedrockobBlock(DefaultMaterial.BEDROCK),
     RemoveSurfaceStone(false),
     objectSpawnRatio(1),
     ResourcesSeed(0L), // "L" means that it is a long instead of an int
@@ -136,6 +138,7 @@ public enum WorldStandardValues implements MultiTypedSetting
     private SettingsType returnType;
     private ArrayList<String> sArrayValue;
     private HashSet<Integer> iSetValue;
+    private DefaultMaterial mValue;
 
     private WorldStandardValues(int i)
     {
@@ -204,6 +207,12 @@ public enum WorldStandardValues implements MultiTypedSetting
         this.returnType = SettingsType.Boolean;
     }
 
+    private WorldStandardValues(DefaultMaterial material)
+    {
+        this.mValue = material;
+        this.returnType = SettingsType.Material;
+    }
+
     @Override
     public int intValue()
     {
@@ -262,6 +271,12 @@ public enum WorldStandardValues implements MultiTypedSetting
     public HashSet<Integer> intSetValue()
     {
         return this.iSetValue;
+    }
+
+    @Override
+    public DefaultMaterial materialValue()
+    {
+        return this.mValue;
     }
 
 }

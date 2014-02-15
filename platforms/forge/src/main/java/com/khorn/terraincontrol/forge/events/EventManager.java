@@ -1,11 +1,12 @@
 package com.khorn.terraincontrol.forge.events;
 
+import com.khorn.terraincontrol.LocalMaterialData;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-
 import cpw.mods.fml.common.registry.GameRegistry;
 
 import java.util.HashMap;
@@ -43,7 +44,7 @@ public class EventManager extends EventHandler
                 resource instanceof CustomObjectGen)
         {
             // Fire population event
-            Populate.EventType forgeEvent = getPopulateEventType(resource.getBlockId());
+            Populate.EventType forgeEvent = getPopulateEventType(resource.getMaterial());
             return TerrainGen.populate(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, villageInChunk, forgeEvent);
         } else if (resource instanceof OreGen)
         {
@@ -54,7 +55,7 @@ public class EventManager extends EventHandler
                 setOreGenerationBegun(world, true);
             }
             // Fire ore generation event
-            GenerateMinable.EventType forgeEvent = getOreEventType(resource.getBlockId());
+            GenerateMinable.EventType forgeEvent = getOreEventType(resource.getMaterial());
             return TerrainGen.generateOre(world.getWorld(), random, null, chunkX, chunkZ, forgeEvent);
         } else
         {
@@ -65,7 +66,7 @@ public class EventManager extends EventHandler
                 setDecorationBegun(world, true);
             }
             // Fire decoration event
-            Decorate.EventType forgeEvent = getDecorateEventType(resource.getBlockId());
+            Decorate.EventType forgeEvent = getDecorateEventType(resource.getMaterial());
             return TerrainGen.decorate(world.getWorld(), random, chunkX, chunkZ, forgeEvent);
         }
     }
@@ -113,57 +114,67 @@ public class EventManager extends EventHandler
         GameRegistry.generateWorld(chunkX, chunkZ, world.getWorld(), world.getChunkGenerator(), world.getChunkGenerator());
     }
 
-    private Decorate.EventType getDecorateEventType(int blockId)
+    private Decorate.EventType getDecorateEventType(LocalMaterialData block)
     {
-        if (blockId == DefaultMaterial.WATER_LILY.id)
+        if (block == null)
+        {
+            // Some resources don't have a main material
+            return Decorate.EventType.CUSTOM;
+        }
+        if (block.isMaterial(DefaultMaterial.WATER_LILY))
             return Decorate.EventType.LILYPAD;
-        if (blockId == DefaultMaterial.CACTUS.id)
+        if (block.isMaterial(DefaultMaterial.CACTUS))
             return Decorate.EventType.CACTUS;
-        if (blockId == DefaultMaterial.LONG_GRASS.id)
+        if (block.isMaterial(DefaultMaterial.LONG_GRASS))
             return Decorate.EventType.GRASS;
-        if (blockId == DefaultMaterial.DEAD_BUSH.id)
+        if (block.isMaterial(DefaultMaterial.DEAD_BUSH))
             return Decorate.EventType.DEAD_BUSH;
-        if (blockId == DefaultMaterial.RED_ROSE.id || blockId == DefaultMaterial.YELLOW_FLOWER.id)
+        if (block.isMaterial(DefaultMaterial.RED_ROSE) || block.isMaterial(DefaultMaterial.YELLOW_FLOWER) || block.isMaterial(DefaultMaterial.DOUBLE_PLANT))
             return Decorate.EventType.FLOWERS;
-        if (blockId == DefaultMaterial.PUMPKIN.id)
+        if (block.isMaterial(DefaultMaterial.PUMPKIN))
             return Decorate.EventType.PUMPKIN;
-        if (blockId == DefaultMaterial.BROWN_MUSHROOM.id || blockId == DefaultMaterial.RED_MUSHROOM.id)
+        if (block.isMaterial(DefaultMaterial.BROWN_MUSHROOM) || block.isMaterial(DefaultMaterial.RED_MUSHROOM))
             return Decorate.EventType.SHROOM;
-        if (blockId == DefaultMaterial.SUGAR_CANE_BLOCK.id)
+        if (block.isMaterial(DefaultMaterial.SUGAR_CANE_BLOCK))
             return Decorate.EventType.REED;
-        if (blockId == DefaultMaterial.SAND.id)
+        if (block.isMaterial(DefaultMaterial.SAND))
             return Decorate.EventType.SAND;
-        if (blockId == DefaultMaterial.CLAY.id)
+        if (block.isMaterial(DefaultMaterial.CLAY))
             return Decorate.EventType.CLAY;
         return Decorate.EventType.CUSTOM;
     }
 
-    private Populate.EventType getPopulateEventType(int blockId)
+    private Populate.EventType getPopulateEventType(LocalMaterialData block)
     {
-        if (blockId == DefaultMaterial.WATER.id)
+        if (block == null)
+        {
+            // BO2s and BO3s don't have one material
+            return Populate.EventType.CUSTOM;
+        }
+        if (block.isMaterial(DefaultMaterial.WATER) || block.isMaterial(DefaultMaterial.STATIONARY_WATER))
             return Populate.EventType.LAKE;
-        if (blockId == DefaultMaterial.LAVA.id)
+        if (block.isMaterial(DefaultMaterial.LAVA) || block.isMaterial(DefaultMaterial.STATIONARY_LAVA))
             return Populate.EventType.LAVA;
         return Populate.EventType.CUSTOM;
     }
 
-    private GenerateMinable.EventType getOreEventType(int blockId)
+    private GenerateMinable.EventType getOreEventType(LocalMaterialData block)
     {
-        if (blockId == DefaultMaterial.COAL_ORE.id)
+        if (block.isMaterial(DefaultMaterial.COAL_ORE))
             return GenerateMinable.EventType.COAL;
-        if (blockId == DefaultMaterial.DIAMOND_ORE.id)
+        if (block.isMaterial(DefaultMaterial.DIAMOND_ORE))
             return GenerateMinable.EventType.DIAMOND;
-        if (blockId == DefaultMaterial.DIRT.id)
+        if (block.isMaterial(DefaultMaterial.DIRT))
             return GenerateMinable.EventType.DIRT;
-        if (blockId == DefaultMaterial.GOLD_ORE.id)
+        if (block.isMaterial(DefaultMaterial.GOLD_ORE))
             return GenerateMinable.EventType.GOLD;
-        if (blockId == DefaultMaterial.GRAVEL.id)
+        if (block.isMaterial(DefaultMaterial.GRAVEL))
             return GenerateMinable.EventType.GRAVEL;
-        if (blockId == DefaultMaterial.IRON_ORE.id)
+        if (block.isMaterial(DefaultMaterial.IRON_ORE))
             return GenerateMinable.EventType.IRON;
-        if (blockId == DefaultMaterial.LAPIS_ORE.id)
+        if (block.isMaterial(DefaultMaterial.LAPIS_ORE))
             return GenerateMinable.EventType.LAPIS;
-        if (blockId == DefaultMaterial.REDSTONE_ORE.id)
+        if (block.isMaterial(DefaultMaterial.REDSTONE_ORE))
             return GenerateMinable.EventType.REDSTONE;
         return GenerateMinable.EventType.CUSTOM;
     }

@@ -1,10 +1,11 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -16,7 +17,7 @@ public class GrassGen extends Resource
         NotGrouped
     }
 
-    private List<Integer> sourceBlocks;
+    private MaterialSet sourceBlocks;
     private PlantType plant;
     private GroupOption groupOption;
 
@@ -50,18 +51,12 @@ public class GrassGen extends Resource
         }
 
         // Not used for terrain generation, they are used by the Forge
-        // implementation to fire Forge events. We'll probably want to rewrite
-        // this in the future to not use block ids
-        blockId = plant.getBlockId();
-        blockData = plant.getBottomBlockData();
+        // implementation to fire Forge events
+        material = plant.getBottomMaterial();
 
         frequency = readInt(args.get(2), 1, 500);
         rarity = readRarity(args.get(3));
-        sourceBlocks = new ArrayList<Integer>();
-        for (int i = 4; i < args.size(); i++)
-        {
-            sourceBlocks.add(readBlockId(args.get(i)));
-        }
+        sourceBlocks = readMaterials(args, 4);
     }
 
     @Override
@@ -92,10 +87,10 @@ public class GrassGen extends Resource
             int centerX = chunkX * 16 + 8 + random.nextInt(16);
             int centerZ = chunkZ * 16 + 8 + random.nextInt(16);
             int centerY = world.getHighestBlockYAt(centerX, centerZ);
-            int id;
+            LocalMaterialData id;
 
             // Fix y position
-            while (((id = world.getTypeId(centerX, centerY, centerZ)) == 0 || id == DefaultMaterial.LEAVES.id || id == DefaultMaterial.LEAVES_2.id) && (centerY > 0))
+            while (((id = world.getMaterial(centerX, centerY, centerZ)).isMaterial(DefaultMaterial.AIR) || id.isMaterial(DefaultMaterial.LEAVES) || id.isMaterial(DefaultMaterial.LEAVES_2)) && (centerY > 0))
             {
                 centerY--;
             }
@@ -109,7 +104,7 @@ public class GrassGen extends Resource
                 int x = centerX + random.nextInt(8) - random.nextInt(8);
                 int y = centerY + random.nextInt(4) - random.nextInt(4);
                 int z = centerZ + random.nextInt(8) - random.nextInt(8);
-                if (world.isEmpty(x, y, z) && this.sourceBlocks.contains(world.getTypeId(x, y - 1, z)))
+                if (world.isEmpty(x, y, z) && this.sourceBlocks.contains(world.getMaterial (x, y - 1, z)))
                 {
                     plant.spawn(world, x, y, z);
                 }
@@ -128,11 +123,11 @@ public class GrassGen extends Resource
             int z = chunkZ * 16 + random.nextInt(16) + 8;
             int y = world.getHighestBlockYAt(x, z);
 
-            int id;
-            while (((id = world.getTypeId(x, y, z)) == 0 || id == DefaultMaterial.LEAVES.id || id == DefaultMaterial.LEAVES_2.id) && (y > 0))
+            LocalMaterialData id;
+            while (((id = world.getMaterial(x, y, z)).isMaterial(DefaultMaterial.AIR) || id.isMaterial(DefaultMaterial.LEAVES) || id.isMaterial(DefaultMaterial.LEAVES_2)) && (y > 0))
                 y--;
 
-            if ((!world.isEmpty(x, y + 1, z)) || (!sourceBlocks.contains(world.getTypeId(x, y, z))))
+            if ((!world.isEmpty(x, y + 1, z)) || (!sourceBlocks.contains(world.getMaterial(x, y, z))))
                 continue;
             plant.spawn(world, x, y + 1, z);
         }
@@ -141,13 +136,13 @@ public class GrassGen extends Resource
     @Override
     public String makeString()
     {
-        return "Grass(" + plant.getName() + "," + groupOption + "," + frequency + "," + rarity + makeMaterial(sourceBlocks) + ")";
+        return "Grass(" + plant.getName() + "," + groupOption + "," + frequency + "," + rarity + makeMaterials(sourceBlocks) + ")";
     }
 
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && ((GrassGen) other).plant.equals(plant);
     }
 
     @Override

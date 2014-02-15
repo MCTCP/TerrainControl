@@ -1,10 +1,9 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.BiomeIds;
+import com.khorn.terraincontrol.LocalMaterialData;
 
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
+import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
@@ -17,9 +16,9 @@ import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -27,7 +26,6 @@ import net.minecraft.world.SpawnerAnimals;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.feature.*;
 
 import java.util.ArrayList;
@@ -108,7 +106,8 @@ public class ForgeWorld implements LocalWorld
     {
         this.name = _name;
 
-        // Save all original vanilla biomes, so that they can be restored later on
+        // Save all original vanilla biomes, so that they can be restored
+        // later on
         for (DefaultBiome defaultBiome : DefaultBiome.values())
         {
             int biomeId = defaultBiome.Id;
@@ -299,45 +298,50 @@ public class ForgeWorld implements LocalWorld
     {
         if (this.settings.worldConfig.BiomeConfigsHaveReplacement)
         {
+            // See the comment in replaceBiomes for an explanation of this
+            replaceBlocks(this.chunkCache[0], 8, 8);
+            replaceBlocks(this.chunkCache[1], 0, 8);
+            replaceBlocks(this.chunkCache[2], 8, 0);
+            replaceBlocks(this.chunkCache[3], 0, 0);
+        }
+    }
 
-            Chunk rawChunk = this.chunkCache[0];
+    private void replaceBlocks(Chunk rawChunk, int startXInChunk, int startZInChunk)
+    {
+        int endXInChunk = startXInChunk + 8;
+        int endZInChunk = startZInChunk + 8;
 
-            ExtendedBlockStorage[] sectionsArray = rawChunk.getBlockStorageArray();
+        ExtendedBlockStorage[] sectionsArray = rawChunk.getBlockStorageArray();
 
-            byte[] ChunkBiomes = rawChunk.getBiomeArray();
+        byte[] chunkBiomes = rawChunk.getBiomeArray();
 
-            int x = this.currentChunkX * 16;
-            int z = this.currentChunkZ * 16;
+        for (ExtendedBlockStorage section : sectionsArray)
+        {
+            if (section == null)
+                continue;
 
-            for (ExtendedBlockStorage section : sectionsArray)
+            for (int sectionX = startXInChunk; sectionX < endXInChunk; sectionX++)
             {
-                if (section == null)
-                    continue;
-
-                for (int sectionX = 0; sectionX < 16; sectionX++)
+                for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
                 {
-                    for (int sectionZ = 0; sectionZ < 16; sectionZ++)
+                    BiomeConfig biomeConfig = this.settings.biomeConfigs[chunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
+                    if (biomeConfig != null && biomeConfig.replacedBlocks.hasReplaceSettings())
                     {
-                        BiomeConfig biomeConfig = this.settings.biomeConfigs[ChunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
-
-                        if (biomeConfig.ReplaceCount > 0)
+                        LocalMaterialData[][] replaceArray = biomeConfig.replacedBlocks.compiledInstructions;
+                        for (int sectionY = 0; sectionY < 16; sectionY++)
                         {
-                            for (int sectionY = 0; sectionY < 16; sectionY++)
-                            {
-                                Block block = section.getBlockByExtId(sectionX, sectionY, sectionZ);
-                                int blockId = Block.getIdFromBlock(block);
-                                if (biomeConfig.replaceMatrixBlocks[blockId] == null)
-                                    continue;
+                            Block block = section.getBlockByExtId(sectionX, sectionY, sectionZ);
+                            int blockId = Block.getIdFromBlock(block);
+                            if (replaceArray[blockId] == null)
+                                continue;
 
-                                int replaceTo = biomeConfig.replaceMatrixBlocks[blockId][section.getYLocation() + sectionY];
-                                if (replaceTo == -1)
-                                    continue;
+                            ForgeMaterialData replaceTo = (ForgeMaterialData) replaceArray[blockId][section.getYLocation() + sectionY];
+                            if (replaceTo == null || replaceTo.getBlockId() == blockId)
+                                continue;
 
-                                section.func_150818_a(sectionX, sectionY, sectionZ, Block.getBlockById(replaceTo >> 4));
-                                section.setExtBlockMetadata(sectionX, sectionY, sectionZ, replaceTo & 0xF);
-                                world.getFullBlockLightValue((x + sectionX), (section.getYLocation() + sectionY), (z + sectionZ));
-
-                            }
+                            // section.setBlock(....)
+                            section.func_150818_a(sectionX, sectionY, sectionZ, replaceTo.internalBlock());
+                            section.setExtBlockMetadata(sectionX, sectionY, sectionZ, replaceTo.getBlockData());
                         }
                     }
                 }
@@ -350,18 +354,45 @@ public class ForgeWorld implements LocalWorld
     {
         if (this.settings.worldConfig.HaveBiomeReplace)
         {
-            byte[] ChunkBiomes = this.chunkCache[0].getBiomeArray();
-
-            for (int i = 0; i < ChunkBiomes.length; i++)
-                ChunkBiomes[i] = (byte) (this.settings.replaceToBiomeNameMatrix[ChunkBiomes[i] & 0xFF] & 0xFF);
+            // Like all other populators, this populator uses an offset of 8
+            // blocks from the chunk start.
+            // This is what happens when the top left chunk has it's biome
+            // replaced:
+            // +--------+--------+ . = no changes in biome for now
+            // |........|........| # = biome is replaced
+            // |....####|####....|
+            // |....####|####....| The top left chunk is saved as chunk 0
+            // +--------+--------+ in the cache, the top right chunk as 1,
+            // |....####|####....| the bottom left as 2 and the bottom
+            // |....####|####....| right chunk as 3.
+            // |........|........|
+            // +--------+--------+
+            replaceBiomes(this.chunkCache[0].getBiomeArray(), 8, 8);
+            replaceBiomes(this.chunkCache[1].getBiomeArray(), 0, 8);
+            replaceBiomes(this.chunkCache[2].getBiomeArray(), 8, 0);
+            replaceBiomes(this.chunkCache[3].getBiomeArray(), 0, 0);
         }
+    }
 
+    private void replaceBiomes(byte[] biomeArray, int startXInChunk, int startZInChunk)
+    {
+        int endXInChunk = startXInChunk + 8;
+        int endZInChunkTimes16 = (startZInChunk + 8) * 16;
+        for (int xInChunk = startXInChunk; xInChunk < endXInChunk; xInChunk++)
+        {
+            for (int zInChunkTimes16 = startZInChunk * 16; zInChunkTimes16 < endZInChunkTimes16; zInChunkTimes16 += 16)
+            {
+                biomeArray[zInChunkTimes16 | xInChunk] = (byte) (this.settings.replaceToBiomeNameMatrix[biomeArray[zInChunkTimes16
+                        | xInChunk] & 0xFF] & 0xFF);
+            }
+        }
     }
 
     @Override
     public void placePopulationMobs(BiomeConfig config, Random random, int chunkX, int chunkZ)
     {
-        SpawnerAnimals.performWorldGenSpawning(this.getWorld(), ((ForgeBiome) config.Biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
+        SpawnerAnimals.performWorldGenSpawning(this.getWorld(), ((ForgeBiome) config.Biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8,
+                16, 16, random);
     }
 
     public void LoadChunk(int x, int z)
@@ -377,7 +408,7 @@ public class ForgeWorld implements LocalWorld
 
     private Chunk getChunk(int x, int y, int z)
     {
-        if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
+        if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
             return null;
 
         x >>= 4;
@@ -401,7 +432,7 @@ public class ForgeWorld implements LocalWorld
     {
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            DefaultMaterial material = getMaterial(x, y, z);
+            LocalMaterialData material = getMaterial(x, y, z);
             if (material.isLiquid())
             {
                 return y + 1;
@@ -419,7 +450,7 @@ public class ForgeWorld implements LocalWorld
     {
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            DefaultMaterial material = getMaterial(x, y, z);
+            LocalMaterialData material = getMaterial(x, y, z);
             if (material.isSolid())
             {
                 return y + 1;
@@ -431,47 +462,38 @@ public class ForgeWorld implements LocalWorld
     @Override
     public boolean isEmpty(int x, int y, int z)
     {
-        return this.getTypeId(x, y, z) == 0;
+        Chunk chunk = this.getChunk(x, y, z);
+        if (chunk == null)
+        {
+            return true;
+        }
+        return chunk.getBlock(x & 0xF, y, z & 0xF).getMaterial().equals(Material.air);
     }
 
     @Override
-    public int getTypeId(int x, int y, int z)
+    public LocalMaterialData getMaterial(int x, int y, int z)
     {
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
         {
-            return 0;
+            return new ForgeMaterialData(Blocks.air, 0);
         }
 
         z &= 0xF;
         x &= 0xF;
 
-        Block block = chunk.getBlock(x, y, z);
-        return Block.getIdFromBlock(block);
+        return new ForgeMaterialData(chunk.getBlock(x, y, z), chunk.getBlockMetadata(x, y, z));
     }
 
     @Override
-    public byte getTypeData(int x, int y, int z)
-    {
-        Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null)
-            return 0;
-
-        z &= 0xF;
-        x &= 0xF;
-
-        return (byte) chunk.getBlockMetadata(x, y, z);
-    }
-
-    @Override
-    public void setBlock(final int x, final int y, final int z, final int typeId, final int data, final boolean updateLight, final boolean applyPhysics, final boolean notifyPlayers)
+    public void setBlock(int x, int y, int z, LocalMaterialData material)
     {
         /*
          * This method usually breaks on every Minecraft update. Always check
          * whether the names are still correct. Often, you'll also need to
          * rewrite parts of this method for newer block place logic.
          */
-        if (y < TerrainControl.worldDepth || y >= TerrainControl.worldHeight)
+        if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
         {
             return;
         }
@@ -485,49 +507,19 @@ public class ForgeWorld implements LocalWorld
             return;
         }
 
-        // Get old block id (only needed for physics)
-        Block oldBlock = Blocks.air;
-        if (applyPhysics)
-        {
-            oldBlock = chunk.getBlock(x & 15, y, z & 15);
-        }
+        // Temporarily make remote, so that torches etc. don't pop off
+        boolean oldStatic = world.isRemote;
+        world.isRemote = true;
+        // chunk.setBlockAndMetadata(...)
+        chunk.func_150807_a(x & 15, y, z & 15, ((ForgeMaterialData) material).internalBlock(), material.getBlockData());
+        world.isRemote = oldStatic;
 
-        // Place block
-        if (applyPhysics)
-        {
-            // chunk.setBlockAndMetadata(..., Block.getBlockById(typeId), ..)
-            chunk.func_150807_a(x & 15, y, z & 15, Block.getBlockById(typeId), data);
-        } else
-        {
-            // Temporarily make remote, so that torches etc. don't pop off
-            boolean oldStatic = world.isRemote;
-            world.isRemote = true;
-            // chunk.setBlockAndMetadata(..., Block.getBlockById(typeId), ..)
-            chunk.func_150807_a(x & 15, y, z & 15, Block.getBlockById(typeId), data);
-            world.isRemote = oldStatic;
-        }
-
-        // Relight and update
-        if (updateLight)
-        {
-            world.func_147451_t(x, y, z); // world.updateAllLightTypes
-        }
-
-        if (notifyPlayers && !world.isRemote)
+        // Relight and update players
+        world.func_147451_t(x, y, z); // world.updateAllLightTypes
+        if (!world.isRemote)
         {
             world.markBlockForUpdate(x, y, z);
         }
-
-        if (!world.isRemote && applyPhysics)
-        {
-            world.notifyBlockChange(x, y, z, oldBlock); // world.notifyBlockChange
-        }
-    }
-
-    @Override
-    public void setBlock(final int x, final int y, final int z, final int typeId, final int data)
-    {
-        this.setBlock(x, y, z, typeId, data, true, false, true);
     }
 
     @Override
@@ -547,13 +539,6 @@ public class ForgeWorld implements LocalWorld
             y += 1;
         }
         return y;
-    }
-
-    @Override
-    public DefaultMaterial getMaterial(int x, int y, int z)
-    {
-        int id = this.getTypeId(x, y, z);
-        return DefaultMaterial.getMaterial(id);
     }
 
     @Override
@@ -717,7 +702,8 @@ public class ForgeWorld implements LocalWorld
             tileEntity.readFromNBT(nmsTag);
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {nmsTag.getString("id"), x, y, z, getTypeId(x, y, z)});
+            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {
+                    nmsTag.getString("id"), x, y, z, getMaterial(x, y, z)});
         }
     }
 

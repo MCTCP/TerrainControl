@@ -1,16 +1,18 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.MaterialSet;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class LiquidGen extends Resource
 {
-    private List<Integer> sourceBlocks;
+    private MaterialSet sourceBlocks;
     private int minAltitude;
     private int maxAltitude;
 
@@ -19,43 +21,40 @@ public class LiquidGen extends Resource
     {
         int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
 
-        if (!sourceBlocks.contains(world.getTypeId(x, y + 1, z)))
+        if (!sourceBlocks.contains(world.getMaterial(x, y + 1, z)))
             return;
-        if (!sourceBlocks.contains(world.getTypeId(x, y - 1, z)))
+        if (!sourceBlocks.contains(world.getMaterial(x, y - 1, z)))
             return;
 
-        if ((world.getTypeId(x, y, z) != 0) && (!sourceBlocks.contains(world.getTypeId(x, y, z))))
+        if (!world.isEmpty(x, y, z) && (!sourceBlocks.contains(world.getMaterial(x, y, z))))
             return;
 
         int i = 0;
         int j = 0;
 
-        int tempBlock = world.getTypeId(x - 1, y, z);
+        LocalMaterialData tempBlock = world.getMaterial(x - 1, y, z);
 
         i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
-        j = (tempBlock == 0) ? j + 1 : j;
+        j = (tempBlock.isMaterial(DefaultMaterial.AIR)) ? j + 1 : j;
 
-        tempBlock = world.getTypeId(x + 1, y, z);
-
-        i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
-        j = (tempBlock == 0) ? j + 1 : j;
-
-        tempBlock = world.getTypeId(x, y, z - 1);
+        tempBlock = world.getMaterial(x + 1, y, z);
 
         i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
-        j = (tempBlock == 0) ? j + 1 : j;
+        j = (tempBlock.isMaterial(DefaultMaterial.AIR)) ? j + 1 : j;
 
-        tempBlock = world.getTypeId(x, y, z + 1);
+        tempBlock = world.getMaterial(x, y, z - 1);
 
         i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
-        j = (tempBlock == 0) ? j + 1 : j;
+        j = (tempBlock.isMaterial(DefaultMaterial.AIR)) ? j + 1 : j;
+
+        tempBlock = world.getMaterial(x, y, z + 1);
+
+        i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
+        j = (tempBlock.isMaterial(DefaultMaterial.AIR)) ? j + 1 : j;
 
         if ((i == 3) && (j == 1))
         {
-            world.setBlock(x, y, z, blockId, 0, true, true, true);
-            // this.world.f = true;
-            // Block.byId[res.BlockId].a(this.world, x, y, z, this.rand);
-            // this.world.f = false;
+            world.setBlock(x, y, z, material);
         }
     }
 
@@ -64,29 +63,24 @@ public class LiquidGen extends Resource
     {
         assureSize(6, args);
 
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
+        material = readMaterial(args.get(0));
         frequency = readInt(args.get(1), 1, 5000);
         rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
-        sourceBlocks = new ArrayList<Integer>();
-        for (int i = 5; i < args.size(); i++)
-        {
-            sourceBlocks.add(readBlockId(args.get(i)));
-        }
+        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        sourceBlocks = readMaterials(args, 5);
     }
 
     @Override
     public String makeString()
     {
-        return "Liquid(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
+        return "Liquid(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
 
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.material.equals(this.material);
     }
 
     @Override

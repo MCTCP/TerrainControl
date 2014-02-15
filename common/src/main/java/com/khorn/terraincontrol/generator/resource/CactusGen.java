@@ -1,10 +1,11 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.MaterialSet;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -13,7 +14,7 @@ public class CactusGen extends Resource
 
     private int minAltitude;
     private int maxAltitude;
-    private List<Integer> sourceBlocks;
+    private MaterialSet sourceBlocks;
 
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
@@ -31,8 +32,8 @@ public class CactusGen extends Resource
                 continue;
 
             // Check foundation
-            int id = world.getTypeId(cactusX, cactusBaseY - 1, cactusZ);
-            if (!sourceBlocks.contains(id))
+            LocalMaterialData foundationMaterial = world.getMaterial(cactusX, cactusBaseY - 1, cactusZ);
+            if (!sourceBlocks.contains(foundationMaterial))
                 continue;
 
             // Check neighbors
@@ -49,7 +50,7 @@ public class CactusGen extends Resource
             int cactusHeight = 1 + rand.nextInt(rand.nextInt(3) + 1);
             for (int dY = 0; dY < cactusHeight; dY++)
             {
-                world.setBlock(cactusX, cactusBaseY + dY, cactusZ, blockId, blockData, false, false, false);
+                world.setBlock(cactusX, cactusBaseY + dY, cactusZ, material);
             }
         }
     }
@@ -57,7 +58,7 @@ public class CactusGen extends Resource
     @Override
     public String makeString()
     {
-        return "Cactus(" + makeMaterial(blockId, blockData) + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
+        return "Cactus(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
 
     @Override
@@ -65,23 +66,18 @@ public class CactusGen extends Resource
     {
         assureSize(6, args);
 
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
+        material = readMaterial(args.get(0));
         frequency = readInt(args.get(1), 1, 100);
         rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.worldHeight);
-        sourceBlocks = new ArrayList<Integer>();
-        for (int i = 5; i < args.size(); i++)
-        {
-            sourceBlocks.add(readBlockId(args.get(i)));
-        }
+        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        sourceBlocks = readMaterials(args, 5);
     }
 
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.material.equals(this.material);
     }
 
     @Override

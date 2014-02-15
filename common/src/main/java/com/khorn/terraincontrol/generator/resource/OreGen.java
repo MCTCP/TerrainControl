@@ -3,9 +3,9 @@ package com.khorn.terraincontrol.generator.resource;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -14,7 +14,7 @@ public class OreGen extends Resource
     private int minAltitude;
     private int maxAltitude;
     private int maxSize;
-    private List<Integer> sourceBlocks;
+    private MaterialSet sourceBlocks;
 
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
@@ -62,9 +62,9 @@ public class OreGen extends Resource
                             for (int i5 = m; i5 <= i2; i5++)
                             {
                                 double d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);
-                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(world.getTypeId(i3, i4, i5)))
+                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(world.getMaterial(i3, i4, i5)))
                                 {
-                                    world.setBlock(i3, i4, i5, blockId, blockData, false, false, false);
+                                    world.setBlock(i3, i4, i5, material);
                                 }
                             }
                         }
@@ -79,30 +79,25 @@ public class OreGen extends Resource
     {
         assureSize(7, args);
 
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
+        material = readMaterial(args.get(0));
         maxSize = readInt(args.get(1), 1, 128);
         frequency = readInt(args.get(2), 1, 100);
         rarity = readRarity(args.get(3));
-        minAltitude = readInt(args.get(4), TerrainControl.worldDepth, TerrainControl.worldHeight);
-        maxAltitude = readInt(args.get(5), minAltitude + 1, TerrainControl.worldHeight);
-        sourceBlocks = new ArrayList<Integer>();
-        for (int i = 6; i < args.size(); i++)
-        {
-            sourceBlocks.add(readBlockId(args.get(i)));
-        }
+        minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(5), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        sourceBlocks = readMaterials(args, 6);
     }
 
     @Override
     public String makeString()
     {
-        return "Ore(" + makeMaterial(blockId, blockData) + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterial(sourceBlocks) + ")";
+        return "Ore(" + material + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
 
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.material.equals(this.material);
     }
 
     @Override

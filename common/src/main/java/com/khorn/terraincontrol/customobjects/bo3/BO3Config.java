@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import com.khorn.terraincontrol.util.helpers.StringHelper;
+
+import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
@@ -28,17 +32,18 @@ public class BO3Config extends ConfigFile
     public int minHeight;
     public int maxHeight;
     public ArrayList<String> excludedBiomes;
-    public HashSet<Integer> sourceBlock;
+    public MaterialSet sourceBlocks;
     public int maxPercentageOutsideSourceBlock;
     public OutsideSourceBlockEnum outsideSourceBlock;
-    public BlockFunction[][] blocks = new BlockFunction[4][]; // four rotations
+    public BlockFunction[][] blocks = new BlockFunction[4][]; // four
+                                                              // rotations
     public BO3Check[][] bo3Checks = new BO3Check[4][];
     public int maxBranchDepth;
     public BranchFunction[][] branches = new BranchFunction[4][];
 
     /**
      * Creates a BO3Config from a file.
-     *
+     * 
      * @param name The name of the BO3 without the extension.
      * @param file The file of the BO3.
      */
@@ -54,10 +59,9 @@ public class BO3Config extends ConfigFile
     }
 
     /**
-     * Creates a BO3Config with the specified settings. Ignores the settings in
-     * the
-     * settings file.
-     *
+     * Creates a BO3Config with the specified settings. Ignores the settings
+     * in the settings file.
+     * 
      * @param oldObject The old BO3 object. It's settings will be copied.
      * @param extraSettings The extra settings.
      */
@@ -151,8 +155,8 @@ public class BO3Config extends ConfigFile
 
         // Sourceblock
         writeBigTitle("Source block settings");
-        writeComment("The block the BO3 should spawn in");
-        writeValue(BO3Settings.SourceBlock, sourceBlock);
+        writeComment("The block(s) the BO3 should spawn in.");
+        writeValue(BO3Settings.SourceBlocks, sourceBlocks.toString());
 
         writeComment("The maximum percentage of the BO3 that can be outside the SourceBlock.");
         writeComment("The BO3 won't be placed on a location with more blocks outside the SourceBlock than this percentage.");
@@ -182,12 +186,31 @@ public class BO3Config extends ConfigFile
         maxBranchDepth = readSettings(BO3Settings.MaxBranchDepth);
         excludedBiomes = readSettings(BO3Settings.ExcludedBiomes);
 
-        sourceBlock = readSettings(BO3Settings.SourceBlock);
+        readSourceBlocks();
         maxPercentageOutsideSourceBlock = readSettings(BO3Settings.MaxPercentageOutsideSourceBlock);
         outsideSourceBlock = readSettings(BO3Settings.OutsideSourceBlock);
 
         // Read the resources
         readResources();
+    }
+
+    /**
+     * Reads all the source blocks, logs a message if the setting was invalid.
+     */
+    private void readSourceBlocks()
+    {
+        this.sourceBlocks = new MaterialSet();
+        List<String> sourceBlocks = readSettings(BO3Settings.SourceBlocks);
+        try
+        {
+            for (String sourceBlock : sourceBlocks)
+            {
+                this.sourceBlocks.parseAndAdd(sourceBlock);
+            }
+        } catch (InvalidConfigException e)
+        {
+            logSettingValueInvalid(BO3Settings.SourceBlocks.name());
+        }
     }
 
     private void readResources()
@@ -204,9 +227,10 @@ public class BO3Config extends ConfigFile
             if (start != -1 && end != -1)
             {
                 String name = key.substring(0, start);
-                String[] props = readComplexString(key.substring(start + 1, end));
+                String[] props = StringHelper.readCommaSeperatedString(key.substring(start + 1, end));
 
-                ConfigFunction<BO3Config> res = TerrainControl.getConfigFunctionsManager().getConfigFunction(name, this, this.name + " on line " + entry.getValue(), Arrays.asList(props));
+                ConfigFunction<BO3Config> res = TerrainControl.getConfigFunctionsManager().getConfigFunction(name, this,
+                        this.name + " on line " + entry.getValue(), Arrays.asList(props));
 
                 if (res != null && res.isValid())
                 {
@@ -297,10 +321,9 @@ public class BO3Config extends ConfigFile
     {
         frequency = applyBounds(frequency, 1, 200);
         rarity = applyBounds(rarity, 0.000001, 100.0);
-        minHeight = applyBounds(minHeight, TerrainControl.worldDepth, TerrainControl.worldHeight - 1);
-        maxHeight = applyBounds(maxHeight, minHeight, TerrainControl.worldHeight);
+        minHeight = applyBounds(minHeight, TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT - 1);
+        maxHeight = applyBounds(maxHeight, minHeight, TerrainControl.WORLD_HEIGHT);
         maxBranchDepth = applyBounds(maxBranchDepth, 1, Integer.MAX_VALUE);
-        sourceBlock = applyBounds(sourceBlock, 0, TerrainControl.supportedBlockIds);
         maxPercentageOutsideSourceBlock = applyBounds(maxPercentageOutsideSourceBlock, 0, 100);
     }
 

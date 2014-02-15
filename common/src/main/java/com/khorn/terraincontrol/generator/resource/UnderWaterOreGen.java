@@ -1,15 +1,16 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.MaterialSet;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class UnderWaterOreGen extends Resource
 {
-    private List<Integer> sourceBlocks;
+    private MaterialSet sourceBlocks;
     private int size;
 
     @Override
@@ -33,10 +34,10 @@ public class UnderWaterOreGen extends Resource
                 {
                     for (int y = firstSolidBlock - two; y <= firstSolidBlock + two; y++)
                     {
-                        int i3 = world.getTypeId(currentX, y, currentZ);
-                        if (sourceBlocks.contains(i3))
+                        LocalMaterialData sourceBlock = world.getMaterial(currentX, y, currentZ);
+                        if (sourceBlocks.contains(sourceBlock))
                         {
-                            world.setBlock(currentX, y, currentZ, blockId, blockData, false, false, false);
+                            world.setBlock(currentX, y, currentZ, material);
                         }
                     }
                 }
@@ -48,28 +49,23 @@ public class UnderWaterOreGen extends Resource
     public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(5, args);
-        blockId = readBlockId(args.get(0));
-        blockData = readBlockData(args.get(0));
+        material = readMaterial(args.get(0));
         size = readInt(args.get(1), 1, 8);
         frequency = readInt(args.get(2), 1, 100);
         rarity = readRarity(args.get(3));
-        sourceBlocks = new ArrayList<Integer>();
-        for (int i = 4; i < args.size(); i++)
-        {
-            sourceBlocks.add(readBlockId(args.get(i)));
-        }
+        sourceBlocks = readMaterials(args, 4);
     }
 
     @Override
     public String makeString()
     {
-        return "UnderWaterOre(" + makeMaterial(blockId, blockData) + "," + size + "," + frequency + "," + rarity + makeMaterial(sourceBlocks) + ")";
+        return "UnderWaterOre(" + material + "," + size + "," + frequency + "," + rarity + makeMaterials(sourceBlocks) + ")";
     }
 
     @Override
     public boolean isAnalogousTo(Resource other)
     {
-        return getClass() == other.getClass() && other.blockId == this.blockId && other.blockData == this.blockData;
+        return getClass() == other.getClass() && other.material.equals(this.material);
     }
 
     @Override

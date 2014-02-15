@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.generator.surface;
 
+import com.khorn.terraincontrol.LocalMaterialData;
+
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
@@ -13,18 +16,14 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 {
     public static class LayerChoice implements Comparable<LayerChoice>
     {
-        public final int surfaceBlockId;
-        public final byte surfaceBlockData;
-        public final int groundBlockId;
-        public final byte groundBlockData;
+        public final LocalMaterialData surfaceBlock;
+        public final LocalMaterialData groundBlock;
         public final float maxNoise;
 
-        public LayerChoice(int surfaceBlockId, byte surfaceBlockData, int groundBlockId, byte groundBlockData, float maxNoise)
+        public LayerChoice(LocalMaterialData surfaceBlock, LocalMaterialData groundBlock, float maxNoise)
         {
-            this.surfaceBlockId = surfaceBlockId;
-            this.surfaceBlockData = surfaceBlockData;
-            this.groundBlockId = groundBlockId;
-            this.groundBlockData = groundBlockData;
+            this.surfaceBlock = surfaceBlock;
+            this.groundBlock = groundBlock;
             this.maxNoise = maxNoise;
         }
 
@@ -52,12 +51,10 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
         layerChoices = new ArrayList<LayerChoice>();
         for (int i = 0; i < args.length - 2; i += 3)
         {
-            int surfaceBlockId = StringHelper.readBlockId(args[i]);
-            byte surfaceBlockData = (byte) StringHelper.readBlockData(args[i]);
-            int groundBlockId = StringHelper.readBlockId(args[i+1]);
-            byte groundBlockData = (byte) StringHelper.readBlockData(args[i+1]);
+            LocalMaterialData surfaceBlock = TerrainControl.readMaterial(args[i]);
+            LocalMaterialData groundBlock = TerrainControl.readMaterial(args[i+1]);
             float maxNoise = (float) StringHelper.readDouble(args[i + 2], -20, 20);
-            layerChoices.add(new LayerChoice(surfaceBlockId, surfaceBlockData, groundBlockId, groundBlockData, maxNoise));
+            layerChoices.add(new LayerChoice(surfaceBlock, groundBlock, maxNoise));
         }
         Collections.sort(layerChoices);
     }
@@ -67,7 +64,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
     {
         int y = world.getSolidHeight(x, z) - 1;
         BiomeConfig config = world.getSettings().biomeConfigs[world.getBiomeId(x, z)];
-        if (config == null || world.getTypeId(x, y, z) != config.surfaceBlock)
+        if (config == null || !world.getMaterial(x, y, z).equals(config.surfaceBlock))
         {
             // Not the correct surface block here, so don't replace it
             // This can happen when another chunk populated part of this chunk
@@ -78,10 +75,10 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
         {
             if (noise <= layer.maxNoise)
             {
-                world.setBlock(x, y, z, layer.surfaceBlockId, layer.surfaceBlockData);
+                world.setBlock(x, y, z, layer.surfaceBlock);
                 for (int i = 1; i < 4; i++)
                 {
-                    world.setBlock(x, y - i, z, layer.groundBlockId, layer.groundBlockData);
+                    world.setBlock(x, y - i, z, layer.groundBlock);
                 }
                 return;
             }
@@ -94,9 +91,9 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
         StringBuilder stringBuilder = new StringBuilder();
         for (LayerChoice groundLayer : this.layerChoices)
         {
-            stringBuilder.append(StringHelper.makeMaterial(groundLayer.surfaceBlockId, groundLayer.surfaceBlockData));
+            stringBuilder.append(groundLayer.surfaceBlock);
             stringBuilder.append(',');
-            stringBuilder.append(StringHelper.makeMaterial(groundLayer.groundBlockId, groundLayer.groundBlockData));
+            stringBuilder.append(groundLayer.groundBlock);
             stringBuilder.append(',');
             stringBuilder.append(groundLayer.maxNoise);
             stringBuilder.append(',');

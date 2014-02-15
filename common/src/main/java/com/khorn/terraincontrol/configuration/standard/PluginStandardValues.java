@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.configuration.standard;
 
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+
 import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 
@@ -9,10 +11,7 @@ import java.util.HashSet;
 
 public enum PluginStandardValues implements MultiTypedSetting
 {
-    //>>	Feature flags
-    developer_name(""),
-    Feature_BiomeInheritanceVariables_Timethor(false),
-    
+   
   //>> Files
     //>>	Main Plugin Config
     ConfigFilename("TerrainControl.ini"),
@@ -166,6 +165,12 @@ public enum PluginStandardValues implements MultiTypedSetting
     public HashSet<Integer> intSetValue()
     {
         return this.iSetValue;
+    }
+
+    @Override
+    public DefaultMaterial materialValue()
+    {
+        throw new UnsupportedOperationException();
     }
 
 }

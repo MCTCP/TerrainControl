@@ -226,7 +226,7 @@ public class StandardMinecraftBiomes
         {
             super(minecraftBiome, worldHeight);
 
-            this.defaultSurfaceBlock = (byte) DefaultMaterial.MYCEL.id;
+            this.defaultSurfaceBlock = DefaultMaterial.MYCEL;
             this.defaultMushroom = 2;
             this.defaultGrass = 0;
             this.defaultDandelions = 0;
@@ -556,8 +556,8 @@ public class StandardMinecraftBiomes
             // Terrain Control does it the other way round: it places
             // hardcoded sand and stained clay and lets the user change the
             // grass and dirt blocks.
-            this.defaultSurfaceBlock = DefaultMaterial.GRASS.id;
-            this.defaultGroundBlock = DefaultMaterial.DIRT.id;
+            this.defaultSurfaceBlock = DefaultMaterial.GRASS;
+            this.defaultGroundBlock = DefaultMaterial.DIRT;
         }
     }
 

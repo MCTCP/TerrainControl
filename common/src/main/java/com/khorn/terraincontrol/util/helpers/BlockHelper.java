@@ -13,12 +13,8 @@ public class BlockHelper
      * @return
      */
     @SuppressWarnings({"PointlessBitwiseExpression", "incomplete-switch"})
-    public static int rotateData(int type, int data)
+    public static int rotateData(DefaultMaterial mat, int data)
     {
-        DefaultMaterial mat = DefaultMaterial.getMaterial(type);
-        if (mat == DefaultMaterial.UNKNOWN_BLOCK)
-            return data;
-
         switch (mat)
         {
             case TORCH:
