@@ -10,13 +10,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- POM for Forge version of Terrain Control -->
+    <!-- POM for Bukkit version of Terrain Control -->
 
     <!-- We need the parent project -->
     <parent>
         <groupId>com.khorn.terraincontrol</groupId>
         <artifactId>terraincontrol</artifactId>
-        <version>2.5.3-SNAPSHOT</version>
+        <version>2.5.4-SNAPSHOT</version>
         <relativePath>../../</relativePath>
     </parent>
 
@@ -29,7 +29,7 @@
     <!-- Constants -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bukkitVersion>1.7.2-R0.2</bukkitVersion>
+        <bukkitVersion>1.7.2-R0.3</bukkitVersion>
     </properties>
 
     <!-- We're open source, find us here -->

@@ -20,12 +20,34 @@ public class TCChunkGenerator extends ChunkGenerator
     private ArrayList<BlockPopulator> BlockPopulator = new ArrayList<BlockPopulator>();
     private boolean NotGenerate = false;
     private TCPlugin plugin;
+
     public TCChunkGenerator(TCPlugin _plugin)
     {
         this.plugin = _plugin;
     }
 
-    public void Init(BukkitWorld _world)
+    /**
+     * Initializes the world if it hasn't already been initialized.
+     * 
+     * @param world
+     *            The world of this generator.
+     */
+    private void makeSureWorldIsInitialized(World world)
+    {
+        if (this.chunkProviderTC == null)
+        {
+            // Not yet initialized, do it now
+            this.plugin.onWorldInit(world);
+        }
+    }
+
+    /**
+     * Called whenever a BukkitWorld instance becomes available.
+     * 
+     * @param _world
+     *            The BukkitWorld instance.
+     */
+    public void onInitialize(BukkitWorld _world)
     {
         this.chunkProviderTC = new ChunkProviderTC(_world.getSettings(), _world);
 
@@ -41,14 +63,15 @@ public class TCChunkGenerator extends ChunkGenerator
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
-        this.plugin.onWorldInit(world);
+        makeSureWorldIsInitialized(world);
+
         return this.BlockPopulator;
     }
 
     @Override
     public boolean canSpawn(World world, int x, int z)
     {
-        this.plugin.onWorldInit(world);
+        makeSureWorldIsInitialized(world);
 
         Material material = world.getHighestBlockAt(x, z).getType();
         return material.isSolid();
@@ -57,6 +80,8 @@ public class TCChunkGenerator extends ChunkGenerator
     @Override
     public byte[][] generateBlockSections(World world, Random random, int x, int z, BiomeGrid biomes)
     {
+        makeSureWorldIsInitialized(world);
+
         if (this.NotGenerate)
             return new byte[16][];
         byte[] BlockArray = this.chunkProviderTC.generate(x, z);

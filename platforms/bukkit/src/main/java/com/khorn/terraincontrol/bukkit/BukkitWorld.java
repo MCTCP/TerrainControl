@@ -691,7 +691,7 @@ public class BukkitWorld implements LocalWorld
                     this.netherFortress = new NetherFortressGen();
                 case NotGenerate:
                 case TerrainTest:
-                    this.generator.Init(this);
+                    this.generator.onInitialize(this);
                     break;
                 case Default:
                     break;
