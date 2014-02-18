@@ -52,7 +52,6 @@ public class TCPlugin extends TerrainControlEngine
         logger = FMLCommonHandler.instance().getFMLLogger();
 
         // Start TerrainControl engine
-        TerrainControl.supportedBlockIds = 4095;
         TerrainControl.setEngine(this);
 
         // Register world type

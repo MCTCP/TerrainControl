@@ -190,7 +190,7 @@ public class ReplacedBlocksMatrix
             return;
         }
 
-        this.compiledInstructions = new LocalMaterialData[TerrainControl.supportedBlockIds][];
+        this.compiledInstructions = new LocalMaterialData[TerrainControl.SUPPORTED_BLOCK_IDS][];
         for (ReplacedBlocksInstruction instruction : instructions)
         {
             int fromBlockId = instruction.getFrom().getBlockId();

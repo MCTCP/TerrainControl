@@ -275,9 +275,19 @@ public class BO3Config extends ConfigFile
         // BO3Checks
         writeBigTitle("BO3 checks");
         writeComment("Require a condition at a certain location in order for the BO3 to be spawned.");
-        writeComment("BlockCheck(x,y,z,id[:data][,id[:data][,...]]) - one of the blocks must be at the location");
-        writeComment("BlockCheckNot(x,y,z,id[:data][,id[:data][,...]]) - all the blocks must not be at the location");
+        writeComment("BlockCheck(x,y,z,BlockName[,BlockName[,...]]) - one of the blocks must be at the location");
+        writeComment("BlockCheckNot(x,y,z,BlockName[,BlockName[,...]]) - all the blocks must not be at the location");
         writeComment("LightCheck(x,y,z,minLightLevel,maxLightLevel) - light must be between min and max (inclusive)");
+        writeComment("");
+        writeComment("You can use \"Solid\" as a BlockName for matching all solid blocks or \"All\" to match all blocks that aren't air.");
+        writeComment("");
+        writeComment("Examples:");
+        writeComment("  BlockCheck(0,-1,0,GRASS,DIRT)  Require grass or dirt just below the object");
+        writeComment("  BlockCheck(0,-1,0,Solid)       Require any solid block just below the object");
+        writeComment("  BlockCheck(0,-1,0,WOOL)        Require any type of wool just below the object");
+        writeComment("  BlockCheck(0,-1,0,WOOL:0)      Require white wool just below the object");
+        writeComment("  BlockCheckNot(0,-1,0,WOOL:0)   Require that there is no white wool below the object");
+        writeComment("  LightCheck(0,0,0,0,1)          Require almost complete darkness just below the object");
         for (BO3Check check : bo3Checks[0])
         {
             writeFunction(check);

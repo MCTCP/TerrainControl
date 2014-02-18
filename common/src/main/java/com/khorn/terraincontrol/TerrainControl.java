@@ -26,9 +26,9 @@ public class TerrainControl
     private static TerrainControlEngine engine;
 
     /**
-     * The maximum block id that is supported. 255 on CraftBukkit.
+     * The amount of different block ids that are supported. 4096 on Minecraft.
      */
-    public static int supportedBlockIds = 255;
+    public static final int SUPPORTED_BLOCK_IDS = 4096;
 
     /**
      * The world depth that the engine supports. Not the actual depth the

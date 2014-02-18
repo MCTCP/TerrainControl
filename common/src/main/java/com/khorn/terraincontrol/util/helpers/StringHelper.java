@@ -142,6 +142,34 @@ public abstract class StringHelper
         return output;
     }
 
+    /**
+     * Gets whether the input specifies which block data should be used.
+     * <p>
+     * A few examples: "WOOL" doesn't specify block data, while "WOOL:0" does.
+     * "buildcraft:blockRedLaser" doesn't specify block data, even though it
+     * contains a colon. However, "buildcraft:blockRedLaser:0" does specify
+     * block data.
+     * 
+     * @param materialString
+     *            The input.
+     * @return True if the input specifies block data, false otherwise.
+     */
+    public static boolean specifiesBlockData(String materialString) {
+        int indexOfColon = materialString.lastIndexOf(":");
+        if (indexOfColon > 0)
+        {
+            String blockDataString = materialString.substring(indexOfColon + 1);
+            try {
+                Integer.parseInt(blockDataString);
+                // If we have reached this point, the text after the last colon
+                // was numeric, so it was indeed block data
+                return true;
+            } catch (NumberFormatException e) {
+            }
+        }
+        return false;
+    }
+
     private StringHelper()
     {
     }

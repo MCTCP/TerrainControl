@@ -77,12 +77,11 @@ public class TCPlugin extends JavaPlugin
         } else
         {
             boolean mcpc = false;
-            if (Bukkit.getVersion().contains("MCPC-Plus"))
+            if (Bukkit.getVersion().contains("MCPC"))
             {
                 // We're on MCPC+, so enable the extra block ids.
-                TerrainControl.supportedBlockIds = 4095;
                 mcpc = true;
-                TerrainControl.log(Level.INFO, "MCPC+ detected, enabling extended block id support.");
+                TerrainControl.log(Level.INFO, "MCPC+ detected.");
             }
 
             // Register structures

@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.TerrainControl;
+
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -93,7 +95,15 @@ public class BukkitMaterialData implements LocalMaterialData
     @Override
     public int hashCode()
     {
-        return getBlockId() * 16 + data;
+        // From 4096 to 69632 when there are 4096 block ids
+        return TerrainControl.SUPPORTED_BLOCK_IDS + getBlockId() * 16 + data;
+    }
+
+    @Override
+    public int hashCodeWithoutBlockData()
+    {
+        // From 0 to 4095 when there are 4096 block ids
+        return getBlockId();
     }
 
     @Override
