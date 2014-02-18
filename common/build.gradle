@@ -9,7 +9,11 @@ ext.ideProjectName = "TerrainControl-Common"
 
 repositories
 {
-	mavenLocal()
+    mavenLocal()
     mavenCentral()
 }
 
+dependencies
+{
+    testCompile 'junit:junit:4+'
+}
