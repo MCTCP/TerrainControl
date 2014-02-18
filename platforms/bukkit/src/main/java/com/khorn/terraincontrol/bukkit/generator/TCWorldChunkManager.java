@@ -30,7 +30,7 @@ public class TCWorldChunkManager extends WorldChunkManager
     @Override
     public BiomeBase getBiome(int paramInt1, int paramInt2)
     {
-        return BiomeBase.getBiome(biomeManager.getBiome(paramInt1, paramInt2));
+        return BiomeBase.getBiome(localWorld.generationToSavedBiomeIds[biomeManager.getBiome(paramInt1, paramInt2)]);
     }
 
     @Override

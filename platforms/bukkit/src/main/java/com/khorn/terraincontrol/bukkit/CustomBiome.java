@@ -18,10 +18,13 @@ import java.util.logging.Level;
 
 public class CustomBiome extends BiomeBase
 {
+    public final int generationId;
+
     @SuppressWarnings("MismatchedReadAndWriteOfArray")
     public CustomBiome(BiomeIds biomeIds, String name)
     {
         super(biomeIds.getSavedId());
+        this.generationId = biomeIds.getGenerationId();
         this.a(name);
 
         // Insert the biome in CraftBukkit's biome mapping

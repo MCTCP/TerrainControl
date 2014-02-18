@@ -39,7 +39,7 @@ public class ObjectSpawner
         int z = chunkZ * 16;
 
         // Get the BiomeConfig of the other corner
-        int biomeId = world.getBiomeId(x + 15, z + 15);
+        int biomeId = world.getCalculatedBiomeId(x + 15, z + 15);
         BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
 
         // Null check
@@ -101,7 +101,7 @@ public class ObjectSpawner
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
                 // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
-                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.world.getBiomeId(blockToFreezeX, blockToFreezeZ)];
+                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.world.getCalculatedBiomeId(blockToFreezeX, blockToFreezeZ)];
                 if (biomeConfig != null && biomeConfig.surfaceAndGroundControl != null)
                 {
                     double noise = this.reusableChunkNoiseArray[i + j * 16];
