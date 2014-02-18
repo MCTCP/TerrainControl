@@ -131,8 +131,8 @@ public class BukkitEngine extends TerrainControlEngine
         }
         if (splitIndex != -1)
         {
-            blockName = input.substring(0, splitIndex - 1);
-            blockData = Integer.parseInt(input.substring(splitIndex));
+            blockName = input.substring(0, splitIndex);
+            blockData = Integer.parseInt(input.substring(splitIndex + 1));
         }
 
         // Get the material belonging to the block and data

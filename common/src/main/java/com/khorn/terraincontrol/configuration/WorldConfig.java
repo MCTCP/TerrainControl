@@ -202,10 +202,6 @@ public class WorldConfig extends ConfigFile
 
         ReadWorldCustomObjects();
 
-        // Need add check to clashes ( what? )
-        if (this.SettingsMode != ConfigMode.WriteDisable)
-            this.writeSettingsFile(this.SettingsMode == ConfigMode.WriteAll);
-
         // Check biome ids, These are the names from the worldConfig file
         // Corrects any instances of incorrect biome id.
         for (String biomeName : CustomBiomeIds.keySet())
@@ -215,8 +211,12 @@ public class WorldConfig extends ConfigFile
                 CustomBiomeIds.put(biomeName, new BiomeIds(world.getFreeBiomeId()));
             }
         }
-        
-        
+
+        // Output to file
+        if (this.SettingsMode != ConfigMode.WriteDisable)
+        {
+            this.writeSettingsFile(this.SettingsMode == ConfigMode.WriteAll);
+        }
     }
 
     /**
@@ -494,15 +494,19 @@ public class WorldConfig extends ConfigFile
             try
             {
                 String[] keys = biome.split(":");
-                int generationBiomeId = Integer.parseInt(keys[1]);
                 if (keys.length == 2)
-                    CustomBiomeIds.put(keys[0], new BiomeIds(generationBiomeId));
-                else if (keys.length == 3)
                 {
+                    int generationBiomeId = Integer.parseInt(keys[1]);
+                    CustomBiomeIds.put(keys[0], new BiomeIds(generationBiomeId));
+                } else if (keys.length == 3)
+                {
+                    int generationBiomeId = Integer.parseInt(keys[1]);
                     int savedBiomeId = Integer.parseInt(keys[2]);
                     CustomBiomeIds.put(keys[0], new BiomeIds(generationBiomeId, savedBiomeId));
                 } else
+                {
                     CustomBiomeIds.put(keys[0], new BiomeIds(-1));
+                }
 
             } catch (NumberFormatException e)
             {
