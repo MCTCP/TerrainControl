@@ -7,7 +7,7 @@ import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -25,7 +25,7 @@ public class MaterialSet
     private boolean allMaterials = false;
 
     private int[] materialIntSet = new int[0];
-    private Set<MaterialSetEntry> materials = new HashSet<MaterialSetEntry>();
+    private Set<MaterialSetEntry> materials = new LinkedHashSet<MaterialSetEntry>();
     private boolean intSetUpToDate = true;
 
     /**
