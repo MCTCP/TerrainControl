@@ -24,13 +24,11 @@ public class ReplacedBlocksMatrix
         /**
          * Parses the given instruction string.
          * 
-         * @param instruction
-         *            The instruction string.
-         * @param maxAllowedY
-         *            Maximum allowed y height for the replace setting,
-         *            inclusive.
-         * @throws InvalidConfigException
-         *             If the instruction is formatted incorrectly.
+         * @param instruction The instruction string.
+         * @param maxAllowedY Maximum allowed y height for the replace
+         *            setting, inclusive.
+         * @throws InvalidConfigException If the instruction is formatted
+         *             incorrectly.
          */
         public ReplacedBlocksInstruction(String instruction, int maxAllowedY) throws InvalidConfigException
         {
@@ -38,7 +36,7 @@ public class ReplacedBlocksMatrix
             if (values.length == 5)
             {
                 // Replace in TC 2.3 style found
-                values = new String[] { values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1) };
+                values = new String[] {values[0], values[1] + ":" + values[2], values[3], "" + (Integer.parseInt(values[4]) - 1)};
             }
 
             if (values.length != 2 && values.length != 4)
@@ -64,16 +62,13 @@ public class ReplacedBlocksMatrix
          * Creates a ReplacedBlocksInstruction with the given parameters.
          * Parameters may not be null.
          * 
-         * @param from
-         *            The block that will be replaced.
-         * @param to
-         *            The block that from will be replaced to.
-         * @param minHeight
-         *            Minimum height for this replace, inclusive. Must be
-         *            smaller than or equal to 0.
-         * @param maxHeight
-         *            Maximum height for this replace, inclusive. Must not be
-         *            larger than {@link ReplacedBlocksMatrix#maxHeight}.
+         * @param from The block that will be replaced.
+         * @param to The block that from will be replaced to.
+         * @param minHeight Minimum height for this replace, inclusive. Must
+         *            be smaller than or equal to 0.
+         * @param maxHeight Maximum height for this replace, inclusive. Must
+         *            not be larger than
+         *            {@link ReplacedBlocksMatrix#maxHeight}.
          */
         public ReplacedBlocksInstruction(LocalMaterialData from, LocalMaterialData to, int minHeight, int maxHeight)
         {
@@ -113,15 +108,15 @@ public class ReplacedBlocksMatrix
     private List<ReplacedBlocksInstruction> instructions;
 
     /**
-     * The compiled ReplacedBlocks instructions. Don't change this variable. May
-     * be null when this biome {@link #hasReplaceSettings() doesn't replace
-     * blocks}.
+     * The compiled ReplacedBlocks instructions. Don't change this variable.
+     * May be null when this biome {@link #hasReplaceSettings() doesn't
+     * replace blocks}.
      */
     public LocalMaterialData[][] compiledInstructions;
 
-    public ReplacedBlocksMatrix(String setting, int maxAllowedY) throws InvalidConfigException
+    public ReplacedBlocksMatrix(String setting, int maxHeight) throws InvalidConfigException
     {
-        this.maxHeight = maxAllowedY;
+        this.maxHeight = maxHeight;
 
         // Parse
         if (setting.isEmpty() || setting.equalsIgnoreCase(NO_REPLACE))
@@ -140,8 +135,9 @@ public class ReplacedBlocksMatrix
             if (start != -1 && end != -1)
             {
                 String keyWithoutBraces = key.substring(start + 1, end);
-                instructions.add(new ReplacedBlocksInstruction(keyWithoutBraces, maxAllowedY));
-            } else {
+                instructions.add(new ReplacedBlocksInstruction(keyWithoutBraces, maxHeight));
+            } else
+            {
                 throw new InvalidConfigException("One of the parts is missing braces around it.");
             }
 
@@ -177,8 +173,7 @@ public class ReplacedBlocksMatrix
      * Sets the ReplacedBlocks instructions. This method will update the
      * {@link #compiledInstructions} array.
      * 
-     * @param instructions
-     *            The new instructions.
+     * @param instructions The new instructions.
      */
     public void setInstructions(Collection<ReplacedBlocksInstruction> instructions)
     {
@@ -198,8 +193,9 @@ public class ReplacedBlocksMatrix
             int maxHeight = instruction.getMaxHeight();
             LocalMaterialData toBlock = instruction.getTo();
 
-            if (compiledInstructions[fromBlockId] == null) {
-                compiledInstructions[fromBlockId] = new LocalMaterialData[this.maxHeight];
+            if (compiledInstructions[fromBlockId] == null)
+            {
+                compiledInstructions[fromBlockId] = new LocalMaterialData[this.maxHeight + 1];
             }
             for (int y = minHeight; y <= maxHeight; y++)
             {
@@ -238,14 +234,16 @@ public class ReplacedBlocksMatrix
     /**
      * Creates an empty matrix.
      * 
-     * @param maxHeight
-     *            Max height for the replace setting, inclusive.
+     * @param maxHeight Max height for the replace setting, inclusive.
      * @return The empty matrix.
      */
-    public static ReplacedBlocksMatrix createEmptyMatrix(int maxHeight) {
-        try {
+    public static ReplacedBlocksMatrix createEmptyMatrix(int maxHeight)
+    {
+        try
+        {
             return new ReplacedBlocksMatrix(NO_REPLACE, maxHeight);
-        } catch (InvalidConfigException e) {
+        } catch (InvalidConfigException e)
+        {
             // Should never happen
             throw new AssertionError(e);
         }
