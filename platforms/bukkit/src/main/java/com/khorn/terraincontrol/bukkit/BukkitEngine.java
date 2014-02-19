@@ -1,16 +1,5 @@
 package com.khorn.terraincontrol.bukkit;
 
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-
-import net.minecraft.server.v1_7_R1.Block;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -19,6 +8,13 @@ import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.TCLogManager;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+import net.minecraft.server.v1_7_R1.Block;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 public class BukkitEngine extends TerrainControlEngine
 {
@@ -28,7 +24,6 @@ public class BukkitEngine extends TerrainControlEngine
     public BukkitEngine(TCPlugin plugin)
     {
         this.plugin = plugin;
-
     }
 
     @Override
@@ -73,13 +68,7 @@ public class BukkitEngine extends TerrainControlEngine
     @Override
     public LocalWorld getWorld(String name)
     {
-        World world = Bukkit.getWorld(name);
-        if (world == null)
-        {
-            // World not loaded
-            return null;
-        }
-        return plugin.worlds.get(world.getUID());
+        return plugin.worlds.get(name);
     }
 
     @Override

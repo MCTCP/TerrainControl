@@ -47,7 +47,7 @@ public class TCListener implements Listener
     @EventHandler(priority = EventPriority.NORMAL)
     public void onStructureGrow(StructureGrowEvent event)
     {
-        BukkitWorld bukkitWorld = this.tcPlugin.worlds.get(event.getWorld().getUID());
+        BukkitWorld bukkitWorld = this.tcPlugin.worlds.get(event.getWorld().getName());
         if (bukkitWorld == null)
             return;
 

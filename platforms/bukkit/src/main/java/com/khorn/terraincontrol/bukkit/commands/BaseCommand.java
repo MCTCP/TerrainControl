@@ -37,9 +37,9 @@ public abstract class BaseCommand
                 return null;
             }
 
-            if (sender instanceof Player && plugin.worlds.containsKey(((Player) sender).getWorld().getUID()))
+            if (sender instanceof Player && plugin.worlds.containsKey(((Player) sender).getWorld().getName()))
             {
-                return plugin.worlds.get(((Player) sender).getWorld().getUID());
+                return plugin.worlds.get(((Player) sender).getWorld().getName());
             }
 
             return null;
@@ -47,9 +47,9 @@ public abstract class BaseCommand
 
         World world = Bukkit.getWorld(arg);
 
-        if (world != null && plugin.worlds.containsKey(world.getUID()))
+        if (world != null && plugin.worlds.containsKey(world.getName()))
         {
-            return plugin.worlds.get(world.getUID());
+            return plugin.worlds.get(world.getName());
         }
 
         return null;

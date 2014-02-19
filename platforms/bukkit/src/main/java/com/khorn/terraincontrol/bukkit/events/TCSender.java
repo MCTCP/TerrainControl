@@ -27,9 +27,9 @@ public class TCSender
         // Send the configs
         World world = player.getWorld();
 
-        if (plugin.worlds.containsKey(world.getUID()))
+        if (plugin.worlds.containsKey(world.getName()))
         {
-            WorldSettings configs = plugin.worlds.get(world.getUID()).getSettings();
+            WorldSettings configs = plugin.worlds.get(world.getName()).getSettings();
 
             TerrainControl.log(Level.FINER, "Config sent to player for world {0}", configs.worldConfig.name); //debug
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

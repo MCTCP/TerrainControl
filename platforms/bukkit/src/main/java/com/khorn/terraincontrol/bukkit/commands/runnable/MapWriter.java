@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.bukkit.commands.runnable;
 
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.bukkit.BukkitWorld;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.sun.imageio.plugins.png.PNGImageWriter;
 import com.sun.imageio.plugins.png.PNGImageWriterSpi;
@@ -28,7 +28,6 @@ public class MapWriter implements Runnable
 
     public static boolean isWorking = false;
 
-    private TCPlugin plugin;
     private World world;
     private int size;
     private CommandSender sender;
@@ -42,9 +41,8 @@ public class MapWriter implements Runnable
         d0, d90, d180, d270
     }
 
-    public MapWriter(TCPlugin _plugin, World _world, int _size, Angle _angle, CommandSender _sender, int _offsetX, int _offsetZ, String _label)
+    public MapWriter(World _world, int _size, Angle _angle, CommandSender _sender, int _offsetX, int _offsetZ, String _label)
     {
-        this.plugin = _plugin;
         this.world = _world;
         this.size = _size;
         this.sender = _sender;
@@ -72,7 +70,7 @@ public class MapWriter implements Runnable
         {
             int[] colors = defaultColors;
             TerrainControl.log(Level.FINER, "BukkitWorld::UUID:: {0}", world.getDataManager().getUUID());
-            BukkitWorld bukkitWorld = plugin.worlds.get(world.getDataManager().getUUID());
+            LocalWorld bukkitWorld = WorldHelper.toLocalWorld(world);
             if (bukkitWorld != null)
             {
                 colors = new int[bukkitWorld.getSettings().biomeConfigs.length];

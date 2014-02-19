@@ -23,7 +23,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.UUID;
 import java.util.logging.Level;
 
 public class TCPlugin extends JavaPlugin
@@ -38,7 +37,7 @@ public class TCPlugin extends JavaPlugin
      */
     public boolean cleanupOnDisable = false;
 
-    public final HashMap<UUID, BukkitWorld> worlds = new HashMap<UUID, BukkitWorld>();
+    public final HashMap<String, BukkitWorld> worlds = new HashMap<String, BukkitWorld>();
     private final HashMap<String, BukkitWorld> notInitedWorlds = new HashMap<String, BukkitWorld>();
 
     @Override
@@ -133,13 +132,11 @@ public class TCPlugin extends JavaPlugin
         }
 
         // Check if not already enabled
-        for (BukkitWorld world : worlds.values())
+        BukkitWorld world = worlds.get(worldName);
+        if (world != null)
         {
-            if (world.getName().equals(worldName))
-            {
-                TerrainControl.log(Level.CONFIG, "Already enabled for ''{0}''", worldName);
-                return world.getChunkGenerator();
-            }
+            TerrainControl.log(Level.CONFIG, "Already enabled for ''{0}''", worldName);
+            return world.getChunkGenerator();
         }
 
         TerrainControl.log(Level.INFO, "Starting to enable world ''{0}''...", worldName);
@@ -201,7 +198,7 @@ public class TCPlugin extends JavaPlugin
 
             // Enable and register the world
             bukkitWorld.enable(world);
-            this.worlds.put(world.getUID(), bukkitWorld);
+            this.worlds.put(world.getName(), bukkitWorld);
 
             // Show message
             TerrainControl.log(Level.INFO, "World {0} is now enabled!", bukkitWorld.getName());
@@ -215,11 +212,11 @@ public class TCPlugin extends JavaPlugin
             // Remove the world from the to-do list
             this.notInitedWorlds.remove(world.getName());
         }
-        if (this.worlds.containsKey(world.getUID()))
+        if (this.worlds.containsKey(world.getName()))
         {
             // Disable and Remove the world from enabled list
-            this.worlds.get(world.getUID()).disable();
-            this.worlds.remove(world.getUID());
+            this.worlds.get(world.getName()).disable();
+            this.worlds.remove(world.getName());
         }
         // Show message
         TerrainControl.log(Level.INFO, "World {0} is now unloaded!", world.getName());
