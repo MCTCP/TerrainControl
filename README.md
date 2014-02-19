@@ -24,5 +24,6 @@ To learn more, check out <a href="https://github.com/Wickth/TerrainControl/wiki/
 * [Forum](http://dev.bukkit.org/bukkit-plugins/terrain-control/forum/)
 * [Downloads at BukkitDev](http://dev.bukkit.org/bukkit-plugins/terrain-control/files/)
 * [Installation instructions](https://github.com/Wickth/TerrainControl/wiki/Installation-instructions)
+* [Compile instructions](https://github.com/Wickth/TerrainControl/wiki/Developer-page#wiki-compiling)
 * [Version history](https://github.com/Wickth/TerrainControl/wiki/Version-history)
 * [Build server at mctcp.com](http://mctcp.com:8900/job/TerrainControl/com.khorn.terraincontrol$terraincontrol-release/)
