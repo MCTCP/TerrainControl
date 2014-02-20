@@ -40,7 +40,6 @@ public class BiomeConfig extends ConfigFile
     public String riverBiome;
     public float riverHeight;
     public float riverVolatility;
-    public int riverWaterLevel;
     public double[] riverHeightMatrix;
 
     public int BiomeSize;
@@ -68,11 +67,18 @@ public class BiomeConfig extends ConfigFile
 
     public String ReplaceBiomeName;
 
-    public boolean UseWorldWaterLevel;
+    public boolean useWorldWaterLevel;
     public int waterLevelMax;
     public int waterLevelMin;
     public LocalMaterialData waterBlock;
     public LocalMaterialData iceBlock;
+    public int riverWaterLevel;
+
+    private int configWaterLevelMax;
+    private int configWaterLevelMin;
+    private LocalMaterialData configWaterBlock;
+    private LocalMaterialData configIceBlock;
+    private int configRiverWaterLevel;
 
     public int SkyColor;
     public int WaterColor;
@@ -175,12 +181,21 @@ public class BiomeConfig extends ConfigFile
                 this.resourceSequence.addAll(defaultSettings.createDefaultResources(this));
             }
 
-            if (this.UseWorldWaterLevel)
+            // Set water level
+            if (this.useWorldWaterLevel)
             {
                 this.waterLevelMax = worldConfig.waterLevelMax;
                 this.waterLevelMin = worldConfig.waterLevelMin;
                 this.waterBlock = worldConfig.waterBlock;
                 this.iceBlock = worldConfig.iceBlock;
+                this.riverWaterLevel = worldConfig.waterLevelMax;
+            } else
+            {
+                this.waterLevelMax = this.configWaterLevelMax;
+                this.waterLevelMin = this.configWaterLevelMin;
+                this.waterBlock = this.configWaterBlock;
+                this.iceBlock = this.configIceBlock;
+                this.riverWaterLevel = this.configRiverWaterLevel;
             }
 
             if (Biome.isCustom() && !Biome.getIds().isVirtual())
@@ -249,11 +264,11 @@ public class BiomeConfig extends ConfigFile
         this.groundBlock = readModSettings(BiomeStandardValues.GroundBlock, defaultSettings.defaultGroundBlock);
         this.surfaceAndGroundControl = readSurfaceAndGroundControlSettings();
 
-        this.UseWorldWaterLevel = readSettings(BiomeStandardValues.UseWorldWaterLevel);
-        this.waterLevelMax = readSettings(BiomeStandardValues.WaterLevelMax);
-        this.waterLevelMin = readSettings(BiomeStandardValues.WaterLevelMin);
-        this.waterBlock = readSettings(BiomeStandardValues.WaterBlock);
-        this.iceBlock = readSettings(BiomeStandardValues.IceBlock);
+        this.useWorldWaterLevel = readSettings(BiomeStandardValues.UseWorldWaterLevel);
+        this.configWaterLevelMax = readSettings(BiomeStandardValues.WaterLevelMax);
+        this.configWaterLevelMin = readSettings(BiomeStandardValues.WaterLevelMin);
+        this.configWaterBlock = readSettings(BiomeStandardValues.WaterBlock);
+        this.configIceBlock = readSettings(BiomeStandardValues.IceBlock);
 
         this.SkyColor = readSettings(BiomeStandardValues.SkyColor);
         this.WaterColor = readModSettingsColor(BiomeStandardValues.WaterColor, defaultSettings.defaultWaterColorMultiplier);
@@ -678,7 +693,7 @@ public class BiomeConfig extends ConfigFile
 
         writeComment("Works the same as WaterLevelMax (scroll down), but is used where a river is generated in this biome");
         writeComment("Can be used to create elevated rivers");
-        writeValue(BiomeStandardValues.RiverWaterLevel, this.riverWaterLevel);
+        writeValue(BiomeStandardValues.RiverWaterLevel, this.configRiverWaterLevel);
 
         writeComment("Works the same as CustomHeightControl (scroll up), but is used where a river is generated in this biome");
         writeHeightSettings(this.riverHeightMatrix, BiomeStandardValues.RiverCustomHeightControl);
@@ -719,17 +734,17 @@ public class BiomeConfig extends ConfigFile
         this.writeSmallTitle("Water and ice");
 
         writeComment("Set this to false to use the water and ice settings of this biome.");
-        writeValue(BiomeStandardValues.UseWorldWaterLevel, this.UseWorldWaterLevel);
+        writeValue(BiomeStandardValues.UseWorldWaterLevel, this.useWorldWaterLevel);
 
         writeComment("Set water level. Every empty between this levels will be fill water or another block from WaterBlock.");
-        writeValue(BiomeStandardValues.WaterLevelMax, this.waterLevelMax);
-        writeValue(BiomeStandardValues.WaterLevelMin, this.waterLevelMin);
+        writeValue(BiomeStandardValues.WaterLevelMax, this.configWaterLevelMax);
+        writeValue(BiomeStandardValues.WaterLevelMin, this.configWaterLevelMin);
 
         writeComment("Block used as water in WaterLevelMax");
-        writeValue(BiomeStandardValues.WaterBlock, this.waterBlock);
+        writeValue(BiomeStandardValues.WaterBlock, this.configWaterBlock);
 
         writeComment("Block used as ice. Ice only spawns if the BiomeTemperture is low enough.");
-        writeValue(BiomeStandardValues.IceBlock, this.iceBlock);
+        writeValue(BiomeStandardValues.IceBlock, this.configIceBlock);
 
         this.writeBigTitle("Visuals and weather");
         this.writeComment("Most of the settings here only have an effect on players with the client version of Terrain Control installed.");
