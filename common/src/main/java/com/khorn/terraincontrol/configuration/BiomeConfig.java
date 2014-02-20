@@ -359,11 +359,11 @@ public class BiomeConfig extends ConfigFile
         String settingValue = readSettings(BiomeStandardValues.ReplacedBlocks);
 
         try {
-            this.replacedBlocks = new ReplacedBlocksMatrix(settingValue, worldConfig.worldHeightScale - 1);
+            this.replacedBlocks = new ReplacedBlocksMatrix(settingValue, worldConfig.worldHeightCap - 1);
         } catch (InvalidConfigException e)
         {
             // Make sure value is never null
-            this.replacedBlocks = ReplacedBlocksMatrix.createEmptyMatrix(worldConfig.worldHeightScale - 1);
+            this.replacedBlocks = ReplacedBlocksMatrix.createEmptyMatrix(worldConfig.worldHeightCap - 1);
             
             // Print warning
             TerrainControl.log(Level.WARNING, "Wrong replace settings '{0}': {1}", this.settingsCache.get(settingValue), e.getMessage());

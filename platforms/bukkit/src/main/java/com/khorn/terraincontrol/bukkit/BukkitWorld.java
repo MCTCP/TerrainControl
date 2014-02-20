@@ -338,7 +338,11 @@ public class BukkitWorld implements LocalWorld
                             if (replaceArray[blockId] == null)
                                 continue;
 
-                            BukkitMaterialData replaceTo = (BukkitMaterialData) replaceArray[blockId][section.getYPosition() + sectionY];
+                            int y = section.getYPosition() + sectionY;
+                            if (y >= replaceArray[blockId].length)
+                                break;
+
+                            BukkitMaterialData replaceTo = (BukkitMaterialData) replaceArray[blockId][y];
                             if (replaceTo == null || replaceTo.getBlockId() == blockId)
                                 continue;
 

@@ -335,7 +335,11 @@ public class ForgeWorld implements LocalWorld
                             if (replaceArray[blockId] == null)
                                 continue;
 
-                            ForgeMaterialData replaceTo = (ForgeMaterialData) replaceArray[blockId][section.getYLocation() + sectionY];
+                            int y = section.getYLocation() + sectionY;
+                            if (y >= replaceArray[blockId].length)
+                                break;
+
+                            ForgeMaterialData replaceTo = (ForgeMaterialData) replaceArray[blockId][y];
                             if (replaceTo == null || replaceTo.getBlockId() == blockId)
                                 continue;
 
