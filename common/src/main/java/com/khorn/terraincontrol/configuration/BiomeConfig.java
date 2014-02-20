@@ -287,7 +287,7 @@ public class BiomeConfig extends ConfigFile
 
         this.riverHeight = readSettings(BiomeStandardValues.RiverHeight);
         this.riverVolatility = readSettings(BiomeStandardValues.RiverVolatility);
-        this.riverWaterLevel = readSettings(BiomeStandardValues.RiverWaterLevel);
+        this.configRiverWaterLevel = readSettings(BiomeStandardValues.RiverWaterLevel);
 
         this.strongholdsEnabled = readModSettings(BiomeStandardValues.StrongholdsEnabled, defaultSettings.defaultStrongholds);
         this.netherFortressesEnabled = readModSettings(BiomeStandardValues.NetherFortressesEnabled, true);
