@@ -26,7 +26,7 @@ public class ReloadCommand extends BaseCommand
     @Override
     public boolean onCommand(CommandSender sender, List<String> args)
     {
-        BukkitWorld world = this.getWorld(sender, args.size() > 0 ? args.get(0) : "");
+        BukkitWorld world = (BukkitWorld) this.getWorld(sender, args.size() > 0 ? args.get(0) : "");
         if (world == null)
         {
             sender.sendMessage(ERROR_COLOR + "World not found. Either you are not in a world with Terrain Control, or you are the console.");

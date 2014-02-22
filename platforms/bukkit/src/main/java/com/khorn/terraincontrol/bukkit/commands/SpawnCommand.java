@@ -1,21 +1,20 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.util.Rotation;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 public class SpawnCommand extends BaseCommand
 {
@@ -34,7 +33,7 @@ public class SpawnCommand extends BaseCommand
         Player me = (Player) sender;
         Random random = new Random();
 
-        BukkitWorld bukkitWorld = this.getWorld(me, args.size() > 1 ? args.get(1) : "");
+        LocalWorld bukkitWorld = this.getWorld(me, args.size() > 1 ? args.get(1) : "");
 
         if (args.isEmpty())
         {

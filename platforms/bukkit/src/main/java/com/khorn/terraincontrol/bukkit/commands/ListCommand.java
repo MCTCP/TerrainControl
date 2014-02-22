@@ -1,16 +1,15 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.bukkit.command.CommandSender;
 
 public class ListCommand extends BaseCommand
 {
@@ -42,7 +41,7 @@ public class ListCommand extends BaseCommand
                     sender.sendMessage(ERROR_COLOR + "Wrong page number " + args.get(2));
                 }
             }
-            BukkitWorld world = this.getWorld(sender, worldName);
+            LocalWorld world = this.getWorld(sender, worldName);
 
             if (world != null)
             {

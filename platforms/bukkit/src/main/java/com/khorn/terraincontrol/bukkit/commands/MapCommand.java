@@ -3,14 +3,13 @@ package com.khorn.terraincontrol.bukkit.commands;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.bukkit.commands.runnable.MapWriter;
-
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public class MapCommand extends BaseCommand
 {

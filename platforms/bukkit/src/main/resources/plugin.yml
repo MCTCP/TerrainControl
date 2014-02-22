@@ -10,7 +10,7 @@ commands:
         usage: |
               /<command> <check> [world] - Checks TC is enable for this world.
               /<command> <reload> [world] - Reload config
-              /<command> <biome> [-f] - Show current chunk biome and block stats
+              /<command> <biome> [-f] [-w] - Show current biome information
         aliases: [terraincontrol]
 permissions:
     tc.*:

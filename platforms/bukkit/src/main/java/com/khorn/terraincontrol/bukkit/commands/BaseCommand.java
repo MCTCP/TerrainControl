@@ -1,17 +1,18 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import com.khorn.terraincontrol.bukkit.BukkitWorld;
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-
-import java.util.List;
-
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
+import org.bukkit.Location;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
+
+import java.util.List;
 
 public abstract class BaseCommand
 {
@@ -28,28 +29,55 @@ public abstract class BaseCommand
 
     public abstract boolean onCommand(CommandSender sender, List<String> args);
 
-    protected BukkitWorld getWorld(CommandSender sender, String arg)
+    /**
+     * Gets the {@link LocalWorld} the sender has provided. If the sender
+     * provided an empty string, the current world of the sender is returned.
+     * This may be null if the sender is not in a world loaded by Terrain
+     * Control. If the sender provided a non-empty string, but Terrain Control
+     * has no world loaded with that name, null will be returned.
+     * 
+     * @param sender
+     *            The sender.
+     * @param worldName
+     *            The world name the sender provided. May be empty.
+     * @return The world, or null if not found.
+     */
+    protected LocalWorld getWorld(CommandSender sender, String worldName)
     {
-        if (arg.isEmpty())
+        if (worldName.isEmpty())
         {
-            if (sender instanceof ConsoleCommandSender)
+            Location location = getLocation(sender);
+            if (location != null)
             {
-                return null;
+                LocalWorld world = WorldHelper.toLocalWorld(location.getWorld());
+                if (world != null)
+                {
+                    return world;
+                }
             }
-
-            if (sender instanceof Player && plugin.worlds.containsKey(((Player) sender).getWorld().getName()))
-            {
-                return plugin.worlds.get(((Player) sender).getWorld().getName());
-            }
-
-            return null;
         }
 
-        World world = Bukkit.getWorld(arg);
+        return TerrainControl.getWorld(worldName);
+    }
 
-        if (world != null && plugin.worlds.containsKey(world.getName()))
+    /**
+     * If the sender has a location (it is a player or a command block), this
+     * method returns their location. If not, this method returns null.
+     * 
+     * @param sender
+     *            The sender.
+     * @return The location, or null if not found.
+     */
+    protected Location getLocation(CommandSender sender)
+    {
+        if (sender instanceof Player)
         {
-            return plugin.worlds.get(world.getName());
+            return ((Player) sender).getLocation();
+        }
+
+        if (sender instanceof BlockCommandSender)
+        {
+            return ((BlockCommandSender) sender).getBlock().getLocation();
         }
 
         return null;
