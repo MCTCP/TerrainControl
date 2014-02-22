@@ -95,6 +95,7 @@ public class BiomeConfigFinder
             if (file.isDirectory())
             {
                 loadBiomesFromDirectory(biomeConfigsStore, file, remainingBiomes);
+                continue;
             }
 
             // Extract name from filename
@@ -102,7 +103,7 @@ public class BiomeConfigFinder
             if (biomeName == null)
             {
                 // Not a valid biome file
-                return;
+                continue;
             }
 
             // Get the correct LocalBiome
@@ -112,7 +113,7 @@ public class BiomeConfigFinder
                 // Doesn't need to be loaded. Maybe it's in both the global
                 // and world folder, maybe it isn't
                 // registered in the WorldConfig
-                return;
+                continue;
             }
 
             // Load biome and remove it from the todo list
