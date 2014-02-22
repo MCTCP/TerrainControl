@@ -48,7 +48,7 @@ public class MaterialSetEntry
     public String toString()
     {
         String output = material.toString();
-        if (includesBlockData && !output.endsWith(":0"))
+        if (includesBlockData && material.getBlockData() == 0)
         {
             // Turn things like "WOOL" back into "WOOL:0" (material.toString
             // never includes "*:0")
