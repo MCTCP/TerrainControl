@@ -30,7 +30,7 @@ public class TCWorldChunkManager extends WorldChunkManager
     @Override
     public BiomeBase getBiome(int paramInt1, int paramInt2)
     {
-        return BiomeBase.getBiome(localWorld.generationToSavedBiomeIds[biomeManager.getBiome(paramInt1, paramInt2)]);
+        return localWorld.getBiomeById(biomeManager.getBiome(paramInt1, paramInt2)).getHandle();
     }
 
     @Override
@@ -48,16 +48,12 @@ public class TCWorldChunkManager extends WorldChunkManager
         }
 
         int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
-        if (localWorld.haveVirtualBiomes)
-            for (int i = 0; i < paramInt3 * paramInt4; i++)
-            {
-                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localWorld.generationToSavedBiomeIds[arrayOfInt[i]]);
-            }
-        else
-            for (int i = 0; i < paramInt3 * paramInt4; i++)
-            {
-                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(arrayOfInt[i]);
-            }
+
+        // Replaces ids with BiomeBases
+        for (int i = 0; i < paramInt3 * paramInt4; i++)
+        {
+            paramArrayOfBiomeBase[i] = localWorld.getBiomeById(arrayOfInt[i]).getHandle();
+        }
 
         return paramArrayOfBiomeBase;
     }
@@ -72,19 +68,10 @@ public class TCWorldChunkManager extends WorldChunkManager
 
         int[] localObject = this.biomeManager.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
 
-        if (localWorld.haveVirtualBiomes)
+        // Replace ids with BiomeBases
+        for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            // Replace generation ids with saved ids
-            for (int i = 0; i < paramInt3 * paramInt4; i++)
-            {
-                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localWorld.generationToSavedBiomeIds[localObject[i]]);
-            }
-        } else
-        {
-            for (int i = 0; i < paramInt3 * paramInt4; i++)
-            {
-                paramArrayOfBiomeBase[i] = BiomeBase.getBiome(localObject[i]);
-            }
+            paramArrayOfBiomeBase[i] = localWorld.getBiomeById(localObject[i]).getHandle();
         }
 
         return paramArrayOfBiomeBase;

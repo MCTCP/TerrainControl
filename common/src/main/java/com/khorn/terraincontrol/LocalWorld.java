@@ -7,7 +7,7 @@ import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public interface LocalWorld
@@ -27,7 +27,7 @@ public interface LocalWorld
 
     public int getBiomeIdByName(String name);
 
-    public ArrayList<LocalBiome> getDefaultBiomes();
+    public List<? extends LocalBiome> getDefaultBiomes();
 
     // Biome manager
 

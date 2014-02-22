@@ -1,10 +1,6 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.BiomeIds;
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalMaterialData;
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.bukkit.generator.BiomeCacheWrapper;
 import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
 import com.khorn.terraincontrol.bukkit.generator.TCWorldChunkManager;
@@ -22,13 +18,12 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
-
 import net.minecraft.server.v1_7_R1.*;
-
 import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 
@@ -47,13 +42,10 @@ public class BukkitWorld implements LocalWorld
     private static int nextBiomeId = DefaultBiome.values().length;
 
     private static final int MAX_BIOMES_COUNT = 1024;
-    private LocalBiome[] biomes = new LocalBiome[MAX_BIOMES_COUNT];
-
-    public int[] generationToSavedBiomeIds = new int[MAX_BIOMES_COUNT];
-    public boolean haveVirtualBiomes = false;
+    private BukkitBiome[] biomes = new BukkitBiome[MAX_BIOMES_COUNT];
 
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
-    private static ArrayList<LocalBiome> defaultBiomes = new ArrayList<LocalBiome>();
+    private static ArrayList<BukkitBiome> defaultBiomes = new ArrayList<BukkitBiome>();
 
     public StrongholdGen strongholdGen;
     public VillageGen villageGen;
@@ -95,7 +87,7 @@ public class BukkitWorld implements LocalWorld
         for (DefaultBiome defaultBiome : DefaultBiome.values())
         {
             int id = defaultBiome.Id;
-            LocalBiome localBiome = BukkitBiome.forVanillaBiome(BiomeBase.getBiome(id));
+            BukkitBiome localBiome = BukkitBiome.forVanillaBiome(BiomeBase.getBiome(id));
             defaultBiomes.add(localBiome);
         }
     }
@@ -103,7 +95,9 @@ public class BukkitWorld implements LocalWorld
     public BukkitWorld(String _name)
     {
         this.name = _name;
-        for (LocalBiome biome : defaultBiomes)
+        
+        // Initialize default biomes
+        for (BukkitBiome biome : defaultBiomes)
         {
             this.biomeNames.put(biome.getName(), biome);
             this.biomes[biome.getIds().getGenerationId()] = biome;
@@ -124,20 +118,6 @@ public class BukkitWorld implements LocalWorld
         biomes[biome.getIds().getGenerationId()] = biome;
         this.biomeNames.put(biome.getName(), biome);
 
-        if (biomeIds.isVirtual())
-        {
-            // Update generationToSavedBiomeIds array
-
-            if (!this.haveVirtualBiomes)
-            {
-                // Initialize array first
-                this.haveVirtualBiomes = true;
-                for (int i = 0; i < MAX_BIOMES_COUNT; i++)
-                    this.generationToSavedBiomeIds[i] = i;
-            }
-            this.generationToSavedBiomeIds[biomeIds.getGenerationId()] = biomeIds.getSavedId();
-        }
-
         return biome;
     }
 
@@ -154,7 +134,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome getBiomeById(int id)
+    public BukkitBiome getBiomeById(int id)
     {
         return biomes[id];
     }
@@ -166,7 +146,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public ArrayList<LocalBiome> getDefaultBiomes()
+    public List<? extends LocalBiome> getDefaultBiomes()
     {
         return defaultBiomes;
     }
@@ -748,7 +728,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome getCalculatedBiome(int x, int z)
+    public BukkitBiome getCalculatedBiome(int x, int z)
     {
         return getBiomeById(getCalculatedBiomeId(x, z));
     }
