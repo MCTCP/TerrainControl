@@ -5,6 +5,7 @@
 
 # NetBeans
 nbproject
+.nb-gradle*
 build.xml
 nbbuild
 
