@@ -1,13 +1,13 @@
 package com.khorn.terraincontrol.forge.util;
 
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import net.minecraft.nbt.*;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 
 public class NBTHelper
 {
@@ -36,7 +36,7 @@ public class NBTHelper
             nmsChildTags = (Map<String, NBTBase>) mapField.get(nmsTag);
         } catch (Exception e)
         {
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
         }
 
         if (nmsChildTags == null)
@@ -122,7 +122,7 @@ public class NBTHelper
                     listTag.addTag(getNBTFromNMSTagCompound(null, nmsListTag.getCompoundTagAt(i)));
                     break;
                 default:
-                    TerrainControl.log(Level.INFO, "Cannot convert list subtype {0} from it's NMS value", new Object[] {listType});
+                    TerrainControl.log(LogMarker.INFO, "Cannot convert list subtype {} from it's NMS value", new Object[] {listType});
                     break;
             }
         }

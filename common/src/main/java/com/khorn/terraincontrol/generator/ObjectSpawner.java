@@ -10,10 +10,10 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorNewOctaves;
 import com.khorn.terraincontrol.generator.resource.Resource;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Random;
-import java.util.logging.Level;
 
 public class ObjectSpawner
 {
@@ -45,7 +45,7 @@ public class ObjectSpawner
         // Null check
         if (localBiomeConfig == null)
         {
-            TerrainControl.log(Level.CONFIG, "Unknown biome id {0} at {1},{2}  (chunk {3},{4}). Population failed.", new Object[] {biomeId, (x + 15), (z + 15), chunkX, chunkZ});
+            TerrainControl.log(LogMarker.DEBUG, "Unknown biome id {} at {},{}  (chunk {},{}). Population failed.", new Object[] {biomeId, (x + 15), (z + 15), chunkX, chunkZ});
             return;
         }
 

@@ -7,11 +7,11 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.*;
@@ -99,8 +99,8 @@ public class VillageStart extends StructureStart
                     break;
                 } catch (Exception e)
                 {
-                    TerrainControl.log(Level.SEVERE, "Cannot make village a sandstone village!");
-                    TerrainControl.printStackTrace(Level.SEVERE, e);
+                    TerrainControl.log(LogMarker.FATAL, "Cannot make village a sandstone village!");
+                    TerrainControl.printStackTrace(LogMarker.FATAL, e);
                 }
             }
         }

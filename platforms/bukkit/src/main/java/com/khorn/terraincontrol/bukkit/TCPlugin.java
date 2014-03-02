@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.bukkit.generator.structures.VillageStart;
 import com.khorn.terraincontrol.bukkit.metrics.BukkitMetricsHelper;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.server.v1_7_R1.BiomeBase;
 import net.minecraft.server.v1_7_R1.WorldGenFactory;
@@ -23,10 +24,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.logging.Level;
 
 public class TCPlugin extends JavaPlugin
 {
+
     public TCListener listener;
     public TCCommandExecutor commandExecutor;
 
@@ -61,11 +62,11 @@ public class TCPlugin extends JavaPlugin
     {
 
         TerrainControl.setEngine(new BukkitEngine(this));
-        if (Bukkit.getWorlds().size() != 0 && !cleanupOnDisable)
+        if (!Bukkit.getWorlds().isEmpty() && !cleanupOnDisable)
         {
             // Reload "handling"
             // (worlds are already loaded and TC didn't clean up itself)
-            TerrainControl.log(Level.SEVERE,
+            TerrainControl.log(LogMarker.FATAL,
                                "The server was just /reloaded! Terrain Control has problems handling this, ",
                                "as old parts from before the reload have not been cleaned up. ",
                                "Unexpected things may happen! Please restart the server! ",
@@ -80,20 +81,21 @@ public class TCPlugin extends JavaPlugin
             {
                 // We're on MCPC+, so enable the extra block ids.
                 mcpc = true;
-                TerrainControl.log(Level.INFO, "MCPC+ detected.");
+                TerrainControl.log(LogMarker.INFO, "MCPC+ detected.");
             }
 
             // Register structures
             try
             {
-                String methodName = mcpc? "func_143034_b" : "b";
+                String methodName = mcpc ? "func_143034_b" : "b";
                 Method registerStructure = WorldGenFactory.class.getDeclaredMethod(methodName, Class.class, String.class);
                 registerStructure.setAccessible(true);
                 registerStructure.invoke(null, RareBuildingStart.class, StructureNames.RARE_BUILDING);
                 registerStructure.invoke(null, VillageStart.class, StructureNames.VILLAGE);
             } catch (Exception e)
             {
-                TerrainControl.log(Level.SEVERE, "Failed to register structures: {0}", e);
+                TerrainControl.log(LogMarker.FATAL, "Failed to register structures:");
+                TerrainControl.printStackTrace(LogMarker.FATAL, e);
             }
 
             // Start the engine
@@ -101,7 +103,7 @@ public class TCPlugin extends JavaPlugin
             this.listener = new TCListener(this);
             Bukkit.getMessenger().registerOutgoingPluginChannel(this, PluginStandardValues.ChannelName.stringValue());
 
-            TerrainControl.log(Level.INFO, "Global objects loaded, waiting for worlds to load");
+            TerrainControl.log(LogMarker.INFO, "Global objects loaded, waiting for worlds to load");
 
             // Start metrics
             new BukkitMetricsHelper(this);
@@ -119,12 +121,12 @@ public class TCPlugin extends JavaPlugin
     {
         if (worldName.isEmpty())
         {
-            TerrainControl.log(Level.CONFIG, "Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
+            TerrainControl.log(LogMarker.DEBUG, "Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
             return new TCChunkGenerator(this);
         }
         if (worldName.equals("test"))
         {
-            TerrainControl.log(Level.CONFIG,
+            TerrainControl.log(LogMarker.DEBUG,
                                "Ignoring world with the name \"test\". This is not a valid world name, ",
                                "as it's used by Multiverse to check if \"TerrainControl\" a valid generator name. ",
                                "So if you were just using /mv create, don't worry about this message.");
@@ -135,11 +137,11 @@ public class TCPlugin extends JavaPlugin
         BukkitWorld world = worlds.get(worldName);
         if (world != null)
         {
-            TerrainControl.log(Level.CONFIG, "Already enabled for ''{0}''", worldName);
+            TerrainControl.log(LogMarker.DEBUG, "Already enabled for ''{}''", (Object) worldName);
             return world.getChunkGenerator();
         }
 
-        TerrainControl.log(Level.INFO, "Starting to enable world ''{0}''...", worldName);
+        TerrainControl.log(LogMarker.INFO, "Starting to enable world ''{}''...", (Object) worldName);
 
         // Create BukkitWorld instance
         BukkitWorld localWorld = new BukkitWorld(worldName);
@@ -181,10 +183,10 @@ public class TCPlugin extends JavaPlugin
         File baseFolder = new File(this.getDataFolder(), "worlds" + File.separator + worldName);
         if (!baseFolder.exists())
         {
-            TerrainControl.log(Level.SEVERE, "TC was not allowed to create folder {0}", baseFolder.getName());
+            TerrainControl.log(LogMarker.FATAL, "TC was not allowed to create folder ", baseFolder.getName());
 
             if (!baseFolder.mkdirs())
-                TerrainControl.log(Level.SEVERE, "cant create folder " + baseFolder.getName());
+                TerrainControl.log(LogMarker.FATAL, "Cant create folder ", baseFolder.getName());
         }
         return baseFolder;
     }
@@ -201,7 +203,7 @@ public class TCPlugin extends JavaPlugin
             this.worlds.put(world.getName(), bukkitWorld);
 
             // Show message
-            TerrainControl.log(Level.INFO, "World {0} is now enabled!", bukkitWorld.getName());
+            TerrainControl.log(LogMarker.INFO, "World {} is now enabled!", (Object) bukkitWorld.getName());
         }
     }
 
@@ -219,9 +221,7 @@ public class TCPlugin extends JavaPlugin
             this.worlds.remove(world.getName());
         }
         // Show message
-        TerrainControl.log(Level.INFO, "World {0} is now unloaded!", world.getName());
+        TerrainControl.log(LogMarker.INFO, "World {} is now unloaded!", (Object) world.getName());
     }
-    
-    
 
 }

@@ -8,14 +8,13 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-
 public class WorldConfig extends ConfigFile
 {
     public final File settingsDir;
@@ -240,8 +239,8 @@ public class WorldConfig extends ConfigFile
         {
             if (!oldCustomObjectsDirectory.renameTo(new File(settingsDir, WorldStandardValues.BO_DirectoryName.stringValue())))
             {
-                TerrainControl.log(Level.WARNING, "Fould old BOBPlugins folder, but it cannot be renamed to WorldObjects.");
-                TerrainControl.log(Level.WARNING, "Please move the BO2s manually and delete BOBPlugins afterwards.");
+                TerrainControl.log(LogMarker.WARN, "Fould old BOBPlugins folder, but it cannot be renamed to WorldObjects.");
+                TerrainControl.log(LogMarker.WARN, "Please move the BO2s manually and delete BOBPlugins afterwards.");
             }
         }
 
@@ -249,14 +248,14 @@ public class WorldConfig extends ConfigFile
         {
             if (!customObjectsDirectory.mkdirs())
             {
-                TerrainControl.log(Level.WARNING, "Can`t create WorldObjects folder. No write permissions?");
+                TerrainControl.log(LogMarker.WARN, "Can`t create WorldObjects folder. No write permissions?");
                 return;
             }
         }
 
         customObjects = new ArrayList<CustomObject>(TerrainControl.getCustomObjectManager().loadObjects(customObjectsDirectory).values());
 
-        TerrainControl.log(Level.INFO, "{0} world custom objects loaded.", customObjects.size());
+        TerrainControl.log(LogMarker.INFO, "{} world custom objects loaded.", customObjects.size());
 
     }
 
@@ -301,7 +300,7 @@ public class WorldConfig extends ConfigFile
             File mapFile = new File(settingsDir, imageFile);
             if (!mapFile.exists())
             {
-                TerrainControl.log(Level.WARNING, "Biome map file not found. Switching BiomeMode to Normal");
+                TerrainControl.log(LogMarker.WARN, "Biome map file not found. Switching BiomeMode to Normal");
                 this.biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
             }
         }
@@ -345,7 +344,7 @@ public class WorldConfig extends ConfigFile
 
         if (this.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && this.ModeTerrain != TerrainMode.OldGenerator)
         {
-            TerrainControl.log(Level.WARNING, "Old biome generator works only with old terrain generator!");
+            TerrainControl.log(LogMarker.WARN, "Old biome generator works only with old terrain generator!");
             this.biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
 
         }

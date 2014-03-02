@@ -5,12 +5,12 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.customobjects.bo2.BO2Loader;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Loader;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 /**
  * This class is the registry for the custom object types. It also stores
@@ -72,7 +72,7 @@ public class CustomObjectManager
         // Load all global objects (they can overwrite special objects)
         TerrainControl.getEngine().getGlobalObjectsDirectory().mkdirs();
         Map<String, CustomObject> loadedGlobalObjects = loadObjects(TerrainControl.getEngine().getGlobalObjectsDirectory());
-        TerrainControl.log(Level.INFO, "{0} Global custom objects loaded", new Object[]{loadedGlobalObjects.size()});
+        TerrainControl.log(LogMarker.INFO, "{} Global custom objects loaded", new Object[]{loadedGlobalObjects.size()});
         this.globalObjects.putAll(loadedGlobalObjects);
     }
 

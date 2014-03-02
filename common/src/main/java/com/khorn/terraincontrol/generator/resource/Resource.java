@@ -7,11 +7,11 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 
 /**
  * Represents a Resource: something that can generate in the world.
@@ -123,11 +123,11 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
             resource.setValid(true);
         } catch (InvalidConfigException e)
         {
-            TerrainControl.log(Level.SEVERE, "Invalid default resource! Please report! {0}: {1}", new Object[]
+            TerrainControl.log(LogMarker.FATAL, "Invalid default resource! Please report! {}: {}", new Object[]
             {
                 clazz.getName(), e.getMessage()
             });
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
             throw new RuntimeException(e);
         }
 

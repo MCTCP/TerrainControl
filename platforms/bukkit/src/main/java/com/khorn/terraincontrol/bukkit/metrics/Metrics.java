@@ -29,6 +29,7 @@
 package com.khorn.terraincontrol.bukkit.metrics;
 
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.io.*;
 import java.net.Proxy;
@@ -36,7 +37,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
 
 import org.bukkit.Bukkit;
@@ -245,7 +245,8 @@ public class Metrics
                     {
                         if (debug)
                         {
-                            Bukkit.getLogger().log(Level.INFO, "[Metrics] {0}", e.getMessage());
+                            //t>>	FIX
+                            TerrainControl.log(LogMarker.INFO, "[Metrics] ", e.getMessage());
                         }
                     }
                 }
@@ -272,14 +273,16 @@ public class Metrics
             {
                 if (debug)
                 {
-                    Bukkit.getLogger().log(Level.INFO, "[Metrics] {0}", ex.getMessage());
+                    //t>>	FIX
+                    TerrainControl.log(LogMarker.INFO, "[Metrics] ", ex.getMessage());
                 }
                 return true;
             } catch (InvalidConfigurationException ex)
             {
                 if (debug)
                 {
-                    Bukkit.getLogger().log(Level.INFO, "[Metrics] {0}", ex.getMessage());
+                    //t>>	FIX
+                    TerrainControl.log(LogMarker.INFO, "[Metrics] ", ex.getMessage());
                 }
                 return true;
             }
@@ -562,7 +565,7 @@ public class Metrics
             gzos.write(input.getBytes("UTF-8"));
         } catch (IOException e)
         {
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
         } finally
         {
             if (gzos != null)

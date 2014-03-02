@@ -3,12 +3,12 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 /**
  * This class searches for the appropriate BiomeConfig for each LocalBiome.
@@ -137,11 +137,11 @@ public class BiomeConfigFinder
         // Check for id conflicts
         if (biomeConfigsStore[biomeId] != null)
         {
-            TerrainControl.log(Level.SEVERE, "Duplicate biome id {0} ({1} and {2})!", new Object[] {biomeId,
+            TerrainControl.log(LogMarker.FATAL, "Duplicate biome id {} ({} and {})!", new Object[] {biomeId,
                     biomeConfigsStore[biomeId].name, biome.getName()});
-            TerrainControl.log(Level.SEVERE, "The biome {0} has been prevented from loading.", new Object[] {biome.getName()});
-            TerrainControl.log(Level.INFO, "If you are updating an old pre-Minecraft 1.7 world, please read this wiki page:");
-            TerrainControl.log(Level.INFO, "https://github.com/Wickth/TerrainControl/wiki/Upgrading-an-old-map-to-Minecraft-1.7");
+            TerrainControl.log(LogMarker.FATAL, "The biome {} has been prevented from loading.", new Object[] {biome.getName()});
+            TerrainControl.log(LogMarker.INFO, "If you are updating an old pre-Minecraft 1.7 world, please read this wiki page:");
+            TerrainControl.log(LogMarker.INFO, "https://github.com/Wickth/TerrainControl/wiki/Upgrading-an-old-map-to-Minecraft-1.7");
 
             return;
         }
@@ -177,7 +177,7 @@ public class BiomeConfigFinder
             return newFile;
         } else
         {
-            TerrainControl.log(Level.INFO, "Failed to rename biome file {0} to {1}",
+            TerrainControl.log(LogMarker.INFO, "Failed to rename biome file {} to {}",
                     new Object[] {toRename.getAbsolutePath(), newFile.getAbsolutePath()});
             return toRename;
         }

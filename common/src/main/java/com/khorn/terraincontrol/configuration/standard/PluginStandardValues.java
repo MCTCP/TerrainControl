@@ -25,8 +25,7 @@ public enum PluginStandardValues implements MultiTypedSetting
     ProtocolVersion(5),
     
   //>>  Plugin Defaults
-    ConsoleLogLevel(PluginConfig.LogLevels.Standard),
-    FileLogLevel(PluginConfig.LogLevels.Standard);
+    LogLevel(PluginConfig.LogLevels.Standard);
     
 
     private int iValue;

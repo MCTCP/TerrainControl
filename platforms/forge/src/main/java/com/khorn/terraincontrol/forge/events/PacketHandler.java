@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.ForgeWorld;
+import com.khorn.terraincontrol.logging.LogMarker;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
@@ -14,7 +15,6 @@ import io.netty.buffer.ByteBufInputStream;
 import net.minecraft.client.multiplayer.WorldClient;
 
 import java.io.DataInputStream;
-import java.util.logging.Level;
 
 public class PacketHandler
 {
@@ -67,8 +67,8 @@ public class PacketHandler
             }
         } catch (Exception e)
         {
-            TerrainControl.log(Level.SEVERE, "Failed to receive packet");
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.log(LogMarker.FATAL, "Failed to receive packet");
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
         }
     }
 

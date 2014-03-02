@@ -8,13 +8,13 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
 
 /**
  * The good old BO2.
@@ -380,7 +380,7 @@ public class BO2 extends ConfigFile implements CustomObject
         }
 
         if (invalidValues)
-            TerrainControl.log(Level.WARNING, "Custom object {0} has wrong value {1}", new Object[] {this.name, settingName});
+            TerrainControl.log(LogMarker.WARN, "Custom object {} has wrong value {}", new Object[] {this.name, settingName});
 
         return output;
 

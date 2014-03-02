@@ -11,14 +11,18 @@ import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
 import com.khorn.terraincontrol.generator.resource.Resource;
+import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.logging.Logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Random;
-import java.util.logging.Level;
+import org.apache.logging.log4j.Marker;
 
 public class TerrainControl
 {
+
+    private static boolean hasprintedPluginLogLevel = false;
 
     /**
      * The engine that powers Terrain Control.
@@ -44,7 +48,7 @@ public class TerrainControl
 
     /**
      * @see TerrainControlEngine#fireCanCustomObjectSpawnEvent(CustomObject,
-     *      LocalWorld, int, int, int)
+     * LocalWorld, int, int, int)
      */
     public static boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
     {
@@ -53,7 +57,7 @@ public class TerrainControl
 
     /**
      * @see TerrainControlEngine#firePopulationEndEvent(LocalWorld, Random,
-     *      boolean, int, int)
+     * boolean, int, int)
      */
     public static void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
@@ -62,7 +66,7 @@ public class TerrainControl
 
     /**
      * @see TerrainControlEngine#firePopulationStartEvent(LocalWorld, Random,
-     *      boolean, int, int)
+     * boolean, int, int)
      */
     public static void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
@@ -71,18 +75,17 @@ public class TerrainControl
 
     /**
      * @see TerrainControlEngine#fireResourceProcessEvent(Resource,
-     *      LocalWorld, Random, boolean, int, int)
+     * LocalWorld, Random, boolean, int, int)
      */
     public static boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX,
-            int chunkZ)
+                                                   int chunkZ)
     {
         return engine.fireResourceProcessEvent(resource, world, random, villageInChunk, chunkX, chunkZ);
     }
 
     /**
      * Returns the biome managers. Register your own biome manager here.
-     * <p/>
-     * 
+     * <p>
      * @return The biome managers.
      */
     public static BiomeModeManager getBiomeModeManager()
@@ -94,11 +97,10 @@ public class TerrainControl
      * Convienence method to quickly get the biome name at the given
      * coordinates. Will return null if the world isn't loaded by Terrain
      * Control.
-     * <p/>
-     * 
+     * <p>
      * @param worldName The world name.
-     * @param x The block x in the world.
-     * @param z The block z in the world.
+     * @param x         The block x in the world.
+     * @param z         The block z in the world.
      * @return The biome name, or null if the world isn't managed by Terrain
      *         Control.
      */
@@ -115,8 +117,7 @@ public class TerrainControl
 
     /**
      * Returns the Resource manager.
-     * <p/>
-     * 
+     * <p>
      * @return The Resource manager.
      */
     public static ConfigFunctionsManager getConfigFunctionsManager()
@@ -126,8 +127,7 @@ public class TerrainControl
 
     /**
      * Returns the CustomObject manager, with hooks to spawn CustomObjects.
-     * <p/>
-     * 
+     * <p>
      * @return The CustomObject manager.
      */
     public static CustomObjectManager getCustomObjectManager()
@@ -137,7 +137,7 @@ public class TerrainControl
 
     /**
      * Returns the engine, containing the API methods.
-     * 
+     * <p>
      * @return The engine
      */
     public static TerrainControlEngine getEngine()
@@ -163,7 +163,7 @@ public class TerrainControl
 
     /**
      * Returns the global config file.
-     * 
+     * <p>
      * @return The global config file.
      */
     public static PluginConfig getPluginConfig()
@@ -173,8 +173,7 @@ public class TerrainControl
 
     /**
      * Returns the world object with the given name.
-     * <p/>
-     * 
+     * <p>
      * @param name The name of the world.
      * @return The world object.
      */
@@ -184,55 +183,99 @@ public class TerrainControl
     }
 
     /**
-     * Logs the message(s) with the given importance. Message will be prefixed
-     * with [TerrainControl], so don't do that yourself.
-     * <p/>
-     * 
+     * Logs the message(s) with the given importance. Message will be
+     * prefixed with [TerrainControl], so don't do that yourself.
+     * <p>
      * @param message The messages to log.
-     * @param level The severity of the message
+     * @param level   The severity of the message
      */
-    public static void log(Level level, String... message)
+    public static void log(Marker level, String... message)
     {
-        engine.log(level, message);
+        Logger.log(level, message);
     }
 
     /**
-     * Logs a format string message with the given importance. Message will be
-     * prefixed with [TerrainControl], so don't do that yourself.
-     * <p/>
-     * 
+     * Logs a format string message with the given importance. Message will
+     * be prefixed with [TerrainControl], so don't do that yourself.
+     * <p>
      * @param message The messages to log formatted similar to Logger.log()
-     *            with the same args.
-     * @param level The severity of the message
-     * @param param The parameter belonging to {0} in the message string
+     *                with the same args.
+     * @param level   The severity of the message
+     * @param params  The parameters belonging to {0...} in the message
+     *                string
      */
-    public static void log(Level level, String message, Object param)
+    public static void log(Marker level, String message, Object... params)
     {
-        engine.log(level, message, param);
+        Logger.log(level, message, params);
     }
 
     /**
-     * Logs a format string message with the given importance. Message will be
-     * prefixed with [TerrainControl], so don't do that yourself.
-     * <p/>
-     * 
-     * @param message The messages to log formatted similar to Logger.log()
-     *            with the same args.
-     * @param level The severity of the message
-     * @param params The parameters belonging to {0...} in the message string
+     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
+     * level matches the level provided. Message will be prefixed with
+     * [TerrainControl], so don't do that yourself.
+     * <p>
+     * @param ifLevel  the Log level to test for
+     * @param messages The messages to log.
      */
-    public static void log(Level level, String message, Object[] params)
+    public static void logIfLevel(Marker ifLevel, String... messages)
     {
-        engine.log(level, message, params);
+        Logger.logIfLevel(ifLevel, messages);
+    }
+
+    /**
+     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
+     * level matches the level provided. Message will be prefixed with
+     * [TerrainControl], so don't do that yourself.
+     * <p>
+     * @param ifLevel the Log level to test for
+     * @param message The messages to log formatted similar to
+     *                Logger.log() with the same args.
+     * @param params  The parameters belonging to {0...} in the message
+     *                string
+     */
+    public static void logIfLevel(Marker ifLevel, String message, Object... params)
+    {
+        Logger.logIfLevel(ifLevel, message, params);
+    }
+
+    /**
+     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
+     * level is between the min/max provided. Message will be prefixed with
+     * [TerrainControl], so don't do that yourself.
+     * <p>
+     * @param min      The minimum Log level to test for
+     * @param max      The maximum Log level to test for
+     * @param messages The messages to log.
+     */
+    public static void logIfLevel(Marker min, Marker max, String... messages)
+    {
+        Logger.logIfLevel(min, max, messages);
+    }
+
+    /**
+     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
+     * level is between the min/max provided. Message will be prefixed with
+     * [TerrainControl], so don't do that yourself.
+     * <p>
+     * @param min     The minimum Log level to test for
+     * @param max     The maximum Log level to test for
+     * @param message The messages to log formatted similar to
+     *                Logger.log() with the same args.
+     * @param params  The parameters belonging to {0...} in the message
+     *                string
+     */
+    public static void logIfLevel(Marker min, Marker max, String message, Object... params)
+    {
+        Logger.logIfLevel(min, max, message, params);
     }
 
     /**
      * Prints the stackTrace of the provided Throwable object
-     * 
+     * <p>
      * @param level The log level to log this stack trace at
-     * @param e The Throwable object to obtain stack trace information from
+     * @param e     The Throwable object to obtain stack trace information from
      */
-    public static void printStackTrace(Level level, Throwable e)
+    public static void printStackTrace(Marker level, Throwable e)
     {
         printStackTrace(level, e, Integer.MAX_VALUE);
     }
@@ -240,17 +283,18 @@ public class TerrainControl
     /**
      * Prints the stackTrace of the provided Throwable object to a certain
      * depth
-     * 
-     * @param level The log level to log this stack trace at
-     * @param e The Throwable object to obtain stack trace information from
+     * <p>
+     * @param level    The log level to log this stack trace at
+     * @param e        The Throwable object to obtain stack trace information
+     *                 from
      * @param maxDepth The max number of trace elements to print
      */
-    public static void printStackTrace(Level level, Throwable e, int maxDepth)
+    public static void printStackTrace(Marker level, Throwable e, int maxDepth)
     {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
-        TerrainControl.log(level, stringWriter.toString());
+        Logger.log(level, stringWriter.toString());
     }
 
     /**
@@ -263,7 +307,7 @@ public class TerrainControl
 
     /**
      * @see TerrainControlEngine#registerEventHandler(EventHandler,
-     *      EventPriority)
+     * EventPriority)
      */
     public static void registerEventHandler(EventHandler handler, EventPriority priority)
     {
@@ -273,7 +317,7 @@ public class TerrainControl
     /**
      * Sets the engine and calls its {@link TerrainControlEngine#onStart()
      * onStart()} method.
-     * 
+     * <p>
      * @param engine The engine.
      */
     public static void setEngine(TerrainControlEngine engine)

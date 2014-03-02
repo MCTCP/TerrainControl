@@ -3,12 +3,12 @@ package com.khorn.terraincontrol.customobjects.bo3;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 public class BO3Loader implements CustomObjectLoader
 {
@@ -61,7 +61,7 @@ public class BO3Loader implements CustomObjectLoader
         } catch (FileNotFoundException e)
         {
             // File not found
-            TerrainControl.log(Level.WARNING, "NBT file {0} not found", path);
+            TerrainControl.log(LogMarker.WARN, "NBT file {} not found", (Object) path);
             tryToClose(stream);
             return null;
         } catch (IOException e)
@@ -77,8 +77,8 @@ public class BO3Loader implements CustomObjectLoader
                 stream.close();
             } catch (IOException corruptFile)
             {
-                TerrainControl.log(Level.SEVERE, "Failed to read NBT meta file: {0}", e.getMessage());
-                TerrainControl.printStackTrace(Level.SEVERE, corruptFile);
+                TerrainControl.log(LogMarker.FATAL, "Failed to read NBT meta file: ", e.getMessage());
+                TerrainControl.printStackTrace(LogMarker.FATAL, corruptFile);
                 tryToClose(stream);
                 return null;
             }
@@ -104,7 +104,7 @@ public class BO3Loader implements CustomObjectLoader
             return registerMetadata(path, ((NamedBinaryTag[]) metadata.getValue())[0]);
         } catch (Exception e)
         {
-            TerrainControl.log(Level.WARNING, "Structure of NBT file is incorrect: {0}", e.getMessage());
+            TerrainControl.log(LogMarker.WARN, "Structure of NBT file is incorrect: ", e.getMessage());
             return null;
         }
 

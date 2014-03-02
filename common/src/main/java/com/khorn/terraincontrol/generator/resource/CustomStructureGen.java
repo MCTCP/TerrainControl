@@ -7,12 +7,12 @@ import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructure;
 import com.khorn.terraincontrol.customobjects.StructuredCustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 
 public class CustomStructureGen extends Resource
 {
@@ -114,7 +114,7 @@ public class CustomStructureGen extends Resource
                 CustomStructureGen otherO = (CustomStructureGen) other;
                 return otherO.objectNames.size() == this.objectNames.size() && otherO.objectNames.containsAll(this.objectNames);
             } catch (Exception ex){
-                TerrainControl.log(Level.WARNING, ex.getMessage());
+                TerrainControl.log(LogMarker.WARN, ex.getMessage());
             }
         }
         return false;

@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 import com.khorn.terraincontrol.util.MultiTypedSetting.SettingsType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
@@ -12,7 +13,6 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import java.awt.Color;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
 
 public abstract class ConfigFile
 {
@@ -119,7 +119,7 @@ public abstract class ConfigFile
                 this.readSuccess = true;
             } catch (IOException e)
             {
-                TerrainControl.printStackTrace(Level.SEVERE, e);
+                TerrainControl.printStackTrace(LogMarker.FATAL, e);
 
                 if (settingsReader != null)
                 {
@@ -128,7 +128,7 @@ public abstract class ConfigFile
                         settingsReader.close();
                     } catch (IOException localIOException1)
                     {
-                        TerrainControl.printStackTrace(Level.SEVERE, localIOException1);
+                        TerrainControl.printStackTrace(LogMarker.FATAL, localIOException1);
                     }
                 }
             } finally
@@ -140,7 +140,7 @@ public abstract class ConfigFile
                         settingsReader.close();
                     } catch (IOException localIOException2)
                     {
-                        TerrainControl.printStackTrace(Level.SEVERE, localIOException2);
+                        TerrainControl.printStackTrace(LogMarker.FATAL, localIOException2);
                     }
                 }
             }
@@ -155,7 +155,7 @@ public abstract class ConfigFile
     // -------------------------------------------- //
     protected void logSettingNotFound(String settingsName)
     {
-        TerrainControl.log(Level.FINEST, "Setting:`{0}` was not found \nin `{1}`.", new Object[]
+        TerrainControl.log(LogMarker.TRACE, "Setting:`{}` was not found in `{}`.", new Object[]
         {
             settingsName, (this.file == null ? this.name + " Biome" : this.file.getName())
         });
@@ -163,12 +163,12 @@ public abstract class ConfigFile
 
     protected void logSettingValueInvalid(String settingsName)
     {
-        TerrainControl.log(Level.WARNING, getSettingValueInvalidError(settingsName));
+        TerrainControl.log(LogMarker.WARN, getSettingValueInvalidError(settingsName));
     }
 
     protected void logSettingValueInvalid(String settingsName, Exception e)
     {
-        TerrainControl.log(Level.WARNING, e.getClass().getSimpleName() + " :: " + getSettingValueInvalidError(settingsName));
+        TerrainControl.log(LogMarker.WARN, "{} :: {}", (Object) e.getClass().getSimpleName(),  getSettingValueInvalidError(settingsName));
     }
 
     private String getSettingValueInvalidError(String settingsName)
@@ -179,7 +179,7 @@ public abstract class ConfigFile
     protected void logFileNotFound(File logFile)
     {
         String logName = logFile.getName();
-        TerrainControl.log(Level.CONFIG, "File not found: {0} in {1}", new Object[]
+        TerrainControl.log(LogMarker.DEBUG, "File not found: {} in {}", new Object[]
         {
             logName, logFile.getAbsolutePath()
         });
@@ -465,7 +465,7 @@ public abstract class ConfigFile
             this.writeConfigSettings();
         } catch (IOException localIOExceptionE)
         {
-            TerrainControl.log(Level.SEVERE, "{0}:: {1}", new Object[]
+            TerrainControl.log(LogMarker.FATAL, "{}:: {}", new Object[]
             {
                 "localIOExceptionE: ", localIOExceptionE.getStackTrace().toString()
             });
@@ -477,7 +477,7 @@ public abstract class ConfigFile
                     this.settingsWriter.close();
                 } catch (IOException localIOException1)
                 {
-                    TerrainControl.log(Level.SEVERE, "{0}:: {1}", new Object[]
+                    TerrainControl.log(LogMarker.FATAL, "{}:: {}", new Object[]
                     {
                         "localIOException1: ", localIOException1.getStackTrace().toString()
                     });
@@ -492,7 +492,7 @@ public abstract class ConfigFile
                     this.settingsWriter.close();
                 } catch (IOException localIOException2)
                 {
-                    TerrainControl.log(Level.SEVERE, "{0}:: {1}", new Object[]
+                    TerrainControl.log(LogMarker.FATAL, "{}:: {}", new Object[]
                     {
                         "localIOException2: ", localIOException2.getStackTrace().toString()
                     });

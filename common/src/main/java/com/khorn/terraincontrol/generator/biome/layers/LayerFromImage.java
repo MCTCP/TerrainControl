@@ -4,11 +4,11 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
 import javax.imageio.ImageIO;
 
 public class LayerFromImage extends Layer
@@ -91,7 +91,7 @@ public class LayerFromImage extends Layer
                     this.biomeMap[nColor] = fillBiome;
             }
         } catch (IOException ioexception) {
-            TerrainControl.log(Level.SEVERE, ioexception.getStackTrace().toString());
+            TerrainControl.log(LogMarker.FATAL, ioexception.getStackTrace().toString());
         }
     }
     @Override

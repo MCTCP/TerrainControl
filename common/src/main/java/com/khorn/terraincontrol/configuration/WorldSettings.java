@@ -6,6 +6,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.FileHelper;
 
 import java.io.DataInputStream;
@@ -14,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 
 /**
  * Holds the WorldConfig and all BiomeConfigs.
@@ -106,8 +106,8 @@ public class WorldSettings
         // Save all settings
         saveSettings();
 
-        TerrainControl.log(Level.INFO, "{0} biomes Loaded", new Object[] {biomesCount});
-        TerrainControl.log(Level.CONFIG, "{0}", new Object[] {loadedBiomeNames});
+        TerrainControl.log(LogMarker.INFO, "{} biomes Loaded", new Object[] {biomesCount});
+        TerrainControl.log(LogMarker.DEBUG, "{}", new Object[] {loadedBiomeNames});
 
     }
 
@@ -130,8 +130,8 @@ public class WorldSettings
             BiomeIds id = biomeConfig.Biome.getIds();
             if (id.isVirtual() && world.getBiomeById(id.getGenerationId()) == null)
             {
-                TerrainControl.log(Level.WARNING,
-                        "All virtual biomes need a real biome to be replaced to. The id {0} was not found for biome {1}.",
+                TerrainControl.log(LogMarker.WARN,
+                        "All virtual biomes need a real biome to be replaced to. The id {} was not found for biome {}.",
                         new Object[] {id.getSavedId(), biomeConfig.name});
             }
 
@@ -199,7 +199,7 @@ public class WorldSettings
                     }
                 } catch (NumberFormatException ex)
                 {
-                    TerrainControl.log(Level.WARNING, "Wrong color in " + biomeConfig.Biome.getName());
+                    TerrainControl.log(LogMarker.WARN, "Wrong color in " + biomeConfig.Biome.getName());
                 }
             }
         }
@@ -243,7 +243,7 @@ public class WorldSettings
         BiomeConfig extendedBiomeConfig = biomeConfigs[world.getBiomeIdByName(extendedBiomeName)];
         if (extendedBiomeConfig == null)
         {
-            TerrainControl.log(Level.WARNING, "The biome {0} tried to extend the biome {1}, but that biome doesn't exist.", new Object[] {
+            TerrainControl.log(LogMarker.WARN, "The biome {} tried to extend the biome {}, but that biome doesn't exist.", new Object[] {
                     biomeConfig.name, extendedBiomeName});
             return;
         }
@@ -251,8 +251,8 @@ public class WorldSettings
         // Check for too much recursion
         if (currentDepth > MAX_INHERITANCE_DEPTH)
         {
-            TerrainControl.log(Level.SEVERE,
-                    "The biome {0} cannot extend the biome {1} - too much configs processed already! Cyclical inheritance?", new Object[] {
+            TerrainControl.log(LogMarker.FATAL,
+                    "The biome {} cannot extend the biome {} - too much configs processed already! Cyclical inheritance?", new Object[] {
                             biomeConfig.name, extendedBiomeConfig.name});
         }
 
@@ -321,11 +321,11 @@ public class WorldSettings
         {
             if (!oldBiomeConfigs.renameTo(new File(settingsDir, biomeFolderName)))
             {
-                TerrainControl.log(Level.WARNING, "========================");
-                TerrainControl.log(Level.WARNING, "Fould old `BiomeConfigs` folder, but it could not be renamed to `", biomeFolderName,
+                TerrainControl.log(LogMarker.WARN, "========================");
+                TerrainControl.log(LogMarker.WARN, "Fould old `BiomeConfigs` folder, but it could not be renamed to `", biomeFolderName,
                         "`!");
-                TerrainControl.log(Level.WARNING, "Please rename the folder manually.");
-                TerrainControl.log(Level.WARNING, "========================");
+                TerrainControl.log(LogMarker.WARN, "Please rename the folder manually.");
+                TerrainControl.log(LogMarker.WARN, "========================");
                 biomeFolderName = "BiomeConfigs";
             }
         }

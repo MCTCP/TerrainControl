@@ -5,12 +5,12 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.Branch;
 import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
-import java.util.logging.Level;
 
 public class WeightedBranchFunction extends BranchFunction implements Branch
 {
@@ -36,18 +36,17 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
                                                      : (cumulativeChance >= 100
                                                         ? cumulativeChance
                                                         : 100));
-        TerrainControl.log(Level.FINEST, "W-Branch: chance_max - " + randomChance);
-        for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
+        TerrainControl.log(LogMarker.TRACE, "W-Branch: chance_max - {}", randomChance);
+        for (BranchNode branch : branches)
         {
-            BranchNode branch = it.next();
-            TerrainControl.log(Level.FINEST, "  " + branch.getCustomObject().getName() + " trying to spawn! #" + branch.getChance());
+            TerrainControl.log(LogMarker.TRACE, "  {} trying to spawn! #{}", (Object) branch.getCustomObject().getName(), branch.getChance());
             if (branch.getChance() >= randomChance)
             {
-                TerrainControl.log(Level.FINEST, "  Successful Spawn");
+                TerrainControl.log(LogMarker.TRACE, "  Successful Spawn");
                 return new CustomObjectCoordinate(branch.getCustomObject(), branch.getRotation(), x + this.x, y + this.y, z + this.z);
             }
         }
-        TerrainControl.log(Level.FINEST, "  No Spawn");
+        TerrainControl.log(LogMarker.TRACE, "  No Spawn");
         return null;
     }
 

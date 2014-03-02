@@ -5,11 +5,11 @@ import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 public abstract class ConfigFunction<T>
 {
@@ -70,11 +70,9 @@ public abstract class ConfigFunction<T>
             configFunction.load(stringArgs);
         } catch (InvalidConfigException e)
         {
-            TerrainControl.log(Level.SEVERE, "Invalid default config function! Please report! {0}: {1}", new Object[]
-            {
-                clazz.getName(), e.getMessage()
-            });
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.log(LogMarker.FATAL, "Invalid default config function! Please report! {}: {}", 
+                    new Object[] { clazz.getName(), e.getMessage() });
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
         }
 
         return configFunction;
@@ -146,12 +144,9 @@ public abstract class ConfigFunction<T>
     /**
      * Loads the settings. Returns false if one of the arguments contains
      * an error.
-     * <p/>
+     * <p>
      * @param args List of args.
-     * <p/>
-     * @return Returns false if one of the arguments contains an error,
-     *         otherwise true.
-     * <p/>
+     * <p>
      * @throws InvalidConfigException If the syntax is invalid.
      */
     protected abstract void load(List<String> args) throws InvalidConfigException;
@@ -257,8 +252,7 @@ public abstract class ConfigFunction<T>
     /**
      * Returns a String in the format ",materialName,materialName,etc"
      * <p/>
-     * @param ids
-     * <p/>
+     * @param materials The set of materials to be converted
      * @return
      */
     protected String makeMaterials(MaterialSet materials)

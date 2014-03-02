@@ -4,11 +4,11 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 
 public class TreeGen extends Resource
 {
@@ -90,7 +90,7 @@ public class TreeGen extends Resource
                 TreeGen otherO = (TreeGen) other;
                 return otherO.treeNames.size() == this.treeNames.size() && otherO.treeNames.containsAll(this.treeNames);
             } catch (Exception ex){
-                TerrainControl.log(Level.WARNING, ex.getMessage());
+                TerrainControl.log(LogMarker.WARN, ex.getMessage());
             }
         }
         return false;

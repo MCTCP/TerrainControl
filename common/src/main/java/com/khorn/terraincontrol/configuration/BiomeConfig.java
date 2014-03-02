@@ -13,6 +13,7 @@ import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.surface.MesaSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
 import com.khorn.terraincontrol.util.helpers.InheritanceHelper;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
@@ -23,7 +24,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
 
 public class BiomeConfig extends ConfigFile
 {
@@ -294,7 +294,7 @@ public class BiomeConfig extends ConfigFile
         this.villageType = (VillageType) readModSettings(BiomeStandardValues.VillageType, defaultSettings.defaultVillageType);
         this.mineshaftsRarity = readSettings(BiomeStandardValues.MineshaftRarity);
         this.rareBuildingType = (RareBuildingType) readModSettings(BiomeStandardValues.RareBuildingType,
-                defaultSettings.defaultRareBuildingType);
+                                                                   defaultSettings.defaultRareBuildingType);
 
         if (this.Biome.isCustom())
         {
@@ -358,15 +358,16 @@ public class BiomeConfig extends ConfigFile
     {
         String settingValue = readSettings(BiomeStandardValues.ReplacedBlocks);
 
-        try {
+        try
+        {
             this.replacedBlocks = new ReplacedBlocksMatrix(settingValue, worldConfig.worldHeightCap - 1);
         } catch (InvalidConfigException e)
         {
             // Make sure value is never null
             this.replacedBlocks = ReplacedBlocksMatrix.createEmptyMatrix(worldConfig.worldHeightCap - 1);
-            
+
             // Print warning
-            TerrainControl.log(Level.WARNING, "Wrong replace settings '{0}': {1}", this.settingsCache.get(settingValue), e.getMessage());
+            TerrainControl.log(LogMarker.WARN, "Wrong replace settings '{}': {}", (Object) this.settingsCache.get(settingValue), e.getMessage());
         }
     }
 
@@ -412,7 +413,7 @@ public class BiomeConfig extends ConfigFile
             } else
             {
                 resource = TerrainControl.getConfigFunctionsManager().getConfigFunction(rName, this,
-                        this.name + " on line " + entry.getValue(), Arrays.asList(props));
+                                                                                        this.name + " on line " + entry.getValue(), Arrays.asList(props));
             }
         }
         return resource;
@@ -446,10 +447,10 @@ public class BiomeConfig extends ConfigFile
     /**
      * Merges two sets of resources. The child set will override any element
      * of the parent that it can.
-     * <p/>
-     * 
+     * <p>
      * @param parent
-     * @param child <p/>
+     * @param child
+     *               <p>
      * @return
      */
     public BiomeConfig merge(BiomeConfig parent)
@@ -458,7 +459,7 @@ public class BiomeConfig extends ConfigFile
         // Run down the list of child settings from config
         for (Map.Entry<String, String> childEntry : this.settingsCache.entrySet())
         { // As long as setting value contains `Interited` and it isnt
-          // a resource
+            // a resource
             String childValue = childEntry.getValue();
             if (childValue.toLowerCase().contains("inherited") && getResource(childEntry) == null)
             { // if the parent has the setting
@@ -467,18 +468,16 @@ public class BiomeConfig extends ConfigFile
                     String parentValue = parent.settingsCache.get(childEntry.getKey());
                     if (parentValue.toLowerCase().contains("inherited"))
                     {
-                        TerrainControl.log(Level.SEVERE, "Parent has `Inherited` keyword. Something is wrong. Please report this.");
+                        TerrainControl.log(LogMarker.FATAL, "Parent has `Inherited` keyword. Something is wrong. Please report this.");
                         continue;
                     }
                     childEntry.setValue(InheritanceHelper.evaluate(childValue, parentValue));
-                    TerrainControl.log(Level.SEVERE, "Setting `{0}` replaced with `{1}`", new Object[] {childEntry.getKey(),
-                            InheritanceHelper.evaluate(childValue, parentValue)});
+                    TerrainControl.log(LogMarker.FATAL, "Setting `{}` replaced with `{}`", new Object[] { childEntry.getKey(), InheritanceHelper.evaluate(childValue, parentValue) });
                 }
             }
         }
 
         // INHERITANCE VARIABLES -- END
-
         // Run down the list of parent settings from config
         for (Map.Entry<String, String> parentEntry : parent.settingsCache.entrySet())
         {
@@ -489,7 +488,7 @@ public class BiomeConfig extends ConfigFile
                 // Give it to the child from the parent
                 this.settingsCache.put(parentEntry.getKey(), parentEntry.getValue());
                 // And let us know if we are producing FINE logs
-                TerrainControl.log(Level.FINER, "Setting({0},{1})",
+                TerrainControl.log(LogMarker.TRACE, "Setting({},{})",
                         new Object[] {parentEntry.getKey(), parent.settingsCache.get(parentEntry.getKey())});
             }
         }
@@ -498,7 +497,7 @@ public class BiomeConfig extends ConfigFile
         this.process();
         parent.process();
         // We dont want to merge resources unless the child allows it.
-        TerrainControl.log(Level.FINER, "=====Doing Resource Inheritance====");
+        TerrainControl.log(LogMarker.TRACE, "=====Doing Resource Inheritance====");
         if (this.doResourceInheritance)
         {
             // Then do the resource merge! Start with Resource Sequence.
@@ -510,13 +509,13 @@ public class BiomeConfig extends ConfigFile
             for (Resource pr : parentRes)
             {
                 boolean analagous = false;
-                TerrainControl.log(Level.FINEST, "BASE:: Checking against: {0}", new Object[] {pr.makeString()});
+                TerrainControl.log(LogMarker.TRACE, "BASE:: Checking against: {}", new Object[] { pr.makeString() });
                 for (Resource cr : childRes)
                 {
-                    TerrainControl.log(Level.FINEST, "CHCK:: Checking against: {0}", new Object[] {cr.makeString()});
+                    TerrainControl.log(LogMarker.TRACE, "CHCK:: Checking against: {}", new Object[] { cr.makeString() });
                     if (cr.isAnalogousTo(pr))
                     {
-                        TerrainControl.log(Level.FINER, "Adding Child Resource\nC: {0}\nP: {1}",
+                        TerrainControl.log(LogMarker.TRACE, "Adding Child Resource\nC: {}\nP: {}",
                                 new Object[] {cr.makeString(), pr.makeString()});
                         T_ResourceSequence.add(cr);
                         childRes.remove(cr);
@@ -526,7 +525,7 @@ public class BiomeConfig extends ConfigFile
                 }
                 if (!analagous)
                 {
-                    TerrainControl.log(Level.FINER, "Adding Parent Resource\n{0}", new Object[] {pr.makeString()});
+                    TerrainControl.log(LogMarker.TRACE, "Adding Parent Resource\n{}", new Object[] {pr.makeString()});
                     T_ResourceSequence.add(pr);
                 }
             }
@@ -540,18 +539,18 @@ public class BiomeConfig extends ConfigFile
                 {
                     if (this.saplingTypes[sap.saplingType.getSaplingId()] == null)
                     {
-                        TerrainControl.log(Level.FINER, "Sapling added to Child: {0}", new Object[] {sap.saplingType.getSaplingId()});
+                        TerrainControl.log(LogMarker.TRACE, "Sapling added to Child: {}", new Object[] {sap.saplingType.getSaplingId()});
                         this.saplingTypes[sap.saplingType.getSaplingId()] = sap;
                     }
                 }
             } else
             {
-                TerrainControl.log(Level.FINER, "No Sapling merge needed!");
+                TerrainControl.log(LogMarker.TRACE, "No Sapling merge needed!");
             }
         }
 
         this.BiomeExtendsProcessed = true;
-        TerrainControl.log(Level.FINER, "=====END Resource Inheritance====");
+        TerrainControl.log(LogMarker.TRACE, "=====END Resource Inheritance====");
         return this;
     }
 
@@ -723,7 +722,7 @@ public class BiomeConfig extends ConfigFile
         writeComment("Alternatively, you can use Mesa, MesaForest or MesaBryce to get blocks");
         writeComment("like the blocks found in the Mesa biomes.");
         writeValue(BiomeStandardValues.SurfaceAndGroundControl,
-                this.surfaceAndGroundControl == null ? "" : this.surfaceAndGroundControl.toString());
+                   this.surfaceAndGroundControl == null ? "" : this.surfaceAndGroundControl.toString());
 
         writeComment("Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])");
         writeComment("Example :");
@@ -1020,10 +1019,10 @@ public class BiomeConfig extends ConfigFile
         this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.worldHeightCap - 1, this.waterLevelMin);
 
         this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomeIds.keySet().contains(
-                this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
+                                 this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
 
         this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.CustomBiomeIds.keySet().contains(this.riverBiome)) ? this.riverBiome
-                : "";
+                          : "";
     }
 
     @Override
@@ -1031,7 +1030,7 @@ public class BiomeConfig extends ConfigFile
     {
         // Old values from WorldConfig
         BiomeStandardValues[] copyFromWorld = {BiomeStandardValues.MaxAverageHeight, BiomeStandardValues.MaxAverageDepth,
-                BiomeStandardValues.Volatility1, BiomeStandardValues.Volatility2, BiomeStandardValues.VolatilityWeight1,
+            BiomeStandardValues.Volatility1, BiomeStandardValues.Volatility2, BiomeStandardValues.VolatilityWeight1,
                 BiomeStandardValues.VolatilityWeight2, BiomeStandardValues.DisableBiomeHeight, BiomeStandardValues.CustomHeightControl};
         for (BiomeStandardValues value : copyFromWorld)
             if (this.worldConfig.settingsCache.containsKey(value.name().toLowerCase()))

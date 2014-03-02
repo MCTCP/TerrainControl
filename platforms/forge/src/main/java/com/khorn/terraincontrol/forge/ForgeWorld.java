@@ -14,6 +14,7 @@ import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
@@ -31,7 +32,6 @@ import net.minecraft.world.gen.feature.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.logging.Level;
 
 public class ForgeWorld implements LocalWorld
 {
@@ -706,7 +706,7 @@ public class ForgeWorld implements LocalWorld
             tileEntity.readFromNBT(nmsTag);
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {
+            TerrainControl.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", new Object[] {
                     nmsTag.getString("id"), x, y, z, getMaterial(x, y, z)});
         }
     }

@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.sun.imageio.plugins.png.PNGImageWriter;
 import com.sun.imageio.plugins.png.PNGImageWriterSpi;
 import net.minecraft.server.v1_7_R1.BiomeBase;
@@ -14,7 +15,6 @@ import org.bukkit.command.CommandSender;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
-import java.util.logging.Level;
 
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
@@ -69,12 +69,12 @@ public class MapWriter implements Runnable
         try
         {
             int[] colors = defaultColors;
-            TerrainControl.log(Level.FINER, "BukkitWorld::UUID:: {0}", world.getDataManager().getUUID());
+            TerrainControl.log(LogMarker.TRACE, "BukkitWorld::UUID:: {}", world.getDataManager().getUUID());
             LocalWorld bukkitWorld = WorldHelper.toLocalWorld(world);
             if (bukkitWorld != null)
             {
                 colors = new int[bukkitWorld.getSettings().biomeConfigs.length];
-                TerrainControl.log(Level.FINER, "BukkitWorld settings biomeConfigs.length::{0}", bukkitWorld.getSettings().biomeConfigs.length);
+                TerrainControl.log(LogMarker.TRACE, "BukkitWorld settings biomeConfigs.length::{}", bukkitWorld.getSettings().biomeConfigs.length);
 
                 for (BiomeConfig biomeConfig : bukkitWorld.getSettings().biomeConfigs)
                 {
@@ -89,14 +89,14 @@ public class MapWriter implements Runnable
                             }
                         } catch (NumberFormatException ex)
                         {
-                            TerrainControl.log(Level.WARNING, "Wrong color in {0}", biomeConfig.Biome.getName());
+                            TerrainControl.log(LogMarker.WARN, "Wrong color in ", biomeConfig.Biome.getName());
                             sender.sendMessage(BaseCommand.ERROR_COLOR + "Wrong color in " + biomeConfig.Biome.getName());
                         }
                     }
                 }
             } else
             {
-                TerrainControl.log(Level.WARNING, "BukkitWorld is null :: Make sure you add `{0}` to bukkit.yml", world.getWorld().getName());
+                TerrainControl.log(LogMarker.WARN, "BukkitWorld is null :: Make sure you add `{}` to bukkit.yml", (Object) world.getWorld().getName());
             }
 
             sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Generating map...");
@@ -166,9 +166,9 @@ public class MapWriter implements Runnable
                                 tempImage.setRGB(image_x, image_y, tempColor.getRGB());
                             } catch (ArrayIndexOutOfBoundsException ex)
                             {
-                                TerrainControl.log(Level.FINEST, "BiomeBuff Idx::{0}<{4}x/{5}z>, Len::{1}, ID::{2} | Colors Len::{3}", new Object[]
+                                TerrainControl.log(LogMarker.TRACE, "BiomeBuff Idx::{}<{}x/{}z>, Len::{}, ID::{} | Colors Len::{}", new Object[]
                                 {
-                                    t, BiomeBuffer.length, BiomeBuffer[t].id, colors.length, x1, z1
+                                    t, x1, z1, BiomeBuffer.length, BiomeBuffer[t].id, colors.length
                                 });
 
                             }
@@ -202,7 +202,7 @@ public class MapWriter implements Runnable
 
         } catch (Exception e)
         {
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
         }
         MapWriter.isWorking = false;
     }

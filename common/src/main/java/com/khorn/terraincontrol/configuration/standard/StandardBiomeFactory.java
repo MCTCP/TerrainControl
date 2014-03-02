@@ -7,12 +7,12 @@ import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.resource.IceSpikeGen.SpikeType;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * A biome generator holds all <i>default</i> settings of a biome.
@@ -46,8 +46,8 @@ public class StandardBiomeFactory
             }
         } catch (Exception e)
         {
-            TerrainControl.log(Level.SEVERE, "Cannot read default settings for biome {0}", new Object[] {biome.getName()});
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.log(LogMarker.FATAL, "Cannot read default settings for biome {}", new Object[] {biome.getName()});
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
         }
 
         // Make sure that we always return something (for custom biomes)

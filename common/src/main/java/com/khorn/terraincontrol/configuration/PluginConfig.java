@@ -5,11 +5,12 @@ import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Marker;
 
 /**
  * Temporarily pre-configured Class that will eventually represent the file
@@ -23,28 +24,33 @@ public final class PluginConfig extends ConfigFile
     public static enum LogLevels
     {
 
-        Off(Level.WARNING),
-        Standard(Level.INFO),
-        Debug(Level.CONFIG),
-        XDebug(Level.FINE),
-        XXDebug(Level.FINER),
-        Trace(Level.FINEST);
-        private Level level;
+        Off(LogMarker.ERROR, Level.ERROR.intLevel()),
+        Quiet(LogMarker.WARN, Level.WARN.intLevel()),
+        Standard(LogMarker.INFO, Level.INFO.intLevel()),
+        Debug(LogMarker.DEBUG, Level.DEBUG.intLevel()),
+        Trace(LogMarker.TRACE, Level.TRACE.intLevel());
+        private final Marker marker;
+        private final int value;
 
-        private LogLevels(Level level)
+        private LogLevels(Marker marker, int value)
         {
-            this.level = level;
+            this.marker = marker;
+            this.value = value;
         }
 
-        public Level getLevel()
+        public Marker getLevel()
         {
-            return level;
+            return marker;
+        }
+
+        public int getValue()
+        {
+            return value;
         }
 
     }
 
-    public LogLevels fileHandlerLevel = LogLevels.Standard;
-    public LogLevels consoleHandlerLevel = LogLevels.Standard;
+    public LogLevels LogLevel = LogLevels.Standard;
     public String biomeConfigExtension;
 
     public PluginConfig(File settingsDir)
@@ -80,27 +86,13 @@ public final class PluginConfig extends ConfigFile
     @Override
     protected void correctSettings()
     {
-        boolean hasOffLevel = false;
-        if (this.consoleHandlerLevel == PluginConfig.LogLevels.Off)
-        {
-            hasOffLevel = true;
-        }
-        if (this.fileHandlerLevel == PluginConfig.LogLevels.Off)
-        {
-            hasOffLevel = true;
-        }
-        if (hasOffLevel)
-        {
-            Logger l = Logger.getLogger("Minecraft");
-            l.log(Level.WARNING, "Quiet Mode: You will no longer see INFO messages FOR ANY PLUGIN.");
-            l.log(Level.WARNING, "WARNING AND SEVERE level logs will still show.");
-        }
-
         if (!BiomeStandardValues.BiomeConfigExtensions.stringArrayListValue().contains(this.biomeConfigExtension))
         {
             String newExtension = BiomeStandardValues.DefaultBiomeConfigExtension.stringValue();
-            TerrainControl.log(Level.WARNING, "BiomeConfig file extension {0} is invalid, changing to {1}", new Object[] {
-                    this.biomeConfigExtension, newExtension});
+            TerrainControl.log(LogMarker.WARN, "BiomeConfig file extension {} is invalid, changing to {}", new Object[]
+            {
+                this.biomeConfigExtension, newExtension
+            });
             this.biomeConfigExtension = newExtension;
         }
 
@@ -110,8 +102,7 @@ public final class PluginConfig extends ConfigFile
     protected void readConfigSettings()
     {
         this.SettingsMode = readSettings(WorldStandardValues.SettingsMode);
-        this.consoleHandlerLevel = readSettings(PluginStandardValues.ConsoleLogLevel);
-        this.fileHandlerLevel = readSettings(PluginStandardValues.FileLogLevel);
+        this.LogLevel = readSettings(PluginStandardValues.LogLevel);
         this.biomeConfigExtension = readSettings(BiomeStandardValues.DefaultBiomeConfigExtension);
     }
 
@@ -136,26 +127,19 @@ public final class PluginConfig extends ConfigFile
         writeSmallTitle("Possible Log Levels");
         // writeComment("   Off         - Only warnings and errors are displayed.");
         // // Shows warning when using this
-        writeComment("   Standard    - Default Level, minimal logging; This is exactly what you are used to.");
-        writeComment("   Debug       - Slightly more detail, this one is not too noisy.");
-        writeComment("   XDebug      - Slightly even more detail, can be slightly noisy.");
-        writeComment("   XXDebug     - Use with caution, some large logs are possible.");
-        writeComment("   Trace       - Only use this in dire circumstances and only for short periods of time, huge logs incoming.");
+        writeComment("   Off         - Bare logging; This will only show FATAL and ERROR logs");
+        writeComment("   Quiet       - Minimal logging; This will show FATAL, ERROR, and WARN logs");
+        writeComment("   Standard    - Default logging; This is exactly what you are used to. Quiet + INFO logs");
+        writeComment("   Debug       - Above Normal logging; Standard logs + DEBUG logs");
+        writeComment("   Trace       - Verbose logging; This gets very messy, Debug logs + TRACE logs");
         writeComment("");
 
-        writeSmallTitle("Console Logging Level");
-        writeComment("This is the level with which logs will be produced on the console. i.e. That black screen thing you see in windows.");
+        writeSmallTitle("Logging Level");
+        writeComment("This is the level with which logs will be produced.");
         writeComment("See ``Possible Log Levels'' if you are lost.");
         writeComment(" ");
         writeComment("Defaults to: Standard");
-        writeValue(PluginStandardValues.ConsoleLogLevel, this.consoleHandlerLevel.name());
-
-        writeSmallTitle("File Logging Level");
-        writeComment("This is the level with which logs will be produced in the log file. i.e. server.log");
-        writeComment("See ``Possible Log Levels'' if you are lost.");
-        writeComment(" ");
-        writeComment("Defaults to: Standard");
-        writeValue(PluginStandardValues.FileLogLevel, this.fileHandlerLevel.name());
+        writeValue(PluginStandardValues.LogLevel, this.LogLevel.name());
 
         writeBigTitle("File Extension Rules");
 
@@ -169,14 +153,9 @@ public final class PluginConfig extends ConfigFile
         writeValue(BiomeStandardValues.DefaultBiomeConfigExtension, this.biomeConfigExtension);
     }
 
-    public LogLevels getFileHandlerLevel()
+    public LogLevels getLogLevel()
     {
-        return fileHandlerLevel;
-    }
-
-    public LogLevels getConsoleHandlerLevel()
-    {
-        return consoleHandlerLevel;
+        return LogLevel;
     }
 
 }

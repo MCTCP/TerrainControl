@@ -36,6 +36,7 @@ dependencies {
     compile 'org.bukkit:craftbukkit:' + ext.bukkitVersion
     compile project(':common')
     compile 'org.apache.logging.log4j:log4j-api:2.0-beta9'
+    compile 'org.apache.logging.log4j:log4j-core:2.0-beta9'
 }
 
 // Replace text in plugin.yml

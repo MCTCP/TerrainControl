@@ -2,11 +2,11 @@ package com.khorn.terraincontrol.generator.biome;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 
 /**
  * Class used to register IBiomeManager
@@ -55,7 +55,7 @@ public class BiomeModeManager
             }
         }
         // Fall back on normal mode
-        TerrainControl.log(Level.WARNING, "{0} is not a valid biome mode, falling back on Normal.", name);
+        TerrainControl.log(LogMarker.WARN, "{} is not a valid biome mode, falling back on Normal.", (Object) name);
         return NORMAL;
     }
 
@@ -78,8 +78,8 @@ public class BiomeModeManager
             }).newInstance(world, cache);
         } catch (Exception e)
         {
-            TerrainControl.log(Level.SEVERE, "Cannot properly reflect biome manager, falling back on BiomeMode:Normal");
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.log(LogMarker.FATAL, "Cannot properly reflect biome manager, falling back on BiomeMode:Normal");
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
             return new NormalBiomeGenerator(world, cache);
         }
     }

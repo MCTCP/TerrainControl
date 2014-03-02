@@ -2,13 +2,13 @@ package com.khorn.terraincontrol.bukkit.commands.runnable;
 
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
+import com.khorn.terraincontrol.logging.LogMarker;
 import net.minecraft.server.v1_7_R1.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
 
 import java.io.*;
 import java.lang.reflect.Field;
-import java.util.logging.Level;
 
 public class BiomeReplace implements Runnable
 {
@@ -170,13 +170,13 @@ public class BiomeReplace implements Runnable
 
         } catch (NoSuchFieldException e)
         {
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
         } catch (IllegalAccessException e)
         {
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
         } catch (IOException e)
         {
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
         }
 
         sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Done. " + chunksRewritten + " chunks rewritten.");

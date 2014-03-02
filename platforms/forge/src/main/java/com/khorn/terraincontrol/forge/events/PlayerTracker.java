@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.TCPlugin;
+import com.khorn.terraincontrol.logging.LogMarker;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
@@ -12,7 +13,6 @@ import net.minecraft.network.play.server.S3FPacketCustomPayload;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.logging.Level;
 
 public class PlayerTracker
 {
@@ -33,7 +33,7 @@ public class PlayerTracker
 
         // Get the config
         // TODO only send the configs when the player is in the main world
-        LocalWorld worldTC = plugin.getWorld();
+        LocalWorld worldTC = TerrainControl.getEngine().getWorld();
 
         if (worldTC == null)
         {
@@ -51,7 +51,7 @@ public class PlayerTracker
             configs.writeToStream(stream);
         } catch (IOException e)
         {
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
         }
 
         // Make the packet

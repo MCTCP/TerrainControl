@@ -19,7 +19,7 @@ public abstract class StringHelper
 
     public static String join(final Object[] list, final String glue)
     {
-        StringBuilder ret = new StringBuilder();
+        StringBuilder ret = new StringBuilder(100);
         for (int i = 0; i < list.length; i++)
         {
             if (i != 0)

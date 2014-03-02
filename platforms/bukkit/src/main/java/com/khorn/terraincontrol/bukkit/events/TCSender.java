@@ -4,13 +4,13 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import com.khorn.terraincontrol.logging.LogMarker;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.logging.Level;
 
 public class TCSender
 {
@@ -31,7 +31,7 @@ public class TCSender
         {
             WorldSettings configs = plugin.worlds.get(world.getName()).getSettings();
 
-            TerrainControl.log(Level.FINER, "Config sent to player for world {0}", configs.worldConfig.name); //debug
+            TerrainControl.log(LogMarker.TRACE, "Config sent to player for world ", configs.worldConfig.name); //debug
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream stream = new DataOutputStream(outputStream);
 
@@ -42,7 +42,7 @@ public class TCSender
                 stream.flush();
             } catch (IOException e)
             {
-                TerrainControl.printStackTrace(Level.SEVERE, e);
+                TerrainControl.printStackTrace(LogMarker.FATAL, e);
             }
 
             byte[] data = outputStream.toByteArray();

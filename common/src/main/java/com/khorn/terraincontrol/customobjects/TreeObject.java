@@ -3,13 +3,13 @@ package com.khorn.terraincontrol.customobjects;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.logging.Level;
 
 public class TreeObject implements CustomObject
 {
@@ -46,7 +46,7 @@ public class TreeObject implements CustomObject
                 }
             } catch (NumberFormatException e)
             {
-                TerrainControl.log(Level.WARNING, "Cannot parse {0} of a {1} tree: invalid number!", new Object[]
+                TerrainControl.log(LogMarker.WARN, "Cannot parse {} of a {} tree: invalid number!", new Object[]
                 {
                     entry.getKey(), type
                 });

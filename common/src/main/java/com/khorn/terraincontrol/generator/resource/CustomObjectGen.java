@@ -4,12 +4,12 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 
 public class CustomObjectGen extends Resource
 {
@@ -68,7 +68,7 @@ public class CustomObjectGen extends Resource
                 CustomObjectGen otherO = (CustomObjectGen) other;
                 return otherO.objectNames.size() == this.objectNames.size() && otherO.objectNames.containsAll(this.objectNames);
             } catch (Exception ex){
-                TerrainControl.log(Level.WARNING, ex.getMessage());
+                TerrainControl.log(LogMarker.WARN, ex.getMessage());
             }
         }
         return false;

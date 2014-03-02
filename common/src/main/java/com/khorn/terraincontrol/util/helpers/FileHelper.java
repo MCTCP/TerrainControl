@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.util.helpers;
 
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.logging.Level;
 
 public class FileHelper
 {
@@ -24,7 +24,7 @@ public class FileHelper
         {
             if (!directory.exists() && !directory.mkdirs())
             {
-                TerrainControl.log(Level.WARNING, "Error creating directory \"{0}\".", new Object[] {directory.getAbsolutePath()});
+                TerrainControl.log(LogMarker.WARN, "Error creating directory \"{}\".", new Object[] {directory.getAbsolutePath()});
                 allFoldersExist = false;
             }
         }

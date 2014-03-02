@@ -3,10 +3,10 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * This class holds data for a bukkit nms.BiomeMeta class. The name does not
@@ -109,11 +109,11 @@ public class WeightedMobSpawnGroup
             }
         } catch (NumberFormatException e)
         {
-            TerrainControl.log(Level.WARNING, "Incorrect number in JSON: {0}", originalJson);
-            TerrainControl.printStackTrace(Level.WARNING, e);
+            TerrainControl.log(LogMarker.WARN, "Incorrect number in JSON: ", originalJson);
+            TerrainControl.printStackTrace(LogMarker.WARN, e);
         } catch (ArrayIndexOutOfBoundsException e)
         {
-            TerrainControl.log(Level.WARNING, "Incorrect JSON: {0}", originalJson);
+            TerrainControl.log(LogMarker.WARN, "Incorrect JSON: ", originalJson);
         }
 
         return mobGroups;

@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -12,7 +13,6 @@ import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.biome.BiomeGenBase;
 
 import java.util.List;
-import java.util.logging.Level;
 
 public class BiomeGenCustom extends BiomeGenBase
 {
@@ -90,7 +90,7 @@ public class BiomeGenCustom extends BiomeGenBase
                 internalList.add(new SpawnListEntry(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
             } else
             {
-                TerrainControl.log(Level.WARNING, "Mob type {0} not found in {1}", new Object[]
+                TerrainControl.log(LogMarker.WARN, "Mob type {} not found in {}", new Object[]
                 {
                     mobGroup.getMobName(), this.biomeName
                 });

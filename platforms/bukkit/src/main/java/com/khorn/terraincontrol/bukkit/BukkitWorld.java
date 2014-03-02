@@ -14,6 +14,7 @@ import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 
 public class BukkitWorld implements LocalWorld
 {
@@ -761,7 +761,7 @@ public class BukkitWorld implements LocalWorld
             tileEntity.a(nmsTag); // tileEntity.load
         } else
         {
-            TerrainControl.log(Level.CONFIG, "Skipping tile entity with id {0}, cannot be placed at {1},{2},{3} on id {4}", new Object[] {
+            TerrainControl.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", new Object[] {
                     nmsTag.getString("id"), x, y, z, getMaterial(x, y, z)});
         }
     }

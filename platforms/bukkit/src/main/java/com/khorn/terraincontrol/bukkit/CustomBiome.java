@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
 
 import net.minecraft.server.v1_7_R1.*;
@@ -14,7 +15,6 @@ import org.bukkit.craftbukkit.v1_7_R1.block.CraftBlock;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 public class CustomBiome extends BiomeBase
 {
@@ -38,8 +38,8 @@ public class CustomBiome extends BiomeBase
 
         } catch (Exception e)
         {
-            TerrainControl.log(Level.SEVERE, "Couldn't update Bukkit's biome mappings!");
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.log(LogMarker.FATAL, "Couldn't update Bukkit's biome mappings!");
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
         }
     }
 
@@ -80,7 +80,7 @@ public class CustomBiome extends BiomeBase
             } else
             {
                 // The .toLowerCase() is just a safeguard so that we get notified if this.af is no longer the biome name
-                TerrainControl.log(Level.WARNING, "Mob type {0} not found in {1}", new Object[]{mobGroup.getMobName(), this.af.toLowerCase()});
+                TerrainControl.log(LogMarker.WARN, "Mob type {} not found in {}", new Object[]{mobGroup.getMobName(), this.af.toLowerCase()});
             }
         }
     }
@@ -98,8 +98,8 @@ public class CustomBiome extends BiomeBase
             return entitiesList.get(mobName);
         } catch (Exception e)
         {
-            TerrainControl.log(Level.SEVERE, "Someone forgot to update the mob spawning code! Please report!");
-            TerrainControl.printStackTrace(Level.SEVERE, e);
+            TerrainControl.log(LogMarker.FATAL, "Someone forgot to update the mob spawning code! Please report!");
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
             return null;
         }
     }

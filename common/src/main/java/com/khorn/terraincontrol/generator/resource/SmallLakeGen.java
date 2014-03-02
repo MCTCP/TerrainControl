@@ -5,12 +5,12 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 
 public class SmallLakeGen extends Resource
 {
@@ -165,7 +165,7 @@ public class SmallLakeGen extends Resource
         if (getClass() != other.getClass())
             return false;
         final SmallLakeGen compare = (SmallLakeGen) other;
-        TerrainControl.log(Level.CONFIG, "Equals::{0}", new Object[]{this.minAltitude == compare.minAltitude
+        TerrainControl.log(LogMarker.DEBUG, "Equals::{}", new Object[]{this.minAltitude == compare.minAltitude
                && this.maxAltitude == compare.maxAltitude
                && Arrays.equals(this.BooleanBuffer, compare.BooleanBuffer)});
         return this.minAltitude == compare.minAltitude

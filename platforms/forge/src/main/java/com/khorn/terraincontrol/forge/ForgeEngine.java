@@ -1,50 +1,79 @@
-package com.khorn.terraincontrol.bukkit;
+package com.khorn.terraincontrol.forge;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import net.minecraft.server.v1_7_R1.Block;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.lang.reflect.Field;
 
-public class BukkitEngine extends TerrainControlEngine
+public class ForgeEngine extends TerrainControlEngine
 {
 
     private final TCPlugin plugin;
+    protected TCWorldType worldType;
 
-    public BukkitEngine(TCPlugin plugin)
+    public ForgeEngine(TCPlugin plugin, TCWorldType worldType)
     {
+        super(FMLCommonHandler.instance().getFMLLogger());
         this.plugin = plugin;
+        this.worldType = worldType;
     }
 
     @Override
     public LocalWorld getWorld(String name)
     {
-        return plugin.worlds.get(name);
+        LocalWorld world = worldType.worldTC;
+        if (world == null)
+        {
+            return null;
+        }
+        if (world.getName().equals(name))
+        {
+            return world;
+        }
+        return null;
     }
 
+    /**
+     * Gets the world loaded by Terrain Control.
+     * <p />
+     * Note: this method may be removed in the future, when multiworld support
+     * is introduced.
+     * <p/>
+     * <p>
+     * @return The world loaded by Terrain Control, or null if no world is
+     *         loaded.
+     */
     @Override
     public LocalWorld getWorld()
     {
-        try
-        {
-            throw new UnsupportedOperationException("Bukkit Should call getWorld with a name as a parameter.");
-        } catch (UnsupportedOperationException ex)
-        {
-            Logger.getLogger(BukkitEngine.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        return worldType.worldTC;
     }
 
     @Override
     public File getTCDataFolder()
     {
-        return plugin.getDataFolder();
+        File dataFolder;
+        try
+        {
+            Field minecraftDir = Loader.class.getDeclaredField("minecraftDir");
+            minecraftDir.setAccessible(true);
+            dataFolder = new File((File) minecraftDir.get(null), "mods" + File.separator + "TerrainControl");
+        } catch (Throwable e)
+        {
+            dataFolder = new File("mods" + File.separator + "TerrainControl");
+            System.out.println("Could not reflect the Minecraft directory, save location may be unpredicatble.");
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
+        }
+        return dataFolder;
     }
 
     @Override
@@ -60,10 +89,10 @@ public class BukkitEngine extends TerrainControlEngine
         // This is so that things like "minecraft:stone" aren't parsed
         // as the block "minecraft" with data "stone", but instead as the
         // block "minecraft:stone" with no block data.
-        Block block = Block.b(input);
+        net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(input);
         if (block != null)
         {
-            return new BukkitMaterialData(block, 0);
+            return new ForgeMaterialData(block, 0);
         }
 
         try
@@ -95,15 +124,15 @@ public class BukkitEngine extends TerrainControlEngine
         }
 
         // Get the material belonging to the block and data
-        Block block = Block.b(blockName);
+        net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(blockName);
         if (block != null)
         {
-            return new BukkitMaterialData(block, blockData);
+            return new ForgeMaterialData(block, blockData);
         }
         DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
         if (defaultMaterial != null)
         {
-            return new BukkitMaterialData(defaultMaterial, blockData);
+            return new ForgeMaterialData(defaultMaterial, blockData);
         }
 
         // Failed
@@ -113,7 +142,7 @@ public class BukkitEngine extends TerrainControlEngine
     @Override
     public LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
     {
-        return new BukkitMaterialData(defaultMaterial, blockData);
+        return new ForgeMaterialData(defaultMaterial, blockData);
     }
 
 }
