@@ -14,7 +14,6 @@ public class BukkitBiome implements LocalBiome
 {
     private BiomeBase biomeBase;
     private boolean isCustom = false;
-    private int customID;
 
     private BiomeIds biomeIds;
     private String name;
@@ -34,42 +33,15 @@ public class BukkitBiome implements LocalBiome
     }
 
     /**
-     * Wraps the custom biome into a local biome.
+     * Creates a new custom biome with the given name and ids.
      * 
-     * @param biomeBase The BiomeBase instance the biome is based on.
-     * @param biomeName The biome name. For non-virtual biomes (see
-     *            {@link BiomeIds#isVirtual()}) this must match the name
-     *            provided in the BiomeBase instance.
-     * @param biomeIds The id of the biome. The id used to save to the map
-     *            files (see {@link BiomeIds#getSavedId()}) must match the name
-     *            provided in the BiomeBase instance.
-     * @param customId Increases 1 for every custom biome on the server. First
-     *            custom biome has 0, second 1, and so on. Old/legacy/only
-     *            kept for compatibility.
+     * @param name Name of the custom biome.
+     * @param biomeIds Ids of the custom biome.
      * @return The custom biome.
-     * @throws IllegalAgrumentException When the biomeName or biomeId doesn't
-     *             match the biomeBase.
      */
-    public static BukkitBiome forCustomBiome(BiomeBase biomeBase, String biomeName, BiomeIds biomeIds, int customId)
+    public static BukkitBiome forCustomBiome(String name, BiomeIds biomeIds)
     {
-        if (biomeIds.getSavedId() != biomeBase.id)
-        {
-            throw new IllegalArgumentException("Passed wrong biome id (BiomeBase: " + biomeBase.id + ", BiomeId: " + biomeIds + ", Name: "
-                    + biomeName + ")");
-        }
-        if (biomeIds.isVirtual())
-        {
-            return new BukkitBiome(biomeBase, biomeName, customId, biomeIds.getGenerationId());
-        } else
-        {
-            String biomeBaseName = biomeBase.af;
-            if (!biomeBaseName.equals(biomeName))
-            {
-                throw new IllegalArgumentException("For non-virtual biomes, the name must match the BiomeBase name (" + biomeBaseName
-                        + " vs " + biomeName + ")");
-            }
-            return new BukkitBiome(biomeBase, customId);
-        }
+        return new BukkitBiome(new CustomBiome(name, biomeIds));
     }
 
     // For vanilla biomes
@@ -83,44 +55,22 @@ public class BukkitBiome implements LocalBiome
         this.humidity = biome.humidity;
     }
 
-    // For non-virtual custom biomes
-    private BukkitBiome(BiomeBase biome, int customId)
+    // For custom biomes
+    private BukkitBiome(CustomBiome biomeBase)
     {
-        this.biomeBase = biome;
-        this.biomeIds = new BiomeIds(biomeBase.id);
+        this.biomeBase = biomeBase;
+        this.biomeIds = new BiomeIds(biomeBase.generationId, biomeBase.id);
         this.isCustom = true;
-        this.customID = customId;
-        this.name = biome.af;
+        this.name = biomeBase.af;
 
-        this.temperature = biome.temperature;
-        this.humidity = biome.humidity;
-
-    }
-
-    // For virtual custom biomes
-    private BukkitBiome(BiomeBase biome, String _name, int customId, int virtualId)
-    {
-        this.biomeBase = biome;
-        this.biomeIds = new BiomeIds(virtualId, biome.id);
-        this.isCustom = true;
-        this.customID = customId;
-        this.name = _name;
-
-        this.temperature = biome.temperature;
-        this.humidity = biome.humidity;
-
+        this.temperature = biomeBase.temperature;
+        this.humidity = biomeBase.humidity;
     }
 
     @Override
     public boolean isCustom()
     {
         return this.isCustom;
-    }
-
-    @Override
-    public int getCustomId()
-    {
-        return customID;
     }
 
     public BiomeBase getHandle()

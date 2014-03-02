@@ -4,15 +4,13 @@ import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.gen.structure.MapGenVillage;
+
+import java.util.List;
+import java.util.Random;
 
 /**
  * Actually a biome manager.
@@ -20,20 +18,11 @@ import net.minecraft.world.gen.structure.MapGenVillage;
 public class TCWorldChunkManager extends WorldChunkManager
 {
     private BiomeGenerator biomeManager;
-    private ArrayList<BiomeGenBase> biomesToSpawnIn = new ArrayList<BiomeGenBase>();
 
     private ForgeWorld localWorld;
 
     public TCWorldChunkManager(ForgeWorld world)
     {
-        this.biomesToSpawnIn.add(BiomeGenBase.getBiome(DefaultBiome.FOREST.Id));
-        this.biomesToSpawnIn.add(BiomeGenBase.getBiome(DefaultBiome.PLAINS.Id));
-        this.biomesToSpawnIn.add(BiomeGenBase.getBiome(DefaultBiome.TAIGA.Id));
-        this.biomesToSpawnIn.add(BiomeGenBase.getBiome(DefaultBiome.DESERT_HILLS.Id));
-        this.biomesToSpawnIn.add(BiomeGenBase.getBiome(DefaultBiome.FOREST_HILLS.Id));
-        this.biomesToSpawnIn.add(BiomeGenBase.getBiome(DefaultBiome.JUNGLE.Id));
-        this.biomesToSpawnIn.add(BiomeGenBase.getBiome(DefaultBiome.JUNGLE_HILLS.Id));
-
         this.localWorld = world;
     }
 
@@ -42,17 +31,11 @@ public class TCWorldChunkManager extends WorldChunkManager
         this.biomeManager = manager;
     }
 
-    @SuppressWarnings("rawtypes")
-    public List a()
-    {
-        return this.biomesToSpawnIn;
-    }
-
     // get biome
     @Override
     public BiomeGenBase getBiomeGenAt(int paramInt1, int paramInt2)
     {
-        return BiomeGenBase.getBiome(biomeManager.getBiome(paramInt1, paramInt2));
+        return localWorld.getBiomeById(biomeManager.getBiome(paramInt1, paramInt2)).getHandle();
     }
 
     // rain
@@ -73,7 +56,7 @@ public class TCWorldChunkManager extends WorldChunkManager
 
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = BiomeGenBase.getBiome(arrayOfInt[i]);
+            paramArrayOfBiomeBase[i] = localWorld.getBiomeById(arrayOfInt[i]).getHandle();
         }
 
         return paramArrayOfBiomeBase;
@@ -90,7 +73,7 @@ public class TCWorldChunkManager extends WorldChunkManager
 
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = BiomeGenBase.getBiome(arrayOfInt[i]);
+            paramArrayOfBiomeBase[i] = localWorld.getBiomeById(arrayOfInt[i]).getHandle();
         }
 
         return paramArrayOfBiomeBase;

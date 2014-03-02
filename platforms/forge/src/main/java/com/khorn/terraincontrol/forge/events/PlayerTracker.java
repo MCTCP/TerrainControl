@@ -4,8 +4,10 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.TCPlugin;
 import com.khorn.terraincontrol.logging.LogMarker;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
@@ -33,7 +35,7 @@ public class PlayerTracker
 
         // Get the config
         // TODO only send the configs when the player is in the main world
-        LocalWorld worldTC = TerrainControl.getEngine().getWorld();
+        LocalWorld worldTC = ((ForgeEngine)TerrainControl.getEngine()).getWorld();
 
         if (worldTC == null)
         {

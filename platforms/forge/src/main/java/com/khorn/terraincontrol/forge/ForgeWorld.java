@@ -1,8 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.LocalMaterialData;
-
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
@@ -27,6 +24,7 @@ import net.minecraft.world.SpawnerAnimals;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.feature.*;
 
 import java.util.ArrayList;
@@ -46,10 +44,9 @@ public class ForgeWorld implements LocalWorld
 
     private static int nextBiomeId = 0;
 
-    // >> This will likely change in 1.7
-    private static final int maxBiomeCount = (Byte.MIN_VALUE * -2);
-    private static ForgeBiome[] biomes = new ForgeBiome[maxBiomeCount];
-    private static BiomeGenBase[] biomesToRestore = new BiomeGenBase[maxBiomeCount];
+    private static final int maxBiomeCount = 1024;
+    private ForgeBiome[] biomes = new ForgeBiome[maxBiomeCount];
+    private static BiomeGenBase[] biomesToRestore = new BiomeGenBase[BiomeGenBase.getBiomeGenArray().length];
 
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
@@ -113,10 +110,10 @@ public class ForgeWorld implements LocalWorld
             int biomeId = defaultBiome.Id;
             BiomeGenBase oldBiome = BiomeGenBase.getBiome(biomeId);
             biomesToRestore[biomeId] = oldBiome;
-            BiomeGenCustom custom = new BiomeGenCustom(new BiomeIds(biomeId), oldBiome.biomeName);
+            ForgeBiome biome = ForgeBiome.createBiome(oldBiome.biomeName, new BiomeIds(biomeId));
+            BiomeGenCustom custom = biome.getHandle();
             nextBiomeId++;
             custom.CopyBiome(oldBiome);
-            ForgeBiome biome = new ForgeBiome(custom);
             biomes[biome.getIds().getGenerationId()] = biome;
             defaultBiomes.add(biome);
             this.biomeNames.put(biome.getName(), biome);
@@ -130,11 +127,13 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome addCustomBiome(String name, BiomeIds id)
+    public LocalBiome addCustomBiome(String name, BiomeIds biomeIds)
     {
-        ForgeBiome biome = new ForgeBiome(new BiomeGenCustom(id, name));
+        ForgeBiome biome = ForgeBiome.createBiome(name, biomeIds);
+
         biomes[biome.getIds().getGenerationId()] = biome;
         this.biomeNames.put(biome.getName(), biome);
+
         return biome;
     }
 
@@ -151,7 +150,7 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome getBiomeById(int id)
+    public ForgeBiome getBiomeById(int id)
     {
         return biomes[id];
     }

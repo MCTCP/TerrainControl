@@ -78,10 +78,6 @@ public class BukkitWorld implements LocalWorld
 
     private BiomeBase[] biomeBaseArray;
 
-    // Need for compatibility with old configs. It is start index for custom
-    // biomes count used only for isle biomes.
-    private int customBiomesCount = 21;
-
     static
     {
         for (DefaultBiome defaultBiome : DefaultBiome.values())
@@ -113,7 +109,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public LocalBiome addCustomBiome(String name, BiomeIds biomeIds)
     {
-        BukkitBiome biome = BukkitBiome.forCustomBiome(new CustomBiome(biomeIds, name), name, biomeIds, customBiomesCount++);
+        BukkitBiome biome = BukkitBiome.forCustomBiome(name, biomeIds);
 
         biomes[biome.getIds().getGenerationId()] = biome;
         this.biomeNames.put(biome.getName(), biome);

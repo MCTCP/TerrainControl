@@ -38,7 +38,7 @@ public class TCPlugin
         
 
         // Start TerrainControl engine, and Register world type
-        TerrainControl.setEngine(new ForgeEngine(this, new TCWorldType("TerrainControl")));
+        TerrainControl.setEngine(new ForgeEngine(new TCWorldType("TerrainControl")));
 
         // Register village and rare building starts
         MapGenStructureIO.registerStructure(RareBuildingStart.class, StructureNames.RARE_BUILDING);

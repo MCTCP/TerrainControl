@@ -17,13 +17,11 @@ import java.lang.reflect.Field;
 public class ForgeEngine extends TerrainControlEngine
 {
 
-    private final TCPlugin plugin;
     protected TCWorldType worldType;
 
-    public ForgeEngine(TCPlugin plugin, TCWorldType worldType)
+    public ForgeEngine(TCWorldType worldType)
     {
         super(FMLCommonHandler.instance().getFMLLogger());
-        this.plugin = plugin;
         this.worldType = worldType;
     }
 
@@ -52,7 +50,6 @@ public class ForgeEngine extends TerrainControlEngine
      * @return The world loaded by Terrain Control, or null if no world is
      *         loaded.
      */
-    @Override
     public LocalWorld getWorld()
     {
         return worldType.worldTC;

@@ -9,8 +9,6 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.server.v1_7_R1.Block;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class BukkitEngine extends TerrainControlEngine
 {
@@ -26,19 +24,6 @@ public class BukkitEngine extends TerrainControlEngine
     public LocalWorld getWorld(String name)
     {
         return plugin.worlds.get(name);
-    }
-
-    @Override
-    public LocalWorld getWorld()
-    {
-        try
-        {
-            throw new UnsupportedOperationException("Bukkit Should call getWorld with a name as a parameter.");
-        } catch (UnsupportedOperationException ex)
-        {
-            Logger.getLogger(BukkitEngine.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
     }
 
     @Override

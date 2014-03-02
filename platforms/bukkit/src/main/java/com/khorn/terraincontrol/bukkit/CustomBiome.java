@@ -21,7 +21,7 @@ public class CustomBiome extends BiomeBase
     public final int generationId;
 
     @SuppressWarnings("MismatchedReadAndWriteOfArray")
-    public CustomBiome(BiomeIds biomeIds, String name)
+    public CustomBiome(String name, BiomeIds biomeIds)
     {
         super(biomeIds.getSavedId());
         this.generationId = biomeIds.getGenerationId();

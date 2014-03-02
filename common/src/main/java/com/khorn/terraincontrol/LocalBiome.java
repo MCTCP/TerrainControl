@@ -42,15 +42,6 @@ public interface LocalBiome
     BiomeIds getIds();
 
     /**
-     * If this biome is a custom biome, this gets an id for this biome that is
-     * unique for this world. This id is decided by Terrain Control and is not
-     * saved to the map files.
-     * 
-     * @return The id.
-     */
-    int getCustomId();
-
-    /**
      * Gets the temperature of this biome, between 0 and 2 (inclusive). Higher
      * is warmer.
      * 

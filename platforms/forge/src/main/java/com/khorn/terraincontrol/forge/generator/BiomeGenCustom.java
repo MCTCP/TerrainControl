@@ -16,7 +16,7 @@ import java.util.List;
 
 public class BiomeGenCustom extends BiomeGenBase
 {
-    
+
     private int skyColor;
     private int grassColor;
     private boolean grassColorIsMultiplier;
@@ -26,16 +26,20 @@ public class BiomeGenCustom extends BiomeGenBase
     private boolean grassColorSet = false;
     private boolean foliageColorSet = false;
 
-    public BiomeGenCustom(BiomeIds id, String name)
-    {
-        super(id.getSavedId());
-        this.setBiomeName(name);
+    public final int generationId;
 
+    public BiomeGenCustom(String name, BiomeIds id)
+    {
+        super(id.getSavedId(), // Use the saved id for Minecraft compatibility
+                !id.isVirtual() // Only register non-virtual biomes
+        );
+        this.setBiomeName(name);
+        this.generationId = id.getGenerationId();
     }
 
     /**
      * Needs a BiomeConfig that has all the visual settings present.
-     *
+     * 
      * @param config
      */
     @SuppressWarnings("unchecked")
@@ -74,7 +78,8 @@ public class BiomeGenCustom extends BiomeGenBase
 
     }
 
-    // Adds the mobs to the internal list. Displays a warning for each mob type
+    // Adds the mobs to the internal list. Displays a warning for each mob
+    // type
     // it doesn't understand
     protected void addMobs(List<SpawnListEntry> internalList, boolean addDefaults, List<WeightedMobSpawnGroup> configList)
     {
@@ -90,10 +95,7 @@ public class BiomeGenCustom extends BiomeGenBase
                 internalList.add(new SpawnListEntry(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
             } else
             {
-                TerrainControl.log(LogMarker.WARN, "Mob type {} not found in {}", new Object[]
-                {
-                    mobGroup.getMobName(), this.biomeName
-                });
+                TerrainControl.log(LogMarker.WARN, "Mob type {} not found in {}", new Object[] {mobGroup.getMobName(), this.biomeName});
             }
         }
     }
@@ -168,5 +170,5 @@ public class BiomeGenCustom extends BiomeGenBase
     {
         return "BiomeGenCustom of " + biomeName;
     }
-    
+
 }

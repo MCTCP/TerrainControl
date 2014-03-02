@@ -187,8 +187,6 @@ public abstract class TerrainControlEngine
      */
     public abstract LocalWorld getWorld(String name);
 
-    public abstract LocalWorld getWorld();
-
     public void onShutdown()
     {
         // Shutdown all loaders

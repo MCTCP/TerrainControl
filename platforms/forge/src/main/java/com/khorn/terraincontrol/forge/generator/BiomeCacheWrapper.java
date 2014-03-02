@@ -16,7 +16,17 @@ public class BiomeCacheWrapper implements com.khorn.terraincontrol.generator.bio
     @Override
     public int getBiome(int x, int z)
     {
-        return handle.getBiomeGenAt(x, z).biomeID;
+        return getId(handle.getBiomeGenAt(x, z));
+    }
+
+    private int getId(BiomeGenBase biome)
+    {
+        // Support for virtual biomes
+        if (biome instanceof BiomeGenCustom)
+        {
+            return ((BiomeGenCustom) biome).generationId;
+        }
+        return biome.biomeID;
     }
 
     @Override
@@ -32,7 +42,7 @@ public class BiomeCacheWrapper implements com.khorn.terraincontrol.generator.bio
         int[] intCache = new int[cached.length];
         for (int i = 0; i < cached.length; i++)
         {
-            intCache[i] = cached[i].biomeID;
+            intCache[i] = getId(cached[i]);
         }
         return intCache;
     }
