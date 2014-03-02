@@ -8,25 +8,24 @@ import org.apache.logging.log4j.Marker;
 public class Logger
 {
 
-    private static org.apache.logging.log4j.Logger baseLogger;
-    private static final java.util.Formatter FORMATTER = new java.util.Formatter();
+    private org.apache.logging.log4j.Logger baseLogger;
     public static final String PLUGIN_NAME = PluginStandardValues.ChannelName.stringValue();
-    private static Marker logLevel;
+    private Marker logLevel;
 
     protected Logger(org.apache.logging.log4j.Logger logger)
     {
-        Logger.logLevel = PluginConfig.LogLevels.Standard.getLevel();
-        Logger.baseLogger = logger;
+        logLevel = PluginConfig.LogLevels.Standard.getLevel();
+        baseLogger = logger;
     }
 
-    public static org.apache.logging.log4j.Logger getBaseLogger()
+    public org.apache.logging.log4j.Logger getBaseLogger()
     {
-        return Logger.baseLogger;
+        return baseLogger;
     }
 
-    public static void setLevel(Marker level)
+    public void setLevel(Marker level)
     {
-        Logger.logLevel = level;
+        logLevel = level;
     }
 
     /**
@@ -36,9 +35,9 @@ public class Logger
      * @param level   The severity of the message
      * @param message The messages to log
      */
-    public static void log(Marker level, String... message)
+    public void log(Marker level, String... message)
     {
-        Logger.log(level, "{}", (Object) StringHelper.join(message, " "));
+        log(level, "{}", (Object) StringHelper.join(message, " "));
     }
 
     /**
@@ -51,27 +50,27 @@ public class Logger
      * @param params  The parameters belonging to {0...} in the message
      *                string
      */
-    public static void log(Marker level, String message, Object... params)
+    public void log(Marker level, String message, Object... params)
     {
         String levelName = level.getName();
         StringBuilder sb = new StringBuilder(50).append('[').append(PLUGIN_NAME).append("] [")
             .append(levelName.substring(levelName.lastIndexOf('.')+1)) //>>	only get the basic name not the FQN
             .append("] ").append(message);
-        if (LogMarker.compare(Logger.logLevel, level) >= 0)
+        if (LogMarker.compare(logLevel, level) >= 0)
         {//>>	Only log messages that we want to see...
             //>>	Log Fatal, Error, and Warn as what they are without Markers.
             if (LogMarker.compare(LogMarker.FATAL, level) == 0)
             {
-                Logger.baseLogger.fatal(sb.toString(), params);
+                baseLogger.fatal(sb.toString(), params);
             } else if (LogMarker.compare(LogMarker.ERROR, level) == 0)
             {
-                Logger.baseLogger.error(sb.toString(), params);
+                baseLogger.error(sb.toString(), params);
             } else if (LogMarker.compare(LogMarker.WARN, level) == 0)
             {
-                Logger.baseLogger.warn(sb.toString(), params);
+                baseLogger.warn(sb.toString(), params);
             } else
             {//>>	Otherwise log the message as info and tag it with a marker
-                Logger.baseLogger.info(level, sb.toString(), params);
+                baseLogger.info(level, sb.toString(), params);
             }
         }
     }
@@ -84,10 +83,10 @@ public class Logger
      * @param ifLevel  the Log level to test for
      * @param messages The messages to log.
      */
-    public static void logIfLevel(Marker ifLevel, String... messages)
+    public void logIfLevel(Marker ifLevel, String... messages)
     {
-        if (LogMarker.compare(Logger.logLevel, ifLevel) == 0)
-            Logger.log(ifLevel, messages);
+        if (LogMarker.compare(logLevel, ifLevel) == 0)
+            log(ifLevel, messages);
     }
 
     /**
@@ -101,10 +100,10 @@ public class Logger
      * @param params  The parameters belonging to {0...} in the message
      *                string
      */
-    public static void logIfLevel(Marker ifLevel, String message, Object... params)
+    public void logIfLevel(Marker ifLevel, String message, Object... params)
     {
-        if (LogMarker.compare(Logger.logLevel, ifLevel) == 0)
-            Logger.log(ifLevel, message, params);
+        if (LogMarker.compare(logLevel, ifLevel) == 0)
+            log(ifLevel, message, params);
     }
 
     /**
@@ -116,10 +115,10 @@ public class Logger
      * @param max      The maximum Log level to test for
      * @param messages The messages to log.
      */
-    public static void logIfLevel(Marker min, Marker max, String... messages)
+    public void logIfLevel(Marker min, Marker max, String... messages)
     {
-        if (LogMarker.compare(Logger.logLevel, max) <= 0 && LogMarker.compare(Logger.logLevel, min) >= 0)
-            Logger.log(max, messages);
+        if (LogMarker.compare(logLevel, max) <= 0 && LogMarker.compare(logLevel, min) >= 0)
+            log(max, messages);
     }
 
     /**
@@ -134,10 +133,10 @@ public class Logger
      * @param params  The parameters belonging to {0...} in the message
      *                string
      */
-    public static void logIfLevel(Marker min, Marker max, String message, Object... params)
+    public void logIfLevel(Marker min, Marker max, String message, Object... params)
     {
-        if (LogMarker.compare(Logger.logLevel, max) <= 0 && LogMarker.compare(Logger.logLevel, min) >= 0)
-            Logger.log(max, message, params);
+        if (LogMarker.compare(logLevel, max) <= 0 && LogMarker.compare(logLevel, min) >= 0)
+            log(max, message, params);
     }
 
 }

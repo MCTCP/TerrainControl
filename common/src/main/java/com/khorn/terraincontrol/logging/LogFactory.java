@@ -11,8 +11,6 @@ public class LogFactory
      */
     public static final String LOGGER_NAME = LogFactory.class.getName();
 
-    private static Logger LOGGER;
-
     private LogFactory()
     { //>>	Shouldnt be instantiated
     }
@@ -23,13 +21,7 @@ public class LogFactory
      */
     public static Logger getLogger()
     {
-        if (LOGGER == null)
-        {
-            return new Logger(LogManager.getLogger(LOGGER_NAME));
-        } else
-        {
-            return LOGGER;
-        }
+        return new Logger(LogManager.getLogger(LOGGER_NAME));
     }
 
     /**
@@ -41,13 +33,7 @@ public class LogFactory
      */
     public static Logger getLogger(org.apache.logging.log4j.Logger logger)
     {
-        if (LOGGER != null && Logger.getBaseLogger().getClass().getName().equals(logger.getClass().getName()))
-        {
-            return LOGGER;
-        } else
-        {
-            return new Logger(logger);
-        }
+        return new Logger(logger);
     }
 
 }

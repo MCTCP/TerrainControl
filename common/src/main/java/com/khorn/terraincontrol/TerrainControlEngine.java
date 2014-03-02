@@ -29,15 +29,16 @@ public abstract class TerrainControlEngine
     private CustomObjectManager customObjectManager;
     private List<EventHandler> monitoringEventHandlers = new ArrayList<EventHandler>(5);
     private PluginConfig pluginConfig;
+    private Logger logger;
 
     public TerrainControlEngine()
     {
-        LogFactory.getLogger();
+        logger = LogFactory.getLogger();
     }
 
-    public TerrainControlEngine(org.apache.logging.log4j.Logger logger)
+    public TerrainControlEngine(org.apache.logging.log4j.Logger log4jLogger)
     {
-        LogFactory.getLogger(logger);
+        logger = LogFactory.getLogger(log4jLogger);
     }
 
     /**
@@ -160,6 +161,15 @@ public abstract class TerrainControlEngine
     public abstract File getGlobalObjectsDirectory();
 
     /**
+     * Gets the logger to which all messages should be logged.
+     * @return The logger.
+     */
+    public Logger getLogger()
+    {
+        return logger;
+    }
+
+    /**
      * Returns the global config file.
      * <p>
      * @return The global config file.
@@ -216,7 +226,7 @@ public abstract class TerrainControlEngine
         // Do pluginConfig loading and then log anything that happened
         // LogManager and PluginConfig are now decoupled, thank the lord!
         pluginConfig = new PluginConfig(getTCDataFolder());
-        Logger.setLevel(pluginConfig.getLogLevel().getLevel());
+        logger.setLevel(pluginConfig.getLogLevel().getLevel());
 
         // Fire start event
         for (EventHandler handler : cancelableEventHandlers)

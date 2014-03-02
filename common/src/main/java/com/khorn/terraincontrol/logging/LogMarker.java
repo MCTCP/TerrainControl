@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 /**
- * @author Timethor
+ * Holds the log markers and allows to compare them to each other.
  */
 public class LogMarker
 {
@@ -23,7 +23,7 @@ public class LogMarker
     public static final Marker DEBUG = MarkerManager.getMarker("com.khorn.terraincontrol.DEBUG", LogMarker.INFO);
     public static final Marker TRACE = MarkerManager.getMarker("com.khorn.terraincontrol.TRACE", LogMarker.DEBUG);
 
-    public static Map<Marker, Integer> StandardLevels = new LinkedHashMap<Marker, Integer>(6);
+    private static Map<Marker, Integer> standardLevels = new LinkedHashMap<Marker, Integer>(6);
 
     private LogMarker()
     {
@@ -31,20 +31,20 @@ public class LogMarker
 
     static
     {
-        StandardLevels.put(FATAL, Level.FATAL.intLevel());
-        StandardLevels.put(ERROR, Level.ERROR.intLevel());
-        StandardLevels.put(WARN, Level.WARN.intLevel());
-        StandardLevels.put(INFO, Level.INFO.intLevel());
-        StandardLevels.put(DEBUG, Level.DEBUG.intLevel());
-        StandardLevels.put(TRACE, Level.TRACE.intLevel());
+        standardLevels.put(FATAL, Level.FATAL.intLevel());
+        standardLevels.put(ERROR, Level.ERROR.intLevel());
+        standardLevels.put(WARN, Level.WARN.intLevel());
+        standardLevels.put(INFO, Level.INFO.intLevel());
+        standardLevels.put(DEBUG, Level.DEBUG.intLevel());
+        standardLevels.put(TRACE, Level.TRACE.intLevel());
     }
 
     public static int compare(Marker first, Marker second)
     {
-        Integer firstInt = StandardLevels.get(first);
+        Integer firstInt = standardLevels.get(first);
         if (firstInt != null)
         {
-            return StandardLevels.get(first).compareTo(StandardLevels.get(second));
+            return standardLevels.get(first).compareTo(standardLevels.get(second));
         } else
         {
             return 0;

@@ -11,8 +11,6 @@ import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
 import com.khorn.terraincontrol.generator.resource.Resource;
-import com.khorn.terraincontrol.logging.LogMarker;
-import com.khorn.terraincontrol.logging.Logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -21,8 +19,6 @@ import org.apache.logging.log4j.Marker;
 
 public class TerrainControl
 {
-
-    private static boolean hasprintedPluginLogLevel = false;
 
     /**
      * The engine that powers Terrain Control.
@@ -191,7 +187,7 @@ public class TerrainControl
      */
     public static void log(Marker level, String... message)
     {
-        Logger.log(level, message);
+        engine.getLogger().log(level, message);
     }
 
     /**
@@ -206,7 +202,7 @@ public class TerrainControl
      */
     public static void log(Marker level, String message, Object... params)
     {
-        Logger.log(level, message, params);
+        engine.getLogger().log(level, message, params);
     }
 
     /**
@@ -219,7 +215,7 @@ public class TerrainControl
      */
     public static void logIfLevel(Marker ifLevel, String... messages)
     {
-        Logger.logIfLevel(ifLevel, messages);
+        engine.getLogger().logIfLevel(ifLevel, messages);
     }
 
     /**
@@ -235,7 +231,7 @@ public class TerrainControl
      */
     public static void logIfLevel(Marker ifLevel, String message, Object... params)
     {
-        Logger.logIfLevel(ifLevel, message, params);
+        engine.getLogger().logIfLevel(ifLevel, message, params);
     }
 
     /**
@@ -249,7 +245,7 @@ public class TerrainControl
      */
     public static void logIfLevel(Marker min, Marker max, String... messages)
     {
-        Logger.logIfLevel(min, max, messages);
+        engine.getLogger().logIfLevel(min, max, messages);
     }
 
     /**
@@ -266,7 +262,7 @@ public class TerrainControl
      */
     public static void logIfLevel(Marker min, Marker max, String message, Object... params)
     {
-        Logger.logIfLevel(min, max, message, params);
+        engine.getLogger().logIfLevel(min, max, message, params);
     }
 
     /**
@@ -294,7 +290,7 @@ public class TerrainControl
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
-        Logger.log(level, stringWriter.toString());
+        engine.getLogger().log(level, stringWriter.toString());
     }
 
     /**
