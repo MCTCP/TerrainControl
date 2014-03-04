@@ -78,9 +78,9 @@ public class BukkitMaterialData implements LocalMaterialData
             // Use Minecraft's name
             if (data != 0)
             {
-                return block.getName() + ":" + data;
+                return Block.REGISTRY.c(block) + ":" + data;
             }
-            return block.getName();
+            return Block.REGISTRY.c(block);
         } else
         {
             // Use our name

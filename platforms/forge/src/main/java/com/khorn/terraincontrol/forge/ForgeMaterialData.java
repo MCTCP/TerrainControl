@@ -79,9 +79,9 @@ public class ForgeMaterialData implements LocalMaterialData
             // Use Minecraft's name
             if (data != 0)
             {
-                return block.getUnlocalizedName() + ":" + data;
+                return Block.blockRegistry.getNameForObject(block) + ":" + data;
             }
-            return block.getUnlocalizedName();
+            return Block.blockRegistry.getNameForObject(block);
         } else
         {
             // Use our name
