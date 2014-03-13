@@ -27,9 +27,9 @@ public class BiomeIds
     /**
      * Creates a new virtual biome id.
      * 
+     * @param generationId The id used during terrain generation.
      * @param savedId The id used in the world save files (the .mca files in
      *            the region directory).
-     * @param generationId The id used during terrain generation.
      */
     public BiomeIds(int generationId, int savedId)
     {
@@ -69,17 +69,12 @@ public class BiomeIds
         return generationId;
     }
 
-    /**
-     * Gets the string representation of this object. If the biome is not
-     * virtual (see {@link #isVirtual()}) this is simply the id of the biome.
-     * If the biome is virtual, the format is
-     * <code>generationId + ":" + savedId</code>.
-     */
+    @Override
     public String toString()
     {
         if (isVirtual())
         {
-            return generationId + ":" + savedId;
+            return generationId + " (gen), " + savedId + " (saved)";
         } else
         {
             return Integer.toString(savedId);

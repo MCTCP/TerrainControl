@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
 public class LayerFromImage extends Layer
@@ -29,7 +30,7 @@ public class LayerFromImage extends Layer
         xOffset = config.imageXOffset;
         zOffset = config.imageZOffset;
         this.imageMode = config.imageMode;
-        this.fillBiome = world.getBiomeIdByName(config.imageFillBiome);
+        this.fillBiome = world.getBiomeByName(config.imageFillBiome).getIds().getGenerationId();
 
         // Read from file
         try

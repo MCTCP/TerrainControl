@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.bukkit.commands.runnable;
 
+import com.khorn.terraincontrol.LocalBiome;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
@@ -73,24 +75,25 @@ public class MapWriter implements Runnable
             LocalWorld bukkitWorld = WorldHelper.toLocalWorld(world);
             if (bukkitWorld != null)
             {
-                colors = new int[bukkitWorld.getSettings().biomeConfigs.length];
-                TerrainControl.log(LogMarker.TRACE, "BukkitWorld settings biomeConfigs.length::{}", bukkitWorld.getSettings().biomeConfigs.length);
+                colors = new int[bukkitWorld.getSettings().biomes.length];
+                TerrainControl.log(LogMarker.TRACE, "BukkitWorld settings biomes.length::{}", bukkitWorld.getSettings().biomes.length);
 
-                for (BiomeConfig biomeConfig : bukkitWorld.getSettings().biomeConfigs)
+                for (LocalBiome biome : bukkitWorld.getSettings().biomes)
                 {
-                    if (biomeConfig != null)
+                    if (biome != null)
                     {
+                        BiomeConfig biomeConfig = biome.getBiomeConfig();
                         try
                         {
                             int color = Integer.decode(biomeConfig.BiomeColor);
                             if (color <= 0xFFFFFF)
                             {
-                                colors[biomeConfig.Biome.getIds().getGenerationId()] = color;
+                                colors[biome.getIds().getGenerationId()] = color;
                             }
                         } catch (NumberFormatException ex)
                         {
-                            TerrainControl.log(LogMarker.WARN, "Wrong color in ", biomeConfig.Biome.getName());
-                            sender.sendMessage(BaseCommand.ERROR_COLOR + "Wrong color in " + biomeConfig.Biome.getName());
+                            TerrainControl.log(LogMarker.WARN, "Wrong color in ", biome.getName());
+                            sender.sendMessage(BaseCommand.ERROR_COLOR + "Wrong color in " + biome.getName());
                         }
                     }
                 }

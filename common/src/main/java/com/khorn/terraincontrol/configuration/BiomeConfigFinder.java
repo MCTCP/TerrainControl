@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -21,7 +20,6 @@ public class BiomeConfigFinder
 
     private final WorldConfig worldConfig;
     private final String preferredBiomeFileExtension;
-    private final int highestPossibleBiomeId;
 
     /**
      * Constructs a new biome loader.
@@ -32,11 +30,10 @@ public class BiomeConfigFinder
      *            are created with this extension.
      * @param biomeConfigsStore Stores all biome configs.
      */
-    public BiomeConfigFinder(WorldConfig worldConfig, String preferredBiomeFileExtension, int highestPossibleBiomeId)
+    public BiomeConfigFinder(WorldConfig worldConfig, String preferredBiomeFileExtension)
     {
         this.worldConfig = worldConfig;
         this.preferredBiomeFileExtension = preferredBiomeFileExtension;
-        this.highestPossibleBiomeId = highestPossibleBiomeId;
     }
 
     /**
@@ -46,15 +43,15 @@ public class BiomeConfigFinder
      * @param directories The directories to search in.
      * @param biomesToLoad The biomes to load.
      */
-    public BiomeConfig[] loadBiomesFromDirectories(Collection<File> directories, Collection<LocalBiome> biomesToLoad)
+    public Map<String, BiomeConfig> loadBiomesFromDirectories(Collection<File> directories, Collection<BiomeLoadInstruction> biomesToLoad)
     {
-        BiomeConfig[] biomeConfigsStore = new BiomeConfig[highestPossibleBiomeId];
+        Map<String, BiomeConfig> biomeConfigsStore = new HashMap<String, BiomeConfig>();
 
         // Switch to a Map<String, LocalBiome>
-        Map<String, LocalBiome> remainingBiomes = new HashMap<String, LocalBiome>();
-        for (LocalBiome biome : biomesToLoad)
+        Map<String, BiomeLoadInstruction> remainingBiomes = new HashMap<String, BiomeLoadInstruction>();
+        for (BiomeLoadInstruction biome : biomesToLoad)
         {
-            remainingBiomes.put(biome.getName(), biome);
+            remainingBiomes.put(biome.getBiomeName(), biome);
         }
 
         // Search all directories
@@ -69,7 +66,7 @@ public class BiomeConfigFinder
 
         // Create all biomes that weren't loaded
         File preferredDirectory = directories.iterator().next();
-        for (LocalBiome localBiome : remainingBiomes.values())
+        for (BiomeLoadInstruction localBiome : remainingBiomes.values())
         {
             File newConfigFile = new File(preferredDirectory, toFileName(localBiome));
             loadBiomeFromFile(biomeConfigsStore, newConfigFile, localBiome);
@@ -81,13 +78,13 @@ public class BiomeConfigFinder
     /**
      * Loads the biomes from the given directory.
      * 
-     * @param biomeConfigsStore Array to store all the loaded biome configs
+     * @param biomeConfigsStore Map to store all the loaded biome configs
      *            in.
      * @param directory The directory to load from.
      * @param remainingBiomes The biomes that should still be loaded. When a
      *            biome is found, it is removed from this map.
      */
-    private void loadBiomesFromDirectory(BiomeConfig[] biomeConfigsStore, File directory, Map<String, LocalBiome> remainingBiomes)
+    private void loadBiomesFromDirectory(Map<String, BiomeConfig> biomeConfigsStore, File directory, Map<String, BiomeLoadInstruction> remainingBiomes)
     {
         for (File file : directory.listFiles())
         {
@@ -107,7 +104,7 @@ public class BiomeConfigFinder
             }
 
             // Get the correct LocalBiome
-            LocalBiome biome = remainingBiomes.get(biomeName);
+            BiomeLoadInstruction biome = remainingBiomes.get(biomeName);
             if (biome == null)
             {
                 // Doesn't need to be loaded. Maybe it's in both the global
@@ -118,7 +115,7 @@ public class BiomeConfigFinder
 
             // Load biome and remove it from the todo list
             loadBiomeFromFile(biomeConfigsStore, file, biome);
-            remainingBiomes.remove(biome.getName());
+            remainingBiomes.remove(biome.getBiomeName());
         }
     }
 
@@ -126,30 +123,16 @@ public class BiomeConfigFinder
      * Loads a single biome from a the specified file. When there is an id
      * conflict, the biome won't load and a message will be printed.
      * 
-     * @param biomeConfigsStore The array to store the biomeConfig in.
+     * @param biomeConfigsStore The maps to store the biomeConfig in.
      * @param file The file to load the biome from.
-     * @param biome The biome that should be loaded from the file.
+     * @param defaultSettings The biome that should be loaded from the file.
      */
-    private void loadBiomeFromFile(BiomeConfig[] biomeConfigsStore, File file, LocalBiome biome)
+    private void loadBiomeFromFile(Map<String, BiomeConfig> biomeConfigsStore, File file, BiomeLoadInstruction defaultSettings)
     {
-        int biomeId = biome.getIds().getGenerationId();
-
-        // Check for id conflicts
-        if (biomeConfigsStore[biomeId] != null)
-        {
-            TerrainControl.log(LogMarker.FATAL, "Duplicate biome id {} ({} and {})!", new Object[] {biomeId,
-                    biomeConfigsStore[biomeId].name, biome.getName()});
-            TerrainControl.log(LogMarker.FATAL, "The biome {} has been prevented from loading.", new Object[] {biome.getName()});
-            TerrainControl.log(LogMarker.INFO, "If you are updating an old pre-Minecraft 1.7 world, please read this wiki page:");
-            TerrainControl.log(LogMarker.INFO, "https://github.com/Wickth/TerrainControl/wiki/Upgrading-an-old-map-to-Minecraft-1.7");
-
-            return;
-        }
-
         // Load biome
-        File renamedFile = renameBiomeFile(file, biome);
-        BiomeConfig biomeConfig = new BiomeConfig(renamedFile, biome, worldConfig);
-        biomeConfigsStore[biomeId] = biomeConfig;
+        File renamedFile = renameBiomeFile(file, defaultSettings);
+        BiomeConfig biomeConfig = new BiomeConfig(defaultSettings, renamedFile, worldConfig);
+        biomeConfigsStore.put(defaultSettings.getBiomeName(), biomeConfig);
     }
 
     /**
@@ -161,7 +144,7 @@ public class BiomeConfigFinder
      * @param biome The biome that the file has settings for.
      * @return The renamed file.
      */
-    private File renameBiomeFile(File toRename, LocalBiome biome)
+    private File renameBiomeFile(File toRename, BiomeLoadInstruction biome)
     {
         String preferredFileName = toFileName(biome);
         if (toRename.getName().equalsIgnoreCase(preferredFileName))
@@ -190,9 +173,9 @@ public class BiomeConfigFinder
      * @param biome The biome.
      * @return The name of the file the biome should be saved in.
      */
-    private String toFileName(LocalBiome biome)
+    private String toFileName(BiomeLoadInstruction biome)
     {
-        return biome.getName() + this.preferredBiomeFileExtension;
+        return biome.getBiomeName() + this.preferredBiomeFileExtension;
     }
 
     /**

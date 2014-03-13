@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
+import com.khorn.terraincontrol.LocalBiome;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
@@ -51,8 +53,8 @@ public class NetherFortressGen extends StructureGenerator
             } else
             {
                 LocalWorld world = WorldHelper.toLocalWorld(worldObj);
-                int biomeId = world.getCalculatedBiomeId(chunkX * 16 + 8, chunkZ * 16 + 8);
-                if (!world.getSettings().biomeConfigs[biomeId].netherFortressesEnabled)
+                LocalBiome biome = world.getCalculatedBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
+                if (!biome.getBiomeConfig().netherFortressesEnabled)
                 {
                     return false;
                 }

@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
@@ -18,12 +18,12 @@ public class LayerMix extends Layer
 
         for (int id = 0; id < this.riverBiomes.length; id++)
         {
-            BiomeConfig biomeConfig = configs.biomeConfigs[id];
+            LocalBiome biome = configs.biomes[id];
 
-            if (biomeConfig == null || biomeConfig.riverBiome.isEmpty())
+            if (biome == null || biome.getBiomeConfig().riverBiome.isEmpty())
                 this.riverBiomes[id] = -1;
             else
-                this.riverBiomes[id] = world.getBiomeIdByName(biomeConfig.riverBiome);
+                this.riverBiomes[id] = world.getBiomeByName(biome.getBiomeConfig().riverBiome).getIds().getGenerationId();
 
         }
     }
@@ -69,7 +69,7 @@ public class LayerMix extends Layer
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
-                if (worldConfig.riversEnabled && (currentPiece & RiverBits) != 0 && !this.configs.biomeConfigs[cachedId].riverBiome.isEmpty())
+                if (worldConfig.riversEnabled && (currentPiece & RiverBits) != 0 && !this.configs.biomes[cachedId].getBiomeConfig().riverBiome.isEmpty())
                     currentPiece = this.riverBiomes[cachedId];
                 else
                     currentPiece = cachedId;
@@ -132,7 +132,7 @@ public class LayerMix extends Layer
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
-                if (worldConfig.riversEnabled && (currentPiece & RiverBits) != 0 && !this.configs.biomeConfigs[cachedId].riverBiome.isEmpty())
+                if (worldConfig.riversEnabled && (currentPiece & RiverBits) != 0 && !this.configs.biomes[cachedId].getBiomeConfig().riverBiome.isEmpty())
                     currentPiece = 1;
                 else
                     currentPiece = 0;

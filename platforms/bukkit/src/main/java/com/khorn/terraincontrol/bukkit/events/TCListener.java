@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.bukkit.events;
 
+import com.khorn.terraincontrol.LocalBiome;
+
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -55,11 +57,11 @@ public class TCListener implements Listener
         int y = event.getLocation().getBlockY();
         int z = event.getLocation().getBlockZ();
 
-        int biomeId = bukkitWorld.getCalculatedBiomeId(x, z);
-        if (bukkitWorld.getSettings().biomeConfigs[biomeId] == null)
+        LocalBiome biome = bukkitWorld.getBiome(x, z);
+        if (biome == null)
             return;
 
-        BiomeConfig biomeConfig = bukkitWorld.getSettings().biomeConfigs[biomeId];
+        BiomeConfig biomeConfig = biome.getBiomeConfig();
         SaplingGen sapling;
 
         switch (event.getSpecies())

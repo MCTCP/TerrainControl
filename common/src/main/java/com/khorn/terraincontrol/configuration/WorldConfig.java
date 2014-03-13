@@ -37,8 +37,6 @@ public class WorldConfig extends ConfigFile
     public ArrayList<String> IsleBiomes = new ArrayList<String>();
     public ArrayList<String> BorderBiomes = new ArrayList<String>();
 
-    public boolean HaveBiomeReplace = false;
-
     public int maxSmoothRadius = 2;
 
     // For old biome generator
@@ -497,11 +495,6 @@ public class WorldConfig extends ConfigFile
                 {
                     int generationBiomeId = Integer.parseInt(keys[1]);
                     CustomBiomeIds.put(keys[0], new BiomeIds(generationBiomeId));
-                } else if (keys.length == 3)
-                {
-                    int generationBiomeId = Integer.parseInt(keys[1]);
-                    int savedBiomeId = Integer.parseInt(keys[2]);
-                    CustomBiomeIds.put(keys[0], new BiomeIds(generationBiomeId, savedBiomeId));
                 } else
                 {
                     CustomBiomeIds.put(keys[0], new BiomeIds(-1));
@@ -885,7 +878,7 @@ public class WorldConfig extends ConfigFile
             {
                 first = false;
             }
-            output.append(entry.getKey()).append(":").append(entry.getValue().toString());
+            output.append(entry.getKey()).append(":").append(entry.getValue().getGenerationId());
         }
         writeValue(WorldStandardValues.CustomBiomes, output.toString());
     }

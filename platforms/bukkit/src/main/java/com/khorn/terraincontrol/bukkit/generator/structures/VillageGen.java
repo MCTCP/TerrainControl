@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
@@ -37,13 +37,13 @@ public class VillageGen extends StructureGenerator
 
         // Add all village biomes to the list
         villageSpawnBiomes = new ArrayList<BiomeBase>();
-        for (BiomeConfig config : configs.biomeConfigs)
+        for (LocalBiome biome : configs.biomes)
         {
-            if (config == null)
+            if (biome == null)
                 continue;
-            if (config.villageType != VillageType.disabled)
+            if (biome.getBiomeConfig().villageType != VillageType.disabled)
             {
-                villageSpawnBiomes.add(((BukkitBiome) config.Biome).getHandle());
+                villageSpawnBiomes.add(((BukkitBiome) biome).getHandle());
             }
         }
     }

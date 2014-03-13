@@ -38,16 +38,17 @@ public class ObjectSpawner
         int x = chunkX * 16;
         int z = chunkZ * 16;
 
-        // Get the BiomeConfig of the other corner
-        int biomeId = world.getCalculatedBiomeId(x + 15, z + 15);
-        BiomeConfig localBiomeConfig = this.worldSettings.biomeConfigs[biomeId];
+        // Get the biome of the other corner
+        LocalBiome biome = world.getCalculatedBiome(x + 15, z + 15);
 
         // Null check
-        if (localBiomeConfig == null)
+        if (biome == null)
         {
-            TerrainControl.log(LogMarker.DEBUG, "Unknown biome id {} at {},{}  (chunk {},{}). Population failed.", new Object[] {biomeId, (x + 15), (z + 15), chunkX, chunkZ});
+            TerrainControl.log(LogMarker.DEBUG, "Unknown biome at {},{}  (chunk {},{}). Population failed.", x + 15, z + 15, chunkX, chunkZ);
             return;
         }
+
+        BiomeConfig biomeConfig = biome.getBiomeConfig();
 
         // Get the random generator
         long resourcesSeed = worldSettings.worldConfig.resourcesSeed != 0L ? worldSettings.worldConfig.resourcesSeed : world.getSeed();
@@ -66,23 +67,20 @@ public class ObjectSpawner
         placeComplexSurfaceBlocks(chunkX, chunkZ);
 
         // Resource sequence
-        for (Resource res : localBiomeConfig.resourceSequence)
+        for (Resource res : biomeConfig.resourceSequence)
         {
             world.setChunksCreations(false);
             res.process(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
         }
 
         // Animals
-        world.placePopulationMobs(localBiomeConfig, rand, chunkX, chunkZ);
+        world.placePopulationMobs(biome, rand, chunkX, chunkZ);
 
         // Snow and ice
         freezeChunk(chunkX, chunkZ);
 
         // Replace blocks
         world.replaceBlocks();
-
-        // Replace biomes
-        world.replaceBiomes();
 
         // Fire event
         TerrainControl.firePopulationEndEvent(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
@@ -101,11 +99,11 @@ public class ObjectSpawner
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
                 // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
-                BiomeConfig biomeConfig = this.worldSettings.biomeConfigs[this.world.getCalculatedBiomeId(blockToFreezeX, blockToFreezeZ)];
-                if (biomeConfig != null && biomeConfig.surfaceAndGroundControl != null)
+                LocalBiome biome = this.world.getCalculatedBiome(blockToFreezeX, blockToFreezeZ);
+                if (biome != null && biome.getBiomeConfig().surfaceAndGroundControl != null)
                 {
                     double noise = this.reusableChunkNoiseArray[i + j * 16];
-                    biomeConfig.surfaceAndGroundControl.spawn(world, noise, blockToFreezeX, blockToFreezeZ);
+                    biome.getBiomeConfig().surfaceAndGroundControl.spawn(world, noise, blockToFreezeX, blockToFreezeZ);
                 }
             }
         }
@@ -130,10 +128,10 @@ public class ObjectSpawner
     protected void freezeColumn(int x, int z, LocalMaterialData snowMaterial)
     {
         // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
-        BiomeConfig biomeConfig = world.getSettings().biomeConfigs[world.getBiomeId(x, z)];
-        if (biomeConfig != null)
+        LocalBiome biome = world.getCalculatedBiome(x, z);
+        if (biome != null)
         {
-            LocalBiome biome = biomeConfig.Biome;
+            BiomeConfig biomeConfig = biome.getBiomeConfig();
             int blockToFreezeY = world.getHighestBlockYAt(x, z);
             if (blockToFreezeY > 0 && biome.getTemperatureAt(x, blockToFreezeY, z) < WorldStandardValues.snowAndIceMaxTemp.floatValue())
             {

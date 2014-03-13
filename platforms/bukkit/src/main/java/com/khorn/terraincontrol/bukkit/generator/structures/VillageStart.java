@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.logging.LogMarker;
 import net.minecraft.server.v1_7_R1.*;
@@ -28,12 +28,11 @@ public class VillageStart extends StructureStart
 
         // Apply the villageType setting
         LocalWorld worldTC = WorldHelper.toLocalWorld(world);
-        int currentBiomeId = worldTC.getBiomeId(startX, startZ);
-        BiomeConfig config = worldTC.getSettings().biomeConfigs[currentBiomeId];
-        if (config != null)
+        LocalBiome biome = worldTC.getBiome(startX, startZ);
+        if (biome != null)
         {
             // Ignore removed custom biomes
-            changeToSandstoneVillage(startPiece, config.villageType == VillageType.sandstone);
+            changeToSandstoneVillage(startPiece, biome.getBiomeConfig().villageType == VillageType.sandstone);
         }
         
         this.a.add(startPiece);

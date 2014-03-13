@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.server.v1_7_R1.*;
@@ -28,13 +28,13 @@ public class StrongholdGen extends StructureGenerator
 
         allowedBiomes = new ArrayList<BiomeBase>();
 
-        for (BiomeConfig biomeConfig : configs.biomeConfigs)
+        for (LocalBiome biome : configs.biomes)
         {
-            if (biomeConfig == null)
+            if (biome == null)
                 continue;
-            if (biomeConfig.strongholdsEnabled)
+            if (biome.getBiomeConfig().strongholdsEnabled)
             {
-                allowedBiomes.add(((BukkitBiome) biomeConfig.Biome).getHandle());
+                allowedBiomes.add(((BukkitBiome) biome).getHandle());
             }
         }
     }

@@ -1,7 +1,71 @@
 package com.khorn.terraincontrol.util.minecraftTypes;
 
-import com.khorn.terraincontrol.configuration.standard.StandardBiomeFactory;
-import com.khorn.terraincontrol.configuration.standard.StandardMinecraftBiomes.*;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MinecraftBiomeTemplate;
+
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
+import com.khorn.terraincontrol.configuration.standard.*;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Beach;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.BirchForest;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.BirchForestHills;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.BirchForestHillsMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.BirchForestMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.ColdBeach;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.ColdTaiga;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.ColdTaigaHills;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.ColdTaigaMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.DeepOcean;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Desert;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.DesertHills;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.DesertMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.ExtremeHills;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.ExtremeHillsEdge;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.ExtremeHillsMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.ExtremeHillsPlus;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.ExtremeHillsPlusMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.FlowerForest;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Forest;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.ForestHills;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.FrozenOcean;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.FrozenRiver;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Hell;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.IceMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.IcePlains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.IcePlainsSpikes;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Jungle;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.JungleEdge;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.JungleEdgeMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.JungleHills;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.JungleMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MegaSpruceTaiga;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MegaTaiga;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MegaTaigaHills;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Mesa;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MesaBryce;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MesaPlateau;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MesaPlateauForest;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MesaPlateauForestMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MesaPlateauMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MushroomIsland;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MushroomIslandShore;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Ocean;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Plains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.River;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.RoofedForest;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.RoofedForestMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Savanna;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.SavannaMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.SavannaPlateau;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.SavannaPlateauMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Sky;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.StoneBeach;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.SunflowerPlains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Swampland;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.SwamplandMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Taiga;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.TaigaHills;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.TaigaMountains;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 /**
  * Enumeration containing the Proper names and IDs of the default Minecraft biomes as well as some
@@ -159,13 +223,13 @@ public enum DefaultBiome
      * Default settings of this biome. Access this using
      * {@link DefaultBiomeSettings#getDefaultSettings(com.khorn.terraincontrol.LocalBiome, int)}
      */
-    private final Class<? extends StandardBiomeFactory> defaultSettingsClass;
+    private final Class<? extends MinecraftBiomeTemplate> defaultSettingsClass;
     /**
      * A DefaultBiome lookup table with the biome ID being the array index
      */
     private static DefaultBiome[] lookupID;
 
-    private DefaultBiome(int i, String name, Class<? extends StandardBiomeFactory> defaultSettings)
+    private DefaultBiome(int i, String name, Class<? extends MinecraftBiomeTemplate> defaultSettings)
     {
         this.Id = i;
         this.Name = name;
@@ -180,9 +244,6 @@ public enum DefaultBiome
         {
             // Register by id
             lookupID[biome.Id] = biome;
-
-            // Register the default settings
-            StandardBiomeFactory.registerDefaultSettings(biome.Id, biome.defaultSettingsClass);
         }
     }
 
@@ -200,6 +261,22 @@ public enum DefaultBiome
         } else
         {
             return null;
+        }
+    }
+
+    public BiomeLoadInstruction getLoadInstructions(MojangSettings mojangSettings, int maxWorldHeight)
+    {
+        try
+        {
+            StandardBiomeTemplate template = (StandardBiomeTemplate) defaultSettingsClass.getConstructors()[0].newInstance(mojangSettings, maxWorldHeight);
+            return new BiomeLoadInstruction(Name, Id, template);
+        } catch (Exception e)
+        {
+            TerrainControl.log(LogMarker.FATAL, "Failed to create default biome");
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
+
+            // Use the standard settings for custom biomes
+            return new BiomeLoadInstruction(Name, Id, new StandardBiomeTemplate(maxWorldHeight));
         }
     }
 

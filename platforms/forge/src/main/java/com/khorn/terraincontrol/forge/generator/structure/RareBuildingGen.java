@@ -1,20 +1,19 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class RareBuildingGen extends MapGenStructure
 {
@@ -41,13 +40,13 @@ public class RareBuildingGen extends MapGenStructure
     {
         biomeList = new ArrayList<BiomeGenBase>();
 
-        for (BiomeConfig biomeConfig : configs.biomeConfigs)
+        for (LocalBiome biome : configs.biomes)
         {
-            if (biomeConfig == null)
+            if (biome == null)
                 continue;
-            if (biomeConfig.rareBuildingType != RareBuildingType.disabled)
+            if (biome.getBiomeConfig().rareBuildingType != RareBuildingType.disabled)
             {
-                biomeList.add(((ForgeBiome) biomeConfig.Biome).getHandle());
+                biomeList.add(((ForgeBiome) biome).getHandle());
             }
         }
 

@@ -1,22 +1,29 @@
 package com.khorn.terraincontrol;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Random;
 
 public interface LocalWorld
 {
 
     // Biome init
-    public LocalBiome addCustomBiome(String name, BiomeIds id);
-
-    public LocalBiome getNullBiome(String name);
+    /**
+     * Creates a LocalBiome instance for the given biome.
+     * @param biomeConfig The settings for the biome, which are saved in
+     *                    the LocalBiome instance.
+     * @param biomeIds    The ids of the biome, used to register the
+     *                    LocalBiome instance.
+     * @return The LocalBiome instance.
+     */
+    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds);
 
     // With static id allocation this is not a required feature.
     public int getMaxBiomesCount();
@@ -25,9 +32,9 @@ public interface LocalWorld
 
     public LocalBiome getBiomeById(int id);
 
-    public int getBiomeIdByName(String name);
+    public LocalBiome getBiomeByName(String name);
 
-    public List<? extends LocalBiome> getDefaultBiomes();
+    public Collection<? extends BiomeLoadInstruction> getDefaultBiomes();
 
     // Biome manager
 
@@ -85,13 +92,11 @@ public interface LocalWorld
 
     public void replaceBlocks();
 
-    public void replaceBiomes();
-
     /**
      * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the
-     * terrain generation.
+     * terrain generation. Calling this method will place the mobs.
      */
-    public void placePopulationMobs(BiomeConfig config, Random random, int chunkX, int chunkZ);
+    public void placePopulationMobs(LocalBiome biome, Random random, int chunkX, int chunkZ);
 
     // Blocks
     public LocalMaterialData getMaterial(int x, int y, int z);
@@ -150,4 +155,5 @@ public interface LocalWorld
      * @return The vertical scale of the world.
      */
     public int getHeightScale();
+
 }

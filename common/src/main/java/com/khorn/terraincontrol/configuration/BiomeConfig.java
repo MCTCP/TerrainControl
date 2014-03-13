@@ -1,10 +1,9 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
-import com.khorn.terraincontrol.configuration.standard.StandardBiomeFactory;
+import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.UseBiome;
@@ -137,9 +136,8 @@ public class BiomeConfig extends ConfigFile
 
     public RareBuildingType rareBuildingType;
 
-    public LocalBiome Biome;
-    public StandardBiomeFactory defaultSettings;
-
+    public final int generationId;
+    public StandardBiomeTemplate defaultSettings;
     public WorldConfig worldConfig;
 
     // Spawn Config
@@ -152,12 +150,13 @@ public class BiomeConfig extends ConfigFile
     public boolean spawnAmbientCreaturesAddDefaults = true;
     public List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
-    public BiomeConfig(File biomeFile, LocalBiome biome, WorldConfig config)
+
+    public BiomeConfig(BiomeLoadInstruction loadInstruction, File biomeFile, WorldConfig worldConfig)
     {
-        super(biome.getName(), biomeFile);
-        this.Biome = biome;
-        this.worldConfig = config;
-        this.defaultSettings = StandardBiomeFactory.getDefaultSettings(biome, config.worldHeightCap);
+        super(loadInstruction.getBiomeName(), biomeFile);
+        this.generationId = loadInstruction.getGenerationId();
+        this.worldConfig = worldConfig;
+        this.defaultSettings = loadInstruction.getBiomeTemplate();
 
         this.readSettingsFile(false);
 
@@ -197,9 +196,6 @@ public class BiomeConfig extends ConfigFile
                 this.iceBlock = this.configIceBlock;
                 this.riverWaterLevel = this.configRiverWaterLevel;
             }
-
-            if (Biome.isCustom() && !Biome.getIds().isVirtual())
-                Biome.setEffects(this);
         }
     }
 
@@ -296,7 +292,7 @@ public class BiomeConfig extends ConfigFile
         this.rareBuildingType = (RareBuildingType) readModSettings(BiomeStandardValues.RareBuildingType,
                                                                    defaultSettings.defaultRareBuildingType);
 
-        if (this.Biome.isCustom())
+        if (this.defaultSettings.isCustomBiome)
         {
             // Only for custom biomes
             this.spawnMonstersAddDefaults = readSettings(BiomeStandardValues.SpawnMonstersAddDefaults);
@@ -575,7 +571,7 @@ public class BiomeConfig extends ConfigFile
     @Override
     protected void writeConfigSettings() throws IOException
     {
-        if (this.Biome.isCustom())
+        if (this.defaultSettings.isCustomBiome)
         {
             writeComment("This is the biome config file of the " + this.name + " biome, which is a custom biome.");
         } else
@@ -749,7 +745,7 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("Most of the settings here only have an effect on players with the client version of Terrain Control installed.");
 
         writeComment("Biome temperature. Float value from 0.0 to 2.0.");
-        if (this.Biome.isCustom())
+        if (this.defaultSettings.isCustomBiome)
         {
             writeComment("When this value is around 0.2, snow will fall on mountain peaks above y=90.");
             writeComment("When this value is around 0.1, the whole biome will be covered in snow and ice.");
@@ -760,7 +756,7 @@ public class BiomeConfig extends ConfigFile
         writeValue(BiomeStandardValues.BiomeTemperature, this.biomeTemperature);
 
         writeComment("Biome wetness. Float value from 0.0 to 1.0.");
-        if (this.Biome.isCustom())
+        if (this.defaultSettings.isCustomBiome)
         {
             writeComment("When this is set to 0, no rain will fall.");
         } else
@@ -888,7 +884,7 @@ public class BiomeConfig extends ConfigFile
         this.writeValue(BiomeStandardValues.RareBuildingType, rareBuildingType.toString());
 
         this.writeBigTitle("Mob spawning");
-        if (DefaultBiome.getBiome(this.Biome.getIds().getSavedId()) != null)
+        if (!this.defaultSettings.isCustomBiome)
         {
             // Stop in the default biomes
             this.writeComment("Mob spawning control doesn't work in default biomes.");
@@ -1145,7 +1141,7 @@ public class BiomeConfig extends ConfigFile
         }
     }
 
-    public void Serialize(DataOutputStream stream) throws IOException
+    public void writeToStream(DataOutputStream stream) throws IOException
     {
         writeStringToStream(stream, this.name);
 
@@ -1159,10 +1155,10 @@ public class BiomeConfig extends ConfigFile
         stream.writeBoolean(this.FoliageColorIsMultiplier);
     }
 
-    public BiomeConfig(DataInputStream stream, WorldConfig config, LocalBiome biome) throws IOException
+    public BiomeConfig(DataInputStream stream, int generationId, WorldConfig config) throws IOException
     {
         super(readStringFromStream(stream), null);
-        this.Biome = biome;
+        this.generationId = generationId;
         this.worldConfig = config;
 
         this.biomeTemperature = stream.readFloat();

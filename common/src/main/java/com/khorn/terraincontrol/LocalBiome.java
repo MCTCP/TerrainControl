@@ -3,7 +3,7 @@ package com.khorn.terraincontrol;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 
 /**
- * Class to access the properties of Minecraft's Biome(Gen)Base class.
+ * Class to access the properties of a biome.
  * 
  */
 public interface LocalBiome
@@ -19,10 +19,8 @@ public interface LocalBiome
     /**
      * Sets the post generator effects. For the client it are things like
      * colors. For the server it are things like mob spawning.
-     * 
-     * @param config The BiomeConfig of the biome.
      */
-    void setEffects(BiomeConfig config);
+    void setEffects();
 
     /**
      * Gets the name of this biome, like Plains. For vanilla biomes, this is
@@ -42,49 +40,6 @@ public interface LocalBiome
     BiomeIds getIds();
 
     /**
-     * Gets the temperature of this biome, between 0 and 2 (inclusive). Higher
-     * is warmer.
-     * 
-     * @return The temperature of this biome,
-     */
-    float getTemperature();
-
-    /**
-     * Gets the wetness of this biome, between 0 and 1. Lower is dryer.
-     * 
-     * @return The wetness of this biome.
-     */
-    float getWetness();
-
-    /**
-     * Gets the default value for the BiomeHeight setting.
-     * 
-     * @return The default BiomeHeight.
-     */
-    float getSurfaceHeight();
-
-    /**
-     * Gets the default value for the BiomeVolatility setting.
-     * 
-     * @return The default BiomeVolatility.
-     */
-    float getSurfaceVolatility();
-
-    /**
-     * Gets the default value for the surface block setting.
-     * 
-     * @return The default SurfaceBlock.
-     */
-    LocalMaterialData getSurfaceBlock();
-
-    /**
-     * Gets the default value for the GroundBlock setting.
-     * 
-     * @return The default GroundBlock.
-     */
-    LocalMaterialData getGroundBlock();
-
-    /**
      * Gets the temperature at the given position, if this biome would be
      * there. This temperature is based on the {@link #getTemperature()}
      * value, but it will be lower at higher altitudes.
@@ -95,4 +50,12 @@ public interface LocalBiome
      * @return The temperature.
      */
     float getTemperatureAt(int x, int y, int z);
+    
+    /**
+     * Gets the {@link BiomeConfig} of this biome, which holds all settings
+     * of this biome.
+     *
+     * @return The BiomeConfig.
+     */
+    BiomeConfig getBiomeConfig();
 }

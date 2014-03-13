@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
@@ -36,13 +36,13 @@ public class RareBuildingGen extends StructureGenerator
     {
         biomeList = new ArrayList<BiomeBase>();
 
-        for (BiomeConfig biomeConfig : configs.biomeConfigs)
+        for (LocalBiome biome : configs.biomes)
         {
-            if (biomeConfig == null)
+            if (biome == null)
                 continue;
-            if (biomeConfig.rareBuildingType != RareBuildingType.disabled)
+            if (biome.getBiomeConfig().rareBuildingType != RareBuildingType.disabled)
             {
-                biomeList.add(((BukkitBiome) biomeConfig.Biome).getHandle());
+                biomeList.add(((BukkitBiome) biome).getHandle());
             }
         }
 

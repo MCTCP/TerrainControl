@@ -1,20 +1,20 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
-import net.minecraft.world.gen.structure.StructureVillagePieces;
-
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.structure.StructureComponent;
+import net.minecraft.world.gen.structure.StructureStart;
+import net.minecraft.world.gen.structure.StructureVillagePieces;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
-
-import net.minecraft.world.World;
-import net.minecraft.world.gen.structure.*;
 
 public class VillageStart extends StructureStart
 {
@@ -32,8 +32,8 @@ public class VillageStart extends StructureStart
 
         // Apply the villageType setting
         LocalWorld worldTC = WorldHelper.toLocalWorld(world);
-        int currentBiomeId = worldTC.getBiomeId(startX, startZ);
-        BiomeConfig config = worldTC.getSettings().biomeConfigs[currentBiomeId];
+        LocalBiome currentBiome = worldTC.getCalculatedBiome(startX, startZ);
+        BiomeConfig config = currentBiome.getBiomeConfig();
         if (config != null)
         {
             // Ignore removed custom biomes

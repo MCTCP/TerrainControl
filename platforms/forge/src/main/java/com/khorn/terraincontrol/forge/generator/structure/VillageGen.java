@@ -1,18 +1,17 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.StructureStart;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.gen.structure.MapGenStructure;
-import net.minecraft.world.gen.structure.StructureStart;
 
 public class VillageGen extends MapGenStructure
 {
@@ -36,13 +35,13 @@ public class VillageGen extends MapGenStructure
 
         // Add all village biomes to the list
         villageSpawnBiomes = new ArrayList<BiomeGenBase>();
-        for (BiomeConfig config : configs.biomeConfigs)
+        for (LocalBiome biome : configs.biomes)
         {
-            if (config == null)
+            if (biome == null)
                 continue;
-            if (config.villageType != VillageType.disabled)
+            if (biome.getBiomeConfig().villageType != VillageType.disabled)
             {
-                villageSpawnBiomes.add(((ForgeBiome) config.Biome).getHandle());
+                villageSpawnBiomes.add(((ForgeBiome) biome).getHandle());
             }
         }
     }

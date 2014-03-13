@@ -162,7 +162,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
             this.initializeSmallByteArray(world.getSeed());
         }
 
-        BiomeConfig biomeConfig = world.getSettings().biomeConfigs[world.getCalculatedBiomeId(x, z)];
+        BiomeConfig biomeConfig = world.getCalculatedBiome(x, z).getBiomeConfig();
         LocalMaterialData biomeSurfaceBlock = biomeConfig.surfaceBlock;
         LocalMaterialData biomeGroundBlock = biomeConfig.groundBlock;
         // The following line prevents grass growing on dirt, but still allows

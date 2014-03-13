@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.generator.biome.layers;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 
 
@@ -20,16 +19,16 @@ public class LayerBiomeBorder extends Layer
     private int[] BordersTo;
 
 
-    public void AddBiome(BiomeConfig ReplaceTo, int ReplaceFrom, LocalWorld world)
+    public void AddBiome(LocalBiome replaceTo, int ReplaceFrom, LocalWorld world)
     {
         this.BordersFrom[ReplaceFrom] = new boolean[world.getMaxBiomesCount()];
 
         for (int i = 0; i < this.BordersFrom[ReplaceFrom].length; i++)
         {
             LocalBiome biome = world.getBiomeById(i);
-            this.BordersFrom[ReplaceFrom][i] = biome == null || !ReplaceTo.NotBorderNear.contains(biome.getName());
+            this.BordersFrom[ReplaceFrom][i] = biome == null || !replaceTo.getBiomeConfig().NotBorderNear.contains(biome.getName());
         }
-        this.BordersTo[ReplaceFrom] = ReplaceTo.Biome.getIds().getGenerationId();
+        this.BordersTo[ReplaceFrom] = replaceTo.getIds().getGenerationId();
     }
 
     @Override

@@ -1,15 +1,9 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -17,6 +11,11 @@ import net.minecraft.world.gen.structure.MapGenStronghold;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.gen.structure.StructureStrongholdPieces;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class StrongholdGen extends MapGenStructure
 {
@@ -35,13 +34,13 @@ public class StrongholdGen extends MapGenStructure
 
         allowedBiomeGenBases = new ArrayList<BiomeGenBase>();
 
-        for (BiomeConfig biomeConfig : configs.biomeConfigs)
+        for (LocalBiome biome : configs.biomes)
         {
-            if (biomeConfig == null)
+            if (biome == null)
                 continue;
-            if (biomeConfig.strongholdsEnabled)
+            if (biome.getBiomeConfig().strongholdsEnabled)
             {
-                allowedBiomeGenBases.add(((ForgeBiome) biomeConfig.Biome).getHandle());
+                allowedBiomeGenBases.add(((ForgeBiome) biome).getHandle());
             }
         }
     }

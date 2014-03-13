@@ -1,13 +1,10 @@
 package com.khorn.terraincontrol.configuration.standard;
 
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.resource.IceSpikeGen.SpikeType;
-import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
@@ -18,61 +15,11 @@ import java.util.List;
  * A biome generator holds all <i>default</i> settings of a biome.
  * 
  */
-public class StandardBiomeFactory
+public class StandardBiomeTemplate
 {
-    // Simple registry for the default settings
-    @SuppressWarnings("unchecked")
-    private static final Class<? extends StandardBiomeFactory>[] defaultSettings = (Class<? extends StandardBiomeFactory>[]) new Class<?>[1024];
-
-    /**
-     * Gets the default settings for a biome. If no default settings are find
-     * for this biome, some boring default settings will be returned.
-     * 
-     * @param biome The biome to get the defaults for.
-     * @param worldHeight The height of the world (many default resources have
-     *            values relative to this).
-     * @return The default settings.
-     */
-    public static StandardBiomeFactory getDefaultSettings(LocalBiome biome, int worldHeight)
-    {
-        StandardBiomeFactory biomeDefaultSettings = null;
-        try
-        {
-            // Try to get the default settings for a biome
-            Class<? extends StandardBiomeFactory> settingsClass = defaultSettings[biome.getIds().getGenerationId()];
-            if (settingsClass != null)
-            {
-                biomeDefaultSettings = (StandardBiomeFactory) settingsClass.getConstructors()[0].newInstance(biome, worldHeight);
-            }
-        } catch (Exception e)
-        {
-            TerrainControl.log(LogMarker.FATAL, "Cannot read default settings for biome {}", new Object[] {biome.getName()});
-            TerrainControl.printStackTrace(LogMarker.FATAL, e);
-        }
-
-        // Make sure that we always return something (for custom biomes)
-        if (biomeDefaultSettings == null)
-        {
-            biomeDefaultSettings = new StandardBiomeFactory(biome, worldHeight);
-        }
-        return biomeDefaultSettings;
-    }
-
-    /**
-     * Registers the default settings for the biome with the given id.
-     * 
-     * @param biomeId The biome id.
-     * @param clazz The class with the default settings.
-     */
-    public static void registerDefaultSettings(int biomeId, Class<? extends StandardBiomeFactory> clazz)
-    {
-        defaultSettings[biomeId] = clazz;
-    }
-
-    // End of registry
-
-    protected final LocalBiome minecraftBiome;
     protected final int worldHeight;
+
+    public boolean isCustomBiome = true;
 
     public String defaultExtends = "";
     public boolean defaultWaterLakes = true;
@@ -124,19 +71,9 @@ public class StandardBiomeFactory
     public Object[] defaultSurfaceSurfaceAndGroundControl = new Object[0];
     public boolean defaultIceSpikes;
 
-    public StandardBiomeFactory(LocalBiome minecraftBiome, int worldHeight)
+    public StandardBiomeTemplate(int worldHeight)
     {
-        this.minecraftBiome = minecraftBiome;
         this.worldHeight = worldHeight;
-
-        // Some settings are provided by LocalBiome, which gets them from
-        // Minecraft
-        this.defaultBiomeSurface = this.minecraftBiome.getSurfaceHeight();
-        this.defaultBiomeVolatility = this.minecraftBiome.getSurfaceVolatility();
-        this.defaultSurfaceBlock = this.minecraftBiome.getSurfaceBlock().toDefaultMaterial();
-        this.defaultGroundBlock = this.minecraftBiome.getGroundBlock().toDefaultMaterial();
-        this.defaultBiomeTemperature = this.minecraftBiome.getTemperature();
-        this.defaultBiomeWetness = this.minecraftBiome.getWetness();
     }
 
     /**

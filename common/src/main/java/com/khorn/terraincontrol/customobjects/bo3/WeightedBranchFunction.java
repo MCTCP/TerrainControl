@@ -7,7 +7,6 @@ import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;

@@ -198,7 +198,7 @@ public class SaplingListener
     // Can return null
     public SaplingGen getSaplingGen(LocalWorld world, SaplingType type, int x, int z)
     {
-        BiomeConfig biomeConfig = world.getSettings().biomeConfigs[world.getBiomeId(x, z)];
+        BiomeConfig biomeConfig = world.getBiome(x, z).getBiomeConfig();
         if (biomeConfig == null)
         {
             return null;

@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
 import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
@@ -22,10 +23,7 @@ import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.server.v1_7_R1.*;
 import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class BukkitWorld implements LocalWorld
 {
@@ -42,10 +40,9 @@ public class BukkitWorld implements LocalWorld
     private static int nextBiomeId = DefaultBiome.values().length;
 
     private static final int MAX_BIOMES_COUNT = 1024;
-    private BukkitBiome[] biomes = new BukkitBiome[MAX_BIOMES_COUNT];
+    private static final int STANDARD_WORLD_HEIGHT = 128;
 
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
-    private static ArrayList<BukkitBiome> defaultBiomes = new ArrayList<BukkitBiome>();
 
     public StrongholdGen strongholdGen;
     public VillageGen villageGen;
@@ -78,40 +75,23 @@ public class BukkitWorld implements LocalWorld
 
     private BiomeBase[] biomeBaseArray;
 
-    static
-    {
-        for (DefaultBiome defaultBiome : DefaultBiome.values())
-        {
-            int id = defaultBiome.Id;
-            BukkitBiome localBiome = BukkitBiome.forVanillaBiome(BiomeBase.getBiome(id));
-            defaultBiomes.add(localBiome);
-        }
-    }
-
     public BukkitWorld(String _name)
     {
         this.name = _name;
-        
-        // Initialize default biomes
-        for (BukkitBiome biome : defaultBiomes)
+    }
+
+    @Override
+    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
+    {
+        BukkitBiome biome;
+        if (biomeConfig.defaultSettings.isCustomBiome)
         {
-            this.biomeNames.put(biome.getName(), biome);
-            this.biomes[biome.getIds().getGenerationId()] = biome;
+            biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds);
+        } else
+        {
+            biome = BukkitBiome.forVanillaBiome(biomeConfig, BiomeBase.getBiome(biomeIds.getSavedId()));
         }
-    }
 
-    @Override
-    public LocalBiome getNullBiome(String name)
-    {
-        return new NullBiome(name);
-    }
-
-    @Override
-    public LocalBiome addCustomBiome(String name, BiomeIds biomeIds)
-    {
-        BukkitBiome biome = BukkitBiome.forCustomBiome(name, biomeIds);
-
-        biomes[biome.getIds().getGenerationId()] = biome;
         this.biomeNames.put(biome.getName(), biome);
 
         return biome;
@@ -132,19 +112,29 @@ public class BukkitWorld implements LocalWorld
     @Override
     public BukkitBiome getBiomeById(int id)
     {
-        return biomes[id];
+        return (BukkitBiome) settings.biomes[id];
     }
 
     @Override
-    public int getBiomeIdByName(String name)
+    public LocalBiome getBiomeByName(String name)
     {
-        return this.biomeNames.get(name).getIds().getGenerationId();
+        return this.biomeNames.get(name);
     }
 
     @Override
-    public List<? extends LocalBiome> getDefaultBiomes()
+    public Collection<? extends BiomeLoadInstruction> getDefaultBiomes()
     {
-        return defaultBiomes;
+        // Loop through all default biomes and create the default
+        // settings for them
+        List<BiomeLoadInstruction> standardBiomes = new ArrayList<BiomeLoadInstruction>();
+        for (DefaultBiome defaultBiome : DefaultBiome.values())
+        {
+            int id = defaultBiome.Id;
+            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(BukkitMojangSettings.fromId(id), STANDARD_WORLD_HEIGHT);
+            standardBiomes.add(instruction);
+        }
+
+        return standardBiomes;
     }
 
     @Override
@@ -277,7 +267,19 @@ public class BukkitWorld implements LocalWorld
     {
         if (this.settings.worldConfig.BiomeConfigsHaveReplacement)
         {
-            // See the comment in replaceBiomes for an explanation of this
+            // Like all other populators, this populator uses an offset of 8
+            // blocks from the chunk start.
+            // This is what happens when the top left chunk has it's biome
+            // replaced:
+            // +--------+--------+ . = no changes in biome for now
+            // |........|........| # = biome is replaced
+            // |....####|####....|
+            // |....####|####....| The top left chunk is saved as chunk 0
+            // +--------+--------+ in the cache, the top right chunk as 1,
+            // |....####|####....| the bottom left as 2 and the bottom
+            // |....####|####....| right chunk as 3.
+            // |........|........|
+            // +--------+--------+
             replaceBlocks(this.chunkCache[0], 8, 8);
             replaceBlocks(this.chunkCache[1], 0, 8);
             replaceBlocks(this.chunkCache[2], 8, 0);
@@ -303,10 +305,10 @@ public class BukkitWorld implements LocalWorld
             {
                 for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
                 {
-                    BiomeConfig biomeConfig = this.settings.biomeConfigs[chunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
-                    if (biomeConfig != null && biomeConfig.replacedBlocks.hasReplaceSettings())
+                    LocalBiome biome = this.settings.biomes[chunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
+                    if (biome != null && biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
                     {
-                        LocalMaterialData[][] replaceArray = biomeConfig.replacedBlocks.compiledInstructions;
+                        LocalMaterialData[][] replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;
                         for (int sectionY = 0; sectionY < 16; sectionY++)
                         {
                             Block block = section.getTypeId(sectionX, sectionY, sectionZ);
@@ -332,48 +334,9 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void replaceBiomes()
+    public void placePopulationMobs(LocalBiome biome, Random random, int chunkX, int chunkZ)
     {
-        if (this.settings.worldConfig.HaveBiomeReplace)
-        {
-            // Like all other populators, this populator uses an offset of 8
-            // blocks from the chunk start.
-            // This is what happens when the top left chunk has it's biome
-            // replaced:
-            // +--------+--------+ . = no changes in biome for now
-            // |........|........| # = biome is replaced
-            // |....####|####....|
-            // |....####|####....| The top left chunk is saved as chunk 0
-            // +--------+--------+ in the cache, the top right chunk as 1,
-            // |....####|####....| the bottom left as 2 and the bottom
-            // |....####|####....| right chunk as 3.
-            // |........|........|
-            // +--------+--------+
-            replaceBiomes(this.chunkCache[0].m(), 8, 8);
-            replaceBiomes(this.chunkCache[1].m(), 0, 8);
-            replaceBiomes(this.chunkCache[2].m(), 8, 0);
-            replaceBiomes(this.chunkCache[3].m(), 0, 0);
-        }
-    }
-
-    private void replaceBiomes(byte[] biomeArray, int startXInChunk, int startZInChunk)
-    {
-        int endXInChunk = startXInChunk + 8;
-        int endZInChunkTimes16 = (startZInChunk + 8) * 16;
-        for (int xInChunk = startXInChunk; xInChunk < endXInChunk; xInChunk++)
-        {
-            for (int zInChunkTimes16 = startZInChunk * 16; zInChunkTimes16 < endZInChunkTimes16; zInChunkTimes16 += 16)
-            {
-                biomeArray[zInChunkTimes16 | xInChunk] = (byte) (this.settings.replaceToBiomeNameMatrix[biomeArray[zInChunkTimes16
-                        | xInChunk] & 0xFF] & 0xFF);
-            }
-        }
-    }
-
-    @Override
-    public void placePopulationMobs(BiomeConfig config, Random random, int chunkX, int chunkZ)
-    {
-        SpawnerCreature.a(this.world, ((BukkitBiome) config.Biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
+        SpawnerCreature.a(this.world, ((BukkitBiome) biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
     }
 
     public void LoadChunk(Chunk chunk)
@@ -491,7 +454,7 @@ public class BukkitWorld implements LocalWorld
             // Chunk is unloaded
             return;
         }
-        
+
         // Temporarily make static, so that torches etc. don't pop off
         boolean oldStatic = world.isStatic;
         world.isStatic = true;
@@ -607,9 +570,8 @@ public class BukkitWorld implements LocalWorld
         {
             // This is an ugly hack. It is a much better idea to give
             // the WorldSettings a proper reload method.
-            this.settings.biomeConfigs = newSettings.biomeConfigs;
+            this.settings.biomes = newSettings.biomes;
             this.settings.biomesCount = newSettings.biomesCount;
-            this.settings.replaceToBiomeNameMatrix = newSettings.replaceToBiomeNameMatrix;
 
             // Deprecate old WorldConfig and replace with new
             this.settings.worldConfig.newSettings = newSettings.worldConfig;

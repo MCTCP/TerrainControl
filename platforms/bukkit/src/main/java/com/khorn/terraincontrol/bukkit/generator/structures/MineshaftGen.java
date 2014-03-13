@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
@@ -21,8 +22,8 @@ public class MineshaftGen extends StructureGenerator
         if (rand.nextInt(80) < Math.max(Math.abs(chunkX), Math.abs(chunkZ)))
         {
             LocalWorld world = WorldHelper.toLocalWorld(worldMC);
-            int biomeId = world.getCalculatedBiomeId(chunkX * 16 + 8, chunkZ * 16 + 8);
-            if (rand.nextDouble() * 100.0 < world.getSettings().biomeConfigs[biomeId].mineshaftsRarity)
+            LocalBiome biome = world.getCalculatedBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
+            if (rand.nextDouble() * 100.0 < biome.getBiomeConfig().mineshaftsRarity)
             {
                 return true;
             }

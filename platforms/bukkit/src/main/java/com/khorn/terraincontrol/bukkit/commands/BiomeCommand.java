@@ -45,7 +45,7 @@ public class BiomeCommand extends BaseCommand
 
         if (args.contains("-f"))
         {
-            sender.sendMessage(MESSAGE_COLOR + "The base temperature of this biome is " + VALUE_COLOR + biome.getTemperature() + MESSAGE_COLOR + ", \nat your height it is " + VALUE_COLOR
+            sender.sendMessage(MESSAGE_COLOR + "The base temperature of this biome is " + VALUE_COLOR + biome.getBiomeConfig().biomeTemperature + MESSAGE_COLOR + ", \nat your height it is " + VALUE_COLOR
                     + biome.getTemperatureAt(x, y, z));
         }
 
