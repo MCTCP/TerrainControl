@@ -1,32 +1,27 @@
 package com.khorn.terraincontrol.bukkit.commands.runnable;
 
 import com.khorn.terraincontrol.LocalBiome;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.logging.LogMarker;
-import com.sun.imageio.plugins.png.PNGImageWriter;
-import com.sun.imageio.plugins.png.PNGImageWriterSpi;
 import net.minecraft.server.v1_7_R1.BiomeBase;
 import net.minecraft.server.v1_7_R1.World;
 import org.bukkit.command.CommandSender;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
+import java.io.File;
+import java.io.IOException;
 
-import javax.imageio.stream.FileCacheImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.ImageIO;
 
 public class MapWriter implements Runnable
 {
-    public static final int[] defaultColors =
-    {
-        0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0, 0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999, 0xFFFF00, 0x996600, 0x009900, 0x003300, 0x666600
-    };
+    public static final int[] defaultColors = {0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0,
+            0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999, 0xFFFF00, 0x996600, 0x009900, 0x003300, 0x666600};
 
     public static boolean isWorking = false;
 
@@ -40,7 +35,10 @@ public class MapWriter implements Runnable
 
     public enum Angle
     {
-        d0, d90, d180, d270
+        d0,
+        d90,
+        d180,
+        d270
     }
 
     public MapWriter(World _world, int _size, Angle _angle, CommandSender _sender, int _offsetX, int _offsetZ, String _label)
@@ -54,6 +52,49 @@ public class MapWriter implements Runnable
         this.label = _label;
     }
 
+    /**
+     * Gets the colors of all biomes, indexed by biome id.
+     * 
+     * @param world The world to get the colors from. Doesn't have to be
+     *            managed by Terrain Control.
+     * @return The colors, indexed by biome id.
+     */
+    private int[] getColors(World world)
+    {
+        TerrainControl.log(LogMarker.TRACE, "BukkitWorld::UUID:: {}", world.getDataManager().getUUID());
+        LocalWorld bukkitWorld = WorldHelper.toLocalWorld(world);
+        if (bukkitWorld == null)
+        {
+            TerrainControl.log(LogMarker.WARN, "BukkitWorld is null :: Make sure you add `{}` to bukkit.yml", (Object) world.getWorld()
+                    .getName());
+            return defaultColors;
+        }
+
+        int[] colors = defaultColors;
+        colors = new int[bukkitWorld.getSettings().biomes.length];
+        TerrainControl.log(LogMarker.TRACE, "BukkitWorld settings biomes.length::{}", bukkitWorld.getSettings().biomes.length);
+
+        for (LocalBiome biome : bukkitWorld.getSettings().biomes)
+        {
+            if (biome != null)
+            {
+                BiomeConfig biomeConfig = biome.getBiomeConfig();
+                try
+                {
+                    int color = Integer.decode(biomeConfig.BiomeColor);
+                    if (color <= 0xFFFFFF)
+                    {
+                        colors[biome.getIds().getGenerationId()] = color;
+                    }
+                } catch (NumberFormatException ex)
+                {
+                    TerrainControl.log(LogMarker.WARN, "Wrong color in ", (Object) biome.getName());
+                    sender.sendMessage(BaseCommand.ERROR_COLOR + "Wrong color in " + biome.getName());
+                }
+            }
+        }
+        return colors;
+    }
 
     @Override
     public void run()
@@ -67,147 +108,130 @@ public class MapWriter implements Runnable
         MapWriter.isWorking = true;
         int height = size;
         int width = size;
+        LocalWorld localWorld = WorldHelper.toLocalWorld(world);
+
+        int[] colors = this.getColors(world);
+
+        sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Generating map...");
+
+        BiomeBase[] biomeBuffer = new BiomeBase[256];
+        long time = System.currentTimeMillis();
+
+        BufferedImage biomeImage = new BufferedImage(height * 16, width * 16, BufferedImage.TYPE_INT_RGB);
+        BufferedImage temperatureImage = new BufferedImage(height * 16, width * 16, BufferedImage.TYPE_INT_RGB);
+
+        int imageX = 0;
+        int imageY = 0;
+
+        for (int x = -height / 2; x < height / 2; x++)
+        {
+            for (int z = -width / 2; z < width / 2; z++)
+            {
+                long time2 = System.currentTimeMillis();
+
+                if (time2 < time)
+                {
+                    time = time2;
+                }
+
+                if (time2 > time + 2000L)
+                {
+                    sender.sendMessage(BaseCommand.MESSAGE_COLOR + ((x + height / 2) * 100 / height) + "%");
+                    time = time2;
+                }
+
+                biomeBuffer = world.getWorldChunkManager().getBiomeBlock(biomeBuffer, offsetX + x * 16, offsetZ + z * 16, 16, 16);
+                for (int x1 = 0; x1 < 16; x1++)
+                {
+                    for (int z1 = 0; z1 < 16; z1++)
+                    {
+
+                        switch (this.angle)
+                        {
+                            case d0:
+                                imageX = (x + height / 2) * 16 + x1;
+                                imageY = (z + width / 2) * 16 + z1;
+                                break;
+                            case d90:
+                                imageX = width * 16 - ((z + width / 2) * 16 + z1 + 1);
+                                imageY = (x + height / 2) * 16 + x1;
+                                break;
+                            case d180:
+                                imageX = height * 16 - ((x + height / 2) * 16 + x1 + 1);
+                                imageY = width * 16 - ((z + width / 2) * 16 + z1 + 1);
+                                break;
+                            case d270:
+                                imageX = (z + width / 2) * 16 + z1;
+                                imageY = height * 16 - ((x + height / 2) * 16 + x1 + 1);
+                                break;
+                        }
+
+                        int arrayPosition = x1 + 16 * z1;
+                        int biomeId = WorldHelper.getGenerationId(biomeBuffer[arrayPosition]);
+                        try
+                        {
+                            // Biome color
+                            biomeImage.setRGB(imageX, imageY, colors[biomeId]);
+
+                            // Temperature
+                            Color temperatureColor = getBiomeTemperatureColor(biomeBuffer[arrayPosition], localWorld);
+                            temperatureImage.setRGB(imageX, imageY, temperatureColor.getRGB());
+                        } catch (ArrayIndexOutOfBoundsException ex)
+                        {
+                            TerrainControl.log(LogMarker.TRACE, "BiomeBuff Idx::{}<{}x/{}z>, Len::{}, ID::{} | Colors Len::{}",
+                                    new Object[] {arrayPosition, x1, z1, biomeBuffer.length, biomeBuffer[arrayPosition].id, colors.length});
+                        }
+                    }
+                }
+            }
+        }
+
+        sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Writing images...");
 
         try
         {
-            int[] colors = defaultColors;
-            TerrainControl.log(LogMarker.TRACE, "BukkitWorld::UUID:: {}", world.getDataManager().getUUID());
-            LocalWorld bukkitWorld = WorldHelper.toLocalWorld(world);
-            if (bukkitWorld != null)
-            {
-                colors = new int[bukkitWorld.getSettings().biomes.length];
-                TerrainControl.log(LogMarker.TRACE, "BukkitWorld settings biomes.length::{}", bukkitWorld.getSettings().biomes.length);
-
-                for (LocalBiome biome : bukkitWorld.getSettings().biomes)
-                {
-                    if (biome != null)
-                    {
-                        BiomeConfig biomeConfig = biome.getBiomeConfig();
-                        try
-                        {
-                            int color = Integer.decode(biomeConfig.BiomeColor);
-                            if (color <= 0xFFFFFF)
-                            {
-                                colors[biome.getIds().getGenerationId()] = color;
-                            }
-                        } catch (NumberFormatException ex)
-                        {
-                            TerrainControl.log(LogMarker.WARN, "Wrong color in ", biome.getName());
-                            sender.sendMessage(BaseCommand.ERROR_COLOR + "Wrong color in " + biome.getName());
-                        }
-                    }
-                }
-            } else
-            {
-                TerrainControl.log(LogMarker.WARN, "BukkitWorld is null :: Make sure you add `{}` to bukkit.yml", (Object) world.getWorld().getName());
-            }
-
-            sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Generating map...");
-            BiomeBase[] BiomeBuffer = new BiomeBase[256];
-
-            long time = System.currentTimeMillis();
-
-            BufferedImage biomeImage = new BufferedImage(height * 16, width * 16, BufferedImage.TYPE_INT_RGB);
-            BufferedImage tempImage = new BufferedImage(height * 16, width * 16, BufferedImage.TYPE_INT_RGB);
-
-            int image_x = 0;
-            int image_y = 0;
-
-
-            for (int x = -height / 2; x < height / 2; x++)
-            {
-                for (int z = -width / 2; z < width / 2; z++)
-                {
-                    long time2 = System.currentTimeMillis();
-
-                    if (time2 < time)
-                    {
-                        time = time2;
-                    }
-
-                    if (time2 > time + 2000L)
-                    {
-                        sender.sendMessage(BaseCommand.MESSAGE_COLOR + ((x + height / 2) * 100 / height) + "%");
-                        time = time2;
-                    }
-
-                    BiomeBuffer = world.getWorldChunkManager().getBiomeBlock(BiomeBuffer, offsetX + x * 16, offsetZ + z * 16, 16, 16);
-                    for (int x1 = 0; x1 < 16; x1++)
-                    {
-                        for (int z1 = 0; z1 < 16; z1++)
-                        {
-                            
-                            switch (this.angle)
-                            {
-                                case d0:
-                                    image_x = (x + height / 2) * 16 + x1;
-                                    image_y = (z + width / 2) * 16 + z1;
-                                    break;
-                                case d90:
-                                    image_x = width * 16 - ((z + width / 2) * 16 + z1 + 1);
-                                    image_y = (x + height / 2) * 16 + x1;
-                                    break;
-                                case d180:
-                                    image_x = height * 16 - ((x + height / 2) * 16 + x1 + 1);
-                                    image_y = width * 16 - ((z + width / 2) * 16 + z1 + 1);
-                                    break;
-                                case d270:
-                                    image_x = (z + width / 2) * 16 + z1;
-                                    image_y = height * 16 - ((x + height / 2) * 16 + x1 + 1);
-                                    break;
-                            }
-
-                            //>>	This allows TC to map any world, even if it is not configured in the bukkit.yml file
-                            int t = x1 + 16 * z1;
-                            int bbid = BiomeBuffer[t].id;
-                            try
-                            {
-                                biomeImage.setRGB(image_x, image_y, colors[bbid]);
-
-                                Color tempColor = Color.getHSBColor(0.7f - BiomeBuffer[t].temperature * 0.7f, 0.9f, BiomeBuffer[t].temperature * 0.7f + 0.3f);
-
-                                tempImage.setRGB(image_x, image_y, tempColor.getRGB());
-                            } catch (ArrayIndexOutOfBoundsException ex)
-                            {
-                                TerrainControl.log(LogMarker.TRACE, "BiomeBuff Idx::{}<{}x/{}z>, Len::{}, ID::{} | Colors Len::{}", new Object[]
-                                {
-                                    t, x1, z1, BiomeBuffer.length, BiomeBuffer[t].id, colors.length
-                                });
-
-                            }
-                        }
-                    }
-                }
-            }
-
-            sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Writing images...");
-            PNGImageWriter PngEncoder = new PNGImageWriter(new PNGImageWriterSpi());
-
             // Write biome colors
-            FileOutputStream fileOutput = new FileOutputStream(label + world.worldData.getName() + "_biome.png", false);
-            ImageOutputStream imageOutput = new FileCacheImageOutputStream(fileOutput, null);
-            PngEncoder.setOutput(imageOutput);
-            PngEncoder.write(biomeImage);
-            imageOutput.close();
-            fileOutput.close();
+            ImageIO.write(biomeImage, "png", new File(label + world.worldData.getName() + "_biome.png"));
 
             // Write temperatures
-            fileOutput = new FileOutputStream(label + world.worldData.getName() + "_temperature.png", false);
-            imageOutput = new FileCacheImageOutputStream(fileOutput, null);
-            PngEncoder.setOutput(imageOutput);
-            PngEncoder.write(tempImage);
-            imageOutput.close();
-            fileOutput.close();
-
-            PngEncoder.dispose();
+            ImageIO.write(temperatureImage, "png", new File(label + world.worldData.getName() + "_temperature.png"));
 
             sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Done");
-
-        } catch (Exception e)
+        } catch (IOException e)
         {
-            TerrainControl.printStackTrace(LogMarker.FATAL, e);
+            sender.sendMessage(BaseCommand.ERROR_COLOR + "Exception while writing images: " + e.getLocalizedMessage());
+            TerrainControl.log(LogMarker.ERROR, "Failed to write image.");
+            TerrainControl.printStackTrace(LogMarker.ERROR, e);
         }
+
         MapWriter.isWorking = false;
     }
-    
+
+    /**
+     * Gets the temperature color of a single biome. Starts at blue, goes to
+     * green, red and darker red for increasing temperatures.
+     * 
+     * @param biome The biome to get the temperature from.
+     * @param world The world the biome is in. May be null if the world isn't
+     *            managed by Terrain Control.
+     * @return The temperature color.
+     */
+    private Color getBiomeTemperatureColor(BiomeBase biome, LocalWorld world)
+    {
+        float temperature;
+        if (world != null)
+        {
+            temperature = world.getBiomeById(WorldHelper.getGenerationId(biome)).getBiomeConfig().biomeTemperature;
+        } else
+        {
+            temperature = biome.temperature;
+        }
+
+        // Prevents us from going around the color wheel twice or getting into
+        // the purple colors
+        float cappedTemperature = Math.min(1.0f, temperature);
+
+        return Color.getHSBColor(0.7f - cappedTemperature * 0.7f, 0.9f, temperature * 0.7f + 0.3f);
+    }
+
 }

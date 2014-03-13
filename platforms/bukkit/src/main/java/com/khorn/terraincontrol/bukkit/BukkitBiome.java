@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import net.minecraft.server.v1_7_R1.BiomeBase;
 
@@ -43,13 +44,7 @@ public class BukkitBiome implements LocalBiome
     protected BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
     {
         this.biomeBase = biome;
-        if (biomeBase instanceof CustomBiome)
-        {
-            this.biomeIds = new BiomeIds(((CustomBiome) biomeBase).generationId, biomeBase.id);
-        } else
-        {
-            this.biomeIds = new BiomeIds(biomeBase.id);
-        }
+        this.biomeIds = new BiomeIds(WorldHelper.getGenerationId(biomeBase), biomeBase.id);
         this.biomeConfig = biomeConfig;
         this.isCustom = biome instanceof CustomBiome;
     }

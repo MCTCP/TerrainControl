@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
-import com.khorn.terraincontrol.bukkit.CustomBiome;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import net.minecraft.server.v1_7_R1.BiomeBase;
 import net.minecraft.server.v1_7_R1.BiomeCache;
 import net.minecraft.server.v1_7_R1.WorldChunkManager;
@@ -17,17 +17,7 @@ public class BiomeCacheWrapper implements com.khorn.terraincontrol.generator.bio
     @Override
     public int getBiome(int x, int z)
     {
-        return getId(handle.b(x, z));
-    }
-
-    private int getId(BiomeBase biome)
-    {
-        // Support for virtual biomes
-        if (biome instanceof CustomBiome)
-        {
-            return ((CustomBiome) biome).generationId;
-        }
-        return biome.id;
+        return WorldHelper.getGenerationId(handle.b(x, z));
     }
 
     @Override
@@ -43,7 +33,7 @@ public class BiomeCacheWrapper implements com.khorn.terraincontrol.generator.bio
         int[] intCache = new int[cached.length];
         for (int i = 0; i < cached.length; i++)
         {
-            intCache[i] = getId(cached[i]);
+            intCache[i] = WorldHelper.getGenerationId(cached[i]);
         }
         return intCache;
     }
