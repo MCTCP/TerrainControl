@@ -114,7 +114,7 @@ public class WorldSettings
             loadedBiomeNames.append(", ");
 
             // Inheritance
-            processInheritance(biomeConfig, 0);
+            processInheritance(biomeConfigs, biomeConfig, 0);
 
             // Settings reading
             biomeConfig.process();
@@ -230,7 +230,7 @@ public class WorldSettings
         }
     }
 
-    private void processInheritance(BiomeConfig biomeConfig, int currentDepth)
+    private void processInheritance(Map<String, BiomeConfig> allBiomeConfigs, BiomeConfig biomeConfig, int currentDepth)
     {
         if (biomeConfig.BiomeExtendsProcessed)
         {
@@ -247,7 +247,7 @@ public class WorldSettings
         }
 
         // This biome extends another biome
-        BiomeConfig extendedBiomeConfig = world.getBiomeByName(extendedBiomeName).getBiomeConfig();
+        BiomeConfig extendedBiomeConfig = allBiomeConfigs.get(extendedBiomeName);
         if (extendedBiomeConfig == null)
         {
             TerrainControl.log(LogMarker.WARN, "The biome {} tried to extend the biome {}, but that biome doesn't exist.", new Object[] {
@@ -266,7 +266,7 @@ public class WorldSettings
         if (!extendedBiomeConfig.BiomeExtendsProcessed)
         {
             // This biome has not been processed yet, do that first
-            processInheritance(extendedBiomeConfig, currentDepth + 1);
+            processInheritance(allBiomeConfigs, extendedBiomeConfig, currentDepth + 1);
         }
 
         // Merge the two
