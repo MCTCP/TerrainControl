@@ -31,7 +31,8 @@ repositories
     mavenLocal()
 }
 
-dependencies {
+dependencies
+{
     compile 'org.bukkit:bukkit:' + ext.bukkitVersion
     compile 'org.bukkit:craftbukkit:' + ext.bukkitVersion
     compile project(':common')
@@ -57,7 +58,8 @@ processResources
 }
 
 // Include all Terrain Control files in the jar
-shadow {
+shadow
+{
     artifactAttached = false
     include 'com/khorn/terraincontrol/**'
 }

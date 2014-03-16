@@ -1,7 +1,7 @@
 // Information for all projects
 
 // The default tasks for all projects
-defaultTasks 'clean', 'build', 'shadowJar', 'install'
+defaultTasks 'clean', 'build', 'shadowJar', 'createReleaseJar', 'install'
 
 allprojects
 {
@@ -10,7 +10,7 @@ allprojects
 
     // Give this a value in a child project to change the name in your IDE
     // Otherwise it will use the default name. In the case of the project
-    // 'platforms/bukkit', the default name is invalid because it contains a slash
+    // 'platforms:bukkit', the default name is invalid because it contains a slash
     ext.ideProjectName = null
 }
 
@@ -44,11 +44,6 @@ subprojects
             classpath.entries.findAll{ entry -> entry.path == "/common" }*.path = "/TerrainControl-Common"
         }
 
-        // Fix project module name in IDEA (for example "platforms/forge.iml" -> "platforms_forge.iml")
-        idea.module.iml.beforeMerged
-        {   module ->
-            task.idea.module.name = task.idea.module.name.replace("/", "_")
-        }
     }
 
     // Generate a pom.xml, upload to local Maven repository

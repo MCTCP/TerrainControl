@@ -1,11 +1,1 @@
-include 'common', 'platforms/bukkit', 'platforms/forge'
-
-/*
- * The 'platforms' module isn't included at the moment. This
- * file should create a jar with both the Bukkit and Forge version in it.
- * However, Gradle tries to rebuild 'platforms/bukkit' and 'platforms/forge'
- * when creating that file. This corrupts the MCP/ForgeGradle cache, making
- * everything very slow. For now, it is probably better to create the
- * universal jar file yourself by putting all classes together with something
- * like 7-zip.
- */
+include 'common', 'platforms:bukkit', 'platforms:forge', 'releases'

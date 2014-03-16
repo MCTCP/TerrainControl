@@ -27,6 +27,7 @@ bin
 dist
 out
 localexport.jardesc
+forgeInfo
 
 # Minecraft and Forge files
 platforms/forge/crash-reports
