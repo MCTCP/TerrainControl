@@ -4,7 +4,6 @@
 import java.util.zip.*;
 
 // Project properties
-archivesBaseName = "terraincontrol-releases"
 description = "TerrainControl Releases"
 
 // Gets the JAR file for the project with the given name
