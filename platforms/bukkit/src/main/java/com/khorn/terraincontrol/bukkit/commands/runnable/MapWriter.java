@@ -179,7 +179,7 @@ public class MapWriter implements Runnable
                         } catch (ArrayIndexOutOfBoundsException ex)
                         {
                             TerrainControl.log(LogMarker.TRACE, "BiomeBuff Idx::{}<{}x/{}z>, Len::{}, ID::{} | Colors Len::{}",
-                                    new Object[] {arrayPosition, x1, z1, biomeBuffer.length, biomeBuffer[arrayPosition].id, colors.length});
+                                    new Object[] {arrayPosition, x1, z1, biomeBuffer.length, WorldHelper.getGenerationId(biomeBuffer[arrayPosition]), colors.length});
                         }
                     }
                 }

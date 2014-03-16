@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.bukkit.generator.structures;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
@@ -81,11 +82,11 @@ public class RareBuildingGen extends StructureGenerator
 
         if (var3 == var5 && var4 == var6)
         {
-            BiomeBase biomeAtPosition = this.c.getWorldChunkManager().getBiome(var3 * 16 + 8, var4 * 16 + 8);
+            int biomeAtPosition = WorldHelper.getGenerationId(this.c.getWorldChunkManager().getBiome(var3 * 16 + 8, var4 * 16 + 8));
 
             for (BiomeBase biome : biomeList)
             {
-                if (biomeAtPosition.id == biome.id)
+                if (biomeAtPosition == WorldHelper.getGenerationId(biome))
                 {
                     return true;
                 }

@@ -143,6 +143,7 @@ public class BukkitWorld implements LocalWorld
         if (this.biomeManager != null)
             return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size, outputType);
 
+        // For BiomeMode:Default
         biomeBaseArray = this.world.worldProvider.e.getBiomes(biomeBaseArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
@@ -157,6 +158,7 @@ public class BukkitWorld implements LocalWorld
         if (this.biomeManager != null)
             return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size, outputType);
 
+        // For BiomeMode:Default
         biomeBaseArray = this.world.worldProvider.e.a(biomeBaseArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
@@ -170,6 +172,8 @@ public class BukkitWorld implements LocalWorld
     {
         if (this.biomeManager != null)
             return this.biomeManager.getBiome(x, z);
+
+        // For BiomeMode:Default
         return this.world.worldProvider.e.getBiome(x, z).id;
     }
 
