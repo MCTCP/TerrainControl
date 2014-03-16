@@ -20,26 +20,57 @@ public class CustomBiome extends BiomeBase
 {
     public final int generationId;
 
+    /**
+     * Creates a CustomBiome instance. Minecraft automatically registers those
+     * instances in the BiomeBase constructor. We don't want this for virtual
+     * biomes (the shouldn't overwrite real biomes), so we restore the old
+     * biome, unregistering the virtual biome.
+     *
+     * @param name Name of the biome.
+     * @param biomeIds Ids of the biome.
+     * @return The CustomBiome instance.
+     */
+    public static CustomBiome createInstance(String name, BiomeIds biomeIds)
+    {
+        if (biomeIds.isVirtual())
+        {
+            // Don't register (the only way to do this on Bukkit is to restore
+            // the original biome afterwards)
+            BiomeBase toRestore = BiomeBase.getBiome(biomeIds.getSavedId());
+            CustomBiome customBiome = new CustomBiome(name, biomeIds);
+            BiomeBase.n()[biomeIds.getSavedId()] = toRestore;
+
+            return customBiome;
+        } else
+        {
+            // Just register normally
+            return new CustomBiome(name, biomeIds);
+        }
+    }
+
     @SuppressWarnings("MismatchedReadAndWriteOfArray")
-    public CustomBiome(String name, BiomeIds biomeIds)
+    private CustomBiome(String name, BiomeIds biomeIds)
     {
         super(biomeIds.getSavedId());
         this.generationId = biomeIds.getGenerationId();
         this.a(name);
 
         // Insert the biome in CraftBukkit's biome mapping
-        try
+        if (!biomeIds.isVirtual())
         {
-            Field biomeMapping = CraftBlock.class.getDeclaredField("BIOME_MAPPING");
-            biomeMapping.setAccessible(true);
-            Biome[] mappingArray = (Biome[]) biomeMapping.get(null);
+            try
+            {
+                Field biomeMapping = CraftBlock.class.getDeclaredField("BIOME_MAPPING");
+                biomeMapping.setAccessible(true);
+                Biome[] mappingArray = (Biome[]) biomeMapping.get(null);
 
-            mappingArray[id] = Biome.OCEAN;
+                mappingArray[id] = Biome.OCEAN;
 
-        } catch (Exception e)
-        {
-            TerrainControl.log(LogMarker.FATAL, "Couldn't update Bukkit's biome mappings!");
-            TerrainControl.printStackTrace(LogMarker.FATAL, e);
+            } catch (Exception e)
+            {
+                TerrainControl.log(LogMarker.FATAL, "Couldn't update Bukkit's biome mappings!");
+                TerrainControl.printStackTrace(LogMarker.FATAL, e);
+            }
         }
     }
 
@@ -48,8 +79,8 @@ public class CustomBiome extends BiomeBase
     {
         this.am = config.BiomeHeight;
         this.an = config.BiomeVolatility;
-        this.ai = ((BukkitMaterialData)config.surfaceBlock).internalBlock();
-        this.ak = ((BukkitMaterialData)config.groundBlock).internalBlock();
+        this.ai = ((BukkitMaterialData) config.surfaceBlock).internalBlock();
+        this.ak = ((BukkitMaterialData) config.groundBlock).internalBlock();
         this.temperature = config.biomeTemperature;
         this.humidity = config.biomeWetness;
         if (this.humidity == 0)
@@ -64,7 +95,8 @@ public class CustomBiome extends BiomeBase
         addMobs(this.av, config.spawnAmbientCreaturesAddDefaults, config.spawnAmbientCreatures);
     }
 
-    // Adds the mobs to the internal list. Displays a warning for each mob type it doesn't understand
+    // Adds the mobs to the internal list. Displays a warning for each mob
+    // type it doesn't understand
     protected void addMobs(List<BiomeMeta> internalList, boolean addDefaults, List<WeightedMobSpawnGroup> configList)
     {
         if (!addDefaults)
@@ -79,8 +111,10 @@ public class CustomBiome extends BiomeBase
                 internalList.add(new BiomeMeta(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
             } else
             {
-                // The .toLowerCase() is just a safeguard so that we get notified if this.af is no longer the biome name
-                TerrainControl.log(LogMarker.WARN, "Mob type {} not found in {}", new Object[]{mobGroup.getMobName(), this.af.toLowerCase()});
+                // The .toLowerCase() is just a safeguard so that we get
+                // notified if this.af is no longer the biome name
+                TerrainControl.log(LogMarker.WARN, "Mob type {} not found in {}",
+                        new Object[] {mobGroup.getMobName(), this.af.toLowerCase()});
             }
         }
     }

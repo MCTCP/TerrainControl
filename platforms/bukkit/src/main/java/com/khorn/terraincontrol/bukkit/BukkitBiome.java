@@ -30,7 +30,7 @@ public class BukkitBiome implements LocalBiome
     }
 
     /**
-     * Creates a new custom biome with the given name and ids.
+     * Creates and registers a new custom biome with the given name and ids.
      * 
      * @param name Name of the custom biome.
      * @param biomeIds Ids of the custom biome.
@@ -38,7 +38,7 @@ public class BukkitBiome implements LocalBiome
      */
     public static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        return new BukkitBiome(biomeConfig, new CustomBiome(biomeConfig.name, biomeIds));
+        return new BukkitBiome(biomeConfig, CustomBiome.createInstance(biomeConfig.name, biomeIds));
     }
 
     protected BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
