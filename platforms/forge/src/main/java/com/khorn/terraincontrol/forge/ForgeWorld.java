@@ -42,9 +42,10 @@ public class ForgeWorld implements LocalWorld
 
     private static int nextBiomeId = 0;
 
-    private static final int maxBiomeCount = 1024;
+    private static final int MAX_BIOMES_COUNT = 1024;
+    private static final int MAX_SAVED_BIOMES_COUNT = 255;
     private static final int STANDARD_WORLD_HEIGHT = 128;
-    
+
     private static BiomeGenBase[] biomesToRestore = new BiomeGenBase[BiomeGenBase.getBiomeGenArray().length];
 
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
@@ -123,7 +124,13 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getMaxBiomesCount()
     {
-        return maxBiomeCount;
+        return MAX_BIOMES_COUNT;
+    }
+
+    @Override
+    public int getMaxSavedBiomesCount()
+    {
+        return MAX_SAVED_BIOMES_COUNT;
     }
 
     @Override

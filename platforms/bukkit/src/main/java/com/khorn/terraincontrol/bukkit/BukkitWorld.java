@@ -40,6 +40,7 @@ public class BukkitWorld implements LocalWorld
     private static int nextBiomeId = DefaultBiome.values().length;
 
     private static final int MAX_BIOMES_COUNT = 1024;
+    private static final int MAX_SAVED_BIOMES_COUNT = 256;
     private static final int STANDARD_WORLD_HEIGHT = 128;
 
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
@@ -101,6 +102,12 @@ public class BukkitWorld implements LocalWorld
     public int getMaxBiomesCount()
     {
         return MAX_BIOMES_COUNT;
+    }
+
+    @Override
+    public int getMaxSavedBiomesCount()
+    {
+        return MAX_SAVED_BIOMES_COUNT;
     }
 
     @Override

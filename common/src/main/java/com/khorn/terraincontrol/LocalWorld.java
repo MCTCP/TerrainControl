@@ -25,8 +25,26 @@ public interface LocalWorld
      */
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds);
 
-    // With static id allocation this is not a required feature.
+    /**
+     * Gets how many different biome ids are in the world. Biome ids will start
+     * at zero, so a returned value of 1024 means that the biome ids range from
+     * 0 to 1023, inclusive.
+     *
+     * @return How many different biome ids are in the world.
+     */
     public int getMaxBiomesCount();
+
+    /**
+     * Gets how many different biome ids Minecraft can actually save to the map
+     * files. Biome ids will start at zero, so a returned value of 256 means
+     * that the biome ids range from 0 to 255, inclusive. Biomes outside of this
+     * range, but inside the range of {@link #getMaxBiomesCount()} must have a
+     * ReplaceToBiomeName setting bringing their saved id back into the normal
+     * range.
+     *
+     * @return How many different biome ids are in the save files.
+     */
+    public int getMaxSavedBiomesCount();
 
     public int getFreeBiomeId();
 

@@ -125,8 +125,16 @@ public class WorldSettings
                 continue;
             }
 
-            // Check for id conflicts
+            // Check generation id range
             int generationId = biomeConfig.generationId;
+            if (generationId < 0 || generationId >= world.getMaxBiomesCount()) {
+                TerrainControl.log(LogMarker.ERROR, "The biome id of the {} biome, {}, is too high. It must be between 0 and {}, inclusive.", 
+                        biomeConfig.name, generationId, world.getMaxBiomesCount() - 1);
+                TerrainControl.log(LogMarker.ERROR, "The biome has been prevented from loading.");
+                continue;
+            }
+
+            // Check for id conflicts
             if (biomes[generationId] != null)
             {
                 TerrainControl.log(LogMarker.FATAL, "Duplicate biome id {} ({} and {})!", generationId, biomes[generationId].getName(),
@@ -134,7 +142,6 @@ public class WorldSettings
                 TerrainControl.log(LogMarker.FATAL, "The biome {} has been prevented from loading.", new Object[] {biomeConfig.name});
                 TerrainControl.log(LogMarker.INFO, "If you are updating an old pre-Minecraft 1.7 world, please read this wiki page:");
                 TerrainControl.log(LogMarker.INFO, "https://github.com/Wickth/TerrainControl/wiki/Upgrading-an-old-map-to-Minecraft-1.7");
-
                 continue;
             }
 
@@ -155,7 +162,17 @@ public class WorldSettings
                 }
             }
 
-            LocalBiome biome = world.createBiomeFor(biomeConfig, new BiomeIds(biomeConfig.generationId, savedId));
+            // Check saved id range
+            if (savedId >= world.getMaxSavedBiomesCount()) {
+                TerrainControl.log(LogMarker.ERROR, "Biomes with an id between {} and {} (inclusive) must have a valid ReplaceToBiomeName setting:", 
+                        world.getMaxBiomesCount(), world.getMaxSavedBiomesCount() - 1);
+                TerrainControl.log(LogMarker.ERROR, "Minecraft can only save biomes with an id between 0 and {}, inclusive.", world.getMaxBiomesCount() - 1);
+                TerrainControl.log(LogMarker.ERROR, "This means that the biome {} with map file id {} had to be prevented from loading.", biomeConfig.name, savedId);
+                continue;
+            }
+
+            // Create biome
+            LocalBiome biome = world.createBiomeFor(biomeConfig, new BiomeIds(generationId, savedId));
             this.biomes[biome.getIds().getGenerationId()] = biome;
 
             // If not virtual, add to saved biomes set
