@@ -23,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class TCPlugin extends JavaPlugin
@@ -66,13 +67,13 @@ public class TCPlugin extends JavaPlugin
         {
             // Reload "handling"
             // (worlds are already loaded and TC didn't clean up itself)
-            TerrainControl.log(LogMarker.FATAL,
-                               "The server was just /reloaded! Terrain Control has problems handling this, ",
-                               "as old parts from before the reload have not been cleaned up. ",
-                               "Unexpected things may happen! Please restart the server! ",
-                               "In the future, instead of /reloading, please restart the server, ",
-                               "or reload a plugin using it's built-in command (like /tc reload), ",
-                               "or use a plugin managing plugin that can reload one plugin at a time.");
+            TerrainControl.log(LogMarker.FATAL, Arrays.asList(
+                    "The server was just /reloaded! Terrain Control has problems handling this, ",
+                    "as old parts from before the reload have not been cleaned up. ",
+                    "Unexpected things may happen! Please restart the server! ",
+                    "In the future, instead of /reloading, please restart the server, ",
+                    "or reload a plugin using it's built-in command (like /tc reload), ",
+                    "or use a plugin managing plugin that can reload one plugin at a time."));
             setEnabled(false);
         } else
         {
@@ -183,7 +184,7 @@ public class TCPlugin extends JavaPlugin
         File baseFolder = new File(this.getDataFolder(), "worlds" + File.separator + worldName);
         if (!baseFolder.exists())
         {
-            TerrainControl.log(LogMarker.FATAL, "TC was not allowed to create folder ", baseFolder.getName());
+            TerrainControl.log(LogMarker.FATAL, "TC was not allowed to create folder {}", baseFolder.getName());
 
             if (!baseFolder.mkdirs())
                 TerrainControl.log(LogMarker.FATAL, "Cant create folder ", baseFolder.getName());

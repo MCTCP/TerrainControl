@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol;
 
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.configuration.PluginConfig;
@@ -14,7 +13,9 @@ import com.khorn.terraincontrol.generator.resource.Resource;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Random;
+
 import org.apache.logging.log4j.Marker;
 
 public class TerrainControl
@@ -179,15 +180,15 @@ public class TerrainControl
     }
 
     /**
-     * Logs the message(s) with the given importance. Message will be
+     * Logs the messages with the given importance. Message will be
      * prefixed with [TerrainControl], so don't do that yourself.
      * <p>
      * @param message The messages to log.
      * @param level   The severity of the message
      */
-    public static void log(Marker level, String... message)
+    public static void log(Marker level, List<String> messages)
     {
-        engine.getLogger().log(level, message);
+        engine.getLogger().log(level, messages);
     }
 
     /**
@@ -213,7 +214,7 @@ public class TerrainControl
      * @param ifLevel  the Log level to test for
      * @param messages The messages to log.
      */
-    public static void logIfLevel(Marker ifLevel, String... messages)
+    public static void logIfLevel(Marker ifLevel, List<String> messages)
     {
         engine.getLogger().logIfLevel(ifLevel, messages);
     }
@@ -243,7 +244,7 @@ public class TerrainControl
      * @param max      The maximum Log level to test for
      * @param messages The messages to log.
      */
-    public static void logIfLevel(Marker min, Marker max, String... messages)
+    public static void logIfLevel(Marker min, Marker max, List<String> messages)
     {
         engine.getLogger().logIfLevel(min, max, messages);
     }

@@ -5,6 +5,8 @@ import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import org.apache.logging.log4j.Marker;
 
+import java.util.List;
+
 public class Logger
 {
 
@@ -35,7 +37,7 @@ public class Logger
      * @param level   The severity of the message
      * @param message The messages to log
      */
-    public void log(Marker level, String... message)
+    public void log(Marker level, List<String> message)
     {
         log(level, "{}", (Object) StringHelper.join(message, " "));
     }
@@ -83,7 +85,7 @@ public class Logger
      * @param ifLevel  the Log level to test for
      * @param messages The messages to log.
      */
-    public void logIfLevel(Marker ifLevel, String... messages)
+    public void logIfLevel(Marker ifLevel, List<String> messages)
     {
         if (LogMarker.compare(logLevel, ifLevel) == 0)
             log(ifLevel, messages);
@@ -115,7 +117,7 @@ public class Logger
      * @param max      The maximum Log level to test for
      * @param messages The messages to log.
      */
-    public void logIfLevel(Marker min, Marker max, String... messages)
+    public void logIfLevel(Marker min, Marker max, List<String> messages)
     {
         if (LogMarker.compare(logLevel, max) <= 0 && LogMarker.compare(logLevel, min) >= 0)
             log(max, messages);
