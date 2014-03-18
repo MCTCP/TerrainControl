@@ -552,8 +552,8 @@ public class WorldConfig extends ConfigFile
         writeComment("but the server can think it is another biome with the same id. This will cause saplings,");
         writeComment("snowfall and mobs to work as in the other biome.");
         writeComment("");
-        writeComment("The available ids range from 0 to 255 and the ids 0-39 and 129-167 are taken by vanilla.");
-        writeComment("Avoid those ids for your custom biomes.");
+        writeComment("The available ids range from 0 to 1023 and the ids 0-39 and 129-167 are taken by vanilla.");
+        writeComment("The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome.");
 
         WriteCustomBiomes();
 
