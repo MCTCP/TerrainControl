@@ -55,9 +55,13 @@ if (notFirstTimeBuild.exists())
     }
 } else
 {
-    if (notFirstTimeBuild.getParentFile().mkdirs())
+    File buildFlagDir = notFirstTimeBuild.getParentFile()
+    if (buildFlagDir.exists() || buildFlagDir.mkdirs())
     {
         notFirstTimeBuild.createNewFile();
+    } else
+    {
+        println(" Could not create directory " + notFirstTimeBuild.getParentFile().getAbsolutePath())
     }
     println(" Skipping Shadow for Forge version, see comment in platforms/forge/build.gradle")
 }
