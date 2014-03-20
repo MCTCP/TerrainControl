@@ -249,7 +249,13 @@ public class BiomeConfig extends ConfigFile
         this.biomeTemperature = readModSettings(BiomeStandardValues.BiomeTemperature, defaultSettings.defaultBiomeTemperature);
         this.biomeWetness = readModSettings(BiomeStandardValues.BiomeWetness, defaultSettings.defaultBiomeWetness);
 
-        this.ReplaceBiomeName = readSettings(BiomeStandardValues.ReplaceToBiomeName);
+        if (this.defaultSettings.isCustomBiome)
+        {
+            this.ReplaceBiomeName = readSettings(BiomeStandardValues.ReplaceToBiomeName);
+        } else
+        {
+            this.ReplaceBiomeName = "";
+        }
 
         this.BiomeHeight = readModSettings(BiomeStandardValues.BiomeHeight, defaultSettings.defaultBiomeSurface);
         this.BiomeVolatility = readModSettings(BiomeStandardValues.BiomeVolatility, defaultSettings.defaultBiomeVolatility);
@@ -606,8 +612,17 @@ public class BiomeConfig extends ConfigFile
         writeComment("and used in the input of BiomeMode:FromImage.");
         writeValue(BiomeStandardValues.BiomeColor, this.BiomeColor);
 
-        writeComment("Replace this biome to specified after all generations. Warning this will cause saplings and mob spawning work as in specified biome");
-        writeValue(BiomeStandardValues.ReplaceToBiomeName, this.ReplaceBiomeName);
+        if (this.defaultSettings.isCustomBiome)
+        {
+            writeComment("Replace this biome to specified after the terrain is generated.");
+            writeComment("This will make the world files contain the id of the specified biome, instead of the id of this biome.");
+            writeComment("This will cause saplings, colors and mob spawning work as in specified biome.");
+            writeValue(BiomeStandardValues.ReplaceToBiomeName, this.ReplaceBiomeName);
+        } else
+        {
+            writeComment("(ReplaceToBiomeName is only available in custom biomes.)");
+            writeComment("");
+        }
 
         writeSmallTitle("Isle biomes only");
 
