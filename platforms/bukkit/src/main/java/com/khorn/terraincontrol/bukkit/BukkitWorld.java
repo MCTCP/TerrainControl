@@ -43,7 +43,7 @@ public class BukkitWorld implements LocalWorld
     private static final int MAX_SAVED_BIOMES_COUNT = 256;
     private static final int STANDARD_WORLD_HEIGHT = 128;
 
-    private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
+    private final Map<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
     public StrongholdGen strongholdGen;
     public VillageGen villageGen;
@@ -579,16 +579,17 @@ public class BukkitWorld implements LocalWorld
             this.settings = newSettings;
         } else
         {
-            // This is an ugly hack. It is a much better idea to give
-            // the WorldSettings a proper reload method.
-            this.settings.biomes = newSettings.biomes;
-            this.settings.biomesCount = newSettings.biomesCount;
-
-            // Deprecate old WorldConfig and replace with new
-            this.settings.worldConfig.newSettings = newSettings.worldConfig;
-            this.settings.worldConfig.isDeprecated = true;
-            this.settings.worldConfig = newSettings.worldConfig;
+            throw new IllegalStateException("Settings are already set");
         }
+    }
+
+    /**
+     * Loads all settings again from disk.
+     */
+    public void reloadSettings()
+    {
+        this.biomeNames.clear();
+        this.settings.reload();
     }
 
     /**

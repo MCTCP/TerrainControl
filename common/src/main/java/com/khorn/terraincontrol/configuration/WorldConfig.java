@@ -156,10 +156,6 @@ public class WorldConfig extends ConfigFile
     public File customObjectsDirectory;
 
     public ConfigMode SettingsMode;
-
-    public boolean isDeprecated = false;
-    public WorldConfig newSettings = null;
-
     public TerrainMode ModeTerrain;
     public Class<? extends BiomeGenerator> biomeMode;
 

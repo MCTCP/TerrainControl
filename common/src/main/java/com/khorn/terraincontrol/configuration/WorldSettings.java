@@ -25,6 +25,7 @@ public class WorldSettings
 
     private static final int MAX_INHERITANCE_DEPTH = 15;
     private LocalWorld world;
+    private File settingsDir;
     public WorldConfig worldConfig;
 
     /**
@@ -39,7 +40,7 @@ public class WorldSettings
      * Holds all biomes that aren't virtual. These need to be sent to all
      * players on the server that have Terrain Control installed.
      */
-    private final Collection<LocalBiome> savedBiomes;
+    private final Collection<LocalBiome> savedBiomes = new HashSet<LocalBiome>();
 
     /**
      * Set this to true to skip indexing of settings and avoiding tampering
@@ -54,11 +55,16 @@ public class WorldSettings
 
     public WorldSettings(File settingsDir, LocalWorld world, boolean checkOnly)
     {
+        this.settingsDir = settingsDir;
         this.world = world;
         this.worldConfig = new WorldConfig(settingsDir, world);
         this.checkOnly = checkOnly;
         this.biomes = new LocalBiome[world.getMaxBiomesCount()];
 
+        load();
+    }
+    
+    private void load() {
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);
         // TerrainControl/worlds/<WorldName>/<WorldBiomes/
@@ -87,7 +93,6 @@ public class WorldSettings
         Map<String, BiomeConfig> biomeConfigs = biomeConfigFinder.loadBiomesFromDirectories(biomeDirs, biomesToLoad);
 
         // Read all settings
-        this.savedBiomes = new HashSet<LocalBiome>();
         String loadedBiomeNames = readSettings(biomeConfigs);
 
         // Save all settings
@@ -95,7 +100,19 @@ public class WorldSettings
 
         TerrainControl.log(LogMarker.INFO, "{} biomes Loaded", new Object[] {biomesCount});
         TerrainControl.log(LogMarker.DEBUG, "{}", new Object[] {loadedBiomeNames});
+    }
+    
+    /**
+     * Reloads the settings from disk.
+     */
+    public void reload() {
+        // Clear biome collections
+        Arrays.fill(this.biomes, null);
+        this.savedBiomes.clear();
+        this.biomesCount = 0;
 
+        // Load again
+        load();
     }
 
     private String readSettings(Map<String, BiomeConfig> biomeConfigs)
@@ -334,7 +351,7 @@ public class WorldSettings
             biome.setEffects();
         }
 
-        savedBiomes = Arrays.asList(biomes);
+        savedBiomes.addAll(Arrays.asList(biomes));
     }
 
     private String correctOldBiomeConfigFolder(File settingsDir)
