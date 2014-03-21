@@ -21,12 +21,15 @@ subprojects
 
     task.plugins.withType(org.gradle.api.plugins.JavaBasePlugin)
     {
-	    // Generate Eclipse config files when using "gradle eclipse"
-	    task.apply plugin: 'eclipse'
-	
-	    // Generate IntelliJ IDEA config files
-	    task.apply plugin: 'idea'
-    
+        // We're still on Java 6
+        sourceCompatibility = '1.6'
+
+        // Generate Eclipse config files when using "gradle eclipse"
+        task.apply plugin: 'eclipse'
+
+        // Generate IntelliJ IDEA config files
+        task.apply plugin: 'idea'
+
         // Change project name in Eclipse
         // See comment above about the ideProjectName
         task.eclipse.project.file.whenMerged
