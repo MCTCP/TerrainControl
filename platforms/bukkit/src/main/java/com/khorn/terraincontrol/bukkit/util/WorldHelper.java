@@ -1,10 +1,9 @@
 package com.khorn.terraincontrol.bukkit.util;
 
-import com.khorn.terraincontrol.bukkit.CustomBiome;
-
-import net.minecraft.server.v1_7_R1.BiomeBase;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.bukkit.CustomBiome;
+import net.minecraft.server.v1_7_R2.BiomeBase;
 
 public abstract class WorldHelper
 {
@@ -15,7 +14,7 @@ public abstract class WorldHelper
      * @param world The world.
      * @return The LocalWorld, or null if there is none.
      */
-    public static LocalWorld toLocalWorld(net.minecraft.server.v1_7_R1.World world)
+    public static LocalWorld toLocalWorld(net.minecraft.server.v1_7_R2.World world)
     {
         return TerrainControl.getWorld(world.getWorld().getName());
     }

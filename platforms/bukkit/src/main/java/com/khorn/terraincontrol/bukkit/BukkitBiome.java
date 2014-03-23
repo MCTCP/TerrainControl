@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import net.minecraft.server.v1_7_R1.BiomeBase;
+import net.minecraft.server.v1_7_R2.BiomeBase;
 
 /**
  * The BukkitBiome is basically a wrapper for the BiomeBase. If you look at

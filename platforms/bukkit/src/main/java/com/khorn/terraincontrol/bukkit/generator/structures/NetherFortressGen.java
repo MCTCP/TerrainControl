@@ -1,11 +1,10 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
 import com.khorn.terraincontrol.LocalBiome;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_7_R1.*;
+import net.minecraft.server.v1_7_R2.*;
 
 import java.util.ArrayList;
 import java.util.List;

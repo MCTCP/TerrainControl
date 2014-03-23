@@ -3,9 +3,9 @@ package com.khorn.terraincontrol.bukkit.commands.runnable;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_7_R1.*;
+import net.minecraft.server.v1_7_R2.*;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_7_R2.CraftWorld;
 
 import java.io.*;
 import java.lang.reflect.Field;

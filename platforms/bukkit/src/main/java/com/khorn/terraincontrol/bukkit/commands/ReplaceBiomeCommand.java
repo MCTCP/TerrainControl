@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.bukkit.commands.runnable.BiomeReplace;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_7_R2.CraftWorld;
 import org.bukkit.entity.Player;
 
 import java.util.List;

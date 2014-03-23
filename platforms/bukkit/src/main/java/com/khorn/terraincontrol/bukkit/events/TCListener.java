@@ -1,16 +1,12 @@
 package com.khorn.terraincontrol.bukkit.events;
 
 import com.khorn.terraincontrol.LocalBiome;
-
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.generator.resource.SaplingGen;
 import com.khorn.terraincontrol.generator.resource.SaplingType;
-
-import java.util.Random;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,6 +17,8 @@ import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+
+import java.util.Random;
 
 public class TCListener implements Listener
 {

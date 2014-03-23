@@ -20,8 +20,8 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
-import net.minecraft.server.v1_7_R1.*;
-import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
+import net.minecraft.server.v1_7_R2.*;
+import org.bukkit.craftbukkit.v1_7_R2.CraftWorld;
 
 import java.util.*;
 
