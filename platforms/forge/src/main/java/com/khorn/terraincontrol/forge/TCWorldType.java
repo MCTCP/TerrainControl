@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
@@ -20,11 +21,12 @@ import java.io.File;
 public class TCWorldType extends WorldType
 {
     public ForgeWorld worldTC;
+
     public TCWorldType(String paramString)
     {
         super(paramString);
     }
-    
+
     @SideOnly(Side.CLIENT)
     public boolean showWorldInfoNotice()
     {
@@ -94,8 +96,14 @@ public class TCWorldType extends WorldType
     }
 
     @Override
-    public int getMinimumSpawnHeight(World world)
+    public int getMinimumSpawnHeight(World mcWorld)
     {
-        return WorldHelper.toLocalWorld(world).getSettings().worldConfig.waterLevelMax;
+        LocalWorld world = WorldHelper.toLocalWorld(mcWorld);
+        if (world == null)
+        {
+            // MCPC+ has an interesting load order sometimes
+            return 64;
+        }
+        return world.getSettings().worldConfig.waterLevelMax;
     }
 }
