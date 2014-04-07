@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
+import com.khorn.terraincontrol.TerrainControl;
+
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
@@ -12,6 +14,7 @@ import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
@@ -74,12 +77,7 @@ public class ForgeWorld implements LocalWorld
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
 
-    private boolean createNewChunks;
     private Chunk[] chunkCache;
-    private Chunk cachedChunk;
-
-    private int currentChunkX;
-    private int currentChunkZ;
 
     private BiomeGenBase[] biomeGenBaseArray;
     private int[] biomeIntArray;
@@ -275,8 +273,11 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public boolean placeDefaultStructures(Random rand, int chunkX, int chunkZ)
+    public boolean placeDefaultStructures(Random rand, ChunkCoordinate chunkCoord)
     {
+        int chunkX = chunkCoord.getChunkX();
+        int chunkZ = chunkCoord.getChunkZ();
+
         boolean isVillagePlaced = false;
         if (this.settings.worldConfig.strongholdsEnabled)
             this.strongholdGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
@@ -365,21 +366,10 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void placePopulationMobs(LocalBiome biome, Random random, int chunkX, int chunkZ)
+    public void placePopulationMobs(LocalBiome biome, Random random, ChunkCoordinate chunkCoord)
     {
-        SpawnerAnimals.performWorldGenSpawning(this.getWorld(), ((ForgeBiome) biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8,
+        SpawnerAnimals.performWorldGenSpawning(this.getWorld(), ((ForgeBiome) biome).getHandle(), chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter(),
                 16, 16, random);
-    }
-
-    public void LoadChunk(int x, int z)
-    {
-        this.currentChunkX = x;
-        this.currentChunkZ = z;
-        this.chunkCache[0] = this.world.getChunkFromChunkCoords(x, z);
-        this.chunkCache[1] = this.world.getChunkFromChunkCoords(x + 1, z);
-        this.chunkCache[2] = this.world.getChunkFromChunkCoords(x, z + 1);
-        this.chunkCache[3] = this.world.getChunkFromChunkCoords(x + 1, z + 1);
-        this.createNewChunks = true;
     }
 
     private Chunk getChunk(int x, int y, int z)
@@ -387,20 +377,27 @@ public class ForgeWorld implements LocalWorld
         if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
             return null;
 
-        x >>= 4;
-        z >>= 4;
-        if (this.cachedChunk != null && this.cachedChunk.xPosition == x && this.cachedChunk.zPosition == z)
-            return this.cachedChunk;
+        int chunkX = x >> 4;
+        int chunkZ = z >> 4;
 
-        int index_x = (x - this.currentChunkX);
-        int index_z = (z - this.currentChunkZ);
-        if ((index_x == 0 || index_x == 1) && (index_z == 0 || index_z == 1))
-            return cachedChunk = this.chunkCache[index_x | (index_z << 1)];
-        else if (this.createNewChunks || this.world.getChunkProvider().chunkExists(x, z))
-            return cachedChunk = this.world.getChunkFromBlockCoords(x, z);
-        else
+        if (this.chunkCache == null)
+        {
+            // Blocks requested outside population step
+            // (Tree growing, /tc spawn, etc.)
+           return world.getChunkFromChunkCoords(chunkX, chunkZ); 
+        }
+
+        // Restrict to chunks we are currently populating
+        Chunk topLeftCachedChunk = this.chunkCache[0];
+        int indexX = (chunkX - topLeftCachedChunk.xPosition);
+        int indexZ = (chunkZ - topLeftCachedChunk.zPosition);
+        if ((indexX == 0 || indexX == 1) && (indexZ == 0 || indexZ == 1))
+        {
+            return this.chunkCache[indexX | (indexZ << 1)];
+        } else
+        {
             return null;
-
+        }
     }
 
     @Override
@@ -518,9 +515,32 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void setChunksCreations(boolean createNew)
+    public void startPopulation(ChunkCoordinate chunkCoord)
     {
-        this.createNewChunks = createNew;
+        if (this.chunkCache != null)
+        {
+            throw new IllegalStateException("Chunk is already being populated");
+        }
+
+        // Initialize cache
+        this.chunkCache = new Chunk[4];
+        for (int indexX = 0; indexX <= 1; indexX++)
+        {
+            for (int indexZ = 0; indexZ <= 1; indexZ++)
+            {
+                this.chunkCache[indexX | (indexZ << 1)] = world.getChunkFromChunkCoords(chunkCoord.getChunkX() + indexX, chunkCoord.getChunkZ() + indexZ);
+            }
+        }
+    }
+
+    @Override
+    public void endPopulation()
+    {
+        if (this.chunkCache == null)
+        {
+            throw new IllegalStateException("Population has already ended");
+        }
+        this.chunkCache = null;
     }
 
     @Override
@@ -610,7 +630,6 @@ public class ForgeWorld implements LocalWorld
         this.jungleTree = new WorldGenMegaJungle(false, 10, 20, 3, 3);
         this.groundBush = new WorldGenShrub(3, 0);
 
-        this.chunkCache = new Chunk[4];
         this.generator = new ChunkProvider(this);
     }
 

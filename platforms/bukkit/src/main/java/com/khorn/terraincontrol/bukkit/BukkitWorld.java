@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
+import com.khorn.terraincontrol.util.ChunkCoordinate;
+
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.bukkit.generator.BiomeCacheWrapper;
 import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
@@ -67,12 +69,7 @@ public class BukkitWorld implements LocalWorld
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
 
-    private boolean createNewChunks;
     private Chunk[] chunkCache;
-    private Chunk cachedChunk;
-
-    private int currentChunkX;
-    private int currentChunkZ;
 
     private BiomeBase[] biomeBaseArray;
 
@@ -256,8 +253,11 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public boolean placeDefaultStructures(Random random, int chunkX, int chunkZ)
+    public boolean placeDefaultStructures(Random random, ChunkCoordinate chunkCoord)
     {
+        int chunkX = chunkCoord.getChunkX();
+        int chunkZ = chunkCoord.getChunkZ();
+
         boolean villageGenerated = false;
         if (this.settings.worldConfig.strongholdsEnabled)
             this.strongholdGen.place(this.world, random, chunkX, chunkZ);
@@ -345,20 +345,9 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void placePopulationMobs(LocalBiome biome, Random random, int chunkX, int chunkZ)
+    public void placePopulationMobs(LocalBiome biome, Random random, ChunkCoordinate chunkCoord)
     {
-        SpawnerCreature.a(this.world, ((BukkitBiome) biome).getHandle(), chunkX * 16 + 8, chunkZ * 16 + 8, 16, 16, random);
-    }
-
-    public void LoadChunk(Chunk chunk)
-    {
-        this.currentChunkX = chunk.locX;
-        this.currentChunkZ = chunk.locZ;
-        this.chunkCache[0] = chunk;
-        this.chunkCache[1] = this.world.getChunkAt(chunk.locX + 1, chunk.locZ);
-        this.chunkCache[2] = this.world.getChunkAt(chunk.locX, chunk.locZ + 1);
-        this.chunkCache[3] = this.world.getChunkAt(chunk.locX + 1, chunk.locZ + 1);
-        this.createNewChunks = true;
+        SpawnerCreature.a(this.world, ((BukkitBiome) biome).getHandle(), chunkCoord.getChunkX() * 16 + 8, chunkCoord.getChunkZ() * 16 + 8, 16, 16, random);
     }
 
     private Chunk getChunk(int x, int y, int z)
@@ -366,21 +355,27 @@ public class BukkitWorld implements LocalWorld
         if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
             return null;
 
-        x >>= 4;
-        z >>= 4;
+        int chunkX = x >> 4;
+        int chunkZ = z >> 4;
 
-        if (this.cachedChunk != null && this.cachedChunk.locX == x && this.cachedChunk.locZ == z)
-            return this.cachedChunk;
+        if (this.chunkCache == null)
+        {
+            // Blocks requested outside population step
+            // (Tree growing, /tc spawn, etc.)
+           return world.getChunkAt(chunkX, chunkZ); 
+        }
 
-        int index_x = (x - this.currentChunkX);
-        int index_z = (z - this.currentChunkZ);
-        if ((index_x == 0 || index_x == 1) && (index_z == 0 || index_z == 1))
-            return cachedChunk = this.chunkCache[index_x | (index_z << 1)];
-        else if (this.createNewChunks || this.world.chunkProvider.isChunkLoaded(x, z))
-            return cachedChunk = this.world.getChunkAt(x, z);
-        else
+        // Restrict to chunks we are currently populating
+        Chunk topLeftCachedChunk = this.chunkCache[0];
+        int indexX = (chunkX - topLeftCachedChunk.locX);
+        int indexZ = (chunkZ - topLeftCachedChunk.locZ);
+        if ((indexX == 0 || indexX == 1) && (indexZ == 0 || indexZ == 1))
+        {
+            return this.chunkCache[indexX | (indexZ << 1)];
+        } else
+        {
             return null;
-
+        }
     }
 
     @Override
@@ -509,9 +504,32 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void setChunksCreations(boolean createNew)
+    public void startPopulation(ChunkCoordinate chunkCoord)
     {
-        this.createNewChunks = createNew;
+        if (this.chunkCache != null)
+        {
+            throw new IllegalStateException("Chunk is already being populated");
+        }
+
+        // Initialize cache
+        this.chunkCache = new Chunk[4];
+        for (int indexX = 0; indexX <= 1; indexX++)
+        {
+            for (int indexZ = 0; indexZ <= 1; indexZ++)
+            {
+                this.chunkCache[indexX | (indexZ << 1)] = world.getChunkAt(chunkCoord.getChunkX() + indexX, chunkCoord.getChunkZ() + indexZ);
+            }
+        }
+    }
+
+    @Override
+    public void endPopulation()
+    {
+        if (this.chunkCache == null)
+        {
+            throw new IllegalStateException("Population has already ended");
+        }
+        this.chunkCache = null;
     }
 
     @Override
@@ -605,7 +623,6 @@ public class BukkitWorld implements LocalWorld
         // Do the things that always need to happen, whether we are enabling
         // for the first time or reloading
         this.world = mcWorld;
-        this.chunkCache = new Chunk[4];
 
         // Inject our own WorldProvider
         if (mcWorld.worldProvider.getName().equals("Overworld"))

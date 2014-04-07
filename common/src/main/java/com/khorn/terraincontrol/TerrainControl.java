@@ -1,22 +1,22 @@
 package com.khorn.terraincontrol;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
 import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
 import com.khorn.terraincontrol.generator.resource.Resource;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+import org.apache.logging.log4j.Marker;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Random;
-
-import org.apache.logging.log4j.Marker;
 
 public class TerrainControl
 {
@@ -56,18 +56,18 @@ public class TerrainControl
      * @see TerrainControlEngine#firePopulationEndEvent(LocalWorld, Random,
      * boolean, int, int)
      */
-    public static void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    public static void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        engine.firePopulationEndEvent(world, random, villageInChunk, chunkX, chunkZ);
+        engine.firePopulationEndEvent(world, random, villageInChunk, chunkCoord);
     }
 
     /**
      * @see TerrainControlEngine#firePopulationStartEvent(LocalWorld, Random,
      * boolean, int, int)
      */
-    public static void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    public static void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        engine.firePopulationStartEvent(world, random, villageInChunk, chunkX, chunkZ);
+        engine.firePopulationStartEvent(world, random, villageInChunk, chunkCoord);
     }
 
     /**

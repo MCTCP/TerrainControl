@@ -1,14 +1,11 @@
 package com.khorn.terraincontrol.forge.generator;
 
-import net.minecraft.block.Block;
-
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
 import com.khorn.terraincontrol.generator.ObjectSpawner;
-
-import java.util.List;
-
+import com.khorn.terraincontrol.util.ChunkCoordinate;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockSand;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.IProgressUpdate;
@@ -18,6 +15,8 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+
+import java.util.List;
 
 public class ChunkProvider implements IChunkProvider
 {
@@ -93,8 +92,7 @@ public class ChunkProvider implements IChunkProvider
         if (this.TestMode)
             return;
         BlockSand.fallInstantly = true;
-        this.world.LoadChunk(x, z);
-        this.spawner.populate(x, z);
+        this.spawner.populate(ChunkCoordinate.fromChunkCoords(x, z));
         BlockSand.fallInstantly = false;
     }
 

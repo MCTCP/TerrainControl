@@ -1,7 +1,8 @@
 package com.khorn.terraincontrol.generator;
 
-import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
@@ -32,11 +33,11 @@ public class ObjectSpawner
         this.noiseGen = new NoiseGeneratorNewOctaves(new Random(world.getSeed()), 4);
     }
 
-    public void populate(int chunkX, int chunkZ)
+    public void populate(ChunkCoordinate chunkCoord)
     {
         // Get the corner block coords
-        int x = chunkX * 16;
-        int z = chunkZ * 16;
+        int x = chunkCoord.getChunkX() * 16;
+        int z = chunkCoord.getChunkZ() * 16;
 
         // Get the biome of the other corner
         LocalBiome biome = world.getCalculatedBiome(x + 15, z + 15);
@@ -44,7 +45,7 @@ public class ObjectSpawner
         // Null check
         if (biome == null)
         {
-            TerrainControl.log(LogMarker.DEBUG, "Unknown biome at {},{}  (chunk {},{}). Population failed.", x + 15, z + 15, chunkX, chunkZ);
+            TerrainControl.log(LogMarker.DEBUG, "Unknown biome at {},{}  (chunk {}). Population failed.", x + 15, z + 15, chunkCoord);
             return;
         }
 
@@ -55,43 +56,44 @@ public class ObjectSpawner
         this.rand.setSeed(resourcesSeed);
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
-        this.rand.setSeed(chunkX * l1 + chunkZ * l2 ^ resourcesSeed);
+        this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
 
         // Generate structures
-        boolean hasGeneratedAVillage = world.placeDefaultStructures(rand, chunkX, chunkZ);
+        boolean hasGeneratedAVillage = world.placeDefaultStructures(rand, chunkCoord);
 
-        // Fire event
-        TerrainControl.firePopulationStartEvent(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
+        // Mark population started
+        world.startPopulation(chunkCoord);
+        TerrainControl.firePopulationStartEvent(world, rand, hasGeneratedAVillage, chunkCoord);
         
         // Complex surface blocks
-        placeComplexSurfaceBlocks(chunkX, chunkZ);
+        placeComplexSurfaceBlocks(chunkCoord);
 
         // Resource sequence
         for (Resource res : biomeConfig.resourceSequence)
         {
-            world.setChunksCreations(false);
-            res.process(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
+            res.process(world, rand, hasGeneratedAVillage, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
         }
 
         // Animals
-        world.placePopulationMobs(biome, rand, chunkX, chunkZ);
+        world.placePopulationMobs(biome, rand, chunkCoord);
 
         // Snow and ice
-        freezeChunk(chunkX, chunkZ);
+        freezeChunk(chunkCoord);
 
         // Replace blocks
         world.replaceBlocks();
 
-        // Fire event
-        TerrainControl.firePopulationEndEvent(world, rand, hasGeneratedAVillage, chunkX, chunkZ);
+        // Mark population ended
+        TerrainControl.firePopulationEndEvent(world, rand, hasGeneratedAVillage, chunkCoord);
+        world.endPopulation();
     }
     
-    protected void placeComplexSurfaceBlocks(int chunkX, int chunkZ)
+    protected void placeComplexSurfaceBlocks(ChunkCoordinate chunkCoord)
     {
-        this.reusableChunkNoiseArray = this.noiseGen.a(this.reusableChunkNoiseArray, chunkX * 16, chunkZ * 16, 16, 16, 0.0625D, 0.0625D, 1.0D);
+        this.reusableChunkNoiseArray = this.noiseGen.a(this.reusableChunkNoiseArray, chunkCoord.getChunkX() * 16, chunkCoord.getChunkZ() * 16, 16, 16, 0.0625D, 0.0625D, 1.0D);
 
-        int x = chunkX * 16 + 8;
-        int z = chunkZ * 16 + 8;
+        int x = chunkCoord.getChunkX() * 16 + 8;
+        int z = chunkCoord.getChunkZ() * 16 + 8;
         for (int i = 0; i < 16; i++)
         {
             for (int j = 0; j < 16; j++)
@@ -109,11 +111,11 @@ public class ObjectSpawner
         }
     }
 
-    protected void freezeChunk(int chunkX, int chunkZ)
+    protected void freezeChunk(ChunkCoordinate chunkCoord)
     {
         LocalMaterialData snowMaterial = TerrainControl.toLocalMaterialData(DefaultMaterial.SNOW, 0);
-        int x = chunkX * 16 + 8;
-        int z = chunkZ * 16 + 8;
+        int x = chunkCoord.getChunkX() * 16 + 8;
+        int z = chunkCoord.getChunkZ() * 16 + 8;
         for (int i = 0; i < 16; i++)
         {
             for (int j = 0; j < 16; j++)

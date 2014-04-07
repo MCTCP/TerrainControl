@@ -28,12 +28,16 @@ public class ChunkCoordinate
     @Override
     public int hashCode()
     {
-        return (Integer.valueOf(chunkX).hashCode() >> 13) ^ Integer.valueOf(chunkZ).hashCode();
+        return (chunkX >> 13) ^ chunkZ;
     }
 
     @Override
     public boolean equals(Object otherObject)
     {
+        if (otherObject == this)
+        {
+            return true;
+        }
         if (otherObject == null)
         {
             return false;
@@ -65,5 +69,27 @@ public class ChunkCoordinate
     public static ChunkCoordinate fromChunkCoords(int chunkX, int chunkZ)
     {
         return new ChunkCoordinate(chunkX, chunkZ);
+    }
+
+    @Override
+    public String toString()
+    {
+        return chunkX + "," + chunkZ;
+    }
+
+    /**
+     * Gets the x position of the block in the center of this chunk.
+     * @return The x position.
+     */
+    public int getBlockXCenter() {
+        return chunkX * 16 + 8;
+    }
+    
+    /**
+     * Gets the z position of the block in the center of this chunk.
+     * @return The z position.
+     */
+    public int getBlockZCenter() {
+        return chunkZ * 16 + 8;
     }
 }

@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
@@ -106,7 +107,7 @@ public interface LocalWorld
 
     public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z);
 
-    public boolean placeDefaultStructures(Random rand, int chunkX, int chunkZ);
+    public boolean placeDefaultStructures(Random rand, ChunkCoordinate chunkCoord);
 
     public void replaceBlocks();
 
@@ -114,7 +115,23 @@ public interface LocalWorld
      * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the
      * terrain generation. Calling this method will place the mobs.
      */
-    public void placePopulationMobs(LocalBiome biome, Random random, int chunkX, int chunkZ);
+    public void placePopulationMobs(LocalBiome biome, Random random, ChunkCoordinate chunkCoord);
+
+    // Population start and end
+    /**
+     * Marks the given chunks as being populated. No new chunks may be created. Implementations may cache the chunk.
+     * @param chunkCoord The chunk being populated.
+     * @throws IllegalStateException If another chunks is being populated. Call {@link #endPopulation()} first.
+     * @see #endPopulation()
+     */
+    public void startPopulation(ChunkCoordinate chunkCoord);
+
+    /**
+     * Stops the population step. New chunks may be created again. Implementations may cache the chunk.
+     * @throws IllegalStateException If no chunk was being populated.
+     * @see #startPopulation(ChunkCoordinate)
+     */
+    public void endPopulation();
 
     // Blocks
     public LocalMaterialData getMaterial(int x, int y, int z);
@@ -139,8 +156,6 @@ public interface LocalWorld
      * Returns the block above the highest block.
      */
     public int getHighestBlockYAt(int x, int z);
-
-    public void setChunksCreations(boolean createNew);
 
     public int getLightLevel(int x, int y, int z);
 

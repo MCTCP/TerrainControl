@@ -1,19 +1,19 @@
 package com.khorn.terraincontrol;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-
-import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.events.EventPriority;
-import com.khorn.terraincontrol.generator.resource.Resource;
-import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.configuration.PluginConfig;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
 import com.khorn.terraincontrol.events.EventHandler;
+import com.khorn.terraincontrol.events.EventPriority;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
+import com.khorn.terraincontrol.generator.resource.Resource;
 import com.khorn.terraincontrol.logging.LogFactory;
 import com.khorn.terraincontrol.logging.Logger;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -71,12 +71,12 @@ public abstract class TerrainControlEngine
      * <p>
      * @see EventHandler#onPopulateEnd(LocalWorld, Random, boolean, int, int)
      */
-    public void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    public void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         for (EventHandler handler : cancelableEventHandlers)
-            handler.onPopulateEnd(world, random, villageInChunk, chunkX, chunkZ);
+            handler.onPopulateEnd(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
         for (EventHandler handler : monitoringEventHandlers)
-            handler.onPopulateEnd(world, random, villageInChunk, chunkX, chunkZ);
+            handler.onPopulateEnd(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
     }
 
     /**
@@ -85,12 +85,12 @@ public abstract class TerrainControlEngine
      * @see EventHandler#onPopulateStart(LocalWorld, Random, boolean, int,
      * int)
      */
-    public void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    public void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         for (EventHandler handler : cancelableEventHandlers)
-            handler.onPopulateStart(world, random, villageInChunk, chunkX, chunkZ);
+            handler.onPopulateStart(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
         for (EventHandler handler : monitoringEventHandlers)
-            handler.onPopulateStart(world, random, villageInChunk, chunkX, chunkZ);
+            handler.onPopulateStart(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
     }
 
     /**
