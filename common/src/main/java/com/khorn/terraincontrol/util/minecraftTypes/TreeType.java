@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.util.minecraftTypes;
 
+/**
+ * Represents all tree types in Minecraft.
+ *
+ */
 public enum TreeType
 {
     Acacia,

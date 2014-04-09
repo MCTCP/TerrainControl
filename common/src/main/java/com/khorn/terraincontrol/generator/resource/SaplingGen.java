@@ -12,6 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Represents a custom sapling generator. This generator can grow vanilla trees,
+ * but also custom objects.
+ *
+ */
 public class SaplingGen extends ConfigFunction<BiomeConfig>
 {
     public List<CustomObject> trees;
@@ -75,7 +80,7 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         {
             if (random.nextInt(100) < treeChances.get(treeNumber))
             {
-                Rotation rotation = trees.get(treeNumber).canRotateRandomly()? Rotation.getRandomRotation(random) : Rotation.NORTH;
+                Rotation rotation = trees.get(treeNumber).canRotateRandomly() ? Rotation.getRandomRotation(random) : Rotation.NORTH;
                 if (trees.get(treeNumber).spawnForced(world, random, rotation, x, y, z))
                 {
                     // Success!
@@ -108,12 +113,12 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
             return false;
         final SaplingGen compare = (SaplingGen) other;
         return this.saplingType == compare.saplingType
-               && (this.treeNames == null ? this.treeNames == compare.treeNames
-                   : this.treeNames.equals(compare.treeNames))
-               && (this.treeNames == null ? this.treeNames == compare.treeNames
-                   : this.treeNames.equals(compare.treeNames))
-               && (this.treeChances == null ? this.treeChances == compare.treeChances
-                   : this.treeChances.equals(compare.treeChances));
+                && (this.treeNames == null ? this.treeNames == compare.treeNames
+                        : this.treeNames.equals(compare.treeNames))
+                && (this.treeNames == null ? this.treeNames == compare.treeNames
+                        : this.treeNames.equals(compare.treeNames))
+                && (this.treeChances == null ? this.treeChances == compare.treeChances
+                        : this.treeChances.equals(compare.treeChances));
     }
-    
+
 }

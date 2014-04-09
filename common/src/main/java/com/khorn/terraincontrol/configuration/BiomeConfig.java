@@ -23,6 +23,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class BiomeConfig extends ConfigFile
 {
@@ -88,8 +89,8 @@ public class BiomeConfig extends ConfigFile
     public boolean FoliageColorIsMultiplier;
 
     public List<Resource> resourceSequence = new ArrayList<Resource>();
-    private SaplingGen[] saplingTypes = new SaplingGen[20];
-    private SaplingGen saplingResource = null;
+
+    private Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
 
     public ArrayList<CustomObject> biomeObjects;
     public CustomStructureGen structureGen;
@@ -223,10 +224,10 @@ public class BiomeConfig extends ConfigFile
 
     public SaplingGen getSaplingGen(SaplingType type)
     {
-        SaplingGen gen = this.saplingTypes[type.getSaplingId()];
+        SaplingGen gen = saplingGrowers.get(type);
         if (gen == null && type.growsTree())
         {
-            gen = this.saplingResource;
+            gen = saplingGrowers.get(SaplingType.All);
         }
         return gen;
     }
@@ -433,11 +434,7 @@ public class BiomeConfig extends ConfigFile
                 if (res instanceof SaplingGen && res.isValid())
                 {
                     SaplingGen sapling = (SaplingGen) res;
-                    if (sapling.saplingType == SaplingType.All)
-                        this.saplingResource = sapling;
-                    else
-                        this.saplingTypes[sapling.saplingType.getSaplingId()] = sapling;
-
+                    this.saplingGrowers.put(sapling.saplingType, sapling);
                 } else if (res instanceof Resource)
                 {
                     this.resourceSequence.add((Resource) res);
@@ -533,16 +530,18 @@ public class BiomeConfig extends ConfigFile
             }
             this.resourceSequence = new ArrayList<Resource>(T_ResourceSequence);
             // if the child is using All saplings then we dont need to merge
-            if (this.saplingResource != null && this.saplingResource.saplingType != SaplingType.All)
+            if (!this.saplingGrowers.containsKey(SaplingType.All))
             {
-                // take all parent sapling types and if child doesnt have
+                // take all parent sapling types and if child doesn't have
                 // them, insert
-                for (SaplingGen sap : parent.saplingTypes)
+                for (Entry<SaplingType, SaplingGen> saplingEntry : parent.saplingGrowers.entrySet())
                 {
-                    if (this.saplingTypes[sap.saplingType.getSaplingId()] == null)
+                    SaplingType saplingType = saplingEntry.getKey();
+                    SaplingGen saplingGen = saplingEntry.getValue();
+                    if (!this.saplingGrowers.containsKey(saplingType))
                     {
-                        TerrainControl.log(LogMarker.TRACE, "Sapling added to Child: {}", new Object[] {sap.saplingType.getSaplingId()});
-                        this.saplingTypes[sap.saplingType.getSaplingId()] = sap;
+                        TerrainControl.log(LogMarker.TRACE, "Sapling added to Child: {}", saplingType);
+                        this.saplingGrowers.put(saplingType, saplingGen);
                     }
                 }
             } else
@@ -994,13 +993,10 @@ public class BiomeConfig extends ConfigFile
 
     private void WriteSaplingSettings() throws IOException
     {
-        if (this.saplingResource != null)
-            this.writeFunction(saplingResource);
-
-        for (SaplingGen res : this.saplingTypes)
-            if (res != null)
-                this.writeFunction(res);
-
+        for (SaplingGen res : this.saplingGrowers.values())
+        {
+            this.writeFunction(res);
+        }
     }
 
     @Override

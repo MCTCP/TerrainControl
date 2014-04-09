@@ -1,81 +1,75 @@
 package com.khorn.terraincontrol.generator.resource;
 
+import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Represents all sapling types, including mushrooms
+ * Represents all sapling types, including mushrooms. Note that not every
+ * {@link TreeType} in Minecraft has its own sapling.
  *
  */
-public enum SaplingType 
+public enum SaplingType
 {
-    All(-1, true),
-    Oak(0, true),
-    Redwood(1, true),
-    Birch(2, true),
-    SmallJungle(3, true),
-    BigJungle(4, true),
-    RedMushroom(5, false),
-    BrownMushroom(6, false);
-    
-    private final int id;
-    private final boolean isTreeSapling;
-    
-    private SaplingType(int id, boolean isTreeSapling)
+    /**
+     * Used as a wildcard for defining something that grows from all saplings.
+     */
+    All,
+    Oak,
+    Redwood,
+    Birch,
+    SmallJungle,
+    BigJungle,
+    RedMushroom,
+    BrownMushroom,
+    Acacia,
+    DarkOak,
+    HugeRedwood;
+
+    // Case insensitive index
+    private static Map<String, SaplingType> BY_NAME = new HashMap<String, SaplingType>();
+    static
     {
-        this.id = id;
-        this.isTreeSapling = isTreeSapling;
+        for (SaplingType type : values())
+        {
+            BY_NAME.put(type.name().toLowerCase(), type);
+        }
     }
-    
-    public int getSaplingId()
-    {
-        return id;
-    }
-    
+
+    /**
+     * Gets whether this sapling grows a tree. For example,
+     * {@link SaplingType#RedMushroom} doesn't grow a tree.
+     *
+     * @return Whether this sapling grows a tree.
+     */
     public boolean growsTree()
     {
-        return isTreeSapling;
+        return this != RedMushroom && this != BrownMushroom;
     }
-    
-    private static SaplingType[] lookupList = new SaplingType[20];
-    
-    static 
+
+    /**
+     * Gets whether this sapling requires four saplings (three neighbour
+     * saplings) to grow a tree. If yes, the saplings must be placed in a 2x2
+     * square.
+     *
+     * @return True if four sapling
+     */
+    public boolean requiresFourSaplings()
     {
-        for(SaplingType type: SaplingType.values())
-        {
-            if(type.id >= 0)
-            {
-                lookupList[type.id] = type;
-            }
-        }
+        return this == BigJungle || this == DarkOak || this == HugeRedwood;
     }
-    
+
+    /**
+     * Gets the sapling type by its name. Name is case insensitive.
+     * 
+     * @param name
+     *            The name to look up.
+     * @return The sapling type.
+     */
     public static SaplingType get(String name)
     {
-        try 
-        {
-            return get(Integer.parseInt(name));
-        } catch(NumberFormatException invalidNumber)
-        {
-            try
-            {
-                return SaplingType.valueOf(name);
-            } catch(IllegalArgumentException unknownType)
-            {
-                return null;
-            }
-        }
+        return BY_NAME.get(name.toLowerCase());
     }
-    
-    public static SaplingType get(int id)
-    {
-        if(id == -1)
-        {
-            return SaplingType.All;
-        }
-        if(id < 0 || id >= lookupList.length)
-        {
-            // Should never happen, unless someone uses a wrong id in the Sapling function
-            return null;
-        }
-        return lookupList[id];
-    }
+
 }

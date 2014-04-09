@@ -1,31 +1,161 @@
 package com.khorn.terraincontrol.forge.events;
 
-import cpw.mods.fml.common.eventhandler.Event.Result;
+import com.khorn.terraincontrol.LocalBiome;
 
-import net.minecraft.init.Blocks;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.resource.SaplingGen;
 import com.khorn.terraincontrol.generator.resource.SaplingType;
-
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockSapling;
+import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+import cpw.mods.fml.common.eventhandler.Event.Result;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
 
+import java.util.Random;
+
 public class SaplingListener
 {
+    private static class SaplingGrower
+    {
+        private final LocalWorld world;
+        private final LocalMaterialData material;
+        private final SaplingType saplingType;
+
+        private int x;
+        private final int y;
+        private int z;
+
+        private SaplingGrower(LocalWorld world, int x, int y, int z)
+        {
+            this.world = world;
+            this.material = world.getMaterial(x, y, z);
+            this.x = x;
+            this.y = y;
+            this.z = z;
+
+            // Check whether block is a sapling
+            if (!this.material.isMaterial(DefaultMaterial.SAPLING))
+            {
+                this.saplingType = null;
+                return;
+            }
+
+            // Try to find big (2x2) sapling
+            SaplingType bigSaplingType = getBigSaplingType(this.material.getBlockData());
+            if (bigSaplingType != null)
+            {
+                if (findFourSaplings())
+                {
+                    this.saplingType = bigSaplingType;
+                    return;
+                }
+            }
+
+            // Try to find small sapling
+            this.saplingType = getSmallSaplingType(this.material.getBlockData());
+        }
+
+        /**
+         * Gets whether the saplings are placed in a 2x2 pattern. If successful,
+         * it adjusts {@link SaplingGrower#x} and {@link SaplingGrower#z} to
+         * represent the top left sapling (with the lowest x and z).
+         * 
+         * @return Whether the saplings are placed in a 2x2 pattern.
+         */
+        private boolean findFourSaplings()
+        {
+            for (int treeOffsetX = 0; treeOffsetX >= -1; --treeOffsetX)
+            {
+                for (int treeOffsetZ = 0; treeOffsetZ >= -1; --treeOffsetZ)
+                {
+                    if (isSameSapling(material, world.getMaterial(x + treeOffsetX, y, z + treeOffsetZ))
+                            && isSameSapling(material, world.getMaterial(x + treeOffsetX + 1, y, z + treeOffsetZ))
+                            && isSameSapling(material, world.getMaterial(x + treeOffsetX, y, z + treeOffsetZ + 1))
+                            && isSameSapling(material, world.getMaterial(x + treeOffsetX + 1, y, z + treeOffsetZ + 1)))
+                    {
+                        // Found! Adjust internal position
+                        x = x + treeOffsetX;
+                        z = z + treeOffsetZ;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
+        /**
+         * Checks if the sapling types are the same, ignoring growth stages.
+         * @param sapling1 The first material to compare.
+         * @param sapling2 The second material to compare.
+         * @return True if both materials are saplings and are of the same type.
+         */
+        private boolean isSameSapling(LocalMaterialData sapling1, LocalMaterialData sapling2)
+        {
+            return sapling1.isMaterial(DefaultMaterial.SAPLING) 
+                    && sapling2.isMaterial(DefaultMaterial.SAPLING) 
+                    &&  sapling1.getBlockData() % 8 == sapling2.getBlockData() % 8;
+        }
+
+        /**
+         * Gets the sapling type, based on the assumption that the sapling is
+         * not placed in a 2x2 pattern.
+         * 
+         * @param data
+         *            The block data of the sapling block.
+         * @return The sapling type, or null if not found.
+         */
+        private SaplingType getSmallSaplingType(int data)
+        {
+            switch (data % 8)
+            { // % 8 makes it ignore growth stage
+                case 0:
+                    return SaplingType.Oak;
+                case 1:
+                    return SaplingType.Redwood;
+                case 2:
+                    return SaplingType.Birch;
+                case 3:
+                    return SaplingType.SmallJungle;
+                case 4:
+                    return SaplingType.Acacia;
+            }
+            return null;
+        }
+
+        /**
+         * Gets the sapling type, based on the assumption that the saplings must
+         * be placed in a 2x2 pattern. Will never return one of the smaller
+         * sapling types.
+         * 
+         * @param data
+         *            The block data of the sapling block.
+         * @return The sapling type, or null if not found.
+         */
+        private SaplingType getBigSaplingType(int data)
+        {
+            switch (data % 8)
+            { // % 8 makes it ignore growth stage
+                case 1:
+                    return SaplingType.HugeRedwood;
+                case 3:
+                    return SaplingType.BigJungle;
+                case 5:
+                    return SaplingType.DarkOak;
+            }
+            return null;
+        }
+    }
+
     @SubscribeEvent
     public void onSaplingGrow(SaplingGrowTreeEvent event)
     {
-        int x = event.x;
-        int y = event.y;
-        int z = event.z;
         World world = event.world;
         LocalWorld localWorld = WorldHelper.toLocalWorld(world);
 
@@ -35,68 +165,16 @@ public class SaplingListener
             return;
         }
 
-        Block block = world.getBlock(x, y, z);
-        BlockSapling saplingBlock = (BlockSapling) Blocks.sapling;
-
-        if (block != saplingBlock)
+        SaplingGrower saplingGrower = new SaplingGrower(localWorld, event.x, event.y, event.z);
+        
+        if (saplingGrower.saplingType == null)
         {
-            // Only vanilla saplings
+            // Unsupported sapling
             return;
         }
 
-        int blockData = world.getBlockMetadata(x, y, z) & 3;
-
-        SaplingType treeToGrow = null;
-
-        boolean hugeJungleTreeHasGrown = false;
-        int jungleOffsetX = 0;
-        int jungleOffsetZ = 0;
-
-        // Get the sapling type
-        if (blockData == 1)
-        {
-            // Redwood trees
-            treeToGrow = SaplingType.Redwood;
-        } else if (blockData == 2)
-        {
-            // Birch trees
-            treeToGrow = SaplingType.Birch;
-        } else if (blockData == 3)
-        {
-            // Jungle trees
-            for (jungleOffsetX = 0; jungleOffsetX >= -1; --jungleOffsetX)
-            {
-                for (jungleOffsetZ = 0; jungleOffsetZ >= -1; --jungleOffsetZ)
-                {
-                    // if (saplingBlock.isSameSapling(..) ..
-                    if (saplingBlock.func_149880_a(world, x + jungleOffsetX, y, z + jungleOffsetZ, 3) && saplingBlock.func_149880_a(world, x + jungleOffsetX + 1, y, z + jungleOffsetZ, 3) && saplingBlock.func_149880_a(world, x + jungleOffsetX, y, z + jungleOffsetZ + 1, 3) && saplingBlock.func_149880_a(world, x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, 3))
-                    {
-                        treeToGrow = SaplingType.BigJungle;
-                        hugeJungleTreeHasGrown = true;
-                        break;
-                    }
-                }
-
-                if (treeToGrow != null)
-                {
-                    break;
-                }
-            }
-
-            if (treeToGrow == null)
-            {
-                jungleOffsetZ = 0;
-                jungleOffsetX = 0;
-                treeToGrow = SaplingType.SmallJungle;
-            }
-        } else
-        {
-            // Normal trees
-            treeToGrow = SaplingType.Oak;
-        }
-
         // Get the sapling generator
-        SaplingGen saplingGen = this.getSaplingGen(localWorld, treeToGrow, x, z);
+        SaplingGen saplingGen = this.getSaplingGen(localWorld, saplingGrower.saplingType, saplingGrower.x, saplingGrower.z);
         if (saplingGen == null)
         {
             // No sapling generator set for this sapling
@@ -109,22 +187,22 @@ public class SaplingListener
         event.setResult(Result.DENY);
 
         // Remove saplings
-        if (hugeJungleTreeHasGrown)
+        if (saplingGrower.saplingType.requiresFourSaplings())
         {
-            world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ, Blocks.air);
-            world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ, Blocks.air);
-            world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ + 1, Blocks.air);
-            world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, Blocks.air);
+            world.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z, Blocks.air);
+            world.setBlock(saplingGrower.x + 1, saplingGrower.y, saplingGrower.z, Blocks.air);
+            world.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z + 1, Blocks.air);
+            world.setBlock(saplingGrower.x + 1, saplingGrower.y, saplingGrower.z + 1, Blocks.air);
         } else
         {
-            world.setBlockToAir(x, y, z);
+            world.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z, Blocks.air);
         }
 
         // Try ten times to grow sapling
         boolean saplingGrown = false;
         for (int i = 0; i < 10; i++)
         {
-            if (saplingGen.growSapling(localWorld, new Random(), x + jungleOffsetX, y, z + jungleOffsetZ))
+            if (saplingGen.growSapling(localWorld, new Random(), saplingGrower.x, saplingGrower.y, saplingGrower.z))
             {
                 saplingGrown = true;
                 break;
@@ -134,15 +212,15 @@ public class SaplingListener
         if (!saplingGrown)
         {
             // Restore sapling
-            if (hugeJungleTreeHasGrown)
+            if (saplingGrower.saplingType.requiresFourSaplings())
             {
-                world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ, block, blockData, 4);
-                world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ, block, blockData, 4);
-                world.setBlock(x + jungleOffsetX, y, z + jungleOffsetZ + 1, block, blockData, 4);
-                world.setBlock(x + jungleOffsetX + 1, y, z + jungleOffsetZ + 1, block, blockData, 4);
+                localWorld.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z, saplingGrower.material);
+                localWorld.setBlock(saplingGrower.x + 1, saplingGrower.y, saplingGrower.z, saplingGrower.material);
+                localWorld.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z + 1, saplingGrower.material);
+                localWorld.setBlock(saplingGrower.x + 1, saplingGrower.y, saplingGrower.z + 1, saplingGrower.material);
             } else
             {
-                world.setBlock(x, y, z, block, blockData, 4);
+                localWorld.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z, saplingGrower.material);
             }
         }
 
@@ -154,7 +232,7 @@ public class SaplingListener
         LocalWorld localWorld = WorldHelper.toLocalWorld(event.world);
         if (localWorld == null)
         {
-            // World not managerd by Terrain Control
+            // World not managed by Terrain Control
             return;
         }
 
@@ -190,19 +268,19 @@ public class SaplingListener
         if (!mushroomGrown)
         {
             // Restore mushroom
-            // event.world.setBlock(...)
-            event.world.func_147446_b(event.x, event.y, event.z, event.block, 0, 2);
+            event.world.setBlock(event.x, event.y, event.z, event.block, 0, 3);
         }
     }
 
     // Can return null
     public SaplingGen getSaplingGen(LocalWorld world, SaplingType type, int x, int z)
     {
-        BiomeConfig biomeConfig = world.getBiome(x, z).getBiomeConfig();
-        if (biomeConfig == null)
+        LocalBiome biome = world.getBiome(x, z);
+        if (biome == null)
         {
             return null;
         }
-        return biomeConfig.getSaplingGen(type);
+        TerrainControl.log(LogMarker.INFO, "Biome: {}" + biome.getName());
+        return biome.getBiomeConfig().getSaplingGen(type);
     }
 }
