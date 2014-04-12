@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.bukkit;
 
-import com.khorn.terraincontrol.util.ChunkCoordinate;
-
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.bukkit.generator.BiomeCacheWrapper;
 import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
@@ -18,12 +16,13 @@ import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
-import net.minecraft.server.v1_7_R2.*;
-import org.bukkit.craftbukkit.v1_7_R2.CraftWorld;
+import net.minecraft.server.v1_7_R3.*;
+import org.bukkit.craftbukkit.v1_7_R3.CraftWorld;
 
 import java.util.*;
 

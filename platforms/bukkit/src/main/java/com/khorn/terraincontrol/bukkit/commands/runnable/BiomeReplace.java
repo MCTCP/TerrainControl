@@ -3,9 +3,9 @@ package com.khorn.terraincontrol.bukkit.commands.runnable;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_7_R2.*;
+import net.minecraft.server.v1_7_R3.*;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_7_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_7_R3.CraftWorld;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -128,7 +128,7 @@ public class BiomeReplace implements Runnable
 
                             DataInputStream localDataInputStream = file.a(x, z);
 
-                            NBTTagCompound localNBTTagCompound1 = NBTCompressedStreamTools.a((DataInput) localDataInputStream);
+                            NBTTagCompound localNBTTagCompound1 = NBTCompressedStreamTools.a((DataInput) localDataInputStream, NBTReadLimiter.a);
 
                             localDataInputStream.close();
 
