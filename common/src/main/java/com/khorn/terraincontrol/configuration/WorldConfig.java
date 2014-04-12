@@ -149,6 +149,7 @@ public class WorldConfig extends ConfigFile
     public boolean flatBedrock;
     public boolean ceilingBedrock;
     public LocalMaterialData bedrockBlock;
+    public boolean populationBoundsCheck;
 
     public boolean removeSurfaceStone;
 
@@ -473,6 +474,7 @@ public class WorldConfig extends ConfigFile
         this.removeSurfaceStone = readSettings(WorldStandardValues.RemoveSurfaceStone);
         this.objectSpawnRatio = readSettings(WorldStandardValues.objectSpawnRatio);
         this.resourcesSeed = readSettings(WorldStandardValues.ResourcesSeed);
+        this.populationBoundsCheck = readSettings(WorldStandardValues.PopulationBoundsCheck);
 
         this.oldTerrainGenerator = this.ModeTerrain == TerrainMode.OldGenerator;
     }
@@ -693,6 +695,11 @@ public class WorldConfig extends ConfigFile
 
         writeComment("Block used as bedrock. No block data allowed.");
         writeValue(WorldStandardValues.BedrockobBlock, this.bedrockBlock);
+        
+        writeComment("Set this to false to disable the bounds check during chunk population.");
+        writeComment("While this allows you to spawn larger objects, it also makes terrain generation");
+        writeComment("dependant on the direction you explored the world in.");
+        writeValue(WorldStandardValues.PopulationBoundsCheck, this.populationBoundsCheck);
 
         this.writeSmallTitle("Water and ice");
         writeComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");

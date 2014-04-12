@@ -373,6 +373,15 @@ public class BukkitWorld implements LocalWorld
             return this.chunkCache[indexX | (indexZ << 1)];
         } else
         {
+            // Outside area
+            if (this.settings.worldConfig.populationBoundsCheck)
+            {
+                return null;
+            }
+            if (world.chunkProvider.isChunkLoaded(chunkX, chunkZ))
+            {
+                return world.getChunkAt(chunkX, chunkZ);
+            }
             return null;
         }
     }

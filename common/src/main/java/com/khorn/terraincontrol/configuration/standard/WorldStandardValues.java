@@ -101,6 +101,7 @@ public enum WorldStandardValues implements MultiTypedSetting
     RemoveSurfaceStone(false),
     objectSpawnRatio(1),
     ResourcesSeed(0L), // "L" means that it is a long instead of an int
+    PopulationBoundsCheck(true),
 
     //>>	Some settings here are similar to BiomeStandardValues
     NetherFortressesEnabled(false),

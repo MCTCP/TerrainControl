@@ -396,6 +396,15 @@ public class ForgeWorld implements LocalWorld
             return this.chunkCache[indexX | (indexZ << 1)];
         } else
         {
+            // Outside area
+            if (this.settings.worldConfig.populationBoundsCheck)
+            {
+                return null;
+            }
+            if (world.getChunkProvider().chunkExists(chunkX, chunkZ))
+            {
+                return world.getChunkFromChunkCoords(chunkX, chunkZ);
+            }
             return null;
         }
     }
