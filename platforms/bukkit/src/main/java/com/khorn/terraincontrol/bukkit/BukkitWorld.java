@@ -301,10 +301,10 @@ public class BukkitWorld implements LocalWorld
     {
         int endXInChunk = startXInChunk + 8;
         int endZInChunk = startZInChunk + 8;
+        int worldStartX = rawChunk.locX * 16;
+        int worldStartZ = rawChunk.locZ * 16;
 
         ChunkSection[] sectionsArray = rawChunk.i();
-
-        byte[] chunkBiomes = rawChunk.m();
 
         for (ChunkSection section : sectionsArray)
         {
@@ -315,7 +315,7 @@ public class BukkitWorld implements LocalWorld
             {
                 for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
                 {
-                    LocalBiome biome = this.settings.biomes[chunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
+                    LocalBiome biome = this.getCalculatedBiome(worldStartX + sectionX, worldStartZ + sectionZ);
                     if (biome != null && biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
                     {
                         LocalMaterialData[][] replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;

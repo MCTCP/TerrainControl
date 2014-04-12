@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.LocalBiome;
 
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -322,10 +322,10 @@ public class ForgeWorld implements LocalWorld
     {
         int endXInChunk = startXInChunk + 8;
         int endZInChunk = startZInChunk + 8;
+        int worldStartX = rawChunk.xPosition * 16;
+        int worldStartZ = rawChunk.zPosition * 16;
 
         ExtendedBlockStorage[] sectionsArray = rawChunk.getBlockStorageArray();
-
-        byte[] chunkBiomes = rawChunk.getBiomeArray();
 
         for (ExtendedBlockStorage section : sectionsArray)
         {
@@ -336,7 +336,7 @@ public class ForgeWorld implements LocalWorld
             {
                 for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
                 {
-                    LocalBiome biome = this.settings.biomes[chunkBiomes[(sectionZ << 4) | sectionX] & 0xFF];
+                    LocalBiome biome = this.getCalculatedBiome(worldStartX + sectionX, worldStartZ + sectionZ);
                     if (biome != null && biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
                     {
                         LocalMaterialData[][] replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;
