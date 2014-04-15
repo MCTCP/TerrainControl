@@ -53,25 +53,28 @@ public class UndergroundLakeGen extends Resource
                 for (int yLake = (int) (yAdjusted - verticalSize / 2.0D); yLake <= (int) (yAdjusted + verticalSize / 2.0D); yLake++)
                     for (int zLake = (int) (zAdjusted - horizontalSize / 2.0D); zLake <= (int) (zAdjusted + horizontalSize / 2.0D); zLake++)
                     {
-                        if (world.isEmpty(xLake, yLake, zLake))
+                        LocalMaterialData material = world.getMaterial(xLake, yLake, zLake);
+                        if (material.isMaterial(DefaultMaterial.AIR) || material.isMaterial(DefaultMaterial.BEDROCK))
+                        {
+                            // Don't replace air or bedrock
                             continue;
+                        }
+
                         double xBounds = (xLake + 0.5D - xAdjusted) / (horizontalSize / 2.0D);
                         double yBounds = (yLake + 0.5D - yAdjusted) / (verticalSize / 2.0D);
                         double zBounds = (zLake + 0.5D - zAdjusted) / (horizontalSize / 2.0D);
                         if (xBounds * xBounds + yBounds * yBounds + zBounds * zBounds >= 1.0D)
                             continue;
-                        LocalMaterialData uBlock = world.getMaterial(xLake, yLake - 1, zLake);
-                        if (!uBlock.isMaterial(DefaultMaterial.AIR))
+                        LocalMaterialData materialBelow = world.getMaterial(xLake, yLake - 1, zLake);
+                        if (materialBelow.isMaterial(DefaultMaterial.AIR))
+                        {
+                            // Air block, also set position above to air
+                            world.setBlock(xLake, yLake, zLake, materialBelow);
+                        } else
                         {
                             // Not air, set position above to water
                             world.setBlock(xLake, yLake, zLake, material);
-                        }  
-                        else
-                        {
-                            // Air block, also set position above to air
-                            world.setBlock(xLake, yLake, zLake, uBlock);
                         }
-                            
                     }
         }
     }
