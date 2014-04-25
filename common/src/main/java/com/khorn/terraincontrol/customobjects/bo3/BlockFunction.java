@@ -26,8 +26,10 @@ public class BlockFunction extends BO3Function
     public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(4, args);
+        // Those limits are arbitrary, LocalWorld.setBlock will limit it
+        // correctly based on what chunks can be accessed
         x = readInt(args.get(0), -100, 100);
-        y = readInt(args.get(1), -100, 100);
+        y = readInt(args.get(1), -1000, 1000);
         z = readInt(args.get(2), -100, 100);
         material = readMaterial(args.get(3));
         if (args.size() == 5)
