@@ -1,8 +1,5 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.generator.resource.IceSpikeGen;
-
-import com.khorn.terraincontrol.generator.resource.BoulderGen;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resource.*;

@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.generator.resource;
 
 import com.khorn.terraincontrol.LocalMaterialData;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;

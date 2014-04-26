@@ -1,8 +1,7 @@
 package com.khorn.terraincontrol.customobjects.bo2;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-
 import com.khorn.terraincontrol.util.MultiTypedSetting;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.*;
 

@@ -1,11 +1,10 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.util.MaterialSet;
-
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
 import java.util.ArrayList;

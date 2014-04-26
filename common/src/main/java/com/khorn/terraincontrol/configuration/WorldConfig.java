@@ -1,8 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.LocalMaterialData;
-
 import com.khorn.terraincontrol.BiomeIds;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;

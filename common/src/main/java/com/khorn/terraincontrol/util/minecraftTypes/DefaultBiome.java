@@ -1,10 +1,7 @@
 package com.khorn.terraincontrol.util.minecraftTypes;
 
-import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MinecraftBiomeTemplate;
-
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
-import com.khorn.terraincontrol.configuration.standard.*;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Beach;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.BirchForest;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.BirchForestHills;
@@ -46,6 +43,7 @@ import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.M
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MesaPlateauForest;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MesaPlateauForestMountains;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MesaPlateauMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MinecraftBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MushroomIsland;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MushroomIslandShore;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Ocean;
@@ -65,6 +63,7 @@ import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.S
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Taiga;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.TaigaHills;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.TaigaMountains;
+import com.khorn.terraincontrol.configuration.standard.*;
 import com.khorn.terraincontrol.logging.LogMarker;
 
 /**

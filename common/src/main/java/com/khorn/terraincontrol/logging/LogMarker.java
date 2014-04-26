@@ -1,10 +1,11 @@
 package com.khorn.terraincontrol.logging;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Holds the log markers and allows to compare them to each other.

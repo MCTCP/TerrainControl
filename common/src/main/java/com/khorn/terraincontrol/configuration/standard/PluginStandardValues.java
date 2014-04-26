@@ -1,9 +1,8 @@
 package com.khorn.terraincontrol.configuration.standard;
 
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-
 import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.util.MultiTypedSetting;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.ArrayList;
 import java.util.Collections;

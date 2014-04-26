@@ -1,9 +1,8 @@
 package com.khorn.terraincontrol.generator.surface;
 
 import com.khorn.terraincontrol.LocalMaterialData;
-
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.helpers.StringHelper;

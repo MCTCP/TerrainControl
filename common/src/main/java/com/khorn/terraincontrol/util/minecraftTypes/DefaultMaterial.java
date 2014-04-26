@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.util.minecraftTypes;
 
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.LocalWorld;
 
 import java.util.Map;
 import java.util.TreeMap;

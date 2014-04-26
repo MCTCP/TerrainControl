@@ -1,9 +1,8 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.util.helpers.StringHelper;
-
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
