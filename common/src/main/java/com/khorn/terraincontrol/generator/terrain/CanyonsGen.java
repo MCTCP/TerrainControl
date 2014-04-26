@@ -1,9 +1,8 @@
 package com.khorn.terraincontrol.generator.terrain;
 
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.generator.ChunkProviderTC;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
@@ -20,12 +19,12 @@ public class CanyonsGen extends TerrainGenBase
         this.worldSettings = wrk;
     }
 
-    protected void a(long paramLong, int chunk_x, int chunk_z, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
+    protected void a(long paramLong, ChunkCoordinate generatingChunk, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
     {
         Random localRandom = new Random(paramLong);
 
-        double d1 = chunk_x * 16 + 8;
-        double d2 = chunk_z * 16 + 8;
+        double d1 = generatingChunk.getBlockXCenter();
+        double d2 = generatingChunk.getBlockZCenter();
 
         float f1 = 0.0F;
         float f2 = 0.0F;
@@ -83,14 +82,14 @@ public class CanyonsGen extends TerrainGenBase
 
             if ((paramDouble1 < d1 - 16.0D - d3 * 2.0D) || (paramDouble3 < d2 - 16.0D - d3 * 2.0D) || (paramDouble1 > d1 + 16.0D + d3 * 2.0D) || (paramDouble3 > d2 + 16.0D + d3 * 2.0D))
                 continue;
-            int k = MathHelper.floor(paramDouble1 - d3) - chunk_x * 16 - 1;
-            int m = MathHelper.floor(paramDouble1 + d3) - chunk_x * 16 + 1;
+            int k = MathHelper.floor(paramDouble1 - d3) - generatingChunk.getBlockX() - 1;
+            int m = MathHelper.floor(paramDouble1 + d3) - generatingChunk.getBlockX() + 1;
 
             int n = MathHelper.floor(paramDouble2 - d4) - 1;
             int i1 = MathHelper.floor(paramDouble2 + d4) + 1;
 
-            int i2 = MathHelper.floor(paramDouble3 - d3) - chunk_z * 16 - 1;
-            int i3 = MathHelper.floor(paramDouble3 + d3) - chunk_z * 16 + 1;
+            int i2 = MathHelper.floor(paramDouble3 - d3) - generatingChunk.getBlockZ() - 1;
+            int i3 = MathHelper.floor(paramDouble3 + d3) - generatingChunk.getBlockZ() + 1;
 
             if (k < 0)
                 k = 0;
@@ -115,7 +114,7 @@ public class CanyonsGen extends TerrainGenBase
                 {
                     for (int i7 = i1 + 1; (i4 == 0) && (i7 >= n - 1); i7--)
                     {
-                        i8 = (i5 * 16 + i6) * ChunkProviderTC.CHUNK_MAX_Y + i7;
+                        i8 = (i5 * 16 + i6) * ChunkCoordinate.CHUNK_Y_SIZE + i7;
                         if (i7 < 0)
                             continue;
                         if (i7 < worldSettings.worldHeightCap)
@@ -136,11 +135,11 @@ public class CanyonsGen extends TerrainGenBase
             }
             for (int i5 = k; i5 < m; i5++)
             {
-                double d9 = (i5 + chunk_x * 16 + 0.5D - paramDouble1) / d3;
+                double d9 = (i5 + generatingChunk.getBlockX() + 0.5D - paramDouble1) / d3;
                 for (i8 = i2; i8 < i3; i8++)
                 {
-                    double d10 = (i8 + chunk_z * 16 + 0.5D - paramDouble3) / d3;
-                    int i9 = (i5 * 16 + i8) * ChunkProviderTC.CHUNK_MAX_Y + i1;
+                    double d10 = (i8 + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
+                    int i9 = (i5 * 16 + i8) * ChunkCoordinate.CHUNK_Y_SIZE + i1;
                     int i10 = 0;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
@@ -176,13 +175,13 @@ public class CanyonsGen extends TerrainGenBase
     }
 
     @Override
-    protected void generateChunk(int chunk_x, int chunk_z, int real_chunk_x, int real_chunk_z, byte[] paramArrayOfByte)
+    protected void generateChunk(ChunkCoordinate currentChunk, ChunkCoordinate originalChunk, byte[] paramArrayOfByte)
     {
         if (this.random.nextInt(100) >= this.worldSettings.canyonRarity)
             return;
-        double d1 = chunk_x * 16 + this.random.nextInt(16);
+        double d1 = currentChunk.getBlockX() + this.random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
         double d2 = this.random.nextInt(this.worldSettings.canyonMaxAltitude - this.worldSettings.canyonMinAltitude) + this.worldSettings.canyonMinAltitude;
-        double d3 = chunk_z * 16 + this.random.nextInt(16);
+        double d3 = currentChunk.getBlockZ() + this.random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
         int i = 1;
 
@@ -194,7 +193,7 @@ public class CanyonsGen extends TerrainGenBase
 
             int size = this.random.nextInt(this.worldSettings.canyonMaxLength - this.worldSettings.canyonMinLength) + this.worldSettings.canyonMinLength;
 
-            a(this.random.nextLong(), real_chunk_x, real_chunk_z, paramArrayOfByte, d1, d2, d3, f3, f1, f2, size, this.worldSettings.canyonDepth);
+            a(this.random.nextLong(), originalChunk, paramArrayOfByte, d1, d2, d3, f3, f1, f2, size, this.worldSettings.canyonDepth);
         }
     }
 }

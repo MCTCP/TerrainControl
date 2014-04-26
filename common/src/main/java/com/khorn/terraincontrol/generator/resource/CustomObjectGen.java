@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
 import java.util.ArrayList;
@@ -46,11 +47,11 @@ public class CustomObjectGen extends Resource
     }
 
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         for (CustomObject object : objects)
         {
-            object.process(world, random, chunkX, chunkZ);
+            object.process(world, random, chunkCoord);
         }
     }
 

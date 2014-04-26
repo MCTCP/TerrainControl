@@ -1,14 +1,15 @@
 package com.khorn.terraincontrol.customobjects.bo2;
 
-import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.util.MaterialSet;
-import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
+import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
@@ -234,7 +235,7 @@ public class BO2 extends ConfigFile implements CustomObject
     }
 
     @Override
-    public boolean process(LocalWorld world, Random rand, int chunkX, int chunkZ)
+    public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
     {
 
         if (branch)
@@ -248,8 +249,8 @@ public class BO2 extends ConfigFile implements CustomObject
         {
             ObjectRarity -= 100;
 
-            int x = chunkX * 16 + rand.nextInt(16);
-            int z = chunkZ * 16 + rand.nextInt(16);
+            int x = chunkCoord.getChunkX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+            int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
             objectSpawned = spawn(world, rand, x, z);
         }

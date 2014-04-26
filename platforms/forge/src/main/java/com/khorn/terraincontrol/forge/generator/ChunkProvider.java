@@ -53,7 +53,7 @@ public class ChunkProvider implements IChunkProvider
     {
         Chunk chunk = new Chunk(this.worldHandle, chunkX, chunkZ);
 
-        byte[] BlockArray = this.generator.generate(chunkX, chunkZ);
+        byte[] BlockArray = this.generator.generate(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
         ExtendedBlockStorage[] sections = chunk.getBlockStorageArray();
 
         int i1 = BlockArray.length / 256;

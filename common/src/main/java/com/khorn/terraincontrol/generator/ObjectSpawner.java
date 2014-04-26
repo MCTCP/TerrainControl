@@ -1,17 +1,16 @@
 package com.khorn.terraincontrol.generator;
 
-import com.khorn.terraincontrol.util.ChunkCoordinate;
-
-import com.khorn.terraincontrol.LocalMaterialData;
-import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorNewOctaves;
 import com.khorn.terraincontrol.generator.resource.Resource;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Random;
@@ -71,7 +70,7 @@ public class ObjectSpawner
         // Resource sequence
         for (Resource res : biomeConfig.resourceSequence)
         {
-            res.process(world, rand, hasGeneratedAVillage, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+            res.process(world, rand, hasGeneratedAVillage, chunkCoord);
         }
 
         // Animals

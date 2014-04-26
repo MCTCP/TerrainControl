@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
@@ -91,11 +92,11 @@ public class TreeObject implements CustomObject
     }
 
     @Override
-    public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         // A tree has no rarity, so spawn it once in the chunk
-        int x = chunkX * 16 + random.nextInt(16);
-        int z = chunkZ * 16 + random.nextInt(16);
+        int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+        int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
         return spawnAsTree(world, random, x, z);
     }
 

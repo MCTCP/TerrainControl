@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.generator;
 
+import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
+import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Y_SIZE;
+import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -11,6 +15,7 @@ import com.khorn.terraincontrol.generator.noise.NoiseGeneratorPerlinOctaves;
 import com.khorn.terraincontrol.generator.terrain.CanyonsGen;
 import com.khorn.terraincontrol.generator.terrain.CavesGen;
 import com.khorn.terraincontrol.generator.terrain.TerrainGenBase;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
@@ -22,12 +27,8 @@ import java.util.Random;
 public class ChunkProviderTC
 {
     // Several constants describing the chunk size of Minecraft
-    public static final int CHUNK_MAX_X = 16;
-    public static final int CHUNK_MAX_Y = 256;
-    public static final int CHUNK_MAX_Z = 16;
-
-    private static final int NOISE_MAX_X = CHUNK_MAX_X / 4 + 1;
-    private static final int NOISE_MAX_Z = CHUNK_MAX_Z / 4 + 1;
+    private static final int NOISE_MAX_X = CHUNK_X_SIZE / 4 + 1;
+    private static final int NOISE_MAX_Z = CHUNK_Z_SIZE / 4 + 1;
 
     public static final int HEIGHT_BITS = 8;
     public static final int HEIGHT_BITS_PLUS_FOUR = HEIGHT_BITS + 4;
@@ -40,7 +41,7 @@ public class ChunkProviderTC
     private final NoiseGeneratorPerlinOctaves noiseGen5;
     private final NoiseGeneratorPerlinOctaves noiseGen6;
     private double[] rawTerrain;
-    private double[] noise4 = new double[CHUNK_MAX_X * CHUNK_MAX_Z];
+    private double[] noise4 = new double[CHUNK_X_SIZE * CHUNK_Z_SIZE];
 
     private double[] noise3;
     private double[] noise1;
@@ -68,7 +69,7 @@ public class ChunkProviderTC
     // Water level at lower resolution
     private final byte[] waterLevelRaw = new byte[25];
     // Water level for each column
-    private final byte[] waterLevel = new byte[CHUNK_MAX_X * CHUNK_MAX_Z];
+    private final byte[] waterLevel = new byte[CHUNK_X_SIZE * CHUNK_Z_SIZE];
 
     private final int heightScale;
     private final int heightCap;
@@ -114,19 +115,20 @@ public class ChunkProviderTC
 
     }
 
-    public byte[] generate(int x, int z)
+    public byte[] generate(ChunkCoordinate chunkCoord)
     {
-
+        int x = chunkCoord.getChunkX();
+        int z = chunkCoord.getChunkZ();
         this.random.setSeed(x * 341873128712L + z * 132897987541L);
 
-        final byte[] blockArray = new byte[CHUNK_MAX_X * CHUNK_MAX_Y * CHUNK_MAX_Z];
+        byte[] blockArray = new byte[CHUNK_X_SIZE * CHUNK_Y_SIZE * CHUNK_Z_SIZE];
 
-        generateTerrain(x, z, blockArray);
+        generateTerrain(chunkCoord, blockArray);
 
-        final boolean dry = addBiomeBlocksAndCheckWater(x, z, blockArray);
+        boolean dry = addBiomeBlocksAndCheckWater(chunkCoord, blockArray);
 
-        this.caveGen.generate(x, z, blockArray);
-        this.canyonGen.generate(x, z, blockArray);
+        this.caveGen.generate(chunkCoord, blockArray);
+        this.canyonGen.generate(chunkCoord, blockArray);
 
         if (this.worldSettings.worldConfig.ModeTerrain == WorldConfig.TerrainMode.Normal
                 || this.worldSettings.worldConfig.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
@@ -138,8 +140,11 @@ public class ChunkProviderTC
 
     }
 
-    protected void generateTerrain(int chunkX, int chunkZ, byte[] blockArray)
+    protected void generateTerrain(ChunkCoordinate chunkCoord, byte[] blockArray)
     {
+        final int chunkX = chunkCoord.getChunkX();
+        final int chunkZ = chunkCoord.getChunkZ();
+
         final int four = 4;
         final int oneEightOfHeight = this.heightCap / 8;
 
@@ -157,15 +162,15 @@ public class ChunkProviderTC
                     OutputType.DEFAULT_FOR_WORLD);
         } else
         {
-            this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * CHUNK_MAX_X, chunkZ * CHUNK_MAX_Z, CHUNK_MAX_X,
-                    CHUNK_MAX_Z, OutputType.DEFAULT_FOR_WORLD);
+            this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * CHUNK_X_SIZE, chunkZ * CHUNK_Z_SIZE, CHUNK_X_SIZE,
+                    CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
         }
 
         generateTerrainNoise(chunkX * four, 0, chunkZ * four, maxYSections, usedYSections);
 
         // Now that the raw terrain is generated, replace raw biome array with
         // fine-tuned one.
-        this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * CHUNK_MAX_X, chunkZ * CHUNK_MAX_Z, CHUNK_MAX_X, CHUNK_MAX_Z,
+        this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * CHUNK_X_SIZE, chunkZ * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE,
                 OutputType.DEFAULT_FOR_WORLD);
 
         final double oneEight = 0.125D;
@@ -274,32 +279,32 @@ public class ChunkProviderTC
      * @return Whether there is a lot of water in this chunk. If yes, no
      *         villages will be placed.
      */
-    protected boolean addBiomeBlocksAndCheckWater(int chunkX, int chunkZ, byte[] blocksArray)
+    protected boolean addBiomeBlocksAndCheckWater(ChunkCoordinate chunkCoord, byte[] blocksArray)
     {
         int dryBlocksOnSurface = 256;
 
         final double d1 = 0.03125D;
-        this.noise4 = this.noiseGen4.a(this.noise4, chunkX * CHUNK_MAX_X, chunkZ * CHUNK_MAX_Z, CHUNK_MAX_X, CHUNK_MAX_Z, d1 * 2.0D,
+        this.noise4 = this.noiseGen4.a(this.noise4, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_X_SIZE, CHUNK_Z_SIZE, d1 * 2.0D,
                 d1 * 2.0D, 1.0D);
 
         WorldConfig worldConfig = this.worldSettings.worldConfig;
 
-        for (int x = 0; x < 16; x++)
+        for (int x = 0; x < CHUNK_X_SIZE; x++)
         {
-            for (int z = 0; z < 16; z++)
+            for (int z = 0; z < CHUNK_Z_SIZE; z++)
             {
                 // The following code is executed for each column in the chunk
 
                 // Get the current biome config and some properties
-                final BiomeConfig biomeConfig = this.worldSettings.biomes[this.biomeArray[(z + x * 16)]].getBiomeConfig();
+                final BiomeConfig biomeConfig = this.worldSettings.biomes[this.biomeArray[(z + x * CHUNK_Z_SIZE)]].getBiomeConfig();
                 final float currentTemperature = biomeConfig.biomeTemperature;
-                final int surfaceBlocksNoise = (int) (this.noise4[(x + z * 16)] / 3.0D + 3.0D + this.random.nextDouble() * 0.25D);
+                final int surfaceBlocksNoise = (int) (this.noise4[(x + z * CHUNK_X_SIZE)] / 3.0D + 3.0D + this.random.nextDouble() * 0.25D);
 
                 // Bedrock on the ceiling
                 if (worldConfig.ceilingBedrock)
                 {
                     // Moved one block lower to fix lighting issues
-                    blocksArray[(z * 16 + x) * CHUNK_MAX_Y + this.heightCap - 2] = (byte) worldConfig.bedrockBlock.getBlockId();
+                    blocksArray[(z * 16 + x) * CHUNK_Y_SIZE + this.heightCap - 2] = (byte) worldConfig.bedrockBlock.getBlockId();
                 }
 
                 // Loop from map height to zero to place bedrock and surface
@@ -308,9 +313,9 @@ public class ChunkProviderTC
                 int currentGroundBlock = biomeConfig.groundBlock.getBlockId();
                 int surfaceBlocksCount = -1;
                 final int currentWaterLevel = this.waterLevel[z + x * 16];
-                for (int y = CHUNK_MAX_Y - 1; y >= 0; y--)
+                for (int y = CHUNK_Y_SIZE - 1; y >= 0; y--)
                 {
-                    final int currentPos = (z * CHUNK_MAX_Z + x) * CHUNK_MAX_Y + y;
+                    final int currentPos = (z * CHUNK_Z_SIZE + x) * CHUNK_Y_SIZE + y;
 
                     if (y < 5 && (worldConfig.createAdminium(y)) && y <= this.random.nextInt(5))
                     {
@@ -381,7 +386,7 @@ public class ChunkProviderTC
                 }
 
                 // Count how many water there is
-                if (blocksArray[(z * 16 + x) * CHUNK_MAX_Y + biomeConfig.waterLevelMax] == biomeConfig.waterBlock.getBlockId())
+                if (blocksArray[(z * CHUNK_X_SIZE + x) * CHUNK_Y_SIZE + biomeConfig.waterLevelMax] == biomeConfig.waterBlock.getBlockId())
                 {
                     dryBlocksOnSurface--;
                 }

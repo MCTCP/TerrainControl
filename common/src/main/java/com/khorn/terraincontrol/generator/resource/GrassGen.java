@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.generator.resource;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
@@ -66,26 +67,26 @@ public class GrassGen extends Resource
     }
 
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         switch (groupOption)
         {
             case Grouped:
-                spawnGrouped(world, random, chunkX, chunkZ);
+                spawnGrouped(world, random, chunkCoord);
                 break;
             case NotGrouped:
-                spawnNotGrouped(world, random, chunkX, chunkZ);
+                spawnNotGrouped(world, random, chunkCoord);
                 break;
         }
     }
 
-    protected void spawnGrouped(LocalWorld world, Random random, int chunkX, int chunkZ)
+    protected void spawnGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         if (random.nextDouble() * 100.0 <= this.rarity)
         {
             // Passed Rarity test, place about Frequency grass in this chunk
-            int centerX = chunkX * 16 + 8 + random.nextInt(16);
-            int centerZ = chunkZ * 16 + 8 + random.nextInt(16);
+            int centerX = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+            int centerZ = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
             int centerY = world.getHighestBlockYAt(centerX, centerZ);
             LocalMaterialData id;
 
@@ -113,18 +114,18 @@ public class GrassGen extends Resource
         }
     }
 
-    protected void spawnNotGrouped(LocalWorld world, Random random, int chunkX, int chunkZ)
+    protected void spawnNotGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         for (int t = 0; t < frequency; t++)
         {
             if (random.nextInt(100) >= rarity)
                 continue;
-            int x = chunkX * 16 + random.nextInt(16) + 8;
-            int z = chunkZ * 16 + random.nextInt(16) + 8;
+            int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+            int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
             int y = world.getHighestBlockYAt(x, z);
 
-            LocalMaterialData id;
-            while (((id = world.getMaterial(x, y, z)).isMaterial(DefaultMaterial.AIR) || id.isMaterial(DefaultMaterial.LEAVES) || id.isMaterial(DefaultMaterial.LEAVES_2)) && (y > 0))
+            LocalMaterialData material;
+            while (((material = world.getMaterial(x, y, z)).isMaterial(DefaultMaterial.AIR) || material.isMaterial(DefaultMaterial.LEAVES) || material.isMaterial(DefaultMaterial.LEAVES_2)) && (y > 0))
                 y--;
 
             if ((!world.isEmpty(x, y + 1, z)) || (!sourceBlocks.contains(world.getMaterial(x, y, z))))

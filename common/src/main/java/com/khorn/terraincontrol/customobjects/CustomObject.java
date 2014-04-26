@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.Map;
@@ -88,13 +89,12 @@ public interface CustomObject
      * Spawns the object one or more times in a chunk. The object can search a good y position by
      * itself.
      *
-     * @param world
-     * @param random
-     * @param chunkX
-     * @param chunkZ
+     * @param world      The world to spawn in.
+     * @param random     Random number generator based on the world seed.
+     * @param chunkCoord The chunk to spawn the objects in.
      * @return Whether at least one object spawned successfully.
      */
-    public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ);
+    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord);
 
     /**
      * Returns a copy of this object will all the settings applied. Can return

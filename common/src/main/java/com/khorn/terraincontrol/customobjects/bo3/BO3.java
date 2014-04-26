@@ -6,6 +6,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.*;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlockEnum;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 
@@ -183,12 +184,12 @@ public class BO3 implements StructuredCustomObject
     }
 
     @Override
-    public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         boolean atLeastOneObjectHasSpawned = false;
 
-        int chunkMiddleX = chunkX * 16 + 8;
-        int chunkMiddleZ = chunkZ * 16 + 8;
+        int chunkMiddleX = chunkCoord.getBlockXCenter();
+        int chunkMiddleZ = chunkCoord.getBlockZCenter();
         for (int i = 0; i < settings.frequency; i++)
         {
             if (settings.rarity > random.nextDouble() * 100.0)

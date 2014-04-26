@@ -2,9 +2,9 @@ package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -15,7 +15,7 @@ import java.util.Random;
  */
 public class UseBiome implements CustomObject
 {
-    public ArrayList<CustomObject> getPossibleObjectsAt(LocalWorld world, int x, int z)
+    public List<CustomObject> getPossibleObjectsAt(LocalWorld world, int x, int z)
     {
         return world.getCalculatedBiome(x, z).getBiomeConfig().biomeObjects;
     }
@@ -81,16 +81,16 @@ public class UseBiome implements CustomObject
             CustomObject selectedObject = possibleObjects.get(random.nextInt(possibleObjects.size()));
 
             // Process the object
-            objectSpawned = selectedObject.process(world, random, x, x);
+            objectSpawned = selectedObject.spawnAsTree(world, random, x, x);
 
         }
         return objectSpawned;
     }
 
     @Override
-    public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
-        List<CustomObject> possibleObjects = getPossibleObjectsAt(world, chunkX * 16 + 8, chunkZ * 16 + 8);
+        List<CustomObject> possibleObjects = getPossibleObjectsAt(world, chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter());
 
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
@@ -111,7 +111,7 @@ public class UseBiome implements CustomObject
             CustomObject selectedObject = possibleObjects.get(random.nextInt(possibleObjects.size()));
 
             // Process the object
-            objectSpawned = selectedObject.process(world, random, chunkX, chunkZ);
+            objectSpawned = selectedObject.process(world, random, chunkCoord);
 
         }
         return objectSpawned;

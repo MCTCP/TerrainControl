@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.customobjects;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.Map;
@@ -86,7 +87,7 @@ public class UseWorld implements CustomObject
     }
 
     @Override
-    public boolean process(LocalWorld world, Random rand, int chunk_x, int chunk_z)
+    public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
     {
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
@@ -107,11 +108,11 @@ public class UseWorld implements CustomObject
 
             CustomObject selectedObject = worldSettings.customObjects.get(rand.nextInt(worldSettings.customObjects.size()));
 
-            if (!selectedObject.hasPreferenceToSpawnIn(world.getBiome(chunk_x * 16 + 8, chunk_z * 16 + 8)))
+            if (!selectedObject.hasPreferenceToSpawnIn(world.getBiome(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter())))
                 continue;
 
             // Process the object
-            objectSpawned = selectedObject.process(world, rand, chunk_x, chunk_z);
+            objectSpawned = selectedObject.process(world, rand, chunkCoord);
 
         }
         return objectSpawned;

@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 
 import java.util.Random;
 
@@ -26,13 +27,13 @@ public class UseBiomeAll extends UseBiome
     }
 
     @Override
-    public boolean process(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         boolean spawnedAtLeastOneObject = false;
 
-        for (CustomObject object : getPossibleObjectsAt(world, chunkX * 16 + 8, chunkZ * 16 + 8))
+        for (CustomObject object : getPossibleObjectsAt(world, chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter()))
         {
-            if (object.process(world, random, chunkX, chunkZ))
+            if (object.process(world, random, chunkCoord))
             {
                 spawnedAtLeastOneObject = true;
             }

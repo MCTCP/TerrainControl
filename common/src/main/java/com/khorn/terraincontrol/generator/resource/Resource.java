@@ -1,13 +1,13 @@
 package com.khorn.terraincontrol.generator.resource;
 
 import com.khorn.terraincontrol.LocalMaterialData;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,20 +50,20 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
      * @param world          The world.
      * @param random         The random number generator.
      * @param villageInChunk Whether there is a village in the chunk.
-     * @param chunkX         The chunk x.
-     * @param chunkZ         The chunk z.
+     * @param chunkCoord     The chunk coordinate.
      */
-    public final void process(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    public final void process(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
 
         // Don't process invalid resources OR Fire event
-        if (!isValid() || !TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkX, chunkZ))
+        if (!isValid() || !TerrainControl.fireResourceProcessEvent(this, world,
+                random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ()))
         {
             return;
         }
 
         // Spawn
-        spawnInChunk(world, random, villageInChunk, chunkX, chunkZ);
+        spawnInChunk(world, random, villageInChunk, chunkCoord);
     }
 
     /**
@@ -72,17 +72,16 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
      * @param world          The world.
      * @param random         The random number generator.
      * @param villageInChunk Whether there is a village in the chunk.
-     * @param chunkX         The chunk x.
-     * @param chunkZ         The chunk z.
+     * @param chunkCoord     The chunk coordinate.
      */
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         for (int t = 0; t < frequency; t++)
         {
             if (random.nextDouble() * 100.0 > rarity)
                 continue;
-            int x = chunkX * 16 + random.nextInt(16) + 8;
-            int z = chunkZ * 16 + random.nextInt(16) + 8;
+            int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+            int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
             spawn(world, random, false, x, z);
         }
     }

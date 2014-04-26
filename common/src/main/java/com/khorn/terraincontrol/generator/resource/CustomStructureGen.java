@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.customobjects.CustomObjectStructure;
 import com.khorn.terraincontrol.customobjects.StructuredCustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.ArrayList;
@@ -57,11 +58,13 @@ public class CustomStructureGen extends Resource
     }
 
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, int currentChunkX, int currentChunkZ)
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         // Find all structures that reach this chunk, and spawn them
         int searchRadius = 5; // Maybe add a setting for this?
 
+        int currentChunkX = chunkCoord.getChunkX();
+        int currentChunkZ = chunkCoord.getChunkZ();
         for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)
         {
             for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
@@ -69,7 +72,7 @@ public class CustomStructureGen extends Resource
                 CustomObjectStructure structureStart = world.getStructureCache().getStructureStart(searchChunkX, searchChunkZ);
                 if (structureStart != null)
                 {
-                    structureStart.spawnForChunk(currentChunkX, currentChunkZ);
+                    structureStart.spawnForChunk(chunkCoord);
                 }
             }
         }

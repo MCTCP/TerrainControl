@@ -66,7 +66,7 @@ public class CustomObjectStructure
 
     public void addToChunk(CustomObjectCoordinate coordObject)
     {
-        ChunkCoordinate chunkCoordinate = ChunkCoordinate.fromBlockCoords(coordObject.getX(), coordObject.getZ());
+        ChunkCoordinate chunkCoordinate = ChunkCoordinate.getPopulatingChunk(coordObject.getX(), coordObject.getZ());
         Set<CustomObjectCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
         if (objectsInChunk == null)
         {
@@ -76,9 +76,8 @@ public class CustomObjectStructure
         objectsToSpawn.put(chunkCoordinate, objectsInChunk);
     }
 
-    public void spawnForChunk(int chunkX, int chunkZ)
+    public void spawnForChunk(ChunkCoordinate chunkCoordinate)
     {
-        ChunkCoordinate chunkCoordinate = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
         Set<CustomObjectCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
         if (objectsInChunk != null)
         {

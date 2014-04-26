@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.generator.resource;
 
-import com.khorn.terraincontrol.util.MaterialSet;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
+import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.helpers.RandomHelper;
 
@@ -30,11 +30,13 @@ public class VeinGen extends Resource
     }
 
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, int currentChunkX, int currentChunkZ)
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         // Find all veins that reach this chunk, and spawn them
         int searchRadius = (this.maxRadius + 15) / 16;
 
+        int currentChunkX = chunkCoord.getChunkX();
+        int currentChunkZ = chunkCoord.getChunkZ();
         for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)
         {
             for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
@@ -42,7 +44,7 @@ public class VeinGen extends Resource
                 Vein vein = getVeinStartInChunk(world, searchChunkX, searchChunkZ);
                 if (vein != null && vein.reachesChunk(currentChunkX, currentChunkZ))
                 {
-                    vein.spawn(world, random, currentChunkX, currentChunkZ, this);
+                    vein.spawn(world, random, chunkCoord, this);
                 }
             }
         }

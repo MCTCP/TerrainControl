@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.generator.resource;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 
@@ -44,7 +45,7 @@ class Vein
         return true;
     }
 
-    public void spawn(LocalWorld world, Random random, int chunkX, int chunkZ, VeinGen gen)
+    public void spawn(LocalWorld world, Random random, ChunkCoordinate chunkCoord, VeinGen gen)
     {
         int sizeSquared = size * size;
 
@@ -52,9 +53,9 @@ class Vein
         {
             if (random.nextInt(100) < gen.oreRarity)
             {
-                int oreX = chunkX * 16 + 8 + random.nextInt(16);
+                int oreX = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
                 int oreY = MathHelper.getRandomNumberInRange(random, gen.minAltitude, gen.maxAltitude);
-                int oreZ = chunkZ * 16 + 8 + random.nextInt(16);
+                int oreZ = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
                 if ((oreX - x) * (oreX - x) + (oreY - y) * (oreY - y) + (oreZ - z) * (oreZ - z) < sizeSquared)
                 {

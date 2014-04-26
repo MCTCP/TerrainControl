@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
+import com.khorn.terraincontrol.util.ChunkCoordinate;
+
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.configuration.WorldConfig;
@@ -77,13 +79,13 @@ public class TCChunkGenerator extends ChunkGenerator
     }
 
     @Override
-    public byte[][] generateBlockSections(World world, Random random, int x, int z, BiomeGrid biomes)
+    public byte[][] generateBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes)
     {
         makeSureWorldIsInitialized(world);
 
         if (this.NotGenerate)
             return new byte[16][];
-        byte[] BlockArray = this.chunkProviderTC.generate(x, z);
+        byte[] BlockArray = this.chunkProviderTC.generate(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
 
         byte[][] SectionBlocks = new byte[16][];
 
