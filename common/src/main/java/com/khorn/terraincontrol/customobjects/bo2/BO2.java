@@ -249,7 +249,7 @@ public class BO2 extends ConfigFile implements CustomObject
         {
             ObjectRarity -= 100;
 
-            int x = chunkCoord.getChunkX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+            int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
             objectSpawned = spawn(world, rand, x, z);
