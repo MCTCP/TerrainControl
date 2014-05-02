@@ -47,7 +47,7 @@ class ColorSetting extends Setting<Integer>
     @Override
     public String write(Integer value)
     {
-        return "0x" + Integer.toHexString(value.intValue() | 0x1000000).substring(1);
+        return "#" + Integer.toHexString(value.intValue() | 0x1000000).substring(1).toUpperCase();
     }
 
 }

@@ -18,7 +18,7 @@ public class ColorSettingTest extends AbstractSettingTest
         testValue(setting, 0x000000);
 
         // Tests leading zeroes
-        assertEquals("0x000040", setting.write(0x000040));
+        assertEquals("#000040", setting.write(0x000040));
     }
 
     @Test(expected = InvalidConfigException.class)
