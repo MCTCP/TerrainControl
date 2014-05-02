@@ -76,7 +76,7 @@ public class ForgeEngine extends TerrainControlEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getTCDataFolder(), PluginStandardValues.BO_DirectoryName.stringValue());
+        return new File(this.getTCDataFolder(), PluginStandardValues.BO_DirectoryName);
     }
 
     @Override

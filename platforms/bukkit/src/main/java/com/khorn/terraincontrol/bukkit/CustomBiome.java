@@ -78,8 +78,8 @@ public class CustomBiome extends BiomeBase
     @SuppressWarnings("unchecked")
     public void setEffects(BiomeConfig config)
     {
-        this.am = config.BiomeHeight;
-        this.an = config.BiomeVolatility;
+        this.am = config.biomeHeight;
+        this.an = config.biomeVolatility;
         this.ai = ((BukkitMaterialData) config.surfaceBlock).internalBlock();
         this.ak = ((BukkitMaterialData) config.groundBlock).internalBlock();
         this.temperature = config.biomeTemperature;

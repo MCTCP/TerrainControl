@@ -1,396 +1,265 @@
 package com.khorn.terraincontrol.configuration.standard;
 
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.util.MultiTypedSetting;
+import static com.khorn.terraincontrol.TerrainControl.WORLD_DEPTH;
+import static com.khorn.terraincontrol.TerrainControl.WORLD_HEIGHT;
+
+import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
+
+import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix;
+import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
+import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+import com.khorn.terraincontrol.configuration.settingType.*;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
-public enum BiomeStandardValues implements MultiTypedSetting
+public class BiomeStandardValues extends Settings
 {
-    //>>   Biome Extensions & Related
-    BiomeConfigExtensions("BiomeConfig.ini,.biome,.bc,.bc.ini,.biome.ini", SettingsType.StringArray),
-    DefaultBiomeConfigExtension(".bc"),
+    // >> Biome Extensions & Related
+    public static final Collection<String> BiomeConfigExtensions = Arrays.asList("BiomeConfig.ini", ".biome", ".bc", ".bc.ini",
+            ".biome.ini");
 
-    // Biome settings
-    BiomeExtends(""),
-    BiomeSize(5),
-    BiomeRarity(100),
-    BiomeColor("", SettingsType.Color),
-    RiverBiome("River"),
-    IsleInBiome("Ocean", SettingsType.StringArray),
-    BiomeIsBorder("", SettingsType.StringArray),
-    NotBorderNear("", SettingsType.StringArray),
+    public static final Setting<Boolean>
+            USE_WORLD_WATER_LEVEL = booleanSetting("UseWorldWaterLevel", true),
+            GRASS_COLOR_IS_MULTIPLIER = booleanSetting("GrassColorIsMultiplier", true),
+            FOLIAGE_COLOR_IS_MULTIPLIER = booleanSetting("FoliageColorIsMultiplier", true),
+            DISABLE_BIOME_HEIGHT = booleanSetting("DisableBiomeHeight", false),
+            STRONGHOLDS_ENABLED = WorldStandardValues.STRONGHOLDS_ENABLED,
+            NETHER_FORTRESSES_ENABLED = WorldStandardValues.NETHER_FORTRESSES_ENABLED,
+            SPAWN_MONSTERS_ADD_DEFAULTS = booleanSetting("SpawnMonstersAddDefaults", true),
+            SPAWN_CREATURES_ADD_DEFAULTS = booleanSetting("SpawnCreaturesAddDefaults", true),
+            SPAWN_WATER_CREATURES_ADD_DEFAULTS = booleanSetting("SpawnWaterCreaturesAddDefaults", true),
+            SPAWN_AMBIENT_CREATURES_ADD_DEFAULTS = booleanSetting("SpawnAmbientCreaturesAddDefaults", true);
 
-    BiomeTemperature(0.5F),
-    BiomeWetness(0.5F),
+    public static final Setting<String>
+            BIOME_CONFIG_EXTENSION = stringSetting("BiomeConfigExtension", ".bc"),
+            BIOME_EXTENDS = stringSetting("BiomeExtends", ""),
+            RIVER_BIOME = stringSetting("RiverBiome", "River"),
+            REPLACE_TO_BIOME_NAME = stringSetting("ReplaceToBiomeName", "");
 
-    ReplaceToBiomeName(""),
+    public static final Setting<Integer>
+            BIOME_SIZE = intSetting("BiomeSize", 5, 0, 20),
+            BIOME_RARITY = intSetting("BiomeRarity", 100, 0, Integer.MAX_VALUE),
+            SMOOTH_RADIUS = intSetting("SmoothRadius", 2, 0, 32),
+            RIVER_WATER_LEVEL = intSetting("RiverWaterLevel", 63, WORLD_DEPTH, WORLD_HEIGHT),
+            WATER_LEVEL_MAX = WorldStandardValues.WATER_LEVEL_MAX,
+            WATER_LEVEL_MIN = WorldStandardValues.WATER_LEVEL_MIN;
 
-    BiomeHeight(0.1D),
-    BiomeVolatility(0.3D),
-    SmoothRadius(2),
+    public static final Setting<Integer>
+            BIOME_COLOR = colorSetting("BiomeColor", "#ffffff"),
+            SKY_COLOR = colorSetting("SkyColor", "#7BA5FF"),
+            WATER_COLOR = colorSetting("WaterColor", "#FFFFFF"),
+            GRASS_COLOR = colorSetting("GrassColor", "#000000"),
+            FOLIAGE_COLOR = colorSetting("FoliageColor", "#000000");
 
-    StoneBlock(DefaultMaterial.STONE),
-    SurfaceBlock(DefaultMaterial.GRASS),
-    SurfaceAndGroundControl(""),
-    GroundBlock(DefaultMaterial.DIRT),
-    ReplacedBlocks("None"),
+    public static final Setting<List<String>>
+            ISLE_IN_BIOME = stringListSetting("IsleInBiome", "Ocean"),
+            BIOME_IS_BORDER = stringListSetting("BiomeIsBorder"),
+            NOT_BORDER_NEAR = stringListSetting("NotBorderNear"),
+            BIOME_OBJECTS = stringListSetting("BiomeObjects");
 
-    UseWorldWaterLevel(true),
+    public static final Setting<Double>
+            VOLATILITY_1 = doubleSetting("Volatility1", 0, -1000, 1000),
+            VOLATILITY_2 = doubleSetting("Volatility2", 0, -1000, 1000),
+            VOLATILITY_WEIGHT_1 = doubleSetting("VolatilityWeight1", 0.5, -1000, 1000),
+            VOLATILITY_WEIGHT_2 = doubleSetting("VolatilityWeight2", 0.45, -1000, 1000),
+            MAX_AVERAGE_HEIGHT = doubleSetting("MaxAverageHeight", 0, -1000, 1000),
+            MAX_AVERAGE_DEPTH = doubleSetting("MaxAverageDepth", 0, -1000, 1000),
+            MINESHAFT_RARITY = doubleSetting("MineshaftRarity", 1, 0, 100);
 
-    SkyColor("0x7BA5FF", SettingsType.Color),
-    WaterColor("0xFFFFFF", SettingsType.Color),
-    GrassColor("0x000000", SettingsType.Color),
-    GrassColorIsMultiplier(true),
-    FoliageColor("0x000000", SettingsType.Color),
-    FoliageColorIsMultiplier(true),
+    public static final Setting<LocalMaterialData>
+            STONE_BLOCK = new MaterialSetting("StoneBlock", DefaultMaterial.STONE),
+            SURFACE_BLOCK = new MaterialSetting("SurfaceBlock", DefaultMaterial.GRASS),
+            GROUND_BLOCK = new MaterialSetting("GroundBlock", DefaultMaterial.DIRT),
+            WATER_BLOCK = WorldStandardValues.WATER_BLOCK,
+            ICE_BLOCK = WorldStandardValues.ICE_BLOCK;
 
-    Volatility1(0.0D),
-    Volatility2(0.0D),
-    VolatilityWeight1(0.5D),
-    VolatilityWeight2(0.45D),
-    DisableBiomeHeight(false),
-    MaxAverageHeight(0.0D),
-    MaxAverageDepth(0.0D),
-    CustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0", SettingsType.StringArray),
+    public static final Setting<double[]>
+            CUSTOM_HEIGHT_CONTROL = new DoubleArraySetting("CustomHeightControl"),
+            RIVER_CUSTOM_HEIGHT_CONTROL = new DoubleArraySetting("RiverCustomHeightControl");
 
-    RiverHeight(-1.0F),
-    RiverVolatility(0.3F),
-    RiverWaterLevel(63),
-    RiverCustomHeightControl("0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0", SettingsType.StringArray),
+    public static final Setting<Float>
+            BIOME_TEMPERATURE = floatSetting("BiomeTemperature", 0.5f, 0, 2),
+            BIOME_WETNESS = floatSetting("BiomeWetness", 0.5f, 0, 1),
+            BIOME_HEIGHT = floatSetting("BiomeHeight", 0.1f, -10, 10),
+            BIOME_VOLATILITY = floatSetting("BiomeVolatility", 0.3f, -1000, 1000),
+            RIVER_HEIGHT = floatSetting("RiverHeight", -1, -10, 10),
+            RIVER_VOLATILITY = floatSetting("RiverVolatility", 0.3f, -1000, 1000);
 
-    BiomeObjects("", SettingsType.StringArray),
+    public static final Setting<List<WeightedMobSpawnGroup>>
+            SPAWN_MONSTERS = mobGroupListSetting("SpawnMonsters"),
+            SPAWN_CREATURES = mobGroupListSetting("SpawnCreatures"),
+            SPAWN_WATER_CREATURES = mobGroupListSetting("SpawnWaterCreatures"),
+            SPAWN_AMBIENT_CREATURES = mobGroupListSetting("SpawnAmbientCreatures");
 
-    SpawnMonstersAddDefaults(true),
-    SpawnMonsters(""),
-    SpawnCreaturesAddDefaults(true),
-    SpawnCreatures(""),
-    SpawnWaterCreaturesAddDefaults(true),
-    SpawnWaterCreatures(""),
-    SpawnAmbientCreaturesAddDefaults(true),
-    SpawnAmbientCreatures(""),
-    
+    public static final Setting<VillageType> VILLAGE_TYPE = enumSetting("VillageType", VillageType.disabled);
+    public static final Setting<RareBuildingType> RARE_BUILDING_TYPE = enumSetting("RareBuildingType", RareBuildingType.disabled);
+
+    public static final Setting<SurfaceGenerator> SURFACE_AND_GROUND_CONTROL = surfaceGeneratorSetting("SurfaceAndGroundControl");
+    public static final Setting<ReplacedBlocksMatrix> REPLACED_BLOCKS = replacedBlocksSetting("ReplacedBlocks");
+
+    // Deprecated settings
+    public static final Setting<Boolean> BIOME_RIVERS = booleanSetting("BiomeRivers", true);
+    public static final Setting<Boolean> DISABLE_NOTCH_PONDS = booleanSetting("DisableNotchPonds", false);
+    /**
+     * Used to read ReplacedBlocks as a string, so that conversion to the new
+     * format is possible.
+     */
+    public static final Setting<String> REPLACED_BLOCKS_OLD = stringSetting("ReplacedBlocks", "");
     // End biome settings
 
     // Resource settings
+    public static final int SmallLakeWaterFrequency = 4;
+    public static final int SmallLakeLavaFrequency = 2;
+    public static final int SmallLakeWaterRarity = 7;
+    public static final int SmallLakeLavaRarity = 1;
+    public static final int SmallLakeMinAltitude = 8;
+    public static final int SmallLakeMaxAltitude = 120;
 
-    SmallLakeWaterFrequency(4),
-    SmallLakeLavaFrequency(2),
-    SmallLakeWaterRarity(7),
-    SmallLakeLavaRarity(1),
-    SmallLakeMinAltitude(8),
-    SmallLakeMaxAltitude(120),
+    public static final int undergroundLakeFrequency = 2;
+    public static final int undergroundLakeRarity = 5;
+    public static final int undergroundLakeMinSize = 50;
+    public static final int undergroundLakeMaxSize = 60;
+    public static final int undergroundLakeMinAltitude = 0;
+    public static final int undergroundLakeMaxAltitude = 50;
 
-    undergroundLakeFrequency(2),
-    undergroundLakeRarity(5),
-    undergroundLakeMinSize(50),
-    undergroundLakeMaxSize(60),
-    undergroundLakeMinAltitude(0),
-    undergroundLakeMaxAltitude(50),
+    public static final int dungeonRarity = 100;
+    public static final int dungeonFrequency = 8;
+    public static final int dungeonMinAltitude = 0;
 
-    dungeonRarity(100),
-    dungeonFrequency(8),
-    dungeonMinAltitude(0),
+    public static final int dirtDepositRarity = 100;
+    public static final int dirtDepositFrequency = 20;
+    public static final int dirtDepositSize = 32;
+    public static final int dirtDepositMinAltitude = 0;
+    public static final int dirtDepositMaxAltitude = 128;
 
-    dirtDepositRarity(100),
-    dirtDepositFrequency(20),
-    dirtDepositSize(32),
-    dirtDepositMinAltitude(0),
-    dirtDepositMaxAltitude(128),
+    public static final int gravelDepositRarity = 100;
+    public static final int gravelDepositFrequency = 10;
+    public static final int gravelDepositSize = 32;
+    public static final int gravelDepositMinAltitude = 0;
+    public static final int gravelDepositMaxAltitude = 128;
 
-    gravelDepositRarity(100),
-    gravelDepositFrequency(10),
-    gravelDepositSize(32),
-    gravelDepositMinAltitude(0),
-    gravelDepositMaxAltitude(128),
+    public static final int clayDepositRarity = 100;
+    public static final int clayDepositFrequency = 1;
+    public static final int clayDepositSize = 32;
+    public static final int clayDepositMinAltitude = 0;
+    public static final int clayDepositMaxAltitude = 128;
 
-    clayDepositRarity(100),
-    clayDepositFrequency(1),
-    clayDepositSize(32),
-    clayDepositMinAltitude(0),
-    clayDepositMaxAltitude(128),
+    public static final int coalDepositRarity = 100;
+    public static final int coalDepositFrequency = 20;
+    public static final int coalDepositSize = 16;
+    public static final int coalDepositMinAltitude = 0;
+    public static final int coalDepositMaxAltitude = 128;
 
-    coalDepositRarity(100),
-    coalDepositFrequency(20),
-    coalDepositSize(16),
-    coalDepositMinAltitude(0),
-    coalDepositMaxAltitude(128),
+    public static final int ironDepositRarity = 100;
+    public static final int ironDepositFrequency = 20;
+    public static final int ironDepositSize = 8;
+    public static final int ironDepositMinAltitude = 0;
+    public static final int ironDepositMaxAltitude = 64;
 
-    ironDepositRarity(100),
-    ironDepositFrequency(20),
-    ironDepositSize(8),
-    ironDepositMinAltitude(0),
-    ironDepositMaxAltitude(64),
+    public static final int goldDepositRarity = 100;
+    public static final int goldDepositFrequency = 2;
+    public static final int goldDepositSize = 8;
+    public static final int goldDepositMinAltitude = 0;
+    public static final int goldDepositMaxAltitude = 32;
 
-    goldDepositRarity(100),
-    goldDepositFrequency(2),
-    goldDepositSize(8),
-    goldDepositMinAltitude(0),
-    goldDepositMaxAltitude(32),
+    public static final int redstoneDepositRarity = 100;
+    public static final int redstoneDepositFrequency = 8;
+    public static final int redstoneDepositSize = 7;
+    public static final int redstoneDepositMinAltitude = 0;
+    public static final int redstoneDepositMaxAltitude = 16;
 
-    redstoneDepositRarity(100),
-    redstoneDepositFrequency(8),
-    redstoneDepositSize(7),
-    redstoneDepositMinAltitude(0),
-    redstoneDepositMaxAltitude(16),
+    public static final int diamondDepositRarity = 100;
+    public static final int diamondDepositFrequency = 1;
+    public static final int diamondDepositSize = 7;
+    public static final int diamondDepositMinAltitude = 0;
+    public static final int diamondDepositMaxAltitude = 16;
 
-    diamondDepositRarity(100),
-    diamondDepositFrequency(1),
-    diamondDepositSize(7),
-    diamondDepositMinAltitude(0),
-    diamondDepositMaxAltitude(16),
+    public static final int lapislazuliDepositRarity = 100;
+    public static final int lapislazuliDepositFrequency = 1;
+    public static final int lapislazuliDepositSize = 7;
+    public static final int lapislazuliDepositMinAltitude = 0;
+    public static final int lapislazuliDepositMaxAltitude = 16;
 
-    lapislazuliDepositRarity(100),
-    lapislazuliDepositFrequency(1),
-    lapislazuliDepositSize(7),
-    lapislazuliDepositMinAltitude(0),
-    lapislazuliDepositMaxAltitude(16),
+    public static final int emeraldDepositRarity = 100;
+    public static final int emeraldDepositFrequency = 1;
+    public static final int emeraldDepositSize = 5;
+    public static final int emeraldDepositMinAltitude = 4;
+    public static final int emeraldDepositMaxAltitude = 32;
 
-    emeraldDepositRarity(100),
-    emeraldDepositFrequency(1),
-    emeraldDepositSize(5),
-    emeraldDepositMinAltitude(4),
-    emeraldDepositMaxAltitude(32),
+    public static final int waterClayDepositRarity = 100;
+    public static final int waterClayDepositSize = 4;
 
-    waterClayDepositRarity(100),
-    waterClayDepositSize(4),
+    public static final int waterSandDepositRarity = 100;
+    public static final int waterSandDepositFrequency = 4;
+    public static final int waterSandDepositSize = 7;
 
-    waterSandDepositRarity(100),
-    waterSandDepositFrequency(4),
-    waterSandDepositSize(7),
+    public static final int roseDepositRarity = 100;
+    public static final int roseDepositMinAltitude = 0;
+    public static final int roseDepositMaxAltitude = 128;
 
-    roseDepositRarity(100),
-    roseDepositMinAltitude(0),
-    roseDepositMaxAltitude(128),
+    public static final int blueOrchidDepositRarity = 100;
+    public static final int blueOrchidDepositMinAltitude = 0;
 
-    blueOrchidDepositRarity(100),
-    blueOrchidDepositMinAltitude(0),
+    public static final int flowerDepositRarity = 100;
+    public static final int flowerDepositMinAltitude = 0;
+    public static final int flowerDepositMaxAltitude = 128;
 
-    flowerDepositRarity(100),
-    flowerDepositMinAltitude(0),
-    flowerDepositMaxAltitude(128),
-    
-    tulipDepositRarity(25),
+    public static final int tulipDepositRarity = 25;
 
-    redMushroomDepositRarity(50),
-    redMushroomDepositMinAltitude(0),
-    redMushroomDepositMaxAltitude(128),
+    public static final int redMushroomDepositRarity = 50;
+    public static final int redMushroomDepositMinAltitude = 0;
+    public static final int redMushroomDepositMaxAltitude = 128;
 
-    brownMushroomDepositRarity(50),
-    brownMushroomDepositMinAltitude(0),
-    brownMushroomDepositMaxAltitude(128),
+    public static final int brownMushroomDepositRarity = 50;
+    public static final int brownMushroomDepositMinAltitude = 0;
+    public static final int brownMushroomDepositMaxAltitude = 128;
 
-    longGrassDepositRarity(100),
-    longGrassGroupedDepositRarity(60),
+    public static final int longGrassDepositRarity = 100;
+    public static final int longGrassGroupedDepositRarity = 60;
 
-    doubleGrassDepositRarity(100),
-    doubleGrassGroupedDepositRarity(15),
+    public static final int doubleGrassDepositRarity = 100;
+    public static final int doubleGrassGroupedDepositRarity = 15;
 
-    deadBushDepositRarity(100),
+    public static final int deadBushDepositRarity = 100;
 
-    pumpkinDepositRarity(3),
-    pumpkinDepositFrequency(1),
-    pumpkinDepositMinAltitude(0),
-    pumpkinDepositMaxAltitude(128),
+    public static final int pumpkinDepositRarity = 3;
+    public static final int pumpkinDepositFrequency = 1;
+    public static final int pumpkinDepositMinAltitude = 0;
+    public static final int pumpkinDepositMaxAltitude = 128;
 
-    reedDepositRarity(100),
-    reedDepositMinAltitude(0),
-    reedDepositMaxAltitude(128),
+    public static final int reedDepositRarity = 100;
+    public static final int reedDepositMinAltitude = 0;
+    public static final int reedDepositMaxAltitude = 128;
 
-    cactusDepositRarity(100),
-    cactusDepositMinAltitude(0),
-    cactusDepositMaxAltitude(128),
+    public static final int cactusDepositRarity = 100;
+    public static final int cactusDepositMinAltitude = 0;
+    public static final int cactusDepositMaxAltitude = 128;
 
-    vinesRarity(100),
-    vinesFrequency(50),
-    vinesMinAltitude(64),
+    public static final int vinesRarity = 100;
+    public static final int vinesFrequency = 50;
+    public static final int vinesMinAltitude = 64;
 
-    waterSourceDepositRarity(100),
-    waterSourceDepositFrequency(20),
-    waterSourceDepositMinAltitude(8),
-    waterSourceDepositMaxAltitude(128),
+    public static final int waterSourceDepositRarity = 100;
+    public static final int waterSourceDepositFrequency = 20;
+    public static final int waterSourceDepositMinAltitude = 8;
+    public static final int waterSourceDepositMaxAltitude = 128;
 
-    lavaSourceDepositRarity(100),
-    lavaSourceDepositFrequency(10),
-    lavaSourceDepositMinAltitude(8),
-    lavaSourceDepositMaxAltitude(128),
+    public static final int lavaSourceDepositRarity = 100;
+    public static final int lavaSourceDepositFrequency = 10;
+    public static final int lavaSourceDepositMinAltitude = 8;
+    public static final int lavaSourceDepositMaxAltitude = 128;
 
-    boulderDepositRarity(30),
-    boulderDepositMinAltitude(0),
-    boulderDepositMaxAltitude(256),
+    public static final int boulderDepositRarity = 30;
+    public static final int boulderDepositMinAltitude = 0;
+    public static final int boulderDepositMaxAltitude = 256;
 
-    iceSpikeDepositMinHeight(60),
-    iceSpikeDepositMaxHeight(128),
+    public static final int iceSpikeDepositMinHeight = 60;
+    public static final int iceSpikeDepositMaxHeight = 128;
     // End resource settings
-
-    // Deprecated settings
-    BiomeRivers(true),
-    DisableNotchPonds(false),
-
-    //>>    Values related to WorldStandardValues
-    WaterLevelMax(63),
-    WaterLevelMin(0),
-    WaterBlock(DefaultMaterial.STATIONARY_WATER),
-    IceBlock(DefaultMaterial.ICE),
-    
-    NetherFortressesEnabled(false),
-    StrongholdsEnabled(true),
-    VillageType(BiomeConfig.VillageType.disabled),
-    MineshaftRarity(1D),
-    RareBuildingType(BiomeConfig.RareBuildingType.disabled);
-
-    private int iValue;
-    private long lValue;
-    private double dValue;
-    private float fValue;
-    private String sValue;
-    private boolean bValue;
-    private Enum<?> eValue;
-    private SettingsType returnType;
-    private ArrayList<String> sArrayValue;
-    private HashSet<Integer> iSetValue;
-    private DefaultMaterial mValue;
-
-    private BiomeStandardValues(int i)
-    {
-        this.iValue = i;
-        this.returnType = SettingsType.Int;
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    private BiomeStandardValues(HashSet<Integer> i)
-    {
-        this.iSetValue = i;
-        this.returnType = SettingsType.IntSet;
-    }
-
-    private BiomeStandardValues(double d)
-    {
-        this.dValue = d;
-        this.returnType = SettingsType.Double;
-    }
-
-    private BiomeStandardValues(float f)
-    {
-        this.fValue = f;
-        this.returnType = SettingsType.Float;
-    }
-
-    private BiomeStandardValues(long l)
-    {
-        this.lValue = l;
-        this.returnType = SettingsType.Long;
-    }
-
-    private BiomeStandardValues(String s)
-    {
-        this.sValue = s;
-        this.returnType = SettingsType.String;
-    }
-
-    private BiomeStandardValues(String s, SettingsType type)
-    {
-        this.returnType = type;
-
-        if (type == SettingsType.StringArray)
-        {
-            this.sArrayValue = new ArrayList<String>();
-            if (s.contains(","))
-                Collections.addAll(this.sArrayValue, s.split(","));
-            else if (!s.isEmpty())
-                this.sArrayValue.add(s);
-            return;
-        }
-        this.sValue = s;
-
-    }
-
-    private BiomeStandardValues(Enum<?> e)
-    {
-        this.eValue = e;
-        this.returnType = SettingsType.Enum;
-
-    }
-
-    private BiomeStandardValues(boolean b)
-    {
-        this.bValue = b;
-        this.returnType = SettingsType.Boolean;
-    }
-
-    private BiomeStandardValues(DefaultMaterial material)
-    {
-        this.mValue = material;
-        this.returnType = SettingsType.Material;
-    }
-
-    @Override
-    public int intValue()
-    {
-        return this.iValue;
-    }
-
-    @Override
-    public long longValue()
-    {
-        return this.lValue;
-    }
-
-    @Override
-    public double doubleValue()
-    {
-        return this.dValue;
-    }
-
-    @Override
-    public float floatValue()
-    {
-        return this.fValue;
-    }
-
-    @Override
-    public Enum<?> enumValue()
-    {
-        return this.eValue;
-    }
-
-    @Override
-    public SettingsType getReturnType()
-    {
-        return this.returnType;
-    }
-
-    @Override
-    public String stringValue()
-    {
-        return this.sValue;
-    }
-
-    @Override
-    public ArrayList<String> stringArrayListValue()
-    {
-        return this.sArrayValue;
-    }
-
-    @Override
-    public boolean booleanValue()
-    {
-        return this.bValue;
-    }
-
-    @Override
-    public HashSet<Integer> intSetValue()
-    {
-        return this.iSetValue;
-    }
-
-    @Override
-    public DefaultMaterial materialValue()
-    {
-        return this.mValue;
-    }
 
 }

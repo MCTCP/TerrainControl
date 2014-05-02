@@ -42,7 +42,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultColor = "0x000070";
+            this.defaultColor = 0x000070;
             this.defaultStrongholds = false;
             this.defaultRiverBiome = "";
             this.defaultTree = new Object[] {1, TreeType.BigTree, 1, TreeType.Tree, 9};
@@ -61,7 +61,7 @@ public class MinecraftBiomeTemplates
             this.defaultOxeyeDaisies = 1;
             this.defaultTulips = 3;
             this.defaultGrass = 100;
-            this.defaultColor = "0x8DB360";
+            this.defaultColor = 0x8DB360;
             this.defaultStrongholds = false;
             this.defaultVillageType = VillageType.wood;
             this.defaultDoubleGrass = 10;
@@ -81,7 +81,7 @@ public class MinecraftBiomeTemplates
             this.defaultGrass = 0;
             this.defaultReed = 10;
             this.defaultCactus = 10;
-            this.defaultColor = "0xFA9418";
+            this.defaultColor = 0xFA9418;
             this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2,
                     this.worldHeight, DefaultMaterial.SAND};
             this.defaultVillageType = VillageType.sandstone;
@@ -95,9 +95,9 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultColor = "0x606060";
+            this.defaultColor = 0x606060;
             this.defaultDandelions = 4;
-            this.defaultEmeraldOre = BiomeStandardValues.emeraldDepositFrequency.intValue();
+            this.defaultEmeraldOre = BiomeStandardValues.emeraldDepositFrequency;
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 10, TreeType.BigTree, 1, TreeType.Tree, 9};
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRASS, DefaultMaterial.DIRT, 1.0,
                     DefaultMaterial.STONE, DefaultMaterial.STONE, 10.0};
@@ -111,7 +111,7 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
 
             this.defaultGrass = 30;
-            this.defaultColor = "0x056621";
+            this.defaultColor = 0x056621;
             this.defaultTree = new Object[] {10, TreeType.Birch, 20, TreeType.Tree, 100};
             this.defaultTallFlowers = 2;
             this.defaultPoppies = 4;
@@ -127,7 +127,7 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
 
             this.defaultGrass = 10;
-            this.defaultColor = "0x0B6659";
+            this.defaultColor = 0x0B6659;
             this.defaultTree = new Object[] {10, TreeType.Taiga1, 35, TreeType.Taiga2, 100};
         }
     }
@@ -145,10 +145,10 @@ public class MinecraftBiomeTemplates
             this.defaultWaterLily = 1;
             this.defaultDandelions = 0;
             this.defaultBlueOrchids = 2;
-            this.defaultColor = "0x07F9B2";
-            this.defaultWaterColorMultiplier = "0xe0ffae";
-            this.defaultGrassColor = "0x7E6E7E";
-            this.defaultFoliageColor = "0x7E6E7E";
+            this.defaultColor = 0x07F9B2;
+            this.defaultWaterColorMultiplier = 0xe0ffae;
+            this.defaultGrassColor = 0x7E6E7E;
+            this.defaultFoliageColor = 0x7E6E7E;
             this.defaultGrass = 30;
             this.defaultRareBuildingType = RareBuildingType.swampHut;
             this.defaultTree = new Object[] {2, TreeType.SwampTree, 100};
@@ -164,7 +164,7 @@ public class MinecraftBiomeTemplates
             this.defaultSize = 8;
             this.defaultRarity = 95;
             this.defaultIsle.add(DefaultBiome.SWAMPLAND.Name);
-            this.defaultColor = "0x0000FF";
+            this.defaultColor = 0x0000FF;
             this.defaultStrongholds = false;
             this.defaultTree = new Object[] {1, TreeType.BigTree, 1, TreeType.Tree, 9};
         }
@@ -175,7 +175,7 @@ public class MinecraftBiomeTemplates
         public Hell(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xFF0000";
+            this.defaultColor = 0xFF0000;
         }
     }
 
@@ -184,7 +184,7 @@ public class MinecraftBiomeTemplates
         public Sky(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x8080FF";
+            this.defaultColor = 0x8080FF;
         }
     }
 
@@ -194,7 +194,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultColor = "0x9090A0";
+            this.defaultColor = 0x9090A0;
             this.defaultStrongholds = false;
             this.defaultRiverBiome = "";
         }
@@ -206,7 +206,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultColor = "0xA0A0FF";
+            this.defaultColor = 0xA0A0FF;
             this.defaultStrongholds = false;
         }
     }
@@ -217,7 +217,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultColor = "0xFFFFFF";
+            this.defaultColor = 0xFFFFFF;
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
             this.defaultPoppies = 3;
             this.defaultGrass = 20;
@@ -232,7 +232,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultColor = "0xA0A0A0";
+            this.defaultColor = 0xA0A0A0;
             this.defaultSize = 6;
             this.defaultRarity = 97;
             this.defaultIsle.add(DefaultBiome.ICE_PLAINS.Name);
@@ -255,7 +255,7 @@ public class MinecraftBiomeTemplates
             this.defaultSize = 6;
             this.defaultIsle.add(DefaultBiome.OCEAN.Name);
             this.defaultIsle.add(DefaultBiome.DEEP_OCEAN.Name);
-            this.defaultColor = "0xFF00FF";
+            this.defaultColor = 0xFF00FF;
             this.defaultWaterLily = 1;
             this.defaultStrongholds = false;
             this.defaultTree = new Object[] {1, TreeType.HugeMushroom, 100};
@@ -270,7 +270,7 @@ public class MinecraftBiomeTemplates
 
             this.defaultSize = 9;
             this.defaultBorder.add(DefaultBiome.MUSHROOM_ISLAND.Name);
-            this.defaultColor = "0xA000FF";
+            this.defaultColor = 0xA000FF;
             this.defaultTree = null; // No mushrooms on the shore
         }
     }
@@ -290,7 +290,7 @@ public class MinecraftBiomeTemplates
             this.defaultNotBorderNear.add(DefaultBiome.DEEP_OCEAN.Name);
             this.defaultNotBorderNear.add(DefaultBiome.COLD_BEACH.Name);
             this.defaultNotBorderNear.add(DefaultBiome.STONE_BEACH.Name);
-            this.defaultColor = "0xFADE55";
+            this.defaultColor = 0xFADE55;
             this.defaultStrongholds = false;
         }
     }
@@ -309,7 +309,7 @@ public class MinecraftBiomeTemplates
             this.defaultGrass = 0;
             this.defaultReed = 50;
             this.defaultCactus = 10;
-            this.defaultColor = "0xD25F12";
+            this.defaultColor = 0xD25F12;
             this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2,
                     this.worldHeight, DefaultMaterial.SAND};
             this.defaultVillageType = VillageType.sandstone;
@@ -327,7 +327,7 @@ public class MinecraftBiomeTemplates
             this.defaultRarity = 97;
             this.defaultIsle.add(DefaultBiome.FOREST.Name);
             this.defaultGrass = 15;
-            this.defaultColor = "0x22551C";
+            this.defaultColor = 0x22551C;
         }
     }
 
@@ -341,7 +341,7 @@ public class MinecraftBiomeTemplates
             this.defaultRarity = 97;
             this.defaultIsle.add(DefaultBiome.TAIGA.Name);
             this.defaultGrass = 10;
-            this.defaultColor = "0x163933";
+            this.defaultColor = 0x163933;
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
         }
     }
@@ -354,7 +354,7 @@ public class MinecraftBiomeTemplates
 
             this.defaultSize = 8;
             this.defaultBorder.add(DefaultBiome.EXTREME_HILLS.Name);
-            this.defaultColor = "0x72789A";
+            this.defaultColor = 0x72789A;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[0];
         }
     }
@@ -369,7 +369,7 @@ public class MinecraftBiomeTemplates
             this.defaultFerns = 20;
             this.defaultPoppies = 4;
             this.defaultDandelions = 4;
-            this.defaultColor = "0x537B09";
+            this.defaultColor = 0x537B09;
             this.defaultRareBuildingType = RareBuildingType.jungleTemple;
             this.defaultTree = new Object[] {50, TreeType.BigTree, 10, TreeType.GroundBush, 50, TreeType.JungleTree, 35,
                     TreeType.CocoaTree, 100};
@@ -382,7 +382,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultColor = "0x2C4205";
+            this.defaultColor = 0x2C4205;
             this.defaultIsle.add(DefaultBiome.JUNGLE.Name);
         }
     }
@@ -392,7 +392,7 @@ public class MinecraftBiomeTemplates
         public JungleEdge(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x628B17";
+            this.defaultColor = 0x628B17;
             this.defaultSize = 8;
             this.defaultBorder.add(DefaultBiome.JUNGLE.Name);
         }
@@ -403,7 +403,7 @@ public class MinecraftBiomeTemplates
         public DeepOcean(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x000030";
+            this.defaultColor = 0x000030;
             this.defaultIsle.add(DefaultBiome.OCEAN.Name);
             this.defaultSize = 3;
         }
@@ -414,7 +414,7 @@ public class MinecraftBiomeTemplates
         public StoneBeach(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xA2A284";
+            this.defaultColor = 0xA2A284;
         }
     }
 
@@ -423,7 +423,7 @@ public class MinecraftBiomeTemplates
         public ColdBeach(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xFAF0C0";
+            this.defaultColor = 0xFAF0C0;
         }
     }
 
@@ -432,7 +432,7 @@ public class MinecraftBiomeTemplates
         public BirchForest(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x307444";
+            this.defaultColor = 0x307444;
             this.defaultTree = new Object[] {10, TreeType.Birch, 80};
         }
     }
@@ -442,7 +442,7 @@ public class MinecraftBiomeTemplates
         public BirchForestHills(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x1F5F32";
+            this.defaultColor = 0x1F5F32;
             this.defaultSize = 6;
             this.defaultRarity = 97;
             this.defaultIsle.add(DefaultBiome.BIRCH_FOREST.Name);
@@ -454,7 +454,7 @@ public class MinecraftBiomeTemplates
         public RoofedForest(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x40511A";
+            this.defaultColor = 0x40511A;
             this.defaultGrass = 15;
             this.defaultTree = new Object[] {20, TreeType.HugeMushroom, 3, TreeType.DarkOak, 66, TreeType.Birch, 20, TreeType.Tree, 100};
             this.defaultTallFlowers = 1;
@@ -467,7 +467,7 @@ public class MinecraftBiomeTemplates
         public ColdTaiga(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x31554A";
+            this.defaultColor = 0x31554A;
         }
     }
 
@@ -476,7 +476,7 @@ public class MinecraftBiomeTemplates
         public ColdTaigaHills(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x243F36";
+            this.defaultColor = 0x243F36;
             this.defaultSize = 6;
             this.defaultRarity = 97;
             this.defaultIsle.add(DefaultBiome.COLD_TAIGA.Name);
@@ -488,7 +488,7 @@ public class MinecraftBiomeTemplates
         public MegaTaiga(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x596651";
+            this.defaultColor = 0x596651;
             this.defaultTree = new Object[] {10, TreeType.HugeTaiga1, 33, TreeType.Taiga1, 33, TreeType.Taiga2, 100};
             this.defaultBoulder = 2;
             this.defaultGrass = 16;
@@ -505,7 +505,7 @@ public class MinecraftBiomeTemplates
         public MegaTaigaHills(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x454F3E";
+            this.defaultColor = 0x454F3E;
             this.defaultSize = 6;
             this.defaultRarity = 97;
             this.defaultIsle.add(DefaultBiome.MEGA_TAIGA.Name);
@@ -517,7 +517,7 @@ public class MinecraftBiomeTemplates
         public ExtremeHillsPlus(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x507050";
+            this.defaultColor = 0x507050;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[0];
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 66, TreeType.BigTree, 10, TreeType.Tree, 100};
         }
@@ -528,7 +528,7 @@ public class MinecraftBiomeTemplates
         public Savanna(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xBDB25F";
+            this.defaultColor = 0xBDB25F;
             this.defaultVillageType = VillageType.wood;
             this.defaultGrass = 200;
             this.defaultDoubleGrass = 4;
@@ -542,7 +542,7 @@ public class MinecraftBiomeTemplates
         public SavannaPlateau(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xA79D64";
+            this.defaultColor = 0xA79D64;
             this.defaultSize = 6;
             this.defaultRarity = 97;
             this.defaultIsle.add(DefaultBiome.SAVANNA.Name);
@@ -554,7 +554,7 @@ public class MinecraftBiomeTemplates
         public Mesa(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xD94515";
+            this.defaultColor = 0xD94515;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {MesaSurfaceGenerator.NAME_NORMAL};
             this.defaultDandelions = 0;
             this.defaultDeadBush = 7;
@@ -569,7 +569,7 @@ public class MinecraftBiomeTemplates
         public MesaPlateauForest(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xB09765";
+            this.defaultColor = 0xB09765;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {MesaSurfaceGenerator.NAME_FOREST};
             this.defaultTree = new Object[] {1, TreeType.Tree, 100};
             this.defaultGrass = 10;
@@ -589,7 +589,7 @@ public class MinecraftBiomeTemplates
         public MesaPlateau(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xCA8C65";
+            this.defaultColor = 0xCA8C65;
         }
     }
 
@@ -598,7 +598,7 @@ public class MinecraftBiomeTemplates
         public SunflowerPlains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xDEFF00";
+            this.defaultColor = 0xDEFF00;
             this.defaultSunflowers = 30;
             this.defaultRarity = 10;
         }
@@ -609,7 +609,7 @@ public class MinecraftBiomeTemplates
         public DesertMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xE58208";
+            this.defaultColor = 0xE58208;
             this.defaultWaterLakes = true;
             this.defaultRarity = 10;
         }
@@ -620,7 +620,7 @@ public class MinecraftBiomeTemplates
         public ExtremeHillsMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x525252";
+            this.defaultColor = 0x525252;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, -1.0,
                     DefaultMaterial.GRASS, DefaultMaterial.DIRT, 2.0, DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, 10.0};
             this.defaultRarity = 10;
@@ -634,7 +634,7 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             int flowerMultiplier = 20;
 
-            this.defaultColor = "0x2D8E49";
+            this.defaultColor = 0x2D8E49;
             this.defaultRarity = 10;
 
             this.defaultDandelions = 0;
@@ -654,7 +654,7 @@ public class MinecraftBiomeTemplates
         public TaigaMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x0A5B4F";
+            this.defaultColor = 0x0A5B4F;
             this.defaultRarity = 10;
         }
     }
@@ -664,7 +664,7 @@ public class MinecraftBiomeTemplates
         public SwamplandMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x28D29F";
+            this.defaultColor = 0x28D29F;
             this.defaultRarity = 10;
         }
     }
@@ -674,7 +674,7 @@ public class MinecraftBiomeTemplates
         public IcePlainsSpikes(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x8CB4B4";
+            this.defaultColor = 0x8CB4B4;
             this.defaultRarity = 10;
             this.defaultTree = null;
             this.defaultDandelions = 0;
@@ -688,7 +688,7 @@ public class MinecraftBiomeTemplates
         public JungleMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x4C7009";
+            this.defaultColor = 0x4C7009;
             this.defaultRarity = 10;
         }
     }
@@ -698,7 +698,7 @@ public class MinecraftBiomeTemplates
         public JungleEdgeMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x5A8015";
+            this.defaultColor = 0x5A8015;
             this.defaultSize = 8;
             this.defaultBorder.add(DefaultBiome.JUNGLE_MOUNTAINS.Name);
         }
@@ -709,7 +709,7 @@ public class MinecraftBiomeTemplates
         public BirchForestMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x4E6E58";
+            this.defaultColor = 0x4E6E58;
             this.defaultRarity = 10;
             this.defaultTree = new Object[] {10, TreeType.TallBirch, 80};
         }
@@ -720,7 +720,7 @@ public class MinecraftBiomeTemplates
         public BirchForestHillsMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x1F502E";
+            this.defaultColor = 0x1F502E;
             this.defaultTree = new Object[] {10, TreeType.TallBirch, 80};
             this.defaultSize = 6;
             this.defaultRarity = 97;
@@ -733,7 +733,7 @@ public class MinecraftBiomeTemplates
         public RoofedForestMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x364416";
+            this.defaultColor = 0x364416;
             this.defaultRarity = 10;
         }
     }
@@ -743,7 +743,7 @@ public class MinecraftBiomeTemplates
         public ColdTaigaMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x2E5046";
+            this.defaultColor = 0x2E5046;
             this.defaultRarity = 10;
         }
     }
@@ -753,7 +753,7 @@ public class MinecraftBiomeTemplates
         public MegaSpruceTaiga(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x598110";
+            this.defaultColor = 0x598110;
             this.defaultRarity = 10;
             this.defaultTree = new Object[] {10, TreeType.HugeTaiga2, 8, TreeType.HugeTaiga1, 30, TreeType.Taiga1, 33, TreeType.Taiga2, 100};
         }
@@ -764,7 +764,7 @@ public class MinecraftBiomeTemplates
         public MegaSpruceTaigaHills(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x475141";
+            this.defaultColor = 0x475141;
         }
     }
 
@@ -773,7 +773,7 @@ public class MinecraftBiomeTemplates
         public ExtremeHillsPlusMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x466246";
+            this.defaultColor = 0x466246;
             this.defaultRarity = 10;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, -1.0,
                     DefaultMaterial.GRASS, DefaultMaterial.DIRT, 2.0, DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, 10.0};
@@ -785,7 +785,7 @@ public class MinecraftBiomeTemplates
         public SavannaMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x5B8015";
+            this.defaultColor = 0x5B8015;
             this.defaultRarity = 10;
             this.defaultGrass = 60;
             this.defaultDoubleGrass = 0;
@@ -799,7 +799,7 @@ public class MinecraftBiomeTemplates
         public SavannaPlateauMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0x99905C";
+            this.defaultColor = 0x99905C;
             this.defaultSize = 6;
             this.defaultRarity = 97;
             this.defaultIsle.add(DefaultBiome.SAVANNA_MOUNTAINS.Name);
@@ -811,7 +811,7 @@ public class MinecraftBiomeTemplates
         public MesaBryce(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xE45627";
+            this.defaultColor = 0xE45627;
             this.defaultRarity = 10;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {MesaSurfaceGenerator.NAME_BRYCE};
         }
@@ -822,7 +822,7 @@ public class MinecraftBiomeTemplates
         public MesaPlateauForestMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xA68F5F";
+            this.defaultColor = 0xA68F5F;
         }
     }
 
@@ -831,7 +831,7 @@ public class MinecraftBiomeTemplates
         public MesaPlateauMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = "0xB77F5C";
+            this.defaultColor = 0xB77F5C;
         }
     }
 

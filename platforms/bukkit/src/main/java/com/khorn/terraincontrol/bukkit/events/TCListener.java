@@ -50,7 +50,7 @@ public class TCListener implements Listener
     public void onPlayerRegisterChannel(PlayerRegisterChannelEvent event)
     {
         // Sends custom colors on join
-        if (event.getChannel().equals(PluginStandardValues.ChannelName.stringValue()))
+        if (event.getChannel().equals(PluginStandardValues.ChannelName))
         {
             tcSender.send(event.getPlayer());
         }
@@ -61,7 +61,7 @@ public class TCListener implements Listener
     {
         // Resends the packet so that the biomes are right again
         Player player = event.getPlayer();
-        if (player.getListeningPluginChannels().contains(PluginStandardValues.ChannelName.stringValue()))
+        if (player.getListeningPluginChannels().contains(PluginStandardValues.ChannelName))
         {
             tcSender.send(player);
         }

@@ -37,7 +37,7 @@ public class TCSender
 
             try
             {
-                stream.writeInt(PluginStandardValues.ProtocolVersion.intValue());
+                stream.writeInt(PluginStandardValues.ProtocolVersion);
                 configs.writeToStream(stream);
                 stream.flush();
             } catch (IOException e)
@@ -47,7 +47,7 @@ public class TCSender
 
             byte[] data = outputStream.toByteArray();
 
-            player.sendPluginMessage(plugin, PluginStandardValues.ChannelName.stringValue(), data);
+            player.sendPluginMessage(plugin, PluginStandardValues.ChannelName, data);
         }
     }
 

@@ -31,20 +31,20 @@ public class WorldConfig extends ConfigFile
     // Holds all world CustomObjects.
     public List<CustomObject> customObjects = new ArrayList<CustomObject>();
 
-    public ArrayList<String> NormalBiomes = new ArrayList<String>();
-    public ArrayList<String> IceBiomes = new ArrayList<String>();
-    public ArrayList<String> IsleBiomes = new ArrayList<String>();
-    public ArrayList<String> BorderBiomes = new ArrayList<String>();
+    public List<String> NormalBiomes = new ArrayList<String>();
+    public List<String> IceBiomes = new ArrayList<String>();
+    public List<String> IsleBiomes = new ArrayList<String>();
+    public List<String> BorderBiomes = new ArrayList<String>();
 
     public int maxSmoothRadius = 2;
 
     // For old biome generator
     public double oldBiomeSize;
 
-    public float minMoisture;
-    public float maxMoisture;
-    public float minTemperature;
-    public float maxTemperature;
+    public double minMoisture;
+    public double maxMoisture;
+    public double minTemperature;
+    public double maxTemperature;
 
     // Biome generator
     public int GenerationDepth;
@@ -181,7 +181,7 @@ public class WorldConfig extends ConfigFile
      */
     public WorldConfig(File settingsDir, LocalWorld world)
     {
-        super(world.getName(), new File(settingsDir, WorldStandardValues.ConfigFilename.stringValue()));
+        super(world.getName(), new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME));
         this.settingsDir = settingsDir;
 
         // Read the WorldConfig file
@@ -226,12 +226,12 @@ public class WorldConfig extends ConfigFile
 
     private void ReadWorldCustomObjects()
     {
-        customObjectsDirectory = new File(this.settingsDir, WorldStandardValues.BO_DirectoryName.stringValue());
+        customObjectsDirectory = new File(this.settingsDir, WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
 
         File oldCustomObjectsDirectory = new File(settingsDir, "BOBPlugins");
         if (oldCustomObjectsDirectory.exists())
         {
-            if (!oldCustomObjectsDirectory.renameTo(new File(settingsDir, WorldStandardValues.BO_DirectoryName.stringValue())))
+            if (!oldCustomObjectsDirectory.renameTo(new File(settingsDir, WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME)))
             {
                 TerrainControl.log(LogMarker.WARN, "Fould old BOBPlugins folder, but it cannot be renamed to WorldObjects.");
                 TerrainControl.log(LogMarker.WARN, "Please move the BO2s manually and delete BOBPlugins afterwards.");
@@ -256,90 +256,64 @@ public class WorldConfig extends ConfigFile
     @Override
     protected void renameOldSettings()
     {
-        renameOldSetting("WaterLevel", WorldStandardValues.WaterLevelMax);
-        renameOldSetting("ModeTerrain", WorldStandardValues.TerrainMode);
-        renameOldSetting("ModeBiome", WorldStandardValues.BiomeMode);
-        renameOldSetting("NetherFortressEnabled", WorldStandardValues.NetherFortressesEnabled);
-        renameOldSetting("PyramidsEnabled", WorldStandardValues.RareBuildingsEnabled);
+        renameOldSetting("WaterLevel", WorldStandardValues.WATER_LEVEL_MAX);
+        renameOldSetting("ModeTerrain", WorldStandardValues.TERRAIN_MODE);
+        renameOldSetting("ModeBiome", WorldStandardValues.BIOME_MODE);
+        renameOldSetting("NetherFortressEnabled", WorldStandardValues.NETHER_FORTRESSES_ENABLED);
+        renameOldSetting("PyramidsEnabled", WorldStandardValues.RARE_BUILDINGS_ENABLED);
         // WorldHeightBits was split into two different settings
-        renameOldSetting("WorldHeightBits", WorldStandardValues.WorldHeightScaleBits);
-        renameOldSetting("WorldHeightBits", WorldStandardValues.WorldHeightCapBits);
+        renameOldSetting("WorldHeightBits", WorldStandardValues.WORLD_HEIGHT_SCALE_BITS);
+        renameOldSetting("WorldHeightBits", WorldStandardValues.WORLD_HEIGHT_CAP_BITS);
     }
 
     @Override
     protected void correctSettings()
     {
-        this.oldBiomeSize = applyBounds(this.oldBiomeSize, 0.1D, 10.0D);
+        LandSize = lowerThanOrEqualTo(LandSize, GenerationDepth);
+        LandFuzzy = lowerThanOrEqualTo(LandFuzzy, GenerationDepth - LandSize);
+        IceSize = lowerThanOrEqualTo(IceSize, GenerationDepth);
 
-        this.GenerationDepth = applyBounds(this.GenerationDepth, 1, 20);
-        this.BiomeRarityScale = applyBounds(this.BiomeRarityScale, 1, Integer.MAX_VALUE);
+        riverRarity = lowerThanOrEqualTo(riverRarity, GenerationDepth);
+        riverSize = lowerThanOrEqualTo(riverSize, GenerationDepth - riverRarity);
 
-        this.LandRarity = applyBounds(this.LandRarity, 1, 100);
-        this.LandSize = applyBounds(this.LandSize, 0, this.GenerationDepth);
-        this.LandFuzzy = applyBounds(this.LandFuzzy, 0, this.GenerationDepth - this.LandSize);
+        NormalBiomes = filterBiomes(NormalBiomes, CustomBiomeIds.keySet());
+        IceBiomes = filterBiomes(IceBiomes, CustomBiomeIds.keySet());
+        IsleBiomes = filterBiomes(IsleBiomes, CustomBiomeIds.keySet());
+        BorderBiomes = filterBiomes(BorderBiomes, CustomBiomeIds.keySet());
 
-        this.IceRarity = applyBounds(this.IceRarity, 1, 100);
-        this.IceSize = applyBounds(this.IceSize, 0, this.GenerationDepth);
-
-        this.riverRarity = applyBounds(this.riverRarity, 0, this.GenerationDepth);
-        this.riverSize = applyBounds(this.riverSize, 0, this.GenerationDepth - this.riverRarity);
-
-        this.NormalBiomes = filterBiomes(this.NormalBiomes, this.CustomBiomeIds.keySet());
-        this.IceBiomes = filterBiomes(this.IceBiomes, this.CustomBiomeIds.keySet());
-        this.IsleBiomes = filterBiomes(this.IsleBiomes, this.CustomBiomeIds.keySet());
-        this.BorderBiomes = filterBiomes(this.BorderBiomes, this.CustomBiomeIds.keySet());
-
-        if (this.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
+        if (biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
         {
             File mapFile = new File(settingsDir, imageFile);
             if (!mapFile.exists())
             {
                 TerrainControl.log(LogMarker.WARN, "Biome map file not found. Switching BiomeMode to Normal");
-                this.biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
+                biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
             }
         }
 
-        this.imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || CustomBiomeIds.keySet().contains(imageFillBiome)) ? imageFillBiome : WorldStandardValues.ImageFillBiome.stringValue();
+        imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || CustomBiomeIds.keySet().contains(imageFillBiome)) ? imageFillBiome : WorldStandardValues.IMAGE_FILL_BIOME.getDefaultValue();
 
-        this.minMoisture = applyBounds(this.minMoisture, 0, 1.0F);
-        this.maxMoisture = applyBounds(this.maxMoisture, 0, 1.0F, this.minMoisture);
+        maxMoisture = higherThan(maxMoisture, minMoisture);
+        maxTemperature = higherThan(maxTemperature, minTemperature);
 
-        this.minTemperature = applyBounds(this.minTemperature, 0, 1.0F);
-        this.maxTemperature = applyBounds(this.maxTemperature, 0, 1.0F, this.minTemperature);
+        caveMaxAltitude = higherThan(caveMaxAltitude, caveMinAltitude);
+        caveSystemPocketMaxSize = higherThan(caveSystemPocketMaxSize, caveSystemPocketMinSize);
+        canyonMaxAltitude = higherThan(canyonMaxAltitude, canyonMinAltitude);
+        canyonMaxLength = higherThan(canyonMaxLength, canyonMinLength);
 
-        this.caveRarity = applyBounds(this.caveRarity, 0, 100);
-        this.caveFrequency = applyBounds(this.caveFrequency, 0, 200);
-        this.caveMinAltitude = applyBounds(this.caveMinAltitude, 0, worldHeightCap);
-        this.caveMaxAltitude = applyBounds(this.caveMaxAltitude, 0, worldHeightCap, this.caveMinAltitude);
-        this.individualCaveRarity = applyBounds(this.individualCaveRarity, 0, 100);
-        this.caveSystemFrequency = applyBounds(this.caveSystemFrequency, 0, 200);
-        this.caveSystemPocketChance = applyBounds(this.caveSystemPocketChance, 0, 100);
-        this.caveSystemPocketMinSize = applyBounds(this.caveSystemPocketMinSize, 0, 100);
-        this.caveSystemPocketMaxSize = applyBounds(this.caveSystemPocketMaxSize, 0, 100, this.caveSystemPocketMinSize);
-
-        this.canyonRarity = applyBounds(this.canyonRarity, 0, 100);
-        this.canyonMinAltitude = applyBounds(this.canyonMinAltitude, 0, worldHeightCap);
-        this.canyonMaxAltitude = applyBounds(this.canyonMaxAltitude, 0, worldHeightCap, this.canyonMinAltitude);
-        this.canyonMinLength = applyBounds(this.canyonMinLength, 1, 500);
-        this.canyonMaxLength = applyBounds(this.canyonMaxLength, 1, 500, this.canyonMinLength);
-        this.canyonDepth = applyBounds(this.canyonDepth, 0.1D, 15D);
-
-        this.waterLevelMin = applyBounds(this.waterLevelMin, 0, worldHeightCap - 1);
-        this.waterLevelMax = applyBounds(this.waterLevelMax, 0, worldHeightCap - 1, this.waterLevelMin);
+        waterLevelMax = higherThan(waterLevelMax, waterLevelMin);
 
         // Remove illegal block data (the chunk generator will ignore block data)
-        this.waterBlock = this.waterBlock.withBlockData(0);
-        this.iceBlock = this.iceBlock.withBlockData(0);
-        this.bedrockBlock = this.bedrockBlock.withBlockData(0);
+        waterBlock = waterBlock.withBlockData(0);
+        iceBlock = iceBlock.withBlockData(0);
+        bedrockBlock = bedrockBlock.withBlockData(0);
 
-        this.villageDistance = applyBounds(this.villageDistance, 9, Integer.MAX_VALUE);
-        this.minimumDistanceBetweenRareBuildings = applyBounds(this.minimumDistanceBetweenRareBuildings, 1, Integer.MAX_VALUE);
-        this.maximumDistanceBetweenRareBuildings = applyBounds(this.maximumDistanceBetweenRareBuildings, this.minimumDistanceBetweenRareBuildings, Integer.MAX_VALUE);
+        maximumDistanceBetweenRareBuildings = higherThan(maximumDistanceBetweenRareBuildings, minimumDistanceBetweenRareBuildings);
 
-        if (this.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && this.ModeTerrain != TerrainMode.OldGenerator)
+        if (biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && ModeTerrain != TerrainMode.OldGenerator)
         {
             TerrainControl.log(LogMarker.WARN, "Old biome generator works only with old terrain generator!");
-            this.biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
+            biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
 
         }
     }
@@ -348,65 +322,64 @@ public class WorldConfig extends ConfigFile
     protected void readConfigSettings()
     {
         // Main modes
-        this.SettingsMode = readSettings(WorldStandardValues.SettingsMode);
-        this.ModeTerrain = readSettings(WorldStandardValues.TerrainMode);
-        this.biomeMode = TerrainControl.getBiomeModeManager().getBiomeManager((String) readSettings(WorldStandardValues.BiomeMode));
+        this.SettingsMode = readSettings(WorldStandardValues.SETTINGS_MODE);
+        this.ModeTerrain = readSettings(WorldStandardValues.TERRAIN_MODE);
+        this.biomeMode = TerrainControl.getBiomeModeManager().getBiomeManager((String) readSettings(WorldStandardValues.BIOME_MODE));
 
         // World and water height
-        this.worldHeightScaleBits = readSettings(WorldStandardValues.WorldHeightScaleBits);
-        this.worldHeightScaleBits = applyBounds(this.worldHeightScaleBits, 5, 8);
-        this.worldHeightScale = 1 << this.worldHeightScaleBits;
-        this.worldHeightCapBits = readSettings(WorldStandardValues.WorldHeightCapBits);
-        this.worldHeightCapBits = applyBounds(this.worldHeightCapBits, this.worldHeightScaleBits, 8);
+        this.worldHeightCapBits = readSettings(WorldStandardValues.WORLD_HEIGHT_CAP_BITS);
         this.worldHeightCap = 1 << this.worldHeightCapBits;
+        this.worldHeightScaleBits = readSettings(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS);
+        this.worldHeightScaleBits = lowerThanOrEqualTo(this.worldHeightScaleBits, this.worldHeightCapBits);
+        this.worldHeightScale = 1 << this.worldHeightScaleBits;
         this.waterLevelMax = worldHeightCap / 2 - 1;
 
         // Biome placement
-        this.GenerationDepth = readSettings(WorldStandardValues.GenerationDepth);
+        this.GenerationDepth = readSettings(WorldStandardValues.GENERATION_DEPTH);
 
-        this.BiomeRarityScale = readSettings(WorldStandardValues.BiomeRarityScale);
-        this.LandRarity = readSettings(WorldStandardValues.LandRarity);
-        this.LandSize = readSettings(WorldStandardValues.LandSize);
-        this.LandFuzzy = readSettings(WorldStandardValues.LandFuzzy);
+        this.BiomeRarityScale = readSettings(WorldStandardValues.BIOME_RARITY_SCALE);
+        this.LandRarity = readSettings(WorldStandardValues.LAND_RARITY);
+        this.LandSize = readSettings(WorldStandardValues.LAND_SIZE);
+        this.LandFuzzy = readSettings(WorldStandardValues.LAND_FUZZY);
 
-        this.IceRarity = readSettings(WorldStandardValues.IceRarity);
-        this.IceSize = readSettings(WorldStandardValues.IceSize);
+        this.IceRarity = readSettings(WorldStandardValues.ICE_RARITY);
+        this.IceSize = readSettings(WorldStandardValues.ICE_SIZE);
 
-        this.FrozenOcean = readSettings(WorldStandardValues.FrozenOcean);
+        this.FrozenOcean = readSettings(WorldStandardValues.FROZEN_OCEAN);
 
         // Rivers
 
-        this.riverRarity = readSettings(WorldStandardValues.RiverRarity);
-        this.riverSize = readSettings(WorldStandardValues.RiverSize);
-        this.riversEnabled = readSettings(WorldStandardValues.RiversEnabled);
-        this.improvedRivers = readSettings(WorldStandardValues.ImprovedRivers);
-        this.randomRivers = readSettings(WorldStandardValues.RandomRivers);
+        this.riverRarity = readSettings(WorldStandardValues.RIVER_RARITY);
+        this.riverSize = readSettings(WorldStandardValues.RIVER_SIZE);
+        this.riversEnabled = readSettings(WorldStandardValues.RIVERS_ENABLED);
+        this.improvedRivers = readSettings(WorldStandardValues.IMPROVED_RIVERS);
+        this.randomRivers = readSettings(WorldStandardValues.RANDOM_RIVERS);
 
         // Biomes
-        this.NormalBiomes = readSettings(WorldStandardValues.NormalBiomes);
-        this.IceBiomes = readSettings(WorldStandardValues.IceBiomes);
-        this.IsleBiomes = readSettings(WorldStandardValues.IsleBiomes);
-        this.BorderBiomes = readSettings(WorldStandardValues.BorderBiomes);
+        this.NormalBiomes = readSettings(WorldStandardValues.NORMAL_BIOMES);
+        this.IceBiomes = readSettings(WorldStandardValues.ICE_BIOMES);
+        this.IsleBiomes = readSettings(WorldStandardValues.ISLE_BIOMES);
+        this.BorderBiomes = readSettings(WorldStandardValues.BORDER_BIOMES);
         ReadCustomBiomes();
 
         // Images
-        this.imageMode = readSettings(WorldStandardValues.ImageMode);
-        this.imageFile = this.readSettings(WorldStandardValues.ImageFile);
-        this.imageOrientation = this.readSettings(WorldStandardValues.ImageOrientation);
-        this.imageFillBiome = this.readSettings(WorldStandardValues.ImageFillBiome);
-        this.imageXOffset = this.readSettings(WorldStandardValues.ImageXOffset);
-        this.imageZOffset = this.readSettings(WorldStandardValues.ImageZOffset);
+        this.imageMode = readSettings(WorldStandardValues.IMAGE_MODE);
+        this.imageFile = this.readSettings(WorldStandardValues.IMAGE_FILE);
+        this.imageOrientation = this.readSettings(WorldStandardValues.IMAGE_ORIENTATION);
+        this.imageFillBiome = this.readSettings(WorldStandardValues.IMAGE_FILL_BIOME);
+        this.imageXOffset = this.readSettings(WorldStandardValues.IMAGE_X_OFFSET);
+        this.imageZOffset = this.readSettings(WorldStandardValues.IMAGE_Z_OFFSET);
 
         // Old biomes
-        this.oldBiomeSize = readSettings(WorldStandardValues.oldBiomeSize);
-        this.minMoisture = readSettings(WorldStandardValues.minMoisture);
-        this.maxMoisture = readSettings(WorldStandardValues.maxMoisture);
-        this.minTemperature = readSettings(WorldStandardValues.minTemperature);
-        this.maxTemperature = readSettings(WorldStandardValues.maxTemperature);
+        this.oldBiomeSize = readSettings(WorldStandardValues.OLD_BIOME_SIZE);
+        this.minMoisture = readSettings(WorldStandardValues.MIN_MOISTURE);
+        this.maxMoisture = readSettings(WorldStandardValues.MAX_MOISTURE);
+        this.minTemperature = readSettings(WorldStandardValues.MIN_TEMPERATURE);
+        this.maxTemperature = readSettings(WorldStandardValues.MAX_TEMPERATURE);
 
         // Fog
-        this.WorldFog = readSettings(WorldStandardValues.WorldFog);
-        this.WorldNightFog = readSettings(WorldStandardValues.WorldNightFog);
+        this.WorldFog = readSettings(WorldStandardValues.WORLD_FOG);
+        this.WorldNightFog = readSettings(WorldStandardValues.WORLD_NIGHT_FOG);
 
         this.WorldFogR = ((WorldFog & 0xFF0000) >> 16) / 255F;
         this.WorldFogG = ((WorldFog & 0xFF00) >> 8) / 255F;
@@ -417,63 +390,63 @@ public class WorldConfig extends ConfigFile
         this.WorldNightFogB = (WorldNightFog & 0xFF) / 255F;
 
         // Structures
-        this.strongholdsEnabled = readSettings(WorldStandardValues.StrongholdsEnabled);
-        this.strongholdCount = readSettings(WorldStandardValues.StrongholdCount);
-        this.strongholdDistance = readSettings(WorldStandardValues.StrongholdDistance);
-        this.strongholdSpread = readSettings(WorldStandardValues.StrongholdSpread);
+        this.strongholdsEnabled = readSettings(WorldStandardValues.STRONGHOLDS_ENABLED);
+        this.strongholdCount = readSettings(WorldStandardValues.STRONGHOLD_COUNT);
+        this.strongholdDistance = readSettings(WorldStandardValues.STRONGHOLD_DISTANCE);
+        this.strongholdSpread = readSettings(WorldStandardValues.STRONGHOLD_SPREAD);
 
-        this.villagesEnabled = readSettings(WorldStandardValues.VillagesEnabled);
-        this.villageDistance = readSettings(WorldStandardValues.VillageDistance);
-        this.villageSize = readSettings(WorldStandardValues.VillageSize);
+        this.villagesEnabled = readSettings(WorldStandardValues.VILLAGES_ENABLED);
+        this.villageDistance = readSettings(WorldStandardValues.VILLAGE_DISTANCE);
+        this.villageSize = readSettings(WorldStandardValues.VILLAGE_SIZE);
 
-        this.rareBuildingsEnabled = readSettings(WorldStandardValues.RareBuildingsEnabled);
-        this.minimumDistanceBetweenRareBuildings = readSettings(WorldStandardValues.MinimumDistanceBetweenRareBuildings);
-        this.maximumDistanceBetweenRareBuildings = readSettings(WorldStandardValues.MaximumDistanceBetweenRareBuildings);
+        this.rareBuildingsEnabled = readSettings(WorldStandardValues.RARE_BUILDINGS_ENABLED);
+        this.minimumDistanceBetweenRareBuildings = readSettings(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
+        this.maximumDistanceBetweenRareBuildings = readSettings(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
 
-        this.mineshaftsEnabled = readSettings(WorldStandardValues.MineshaftsEnabled);
-        this.netherFortressesEnabled = readSettings(WorldStandardValues.NetherFortressesEnabled);
+        this.mineshaftsEnabled = readSettings(WorldStandardValues.MINESHAFTS_ENABLED);
+        this.netherFortressesEnabled = readSettings(WorldStandardValues.NETHER_FORTRESSES_ENABLED);
 
         // Caves
-        this.caveRarity = readSettings(WorldStandardValues.caveRarity);
-        this.caveFrequency = readSettings(WorldStandardValues.caveFrequency);
-        this.caveMinAltitude = readSettings(WorldStandardValues.caveMinAltitude);
-        this.caveMaxAltitude = readSettings(WorldStandardValues.caveMaxAltitude);
-        this.individualCaveRarity = readSettings(WorldStandardValues.individualCaveRarity);
-        this.caveSystemFrequency = readSettings(WorldStandardValues.caveSystemFrequency);
-        this.caveSystemPocketChance = readSettings(WorldStandardValues.caveSystemPocketChance);
-        this.caveSystemPocketMinSize = readSettings(WorldStandardValues.caveSystemPocketMinSize);
-        this.caveSystemPocketMaxSize = readSettings(WorldStandardValues.caveSystemPocketMaxSize);
-        this.evenCaveDistribution = readSettings(WorldStandardValues.evenCaveDistribution);
+        this.caveRarity = readSettings(WorldStandardValues.CAVE_RARITY);
+        this.caveFrequency = readSettings(WorldStandardValues.CAVE_FREQUENCY);
+        this.caveMinAltitude = readSettings(WorldStandardValues.CAVE_MIN_ALTITUDE);
+        this.caveMaxAltitude = readSettings(WorldStandardValues.CAVE_MAX_ALTITUDE);
+        this.individualCaveRarity = readSettings(WorldStandardValues.INDIVIDUAL_CAVE_RARITY);
+        this.caveSystemFrequency = readSettings(WorldStandardValues.CAVE_SYSTEM_FREQUENCY);
+        this.caveSystemPocketChance = readSettings(WorldStandardValues.CAVE_SYSTEM_POCKET_CHANCE);
+        this.caveSystemPocketMinSize = readSettings(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE);
+        this.caveSystemPocketMaxSize = readSettings(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE);
+        this.evenCaveDistribution = readSettings(WorldStandardValues.EVEN_CAVE_DISTRIBUTION);
 
         // Canyons
-        this.canyonRarity = readSettings(WorldStandardValues.canyonRarity);
-        this.canyonMinAltitude = readSettings(WorldStandardValues.canyonMinAltitude);
-        this.canyonMaxAltitude = readSettings(WorldStandardValues.canyonMaxAltitude);
-        this.canyonMinLength = readSettings(WorldStandardValues.canyonMinLength);
-        this.canyonMaxLength = readSettings(WorldStandardValues.canyonMaxLength);
-        this.canyonDepth = readSettings(WorldStandardValues.canyonDepth);
+        this.canyonRarity = readSettings(WorldStandardValues.CANYON_RARITY);
+        this.canyonMinAltitude = readSettings(WorldStandardValues.CANYON_MIN_ALTITUDE);
+        this.canyonMaxAltitude = readSettings(WorldStandardValues.CANYON_MAX_ALTITUDE);
+        this.canyonMinLength = readSettings(WorldStandardValues.CANYON_MIN_LENGTH);
+        this.canyonMaxLength = readSettings(WorldStandardValues.CANYON_MAX_LENGTH);
+        this.canyonDepth = readSettings(WorldStandardValues.CANYON_DEPTH);
 
         // Water
-        this.waterLevelMax = readSettings(WorldStandardValues.WaterLevelMax);
-        this.waterLevelMin = readSettings(WorldStandardValues.WaterLevelMin);
-        this.waterBlock = readSettings(WorldStandardValues.WaterBlock);
-        this.iceBlock = readSettings(WorldStandardValues.IceBlock);
+        this.waterLevelMax = readSettings(WorldStandardValues.WATER_LEVEL_MAX);
+        this.waterLevelMin = readSettings(WorldStandardValues.WATER_LEVEL_MIN);
+        this.waterBlock = readSettings(WorldStandardValues.WATER_BLOCK);
+        this.iceBlock = readSettings(WorldStandardValues.ICE_BLOCK);
 
         // Fracture
-        this.fractureHorizontal = readSettings(WorldStandardValues.FractureHorizontal);
-        this.fractureVertical = readSettings(WorldStandardValues.FractureVertical);
+        this.fractureHorizontal = readSettings(WorldStandardValues.FRACTURE_HORIZONTAL);
+        this.fractureVertical = readSettings(WorldStandardValues.FRACTURE_VERTICAL);
 
         // Bedrock
-        this.disableBedrock = readSettings(WorldStandardValues.DisableBedrock);
-        this.ceilingBedrock = readSettings(WorldStandardValues.CeilingBedrock);
-        this.flatBedrock = readSettings(WorldStandardValues.FlatBedrock);
-        this.bedrockBlock = readSettings(WorldStandardValues.BedrockobBlock);
+        this.disableBedrock = readSettings(WorldStandardValues.DISABLE_BEDROCK);
+        this.ceilingBedrock = readSettings(WorldStandardValues.CEILING_BEDROCK);
+        this.flatBedrock = readSettings(WorldStandardValues.FLAT_BEDROCK);
+        this.bedrockBlock = readSettings(WorldStandardValues.BEDROCK_BLOCK);
 
         // Misc
-        this.removeSurfaceStone = readSettings(WorldStandardValues.RemoveSurfaceStone);
-        this.objectSpawnRatio = readSettings(WorldStandardValues.objectSpawnRatio);
-        this.resourcesSeed = readSettings(WorldStandardValues.ResourcesSeed);
-        this.populationBoundsCheck = readSettings(WorldStandardValues.PopulationBoundsCheck);
+        this.removeSurfaceStone = readSettings(WorldStandardValues.REMOVE_SURFACE_STONE);
+        this.objectSpawnRatio = readSettings(WorldStandardValues.OBJECT_SPAWN_RATIO);
+        this.resourcesSeed = readSettings(WorldStandardValues.RESOURCES_SEED);
+        this.populationBoundsCheck = readSettings(WorldStandardValues.POPULATION_BOUNDS_CHECK);
 
         this.oldTerrainGenerator = this.ModeTerrain == TerrainMode.OldGenerator;
     }
@@ -481,7 +454,7 @@ public class WorldConfig extends ConfigFile
     private void ReadCustomBiomes()
     {
 
-        ArrayList<String> biomes = this.readSettings(WorldStandardValues.CustomBiomes);
+        List<String> biomes = this.readSettings(WorldStandardValues.CUSTOM_BIOMES);
 
         for (String biome : biomes)
         {
@@ -516,7 +489,7 @@ public class WorldConfig extends ConfigFile
         writeComment("   WriteAll - default");
         writeComment("   WriteWithoutComments - write config files without help comments");
         writeComment("   WriteDisable - doesn't write to the config files, it only reads. Doesn't auto-update the configs. Use with care!");
-        writeValue(WorldStandardValues.SettingsMode, this.SettingsMode.name());
+        writeValue(WorldStandardValues.SETTINGS_MODE, this.SettingsMode);
 
         writeComment("Possible terrain modes: Normal, OldGenerator, TerrainTest, NotGenerate, Default");
         writeComment("   Normal - use all features");
@@ -524,14 +497,14 @@ public class WorldConfig extends ConfigFile
         writeComment("   TerrainTest - generate only terrain without any resources");
         writeComment("   NotGenerate - generate empty chunks");
         writeComment("   Default - use default terrain generator");
-        writeValue(WorldStandardValues.TerrainMode, this.ModeTerrain.name());
+        writeValue(WorldStandardValues.TERRAIN_MODE, this.ModeTerrain);
 
         writeComment("Possible biome modes: Normal, OldGenerator, Default");
         writeComment("   Normal - use all features");
         writeComment("   FromImage - get biomes from image file");
         writeComment("   OldGenerator - generate biome like the Beta 1.7.3 generator");
         writeComment("   Default - use default Notch biome generator");
-        writeValue(WorldStandardValues.BiomeMode, TerrainControl.getBiomeModeManager().getName(biomeMode));
+        writeValue(WorldStandardValues.BIOME_MODE, TerrainControl.getBiomeModeManager().getName(biomeMode));
 
         // Custom biomes
         writeBigTitle("Custom biomes");
@@ -563,60 +536,60 @@ public class WorldConfig extends ConfigFile
         writeComment("Small %/total area biomes (Oasis,Mountain Peaks) must be larger (limit=GenerationDepth)");
         writeComment("This could also represent \"Total number of biome sizes\" ");
         writeComment("Small values (about 1-2) and Large values (about 20) may affect generator performance.");
-        writeValue(WorldStandardValues.GenerationDepth, this.GenerationDepth);
+        writeValue(WorldStandardValues.GENERATION_DEPTH, this.GenerationDepth);
 
         writeComment("Max biome rarity from 1 to infinity. By default this is 100, but you can raise it for");
         writeComment("fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
-        writeValue(WorldStandardValues.BiomeRarityScale, this.BiomeRarityScale);
+        writeValue(WorldStandardValues.BIOME_RARITY_SCALE, this.BiomeRarityScale);
 
         writeSmallTitle("Biome lists");
 
         writeComment("Don't forget to register your custom biomes first in CustomBiomes!");
 
         writeComment("Biomes generated normal way. Names are case sensitive.");
-        writeValue(WorldStandardValues.NormalBiomes, this.NormalBiomes);
+        writeValue(WorldStandardValues.NORMAL_BIOMES, this.NormalBiomes);
 
         writeComment("Biomes generated in \"ice areas\". Names are case sensitive.");
-        writeValue(WorldStandardValues.IceBiomes, this.IceBiomes);
+        writeValue(WorldStandardValues.ICE_BIOMES, this.IceBiomes);
 
         writeComment("Biomes used as isles in other biomes. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.");
-        writeValue(WorldStandardValues.IsleBiomes, this.IsleBiomes);
+        writeValue(WorldStandardValues.ISLE_BIOMES, this.IsleBiomes);
 
         writeComment("Biomes used as borders of other biomes. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
-        writeValue(WorldStandardValues.BorderBiomes, this.BorderBiomes);
+        writeValue(WorldStandardValues.BORDER_BIOMES, this.BorderBiomes);
 
         writeSmallTitle("Landmass settings (for NormalBiomes)");
 
         writeComment("Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
-        writeValue(WorldStandardValues.LandRarity, this.LandRarity);
+        writeValue(WorldStandardValues.LAND_RARITY, this.LandRarity);
 
         writeComment("Land size from 0 to GenerationDepth.");
-        writeValue(WorldStandardValues.LandSize, this.LandSize);
+        writeValue(WorldStandardValues.LAND_SIZE, this.LandSize);
 
         writeComment("Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
-        writeValue(WorldStandardValues.LandFuzzy, this.LandFuzzy);
+        writeValue(WorldStandardValues.LAND_FUZZY, this.LandFuzzy);
 
         writeSmallTitle("Ice area settings (for IceBiomes)");
 
         writeComment("Rarity of the \"ice areas\" from 100 to 1. 100 = ice world, 1 = no IceBiomes");
-        writeValue(WorldStandardValues.IceRarity, this.IceRarity);
+        writeValue(WorldStandardValues.ICE_RARITY, this.IceRarity);
 
         writeComment("Ice area size from 0 to GenerationDepth.");
-        writeValue(WorldStandardValues.IceSize, this.IceSize);
+        writeValue(WorldStandardValues.ICE_SIZE, this.IceSize);
 
         writeComment("Set this to false to stop the ocean from freezing near when an \"ice area\" intersects with an ocean.");
-        writeValue(WorldStandardValues.FrozenOcean, this.FrozenOcean);
+        writeValue(WorldStandardValues.FROZEN_OCEAN, this.FrozenOcean);
 
         writeSmallTitle("Rivers");
 
         writeComment("River rarity. Must be from 0 to GenerationDepth.");
-        writeValue(WorldStandardValues.RiverRarity, this.riverRarity);
+        writeValue(WorldStandardValues.RIVER_RARITY, this.riverRarity);
 
         writeComment("River size from 0 to GenerationDepth - RiverRarity");
-        writeValue(WorldStandardValues.RiverSize, this.riverSize);
+        writeValue(WorldStandardValues.RIVER_SIZE, this.riverSize);
 
         writeComment("Set this to false to prevent the river generator from doing anything.");
-        writeValue(WorldStandardValues.RiversEnabled, this.riversEnabled);
+        writeValue(WorldStandardValues.RIVERS_ENABLED, this.riversEnabled);
 
         writeComment("When this is set to false, the standard river generator of Minecraft will be used.");
         writeComment("This means that a technical biome, determined by the RiverBiome setting of the biome");
@@ -624,10 +597,10 @@ public class WorldConfig extends ConfigFile
         writeComment("");
         writeComment("When enabled, the rivers won't use a technical biome in your world anymore, instead");
         writeComment("you can control them using the river settings in the BiomeConfigs.");
-        writeValue(WorldStandardValues.ImprovedRivers, this.improvedRivers);
+        writeValue(WorldStandardValues.IMPROVED_RIVERS, this.improvedRivers);
 
         writeComment("When set to true the rivers will no longer follow biome border most of the time.");
-        writeValue(WorldStandardValues.RandomRivers, this.randomRivers);
+        writeValue(WorldStandardValues.RANDOM_RIVERS, this.randomRivers);
 
         // Settings for BiomeMode:FromImage
         writeBigTitle("Settings for BiomeMode:FromImage");
@@ -637,24 +610,24 @@ public class WorldConfig extends ConfigFile
         writeComment("   Mirror - advanced repeat image mode");
         writeComment("   ContinueNormal - continue normal generation");
         writeComment("   FillEmpty - fill by biome in \"ImageFillBiome settings\" ");
-        writeValue(WorldStandardValues.ImageMode, this.imageMode.name());
+        writeValue(WorldStandardValues.IMAGE_MODE, this.imageMode);
 
         writeComment("Source png file for FromImage biome mode.");
-        writeValue(WorldStandardValues.ImageFile, this.imageFile);
+        writeValue(WorldStandardValues.IMAGE_FILE, this.imageFile);
 
         writeComment("Where the png's north is oriented? Possible values: North, East, South, West");
         writeComment("   North - the top of your picture if north (no any rotation)");
         writeComment("   West - previous behavior (you should rotate png CCW manually)");
         writeComment("   East - png should be rotated CW manually");
         writeComment("   South - rotate png 180 degrees before generating world");
-        writeValue(WorldStandardValues.ImageOrientation, this.imageOrientation.name());
+        writeValue(WorldStandardValues.IMAGE_ORIENTATION, this.imageOrientation);
 
         writeComment("Biome name for fill outside image boundaries with FillEmpty mode.");
-        writeValue(WorldStandardValues.ImageFillBiome, this.imageFillBiome);
+        writeValue(WorldStandardValues.IMAGE_FILL_BIOME, this.imageFillBiome);
 
         writeComment("Shifts map position from x=0 and z=0 coordinates.");
-        writeValue(WorldStandardValues.ImageXOffset, this.imageXOffset);
-        writeValue(WorldStandardValues.ImageZOffset, this.imageZOffset);
+        writeValue(WorldStandardValues.IMAGE_X_OFFSET, this.imageXOffset);
+        writeValue(WorldStandardValues.IMAGE_Z_OFFSET, this.imageZOffset);
 
         // Terrain height and volatility
         writeBigTitle("Terrain height and volatility");
@@ -662,63 +635,57 @@ public class WorldConfig extends ConfigFile
         writeComment("Scales the height of the world. Adding 1 to this doubles the");
         writeComment("height of the terrain, substracting 1 to this halves the height");
         writeComment("of the terrain. Values must be between 5 and 8, inclusive.");
-        writeValue(WorldStandardValues.WorldHeightScaleBits, this.worldHeightScaleBits);
+        writeValue(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS, this.worldHeightScaleBits);
 
         writeComment("Height cap of the base terrain. Setting this to 7 makes no terrain");
         writeComment("generate above y = 2 ^ 7 = 128. Doesn't affect resources (trees, objects, etc.).");
         writeComment("Values must be between 5 and 8, inclusive. Values may not be lower");
         writeComment("than WorldHeightScaleBits.");
-        writeValue(WorldStandardValues.WorldHeightCapBits, this.worldHeightCapBits);
+        writeValue(WorldStandardValues.WORLD_HEIGHT_CAP_BITS, this.worldHeightCapBits);
 
         writeComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured horizontally.");
-        writeValue(WorldStandardValues.FractureHorizontal, this.fractureHorizontal);
+        writeValue(WorldStandardValues.FRACTURE_HORIZONTAL, this.fractureHorizontal);
 
         writeComment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured vertically.");
         writeComment("Positive values will lead to large cliffs/overhangs, floating islands, and/or a cavern world depending on other settings.");
-        writeValue(WorldStandardValues.FractureVertical, this.fractureVertical);
+        writeValue(WorldStandardValues.FRACTURE_VERTICAL, this.fractureVertical);
 
         // Blocks
         writeBigTitle("Blocks");
 
         writeComment("Attempts to replace all surface stone with biome surface block");
-        writeValue(WorldStandardValues.RemoveSurfaceStone, this.removeSurfaceStone);
+        writeValue(WorldStandardValues.REMOVE_SURFACE_STONE, this.removeSurfaceStone);
 
         writeComment("Disable bottom of map bedrock generation");
-        writeValue(WorldStandardValues.DisableBedrock, this.disableBedrock);
+        writeValue(WorldStandardValues.DISABLE_BEDROCK, this.disableBedrock);
 
         writeComment("Enable ceiling of map bedrock generation");
-        writeValue(WorldStandardValues.CeilingBedrock, this.ceilingBedrock);
+        writeValue(WorldStandardValues.CEILING_BEDROCK, this.ceilingBedrock);
 
         writeComment("Make bottom layer of bedrock flat");
-        writeValue(WorldStandardValues.FlatBedrock, this.flatBedrock);
+        writeValue(WorldStandardValues.FLAT_BEDROCK, this.flatBedrock);
 
         writeComment("Block used as bedrock. No block data allowed.");
-        writeValue(WorldStandardValues.BedrockobBlock, this.bedrockBlock);
+        writeValue(WorldStandardValues.BEDROCK_BLOCK, this.bedrockBlock);
         
         writeComment("Set this to false to disable the bounds check during chunk population.");
         writeComment("While this allows you to spawn larger objects, it also makes terrain generation");
         writeComment("dependant on the direction you explored the world in.");
-        writeValue(WorldStandardValues.PopulationBoundsCheck, this.populationBoundsCheck);
+        writeValue(WorldStandardValues.POPULATION_BOUNDS_CHECK, this.populationBoundsCheck);
 
         this.writeSmallTitle("Water and ice");
         writeComment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
-        writeValue(WorldStandardValues.WaterLevelMax, this.waterLevelMax);
-        writeValue(WorldStandardValues.WaterLevelMin, this.waterLevelMin);
+        writeValue(WorldStandardValues.WATER_LEVEL_MAX, this.waterLevelMax);
+        writeValue(WorldStandardValues.WATER_LEVEL_MIN, this.waterLevelMin);
 
         writeComment("Block used as water in WaterLevel. No block data allowed.");
-        writeValue(WorldStandardValues.WaterBlock, this.waterBlock.toString());
+        writeValue(WorldStandardValues.WATER_BLOCK, this.waterBlock);
 
         writeComment("BlockId used as ice. No block data allowed.");
-        writeValue(WorldStandardValues.IceBlock, this.iceBlock.toString());
+        writeValue(WorldStandardValues.ICE_BLOCK, this.iceBlock);
 
-        writeComment("Seed used for the resource generation. Can only be numeric. Leave blank to use the world seed.");
-        if (this.resourcesSeed == 0)
-        {   // It's zero, so leave it blank, we're using the world seed
-            writeValue(WorldStandardValues.ResourcesSeed, "");
-        } else
-        {
-            writeValue(WorldStandardValues.ResourcesSeed, this.resourcesSeed);
-        }
+        writeComment("Seed used for the resource generation. Can only be numeric. Set to 0 to use the world seed.");
+        writeValue(WorldStandardValues.RESOURCES_SEED, this.resourcesSeed);
 
         if (objectSpawnRatio != 1)
         {
@@ -733,7 +700,7 @@ public class WorldConfig extends ConfigFile
             writeComment("the chosen object cannot spawn. This setting tells TC how many times it should");
             writeComment("try to spawn that object.");
             writeComment("This setting doesn't affect growing saplings anymore.");
-            this.writeValue(WorldStandardValues.objectSpawnRatio, this.objectSpawnRatio);
+            this.writeValue(WorldStandardValues.OBJECT_SPAWN_RATIO, this.objectSpawnRatio);
         }
 
         // Structures
@@ -744,128 +711,127 @@ public class WorldConfig extends ConfigFile
         // Strongholds
         writeSmallTitle("Strongholds");
         writeComment("Set this to false to prevent the stronghold generator from doing anything.");
-        writeValue(WorldStandardValues.StrongholdsEnabled, this.strongholdsEnabled);
+        writeValue(WorldStandardValues.STRONGHOLDS_ENABLED, this.strongholdsEnabled);
 
         writeComment("The number of strongholds in the world.");
-        writeValue(WorldStandardValues.StrongholdCount, this.strongholdCount);
+        writeValue(WorldStandardValues.STRONGHOLD_COUNT, this.strongholdCount);
 
         writeComment("How far strongholds are from the spawn and other strongholds (minimum is 1.0, default is 32.0).");
-        writeValue(WorldStandardValues.StrongholdDistance, this.strongholdDistance);
+        writeValue(WorldStandardValues.STRONGHOLD_DISTANCE, this.strongholdDistance);
 
         writeComment("How concentrated strongholds are around the spawn (minimum is 1, default is 3). Lower number, lower concentration.");
-        writeValue(WorldStandardValues.StrongholdSpread, this.strongholdSpread);
+        writeValue(WorldStandardValues.STRONGHOLD_SPREAD, this.strongholdSpread);
 
         // Villages
         writeSmallTitle("Villages");
         writeComment("Whether the villages are enabled or not.");
-        writeValue(WorldStandardValues.VillagesEnabled, this.villagesEnabled);
+        writeValue(WorldStandardValues.VILLAGES_ENABLED, this.villagesEnabled);
 
         writeComment("The size of the village. Larger is bigger. Normal worlds have 0 as default, superflat worlds 1.");
-        writeValue(WorldStandardValues.VillageSize, this.villageSize);
+        writeValue(WorldStandardValues.VILLAGE_SIZE, this.villageSize);
 
         writeComment("The minimum distance between the village centers in chunks. Minimum value is 9.");
-        writeValue(WorldStandardValues.VillageDistance, this.villageDistance);
+        writeValue(WorldStandardValues.VILLAGE_DISTANCE, this.villageDistance);
 
         // Rare buildings
         writeSmallTitle("Rare buildings");
         writeComment("Rare buildings are either desert pyramids, jungle temples or swamp huts.");
 
         writeComment("Whether rare buildings are enabled.");
-        writeValue(WorldStandardValues.RareBuildingsEnabled, this.rareBuildingsEnabled);
+        writeValue(WorldStandardValues.RARE_BUILDINGS_ENABLED, this.rareBuildingsEnabled);
 
         writeComment("The minimum distance between rare buildings in chunks.");
-        writeValue(WorldStandardValues.MinimumDistanceBetweenRareBuildings, this.minimumDistanceBetweenRareBuildings);
+        writeValue(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.minimumDistanceBetweenRareBuildings);
 
         writeComment("The maximum distance between rare buildings in chunks.");
-        writeValue(WorldStandardValues.MaximumDistanceBetweenRareBuildings, this.maximumDistanceBetweenRareBuildings);
+        writeValue(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.maximumDistanceBetweenRareBuildings);
 
         // Other structures
         writeSmallTitle("Other structures");
-        writeValue(WorldStandardValues.MineshaftsEnabled, this.mineshaftsEnabled);
-        writeValue(WorldStandardValues.NetherFortressesEnabled, this.netherFortressesEnabled);
+        writeValue(WorldStandardValues.MINESHAFTS_ENABLED, this.mineshaftsEnabled);
+        writeValue(WorldStandardValues.NETHER_FORTRESSES_ENABLED, this.netherFortressesEnabled);
 
         // Visual settings
         this.writeBigTitle("Visual settings");
         this.writeComment("Warning this section will work only for players with the single version of Terrain Control installed.");
 
         writeComment("World fog color");
-        writeColorValue(WorldStandardValues.WorldFog, this.WorldFog);
+        writeValue(WorldStandardValues.WORLD_FOG, this.WorldFog);
 
         writeComment("World night fog color");
-        writeColorValue(WorldStandardValues.WorldNightFog, this.WorldNightFog);
+        writeValue(WorldStandardValues.WORLD_NIGHT_FOG, this.WorldNightFog);
 
         // Cave settings (still using code from Bucyruss' BiomeTerrainMod)
         writeBigTitle("Cave settings");
 
         writeComment("This controls the odds that a given chunk will host a single cave and/or the start of a cave system.");
-        writeValue(WorldStandardValues.caveRarity, this.caveRarity);
+        writeValue(WorldStandardValues.CAVE_RARITY, this.caveRarity);
 
         writeComment("The number of times the cave generation algorithm will attempt to create single caves and cave");
         writeComment("systems in the given chunk. This value is larger because the likelihood for the cave generation");
         writeComment("algorithm to bailout is fairly high and it is used in a randomizer that trends towards lower");
         writeComment("random numbers. With an input of 40 (default) the randomizer will result in an average random");
         writeComment("result of 5 to 6. This can be turned off by setting evenCaveDistribution (below) to true.");
-        writeValue(WorldStandardValues.caveFrequency, this.caveFrequency);
+        writeValue(WorldStandardValues.CAVE_FREQUENCY, this.caveFrequency);
 
         writeComment("Sets the minimum and maximum altitudes at which caves will be generated. These values are");
         writeComment("used in a randomizer that trends towards lower numbers so that caves become more frequent");
         writeComment("the closer you get to the bottom of the map. Setting even cave distribution (above) to true");
         writeComment("will turn off this randomizer and use a flat random number generator that will create an even");
         writeComment("density of caves at all altitudes.");
-        writeValue(WorldStandardValues.caveMinAltitude, this.caveMinAltitude);
-        writeValue(WorldStandardValues.caveMaxAltitude, this.caveMaxAltitude);
+        writeValue(WorldStandardValues.CAVE_MIN_ALTITUDE, this.caveMinAltitude);
+        writeValue(WorldStandardValues.CAVE_MAX_ALTITUDE, this.caveMaxAltitude);
 
         writeComment("The odds that the cave generation algorithm will generate a single cavern without an accompanying");
         writeComment("cave system. Note that whenever the algorithm generates an individual cave it will also attempt to");
         writeComment("generate a pocket of cave systems in the vicinity (no guarantee of connection or that the cave system");
         writeComment("will actually be created).");
-        writeValue(WorldStandardValues.individualCaveRarity, this.individualCaveRarity);
+        writeValue(WorldStandardValues.INDIVIDUAL_CAVE_RARITY, this.individualCaveRarity);
 
         writeComment("The number of times the algorithm will attempt to start a cave system in a given chunk per cycle of");
         writeComment("the cave generation algorithm (see cave frequency setting above). Note that setting this value too");
         writeComment("high with an accompanying high cave frequency value can cause extremely long world generation time.");
-        writeValue(WorldStandardValues.caveSystemFrequency, this.caveSystemFrequency);
+        writeValue(WorldStandardValues.CAVE_SYSTEM_FREQUENCY, this.caveSystemFrequency);
 
         writeComment("This can be set to create an additional chance that a cave system pocket (a higher than normal");
         writeComment("density of cave systems) being started in a given chunk. Normally, a cave pocket will only be");
         writeComment("attempted if an individual cave is generated, but this will allow more cave pockets to be generated");
         writeComment("in addition to the individual cave trigger.");
-        writeValue(WorldStandardValues.caveSystemPocketChance, this.caveSystemPocketChance);
+        writeValue(WorldStandardValues.CAVE_SYSTEM_POCKET_CHANCE, this.caveSystemPocketChance);
 
         writeComment("The minimum and maximum size that a cave system pocket can be. This modifies/overrides the");
         writeComment("cave system frequency setting (above) when triggered.");
-        writeValue(WorldStandardValues.caveSystemPocketMinSize, this.caveSystemPocketMinSize);
-        writeValue(WorldStandardValues.caveSystemPocketMaxSize, this.caveSystemPocketMaxSize);
+        writeValue(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE, this.caveSystemPocketMinSize);
+        writeValue(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE, this.caveSystemPocketMaxSize);
 
         writeComment("Setting this to true will turn off the randomizer for cave frequency (above). Do note that");
         writeComment("if you turn this on you will probably want to adjust the cave frequency down to avoid long");
         writeComment("load times at world creation.");
-        writeValue(WorldStandardValues.evenCaveDistribution, this.evenCaveDistribution);
+        writeValue(WorldStandardValues.EVEN_CAVE_DISTRIBUTION, this.evenCaveDistribution);
 
         // Canyon settings
         writeBigTitle("Canyon settings");
-        writeValue(WorldStandardValues.canyonRarity, this.canyonRarity);
-        writeValue(WorldStandardValues.canyonMinAltitude, this.canyonMinAltitude);
-        writeValue(WorldStandardValues.canyonMaxAltitude, this.canyonMaxAltitude);
-        writeValue(WorldStandardValues.canyonMinLength, this.canyonMinLength);
-        writeValue(WorldStandardValues.canyonMaxLength, this.canyonMaxLength);
-        writeValue(WorldStandardValues.canyonDepth, this.canyonDepth);
+        writeValue(WorldStandardValues.CANYON_RARITY, this.canyonRarity);
+        writeValue(WorldStandardValues.CANYON_MIN_ALTITUDE, this.canyonMinAltitude);
+        writeValue(WorldStandardValues.CANYON_MAX_ALTITUDE, this.canyonMaxAltitude);
+        writeValue(WorldStandardValues.CANYON_MIN_LENGTH, this.canyonMinLength);
+        writeValue(WorldStandardValues.CANYON_MAX_LENGTH, this.canyonMaxLength);
+        writeValue(WorldStandardValues.CANYON_DEPTH, this.canyonDepth);
 
         // Settings for BiomeMode:OldGenerator
         writeBigTitle("Settings for BiomeMode:OldGenerator");
         writeComment("This generator works only with old terrain generator!");
-        writeValue(WorldStandardValues.oldBiomeSize, this.oldBiomeSize);
-        writeValue(WorldStandardValues.minMoisture, this.minMoisture);
-        writeValue(WorldStandardValues.maxMoisture, this.maxMoisture);
-        writeValue(WorldStandardValues.minTemperature, this.minTemperature);
-        writeValue(WorldStandardValues.maxTemperature, this.maxTemperature);
+        writeValue(WorldStandardValues.OLD_BIOME_SIZE, this.oldBiomeSize);
+        writeValue(WorldStandardValues.MIN_MOISTURE, this.minMoisture);
+        writeValue(WorldStandardValues.MAX_MOISTURE, this.maxMoisture);
+        writeValue(WorldStandardValues.MIN_TEMPERATURE, this.minTemperature);
+        writeValue(WorldStandardValues.MAX_TEMPERATURE, this.maxTemperature);
 
     }
 
     private void WriteCustomBiomes() throws IOException
     {
-        StringBuilder output = new StringBuilder();
-        boolean first = true;
+        List<String> output = new ArrayList<String>();
         // Custom biome id
         List<Entry<String, BiomeIds>> cbi = new ArrayList<Entry<String, BiomeIds>>(this.CustomBiomeIds.entrySet());
         Collections.sort(cbi, CBV);
@@ -873,16 +839,9 @@ public class WorldConfig extends ConfigFile
         for (Iterator<Entry<String, BiomeIds>> it = cbi.iterator(); it.hasNext();)
         {
             Entry<String, BiomeIds> entry = it.next();
-            if (!first)
-            {
-                output.append(",");
-            } else
-            {
-                first = false;
-            }
-            output.append(entry.getKey()).append(":").append(entry.getValue().getGenerationId());
+            output.add(entry.getKey() + ":" + entry.getValue().getGenerationId());
         }
-        writeValue(WorldStandardValues.CustomBiomes, output.toString());
+        writeValue(WorldStandardValues.CUSTOM_BIOMES, output);
     }
 
     public double getFractureHorizontal()

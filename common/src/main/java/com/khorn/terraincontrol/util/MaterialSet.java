@@ -29,10 +29,19 @@ public class MaterialSet
     private boolean intSetUpToDate = true;
 
     /**
-     * Adds the given material to the list. If the material is "All", all
+     * Adds the given material to the list.
+     *
+     * <p>If the material is "All", all
      * materials in existence are added to the list. If the material is
-     * "Solid", all solid materials are added to the list.
-     * 
+     * "Solid", all solid materials are added to the list. Otherwise,
+     * {@link TerrainControl#readMaterial(String)} is used to read the
+     * material.
+     *
+     * <p>If the material {@link StringHelper#specifiesBlockData(String)
+     * specifies block data}, it will match only materials with exactly that
+     * block data. If the material doesn't specify block data, it will match
+     * materials with any block data.
+     *
      * @param input The name of the material to add.
      * @throws InvalidConfigException If the name is invalid.
      */
@@ -96,7 +105,7 @@ public class MaterialSet
     /**
      * Gets whether the specified material is in this collection. Returns
      * false if the material is null.
-     * 
+     *
      * @param material The material to check.
      * @return True if the material is in this set.
      */
@@ -134,9 +143,10 @@ public class MaterialSet
      * Returns a comma (",") seperated list of all materials in this set.
      * Keywords are left intact. No brackets ("[" or "]") are used at the
      * begin and end of the string.
-     * 
+     *
      * @return The string.
      */
+    @Override
     public String toString()
     {
         // Check if all materials are included
@@ -168,7 +178,7 @@ public class MaterialSet
 
     /**
      * Gets a new material set where all blocks are rotated.
-     * 
+     *
      * @return The new material set.
      */
     public MaterialSet rotate()

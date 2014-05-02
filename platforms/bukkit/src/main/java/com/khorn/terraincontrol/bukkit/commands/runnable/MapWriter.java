@@ -79,18 +79,8 @@ public class MapWriter implements Runnable
             if (biome != null)
             {
                 BiomeConfig biomeConfig = biome.getBiomeConfig();
-                try
-                {
-                    int color = Integer.decode(biomeConfig.BiomeColor);
-                    if (color <= 0xFFFFFF)
-                    {
-                        colors[biome.getIds().getGenerationId()] = color;
-                    }
-                } catch (NumberFormatException ex)
-                {
-                    TerrainControl.log(LogMarker.WARN, "Wrong color in ", (Object) biome.getName());
-                    sender.sendMessage(BaseCommand.ERROR_COLOR + "Wrong color in " + biome.getName());
-                }
+                int color = biomeConfig.biomeColor;
+                colors[biome.getIds().getGenerationId()] = color;
             }
         }
         return colors;

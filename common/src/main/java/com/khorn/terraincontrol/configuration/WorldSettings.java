@@ -70,7 +70,7 @@ public class WorldSettings
         // TerrainControl/worlds/<WorldName>/<WorldBiomes/
         biomeDirs.add(new File(settingsDir, correctOldBiomeConfigFolder(settingsDir)));
         // TerrainControl/GlobalBiomes/
-        biomeDirs.add(new File(TerrainControl.getEngine().getTCDataFolder(), PluginStandardValues.BiomeConfigDirectoryName.stringValue()));
+        biomeDirs.add(new File(TerrainControl.getEngine().getTCDataFolder(), PluginStandardValues.BiomeConfigDirectoryName));
 
         FileHelper.makeFolders(biomeDirs);
 
@@ -165,14 +165,14 @@ public class WorldSettings
             // Get correct saved id (defaults to generation id, but can be set
             // to use the generation id of another biome)
             int savedId = biomeConfig.generationId;
-            if (!biomeConfig.ReplaceBiomeName.isEmpty())
+            if (!biomeConfig.replaceToBiomeName.isEmpty())
             {
-                BiomeConfig replaceToConfig = biomeConfigs.get(biomeConfig.ReplaceBiomeName);
+                BiomeConfig replaceToConfig = biomeConfigs.get(biomeConfig.replaceToBiomeName);
                 if (replaceToConfig == null)
                 {
-                    biomeConfig.ReplaceBiomeName = "";
+                    biomeConfig.replaceToBiomeName = "";
                     TerrainControl.log(LogMarker.WARN, "Invalid ReplaceToBiomeName in biome {}: biome {} doesn't exist", biomeConfig.name,
-                            biomeConfig.ReplaceBiomeName);
+                            biomeConfig.replaceToBiomeName);
                 } else
                 {
                     savedId = replaceToConfig.generationId;
@@ -207,17 +207,17 @@ public class WorldSettings
             // Indexing BiomeRarity
             if (this.worldConfig.NormalBiomes.contains(biomeConfig.name))
             {
-                this.worldConfig.normalBiomesRarity += biomeConfig.BiomeRarity;
+                this.worldConfig.normalBiomesRarity += biomeConfig.biomeRarity;
             }
             if (this.worldConfig.IceBiomes.contains(biomeConfig.name))
             {
-                this.worldConfig.iceBiomesRarity += biomeConfig.BiomeRarity;
+                this.worldConfig.iceBiomesRarity += biomeConfig.biomeRarity;
             }
 
             // Indexing MaxSmoothRadius
-            if (this.worldConfig.maxSmoothRadius < biomeConfig.SmoothRadius)
+            if (this.worldConfig.maxSmoothRadius < biomeConfig.smoothRadius)
             {
-                this.worldConfig.maxSmoothRadius = biomeConfig.SmoothRadius;
+                this.worldConfig.maxSmoothRadius = biomeConfig.smoothRadius;
             }
 
             // Indexing BiomeColor
@@ -228,17 +228,8 @@ public class WorldSettings
                     this.worldConfig.biomeColorMap = new HashMap<Integer, Integer>();
                 }
 
-                try
-                {
-                    int color = Integer.decode(biomeConfig.BiomeColor);
-                    if (color <= 0xFFFFFF)
-                    {
-                        this.worldConfig.biomeColorMap.put(color, biome.getIds().getGenerationId());
-                    }
-                } catch (NumberFormatException ex)
-                {
-                    TerrainControl.log(LogMarker.WARN, "Wrong color in {}", biomeConfig.name);
-                }
+                int color = biomeConfig.biomeColor;
+                this.worldConfig.biomeColorMap.put(color, biome.getIds().getGenerationId());
             }
 
             // Setting effects
@@ -266,17 +257,17 @@ public class WorldSettings
 
     private void processInheritance(Map<String, BiomeConfig> allBiomeConfigs, BiomeConfig biomeConfig, int currentDepth)
     {
-        if (biomeConfig.BiomeExtendsProcessed)
+        if (biomeConfig.biomeExtendsProcessed)
         {
             // Already processed earlier
             return;
         }
 
-        String extendedBiomeName = biomeConfig.BiomeExtends;
+        String extendedBiomeName = biomeConfig.biomeExtends;
         if (extendedBiomeName == null || extendedBiomeName.length() == 0)
         {
             // Not extending anything
-            biomeConfig.BiomeExtendsProcessed = true;
+            biomeConfig.biomeExtendsProcessed = true;
             return;
         }
 
@@ -297,7 +288,7 @@ public class WorldSettings
                             biomeConfig.name, extendedBiomeConfig.name});
         }
 
-        if (!extendedBiomeConfig.BiomeExtendsProcessed)
+        if (!extendedBiomeConfig.biomeExtendsProcessed)
         {
             // This biome has not been processed yet, do that first
             processInheritance(allBiomeConfigs, extendedBiomeConfig, currentDepth + 1);
@@ -307,7 +298,7 @@ public class WorldSettings
         biomeConfig.merge(extendedBiomeConfig);
 
         // Done
-        biomeConfig.BiomeExtendsProcessed = true;
+        biomeConfig.biomeExtendsProcessed = true;
     }
 
     // Read settings from the network
@@ -357,7 +348,7 @@ public class WorldSettings
     private String correctOldBiomeConfigFolder(File settingsDir)
     {
         // Rename the old folder
-        String biomeFolderName = WorldStandardValues.BiomeConfigDirectoryName.stringValue();
+        String biomeFolderName = WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME;
         File oldBiomeConfigs = new File(settingsDir, "BiomeConfigs");
         if (oldBiomeConfigs.exists())
         {

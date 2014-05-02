@@ -38,7 +38,7 @@ public class PacketHandler
         try
         {
             int serverProtocolVersion = stream.readInt();
-            int clientProtocolVersion = PluginStandardValues.ProtocolVersion.intValue();
+            int clientProtocolVersion = PluginStandardValues.ProtocolVersion;
             if (serverProtocolVersion == clientProtocolVersion)
             {
                 // Server sent config
@@ -59,11 +59,11 @@ public class PacketHandler
                     worldTC.InitM(worldMC, config);
                 }
 
-                System.out.println("TerrainControl: config received from server");
+                TerrainControl.log(LogMarker.INFO, "Config received from server");
             } else
             {
                 // Server or client is outdated
-                System.out.println("TerrainControl: server has different protocol version! " + "Client: " + PluginStandardValues.ProtocolVersion.intValue() + " Server: " + serverProtocolVersion);
+                TerrainControl.log(LogMarker.WARN, "Server has different protocol version! " + "Client: " + PluginStandardValues.ProtocolVersion + " Server: " + serverProtocolVersion);
             }
         } catch (Exception e)
         {
