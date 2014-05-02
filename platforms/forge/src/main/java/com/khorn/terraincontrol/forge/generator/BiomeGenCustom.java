@@ -51,12 +51,12 @@ public class BiomeGenCustom extends BiomeGenBase
         {
             this.setDisableRain();
         }
-        this.waterColorMultiplier = config.WaterColor;
-        this.skyColor = config.SkyColor;
-        this.grassColor = config.GrassColor;
-        this.grassColorIsMultiplier = config.GrassColorIsMultiplier;
-        this.foliageColor = config.FoliageColor;
-        this.foliageColorIsMultiplier = config.FoliageColorIsMultiplier;
+        this.waterColorMultiplier = config.waterColor;
+        this.skyColor = config.skyColor;
+        this.grassColor = config.grassColor;
+        this.grassColorIsMultiplier = config.grassColorIsMultiplier;
+        this.foliageColor = config.foliageColor;
+        this.foliageColorIsMultiplier = config.foliageColorIsMultiplier;
 
         if (this.grassColor != 0xffffff)
             this.grassColorSet = true;

@@ -1,15 +1,11 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
-import com.khorn.terraincontrol.util.MultiTypedSetting;
-import com.khorn.terraincontrol.util.MultiTypedSetting.SettingsType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
-import java.awt.Color;
 import java.io.*;
 import java.util.*;
 
@@ -21,7 +17,7 @@ public abstract class ConfigFile
 
     public File file;
     public boolean readSuccess;
-    
+
     /**
      * True if the file does not exist yet on disk, false otherwise. Used to
      * provide backwards compatible default settings.
@@ -51,6 +47,7 @@ public abstract class ConfigFile
             throw new IllegalArgumentException("Name may not be null");
         }
     }
+
     /**
      * Stores all the settings. Settings like Name:Value or Name=Value are
      * stored as name, Value and settings like Function(a, b, c) are stored
@@ -154,10 +151,8 @@ public abstract class ConfigFile
     // -------------------------------------------- //
     protected void logSettingNotFound(String settingsName)
     {
-        TerrainControl.log(LogMarker.TRACE, "Setting:`{}` was not found in `{}`.", new Object[]
-        {
-            settingsName, (this.file == null ? this.name + " Biome" : this.file.getName())
-        });
+        TerrainControl.log(LogMarker.TRACE, "Setting:`{}` was not found in `{}`.",settingsName,
+                (this.file == null ? this.name + " Biome" : this.file.getName()));
     }
 
     protected void logSettingValueInvalid(String settingsName)
@@ -167,7 +162,7 @@ public abstract class ConfigFile
 
     protected void logSettingValueInvalid(String settingsName, Exception e)
     {
-        TerrainControl.log(LogMarker.WARN, "{} :: {}", (Object) e.getClass().getSimpleName(),  getSettingValueInvalidError(settingsName));
+        TerrainControl.log(LogMarker.WARN, "{} :: {}", (Object) e.getClass().getSimpleName(), getSettingValueInvalidError(settingsName));
     }
 
     private String getSettingValueInvalidError(String settingsName)
@@ -178,277 +173,46 @@ public abstract class ConfigFile
     protected void logFileNotFound(File logFile)
     {
         String logName = logFile.getName();
-        TerrainControl.log(LogMarker.DEBUG, "File not found: {} in {}", new Object[]
-        {
-            logName, logFile.getAbsolutePath()
-        });
+        TerrainControl.log(LogMarker.DEBUG, "File not found: {} in {}", new Object[] {logName, logFile.getAbsolutePath()});
     }
 
-    // -------------------------------------------- //
-    // ReadModSettings
-    // -------------------------------------------- //
-    protected List<WeightedMobSpawnGroup> readModSettings(MultiTypedSetting setting, List<WeightedMobSpawnGroup> defaultValue)
+
+    /**
+     * Reads a setting. If the setting has an invalid value,
+     * a message is logged and the default value is returned.
+     * @param setting The setting to read.
+     * @return The value of the setting.
+     */
+    protected <T> T readSettings(Setting<T> setting)
     {
-        String settingsName = setting.name().toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
+        return readSettings(setting, setting.getDefaultValue());
+    }
+
+    /**
+     * Reads a setting. This method allows you to provide another default
+     * value. If the setting has an invalid value, a message is logged and
+     * the default value is returned.
+     * @param setting      The setting to read.
+     * @param defaultValue Default value for the setting.
+     * @return The value of the setting.
+     */
+    protected <T> T readSettings(Setting<T> setting, T defaultValue)
+    {
+        String settingsName = setting.getName().toLowerCase();
+        String value = settingsCache.get(settingsName);
+        if (value == null)
         {
-            String json = this.settingsCache.get(settingsName);
-            if (json == null)
-                return defaultValue;
-            return WeightedMobSpawnGroup.fromJson(json);
+            logSettingNotFound(setting.getName());
+            return defaultValue;
         }
-
-        logSettingNotFound(settingsName);
-
-        return defaultValue;
-    }
-
-    protected HashSet<Integer> readModSettings(MultiTypedSetting setting, HashSet<Integer> defaultValue)
-    {
-        String settingsName = setting.name().toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
+        try
         {
-            HashSet<Integer> out = new HashSet<Integer>();
-            if (this.settingsCache.get(settingsName).trim().isEmpty() || this.settingsCache.get(settingsName).equals("None"))
-            {
-                return out;
-            }
-            for (String string : this.settingsCache.get(settingsName).split(","))
-            {
-                out.add(Integer.parseInt(string));
-            }
-            return out;
+            return setting.read(value);
+        } catch (InvalidConfigException e)
+        {
+            logSettingValueInvalid(setting.getName(), e);
+            return defaultValue;
         }
-        logSettingNotFound(settingsName);
-        return defaultValue;
-    }
-
-    protected ArrayList<String> readModSettings(MultiTypedSetting setting, ArrayList<String> defaultValue)
-    {
-        String settingsName = setting.name().toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
-        {
-            ArrayList<String> out = new ArrayList<String>();
-            if (this.settingsCache.get(settingsName).trim().isEmpty() || this.settingsCache.get(settingsName).equals("None"))
-            {
-                return out;
-            }
-            Collections.addAll(out, this.settingsCache.get(settingsName).split(","));
-            return out;
-        }
-        logSettingNotFound(settingsName);
-        return defaultValue;
-    }
-
-    protected int readModSettings(MultiTypedSetting setting, int defaultValue)
-    {
-        String settingsName = setting.name().toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
-        {
-            try
-            {
-                return Integer.valueOf(this.settingsCache.get(settingsName));
-            } catch (NumberFormatException e)
-            {
-                logSettingValueInvalid(settingsName, e);
-            }
-        }
-        logSettingNotFound(settingsName);
-        return defaultValue;
-    }
-
-    protected long readModSettings(MultiTypedSetting setting, long defaultValue)
-    {
-        String settingsName = setting.name().toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
-        {
-            String value = settingsCache.get(settingsName);
-            if (value.isEmpty())
-            {
-                return 0;
-            }
-            try
-            {
-                return Long.parseLong(value);
-            } catch (NumberFormatException e)
-            {
-                logSettingValueInvalid(settingsName, e);
-            }
-        }
-        logSettingNotFound(settingsName);
-        return defaultValue;
-    }
-
-    protected String readModSettings(MultiTypedSetting setting, String defaultValue)
-    {
-        String settingsName = setting.name().toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
-        {
-            return this.settingsCache.get(settingsName);
-        }
-        logSettingNotFound(settingsName);
-        return defaultValue;
-    }
-
-    protected double readModSettings(MultiTypedSetting setting, double defaultValue)
-    {
-        String settingsName = setting.name().toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
-        {
-            try
-            {
-                return Double.valueOf(this.settingsCache.get(settingsName));
-            } catch (NumberFormatException e)
-            {
-                logSettingValueInvalid(settingsName, e);
-            }
-        }
-        logSettingNotFound(settingsName);
-        return defaultValue;
-    }
-
-    protected int readModSettingsColor(MultiTypedSetting setting, String defaultValue)
-    {
-        String settingsName = setting.name().toLowerCase();
-        Color color = Color.decode(defaultValue);
-        if (this.settingsCache.containsKey(settingsName))
-        {
-            try
-            {
-                color = Color.decode(this.settingsCache.get(settingsName));
-            } catch (NumberFormatException e)
-            {
-                logSettingValueInvalid(settingsName, e);
-            }
-        } else
-            logSettingNotFound(settingsName);
-        return color.getRGB() & 0xFFFFFF;
-    }
-
-    protected float readModSettings(MultiTypedSetting setting, float defaultValue)
-    {
-        String settingsName = setting.name().toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
-        {
-            try
-            {
-                return Float.valueOf(this.settingsCache.get(settingsName));
-            } catch (NumberFormatException e)
-            {
-                logSettingValueInvalid(settingsName, e);
-            }
-        }
-        logSettingNotFound(settingsName);
-        return defaultValue;
-    }
-
-    protected boolean readModSettings(MultiTypedSetting setting, boolean defaultValue)
-    {
-        String settingsName = setting.name().toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
-        {
-            return Boolean.valueOf(this.settingsCache.get(settingsName));
-        }
-        logSettingNotFound(settingsName);
-        return defaultValue;
-    }
-
-    protected Enum<?> readModSettings(MultiTypedSetting setting, Enum<?> defaultValue)
-    {
-        String settingsName = setting.name().toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
-        {
-
-            Class<?> enumClass = defaultValue.getDeclaringClass();
-            String value = this.settingsCache.get(settingsName);
-
-            if (enumClass.isEnum())
-            {
-
-                Object[] enumValues = enumClass.getEnumConstants();
-                for (Object enumValue : enumValues)
-                {
-                    String enumName = ((Enum<?>) enumValue).name();
-                    if (enumName.toLowerCase().equals(value) || enumName.equals(value))
-                        return (Enum<?>) enumValue;
-                }
-                logSettingValueInvalid(settingsName);
-
-            }
-
-        }
-        logSettingNotFound(settingsName);
-        return defaultValue;
-
-    }
-    
-    protected LocalMaterialData readModSettings(MultiTypedSetting setting, DefaultMaterial defaultValue)
-    {
-        String settingsName = setting.name().toLowerCase();
-        if (this.settingsCache.containsKey(settingsName))
-        {
-            try
-            {
-                return TerrainControl.readMaterial(this.settingsCache.get(settingsName));
-            } catch (InvalidConfigException e)
-            {
-                logSettingValueInvalid(settingsName);
-            }
-        }
-        logSettingNotFound(settingsName);
-        return TerrainControl.toLocalMaterialData(defaultValue, 0);
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T> T readSettings(MultiTypedSetting value)
-    {
-        Object obj = null;
-
-        switch (value.getReturnType())
-        {
-            case String:
-                obj = readModSettings(value, value.stringValue());
-                break;
-            case Boolean:
-                obj = readModSettings(value, value.booleanValue());
-                break;
-            case Int:
-                obj = readModSettings(value, value.intValue());
-                break;
-            case IntSet:
-                obj = readModSettings(value, value.intSetValue());
-                break;
-            case Long:
-                obj = readModSettings(value, value.longValue());
-                break;
-            case Enum:
-                obj = readModSettings(value, value.enumValue());
-                break;
-            case Double:
-                obj = readModSettings(value, value.doubleValue());
-                break;
-            case Float:
-                obj = readModSettings(value, value.floatValue());
-                break;
-            case StringArray:
-                obj = readModSettings(value, value.stringArrayListValue());
-                break;
-            case Color:
-                obj = readModSettingsColor(value, value.stringValue());
-                break;
-            case Material:
-                obj = readModSettings(value, value.materialValue());
-                break;
-            /*
-             * This prevents NPE if you happen to add a new type to
-             * TCSettings and cascade the change but forget to add it here
-             */
-            default:
-                throw new EnumConstantNotPresentException(SettingsType.class, value.getReturnType().name());
-        }
-
-        return (T) obj;
-
     }
 
     public void writeSettingsFile(boolean comments)
@@ -464,10 +228,8 @@ public abstract class ConfigFile
             this.writeConfigSettings();
         } catch (IOException localIOExceptionE)
         {
-            TerrainControl.log(LogMarker.FATAL, "{}:: {}", new Object[]
-            {
-                "localIOExceptionE: ", localIOExceptionE.getStackTrace().toString()
-            });
+            TerrainControl.log(LogMarker.FATAL, "{}:: {}", new Object[] {"localIOExceptionE: ",
+                    localIOExceptionE.getStackTrace().toString()});
 
             if (this.settingsWriter != null)
             {
@@ -476,10 +238,8 @@ public abstract class ConfigFile
                     this.settingsWriter.close();
                 } catch (IOException localIOException1)
                 {
-                    TerrainControl.log(LogMarker.FATAL, "{}:: {}", new Object[]
-                    {
-                        "localIOException1: ", localIOException1.getStackTrace().toString()
-                    });
+                    TerrainControl.log(LogMarker.FATAL, "{}:: {}", new Object[] {"localIOException1: ",
+                            localIOException1.getStackTrace().toString()});
                 }
             }
         } finally
@@ -491,106 +251,35 @@ public abstract class ConfigFile
                     this.settingsWriter.close();
                 } catch (IOException localIOException2)
                 {
-                    TerrainControl.log(LogMarker.FATAL, "{}:: {}", new Object[]
-                    {
-                        "localIOException2: ", localIOException2.getStackTrace().toString()
-                    });
+                    TerrainControl.log(LogMarker.FATAL, "{}:: {}", new Object[] {"localIOException2: ",
+                            localIOException2.getStackTrace().toString()});
                 }
             }
         }
     }
 
-    protected void writeValue(MultiTypedSetting setting, ArrayList<String> settingsValue) throws IOException
+    /**
+     * Writes given setting to the config file.
+     * @param setting       The setting to write.
+     * @param settingsValue The value of the setting to write.
+     * @throws IOException When an IO error occurs.
+     */
+    protected <T> void writeValue(Setting<T> setting, T settingsValue)
+            throws IOException
     {
-        String out = "";
-        for (String key : settingsValue)
-        {
-            if (out.isEmpty())
-                out += key;
-            else
-                out += "," + key;
-        }
-
-        this.settingsWriter.write(setting.name() + ": " + out);
+        this.settingsWriter.write(setting.getName() + ": " + setting.write(settingsValue));
         this.settingsWriter.newLine();
         this.settingsWriter.newLine();
     }
 
-    protected void writeValue(MultiTypedSetting setting, HashSet<Integer> settingsValue) throws IOException
-    {
-        String out = "";
-        for (Integer key : settingsValue)
-        {
-            if (out.isEmpty())
-                out += key;
-            else
-                out += "," + key;
-        }
-
-        this.settingsWriter.write(setting.name() + ": " + out);
-        this.settingsWriter.newLine();
-        this.settingsWriter.newLine();
-    }
-
-    protected void writeValue(MultiTypedSetting setting, List<WeightedMobSpawnGroup> settingsValue) throws IOException
-    {
-        this.settingsWriter.write(setting.name() + ": " + WeightedMobSpawnGroup.toJson(settingsValue));
-        this.settingsWriter.newLine();
-        this.settingsWriter.newLine();
-    }
-
-    protected void writeValue(MultiTypedSetting setting, int settingsValue) throws IOException
-    {
-        this.settingsWriter.write(setting.name() + ": " + Integer.toString(settingsValue));
-        this.settingsWriter.newLine();
-        this.settingsWriter.newLine();
-    }
-
-    protected void writeValue(MultiTypedSetting setting, double settingsValue) throws IOException
-    {
-        this.settingsWriter.write(setting.name() + ": " + Double.toString(settingsValue));
-        this.settingsWriter.newLine();
-        this.settingsWriter.newLine();
-    }
-
-    protected void writeValue(MultiTypedSetting setting, float settingsValue) throws IOException
-    {
-        this.settingsWriter.write(setting.name() + ": " + Float.toString(settingsValue));
-        this.settingsWriter.newLine();
-        this.settingsWriter.newLine();
-    }
-
-    protected void writeValue(MultiTypedSetting setting, boolean settingsValue) throws IOException
-    {
-        this.settingsWriter.write(setting.name() + ": " + Boolean.toString(settingsValue));
-        this.settingsWriter.newLine();
-        this.settingsWriter.newLine();
-    }
-
-    protected void writeValue(MultiTypedSetting setting, String settingsValue) throws IOException
-    {
-        this.settingsWriter.write(setting.name() + ": " + settingsValue);
-        this.settingsWriter.newLine();
-        this.settingsWriter.newLine();
-    }
-
-    protected void writeValue(MultiTypedSetting setting, LocalMaterialData settingsValue) throws IOException
-    {
-        this.settingsWriter.write(setting.name() + ": " + settingsValue);
-        this.settingsWriter.newLine();
-        this.settingsWriter.newLine();
-    }
-
+    /**
+     * Writes the given config function to the config file.
+     * @param function The function to write.
+     * @throws IOException When an IO error occurs.
+     */
     protected void writeFunction(ConfigFunction<?> function) throws IOException
     {
         this.settingsWriter.write(function.write());
-        this.settingsWriter.newLine();
-    }
-
-    protected void writeColorValue(MultiTypedSetting setting, int RGB) throws IOException
-    {
-        this.settingsWriter.write(setting.name() + ": 0x" + Integer.toHexString((0xFFFFFF & RGB) | 0x1000000).substring(1));
-        this.settingsWriter.newLine();
         this.settingsWriter.newLine();
     }
 
@@ -663,65 +352,60 @@ public abstract class ConfigFile
      * @param oldValue Name of the old setting.
      * @param newValue The new setting.
      */
-    protected void renameOldSetting(String oldValue, MultiTypedSetting newValue)
+    protected void renameOldSetting(String oldValue, com.khorn.terraincontrol.configuration.settingType.Setting<?> newValue)
     {
         if (this.settingsCache.containsKey(oldValue.toLowerCase()))
         {
-            this.settingsCache.put(newValue.name().toLowerCase(), this.settingsCache.get(oldValue.toLowerCase()));
+            this.settingsCache.put(newValue.getName().toLowerCase(), this.settingsCache.get(oldValue.toLowerCase()));
         }
     }
 
-    protected int applyBounds(int value, int min, int max)
+    /**
+     * Silently corrects the given number so that it is higher than the
+     * minimum value.
+     * @param currentValue The current value, will be corrected if needed.
+     * @param minimumValue The minimum value.
+     * @return The corrected value.
+     */
+    protected int higherThan(int currentValue, int minimumValue)
     {
-        if (value > max)
-            return max;
-        else if (value < min)
-            return min;
-        else
-            return value;
+        if (currentValue <= minimumValue) {
+            return minimumValue + 1;
+        }
+        return currentValue;
     }
 
-    protected double applyBounds(double value, double min, double max)
+    /**
+     * Silently corrects the given number so that it is higher than or equal
+     * to the minimum value.
+     * @param currentValue The current value, will be corrected if needed.
+     * @param minimumValue The minimum value.
+     * @return The corrected value.
+     */
+    protected double higherThan(double currentValue, double minimumValue)
     {
-        if (value > max)
-            return max;
-        else if (value < min)
-            return min;
-        else
-            return value;
+        if (currentValue < minimumValue) {
+            return minimumValue;
+        }
+        return currentValue;
     }
 
-    protected float applyBounds(float value, float min, float max)
+    /**
+     * Silently corrects the given number so that it is lower than or equal
+     * to the maximum value.
+     * @param currentValue The current value, will be corrected if needed.
+     * @param maximumValue The maximum value.
+     * @return The corrected value.
+     */
+    protected int lowerThanOrEqualTo(int currentValue, int maximumValue)
     {
-        if (value > max)
-            return max;
-        else if (value < min)
-            return min;
-        else
-            return value;
+        if (currentValue > maximumValue) {
+            return maximumValue;
+        }
+        return currentValue;
     }
 
-    protected float applyBounds(float value, float min, float max, float minValue)
-    {
-        value = applyBounds(value, min, max);
-
-        if (value < minValue)
-            return minValue + 1;
-        else
-            return value;
-    }
-
-    protected int applyBounds(int value, int min, int max, int minValue)
-    {
-        value = applyBounds(value, min, max);
-
-        if (value < minValue)
-            return minValue + 1;
-        else
-            return value;
-    }
-
-    protected ArrayList<String> filterBiomes(ArrayList<String> biomes, Set<String> customBiomes)
+    protected ArrayList<String> filterBiomes(List<String> biomes, Set<String> customBiomes)
     {
         ArrayList<String> output = new ArrayList<String>();
 

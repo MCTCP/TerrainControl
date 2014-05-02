@@ -101,7 +101,7 @@ public class ObjectSpawner
                 int blockToFreezeZ = z + j;
                 // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
                 LocalBiome biome = this.world.getCalculatedBiome(blockToFreezeX, blockToFreezeZ);
-                if (biome != null && biome.getBiomeConfig().surfaceAndGroundControl != null)
+                if (biome != null)
                 {
                     double noise = this.reusableChunkNoiseArray[i + j * 16];
                     biome.getBiomeConfig().surfaceAndGroundControl.spawn(world, noise, blockToFreezeX, blockToFreezeZ);
@@ -134,7 +134,7 @@ public class ObjectSpawner
         {
             BiomeConfig biomeConfig = biome.getBiomeConfig();
             int blockToFreezeY = world.getHighestBlockYAt(x, z);
-            if (blockToFreezeY > 0 && biome.getTemperatureAt(x, blockToFreezeY, z) < WorldStandardValues.snowAndIceMaxTemp.floatValue())
+            if (blockToFreezeY > 0 && biome.getTemperatureAt(x, blockToFreezeY, z) < WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
             {
                 // Ice has to be placed one block in the world
                 if (world.getMaterial(x, blockToFreezeY - 1, z).isLiquid())

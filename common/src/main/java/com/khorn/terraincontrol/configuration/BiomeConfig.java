@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
@@ -9,11 +10,9 @@ import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.UseBiome;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resource.*;
-import com.khorn.terraincontrol.generator.surface.MesaSurfaceGenerator;
-import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
+import com.khorn.terraincontrol.generator.surface.NullSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
-import com.khorn.terraincontrol.util.MultiTypedSetting;
 import com.khorn.terraincontrol.util.helpers.InheritanceHelper;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
@@ -31,8 +30,8 @@ public class BiomeConfig extends ConfigFile
      * Biome Inheritance: String name of the biome to extend
      */
 
-    public String BiomeExtends;
-    public boolean BiomeExtendsProcessed = false;
+    public String biomeExtends;
+    public boolean biomeExtendsProcessed = false;
 
     private boolean processHasRun = false;
     private boolean doResourceInheritance = true;
@@ -42,19 +41,19 @@ public class BiomeConfig extends ConfigFile
     public float riverVolatility;
     public double[] riverHeightMatrix;
 
-    public int BiomeSize;
-    public int BiomeRarity;
+    public int biomeSize;
+    public int biomeRarity;
 
-    public String BiomeColor;
+    public int biomeColor;
 
-    public ArrayList<String> BiomeIsBorder;
-    public ArrayList<String> IsleInBiome;
-    public ArrayList<String> NotBorderNear;
+    public List<String> biomeIsBorder;
+    public List<String> isleInBiome;
+    public List<String> notBorderNear;
 
     // Surface config
-    public float BiomeHeight;
-    public float BiomeVolatility;
-    public int SmoothRadius;
+    public float biomeHeight;
+    public float biomeVolatility;
+    public int smoothRadius;
 
     public float biomeTemperature;
     public float biomeWetness;
@@ -65,7 +64,7 @@ public class BiomeConfig extends ConfigFile
     public ReplacedBlocksMatrix replacedBlocks;
     public SurfaceGenerator surfaceAndGroundControl;
 
-    public String ReplaceBiomeName;
+    public String replaceToBiomeName;
 
     public boolean useWorldWaterLevel;
     public int waterLevelMax;
@@ -80,13 +79,13 @@ public class BiomeConfig extends ConfigFile
     private LocalMaterialData configIceBlock;
     private int configRiverWaterLevel;
 
-    public int SkyColor;
-    public int WaterColor;
+    public int skyColor;
+    public int waterColor;
 
-    public int GrassColor;
-    public boolean GrassColorIsMultiplier;
-    public int FoliageColor;
-    public boolean FoliageColorIsMultiplier;
+    public int grassColor;
+    public boolean grassColorIsMultiplier;
+    public int foliageColor;
+    public boolean foliageColorIsMultiplier;
 
     public List<Resource> resourceSequence = new ArrayList<Resource>();
 
@@ -151,7 +150,6 @@ public class BiomeConfig extends ConfigFile
     public boolean spawnAmbientCreaturesAddDefaults = true;
     public List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
-
     public BiomeConfig(BiomeLoadInstruction loadInstruction, File biomeFile, WorldConfig worldConfig)
     {
         super(loadInstruction.getBiomeName(), biomeFile);
@@ -162,7 +160,7 @@ public class BiomeConfig extends ConfigFile
         this.readSettingsFile(false);
 
         // Read this setting early, before inheritance is applied
-        this.BiomeExtends = readSettings(BiomeStandardValues.BiomeExtends);
+        this.biomeExtends = readSettings(BiomeStandardValues.BIOME_EXTENDS);
     }
 
     public void process()
@@ -206,7 +204,7 @@ public class BiomeConfig extends ConfigFile
         {
             throw new IllegalStateException("Run process() first!");
         }
-        if (!this.BiomeExtends.isEmpty())
+        if (!this.biomeExtends.isEmpty())
         {
             // Child Inheritance Biomes
             if (this.worldConfig.SettingsMode != WorldConfig.ConfigMode.WriteDisable)
@@ -235,143 +233,126 @@ public class BiomeConfig extends ConfigFile
     @Override
     protected void readConfigSettings()
     {
-        this.BiomeExtends = readModSettings(BiomeStandardValues.BiomeExtends, defaultSettings.defaultExtends);
-        this.BiomeSize = readModSettings(BiomeStandardValues.BiomeSize, defaultSettings.defaultSize);
-        this.BiomeRarity = readModSettings(BiomeStandardValues.BiomeRarity, defaultSettings.defaultRarity);
+        this.biomeExtends = readSettings(BiomeStandardValues.BIOME_EXTENDS, defaultSettings.defaultExtends);
+        this.biomeSize = readSettings(BiomeStandardValues.BIOME_SIZE, defaultSettings.defaultSize);
+        this.biomeRarity = readSettings(BiomeStandardValues.BIOME_RARITY, defaultSettings.defaultRarity);
 
-        this.BiomeColor = readModSettings(BiomeStandardValues.BiomeColor, defaultSettings.defaultColor);
+        this.biomeColor = readSettings(BiomeStandardValues.BIOME_COLOR, defaultSettings.defaultColor);
 
-        this.riverBiome = readModSettings(BiomeStandardValues.RiverBiome, defaultSettings.defaultRiverBiome);
+        this.riverBiome = readSettings(BiomeStandardValues.RIVER_BIOME, defaultSettings.defaultRiverBiome);
 
-        this.IsleInBiome = readModSettings(BiomeStandardValues.IsleInBiome, defaultSettings.defaultIsle);
-        this.BiomeIsBorder = readModSettings(BiomeStandardValues.BiomeIsBorder, defaultSettings.defaultBorder);
-        this.NotBorderNear = readModSettings(BiomeStandardValues.NotBorderNear, defaultSettings.defaultNotBorderNear);
+        this.isleInBiome = readSettings(BiomeStandardValues.ISLE_IN_BIOME, defaultSettings.defaultIsle);
+        this.biomeIsBorder = readSettings(BiomeStandardValues.BIOME_IS_BORDER, defaultSettings.defaultBorder);
+        this.notBorderNear = readSettings(BiomeStandardValues.NOT_BORDER_NEAR, defaultSettings.defaultNotBorderNear);
 
-        this.biomeTemperature = readModSettings(BiomeStandardValues.BiomeTemperature, defaultSettings.defaultBiomeTemperature);
-        this.biomeWetness = readModSettings(BiomeStandardValues.BiomeWetness, defaultSettings.defaultBiomeWetness);
+        this.biomeTemperature = readSettings(BiomeStandardValues.BIOME_TEMPERATURE, defaultSettings.defaultBiomeTemperature);
+        this.biomeWetness = readSettings(BiomeStandardValues.BIOME_WETNESS, defaultSettings.defaultBiomeWetness);
 
         if (this.defaultSettings.isCustomBiome)
         {
-            this.ReplaceBiomeName = readSettings(BiomeStandardValues.ReplaceToBiomeName);
+            this.replaceToBiomeName = readSettings(BiomeStandardValues.REPLACE_TO_BIOME_NAME);
         } else
         {
-            this.ReplaceBiomeName = "";
+            this.replaceToBiomeName = "";
         }
 
-        this.BiomeHeight = readModSettings(BiomeStandardValues.BiomeHeight, defaultSettings.defaultBiomeSurface);
-        this.BiomeVolatility = readModSettings(BiomeStandardValues.BiomeVolatility, defaultSettings.defaultBiomeVolatility);
-        this.SmoothRadius = readSettings(BiomeStandardValues.SmoothRadius);
+        this.biomeHeight = readSettings(BiomeStandardValues.BIOME_HEIGHT, defaultSettings.defaultBiomeSurface);
+        this.biomeVolatility = readSettings(BiomeStandardValues.BIOME_VOLATILITY, defaultSettings.defaultBiomeVolatility);
+        this.smoothRadius = readSettings(BiomeStandardValues.SMOOTH_RADIUS);
 
-        this.stoneBlock = readSettings(BiomeStandardValues.StoneBlock);
-        this.surfaceBlock = readModSettings(BiomeStandardValues.SurfaceBlock, defaultSettings.defaultSurfaceBlock);
-        this.groundBlock = readModSettings(BiomeStandardValues.GroundBlock, defaultSettings.defaultGroundBlock);
+        this.stoneBlock = readSettings(BiomeStandardValues.STONE_BLOCK);
+        this.surfaceBlock = readSettings(BiomeStandardValues.SURFACE_BLOCK,
+                TerrainControl.toLocalMaterialData(defaultSettings.defaultSurfaceBlock, 0));
+        this.groundBlock = readSettings(BiomeStandardValues.GROUND_BLOCK,
+                TerrainControl.toLocalMaterialData(defaultSettings.defaultGroundBlock, 0));
+        this.replacedBlocks = readSettings(BiomeStandardValues.REPLACED_BLOCKS);
         this.surfaceAndGroundControl = readSurfaceAndGroundControlSettings();
 
-        this.useWorldWaterLevel = readSettings(BiomeStandardValues.UseWorldWaterLevel);
-        this.configWaterLevelMax = readSettings(BiomeStandardValues.WaterLevelMax);
-        this.configWaterLevelMin = readSettings(BiomeStandardValues.WaterLevelMin);
-        this.configWaterBlock = readSettings(BiomeStandardValues.WaterBlock);
-        this.configIceBlock = readSettings(BiomeStandardValues.IceBlock);
+        this.useWorldWaterLevel = readSettings(BiomeStandardValues.USE_WORLD_WATER_LEVEL);
+        this.configWaterLevelMax = readSettings(BiomeStandardValues.WATER_LEVEL_MAX);
+        this.configWaterLevelMin = readSettings(BiomeStandardValues.WATER_LEVEL_MIN);
+        this.configWaterBlock = readSettings(BiomeStandardValues.WATER_BLOCK);
+        this.configIceBlock = readSettings(BiomeStandardValues.ICE_BLOCK);
 
-        this.SkyColor = readSettings(BiomeStandardValues.SkyColor);
-        this.WaterColor = readModSettingsColor(BiomeStandardValues.WaterColor, defaultSettings.defaultWaterColorMultiplier);
-        this.GrassColor = readModSettingsColor(BiomeStandardValues.GrassColor, defaultSettings.defaultGrassColor);
-        this.GrassColorIsMultiplier = readSettings(BiomeStandardValues.GrassColorIsMultiplier);
-        this.FoliageColor = readModSettingsColor(BiomeStandardValues.FoliageColor, defaultSettings.defaultFoliageColor);
-        this.FoliageColorIsMultiplier = readSettings(BiomeStandardValues.FoliageColorIsMultiplier);
+        this.skyColor = readSettings(BiomeStandardValues.SKY_COLOR);
+        this.waterColor = readSettings(BiomeStandardValues.WATER_COLOR, defaultSettings.defaultWaterColorMultiplier);
+        this.grassColor = readSettings(BiomeStandardValues.GRASS_COLOR, defaultSettings.defaultGrassColor);
+        this.grassColorIsMultiplier = readSettings(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER);
+        this.foliageColor = readSettings(BiomeStandardValues.FOLIAGE_COLOR, defaultSettings.defaultFoliageColor);
+        this.foliageColorIsMultiplier = readSettings(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER);
 
-        this.volatilityRaw1 = readSettings(BiomeStandardValues.Volatility1);
-        this.volatilityRaw2 = readSettings(BiomeStandardValues.Volatility2);
-        this.volatilityWeightRaw1 = readSettings(BiomeStandardValues.VolatilityWeight1);
-        this.volatilityWeightRaw2 = readSettings(BiomeStandardValues.VolatilityWeight2);
-        this.disableNotchHeightControl = readSettings(BiomeStandardValues.DisableBiomeHeight);
-        this.maxAverageHeight = readSettings(BiomeStandardValues.MaxAverageHeight);
-        this.maxAverageDepth = readSettings(BiomeStandardValues.MaxAverageDepth);
+        this.volatilityRaw1 = readSettings(BiomeStandardValues.VOLATILITY_1);
+        this.volatilityRaw2 = readSettings(BiomeStandardValues.VOLATILITY_2);
+        this.volatilityWeightRaw1 = readSettings(BiomeStandardValues.VOLATILITY_WEIGHT_1);
+        this.volatilityWeightRaw2 = readSettings(BiomeStandardValues.VOLATILITY_WEIGHT_2);
+        this.disableNotchHeightControl = readSettings(BiomeStandardValues.DISABLE_BIOME_HEIGHT);
+        this.maxAverageHeight = readSettings(BiomeStandardValues.MAX_AVERAGE_HEIGHT);
+        this.maxAverageDepth = readSettings(BiomeStandardValues.MAX_AVERAGE_DEPTH);
 
-        this.riverHeight = readSettings(BiomeStandardValues.RiverHeight);
-        this.riverVolatility = readSettings(BiomeStandardValues.RiverVolatility);
-        this.configRiverWaterLevel = readSettings(BiomeStandardValues.RiverWaterLevel);
+        this.riverHeight = readSettings(BiomeStandardValues.RIVER_HEIGHT);
+        this.riverVolatility = readSettings(BiomeStandardValues.RIVER_VOLATILITY);
+        this.configRiverWaterLevel = readSettings(BiomeStandardValues.RIVER_WATER_LEVEL);
 
-        this.strongholdsEnabled = readModSettings(BiomeStandardValues.StrongholdsEnabled, defaultSettings.defaultStrongholds);
-        this.netherFortressesEnabled = readModSettings(BiomeStandardValues.NetherFortressesEnabled, true);
-        this.villageType = (VillageType) readModSettings(BiomeStandardValues.VillageType, defaultSettings.defaultVillageType);
-        this.mineshaftsRarity = readSettings(BiomeStandardValues.MineshaftRarity);
-        this.rareBuildingType = (RareBuildingType) readModSettings(BiomeStandardValues.RareBuildingType,
-                                                                   defaultSettings.defaultRareBuildingType);
+        this.strongholdsEnabled = readSettings(BiomeStandardValues.STRONGHOLDS_ENABLED, defaultSettings.defaultStrongholds);
+        this.netherFortressesEnabled = readSettings(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, true);
+        this.villageType = readSettings(BiomeStandardValues.VILLAGE_TYPE, defaultSettings.defaultVillageType);
+        this.mineshaftsRarity = readSettings(BiomeStandardValues.MINESHAFT_RARITY);
+        this.rareBuildingType = readSettings(BiomeStandardValues.RARE_BUILDING_TYPE, defaultSettings.defaultRareBuildingType);
 
         if (this.defaultSettings.isCustomBiome)
         {
             // Only for custom biomes
-            this.spawnMonstersAddDefaults = readSettings(BiomeStandardValues.SpawnMonstersAddDefaults);
-            this.spawnMonsters = readModSettings(BiomeStandardValues.SpawnMonsters, new ArrayList<WeightedMobSpawnGroup>());
-            this.spawnCreaturesAddDefaults = readSettings(BiomeStandardValues.SpawnCreaturesAddDefaults);
-            this.spawnCreatures = readModSettings(BiomeStandardValues.SpawnCreatures, new ArrayList<WeightedMobSpawnGroup>());
-            this.spawnWaterCreaturesAddDefaults = readSettings(BiomeStandardValues.SpawnWaterCreaturesAddDefaults);
-            this.spawnWaterCreatures = readModSettings(BiomeStandardValues.SpawnWaterCreatures, new ArrayList<WeightedMobSpawnGroup>());
-            this.spawnAmbientCreaturesAddDefaults = readSettings(BiomeStandardValues.SpawnAmbientCreaturesAddDefaults);
-            this.spawnAmbientCreatures = readModSettings(BiomeStandardValues.SpawnAmbientCreatures, new ArrayList<WeightedMobSpawnGroup>());
+            this.spawnMonstersAddDefaults = readSettings(BiomeStandardValues.SPAWN_MONSTERS_ADD_DEFAULTS);
+            this.spawnMonsters = readSettings(BiomeStandardValues.SPAWN_MONSTERS);
+            this.spawnCreaturesAddDefaults = readSettings(BiomeStandardValues.SPAWN_CREATURES_ADD_DEFAULTS);
+            this.spawnCreatures = readSettings(BiomeStandardValues.SPAWN_CREATURES);
+            this.spawnWaterCreaturesAddDefaults = readSettings(BiomeStandardValues.SPAWN_WATER_CREATURES_ADD_DEFAULTS);
+            this.spawnWaterCreatures = readSettings(BiomeStandardValues.SPAWN_WATER_CREATURES);
+            this.spawnAmbientCreaturesAddDefaults = readSettings(BiomeStandardValues.SPAWN_AMBIENT_CREATURES_ADD_DEFAULTS);
+            this.spawnAmbientCreatures = readSettings(BiomeStandardValues.SPAWN_AMBIENT_CREATURES);
         }
 
         this.ReadCustomObjectSettings();
-        this.readReplaceSettings();
         this.ReadResourceSettings();
         this.heightMatrix = new double[this.worldConfig.worldHeightCap / 8 + 1];
-        this.readHeightSettings(this.heightMatrix, BiomeStandardValues.CustomHeightControl);
+        this.readHeightSettings(this.heightMatrix, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL);
         this.riverHeightMatrix = new double[this.worldConfig.worldHeightCap / 8 + 1];
-        this.readHeightSettings(this.riverHeightMatrix, BiomeStandardValues.RiverCustomHeightControl);
+        this.readHeightSettings(this.riverHeightMatrix, BiomeStandardValues.RIVER_CUSTOM_HEIGHT_CONTROL);
     }
 
-    private void readHeightSettings(double[] heightMatrix, MultiTypedSetting setting)
+    private void readHeightSettings(double[] heightMatrix, Setting<double[]> setting)
     {
-        ArrayList<String> keys = readSettings(setting);
+        double[] keys = readSettings(setting);
         try
         {
-            for (int i = 0; i < heightMatrix.length && i < keys.size(); i++)
-                heightMatrix[i] = Double.parseDouble(keys.get(i));
+            for (int i = 0; i < heightMatrix.length && i < keys.length; i++)
+                heightMatrix[i] = keys[i];
         } catch (NumberFormatException e)
         {
-            logSettingValueInvalid(setting.name(), e);
+            logSettingValueInvalid(setting.getName(), e);
         }
     }
 
     private SurfaceGenerator readSurfaceAndGroundControlSettings()
     {
-        String defaultValue = this.isNewConfig ? StringHelper.join(defaultSettings.defaultSurfaceSurfaceAndGroundControl, ",") : "";
-        String settingValue = readModSettings(BiomeStandardValues.SurfaceAndGroundControl, defaultValue);
-        if (settingValue.length() > 0)
+        // Get default value
+        SurfaceGenerator defaultSetting;
+        if (isNewConfig)
         {
-            SurfaceGenerator mesa = MesaSurfaceGenerator.getFor(settingValue);
-            if (mesa != null)
-            {
-                return mesa;
-            }
+            String defaultString = StringHelper.join(defaultSettings.defaultSurfaceSurfaceAndGroundControl, ",");
             try
             {
-                String[] parts = StringHelper.readCommaSeperatedString(settingValue);
-                return new SimpleSurfaceGenerator(parts);
+                defaultSetting = BiomeStandardValues.SURFACE_AND_GROUND_CONTROL.read(defaultString);
             } catch (InvalidConfigException e)
             {
-                logSettingValueInvalid(BiomeStandardValues.SurfaceAndGroundControl.name());
+                throw new AssertionError(e);
             }
-        }
-        return null;
-    }
-
-    private void readReplaceSettings()
-    {
-        String settingValue = readSettings(BiomeStandardValues.ReplacedBlocks);
-
-        try
+        } else
         {
-            this.replacedBlocks = new ReplacedBlocksMatrix(settingValue, worldConfig.worldHeightCap - 1);
-        } catch (InvalidConfigException e)
-        {
-            // Make sure value is never null
-            this.replacedBlocks = ReplacedBlocksMatrix.createEmptyMatrix(worldConfig.worldHeightCap - 1);
-
-            // Print warning
-            TerrainControl.log(LogMarker.WARN, "Wrong replace settings '{}': {}", (Object) this.settingsCache.get(settingValue), e.getMessage());
+            defaultSetting = new NullSurfaceGenerator();
         }
+
+        return readSettings(BiomeStandardValues.SURFACE_AND_GROUND_CONTROL, defaultSetting);
     }
 
     private ConfigFunction<BiomeConfig> getResource(Map.Entry<String, String> entry)
@@ -416,7 +397,7 @@ public class BiomeConfig extends ConfigFile
             } else
             {
                 resource = TerrainControl.getConfigFunctionsManager().getConfigFunction(rName, this,
-                                                                                        this.name + " on line " + entry.getValue(), Arrays.asList(props));
+                        this.name + " on line " + entry.getValue(), Arrays.asList(props));
             }
         }
         return resource;
@@ -458,7 +439,7 @@ public class BiomeConfig extends ConfigFile
         // Run down the list of child settings from config
         for (Map.Entry<String, String> childEntry : this.settingsCache.entrySet())
         { // As long as setting value contains `Interited` and it isnt
-            // a resource
+          // a resource
             String childValue = childEntry.getValue();
             if (childValue.toLowerCase().contains("inherited") && getResource(childEntry) == null)
             { // if the parent has the setting
@@ -471,7 +452,8 @@ public class BiomeConfig extends ConfigFile
                         continue;
                     }
                     childEntry.setValue(InheritanceHelper.evaluate(childValue, parentValue));
-                    TerrainControl.log(LogMarker.FATAL, "Setting `{}` replaced with `{}`", new Object[] { childEntry.getKey(), InheritanceHelper.evaluate(childValue, parentValue) });
+                    TerrainControl.log(LogMarker.FATAL, "Setting `{}` replaced with `{}`", new Object[] {childEntry.getKey(),
+                            InheritanceHelper.evaluate(childValue, parentValue)});
                 }
             }
         }
@@ -508,10 +490,10 @@ public class BiomeConfig extends ConfigFile
             for (Resource pr : parentRes)
             {
                 boolean analagous = false;
-                TerrainControl.log(LogMarker.TRACE, "BASE:: Checking against: {}", new Object[] { pr.makeString() });
+                TerrainControl.log(LogMarker.TRACE, "BASE:: Checking against: {}", new Object[] {pr.makeString()});
                 for (Resource cr : childRes)
                 {
-                    TerrainControl.log(LogMarker.TRACE, "CHCK:: Checking against: {}", new Object[] { cr.makeString() });
+                    TerrainControl.log(LogMarker.TRACE, "CHCK:: Checking against: {}", new Object[] {cr.makeString()});
                     if (cr.isAnalogousTo(pr))
                     {
                         TerrainControl.log(LogMarker.TRACE, "Adding Child Resource\nC: {}\nP: {}",
@@ -550,7 +532,7 @@ public class BiomeConfig extends ConfigFile
             }
         }
 
-        this.BiomeExtendsProcessed = true;
+        this.biomeExtendsProcessed = true;
         TerrainControl.log(LogMarker.TRACE, "=====END Resource Inheritance====");
         return this;
     }
@@ -561,7 +543,7 @@ public class BiomeConfig extends ConfigFile
         biomeObjectStrings = new ArrayList<String>();
 
         // Read from BiomeObjects setting
-        List<String> customObjectStrings = readSettings(BiomeStandardValues.BiomeObjects);
+        List<String> customObjectStrings = readSettings(BiomeStandardValues.BIOME_OBJECTS);
         for (String customObjectString : customObjectStrings)
         {
             CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(customObjectString, worldConfig);
@@ -588,7 +570,7 @@ public class BiomeConfig extends ConfigFile
         writeComment("This should be the value of the biomeConfig you wish to extend.");
         writeComment("The extended config will be loaded, at which point the configs included below");
         writeComment("will overwrite any configs loaded from the extended config.");
-        writeValue(BiomeStandardValues.BiomeExtends, this.BiomeExtends);
+        writeValue(BiomeStandardValues.BIOME_EXTENDS, this.biomeExtends);
 
         // Biome placement
         writeBigTitle("Biome placement");
@@ -597,7 +579,7 @@ public class BiomeConfig extends ConfigFile
         writeComment("Higher numbers give a smaller biome, lower numbers a larger biome.");
         writeComment("Oceans and rivers are generated using a dirrerent algorithm in the default settings,");
         writeComment("(they aren't in one of the biome lists), so this setting won't affect them.");
-        writeValue(BiomeStandardValues.BiomeSize, this.BiomeSize);
+        writeValue(BiomeStandardValues.BIOME_SIZE, this.biomeSize);
 
         writeComment("Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.");
         writeComment("Example for normal biome :");
@@ -605,18 +587,18 @@ public class BiomeConfig extends ConfigFile
         writeComment("  50 rarity mean 1/11 chance than other");
         writeComment("For isle biome this is chance to spawn isle in good place.");
         writeComment("Don`t work on Ocean and River (frozen versions too) biomes until not added as normal biome.");
-        writeValue(BiomeStandardValues.BiomeRarity, this.BiomeRarity);
+        writeValue(BiomeStandardValues.BIOME_RARITY, this.biomeRarity);
 
         writeComment("The hexadecimal color value of this biome. Used in the output of the /tc map command,");
         writeComment("and used in the input of BiomeMode:FromImage.");
-        writeValue(BiomeStandardValues.BiomeColor, this.BiomeColor);
+        writeValue(BiomeStandardValues.BIOME_COLOR, this.biomeColor);
 
         if (this.defaultSettings.isCustomBiome)
         {
             writeComment("Replace this biome to specified after the terrain is generated.");
             writeComment("This will make the world files contain the id of the specified biome, instead of the id of this biome.");
             writeComment("This will cause saplings, colors and mob spawning work as in specified biome.");
-            writeValue(BiomeStandardValues.ReplaceToBiomeName, this.ReplaceBiomeName);
+            writeValue(BiomeStandardValues.REPLACE_TO_BIOME_NAME, this.replaceToBiomeName);
         } else
         {
             writeComment("(ReplaceToBiomeName is only available in custom biomes.)");
@@ -626,15 +608,15 @@ public class BiomeConfig extends ConfigFile
         writeSmallTitle("Isle biomes only");
 
         writeComment("Biome name list where this biome will be spawned as isle. Like Mushroom isle in Ocean.  This work only if this biome is in IsleBiomes in world config");
-        writeValue(BiomeStandardValues.IsleInBiome, this.IsleInBiome);
+        writeValue(BiomeStandardValues.ISLE_IN_BIOME, this.isleInBiome);
 
         writeSmallTitle("Border biomes only");
 
         writeComment("Biome name list where this biome will be border.Like Mushroom isle shore. Use is compared as IsleInBiome");
-        writeValue(BiomeStandardValues.BiomeIsBorder, this.BiomeIsBorder);
+        writeValue(BiomeStandardValues.BIOME_IS_BORDER, this.biomeIsBorder);
 
         writeComment("Biome name list near border is not applied. ");
-        writeValue(BiomeStandardValues.NotBorderNear, this.NotBorderNear);
+        writeValue(BiomeStandardValues.NOT_BORDER_NEAR, this.notBorderNear);
 
         // Terrain height and volatility
         writeBigTitle("Terrain height and volatility");
@@ -642,43 +624,43 @@ public class BiomeConfig extends ConfigFile
         writeComment("BiomeHeight mean how much height will be added in terrain generation");
         writeComment("It is double value from -10.0 to 10.0");
         writeComment("Value 0.0 equivalent half of map height with all other default settings");
-        writeValue(BiomeStandardValues.BiomeHeight, this.BiomeHeight);
+        writeValue(BiomeStandardValues.BIOME_HEIGHT, this.biomeHeight);
 
         writeComment("Biome volatility.");
-        writeValue(BiomeStandardValues.BiomeVolatility, this.BiomeVolatility);
+        writeValue(BiomeStandardValues.BIOME_VOLATILITY, this.biomeVolatility);
 
         writeComment("Smooth radius between biomes. Must be between 0 and 32, inclusive. The resulting");
         writeComment("smooth radius seems to be  (thisSmoothRadius + 1 + smoothRadiusOfBiomeOnOtherSide) * 4 .");
         writeComment("So if two biomes next to each other have both a smooth radius of 2, the");
         writeComment("resulting smooth area will be (2 + 1 + 2) * 4 = 20 blocks wide.");
-        writeValue(BiomeStandardValues.SmoothRadius, this.SmoothRadius);
+        writeValue(BiomeStandardValues.SMOOTH_RADIUS, this.smoothRadius);
 
         writeComment("If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.");
         writeComment("If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.");
-        writeValue(BiomeStandardValues.MaxAverageHeight, this.maxAverageHeight);
+        writeValue(BiomeStandardValues.MAX_AVERAGE_HEIGHT, this.maxAverageHeight);
 
         writeComment("If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the ottom of the ocean) will fall before leveling off when it begins to decrease in elevation. ");
         writeComment("If the value is less than 0, then it will cause the terrain to either fall to a lesser depth before leveling out or increase in height if the value is a large enough negative.");
-        writeValue(BiomeStandardValues.MaxAverageDepth, this.maxAverageDepth);
+        writeValue(BiomeStandardValues.MAX_AVERAGE_DEPTH, this.maxAverageDepth);
 
         writeComment("Another type of noise. This noise is independent from biomes. The larger the values the more chaotic/volatile landscape generation becomes.");
         writeComment("Setting the values to negative will have the opposite effect and make landscape generation calmer/gentler.");
-        writeValue(BiomeStandardValues.Volatility1, this.volatilityRaw1);
-        writeValue(BiomeStandardValues.Volatility2, this.volatilityRaw2);
+        writeValue(BiomeStandardValues.VOLATILITY_1, this.volatilityRaw1);
+        writeValue(BiomeStandardValues.VOLATILITY_2, this.volatilityRaw2);
 
         writeComment("Adjust the weight of the corresponding volatility settings. This allows you to change how prevalent you want either of the volatility settings to be in the terrain.");
-        writeValue(BiomeStandardValues.VolatilityWeight1, this.volatilityWeightRaw1);
-        writeValue(BiomeStandardValues.VolatilityWeight2, this.volatilityWeightRaw2);
+        writeValue(BiomeStandardValues.VOLATILITY_WEIGHT_1, this.volatilityWeightRaw1);
+        writeValue(BiomeStandardValues.VOLATILITY_WEIGHT_2, this.volatilityWeightRaw2);
 
         writeComment("Disable all noises except Volatility1 and Volatility2. Also disable default block chance from height.");
-        writeValue(BiomeStandardValues.DisableBiomeHeight, this.disableNotchHeightControl);
+        writeValue(BiomeStandardValues.DISABLE_BIOME_HEIGHT, this.disableNotchHeightControl);
 
         writeComment("List of custom height factor, 17 double entries, each entire control of about 7 blocks height from down. Positive entry - better chance of spawn blocks, negative - smaller");
         writeComment("Values which affect your configuration may be found only experimental. That may be very big, like ~3000.0 depends from height");
         writeComment("Example:");
         writeComment("  CustomHeightControl:0.0,-2500.0,0.0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0");
         writeComment("Make empty layer above bedrock layer. ");
-        writeHeightSettings(this.heightMatrix, BiomeStandardValues.CustomHeightControl);
+        writeValue(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, this.heightMatrix);
 
         writeBigTitle("Rivers");
         writeComment("There are two different river systems - the standard one and the improved one.");
@@ -689,71 +671,70 @@ public class BiomeConfig extends ConfigFile
         writeSmallTitle("ImprovedRivers:false");
         writeComment("Only available when ImprovedRivers is set to false in the WorldConfig.");
         writeComment("Sets which biome is used as the river biome.");
-        writeValue(BiomeStandardValues.RiverBiome, this.riverBiome);
+        writeValue(BiomeStandardValues.RIVER_BIOME, this.riverBiome);
 
         writeSmallTitle("ImprovedRivers:true");
         writeComment("Only available when ImprovedRivers is set to true in the WorldConfig.");
         writeComment("");
         writeComment("Works the same as BiomeHeight (scroll up), but is used where a river is generated in this biome");
-        writeValue(BiomeStandardValues.RiverHeight, this.riverHeight);
+        writeValue(BiomeStandardValues.RIVER_HEIGHT, this.riverHeight);
 
         writeComment("Works the same as BiomeVolatility (scroll up), but is used where a river is generated in this biome");
-        writeValue(BiomeStandardValues.RiverVolatility, this.riverVolatility);
+        writeValue(BiomeStandardValues.RIVER_VOLATILITY, this.riverVolatility);
 
         writeComment("Works the same as WaterLevelMax (scroll down), but is used where a river is generated in this biome");
         writeComment("Can be used to create elevated rivers");
-        writeValue(BiomeStandardValues.RiverWaterLevel, this.configRiverWaterLevel);
+        writeValue(BiomeStandardValues.RIVER_WATER_LEVEL, this.configRiverWaterLevel);
 
         writeComment("Works the same as CustomHeightControl (scroll up), but is used where a river is generated in this biome");
-        writeHeightSettings(this.riverHeightMatrix, BiomeStandardValues.RiverCustomHeightControl);
+        writeValue(BiomeStandardValues.RIVER_CUSTOM_HEIGHT_CONTROL, this.riverHeightMatrix);
 
         this.writeBigTitle("Blocks");
 
         writeComment("Change this to generate something else than stone in the biome. Doesn't support block data.");
-        writeValue(BiomeStandardValues.StoneBlock, this.stoneBlock);
+        writeValue(BiomeStandardValues.STONE_BLOCK, this.stoneBlock);
 
         writeComment("Surface block, usually GRASS. Doesn't support block data.");
-        writeValue(BiomeStandardValues.SurfaceBlock, this.surfaceBlock);
+        writeValue(BiomeStandardValues.SURFACE_BLOCK, this.surfaceBlock);
 
         writeComment("Block from stone to surface, like dirt in most biomes. Doesn't support block data.");
-        writeValue(BiomeStandardValues.GroundBlock, this.groundBlock);
+        writeValue(BiomeStandardValues.GROUND_BLOCK, this.groundBlock);
 
         writeComment("Setting for biomes with more complex surface and ground blocks.");
         writeComment("Each column in the world has a noise value from what appears to be -7 to 7.");
         writeComment("Values near 0 are more common than values near -7 and 7. This setting is");
         writeComment("used to change the surface block based on the noise value for the column.");
         writeComment("Syntax: SurfaceBlockName,GroundBlockName,MaxNoise,[AnotherSurfaceBlockName,[AnotherGroundBlockName,MaxNoise[,...]]");
-        writeComment("Example: " + BiomeStandardValues.SurfaceAndGroundControl + ": STONE,STONE,-0.8,GRAVEL,STONE,0.0,DIRT,DIRT,10.0");
+        writeComment("Example: " + BiomeStandardValues.SURFACE_AND_GROUND_CONTROL + ": STONE,STONE,-0.8,GRAVEL,STONE,0.0,DIRT,DIRT,10.0");
         writeComment("  When the noise is below -0.8, stone is the surface and ground block, between -0.8 and 0");
         writeComment("  gravel with stone just below and between 0.0 and 10.0 there's only dirt.");
-        writeComment("  Because 10.0 is higher than the noise can ever get, the normal " + BiomeStandardValues.SurfaceBlock);
-        writeComment("  and " + BiomeStandardValues.GroundBlock + " will never appear in this biome.");
+        writeComment("  Because 10.0 is higher than the noise can ever get, the normal " + BiomeStandardValues.SURFACE_BLOCK);
+        writeComment("  and " + BiomeStandardValues.GROUND_BLOCK + " will never appear in this biome.");
         writeComment("");
         writeComment("Alternatively, you can use Mesa, MesaForest or MesaBryce to get blocks");
         writeComment("like the blocks found in the Mesa biomes.");
-        writeValue(BiomeStandardValues.SurfaceAndGroundControl,
-                   this.surfaceAndGroundControl == null ? "" : this.surfaceAndGroundControl.toString());
+        writeValue(BiomeStandardValues.SURFACE_AND_GROUND_CONTROL, this.surfaceAndGroundControl);
 
         writeComment("Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])");
         writeComment("Example :");
         writeComment("  ReplacedBlocks: (GRASS,DIRT,100,127),(GRAVEL,GLASS)");
         writeComment("Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
-        writeValue(BiomeStandardValues.ReplacedBlocks, replacedBlocks.toString());
+        writeValue(BiomeStandardValues.REPLACED_BLOCKS, replacedBlocks);
 
         this.writeSmallTitle("Water and ice");
 
         writeComment("Set this to false to use the water and ice settings of this biome.");
-        writeValue(BiomeStandardValues.UseWorldWaterLevel, this.useWorldWaterLevel);
+        writeValue(BiomeStandardValues.USE_WORLD_WATER_LEVEL, this.useWorldWaterLevel);
 
         writeComment("Set water level. Every empty between this levels will be fill water or another block from WaterBlock.");
-        writeValue(BiomeStandardValues.WaterLevelMax, this.configWaterLevelMax);
-        writeValue(BiomeStandardValues.WaterLevelMin, this.configWaterLevelMin);
+        writeValue(BiomeStandardValues.WATER_LEVEL_MAX, this.configWaterLevelMax);
+        writeValue(BiomeStandardValues.WATER_LEVEL_MIN, this.configWaterLevelMin);
 
         writeComment("Block used as water in WaterLevelMax");
-        writeValue(BiomeStandardValues.WaterBlock, this.configWaterBlock);
+        writeValue(BiomeStandardValues.WATER_BLOCK, this.configWaterBlock);
 
         writeComment("Block used as ice. Ice only spawns if the BiomeTemperture is low enough.");
-        writeValue(BiomeStandardValues.IceBlock, this.configIceBlock);
+        writeValue(BiomeStandardValues.ICE_BLOCK, this.configIceBlock);
 
         this.writeBigTitle("Visuals and weather");
         this.writeComment("Most of the settings here only have an effect on players with the client version of Terrain Control installed.");
@@ -767,7 +748,7 @@ public class BiomeConfig extends ConfigFile
         {
             writeComment("On default biomes, this won't do anything except changing the grass and leaves colors slightly.");
         }
-        writeValue(BiomeStandardValues.BiomeTemperature, this.biomeTemperature);
+        writeValue(BiomeStandardValues.BIOME_TEMPERATURE, this.biomeTemperature);
 
         writeComment("Biome wetness. Float value from 0.0 to 1.0.");
         if (this.defaultSettings.isCustomBiome)
@@ -777,27 +758,27 @@ public class BiomeConfig extends ConfigFile
         {
             writeComment("On default biomes, this won't do anything except changing the grass and leaves colors slightly.");
         }
-        writeValue(BiomeStandardValues.BiomeWetness, this.biomeWetness);
+        writeValue(BiomeStandardValues.BIOME_WETNESS, this.biomeWetness);
 
         this.writeComment("Biome sky color.");
-        this.writeColorValue(BiomeStandardValues.SkyColor, this.SkyColor);
+        this.writeValue(BiomeStandardValues.SKY_COLOR, this.skyColor);
 
         this.writeComment("Biome water color multiplier.");
-        this.writeColorValue(BiomeStandardValues.WaterColor, this.WaterColor);
+        this.writeValue(BiomeStandardValues.WATER_COLOR, this.waterColor);
 
         this.writeComment("Biome grass color.");
-        this.writeColorValue(BiomeStandardValues.GrassColor, this.GrassColor);
+        this.writeValue(BiomeStandardValues.GRASS_COLOR, this.grassColor);
 
         this.writeComment("Whether the grass color is a multiplier.");
         this.writeComment("If you set it to true, the color will be based on this value, the BiomeTemperature and the BiomeWetness.");
         this.writeComment("If you set it to false, the grass color will be just this color.");
-        this.writeValue(BiomeStandardValues.GrassColorIsMultiplier, this.GrassColorIsMultiplier);
+        this.writeValue(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER, this.grassColorIsMultiplier);
 
         this.writeComment("Biome foliage color.");
-        this.writeColorValue(BiomeStandardValues.FoliageColor, this.FoliageColor);
+        this.writeValue(BiomeStandardValues.FOLIAGE_COLOR, this.foliageColor);
 
         this.writeComment("Whether the foliage color is a multiplier. See GrassColorIsMultiplier for details.");
-        this.writeValue(BiomeStandardValues.FoliageColorIsMultiplier, this.FoliageColorIsMultiplier);
+        this.writeValue(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, this.foliageColorIsMultiplier);
 
         this.writeBigTitle("Resource queue");
         this.writeComment("This section control all resources spawning after terrain generation.");
@@ -883,19 +864,19 @@ public class BiomeConfig extends ConfigFile
 
         this.writeComment("Disables strongholds for this biome. If there is no suitable biome nearby,");
         this.writeComment("Minecraft will ignore this setting.");
-        this.writeValue(BiomeStandardValues.StrongholdsEnabled, strongholdsEnabled);
+        this.writeValue(BiomeStandardValues.STRONGHOLDS_ENABLED, strongholdsEnabled);
 
         this.writeComment("Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
-        this.writeValue(BiomeStandardValues.NetherFortressesEnabled, netherFortressesEnabled);
+        this.writeValue(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, netherFortressesEnabled);
 
         this.writeComment("The village type in this biome. Can be wood, sandstone or disabled.");
-        this.writeValue(BiomeStandardValues.VillageType, villageType.toString());
+        this.writeValue(BiomeStandardValues.VILLAGE_TYPE, villageType);
 
         this.writeComment("The mineshaft rarity from 0 to 100. 0 = no mineshafts, 1 = default rarity, 100 = a wooden chaos.");
-        this.writeValue(BiomeStandardValues.MineshaftRarity, mineshaftsRarity);
+        this.writeValue(BiomeStandardValues.MINESHAFT_RARITY, mineshaftsRarity);
 
         this.writeComment("The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut or disabled.");
-        this.writeValue(BiomeStandardValues.RareBuildingType, rareBuildingType.toString());
+        this.writeValue(BiomeStandardValues.RARE_BUILDING_TYPE, rareBuildingType);
 
         this.writeBigTitle("Mob spawning");
         if (!this.defaultSettings.isCustomBiome)
@@ -943,34 +924,25 @@ public class BiomeConfig extends ConfigFile
         this.writeComment("========<CONFIGURATION>========");
 
         this.writeComment("Should we add the default monster spawn groups?");
-        writeValue(BiomeStandardValues.SpawnMonstersAddDefaults, this.spawnMonstersAddDefaults);
+        writeValue(BiomeStandardValues.SPAWN_MONSTERS_ADD_DEFAULTS, this.spawnMonstersAddDefaults);
         this.writeComment("Add extra monster spawn groups here");
-        writeValue(BiomeStandardValues.SpawnMonsters, this.spawnMonsters);
+        writeValue(BiomeStandardValues.SPAWN_MONSTERS, this.spawnMonsters);
 
         this.writeComment("Should we add the default creature spawn groups?");
-        writeValue(BiomeStandardValues.SpawnCreaturesAddDefaults, this.spawnCreaturesAddDefaults);
+        writeValue(BiomeStandardValues.SPAWN_CREATURES_ADD_DEFAULTS, this.spawnCreaturesAddDefaults);
         this.writeComment("Add extra creature spawn groups here");
-        writeValue(BiomeStandardValues.SpawnCreatures, this.spawnCreatures);
+        writeValue(BiomeStandardValues.SPAWN_CREATURES, this.spawnCreatures);
 
         this.writeComment("Should we add the default watercreature spawn groups?");
-        writeValue(BiomeStandardValues.SpawnWaterCreaturesAddDefaults, this.spawnWaterCreaturesAddDefaults);
+        writeValue(BiomeStandardValues.SPAWN_WATER_CREATURES_ADD_DEFAULTS, this.spawnWaterCreaturesAddDefaults);
         this.writeComment("Add extra watercreature spawn groups here");
-        writeValue(BiomeStandardValues.SpawnWaterCreatures, this.spawnWaterCreatures);
+        writeValue(BiomeStandardValues.SPAWN_WATER_CREATURES, this.spawnWaterCreatures);
 
         this.writeComment("Should we add the default ambient creature spawn groups? (Currently only bats)");
-        writeValue(BiomeStandardValues.SpawnAmbientCreaturesAddDefaults, this.spawnAmbientCreaturesAddDefaults);
+        writeValue(BiomeStandardValues.SPAWN_AMBIENT_CREATURES_ADD_DEFAULTS, this.spawnAmbientCreaturesAddDefaults);
         this.writeComment("Add extra ambient creature spawn groups here");
-        writeValue(BiomeStandardValues.SpawnAmbientCreatures, this.spawnAmbientCreatures);
+        writeValue(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.spawnAmbientCreatures);
 
-    }
-
-    private void writeHeightSettings(double[] heightMatrix, MultiTypedSetting setting) throws IOException
-    {
-        String output = Double.toString(heightMatrix[0]);
-        for (int i = 1; i < heightMatrix.length; i++)
-            output = output + "," + Double.toString(heightMatrix[i]);
-
-        this.writeValue(setting, output);
     }
 
     private void WriteResources() throws IOException
@@ -988,7 +960,7 @@ public class BiomeConfig extends ConfigFile
         {
             objectStrings.add(objectString);
         }
-        this.writeValue(BiomeStandardValues.BiomeObjects, objectStrings);
+        this.writeValue(BiomeStandardValues.BIOME_OBJECTS, objectStrings);
     }
 
     private void WriteSaplingSettings() throws IOException
@@ -1002,19 +974,13 @@ public class BiomeConfig extends ConfigFile
     @Override
     protected void correctSettings()
     {
-        this.BiomeExtends = (this.BiomeExtends == null || this.BiomeExtends.equals("null")) ? "" : this.BiomeExtends;
-        this.BiomeSize = applyBounds(this.BiomeSize, 0, this.worldConfig.GenerationDepth);
-        this.BiomeHeight = (float) applyBounds(this.BiomeHeight, -10.0, 10.0);
-        this.BiomeRarity = applyBounds(this.BiomeRarity, 1, this.worldConfig.BiomeRarityScale);
+        this.biomeExtends = (this.biomeExtends == null || this.biomeExtends.equals("null")) ? "" : this.biomeExtends;
+        this.biomeSize = lowerThanOrEqualTo(biomeSize, worldConfig.GenerationDepth);
+        this.biomeRarity = lowerThanOrEqualTo(biomeRarity, worldConfig.BiomeRarityScale);
 
-        this.SmoothRadius = applyBounds(this.SmoothRadius, 0, 32);
-
-        this.biomeTemperature = applyBounds(this.biomeTemperature, 0.0F, 2.0F);
-        this.biomeWetness = applyBounds(this.biomeWetness, 0.0F, 1.0F);
-
-        this.IsleInBiome = filterBiomes(this.IsleInBiome, this.worldConfig.CustomBiomeIds.keySet());
-        this.BiomeIsBorder = filterBiomes(this.BiomeIsBorder, this.worldConfig.CustomBiomeIds.keySet());
-        this.NotBorderNear = filterBiomes(this.NotBorderNear, this.worldConfig.CustomBiomeIds.keySet());
+        this.isleInBiome = filterBiomes(this.isleInBiome, this.worldConfig.CustomBiomeIds.keySet());
+        this.biomeIsBorder = filterBiomes(this.biomeIsBorder, this.worldConfig.CustomBiomeIds.keySet());
+        this.notBorderNear = filterBiomes(this.notBorderNear, this.worldConfig.CustomBiomeIds.keySet());
 
         this.volatility1 = this.volatilityRaw1 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw1) + 1.0D) : this.volatilityRaw1 + 1.0D;
         this.volatility2 = this.volatilityRaw2 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw2) + 1.0D) : this.volatilityRaw2 + 1.0D;
@@ -1022,35 +988,34 @@ public class BiomeConfig extends ConfigFile
         this.volatilityWeight1 = (this.volatilityWeightRaw1 - 0.5D) * 24.0D;
         this.volatilityWeight2 = (0.5D - this.volatilityWeightRaw2) * 24.0D;
 
-        this.waterLevelMin = applyBounds(this.waterLevelMin, 0, this.worldConfig.worldHeightCap - 1);
-        this.waterLevelMax = applyBounds(this.waterLevelMax, 0, this.worldConfig.worldHeightCap - 1, this.waterLevelMin);
+        this.waterLevelMax = lowerThanOrEqualTo(waterLevelMax, this.waterLevelMin);
 
-        this.ReplaceBiomeName = (DefaultBiome.Contain(this.ReplaceBiomeName) || this.worldConfig.CustomBiomeIds.keySet().contains(
-                                 this.ReplaceBiomeName)) ? this.ReplaceBiomeName : "";
+        this.replaceToBiomeName = (DefaultBiome.Contain(this.replaceToBiomeName) || this.worldConfig.CustomBiomeIds.keySet().contains(
+                this.replaceToBiomeName)) ? this.replaceToBiomeName : "";
 
         this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.CustomBiomeIds.keySet().contains(this.riverBiome)) ? this.riverBiome
-                          : "";
+                : "";
     }
 
     @Override
     protected void renameOldSettings()
     {
         // Old values from WorldConfig
-        BiomeStandardValues[] copyFromWorld = {BiomeStandardValues.MaxAverageHeight, BiomeStandardValues.MaxAverageDepth,
-            BiomeStandardValues.Volatility1, BiomeStandardValues.Volatility2, BiomeStandardValues.VolatilityWeight1,
-                BiomeStandardValues.VolatilityWeight2, BiomeStandardValues.DisableBiomeHeight, BiomeStandardValues.CustomHeightControl};
-        for (BiomeStandardValues value : copyFromWorld)
-            if (this.worldConfig.settingsCache.containsKey(value.name().toLowerCase()))
+        Setting<?>[] copyFromWorld = {BiomeStandardValues.MAX_AVERAGE_HEIGHT, BiomeStandardValues.MAX_AVERAGE_DEPTH,
+                BiomeStandardValues.VOLATILITY_1, BiomeStandardValues.VOLATILITY_2, BiomeStandardValues.VOLATILITY_WEIGHT_1,
+                BiomeStandardValues.VOLATILITY_WEIGHT_2, BiomeStandardValues.DISABLE_BIOME_HEIGHT, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL};
+        for (Setting<?> value : copyFromWorld)
+            if (this.worldConfig.settingsCache.containsKey(value.getName().toLowerCase()))
             {
                 // this.SettingsCache.put(value.name(),
                 // this.worldConfig.SettingsCache.get(value.name().toLowerCase()));
-                this.settingsCache.put(value.name().toLowerCase(), this.worldConfig.settingsCache.get(value.name().toLowerCase()));
+                this.settingsCache.put(value.getName().toLowerCase(), this.worldConfig.settingsCache.get(value.getName().toLowerCase()));
             }
 
         // disableNotchPonds
         if (this.settingsCache.containsKey("disableNotchPonds".toLowerCase()))
         {
-            if (!readModSettings(BiomeStandardValues.DisableNotchPonds, false))
+            if (!readSettings(BiomeStandardValues.DISABLE_NOTCH_PONDS, false))
             {
                 this.settingsCache.put("SmallLake(WATER,4,7,8," + this.worldConfig.worldHeightCap + ")", "0");
                 this.settingsCache.put("SmallLake(LAVA,2,3,8," + (this.worldConfig.worldHeightCap - 8) + ")", "1");
@@ -1083,7 +1048,7 @@ public class BiomeConfig extends ConfigFile
         }
 
         // FrozenRivers
-        if (!this.worldConfig.readModSettings(WorldStandardValues.FrozenRivers, true))
+        if (!this.worldConfig.readSettings(WorldStandardValues.FROZEN_RIVERS))
         {
             // User had disabled frozen rivers in the old WorldConfig
             // So ignore the default value of RiverBiome
@@ -1091,7 +1056,7 @@ public class BiomeConfig extends ConfigFile
         }
 
         // BiomeRivers
-        if (!(Boolean) readSettings(BiomeStandardValues.BiomeRivers))
+        if (!(Boolean) readSettings(BiomeStandardValues.BIOME_RIVERS))
         {
             // If the rivers were disabled using the old setting, disable them
             // also using the new setting
@@ -1100,7 +1065,7 @@ public class BiomeConfig extends ConfigFile
         }
 
         // ReplacedBlocks
-        String replacedBlocksValue = readSettings(BiomeStandardValues.ReplacedBlocks);
+        String replacedBlocksValue = readSettings(BiomeStandardValues.REPLACED_BLOCKS_OLD);
 
         if (replacedBlocksValue.contains("="))
         {
@@ -1158,12 +1123,12 @@ public class BiomeConfig extends ConfigFile
 
         stream.writeFloat(this.biomeTemperature);
         stream.writeFloat(this.biomeWetness);
-        stream.writeInt(this.SkyColor);
-        stream.writeInt(this.WaterColor);
-        stream.writeInt(this.GrassColor);
-        stream.writeBoolean(this.GrassColorIsMultiplier);
-        stream.writeInt(this.FoliageColor);
-        stream.writeBoolean(this.FoliageColorIsMultiplier);
+        stream.writeInt(this.skyColor);
+        stream.writeInt(this.waterColor);
+        stream.writeInt(this.grassColor);
+        stream.writeBoolean(this.grassColorIsMultiplier);
+        stream.writeInt(this.foliageColor);
+        stream.writeBoolean(this.foliageColorIsMultiplier);
     }
 
     public BiomeConfig(DataInputStream stream, int generationId, WorldConfig config) throws IOException
@@ -1174,12 +1139,12 @@ public class BiomeConfig extends ConfigFile
 
         this.biomeTemperature = stream.readFloat();
         this.biomeWetness = stream.readFloat();
-        this.SkyColor = stream.readInt();
-        this.WaterColor = stream.readInt();
-        this.GrassColor = stream.readInt();
-        this.GrassColorIsMultiplier = stream.readBoolean();
-        this.FoliageColor = stream.readInt();
-        this.FoliageColorIsMultiplier = stream.readBoolean();
+        this.skyColor = stream.readInt();
+        this.waterColor = stream.readInt();
+        this.grassColor = stream.readInt();
+        this.grassColorIsMultiplier = stream.readBoolean();
+        this.foliageColor = stream.readInt();
+        this.foliageColorIsMultiplier = stream.readBoolean();
     }
 
 }

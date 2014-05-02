@@ -49,7 +49,7 @@ public class PlayerTracker
         DataOutputStream stream = new DataOutputStream(outputStream);
         try
         {
-            stream.writeInt(PluginStandardValues.ProtocolVersion.intValue());
+            stream.writeInt(PluginStandardValues.ProtocolVersion);
             configs.writeToStream(stream);
         } catch (IOException e)
         {
@@ -57,7 +57,7 @@ public class PlayerTracker
         }
 
         // Make the packet
-        S3FPacketCustomPayload packet = new S3FPacketCustomPayload(PluginStandardValues.ChannelName.stringValue(), outputStream.toByteArray());
+        S3FPacketCustomPayload packet = new S3FPacketCustomPayload(PluginStandardValues.ChannelName, outputStream.toByteArray());
 
         // Send the packet
         event.handler.handleCustomPayload(packet);

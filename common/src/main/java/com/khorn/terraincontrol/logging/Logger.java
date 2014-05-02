@@ -11,7 +11,7 @@ public class Logger
 {
 
     private org.apache.logging.log4j.Logger baseLogger;
-    public static final String PLUGIN_NAME = PluginStandardValues.ChannelName.stringValue();
+    public static final String PLUGIN_NAME = PluginStandardValues.ChannelName;
     private Marker logLevel;
 
     protected Logger(org.apache.logging.log4j.Logger logger)

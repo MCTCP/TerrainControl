@@ -91,14 +91,14 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
         for (LayerChoice groundLayer : this.layerChoices)
         {
             stringBuilder.append(groundLayer.surfaceBlock);
-            stringBuilder.append(',');
+            stringBuilder.append(',').append(' ');
             stringBuilder.append(groundLayer.groundBlock);
-            stringBuilder.append(',');
+            stringBuilder.append(',').append(' ');
             stringBuilder.append(groundLayer.maxNoise);
-            stringBuilder.append(',');
+            stringBuilder.append(',').append(' ');
         }
-        // Delete last ','
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        // Delete last ", "
+        stringBuilder.deleteCharAt(stringBuilder.length() - 2);
         return stringBuilder.toString();
     }
 

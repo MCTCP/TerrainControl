@@ -1,38 +1,46 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import static com.khorn.terraincontrol.TerrainControl.WORLD_DEPTH;
+import static com.khorn.terraincontrol.TerrainControl.WORLD_HEIGHT;
+
+import com.khorn.terraincontrol.configuration.settingType.Setting;
+import com.khorn.terraincontrol.configuration.settingType.Settings;
 import com.khorn.terraincontrol.customobjects.StructurePartSpawnHeight;
-import com.khorn.terraincontrol.util.MultiTypedSetting;
+import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 
-public enum BO3Settings implements MultiTypedSetting
+public class BO3Settings extends Settings
 {
-    // BO3
-    Author("Unknown"),
-    Description("No description given"),
-    Version(3),
+    public static final Setting<Boolean>
+            TREE = booleanSetting("Tree", true),
+            ROTATE_RANDOMLY = booleanSetting("RotateRandomly", false);
 
-    // Main settings
-    Tree(true),
-    Frequency(1),
-    Rarity(100.0),
-    RotateRandomly(false),
-    SpawnHeight(SpawnHeightEnum.highestBlock),
-    MinHeight(0),
-    MaxHeight(256),
-    MaxBranchDepth(10),
-    ExcludedBiomes("All", SettingsType.StringArray),
+    public static final Setting<Double> RARITY = doubleSetting("Rarity", 100, 0.000001, 100);
 
-    // Source block settings
-    SourceBlocks(DefaultMaterial.AIR.toString(), SettingsType.StringArray),
-    OutsideSourceBlock(OutsideSourceBlockEnum.placeAnyway),
-    MaxPercentageOutsideSourceBlock(100);
+    public static final Setting<Integer>
+            FREQUENCY = intSetting("Frequency", 1, 1, 200),
+            MIN_HEIGHT = intSetting("MinHeight", 0, WORLD_DEPTH, WORLD_HEIGHT),
+            MAX_HEIGHT = intSetting("MaxHeight", 256, WORLD_DEPTH, WORLD_HEIGHT),
+            MAX_BRANCH_DEPTH = intSetting("MaxBranchDepth", 10, 1, 100),
+            MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK = intSetting("MaxPercentageOutsideSourceBlock", 100, 0, 100);
+
+    public static final Setting<String>
+            AUTHOR = stringSetting("Author", "Unknown"),
+            DESCRIPTION = stringSetting("Description", "No description given"),
+            VERSION = stringSetting("Version", "3");
+
+    public static final Setting<List<String>> EXCLUDED_BIOMES = stringListSetting("ExcludedBiomes", "All");
+
+    public static final Setting<MaterialSet> SOURCE_BLOCKS = materialSetSetting("SourceBlocks", DefaultMaterial.AIR);
+
+    // Enum settings
+    public static final Setting<OutsideSourceBlock> OUTSIDE_SOURCE_BLOCK = enumSetting("OutsideSourceBlock", OutsideSourceBlock.placeAnyway);
+    public static final Setting<SpawnHeight> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeight.highestBlock);
 
     // The spawn height
-    public enum SpawnHeightEnum
+    public static enum SpawnHeight
     {
         randomY(StructurePartSpawnHeight.PROVIDED),
         highestBlock(StructurePartSpawnHeight.HIGHEST_BLOCK),
@@ -40,7 +48,7 @@ public enum BO3Settings implements MultiTypedSetting
 
         private StructurePartSpawnHeight height;
 
-        private SpawnHeightEnum(StructurePartSpawnHeight height)
+        private SpawnHeight(StructurePartSpawnHeight height)
         {
             this.height = height;
         }
@@ -52,158 +60,10 @@ public enum BO3Settings implements MultiTypedSetting
     }
 
     // What to do when outside the source block
-    public enum OutsideSourceBlockEnum
+    public static enum OutsideSourceBlock
     {
         dontPlace,
         placeAnyway
     }
 
-    private Object value;
-    private SettingsType returnType;
-
-    private BO3Settings(int i)
-    {
-        value = i;
-        returnType = SettingsType.Int;
-    }
-    
-    private BO3Settings(int i, SettingsType type)
-    {
-        if (type == SettingsType.IntSet){
-            HashSet<Integer> x = new HashSet<Integer>();
-            x.add(i);
-            value = x;
-            returnType = SettingsType.IntSet;
-        } else {
-            value = i;
-            returnType = SettingsType.Int;
-        }
-    }
-    
-    private BO3Settings(HashSet<Integer> set, SettingsType type)
-    {
-        value = set;
-        returnType = SettingsType.IntSet;
-    }
-    
-    private BO3Settings(long i)
-    {
-        value = i;
-        returnType = SettingsType.Long;
-    }
-
-    private BO3Settings(double d)
-    {
-        value = d;
-        returnType = SettingsType.Double;
-    }
-
-    private BO3Settings(float f)
-    {
-        value = f;
-        returnType = SettingsType.Float;
-    }
-
-    private BO3Settings(String s)
-    {
-        value = s;
-        returnType = SettingsType.String;
-    }
-
-    private BO3Settings(String s, SettingsType type)
-    {
-        returnType = type;
-
-        if (type == SettingsType.StringArray)
-        {
-            ArrayList<String> list = new ArrayList<String>();
-            if (s.contains(","))
-                Collections.addAll(list, s.split(","));
-            else if (!s.isEmpty())
-                list.add(s);
-            value = list;
-            return;
-        }
-        value = s;
-    }
-
-    private BO3Settings(Enum<?> e)
-    {
-        value = e;
-        returnType = SettingsType.Enum;
-
-    }
-
-    private BO3Settings(Boolean b)
-    {
-        value = b;
-        returnType = SettingsType.Boolean;
-    }
-
-    @Override
-    public int intValue()
-    {
-        return (Integer) value;
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    public HashSet<Integer> intSetValue() {
-        return (HashSet<Integer>) value;
-    }
-    
-    @Override
-    public double doubleValue()
-    {
-        return (Double) value;
-    }
-
-    @Override
-    public float floatValue()
-    {
-        return (Float) value;
-    }
-
-    @Override
-    public Enum<?> enumValue()
-    {
-        return (Enum<?>) value;
-    }
-
-    @Override
-    public SettingsType getReturnType()
-    {
-        return returnType;
-    }
-
-    @Override
-    public String stringValue()
-    {
-        return (String) value;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public ArrayList<String> stringArrayListValue()
-    {
-        return (ArrayList<String>) value;
-    }
-
-    @Override
-    public boolean booleanValue()
-    {
-        return (Boolean) value;
-    }
-
-    @Override
-    public long longValue()
-    {
-        return (Long) value;
-    }
-
-    @Override
-    public DefaultMaterial materialValue()
-    {
-        throw new UnsupportedOperationException();
-    }
 }

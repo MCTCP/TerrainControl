@@ -4,8 +4,8 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.*;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlockEnum;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeight;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
@@ -142,7 +142,7 @@ public class BO3 implements StructuredCustomObject
         // Spawn
         for (BlockFunction block : blocks)
         {
-            if (settings.outsideSourceBlock == OutsideSourceBlockEnum.placeAnyway || settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z)))
+            if (settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway || settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z)))
             {
                 block.spawn(world, random, x + block.x, y + block.y, z + block.z);
             }
@@ -154,15 +154,15 @@ public class BO3 implements StructuredCustomObject
     {
         Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int y = 0;
-        if (settings.spawnHeight == SpawnHeightEnum.randomY)
+        if (settings.spawnHeight == SpawnHeight.randomY)
         {
             y = MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight);
         }
-        if (settings.spawnHeight == SpawnHeightEnum.highestBlock)
+        if (settings.spawnHeight == SpawnHeight.highestBlock)
         {
             y = world.getHighestBlockYAt(x, z);
         }
-        if (settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
+        if (settings.spawnHeight == SpawnHeight.highestSolidBlock)
         {
             y = world.getSolidHeight(x, z);
         }

@@ -2,8 +2,8 @@ package com.khorn.terraincontrol.util.helpers;
 
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -102,8 +102,13 @@ public abstract class StringHelper
      * return <code>["part1", "part2", ..]</code>. Commas (',') inside braces
      * are ignored, so <code>part1,part2(extravalue,anothervalue),part3</code>
      * gets parsed as
-     * <code>["part1", "part2(extravalue,anothervalue)", "part3"]</code> instead
-     * of <code>["part1", "part2(extravalue", "anothervalue)", "part3"]</code>
+     * <code>["part1", "part2(extravalue,anothervalue)", "part3"]</code>
+     * instead of
+     * <code>["part1", "part2(extravalue", "anothervalue)", "part3"]</code>.
+     *
+     * <p>Extra whitespace around each part is removed using
+     * {@link String#trim()}. <code>part1, part2</code> will become
+     * <code>["part1", "part2"]</code> and not <code>["part1", " part2"]</code>
      * 
      * @param line
      *            The line to parse.
@@ -111,7 +116,7 @@ public abstract class StringHelper
      */
     public static String[] readCommaSeperatedString(String line)
     {
-        List<String> buffer = new ArrayList<String>();
+        List<String> buffer = new LinkedList<String>();
 
         int index = 0;
         int lastFound = 0;
@@ -121,7 +126,7 @@ public abstract class StringHelper
         {
             if (c == ',' && inBracer == 0)
             {
-                buffer.add(line.substring(lastFound, index));
+                buffer.add(line.substring(lastFound, index).trim());
                 lastFound = index + 1;
             }
 
@@ -132,7 +137,7 @@ public abstract class StringHelper
 
             index++;
         }
-        buffer.add(line.substring(lastFound, index));
+        buffer.add(line.substring(lastFound, index).trim());
 
         String[] output = new String[0];
 
@@ -172,5 +177,38 @@ public abstract class StringHelper
 
     private StringHelper()
     {
+    }
+
+    /**
+     * Parses the string and returns a number between minValue and maxValue.
+     * 
+     * @param string
+     *            The string to parse.
+     * @param minValue
+     *            The minimum value, inclusive.
+     * @param maxValue
+     *            The maximum value, inclusive.
+     * @return The number in the String, capped at the minValue and maxValue.
+     * @throws InvalidConfigException
+     *             If the number is invalid.
+     */
+    public static long readLong(String string, long minValue, long maxValue) throws InvalidConfigException
+    {
+        try
+        {
+            long number = Long.parseLong(string);
+            if (number < minValue)
+            {
+                return minValue;
+            }
+            if (number > maxValue)
+            {
+                return maxValue;
+            }
+            return number;
+        } catch (NumberFormatException e)
+        {
+            throw new InvalidConfigException("Incorrect number: " + string);
+        }
     }
 }

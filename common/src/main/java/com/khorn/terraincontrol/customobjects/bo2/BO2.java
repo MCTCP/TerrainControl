@@ -6,8 +6,6 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.Rotation;
@@ -273,49 +271,46 @@ public class BO2 extends ConfigFile implements CustomObject
         // It doesn't write.
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void readConfigSettings()
     {
-        this.version = readModSettings(BO2Settings.version, BO2Settings.version.stringValue());
+        this.version = readSettings(BO2Settings.VERSION);
 
-        this.spawnOnBlockType = this.ReadBlockList((ArrayList<String>) readSettings(BO2Settings.spawnOnBlockType),
-                BO2Settings.spawnOnBlockType.name());
-        this.collisionBlockType = this.ReadBlockList((ArrayList<String>) readSettings(BO2Settings.collisionBlockType),
-                BO2Settings.collisionBlockType.name());
+        this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE);
+        this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE);
 
-        this.spawnInBiome = readSettings(BO2Settings.spawnInBiome);
+        this.spawnInBiome = readSettings(BO2Settings.SPAWN_IN_BIOME);
 
-        this.spawnSunlight = readSettings(BO2Settings.spawnSunlight);
-        this.spawnDarkness = readSettings(BO2Settings.spawnDarkness);
-        this.spawnWater = readSettings(BO2Settings.spawnWater);
-        this.spawnLava = readSettings(BO2Settings.spawnLava);
-        this.spawnAboveGround = readSettings(BO2Settings.spawnAboveGround);
-        this.spawnUnderGround = readSettings(BO2Settings.spawnUnderGround);
+        this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT);
+        this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS);
+        this.spawnWater = readSettings(BO2Settings.SPAWN_WATER);
+        this.spawnLava = readSettings(BO2Settings.SPAWN_LAVA);
+        this.spawnAboveGround = readSettings(BO2Settings.SPAWN_ABOVE_GROUND);
+        this.spawnUnderGround = readSettings(BO2Settings.SPAWN_UNDER_GROUND);
 
-        this.underFill = readSettings(BO2Settings.underFill);
+        this.underFill = readSettings(BO2Settings.UNDER_FILL);
 
-        this.randomRotation = readSettings(BO2Settings.randomRotation);
-        this.dig = readSettings(BO2Settings.dig);
-        this.tree = readSettings(BO2Settings.tree);
-        this.branch = readSettings(BO2Settings.branch);
-        this.diggingBranch = readSettings(BO2Settings.diggingBranch);
-        this.needsFoundation = readSettings(BO2Settings.needsFoundation);
-        this.rarity = readSettings(BO2Settings.rarity);
-        this.collisionPercentage = readSettings(BO2Settings.collisionPercentage);
-        this.spawnElevationMin = readSettings(BO2Settings.spawnElevationMin);
-        this.spawnElevationMax = readSettings(BO2Settings.spawnElevationMax);
+        this.randomRotation = readSettings(BO2Settings.RANDON_ROTATION);
+        this.dig = readSettings(BO2Settings.DIG);
+        this.tree = readSettings(BO2Settings.TREE);
+        this.branch = readSettings(BO2Settings.BRANCH);
+        this.diggingBranch = readSettings(BO2Settings.DIGGING_BRANCH);
+        this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION);
+        this.rarity = readSettings(BO2Settings.RARITY);
+        this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE);
+        this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN);
+        this.spawnElevationMax = readSettings(BO2Settings.SPAWN_ELEVATION_MAX);
 
-        this.groupFrequencyMin = readSettings(BO2Settings.groupFrequencyMin);
-        this.groupFrequencyMax = readSettings(BO2Settings.groupFrequencyMax);
-        this.groupSeparationMin = readSettings(BO2Settings.groupSeparationMin);
-        this.groupSeparationMax = readSettings(BO2Settings.groupSeparationMax);
+        this.groupFrequencyMin = readSettings(BO2Settings.GROUP_FREQUENCY_MIN);
+        this.groupFrequencyMax = readSettings(BO2Settings.GROUP_FREQUENCY_MAX);
+        this.groupSeparationMin = readSettings(BO2Settings.GROUP_SEPERATION_MIN);
+        this.groupSeparationMax = readSettings(BO2Settings.GROUP_SEPERATION_MAX);
         // >> Is this not used anymore? Netbeans finds no references to it
         // >> Nothing other than this line references BO2Settings.groupId
         // either...
-        this.groupId = readSettings(BO2Settings.groupId);
+        this.groupId = readSettings(BO2Settings.GROUP_ID);
 
-        this.branchLimit = readSettings(BO2Settings.branchLimit);
+        this.branchLimit = readSettings(BO2Settings.BRANCH_LIMIT);
 
         this.ReadCoordinates();
     }
@@ -360,30 +355,6 @@ public class BO2 extends ConfigFile implements CustomObject
             coordinate = coordinate.Rotate();
             data[3][i] = coordinate;
         }
-
-    }
-
-    private MaterialSet ReadBlockList(ArrayList<String> blocks, String settingName)
-    {
-        MaterialSet output = new MaterialSet();
-
-        boolean invalidValues = false;
-
-        for (String block : blocks)
-        {
-            try
-            {
-                output.parseAndAdd(block);
-            } catch (InvalidConfigException e)
-            {
-                invalidValues = true;
-            }
-        }
-
-        if (invalidValues)
-            TerrainControl.log(LogMarker.WARN, "Custom object {} has wrong value {}", new Object[] {this.name, settingName});
-
-        return output;
 
     }
 

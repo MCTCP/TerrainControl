@@ -88,20 +88,20 @@ public abstract class Layer
                 
                 BiomeConfig biomeConfig = biome.getBiomeConfig();
 
-                if (biomeConfig.BiomeSize != i)
+                if (biomeConfig.biomeSize != i)
                     continue;
                 if (worldConfig.NormalBiomes.contains(biomeConfig.name))
                 {
-                    for (int t = 0; t < biomeConfig.BiomeRarity; t++)
+                    for (int t = 0; t < biomeConfig.biomeRarity; t++)
                         normalBiomes.add(biome);
-                    worldConfig.normalBiomesRarity -= biomeConfig.BiomeRarity;
+                    worldConfig.normalBiomesRarity -= biomeConfig.biomeRarity;
                 }
 
                 if (worldConfig.IceBiomes.contains(biomeConfig.name))
                 {
-                    for (int t = 0; t < biomeConfig.BiomeRarity; t++)
+                    for (int t = 0; t < biomeConfig.biomeRarity; t++)
                         iceBiomes.add(biome);
-                    worldConfig.iceBiomesRarity -= biomeConfig.BiomeRarity;
+                    worldConfig.iceBiomesRarity -= biomeConfig.biomeRarity;
                 }
 
             }
@@ -181,15 +181,15 @@ public abstract class Layer
                 if (biome == null)
                     continue;
                 BiomeConfig biomeConfig = biome.getBiomeConfig();
-                if (biomeConfig.BiomeSize != depth)
+                if (biomeConfig.biomeSize != depth)
                     continue;
-                if (worldConfig.IsleBiomes.contains(biomeConfig.name) && biomeConfig.IsleInBiome != null)
+                if (worldConfig.IsleBiomes.contains(biomeConfig.name) && biomeConfig.isleInBiome != null)
                 {
                     int id = biome.getIds().getGenerationId();
 
                     LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + id, MainLayer);
                     layerBiome.biome = biome;
-                    for (String islandInName : biomeConfig.IsleInBiome)
+                    for (String islandInName : biomeConfig.isleInBiome)
                     {
                         int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
                         if (islandIn == DefaultBiome.OCEAN.Id)
@@ -198,15 +198,15 @@ public abstract class Layer
                             layerBiome.BiomeIsles[islandIn] = true;
                     }
 
-                    layerBiome.chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.BiomeRarity;
+                    layerBiome.chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarity;
                     MainLayer = layerBiome;
                 }
 
-                if (worldConfig.BorderBiomes.contains(biomeConfig.name) && biomeConfig.BiomeIsBorder != null)
+                if (worldConfig.BorderBiomes.contains(biomeConfig.name) && biomeConfig.biomeIsBorder != null)
                 {
                     haveBorder = true;
 
-                    for (String replaceFromName : biomeConfig.BiomeIsBorder)
+                    for (String replaceFromName : biomeConfig.biomeIsBorder)
                     {
                         int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
                         layerBiomeBorder.AddBiome(biome, replaceFrom, world);

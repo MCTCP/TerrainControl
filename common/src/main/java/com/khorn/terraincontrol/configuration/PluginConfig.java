@@ -6,11 +6,11 @@ import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.logging.LogMarker;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Marker;
 
 import java.io.File;
 import java.io.IOException;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Marker;
 
 /**
  * Temporarily pre-configured Class that will eventually represent the file
@@ -56,7 +56,7 @@ public final class PluginConfig extends ConfigFile
     public PluginConfig(File settingsDir)
     {
 
-        super(PluginStandardValues.ChannelName.stringValue(), new File(settingsDir, PluginStandardValues.ConfigFilename.stringValue()));
+        super(PluginStandardValues.ChannelName, new File(settingsDir, PluginStandardValues.ConfigFilename));
         if (!settingsDir.exists())
             settingsDir.mkdirs();
         init();
@@ -86,9 +86,9 @@ public final class PluginConfig extends ConfigFile
     @Override
     protected void correctSettings()
     {
-        if (!BiomeStandardValues.BiomeConfigExtensions.stringArrayListValue().contains(this.biomeConfigExtension))
+        if (!BiomeStandardValues.BiomeConfigExtensions.contains(this.biomeConfigExtension))
         {
-            String newExtension = BiomeStandardValues.DefaultBiomeConfigExtension.stringValue();
+            String newExtension = BiomeStandardValues.BIOME_CONFIG_EXTENSION.getDefaultValue();
             TerrainControl.log(LogMarker.WARN, "BiomeConfig file extension {} is invalid, changing to {}", new Object[]
             {
                 this.biomeConfigExtension, newExtension
@@ -101,9 +101,9 @@ public final class PluginConfig extends ConfigFile
     @Override
     protected void readConfigSettings()
     {
-        this.SettingsMode = readSettings(WorldStandardValues.SettingsMode);
+        this.SettingsMode = readSettings(WorldStandardValues.SETTINGS_MODE);
         this.LogLevel = readSettings(PluginStandardValues.LogLevel);
-        this.biomeConfigExtension = readSettings(BiomeStandardValues.DefaultBiomeConfigExtension);
+        this.biomeConfigExtension = readSettings(BiomeStandardValues.BIOME_CONFIG_EXTENSION);
     }
 
     @Override
@@ -119,7 +119,7 @@ public final class PluginConfig extends ConfigFile
         writeComment("   WriteDisable         - Doesn't write to the config files, it only reads.");
         writeComment("                          Doesn't auto-update the configs. Use with care!");
         writeComment("Defaults to: WriteAll");
-        writeValue(WorldStandardValues.SettingsMode, this.SettingsMode.name());
+        writeValue(WorldStandardValues.SETTINGS_MODE, this.SettingsMode);
 
         // Custom biomes
         writeBigTitle("Log Levels");
@@ -139,7 +139,7 @@ public final class PluginConfig extends ConfigFile
         writeComment("See ``Possible Log Levels'' if you are lost.");
         writeComment(" ");
         writeComment("Defaults to: Standard");
-        writeValue(PluginStandardValues.LogLevel, this.LogLevel.name());
+        writeValue(PluginStandardValues.LogLevel, this.LogLevel);
 
         writeBigTitle("File Extension Rules");
 
@@ -150,7 +150,7 @@ public final class PluginConfig extends ConfigFile
         writeComment("BiomeConfig.ini, .biome, .bc, .bc.ini, and .biome.ini");
         writeComment(" ");
         writeComment("Defaults to: .bc");
-        writeValue(BiomeStandardValues.DefaultBiomeConfigExtension, this.biomeConfigExtension);
+        writeValue(BiomeStandardValues.BIOME_CONFIG_EXTENSION, this.biomeConfigExtension);
     }
 
     public LogLevels getLogLevel()

@@ -570,7 +570,7 @@ public class ChunkProviderTC
 
         final BiomeConfig centerBiomeConfig = toBiomeConfig(this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius)
                 * (NOISE_MAX_X + this.maxSmoothDiameter))]);
-        final int lookRadius = centerBiomeConfig.SmoothRadius;
+        final int lookRadius = centerBiomeConfig.smoothRadius;
 
         float nextBiomeHeight, biomeWeight;
 
@@ -581,17 +581,17 @@ public class ChunkProviderTC
                 final BiomeConfig nextBiomeConfig = toBiomeConfig(this.biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius)
                         * (NOISE_MAX_X + this.maxSmoothDiameter))]);
 
-                nextBiomeHeight = nextBiomeConfig.BiomeHeight;
+                nextBiomeHeight = nextBiomeConfig.biomeHeight;
 
                 biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius)
                         * this.maxSmoothDiameter)]
                         / (nextBiomeHeight + 2.0F);
                 biomeWeight = Math.abs(biomeWeight);
-                if (nextBiomeHeight > centerBiomeConfig.BiomeHeight)
+                if (nextBiomeHeight > centerBiomeConfig.biomeHeight)
                 {
                     biomeWeight /= 2.0F;
                 }
-                volatilitySum += nextBiomeConfig.BiomeVolatility * biomeWeight;
+                volatilitySum += nextBiomeConfig.biomeVolatility * biomeWeight;
                 heightSum += nextBiomeHeight * biomeWeight;
                 biomeWeightSum += biomeWeight;
             }
@@ -622,11 +622,11 @@ public class ChunkProviderTC
         final BiomeConfig biomeConfig = toBiomeConfig(this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius)
                 * (NOISE_MAX_X + this.maxSmoothDiameter))]);
 
-        final int lookRadius = biomeConfig.SmoothRadius;
+        final int lookRadius = biomeConfig.smoothRadius;
 
         this.riverFound = this.riverArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))] == 1;
 
-        final float riverCenterHeight = this.riverFound ? biomeConfig.riverHeight : biomeConfig.BiomeHeight;
+        final float riverCenterHeight = this.riverFound ? biomeConfig.riverHeight : biomeConfig.biomeHeight;
 
         BiomeConfig nextBiomeConfig;
         float nextBiomeHeight, biomeWeight, nextRiverHeight, riverWeight;
@@ -638,17 +638,17 @@ public class ChunkProviderTC
 
                 nextBiomeConfig = toBiomeConfig(this.biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius)
                         * (NOISE_MAX_X + this.maxSmoothDiameter))]);
-                nextBiomeHeight = nextBiomeConfig.BiomeHeight;
+                nextBiomeHeight = nextBiomeConfig.biomeHeight;
                 biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius)
                         * this.maxSmoothDiameter)]
                         / (nextBiomeHeight + 2.0F);
 
                 biomeWeight = Math.abs(biomeWeight);
-                if (nextBiomeHeight > biomeConfig.BiomeHeight)
+                if (nextBiomeHeight > biomeConfig.biomeHeight)
                 {
                     biomeWeight /= 2.0F;
                 }
-                volatilitySum += nextBiomeConfig.BiomeVolatility * biomeWeight;
+                volatilitySum += nextBiomeConfig.biomeVolatility * biomeWeight;
                 heightSum += nextBiomeHeight * biomeWeight;
                 WeightSum += biomeWeight;
 
@@ -672,7 +672,7 @@ public class ChunkProviderTC
                 {
                     nextRiverHeight = riverCenterHeight;
                 }
-                riverVolatilitySum += (isRiver ? nextBiomeConfig.riverVolatility : nextBiomeConfig.BiomeVolatility) * riverWeight;
+                riverVolatilitySum += (isRiver ? nextBiomeConfig.riverVolatility : nextBiomeConfig.biomeVolatility) * riverWeight;
                 riverHeightSum += nextRiverHeight * riverWeight;
                 riverWeightSum += riverWeight;
             }

@@ -102,7 +102,7 @@ public class TCPlugin extends JavaPlugin
             // Start the engine
             this.commandExecutor = new TCCommandExecutor(this);
             this.listener = new TCListener(this);
-            Bukkit.getMessenger().registerOutgoingPluginChannel(this, PluginStandardValues.ChannelName.stringValue());
+            Bukkit.getMessenger().registerOutgoingPluginChannel(this, PluginStandardValues.ChannelName);
 
             TerrainControl.log(LogMarker.INFO, "Global objects loaded, waiting for worlds to load");
 
