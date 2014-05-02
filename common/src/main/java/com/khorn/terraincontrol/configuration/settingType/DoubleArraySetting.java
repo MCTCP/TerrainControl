@@ -49,7 +49,7 @@ public class DoubleArraySetting extends Setting<double[]>
         {
             if (i != 0)
             {
-                builder.append(",");
+                builder.append(", ");
             }
             builder.append(values[i]);
         }

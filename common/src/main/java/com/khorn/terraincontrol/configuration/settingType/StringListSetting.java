@@ -44,7 +44,7 @@ class StringListSetting extends Setting<List<String>>
     @Override
     public String write(List<String> value)
     {
-        return StringHelper.join(value, ",");
+        return StringHelper.join(value, ", ");
     }
 
 }

@@ -126,7 +126,7 @@ public abstract class StringHelper
         {
             if (c == ',' && inBracer == 0)
             {
-                buffer.add(line.substring(lastFound, index));
+                buffer.add(line.substring(lastFound, index).trim());
                 lastFound = index + 1;
             }
 
