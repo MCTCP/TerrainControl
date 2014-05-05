@@ -5,7 +5,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.*;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeight;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
@@ -154,15 +154,15 @@ public class BO3 implements StructuredCustomObject
     {
         Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int y = 0;
-        if (settings.spawnHeight == SpawnHeight.randomY)
+        if (settings.spawnHeight == SpawnHeightEnum.randomY)
         {
             y = MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight);
         }
-        if (settings.spawnHeight == SpawnHeight.highestBlock)
+        if (settings.spawnHeight == SpawnHeightEnum.highestBlock)
         {
             y = world.getHighestBlockYAt(x, z);
         }
-        if (settings.spawnHeight == SpawnHeight.highestSolidBlock)
+        if (settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
         {
             y = world.getSolidHeight(x, z);
         }

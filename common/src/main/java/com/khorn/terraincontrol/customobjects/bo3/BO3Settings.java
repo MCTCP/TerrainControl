@@ -37,10 +37,10 @@ public class BO3Settings extends Settings
 
     // Enum settings
     public static final Setting<OutsideSourceBlock> OUTSIDE_SOURCE_BLOCK = enumSetting("OutsideSourceBlock", OutsideSourceBlock.placeAnyway);
-    public static final Setting<SpawnHeight> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeight.highestBlock);
+    public static final Setting<SpawnHeightEnum> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
 
     // The spawn height
-    public static enum SpawnHeight
+    public static enum SpawnHeightEnum
     {
         randomY(StructurePartSpawnHeight.PROVIDED),
         highestBlock(StructurePartSpawnHeight.HIGHEST_BLOCK),
@@ -48,7 +48,7 @@ public class BO3Settings extends Settings
 
         private StructurePartSpawnHeight height;
 
-        private SpawnHeight(StructurePartSpawnHeight height)
+        private SpawnHeightEnum(StructurePartSpawnHeight height)
         {
             this.height = height;
         }

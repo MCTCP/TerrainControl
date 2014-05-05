@@ -7,7 +7,7 @@ import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeight;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
@@ -29,10 +29,15 @@ public class BO3Config extends ConfigFile
     public int frequency;
     public double rarity;
     public boolean rotateRandomly;
-    public SpawnHeight spawnHeight;
+    public SpawnHeightEnum spawnHeight;
     public int minHeight;
     public int maxHeight;
-    public List<String> excludedBiomes;
+    /*
+     * Using ArrayList instead of List to avoid breaking BO3Tools.
+     * Eventually we probably want to get rid entirely of (Array)List<String>
+     * for biome lists and use a proper BiomeList.
+     */
+    public ArrayList<String> excludedBiomes;
     public MaterialSet sourceBlocks;
     public int maxPercentageOutsideSourceBlock;
     public OutsideSourceBlock outsideSourceBlock;
@@ -185,7 +190,7 @@ public class BO3Config extends ConfigFile
         minHeight = readSettings(BO3Settings.MIN_HEIGHT);
         maxHeight = readSettings(BO3Settings.MAX_HEIGHT);
         maxBranchDepth = readSettings(BO3Settings.MAX_BRANCH_DEPTH);
-        excludedBiomes = readSettings(BO3Settings.EXCLUDED_BIOMES);
+        excludedBiomes = new ArrayList<String>(readSettings(BO3Settings.EXCLUDED_BIOMES));
 
         sourceBlocks = readSettings(BO3Settings.SOURCE_BLOCKS);
         maxPercentageOutsideSourceBlock = readSettings(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK);
