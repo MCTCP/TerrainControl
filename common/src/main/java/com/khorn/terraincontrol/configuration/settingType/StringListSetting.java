@@ -31,14 +31,7 @@ class StringListSetting extends Setting<List<String>>
     @Override
     public List<String> read(String string) throws InvalidConfigException
     {
-        String[] split = StringHelper.readCommaSeperatedString(string);
-        for (int i = 0; i < split.length; i++)
-        {
-            // Trimming the values allows "Value1, Value2" instead of
-            // "Value1,Value2"
-            split[i] = split[i];
-        }
-        return Arrays.asList(split);
+        return Arrays.asList(StringHelper.readCommaSeperatedString(string));
     }
 
     @Override
