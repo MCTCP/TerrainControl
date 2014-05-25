@@ -461,6 +461,11 @@ public class WorldConfig extends ConfigFile
             try
             {
                 String[] keys = biome.split(":");
+                if (keys[0].isEmpty())
+                {
+                    // Don't allow biomes with empty names
+                    continue;
+                }
                 if (keys.length == 2)
                 {
                     int generationBiomeId = Integer.parseInt(keys[1]);
