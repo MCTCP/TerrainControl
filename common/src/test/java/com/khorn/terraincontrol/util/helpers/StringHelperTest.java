@@ -15,7 +15,10 @@ public class StringHelperTest
     @Test
     public void testReadCommaSeperatedString()
     {
-        assertArrayEquals(StringHelper.readCommaSeperatedString(""), new String[] {""});
+        // Test empty string
+        assertArrayEquals(StringHelper.readCommaSeperatedString(""), new String[0]);
+
+        // Test simple strings
         assertArrayEquals(StringHelper.readCommaSeperatedString("a"), new String[] {"a"});
         assertArrayEquals(StringHelper.readCommaSeperatedString("a,b,cd"), new String[] {"a", "b", "cd"});
 
@@ -26,7 +29,9 @@ public class StringHelperTest
         assertArrayEquals(StringHelper.readCommaSeperatedString("a,b(c,d(e,f),g),h"), new String[] {"a", "b(c,d(e,f),g)", "h"});
 
         // Test if whitespace is stripped
+        assertArrayEquals(StringHelper.readCommaSeperatedString("   "), new String[0]);
         assertArrayEquals(StringHelper.readCommaSeperatedString("a, b(c,d), e"), new String[] {"a", "b(c,d)", "e"});
+        assertArrayEquals(StringHelper.readCommaSeperatedString("  a, b(c,d), e  "), new String[] {"a", "b(c,d)", "e"});
     }
 
     @Test

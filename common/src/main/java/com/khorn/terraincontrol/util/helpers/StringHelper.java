@@ -109,13 +109,22 @@ public abstract class StringHelper
      * <p>Extra whitespace around each part is removed using
      * {@link String#trim()}. <code>part1, part2</code> will become
      * <code>["part1", "part2"]</code> and not <code>["part1", " part2"]</code>
-     * 
+     *
+     * <p>An empty string, or a string consisting of only whitespace, will
+     * result in an empty array.
+     *
      * @param line
      *            The line to parse.
      * @return The parts of the string.
      */
     public static String[] readCommaSeperatedString(String line)
     {
+        if (line.trim().isEmpty())
+        {
+            // Empty lines have no elements, not one empty element
+            return new String[0];
+        }
+
         List<String> buffer = new LinkedList<String>();
 
         int index = 0;
