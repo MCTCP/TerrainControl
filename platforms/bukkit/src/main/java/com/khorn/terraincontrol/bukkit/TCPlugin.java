@@ -184,10 +184,8 @@ public class TCPlugin extends JavaPlugin
         File baseFolder = new File(this.getDataFolder(), "worlds" + File.separator + worldName);
         if (!baseFolder.exists())
         {
-            TerrainControl.log(LogMarker.FATAL, "TC was not allowed to create folder {}", baseFolder.getName());
-
             if (!baseFolder.mkdirs())
-                TerrainControl.log(LogMarker.FATAL, "Cant create folder ", baseFolder.getName());
+                TerrainControl.log(LogMarker.FATAL, "Can't create folder ", baseFolder.getName());
         }
         return baseFolder;
     }
