@@ -30,12 +30,22 @@ localexport.jardesc
 forgeInfo
 
 # Minecraft and Forge files
+platforms/forge/banned-players.txt
+platforms/forge/banned-ips.txt
 platforms/forge/crash-reports
 platforms/forge/logs
 platforms/forge/mods
 platforms/forge/config
 platforms/forge/options.txt
+platforms/forge/ops.txt
 platforms/forge/saves
+platforms/forge/server.properties
+platforms/forge/white-list.txt
+platforms/forge**/*.dat
+platforms/forge**/level.dat_old
+platforms/forge**/session.lock
+platforms/forge**/*.mca
+platforms/forge**/*.json
 platforms/forge**/assets
 
 
