@@ -58,8 +58,9 @@ public class PacketHandler
                     // If the packet wasn't empty, add the new biomes
                     WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
 
-                    ForgeWorld worldTC = new ForgeWorld("external");
                     DataInputStream wrappedStream = new DataInputStream(new ByteBufInputStream(stream));
+                    String worldName = ConfigFile.readStringFromStream(wrappedStream);
+                    ForgeWorld worldTC = new ForgeWorld(worldName);
                     WorldSettings config = new WorldSettings(wrappedStream, worldTC);
                     wrappedStream.close();
 
