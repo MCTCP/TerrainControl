@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.forge.events;
 
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.ForgeWorld;
@@ -12,9 +13,15 @@ import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
 
 import java.io.DataInputStream;
+import java.util.Arrays;
 
 public class PacketHandler
 {
@@ -63,13 +70,41 @@ public class PacketHandler
             } else
             {
                 // Server or client is outdated
-                TerrainControl.log(LogMarker.WARN, "Server has different protocol version! " + "Client: " + PluginStandardValues.ProtocolVersion + " Server: " + serverProtocolVersion);
+                if (serverProtocolVersion > PluginStandardValues.ProtocolVersion)
+                {
+                    sendMessage(EnumChatFormatting.GREEN, "The server is running a newer version of " + PluginStandardValues.PLUGIN_NAME
+                            + ". Please update!");
+                } else
+                {
+                    sendMessage(EnumChatFormatting.YELLOW, "The server is running an outdated version of "
+                            + PluginStandardValues.PLUGIN_NAME + ". Cannot load custom biome colors and weather.");
+                }
+                TerrainControl.log(LogMarker.WARN, "Server has different protocol version. Client: {} Server: {}",
+                        PluginStandardValues.ProtocolVersion, serverProtocolVersion);
             }
         } catch (Exception e)
         {
+            sendMessage(EnumChatFormatting.RED, "Error receiving packet.");
             TerrainControl.log(LogMarker.FATAL, "Failed to receive packet");
             TerrainControl.printStackTrace(LogMarker.FATAL, e);
+            TerrainControl.log(LogMarker.FATAL, "Packet contents: {}", Arrays.toString(stream.array()));
         }
+    }
+
+    /**
+     * Sends a message that will be displayed ingame.
+     * @param color The color of the message.
+     * @param message The message to send.
+     */
+    private void sendMessage(EnumChatFormatting color, String message)
+    {
+        IChatComponent chat = new ChatComponentText(PluginStandardValues.PLUGIN_NAME + ": " + message);
+
+        ChatStyle chatStyle = new ChatStyle();
+        chatStyle.setColor(color);
+        chat.setChatStyle(chatStyle);
+
+        Minecraft.getMinecraft().thePlayer.addChatMessage(chat);
     }
 
 }

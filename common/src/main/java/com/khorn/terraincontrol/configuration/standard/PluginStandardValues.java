@@ -22,4 +22,9 @@ public class PluginStandardValues extends Settings
   //>>  Plugin Defaults
     public static final Setting<LogLevels> LogLevel = enumSetting("LogLevel", LogLevels.Standard);
 
+    /**
+     * Name of the plugin, "Terrain Control".
+     */
+    public static final String PLUGIN_NAME = "Terrain Control";
+
 }
