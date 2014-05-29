@@ -10,7 +10,8 @@ import com.khorn.terraincontrol.forge.events.SaplingListener;
 import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import cpw.mods.fml.common.*;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -52,7 +53,7 @@ public class TCPlugin
         }
 
         // Register player tracker, for sending configs.
-        MinecraftForge.EVENT_BUS.register(new PlayerTracker(this));
+        FMLCommonHandler.instance().bus().register(new PlayerTracker());
 
         // Register sapling tracker, for custom tree growth.
         SaplingListener saplingListener = new SaplingListener();

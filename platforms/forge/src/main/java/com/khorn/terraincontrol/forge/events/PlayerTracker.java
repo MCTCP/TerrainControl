@@ -4,12 +4,11 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
-import com.khorn.terraincontrol.forge.ForgeEngine;
-import com.khorn.terraincontrol.forge.TCPlugin;
+import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
-
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
 
 import java.io.ByteArrayOutputStream;
@@ -19,24 +18,22 @@ import java.io.IOException;
 public class PlayerTracker
 {
 
-    TCPlugin plugin;
-
-    public PlayerTracker(TCPlugin plugin)
-    {
-        this.plugin = plugin;
-    }
-
     @SubscribeEvent
-    public void onPlayerLogin(ClientConnectedToServerEvent event)
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
         // Server-side - called whenever a player logs in
         // I couldn't find a way to detect if the client has TerrainControl,
         // so for now the configs are sent anyway.
 
         // Get the config
-        // TODO only send the configs when the player is in the main world
-        LocalWorld worldTC = ((ForgeEngine)TerrainControl.getEngine()).getWorld();
+        if (!(event.player instanceof EntityPlayerMP))
+        {
+            return;
+        }
 
+        EntityPlayerMP player = (EntityPlayerMP) event.player;
+        
+        LocalWorld worldTC = WorldHelper.toLocalWorld(player.getEntityWorld());
         if (worldTC == null)
         {
             // World not loaded
@@ -60,8 +57,7 @@ public class PlayerTracker
         S3FPacketCustomPayload packet = new S3FPacketCustomPayload(PluginStandardValues.ChannelName, outputStream.toByteArray());
 
         // Send the packet
-        event.handler.handleCustomPayload(packet);
-        System.out.println("TerrainControl: sent config");
+        player.playerNetServerHandler.sendPacket(packet);
     }
 
 }
