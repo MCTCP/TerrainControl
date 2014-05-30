@@ -80,7 +80,6 @@ public class ForgeWorld implements LocalWorld
     private Chunk[] chunkCache;
 
     private BiomeGenBase[] biomeGenBaseArray;
-    private int[] biomeIntArray;
 
     public static void restoreBiomes()
     {
@@ -650,18 +649,6 @@ public class ForgeWorld implements LocalWorld
     public World getWorld()
     {
         return this.world;
-    }
-
-    public void FillChunkForBiomes(Chunk chunk, int x, int z)
-    {
-
-        byte[] arrayOfByte2 = chunk.getBiomeArray();
-        biomeIntArray = this.getBiomes(biomeIntArray, x * 16, z * 16, 16, 16, OutputType.DEFAULT_FOR_WORLD);
-
-        for (int i1 = 0; i1 < arrayOfByte2.length; i1++)
-        {
-            arrayOfByte2[i1] = (byte) biomeIntArray[i1];
-        }
     }
 
     @Override

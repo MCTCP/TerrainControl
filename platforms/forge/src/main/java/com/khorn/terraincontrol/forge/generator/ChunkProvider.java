@@ -1,9 +1,14 @@
 package com.khorn.terraincontrol.forge.generator;
 
+import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
+import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
+
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
 import com.khorn.terraincontrol.generator.ObjectSpawner;
+import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSand;
@@ -27,6 +32,12 @@ public class ChunkProvider implements IChunkProvider
 
     private ChunkProviderTC generator;
     private ObjectSpawner spawner;
+    
+    /** 
+     * Used in {@link #fillBiomeArray(Chunk, int, int)}, to avoid creating
+     * new int arrays.
+     * */
+    private int[] biomeIntArray;
 
     public ChunkProvider(ForgeWorld _world)
     {
@@ -74,10 +85,31 @@ public class ChunkProvider implements IChunkProvider
                         sections[sectionId].func_150818_a(blockX, blockY & 0xF, blockZ, Block.getBlockById(block & 0xFF));
                     }
                 }
-        world.FillChunkForBiomes(chunk, chunkX, chunkZ);
 
+        fillBiomeArray(chunk);
         chunk.generateSkylightMap();
+
         return chunk;
+    }
+
+    /**
+     * Fills the biome array of a chunk with the proper saved ids (no
+     * generation ids).
+     * @param chunk The chunk to fill the biomes of.
+     */
+    private void fillBiomeArray(Chunk chunk)
+    {
+        byte[] chunkBiomeArray = chunk.getBiomeArray();
+        LocalBiome[] biomeMap = world.getSettings().biomes;
+        biomeIntArray = world.getBiomes(biomeIntArray,
+                chunk.xPosition * CHUNK_X_SIZE, chunk.zPosition * CHUNK_Z_SIZE,
+                CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
+
+        for (int i = 0; i < chunkBiomeArray.length; i++)
+        {
+            int biomeId = biomeIntArray[i];
+            chunkBiomeArray[biomeId] = (byte) biomeMap[biomeId].getIds().getSavedId();
+        }
     }
 
     @Override
