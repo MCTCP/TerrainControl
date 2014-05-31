@@ -3,17 +3,25 @@ package com.khorn.terraincontrol.customobjects;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.configuration.io.SettingsReader;
+import com.khorn.terraincontrol.configuration.settingType.Setting;
+import com.khorn.terraincontrol.configuration.settingType.Settings;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 
 public class TreeObject implements CustomObject
 {
+    private static class TreeSettings extends Settings
+    {
+        static final Setting<Integer> MIN_HEIGHT = intSetting("MinHeight",
+                TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        static final Setting<Integer> MAX_HEIGHT = intSetting("MaxHeight",
+                TerrainControl.WORLD_HEIGHT, TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+    }
 
     private TreeType type;
     private int minHeight = TerrainControl.WORLD_DEPTH;
@@ -30,30 +38,11 @@ public class TreeObject implements CustomObject
         // Stub method
     }
 
-    public TreeObject(TreeType type, Map<String, String> settings)
+    public TreeObject(TreeType type, SettingsReader settings)
     {
         this.type = type;
-        for (Entry<String, String> entry : settings.entrySet())
-        {
-            try
-            {
-                if (entry.getKey().equalsIgnoreCase("MinHeight"))
-                {
-                    this.minHeight = Math.max(TerrainControl.WORLD_DEPTH, Math.min(Integer.parseInt(entry.getValue()), TerrainControl.WORLD_HEIGHT));
-                }
-                if (entry.getKey().equalsIgnoreCase("MaxHeight"))
-                {
-                    this.maxHeight = Math.max(minHeight, Math.min(Integer.parseInt(entry.getValue()), TerrainControl.WORLD_HEIGHT));
-                }
-            } catch (NumberFormatException e)
-            {
-                TerrainControl.log(LogMarker.WARN, "Cannot parse {} of a {} tree: invalid number!", new Object[]
-                {
-                    entry.getKey(), type
-                });
-            }
-
-        }
+        this.minHeight = settings.getSetting(TreeSettings.MIN_HEIGHT, TreeSettings.MIN_HEIGHT.getDefaultValue());
+        this.maxHeight = settings.getSetting(TreeSettings.MAX_HEIGHT, TreeSettings.MAX_HEIGHT.getDefaultValue());
     }
 
     @Override
@@ -101,7 +90,7 @@ public class TreeObject implements CustomObject
     }
 
     @Override
-    public CustomObject applySettings(Map<String, String> settings)
+    public CustomObject applySettings(SettingsReader settings)
     {
         return new TreeObject(type, settings);
     }

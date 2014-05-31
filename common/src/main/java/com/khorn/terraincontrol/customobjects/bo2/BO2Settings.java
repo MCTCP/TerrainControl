@@ -3,12 +3,12 @@ package com.khorn.terraincontrol.customobjects.bo2;
 import static com.khorn.terraincontrol.TerrainControl.WORLD_DEPTH;
 import static com.khorn.terraincontrol.TerrainControl.WORLD_HEIGHT;
 
-import java.util.List;
-
 import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.configuration.settingType.Settings;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+
+import java.util.List;
 
 public class BO2Settings extends Settings
 {

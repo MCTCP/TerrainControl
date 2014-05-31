@@ -5,15 +5,17 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
+import com.khorn.terraincontrol.configuration.io.SettingsReader;
+import com.khorn.terraincontrol.configuration.io.SettingsWriter;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * The good old BO2.
@@ -59,32 +61,21 @@ public class BO2 extends ConfigFile implements CustomObject
 
     public int branchLimit;
 
-    public BO2(String name, File file)
+    public BO2(SettingsReader reader)
     {
-        super(name, file);
-        readSettingsFile();
-    }
-
-    public BO2(String name, File file, Map<String, String> settings)
-    {
-        super(name, file);
-        settingsCache = settings;
-        // Initialize immediately
-        readConfigSettings();
-        correctSettings();
+        super(reader);
     }
 
     @Override
     public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
     {
-        readConfigSettings();
-        correctSettings();
+        enable();
     }
 
-    @Override
-    public String getName()
+    private void enable()
     {
-        return this.name;
+        readConfigSettings();
+        correctSettings();
     }
 
     @Override
@@ -257,16 +248,16 @@ public class BO2 extends ConfigFile implements CustomObject
     }
 
     @Override
-    public CustomObject applySettings(Map<String, String> extraSettings)
+    public CustomObject applySettings(SettingsReader extraSettings)
     {
-        Map<String, String> newSettings = new HashMap<String, String>();
-        newSettings.putAll(settingsCache);
-        newSettings.putAll(extraSettings);
-        return new BO2(name, file, newSettings);
+        extraSettings.setFallbackReader(this.reader);
+        BO2 bo2WithSettings = new BO2(extraSettings);
+        bo2WithSettings.enable();
+        return bo2WithSettings;
     }
 
     @Override
-    protected void writeConfigSettings() throws IOException
+    protected void writeConfigSettings(SettingsWriter writer) throws IOException
     {
         // It doesn't write.
     }
@@ -331,9 +322,9 @@ public class BO2 extends ConfigFile implements CustomObject
     {
         ArrayList<ObjectCoordinate> coordinates = new ArrayList<ObjectCoordinate>();
 
-        for (String key : settingsCache.keySet())
+        for (Entry<String, String> line : reader.getRawSettings())
         {
-            ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(key, settingsCache.get(key));
+            ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(line.getKey(), line.getValue());
             if (buffer != null)
                 coordinates.add(buffer);
         }

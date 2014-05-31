@@ -2,6 +2,9 @@ package com.khorn.terraincontrol;
 
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.configuration.PluginConfig;
+import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
+import com.khorn.terraincontrol.configuration.io.FileSettingsWriter;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
@@ -102,7 +105,7 @@ public abstract class TerrainControlEngine
      *         false otherwise.
      */
     public boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX,
-                                            int chunkZ)
+            int chunkZ)
     {
         boolean success = true;
         for (EventHandler handler : cancelableEventHandlers)
@@ -225,7 +228,9 @@ public abstract class TerrainControlEngine
 
         // Do pluginConfig loading and then log anything that happened
         // LogManager and PluginConfig are now decoupled, thank the lord!
-        pluginConfig = new PluginConfig(getTCDataFolder());
+        pluginConfig = new PluginConfig(new FileSettingsReader("PluginConfig", new File(getTCDataFolder(),
+                PluginStandardValues.ConfigFilename)));
+        FileSettingsWriter.writeToFile(pluginConfig, pluginConfig.SettingsMode);
         logger.setLevel(pluginConfig.getLogLevel().getLevel());
 
         // Fire start event

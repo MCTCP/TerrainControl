@@ -2,6 +2,8 @@ package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
+import com.khorn.terraincontrol.configuration.io.SettingsReader;
+import com.khorn.terraincontrol.configuration.io.SettingsWriter;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
@@ -9,7 +11,6 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -53,28 +54,15 @@ public final class PluginConfig extends ConfigFile
     public LogLevels LogLevel = LogLevels.Standard;
     public String biomeConfigExtension;
 
-    public PluginConfig(File settingsDir)
+    public PluginConfig(SettingsReader settingsReader)
     {
 
-        super(PluginStandardValues.ChannelName, new File(settingsDir, PluginStandardValues.ConfigFilename));
-        if (!settingsDir.exists())
-            settingsDir.mkdirs();
-        init();
-    }
+        super(settingsReader);
 
-    private void init()
-    {
-        if (this.file.exists())
-        {
-            this.readSettingsFile();
-        }
         this.renameOldSettings();
         this.readConfigSettings();
 
         this.correctSettings();
-
-        if (this.SettingsMode != ConfigMode.WriteDisable)
-            this.writeSettingsFile(this.SettingsMode == ConfigMode.WriteAll);
     }
 
     @Override
@@ -107,50 +95,50 @@ public final class PluginConfig extends ConfigFile
     }
 
     @Override
-    protected void writeConfigSettings() throws IOException
+    protected void writeConfigSettings(SettingsWriter writer) throws IOException
     {
         // The modes
-        writeBigTitle("The TerrainControl Plugin Config File ");
+        writer.bigTitle("The TerrainControl Plugin Config File ");
 
-        writeComment("How this config file will be treated.");
-        writeComment("Possible Write Modes:");
-        writeComment("   WriteAll             - Write config files with help comments");
-        writeComment("   WriteWithoutComments - Write config files without help comments");
-        writeComment("   WriteDisable         - Doesn't write to the config files, it only reads.");
-        writeComment("                          Doesn't auto-update the configs. Use with care!");
-        writeComment("Defaults to: WriteAll");
-        writeValue(WorldStandardValues.SETTINGS_MODE, this.SettingsMode);
+        writer.comment("How this config file will be treated.");
+        writer.comment("Possible Write Modes:");
+        writer.comment("   WriteAll             - Write config files with help comments");
+        writer.comment("   WriteWithoutComments - Write config files without help comments");
+        writer.comment("   WriteDisable         - Doesn't write to the config files, it only reads.");
+        writer.comment("                          Doesn't auto-update the configs. Use with care!");
+        writer.comment("Defaults to: WriteAll");
+        writer.setting(WorldStandardValues.SETTINGS_MODE, this.SettingsMode);
 
         // Custom biomes
-        writeBigTitle("Log Levels");
+        writer.bigTitle("Log Levels");
 
-        writeSmallTitle("Possible Log Levels");
+        writer.smallTitle("Possible Log Levels");
         // writeComment("   Off         - Only warnings and errors are displayed.");
         // // Shows warning when using this
-        writeComment("   Off         - Bare logging; This will only show FATAL and ERROR logs");
-        writeComment("   Quiet       - Minimal logging; This will show FATAL, ERROR, and WARN logs");
-        writeComment("   Standard    - Default logging; This is exactly what you are used to. Quiet + INFO logs");
-        writeComment("   Debug       - Above Normal logging; Standard logs + DEBUG logs");
-        writeComment("   Trace       - Verbose logging; This gets very messy, Debug logs + TRACE logs");
-        writeComment("");
+        writer.comment("   Off         - Bare logging; This will only show FATAL and ERROR logs");
+        writer.comment("   Quiet       - Minimal logging; This will show FATAL, ERROR, and WARN logs");
+        writer.comment("   Standard    - Default logging; This is exactly what you are used to. Quiet + INFO logs");
+        writer.comment("   Debug       - Above Normal logging; Standard logs + DEBUG logs");
+        writer.comment("   Trace       - Verbose logging; This gets very messy, Debug logs + TRACE logs");
+        writer.comment("");
 
-        writeSmallTitle("Logging Level");
-        writeComment("This is the level with which logs will be produced.");
-        writeComment("See ``Possible Log Levels'' if you are lost.");
-        writeComment(" ");
-        writeComment("Defaults to: Standard");
-        writeValue(PluginStandardValues.LogLevel, this.LogLevel);
+        writer.smallTitle("Logging Level");
+        writer.comment("This is the level with which logs will be produced.");
+        writer.comment("See ``Possible Log Levels'' if you are lost.");
+        writer.comment(" ");
+        writer.comment("Defaults to: Standard");
+        writer.setting(PluginStandardValues.LogLevel, this.LogLevel);
 
-        writeBigTitle("File Extension Rules");
+        writer.bigTitle("File Extension Rules");
 
-        writeSmallTitle("Default Biome File Extension");
-        writeComment("Pre-TC 2.5.0, biome config files were in the form BiomeNameBiomeConfig.ini");
-        writeComment("Now, biome config files are in the form BiomeName.bc.ini");
-        writeComment("You may change this by choosing between the following extensions:");
-        writeComment("BiomeConfig.ini, .biome, .bc, .bc.ini, and .biome.ini");
-        writeComment(" ");
-        writeComment("Defaults to: .bc");
-        writeValue(BiomeStandardValues.BIOME_CONFIG_EXTENSION, this.biomeConfigExtension);
+        writer.smallTitle("Default Biome File Extension");
+        writer.comment("Pre-TC 2.5.0, biome config files were in the form BiomeNameBiomeConfig.ini");
+        writer.comment("Now, biome config files are in the form BiomeName.bc.ini");
+        writer.comment("You may change this by choosing between the following extensions:");
+        writer.comment("BiomeConfig.ini, .biome, .bc, .bc.ini, and .biome.ini");
+        writer.comment(" ");
+        writer.comment("Defaults to: .bc");
+        writer.setting(BiomeStandardValues.BIOME_CONFIG_EXTENSION, this.biomeConfigExtension);
     }
 
     public LogLevels getLogLevel()

@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.customobjects;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.io.BracketSettingsReader;
 import com.khorn.terraincontrol.customobjects.bo2.BO2Loader;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Loader;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -235,41 +236,22 @@ public class CustomObjectManager
      */
     public CustomObject getObjectFromString(String string, WorldConfig config)
     {
-        String[] parts = new String[] {string, ""};
+        String objectName = string;
+        String objectExtraSettings = "";
 
         int start = string.indexOf('(');
         int end = string.lastIndexOf(')');
         if (start != -1 && end != -1)
         {
-            parts[0] = string.substring(0, start);
-            parts[1] = string.substring(start + 1, end);
+            objectName = string.substring(0, start);
+            objectExtraSettings = string.substring(start + 1, end);
         }
 
-        CustomObject object = getCustomObject(parts[0], config);
+        CustomObject object = getCustomObject(objectName, config);
 
-        if (object != null && parts[1].length() != 0)
+        if (object != null && objectExtraSettings.length() != 0)
         {
-            // More settings have been given
-            Map<String, String> settingsMap = new HashMap<String, String>();
-
-            String[] settings = parts[1].split(";");
-            for (String setting : settings)
-            {
-                String[] settingParts = setting.split("=");
-                if (settingParts.length == 1)
-                {
-                    // Boolean values or resources
-                    settingsMap.put(settingParts[0], "true");
-                } else if (settingParts.length == 2)
-                {
-                    settingsMap.put(settingParts[0].toLowerCase(), settingParts[1]);
-                }
-            }
-
-            if (settingsMap.size() > 0)
-            {
-                object = object.applySettings(settingsMap);
-            }
+            object = object.applySettings(new BracketSettingsReader(object.getName(), objectExtraSettings));
         }
 
         return object;

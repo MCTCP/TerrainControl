@@ -3,14 +3,16 @@ package com.khorn.terraincontrol.configuration.standard;
 import static com.khorn.terraincontrol.TerrainControl.WORLD_DEPTH;
 import static com.khorn.terraincontrol.TerrainControl.WORLD_HEIGHT;
 
-import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
-
-import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
+import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
-import com.khorn.terraincontrol.configuration.settingType.*;
+import com.khorn.terraincontrol.configuration.settingType.DoubleArraySetting;
+import com.khorn.terraincontrol.configuration.settingType.MaterialSetting;
+import com.khorn.terraincontrol.configuration.settingType.Setting;
+import com.khorn.terraincontrol.configuration.settingType.Settings;
+import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Arrays;

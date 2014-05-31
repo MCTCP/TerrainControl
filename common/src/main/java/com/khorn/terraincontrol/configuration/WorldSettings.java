@@ -4,6 +4,11 @@ import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
+import com.khorn.terraincontrol.configuration.io.FileSettingsWriter;
+import com.khorn.terraincontrol.configuration.io.MemorySettingsReader;
+import com.khorn.terraincontrol.configuration.io.SettingsReader;
+import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
@@ -57,14 +62,17 @@ public class WorldSettings
     {
         this.settingsDir = settingsDir;
         this.world = world;
-        this.worldConfig = new WorldConfig(settingsDir, world);
+        File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
+        this.worldConfig = new WorldConfig(new FileSettingsReader(world.getName(), worldConfigFile), world);
+        FileSettingsWriter.writeToFile(worldConfig, worldConfig.SettingsMode);
         this.checkOnly = checkOnly;
         this.biomes = new LocalBiome[world.getMaxBiomesCount()];
 
         load();
     }
-    
-    private void load() {
+
+    private void load()
+    {
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);
         // TerrainControl/worlds/<WorldName>/<WorldBiomes/
@@ -80,11 +88,11 @@ public class WorldSettings
 
         // This adds all custombiomes that have been listed in WorldConfig to
         // the arrayList
-        for (Entry<String, BiomeIds> entry : worldConfig.CustomBiomeIds.entrySet())
+        for (Entry<String, Integer> entry : worldConfig.customBiomeGenerationIds.entrySet())
         {
             String biomeName = entry.getKey();
-            BiomeIds ids = entry.getValue();
-            biomesToLoad.add(new BiomeLoadInstruction(biomeName, ids.getGenerationId(), new StandardBiomeTemplate(
+            int generationId = entry.getValue();
+            biomesToLoad.add(new BiomeLoadInstruction(biomeName, generationId, new StandardBiomeTemplate(
                     worldConfig.worldHeightScale)));
         }
 
@@ -101,11 +109,12 @@ public class WorldSettings
         TerrainControl.log(LogMarker.INFO, "{} biomes Loaded", new Object[] {biomesCount});
         TerrainControl.log(LogMarker.DEBUG, "{}", new Object[] {loadedBiomeNames});
     }
-    
+
     /**
      * Reloads the settings from disk.
      */
-    public void reload() {
+    public void reload()
+    {
         // Clear biome collections
         Arrays.fill(this.biomes, null);
         this.savedBiomes.clear();
@@ -127,7 +136,7 @@ public class WorldSettings
 
             // Statistics of the loaded biomes
             this.biomesCount++;
-            loadedBiomeNames.append(biomeConfig.name);
+            loadedBiomeNames.append(biomeConfig.getName());
             loadedBiomeNames.append(", ");
 
             // Inheritance
@@ -144,9 +153,11 @@ public class WorldSettings
 
             // Check generation id range
             int generationId = biomeConfig.generationId;
-            if (generationId < 0 || generationId >= world.getMaxBiomesCount()) {
-                TerrainControl.log(LogMarker.ERROR, "The biome id of the {} biome, {}, is too high. It must be between 0 and {}, inclusive.", 
-                        biomeConfig.name, generationId, world.getMaxBiomesCount() - 1);
+            if (generationId < 0 || generationId >= world.getMaxBiomesCount())
+            {
+                TerrainControl.log(LogMarker.ERROR,
+                        "The biome id of the {} biome, {}, is too high. It must be between 0 and {}, inclusive.",
+                        biomeConfig.getName(), generationId, world.getMaxBiomesCount() - 1);
                 TerrainControl.log(LogMarker.ERROR, "The biome has been prevented from loading.");
                 continue;
             }
@@ -155,8 +166,8 @@ public class WorldSettings
             if (biomes[generationId] != null)
             {
                 TerrainControl.log(LogMarker.FATAL, "Duplicate biome id {} ({} and {})!", generationId, biomes[generationId].getName(),
-                        biomeConfig.name);
-                TerrainControl.log(LogMarker.FATAL, "The biome {} has been prevented from loading.", new Object[] {biomeConfig.name});
+                        biomeConfig.getName());
+                TerrainControl.log(LogMarker.FATAL, "The biome {} has been prevented from loading.", new Object[] {biomeConfig.getName()});
                 TerrainControl.log(LogMarker.INFO, "If you are updating an old pre-Minecraft 1.7 world, please read this wiki page:");
                 TerrainControl.log(LogMarker.INFO, "https://github.com/Wickth/TerrainControl/wiki/Upgrading-an-old-map-to-Minecraft-1.7");
                 continue;
@@ -171,7 +182,7 @@ public class WorldSettings
                 if (replaceToConfig == null)
                 {
                     biomeConfig.replaceToBiomeName = "";
-                    TerrainControl.log(LogMarker.WARN, "Invalid ReplaceToBiomeName in biome {}: biome {} doesn't exist", biomeConfig.name,
+                    TerrainControl.log(LogMarker.WARN, "Invalid ReplaceToBiomeName in biome {}: biome {} doesn't exist", biomeConfig.getName(),
                             biomeConfig.replaceToBiomeName);
                 } else
                 {
@@ -180,11 +191,15 @@ public class WorldSettings
             }
 
             // Check saved id range
-            if (savedId >= world.getMaxSavedBiomesCount()) {
-                TerrainControl.log(LogMarker.ERROR, "Biomes with an id between {} and {} (inclusive) must have a valid ReplaceToBiomeName setting:", 
+            if (savedId >= world.getMaxSavedBiomesCount())
+            {
+                TerrainControl.log(LogMarker.ERROR,
+                        "Biomes with an id between {} and {} (inclusive) must have a valid ReplaceToBiomeName setting:",
                         world.getMaxBiomesCount(), world.getMaxSavedBiomesCount() - 1);
-                TerrainControl.log(LogMarker.ERROR, "Minecraft can only save biomes with an id between 0 and {}, inclusive.", world.getMaxBiomesCount() - 1);
-                TerrainControl.log(LogMarker.ERROR, "This means that the biome {} with map file id {} had to be prevented from loading.", biomeConfig.name, savedId);
+                TerrainControl.log(LogMarker.ERROR, "Minecraft can only save biomes with an id between 0 and {}, inclusive.",
+                        world.getMaxBiomesCount() - 1);
+                TerrainControl.log(LogMarker.ERROR, "This means that the biome {} with map file id {} had to be prevented from loading.",
+                        biomeConfig.getName(), savedId);
                 continue;
             }
 
@@ -205,11 +220,11 @@ public class WorldSettings
             }
 
             // Indexing BiomeRarity
-            if (this.worldConfig.NormalBiomes.contains(biomeConfig.name))
+            if (this.worldConfig.NormalBiomes.contains(biomeConfig.getName()))
             {
                 this.worldConfig.normalBiomesRarity += biomeConfig.biomeRarity;
             }
-            if (this.worldConfig.IceBiomes.contains(biomeConfig.name))
+            if (this.worldConfig.IceBiomes.contains(biomeConfig.getName()))
             {
                 this.worldConfig.iceBiomesRarity += biomeConfig.biomeRarity;
             }
@@ -276,7 +291,7 @@ public class WorldSettings
         if (extendedBiomeConfig == null)
         {
             TerrainControl.log(LogMarker.WARN, "The biome {} tried to extend the biome {}, but that biome doesn't exist.", new Object[] {
-                    biomeConfig.name, extendedBiomeName});
+                    biomeConfig.getName(), extendedBiomeName});
             return;
         }
 
@@ -285,7 +300,7 @@ public class WorldSettings
         {
             TerrainControl.log(LogMarker.FATAL,
                     "The biome {} cannot extend the biome {} - too much configs processed already! Cyclical inheritance?", new Object[] {
-                            biomeConfig.name, extendedBiomeConfig.name});
+                            biomeConfig.getName(), extendedBiomeConfig.getName()});
         }
 
         if (!extendedBiomeConfig.biomeExtendsProcessed)
@@ -306,38 +321,45 @@ public class WorldSettings
     {
         this.checkOnly = false;
 
-        // General information
-        worldConfig = new WorldConfig(world);
-
-        worldConfig.WorldFog = stream.readInt();
-        worldConfig.WorldNightFog = stream.readInt();
-
-        worldConfig.WorldFogR = ((worldConfig.WorldFog & 0xFF0000) >> 16) / 255F;
-        worldConfig.WorldFogG = ((worldConfig.WorldFog & 0xFF00) >> 8) / 255F;
-        worldConfig.WorldFogB = (worldConfig.WorldFog & 0xFF) / 255F;
-
-        worldConfig.WorldNightFogR = ((worldConfig.WorldNightFog & 0xFF0000) >> 16) / 255F;
-        worldConfig.WorldNightFogG = ((worldConfig.WorldNightFog & 0xFF00) >> 8) / 255F;
-        worldConfig.WorldNightFogB = (worldConfig.WorldNightFog & 0xFF) / 255F;
+        // Create WorldConfig
+        SettingsReader worldSettingsReader = new MemorySettingsReader(world.getName());
+        worldSettingsReader.putSetting(WorldStandardValues.WORLD_FOG, stream.readInt());
+        worldSettingsReader.putSetting(WorldStandardValues.WORLD_NIGHT_FOG, stream.readInt());
+        worldConfig = new WorldConfig(worldSettingsReader, world);
 
         // Custom biomes + ids
         int count = stream.readInt();
         while (count-- > 0)
         {
             String biomeName = ConfigFile.readStringFromStream(stream);
-            BiomeIds id = new BiomeIds(stream.readInt());
-            worldConfig.CustomBiomeIds.put(biomeName, id);
+            int id = stream.readInt();
+            worldConfig.customBiomeGenerationIds.put(biomeName, id);
         }
 
         // BiomeConfigs
+        StandardBiomeTemplate defaultSettings = new StandardBiomeTemplate(worldConfig.worldHeightCap);
         biomes = new LocalBiome[world.getMaxBiomesCount()];
 
         count = stream.readInt();
         while (count-- > 0)
         {
             int id = stream.readInt();
-            BiomeConfig config = new BiomeConfig(stream, id, worldConfig);
+            String biomeName = ConfigFile.readStringFromStream(stream);
+            SettingsReader biomeReader = new MemorySettingsReader(biomeName);
+            biomeReader.putSetting(BiomeStandardValues.BIOME_TEMPERATURE, stream.readFloat());
+            biomeReader.putSetting(BiomeStandardValues.BIOME_WETNESS, stream.readFloat());
+            biomeReader.putSetting(BiomeStandardValues.SKY_COLOR, stream.readInt());
+            biomeReader.putSetting(BiomeStandardValues.WATER_COLOR, stream.readInt());
+            biomeReader.putSetting(BiomeStandardValues.GRASS_COLOR, stream.readInt());
+            biomeReader.putSetting(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER, stream.readBoolean());
+            biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR, stream.readInt());
+            biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, stream.readBoolean());
+
+            BiomeLoadInstruction instruction = new BiomeLoadInstruction(biomeName, id, defaultSettings);
+            BiomeConfig config = new BiomeConfig(biomeReader, instruction, worldConfig);
+            config.process();
             LocalBiome biome = world.createBiomeFor(config, new BiomeIds(id));
+
             biomes[id] = biome;
             biome.setEffects();
         }
@@ -368,17 +390,27 @@ public class WorldSettings
     public void writeToStream(DataOutputStream stream) throws IOException
     {
         // General information
-        ConfigFile.writeStringToStream(stream, worldConfig.name);
+        ConfigFile.writeStringToStream(stream, worldConfig.getName());
 
         stream.writeInt(worldConfig.WorldFog);
         stream.writeInt(worldConfig.WorldNightFog);
 
-        // Custom biomes + ids
-        stream.writeInt(worldConfig.CustomBiomeIds.size());
-        for (Entry<String, BiomeIds> entry : worldConfig.CustomBiomeIds.entrySet())
+        // Fetch all non-virtual custom biomes
+        Collection<LocalBiome> nonVirtualCustomBiomes = new ArrayList<LocalBiome>(worldConfig.customBiomeGenerationIds.size());
+        for (Integer generationId : worldConfig.customBiomeGenerationIds.values())
         {
-            ConfigFile.writeStringToStream(stream, entry.getKey());
-            stream.writeInt(entry.getValue().getSavedId());
+            LocalBiome biome = biomes[generationId];
+            if (!biome.getIds().isVirtual()) {
+                nonVirtualCustomBiomes.add(biome);
+            }
+        }
+
+        // Write them to the stream
+        stream.writeInt(nonVirtualCustomBiomes.size());
+        for (LocalBiome biome : nonVirtualCustomBiomes)
+        {
+            ConfigFile.writeStringToStream(stream, biome.getName());
+            stream.writeInt(biome.getIds().getSavedId());
         }
 
         // BiomeConfigs
@@ -388,7 +420,7 @@ public class WorldSettings
             if (biome == null)
             {
                 continue;
-            }
+            } 
             stream.writeInt(biome.getIds().getSavedId());
             biome.getBiomeConfig().writeToStream(stream);
         }

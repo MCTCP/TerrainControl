@@ -1,10 +1,9 @@
 package com.khorn.terraincontrol.configuration.settingType;
 
-import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
-
-import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix;
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 

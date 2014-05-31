@@ -1,9 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resource.*;
-import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,77 +57,42 @@ public class ConfigFunctionsManager
      * <p/>
      * @return A config function with the given name, or null of it wasn't
      *         found.
+     * @throws InvalidConfigException If the config function is invalid.
      */
     @SuppressWarnings("unchecked")
     // It's checked with if (!clazz.isAssignableFrom(holder.getClass()))
-    public <T> ConfigFunction<T> getConfigFunction(String name, T holder, String locationOfResource, List<String> args)
+    public <T> ConfigFunction<T> getConfigFunction(String name, T holder, List<String> args) throws InvalidConfigException
     {
-        // Check if config function exists
-        if (!configFunctions.containsKey(name.toLowerCase()))
+        // Get the class of the config function
+        Class<? extends ConfigFunction<?>> clazz = configFunctions.get(name.toLowerCase());
+        if (clazz == null)
         {
-            TerrainControl.log(LogMarker.WARN, "Invalid resource {} in {}: resource type not found!", new Object[]
-            {
-                name, locationOfResource
-            });
-            return null;
+            throw new InvalidConfigException("Resource type " + name + " not found");
         }
 
-        ConfigFunction<?> configFunction;
-        Class<? extends ConfigFunction<?>> clazz = configFunctions.get(name.toLowerCase());
-
         // Get a config function
+        ConfigFunction<T> configFunction;
         try
         {
-            configFunction = clazz.newInstance();
-        } catch (InstantiationException e)
+            configFunction = (ConfigFunction<T>) clazz.newInstance();
+        } catch (Exception e)
         {
-            TerrainControl.log(LogMarker.WARN, "Reflection error (Instantiation) while loading the resources: ", e.getMessage());
-            TerrainControl.printStackTrace(LogMarker.WARN, e);
-            return null;
-        } catch (IllegalAccessException e)
-        {
-            TerrainControl.log(LogMarker.WARN, "Reflection error (IllegalAccess) while loading the resources: ", e.getMessage());
-            TerrainControl.printStackTrace(LogMarker.WARN, e);
-            return null;
+            throw new RuntimeException("Reflection error while loading the resources: ", e);
         }
 
         // Check if config function is of the right type
         boolean matchingTypes;
-        try
-        {
-            matchingTypes = holder.getClass().isAssignableFrom((Class<?>) clazz.getMethod("getHolderType").invoke(configFunction));
-        } catch (Exception e)
-        {
-            TerrainControl.log(LogMarker.WARN, "Reflection error ({}) while loading the resources: ", new Object[]
-            {
-                e.getClass().getSimpleName(), e.getMessage()
-            });
-            TerrainControl.printStackTrace(LogMarker.WARN, e);
-            return null;
-        }
+        matchingTypes = holder.getClass().isAssignableFrom(configFunction.getHolderType());
         if (!matchingTypes)
         {
-            TerrainControl.log(LogMarker.WARN, "Invalid resource {} in {}: cannot be placed in this config file!", new Object[]
-            {
-                name, locationOfResource
-            });
-            return null;
+            throw new InvalidConfigException("Resource " + name + " cannot be placed in this config file");
         }
 
         // Set the holder
         configFunction.setHolder(holder);
 
         // Load it
-        try
-        {
-            configFunction.read(name, args);
-        } catch (InvalidConfigException e)
-        {
-            TerrainControl.log(LogMarker.WARN, "Invalid resource {} in {}: {}", new Object[]
-            {
-                name, locationOfResource, e.getMessage()
-            });
-        }
+        configFunction.read(name, args);
 
         // Return it
         return (ConfigFunction<T>) configFunction;

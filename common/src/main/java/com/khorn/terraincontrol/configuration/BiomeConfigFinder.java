@@ -1,6 +1,8 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
+import com.khorn.terraincontrol.configuration.io.SettingsReader;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.logging.LogMarker;
 
@@ -125,14 +127,15 @@ public class BiomeConfigFinder
      * 
      * @param biomeConfigsStore The maps to store the biomeConfig in.
      * @param file The file to load the biome from.
-     * @param defaultSettings The biome that should be loaded from the file.
+     * @param loadInstruction The biome that should be loaded from the file.
      */
-    private void loadBiomeFromFile(Map<String, BiomeConfig> biomeConfigsStore, File file, BiomeLoadInstruction defaultSettings)
+    private void loadBiomeFromFile(Map<String, BiomeConfig> biomeConfigsStore, File file, BiomeLoadInstruction loadInstruction)
     {
         // Load biome
-        File renamedFile = renameBiomeFile(file, defaultSettings);
-        BiomeConfig biomeConfig = new BiomeConfig(defaultSettings, renamedFile, worldConfig);
-        biomeConfigsStore.put(defaultSettings.getBiomeName(), biomeConfig);
+        File renamedFile = renameBiomeFile(file, loadInstruction);
+        SettingsReader reader = new FileSettingsReader(loadInstruction.getBiomeName(), renamedFile);
+        BiomeConfig biomeConfig = new BiomeConfig(reader, loadInstruction, worldConfig);
+        biomeConfigsStore.put(loadInstruction.getBiomeName(), biomeConfig);
     }
 
     /**

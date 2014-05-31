@@ -3,6 +3,9 @@ package com.khorn.terraincontrol.customobjects.bo3;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
+import com.khorn.terraincontrol.configuration.io.FileSettingsWriter;
+import com.khorn.terraincontrol.configuration.io.SettingsReader;
 import com.khorn.terraincontrol.customobjects.*;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
@@ -17,8 +20,8 @@ import java.util.Random;
 public class BO3 implements StructuredCustomObject
 {
     private BO3Config settings;
-    private String name;
-    private File file;
+    private final String name;
+    private final File file;
 
     /**
      * Creates a BO3 from a file.
@@ -35,7 +38,7 @@ public class BO3 implements StructuredCustomObject
     @Override
     public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
     {
-        this.settings = new BO3Config(name, file, otherObjectsInDirectory);
+        this.settings = new BO3Config(new FileSettingsReader(name, file), otherObjectsInDirectory);
     }
 
     /**
@@ -45,11 +48,12 @@ public class BO3 implements StructuredCustomObject
      * @param oldObject     The object where this object is based on
      * @param extraSettings The settings to override
      */
-    public BO3(BO3 oldObject, Map<String, String> extraSettings)
+    public BO3(BO3 oldObject, SettingsReader extraSettings)
     {
-        this.settings = new BO3Config(oldObject, extraSettings);
-        this.name = settings.name;
-        this.file = settings.file;
+        this.settings = new BO3Config(extraSettings, oldObject.settings.otherObjectsInDirectory);
+        FileSettingsWriter.writeToFile(this.settings, this.settings.settingsMode);
+        this.name = settings.getName();
+        this.file = settings.getFile();
     }
 
     @Override
@@ -205,8 +209,9 @@ public class BO3 implements StructuredCustomObject
     }
 
     @Override
-    public CustomObject applySettings(Map<String, String> extraSettings)
+    public CustomObject applySettings(SettingsReader extraSettings)
     {
+        extraSettings.setFallbackReader(this.settings.reader);
         return new BO3(this, extraSettings);
     }
 

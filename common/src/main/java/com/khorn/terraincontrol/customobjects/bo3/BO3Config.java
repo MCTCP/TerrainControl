@@ -1,20 +1,18 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
+import com.khorn.terraincontrol.configuration.io.SettingsReader;
+import com.khorn.terraincontrol.configuration.io.SettingsWriter;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.khorn.terraincontrol.util.MaterialSet;
-import com.khorn.terraincontrol.util.helpers.StringHelper;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -53,126 +51,83 @@ public class BO3Config extends ConfigFile
      * @param name The name of the BO3 without the extension.
      * @param file The file of the BO3.
      */
-    public BO3Config(String name, File file, Map<String, CustomObject> otherObjectsInDirectory)
+    public BO3Config(SettingsReader reader, Map<String, CustomObject> otherObjectsInDirectory)
     {
-        super(name, file);
+        super(reader);
 
         this.otherObjectsInDirectory = otherObjectsInDirectory;
 
-        readSettingsFile();
-
-        init();
-    }
-
-    /**
-     * Creates a BO3Config with the specified settings. Ignores the settings
-     * in the settings file.
-     * 
-     * @param oldObject The old BO3 object. It's settings will be copied.
-     * @param extraSettings The extra settings.
-     */
-    public BO3Config(BO3 oldObject, Map<String, String> extraSettings)
-    {
-        super(oldObject.getSettings().name, oldObject.getSettings().file);
-
-        this.settingsCache = oldObject.getSettings().settingsCache;
-        this.settingsCache.putAll(extraSettings);
-
-        // Make sure that the BO3 file won't get overwritten
-        this.settingsCache.put(WorldStandardValues.SETTINGS_MODE.toString().toLowerCase(), ConfigMode.WriteDisable.toString());
-
-        init();
-    }
-
-    private void init()
-    {
         readConfigSettings();
         correctSettings();
-        if (settingsMode != ConfigMode.WriteDisable)
-        {
-            writeSettingsFile(settingsMode == ConfigMode.WriteAll);
-        }
-
         rotateBlocksAndChecks();
     }
 
     @Override
-    public void logFileNotFound(File file)
-    {
-        // Ignore
-    }
-
-    public Map<String, String> getSettingsCache()
-    {
-        return settingsCache;
-    }
-
-    @Override
-    protected void writeConfigSettings() throws IOException
+    protected void writeConfigSettings(SettingsWriter writer) throws IOException
     {
         // The object
-        writeBigTitle("BO3 object");
-        writeComment("This is the config file of a custom object.");
-        writeComment("If you add this object correctly to your BiomeConfigs, it will spawn in the world.");
-        writeComment("");
-        writeComment("This is the creator of this BO3 object");
-        writeValue(BO3Settings.AUTHOR, author);
+        writer.bigTitle("BO3 object");
+        writer.comment("This is the config file of a custom object.");
+        writer.comment("If you add this object correctly to your BiomeConfigs, it will spawn in the world.");
+        writer.comment("");
+        writer.comment("This is the creator of this BO3 object");
+        writer.setting(BO3Settings.AUTHOR, author);
 
-        writeComment("A short description of this BO3 object");
-        writeValue(BO3Settings.DESCRIPTION, description);
+        writer.comment("A short description of this BO3 object");
+        writer.setting(BO3Settings.DESCRIPTION, description);
 
-        writeComment("The BO3 version, don't change this! It can be used by external applications to do a version check.");
-        writeValue(BO3Settings.VERSION, "3");
+        writer.comment("The BO3 version, don't change this! It can be used by external applications to do a version check.");
+        writer.setting(BO3Settings.VERSION, "3");
 
-        writeComment("The settings mode, WriteAll, WriteWithoutComments or WriteDisable. See WorldConfig.");
-        writeValue(WorldStandardValues.SETTINGS_MODE, settingsMode);
+        writer.comment("The settings mode, WriteAll, WriteWithoutComments or WriteDisable. See WorldConfig.");
+        writer.setting(WorldStandardValues.SETTINGS_MODE, settingsMode);
 
         // Main settings
-        writeBigTitle("Main settings");
-        writeComment("This needs to be set to true to spawn the object in the Tree and Sapling resources.");
-        writeValue(BO3Settings.TREE, tree);
+        writer.bigTitle("Main settings");
+        writer.comment("This needs to be set to true to spawn the object in the Tree and Sapling resources.");
+        writer.setting(BO3Settings.TREE, tree);
 
-        writeComment("The frequency of the BO3 from 1 to 200. Tries this many times to spawn this BO3 when using the CustomObject(...) resource.");
-        writeComment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
-        writeValue(BO3Settings.FREQUENCY, frequency);
+        writer.comment("The frequency of the BO3 from 1 to 200. Tries this many times to spawn this BO3 when using the CustomObject(...) resource.");
+        writer.comment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
+        writer.setting(BO3Settings.FREQUENCY, frequency);
 
-        writeComment("The rarity of the BO3 from 0 to 100. Each spawn attempt has rarity% chance to succeed when using the CustomObject(...) resource.");
-        writeComment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
-        writeValue(BO3Settings.RARITY, rarity);
+        writer.comment("The rarity of the BO3 from 0 to 100. Each spawn attempt has rarity% chance to succeed when using the CustomObject(...) resource.");
+        writer.comment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
+        writer.setting(BO3Settings.RARITY, rarity);
 
-        writeComment("If you set this to true, the BO3 will be placed with a random rotation.");
-        writeValue(BO3Settings.ROTATE_RANDOMLY, rotateRandomly);
+        writer.comment("If you set this to true, the BO3 will be placed with a random rotation.");
+        writer.setting(BO3Settings.ROTATE_RANDOMLY, rotateRandomly);
 
-        writeComment("The spawn height of the BO3 - randomY, highestBlock or highestSolidBlock.");
-        writeValue(BO3Settings.SPAWN_HEIGHT, spawnHeight);
+        writer.comment("The spawn height of the BO3 - randomY, highestBlock or highestSolidBlock.");
+        writer.setting(BO3Settings.SPAWN_HEIGHT, spawnHeight);
 
-        writeComment("The height limits for the BO3.");
-        writeValue(BO3Settings.MIN_HEIGHT, minHeight);
-        writeValue(BO3Settings.MAX_HEIGHT, maxHeight);
+        writer.comment("The height limits for the BO3.");
+        writer.setting(BO3Settings.MIN_HEIGHT, minHeight);
+        writer.setting(BO3Settings.MAX_HEIGHT, maxHeight);
 
-        writeComment("Objects can have other objects attacthed to it: branches. Branches can also");
-        writeComment("have branches attached to it, which can also have branches, etc. This is the");
-        writeComment("maximum branch depth for this objects.");
-        writeValue(BO3Settings.MAX_BRANCH_DEPTH, maxBranchDepth);
+        writer.comment("Objects can have other objects attacthed to it: branches. Branches can also");
+        writer.comment("have branches attached to it, which can also have branches, etc. This is the");
+        writer.comment("maximum branch depth for this objects.");
+        writer.setting(BO3Settings.MAX_BRANCH_DEPTH, maxBranchDepth);
 
-        writeComment("When spawned with the UseWorld keyword, this BO3 should NOT spawn in the following biomes.");
-        writeComment("If you write the BO3 name directly in the BiomeConfigs, this will be ignored.");
-        writeValue(BO3Settings.EXCLUDED_BIOMES, excludedBiomes);
+        writer.comment("When spawned with the UseWorld keyword, this BO3 should NOT spawn in the following biomes.");
+        writer.comment("If you writer.write the BO3 name directly in the BiomeConfigs, this will be ignored.");
+        writer.setting(BO3Settings.EXCLUDED_BIOMES, excludedBiomes);
 
         // Sourceblock
-        writeBigTitle("Source block settings");
-        writeComment("The block(s) the BO3 should spawn in.");
-        writeValue(BO3Settings.SOURCE_BLOCKS, sourceBlocks);
+        writer.bigTitle("Source block settings");
+        writer.comment("The block(s) the BO3 should spawn in.");
+        writer.setting(BO3Settings.SOURCE_BLOCKS, sourceBlocks);
 
-        writeComment("The maximum percentage of the BO3 that can be outside the SourceBlock.");
-        writeComment("The BO3 won't be placed on a location with more blocks outside the SourceBlock than this percentage.");
-        writeValue(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK, maxPercentageOutsideSourceBlock);
+        writer.comment("The maximum percentage of the BO3 that can be outside the SourceBlock.");
+        writer.comment("The BO3 won't be placed on a location with more blocks outside the SourceBlock than this percentage.");
+        writer.setting(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK, maxPercentageOutsideSourceBlock);
 
-        writeComment("What to do when a block is about to be placed outside the SourceBlock? (dontPlace, placeAnyway)");
-        writeValue(BO3Settings.OUTSIDE_SOURCE_BLOCK, outsideSourceBlock);
+        writer.comment("What to do when a block is about to be placed outside the SourceBlock? (dontPlace, placeAnyway)");
+        writer.setting(BO3Settings.OUTSIDE_SOURCE_BLOCK, outsideSourceBlock);
 
         // Blocks and other things
-        writeResources();
+        writeResources(writer);
     }
 
     @Override
@@ -202,38 +157,26 @@ public class BO3Config extends ConfigFile
 
     private void readResources()
     {
-        List<BlockFunction> tempBlocksList = new ArrayList<BlockFunction>();
+        ArrayList<BlockFunction> tempBlocksList = new ArrayList<BlockFunction>();
         List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
         List<BranchFunction> tempBranchesList = new ArrayList<BranchFunction>();
 
-        for (Map.Entry<String, String> entry : this.settingsCache.entrySet())
+        for (ConfigFunction<BO3Config> res : reader.getConfigFunctions(this))
         {
-            String key = entry.getKey();
-            int start = key.indexOf('(');
-            int end = key.lastIndexOf(')');
-            if (start != -1 && end != -1)
+            if (res.isValid())
             {
-                String name = key.substring(0, start);
-                String[] props = StringHelper.readCommaSeperatedString(key.substring(start + 1, end));
-
-                ConfigFunction<BO3Config> res = TerrainControl.getConfigFunctionsManager().getConfigFunction(name, this,
-                        this.name + " on line " + entry.getValue(), Arrays.asList(props));
-
-                if (res != null && res.isValid())
+                if (res instanceof BlockFunction)
                 {
-                    if (res instanceof BlockFunction)
-                    {
-                        tempBlocksList.add((BlockFunction) res);
-                    } else if (res instanceof BO3Check)
-                    {
-                        tempChecksList.add((BO3Check) res);
-                    } else if (res instanceof WeightedBranchFunction)
-                    {
-                        tempBranchesList.add((WeightedBranchFunction) res);
-                    } else if (res instanceof BranchFunction)
-                    {
-                        tempBranchesList.add((BranchFunction) res);
-                    }
+                    tempBlocksList.add((BlockFunction) res);
+                } else if (res instanceof BO3Check)
+                {
+                    tempChecksList.add((BO3Check) res);
+                } else if (res instanceof WeightedBranchFunction)
+                {
+                    tempBranchesList.add((WeightedBranchFunction) res);
+                } else if (res instanceof BranchFunction)
+                {
+                    tempBranchesList.add((BranchFunction) res);
                 }
             }
         }
@@ -244,71 +187,71 @@ public class BO3Config extends ConfigFile
         branches[0] = tempBranchesList.toArray(new BranchFunction[tempBranchesList.size()]);
     }
 
-    public void writeResources() throws IOException
+    public void writeResources(SettingsWriter writer) throws IOException
     {
         // Blocks
-        writeBigTitle("Blocks");
-        writeComment("All the blocks used in the BO3 are listed here. Possible blocks:");
-        writeComment("Block(x,y,z,id[.data][,nbtfile.nbt)");
-        writeComment("RandomBlock(x,y,z,id[:data][,nbtfile.nbt],chance[,id[:data][,nbtfile.nbt],chance[,...]])");
-        writeComment("So RandomBlock(0,0,0,CHEST,chest.nbt,50,CHEST,anotherchest.nbt,100) will spawn a chest at");
-        writeComment("the BO3 origin, and give it a 50% chance to have the contents of chest.nbt, or, if that");
-        writeComment("fails, a 100% percent chance to have the contents of anotherchest.nbt.");
+        writer.bigTitle("Blocks");
+        writer.comment("All the blocks used in the BO3 are listed here. Possible blocks:");
+        writer.comment("Block(x,y,z,id[.data][,nbtfile.nbt)");
+        writer.comment("RandomBlock(x,y,z,id[:data][,nbtfile.nbt],chance[,id[:data][,nbtfile.nbt],chance[,...]])");
+        writer.comment("So RandomBlock(0,0,0,CHEST,chest.nbt,50,CHEST,anotherchest.nbt,100) will spawn a chest at");
+        writer.comment("the BO3 origin, and give it a 50% chance to have the contents of chest.nbt, or, if that");
+        writer.comment("fails, a 100% percent chance to have the contents of anotherchest.nbt.");
         for (BlockFunction block : blocks[0])
         {
-            writeFunction(block);
+            writer.function(block);
         }
 
         // BO3Checks
-        writeBigTitle("BO3 checks");
-        writeComment("Require a condition at a certain location in order for the BO3 to be spawned.");
-        writeComment("BlockCheck(x,y,z,BlockName[,BlockName[,...]]) - one of the blocks must be at the location");
-        writeComment("BlockCheckNot(x,y,z,BlockName[,BlockName[,...]]) - all the blocks must not be at the location");
-        writeComment("LightCheck(x,y,z,minLightLevel,maxLightLevel) - light must be between min and max (inclusive)");
-        writeComment("");
-        writeComment("You can use \"Solid\" as a BlockName for matching all solid blocks or \"All\" to match all blocks that aren't air.");
-        writeComment("");
-        writeComment("Examples:");
-        writeComment("  BlockCheck(0,-1,0,GRASS,DIRT)  Require grass or dirt just below the object");
-        writeComment("  BlockCheck(0,-1,0,Solid)       Require any solid block just below the object");
-        writeComment("  BlockCheck(0,-1,0,WOOL)        Require any type of wool just below the object");
-        writeComment("  BlockCheck(0,-1,0,WOOL:0)      Require white wool just below the object");
-        writeComment("  BlockCheckNot(0,-1,0,WOOL:0)   Require that there is no white wool below the object");
-        writeComment("  LightCheck(0,0,0,0,1)          Require almost complete darkness just below the object");
+        writer.bigTitle("BO3 checks");
+        writer.comment("Require a condition at a certain location in order for the BO3 to be spawned.");
+        writer.comment("BlockCheck(x,y,z,BlockName[,BlockName[,...]]) - one of the blocks must be at the location");
+        writer.comment("BlockCheckNot(x,y,z,BlockName[,BlockName[,...]]) - all the blocks must not be at the location");
+        writer.comment("LightCheck(x,y,z,minLightLevel,maxLightLevel) - light must be between min and max (inclusive)");
+        writer.comment("");
+        writer.comment("You can use \"Solid\" as a BlockName for matching all solid blocks or \"All\" to match all blocks that aren't air.");
+        writer.comment("");
+        writer.comment("Examples:");
+        writer.comment("  BlockCheck(0,-1,0,GRASS,DIRT)  Require grass or dirt just below the object");
+        writer.comment("  BlockCheck(0,-1,0,Solid)       Require any solid block just below the object");
+        writer.comment("  BlockCheck(0,-1,0,WOOL)        Require any type of wool just below the object");
+        writer.comment("  BlockCheck(0,-1,0,WOOL:0)      Require white wool just below the object");
+        writer.comment("  BlockCheckNot(0,-1,0,WOOL:0)   Require that there is no white wool below the object");
+        writer.comment("  LightCheck(0,0,0,0,1)          Require almost complete darkness just below the object");
         for (BO3Check check : bo3Checks[0])
         {
-            writeFunction(check);
+            writer.function(check);
         }
 
         // Branches
-        writeBigTitle("Branches");
-        writeComment("Branches are objects that will spawn when this object spawns when it is used in");
-        writeComment("the CustomStructure resource. Branches can also have branches, making complex");
-        writeComment("structures possible. See the wiki for more details.");
-        writeComment("");
-        writeComment("Regular Branches spawn each branch with an independent chance of spawning.");
-        writeComment("Branch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]][IndividualChance])");
-        writeComment("branchName - name of the object to spawn.");
-        writeComment("rotation - NORTH, SOUTH, EAST or WEST.");
-        writeComment("IndividualChance - The chance each branch has to spawn, assumed to be 100 when left blank");
-        writeComment("");
-        writeComment("Weighted Branches spawn branches with a dependent chance of spawning.");
-        writeComment("WeightedBranch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]][MaxChanceOutOf])");
-        writeComment("MaxChanceOutOf - The chance all branches have to spawn out of, assumed to be 100 when left blank");
-//        writeComment("Example1: WeightedBranch(0,0,0,branch1,NORTH,2,branch2,NORTH,6,10)");
-//        writeComment("   branch1 will have a 2 in 10 (20%) chance of spawning, branch2 will have a 6 in 10 (60%) chance to spawn,");
-//        writeComment("   and there is a 2 in 10 (20%) chance nothing will spawn");
-//        writeComment("Example1A: WeightedBranch(0,0,0,branch1,NORTH,10,branch2,NORTH,30,50)");
-//        writeComment("   Same chance as Example1");
-//        writeComment("   branch1 will have a 10 in 50 (20%) chance of spawning, branch2 will have a 30 in 50 (60%) chance to spawn,");
-//        writeComment("   and there is a 10 in 50 (20%) chance nothing will spawn");
-//        writeComment("Example2: WeightedBranch(0,0,0,branch1,NORTH,10,branch2,NORTH,30)");
-//        writeComment("   branch1 will have a 10 in 100 (10%) chance of spawning, branch2 will have a 30 in 100 (30%) chance to spawn,");
-//        writeComment("   and there is a 60 in 100 (60%) chance nothing will spawn");
+        writer.bigTitle("Branches");
+        writer.comment("Branches are objects that will spawn when this object spawns when it is used in");
+        writer.comment("the CustomStructure resource. Branches can also have branches, making complex");
+        writer.comment("structures possible. See the wiki for more details.");
+        writer.comment("");
+        writer.comment("Regular Branches spawn each branch with an independent chance of spawning.");
+        writer.comment("Branch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]][IndividualChance])");
+        writer.comment("branchName - name of the object to spawn.");
+        writer.comment("rotation - NORTH, SOUTH, EAST or WEST.");
+        writer.comment("IndividualChance - The chance each branch has to spawn, assumed to be 100 when left blank");
+        writer.comment("");
+        writer.comment("Weighted Branches spawn branches with a dependent chance of spawning.");
+        writer.comment("WeightedBranch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]][MaxChanceOutOf])");
+        writer.comment("MaxChanceOutOf - The chance all branches have to spawn out of, assumed to be 100 when left blank");
+//        writer.writeComment("Example1: WeightedBranch(0,0,0,branch1,NORTH,2,branch2,NORTH,6,10)");
+//        writer.writeComment("   branch1 will have a 2 in 10 (20%) chance of spawning, branch2 will have a 6 in 10 (60%) chance to spawn,");
+//        writer.writeComment("   and there is a 2 in 10 (20%) chance nothing will spawn");
+//        writer.writeComment("Example1A: WeightedBranch(0,0,0,branch1,NORTH,10,branch2,NORTH,30,50)");
+//        writer.writeComment("   Same chance as Example1");
+//        writer.writeComment("   branch1 will have a 10 in 50 (20%) chance of spawning, branch2 will have a 30 in 50 (60%) chance to spawn,");
+//        writer.writeComment("   and there is a 10 in 50 (20%) chance nothing will spawn");
+//        writer.writeComment("Example2: WeightedBranch(0,0,0,branch1,NORTH,10,branch2,NORTH,30)");
+//        writer.writeComment("   branch1 will have a 10 in 100 (10%) chance of spawning, branch2 will have a 30 in 100 (30%) chance to spawn,");
+//        writer.writeComment("   and there is a 60 in 100 (60%) chance nothing will spawn");
 
         for (BranchFunction branch : branches[0])
         {
-            writeFunction(branch);
+            writer.function(branch);
         }
 
     }
@@ -332,7 +275,7 @@ public class BO3Config extends ConfigFile
     {
         for (int i = 1; i < 4; i++)
         {
-            // Blocks
+            // Blocks (blocks[i - 1]  is previous rotation)
             blocks[i] = new BlockFunction[blocks[i - 1].length];
             for (int j = 0; j < blocks[i].length; j++)
             {

@@ -20,10 +20,9 @@ public abstract class ConfigFunction<T>
     private String inputName;
     private List<String> inputArgs;
 
-    @SuppressWarnings("unchecked")
-    public void setHolder(Object holder)
+    public void setHolder(T holder)
     {
-        this.holder = (T) holder;
+        this.holder = holder;
     }
 
     public T getHolder()
@@ -44,7 +43,7 @@ public abstract class ConfigFunction<T>
      *              <p/>
      * @return
      */
-    public static <T> ConfigFunction<?> create(T holder, Class<? extends ConfigFunction<T>> clazz, Object... args)
+    public static <T> ConfigFunction<T> create(T holder, Class<? extends ConfigFunction<T>> clazz, Object... args)
     {
         List<String> stringArgs = new ArrayList<String>(args.length);
         for (Object arg : args)
@@ -52,7 +51,7 @@ public abstract class ConfigFunction<T>
             stringArgs.add("" + arg);
         }
 
-        ConfigFunction<?> configFunction;
+        ConfigFunction<T> configFunction;
         try
         {
             configFunction = clazz.newInstance();

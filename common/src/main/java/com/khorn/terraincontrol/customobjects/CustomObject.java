@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.io.SettingsReader;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 
@@ -13,7 +14,7 @@ public interface CustomObject
     /**
      * Called after all objects are loaded. The settings should be loaded
      * inside this method.
-     * 
+     *
      * @param otherObjectsInDirectory A map of all other objects in the
      *                                directory. Keys are lowercase.
      */
@@ -45,7 +46,7 @@ public interface CustomObject
     /**
      * Returns whether this object can be placed with a random rotation. If
      * not, the rotation should always be NORTH.
-     * 
+     *
      * @return Whether this object can be placed with a random rotation.
      */
     public boolean canRotateRandomly();
@@ -64,7 +65,7 @@ public interface CustomObject
     /**
      * Returns whether the location would theoretically allow the object to
      * spawn there. Frequency/rarity is ignored.
-     * 
+     *
      * @param world The world to check.
      * @param x     X coord of the object origin.
      * @param y     Y coord of the object origin.
@@ -97,13 +98,14 @@ public interface CustomObject
     public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord);
 
     /**
-     * Returns a copy of this object will all the settings applied. Can return
-     * null if the settings are invalid.
+     * Creates a new object with all settings applied.
      *
-     * @param settings A Map with all the settings. The name of the setting is always lowercase.
+     * @param settings The settings. The settings of the existing object will
+     * be {@link SettingsReader#setFallbackReader(SettingsReader) set as a
+     * fallback}.
      * @return A copy of this object will all the settings applied.
      */
-    public CustomObject applySettings(Map<String, String> settings);
+    public CustomObject applySettings(SettingsReader settings);
 
     /**
      * Returns whether this object would like to spawn in this biome. BO2s will
