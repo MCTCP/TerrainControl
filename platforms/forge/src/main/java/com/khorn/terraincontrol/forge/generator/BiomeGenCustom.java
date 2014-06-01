@@ -108,7 +108,14 @@ public class BiomeGenCustom extends BiomeGenBase
         return (Class<? extends Entity>) EntityList.stringToClassMapping.get(mobName);
     }
 
-    public void CopyBiome(BiomeGenBase baseBiome)
+    /**
+     * Copies all properties from another biome. Later on, some properties may
+     * get overwritten or modified by {@link #setEffects(BiomeConfig)}. Other
+     * properties are not used by Terrain Control, but may be used by other
+     * mods.
+     * @param baseBiome The biome to copy the settings from.
+     */
+    public void copyBiome(BiomeGenBase baseBiome)
     {
         this.fillerBlock = baseBiome.fillerBlock;
         this.topBlock = baseBiome.topBlock;

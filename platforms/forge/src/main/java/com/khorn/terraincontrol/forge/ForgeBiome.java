@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
+import net.minecraft.world.biome.BiomeGenBase;
 
 public class ForgeBiome implements LocalBiome
 {
@@ -21,12 +22,22 @@ public class ForgeBiome implements LocalBiome
      */
     public static ForgeBiome createBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        // See the BiomeGenCustom constructor for a note
-        // about biome registration
-        return new ForgeBiome(biomeConfig, new BiomeGenCustom(biomeConfig.name, biomeIds));
+        // Save the previous biome
+        BiomeGenBase previousBiome = BiomeGenBase.getBiome(biomeIds.getSavedId());
+
+        // Register new biome
+        ForgeBiome biome = new ForgeBiome(biomeConfig, new BiomeGenCustom(biomeConfig.name, biomeIds));
+        
+        // Restore settings of the previous biome
+        if (previousBiome != null)
+        {
+            biome.biomeBase.copyBiome(previousBiome);
+        }
+
+        return biome;
     }
 
-    public ForgeBiome(BiomeConfig biomeConfig, BiomeGenCustom biome)
+    private ForgeBiome(BiomeConfig biomeConfig, BiomeGenCustom biome)
     {
         this.biomeBase = biome;
         this.biomeIds = new BiomeIds(biome.generationId, biome.biomeID);
