@@ -32,11 +32,11 @@ public class ChunkProvider implements IChunkProvider
 
     private ChunkProviderTC generator;
     private ObjectSpawner spawner;
-    
+
     /** 
-     * Used in {@link #fillBiomeArray(Chunk, int, int)}, to avoid creating
+     * Used in {@link #fillBiomeArray(Chunk)}, to avoid creating
      * new int arrays.
-     * */
+     */
     private int[] biomeIntArray;
 
     public ChunkProvider(ForgeWorld _world)
@@ -108,7 +108,7 @@ public class ChunkProvider implements IChunkProvider
         for (int i = 0; i < chunkBiomeArray.length; i++)
         {
             int biomeId = biomeIntArray[i];
-            chunkBiomeArray[biomeId] = (byte) biomeMap[biomeId].getIds().getSavedId();
+            chunkBiomeArray[i] = (byte) biomeMap[biomeId].getIds().getSavedId();
         }
     }
 
