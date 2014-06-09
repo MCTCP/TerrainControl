@@ -127,13 +127,13 @@ public class ForgeEngine extends TerrainControlEngine
             return new ForgeMaterialData(block, blockData);
         }
         DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
-        if (defaultMaterial != null)
+        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
         {
             return new ForgeMaterialData(defaultMaterial, blockData);
         }
 
         // Failed
-        throw new InvalidConfigException("Unkown material: " + input);
+        throw new InvalidConfigException("Unknown material: " + input);
     }
 
     @Override

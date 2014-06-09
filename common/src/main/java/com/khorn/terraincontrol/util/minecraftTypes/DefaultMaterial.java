@@ -297,7 +297,7 @@ public enum DefaultMaterial
             return defaultMaterial;
         }
 
-        // Try parsing it als id
+        // Try parsing it as id
         try
         {
             return getMaterial(Integer.parseInt(blockName));

@@ -86,13 +86,13 @@ public class BukkitEngine extends TerrainControlEngine
             return new BukkitMaterialData(block, blockData);
         }
         DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
-        if (defaultMaterial != null)
+        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
         {
             return new BukkitMaterialData(defaultMaterial, blockData);
         }
 
         // Failed
-        throw new InvalidConfigException("Unkown material: " + input);
+        throw new InvalidConfigException("Unknown material: " + input);
     }
 
     @Override
