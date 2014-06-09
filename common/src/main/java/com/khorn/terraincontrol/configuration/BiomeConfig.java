@@ -17,7 +17,6 @@ import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.surface.NullSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
-import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -26,8 +25,10 @@ import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 public class BiomeConfig extends ConfigFile
 {
@@ -162,7 +163,7 @@ public class BiomeConfig extends ConfigFile
         this.defaultSettings = loadInstruction.getBiomeTemplate();
 
         // Read this setting early, before inheritance is applied
-        this.biomeExtends = readSettings(BiomeStandardValues.BIOME_EXTENDS);
+        this.biomeExtends = readSettings(BiomeStandardValues.BIOME_EXTENDS, defaultSettings.defaultExtends);
     }
 
     public void process()
@@ -231,7 +232,7 @@ public class BiomeConfig extends ConfigFile
     @Override
     protected void readConfigSettings()
     {
-        this.biomeExtends = readSettings(BiomeStandardValues.BIOME_EXTENDS, defaultSettings.defaultExtends);
+        this.doResourceInheritance = readSettings(BiomeStandardValues.RESOURCE_INHERITANCE);
         this.biomeSize = readSettings(BiomeStandardValues.BIOME_SIZE, defaultSettings.defaultSize);
         this.biomeRarity = readSettings(BiomeStandardValues.BIOME_RARITY, defaultSettings.defaultRarity);
 
@@ -349,7 +350,7 @@ public class BiomeConfig extends ConfigFile
 
     private void ReadResourceSettings()
     {
-        for (ConfigFunction<BiomeConfig> res : reader.getConfigFunctions(this))
+        for (ConfigFunction<BiomeConfig> res : reader.getConfigFunctions(this, this.doResourceInheritance))
         {
             // Do not include DoResourceInheritance() as a resource
             if (res != null && res.getHolderType() != null)
@@ -369,75 +370,16 @@ public class BiomeConfig extends ConfigFile
     /**
      * Merges two sets of resources. The child set will override any element
      * of the parent that it can.
-     * <p>
+     *
      * @param parent
      * @param child
-     *               <p>
-     * @return
      */
-    public BiomeConfig merge(BiomeConfig parent)
+    public void merge(BiomeConfig parent)
     {
         // Merging settings is easy
         this.reader.setFallbackReader(parent.reader);
 
-        // We dont want to merge resources unless the child allows it.
-        TerrainControl.log(LogMarker.TRACE, "=====Doing Resource Inheritance====");
-        if (this.doResourceInheritance)
-        {
-            // Then do the resource merge! Start with Resource Sequence.
-            ArrayList<Resource> T_ResourceSequence = new ArrayList<Resource>(this.resourceSequence);
-            ArrayList<Resource> childRes = new ArrayList<Resource>(this.resourceSequence);
-            ArrayList<Resource> parentRes = new ArrayList<Resource>(parent.resourceSequence);
-            childRes.removeAll(Collections.singleton(null));
-            parentRes.removeAll(Collections.singleton(null));
-            for (Resource pr : parentRes)
-            {
-                boolean analagous = false;
-                TerrainControl.log(LogMarker.TRACE, "BASE:: Checking against: {}", new Object[] {pr.makeString()});
-                for (Resource cr : childRes)
-                {
-                    TerrainControl.log(LogMarker.TRACE, "CHCK:: Checking against: {}", new Object[] {cr.makeString()});
-                    if (cr.isAnalogousTo(pr))
-                    {
-                        TerrainControl.log(LogMarker.TRACE, "Adding Child Resource\nC: {}\nP: {}",
-                                new Object[] {cr.makeString(), pr.makeString()});
-                        T_ResourceSequence.add(cr);
-                        childRes.remove(cr);
-                        analagous = true;
-                        break;
-                    }
-                }
-                if (!analagous)
-                {
-                    TerrainControl.log(LogMarker.TRACE, "Adding Parent Resource\n{}", new Object[] {pr.makeString()});
-                    T_ResourceSequence.add(pr);
-                }
-            }
-            this.resourceSequence = new ArrayList<Resource>(T_ResourceSequence);
-            // if the child is using All saplings then we dont need to merge
-            if (!this.saplingGrowers.containsKey(SaplingType.All))
-            {
-                // take all parent sapling types and if child doesn't have
-                // them, insert
-                for (Entry<SaplingType, SaplingGen> saplingEntry : parent.saplingGrowers.entrySet())
-                {
-                    SaplingType saplingType = saplingEntry.getKey();
-                    SaplingGen saplingGen = saplingEntry.getValue();
-                    if (!this.saplingGrowers.containsKey(saplingType))
-                    {
-                        TerrainControl.log(LogMarker.TRACE, "Sapling added to Child: {}", saplingType);
-                        this.saplingGrowers.put(saplingType, saplingGen);
-                    }
-                }
-            } else
-            {
-                TerrainControl.log(LogMarker.TRACE, "No Sapling merge needed!");
-            }
-        }
-
         this.biomeExtendsProcessed = true;
-        TerrainControl.log(LogMarker.TRACE, "=====END Resource Inheritance====");
-        return this;
     }
 
     private void ReadCustomObjectSettings()
@@ -474,6 +416,12 @@ public class BiomeConfig extends ConfigFile
         writer.comment("The extended config will be loaded, at which point the configs included below");
         writer.comment("will overwrite any configs loaded from the extended config.");
         writer.setting(BiomeStandardValues.BIOME_EXTENDS, this.biomeExtends);
+        
+        writer.comment("When set to true, all resources of the parent biome (if any) will be copied");
+        writer.comment("to the resources queue of this biome. If a resource in the parent biome looks");
+        writer.comment("very similar to that of a child biome (for example, two ores of the same type)");
+        writer.comment("it won't be copied.");
+        writer.setting(BiomeStandardValues.RESOURCE_INHERITANCE, this.doResourceInheritance);
 
         // Biome placement
         writer.bigTitle("Biome placement");

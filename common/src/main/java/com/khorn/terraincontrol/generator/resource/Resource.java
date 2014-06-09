@@ -115,11 +115,9 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
         {
             return null;
         }
-        resource.setHolder(config);
         try
         {
-            resource.load(stringArgs);
-            resource.setValid(true);
+            resource.init(config, stringArgs);
         } catch (InvalidConfigException e)
         {
             TerrainControl.log(LogMarker.FATAL, "Invalid default resource! Please report! {}: {}", new Object[]
@@ -134,6 +132,22 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     }
 
     /**
+     * This implementation of
+     * {@link ConfigFunction#isAnalogousTo(ConfigFunction)} checks whether the
+     * classes and the material are the same. For a lot of resources, this is
+     * enough, bug other resources need to override this.
+     */
+    @Override
+    public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other) {
+        if (!other.getClass().equals(this.getClass()))
+        {
+            return false;
+        }
+        Resource resource = (Resource) other;
+        return resource.material.equals(this.material);
+    }
+
+    /**
      * Returns the material. Resources that don't have a material will return null.
      * <p/>
      * @return The material of the resource this object represents.
@@ -142,16 +156,6 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     {
         return material;
     }
-
-    
-    /**
-     * Returns whether or not the two resources are similar to each other AND
-     * not equal. This should return true if two resources are of the same class
-     * and if critical element are the same. For example source blocks. This 
-     * will be used to test if a resource should be overridden via inheritance.
-     * @return
-     */
-    public abstract boolean isAnalogousTo(Resource other);
 
     /**
      * Returns whether or not the two resources are property-wise equal.

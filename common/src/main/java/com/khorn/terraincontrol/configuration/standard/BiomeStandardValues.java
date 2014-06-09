@@ -26,6 +26,7 @@ public class BiomeStandardValues extends Settings
             ".biome.ini");
 
     public static final Setting<Boolean>
+            RESOURCE_INHERITANCE = booleanSetting("ResourceInheritance", true),
             USE_WORLD_WATER_LEVEL = booleanSetting("UseWorldWaterLevel", true),
             GRASS_COLOR_IS_MULTIPLIER = booleanSetting("GrassColorIsMultiplier", true),
             FOLIAGE_COLOR_IS_MULTIPLIER = booleanSetting("FoliageColorIsMultiplier", true),

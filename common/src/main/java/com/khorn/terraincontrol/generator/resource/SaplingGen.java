@@ -121,4 +121,10 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
                         : this.treeChances.equals(compare.treeChances));
     }
 
+    @Override
+    public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other)
+    {
+        return other.getClass().equals(getClass()) && saplingType.equals(((SaplingGen)other).saplingType);
+    }
+
 }

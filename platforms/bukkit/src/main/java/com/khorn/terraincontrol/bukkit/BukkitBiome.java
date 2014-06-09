@@ -38,7 +38,7 @@ public class BukkitBiome implements LocalBiome
      */
     public static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        return new BukkitBiome(biomeConfig, CustomBiome.createInstance(biomeConfig.name, biomeIds));
+        return new BukkitBiome(biomeConfig, CustomBiome.createInstance(biomeConfig.getName(), biomeIds));
     }
 
     protected BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
@@ -72,7 +72,7 @@ public class BukkitBiome implements LocalBiome
     @Override
     public String getName()
     {
-        return this.biomeConfig.name;
+        return this.biomeConfig.getName();
     }
 
     @Override

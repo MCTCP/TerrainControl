@@ -3,6 +3,8 @@ package com.khorn.terraincontrol.generator.resource;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
@@ -227,9 +229,10 @@ public class IceSpikeGen extends Resource
     }
 
     @Override
-    public boolean isAnalogousTo(Resource other)
+    public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other)
     {
-        return other.getClass() == getClass() && other.material.equals(this.material) && ((IceSpikeGen) other).type == this.type;
+        // Enforces shape as well
+        return super.isAnalogousTo(other) && ((IceSpikeGen) other).type == this.type;
     }
 
 }

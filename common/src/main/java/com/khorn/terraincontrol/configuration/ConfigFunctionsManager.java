@@ -57,17 +57,16 @@ public class ConfigFunctionsManager
      * <p/>
      * @return A config function with the given name, or null of it wasn't
      *         found.
-     * @throws InvalidConfigException If the config function is invalid.
      */
     @SuppressWarnings("unchecked")
     // It's checked with if (!clazz.isAssignableFrom(holder.getClass()))
-    public <T> ConfigFunction<T> getConfigFunction(String name, T holder, List<String> args) throws InvalidConfigException
+    public <T> ConfigFunction<T> getConfigFunction(String name, T holder, List<String> args)
     {
         // Get the class of the config function
         Class<? extends ConfigFunction<?>> clazz = configFunctions.get(name.toLowerCase());
         if (clazz == null)
         {
-            throw new InvalidConfigException("Resource type " + name + " not found");
+            return new ErroredFunction<T>(name, holder, args, "Resource type " + name + " not found");
         }
 
         // Get a config function
@@ -81,21 +80,21 @@ public class ConfigFunctionsManager
         }
 
         // Check if config function is of the right type
-        boolean matchingTypes;
-        matchingTypes = holder.getClass().isAssignableFrom(configFunction.getHolderType());
+        boolean matchingTypes = holder.getClass().isAssignableFrom(configFunction.getHolderType());
         if (!matchingTypes)
         {
-            throw new InvalidConfigException("Resource " + name + " cannot be placed in this config file");
+            return new ErroredFunction<T>(name, holder, args, "Resource " + name + " cannot be placed in this config file");
         }
 
-        // Set the holder
-        configFunction.setHolder(holder);
-
-        // Load it
-        configFunction.read(name, args);
-
-        // Return it
-        return (ConfigFunction<T>) configFunction;
+        // Initialize the function
+        try
+        {
+            configFunction.init(holder, args);
+        } catch (InvalidConfigException e)
+        {
+            configFunction.invalidate(name, args, e.getMessage());
+        }
+        return configFunction;
     }
 
 }

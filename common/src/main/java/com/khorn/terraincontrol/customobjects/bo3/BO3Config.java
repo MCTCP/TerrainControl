@@ -161,7 +161,7 @@ public class BO3Config extends ConfigFile
         List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
         List<BranchFunction> tempBranchesList = new ArrayList<BranchFunction>();
 
-        for (ConfigFunction<BO3Config> res : reader.getConfigFunctions(this))
+        for (ConfigFunction<BO3Config> res : reader.getConfigFunctions(this, true))
         {
             if (res.isValid())
             {

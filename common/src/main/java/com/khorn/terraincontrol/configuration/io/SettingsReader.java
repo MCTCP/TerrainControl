@@ -26,6 +26,7 @@ public interface SettingsReader
      * Adds a ConfigFunction to this reader, so that it can be read back
      * using {@link #getConfigFunctions(Object)}. If this reader doesn't
      * support ConfigFunctions, this method does nothing.
+     *
      * @param <T> The type of the function. Must match the type used in {@link #getConfigFunctions(Object)}.
      * @param function The function to add.
      */
@@ -34,15 +35,19 @@ public interface SettingsReader
     /**
      * Gets all ConfigFunctions in this configuration. If this reader doesn't
      * support ConfigFunctions, an empty list will be returned.
+     *
      * @param <T> The type of the config functions.
-     * @param holder The holder of all config functions.
+     * @param holder      The holder of all config functions.
+     * @param useFallback True if the {@link #setFallbackReader(SettingsReader)
+     * fallback reader} must be used, false otherwise.
      * @return The config functions.
      */
-    <T> List<ConfigFunction<T>> getConfigFunctions(T holder);
+    <T> List<ConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback);
 
     /**
      * Gets the file this reader if reading from. Will be null if this reader
      * doesn't read from a file.
+     *
      * @return The file, or null if not reading from a file.
      */
     File getFile();
@@ -50,6 +55,7 @@ public interface SettingsReader
     /**
      * Gets the name of this config file. For worlds, this is the world name,
      * for biomes this is the biome name, etc.
+     *
      * @return The name of this config file.
      */
     String getName();

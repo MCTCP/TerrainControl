@@ -101,12 +101,6 @@ public class VeinGen extends Resource
     }
 
     @Override
-    public boolean isAnalogousTo(Resource other)
-    {
-        return getClass() == other.getClass() && other.material.equals(this.material);
-    }
-
-    @Override
     public boolean equals(Object other)
     {
         if (!super.equals(other))

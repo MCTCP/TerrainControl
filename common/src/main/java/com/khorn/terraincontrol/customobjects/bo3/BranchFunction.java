@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.Branch;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
@@ -149,6 +150,16 @@ public class BranchFunction extends BO3Function implements Branch
         }
         return cumulativeChance;
 
+    }
+
+    @Override
+    public boolean isAnalogousTo(ConfigFunction<BO3Config> other)
+    {
+        if(!getClass().equals(other.getClass())) {
+            return false;
+        }
+        BranchFunction branch = (BranchFunction) other;
+        return branch.x == x && branch.y == y && branch.z == z;
     }
 
 }

@@ -2,6 +2,8 @@ package com.khorn.terraincontrol.generator.resource;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -62,7 +64,7 @@ public class CustomObjectGen extends Resource
     }
 
     @Override
-    public boolean isAnalogousTo(Resource other)
+    public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other)
     {
         if (getClass() == other.getClass()){
             try {

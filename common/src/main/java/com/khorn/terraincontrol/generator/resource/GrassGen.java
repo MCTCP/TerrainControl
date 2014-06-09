@@ -2,6 +2,8 @@ package com.khorn.terraincontrol.generator.resource;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
@@ -141,7 +143,7 @@ public class GrassGen extends Resource
     }
 
     @Override
-    public boolean isAnalogousTo(Resource other)
+    public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other)
     {
         return getClass() == other.getClass() && ((GrassGen) other).plant.equals(plant);
     }

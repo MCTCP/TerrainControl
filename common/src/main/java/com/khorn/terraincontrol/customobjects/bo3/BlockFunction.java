@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 
@@ -34,7 +35,7 @@ public class BlockFunction extends BO3Function
         material = readMaterial(args.get(3));
         if (args.size() == 5)
         {
-            metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().file);
+            metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().getFile());
             if (metaDataTag != null)
             {
                 hasMetaData = true;
@@ -89,6 +90,16 @@ public class BlockFunction extends BO3Function
         {
             world.attachMetadata(x, y, z, metaDataTag);
         }
+    }
+
+    @Override
+    public boolean isAnalogousTo(ConfigFunction<BO3Config> other)
+    {
+        if(!getClass().equals(other.getClass())) {
+            return false;
+        }
+        BlockFunction block = (BlockFunction) other;
+        return block.x == x && block.y == y && block.z == z;
     }
 
 }

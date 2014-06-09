@@ -130,12 +130,6 @@ public class WellGen extends Resource
     }
 
     @Override
-    public boolean isAnalogousTo(Resource other)
-    {
-        return getClass() == other.getClass() && other.material.equals(material);
-    }
-
-    @Override
     public int hashCode()
     {
         int hash = 3;

@@ -90,14 +90,14 @@ public abstract class Layer
 
                 if (biomeConfig.biomeSize != i)
                     continue;
-                if (worldConfig.NormalBiomes.contains(biomeConfig.name))
+                if (worldConfig.NormalBiomes.contains(biomeConfig.getName()))
                 {
                     for (int t = 0; t < biomeConfig.biomeRarity; t++)
                         normalBiomes.add(biome);
                     worldConfig.normalBiomesRarity -= biomeConfig.biomeRarity;
                 }
 
-                if (worldConfig.IceBiomes.contains(biomeConfig.name))
+                if (worldConfig.IceBiomes.contains(biomeConfig.getName()))
                 {
                     for (int t = 0; t < biomeConfig.biomeRarity; t++)
                         iceBiomes.add(biome);
@@ -183,7 +183,7 @@ public abstract class Layer
                 BiomeConfig biomeConfig = biome.getBiomeConfig();
                 if (biomeConfig.biomeSize != depth)
                     continue;
-                if (worldConfig.IsleBiomes.contains(biomeConfig.name) && biomeConfig.isleInBiome != null)
+                if (worldConfig.IsleBiomes.contains(biomeConfig.getName()) && biomeConfig.isleInBiome != null)
                 {
                     int id = biome.getIds().getGenerationId();
 
@@ -202,7 +202,7 @@ public abstract class Layer
                     MainLayer = layerBiome;
                 }
 
-                if (worldConfig.BorderBiomes.contains(biomeConfig.name) && biomeConfig.biomeIsBorder != null)
+                if (worldConfig.BorderBiomes.contains(biomeConfig.getName()) && biomeConfig.biomeIsBorder != null)
                 {
                     haveBorder = true;
 

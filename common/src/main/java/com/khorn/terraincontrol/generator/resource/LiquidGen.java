@@ -78,12 +78,6 @@ public class LiquidGen extends Resource
     }
 
     @Override
-    public boolean isAnalogousTo(Resource other)
-    {
-        return getClass() == other.getClass() && other.material.equals(this.material);
-    }
-
-    @Override
     public int hashCode()
     {
         int hash = 7;

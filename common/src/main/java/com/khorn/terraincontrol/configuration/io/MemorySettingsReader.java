@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.configuration.io;
 
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
+import com.khorn.terraincontrol.util.helpers.InheritanceHelper;
 
 import java.io.File;
 import java.util.*;
@@ -26,12 +27,20 @@ public class MemorySettingsReader implements SettingsReader
     }
 
     @Override
-    public <T> List<ConfigFunction<T>> getConfigFunctions(T holder)
+    public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback)
     {
-        // I wonder if this can be done more elegantly. We would need to add
-        // T as a type parameters for this class to avoid this ugly cast.
+        // I wonder if this can be done more elegantly. The functions list has
+        // no type parameter. We would need to add T as a type parameters for
+        // this class to avoid this ugly cast.
         @SuppressWarnings({"unchecked", "rawtypes"})
         List<ConfigFunction<T>> functions = (List<ConfigFunction<T>>) (List) configFunctions;
+
+        // Now add all parent resources
+        if (useFallback && fallback != null)
+        {
+            return InheritanceHelper.mergeLists(functions, fallback.getConfigFunctions(holder, true));
+        }
+
         return functions;
     }
 
@@ -65,7 +74,7 @@ public class MemorySettingsReader implements SettingsReader
             return value;
         }
 
-        // Try fallback
+        // Add inherited functions
         if (fallback != null)
         {
             return fallback.getSetting(setting, defaultValue);

@@ -86,9 +86,4 @@ public class BoulderGen extends Resource
         return "Boulder(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
 
-    @Override
-    public boolean isAnalogousTo(Resource other)
-    {
-        return other.getClass() == BoulderGen.class && other.material.equals(this.material);
-    }
 }

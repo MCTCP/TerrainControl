@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.ConfigFunction;
 
 /**
  * Represents a check - something that can prevent the BO3 from spawning if this
@@ -34,6 +35,22 @@ public abstract class BO3Check extends BO3Function
      * @return Whether this check prevents the BO3 from spawning.
      */
     public abstract boolean preventsSpawn(LocalWorld world, int x, int y, int z);
+    
+
+    /**
+     * This implementation of
+     * {@link ConfigFunction#isAnalogousTo(ConfigFunction)} simply checks
+     * whether the classes and coordinates are the same.
+     */
+    @Override
+    public boolean isAnalogousTo(ConfigFunction<BO3Config> other)
+    {
+        if(!getClass().equals(other.getClass())) {
+            return false;
+        }
+        BO3Check check = (BO3Check) other;
+        return check.x == x && check.y == y && check.z == z;
+    }
 
     @Override
     public abstract BO3Check rotate();

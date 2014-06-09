@@ -26,7 +26,7 @@ public class ForgeBiome implements LocalBiome
         BiomeGenBase previousBiome = BiomeGenBase.getBiome(biomeIds.getSavedId());
 
         // Register new biome
-        ForgeBiome biome = new ForgeBiome(biomeConfig, new BiomeGenCustom(biomeConfig.name, biomeIds));
+        ForgeBiome biome = new ForgeBiome(biomeConfig, new BiomeGenCustom(biomeConfig.getName(), biomeIds));
         
         // Restore settings of the previous biome
         if (previousBiome != null)

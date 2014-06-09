@@ -58,12 +58,6 @@ public class PlantGen extends Resource
     }
 
     @Override
-    public boolean isAnalogousTo(Resource other)
-    {
-        return getClass() == other.getClass() && ((PlantGen) other).plant.equals(this.plant);
-    }
-
-    @Override
     public int hashCode()
     {
         int hash = 7;

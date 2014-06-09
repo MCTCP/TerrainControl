@@ -10,6 +10,11 @@ import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 
+/**
+ * Reads settings from a formatted string like:
+ * <code>(SettingName=SettingValue;SettingName2=SettingValue2)</code>.
+ *
+ */
 public class BracketSettingsReader implements SettingsReader
 {
     private SettingsReader fallback;
@@ -49,8 +54,13 @@ public class BracketSettingsReader implements SettingsReader
     }
 
     @Override
-    public <T> List<ConfigFunction<T>> getConfigFunctions(T holder)
+    public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback)
     {
+        // Add inherited functions
+        if (useFallback && fallback != null)
+        {
+            return fallback.getConfigFunctions(holder, true);
+        }
         return Collections.emptyList();
     }
 

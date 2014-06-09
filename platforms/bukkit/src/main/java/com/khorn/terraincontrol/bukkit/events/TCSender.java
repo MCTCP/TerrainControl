@@ -31,7 +31,7 @@ public class TCSender
         {
             WorldSettings configs = plugin.worlds.get(world.getName()).getSettings();
 
-            TerrainControl.log(LogMarker.TRACE, "Config sent to player for world ", configs.worldConfig.name); //debug
+            TerrainControl.log(LogMarker.TRACE, "Config sent to player for world ", configs.worldConfig.getName()); //debug
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream stream = new DataOutputStream(outputStream);
 
