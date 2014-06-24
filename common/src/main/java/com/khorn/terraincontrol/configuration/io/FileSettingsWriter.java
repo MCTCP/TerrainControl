@@ -155,6 +155,7 @@ public class FileSettingsWriter implements SettingsWriter
     @Override
     public void open() throws IOException
     {
+        file.getParentFile().mkdirs();
         writer = new BufferedWriter(new FileWriter(file));
     }
 
