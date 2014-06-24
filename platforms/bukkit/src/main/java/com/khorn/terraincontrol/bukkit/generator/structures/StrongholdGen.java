@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_7_R3.*;
+import net.minecraft.server.v1_7_R1.*;
 
 import java.util.ArrayList;
 import java.util.Collections;

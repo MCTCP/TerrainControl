@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_7_R3.*;
+import net.minecraft.server.v1_7_R1.*;
 
 import java.lang.reflect.Field;
 import java.util.List;

@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings;
-import net.minecraft.server.v1_7_R3.BiomeBase;
+import net.minecraft.server.v1_7_R1.BiomeBase;
 
 /**
  * Gets some default settings from the BiomeBase instance. The settings in the
