@@ -77,18 +77,18 @@ public class TCPlugin extends JavaPlugin
             setEnabled(false);
         } else
         {
-            boolean mcpc = false;
-            if (Bukkit.getVersion().contains("MCPC"))
+            boolean cauldron = false;
+            if (Bukkit.getVersion().contains("Cauldron"))
             {
-                // We're on MCPC+, so enable the extra block ids.
-                mcpc = true;
-                TerrainControl.log(LogMarker.INFO, "MCPC+ detected.");
+                // We're on Cauldron, so enable some remappings
+                cauldron = true;
+                TerrainControl.log(LogMarker.INFO, "Cauldron detected.");
             }
 
             // Register structures
             try
             {
-                String methodName = mcpc ? "func_143034_b" : "b";
+                String methodName = cauldron ? "func_143034_b" : "b";
                 Method registerStructure = WorldGenFactory.class.getDeclaredMethod(methodName, Class.class, String.class);
                 registerStructure.setAccessible(true);
                 registerStructure.invoke(null, RareBuildingStart.class, StructureNames.RARE_BUILDING);
