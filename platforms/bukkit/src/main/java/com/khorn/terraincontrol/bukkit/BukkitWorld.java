@@ -12,6 +12,7 @@ import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
+import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
@@ -113,15 +114,25 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public BukkitBiome getBiomeById(int id)
+    public BukkitBiome getBiomeById(int id) throws BiomeNotFoundException
     {
-        return (BukkitBiome) settings.biomes[id];
+        LocalBiome biome = settings.biomes[id];
+        if (biome == null)
+        {
+            throw new BiomeNotFoundException(id, Arrays.asList(settings.biomes));
+        }
+        return (BukkitBiome) biome;
     }
 
     @Override
-    public LocalBiome getBiomeByName(String name)
+    public LocalBiome getBiomeByName(String name) throws BiomeNotFoundException
     {
-        return this.biomeNames.get(name);
+        LocalBiome biome = biomeNames.get(name);
+        if (biome == null)
+        {
+            throw new BiomeNotFoundException(name, biomeNames.keySet());
+        }
+        return biome;
     }
 
     @Override
@@ -735,7 +746,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome getBiome(int x, int z)
+    public LocalBiome getBiome(int x, int z) throws BiomeNotFoundException
     {
         return getBiomeById(world.getBiome(x, z).id);
     }

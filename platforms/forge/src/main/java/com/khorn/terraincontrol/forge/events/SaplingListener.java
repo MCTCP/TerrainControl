@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.resource.SaplingGen;
 import com.khorn.terraincontrol.generator.resource.SaplingType;
@@ -273,12 +274,14 @@ public class SaplingListener
     // Can return null
     public SaplingGen getSaplingGen(LocalWorld world, SaplingType type, int x, int z)
     {
-        LocalBiome biome = world.getBiome(x, z);
-        if (biome == null)
+        try
+        {
+            LocalBiome biome = world.getBiome(x, z);
+            TerrainControl.log(LogMarker.INFO, "Biome: {}" + biome.getName());
+            return biome.getBiomeConfig().getSaplingGen(type);
+        } catch (BiomeNotFoundException e)
         {
             return null;
         }
-        TerrainControl.log(LogMarker.INFO, "Biome: {}" + biome.getName());
-        return biome.getBiomeConfig().getSaplingGen(type);
     }
 }

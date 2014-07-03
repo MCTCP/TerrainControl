@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
+import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
@@ -49,9 +50,9 @@ public interface LocalWorld
 
     public int getFreeBiomeId();
 
-    public LocalBiome getBiomeById(int id);
+    public LocalBiome getBiomeById(int id) throws BiomeNotFoundException ;
 
-    public LocalBiome getBiomeByName(String name);
+    public LocalBiome getBiomeByName(String name) throws BiomeNotFoundException;
 
     public Collection<? extends BiomeLoadInstruction> getDefaultBiomes();
 
@@ -94,8 +95,9 @@ public interface LocalWorld
      * @param x The block x.
      * @param z The block z.
      * @return The biome at the given coordinates.
+     * @throws BiomeNotFoundException If the saved biome id is invalid.
      */
-    public LocalBiome getBiome(int x, int z);
+    public LocalBiome getBiome(int x, int z) throws BiomeNotFoundException;
 
     // temperature*rain
     public double getBiomeFactorForOldBM(int index);

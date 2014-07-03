@@ -5,6 +5,8 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.exception.BiomeNotFoundException;
+
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
@@ -51,10 +53,17 @@ public class BiomeCommand extends BaseCommand
 
         if (args.contains("-s"))
         {
-            LocalBiome savedBiome = world.getBiome(x, z);
-            BiomeIds savedIds = savedBiome.getIds();
-            sender.sendMessage(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR
-                    + savedIds.getSavedId());
+            try
+            {
+                LocalBiome savedBiome = world.getBiome(x, z);
+                BiomeIds savedIds = savedBiome.getIds();
+                sender.sendMessage(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR
+                        + savedBiome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR
+                        + savedIds.getSavedId());
+            } catch (BiomeNotFoundException e)
+            {
+                sender.sendMessage(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here.");
+            }
         }
 
         return true;

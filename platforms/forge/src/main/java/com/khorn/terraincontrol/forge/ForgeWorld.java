@@ -1,12 +1,11 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.LocalBiome;
-
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
+import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.generator.ChunkProvider;
 import com.khorn.terraincontrol.forge.generator.structure.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
@@ -137,15 +136,25 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public ForgeBiome getBiomeById(int id)
+    public ForgeBiome getBiomeById(int id) throws BiomeNotFoundException
     {
-        return (ForgeBiome) this.settings.biomes[id];
+        LocalBiome biome = settings.biomes[id];
+        if (biome == null)
+        {
+            throw new BiomeNotFoundException(id, Arrays.asList(settings.biomes));
+        }
+        return (ForgeBiome) biome;
     }
 
     @Override
-    public LocalBiome getBiomeByName(String name)
+    public LocalBiome getBiomeByName(String name) throws BiomeNotFoundException
     {
-        return this.biomeNames.get(name);
+        LocalBiome biome = biomeNames.get(name);
+        if (biome == null)
+        {
+            throw new BiomeNotFoundException(name, biomeNames.keySet());
+        }
+        return biome;
     }
 
     @Override
@@ -664,7 +673,7 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome getBiome(int x, int z)
+    public LocalBiome getBiome(int x, int z) throws BiomeNotFoundException
     {
         return getBiomeById(world.getBiomeGenForCoords(x, z).biomeID);
     }

@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.resource.SaplingGen;
 import com.khorn.terraincontrol.generator.resource.SaplingType;
 import org.bukkit.Location;
@@ -27,8 +28,11 @@ class SaplingListener
 
         Location location = event.getLocation();
 
-        LocalBiome biome = world.getBiome(location.getBlockX(), location.getBlockZ());
-        if (biome == null)
+        LocalBiome biome;
+        try
+        {
+            biome = world.getBiome(location.getBlockX(), location.getBlockZ());
+        } catch (BiomeNotFoundException e)
         {
             return;
         }
