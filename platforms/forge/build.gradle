@@ -29,7 +29,7 @@ apply plugin: 'forge'
 archivesBaseName = "terraincontrol-forge"
 description = "TerrainControl for Minecraft Forge"
 ext.ideProjectName = "TerrainControl-Forge"
-ext.forgeVersion = "1.7.2-10.12.0.1057"
+ext.forgeVersion = "1.7.10-10.13.0.1160"
 minecraft.version = ext.forgeVersion
 
 // The shadow plugin requires all dependencies to be present,
@@ -82,6 +82,10 @@ dependencies
 // Replace text in mcmod.info
 processResources
 {
+    // This will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
     // Replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs)
     {
