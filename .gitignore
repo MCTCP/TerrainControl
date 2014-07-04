@@ -29,7 +29,8 @@ out
 localexport.jardesc
 forgeInfo
 
-# Minecraft and Forge files
+# Minecraft, Bukkit and Forge files
+platforms/bukkit/logs
 platforms/forge/banned-players.txt
 platforms/forge/banned-ips.txt
 platforms/forge/crash-reports
