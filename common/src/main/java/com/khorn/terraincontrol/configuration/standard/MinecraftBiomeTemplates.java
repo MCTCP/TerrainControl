@@ -33,6 +33,11 @@ public class MinecraftBiomeTemplates
             this.defaultGroundBlock = this.mojangSettings.getGroundBlock().toDefaultMaterial();
             this.defaultBiomeTemperature = this.mojangSettings.getTemperature();
             this.defaultBiomeWetness = this.mojangSettings.getWetness();
+
+            this.defaultMonsters = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.MONSTER);
+            this.defaultCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.CREATURE);
+            this.defaultWaterCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.WATER_CREATURE);
+            this.defaultAmbientCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.AMBIENT_CREATURE);
         }
     }
 

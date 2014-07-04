@@ -10,48 +10,38 @@ import java.util.Map;
  */
 public enum MobNames
 {
-    // All entities sorted by the network ID
-    CREEPER("Creeper", "creeper"),
-    SKELETON("Skeleton", "skeleton"),
-    SPIDER("Spider", "spider"),
-    GIANT("Giant", "giant", "giantzombie", "zombiegiant"),
-    ZOMBIE("Zombie", "zombie"),
-    SLIME("Slime", "slime"),
-    GHAST("Ghast", "ghast"),
-    PIG_ZOMBIE("PigZombie", "pigzombie", "pig_zombie"),
-    ENDERMAN("Enderman", "enderman"),
-    CAVE_SPIDER("CaveSpider", "cavespider", "cave_spider"),
-    SILVERFISH("Silverfish", "silverfish", "silver_fish"),
-    BLAZE("Blaze", "blaze"),
-    MAGMA_CUBE("LavaSlime", "lavaslime", "lava_slime", "magmacube", "magma_cube"),
-    ENDER_DRAGON("EnderDragon", "enderdragon", "ender_dragon"),
-    WITHER_BOSS("WitherBoss", "witherboss", "wither_boss", "Wither", "wither"),
     BAT("Bat", "bat"),
-    WITCH("Witch", "witch"),
-    PIG("Pig", "pig"),
-    SHEEP("Sheep", "sheep"),
-    COW("Cow", "cow"),
+    BLAZE("Blaze", "blaze"),
+    CAVE_SPIDER("CaveSpider", "cavespider", "cave_spider"),
     CHICKEN("Chicken", "chicken"),
-    SQUID("Squid", "squid"),
-    WOLF("Wolf", "wolf"),
-    MUSHROOM_COW("MushroomCow", "mushroomcow", "shroom", "mooshroom", "moshoom", "mcow", "shroomcow"),
-    SNOWMAN("SnowMan", "snowman"),
-    OCELOT("Ozelot", "ozelot", "Ocelot", "ocelot"),
+    COW("Cow", "cow"),
+    CREEPER("Creeper", "creeper"),
+    ENDER_DRAGON("EnderDragon", "enderdragon", "ender_dragon"),
+    ENDERMAN("Enderman", "enderman"),
+    GHAST("Ghast", "ghast"),
+    GIANT("Giant", "giant", "giantzombie", "zombiegiant"),
+    HORSE("EntityHorse", "Horse", "horse"),
     IRON_GOLEM("VillagerGolem", "villagergolem", "villager_golem", "IronGolem", "irongolem", "iron_golem"),
-    VILLAGER("Villager", "villager");
+    MAGMA_CUBE("LavaSlime", "lavaslime", "lava_slime", "magmacube", "magma_cube"),
+    MUSHROOM_COW("MushroomCow", "mushroomcow", "shroom", "mooshroom", "moshoom", "mcow", "shroomcow"),
+    OCELOT("Ozelot", "ozelot", "Ocelot", "ocelot"),
+    PIG("Pig", "pig"),
+    PIG_ZOMBIE("PigZombie", "pigzombie", "pig_zombie"),
+    SHEEP("Sheep", "sheep"),
+    SILVERFISH("Silverfish", "silverfish", "silver_fish"),
+    SKELETON("Skeleton", "skeleton"),
+    SLIME("Slime", "slime"),
+    SNOWMAN("SnowMan", "snowman"),
+    SPIDER("Spider", "spider"),
+    SQUID("Squid", "squid"),
+    VILLAGER("Villager", "villager"),
+    WITCH("Witch", "witch"),
+    WITHER("WitherBoss", "witherboss", "wither_boss", "Wither", "wither"),
+    WOLF("Wolf", "wolf"),
+    ZOMBIE("Zombie", "zombie");
 
     // Contains all aliases (alias, internalName)
     private static Map<String, String> mobAliases = new HashMap<String, String>();
-
-    // Fields and constructor
-    private String internalMinecraftName;
-    private String[] aliases;
-
-    private MobNames(String internalMinecraftName, String... aliases)
-    {
-        this.internalMinecraftName = internalMinecraftName;
-        this.aliases = aliases;
-    }
 
     // Auto-register all aliases in the enum
     static
@@ -63,12 +53,28 @@ public enum MobNames
     }
 
     /**
+     * Returns the internal name of the mob. If it can't be found, it returns
+     * the alias.
+     *
+     * @param alias The alias.
+     * @return The internal name, or if it can't be found, the alias.
+     */
+    public static String toInternalName(String alias)
+    {
+        if (mobAliases.containsKey(alias))
+        {
+            return mobAliases.get(alias);
+        }
+        return alias;
+    }
+
+    /**
      * Register aliases here
      *
      * @param internalMinecraftName The internal Minecraft mob id, for example Ozelot
      * @param aliases               The alias, for example Ocelot
      */
-    public static void register(String internalMinecraftName, String... aliases)
+    private static void register(String internalMinecraftName, String... aliases)
     {
         for (String alias : aliases)
         {
@@ -76,19 +82,22 @@ public enum MobNames
         }
     }
 
-    /**
-     * Returns the internal name of the mob. If it can't be found, it returns
-     * the alias.
-     *
-     * @param alias The alias.
-     * @return The internal name, or if it can't be found, the alias.
-     */
-    public static String getInternalMinecraftName(String alias)
+
+    private String[] aliases;
+    private String internalMinecraftName;
+
+    private MobNames(String internalMinecraftName, String... aliases)
     {
-        if (mobAliases.containsKey(alias))
-        {
-            return mobAliases.get(alias);
-        }
-        return alias;
+        this.internalMinecraftName = internalMinecraftName;
+        this.aliases = aliases;
+    }
+
+    /**
+     * Gets the internal Minecraft name of this mob.
+     * @return The internal Minecraft name.
+     */
+    public String getInternalName()
+    {
+        return this.internalMinecraftName;
     }
 }

@@ -1,6 +1,9 @@
 package com.khorn.terraincontrol.configuration.standard;
 
+import java.util.List;
+
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 
 /**
  * Some default settings are provided by Mojang, so that they don't have to be
@@ -9,6 +12,16 @@ import com.khorn.terraincontrol.LocalMaterialData;
  */
 public interface MojangSettings
 {
+    /**
+     * Represents the four mob type groups used by vanilla Minecraft.
+     */
+    public static enum EntityCategory
+    {
+        AMBIENT_CREATURE,
+        WATER_CREATURE,
+        CREATURE,
+        MONSTER
+    }
 
     /**
      * Gets the temperature of this biome, between 0 and 2 (inclusive). Higher
@@ -52,5 +65,12 @@ public interface MojangSettings
      * @return The default GroundBlock.
      */
     LocalMaterialData getGroundBlock();
+
+    /**
+     * Gets the default value for the mob spawn list.
+     * @param entityCategory The mob type.
+     * @return The mob spawn list.
+     */
+    List<WeightedMobSpawnGroup> getMobSpawnGroup(EntityCategory entityCategory);
 
 }

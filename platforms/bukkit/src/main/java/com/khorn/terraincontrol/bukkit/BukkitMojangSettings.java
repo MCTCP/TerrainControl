@@ -1,8 +1,12 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings;
 import net.minecraft.server.v1_7_R3.BiomeBase;
+
+import java.util.List;
 
 /**
  * Gets some default settings from the BiomeBase instance. The settings in the
@@ -77,6 +81,12 @@ public final class BukkitMojangSettings implements MojangSettings
     public LocalMaterialData getGroundBlock()
     {
         return new BukkitMaterialData(biomeBase.ak, 0);
+    }
+
+    @Override
+    public List<WeightedMobSpawnGroup> getMobSpawnGroup(EntityCategory mobType)
+    {
+        return MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, mobType);
     }
 
 }

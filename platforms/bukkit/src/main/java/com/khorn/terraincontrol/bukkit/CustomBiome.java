@@ -2,20 +2,17 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.logging.LogMarker;
-import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
 import net.minecraft.server.v1_7_R3.BiomeBase;
 import net.minecraft.server.v1_7_R3.BiomeMeta;
-import net.minecraft.server.v1_7_R3.Entity;
-import net.minecraft.server.v1_7_R3.EntityTypes;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_7_R3.block.CraftBlock;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 
 public class CustomBiome extends BiomeBase
 {
@@ -90,52 +87,16 @@ public class CustomBiome extends BiomeBase
         }
 
         // Mob spawning
-        addMobs(this.as, config.spawnMonstersAddDefaults, config.spawnMonsters);
-        addMobs(this.at, config.spawnCreaturesAddDefaults, config.spawnCreatures);
-        addMobs(this.au, config.spawnWaterCreaturesAddDefaults, config.spawnWaterCreatures);
-        addMobs(this.av, config.spawnAmbientCreaturesAddDefaults, config.spawnAmbientCreatures);
+        addMobs(this.as, config.spawnMonsters);
+        addMobs(this.at, config.spawnCreatures);
+        addMobs(this.au, config.spawnWaterCreatures);
+        addMobs(this.av, config.spawnAmbientCreatures);
     }
 
-    // Adds the mobs to the internal list. Displays a warning for each mob
-    // type it doesn't understand
-    protected void addMobs(List<BiomeMeta> internalList, boolean addDefaults, List<WeightedMobSpawnGroup> configList)
+    // Adds the mobs to the internal list.
+    protected void addMobs(List<BiomeMeta> internalList, List<WeightedMobSpawnGroup> configList)
     {
-        if (!addDefaults)
-        {
-            internalList.clear();
-        }
-        for (WeightedMobSpawnGroup mobGroup : configList)
-        {
-            Class<? extends Entity> entityClass = getEntityClass(mobGroup);
-            if (entityClass != null)
-            {
-                internalList.add(new BiomeMeta(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
-            } else
-            {
-                // The .toLowerCase() is just a safeguard so that we get
-                // notified if this.af is no longer the biome name
-                TerrainControl.log(LogMarker.WARN, "Mob type {} not found in {}",
-                        new Object[] {mobGroup.getMobName(), this.af.toLowerCase()});
-            }
-        }
-    }
-
-    // Gets the class of the entity.
-    @SuppressWarnings("unchecked")
-    protected Class<? extends Entity> getEntityClass(WeightedMobSpawnGroup mobGroup)
-    {
-        String mobName = MobNames.getInternalMinecraftName(mobGroup.getMobName());
-        try
-        {
-            Field entitiesField = EntityTypes.class.getDeclaredField("c");
-            entitiesField.setAccessible(true);
-            Map<String, Class<? extends Entity>> entitiesList = (Map<String, Class<? extends Entity>>) entitiesField.get(null);
-            return entitiesList.get(mobName);
-        } catch (Exception e)
-        {
-            TerrainControl.log(LogMarker.FATAL, "Someone forgot to update the mob spawning code! Please report!");
-            TerrainControl.printStackTrace(LogMarker.FATAL, e);
-            return null;
-        }
+        internalList.clear();
+        internalList.addAll(MobSpawnGroupHelper.toMinecraftlist(configList));
     }
 }

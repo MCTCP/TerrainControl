@@ -1,13 +1,9 @@
 package com.khorn.terraincontrol.forge.generator;
 
 import com.khorn.terraincontrol.BiomeIds;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
-import com.khorn.terraincontrol.logging.LogMarker;
-import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
+import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -65,10 +61,10 @@ public class BiomeGenCustom extends BiomeGenBase
             this.foliageColorSet = true;
 
         // Mob spawning
-        addMobs(this.spawnableMonsterList, config.spawnMonstersAddDefaults, config.spawnMonsters);
-        addMobs(this.spawnableCreatureList, config.spawnCreaturesAddDefaults, config.spawnCreatures);
-        addMobs(this.spawnableWaterCreatureList, config.spawnWaterCreaturesAddDefaults, config.spawnWaterCreatures);
-        addMobs(this.spawnableCaveCreatureList, config.spawnAmbientCreaturesAddDefaults, config.spawnAmbientCreatures);
+        addMobs(this.spawnableMonsterList, config.spawnMonsters);
+        addMobs(this.spawnableCreatureList, config.spawnCreatures);
+        addMobs(this.spawnableWaterCreatureList, config.spawnWaterCreatures);
+        addMobs(this.spawnableCaveCreatureList, config.spawnAmbientCreatures);
 
         // color ?
         // this.x = 522674;
@@ -78,34 +74,11 @@ public class BiomeGenCustom extends BiomeGenBase
 
     }
 
-    // Adds the mobs to the internal list. Displays a warning for each mob
-    // type
-    // it doesn't understand
-    protected void addMobs(List<SpawnListEntry> internalList, boolean addDefaults, List<WeightedMobSpawnGroup> configList)
+    // Adds the mobs to the internal list
+    protected void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)
     {
-        if (!addDefaults)
-        {
-            internalList.clear();
-        }
-        for (WeightedMobSpawnGroup mobGroup : configList)
-        {
-            Class<? extends Entity> entityClass = getEntityClass(mobGroup);
-            if (entityClass != null)
-            {
-                internalList.add(new SpawnListEntry(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
-            } else
-            {
-                TerrainControl.log(LogMarker.WARN, "Mob type {} not found in {}", new Object[] {mobGroup.getMobName(), this.biomeName});
-            }
-        }
-    }
-
-    // Gets the class of the entity.
-    @SuppressWarnings("unchecked")
-    protected Class<? extends Entity> getEntityClass(WeightedMobSpawnGroup mobGroup)
-    {
-        String mobName = MobNames.getInternalMinecraftName(mobGroup.getMobName());
-        return (Class<? extends Entity>) EntityList.stringToClassMapping.get(mobName);
+        internalList.clear();
+        internalList.addAll(MobSpawnGroupHelper.toMinecraftlist(configList));
     }
 
     /**
@@ -178,4 +151,3 @@ public class BiomeGenCustom extends BiomeGenBase
     }
 
 }
-

@@ -11,23 +11,24 @@ public class ForgeBiome implements LocalBiome
     private final BiomeGenCustom biomeBase;
     private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
+    private final String originalName;
 
     /**
      * Creates a new biome with the given name and id. Also registers it in
      * Minecraft's biome array, but only when the biome is not virtual.
      * 
-     * @param name The name of the biome.
-     * @param biomeIds The ids of the biome.
+     * @param biomeConfig The config of the biome.
+     * @param biomeIds    The ids of the biome.
      * @return The registered biome.
      */
     public static ForgeBiome createBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        // Save the previous biome
+        // Store the previous biome in a variable
         BiomeGenBase previousBiome = BiomeGenBase.getBiome(biomeIds.getSavedId());
 
         // Register new biome
         ForgeBiome biome = new ForgeBiome(biomeConfig, new BiomeGenCustom(biomeConfig.getName(), biomeIds));
-        
+
         // Restore settings of the previous biome
         if (previousBiome != null)
         {
@@ -40,6 +41,7 @@ public class ForgeBiome implements LocalBiome
     private ForgeBiome(BiomeConfig biomeConfig, BiomeGenCustom biome)
     {
         this.biomeBase = biome;
+        this.originalName = biomeConfig.getName();
         this.biomeIds = new BiomeIds(biome.generationId, biome.biomeID);
         this.biomeConfig = biomeConfig;
     }
@@ -59,6 +61,10 @@ public class ForgeBiome implements LocalBiome
     @Override
     public String getName()
     {
+        if (!originalName.equals(biomeBase.biomeName))
+        {
+            System.out.println("..");
+        }
         return biomeBase.biomeName;
     }
 

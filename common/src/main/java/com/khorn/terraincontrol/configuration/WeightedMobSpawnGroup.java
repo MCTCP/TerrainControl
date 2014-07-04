@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
+import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,16 @@ public class WeightedMobSpawnGroup
         this.max = max;
     }
 
-    public String getMobName()
+    public WeightedMobSpawnGroup(MobNames mobName, int weight, int min, int max) {
+        this(mobName.getInternalName(), weight, min, max);
+    }
+
+    public String getInternalName()
+    {
+        return MobNames.toInternalName(this.mob);
+    }
+
+    public String getConfigName()
     {
         return this.mob;
     }
@@ -159,7 +169,7 @@ public class WeightedMobSpawnGroup
     private void toJson(StringBuilder json)
     {
         json.append("{\"mob\": \"");
-        json.append(getMobName());
+        json.append(getConfigName());
         json.append("\", \"weight\": ");
         json.append(getWeight());
         json.append(", \"min\": ");

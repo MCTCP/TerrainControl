@@ -92,4 +92,10 @@ public class BukkitBiome implements LocalBiome
     {
         return this.biomeConfig;
     }
+
+    @Override
+    public String toString()
+    {
+        return getName();
+    }
 }

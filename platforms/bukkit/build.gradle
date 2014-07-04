@@ -33,6 +33,7 @@ repositories
 
 dependencies
 {
+    testCompile 'junit:junit:4+'
     compile 'org.bukkit:bukkit:' + ext.bukkitVersion
     compile 'org.bukkit:craftbukkit:' + ext.bukkitVersion
     compile project(':common')

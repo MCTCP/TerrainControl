@@ -1,7 +1,12 @@
 package com.khorn.terraincontrol.forge;
 
-import net.minecraft.world.biome.BiomeGenBase;
+import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
 
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+
+import java.util.List;
+
+import net.minecraft.world.biome.BiomeGenBase;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings;
 
@@ -78,6 +83,12 @@ public final class ForgeMojangSettings implements MojangSettings
     public LocalMaterialData getGroundBlock()
     {
         return new ForgeMaterialData(biomeBase.fillerBlock, 0);
+    }
+
+    @Override
+    public List<WeightedMobSpawnGroup> getMobSpawnGroup(EntityCategory entityCategory)
+    {
+        return MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, entityCategory);
     }
 
 }

@@ -26,6 +26,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -146,13 +147,9 @@ public class BiomeConfig extends ConfigFile
     public WorldConfig worldConfig;
 
     // Spawn Config
-    public boolean spawnMonstersAddDefaults = true;
     public List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
-    public boolean spawnCreaturesAddDefaults = true;
     public List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
-    public boolean spawnWaterCreaturesAddDefaults = true;
     public List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
-    public boolean spawnAmbientCreaturesAddDefaults = true;
     public List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
     public BiomeConfig(SettingsReader reader, BiomeLoadInstruction loadInstruction, WorldConfig worldConfig)
@@ -300,15 +297,17 @@ public class BiomeConfig extends ConfigFile
 
         if (this.defaultSettings.isCustomBiome)
         {
-            // Only for custom biomes
-            this.spawnMonstersAddDefaults = readSettings(BiomeStandardValues.SPAWN_MONSTERS_ADD_DEFAULTS);
-            this.spawnMonsters = readSettings(BiomeStandardValues.SPAWN_MONSTERS);
-            this.spawnCreaturesAddDefaults = readSettings(BiomeStandardValues.SPAWN_CREATURES_ADD_DEFAULTS);
-            this.spawnCreatures = readSettings(BiomeStandardValues.SPAWN_CREATURES);
-            this.spawnWaterCreaturesAddDefaults = readSettings(BiomeStandardValues.SPAWN_WATER_CREATURES_ADD_DEFAULTS);
-            this.spawnWaterCreatures = readSettings(BiomeStandardValues.SPAWN_WATER_CREATURES);
-            this.spawnAmbientCreaturesAddDefaults = readSettings(BiomeStandardValues.SPAWN_AMBIENT_CREATURES_ADD_DEFAULTS);
-            this.spawnAmbientCreatures = readSettings(BiomeStandardValues.SPAWN_AMBIENT_CREATURES);
+            // Modifying only works in custom biomes, so let the config file reflect that
+            this.spawnMonsters = readSettings(BiomeStandardValues.SPAWN_MONSTERS, defaultSettings.defaultMonsters);
+            this.spawnCreatures = readSettings(BiomeStandardValues.SPAWN_CREATURES, defaultSettings.defaultCreatures);
+            this.spawnWaterCreatures = readSettings(BiomeStandardValues.SPAWN_WATER_CREATURES, defaultSettings.defaultWaterCreatures);
+            this.spawnAmbientCreatures = readSettings(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, defaultSettings.defaultAmbientCreatures);
+        } else
+        {
+            this.spawnMonsters = defaultSettings.defaultMonsters;
+            this.spawnCreatures = defaultSettings.defaultCreatures;
+            this.spawnWaterCreatures = defaultSettings.defaultWaterCreatures;
+            this.spawnAmbientCreatures = defaultSettings.defaultAmbientCreatures;
         }
 
         this.ReadCustomObjectSettings();
@@ -730,70 +729,51 @@ public class BiomeConfig extends ConfigFile
         writer.setting(BiomeStandardValues.RARE_BUILDING_TYPE, rareBuildingType);
 
         writer.bigTitle("Mob spawning");
-        if (!this.defaultSettings.isCustomBiome)
+
+        if (defaultSettings.isCustomBiome)
         {
-            // Stop in the default biomes
-            writer.comment("Mob spawning control doesn't work in default biomes.");
-            return;
+            writer.comment("This is where you configure mob spawning. Mobs spawn in groups,");
+            writer.comment("see http://minecraft.gamepedia.com/Spawn#Mob_spawning");
+            writer.comment("");
+            writer.comment("A mobgroups is made of four parts. They are mob, weight, min and max.");
+            writer.comment("The mob is one of the Minecraft internal mob names.");
+            writer.comment("See http://minecraft.gamepedia.com/Chunk_format#Mobs");
+            writer.comment("The weight is used for a random selection. This is a positive integer.");
+            writer.comment("The min is the minimum amount of mobs spawning as a group. This is a positive integer.");
+            writer.comment("The max is the maximum amount of mobs spawning as a group. This is a positive integer.");
+            writer.comment("");
+            writer.comment("Mob groups are written to the config files in Json.");
+            writer.comment("Json is a tree document format: http://en.wikipedia.org/wiki/JSON");
+            writer.comment("Write a mobgroup like this: {\"mob\": \"mobname\", \"weight\": integer, \"min\": integer, \"max\": integer}");
+            writer.comment("For example: {\"mob\": \"Ocelot\", \"weight\": 10, \"min\": 2, \"max\": 6}");
+            writer.comment("For example: {\"mob\": \"MushroomCow\", \"weight\": 5, \"min\": 2, \"max\": 2}");
+            writer.comment("A json list of mobgroups looks like this: [mobgroup, mobgroup, mobgroup...]");
+            writer.comment("This would be an ampty list: []");
+            writer.comment("You can validate your json here: http://jsonlint.com/");
+            writer.comment("");
+            writer.comment("There are four categories of mobs: monsters, creatures, water creatures and ambient creatures.");
+            writer.comment("In custom biomes, you can add your own mobgroups in the lists below. In the vanilla biomes,");
+            writer.comment("your changes are ignored.");
+            writer.comment("");
+        } else
+        {
+            writer.comment("It's not possible to change mob spawns in vanilla biomes. These");
+            writer.comment("are the values used by vanilla for this biome. They are read-only:");
+            writer.comment("changes to this setting are ignored and overwritten.");
+            writer.comment("");
         }
 
-        writer.comment("========<TUTORIAL>========");
-        writer.comment("This is where you configure mob spawning. Changing this section is optional.");
-        writer.comment("");
-        writer.comment("#STEP1: Understanding what a mobgroup is.");
-        writer.comment("A mobgroups is made of four parts. They are mob, weight, min and max.");
-        writer.comment("The mob is one of the Minecraft internal mob names.");
-        writer.comment("See http://www.minecraftwiki.net/wiki/Chunk_format#Mobs");
-        writer.comment("The weight is used for a random selection. This is a positive integer.");
-        writer.comment("The min is the minimum amount of mobs spawning as a group. This is a positive integer.");
-        writer.comment("The max is the maximum amount of mobs spawning as a group. This is a positive integer.");
-        writer.comment("");
-        writer.comment("#STEP2: Understanding how write a mobgroup as JSON as well as lists of them.");
-        writer.comment("Json is a tree document format: http://en.wikipedia.org/wiki/JSON");
-        writer.comment("Write a mobgroup like this: {\"mob\": \"mobname\", \"weight\": integer, \"min\": integer, \"max\": integer}");
-        writer.comment("For example: {\"mob\": \"Ocelot\", \"weight\": 10, \"min\": 2, \"max\": 6}");
-        writer.comment("For example: {\"mob\": \"MushroomCow\", \"weight\": 5, \"min\": 2, \"max\": 2}");
-        writer.comment("A json list of mobgroups looks like this: [mobgroup, mobgroup, mobgroup...]");
-        writer.comment("This would be an ampty list: []");
-        writer.comment("You can validate your json here: http://jsonlint.com/");
-        writer.comment("");
-        writer.comment("#STEP3: Understanding what to do with all this info");
-        writer.comment("There are three categories of mobs: monsters, creatures and watercreatures.");
-        writer.comment("These list may be populated with Default values if thee booleans bellow is set to true");
-        writer.comment("You may also add your own mobgroups in the lists below");
-        writer.comment("");
-        writer.comment("#STEP4: What is in the default mob groups?");
-        writer.comment("The default mob groups are controlled by vanilla minecraft.");
-        writer.comment("At 2012-03-24 you could find them here: https://github.com/Bukkit/mc-dev/blob/master/net/minecraft/server/BiomeBase.java#L75");
-        writer.comment("In simple terms:");
-        writer.comment("default creatures: [{\"mob\": \"Sheep\", \"weight\": 12, \"min\": 4, \"max\": 4}, {\"mob\": \"Pig\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Chicken\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Cow\", \"weight\": 8, \"min\": 4, \"max\": 4}]");
-        writer.comment("default monsters: [{\"mob\": \"Spider\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Zombie\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Skeleton\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Creeper\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Slime\", \"weight\": 10, \"min\": 4, \"max\": 4}, {\"mob\": \"Enderman\", \"weight\": 1, \"min\": 1, \"max\": 4}]");
-        writer.comment("default watercreatures: [{\"mob\": \"Squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]");
-        writer.comment("");
-        writer.comment("So for example ocelots wont spawn unless you add them below.");
-
-        writer.comment("========<CONFIGURATION>========");
-
-        writer.comment("Should we add the default monster spawn groups?");
-        writer.setting(BiomeStandardValues.SPAWN_MONSTERS_ADD_DEFAULTS, this.spawnMonstersAddDefaults);
-        writer.comment("Add extra monster spawn groups here");
+        writer.comment("The monsters (skeletons, zombies, etc.) that spawn in this biome");
         writer.setting(BiomeStandardValues.SPAWN_MONSTERS, this.spawnMonsters);
 
-        writer.comment("Should we add the default creature spawn groups?");
-        writer.setting(BiomeStandardValues.SPAWN_CREATURES_ADD_DEFAULTS, this.spawnCreaturesAddDefaults);
-        writer.comment("Add extra creature spawn groups here");
+        writer.comment("The friendly creatures (cows, pigs, etc.) that spawn in this biome");
         writer.setting(BiomeStandardValues.SPAWN_CREATURES, this.spawnCreatures);
 
-        writer.comment("Should we add the default watercreature spawn groups?");
-        writer.setting(BiomeStandardValues.SPAWN_WATER_CREATURES_ADD_DEFAULTS, this.spawnWaterCreaturesAddDefaults);
-        writer.comment("Add extra watercreature spawn groups here");
+        writer.comment("The water creatures (only squids in vanilla) that spawn in this biome");
         writer.setting(BiomeStandardValues.SPAWN_WATER_CREATURES, this.spawnWaterCreatures);
 
-        writer.comment("Should we add the default ambient creature spawn groups? (Currently only bats)");
-        writer.setting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES_ADD_DEFAULTS, this.spawnAmbientCreaturesAddDefaults);
-        writer.comment("Add extra ambient creature spawn groups here");
+        writer.comment("The ambient creatures (only bats in vanila) that spawn in this biome");
         writer.setting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.spawnAmbientCreatures);
-
     }
 
     private void WriteResources(SettingsWriter writer) throws IOException
@@ -961,6 +941,35 @@ public class BiomeConfig extends ConfigFile
             replacedBlocks.setInstructions(output);
             this.reader.putSetting(BiomeStandardValues.REPLACED_BLOCKS, replacedBlocks);
         }
+
+        // SpawnMobsAddDefaults: add default values to list if old boolean was
+        // set to true
+        if (reader.getSetting(BiomeStandardValues.SPAWN_MONSTERS_ADD_DEFAULTS, false))
+        {
+            addDefaultMobGroups(BiomeStandardValues.SPAWN_MONSTERS, defaultSettings.defaultMonsters);
+        }
+        if (reader.getSetting(BiomeStandardValues.SPAWN_CREATURES_ADD_DEFAULTS, false))
+        {
+            addDefaultMobGroups(BiomeStandardValues.SPAWN_CREATURES, defaultSettings.defaultCreatures);
+        }
+        if (reader.getSetting(BiomeStandardValues.SPAWN_WATER_CREATURES_ADD_DEFAULTS, false))
+        {
+            addDefaultMobGroups(BiomeStandardValues.SPAWN_WATER_CREATURES, defaultSettings.defaultWaterCreatures);
+        }
+        if (reader.getSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES_ADD_DEFAULTS, false))
+        {
+            addDefaultMobGroups(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, defaultSettings.defaultAmbientCreatures);
+        }
+    }
+
+    private void addDefaultMobGroups(Setting<List<WeightedMobSpawnGroup>> setting,
+            List<WeightedMobSpawnGroup> defaultGroups)
+    {
+        List<WeightedMobSpawnGroup> emptyList = Collections.emptyList();
+        List<WeightedMobSpawnGroup> groups = new ArrayList<WeightedMobSpawnGroup>();
+        groups.addAll(defaultGroups);
+        groups.addAll(reader.getSetting(setting, emptyList));
+        reader.putSetting(setting, groups);
     }
 
     public void writeToStream(DataOutputStream stream) throws IOException

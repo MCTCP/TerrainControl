@@ -35,7 +35,7 @@ public class WeightedMobSpawnGroupTest
         assertEquals(3, creeperGroup.min);
         assertEquals(5, creeperGroup.max);
 
-        assertEquals(creeperGroup.mob, creeperGroup.getMobName());
+        assertEquals(creeperGroup.mob, creeperGroup.getConfigName());
         assertEquals(creeperGroup.weight, creeperGroup.getWeight());
         assertEquals(creeperGroup.min, creeperGroup.getMin());
         assertEquals(creeperGroup.max, creeperGroup.getMax());
