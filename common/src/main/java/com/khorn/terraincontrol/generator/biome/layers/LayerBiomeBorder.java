@@ -25,7 +25,7 @@ public class LayerBiomeBorder extends Layer
 
         for (int i = 0; i < this.BordersFrom[ReplaceFrom].length; i++)
         {
-            LocalBiome biome = world.getBiomeById(i);
+            LocalBiome biome = world.getBiomeByIdOrNull(i);
             this.BordersFrom[ReplaceFrom][i] = biome == null || !replaceTo.getBiomeConfig().notBorderNear.contains(biome.getName());
         }
         this.BordersTo[ReplaceFrom] = replaceTo.getIds().getGenerationId();

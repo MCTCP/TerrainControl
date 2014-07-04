@@ -50,7 +50,9 @@ public interface LocalWorld
 
     public int getFreeBiomeId();
 
-    public LocalBiome getBiomeById(int id) throws BiomeNotFoundException ;
+    public LocalBiome getBiomeById(int id) throws BiomeNotFoundException;
+
+    public LocalBiome getBiomeByIdOrNull(int id);
 
     public LocalBiome getBiomeByName(String name) throws BiomeNotFoundException;
 

@@ -123,6 +123,12 @@ public class BukkitWorld implements LocalWorld
         }
         return (BukkitBiome) biome;
     }
+    
+    @Override
+    public LocalBiome getBiomeByIdOrNull(int id)
+    {
+        return settings.biomes[id];
+    }
 
     @Override
     public LocalBiome getBiomeByName(String name) throws BiomeNotFoundException

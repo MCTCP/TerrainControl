@@ -145,6 +145,12 @@ public class ForgeWorld implements LocalWorld
         }
         return (ForgeBiome) biome;
     }
+    
+    @Override
+    public LocalBiome getBiomeByIdOrNull(int id)
+    {
+        return settings.biomes[id];
+    }
 
     @Override
     public LocalBiome getBiomeByName(String name) throws BiomeNotFoundException
