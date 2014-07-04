@@ -119,7 +119,6 @@ public class BiomeGenCustom extends BiomeGenBase
     {
         this.fillerBlock = baseBiome.fillerBlock;
         this.topBlock = baseBiome.topBlock;
-        this.biomeName = baseBiome.biomeName;
         this.color = baseBiome.color;
         this.rootHeight = baseBiome.rootHeight;
         this.heightVariation = baseBiome.heightVariation;
@@ -179,3 +178,4 @@ public class BiomeGenCustom extends BiomeGenBase
     }
 
 }
+
