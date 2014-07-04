@@ -8,11 +8,11 @@ buildscript
     }
     dependencies
     {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:0.8'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:' + ext.shadowVersion
     }
 }
 
-apply plugin: 'shadow'
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 
 // Project properties
@@ -58,9 +58,12 @@ processResources
 }
 
 // Include all Terrain Control files in the jar
-shadow
+shadowJar
 {
-    artifactAttached = false
-    include 'com/khorn/terraincontrol/**'
+    destinationDir = new File(project.buildDir, "distributions")
+    classifier = ''
+    dependencies
+    {
+        include project(":common")
+    }
 }
-

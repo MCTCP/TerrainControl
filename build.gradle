@@ -12,6 +12,9 @@ allprojects
     // Otherwise it will use the default name. In the case of the project
     // 'platforms:bukkit', the default name is invalid because it contains a slash
     ext.ideProjectName = null
+
+    // Version of the shadow plugin
+    ext.shadowVersion = '1.0.1'
 }
 
 // Information for all subprojects
