@@ -23,7 +23,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 import java.io.File;
 
-@Mod(modid = "TerrainControl", name = "TerrainControl")
+@Mod(modid = "TerrainControl", name = "TerrainControl", acceptableRemoteVersions = "*")
 public class TCPlugin
 {
 
