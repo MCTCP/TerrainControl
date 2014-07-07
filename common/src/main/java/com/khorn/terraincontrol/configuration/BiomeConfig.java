@@ -25,11 +25,7 @@ import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BiomeConfig extends ConfigFile
 {
@@ -835,10 +831,10 @@ public class BiomeConfig extends ConfigFile
      */
     private <T> void moveSettingFromWorld(Setting<T> setting)
     {
-        T value = worldConfig.reader.getSetting(setting, setting.getDefaultValue());
-        if (!value.equals(setting.getDefaultValue()))
+        if (worldConfig.reader.hasSetting(setting))
         {
-            this.reader.putSetting(setting, value);
+            T value = worldConfig.reader.getSetting(setting, setting.getDefaultValue());
+            reader.putSetting(setting, value);
         }
     }
 
