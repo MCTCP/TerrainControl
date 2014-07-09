@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import net.minecraft.server.v1_7_R3.Block;
+import net.minecraft.server.v1_7_R4.Block;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
@@ -23,7 +23,7 @@ public class BukkitMaterialData implements LocalMaterialData
 
     public BukkitMaterialData(DefaultMaterial defaultMaterial, int data)
     {
-        this.block = Block.e(defaultMaterial.id);
+        this.block = Block.getById(defaultMaterial.id);
         this.data = (byte) data;
     }
 
@@ -65,7 +65,7 @@ public class BukkitMaterialData implements LocalMaterialData
     @Override
     public int getBlockId()
     {
-        return Block.b(block);
+        return Block.getId(block);
     }
 
     @Override

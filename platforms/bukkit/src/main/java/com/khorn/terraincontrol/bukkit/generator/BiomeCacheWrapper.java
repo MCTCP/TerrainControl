@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
-import net.minecraft.server.v1_7_R3.BiomeBase;
-import net.minecraft.server.v1_7_R3.BiomeCache;
-import net.minecraft.server.v1_7_R3.WorldChunkManager;
+import net.minecraft.server.v1_7_R4.BiomeBase;
+import net.minecraft.server.v1_7_R4.BiomeCache;
+import net.minecraft.server.v1_7_R4.WorldChunkManager;
 
 public class BiomeCacheWrapper implements com.khorn.terraincontrol.generator.biome.BiomeCache
 {

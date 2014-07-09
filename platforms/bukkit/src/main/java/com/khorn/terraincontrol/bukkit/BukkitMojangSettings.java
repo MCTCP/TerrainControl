@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings;
-import net.minecraft.server.v1_7_R3.BiomeBase;
+import net.minecraft.server.v1_7_R4.BiomeBase;
 
 import java.util.List;
 

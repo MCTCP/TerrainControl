@@ -22,8 +22,8 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
-import net.minecraft.server.v1_7_R3.*;
-import org.bukkit.craftbukkit.v1_7_R3.CraftWorld;
+import net.minecraft.server.v1_7_R4.*;
+import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
 
 import java.util.*;
 
@@ -222,7 +222,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void PlaceDungeons(Random rand, int x, int y, int z)
     {
-        new WorldGenDungeons().a(this.world, rand, x, y, z);
+        new WorldGenDungeons().generate(this.world, rand, x, y, z);
     }
 
     @Override
@@ -231,38 +231,38 @@ public class BukkitWorld implements LocalWorld
         switch (type)
         {
             case Tree:
-                return tree.a(this.world, rand, x, y, z);
+                return tree.generate(this.world, rand, x, y, z);
             case BigTree:
                 bigTree.a(1.0D, 1.0D, 1.0D);
-                return bigTree.a(this.world, rand, x, y, z);
+                return bigTree.generate(this.world, rand, x, y, z);
             case Forest:
             case Birch:
-                return birchTree.a(this.world, rand, x, y, z);
+                return birchTree.generate(this.world, rand, x, y, z);
             case TallBirch:
-                return longBirchTree.a(this.world, rand, x, y, z);
+                return longBirchTree.generate(this.world, rand, x, y, z);
             case HugeMushroom:
                 hugeMushroom.a(1.0D, 1.0D, 1.0D);
-                return hugeMushroom.a(this.world, rand, x, y, z);
+                return hugeMushroom.generate(this.world, rand, x, y, z);
             case SwampTree:
-                return swampTree.a(this.world, rand, x, y, z);
+                return swampTree.generate(this.world, rand, x, y, z);
             case Taiga1:
-                return taigaTree1.a(this.world, rand, x, y, z);
+                return taigaTree1.generate(this.world, rand, x, y, z);
             case Taiga2:
-                return taigaTree2.a(this.world, rand, x, y, z);
+                return taigaTree2.generate(this.world, rand, x, y, z);
             case JungleTree:
-                return jungleTree.a(this.world, rand, x, y, z);
+                return jungleTree.generate(this.world, rand, x, y, z);
             case GroundBush:
-                return groundBush.a(this.world, rand, x, y, z);
+                return groundBush.generate(this.world, rand, x, y, z);
             case CocoaTree:
-                return cocoaTree.a(this.world, rand, x, y, z);
+                return cocoaTree.generate(this.world, rand, x, y, z);
             case Acacia:
-                return acaciaTree.a(this.world, rand, x, y, z);
+                return acaciaTree.generate(this.world, rand, x, y, z);
             case DarkOak:
-                return darkOakTree.a(this.world, rand, x, y, z);
+                return darkOakTree.generate(this.world, rand, x, y, z);
             case HugeTaiga1:
-                return hugeTaigaTree1.a(this.world, rand, x, y, z);
+                return hugeTaigaTree1.generate(this.world, rand, x, y, z);
             case HugeTaiga2:
-                return hugeTaigaTree2.a(this.world, rand, x, y, z);
+                return hugeTaigaTree2.generate(this.world, rand, x, y, z);
             default:
                 throw new AssertionError("Failed to handle tree of type " + type.toString());
         }
@@ -321,7 +321,7 @@ public class BukkitWorld implements LocalWorld
         int worldStartX = rawChunk.locX * 16;
         int worldStartZ = rawChunk.locZ * 16;
 
-        ChunkSection[] sectionsArray = rawChunk.i();
+        ChunkSection[] sectionsArray = rawChunk.getSections();
 
         for (ChunkSection section : sectionsArray)
         {
@@ -339,7 +339,7 @@ public class BukkitWorld implements LocalWorld
                         for (int sectionY = 0; sectionY < 16; sectionY++)
                         {
                             Block block = section.getTypeId(sectionX, sectionY, sectionZ);
-                            int blockId = Block.b(block);
+                            int blockId = Block.getId(block);
                             if (replaceArray[blockId] == null)
                                 continue;
 

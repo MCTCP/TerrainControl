@@ -5,10 +5,10 @@ import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_7_R3.BiomeBase;
-import net.minecraft.server.v1_7_R3.StructureGenerator;
-import net.minecraft.server.v1_7_R3.StructureStart;
-import net.minecraft.server.v1_7_R3.World;
+import net.minecraft.server.v1_7_R4.BiomeBase;
+import net.minecraft.server.v1_7_R4.StructureGenerator;
+import net.minecraft.server.v1_7_R4.StructureStart;
+import net.minecraft.server.v1_7_R4.World;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,10 +6,10 @@ import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_7_R3.BiomeBase;
-import net.minecraft.server.v1_7_R3.BiomeMeta;
+import net.minecraft.server.v1_7_R4.BiomeBase;
+import net.minecraft.server.v1_7_R4.BiomeMeta;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_7_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_7_R4.block.CraftBlock;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -36,7 +36,7 @@ public class CustomBiome extends BiomeBase
             // the original biome afterwards)
             BiomeBase toRestore = BiomeBase.getBiome(biomeIds.getSavedId());
             CustomBiome customBiome = new CustomBiome(name, biomeIds);
-            BiomeBase.n()[biomeIds.getSavedId()] = toRestore;
+            BiomeBase.getBiomes()[biomeIds.getSavedId()] = toRestore;
 
             return customBiome;
         } else

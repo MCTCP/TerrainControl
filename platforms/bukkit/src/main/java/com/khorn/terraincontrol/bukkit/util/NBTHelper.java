@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.util;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
-import net.minecraft.server.v1_7_R3.*;
+import net.minecraft.server.v1_7_R4.*;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -116,7 +116,7 @@ public class NBTHelper
                     listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.d(i)));
                     break;
                 case TAG_String:
-                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.f(i)));
+                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.getString(i)));
                     break;
                 case TAG_Compound:
                     listTag.addTag(getNBTFromNMSTagCompound(null, nmsListTag.get(i)));
