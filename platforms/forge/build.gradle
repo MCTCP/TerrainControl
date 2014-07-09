@@ -19,7 +19,7 @@ buildscript
     dependencies
     {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-        classpath 'com.github.jengelman.gradle.plugins:shadow:' + ext.shadowVersion
+        classpath 'com.github.jengelman.gradle.plugins:shadow:' + project.ext.shadowVersion
     }
 }
 
@@ -61,7 +61,7 @@ processResources
         include 'mcmod.info'
 
         // Replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
 
     // Copy everything else, that's not the mcmod.info

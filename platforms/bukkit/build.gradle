@@ -8,7 +8,7 @@ buildscript
     }
     dependencies
     {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:' + ext.shadowVersion
+        classpath 'com.github.jengelman.gradle.plugins:shadow:' + project.ext.shadowVersion
     }
 }
 
@@ -35,8 +35,8 @@ repositories
 dependencies
 {
     testCompile 'junit:junit:4+'
-    compile 'org.spigotmc:spigot-api:' + ext.bukkitVersion
-    compile 'org.spigotmc:spigot:' + ext.bukkitVersion
+    compile 'org.spigotmc:spigot-api:' + project.ext.bukkitVersion
+    compile 'org.spigotmc:spigot:' + project.ext.bukkitVersion
     compile project(':common')
     compile 'org.apache.logging.log4j:log4j-api:2.0-beta9'
     compile 'org.apache.logging.log4j:log4j-core:2.0-beta9'

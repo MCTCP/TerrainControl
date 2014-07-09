@@ -14,7 +14,7 @@ allprojects
     ext.ideProjectName = null
 
     // Version of the shadow plugin
-    ext.shadowVersion = '1.0.1'
+    ext.shadowVersion = '1.0.2'
 }
 
 // Information for all subprojects
