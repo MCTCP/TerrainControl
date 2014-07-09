@@ -35,23 +35,6 @@ minecraft.version = ext.forgeVersion
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
-// Include all Terrain Control files in the jar
-shadowJar
-{
-    destinationDir = new File(project.buildDir, "distributions")
-    classifier = ''
-    dependencies
-    {
-        include project(":common")
-
-        // Where do these files come from? Shadow includes them in the
-        // JAR, unless these lines are present. Maybe it's something created
-        // by Forge? Google gives no results.
-        exclude 'GradleStart.class'
-        exclude 'GradleStart.class.md5'
-    }
-}
-
 repositories
 {
     mavenCentral()
@@ -85,6 +68,23 @@ processResources
     from(sourceSets.main.resources.srcDirs)
     {
         exclude 'mcmod.info'
+    }
+}
+
+// Include all Terrain Control files in the jar
+shadowJar
+{
+    destinationDir = new File(project.buildDir, "distributions")
+    classifier = ''
+    dependencies
+    {
+        include project(":common")
+
+        // Where do these files come from? Shadow includes them in the
+        // JAR, unless these lines are present. Maybe it's something created
+        // by Forge? Google gives no results.
+        exclude 'GradleStart.class'
+        exclude 'GradleStart.class.md5'
     }
 }
 
