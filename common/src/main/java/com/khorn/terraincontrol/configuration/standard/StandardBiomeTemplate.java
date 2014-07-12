@@ -47,7 +47,8 @@ public class StandardBiomeTemplate
     public int defaultMushroom = 0;
     public int defaultReed = 0;
     public int defaultCactus = 0;
-    public int defaultClay = 1;
+    public int defaultWaterSand = 3;
+    public int defaultWaterGravel = 1;
     public Object[] defaultWell; // Parameters for well resource
     public float defaultBiomeSurface = 0.1F;
     public float defaultBiomeVolatility = 0.3F;
@@ -171,20 +172,27 @@ public class StandardBiomeTemplate
         }
 
         // Under water sand
-        resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.SAND, BiomeStandardValues.waterSandDepositSize, BiomeStandardValues.waterSandDepositFrequency,
-                BiomeStandardValues.waterSandDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.GRASS));
+        if (defaultWaterSand > 0)
+        {
+            resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.SAND, BiomeStandardValues.waterSandDepositSize, defaultWaterSand,
+                    BiomeStandardValues.waterSandDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.GRASS));
+        }
 
         // Under water clay
-        if (this.defaultClay > 0)
-        {
-            resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.CLAY, BiomeStandardValues.waterClayDepositSize, this.defaultClay,
+        resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.CLAY, BiomeStandardValues.waterClayDepositSize, BiomeStandardValues.waterClayDepositFrequency,
                     BiomeStandardValues.waterClayDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.CLAY));
 
+        // Under water gravel
+        if (defaultWaterGravel > 0)
+        {
+            resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.GRAVEL, BiomeStandardValues.waterGravelDepositSize, defaultWaterGravel,
+                    BiomeStandardValues.waterGravelDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.GRASS));
         }
+
         // Custom objects
         resources.add(Resource.createResource(config, CustomObjectGen.class, "UseWorld"));
 
-        // Boulders
+        // Boulder
         if (this.defaultBoulder != 0)
         {
             resources.add(Resource.createResource(config, BoulderGen.class, DefaultMaterial.MOSSY_COBBLESTONE, defaultBoulder, BiomeStandardValues.boulderDepositRarity,

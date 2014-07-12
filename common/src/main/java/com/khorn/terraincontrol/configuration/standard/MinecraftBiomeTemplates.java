@@ -146,7 +146,8 @@ public class MinecraftBiomeTemplates
             this.defaultDandelions = 0;
             this.defaultMushroom = 16;
             this.defaultReed = 10;
-            this.defaultClay = 1;
+            this.defaultWaterSand = 0;
+            this.defaultWaterGravel = 0;
             this.defaultWaterLily = 1;
             this.defaultDandelions = 0;
             this.defaultBlueOrchids = 2;

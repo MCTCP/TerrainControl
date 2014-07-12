@@ -196,11 +196,14 @@ public class BiomeStandardValues extends Settings
     public static final int emeraldDepositMaxAltitude = 32;
 
     public static final int waterClayDepositRarity = 100;
+    public static final int waterClayDepositFrequency = 1;
     public static final int waterClayDepositSize = 4;
 
     public static final int waterSandDepositRarity = 100;
-    public static final int waterSandDepositFrequency = 4;
     public static final int waterSandDepositSize = 7;
+
+    public static final int waterGravelDepositRarity = 100;
+    public static final int waterGravelDepositSize = 6;
 
     public static final int roseDepositRarity = 100;
     public static final int roseDepositMinAltitude = 0;
