@@ -25,8 +25,7 @@ repositories
 {
     maven // For Bukkit and CraftBukkit
     {
-        // Using Spigot for now, as CraftBukkit 1.7.10 isn't uploaded yet
-        url "http://repo.md-5.net/content/repositories/snapshots/"
+        url "http://repo.bukkit.org/content/groups/public"
     }
     mavenCentral() // For log4j
     mavenLocal()
@@ -35,8 +34,8 @@ repositories
 dependencies
 {
     testCompile 'junit:junit:4+'
-    compile 'org.spigotmc:spigot-api:' + project.ext.bukkitVersion
-    compile 'org.spigotmc:spigot:' + project.ext.bukkitVersion
+    compile 'org.bukkit:bukkit:' + project.ext.bukkitVersion
+    compile 'org.bukkit:craftbukkit:' + project.ext.bukkitVersion
     compile project(':common')
     compile 'org.apache.logging.log4j:log4j-api:2.0-beta9'
     compile 'org.apache.logging.log4j:log4j-core:2.0-beta9'
