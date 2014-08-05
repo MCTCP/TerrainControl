@@ -1,35 +1,34 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
-
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 
 public class LayerIce extends Layer
 {
-    public LayerIce(long paramLong, Layer paramGenLayer, int _rarity)
-    {
-        super(paramLong);
-        this.child = paramGenLayer;
-        this.rarity = 101 - _rarity;
-    }
-
 
     public int rarity = 5;
 
-    @Override
-    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    public LayerIce(long seed, Layer childLayer, int _rarity)
     {
-        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
+        super(seed);
+        this.child = childLayer;
+        this.rarity = 101 - _rarity;
+    }
 
-        int[] arrayOfInt2 = arraysCache.GetArray( x_size * z_size);
-        for (int i = 0; i < z_size; i++)
+    @Override
+    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
+    {
+        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
+        int[] thisInts = cache.getArray(xSize * zSize);
+
+        for (int zi = 0; zi < zSize; zi++)
         {
-            for (int j = 0; j < x_size; j++)
+            for (int xi = 0; xi < xSize; xi++)
             {
-                SetSeed(z + i, x + j);      // reversed
-                arrayOfInt2[(j + i * x_size)] = (nextInt(rarity) == 0 ? (arrayOfInt1[(j + i * x_size)] | IceBit) : arrayOfInt1[(j + i * x_size)]);
+                initChunkSeed(z + zi, x + xi);      // reversed
+                thisInts[(xi + zi * xSize)] = (nextInt(rarity) == 0 ? (childInts[(xi + zi * xSize)] | IceBit) : childInts[(xi + zi * xSize)]);
             }
         }
-
-        return arrayOfInt2;
+        return thisInts;
     }
+
 }

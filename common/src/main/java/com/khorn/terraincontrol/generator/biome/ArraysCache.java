@@ -5,10 +5,10 @@ import java.util.ArrayList;
 public class ArraysCache
 {
 
-    private final int[][] SmallArrays = new int[128][];
-    private int SmallArraysNext = 0;
-    private final ArrayList<int[]> BigArrays = new ArrayList<int[]>();
-    private int BigArraysNext = 0;
+    private final int[][] smallArrays = new int[128][];
+    private int smallArraysNext = 0;
+    private final ArrayList<int[]> bigArrays = new ArrayList<int[]>();
+    private int bigArraysNext = 0;
 
     public boolean isFree = true;
 
@@ -19,46 +19,46 @@ public class ArraysCache
 
     }
 
-    public void Release()
+    public void release()
     {
-        SmallArraysNext = 0;
-        BigArraysNext = 0;
+        smallArraysNext = 0;
+        bigArraysNext = 0;
         isFree = true;
         outputType = OutputType.FULL;
     }
 
-    public int[] GetArray(int size)
+    public int[] getArray(int size)
     {
 
         if (size <= 256)
         {
-            int[] array = SmallArrays[SmallArraysNext];
+            int[] array = smallArrays[smallArraysNext];
             if (array == null)
             {
                 array = new int[256];
-                SmallArrays[SmallArraysNext] = array;
+                smallArrays[smallArraysNext] = array;
             }
-            SmallArraysNext++;
+            smallArraysNext++;
 
             return array;
         }
 
         int[] array;
-        if (BigArraysNext == BigArrays.size())
+        if (bigArraysNext == bigArrays.size())
         {
             array = new int[size];
-            BigArrays.add(array);
+            bigArrays.add(array);
         } else
         {
-            array = (int[]) BigArrays.get(BigArraysNext);
+            array = (int[]) bigArrays.get(bigArraysNext);
             if (array.length < size)
             {
                 array = new int[size];
-                BigArrays.set(BigArraysNext, array);
+                bigArrays.set(bigArraysNext, array);
             }
         }
 
-        BigArraysNext++;
+        bigArraysNext++;
         return array;
 
     }

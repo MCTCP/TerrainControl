@@ -1,10 +1,10 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
-
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 
 public class LayerRiverInit extends Layer
 {
+
     public LayerRiverInit(long paramLong, Layer paramGenLayer)
     {
         super(paramLong);
@@ -12,26 +12,26 @@ public class LayerRiverInit extends Layer
     }
 
     @Override
-    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
+        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
+        int[] thisInts = cache.getArray(xSize * zSize);
 
-        int[] arrayOfInt2 = arraysCache.GetArray( x_size * z_size);
-        for (int i = 0; i < z_size; i++)
+        for (int zi = 0; zi < zSize; zi++)
         {
-            for (int j = 0; j < x_size; j++)
+            for (int xi = 0; xi < xSize; xi++)
             {
-                SetSeed(i + z, j + x);           // reversed
-                int currentPiece = arrayOfInt1[(j + i * x_size)];
+                initChunkSeed(zi + z, xi + x);           // reversed
+                int currentPiece = childInts[(xi + zi * xSize)];
                 if (nextInt(2) == 0)
                     currentPiece |= RiverBitOne;
                 else
                     currentPiece |= RiverBitTwo;
 
-                arrayOfInt2[(j + i * x_size)] = currentPiece;
+                thisInts[(xi + zi * xSize)] = currentPiece;
             }
         }
-
-        return arrayOfInt2;
+        return thisInts;
     }
+
 }

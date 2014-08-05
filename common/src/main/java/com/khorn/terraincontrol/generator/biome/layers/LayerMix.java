@@ -9,10 +9,14 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 public class LayerMix extends Layer
 {
-    public LayerMix(long paramLong, Layer paramGenLayer, WorldSettings configs, LocalWorld world)
+
+    private WorldSettings configs;
+    private int[] riverBiomes;
+
+    public LayerMix(long seed, Layer childLayer, WorldSettings configs, LocalWorld world)
     {
-        super(paramLong);
-        this.child = paramGenLayer;
+        super(seed);
+        this.child = childLayer;
         this.configs = configs;
         this.riverBiomes = new int[world.getMaxBiomesCount()];
 
@@ -28,39 +32,36 @@ public class LayerMix extends Layer
         }
     }
 
-    private WorldSettings configs;
-    private int[] riverBiomes;
-
     @Override
-    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        switch (arraysCache.outputType)
+        switch (cache.outputType)
         {
             case FULL:
-                return this.GetFull(arraysCache, x, z, x_size, z_size);
+                return this.getFull(cache, x, z, xSize, zSize);
             case WITHOUT_RIVERS:
-                return this.GetWithoutRivers(arraysCache, x, z, x_size, z_size);
+                return this.getWithoutRivers(cache, x, z, xSize, zSize);
             case ONLY_RIVERS:
-                return this.GetOnlyRivers(arraysCache, x, z, x_size, z_size);
+                return this.getOnlyRivers(cache, x, z, xSize, zSize);
             default:
-                throw new UnsupportedOperationException("Unknown/invalid output type: " + arraysCache.outputType);
+                throw new UnsupportedOperationException("Unknown/invalid output type: " + cache.outputType);
         }
 
     }
 
-    private int[] GetFull(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    private int[] getFull(ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
-        int[] arrayOfInt2 = arraysCache.GetArray(x_size * z_size);
+        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
+        int[] thisInts = cache.getArray(xSize * zSize);
         WorldConfig worldConfig = this.configs.worldConfig;
 
         int currentPiece;
         int cachedId;
-        for (int i = 0; i < z_size; i++)
+        for (int zi = 0; zi < zSize; zi++)
         {
-            for (int j = 0; j < x_size; j++)
+            for (int xi = 0; xi < xSize; xi++)
             {
-                currentPiece = arrayOfInt1[(j + i * x_size)];
+                currentPiece = childInts[(xi + zi * xSize)];
 
                 if ((currentPiece & LandBit) != 0)
                     cachedId = currentPiece & BiomeBits;
@@ -74,26 +75,25 @@ public class LayerMix extends Layer
                 else
                     currentPiece = cachedId;
 
-                arrayOfInt2[(j + i * x_size)] = currentPiece;
+                thisInts[(xi + zi * xSize)] = currentPiece;
             }
         }
-
-        return arrayOfInt2;
+        return thisInts;
     }
 
-    private int[] GetWithoutRivers(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    private int[] getWithoutRivers(ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
-        int[] arrayOfInt2 = arraysCache.GetArray(x_size * z_size);
+        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
+        int[] thisInts = cache.getArray(xSize * zSize);
         WorldConfig worldConfig = this.configs.worldConfig;
 
         int currentPiece;
         int cachedId;
-        for (int i = 0; i < z_size; i++)
+        for (int zi = 0; zi < zSize; zi++)
         {
-            for (int j = 0; j < x_size; j++)
+            for (int xi = 0; xi < xSize; xi++)
             {
-                currentPiece = arrayOfInt1[(j + i * x_size)];
+                currentPiece = childInts[(xi + zi * xSize)];
 
                 if ((currentPiece & LandBit) != 0)
                     cachedId = currentPiece & BiomeBits;
@@ -104,26 +104,25 @@ public class LayerMix extends Layer
 
                 currentPiece = cachedId;
 
-                arrayOfInt2[(j + i * x_size)] = currentPiece;
+                thisInts[(xi + zi * xSize)] = currentPiece;
             }
         }
-
-        return arrayOfInt2;
+        return thisInts;
     }
 
-    private int[] GetOnlyRivers(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    private int[] getOnlyRivers(ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
-        int[] arrayOfInt2 = arraysCache.GetArray(x_size * z_size);
+        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
+        int[] thisInts = cache.getArray(xSize * zSize);
         WorldConfig worldConfig = this.configs.worldConfig;
 
         int currentPiece;
         int cachedId;
-        for (int i = 0; i < z_size; i++)
+        for (int zi = 0; zi < zSize; zi++)
         {
-            for (int j = 0; j < x_size; j++)
+            for (int xi = 0; xi < xSize; xi++)
             {
-                currentPiece = arrayOfInt1[(j + i * x_size)];
+                currentPiece = childInts[(xi + zi * xSize)];
 
                 if ((currentPiece & LandBit) != 0)
                     cachedId = currentPiece & BiomeBits;
@@ -137,10 +136,10 @@ public class LayerMix extends Layer
                 else
                     currentPiece = 0;
 
-                arrayOfInt2[(j + i * x_size)] = currentPiece;
+                thisInts[(xi + zi * xSize)] = currentPiece;
             }
         }
-
-        return arrayOfInt2;
+        return thisInts;
     }
+
 }

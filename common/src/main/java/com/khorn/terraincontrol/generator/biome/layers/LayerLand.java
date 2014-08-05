@@ -1,38 +1,37 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
-
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 
 public class LayerLand extends Layer
 {
-    public LayerLand(long paramLong, Layer paramGenLayer, int _chance)
-    {
-        super(paramLong);
-        this.child = paramGenLayer;
-        this.chance = 101 - _chance;
-    }
 
-    public int chance = 5;
+    public int rarity = 5;
+
+    public LayerLand(long seed, Layer childLayer, int _rarity)
+    {
+        super(seed);
+        this.child = childLayer;
+        this.rarity = 101 - _rarity;
+    }
 
     @Override
-    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
     {
+        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
+        int[] thisInts = cache.getArray(xSize * zSize);
 
-        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
-
-        int[] arrayOfInt2 = arraysCache.GetArray( x_size * z_size);
-        for (int i = 0; i < z_size; i++)
+        for (int zi = 0; zi < zSize; zi++)
         {
-            for (int j = 0; j < x_size; j++)
+            for (int xi = 0; xi < xSize; xi++)
             {
-                SetSeed(x + j, z + i);
-                if (nextInt(chance) == 0)
-                    arrayOfInt2[(j + i * x_size)] = arrayOfInt1[(j + i * x_size)] | LandBit;
+                initChunkSeed(x + xi, z + zi);
+                if (nextInt(rarity) == 0)
+                    thisInts[(xi + zi * xSize)] = childInts[(xi + zi * xSize)] | LandBit;
                 else
-                    arrayOfInt2[(j + i * x_size)] = arrayOfInt1[(j + i * x_size)];
+                    thisInts[(xi + zi * xSize)] = childInts[(xi + zi * xSize)];
             }
         }
-
-        return arrayOfInt2;
+        return thisInts;
     }
+
 }

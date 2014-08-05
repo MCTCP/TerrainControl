@@ -4,20 +4,20 @@ package com.khorn.terraincontrol.generator.biome;
 public class ArraysCacheManager
 {
 
-    private static final ArraysCache[] ARRAYS_CACHes = new ArraysCache[4];
+    private static final ArraysCache[] ARRAYS_CACHES = new ArraysCache[4];
 
     static
     {
-        for (int i = 0; i < ARRAYS_CACHes.length; i++)
-            ARRAYS_CACHes[i] = new ArraysCache();
+        for (int i = 0; i < ARRAYS_CACHES.length; i++)
+            ARRAYS_CACHES[i] = new ArraysCache();
 
     }
 
     public static ArraysCache GetCache()
     {
-        synchronized (ARRAYS_CACHes)
+        synchronized (ARRAYS_CACHES)
         {
-            for (ArraysCache ArraysCache : ARRAYS_CACHes)
+            for (ArraysCache ArraysCache : ARRAYS_CACHES)
             {
                 if (ArraysCache.isFree)
                 {
@@ -32,9 +32,9 @@ public class ArraysCacheManager
 
     public static void ReleaseCache(ArraysCache cache)
     {
-        synchronized (ARRAYS_CACHes)
+        synchronized (ARRAYS_CACHES)
         {
-            cache.Release();
+            cache.release();
         }
     }
 

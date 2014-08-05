@@ -1,21 +1,22 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
-
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 
 public class LayerEmpty extends Layer
 {
-    public LayerEmpty(long paramLong)
+
+    public LayerEmpty(long seed)
     {
-        super(paramLong);
+        super(seed);
     }
 
     @Override
-    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] arrayOfInt = arraysCache.GetArray( x_size * z_size);
-        for (int i = 0; i < arrayOfInt.length; i++)
-            arrayOfInt[i] = 0;
-        return arrayOfInt;
+        int[] thisInts = cache.getArray(xSize * zSize);
+        for (int i = 0; i < thisInts.length; i++)
+            thisInts[i] = 0;
+        return thisInts;
     }
+
 }

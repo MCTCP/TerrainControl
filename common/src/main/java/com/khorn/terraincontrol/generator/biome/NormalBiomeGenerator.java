@@ -38,7 +38,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
             cache.outputType = defaultOutputType;
         else
             cache.outputType = outputType;
-        int[] arrayOfInt = this.unZoomedLayer.GetBiomes(cache, x, z, x_size, z_size);
+        int[] arrayOfInt = this.unZoomedLayer.getInts(cache, x, z, x_size, z_size);
         ArraysCacheManager.ReleaseCache(cache);
 
         System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);
@@ -56,7 +56,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
         ArraysCache cache = ArraysCacheManager.GetCache();
         cache.outputType = defaultOutputType;
 
-        int[] arrayOfInt = this.biomeLayer.GetBiomes(cache, x, y, x_size, z_size);
+        int[] arrayOfInt = this.biomeLayer.getInts(cache, x, y, x_size, z_size);
         ArraysCacheManager.ReleaseCache(cache);
         WorldConfig worldConfig = world.getSettings().worldConfig;
         for (int i = 0; i < x_size * z_size; i++)
@@ -95,7 +95,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
             cache.outputType = defaultOutputType;
         else
             cache.outputType = outputType;
-        int[] arrayOfInt = this.biomeLayer.GetBiomes(cache, x, z, x_size, z_size);
+        int[] arrayOfInt = this.biomeLayer.getInts(cache, x, z, x_size, z_size);
         ArraysCacheManager.ReleaseCache(cache);
 
         System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);

@@ -5,29 +5,30 @@ import com.khorn.terraincontrol.generator.biome.ArraysCache;
 
 public class LayerBiome extends Layer
 {
-    public LocalBiome[] biomes;
-    public LocalBiome[] ice_biomes;
 
+    private LocalBiome[] biomes;
+    private LocalBiome[] ice_biomes;
 
-    public LayerBiome(long paramLong, Layer paramGenLayer)
+    public LayerBiome(long seed, Layer childLayer, LocalBiome[] biomes, LocalBiome[] ice_biomes)
     {
-        super(paramLong);
-        this.child = paramGenLayer;
+        super(seed);
+        this.child = childLayer;
+        this.biomes = biomes;
+        this.ice_biomes = ice_biomes;
     }
 
     @Override
-    public int[] GetBiomes(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] arrayOfInt1 = this.child.GetBiomes(arraysCache, x, z, x_size, z_size);
+        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
+        int[] thisInts = cache.getArray(xSize * zSize);
 
-        int[] arrayOfInt2 = arraysCache.GetArray(x_size * z_size);
-        for (int i = 0; i < z_size; i++)
+        for (int i = 0; i < zSize; i++)
         {
-            for (int j = 0; j < x_size; j++)
+            for (int j = 0; j < xSize; j++)
             {
-                SetSeed(j + x, i + z);
-                int currentPiece = arrayOfInt1[(j + i * x_size)];
-
+                initChunkSeed(j + x, i + z);
+                int currentPiece = childInts[(j + i * xSize)];
 
                 if ((currentPiece & BiomeBits) == 0)    // without biome
                 {
@@ -43,13 +44,10 @@ public class LayerBiome extends Layer
                             currentPiece |= biome.getIds().getGenerationId();
                     }
                 }
-
-                arrayOfInt2[(j + i * x_size)] = currentPiece;
-
-
+                thisInts[(j + i * xSize)] = currentPiece;
             }
         }
-
-        return arrayOfInt2;
+        return thisInts;
     }
+
 }
