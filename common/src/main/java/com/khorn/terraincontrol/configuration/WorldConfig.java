@@ -312,7 +312,7 @@ public class WorldConfig extends ConfigFile
         // Main modes
         this.SettingsMode = readSettings(WorldStandardValues.SETTINGS_MODE);
         this.ModeTerrain = readSettings(WorldStandardValues.TERRAIN_MODE);
-        this.biomeMode = TerrainControl.getBiomeModeManager().getBiomeManager((String) readSettings(WorldStandardValues.BIOME_MODE));
+        this.biomeMode = TerrainControl.getBiomeModeManager().getBiomeManager(readSettings(WorldStandardValues.BIOME_MODE));
 
         // World and water height
         this.worldHeightCapBits = readSettings(WorldStandardValues.WORLD_HEIGHT_CAP_BITS);
