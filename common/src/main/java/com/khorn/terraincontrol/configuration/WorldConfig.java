@@ -478,13 +478,13 @@ public class WorldConfig extends ConfigFile
         // The modes
         writer.bigTitle("The modes");
         writer.comment("What Terrain Control does with the config files.");
-        writer.comment("Possible modes: WriteAll, WriteWithoutComments, WriteDisable");
+        writer.comment("Possible modes:");
         writer.comment("   WriteAll - default");
         writer.comment("   WriteWithoutComments - write config files without help comments");
         writer.comment("   WriteDisable - doesn't write to the config files, it only reads. Doesn't auto-update the configs. Use with care!");
         writer.setting(WorldStandardValues.SETTINGS_MODE, this.SettingsMode);
 
-        writer.comment("Possible terrain modes: Normal, OldGenerator, TerrainTest, NotGenerate, Default");
+        writer.comment("Possible terrain modes:");
         writer.comment("   Normal - use all features");
         writer.comment("   OldGenerator - generate land like Beta 1.7.3 generator");
         writer.comment("   TerrainTest - generate only terrain without any resources");
@@ -492,7 +492,7 @@ public class WorldConfig extends ConfigFile
         writer.comment("   Default - use default terrain generator");
         writer.setting(WorldStandardValues.TERRAIN_MODE, this.ModeTerrain);
 
-        writer.comment("Possible biome modes: Normal, OldGenerator, Default");
+        writer.comment("Possible biome modes:");
         writer.comment("   Normal - use all features");
         writer.comment("   FromImage - get biomes from image file");
         writer.comment("   OldGenerator - generate biome like the Beta 1.7.3 generator");
