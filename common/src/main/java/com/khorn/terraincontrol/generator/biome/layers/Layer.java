@@ -233,10 +233,7 @@ public abstract class Layer
         //MainLayer = new LayerCacheInit(1, MainLayer);
         //ZoomedLayer = new LayerCacheInit(1, ZoomedLayer);
         
-        return new Layer[]
-        {
-            MainLayer, ZoomedLayer
-        };
+        return new Layer[]{MainLayer, ZoomedLayer};
     }
 
     public Layer(long seed)
