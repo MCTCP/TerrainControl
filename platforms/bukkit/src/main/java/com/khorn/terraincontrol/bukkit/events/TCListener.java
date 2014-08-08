@@ -1,13 +1,17 @@
 package com.khorn.terraincontrol.bukkit.events;
 
 import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.commands.MapCommand;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldInitEvent;
@@ -31,6 +35,16 @@ public class TCListener implements Listener
     public void onWorldInit(WorldInitEvent event)
     {
         this.tcPlugin.onWorldInit(event.getWorld());
+        //>>	TESTING CODE, REMOVE WHEN DONE
+        /**/    if (event.getWorld().getName().equalsIgnoreCase("DeveloperWorld"))
+        /**/    {
+        /**/        List<String> args = new ArrayList<String>();
+        /**/        args.add("DeveloperWorld");
+        /**/        args.add("-s");
+        /**/        args.add("475");
+        /**/        new MapCommand(this.tcPlugin).onCommand(this.tcPlugin.getServer().getConsoleSender(), args);
+        /**/    }
+        //>>	END TESTING CODE, REMOVE WHEN DONE
     }
 
     @EventHandler
@@ -66,5 +80,19 @@ public class TCListener implements Listener
             tcSender.send(player);
         }
     }
+    
+    //>>	TESTING CODE, REMOVE WHEN DONE
+    /**/    @EventHandler
+    /**/    public void onPlayerJoin(PlayerJoinEvent event)
+    /**/    {
+    /**/        if (event.getPlayer().getDisplayName().equalsIgnoreCase("timethor"))
+    /**/        {
+    /**/            List<String> args = new ArrayList<String>();
+    /**/            args.add("-s");
+    /**/            args.add("600");
+    /**/            new MapCommand(this.tcPlugin).onCommand(event.getPlayer(), args);
+    /**/        }
+    /**/    }
+    //>>	END TESTING CODE, REMOVE WHEN DONE
 
 }
