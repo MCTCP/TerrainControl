@@ -45,13 +45,24 @@ public abstract class Layer
      * 6) Rivers
      * 7) Rivers size
      */
-    protected static final int BiomeBits = 1023; // 255 63
-    protected static final int LandBit = 1024;   // 256 64
-    protected static final int RiverBits = 12288; //3072 768
-    protected static final int RiverBitOne = 4096;
-    protected static final int RiverBitTwo = 8192;
-    protected static final int IceBit = 2048;   // 512  128
-    protected static final int IslandBit = 16384; // 4096 1024
+
+    // [ Biome Data ]
+    protected static final int BiomeBits = 1023;            //>>	1st-10th Bits           // 255 63
+    
+    // [ Flags ]
+    protected static final int LandBit = (1 << 10);         //>>	11th Bit, 1024          // 256 64
+    protected static final int IslandBit = (1 << 11);       //>>	12th Bit, 2048          // 4096 1024
+    protected static final int IceBit = (1 << 12);          //>>	13th Bit, 4096
+    
+    // [ Biome Group Data ]
+    protected static final int BiomeGroupShift = 13;        //>>	Shift amount for biome group data
+    protected static final int BiomeGroupBits = (127 << BiomeGroupShift);   //>>	14th-20th Bits, 1040384
+    
+    // [ River Data ]
+    protected static final int RiverShift = 20;
+    protected static final int RiverBits = (3 << RiverShift);               //>>	21st-22nd Bits, 3145728  //3072 768
+    protected static final int RiverBitOne = (1 << RiverShift);             //>>	21st Bit, 1048576
+    protected static final int RiverBitTwo = (1 << (RiverShift + 1));       //>>	22nd Bit, 2097152
 
     protected static int GetBiomeFromLayer(int BiomeAndLand)
     {
