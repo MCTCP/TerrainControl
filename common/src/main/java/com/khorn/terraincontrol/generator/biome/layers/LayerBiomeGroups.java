@@ -8,9 +8,6 @@ import java.util.SortedMap;
 
 import static com.khorn.terraincontrol.generator.biome.layers.Layer.IceBit;
 
-/**
- * @author Timethor
- */
 public class LayerBiomeGroups extends Layer
 {
 

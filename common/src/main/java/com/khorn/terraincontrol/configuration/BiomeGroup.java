@@ -21,11 +21,6 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Represents a Resource: something that can generate in the world.
- * <p>
- * @TODO get class to enforce global group max restriction
- */
 public class BiomeGroup extends ConfigFunction<WorldConfig>
 {
 

@@ -11,11 +11,6 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-/**
- * Represents a Resource: something that can generate in the world.
- * <p>
- * @TODO get class to enforce global group max restriction
- */
 public class BiomeGroupManager
 {
 
