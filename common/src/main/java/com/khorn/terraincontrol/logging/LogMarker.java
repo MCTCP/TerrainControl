@@ -13,7 +13,7 @@ import java.util.Map;
 public class LogMarker
 {
 
-    /**
+    /*
      * Markers for specific Log levels, we use these as internal Log Levels, but
      * can be used to filter logs in a very specific way
      */
