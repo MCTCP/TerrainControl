@@ -78,6 +78,7 @@ public class WorldStandardValues extends Settings
 
     public static final Setting<Boolean>
             RIVERS_ENABLED = booleanSetting("RiversEnabled", true),
+            GROUP_FREEZE_ENABLED = booleanSetting("FreezeAllBiomesInColdGroup", false),
             RANDOM_RIVERS = booleanSetting("RandomRivers", false),
             IMPROVED_RIVERS = booleanSetting("ImprovedRivers", false),
             FROZEN_OCEAN = booleanSetting("FrozenOcean", true),
@@ -99,9 +100,11 @@ public class WorldStandardValues extends Settings
             BEDROCK_BLOCK = new MaterialSetting("BedrockobBlock", DefaultMaterial.BEDROCK);
 
     public static final Setting<List<String>>
-            NORMAL_BIOMES = stringListSetting("NormalBiomes", "Desert", "Forest",
+            //>>	1.6.4 Biome pseudo-groups
+            NORMAL_BIOMES = stringListSetting("NormalBiomes", "4" , "97" ,"Desert", "Forest",
                     "Extreme Hills", "Swampland", "Plains", "Taiga", "Jungle"),
-            ICE_BIOMES = stringListSetting("IceBiomes", "Ice Plains"),
+            ICE_BIOMES = stringListSetting("IceBiomes", "3", "15" ,"Ice Plains"),
+            //>>	Special Lists
             ISLE_BIOMES = stringListSetting("IsleBiomes", "MushroomIsland",
                     "Ice Mountains", "DesertHills", "ForestHills", "TaigaHills",
                     "River", "JungleHills"),
@@ -113,8 +116,9 @@ public class WorldStandardValues extends Settings
             OLD_BIOME_SIZE = doubleSetting("OldBiomeSize", 1.5, 0.1, 10),
             MIN_MOISTURE = doubleSetting("MinMoisture", 0, 0, 1),
             MAX_MOISTURE = doubleSetting("MaxMoisture", 0, 0, 1),
-            MIN_TEMPERATURE = doubleSetting("MinTemperature", 0, 0, 1),
-            MAX_TEMPERATURE = doubleSetting("MaxTemperature", 0, 0, 1),
+            MIN_TEMPERATURE = doubleSetting("MinTemperature", 0, 0, 2),
+            MAX_TEMPERATURE = doubleSetting("MaxTemperature", 0, 0, 2),
+            FROZEN_OCEAN_TEMPERATURE = doubleSetting("OceanFreezingTemperature", 0.15, 0, 2),
             CANYON_DEPTH = doubleSetting("CanyonDepth", 3, 0.1, 15),
             FRACTURE_HORIZONTAL = doubleSetting("FractureHorizontal", 0, -500, 500),
             FRACTURE_VERTICAL = doubleSetting("FractureVertical", 0, -500, 500),

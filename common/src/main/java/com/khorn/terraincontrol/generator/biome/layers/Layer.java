@@ -4,12 +4,13 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeGroupManager;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
-import java.util.ArrayList;
 
 public abstract class Layer
 {
@@ -18,6 +19,8 @@ public abstract class Layer
     protected Layer child;
     private long chunkSeed;
     protected long baseSeed;
+    //>>	This helps our random numbers be a little more random
+    protected static final int entropy = 10000;
 
     /*
      * LayerIsland - chance to big land
@@ -80,53 +83,11 @@ public abstract class Layer
         WorldSettings configs = world.getSettings();
         WorldConfig worldConfig = configs.worldConfig;
 
-        LocalBiome[][] NormalBiomeMap = new LocalBiome[worldConfig.GenerationDepth + 1][];
-        LocalBiome[][] IceBiomeMap = new LocalBiome[worldConfig.GenerationDepth + 1][];
-
-        for (int i = 0; i < worldConfig.GenerationDepth + 1; i++)
-        {
-            ArrayList<LocalBiome> normalBiomes = new ArrayList<LocalBiome>();
-            ArrayList<LocalBiome> iceBiomes = new ArrayList<LocalBiome>();
-            for (LocalBiome biome : configs.biomes)
-            {
-                if (biome == null)
-                    continue;
-
-                BiomeConfig biomeConfig = biome.getBiomeConfig();
-
-                if (biomeConfig.biomeSize != i)
-                    continue;
-                if (worldConfig.NormalBiomes.contains(biomeConfig.getName()))
-                {
-                    for (int t = 0; t < biomeConfig.biomeRarity; t++)
-                        normalBiomes.add(biome);
-                    worldConfig.normalBiomesRarity -= biomeConfig.biomeRarity;
-                }
-
-                if (worldConfig.IceBiomes.contains(biomeConfig.getName()))
-                {
-                    for (int t = 0; t < biomeConfig.biomeRarity; t++)
-                        iceBiomes.add(biome);
-                    worldConfig.iceBiomesRarity -= biomeConfig.biomeRarity;
-                }
-
-            }
-
-            if (!normalBiomes.isEmpty())
-                NormalBiomeMap[i] = normalBiomes.toArray(new LocalBiome[normalBiomes.size() + worldConfig.normalBiomesRarity]);
-            else
-                NormalBiomeMap[i] = new LocalBiome[0];
-
-            if (!iceBiomes.isEmpty())
-                IceBiomeMap[i] = iceBiomes.toArray(new LocalBiome[iceBiomes.size() + worldConfig.iceBiomesRarity]);
-            else
-                IceBiomeMap[i] = new LocalBiome[0];
-
-        }
+        BiomeGroupManager groupManager = worldConfig.biomeGroupManager;
 
         Layer MainLayer = new LayerEmpty(1L);
-
         Layer RiverLayer = new LayerEmpty(1L);
+        
         boolean riversStarted = false;
 
         for (int depth = 0; depth <= worldConfig.GenerationDepth; depth++)
@@ -146,11 +107,15 @@ public abstract class Layer
             if (depth < (worldConfig.LandSize + worldConfig.LandFuzzy))
                 MainLayer = new LayerLandRandom(depth, MainLayer);
 
-            if (NormalBiomeMap[depth].length != 0 || IceBiomeMap[depth].length != 0)
-                MainLayer = new LayerBiome(200, MainLayer, NormalBiomeMap[depth], IceBiomeMap[depth]);
-
-            if (worldConfig.IceSize == depth)
-                MainLayer = new LayerIce(depth, MainLayer, worldConfig.IceRarity);
+            if (!groupManager.isGroupDepthMapEmpty(depth)){
+                TerrainControl.log(LogMarker.INFO, "Groups are mapped at depth {}", depth);
+                MainLayer = new LayerBiomeGroups(300L, MainLayer, groupManager, depth, worldConfig.FreezeAllColdGroupBiomes);
+            }
+            
+            if (!groupManager.isBiomeDepthMapEmpty(depth)){
+                MainLayer = new LayerBiome(200L, MainLayer, groupManager, depth, worldConfig.FrozenOceanTemperature);
+                TerrainControl.log(LogMarker.INFO, "Biomes are mapped at depth {}", depth);
+            }
 
             if (worldConfig.riverRarity == depth)
                 if (worldConfig.randomRivers)
@@ -235,13 +200,8 @@ public abstract class Layer
         
         Layer ZoomedLayer = new LayerZoomVoronoi(10L, MainLayer);
 
-        //TemperatureLayer = new LayerTemperatureMix(TemperatureLayer, ZoomedLayer, 0, config);
-        
         ZoomedLayer.initWorldGenSeed(paramLong);
 
-        //MainLayer = new LayerCacheInit(1, MainLayer);
-        //ZoomedLayer = new LayerCacheInit(1, ZoomedLayer);
-        
         return new Layer[]{MainLayer, ZoomedLayer};
     }
 
