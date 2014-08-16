@@ -11,13 +11,13 @@ import com.khorn.terraincontrol.generator.biome.ArraysCache;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
-
 public abstract class Layer
 {
 
     protected long worldGenSeed;
     protected Layer child;
     private long chunkSeed;
+    private long groupSeed;
     protected long baseSeed;
     //>>	This helps our random numbers be a little more random
     protected static final int entropy = 10000;
@@ -48,19 +48,18 @@ public abstract class Layer
      * 6) Rivers
      * 7) Rivers size
      */
-
     // [ Biome Data ]
     protected static final int BiomeBits = 1023;            //>>	1st-10th Bits           // 255 63
-    
+
     // [ Flags ]
     protected static final int LandBit = (1 << 10);         //>>	11th Bit, 1024          // 256 64
     protected static final int IslandBit = (1 << 11);       //>>	12th Bit, 2048          // 4096 1024
     protected static final int IceBit = (1 << 12);          //>>	13th Bit, 4096
-    
+
     // [ Biome Group Data ]
     protected static final int BiomeGroupShift = 13;        //>>	Shift amount for biome group data
     protected static final int BiomeGroupBits = (127 << BiomeGroupShift);   //>>	14th-20th Bits, 1040384
-    
+
     // [ River Data ]
     protected static final int RiverShift = 20;
     protected static final int RiverBits = (3 << RiverShift);               //>>	21st-22nd Bits, 3145728  //3072 768
@@ -71,7 +70,7 @@ public abstract class Layer
     {
         return (selection & LandBit) != 0 ? (selection & BiomeBits) : 0;
     }
-    
+
     public static Layer[] Init(long paramLong, LocalWorld world)
     {
 
@@ -87,7 +86,7 @@ public abstract class Layer
 
         Layer MainLayer = new LayerEmpty(1L);
         Layer RiverLayer = new LayerEmpty(1L);
-        
+
         boolean riversStarted = false;
 
         for (int depth = 0; depth <= worldConfig.GenerationDepth; depth++)
@@ -105,17 +104,25 @@ public abstract class Layer
             }
 
             if (depth < (worldConfig.LandSize + worldConfig.LandFuzzy))
+            {
+                TerrainControl.log(LogMarker.INFO, "Fuzzy Time! at depth {}", depth);
                 MainLayer = new LayerLandRandom(depth, MainLayer);
-
-            if (!groupManager.isGroupDepthMapEmpty(depth)){
-                TerrainControl.log(LogMarker.INFO, "Groups are mapped at depth {}", depth);
-                MainLayer = new LayerBiomeGroups(300L, MainLayer, groupManager, depth, worldConfig.FreezeAllColdGroupBiomes);
             }
-            
-            if (!groupManager.isBiomeDepthMapEmpty(depth)){
-                MainLayer = new LayerBiome(200L, MainLayer, groupManager, depth, worldConfig.FrozenOceanTemperature);
+
+            if (!groupManager.isGroupDepthMapEmpty(depth))
+            {
+                TerrainControl.log(LogMarker.INFO, "Groups are mapped at depth {}", depth);
+                MainLayer = new LayerBiomeGroups(MainLayer, groupManager, depth, worldConfig.FreezeAllColdGroupBiomes);
+            }
+
+            if (!groupManager.isBiomeDepthMapEmpty(depth))
+            {
+                MainLayer = new LayerBiome(200, MainLayer, groupManager, depth, worldConfig.FrozenOceanTemperature);
                 TerrainControl.log(LogMarker.INFO, "Biomes are mapped at depth {}", depth);
             }
+
+            if (depth == 3)
+                MainLayer = new LayerIce(depth, MainLayer);
 
             if (worldConfig.riverRarity == depth)
                 if (worldConfig.randomRivers)
@@ -139,11 +146,11 @@ public abstract class Layer
             {
                 if (biome == null)
                     continue;
-                
+
                 BiomeConfig biomeConfig = biome.getBiomeConfig();
                 if (biomeConfig.biomeSize != depth)
                     continue;
-                
+
                 if (worldConfig.IsleBiomes.contains(biomeConfig.getName()) && biomeConfig.isleInBiome != null)
                 {
                     int id = biome.getIds().getGenerationId();
@@ -170,7 +177,6 @@ public abstract class Layer
                     {
                         int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
                         layerBiomeBorder.addBiome(biome, replaceFrom, world);
-
                     }
                 }
             }
@@ -181,7 +187,7 @@ public abstract class Layer
                 MainLayer = layerBiomeBorder;
             }
         }
-        
+
         if (worldConfig.randomRivers)
             MainLayer = new LayerMixWithRiver(1L, MainLayer, RiverLayer, configs, world);
         else
@@ -197,12 +203,15 @@ public abstract class Layer
             else
                 MainLayer = new LayerFromImage(1L, null, worldConfig, world);
         }
-        
+
         Layer ZoomedLayer = new LayerZoomVoronoi(10L, MainLayer);
 
         ZoomedLayer.initWorldGenSeed(paramLong);
 
-        return new Layer[]{MainLayer, ZoomedLayer};
+        return new Layer[]
+        {
+            MainLayer, ZoomedLayer
+        };
     }
 
     public Layer(long seed)
@@ -214,6 +223,10 @@ public abstract class Layer
         this.baseSeed += seed;
         this.baseSeed *= (this.baseSeed * 6364136223846793005L + 1442695040888963407L);
         this.baseSeed += seed;
+    }
+
+    protected Layer()
+    {
     }
 
     public void initWorldGenSeed(long seed)
@@ -242,6 +255,19 @@ public abstract class Layer
         this.chunkSeed += z;
     }
 
+    protected void initGroupSeed(long x, long z)
+    {
+        this.groupSeed = this.chunkSeed;
+        this.groupSeed *= (this.groupSeed * 6364136223846793005L + 1442695040888963407L);
+        this.groupSeed += x;
+        this.groupSeed *= (this.groupSeed * 6364136223846793005L + 1442695040888963407L);
+        this.groupSeed += z;
+        this.groupSeed *= (this.groupSeed * 6364136223846793005L + 1442695040888963407L);
+        this.groupSeed += x;
+        this.groupSeed *= (this.groupSeed * 6364136223846793005L + 1442695040888963407L);
+        this.groupSeed += z;
+    }
+
     protected int nextInt(int x)
     {
         int i = (int) ((this.chunkSeed >> 24) % x);
@@ -252,11 +278,26 @@ public abstract class Layer
         return i;
     }
 
+    protected int nextGroupInt(int x)
+    {
+        int i = (int) ((this.groupSeed >> 24) % x);
+        if (i < 0)
+            i += x;
+        this.groupSeed *= (this.groupSeed * 6364136223846793005L + 1442695040888963407L);
+        this.groupSeed += this.chunkSeed;
+        return i;
+    }
+
     public abstract int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize);
 
     protected int getRandomInArray(int... biomes)
     {
         return biomes[this.nextInt(biomes.length)];
+    }
+
+    protected int getGroupRandomInArray(int... biomes)
+    {
+        return biomes[this.nextGroupInt(biomes.length)];
     }
 
     protected int getRandomOf4(int a, int b, int c, int d)

@@ -5,13 +5,12 @@ import com.khorn.terraincontrol.generator.biome.ArraysCache;
 public class LayerIce extends Layer
 {
 
-    public int rarity = 5;
+    public int rarity = 10;
 
-    public LayerIce(long seed, Layer childLayer, int _rarity)
+    public LayerIce(long seed, Layer childLayer)
     {
         super(seed);
         this.child = childLayer;
-        this.rarity = 101 - _rarity;
     }
 
     @Override

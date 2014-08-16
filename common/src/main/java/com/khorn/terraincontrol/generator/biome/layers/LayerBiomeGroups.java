@@ -15,9 +15,8 @@ public class LayerBiomeGroups extends Layer
     private int depth;
     private boolean freezeGroups;
 
-    public LayerBiomeGroups(long paramLong, Layer paramGenLayer, BiomeGroupManager biomeGroups, int depth, boolean freezeGroups)
+    public LayerBiomeGroups(Layer paramGenLayer, BiomeGroupManager biomeGroups, int depth, boolean freezeGroups)
     {
-        super(paramLong);
         this.child = paramGenLayer;
         this.biomeGroupManager = biomeGroups;
         this.depth = depth;
@@ -34,13 +33,13 @@ public class LayerBiomeGroups extends Layer
         {
             for (int j = 0; j < x_size; j++)
             {
-                initChunkSeed(j + x, i + z);
+                initGroupSeed(j + x, i + z);
                 int currentPiece = childInts[(j + i * x_size)];               
 
                 if ((currentPiece & LandBit) != 0 && (currentPiece & BiomeGroupBits) == 0)    // land without biome group
                 {
                     SortedMap<Integer, BiomeGroup> possibleGroups = biomeGroupManager.getGroupDepthMap(depth);
-                    int newGroupRarity = nextInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleGroups)*entropy);
+                    int newGroupRarity = nextGroupInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleGroups)*entropy);
                         //>>	Spawn the biome based on the rarity spectrum
                         for (Entry<Integer, BiomeGroup> group : possibleGroups.entrySet())
                         {
@@ -48,7 +47,7 @@ public class LayerBiomeGroups extends Layer
                             {   
                                 if (group.getValue() != null){
                                     currentPiece |= (group.getValue().getGroupid() << BiomeGroupShift) |
-//                                    currentPiece |= (group.getValue().getGroupid() + 15) |
+//                                                    (group.getValue().getGroupid() + 15) |
                                                     //>>	If the average temp of the group is cold
                                                     ((group.getValue().isColdGroup() && freezeGroups) ? IceBit : 0);
                                 }

@@ -27,7 +27,6 @@ public class BiomeGroup extends ConfigFunction<WorldConfig>
     private int groupid;
     private String name;
     private int groupRarity;
-    private int cumulativeBiomeRarity = 0;
     private int generationDepth = 0;
     private float avgTemp = 0;
     private boolean coldGroup = false;
@@ -206,20 +205,20 @@ public class BiomeGroup extends ConfigFunction<WorldConfig>
 
     public SortedMap<Integer, LocalBiome> getDepthMap(int depth)
     {
-        this.cumulativeBiomeRarity = 0;
+        int cumulativeBiomeRarity = 0;
         TreeMap<Integer, LocalBiome> map = new TreeMap<Integer, LocalBiome>();
         for (Entry<String, LocalBiome> biome : this.biomes.entrySet())
         {
             if (biome.getValue().getBiomeConfig().biomeSize == depth)
             {
-                this.cumulativeBiomeRarity += biome.getValue().getBiomeConfig().biomeRarity;
-                map.put(this.cumulativeBiomeRarity, biome.getValue());
+                cumulativeBiomeRarity += biome.getValue().getBiomeConfig().biomeRarity;
+                map.put(cumulativeBiomeRarity, biome.getValue());
             }
         }
-        if (cumulativeBiomeRarity < map.size() * 100)
-        {
-            map.put(map.size() * 100, null);
-        }
+//        if (cumulativeBiomeRarity < map.size() * 100)
+//        {
+//            map.put(map.size() * 100, null);
+//        }
         return map;
     }
 

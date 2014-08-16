@@ -43,11 +43,11 @@ public class LayerBiome extends Layer
                     //>>	Get Max Rarity
                     if (!possibleBiomes.isEmpty())
                     {
-                        int newBiomeRarity = nextInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleBiomes)*entropy);
+                        int newBiomeRarity = nextInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleBiomes));
                         //>>	Spawn the biome based on the rarity spectrum
                         for (Entry<Integer, LocalBiome> biome : possibleBiomes.entrySet())
                         {
-                            if (newBiomeRarity/entropy < biome.getKey())
+                            if (newBiomeRarity < biome.getKey())
                             {
                                 if (biome.getValue() != null){
                                     currentPiece |= biome.getValue().getIds().getGenerationId() |
