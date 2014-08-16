@@ -51,7 +51,7 @@ public class LayerLandRandom extends Layer
                     thisInts[(xi + zi * xSize)] ^= LandBit;
 
                 //>>	Handle BiomeGroups
-                thisInts[(xi + zi * xSize)] = modLandBits(thisInts[(xi + zi * xSize)], childInts, xi, zi, xSize0);
+//                thisInts[(xi + zi * xSize)] = modLandBits(thisInts[(xi + zi * xSize)], childInts, xi, zi, xSize0);
             }
         }
         return thisInts;

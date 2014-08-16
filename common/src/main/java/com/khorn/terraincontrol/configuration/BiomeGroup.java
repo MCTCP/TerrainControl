@@ -208,8 +208,8 @@ public class BiomeGroup extends ConfigFunction<WorldConfig>
         int cumulativeBiomeRarity = 0;
         TreeMap<Integer, LocalBiome> map = new TreeMap<Integer, LocalBiome>();
         for (Entry<String, LocalBiome> biome : this.biomes.entrySet())
-        {
-            if (biome.getValue().getBiomeConfig().biomeSize == depth)
+        {                                                           //>>	When depth given is negative, include all biomes in group
+            if (biome.getValue().getBiomeConfig().biomeSize == depth || depth < 0)
             {
                 cumulativeBiomeRarity += biome.getValue().getBiomeConfig().biomeRarity;
                 map.put(cumulativeBiomeRarity, biome.getValue());
@@ -221,7 +221,7 @@ public class BiomeGroup extends ConfigFunction<WorldConfig>
 //        }
         return map;
     }
-
+    
     public int getGroupRarity()
     {
         return groupRarity;
