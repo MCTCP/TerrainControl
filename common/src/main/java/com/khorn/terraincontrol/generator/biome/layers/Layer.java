@@ -11,15 +11,79 @@ import com.khorn.terraincontrol.generator.biome.ArraysCache;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
+/**
+ * Layer is the abstract base class for the entire layering system.
+ * This system works on the principle that given an array of integers
+ * representing a given space on a Minecraft map, that each column of
+ * blocks is represented by a single array index/location. At each location
+ * a sequence of operations is performed such that the end result is a
+ * full description of what should be created upon generation with
+ * respect to biome information.
+ * <p>
+ * Each subclass will need to implement getInts() which is responsible
+ * to acting upon the array of ints in it's own unique way. As previously
+ * mentioned, each array index is associated with a column of blocks in
+ * Minecraft. Each array index is acted upon using a bit masking system.
+ * <p>
+ * The bit masking system works by marking locations with specific properties
+ * or data such as: Land, Island, Ice, River, Biome, and BiomeGroup.
+ * For example, the first part of the system starts by assigning MainLayer
+ * to LayerEmpty. This layer simply initializes the array of ints with zeros.
+ * Next MainLayer is assigned to LayerZoom which has the job of increasing
+ * the resolution of the array of ints. Notice how each new layer assigned
+ * to MainLayer passes the previous MainLayer into the constructor. Next we
+ * see MainLayer assigned to LayerLand. LayerLand randomly marks indices with
+ * a Land flag. This flag is then used by the next layers, LayerLandRandom
+ * and LayerBiomeGroup, to act upon the map in land specific ways. This process
+ * continues for @generationDepth times and is then finished with a set of
+ * layers that clean up after the layer system and get it ready for generation
+ * <p>
+ * It is important to note that getInts should, in most cases, call
+ * this.child.getInts() which will follow the trail all the way back to the
+ * initial `LayerEmpty` call and produce all modifications to the array as
+ * it climbs back up the chain of getInts() calls.
+ */
 public abstract class Layer
 {
 
-    protected long worldGenSeed;
-    protected Layer child;
-    private long chunkSeed;
-    private long groupSeed;
+    /**
+     * The base seed set during layer construction, all other seeds are based
+     * upon this one.
+     */
     protected long baseSeed;
-    //>>	This helps our random numbers be a little more random
+
+    /**
+     * A general seed kept for use in world generation
+     * <p>
+     * @see initWorldGenSeed
+     */
+    protected long worldGenSeed;
+
+    /**
+     * This seed is used for general random number generation within the Layers
+     * system. It is based off of both the worldGenSeed and baseSeed.
+     * <p>
+     * @see initWorldGenSeed
+     * @see initChunkSeed
+     */
+    private long chunkSeed;
+
+    /**
+     * This seed is used for generating random numbers for biome groups
+     * <p>
+     * @see initGroupSeed
+     */
+    private long groupSeed;
+
+    /**
+     * The layer to process before this one. getInts() should call
+     * child.getInts() before doing any processing -- in most cases.
+     */
+    protected Layer child;
+
+    /**
+     * This helps our random numbers be a little more random
+     */
     protected static final int entropy = 10000;
 
     /*
@@ -66,22 +130,24 @@ public abstract class Layer
     protected static final int RiverBitOne = (1 << RiverShift);             //>>	21st Bit, 1048576
     protected static final int RiverBitTwo = (1 << (RiverShift + 1));       //>>	22nd Bit, 2097152
 
+    /**
+     * In a single step, checks for land and when present returns biome data
+     * @param selection The location to be checked
+     * @return Biome Data or 0 when not on land
+     */
     protected static int getBiomeFromLayer(int selection)
     {
         return (selection & LandBit) != 0 ? (selection & BiomeBits) : 0;
     }
 
-    public static Layer[] Init(long paramLong, LocalWorld world)
+    public static Layer[] Init(long seed, LocalWorld world)
     {
 
-        /*
-         * int BigLandSize = 2; //default 0, more - smaller
-         * int ChanceToIncreaseLand = 6; //default 4
-         * int MaxDepth = 10;
-         */
+        // Get Configs and Settings for use with layers
         WorldSettings configs = world.getSettings();
         WorldConfig worldConfig = configs.worldConfig;
 
+        // Bring in Group Manager for biome groups
         BiomeGroupManager groupManager = worldConfig.biomeGroupManager;
 
         Layer MainLayer = new LayerEmpty(1L);
@@ -91,7 +157,7 @@ public abstract class Layer
 
         for (int depth = 0; depth <= worldConfig.GenerationDepth; depth++)
         {
-
+            
             MainLayer = new LayerZoom(2001 + depth, MainLayer);
 
             if (worldConfig.randomRivers && riversStarted)
@@ -99,6 +165,7 @@ public abstract class Layer
 
             if (worldConfig.LandSize == depth)
             {
+                TerrainControl.log(LogMarker.INFO, "Adding Land at depth {}", depth);
                 MainLayer = new LayerLand(1L, MainLayer, worldConfig.LandRarity);
                 MainLayer = new LayerZoomFuzzy(2000L, MainLayer);
             }
@@ -121,19 +188,24 @@ public abstract class Layer
                 TerrainControl.log(LogMarker.INFO, "Biomes are mapped at depth {}", depth);
             }
 
-            if (depth == 3)
+            if (depth == 3){
+                TerrainControl.log(LogMarker.INFO, "Ice added at depth {}", depth);
                 MainLayer = new LayerIce(depth, MainLayer);
+            }
 
-            if (worldConfig.riverRarity == depth)
+            if (worldConfig.riverRarity == depth){
+                TerrainControl.log(LogMarker.INFO, "River Init at depth {}", depth);
                 if (worldConfig.randomRivers)
                 {
                     RiverLayer = new LayerRiverInit(155, RiverLayer);
                     riversStarted = true;
                 } else
                     MainLayer = new LayerRiverInit(155, MainLayer);
+            }
 
             if ((worldConfig.GenerationDepth - worldConfig.riverSize) == depth)
             {
+                TerrainControl.log(LogMarker.INFO, "RIVERS! at depth {}", depth);
                 if (worldConfig.randomRivers)
                     RiverLayer = new LayerRiver(5 + depth, RiverLayer);
                 else
@@ -206,7 +278,7 @@ public abstract class Layer
 
         Layer ZoomedLayer = new LayerZoomVoronoi(10L, MainLayer);
 
-        ZoomedLayer.initWorldGenSeed(paramLong);
+        ZoomedLayer.initWorldGenSeed(seed);
 
         return new Layer[]
         {
@@ -225,7 +297,7 @@ public abstract class Layer
         this.baseSeed += seed;
     }
 
-    protected Layer()
+    public Layer()
     {
     }
 
