@@ -4,6 +4,7 @@ package com.khorn.terraincontrol.generator.biome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorOldOctaves;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.util.Random;
@@ -55,28 +56,28 @@ public class OldBiomeGenerator extends BiomeGenerator
         return temp_out;
     }
 
-    public int[] getBiomes(int[] paramArrayOfBiomeBase, int x, int z, int x_size, int z_size, boolean useCache)
+    public int[] getBiomes(int[] paramArrayOfBiomeBase, int x, int z, int xSize, int zSize, boolean useCache)
     {
-        if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < x_size * z_size))
+        if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < xSize * zSize))
         {
-            paramArrayOfBiomeBase = new int[x_size * z_size];
+            paramArrayOfBiomeBase = new int[xSize * zSize];
         }
-        if ((useCache) && (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
+        if ((useCache) && (xSize == ChunkCoordinate.CHUNK_X_SIZE) && (zSize == ChunkCoordinate.CHUNK_Z_SIZE) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
-            int[] localObject = this.cache.getCachedBiomes(x, z);
-            System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, x_size * z_size);
+            int[] localObject = this.cache.getCachedBiomes(ChunkCoordinate.fromBlockCoords(x, z));
+            System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, xSize * zSize);
             return paramArrayOfBiomeBase;
         }
 
         WorldConfig worldConfig = world.getSettings().worldConfig;
-        this.oldTemperature1 = this.temperatureGenerator1.a(this.oldTemperature1, x, z, x_size, x_size, 0.025000000372529D / worldConfig.oldBiomeSize, 0.025000000372529D / worldConfig.oldBiomeSize, 0.25D);
-        this.oldWetness = this.wetnessGenerator.a(this.oldWetness, x, z, x_size, x_size, 0.0500000007450581D / worldConfig.oldBiomeSize, 0.0500000007450581D / worldConfig.oldBiomeSize, 0.3333333333333333D);
-        this.oldTemperature2 = this.temperatureGenerator2.a(this.oldTemperature2, x, z, x_size, x_size, 0.25D / worldConfig.oldBiomeSize, 0.25D / worldConfig.oldBiomeSize, 0.5882352941176471D);
+        this.oldTemperature1 = this.temperatureGenerator1.a(this.oldTemperature1, x, z, xSize, xSize, 0.025000000372529D / worldConfig.oldBiomeSize, 0.025000000372529D / worldConfig.oldBiomeSize, 0.25D);
+        this.oldWetness = this.wetnessGenerator.a(this.oldWetness, x, z, xSize, xSize, 0.0500000007450581D / worldConfig.oldBiomeSize, 0.0500000007450581D / worldConfig.oldBiomeSize, 0.3333333333333333D);
+        this.oldTemperature2 = this.temperatureGenerator2.a(this.oldTemperature2, x, z, xSize, xSize, 0.25D / worldConfig.oldBiomeSize, 0.25D / worldConfig.oldBiomeSize, 0.5882352941176471D);
 
         int i = 0;
-        for (int j = 0; j < x_size; j++)
+        for (int j = 0; j < xSize; j++)
         {
-            for (int k = 0; k < z_size; k++)
+            for (int k = 0; k < zSize; k++)
             {
                 double d1 = this.oldTemperature2[i] * 1.1D + 0.5D;
 
@@ -124,7 +125,7 @@ public class OldBiomeGenerator extends BiomeGenerator
     @Override
     public int getBiome(int x, int z)
     {
-        return this.cache.getBiome(x, z);
+        return this.cache.getCalculatedBiomeId(x, z);
     }
 
     @Override

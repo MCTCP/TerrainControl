@@ -11,7 +11,6 @@ public class ForgeBiome implements LocalBiome
     private final BiomeGenCustom biomeBase;
     private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
-    private final String originalName;
 
     /**
      * Creates a new biome with the given name and id. Also registers it in
@@ -41,7 +40,6 @@ public class ForgeBiome implements LocalBiome
     private ForgeBiome(BiomeConfig biomeConfig, BiomeGenCustom biome)
     {
         this.biomeBase = biome;
-        this.originalName = biomeConfig.getName();
         this.biomeIds = new BiomeIds(biome.generationId, biome.biomeID);
         this.biomeConfig = biomeConfig;
     }
@@ -61,10 +59,6 @@ public class ForgeBiome implements LocalBiome
     @Override
     public String getName()
     {
-        if (!originalName.equals(biomeBase.biomeName))
-        {
-            System.out.println("..");
-        }
         return biomeBase.biomeName;
     }
 
@@ -89,5 +83,11 @@ public class ForgeBiome implements LocalBiome
     public BiomeConfig getBiomeConfig()
     {
         return biomeConfig;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return getName() + "[" + biomeIds + "]";
     }
 }

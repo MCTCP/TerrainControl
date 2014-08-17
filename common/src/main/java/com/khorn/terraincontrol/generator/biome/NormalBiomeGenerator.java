@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.generator.biome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.biome.layers.Layer;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 
 /**
  * This is the normal biome mode, which has all of Terrain Control's features.
@@ -82,11 +83,11 @@ public class NormalBiomeGenerator extends BiomeGenerator
             useCache = false;
         }
 
-        if (useCache && (x_size == 16) && (z_size == 16) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
+        if (useCache && (x_size == ChunkCoordinate.CHUNK_X_SIZE) && (z_size == ChunkCoordinate.CHUNK_Z_SIZE) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
         {
             synchronized (this.lockObject)
             {
-                biomeArray = this.cache.getCachedBiomes(x, z);
+                biomeArray = this.cache.getCachedBiomes(ChunkCoordinate.fromBlockCoords(x, z));
             }
             return biomeArray;
         }
@@ -107,7 +108,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
     @Override
     public int getBiome(int x, int z)
     {
-        return cache.getBiome(x, z);
+        return cache.getCalculatedBiomeId(x, z);
     }
 
     @Override

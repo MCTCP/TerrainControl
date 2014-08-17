@@ -18,6 +18,19 @@ public abstract class BiomeGenerator
         this.cache = cache;
     }
 
+    /**
+     * Calculate biome ids array used in terrain generation.
+     * 
+     * @param biomeArray Output array. If it is null or wrong size return new
+     *            array.
+     * @param x The block x.
+     * @param z The block z.
+     * @param x_size Size of block in x coordinate.
+     * @param z_size Size of blocks in z coordinate.
+     * @param type Output type. May be FULL, WITHOUT_RIVERS, ONLY_RIVERS or
+     *            DEFAULT_FOR_WORLD.
+     * @return Array filled by biome ids.
+     */
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int xSize, int zSize, OutputType type)
     {
         // Fall back on getBiomes

@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.util.helpers;
 
+import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.biome.*;
@@ -34,7 +36,7 @@ public abstract class MetricsHelper
                 } else if (clazz.equals(FromImageBiomeGenerator.class))
                 {
                     fromImageMode++;
-                } else if (clazz.equals(VanillaBiomeGenerator.class))
+                } else if (VanillaBiomeGenerator.class.isAssignableFrom(clazz))
                 {
                     vanillaMode++;
                 } else if (clazz.equals(OldBiomeGenerator.class))

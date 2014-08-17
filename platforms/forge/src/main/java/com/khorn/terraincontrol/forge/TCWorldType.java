@@ -4,10 +4,11 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
-import com.khorn.terraincontrol.forge.generator.BiomeCacheWrapper;
 import com.khorn.terraincontrol.forge.generator.TCWorldChunkManager;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
+import com.khorn.terraincontrol.generator.biome.BiomeCache;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -67,22 +68,34 @@ public class TCWorldType extends WorldType
         WorldSettings config = new WorldSettings(worldDirectory, worldTC, false);
         this.worldTC.Init(world, config);
 
-        WorldChunkManager chunkManager = null;
-
-        Class<? extends BiomeGenerator> biomeManagerClass = this.worldTC.getSettings().worldConfig.biomeMode;
-
-        if (biomeManagerClass == TerrainControl.getBiomeModeManager().VANILLA)
-        {
-            chunkManager = super.getChunkManager(world);
-        } else
-        {
-            chunkManager = new TCWorldChunkManager(this.worldTC);
-            BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeManagerClass, worldTC, new BiomeCacheWrapper(chunkManager));
-            ((TCWorldChunkManager) chunkManager).setBiomeManager(biomeManager);
-            this.worldTC.setBiomeManager(biomeManager);
-        }
+        Class<? extends BiomeGenerator> biomeGenClass = worldTC.getSettings().worldConfig.biomeMode;
+        BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeGenClass, worldTC, new BiomeCache(worldTC));
+        WorldChunkManager chunkManager = createWorldChunkManager(worldTC, biomeManager);
+        this.worldTC.setBiomeManager(biomeManager);
 
         return chunkManager;
+    }
+
+    /**
+     * Gets the appropriate WorldChunkManager. For the vanilla biome
+     * generator we have to use WorldChunkManager, for other biome modes
+     * TCWorldChunkManager is the right option.
+     * @param world         ForgeWorld instance, needed to instantiate the
+     *                      WorldChunkManager.
+     * @param biomeGenClass Biome generator class.
+     * @return The most appropriate WorldChunkManager.
+     */
+    private WorldChunkManager createWorldChunkManager(ForgeWorld world, BiomeGenerator biomeGenerator)
+    {
+        if (biomeGenerator instanceof VanillaBiomeGenerator)
+        {
+            return super.getChunkManager(world.getWorld());
+        } else
+        {
+            TCWorldChunkManager worldChunkManager = new TCWorldChunkManager(this.worldTC);
+            worldChunkManager.setBiomeManager(biomeGenerator);
+            return worldChunkManager;
+        }
     }
 
     @Override

@@ -13,22 +13,18 @@ import java.util.Map.Entry;
  */
 public class BiomeModeManager
 {
+
     // Stores all biome managers
     private Map<String, Class<? extends BiomeGenerator>> registered = new HashMap<String, Class<? extends BiomeGenerator>>();
 
     public final Class<NormalBiomeGenerator> NORMAL = register("Normal", NormalBiomeGenerator.class);
     public final Class<FromImageBiomeGenerator> FROM_IMAGE = register("FromImage", FromImageBiomeGenerator.class);
     public final Class<OldBiomeGenerator> OLD_GENERATOR = register("OldGenerator", OldBiomeGenerator.class);
-    public final Class<VanillaBiomeGenerator> VANILLA = register("Default", VanillaBiomeGenerator.class);
 
     /**
      * Register a biome manager. Should be called before the config files
      * are read.
-     * <p/>
      * @param manager The biome manager to register.
-     * <p/>
-     * @return
-     * <p/>
      * @return The biome manager that was just registered.
      */
     public <T extends BiomeGenerator> Class<T> register(String name, Class<T> clazz)

@@ -3,52 +3,24 @@ package com.khorn.terraincontrol.generator.biome;
 import com.khorn.terraincontrol.LocalWorld;
 
 /**
- * Dummy class. Handled by special if-statements in the 
- * implementations of LocalWorld.
+ * Represents the vanilla Minecraft generator.
+ * 
+ * Unlike other biome generators this biome generator isn't automatically
+ * registered. The reason for this is simple: it has a dependency on Minecraft.
+ * Implementations should register a subclass of this class using
+ * {@link BiomeModeManager#register(String, Class)} with the name set to
+ * {@link #GENERATOR_NAME}.
  *
  */
-public class VanillaBiomeGenerator extends BiomeGenerator
-{
+public abstract class VanillaBiomeGenerator extends BiomeGenerator {
 
-    public VanillaBiomeGenerator(LocalWorld world, BiomeCache cache)
-    {
+    /**
+     * Name the vanilla generator should register itself with.
+     */
+    public static final String GENERATOR_NAME = "Default";
+
+    public VanillaBiomeGenerator(LocalWorld world, BiomeCache cache) {
         super(world, cache);
-    }
-
-    @Override
-    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
-    {
-        throw new UnsupportedOperationException("Dummy class");
-    }
-
-    @Override
-    public float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int x_size, int z_size)
-    {
-        throw new UnsupportedOperationException("Dummy class");
-    }
-
-    @Override
-    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
-    {
-        throw new UnsupportedOperationException("Dummy class");
-    }
-
-    @Override
-    public int getBiome(int x, int z)
-    {
-        throw new UnsupportedOperationException("Dummy class");
-    }
-
-    @Override
-    public void cleanupCache()
-    {
-
-    }
-
-    @Override
-    public boolean canGenerateUnZoomed()
-    {
-        throw new UnsupportedOperationException("Dummy class");
     }
 
 }

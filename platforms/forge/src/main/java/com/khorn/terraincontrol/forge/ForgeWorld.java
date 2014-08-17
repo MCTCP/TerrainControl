@@ -11,7 +11,6 @@ import com.khorn.terraincontrol.forge.generator.structure.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
-import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
@@ -77,8 +76,6 @@ public class ForgeWorld implements LocalWorld
     private WorldGenTaiga2 taigaTree2;
 
     private Chunk[] chunkCache;
-
-    private BiomeGenBase[] biomeGenBaseArray;
 
     public static void restoreBiomes()
     {
@@ -180,39 +177,9 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
-    {
-        if (this.biomeManager != null)
-            return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size, outputType);
-
-        biomeGenBaseArray = this.world.provider.worldChunkMgr.getBiomesForGeneration(biomeGenBaseArray, x, z, x_size, z_size);
-        if (biomeArray == null || biomeArray.length < x_size * z_size)
-            biomeArray = new int[x_size * z_size];
-        for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = biomeGenBaseArray[i].biomeID;
-        return biomeArray;
-    }
-
-    @Override
-    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
-    {
-        if (this.biomeManager != null)
-            return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size, outputType);
-
-        biomeGenBaseArray = this.world.provider.worldChunkMgr.getBiomeGenAt(biomeGenBaseArray, x, z, x_size, z_size, true);
-        if (biomeArray == null || biomeArray.length < x_size * z_size)
-            biomeArray = new int[x_size * z_size];
-        for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = biomeGenBaseArray[i].biomeID;
-        return biomeArray;
-    }
-
-    @Override
     public int getCalculatedBiomeId(int x, int z)
     {
-        if (this.biomeManager != null)
-            return this.biomeManager.getBiome(x, z);
-        return this.world.provider.worldChunkMgr.getBiomeGenAt(x, z).biomeID;
+        return this.biomeManager.getBiome(x, z);
     }
 
     @Override
@@ -728,11 +695,8 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public boolean canBiomeManagerGenerateUnzoomed()
-    {
-        if (this.biomeManager != null)
-            return biomeManager.canGenerateUnZoomed();
-        return true;
+    public BiomeGenerator getBiomeGenerator() {
+        return biomeManager;
     }
 
 }

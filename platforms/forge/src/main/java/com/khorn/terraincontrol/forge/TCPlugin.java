@@ -7,8 +7,10 @@ import com.khorn.terraincontrol.forge.events.EventManager;
 import com.khorn.terraincontrol.forge.events.PacketHandler;
 import com.khorn.terraincontrol.forge.events.PlayerTracker;
 import com.khorn.terraincontrol.forge.events.SaplingListener;
+import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
+import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -36,10 +38,12 @@ public class TCPlugin
     public void load(FMLInitializationEvent event)
     {
         // This is the place where the mod starts loading
-        
 
         // Start TerrainControl engine, and Register world type
         TerrainControl.setEngine(new ForgeEngine(new TCWorldType("TerrainControl")));
+
+        // Register Default biome generator
+        TerrainControl.getBiomeModeManager().register(VanillaBiomeGenerator.GENERATOR_NAME, ForgeVanillaBiomeGenerator.class);
 
         // Register village and rare building starts
         MapGenStructureIO.registerStructure(RareBuildingStart.class, StructureNames.RARE_BUILDING);

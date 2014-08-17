@@ -101,7 +101,7 @@ public class ChunkProvider implements IChunkProvider
     {
         byte[] chunkBiomeArray = chunk.getBiomeArray();
         LocalBiome[] biomeMap = world.getSettings().biomes;
-        biomeIntArray = world.getBiomes(biomeIntArray,
+        biomeIntArray = world.getBiomeGenerator().getBiomes(biomeIntArray,
                 chunk.xPosition * CHUNK_X_SIZE, chunk.zPosition * CHUNK_Z_SIZE,
                 CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
 

@@ -4,6 +4,8 @@ import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Y_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
+import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -151,18 +153,19 @@ public class ChunkProviderTC
         final int maxYSections = this.heightCap / 8 + 1;
         final int usedYSections = this.heightScale / 8 + 1;
 
+        BiomeGenerator biomeGenerator = this.localWorld.getBiomeGenerator();
         if (worldSettings.worldConfig.improvedRivers)
-            this.riverArray = this.localWorld.getBiomesUnZoomed(this.riverArray, chunkX * 4 - maxSmoothRadius,
+            this.riverArray = biomeGenerator.getBiomesUnZoomed(this.riverArray, chunkX * 4 - maxSmoothRadius,
                     chunkZ * 4 - maxSmoothRadius, NOISE_MAX_X + maxSmoothDiameter, NOISE_MAX_Z + maxSmoothDiameter, OutputType.ONLY_RIVERS);
 
-        if (this.localWorld.canBiomeManagerGenerateUnzoomed())
+        if (biomeGenerator.canGenerateUnZoomed())
         {
-            this.biomeArray = this.localWorld.getBiomesUnZoomed(this.biomeArray, chunkX * 4 - maxSmoothRadius,
+            this.biomeArray = biomeGenerator.getBiomesUnZoomed(this.biomeArray, chunkX * 4 - maxSmoothRadius,
                     chunkZ * 4 - maxSmoothRadius, NOISE_MAX_X + maxSmoothDiameter, NOISE_MAX_Z + maxSmoothDiameter,
                     OutputType.DEFAULT_FOR_WORLD);
         } else
         {
-            this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * CHUNK_X_SIZE, chunkZ * CHUNK_Z_SIZE, CHUNK_X_SIZE,
+            this.biomeArray = biomeGenerator.getBiomes(this.biomeArray, chunkX * CHUNK_X_SIZE, chunkZ * CHUNK_Z_SIZE, CHUNK_X_SIZE,
                     CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
         }
 
@@ -170,8 +173,11 @@ public class ChunkProviderTC
 
         // Now that the raw terrain is generated, replace raw biome array with
         // fine-tuned one.
-        this.biomeArray = this.localWorld.getBiomes(this.biomeArray, chunkX * CHUNK_X_SIZE, chunkZ * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE,
-                OutputType.DEFAULT_FOR_WORLD);
+        if (biomeGenerator.canGenerateUnZoomed())
+        {
+            this.biomeArray = biomeGenerator.getBiomes(this.biomeArray, chunkX * CHUNK_X_SIZE, chunkZ * CHUNK_Z_SIZE, CHUNK_X_SIZE,
+                    CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
+        }
 
         final double oneEight = 0.125D;
         final int z_step = 1 << HEIGHT_BITS;

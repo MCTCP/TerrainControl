@@ -3,12 +3,14 @@ package com.khorn.terraincontrol.bukkit;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.bukkit.events.TCListener;
+import com.khorn.terraincontrol.bukkit.generator.BukkitVanillaBiomeGenerator;
 import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
 import com.khorn.terraincontrol.bukkit.generator.structures.RareBuildingStart;
 import com.khorn.terraincontrol.bukkit.generator.structures.VillageStart;
 import com.khorn.terraincontrol.bukkit.metrics.BukkitMetricsHelper;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.server.v1_7_R4.BiomeBase;
@@ -84,6 +86,9 @@ public class TCPlugin extends JavaPlugin
                 cauldron = true;
                 TerrainControl.log(LogMarker.INFO, "Cauldron detected.");
             }
+
+            // Register vanilla generator
+            TerrainControl.getBiomeModeManager().register(VanillaBiomeGenerator.GENERATOR_NAME, BukkitVanillaBiomeGenerator.class);
 
             // Register structures
             try

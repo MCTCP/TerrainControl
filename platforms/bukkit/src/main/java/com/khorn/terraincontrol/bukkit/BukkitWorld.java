@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.*;
-import com.khorn.terraincontrol.bukkit.generator.BiomeCacheWrapper;
 import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
 import com.khorn.terraincontrol.bukkit.generator.TCWorldChunkManager;
 import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
@@ -13,9 +12,10 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
+import com.khorn.terraincontrol.generator.biome.BiomeCache;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
-import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
@@ -37,7 +37,7 @@ public class BukkitWorld implements LocalWorld
     private WorldSettings settings;
     private CustomObjectStructureCache structureCache;
     private String name;
-    private BiomeGenerator biomeManager;
+    private BiomeGenerator biomeGenerator;
 
     private static int nextBiomeId = DefaultBiome.values().length;
 
@@ -70,8 +70,6 @@ public class BukkitWorld implements LocalWorld
     private WorldGenTaiga2 taigaTree2;
 
     private Chunk[] chunkCache;
-
-    private BiomeBase[] biomeBaseArray;
 
     public BukkitWorld(String _name)
     {
@@ -158,49 +156,15 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
-    {
-        if (this.biomeManager != null)
-            return this.biomeManager.getBiomesUnZoomed(biomeArray, x, z, x_size, z_size, outputType);
-
-        // For BiomeMode:Default
-        biomeBaseArray = this.world.worldProvider.e.getBiomes(biomeBaseArray, x, z, x_size, z_size);
-        if (biomeArray == null || biomeArray.length < x_size * z_size)
-            biomeArray = new int[x_size * z_size];
-        for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = biomeBaseArray[i].id;
-        return biomeArray;
-    }
-
-    @Override
-    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
-    {
-        if (this.biomeManager != null)
-            return this.biomeManager.getBiomes(biomeArray, x, z, x_size, z_size, outputType);
-
-        // For BiomeMode:Default
-        biomeBaseArray = this.world.worldProvider.e.a(biomeBaseArray, x, z, x_size, z_size, true);
-        if (biomeArray == null || biomeArray.length < x_size * z_size)
-            biomeArray = new int[x_size * z_size];
-        for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = biomeBaseArray[i].id;
-        return biomeArray;
-    }
-
-    @Override
     public int getCalculatedBiomeId(int x, int z)
     {
-        if (this.biomeManager != null)
-            return this.biomeManager.getBiome(x, z);
-
-        // For BiomeMode:Default
-        return this.world.worldProvider.e.getBiome(x, z).id;
+        return this.biomeGenerator.getBiome(x, z);
     }
 
     @Override
     public double getBiomeFactorForOldBM(int index)
     {
-        OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) this.biomeManager;
+        OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) this.biomeGenerator;
         return oldBiomeGenerator.oldTemperature1[index] * oldBiomeGenerator.oldWetness[index];
     }
 
@@ -659,16 +623,9 @@ public class BukkitWorld implements LocalWorld
 
         // Inject our own BiomeManager (called WorldChunkManager)
         Class<? extends BiomeGenerator> biomeModeClass = this.settings.worldConfig.biomeMode;
-        if (biomeModeClass != TerrainControl.getBiomeModeManager().VANILLA)
-        {
-            TCWorldChunkManager worldChunkManager = new TCWorldChunkManager(this);
-            mcWorld.worldProvider.e = worldChunkManager;
-
-            BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeModeClass, this,
-                    new BiomeCacheWrapper(worldChunkManager));
-            worldChunkManager.setBiomeManager(biomeManager);
-            setBiomeManager(biomeManager);
-        }
+        biomeGenerator = TerrainControl.getBiomeModeManager().create(biomeModeClass, this,
+                new BiomeCache(this));
+        injectWorldChunkManager(biomeGenerator);
 
         if (!initialized)
         {
@@ -717,6 +674,19 @@ public class BukkitWorld implements LocalWorld
         }
     }
 
+    private void injectWorldChunkManager(BiomeGenerator biomeGenerator)
+    {
+        if (biomeGenerator instanceof VanillaBiomeGenerator)
+        {
+            // No need to inject, we need to use the vanilla generator
+            return;
+        }
+
+        TCWorldChunkManager worldChunkManager = new TCWorldChunkManager(this);
+        this.world.worldProvider.e = worldChunkManager;
+        worldChunkManager.setBiomeManager(biomeGenerator);
+    }
+
     /**
      * Cleans up references of itself in Minecraft's native code.
      */
@@ -732,11 +702,6 @@ public class BukkitWorld implements LocalWorld
     public void setChunkGenerator(TCChunkGenerator _generator)
     {
         this.generator = _generator;
-    }
-
-    public void setBiomeManager(BiomeGenerator manager)
-    {
-        this.biomeManager = manager;
     }
 
     @Override
@@ -801,11 +766,8 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public boolean canBiomeManagerGenerateUnzoomed()
-    {
-        if (this.biomeManager != null)
-            return biomeManager.canGenerateUnZoomed();
-        return true;
+    public BiomeGenerator getBiomeGenerator() {
+        return biomeGenerator;
     }
 
 }

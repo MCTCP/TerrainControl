@@ -5,7 +5,7 @@ import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
-import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
@@ -59,23 +59,11 @@ public interface LocalWorld
     public Collection<? extends BiomeLoadInstruction> getDefaultBiomes();
 
     // Biome manager
-
     /**
-     * Calculate biome ids array used in terrain generation.
-     * 
-     * @param biomeArray Output array. If it is null or wrong size return new
-     *            array.
-     * @param x The block x.
-     * @param z The block z.
-     * @param x_size Size of block in x coordinate.
-     * @param z_size Size of blocks in z coordinate.
-     * @param type Output type. May be FULL, WITHOUT_RIVERS, ONLY_RIVERS or
-     *            DEFAULT_FOR_WORLD.
-     * @return Array filled by biome ids.
+     * Gets the biome generator.
+     * @return The biome generator.
      */
-    public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
-
-    public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType type);
+    public BiomeGenerator getBiomeGenerator();
 
     public int getCalculatedBiomeId(int x, int z);
 
@@ -171,8 +159,6 @@ public interface LocalWorld
     public CustomObjectStructureCache getStructureCache();
 
     public String getName();
-
-    public boolean canBiomeManagerGenerateUnzoomed();
 
     public long getSeed();
 
