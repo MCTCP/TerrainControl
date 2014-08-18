@@ -8,8 +8,8 @@ import com.khorn.terraincontrol.LocalWorld;
  */
 public class FromImageBiomeGenerator extends NormalBiomeGenerator
 {
-    public FromImageBiomeGenerator(LocalWorld world, BiomeCache cache)
+    public FromImageBiomeGenerator(LocalWorld world)
     {
-        super(world, cache);
+        super(world);
     }
 }

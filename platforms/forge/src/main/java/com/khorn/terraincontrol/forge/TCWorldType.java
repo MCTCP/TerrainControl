@@ -6,7 +6,6 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.forge.generator.TCWorldChunkManager;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
-import com.khorn.terraincontrol.generator.biome.BiomeCache;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import cpw.mods.fml.relauncher.Side;
@@ -69,7 +68,7 @@ public class TCWorldType extends WorldType
         this.worldTC.Init(world, config);
 
         Class<? extends BiomeGenerator> biomeGenClass = worldTC.getSettings().worldConfig.biomeMode;
-        BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().create(biomeGenClass, worldTC, new BiomeCache(worldTC));
+        BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().createCached(biomeGenClass, worldTC);
         WorldChunkManager chunkManager = createWorldChunkManager(worldTC, biomeManager);
         this.worldTC.setBiomeManager(biomeManager);
 

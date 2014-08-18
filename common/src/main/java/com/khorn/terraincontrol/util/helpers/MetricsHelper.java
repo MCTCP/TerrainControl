@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.util.helpers;
 
-import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.biome.*;

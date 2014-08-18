@@ -12,7 +12,6 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
-import com.khorn.terraincontrol.generator.biome.BiomeCache;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
@@ -623,8 +622,7 @@ public class BukkitWorld implements LocalWorld
 
         // Inject our own BiomeManager (called WorldChunkManager)
         Class<? extends BiomeGenerator> biomeModeClass = this.settings.worldConfig.biomeMode;
-        biomeGenerator = TerrainControl.getBiomeModeManager().create(biomeModeClass, this,
-                new BiomeCache(this));
+        biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeModeClass, this);
         injectWorldChunkManager(biomeGenerator);
 
         if (!initialized)

@@ -56,28 +56,38 @@ public class BiomeModeManager
     }
 
     /**
-     * Does the reflection logic for you.
-     * <p/>
+     * Creates an instance of the given biome generator. If an error occurs
+     * during instantiation, a message is logged and the normal biome
+     * generator is returned.
      * @param clazz The BiomeGenerator class to instantiate.
      * @param world The world of the biome generator.
-     * @param cache The biome cache object.
-     * <p/>
-     * @return The instantiated object.
+     * @return The biome generator.
+     * @see #createCached(Class, LocalWorld)
      */
-    public <T extends BiomeGenerator> BiomeGenerator create(Class<T> clazz, LocalWorld world, BiomeCache cache)
+    public <T extends BiomeGenerator> BiomeGenerator create(Class<T> clazz, LocalWorld world)
     {
         try
         {
-            return clazz.getConstructor(new Class[]
-            {
-                LocalWorld.class, BiomeCache.class
-            }).newInstance(world, cache);
+            return clazz.getConstructor(LocalWorld.class).newInstance(world);
         } catch (Exception e)
         {
             TerrainControl.log(LogMarker.FATAL, "Cannot properly reflect biome manager, falling back on BiomeMode:Normal");
             TerrainControl.printStackTrace(LogMarker.FATAL, e);
-            return new NormalBiomeGenerator(world, cache);
+            return new NormalBiomeGenerator(world);
         }
+    }
+
+    /**
+     * Same as {@link #create(Class, LocalWorld)}, but the returned biome
+     * generator is now guaranteed to be cached: if the generator with the
+     * given class isn't cached, it is wrapped in a cache.
+     * @param biomeModeClass Class to create a biome generator from.
+     * @param world          World the biome generates for.
+     * @return The cached biome generator.
+     */
+    public BiomeGenerator createCached(Class<? extends BiomeGenerator> biomeModeClass, LocalWorld world)
+    {
+        return CachedBiomeGenerator.makeCached(create(biomeModeClass, world));
     }
 
     /**

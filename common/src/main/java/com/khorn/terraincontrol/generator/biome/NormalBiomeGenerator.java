@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.generator.biome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.biome.layers.Layer;
-import com.khorn.terraincontrol.util.ChunkCoordinate;
 
 /**
  * This is the normal biome mode, which has all of Terrain Control's features.
@@ -14,9 +13,9 @@ public class NormalBiomeGenerator extends BiomeGenerator
     private Layer biomeLayer;
     private OutputType defaultOutputType = OutputType.FULL;
 
-    public NormalBiomeGenerator(LocalWorld world, BiomeCache cache)
+    public NormalBiomeGenerator(LocalWorld world)
     {
-        super(world, cache);
+        super(world);
 
         Layer[] layers = Layer.Init(world.getSeed(), world);
 
@@ -76,21 +75,11 @@ public class NormalBiomeGenerator extends BiomeGenerator
     @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
-        boolean useCache = true;
         if ((biomeArray == null) || (biomeArray.length < x_size * z_size))
         {
             biomeArray = new int[x_size * z_size];
-            useCache = false;
         }
 
-        if (useCache && (x_size == ChunkCoordinate.CHUNK_X_SIZE) && (z_size == ChunkCoordinate.CHUNK_Z_SIZE) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
-        {
-            synchronized (this.lockObject)
-            {
-                biomeArray = this.cache.getCachedBiomes(ChunkCoordinate.fromBlockCoords(x, z));
-            }
-            return biomeArray;
-        }
         ArraysCache cache = ArraysCacheManager.GetCache();
         if (outputType == OutputType.DEFAULT_FOR_WORLD)
             cache.outputType = defaultOutputType;
@@ -103,18 +92,6 @@ public class NormalBiomeGenerator extends BiomeGenerator
 
         return biomeArray;
 
-    }
-
-    @Override
-    public int getBiome(int x, int z)
-    {
-        return cache.getCalculatedBiomeId(x, z);
-    }
-
-    @Override
-    public void cleanupCache()
-    {
-        cache.cleanupCache();
     }
 
     @Override

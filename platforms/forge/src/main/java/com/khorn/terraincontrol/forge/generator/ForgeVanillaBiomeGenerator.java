@@ -2,7 +2,6 @@ package com.khorn.terraincontrol.forge.generator;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.forge.ForgeWorld;
-import com.khorn.terraincontrol.generator.biome.BiomeCache;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -23,8 +22,9 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
     private BiomeGenBase[] biomeGenBaseArray;
     private WorldChunkManager worldChunkManager;
 
-    public ForgeVanillaBiomeGenerator(LocalWorld world, BiomeCache cache) {
-        super(world, cache);
+    public ForgeVanillaBiomeGenerator(LocalWorld world)
+    {
+        super(world);
     }
 
     private WorldChunkManager getWorldChunkManager()

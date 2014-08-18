@@ -19,8 +19,25 @@ public abstract class VanillaBiomeGenerator extends BiomeGenerator {
      */
     public static final String GENERATOR_NAME = "Default";
 
-    public VanillaBiomeGenerator(LocalWorld world, BiomeCache cache) {
-        super(world, cache);
+    public VanillaBiomeGenerator(LocalWorld world)
+    {
+        super(world);
     }
+
+    @Override
+    public boolean isCached()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * Redeclared as abstract to force the vanilla generator to override
+     * this method.
+     */
+    @Override
+    public abstract void cleanupCache();
 
 }

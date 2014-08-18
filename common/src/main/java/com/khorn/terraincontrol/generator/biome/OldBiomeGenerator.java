@@ -4,7 +4,6 @@ package com.khorn.terraincontrol.generator.biome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorOldOctaves;
-import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.util.Random;
@@ -23,9 +22,9 @@ public class OldBiomeGenerator extends BiomeGenerator
     private static int[] biomeDiagram = new int[4096];
     private static boolean hasGeneratedBiomeDiagram;
 
-    public OldBiomeGenerator(LocalWorld world, BiomeCache cache)
+    public OldBiomeGenerator(LocalWorld world)
     {
-        super(world, cache);
+        super(world);
         this.temperatureGenerator1 = new NoiseGeneratorOldOctaves(new Random(world.getSeed() * 9871L), 4);
         this.wetnessGenerator = new NoiseGeneratorOldOctaves(new Random(world.getSeed() * 39811L), 4);
         this.temperatureGenerator2 = new NoiseGeneratorOldOctaves(new Random(world.getSeed() * 543321L), 2);
@@ -46,7 +45,7 @@ public class OldBiomeGenerator extends BiomeGenerator
         }
         //???>>	Is this needed? I cant find a usage...
         int[] temp_biomeBases = new int[x_size * z_size];
-        this.getBiomes(temp_biomeBases, x, z, x_size, z_size, false);
+        this.getBiomes(temp_biomeBases, x, z, x_size, z_size);
 
         for (int i = 0; i < temp_out.length; i++)
         {
@@ -56,17 +55,11 @@ public class OldBiomeGenerator extends BiomeGenerator
         return temp_out;
     }
 
-    public int[] getBiomes(int[] paramArrayOfBiomeBase, int x, int z, int xSize, int zSize, boolean useCache)
+    public int[] getBiomes(int[] paramArrayOfBiomeBase, int x, int z, int xSize, int zSize)
     {
         if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < xSize * zSize))
         {
             paramArrayOfBiomeBase = new int[xSize * zSize];
-        }
-        if ((useCache) && (xSize == ChunkCoordinate.CHUNK_X_SIZE) && (zSize == ChunkCoordinate.CHUNK_Z_SIZE) && ((x & 0xF) == 0) && ((z & 0xF) == 0))
-        {
-            int[] localObject = this.cache.getCachedBiomes(ChunkCoordinate.fromBlockCoords(x, z));
-            System.arraycopy(localObject, 0, paramArrayOfBiomeBase, 0, xSize * zSize);
-            return paramArrayOfBiomeBase;
         }
 
         WorldConfig worldConfig = world.getSettings().worldConfig;
@@ -119,19 +112,7 @@ public class OldBiomeGenerator extends BiomeGenerator
     @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
-        return getBiomes(biomeArray, x, z, x_size, z_size, false);
-    }
-
-    @Override
-    public int getBiome(int x, int z)
-    {
-        return this.cache.getCalculatedBiomeId(x, z);
-    }
-
-    @Override
-    public void cleanupCache()
-    {
-        this.cache.cleanupCache();
+        return getBiomes(biomeArray, x, z, x_size, z_size);
     }
 
     private static int getBiomeFromDiagram(double temp, double rain)

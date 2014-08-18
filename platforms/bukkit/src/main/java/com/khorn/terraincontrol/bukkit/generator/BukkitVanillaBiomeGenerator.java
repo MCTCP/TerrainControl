@@ -2,7 +2,6 @@ package com.khorn.terraincontrol.bukkit.generator;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
-import com.khorn.terraincontrol.generator.biome.BiomeCache;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import net.minecraft.server.v1_7_R4.BiomeBase;
@@ -23,8 +22,8 @@ public class BukkitVanillaBiomeGenerator extends VanillaBiomeGenerator {
     private BiomeBase[] biomeGenBaseArray;
     private WorldChunkManager worldChunkManager;
 
-    public BukkitVanillaBiomeGenerator(LocalWorld world, BiomeCache cache) {
-        super(world, cache);
+    public BukkitVanillaBiomeGenerator(LocalWorld world) {
+        super(world);
     }
 
     private WorldChunkManager getWorldChunkManager()
