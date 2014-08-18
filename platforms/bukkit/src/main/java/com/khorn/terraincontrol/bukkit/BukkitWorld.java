@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.*;
+import com.khorn.terraincontrol.bukkit.generator.BukkitVanillaBiomeGenerator;
 import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
 import com.khorn.terraincontrol.bukkit.generator.TCWorldChunkManager;
 import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
@@ -14,7 +15,6 @@ import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
-import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
@@ -674,15 +674,15 @@ public class BukkitWorld implements LocalWorld
 
     private void injectWorldChunkManager(BiomeGenerator biomeGenerator)
     {
-        if (biomeGenerator instanceof VanillaBiomeGenerator)
+        if (biomeGenerator instanceof BukkitVanillaBiomeGenerator)
         {
-            // No need to inject, we need to use the vanilla generator
-            return;
+            // Let our biome generator depend on Minecraft's
+            ((BukkitVanillaBiomeGenerator) biomeGenerator).setWorldChunkManager(this.world.worldProvider.e);
+        } else
+        {
+            // Let Minecraft's biome generator depend on ours
+            this.world.worldProvider.e = new TCWorldChunkManager(this, biomeGenerator);
         }
-
-        TCWorldChunkManager worldChunkManager = new TCWorldChunkManager(this);
-        this.world.worldProvider.e = worldChunkManager;
-        worldChunkManager.setBiomeManager(biomeGenerator);
     }
 
     /**

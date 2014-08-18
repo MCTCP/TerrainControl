@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.forge.generator;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -27,27 +26,10 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
         super(world);
     }
 
-    private WorldChunkManager getWorldChunkManager()
-    {
-        if (worldChunkManager != null)
-        {
-            return worldChunkManager;
-        }
-
-        worldChunkManager = ((ForgeWorld) world).getWorld().getWorldChunkManager();
-        if (worldChunkManager instanceof TCWorldChunkManager)
-        {
-            // Sanity check
-            throw new AssertionError(getClass().getName() + " expects a vanilla WorldChunkManager, " + worldChunkManager.getClass()
-                    + " given");
-        }
-        return worldChunkManager;
-    }
-
     @Override
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
-        biomeGenBaseArray = getWorldChunkManager().getBiomesForGeneration(biomeGenBaseArray, x, z, x_size, z_size);
+        biomeGenBaseArray = worldChunkManager.getBiomesForGeneration(biomeGenBaseArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
@@ -58,13 +40,13 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
     @Override
     public float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int x_size, int z_size)
     {
-        return getWorldChunkManager().getRainfall(paramArrayOfFloat, x, z, x_size, z_size);
+        return worldChunkManager.getRainfall(paramArrayOfFloat, x, z, x_size, z_size);
     }
 
     @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
-        biomeGenBaseArray = getWorldChunkManager().getBiomeGenAt(biomeGenBaseArray, x, z, x_size, z_size, true);
+        biomeGenBaseArray = worldChunkManager.getBiomeGenAt(biomeGenBaseArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
@@ -75,19 +57,37 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
     @Override
     public int getBiome(int x, int z)
     {
-        return getWorldChunkManager().getBiomeGenAt(x, z).biomeID;
+        return worldChunkManager.getBiomeGenAt(x, z).biomeID;
     }
 
     @Override
     public void cleanupCache()
     {
-        getWorldChunkManager().cleanupCache();
+        worldChunkManager.cleanupCache();
     }
 
     @Override
     public boolean canGenerateUnZoomed()
     {
         return true;
+    }
+
+    /**
+     * Sets the vanilla WorldChunkManager. Must be called before generating
+     * any biomes.
+     * @param worldChunkManager The vanilla WorldChunkManager.
+     */
+    public void setWorldChunkManager(WorldChunkManager worldChunkManager)
+    {
+        if (worldChunkManager instanceof TCWorldChunkManager)
+        {
+            // TCWorldChunkManager is unusable, as it just asks the
+            // BiomeGenerator for the biomes, creating an infinite loop
+            throw new IllegalArgumentException(getClass()
+                    + " expects a vanilla WorldChunkManager, "
+                    + worldChunkManager.getClass() + " given");
+        }
+        this.worldChunkManager = worldChunkManager;
     }
 
 }

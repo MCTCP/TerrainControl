@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import net.minecraft.server.v1_7_R4.BiomeBase;
@@ -26,26 +25,23 @@ public class BukkitVanillaBiomeGenerator extends VanillaBiomeGenerator {
         super(world);
     }
 
-    private WorldChunkManager getWorldChunkManager()
+    public void setWorldChunkManager(WorldChunkManager worldChunkManager)
     {
-        if (worldChunkManager != null)
-        {
-            return worldChunkManager;
-        }
-
-        worldChunkManager = ((BukkitWorld) world).getWorld().getWorldChunkManager();
         if (worldChunkManager instanceof TCWorldChunkManager)
         {
-            // Sanity check
-            throw new AssertionError(getClass().getName() + " expects a vanilla WorldChunkManager, " + worldChunkManager.getClass() + " given");
+            // TCWorldChunkManager is unusable, as it just asks the
+            // BiomeGenerator for the biomes, creating an infinite loop
+            throw new IllegalArgumentException(getClass()
+                    + " expects a vanilla WorldChunkManager, "
+                    + worldChunkManager.getClass() + " given");
         }
-        return worldChunkManager;
+        this.worldChunkManager = worldChunkManager;
     }
 
     @Override
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int xSize, int zSize, OutputType outputType)
     {
-        biomeGenBaseArray = getWorldChunkManager().getBiomes(biomeGenBaseArray, x, z, xSize, zSize);
+        biomeGenBaseArray = worldChunkManager.getBiomes(biomeGenBaseArray, x, z, xSize, zSize);
         if (biomeArray == null || biomeArray.length < xSize * zSize)
             biomeArray = new int[xSize * zSize];
         for (int i = 0; i < xSize * zSize; i++)
@@ -56,13 +52,13 @@ public class BukkitVanillaBiomeGenerator extends VanillaBiomeGenerator {
     @Override
     public float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int x_size, int z_size)
     {
-        return getWorldChunkManager().getWetness(paramArrayOfFloat, x, z, x_size, z_size);
+        return worldChunkManager.getWetness(paramArrayOfFloat, x, z, x_size, z_size);
     }
 
     @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int xSize, int z_size, OutputType outputType)
     {
-        biomeGenBaseArray = getWorldChunkManager().a(biomeGenBaseArray, x, z, xSize, z_size, true);
+        biomeGenBaseArray = worldChunkManager.a(biomeGenBaseArray, x, z, xSize, z_size, true);
         if (biomeArray == null || biomeArray.length < xSize * z_size)
             biomeArray = new int[xSize * z_size];
         for (int i = 0; i < xSize * z_size; i++)
@@ -73,13 +69,13 @@ public class BukkitVanillaBiomeGenerator extends VanillaBiomeGenerator {
     @Override
     public int getBiome(int x, int z)
     {
-        return getWorldChunkManager().getBiome(x, z).id;
+        return worldChunkManager.getBiome(x, z).id;
     }
 
     @Override
     public void cleanupCache()
     {
-        getWorldChunkManager().b();
+        worldChunkManager.b();
     }
 
     @Override

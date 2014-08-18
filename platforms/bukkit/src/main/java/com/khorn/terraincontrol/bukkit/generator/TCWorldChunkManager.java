@@ -12,31 +12,32 @@ import net.minecraft.server.v1_7_R4.WorldGenVillage;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Minecraft's biome generator class is WorldChunkManager, we use
+ * BiomeGenerator. This class provides a bridge between the two, allowing us to
+ * use custom biome generators.
+ */
 public class TCWorldChunkManager extends WorldChunkManager
 {
     private BukkitWorld localWorld;
-    private BiomeGenerator biomeManager;
+    private BiomeGenerator biomeGenerator;
 
-    public TCWorldChunkManager(BukkitWorld world)
+    public TCWorldChunkManager(BukkitWorld world, BiomeGenerator biomeGenerator)
     {
-        localWorld = world;
-    }
-
-    public void setBiomeManager(BiomeGenerator manager)
-    {
-        this.biomeManager = manager;
+        this.localWorld = world;
+        this.biomeGenerator = biomeGenerator;
     }
 
     @Override
     public BiomeBase getBiome(int paramInt1, int paramInt2)
     {
-        return localWorld.getBiomeById(biomeManager.getBiome(paramInt1, paramInt2)).getHandle();
+        return localWorld.getBiomeById(biomeGenerator.getBiome(paramInt1, paramInt2)).getHandle();
     }
 
     @Override
     public float[] getWetness(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
-        return biomeManager.getRainfall(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
+        return biomeGenerator.getRainfall(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
     }
 
     @Override
@@ -47,7 +48,7 @@ public class TCWorldChunkManager extends WorldChunkManager
             paramArrayOfBiomeBase = new BiomeBase[paramInt3 * paramInt4];
         }
 
-        int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
+        int[] arrayOfInt = this.biomeGenerator.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
 
         // Replaces ids with BiomeBases
         for (int i = 0; i < paramInt3 * paramInt4; i++)
@@ -66,7 +67,7 @@ public class TCWorldChunkManager extends WorldChunkManager
             paramArrayOfBiomeBase = new BiomeBase[paramInt3 * paramInt4];
         }
 
-        int[] localObject = this.biomeManager.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
+        int[] localObject = this.biomeGenerator.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
 
         // Replace ids with BiomeBases
         for (int i = 0; i < paramInt3 * paramInt4; i++)
@@ -119,7 +120,7 @@ public class TCWorldChunkManager extends WorldChunkManager
 
         int n = k - i + 1;
         int i1 = m - j + 1;
-        int[] arrayOfInt = this.biomeManager.getBiomesUnZoomed(null, i, j, n, i1, OutputType.DEFAULT_FOR_WORLD);
+        int[] arrayOfInt = this.biomeGenerator.getBiomesUnZoomed(null, i, j, n, i1, OutputType.DEFAULT_FOR_WORLD);
         ChunkPosition localChunkPosition = null;
         int i2 = 0;
         for (int i3 = 0; i3 < arrayOfInt.length; i3++)
@@ -141,6 +142,6 @@ public class TCWorldChunkManager extends WorldChunkManager
     @Override
     public void b()
     {
-        this.biomeManager.cleanupCache();
+        this.biomeGenerator.cleanupCache();
     }
 }

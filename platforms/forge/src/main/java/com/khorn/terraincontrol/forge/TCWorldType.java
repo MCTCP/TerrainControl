@@ -4,10 +4,10 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.TCWorldChunkManager;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
-import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -86,14 +86,14 @@ public class TCWorldType extends WorldType
      */
     private WorldChunkManager createWorldChunkManager(ForgeWorld world, BiomeGenerator biomeGenerator)
     {
-        if (biomeGenerator instanceof VanillaBiomeGenerator)
+        if (biomeGenerator instanceof ForgeVanillaBiomeGenerator)
         {
-            return super.getChunkManager(world.getWorld());
+            WorldChunkManager worldChunkManager = super.getChunkManager(world.getWorld());
+            ((ForgeVanillaBiomeGenerator) biomeGenerator).setWorldChunkManager(worldChunkManager);
+            return worldChunkManager;
         } else
         {
-            TCWorldChunkManager worldChunkManager = new TCWorldChunkManager(this.worldTC);
-            worldChunkManager.setBiomeManager(biomeGenerator);
-            return worldChunkManager;
+            return new TCWorldChunkManager(this.worldTC, biomeGenerator);
         }
     }
 
