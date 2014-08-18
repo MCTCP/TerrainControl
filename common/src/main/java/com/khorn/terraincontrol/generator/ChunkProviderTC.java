@@ -4,13 +4,12 @@ import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Y_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
-import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
-
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorNewOctaves;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorPerlinOctaves;
@@ -541,10 +540,13 @@ public class ChunkProviderTC
 
     private void oldBiomeFactor(int x, int z, int i4, int ySections, double noiseHeight)
     {
-        if (this.worldSettings.worldConfig.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR)
+        BiomeGenerator unwrapped = localWorld.getBiomeGenerator().unwrap();
+        if (unwrapped instanceof OldBiomeGenerator)
         {
-            this.volatilityFactor = (1.0D - this.localWorld.getBiomeFactorForOldBM(z * 48 + 17 + x * 3));
-
+            OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) unwrapped;
+            int index = z * 48 + 17 + x * 3;
+            double product = oldBiomeGenerator.oldTemperature1[index] * oldBiomeGenerator.oldWetness[index];
+            this.volatilityFactor = 1.0 - product;
         } else
         {
             final BiomeConfig biomeConfig = toBiomeConfig(this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius)

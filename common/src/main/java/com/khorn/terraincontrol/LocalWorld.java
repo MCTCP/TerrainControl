@@ -89,9 +89,6 @@ public interface LocalWorld
      */
     public LocalBiome getBiome(int x, int z) throws BiomeNotFoundException;
 
-    // temperature*rain
-    public double getBiomeFactorForOldBM(int index);
-
     // Default generators
     public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry);
 

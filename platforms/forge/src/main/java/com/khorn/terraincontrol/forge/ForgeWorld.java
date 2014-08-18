@@ -10,7 +10,6 @@ import com.khorn.terraincontrol.forge.generator.ChunkProvider;
 import com.khorn.terraincontrol.forge.generator.structure.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
-import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
@@ -180,13 +179,6 @@ public class ForgeWorld implements LocalWorld
     public int getCalculatedBiomeId(int x, int z)
     {
         return this.biomeManager.getBiome(x, z);
-    }
-
-    @Override
-    public double getBiomeFactorForOldBM(int index)
-    {
-        OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) this.biomeManager;
-        return oldBiomeGenerator.oldTemperature1[index] * oldBiomeGenerator.oldWetness[index];
     }
 
     @Override

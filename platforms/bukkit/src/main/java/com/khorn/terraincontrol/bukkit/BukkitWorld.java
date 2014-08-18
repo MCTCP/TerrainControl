@@ -14,7 +14,6 @@ import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
-import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
@@ -158,13 +157,6 @@ public class BukkitWorld implements LocalWorld
     public int getCalculatedBiomeId(int x, int z)
     {
         return this.biomeGenerator.getBiome(x, z);
-    }
-
-    @Override
-    public double getBiomeFactorForOldBM(int index)
-    {
-        OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) this.biomeGenerator;
-        return oldBiomeGenerator.oldTemperature1[index] * oldBiomeGenerator.oldWetness[index];
     }
 
     @Override

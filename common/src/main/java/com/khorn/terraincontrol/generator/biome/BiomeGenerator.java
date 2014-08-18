@@ -105,4 +105,15 @@ public abstract class BiomeGenerator
         return false;
     }
 
+    /**
+     * Biome generators can be wrapped, for example to cache another biome
+     * generator. This method returns the unwrapped biome generator. If this
+     * biome generator doesn't wrap another biome generator, it returns itself.
+     * @return The unwrapped biome generator.
+     */
+    public BiomeGenerator unwrap()
+    {
+        return this;
+    }
+
 }

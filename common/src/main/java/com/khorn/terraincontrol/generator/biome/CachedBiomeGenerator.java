@@ -179,4 +179,10 @@ class CachedBiomeGenerator extends BiomeGenerator
     {
         return true;
     }
+
+    @Override
+    public BiomeGenerator unwrap()
+    {
+        return generator.unwrap();
+    }
 }
