@@ -128,7 +128,7 @@ public class BiomeGroupManager
         return true;
     }
 
-    public Map<Integer, LocalBiome> getBiomeDepthMap(int groupId, int depth)
+    public SortedMap<Integer, LocalBiome> getBiomeDepthMap(int groupId, int depth)
     {
         return getGroup(groupId).getDepthMap(depth);
     }
