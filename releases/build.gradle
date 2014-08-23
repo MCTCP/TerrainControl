@@ -10,7 +10,7 @@ description = "TerrainControl Releases"
 def getJarFile(Project project)
 {
     String fileName = project.archivesBaseName + '-' + project.version + ".jar"
-    return new File(project.buildDir, 'distributions/' + fileName)
+    return new File(project.buildDir, 'libs/' + fileName)
 }
 
 // Adds all files from the given zip file (source) to the given destination, which
@@ -48,22 +48,27 @@ def addToZip(File source, ZipOutputStream destination, Set<String> alreadyAddedF
 
 task createReleaseJar <<
 {
+    File commonFile = getJarFile(project(":common"))
     File forgeFile = getJarFile(project(":platforms:forge"))
     File bukkitFile = getJarFile(project(":platforms:bukkit"))
-    File ourFile = getJarFile(project)
+    File ourFile = new File(project.buildDir, "distributions/TerrainControl-Forge-And-Bukkit-" + project.version + ".jar")
 
-    if (forgeFile.exists() && bukkitFile.exists())
+    if (commonFile.exists() && forgeFile.exists() && bukkitFile.exists())
     {
         ourFile.getParentFile().mkdirs()
         ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(ourFile))
         Set<String> alreadyAddedFiles = new HashSet<String>()
 
+		addToZip(commonFile, outputStream, alreadyAddedFiles)
         addToZip(forgeFile, outputStream, alreadyAddedFiles)
         addToZip(bukkitFile, outputStream, alreadyAddedFiles)
 
         outputStream.close()
     } else
     {
-        println(" Skipping the release jar, as the Bukkit or the Forge file failed")
+        println(" Skipping the release jar, as the Common, Bukkit or Forge file failed")
+		println(" Common exists: " + commonFile.exists())
+		println(" Forge exists: " + forgeFile.exists())
+		println(" Bukkit exists: " + bukkitFile.exists())
     }
 }
