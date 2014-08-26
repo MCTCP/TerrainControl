@@ -486,9 +486,13 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void startPopulation(ChunkCoordinate chunkCoord)
     {
-        if (this.chunkCache != null)
+        if (this.chunkCache != null && settings.worldConfig.populationBoundsCheck)
         {
-            throw new IllegalStateException("Chunk is already being populated");
+            throw new IllegalStateException("Chunk is already being populated."
+                    + " This may be a bug in Terrain Control, but it may also be"
+                    + " another mod that is poking in unloaded chunks. Set"
+                    + " PopulationBoundsCheck to false in the WorldConfig to"
+                    + " disable this error.");
         }
 
         // Initialize cache
@@ -505,9 +509,13 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void endPopulation()
     {
-        if (this.chunkCache == null)
+        if (this.chunkCache == null && settings.worldConfig.populationBoundsCheck)
         {
-            throw new IllegalStateException("Population has already ended");
+            throw new IllegalStateException("Chunk is not being populated."
+                    + " This may be a bug in Terrain Control, but it may also be"
+                    + " another mod that is poking in unloaded chunks. Set"
+                    + " PopulationBoundsCheck to false in the WorldConfig to"
+                    + " disable this error.");
         }
         this.chunkCache = null;
     }
