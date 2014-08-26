@@ -121,7 +121,7 @@ public class BiomeGenCustom extends BiomeGenBase
             return original;
         if (grassColorIsMultiplier)
         {
-            return ((ColorizerFoliage.getFoliageColor(temperature, rainfall) & 0xFEFEFE) + grassColor) / 2;
+            return ((ColorizerFoliage.getFoliageColor(Math.min(temperature, 1.0f), rainfall) & 0xFEFEFE) + grassColor) / 2;
         } else
         {
             return grassColor;
@@ -137,7 +137,7 @@ public class BiomeGenCustom extends BiomeGenBase
             return original;
         if (foliageColorIsMultiplier)
         {
-            return ((ColorizerFoliage.getFoliageColor(temperature, rainfall) & 0xFEFEFE) + foliageColor) / 2;
+            return ((ColorizerFoliage.getFoliageColor(Math.min(temperature, 1.0f), rainfall) & 0xFEFEFE) + foliageColor) / 2;
         } else
         {
             return foliageColor;
