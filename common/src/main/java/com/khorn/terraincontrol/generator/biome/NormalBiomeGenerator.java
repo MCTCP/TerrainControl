@@ -62,10 +62,6 @@ public class NormalBiomeGenerator extends BiomeGenerator
         for (int i = 0; i < x_size * z_size; i++)
         {
             float f1 = world.getBiomeById(arrayOfInt[i]).getBiomeConfig().biomeWetness;
-            if (f1 < worldConfig.minMoisture)
-                f1 = (float) worldConfig.minMoisture;
-            if (f1 > worldConfig.maxMoisture)
-                f1 = (float) worldConfig.maxMoisture;
             paramArrayOfFloat[i] = f1;
         }
 
