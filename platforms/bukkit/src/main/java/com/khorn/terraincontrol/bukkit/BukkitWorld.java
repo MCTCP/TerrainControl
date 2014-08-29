@@ -245,28 +245,22 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void replaceBlocks()
+    public void replaceBlocks(ChunkCoordinate chunkCoord)
     {
-        if (this.settings.worldConfig.BiomeConfigsHaveReplacement)
+        if (!this.settings.worldConfig.BiomeConfigsHaveReplacement)
         {
-            // Like all other populators, this populator uses an offset of 8
-            // blocks from the chunk start.
-            // This is what happens when the top left chunk has it's biome
-            // replaced:
-            // +--------+--------+ . = no changes in biome for now
-            // |........|........| # = biome is replaced
-            // |....####|####....|
-            // |....####|####....| The top left chunk is saved as chunk 0
-            // +--------+--------+ in the cache, the top right chunk as 1,
-            // |....####|####....| the bottom left as 2 and the bottom
-            // |....####|####....| right chunk as 3.
-            // |........|........|
-            // +--------+--------+
-            replaceBlocks(this.chunkCache[0], 8, 8);
-            replaceBlocks(this.chunkCache[1], 0, 8);
-            replaceBlocks(this.chunkCache[2], 8, 0);
-            replaceBlocks(this.chunkCache[3], 0, 0);
+            // Don't waste time here, ReplacedBlocks is empty everywhere
+            return;
         }
+
+        // Get cache
+        Chunk[] cache = getChunkCache(chunkCoord);
+
+        // Replace the blocks
+        replaceBlocks(cache[0], 8, 8);
+        replaceBlocks(cache[1], 0, 8);
+        replaceBlocks(cache[2], 8, 0);
+        replaceBlocks(cache[3], 0, 0);
     }
 
     private void replaceBlocks(Chunk rawChunk, int startXInChunk, int startZInChunk)
@@ -496,14 +490,41 @@ public class BukkitWorld implements LocalWorld
         }
 
         // Initialize cache
-        this.chunkCache = new Chunk[4];
+        this.chunkCache = loadFourChunks(chunkCoord);
+    }
+
+    private Chunk[] getChunkCache(ChunkCoordinate topLeft)
+    {
+        if (this.chunkCache == null || !topLeft.coordsMatch(this.chunkCache[0].locX, this.chunkCache[0].locZ))
+        {
+            // Cache is invalid, most likely because two chunks are being
+            // populated at once
+            if (this.settings.worldConfig.populationBoundsCheck)
+            {
+                // ... but this can never happen, as startPopulation() checks
+                // for this if populationBoundsCheck is set to true
+                // So we have a bug
+                throw new IllegalStateException("chunkCache is null");
+            } else
+            {
+                // Use a temporary cache, best we can do
+                return this.loadFourChunks(topLeft);
+            }
+        }
+        return this.chunkCache;
+    }
+
+    private Chunk[] loadFourChunks(ChunkCoordinate topLeft)
+    {
+        Chunk[] chunkCache = new Chunk[4];
         for (int indexX = 0; indexX <= 1; indexX++)
         {
             for (int indexZ = 0; indexZ <= 1; indexZ++)
             {
-                this.chunkCache[indexX | (indexZ << 1)] = world.getChunkAt(chunkCoord.getChunkX() + indexX, chunkCoord.getChunkZ() + indexZ);
+                chunkCache[indexX | (indexZ << 1)] = world.getChunkAt(topLeft.getChunkX() + indexX, topLeft.getChunkZ() + indexZ);
             }
         }
+        return chunkCache;
     }
 
     @Override

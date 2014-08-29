@@ -98,7 +98,36 @@ public interface LocalWorld
 
     public boolean placeDefaultStructures(Random rand, ChunkCoordinate chunkCoord);
 
-    public void replaceBlocks();
+    /**
+     * Executes ReplacedBlocks.
+     *
+     * <p>
+     * During terrain population, four chunks are guaranteed to be loaded:
+     * (chunkX, chunkZ), (chunkX + 1, chunkZ), (chunkX, chunkZ + 1) and
+     * (chunkX + 1, chunkZ + 1). All populators use an 8-block offset from the
+     * top left chunk, and populate an area of 16x16 blocks from there. This
+     * allows them to extend 8 blocks from their population area without
+     * hitting potentially unloaded chunks.
+     *
+     * <p>
+     * Populalators may place blocks in already populated chunks, which would
+     * cause those blocks to be never replaced. ReplacedBlocks uses the same
+     * 8-block offset to minimize this risk. This is what happens when the top
+     * left chunk has it's blocks replaced:
+     * <pre>
+     * +--------+--------+ . = no changes in blocks for now
+     * |........|........| # = blocks are replaced
+     * |....####|####....|
+     * |....####|####....|
+     * +--------+--------+
+     * |....####|####....|
+     * |....####|####....|
+     * |........|........|
+     * +--------+--------+
+     * </pre?
+     * @param chunkCoord The top left chunk for ReplacedBlocks.
+     */
+    public void replaceBlocks(ChunkCoordinate chunkCoord);
 
     /**
      * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the

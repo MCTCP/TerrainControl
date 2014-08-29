@@ -80,7 +80,7 @@ public class ObjectSpawner
         freezeChunk(chunkCoord);
 
         // Replace blocks
-        world.replaceBlocks();
+        world.replaceBlocks(chunkCoord);
 
         // Mark population ended
         TerrainControl.firePopulationEndEvent(world, rand, hasGeneratedAVillage, chunkCoord);

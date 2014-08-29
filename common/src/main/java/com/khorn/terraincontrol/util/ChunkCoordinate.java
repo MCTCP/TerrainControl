@@ -157,4 +157,16 @@ public class ChunkCoordinate
     {
         return chunkZ * CHUNK_Z_SIZE;
     }
+
+    /**
+     * Gets whether the given chunk coordinates match the chunk x and chunk z
+     * of this chunk.
+     * @param chunkX The chunk x to check.
+     * @param chunkZ The chunk z to check.
+     * @return True if the coordinates match, false otherwise.
+     */
+    public boolean coordsMatch(int chunkX, int chunkZ)
+    {
+        return this.chunkX == chunkX && this.chunkZ == chunkZ;
+    }
 }
