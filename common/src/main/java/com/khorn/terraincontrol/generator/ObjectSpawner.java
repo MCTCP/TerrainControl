@@ -91,20 +91,21 @@ public class ObjectSpawner
     {
         this.reusableChunkNoiseArray = this.noiseGen.a(this.reusableChunkNoiseArray, chunkCoord.getChunkX() * 16, chunkCoord.getChunkZ() * 16, 16, 16, 0.0625D, 0.0625D, 1.0D);
 
-        int x = chunkCoord.getChunkX() * 16 + 8;
-        int z = chunkCoord.getChunkZ() * 16 + 8;
-        for (int i = 0; i < 16; i++)
+        int x = chunkCoord.getBlockXCenter();
+        int z = chunkCoord.getBlockZCenter();
+        for (int i = 0; i < ChunkCoordinate.CHUNK_X_SIZE; i++)
         {
-            for (int j = 0; j < 16; j++)
+            for (int j = 0; j < ChunkCoordinate.CHUNK_Z_SIZE; j++)
             {
-                int blockToFreezeX = x + i;
-                int blockToFreezeZ = z + j;
+                int blockToReplaceX = x + i;
+                int blockToReplaceZ = z + j;
                 // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
-                LocalBiome biome = this.world.getCalculatedBiome(blockToFreezeX, blockToFreezeZ);
+                LocalBiome biome = this.world.getCalculatedBiome(blockToReplaceX, blockToReplaceZ);
                 if (biome != null)
                 {
                     double noise = this.reusableChunkNoiseArray[i + j * 16];
-                    biome.getBiomeConfig().surfaceAndGroundControl.spawn(world, noise, blockToFreezeX, blockToFreezeZ);
+                    BiomeConfig biomeConfig = biome.getBiomeConfig();
+                    biomeConfig.surfaceAndGroundControl.spawn(world, biomeConfig, noise, blockToReplaceX, blockToReplaceZ);
                 }
             }
         }

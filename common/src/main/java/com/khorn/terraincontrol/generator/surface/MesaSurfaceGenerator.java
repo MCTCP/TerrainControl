@@ -153,7 +153,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     }
 
     @Override
-    public void spawn(LocalWorld world, double noise, int x, int z)
+    public void spawn(LocalWorld world, BiomeConfig biomeConfig, double noise, int x, int z)
     {
         random.setSeed(world.getSeed() ^ x ^ z);
         if (this.blockDataValuesArray == null)
@@ -161,7 +161,6 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
             this.initializeSmallByteArray(world.getSeed());
         }
 
-        BiomeConfig biomeConfig = world.getCalculatedBiome(x, z).getBiomeConfig();
         LocalMaterialData biomeSurfaceBlock = biomeConfig.surfaceBlock;
         LocalMaterialData biomeGroundBlock = biomeConfig.groundBlock;
         // The following line prevents grass growing on dirt, but still allows

@@ -32,14 +32,18 @@ public abstract class BiomeGenerator
     /**
      * Calculates the biome ids array used in terrain generation.
      * 
-     * @param biomeArray Output array. If it is null or wrong size return new
-     *            array.
-     * @param x The block x.
-     * @param z The block z.
-     * @param xSize Size of block in x coordinate.
-     * @param zSize Size of blocks in z coordinate.
-     * @param type Output type.
-     * @return Array filled by biome ids.
+     * @param biomeArray Cache will fill this array if is large enough and not
+     *                   null. Otherwise, it will create a fresh array.
+     * @param x          X start in blocks.
+     * @param z          Y start in blocks.
+     * @param xSize      X size in blocks.
+     * @param zSize      Y size in blocks.
+     * @param type       The output type.
+     * @return The array. The biome generator is not allowed to do anything
+     * with the array after the method has finished executing; the caller is
+     * free to reuse the array for other purposes. This means that the biome
+     * generator is not allowed to return internal arrays, or to store this
+     * array.
      */
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int xSize, int zSize, OutputType type)
     {
@@ -52,6 +56,23 @@ public abstract class BiomeGenerator
 
     public abstract float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int xSize, int zSize);
 
+    /**
+     * Gets the detailed biomes. Each column in the world is represented by
+     * one position in the array.
+     *
+     * @param biomeArray Cache will fill this array if is large enough and not
+     *                   null. Otherwise, it will create a fresh array.
+     * @param x          X start in blocks.
+     * @param z          Y start in blocks.
+     * @param xSize      X size in blocks.
+     * @param zSize      Y size in blocks.
+     * @param type       The output type.
+     * @return The array. The biome generator is not allowed to do anything
+     * with the array after the method has finished executing; the caller is
+     * free to reuse the array for other purposes. This means that the biome
+     * generator is not allowed to return internal arrays, or to store this
+     * array.
+     */
     public abstract int[] getBiomes(int[] biomeArray, int x, int z, int xSize, int zSize, OutputType type);
 
     /**
@@ -59,7 +80,7 @@ public abstract class BiomeGenerator
      * generators, as the method would be way too slow otherwise.
      * @param blockX X coord of the column.
      * @param blockZ Z coord of the column.
-     * @return The biome ud.
+     * @return The biome id.
      * @throws UnsupportedOperationException If {@link #isCached()} == false.
      */
     public int getBiome(int blockX, int blockZ) throws UnsupportedOperationException
