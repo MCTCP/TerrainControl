@@ -23,9 +23,9 @@ ext.bukkitVersion = "1.7.10-R0.1-SNAPSHOT"
 
 repositories
 {
-    maven // For Bukkit and CraftBukkit
+    maven // Mirror for Bukkit and CraftBukkit
     {
-        url "http://repo.bukkit.org/content/groups/public"
+        url "http://repo.md-5.net/content/groups/public"
     }
     mavenCentral() // For log4j
     mavenLocal()
