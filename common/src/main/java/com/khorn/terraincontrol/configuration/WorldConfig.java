@@ -274,15 +274,9 @@ public class WorldConfig extends ConfigFile
             File mapFile = new File(settingsDir, imageFile);
             if (!mapFile.exists())
             {
-                TerrainControl.log(LogMarker.WARN, "Biome map file {} not found. Switching BiomeMode to Normal", mapFile.getAbsolutePath());
+                TerrainControl.log(LogMarker.WARN, "Biome map file not found. Switching BiomeMode to Normal");
                 biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
-            } else
-            {
-                TerrainControl.log(LogMarker.INFO, "Biome map file {} found, using that", mapFile.getAbsolutePath());
             }
-        } else
-        {
-            TerrainControl.log(LogMarker.INFO, "BiomeMode is not FromImage, ignoring map file");
         }
 
         imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || customBiomeGenerationIds.keySet().contains(imageFillBiome)) ? imageFillBiome : WorldStandardValues.IMAGE_FILL_BIOME.getDefaultValue();
