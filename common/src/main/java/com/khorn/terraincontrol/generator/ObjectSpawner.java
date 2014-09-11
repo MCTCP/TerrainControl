@@ -39,7 +39,7 @@ public class ObjectSpawner
         int z = chunkCoord.getChunkZ() * 16;
 
         // Get the biome of the other corner
-        LocalBiome biome = world.getCalculatedBiome(x + 15, z + 15);
+        LocalBiome biome = world.getBiome(x + 15, z + 15);
 
         // Null check
         if (biome == null)
@@ -100,7 +100,7 @@ public class ObjectSpawner
                 int blockToReplaceX = x + i;
                 int blockToReplaceZ = z + j;
                 // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
-                LocalBiome biome = this.world.getCalculatedBiome(blockToReplaceX, blockToReplaceZ);
+                LocalBiome biome = this.world.getBiome(blockToReplaceX, blockToReplaceZ);
                 if (biome != null)
                 {
                     double noise = this.reusableChunkNoiseArray[i + j * 16];
@@ -130,7 +130,7 @@ public class ObjectSpawner
     protected void freezeColumn(int x, int z, LocalMaterialData snowMaterial)
     {
         // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
-        LocalBiome biome = world.getCalculatedBiome(x, z);
+        LocalBiome biome = world.getBiome(x, z);
         if (biome != null)
         {
             BiomeConfig biomeConfig = biome.getBiomeConfig();

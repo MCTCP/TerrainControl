@@ -154,12 +154,6 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public int getCalculatedBiomeId(int x, int z)
-    {
-        return this.biomeGenerator.getBiome(x, z);
-    }
-
-    @Override
     public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
     {
         if (this.settings.worldConfig.strongholdsEnabled)
@@ -281,7 +275,7 @@ public class BukkitWorld implements LocalWorld
             {
                 for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
                 {
-                    LocalBiome biome = this.getCalculatedBiome(worldStartX + sectionX, worldStartZ + sectionZ);
+                    LocalBiome biome = this.getBiome(worldStartX + sectionX, worldStartZ + sectionZ);
                     if (biome != null && biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
                     {
                         LocalMaterialData[][] replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;
@@ -726,17 +720,23 @@ public class BukkitWorld implements LocalWorld
     @Override
     public BukkitBiome getCalculatedBiome(int x, int z)
     {
-        return getBiomeById(getCalculatedBiomeId(x, z));
+        return getBiomeById(this.biomeGenerator.getBiome(x, z));
     }
 
     @Override
-    public int getBiomeId(int x, int z)
+    public LocalBiome getBiome(int x, int z)
     {
-        return world.getBiome(x, z).id;
+        if (this.settings.worldConfig.populateUsingSavedBiomes)
+        {
+            return getSavedBiome(x, z);
+        } else
+        {
+            return getCalculatedBiome(x, z);
+        }
     }
 
     @Override
-    public LocalBiome getBiome(int x, int z) throws BiomeNotFoundException
+    public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
     {
         return getBiomeById(world.getBiome(x, z).id);
     }

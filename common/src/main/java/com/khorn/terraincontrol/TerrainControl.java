@@ -109,7 +109,7 @@ public class TerrainControl
             // World isn't loaded by Terrain Control
             return null;
         }
-        return world.getBiome(x, z).getName();
+        return world.getSavedBiome(x, z).getName();
     }
 
     /**

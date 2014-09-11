@@ -32,7 +32,7 @@ public class VillageStart extends StructureStart
 
         // Apply the villageType setting
         LocalWorld worldTC = WorldHelper.toLocalWorld(world);
-        LocalBiome currentBiome = worldTC.getCalculatedBiome(startX, startZ);
+        LocalBiome currentBiome = worldTC.getBiome(startX, startZ);
         BiomeConfig config = currentBiome.getBiomeConfig();
         if (config != null)
         {

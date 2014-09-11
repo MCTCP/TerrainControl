@@ -18,7 +18,7 @@ public class UseBiome implements CustomObject
 {
     public List<CustomObject> getPossibleObjectsAt(LocalWorld world, int x, int z)
     {
-        return world.getCalculatedBiome(x, z).getBiomeConfig().biomeObjects;
+        return world.getBiome(x, z).getBiomeConfig().biomeObjects;
     }
 
     @Override

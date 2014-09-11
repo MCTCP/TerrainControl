@@ -31,7 +31,7 @@ class SaplingListener
         LocalBiome biome;
         try
         {
-            biome = world.getBiome(location.getBlockX(), location.getBlockZ());
+            biome = world.getSavedBiome(location.getBlockX(), location.getBlockZ());
         } catch (BiomeNotFoundException e)
         {
             return;

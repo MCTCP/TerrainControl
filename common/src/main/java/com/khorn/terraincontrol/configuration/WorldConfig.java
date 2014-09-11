@@ -5,6 +5,8 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.io.SettingsReader;
 import com.khorn.terraincontrol.configuration.io.SettingsWriter;
+import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
@@ -151,7 +153,7 @@ public class WorldConfig extends ConfigFile
     public boolean ceilingBedrock;
     public LocalMaterialData bedrockBlock;
     public boolean populationBoundsCheck;
-
+    public boolean populateUsingSavedBiomes;
     public boolean removeSurfaceStone;
 
     public int objectSpawnRatio;
@@ -435,6 +437,7 @@ public class WorldConfig extends ConfigFile
         this.objectSpawnRatio = readSettings(WorldStandardValues.OBJECT_SPAWN_RATIO);
         this.resourcesSeed = readSettings(WorldStandardValues.RESOURCES_SEED);
         this.populationBoundsCheck = readSettings(WorldStandardValues.POPULATION_BOUNDS_CHECK);
+        this.populateUsingSavedBiomes = readSettings(WorldStandardValues.POPULATE_USING_SAVED_BIOMES);
 
         this.oldTerrainGenerator = this.ModeTerrain == TerrainMode.OldGenerator;
     }
@@ -660,11 +663,24 @@ public class WorldConfig extends ConfigFile
 
         writer.comment("Block used as bedrock. No block data allowed.");
         writer.setting(WorldStandardValues.BEDROCK_BLOCK, this.bedrockBlock);
-        
+
         writer.comment("Set this to false to disable the bounds check during chunk population.");
         writer.comment("While this allows you to spawn larger objects, it also makes terrain generation");
         writer.comment("dependant on the direction you explored the world in.");
         writer.setting(WorldStandardValues.POPULATION_BOUNDS_CHECK, this.populationBoundsCheck);
+
+        if (this.populateUsingSavedBiomes)
+        {
+            writer.comment("Advanced setting, only written to this file when set to true.");
+            writer.comment("If it is set to true the biome populator will use the biome ids present in the");
+            writer.comment("chunk data, ignoring the biome generator. This is useful if you have a premade");
+            writer.comment("map made with for example WorldPainter, but still want to populate it using "
+                    + PluginStandardValues.PLUGIN_NAME + ".");
+            writer.comment("Using this together with " + BiomeStandardValues.REPLACE_TO_BIOME_NAME + " is discouraged: it uses the biome");
+            writer.comment("specified in " + BiomeStandardValues.REPLACE_TO_BIOME_NAME
+                    + " to populate the chunk, instead of the biome itself.");
+            writer.setting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES, this.populateUsingSavedBiomes);
+        }
 
         writer.smallTitle("Water and ice");
         writer.comment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
