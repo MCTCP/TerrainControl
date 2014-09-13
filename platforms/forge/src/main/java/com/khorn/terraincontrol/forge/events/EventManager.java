@@ -131,8 +131,7 @@ public class EventManager extends EventHandler
                 blockZ, villageInChunk);
         MinecraftForge.EVENT_BUS.post(forgeEvent);
 
-        // Population close (FML and ModLoader style)
-        GameRegistry.generateWorld(chunkX, chunkZ, world.getWorld(), world.getChunkGenerator(), world.getChunkGenerator());
+        // There is no need to call GameRegistry.generateWorld, because it is done by the Chunk Provider in Forge.
     }
 
     private Decorate.EventType getDecorateEventType(LocalMaterialData block)
