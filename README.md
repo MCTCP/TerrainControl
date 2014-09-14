@@ -26,4 +26,4 @@ To learn more, check out <a href="https://github.com/Wickth/TerrainControl/wiki/
 * [Installation instructions](https://github.com/Wickth/TerrainControl/wiki/Installation-instructions)
 * [Compile instructions](https://github.com/Wickth/TerrainControl/wiki/Developer-page#wiki-compiling)
 * [Version history](https://github.com/Wickth/TerrainControl/wiki/Version-history)
-* [Build server at mctcp.com](http://mctcp.com:8900/job/TerrainControl%20-%20Master%20-%20Gradle/default/)
+* [Build server at mctcp.com](http://build.mctcp.com/job/TerrainControl%20-%20Master%20-%20Gradle/default/)
