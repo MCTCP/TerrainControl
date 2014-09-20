@@ -1,7 +1,7 @@
 // Information for all projects
 
 // The default tasks for all projects
-defaultTasks 'removeOldReleases', 'build', 'shadowJar', 'createReleaseJar', 'install'
+defaultTasks 'removeOldReleases', 'build', 'createReleaseJar', 'install'
 
 allprojects
 {

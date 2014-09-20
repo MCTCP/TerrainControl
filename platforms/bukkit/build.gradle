@@ -1,18 +1,5 @@
 // Build script for Terrain Control for Bukkit
 
-buildscript
-{
-    repositories
-    {
-        jcenter() // For shadow plugin
-    }
-    dependencies
-    {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:' + project.ext.shadowVersion
-    }
-}
-
-apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 
 // Project properties
@@ -62,12 +49,12 @@ processResources
 }
 
 // Include all Terrain Control files in the jar
-shadowJar
+jar
 {
     destinationDir = new File(project.buildDir, "distributions")
     classifier = ''
-    dependencies
+    from
     {
-        include project(":common")
+        project(":common").sourceSets.main.output.files
     }
 }
