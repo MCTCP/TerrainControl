@@ -9,7 +9,6 @@ import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.*;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate;
