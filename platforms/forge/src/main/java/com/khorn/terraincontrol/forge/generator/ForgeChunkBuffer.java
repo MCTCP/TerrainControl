@@ -41,7 +41,7 @@ class ForgeChunkBuffer implements ChunkBuffer
     @Override
     public void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material)
     {
-        int arrayPos = (blockZ * CHUNK_X_SIZE + blockX) * CHUNK_Y_SIZE + blockY;
+        int arrayPos = (blockX * CHUNK_X_SIZE + blockZ) * CHUNK_Y_SIZE + blockY;
         blocks[arrayPos] = ((ForgeMaterialData) material).internalBlock();
         blockData[arrayPos] = material.getBlockData();
     }
@@ -49,7 +49,7 @@ class ForgeChunkBuffer implements ChunkBuffer
     @Override
     public LocalMaterialData getBlock(int blockX, int blockY, int blockZ)
     {
-        int arrayPos = (blockZ * CHUNK_X_SIZE + blockX) * CHUNK_Y_SIZE + blockY;
+        int arrayPos = (blockX * CHUNK_X_SIZE + blockZ) * CHUNK_Y_SIZE + blockY;
         Block block = blocks[arrayPos];
         if (block == null)
         {
