@@ -1,7 +1,9 @@
 package com.khorn.terraincontrol.generator.terrain;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -18,13 +20,15 @@ public class CavesGen extends TerrainGenBase
         this.worldSettings = wrk;
     }
 
-    protected void generateLargeCaveNode(long seed, ChunkCoordinate generatingChunk, byte[] chunkArray, double x, double y, double z)
+    protected void generateLargeCaveNode(long seed, ChunkBuffer generatingChunkBuffer, double x, double y, double z)
     {
-        generateCaveNode(seed, generatingChunk, chunkArray, x, y, z, 1.0F + this.random.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
+        generateCaveNode(seed, generatingChunkBuffer, x, y, z, 1.0F + this.random.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
     }
 
-    protected void generateCaveNode(long seed, ChunkCoordinate generatingChunk, byte[] chunkArray, double x, double y, double z, float paramFloat1, float paramFloat2, float paramFloat3, int angle, int maxAngle, double paramDouble4)
+    protected void generateCaveNode(long seed, ChunkBuffer generatingChunkBuffer, double x, double y, double z, float paramFloat1,
+            float paramFloat2, float paramFloat3, int angle, int maxAngle, double paramDouble4)
     {
+        ChunkCoordinate generatingChunk = generatingChunkBuffer.getChunkCoordinate();
         double real_x = generatingChunk.getBlockXCenter();
         double real_z = generatingChunk.getBlockZCenter();
 
@@ -76,8 +80,10 @@ public class CavesGen extends TerrainGenBase
 
             if ((!isLargeCave) && (angle == j) && (paramFloat1 > 1.0F) && (maxAngle > 0))
             {
-                generateCaveNode(localRandom.nextLong(), generatingChunk, chunkArray, x, y, z, localRandom.nextFloat() * 0.5F + 0.5F, paramFloat2 - 1.570796F, paramFloat3 / 3.0F, angle, maxAngle, 1.0D);
-                generateCaveNode(localRandom.nextLong(), generatingChunk, chunkArray, x, y, z, localRandom.nextFloat() * 0.5F + 0.5F, paramFloat2 + 1.570796F, paramFloat3 / 3.0F, angle, maxAngle, 1.0D);
+                generateCaveNode(localRandom.nextLong(), generatingChunkBuffer, x, y, z, localRandom.nextFloat() * 0.5F + 0.5F,
+                        paramFloat2 - 1.570796F, paramFloat3 / 3.0F, angle, maxAngle, 1.0D);
+                generateCaveNode(localRandom.nextLong(), generatingChunkBuffer, x, y, z, localRandom.nextFloat() * 0.5F + 0.5F,
+                        paramFloat2 + 1.570796F, paramFloat3 / 3.0F, angle, maxAngle, 1.0D);
                 return;
             }
             if ((!isLargeCave) && (localRandom.nextInt(4) == 0))
@@ -127,20 +133,20 @@ public class CavesGen extends TerrainGenBase
 
 
             boolean waterFound = false;
-            int arrayPosition;
             for (int local_x = m; (!waterFound) && (local_x < n); local_x++)
             {
                 for (int local_z = i3; (!waterFound) && (local_z < i4); local_z++)
                 {
                     for (int local_y = i2 + 1; (!waterFound) && (local_y >= i1 - 1); local_y--)
                     {
-                        arrayPosition = (local_x * 16 + local_z) * ChunkCoordinate.CHUNK_Y_SIZE + local_y;
                         if (local_y < 0)
                             continue;
 
                         if (local_y < this.worldSettings.worldHeightCap)
                         {
-                            if ((chunkArray[arrayPosition] == DefaultMaterial.WATER.id) || (chunkArray[arrayPosition] == DefaultMaterial.STATIONARY_WATER.id))
+                            LocalMaterialData materialAtPosition = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
+                            if (materialAtPosition.isMaterial(DefaultMaterial.WATER)
+                                    || materialAtPosition.isMaterial(DefaultMaterial.STATIONARY_WATER))
                             {
                                 waterFound = true;
                             }
@@ -160,7 +166,6 @@ public class CavesGen extends TerrainGenBase
                 {
                     double d10 = (local_z + generatingChunk.getBlockZ() + 0.5D - z) / d3;
 
-                    int i10 = (local_x * 16 + local_z) * ChunkCoordinate.CHUNK_Y_SIZE + i2;
                     boolean grassFound = false;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
@@ -169,23 +174,25 @@ public class CavesGen extends TerrainGenBase
                             double d11 = (local_y + 0.5D - y) / d4;
                             if ((d11 > -0.7D) && (d9 * d9 + d11 * d11 + d10 * d10 < 1.0D))
                             {
-                                int i13 = chunkArray[i10];
-                                if (i13 == DefaultMaterial.GRASS.id)
+                                LocalMaterialData i13 = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
+                                if (i13.isMaterial(DefaultMaterial.GRASS))
                                     grassFound = true;
-                                if ((i13 == DefaultMaterial.STONE.id) || (i13 == DefaultMaterial.DIRT.id) || (i13 == DefaultMaterial.GRASS.id))
+                                if (i13.isMaterial(DefaultMaterial.STONE) || i13.isMaterial(DefaultMaterial.DIRT)
+                                        || i13.isMaterial(DefaultMaterial.GRASS))
                                 {
                                     if (local_y < 10)
                                     {
-                                        chunkArray[i10] = (byte) DefaultMaterial.STATIONARY_LAVA.id;
+                                        generatingChunkBuffer.setBlock(local_x, local_y, local_z, lava);
                                     } else
                                     {
-                                        chunkArray[i10] = 0;
-                                        if ((!grassFound) && (chunkArray[(i10 - 1)] == DefaultMaterial.DIRT.id))
-                                            chunkArray[(i10 - 1)] = (byte) DefaultMaterial.GRASS.id;
+                                        generatingChunkBuffer.setBlock(local_x, local_y, local_z, air);
+                                        if ((!grassFound)
+                                                && (generatingChunkBuffer.getBlock(local_x, local_y - 1, local_z)
+                                                        .isMaterial(DefaultMaterial.DIRT)))
+                                            generatingChunkBuffer.setBlock(local_x, local_y - 1, local_z, grass);
                                     }
                                 }
                             }
-                            i10--;
                         }
                     }
                 }
@@ -196,7 +203,7 @@ public class CavesGen extends TerrainGenBase
     }
 
     @Override
-    protected void generateChunk(ChunkCoordinate chunkCoord, ChunkCoordinate generatingChunk, byte[] paramArrayOfByte)
+    protected void generateChunk(ChunkCoordinate chunkCoord, ChunkBuffer generatingChunkBuffer)
     {
         int i = this.random.nextInt(this.random.nextInt(this.random.nextInt(this.worldSettings.caveFrequency) + 1) + 1);
         if (this.worldSettings.evenCaveDistribution)
@@ -221,7 +228,7 @@ public class CavesGen extends TerrainGenBase
             boolean largeCaveSpawned = false;
             if (this.random.nextInt(100) <= this.worldSettings.individualCaveRarity)
             {
-                generateLargeCaveNode(this.random.nextLong(), generatingChunk, paramArrayOfByte, x, y, z);
+                generateLargeCaveNode(this.random.nextLong(), generatingChunkBuffer, x, y, z);
                 largeCaveSpawned = true;
             }
 
@@ -236,7 +243,7 @@ public class CavesGen extends TerrainGenBase
                 float f2 = (this.random.nextFloat() - 0.5F) * 2.0F / 8.0F;
                 float f3 = this.random.nextFloat() * 2.0F + this.random.nextFloat();
 
-                generateCaveNode(this.random.nextLong(), generatingChunk, paramArrayOfByte, x, y, z, f3, f1, f2, 0, 0, 1.0D);
+                generateCaveNode(this.random.nextLong(), generatingChunkBuffer, x, y, z, f3, f1, f2, 0, 0, 1.0D);
             }
         }
     }

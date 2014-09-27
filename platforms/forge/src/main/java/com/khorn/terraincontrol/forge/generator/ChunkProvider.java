@@ -3,14 +3,8 @@ package com.khorn.terraincontrol.forge.generator;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.ForgeWorld;
-import com.khorn.terraincontrol.generator.ChunkProviderTC;
-import com.khorn.terraincontrol.generator.ObjectSpawner;
-import com.khorn.terraincontrol.generator.biome.OutputType;
-import com.khorn.terraincontrol.util.ChunkCoordinate;
-import net.minecraft.block.Block;
+import java.util.List;
+
 import net.minecraft.block.BlockSand;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.IProgressUpdate;
@@ -19,9 +13,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
-import java.util.List;
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.ForgeWorld;
+import com.khorn.terraincontrol.generator.ChunkProviderTC;
+import com.khorn.terraincontrol.generator.ObjectSpawner;
+import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 
 public class ChunkProvider implements IChunkProvider
 {
@@ -41,8 +40,6 @@ public class ChunkProvider implements IChunkProvider
 
     public ChunkProvider(ForgeWorld _world)
     {
-        // super(_world.getWorld(), _world.getSeed());
-
         this.world = _world;
         this.worldHandle = _world.getWorld();
 
@@ -62,30 +59,11 @@ public class ChunkProvider implements IChunkProvider
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ)
     {
-        Chunk chunk = new Chunk(this.worldHandle, chunkX, chunkZ);
+        ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
+        ForgeChunkBuffer chunkBuffer = new ForgeChunkBuffer(chunkCoord);
+        this.generator.generate(chunkBuffer);
 
-        byte[] BlockArray = this.generator.generate(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
-        ExtendedBlockStorage[] sections = chunk.getBlockStorageArray();
-
-        int i1 = BlockArray.length / 256;
-        for (int blockX = 0; blockX < 16; blockX++)
-            for (int blockZ = 0; blockZ < 16; blockZ++)
-                for (int blockY = 0; blockY < i1; blockY++)
-                {
-                    int block = BlockArray[(blockX << ChunkProviderTC.HEIGHT_BITS_PLUS_FOUR | blockZ << ChunkProviderTC.HEIGHT_BITS | blockY)];
-                    if (block != 0)
-                    {
-                        int sectionId = blockY >> 4;
-                        if (sections[sectionId] == null)
-                        {
-                            // Second argument is skylight
-                            sections[sectionId] = new ExtendedBlockStorage(sectionId << 4, !chunk.worldObj.provider.hasNoSky);
-                        }
-                        // We should optimize this
-                        sections[sectionId].func_150818_a(blockX, blockY & 0xF, blockZ, Block.getBlockById(block & 0xFF));
-                    }
-                }
-
+        Chunk chunk = chunkBuffer.toChunk(this.worldHandle);
         fillBiomeArray(chunk);
         chunk.generateSkylightMap();
 
@@ -152,9 +130,8 @@ public class ChunkProvider implements IChunkProvider
         return "TerrainControlLevelSource";
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
-    public List getPossibleCreatures(EnumCreatureType paramaca, int paramInt1, int paramInt2, int paramInt3)
+    public List<?> getPossibleCreatures(EnumCreatureType paramaca, int paramInt1, int paramInt2, int paramInt3)
     {
         BiomeGenBase Biome = this.worldHandle.getBiomeGenForCoords(paramInt1, paramInt3);
         if (Biome == null)
@@ -164,7 +141,6 @@ public class ChunkProvider implements IChunkProvider
         return Biome.getSpawnableList(paramaca);
     }
 
-    
     @Override
     public ChunkPosition func_147416_a(World world, String s, int x, int y, int z)
     {

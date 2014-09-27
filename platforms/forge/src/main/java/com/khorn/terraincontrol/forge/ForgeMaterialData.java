@@ -1,10 +1,11 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.TerrainControl;
-
 import net.minecraft.block.Block;
-import com.khorn.terraincontrol.util.helpers.BlockHelper;
+import net.minecraft.init.Blocks;
+
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 
@@ -178,6 +179,11 @@ public class ForgeMaterialData implements LocalMaterialData
 
         // No changes, return object itself
         return this;
+    }
+
+    @Override
+    public boolean isAir() {
+        return block == Blocks.air;
     }
 
 }

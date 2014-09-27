@@ -1,12 +1,21 @@
 package com.khorn.terraincontrol.generator.terrain;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Random;
 
 public abstract class TerrainGenBase
 {
+    // Hardcoded materials that cannot be changed for now
+    protected final LocalMaterialData air = TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0);
+    protected final LocalMaterialData lava = TerrainControl.toLocalMaterialData(DefaultMaterial.STATIONARY_LAVA, 0);
+    protected final LocalMaterialData grass = TerrainControl.toLocalMaterialData(DefaultMaterial.GRASS, 0);
+
     protected int checkAreaSize = 8;
     protected Random random = new Random();
     protected LocalWorld world;
@@ -21,9 +30,10 @@ public abstract class TerrainGenBase
         worldLong2 = this.random.nextLong();
     }
 
-    public void generate(ChunkCoordinate chunkCoord, byte[] paramArrayOfByte)
+    public void generate(ChunkBuffer chunkBuffer)
     {
         int i = this.checkAreaSize;
+        ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
         int chunkX = chunkCoord.getChunkX();
         int chunkZ = chunkCoord.getChunkZ();
 
@@ -33,7 +43,7 @@ public abstract class TerrainGenBase
                 long l3 = x * worldLong1;
                 long l4 = z * worldLong2;
                 this.random.setSeed(l3 ^ l4 ^ this.world.getSeed());
-                generateChunk(ChunkCoordinate.fromChunkCoords(x, z), chunkCoord, paramArrayOfByte);
+                generateChunk(ChunkCoordinate.fromChunkCoords(x, z), chunkBuffer);
             }
     }
 
@@ -42,10 +52,9 @@ public abstract class TerrainGenBase
      * calls this method for all chunks not more than {@link #checkAreaSize}
      * chunks away on either axis from the generatingChunk.
      *
-     * @param currentChunk    The chunk we're searching.
-     * @param generatingChunk The chunk that is currently being generated.
-     * @param blocks          The blocks of the chunk that is currently
-     *                        being generated.
+     * @param currentChunk          The chunk we're searching.
+     * @param generatingChunkBuffer The chunk that is currently being
+     *                              generated.
      */
-    protected abstract void generateChunk(ChunkCoordinate currentChunk, ChunkCoordinate generatingChunk, byte[] blocks);
+    protected abstract void generateChunk(ChunkCoordinate currentChunk, ChunkBuffer generatingChunkBuffer);
 }

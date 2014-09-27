@@ -1,10 +1,12 @@
 package com.khorn.terraincontrol.bukkit;
 
+import net.minecraft.server.v1_7_R4.Block;
+import net.minecraft.server.v1_7_R4.Blocks;
+
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import net.minecraft.server.v1_7_R4.Block;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
@@ -174,6 +176,11 @@ public class BukkitMaterialData implements LocalMaterialData
 
         // No changes, return object itself
         return this;
+    }
+
+    @Override
+    public boolean isAir() {
+        return block == Blocks.AIR;
     }
 
 }

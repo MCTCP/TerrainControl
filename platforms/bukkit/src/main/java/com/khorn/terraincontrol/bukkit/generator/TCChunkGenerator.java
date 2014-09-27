@@ -1,19 +1,19 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
-import com.khorn.terraincontrol.util.ChunkCoordinate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-import com.khorn.terraincontrol.bukkit.BukkitWorld;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.generator.ChunkProviderTC;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.khorn.terraincontrol.bukkit.BukkitWorld;
+import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.ChunkProviderTC;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 
 public class TCChunkGenerator extends ChunkGenerator
 {
@@ -85,28 +85,10 @@ public class TCChunkGenerator extends ChunkGenerator
 
         if (this.NotGenerate)
             return new byte[16][];
-        byte[] BlockArray = this.chunkProviderTC.generate(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
+        ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
+        BukkitChunkBuffer chunkBuffer = new BukkitChunkBuffer(chunkCoord);
+        this.chunkProviderTC.generate(chunkBuffer);
 
-        byte[][] SectionBlocks = new byte[16][];
-
-        // TODO Too slow, for fix need change generator output.
-        int max_y = BlockArray.length / 256;
-        for (int _x = 0; _x < 16; _x++)
-            for (int _z = 0; _z < 16; _z++)
-                for (int y = 0; y < max_y; y++)
-                {
-                    byte block = BlockArray[(_x << ChunkProviderTC.HEIGHT_BITS_PLUS_FOUR | _z << ChunkProviderTC.HEIGHT_BITS | y)];
-                    if (block != 0)
-                    {
-                        int sectionId = y >> 4;
-                        if (SectionBlocks[sectionId] == null)
-                        {
-                            SectionBlocks[sectionId] = new byte[4096];
-                        }
-                        SectionBlocks[sectionId][(y & 0xF) << 8 | _z << 4 | _x] = block;
-                    }
-                }
-        return SectionBlocks;
-
+        return chunkBuffer.accessBytes();
     }
 }
