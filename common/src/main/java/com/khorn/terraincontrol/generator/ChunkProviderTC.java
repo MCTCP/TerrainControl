@@ -328,7 +328,7 @@ public class ChunkProviderTC
                         // Surface blocks logic (grass, dirt, sand, sandstone)
                         final LocalMaterialData blockOnCurrentPos = chunkBuffer.getBlock(x, y, z);
 
-                        if (blockOnCurrentPos.isMaterial(DefaultMaterial.AIR))
+                        if (blockOnCurrentPos.isAir())
                         {
                             // Reset when air is found
                             surfaceBlocksCount = -1;

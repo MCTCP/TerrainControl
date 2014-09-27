@@ -233,7 +233,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                 blockAtPosition = TerrainControl.toLocalMaterialData(DefaultMaterial.STONE, 0);
             }
 
-            if (blockAtPosition.isMaterial(DefaultMaterial.AIR))
+            if (blockAtPosition.isAir())
             {
                 j1 = -1;
             } else if (blockAtPosition.isSolid())

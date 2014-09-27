@@ -4,7 +4,6 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -115,7 +114,7 @@ public class MaterialSet
         {
             return false;
         }
-        if (allMaterials && !material.isMaterial(DefaultMaterial.AIR))
+        if (allMaterials && !material.isAir())
         {
             return true;
         }
