@@ -419,13 +419,13 @@ public class ForgeWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
         {
-            return new ForgeMaterialData(Blocks.air, 0);
+            return ForgeMaterialData.ofMinecraftBlock(Blocks.air, 0);
         }
 
         z &= 0xF;
         x &= 0xF;
 
-        return new ForgeMaterialData(chunk.getBlock(x, y, z), chunk.getBlockMetadata(x, y, z));
+        return ForgeMaterialData.ofMinecraftBlock(chunk.getBlock(x, y, z), chunk.getBlockMetadata(x, y, z));
     }
 
     @Override

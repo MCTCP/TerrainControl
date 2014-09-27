@@ -3,15 +3,15 @@ package com.khorn.terraincontrol.forge.generator;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Y_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.forge.ForgeMaterialData;
 import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 /**
  * Implementation of {@link ChunkBuffer}. This implementation supports block
@@ -56,7 +56,7 @@ class ForgeChunkBuffer implements ChunkBuffer
             block = Blocks.air;
         }
         byte data = blockData[arrayPos];
-        return new ForgeMaterialData(block, data);
+        return ForgeMaterialData.ofMinecraftBlock(block, data);
     }
 
     /**

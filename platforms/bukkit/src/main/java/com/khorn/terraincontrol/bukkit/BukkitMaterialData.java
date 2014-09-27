@@ -1,12 +1,14 @@
 package com.khorn.terraincontrol.bukkit;
 
-import net.minecraft.server.v1_7_R4.Block;
-import net.minecraft.server.v1_7_R4.Blocks;
-
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+import net.minecraft.server.v1_7_R4.Block;
+import net.minecraft.server.v1_7_R4.Blocks;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
@@ -14,18 +16,68 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
  */
 public class BukkitMaterialData implements LocalMaterialData
 {
+    /**
+     * Caches all unique blocks with their BukkitMaterialData equivalent. If
+     * uncached you'll easily see more than 50000 BukkitMaterialData instances
+     * in memory. Doens't support block data.
+     */
+    private static final Map<Block, BukkitMaterialData> CACHE = new IdentityHashMap<Block, BukkitMaterialData>();
+
+    /**
+     * Gets a {@code BukkitMaterialData} of the given id and data.
+     * @param id   The block id.
+     * @param data The block data.
+     * @return The {@code BukkitMateialData} instance.
+     */
+    public static BukkitMaterialData ofIds(int id, int data)
+    {
+        return ofMinecraftBlock(Block.getById(id), data);
+    }
+
+    /**
+     * Gets a {@code BukkitMaterialData} of the given material and data.
+     * @param material The material.
+     * @param data     The block data.
+     * @return The {@code BukkitMateialData} instance.
+     */
+    public static BukkitMaterialData ofDefaultMaterial(DefaultMaterial material, int data)
+    {
+        return ofIds(material.id, data);
+    }
+
+    /**
+     * Gets a {@code BukkitMaterialData} of the given Minecraft block and data.
+     * @param material The material.
+     * @param data     The block data.
+     * @return The {@code BukkitMateialData} instance.
+     */
+    public static BukkitMaterialData ofMinecraftBlock(Block block, int data)
+    {
+        if (data != 0)
+        {
+            // Cache doens't support block data
+            return new BukkitMaterialData(block, data);
+        }
+
+        BukkitMaterialData cached = CACHE.get(block);
+        if (cached != null)
+        {
+            // Found cache entry
+            return cached;
+        }
+
+        // Create cache entry
+        BukkitMaterialData newObject = new BukkitMaterialData(block, data);
+        CACHE.put(block, newObject);
+        return newObject;
+    }
+
     private final Block block;
     private final byte data;
 
-    public BukkitMaterialData(Block block, int data)
+    private BukkitMaterialData(Block block, int data)
     {
         this.block = block;
-        this.data = (byte) data;
-    }
-
-    public BukkitMaterialData(DefaultMaterial defaultMaterial, int data)
-    {
-        this.block = Block.getById(defaultMaterial.id);
         this.data = (byte) data;
     }
 

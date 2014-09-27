@@ -48,7 +48,7 @@ public class BukkitEngine extends TerrainControlEngine
         Block block = Block.b(input);
         if (block != null)
         {
-            return new BukkitMaterialData(block, 0);
+            return BukkitMaterialData.ofMinecraftBlock(block, 0);
         }
 
         try
@@ -83,12 +83,12 @@ public class BukkitEngine extends TerrainControlEngine
         Block block = Block.b(blockName);
         if (block != null)
         {
-            return new BukkitMaterialData(block, blockData);
+            return BukkitMaterialData.ofMinecraftBlock(block, blockData);
         }
         DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
         if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
         {
-            return new BukkitMaterialData(defaultMaterial, blockData);
+            return BukkitMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
         }
 
         // Failed
@@ -98,7 +98,7 @@ public class BukkitEngine extends TerrainControlEngine
     @Override
     public LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
     {
-        return new BukkitMaterialData(defaultMaterial, blockData);
+        return BukkitMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
     }
 
 }

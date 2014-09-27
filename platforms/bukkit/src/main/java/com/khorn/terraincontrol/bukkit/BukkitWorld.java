@@ -395,13 +395,13 @@ public class BukkitWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
         {
-            return new BukkitMaterialData(DefaultMaterial.AIR, 0);
+            return BukkitMaterialData.ofDefaultMaterial(DefaultMaterial.AIR, 0);
         }
 
         z &= 0xF;
         x &= 0xF;
 
-        return new BukkitMaterialData(chunk.getType(x, y, z), chunk.getData(x, y, z));
+        return BukkitMaterialData.ofMinecraftBlock(chunk.getType(x, y, z), chunk.getData(x, y, z));
     }
 
     @Override

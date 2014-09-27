@@ -1,13 +1,12 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Y_SIZE;
-import net.minecraft.server.v1_7_R4.Block;
-import net.minecraft.server.v1_7_R4.Blocks;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.bukkit.BukkitMaterialData;
 import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+import net.minecraft.server.v1_7_R4.Blocks;
 
 class BukkitChunkBuffer implements ChunkBuffer
 {
@@ -45,11 +44,11 @@ class BukkitChunkBuffer implements ChunkBuffer
         byte[] section = sections[sectionId];
         if (section == null)
         {
-            return new BukkitMaterialData(Blocks.AIR, 0);
+            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR, 0);
         }
 
         byte blockId = section[getPositionInSectionArray(blockX, blockY, blockZ)];
-        return new BukkitMaterialData(Block.getById(blockId), 0);
+        return BukkitMaterialData.ofIds(blockId, 0);
     }
 
     @Override

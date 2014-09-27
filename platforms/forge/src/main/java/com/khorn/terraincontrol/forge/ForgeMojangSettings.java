@@ -1,14 +1,12 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
-
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+import com.khorn.terraincontrol.configuration.standard.MojangSettings;
+import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
+import net.minecraft.world.biome.BiomeGenBase;
 
 import java.util.List;
-
-import net.minecraft.world.biome.BiomeGenBase;
-import com.khorn.terraincontrol.LocalMaterialData;
-import com.khorn.terraincontrol.configuration.standard.MojangSettings;
 
 /**
  * Gets some default settings from the BiomeBase instance. The settings in the
@@ -76,13 +74,13 @@ public final class ForgeMojangSettings implements MojangSettings
     @Override
     public LocalMaterialData getSurfaceBlock()
     {
-        return new ForgeMaterialData(biomeBase.topBlock, 0);
+        return ForgeMaterialData.ofMinecraftBlock(biomeBase.topBlock, 0);
     }
 
     @Override
     public LocalMaterialData getGroundBlock()
     {
-        return new ForgeMaterialData(biomeBase.fillerBlock, 0);
+        return ForgeMaterialData.ofMinecraftBlock(biomeBase.fillerBlock, 0);
     }
 
     @Override
