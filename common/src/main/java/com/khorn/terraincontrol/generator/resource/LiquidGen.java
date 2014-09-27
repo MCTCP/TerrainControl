@@ -5,7 +5,6 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.MaterialSet;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -35,22 +34,22 @@ public class LiquidGen extends Resource
         LocalMaterialData tempBlock = world.getMaterial(x - 1, y, z);
 
         i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
-        j = (tempBlock.isMaterial(DefaultMaterial.AIR)) ? j + 1 : j;
+        j = (tempBlock.isAir()) ? j + 1 : j;
 
         tempBlock = world.getMaterial(x + 1, y, z);
 
         i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
-        j = (tempBlock.isMaterial(DefaultMaterial.AIR)) ? j + 1 : j;
+        j = (tempBlock.isAir()) ? j + 1 : j;
 
         tempBlock = world.getMaterial(x, y, z - 1);
 
         i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
-        j = (tempBlock.isMaterial(DefaultMaterial.AIR)) ? j + 1 : j;
+        j = (tempBlock.isAir()) ? j + 1 : j;
 
         tempBlock = world.getMaterial(x, y, z + 1);
 
         i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
-        j = (tempBlock.isMaterial(DefaultMaterial.AIR)) ? j + 1 : j;
+        j = (tempBlock.isAir()) ? j + 1 : j;
 
         if ((i == 3) && (j == 1))
         {

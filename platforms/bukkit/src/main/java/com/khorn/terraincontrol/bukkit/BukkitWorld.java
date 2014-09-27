@@ -18,7 +18,6 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.server.v1_7_R4.*;
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
@@ -395,7 +394,7 @@ public class BukkitWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
         {
-            return BukkitMaterialData.ofDefaultMaterial(DefaultMaterial.AIR, 0);
+            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR, 0);
         }
 
         z &= 0xF;
