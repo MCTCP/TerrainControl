@@ -65,7 +65,7 @@ public class UseBiome implements CustomObject
 
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
-        int objectSpawnRatio = world.getSettings().worldConfig.objectSpawnRatio;
+        int objectSpawnRatio = world.getConfigs().getWorldConfig().objectSpawnRatio;
 
         if (possibleObjects.isEmpty())
             return false;
@@ -95,7 +95,7 @@ public class UseBiome implements CustomObject
 
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
-        int objectSpawnRatio = world.getSettings().worldConfig.objectSpawnRatio;
+        int objectSpawnRatio = world.getConfigs().getWorldConfig().objectSpawnRatio;
 
         if (possibleObjects.isEmpty())
             return false;

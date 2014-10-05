@@ -1,19 +1,18 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.generator.BlockPopulator;
-import org.bukkit.generator.ChunkGenerator;
-
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.generator.BlockPopulator;
+import org.bukkit.generator.ChunkGenerator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class TCChunkGenerator extends ChunkGenerator
 {
@@ -50,9 +49,9 @@ public class TCChunkGenerator extends ChunkGenerator
      */
     public void onInitialize(BukkitWorld _world)
     {
-        this.chunkProviderTC = new ChunkProviderTC(_world.getSettings(), _world);
+        this.chunkProviderTC = new ChunkProviderTC(_world.getConfigs(), _world);
 
-        WorldConfig.TerrainMode mode = _world.getSettings().worldConfig.ModeTerrain;
+        WorldConfig.TerrainMode mode = _world.getConfigs().getWorldConfig().ModeTerrain;
 
         if (mode == WorldConfig.TerrainMode.Normal || mode == WorldConfig.TerrainMode.OldGenerator)
             this.BlockPopulator.add(new TCBlockPopulator(_world));

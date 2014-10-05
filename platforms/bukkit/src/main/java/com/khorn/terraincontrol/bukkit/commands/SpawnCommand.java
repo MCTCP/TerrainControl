@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
@@ -43,7 +42,7 @@ public class SpawnCommand extends BaseCommand
         CustomObject spawnObject = null;
 
         if (bukkitWorld != null)
-            spawnObject = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(0), bukkitWorld);
+            spawnObject = bukkitWorld.getConfigs().getCustomObjects().parseCustomObject(args.get(0));
 
         if (spawnObject == null)
         {

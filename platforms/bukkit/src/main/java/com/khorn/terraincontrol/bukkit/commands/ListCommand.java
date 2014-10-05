@@ -5,10 +5,10 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjects;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class ListCommand extends BaseCommand
@@ -45,11 +45,11 @@ public class ListCommand extends BaseCommand
 
             if (world != null)
             {
-                if (world.getSettings().worldConfig.customObjects.isEmpty())
+                if (world.getConfigs().getCustomObjects().isEmpty())
                     sender.sendMessage(MESSAGE_COLOR + "This world does not have custom objects");
 
                 List<String> pluginList = new ArrayList<String>();
-                for (CustomObject object : world.getSettings().worldConfig.customObjects)
+                for (CustomObject object : world.getConfigs().getCustomObjects())
                 {
                     pluginList.add(VALUE_COLOR + object.getName());
                 }
@@ -72,7 +72,7 @@ public class ListCommand extends BaseCommand
             }
         }
 
-        Collection<CustomObject> globalObjects = TerrainControl.getCustomObjectManager().globalObjects.values();
+        CustomObjects globalObjects = TerrainControl.getCustomObjectManager().getGlobalObjects();
 
         if (globalObjects.isEmpty())
             sender.sendMessage(MESSAGE_COLOR + "This global directory does not have custom objects");

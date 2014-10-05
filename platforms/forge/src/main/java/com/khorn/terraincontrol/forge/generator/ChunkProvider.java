@@ -3,8 +3,13 @@ package com.khorn.terraincontrol.forge.generator;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
-import java.util.List;
-
+import com.khorn.terraincontrol.configuration.ConfigProvider;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.ForgeWorld;
+import com.khorn.terraincontrol.generator.ChunkProviderTC;
+import com.khorn.terraincontrol.generator.ObjectSpawner;
+import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import net.minecraft.block.BlockSand;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.IProgressUpdate;
@@ -14,13 +19,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.ForgeWorld;
-import com.khorn.terraincontrol.generator.ChunkProviderTC;
-import com.khorn.terraincontrol.generator.ObjectSpawner;
-import com.khorn.terraincontrol.generator.biome.OutputType;
-import com.khorn.terraincontrol.util.ChunkCoordinate;
+import java.util.List;
 
 public class ChunkProvider implements IChunkProvider
 {
@@ -43,10 +42,10 @@ public class ChunkProvider implements IChunkProvider
         this.world = _world;
         this.worldHandle = _world.getWorld();
 
-        this.TestMode = world.getSettings().worldConfig.ModeTerrain == WorldConfig.TerrainMode.TerrainTest;
+        this.TestMode = world.getConfigs().getWorldConfig().ModeTerrain == WorldConfig.TerrainMode.TerrainTest;
 
-        this.generator = new ChunkProviderTC(this.world.getSettings(), this.world);
-        this.spawner = new ObjectSpawner(this.world.getSettings(), this.world);
+        this.generator = new ChunkProviderTC(this.world.getConfigs(), this.world);
+        this.spawner = new ObjectSpawner(this.world.getConfigs(), this.world);
 
     }
 
@@ -78,15 +77,15 @@ public class ChunkProvider implements IChunkProvider
     private void fillBiomeArray(Chunk chunk)
     {
         byte[] chunkBiomeArray = chunk.getBiomeArray();
-        LocalBiome[] biomeMap = world.getSettings().biomes;
+        ConfigProvider configProvider = world.getConfigs();
         biomeIntArray = world.getBiomeGenerator().getBiomes(biomeIntArray,
                 chunk.xPosition * CHUNK_X_SIZE, chunk.zPosition * CHUNK_Z_SIZE,
                 CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
 
         for (int i = 0; i < chunkBiomeArray.length; i++)
         {
-            int biomeId = biomeIntArray[i];
-            chunkBiomeArray[i] = (byte) biomeMap[biomeId].getIds().getSavedId();
+            int generationId = biomeIntArray[i];
+            chunkBiomeArray[i] = (byte) configProvider.getBiomeByIdOrNull(generationId).getIds().getSavedId();
         }
     }
 

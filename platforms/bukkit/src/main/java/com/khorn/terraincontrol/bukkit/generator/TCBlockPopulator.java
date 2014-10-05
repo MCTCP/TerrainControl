@@ -16,7 +16,7 @@ public class TCBlockPopulator extends BlockPopulator
 
     public TCBlockPopulator(BukkitWorld world)
     {
-        this.spawner = new ObjectSpawner(world.getSettings(), world);
+        this.spawner = new ObjectSpawner(world.getConfigs(), world);
     }
 
     @Override

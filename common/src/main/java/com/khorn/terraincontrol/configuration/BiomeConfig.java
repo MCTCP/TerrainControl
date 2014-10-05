@@ -386,7 +386,7 @@ public class BiomeConfig extends ConfigFile
         List<String> customObjectStrings = readSettings(BiomeStandardValues.BIOME_OBJECTS);
         for (String customObjectString : customObjectStrings)
         {
-            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(customObjectString, worldConfig);
+            CustomObject object = worldConfig.worldObjects.parseCustomObject(customObjectString);
             if (object != null && !(object instanceof UseBiome))
             {
                 biomeObjects.add(object);

@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.forge;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
+import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
@@ -563,7 +564,14 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
+    @Deprecated
     public WorldSettings getSettings()
+    {
+        return this.settings;
+    }
+
+    @Override
+    public ConfigProvider getConfigs()
     {
         return this.settings;
     }

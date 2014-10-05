@@ -70,11 +70,11 @@ public class MapWriter implements Runnable
             return defaultColors;
         }
 
-        int[] colors = defaultColors;
-        colors = new int[bukkitWorld.getSettings().biomes.length];
-        TerrainControl.log(LogMarker.TRACE, "BukkitWorld settings biomes.length::{}", bukkitWorld.getSettings().biomes.length);
+        LocalBiome[] biomes = bukkitWorld.getConfigs().getBiomeArray();
+        int[] colors = new int[biomes.length];
+        TerrainControl.log(LogMarker.TRACE, "BukkitWorld settings biomes.length::{}", biomes.length);
 
-        for (LocalBiome biome : bukkitWorld.getSettings().biomes)
+        for (LocalBiome biome : biomes)
         {
             if (biome != null)
             {

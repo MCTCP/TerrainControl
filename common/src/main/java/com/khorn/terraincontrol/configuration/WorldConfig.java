@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjects;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
@@ -33,7 +34,12 @@ public class WorldConfig extends ConfigFile
     public Map<String, Integer> customBiomeGenerationIds = new HashMap<String, Integer>();
 
     // Holds all world CustomObjects.
-    public List<CustomObject> customObjects = new ArrayList<CustomObject>();
+    public final CustomObjects worldObjects;
+    /**
+     * @deprecated Use {@link #worldObjects} instead.
+     */
+    @Deprecated
+    public final List<CustomObject> customObjects;
 
     public List<String> NormalBiomes = new ArrayList<String>();
     public List<String> IceBiomes = new ArrayList<String>();
@@ -183,7 +189,7 @@ public class WorldConfig extends ConfigFile
      *            in.
      * @param world The LocalWorld instance of the world.
      */
-    public WorldConfig(SettingsReader settingsReader, LocalWorld world)
+    public WorldConfig(SettingsReader settingsReader, LocalWorld world, CustomObjects customObjects)
     {
         super(settingsReader);
         if (settingsReader.getFile() != null) {
@@ -191,6 +197,9 @@ public class WorldConfig extends ConfigFile
         } else {
             settingsDir = new File(".");
         }
+
+        this.worldObjects = customObjects;
+        this.customObjects = customObjects.getAll();
 
         // Read the WorldConfig file
         this.readConfigSettings();
@@ -236,11 +245,6 @@ public class WorldConfig extends ConfigFile
                 return;
             }
         }
-
-        customObjects = new ArrayList<CustomObject>(TerrainControl.getCustomObjectManager().loadObjects(customObjectsDirectory).values());
-
-        TerrainControl.log(LogMarker.INFO, "{} world custom objects loaded.", customObjects.size());
-
     }
 
     @Override

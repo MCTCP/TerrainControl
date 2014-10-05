@@ -18,7 +18,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
 
         Layer[] layers = Layer.Init(world.getSeed(), world);
 
-        if (world.getSettings().worldConfig.improvedRivers)
+        if (world.getConfigs().getWorldConfig().improvedRivers)
             defaultOutputType = OutputType.WITHOUT_RIVERS;
 
         this.unZoomedLayer = layers[0];

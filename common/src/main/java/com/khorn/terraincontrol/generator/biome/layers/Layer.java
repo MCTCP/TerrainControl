@@ -4,8 +4,8 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
@@ -68,8 +68,8 @@ public abstract class Layer
          * int ChanceToIncreaseLand = 6; //default 4
          * int MaxDepth = 10;
          */
-        WorldSettings configs = world.getSettings();
-        WorldConfig worldConfig = configs.worldConfig;
+        ConfigProvider configs = world.getConfigs();
+        WorldConfig worldConfig = configs.getWorldConfig();
 
         LocalBiome[][] NormalBiomeMap = new LocalBiome[worldConfig.GenerationDepth + 1][];
         LocalBiome[][] IceBiomeMap = new LocalBiome[worldConfig.GenerationDepth + 1][];
@@ -78,7 +78,7 @@ public abstract class Layer
         {
             ArrayList<LocalBiome> normalBiomes = new ArrayList<LocalBiome>();
             ArrayList<LocalBiome> iceBiomes = new ArrayList<LocalBiome>();
-            for (LocalBiome biome : configs.biomes)
+            for (LocalBiome biome : configs.getBiomeArray())
             {
                 if (biome == null)
                     continue;
@@ -161,7 +161,7 @@ public abstract class Layer
 
             LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
             boolean haveBorder = false;
-            for (LocalBiome biome : configs.biomes)
+            for (LocalBiome biome : configs.getBiomeArray())
             {
                 if (biome == null)
                     continue;

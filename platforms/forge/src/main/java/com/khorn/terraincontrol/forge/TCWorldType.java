@@ -67,7 +67,7 @@ public class TCWorldType extends WorldType
         WorldSettings config = new WorldSettings(worldDirectory, worldTC, false);
         this.worldTC.Init(world, config);
 
-        Class<? extends BiomeGenerator> biomeGenClass = worldTC.getSettings().worldConfig.biomeMode;
+        Class<? extends BiomeGenerator> biomeGenClass = worldTC.getConfigs().getWorldConfig().biomeMode;
         BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().createCached(biomeGenClass, worldTC);
         WorldChunkManager chunkManager = createWorldChunkManager(worldTC, biomeManager);
         this.worldTC.setBiomeManager(biomeManager);
@@ -100,7 +100,7 @@ public class TCWorldType extends WorldType
     @Override
     public IChunkProvider getChunkGenerator(World world, String generatorOptions)
     {
-        if (this.worldTC.getSettings().worldConfig.ModeTerrain != WorldConfig.TerrainMode.Default)
+        if (this.worldTC.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
         {
             return this.worldTC.getChunkGenerator();
         } else
@@ -116,6 +116,6 @@ public class TCWorldType extends WorldType
             // MCPC+ has an interesting load order sometimes
             return 64;
         }
-        return world.getSettings().worldConfig.waterLevelMax;
+        return world.getConfigs().getWorldConfig().waterLevelMax;
     }
 }

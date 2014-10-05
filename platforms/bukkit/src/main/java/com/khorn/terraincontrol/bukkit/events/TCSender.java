@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit.events;
 
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.logging.LogMarker;
 import org.bukkit.World;
@@ -29,9 +29,8 @@ public class TCSender
 
         if (plugin.worlds.containsKey(world.getName()))
         {
-            WorldSettings configs = plugin.worlds.get(world.getName()).getSettings();
+            ConfigProvider configs = plugin.worlds.get(world.getName()).getConfigs();
 
-            TerrainControl.log(LogMarker.TRACE, "Config sent to player for world ", configs.worldConfig.getName()); //debug
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream stream = new DataOutputStream(outputStream);
 

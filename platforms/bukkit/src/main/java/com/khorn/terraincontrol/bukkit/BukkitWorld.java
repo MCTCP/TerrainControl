@@ -7,9 +7,7 @@ import com.khorn.terraincontrol.bukkit.generator.TCWorldChunkManager;
 import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
 import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
@@ -547,7 +545,14 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
+    @Deprecated
     public WorldSettings getSettings()
+    {
+        return this.settings;
+    }
+
+    @Override
+    public ConfigProvider getConfigs()
     {
         return this.settings;
     }

@@ -24,7 +24,7 @@ public abstract class MetricsHelper
     {
         for (LocalWorld world : worlds)
         {
-            WorldConfig config = world.getSettings().worldConfig;
+            WorldConfig config = world.getConfigs().getWorldConfig();
             if (config != null)
             {
                 Class<? extends BiomeGenerator> clazz = config.biomeMode;

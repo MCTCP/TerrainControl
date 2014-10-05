@@ -5,7 +5,8 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.configuration.ConfigProvider;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorNewOctaves;
 import com.khorn.terraincontrol.generator.resource.Resource;
@@ -18,15 +19,15 @@ import java.util.Random;
 public class ObjectSpawner
 {
 
-    private WorldSettings worldSettings;
-    private Random rand;
-    private LocalWorld world;
-    private NoiseGeneratorNewOctaves noiseGen;
+    private final ConfigProvider configProvider;
+    private final Random rand;
+    private final LocalWorld world;
+    private final NoiseGeneratorNewOctaves noiseGen;
     private double[] reusableChunkNoiseArray;
 
-    public ObjectSpawner(WorldSettings configs, LocalWorld localWorld)
+    public ObjectSpawner(ConfigProvider configProvider, LocalWorld localWorld)
     {
-        this.worldSettings = configs;
+        this.configProvider = configProvider;
         this.rand = new Random();
         this.world = localWorld;
         this.noiseGen = new NoiseGeneratorNewOctaves(new Random(world.getSeed()), 4);
@@ -51,7 +52,8 @@ public class ObjectSpawner
         BiomeConfig biomeConfig = biome.getBiomeConfig();
 
         // Get the random generator
-        long resourcesSeed = worldSettings.worldConfig.resourcesSeed != 0L ? worldSettings.worldConfig.resourcesSeed : world.getSeed();
+        WorldConfig worldConfig = configProvider.getWorldConfig();
+        long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
         this.rand.setSeed(resourcesSeed);
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;

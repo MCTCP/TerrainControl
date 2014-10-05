@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.forge.events;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -39,7 +39,7 @@ public class PlayerTracker
             // World not loaded
             return;
         }
-        WorldSettings configs = worldTC.getSettings();
+        ConfigProvider configs = worldTC.getConfigs();
 
         // Serialize it
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
