@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.configuration.io.BracketSettingsReader;
+import com.khorn.terraincontrol.util.helpers.FileHelper;
 
 import java.io.File;
 import java.util.*;
@@ -41,6 +42,7 @@ public class CustomObjects implements Iterable<CustomObject>
     /**
      * Loads all custom objects from the given directory and its
      * subdirectories. Any objects that were already loaded will be unloaded.
+     * If the directory does not exist it will be created.
      * @param loaders   Map of all custom object loaders, indexed by lowercase
      *                  extension without the dot, like "bo3".
      * @param directory The directory to load from. Subdirectories will be
@@ -48,6 +50,11 @@ public class CustomObjects implements Iterable<CustomObject>
      */
     public void load(Map<String, CustomObjectLoader> loaders, File directory)
     {
+        if (!FileHelper.makeFolder(directory))
+        {
+            return;
+        }
+
         Map<String, CustomObject> objects = loadObjectsRecursive(loaders, directory);
         for (CustomObject object : objects.values())
         {
@@ -151,6 +158,10 @@ public class CustomObjects implements Iterable<CustomObject>
         if (object == null && fallback != null)
         {
             return fallback.getObjectByName(name);
+        }
+        if (object == null)
+        {
+            System.out.println("Didn't find " + name);
         }
         return object;
     }

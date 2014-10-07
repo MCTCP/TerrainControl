@@ -6,6 +6,10 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import java.io.File;
 import java.util.Collection;
 
+/**
+ * Methods for dealing with files and folders.
+ *
+ */
 public final class FileHelper
 {
     /**
@@ -14,7 +18,9 @@ public final class FileHelper
      * created.
      * 
      * @param folders The folders that must exist.
-     * @return True if all folders were created, false otherwise.
+     * @return True if all folders already existed or were created, false
+     * otherwise. In other words: if this method returns true, you can be sure
+     * now that all folders exist.
      */
     public static boolean makeFolders(Collection<File> folders)
     {
@@ -22,14 +28,31 @@ public final class FileHelper
 
         for (File directory : folders)
         {
-            if (!directory.exists() && !directory.mkdirs())
+            if (!makeFolder(directory))
             {
-                TerrainControl.log(LogMarker.WARN, "Error creating directory \"{}\".", new Object[] {directory.getAbsolutePath()});
                 allFoldersExist = false;
             }
         }
 
         return allFoldersExist;
+    }
+
+    /**
+     * Makes sure the given folder exists. If it doesn't exist yet it is
+     * created. If it could not be created a message is logged.
+     * @param folder The folder that must exist.
+     * @return True if the folder already existed or was created, false
+     * otherwise. In other words: if this method returns true, you can be sure
+     * now that this folder exists.
+     */
+    public static boolean makeFolder(File folder)
+    {
+        if (!folder.exists() && !folder.mkdirs())
+        {
+            TerrainControl.log(LogMarker.WARN, "Error creating directory \"{}\".", folder.getAbsolutePath());
+            return false;
+        }
+        return true;
     }
 
     /**

@@ -77,7 +77,6 @@ public class CustomObjectManager
     public void loadGlobalObjects()
     {
         // Load all global objects (they can overwrite special objects)
-        TerrainControl.getEngine().getGlobalObjectsDirectory().mkdirs();
         this.globalCustomObjects.load(this.loaders, TerrainControl.getEngine().getGlobalObjectsDirectory());
         TerrainControl.log(LogMarker.INFO, "{} Global custom objects loaded", globalCustomObjects.getAll().size());
     }

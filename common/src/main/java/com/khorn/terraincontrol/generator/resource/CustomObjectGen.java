@@ -24,7 +24,7 @@ public class CustomObjectGen extends Resource
     {
         if (args.isEmpty() || (args.size() == 1 && args.get(0).trim().isEmpty()))
         {
-            // Backwards compability
+            // Backwards compatibility
             args = new ArrayList<String>();
             args.add("UseWorld");
         }
