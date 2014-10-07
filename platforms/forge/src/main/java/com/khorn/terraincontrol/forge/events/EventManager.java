@@ -60,7 +60,7 @@ public class EventManager extends EventHandler
             Populate.EventType forgeEvent = getPopulateEventType(resource.getMaterial());
             return TerrainGen.populate(world.getChunkGenerator(), world.getWorld(), random, blockX, blockZ,
                     villageInChunk, forgeEvent);
-        } else if (resource instanceof OreGen)
+        } else if (resource instanceof OreGen || resource instanceof VeinGen)
         {
             if (!hasOreGenerationBegun(world))
             {
@@ -121,7 +121,7 @@ public class EventManager extends EventHandler
         // Ore generation close
         if (hasOreGenerationBegun(world))
         {
-            MinecraftForge.EVENT_BUS.post(new OreGenEvent.Post(world.getWorld(), random, blockX, blockZ));
+            MinecraftForge.ORE_GEN_BUS.post(new OreGenEvent.Post(world.getWorld(), random, blockX, blockZ));
             setOreGenerationBegun(world, false);
         }
 
