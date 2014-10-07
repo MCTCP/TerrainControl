@@ -371,7 +371,11 @@ public class WorldSettings implements ConfigProvider
     public WorldSettings(DataInputStream stream, LocalWorld world) throws IOException
     {
         this.checkOnly = false;
-        this.customObjects = new CustomObjects();
+        // We need a valid CustomObjects object with things like the trees in
+        // it, so that the configs can load without errors
+        // An empty CustomObjects instance with the global objects as fallback
+        // would work just as well
+        this.customObjects = TerrainControl.getCustomObjectManager().getGlobalObjects();
 
         // Create WorldConfig
         SettingsReader worldSettingsReader = new MemorySettingsReader(world.getName());
