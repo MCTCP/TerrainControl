@@ -214,11 +214,25 @@ public class WorldConfig extends ConfigFile
 
         // Check biome ids, These are the names from the worldConfig file
         // Corrects any instances of incorrect biome id.
-        for (String biomeName : customBiomeGenerationIds.keySet())
+        for (Iterator<Entry<String, Integer>> it = customBiomeGenerationIds.entrySet().iterator(); it.hasNext();)
         {
-            if (customBiomeGenerationIds.get(biomeName) == -1)
+            Entry<String, Integer> entry = it.next();
+
+            // Check name
+            String biomeName = entry.getKey();
+            if (DefaultBiome.Contain(biomeName))
             {
-                customBiomeGenerationIds.put(biomeName, world.getFreeBiomeId());
+                TerrainControl.log(LogMarker.WARN, "CustomBiomes only accepts custom biomes,"
+                        + " {} is a vanilla biome. Removing it from the list.", biomeName);
+                it.remove();
+                continue;
+            }
+
+            // Check id
+            int biomeId = entry.getValue();
+            if (biomeId == -1)
+            {
+                entry.setValue(world.getFreeBiomeId());
             }
         }
     }
