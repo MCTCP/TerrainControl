@@ -457,7 +457,7 @@ public class WorldSettings implements ConfigProvider
         for (Integer generationId : worldConfig.customBiomeGenerationIds.values())
         {
             LocalBiome biome = biomes[generationId];
-            if (!biome.getIds().isVirtual()) {
+            if (biome != null && !biome.getIds().isVirtual()) {
                 nonVirtualCustomBiomes.add(biome);
             }
         }
