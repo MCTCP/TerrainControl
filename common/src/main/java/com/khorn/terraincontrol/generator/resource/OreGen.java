@@ -21,7 +21,7 @@ public class OreGen extends Resource
     {
         int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
 
-        float f = rand.nextFloat() * 3.141593F;
+        float f = rand.nextFloat() * (float) Math.PI;
 
         double d1 = x + 8 + MathHelper.sin(f) * maxSize / 8.0F;
         double d2 = x + 8 - MathHelper.sin(f) * maxSize / 8.0F;
@@ -31,15 +31,16 @@ public class OreGen extends Resource
         double d5 = y + rand.nextInt(3) - 2;
         double d6 = y + rand.nextInt(3) - 2;
 
-        for (int i = 0; i <= maxSize; i++)
+        for (int i = 0; i < maxSize; i++)
         {
-            double d7 = d1 + (d2 - d1) * i / maxSize;
-            double d8 = d5 + (d6 - d5) * i / maxSize;
-            double d9 = d3 + (d4 - d3) * i / maxSize;
+            float iFactor = (float) i / (float) maxSize;
+            double d7 = d1 + (d2 - d1) * iFactor;
+            double d8 = d5 + (d6 - d5) * iFactor;
+            double d9 = d3 + (d4 - d3) * iFactor;
 
             double d10 = rand.nextDouble() * maxSize / 16.0D;
-            double d11 = (MathHelper.sin(i * 3.141593F / maxSize) + 1.0F) * d10 + 1.0D;
-            double d12 = (MathHelper.sin(i * 3.141593F / maxSize) + 1.0F) * d10 + 1.0D;
+            double d11 = (MathHelper.sin((float) Math.PI * iFactor) + 1.0) * d10 + 1.0;
+            double d12 = (MathHelper.sin((float) Math.PI * iFactor) + 1.0) * d10 + 1.0;
 
             int j = MathHelper.floor(d7 - d11 / 2.0D);
             int k = MathHelper.floor(d8 - d12 / 2.0D);
