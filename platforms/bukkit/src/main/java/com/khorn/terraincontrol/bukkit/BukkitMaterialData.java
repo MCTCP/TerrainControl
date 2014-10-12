@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.server.v1_7_R4.Block;
+import net.minecraft.server.v1_7_R4.BlockFalling;
 import net.minecraft.server.v1_7_R4.Blocks;
 
 import java.util.IdentityHashMap;
@@ -233,6 +234,12 @@ public class BukkitMaterialData implements LocalMaterialData
     @Override
     public boolean isAir() {
         return block == Blocks.AIR;
+    }
+
+    @Override
+    public boolean canFall()
+    {
+        return block instanceof BlockFalling;
     }
 
 }

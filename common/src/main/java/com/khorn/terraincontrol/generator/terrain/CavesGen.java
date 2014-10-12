@@ -1,7 +1,9 @@
 package com.khorn.terraincontrol.generator.terrain;
 
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
@@ -131,7 +133,7 @@ public class CavesGen extends TerrainGenBase
             if (i4 > 16)
                 i4 = 16;
 
-
+            // Search for water
             boolean waterFound = false;
             for (int local_x = m; (!waterFound) && (local_x < n); local_x++)
             {
@@ -139,14 +141,11 @@ public class CavesGen extends TerrainGenBase
                 {
                     for (int local_y = i2 + 1; (!waterFound) && (local_y >= i1 - 1); local_y--)
                     {
-                        if (local_y < 0)
-                            continue;
-
-                        if (local_y < this.worldSettings.worldHeightCap)
+                        if (local_y >= 0 && local_y < this.worldSettings.worldHeightCap)
                         {
-                            LocalMaterialData materialAtPosition = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
-                            if (materialAtPosition.isMaterial(DefaultMaterial.WATER)
-                                    || materialAtPosition.isMaterial(DefaultMaterial.STATIONARY_WATER))
+                            LocalMaterialData material = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
+                            if (material.isMaterial(DefaultMaterial.WATER)
+                                    || material.isMaterial(DefaultMaterial.STATIONARY_WATER))
                             {
                                 waterFound = true;
                             }
@@ -159,37 +158,53 @@ public class CavesGen extends TerrainGenBase
             if (waterFound)
                 continue;
 
+            // Generate cave
             for (int local_x = m; local_x < n; local_x++)
             {
                 double d9 = (local_x + generatingChunk.getBlockX() + 0.5D - x) / d3;
                 for (int local_z = i3; local_z < i4; local_z++)
                 {
+                    LocalBiome biome = this.world.getBiome(local_x + generatingChunk.getBlockX(), local_z + generatingChunk.getBlockZ());
                     double d10 = (local_z + generatingChunk.getBlockZ() + 0.5D - z) / d3;
 
                     boolean grassFound = false;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
-                        for (int local_y = i2 - 1; local_y >= i1; local_y--)
+                        for (int local_y = i2; local_y > i1; local_y--)
                         {
-                            double d11 = (local_y + 0.5D - y) / d4;
+                            double d11 = ((local_y - 1) + 0.5D - y) / d4;
                             if ((d11 > -0.7D) && (d9 * d9 + d11 * d11 + d10 * d10 < 1.0D))
                             {
-                                LocalMaterialData i13 = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
-                                if (i13.isMaterial(DefaultMaterial.GRASS))
+                                LocalMaterialData material = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
+                                LocalMaterialData materialAbove = generatingChunkBuffer.getBlock(local_x, local_y + 1, local_z);
+                                if (material.isMaterial(DefaultMaterial.GRASS) || material.isMaterial(DefaultMaterial.MYCEL))
                                     grassFound = true;
-                                if (i13.isMaterial(DefaultMaterial.STONE) || i13.isMaterial(DefaultMaterial.DIRT)
-                                        || i13.isMaterial(DefaultMaterial.GRASS))
+                                if (this.isSuitableBlock(material, materialAbove, biome))
                                 {
-                                    if (local_y < 10)
+                                    if (local_y - 1 < 10)
                                     {
                                         generatingChunkBuffer.setBlock(local_x, local_y, local_z, lava);
                                     } else
                                     {
                                         generatingChunkBuffer.setBlock(local_x, local_y, local_z, air);
-                                        if ((!grassFound)
+
+                                        // Replace supporting sand with
+                                        // sandstone. TODO: support red
+                                        // sand(stone) in Minecraft 1.8
+                                        if (materialAbove.isMaterial(DefaultMaterial.SAND) && materialAbove.getBlockData() == 0)
+                                        {
+                                            generatingChunkBuffer.setBlock(local_x, local_y + 1, local_z, sandstone);
+                                        }
+
+                                        // If grass was just deleted, try to
+                                        // move it down
+                                        if (grassFound
                                                 && (generatingChunkBuffer.getBlock(local_x, local_y - 1, local_z)
                                                         .isMaterial(DefaultMaterial.DIRT)))
-                                            generatingChunkBuffer.setBlock(local_x, local_y - 1, local_z, grass);
+                                        {
+                                            generatingChunkBuffer.setBlock(local_x, local_y - 1, local_z,
+                                                    biome.getBiomeConfig().surfaceBlock);
+                                        }
                                     }
                                 }
                             }
@@ -200,6 +215,44 @@ public class CavesGen extends TerrainGenBase
             if (isLargeCave)
                 break;
         }
+    }
+
+    protected boolean isSuitableBlock(LocalMaterialData material, LocalMaterialData materialAbove, LocalBiome biome)
+    {
+        BiomeConfig biomeConfig = biome.getBiomeConfig();
+        if (material.equals(biomeConfig.stoneBlock))
+        {
+            return true;
+        }
+        if (material.canFall())
+        {
+            return !materialAbove.isLiquid();
+        }
+        if (material.equals(biomeConfig.groundBlock))
+        {
+            return true;
+        }
+        if (material.equals(biomeConfig.surfaceBlock))
+        {
+            return true;
+        }
+
+        // Few hardcoded cases
+        if (material.isMaterial(DefaultMaterial.HARD_CLAY))
+        {
+            return true;
+        }
+        if (material.isMaterial(DefaultMaterial.SANDSTONE))
+        {
+            return true;
+        }
+        // TODO: add red sandstone case in Minecraft 1.8
+        if (material.isMaterial(DefaultMaterial.SNOW))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     @Override

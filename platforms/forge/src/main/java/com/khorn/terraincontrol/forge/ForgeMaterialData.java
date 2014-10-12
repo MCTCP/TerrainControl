@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFalling;
 import net.minecraft.init.Blocks;
 
 import java.util.IdentityHashMap;
@@ -237,6 +238,12 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public boolean isAir() {
         return block == Blocks.air;
+    }
+
+    @Override
+    public boolean canFall()
+    {
+        return block instanceof BlockFalling;
     }
 
 }

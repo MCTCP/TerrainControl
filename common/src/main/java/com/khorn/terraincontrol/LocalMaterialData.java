@@ -146,4 +146,11 @@ public interface LocalMaterialData
      */
     LocalMaterialData rotate();
 
+    /**
+     * Gets whether this material falls down when no other block supports this
+     * block, like gravel and sand do.
+     * @return True if this material can fall, false otherwise.
+     */
+    boolean canFall();
+
 }
