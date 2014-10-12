@@ -1,7 +1,9 @@
 package com.khorn.terraincontrol.generator.terrain;
 
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
@@ -142,31 +144,35 @@ public class CanyonsGen extends TerrainGenBase
                 double d9 = (localZ + generatingChunk.getBlockX() + 0.5D - paramDouble1) / d3;
                 for (int localX = i2; localX < i3; localX++)
                 {
+                    LocalBiome biome = world.getBiome(localX + generatingChunk.getBlockX(), localZ + generatingChunk.getBlockZ());
+                    BiomeConfig biomeConfig = biome.getBiomeConfig();
                     double d10 = (localX + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
-                    int i10 = 0;
+                    boolean grassFound = false;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
-                        for (int localY = minY - 1; localY >= maxY; localY--)
+                        for (int localY = minY; localY >= maxY; localY--)
                         {
-                            double d11 = (localY + 0.5D - paramDouble2) / d4;
-                            if ((d9 * d9 + d10 * d10) * this.a[localY] + d11 * d11 / 6.0D < 1.0D)
+                            double d11 = ((localY - 1) + 0.5D - paramDouble2) / d4;
+                            if ((d9 * d9 + d10 * d10) * this.a[localY - 1] + d11 * d11 / 6.0D < 1.0D)
                             {
-                                LocalMaterialData i12 = generatingChunkBuffer.getBlock(localX, localY, localZ);
-                                if (i12.isMaterial(DefaultMaterial.GRASS))
-                                    i10 = 1;
-                                if ((i12.isMaterial(DefaultMaterial.STONE)) || (i12.isMaterial(DefaultMaterial.DIRT))
-                                        || (i12.isMaterial(DefaultMaterial.GRASS)))
+                                LocalMaterialData material = generatingChunkBuffer.getBlock(localX, localY, localZ);
+                                if (material.isMaterial(DefaultMaterial.GRASS))
+                                    grassFound = true;
+                                if (material.equals(biomeConfig.stoneBlock) || material.isMaterial(DefaultMaterial.DIRT)
+                                        || material.isMaterial(DefaultMaterial.GRASS))
                                 {
-                                    if (localY < 10)
+                                    if (localY - 1 < 10)
                                     {
                                         generatingChunkBuffer.setBlock(localX, localY, localZ, lava);
                                     } else
                                     {
                                         generatingChunkBuffer.setBlock(localX, localY, localZ, air);
-                                        if ((i10 != 0)
+                                        if ((grassFound != false)
                                                 && (generatingChunkBuffer.getBlock(localX, localY - 1, localZ)
                                                         .isMaterial(DefaultMaterial.DIRT)))
-                                            generatingChunkBuffer.setBlock(localX, localY - 1, localZ, grass);
+                                        {
+                                            generatingChunkBuffer.setBlock(localX, localY - 1, localZ, biomeConfig.surfaceBlock);
+                                        }
                                     }
                                 }
                             }

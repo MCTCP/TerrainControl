@@ -14,7 +14,6 @@ public abstract class TerrainGenBase
     // Hardcoded materials that cannot be changed for now
     protected final LocalMaterialData air = TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0);
     protected final LocalMaterialData lava = TerrainControl.toLocalMaterialData(DefaultMaterial.STATIONARY_LAVA, 0);
-    protected final LocalMaterialData grass = TerrainControl.toLocalMaterialData(DefaultMaterial.GRASS, 0);
     protected final LocalMaterialData sandstone = TerrainControl.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
 
     protected int checkAreaSize = 8;
