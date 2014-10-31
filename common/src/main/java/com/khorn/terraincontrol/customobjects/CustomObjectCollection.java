@@ -11,29 +11,29 @@ import java.util.*;
  * a directory, or can be loaded manually and then added to this collection.
  *
  */
-public class CustomObjects implements Iterable<CustomObject>
+public class CustomObjectCollection implements Iterable<CustomObject>
 {
     private final List<CustomObject> objects;
     private final Map<String, CustomObject> objectsByName;
-    private CustomObjects fallback;
+    private CustomObjectCollection fallback;
 
     /**
-     * Creates a new {@link CustomObjects} instance with no loaded objects.
+     * Creates a new {@link CustomObjectCollection} instance with no loaded objects.
      */
-    public CustomObjects()
+    public CustomObjectCollection()
     {
         this.objects = new ArrayList<CustomObject>();
         this.objectsByName = new HashMap<String, CustomObject>();
     }
 
     /**
-     * Creates a new {@link CustomObjects} instance that loads the objects immediately.
+     * Creates a new {@link CustomObjectCollection} instance that loads the objects immediately.
      * @param loaders   Map of all custom object loaders, indexed by lowercase
      *                  extension without the dot, like "bo3".
      * @param directory The directory to load from. Subdirectories will be
      *                  searched too.
      */
-    public CustomObjects(Map<String, CustomObjectLoader> loaders, File directory)
+    public CustomObjectCollection(Map<String, CustomObjectLoader> loaders, File directory)
     {
         this();
         load(loaders, directory);
@@ -83,7 +83,7 @@ public class CustomObjects implements Iterable<CustomObject>
      * up by name.
      * @param customObjects The fallback.
      */
-    public void setFallback(CustomObjects customObjects)
+    public void setFallback(CustomObjectCollection customObjects)
     {
         this.fallback = customObjects;
     }

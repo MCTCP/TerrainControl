@@ -9,7 +9,7 @@ import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.CustomObjects;
+import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
@@ -34,7 +34,7 @@ public class WorldConfig extends ConfigFile
     public Map<String, Integer> customBiomeGenerationIds = new HashMap<String, Integer>();
 
     // Holds all world CustomObjects.
-    public final CustomObjects worldObjects;
+    public final CustomObjectCollection worldObjects;
     /**
      * @deprecated Use {@link #worldObjects} instead.
      */
@@ -189,7 +189,7 @@ public class WorldConfig extends ConfigFile
      *            in.
      * @param world The LocalWorld instance of the world.
      */
-    public WorldConfig(SettingsReader settingsReader, LocalWorld world, CustomObjects customObjects)
+    public WorldConfig(SettingsReader settingsReader, LocalWorld world, CustomObjectCollection customObjects)
     {
         super(settingsReader);
         if (settingsReader.getFile() != null) {

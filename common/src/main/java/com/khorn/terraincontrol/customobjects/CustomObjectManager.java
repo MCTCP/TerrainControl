@@ -43,7 +43,7 @@ public class CustomObjectManager
 {
 
     private final Map<String, CustomObjectLoader> loaders;
-    private final CustomObjects globalCustomObjects;
+    private final CustomObjectCollection globalCustomObjects;
 
     /**
      * @deprecated Use {@link #getGlobalObjects()} instead.
@@ -60,7 +60,7 @@ public class CustomObjectManager
         registerCustomObjectLoader("bo2", new BO2Loader());
         registerCustomObjectLoader("bo3", new BO3Loader());
 
-        this.globalCustomObjects = new CustomObjects();
+        this.globalCustomObjects = new CustomObjectCollection();
         this.globalObjects = globalCustomObjects.accessMap();
 
         // Put some default CustomObjects
@@ -108,7 +108,7 @@ public class CustomObjectManager
      * Gets all global objects.
      * @return The global objects.
      */
-    public CustomObjects getGlobalObjects()
+    public CustomObjectCollection getGlobalObjects()
     {
         return globalCustomObjects;
     }

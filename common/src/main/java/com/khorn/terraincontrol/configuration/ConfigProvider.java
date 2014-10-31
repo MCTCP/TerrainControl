@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.customobjects.CustomObjects;
+import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -56,6 +56,6 @@ public interface ConfigProvider
      * Gets all custom objects of this world.
      * @return All custom objects.
      */
-    CustomObjects getCustomObjects();
+    CustomObjectCollection getCustomObjects();
 
 }

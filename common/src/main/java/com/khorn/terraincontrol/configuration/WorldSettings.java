@@ -13,7 +13,7 @@ import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
-import com.khorn.terraincontrol.customobjects.CustomObjects;
+import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.FileHelper;
 
@@ -36,7 +36,7 @@ public class WorldSettings implements ConfigProvider
     private static final int MAX_INHERITANCE_DEPTH = 15;
     private LocalWorld world;
     private File settingsDir;
-    private CustomObjects customObjects;
+    private CustomObjectCollection customObjects;
     public WorldConfig worldConfig;
 
     /**
@@ -94,7 +94,7 @@ public class WorldSettings implements ConfigProvider
         Map<String, CustomObjectLoader> objectLoaders =
                 TerrainControl.getCustomObjectManager().getObjectLoaders();
 
-        customObjects = new CustomObjects(objectLoaders, worldObjectsDir);
+        customObjects = new CustomObjectCollection(objectLoaders, worldObjectsDir);
         customObjects.setFallback(TerrainControl.getCustomObjectManager().getGlobalObjects());
         TerrainControl.log(LogMarker.INFO, "{} world custom objects loaded.", customObjects.getAll().size());
     }
@@ -490,7 +490,7 @@ public class WorldSettings implements ConfigProvider
     }
 
     @Override
-    public CustomObjects getCustomObjects()
+    public CustomObjectCollection getCustomObjects()
     {
         return customObjects;
     }

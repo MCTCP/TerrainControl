@@ -62,7 +62,7 @@ public class UseWorld implements CustomObject
         // object, as long as the objectSpawnRatio cap isn't reached.
 
         WorldConfig worldConfig = world.getConfigs().getWorldConfig();
-        CustomObjects customObjects = world.getConfigs().getCustomObjects();
+        CustomObjectCollection customObjects = world.getConfigs().getCustomObjects();
 
         if (customObjects.isEmpty())
             return false;
@@ -95,7 +95,7 @@ public class UseWorld implements CustomObject
         // object, as long as the objectSpawnRatio cap isn't reached.
 
         WorldConfig worldConfig = world.getConfigs().getWorldConfig();
-        CustomObjects customObjects = world.getConfigs().getCustomObjects();
+        CustomObjectCollection customObjects = world.getConfigs().getCustomObjects();
 
         if (customObjects.isEmpty())
             return false;

@@ -5,7 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.CustomObjects;
+import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class ListCommand extends BaseCommand
             }
         }
 
-        CustomObjects globalObjects = TerrainControl.getCustomObjectManager().getGlobalObjects();
+        CustomObjectCollection globalObjects = TerrainControl.getCustomObjectManager().getGlobalObjects();
 
         if (globalObjects.isEmpty())
             sender.sendMessage(MESSAGE_COLOR + "This global directory does not have custom objects");
