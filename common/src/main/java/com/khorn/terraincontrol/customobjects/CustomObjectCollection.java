@@ -159,10 +159,6 @@ public class CustomObjectCollection implements Iterable<CustomObject>
         {
             return fallback.getObjectByName(name);
         }
-        if (object == null)
-        {
-            System.out.println("Didn't find " + name);
-        }
         return object;
     }
 
