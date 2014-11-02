@@ -64,6 +64,8 @@ task createReleaseJar <<
         outputStream.close()
     } else
     {
-        println(" Skipping the release jar, as the Bukkit or the Forge file failed")
+        println(" Skipping the release jar, as the Bukkit or Forge file failed")
+		println(" Forge exists: " + forgeFile.exists())
+		println(" Bukkit exists: " + bukkitFile.exists())
     }
 }

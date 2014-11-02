@@ -6,7 +6,6 @@ import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
 import com.khorn.terraincontrol.configuration.io.FileSettingsWriter;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
 import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.events.EventPriority;
@@ -203,10 +202,7 @@ public abstract class TerrainControlEngine
     public void onShutdown()
     {
         // Shutdown all loaders
-        for (CustomObjectLoader loader : customObjectManager.loaders.values())
-        {
-            loader.onShutdown();
-        }
+        customObjectManager.shutdown();
 
         // Null out values to help the garbage collector
         customObjectManager = null;

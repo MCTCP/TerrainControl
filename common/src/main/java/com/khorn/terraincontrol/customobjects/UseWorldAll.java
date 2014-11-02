@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 
 import java.util.Random;
@@ -17,7 +16,7 @@ public class UseWorldAll extends UseWorld
     @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
     {
-        for (CustomObject object : world.getSettings().worldConfig.customObjects)
+        for (CustomObject object : world.getConfigs().getCustomObjects())
         {
             if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
@@ -33,13 +32,9 @@ public class UseWorldAll extends UseWorld
     @Override
     public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
     {
-        WorldConfig worldSettings = world.getSettings().worldConfig;
         boolean spawnedAtLeastOneObject = false;
 
-        if (worldSettings.customObjects.isEmpty())
-            return false;
-
-        for (CustomObject selectedObject : worldSettings.customObjects)
+        for (CustomObject selectedObject : world.getConfigs().getCustomObjects())
         {
             if (!selectedObject.hasPreferenceToSpawnIn(world.getBiome(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter())))
                 continue;

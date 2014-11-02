@@ -24,7 +24,7 @@ public class CustomObjectGen extends Resource
     {
         if (args.isEmpty() || (args.size() == 1 && args.get(0).trim().isEmpty()))
         {
-            // Backwards compability
+            // Backwards compatibility
             args = new ArrayList<String>();
             args.add("UseWorld");
         }
@@ -32,7 +32,7 @@ public class CustomObjectGen extends Resource
         objectNames = new ArrayList<String>();
         for (String arg : args)
         {
-            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(arg, getHolder().worldConfig);
+            CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(arg);
             if (object == null || !object.canSpawnAsObject())
             {
                 throw new InvalidConfigException("No custom object found with the name " + arg);

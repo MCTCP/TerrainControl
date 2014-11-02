@@ -12,6 +12,8 @@ import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
+import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.FileHelper;
 
@@ -24,13 +26,17 @@ import java.util.Map.Entry;
 
 /**
  * Holds the WorldConfig and all BiomeConfigs.
+ *
+ * <p>Note: this is an internal class that is pending a rename. For backwards
+ * compatibility it is still here as a public class with this name.
  */
-public class WorldSettings
+public class WorldSettings implements ConfigProvider
 {
 
     private static final int MAX_INHERITANCE_DEPTH = 15;
     private LocalWorld world;
     private File settingsDir;
+    private CustomObjectCollection customObjects;
     public WorldConfig worldConfig;
     private BiomeGroupManager biomeGroupManager = new BiomeGroupManager();
 
@@ -57,24 +63,57 @@ public class WorldSettings
     /**
      * The number of loaded biomes.
      */
-    public int biomesCount;
+    private int biomesCount;
 
     public WorldSettings(File settingsDir, LocalWorld world, boolean checkOnly)
     {
         this.settingsDir = settingsDir;
         this.world = world;
-        File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
-        this.worldConfig = new WorldConfig(new FileSettingsReader(world.getName(), worldConfigFile), biomeGroupManager, world);
-        FileSettingsWriter.writeToFile(worldConfig, worldConfig.SettingsMode);
         this.checkOnly = checkOnly;
-        this.biomes = new LocalBiome[world.getMaxBiomesCount()];
 
-        load();
-        //>>	We have to wait for the loading in order to get things like temperature
+        loadCustomObjects();
+        loadWorldConfig();
+
+        this.biomes = new LocalBiome[world.getMaxBiomesCount()];
+        loadBiomes();
+
+        // >> We have to wait for the loading in order to get things like
+        // temperature
         biomeGroupManager.processBiomeData(world);
     }
 
-    private void load()
+    private void loadCustomObjects()
+    {
+        File worldObjectsDir = new File(settingsDir, WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
+
+        // Migrate folders
+        File oldWorldObjectsDir = new File(settingsDir, "BOBPlugins");
+        if (!FileHelper.migrateFolder(oldWorldObjectsDir, worldObjectsDir))
+        {
+            TerrainControl.log(LogMarker.WARN, "Failed to move old world"
+                    + " custom objects from {} to {} in world {}."
+                    + " Please move the old objects manually.",
+                    oldWorldObjectsDir.getName(), worldObjectsDir.getName(), world.getName());
+        }
+
+        Map<String, CustomObjectLoader> objectLoaders =
+                TerrainControl.getCustomObjectManager().getObjectLoaders();
+
+        customObjects = new CustomObjectCollection(objectLoaders, worldObjectsDir);
+        customObjects.setFallback(TerrainControl.getCustomObjectManager().getGlobalObjects());
+        TerrainControl.log(LogMarker.INFO, "{} world custom objects loaded.", customObjects.getAll().size());
+    }
+
+    private void loadWorldConfig()
+    {
+        File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
+        this.worldConfig = new WorldConfig(new FileSettingsReader(world.getName(), worldConfigFile), biomeGroupManager, world,
+                customObjects);
+        FileSettingsWriter.writeToFile(worldConfig, worldConfig.SettingsMode);
+
+    }
+
+    private void loadBiomes()
     {
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);
@@ -113,9 +152,23 @@ public class WorldSettings
         TerrainControl.log(LogMarker.DEBUG, "{}", new Object[] {loadedBiomeNames});
     }
 
-    /**
-     * Reloads the settings from disk.
-     */
+    @Override
+    public WorldConfig getWorldConfig()
+    {
+        return worldConfig;
+    }
+
+    @Override
+    public LocalBiome getBiomeByIdOrNull(int id)
+    {
+        if (id < 0 || id > biomes.length)
+        {
+            return null;
+        }
+        return biomes[id];
+    }
+
+    @Override
     public void reload()
     {
         // Clear biome collections
@@ -124,7 +177,9 @@ public class WorldSettings
         this.biomesCount = 0;
 
         // Load again
-        load();
+        loadCustomObjects();
+        loadWorldConfig();
+        loadBiomes();
     }
 
     private String readSettings(Map<String, BiomeConfig> biomeConfigs)
@@ -313,12 +368,17 @@ public class WorldSettings
     public WorldSettings(DataInputStream stream, LocalWorld world) throws IOException
     {
         this.checkOnly = false;
+        // We need a valid CustomObjects object with things like the trees in
+        // it, so that the configs can load without errors
+        // An empty CustomObjects instance with the global objects as fallback
+        // would work just as well
+        this.customObjects = TerrainControl.getCustomObjectManager().getGlobalObjects();
 
         // Create WorldConfig
         SettingsReader worldSettingsReader = new MemorySettingsReader(world.getName());
         worldSettingsReader.putSetting(WorldStandardValues.WORLD_FOG, stream.readInt());
         worldSettingsReader.putSetting(WorldStandardValues.WORLD_NIGHT_FOG, stream.readInt());
-        worldConfig = new WorldConfig(worldSettingsReader, biomeGroupManager, world);
+        worldConfig = new WorldConfig(worldSettingsReader, biomeGroupManager, world, customObjects);
 
         // Custom biomes + ids
         int count = stream.readInt();
@@ -380,6 +440,7 @@ public class WorldSettings
         return biomeFolderName;
     }
 
+    @Override
     public void writeToStream(DataOutputStream stream) throws IOException
     {
         // General information
@@ -415,6 +476,18 @@ public class WorldSettings
             stream.writeInt(biome.getIds().getSavedId());
             biome.getBiomeConfig().writeToStream(stream);
         }
+    }
+
+    @Override
+    public LocalBiome[] getBiomeArray()
+    {
+        return this.biomes;
+    }
+
+    @Override
+    public CustomObjectCollection getCustomObjects()
+    {
+        return customObjects;
     }
 
 }

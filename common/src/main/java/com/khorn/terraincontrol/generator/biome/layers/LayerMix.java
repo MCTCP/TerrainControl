@@ -2,18 +2,18 @@ package com.khorn.terraincontrol.generator.biome.layers;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 public class LayerMix extends Layer
 {
 
-    private WorldSettings configs;
+    private ConfigProvider configs;
     private int[] riverBiomes;
 
-    public LayerMix(long seed, Layer childLayer, WorldSettings configs, LocalWorld world)
+    public LayerMix(long seed, Layer childLayer, ConfigProvider configs, LocalWorld world)
     {
         super(seed);
         this.child = childLayer;
@@ -22,7 +22,7 @@ public class LayerMix extends Layer
 
         for (int id = 0; id < this.riverBiomes.length; id++)
         {
-            LocalBiome biome = configs.biomes[id];
+            LocalBiome biome = configs.getBiomeByIdOrNull(id);
 
             if (biome == null || biome.getBiomeConfig().riverBiome.isEmpty())
                 this.riverBiomes[id] = -1;
@@ -53,7 +53,7 @@ public class LayerMix extends Layer
     {
         int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
         int[] thisInts = cache.getArray(xSize * zSize);
-        WorldConfig worldConfig = this.configs.worldConfig;
+        WorldConfig worldConfig = this.configs.getWorldConfig();
 
         int currentPiece;
         int cachedId;
@@ -70,7 +70,8 @@ public class LayerMix extends Layer
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
-                if (worldConfig.riversEnabled && (currentPiece & RiverBits) != 0 && !this.configs.biomes[cachedId].getBiomeConfig().riverBiome.isEmpty())
+                if (worldConfig.riversEnabled && (currentPiece & RiverBits) != 0
+                        && !this.configs.getBiomeByIdOrNull(cachedId).getBiomeConfig().riverBiome.isEmpty())
                     currentPiece = this.riverBiomes[cachedId];
                 else
                     currentPiece = cachedId;
@@ -85,7 +86,7 @@ public class LayerMix extends Layer
     {
         int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
         int[] thisInts = cache.getArray(xSize * zSize);
-        WorldConfig worldConfig = this.configs.worldConfig;
+        WorldConfig worldConfig = this.configs.getWorldConfig();
 
         int currentPiece;
         int cachedId;
@@ -114,7 +115,7 @@ public class LayerMix extends Layer
     {
         int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
         int[] thisInts = cache.getArray(xSize * zSize);
-        WorldConfig worldConfig = this.configs.worldConfig;
+        WorldConfig worldConfig = this.configs.getWorldConfig();
 
         int currentPiece;
         int cachedId;
@@ -131,7 +132,8 @@ public class LayerMix extends Layer
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
-                if (worldConfig.riversEnabled && (currentPiece & RiverBits) != 0 && !this.configs.biomes[cachedId].getBiomeConfig().riverBiome.isEmpty())
+                if (worldConfig.riversEnabled && (currentPiece & RiverBits) != 0
+                        && !this.configs.getBiomeByIdOrNull(cachedId).getBiomeConfig().riverBiome.isEmpty())
                     currentPiece = 1;
                 else
                     currentPiece = 0;

@@ -59,10 +59,9 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
     }
 
     @Override
-    public void spawn(LocalWorld world, double noise, int x, int z)
+    public void spawn(LocalWorld world, BiomeConfig config, double noise, int x, int z)
     {
         int y = world.getSolidHeight(x, z) - 1;
-        BiomeConfig config = world.getCalculatedBiome(x, z).getBiomeConfig();
         if (config == null || !world.getMaterial(x, y, z).equals(config.surfaceBlock))
         {
             // Not the correct surface block here, so don't replace it

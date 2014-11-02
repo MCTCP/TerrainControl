@@ -6,7 +6,6 @@ buildscript
     {
         mavenCentral()
         mavenLocal()
-        jcenter() // For Shadow plugin
         maven
         {
             url = "http://files.minecraftforge.net/maven"
@@ -19,7 +18,6 @@ buildscript
     dependencies
     {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-        classpath 'com.github.jengelman.gradle.plugins:shadow:' + project.ext.shadowVersion
     }
 }
 
@@ -31,9 +29,6 @@ description = "TerrainControl for Minecraft Forge"
 ext.ideProjectName = "TerrainControl-Forge"
 ext.forgeVersion = "1.7.10-10.13.0.1160"
 minecraft.version = ext.forgeVersion
-
-
-apply plugin: 'com.github.johnrengelman.shadow'
 
 repositories
 {
@@ -72,19 +67,12 @@ processResources
 }
 
 // Include all Terrain Control files in the jar
-shadowJar
+jar
 {
     destinationDir = new File(project.buildDir, "distributions")
     classifier = ''
-    dependencies
+    from
     {
-        include project(":common")
-
-        // Where do these files come from? Shadow includes them in the
-        // JAR, unless these lines are present. Maybe it's something created
-        // by Forge? Google gives no results.
-        exclude 'GradleStart.class'
-        exclude 'GradleStart.class.md5'
+        project(":common").sourceSets.main.output.files
     }
 }
-

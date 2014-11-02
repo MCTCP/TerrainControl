@@ -7,9 +7,7 @@ import com.khorn.terraincontrol.bukkit.generator.TCWorldChunkManager;
 import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
 import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
-import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
@@ -18,7 +16,6 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.server.v1_7_R4.*;
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
@@ -154,12 +151,6 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public int getCalculatedBiomeId(int x, int z)
-    {
-        return this.biomeGenerator.getBiome(x, z);
-    }
-
-    @Override
     public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
     {
         if (this.settings.worldConfig.strongholdsEnabled)
@@ -245,28 +236,22 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void replaceBlocks()
+    public void replaceBlocks(ChunkCoordinate chunkCoord)
     {
-        if (this.settings.worldConfig.BiomeConfigsHaveReplacement)
+        if (!this.settings.worldConfig.BiomeConfigsHaveReplacement)
         {
-            // Like all other populators, this populator uses an offset of 8
-            // blocks from the chunk start.
-            // This is what happens when the top left chunk has it's biome
-            // replaced:
-            // +--------+--------+ . = no changes in biome for now
-            // |........|........| # = biome is replaced
-            // |....####|####....|
-            // |....####|####....| The top left chunk is saved as chunk 0
-            // +--------+--------+ in the cache, the top right chunk as 1,
-            // |....####|####....| the bottom left as 2 and the bottom
-            // |....####|####....| right chunk as 3.
-            // |........|........|
-            // +--------+--------+
-            replaceBlocks(this.chunkCache[0], 8, 8);
-            replaceBlocks(this.chunkCache[1], 0, 8);
-            replaceBlocks(this.chunkCache[2], 8, 0);
-            replaceBlocks(this.chunkCache[3], 0, 0);
+            // Don't waste time here, ReplacedBlocks is empty everywhere
+            return;
         }
+
+        // Get cache
+        Chunk[] cache = getChunkCache(chunkCoord);
+
+        // Replace the blocks
+        replaceBlocks(cache[0], 8, 8);
+        replaceBlocks(cache[1], 0, 8);
+        replaceBlocks(cache[2], 8, 0);
+        replaceBlocks(cache[3], 0, 0);
     }
 
     private void replaceBlocks(Chunk rawChunk, int startXInChunk, int startZInChunk)
@@ -287,7 +272,7 @@ public class BukkitWorld implements LocalWorld
             {
                 for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
                 {
-                    LocalBiome biome = this.getCalculatedBiome(worldStartX + sectionX, worldStartZ + sectionZ);
+                    LocalBiome biome = this.getBiome(worldStartX + sectionX, worldStartZ + sectionZ);
                     if (biome != null && biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
                     {
                         LocalMaterialData[][] replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;
@@ -407,13 +392,13 @@ public class BukkitWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null)
         {
-            return new BukkitMaterialData(DefaultMaterial.AIR, 0);
+            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR, 0);
         }
 
         z &= 0xF;
         x &= 0xF;
 
-        return new BukkitMaterialData(chunk.getType(x, y, z), chunk.getData(x, y, z));
+        return BukkitMaterialData.ofMinecraftBlock(chunk.getType(x, y, z), chunk.getData(x, y, z));
     }
 
     @Override
@@ -486,28 +471,63 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void startPopulation(ChunkCoordinate chunkCoord)
     {
-        if (this.chunkCache != null)
+        if (this.chunkCache != null && settings.worldConfig.populationBoundsCheck)
         {
-            throw new IllegalStateException("Chunk is already being populated");
+            throw new IllegalStateException("Chunk is already being populated."
+                    + " This may be a bug in Terrain Control, but it may also be"
+                    + " another mod that is poking in unloaded chunks. Set"
+                    + " PopulationBoundsCheck to false in the WorldConfig to"
+                    + " disable this error.");
         }
 
         // Initialize cache
-        this.chunkCache = new Chunk[4];
+        this.chunkCache = loadFourChunks(chunkCoord);
+    }
+
+    private Chunk[] getChunkCache(ChunkCoordinate topLeft)
+    {
+        if (this.chunkCache == null || !topLeft.coordsMatch(this.chunkCache[0].locX, this.chunkCache[0].locZ))
+        {
+            // Cache is invalid, most likely because two chunks are being
+            // populated at once
+            if (this.settings.worldConfig.populationBoundsCheck)
+            {
+                // ... but this can never happen, as startPopulation() checks
+                // for this if populationBoundsCheck is set to true
+                // So we have a bug
+                throw new IllegalStateException("chunkCache is null");
+            } else
+            {
+                // Use a temporary cache, best we can do
+                return this.loadFourChunks(topLeft);
+            }
+        }
+        return this.chunkCache;
+    }
+
+    private Chunk[] loadFourChunks(ChunkCoordinate topLeft)
+    {
+        Chunk[] chunkCache = new Chunk[4];
         for (int indexX = 0; indexX <= 1; indexX++)
         {
             for (int indexZ = 0; indexZ <= 1; indexZ++)
             {
-                this.chunkCache[indexX | (indexZ << 1)] = world.getChunkAt(chunkCoord.getChunkX() + indexX, chunkCoord.getChunkZ() + indexZ);
+                chunkCache[indexX | (indexZ << 1)] = world.getChunkAt(topLeft.getChunkX() + indexX, topLeft.getChunkZ() + indexZ);
             }
         }
+        return chunkCache;
     }
 
     @Override
     public void endPopulation()
     {
-        if (this.chunkCache == null)
+        if (this.chunkCache == null && settings.worldConfig.populationBoundsCheck)
         {
-            throw new IllegalStateException("Population has already ended");
+            throw new IllegalStateException("Chunk is not being populated."
+                    + " This may be a bug in Terrain Control, but it may also be"
+                    + " another mod that is poking in unloaded chunks. Set"
+                    + " PopulationBoundsCheck to false in the WorldConfig to"
+                    + " disable this error.");
         }
         this.chunkCache = null;
     }
@@ -525,7 +545,14 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
+    @Deprecated
     public WorldSettings getSettings()
+    {
+        return this.settings;
+    }
+
+    @Override
+    public ConfigProvider getConfigs()
     {
         return this.settings;
     }
@@ -697,17 +724,23 @@ public class BukkitWorld implements LocalWorld
     @Override
     public BukkitBiome getCalculatedBiome(int x, int z)
     {
-        return getBiomeById(getCalculatedBiomeId(x, z));
+        return getBiomeById(this.biomeGenerator.getBiome(x, z));
     }
 
     @Override
-    public int getBiomeId(int x, int z)
+    public LocalBiome getBiome(int x, int z)
     {
-        return world.getBiome(x, z).id;
+        if (this.settings.worldConfig.populateUsingSavedBiomes)
+        {
+            return getSavedBiome(x, z);
+        } else
+        {
+            return getCalculatedBiome(x, z);
+        }
     }
 
     @Override
-    public LocalBiome getBiome(int x, int z) throws BiomeNotFoundException
+    public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
     {
         return getBiomeById(world.getBiome(x, z).id);
     }

@@ -52,7 +52,7 @@ public class NetherFortressGen extends StructureGenerator
             } else
             {
                 LocalWorld world = WorldHelper.toLocalWorld(worldObj);
-                LocalBiome biome = world.getCalculatedBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
+                LocalBiome biome = world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
                 if (!biome.getBiomeConfig().netherFortressesEnabled)
                 {
                     return false;

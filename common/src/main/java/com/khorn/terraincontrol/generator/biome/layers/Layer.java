@@ -5,8 +5,8 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeGroupManager;
+import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
@@ -144,8 +144,8 @@ public abstract class Layer
     {
 
         // Get Configs and Settings for use with layers
-        WorldSettings configs = world.getSettings();
-        WorldConfig worldConfig = configs.worldConfig;
+        ConfigProvider configs = world.getConfigs();
+        WorldConfig worldConfig = configs.getWorldConfig();
 
         // Bring in Group Manager for biome groups
         BiomeGroupManager groupManager = worldConfig.biomeGroupManager;
@@ -214,7 +214,7 @@ public abstract class Layer
 
             LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
             boolean haveBorder = false;
-            for (LocalBiome biome : configs.biomes)
+            for (LocalBiome biome : configs.getBiomeArray())
             {
                 if (biome == null)
                     continue;

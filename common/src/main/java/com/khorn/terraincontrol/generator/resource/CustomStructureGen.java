@@ -31,7 +31,7 @@ public class CustomStructureGen extends Resource
         objectChances = new ArrayList<Double>();
         for (int i = 0; i < args.size() - 1; i += 2)
         {
-            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(i), getHolder().worldConfig);
+            CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(args.get(i));
             if (object == null || !object.canSpawnAsObject())
             {
                 throw new InvalidConfigException("No custom object found with the name " + args.get(i));

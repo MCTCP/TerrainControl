@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.generator.resource;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
@@ -47,7 +46,7 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
 
         for (int i = 1; i < args.size() - 1; i += 2)
         {
-            CustomObject object = TerrainControl.getCustomObjectManager().getObjectFromString(args.get(i), getHolder().worldConfig);
+            CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(args.get(i));
             if (object == null)
             {
                 throw new InvalidConfigException("Custom object " + args.get(i) + " not found!");

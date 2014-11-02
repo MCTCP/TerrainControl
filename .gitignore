@@ -47,8 +47,8 @@ platforms/forge**/level.dat_old
 platforms/forge**/session.lock
 platforms/forge**/*.mca
 platforms/forge**/*.json
-platforms/forge**/assets
+platforms/forge/run
 
-
-# Mac filesystem dust
+# Filesystem dust
+Thumbs.db
 .DS_Store

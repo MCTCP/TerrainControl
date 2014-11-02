@@ -65,6 +65,14 @@ public interface LocalMaterialData
     boolean isSolid();
 
     /**
+     * Gets whether this material is air. This is functionally equivalent to
+     * {@code isMaterial(DefaultMaterial.AIR)}, but may yield better
+     * performance.
+     * @return True if this material is air, false otherwise.
+     */
+    boolean isAir();
+
+    /**
      * Gets the default material belonging to this material. The block data will
      * be lost. If the material is not one of the vanilla Minecraft materials,
      * {@link DefaultMaterial#UNKNOWN_BLOCK} is returned.
@@ -137,5 +145,12 @@ public interface LocalMaterialData
      * @return The rotated material.
      */
     LocalMaterialData rotate();
+
+    /**
+     * Gets whether this material falls down when no other block supports this
+     * block, like gravel and sand do.
+     * @return True if this material can fall, false otherwise.
+     */
+    boolean canFall();
 
 }

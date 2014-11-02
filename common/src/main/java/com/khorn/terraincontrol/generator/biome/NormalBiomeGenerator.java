@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.generator.biome;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.biome.layers.Layer;
 
 /**
@@ -19,7 +18,7 @@ public class NormalBiomeGenerator extends BiomeGenerator
 
         Layer[] layers = Layer.Init(world.getSeed(), world);
 
-        if (world.getSettings().worldConfig.improvedRivers)
+        if (world.getConfigs().getWorldConfig().improvedRivers)
             defaultOutputType = OutputType.WITHOUT_RIVERS;
 
         this.unZoomedLayer = layers[0];
@@ -58,14 +57,9 @@ public class NormalBiomeGenerator extends BiomeGenerator
 
         int[] arrayOfInt = this.biomeLayer.getInts(cache, x, y, x_size, z_size);
         ArraysCacheManager.ReleaseCache(cache);
-        WorldConfig worldConfig = world.getSettings().worldConfig;
         for (int i = 0; i < x_size * z_size; i++)
         {
             float f1 = world.getBiomeById(arrayOfInt[i]).getBiomeConfig().biomeWetness;
-            if (f1 < worldConfig.minMoisture)
-                f1 = (float) worldConfig.minMoisture;
-            if (f1 > worldConfig.maxMoisture)
-                f1 = (float) worldConfig.maxMoisture;
             paramArrayOfFloat[i] = f1;
         }
 

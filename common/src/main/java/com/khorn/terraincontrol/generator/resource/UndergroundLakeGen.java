@@ -53,7 +53,7 @@ public class UndergroundLakeGen extends Resource
                     for (int zLake = (int) (zAdjusted - horizontalSize / 2.0D); zLake <= (int) (zAdjusted + horizontalSize / 2.0D); zLake++)
                     {
                         LocalMaterialData material = world.getMaterial(xLake, yLake, zLake);
-                        if (material.isMaterial(DefaultMaterial.AIR) || material.isMaterial(DefaultMaterial.BEDROCK))
+                        if (material.isAir() || material.isMaterial(DefaultMaterial.BEDROCK))
                         {
                             // Don't replace air or bedrock
                             continue;
@@ -65,7 +65,7 @@ public class UndergroundLakeGen extends Resource
                         if (xBounds * xBounds + yBounds * yBounds + zBounds * zBounds >= 1.0D)
                             continue;
                         LocalMaterialData materialBelow = world.getMaterial(xLake, yLake - 1, zLake);
-                        if (materialBelow.isMaterial(DefaultMaterial.AIR))
+                        if (materialBelow.isAir())
                         {
                             // Air block, also set position above to air
                             world.setBlock(xLake, yLake, zLake, materialBelow);

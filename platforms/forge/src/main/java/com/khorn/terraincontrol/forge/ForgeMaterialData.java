@@ -1,11 +1,15 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.TerrainControl;
-
-import net.minecraft.block.Block;
-import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockFalling;
+import net.minecraft.init.Blocks;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 
 /**
@@ -14,18 +18,69 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
  */
 public class ForgeMaterialData implements LocalMaterialData
 {
+    /**
+     * Caches all unique blocks with their BukkitMaterialData equivalent. If
+     * uncached you'll easily see more than 50000 BukkitMaterialData instances
+     * in memory. Doens't support block data yet, but this can maybe be added
+     * in Minecraft 1.8 when BlockState instances are added.
+     */
+    private static final Map<Block, ForgeMaterialData> CACHE = new IdentityHashMap<Block, ForgeMaterialData>();
+
+    /**
+     * Gets a {@code BukkitMaterialData} of the given id and data.
+     * @param id   The block id.
+     * @param data The block data.
+     * @return The {@code BukkitMateialData} instance.
+     */
+    public static ForgeMaterialData ofIds(int id, int data)
+    {
+        return ofMinecraftBlock(Block.getBlockById(id), data);
+    }
+
+    /**
+     * Gets a {@code BukkitMaterialData} of the given material and data.
+     * @param material The material.
+     * @param data     The block data.
+     * @return The {@code BukkitMateialData} instance.
+     */
+    public static ForgeMaterialData ofDefaultMaterial(DefaultMaterial material, int data)
+    {
+        return ofIds(material.id, data);
+    }
+
+    /**
+     * Gets a {@code BukkitMaterialData} of the given Minecraft block and data.
+     * @param material The material.
+     * @param data     The block data.
+     * @return The {@code BukkitMateialData} instance.
+     */
+    public static ForgeMaterialData ofMinecraftBlock(Block block, int data)
+    {
+        if (data != 0)
+        {
+            // Cache doens't support block data
+            return new ForgeMaterialData(block, data);
+        }
+
+        ForgeMaterialData cached = CACHE.get(block);
+        if (cached != null)
+        {
+            // Found cache entry
+            return cached;
+        }
+
+        // Create cache entry
+        ForgeMaterialData newObject = new ForgeMaterialData(block, data);
+        CACHE.put(block, newObject);
+        return newObject;
+    }
+
     private final Block block;
     private final byte data;
 
-    public ForgeMaterialData(Block block, int data)
+    private ForgeMaterialData(Block block, int data)
     {
         this.block = block;
-        this.data = (byte) data;
-    }
-
-    public ForgeMaterialData(DefaultMaterial defaultMaterial, int data)
-    {
-        this.block = Block.getBlockById(defaultMaterial.id);
         this.data = (byte) data;
     }
 
@@ -178,6 +233,17 @@ public class ForgeMaterialData implements LocalMaterialData
 
         // No changes, return object itself
         return this;
+    }
+
+    @Override
+    public boolean isAir() {
+        return block == Blocks.air;
+    }
+
+    @Override
+    public boolean canFall()
+    {
+        return block instanceof BlockFalling;
     }
 
 }

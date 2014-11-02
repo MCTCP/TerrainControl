@@ -4,10 +4,12 @@ import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Y_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OldBiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
@@ -33,6 +35,10 @@ public class ChunkProviderTC
 
     public static final int HEIGHT_BITS = 8;
     public static final int HEIGHT_BITS_PLUS_FOUR = HEIGHT_BITS + 4;
+
+    // Some hardcoded materials, not changeable in configs
+    private final LocalMaterialData air = TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0);
+    private final LocalMaterialData sandstone = TerrainControl.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
 
     private final Random random;
     private final NoiseGeneratorPerlinOctaves noiseGen1;
@@ -60,7 +66,7 @@ public class ChunkProviderTC
     private double volatilityFactor;
     private double heightFactor;
 
-    private WorldSettings worldSettings;
+    private final ConfigProvider configProvider;
 
     private final TerrainGenBase caveGen;
     private final TerrainGenBase canyonGen;
@@ -78,9 +84,9 @@ public class ChunkProviderTC
     private final int maxSmoothDiameter;
     private final int maxSmoothRadius;
 
-    public ChunkProviderTC(WorldSettings configs, LocalWorld world)
+    public ChunkProviderTC(ConfigProvider configs, LocalWorld world)
     {
-        this.worldSettings = configs;
+        this.configProvider = configs;
         this.localWorld = world;
         this.heightCap = world.getHeightCap();
         this.heightScale = world.getHeightScale();
@@ -94,14 +100,16 @@ public class ChunkProviderTC
         this.noiseGen5 = new NoiseGeneratorPerlinOctaves(this.random, 10);
         this.noiseGen6 = new NoiseGeneratorPerlinOctaves(this.random, 16);
 
-        this.caveGen = new CavesGen(configs.worldConfig, this.localWorld);
-        this.canyonGen = new CanyonsGen(configs.worldConfig, this.localWorld);
+        this.caveGen = new CavesGen(configs.getWorldConfig(), this.localWorld);
+        this.canyonGen = new CanyonsGen(configs.getWorldConfig(), this.localWorld);
+
+        WorldConfig worldConfig = configs.getWorldConfig();
 
         // Contains 2d array maxSmoothDiameter*maxSmoothDiameter.
         // Maximum weight is in array center.
 
-        this.maxSmoothDiameter = configs.worldConfig.maxSmoothRadius * 2 + 1;
-        this.maxSmoothRadius = configs.worldConfig.maxSmoothRadius;
+        this.maxSmoothDiameter = worldConfig.maxSmoothRadius * 2 + 1;
+        this.maxSmoothRadius = worldConfig.maxSmoothRadius;
 
         this.nearBiomeWeightArray = new float[maxSmoothDiameter * maxSmoothDiameter];
 
@@ -116,35 +124,34 @@ public class ChunkProviderTC
 
     }
 
-    public byte[] generate(ChunkCoordinate chunkCoord)
+    public void generate(ChunkBuffer chunkBuffer)
     {
+        ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
         int x = chunkCoord.getChunkX();
         int z = chunkCoord.getChunkZ();
         this.random.setSeed(x * 341873128712L + z * 132897987541L);
 
-        byte[] blockArray = new byte[CHUNK_X_SIZE * CHUNK_Y_SIZE * CHUNK_Z_SIZE];
+        generateTerrain(chunkBuffer);
 
-        generateTerrain(chunkCoord, blockArray);
+        boolean dry = addBiomeBlocksAndCheckWater(chunkBuffer);
 
-        boolean dry = addBiomeBlocksAndCheckWater(chunkCoord, blockArray);
+        this.caveGen.generate(chunkBuffer);
+        this.canyonGen.generate(chunkBuffer);
 
-        this.caveGen.generate(chunkCoord, blockArray);
-        this.canyonGen.generate(chunkCoord, blockArray);
-
-        if (this.worldSettings.worldConfig.ModeTerrain == WorldConfig.TerrainMode.Normal
-                || this.worldSettings.worldConfig.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
+        WorldConfig worldConfig = configProvider.getWorldConfig();
+        if (worldConfig.ModeTerrain == WorldConfig.TerrainMode.Normal
+                || worldConfig.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
         {
             this.localWorld.prepareDefaultStructures(x, z, dry);
         }
 
-        return blockArray;
-
     }
 
-    protected void generateTerrain(ChunkCoordinate chunkCoord, byte[] blockArray)
+    protected void generateTerrain(ChunkBuffer chunkBuffer)
     {
-        final int chunkX = chunkCoord.getChunkX();
-        final int chunkZ = chunkCoord.getChunkZ();
+        ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
+        int chunkX = chunkCoord.getChunkX();
+        int chunkZ = chunkCoord.getChunkZ();
 
         final int four = 4;
         final int oneEightOfHeight = this.heightCap / 8;
@@ -152,8 +159,9 @@ public class ChunkProviderTC
         final int maxYSections = this.heightCap / 8 + 1;
         final int usedYSections = this.heightScale / 8 + 1;
 
+        WorldConfig worldConfig = configProvider.getWorldConfig();
         BiomeGenerator biomeGenerator = this.localWorld.getBiomeGenerator();
-        if (worldSettings.worldConfig.improvedRivers)
+        if (worldConfig.improvedRivers)
             this.riverArray = biomeGenerator.getBiomesUnZoomed(this.riverArray, chunkX * 4 - maxSmoothRadius,
                     chunkZ * 4 - maxSmoothRadius, NOISE_MAX_X + maxSmoothDiameter, NOISE_MAX_Z + maxSmoothDiameter, OutputType.ONLY_RIVERS);
 
@@ -179,7 +187,6 @@ public class ChunkProviderTC
         }
 
         final double oneEight = 0.125D;
-        final int z_step = 1 << HEIGHT_BITS;
         final double oneFourth = 0.25D;
 
         for (int x = 0; x < four; x++)
@@ -236,27 +243,24 @@ public class ChunkProviderTC
 
                         for (int piece_x = 0; piece_x < 4; piece_x++)
                         {
-                            int position = (piece_x + x * 4) << HEIGHT_BITS_PLUS_FOUR | (0 + z * 4) << HEIGHT_BITS | (y * 8 + piece_y);
-
                             double d16 = d11;
                             final double d17 = (d12 - d11) * oneFourth;
                             for (int piece_z = 0; piece_z < 4; piece_z++)
                             {
                                 final BiomeConfig biomeConfig = toBiomeConfig(this.biomeArray[(z * 4 + piece_z) * 16 + (piece_x + x * 4)]);
                                 final int waterLevelMax = this.waterLevel[(z * 4 + piece_z) * 16 + (piece_x + x * 4)] & 0xFF;
-                                int blockId = 0;
+                                LocalMaterialData block = air;
                                 if (y * 8 + piece_y < waterLevelMax && y * 8 + piece_y > biomeConfig.waterLevelMin)
                                 {
-                                    blockId = biomeConfig.waterBlock.getBlockId();
+                                    block = biomeConfig.waterBlock;
                                 }
 
                                 if (d16 > 0.0D)
                                 {
-                                    blockId = biomeConfig.stoneBlock.getBlockId();
+                                    block = biomeConfig.stoneBlock;
                                 }
 
-                                blockArray[position] = (byte) blockId;
-                                position += z_step;
+                                chunkBuffer.setBlock(piece_x + x * 4, y * 8 + piece_y, z * 4 + piece_z, block);
                                 d16 += d17;
                             }
                             d11 += d13;
@@ -278,21 +282,19 @@ public class ChunkProviderTC
      * Adds the biome blocks like grass, dirt, sand and sandstone. Also adds
      * bedrock at the bottom of the map.
      * 
-     * @param chunkX The chunk X.
-     * @param chunkZ The chunk Z.
-     * @param blocksArray The blocks in the chunk. Will be modified.
+     * @param chunkBuffer The the chunk to add the blocks to.
      * @return Whether there is a lot of water in this chunk. If yes, no
      *         villages will be placed.
      */
-    protected boolean addBiomeBlocksAndCheckWater(ChunkCoordinate chunkCoord, byte[] blocksArray)
+    protected boolean addBiomeBlocksAndCheckWater(ChunkBuffer chunkBuffer)
     {
+        ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
+        WorldConfig worldConfig = configProvider.getWorldConfig();
         int dryBlocksOnSurface = 256;
 
         final double d1 = 0.03125D;
         this.noise4 = this.noiseGen4.a(this.noise4, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_X_SIZE, CHUNK_Z_SIZE, d1 * 2.0D,
                 d1 * 2.0D, 1.0D);
-
-        WorldConfig worldConfig = this.worldSettings.worldConfig;
 
         for (int x = 0; x < CHUNK_X_SIZE; x++)
         {
@@ -301,7 +303,7 @@ public class ChunkProviderTC
                 // The following code is executed for each column in the chunk
 
                 // Get the current biome config and some properties
-                final BiomeConfig biomeConfig = this.worldSettings.biomes[this.biomeArray[(z + x * CHUNK_Z_SIZE)]].getBiomeConfig();
+                final BiomeConfig biomeConfig = this.configProvider.getBiomeByIdOrNull(this.biomeArray[(x + z * CHUNK_X_SIZE)]).getBiomeConfig();
                 final float currentTemperature = biomeConfig.biomeTemperature;
                 final int surfaceBlocksNoise = (int) (this.noise4[(x + z * CHUNK_X_SIZE)] / 3.0D + 3.0D + this.random.nextDouble() * 0.25D);
 
@@ -309,57 +311,55 @@ public class ChunkProviderTC
                 if (worldConfig.ceilingBedrock)
                 {
                     // Moved one block lower to fix lighting issues
-                    blocksArray[(z * 16 + x) * CHUNK_Y_SIZE + this.heightCap - 2] = (byte) worldConfig.bedrockBlock.getBlockId();
+                    chunkBuffer.setBlock(x, this.heightCap - 2, z, worldConfig.bedrockBlock);
                 }
 
                 // Loop from map height to zero to place bedrock and surface
                 // blocks
-                int currentSurfaceBlock = biomeConfig.surfaceBlock.getBlockId();
-                int currentGroundBlock = biomeConfig.groundBlock.getBlockId();
+                LocalMaterialData currentSurfaceBlock = biomeConfig.surfaceBlock;
+                LocalMaterialData currentGroundBlock = biomeConfig.groundBlock;
                 int surfaceBlocksCount = -1;
                 final int currentWaterLevel = this.waterLevel[z + x * 16];
                 for (int y = CHUNK_Y_SIZE - 1; y >= 0; y--)
                 {
-                    final int currentPos = (z * CHUNK_Z_SIZE + x) * CHUNK_Y_SIZE + y;
-
                     if (y < 5 && (worldConfig.createAdminium(y)) && y <= this.random.nextInt(5))
                     {
                         // Place bottom bedrock
-                        blocksArray[currentPos] = (byte) worldConfig.bedrockBlock.getBlockId();
+                        chunkBuffer.setBlock(x, y, z, worldConfig.bedrockBlock);
                     } else
                     {
                         // Surface blocks logic (grass, dirt, sand, sandstone)
-                        final int blockOnCurrentPos = blocksArray[currentPos] & 0xff;
+                        final LocalMaterialData blockOnCurrentPos = chunkBuffer.getBlock(x, y, z);
 
-                        if (blockOnCurrentPos == 0)
+                        if (blockOnCurrentPos.isAir())
                         {
                             // Reset when air is found
                             surfaceBlocksCount = -1;
-                        } else if (blockOnCurrentPos == biomeConfig.stoneBlock.getBlockId())
+                        } else if (blockOnCurrentPos.equals(biomeConfig.stoneBlock))
                         {
                             if (surfaceBlocksCount == -1)
                             {
                                 // Set when variable was reset
                                 if (surfaceBlocksNoise <= 0 && !worldConfig.removeSurfaceStone)
                                 {
-                                    currentSurfaceBlock = 0;
-                                    currentGroundBlock = biomeConfig.stoneBlock.getBlockId();
+                                    currentSurfaceBlock = air;
+                                    currentGroundBlock = biomeConfig.stoneBlock;
                                 } else if ((y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1))
                                 {
-                                    currentSurfaceBlock = biomeConfig.surfaceBlock.getBlockId();
-                                    currentGroundBlock = biomeConfig.groundBlock.getBlockId();
+                                    currentSurfaceBlock = biomeConfig.surfaceBlock;
+                                    currentGroundBlock = biomeConfig.groundBlock;
                                 }
 
                                 // Use blocks for the top of the water instead
                                 // when on water
-                                if ((y < currentWaterLevel) && (y > worldConfig.waterLevelMin) && (currentSurfaceBlock == 0))
+                                if ((y < currentWaterLevel) && (y > worldConfig.waterLevelMin) && currentSurfaceBlock.isAir())
                                 {
                                     if (currentTemperature < 0.15F)
                                     {
-                                        currentSurfaceBlock = (byte) biomeConfig.iceBlock.getBlockId();
+                                        currentSurfaceBlock = biomeConfig.iceBlock;
                                     } else
                                     {
-                                        currentSurfaceBlock = (byte) biomeConfig.waterBlock.getBlockId();
+                                        currentSurfaceBlock = biomeConfig.waterBlock;
                                     }
                                 }
 
@@ -367,23 +367,23 @@ public class ChunkProviderTC
                                 surfaceBlocksCount = surfaceBlocksNoise;
                                 if (y >= currentWaterLevel - 1)
                                 {
-                                    blocksArray[currentPos] = (byte) currentSurfaceBlock;
+                                    chunkBuffer.setBlock(x, y, z, currentSurfaceBlock);
                                 } else
                                 {
-                                    blocksArray[currentPos] = (byte) currentGroundBlock;
+                                    chunkBuffer.setBlock(x, y, z, currentGroundBlock);
                                 }
 
                             } else if (surfaceBlocksCount > 0)
                             {
                                 // Place ground block
                                 surfaceBlocksCount--;
-                                blocksArray[currentPos] = (byte) currentGroundBlock;
+                                chunkBuffer.setBlock(x, y, z, currentGroundBlock);
 
                                 // Place sandstone under stand
-                                if ((surfaceBlocksCount == 0) && (currentGroundBlock == DefaultMaterial.SAND.id))
+                                if ((surfaceBlocksCount == 0) && (currentGroundBlock.isMaterial(DefaultMaterial.SAND)))
                                 {
                                     surfaceBlocksCount = this.random.nextInt(4);
-                                    currentGroundBlock = (byte) DefaultMaterial.SANDSTONE.id;
+                                    currentGroundBlock = sandstone;
                                 }
                             }
                         }
@@ -391,7 +391,7 @@ public class ChunkProviderTC
                 }
 
                 // Count how many water there is
-                if (blocksArray[(z * CHUNK_X_SIZE + x) * CHUNK_Y_SIZE + biomeConfig.waterLevelMax] == biomeConfig.waterBlock.getBlockId())
+                if (chunkBuffer.getBlock(x, biomeConfig.waterLevelMax, z).equals(biomeConfig.waterBlock))
                 {
                     dryBlocksOnSurface--;
                 }
@@ -410,8 +410,7 @@ public class ChunkProviderTC
             this.rawTerrain = new double[NOISE_MAX_X * maxYSections * NOISE_MAX_Z];
         }
 
-        WorldConfig worldConfig = this.worldSettings.worldConfig;
-
+        WorldConfig worldConfig = configProvider.getWorldConfig();
         final double xzScale = 684.41200000000003D * worldConfig.getFractureHorizontal();
         final double yScale = 684.41200000000003D * worldConfig.getFractureVertical();
 
@@ -438,7 +437,7 @@ public class ChunkProviderTC
 
                 final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius)
                         * (NOISE_MAX_X + this.maxSmoothDiameter))];
-                final BiomeConfig biomeConfig = this.worldSettings.biomes[biomeId].getBiomeConfig();
+                final BiomeConfig biomeConfig = this.configProvider.getBiomeByIdOrNull(biomeId).getBiomeConfig();
 
                 double noiseHeight = this.noise6[i2D] / 8000.0D;
                 if (noiseHeight < 0.0D)
@@ -716,7 +715,7 @@ public class ChunkProviderTC
      */
     private BiomeConfig toBiomeConfig(int id)
     {
-        return this.worldSettings.biomes[id].getBiomeConfig();
+        return this.configProvider.getBiomeByIdOrNull(id).getBiomeConfig();
     }
 
 }

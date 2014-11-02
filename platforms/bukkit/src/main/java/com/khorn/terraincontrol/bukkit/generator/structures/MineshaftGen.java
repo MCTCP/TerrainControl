@@ -22,7 +22,7 @@ public class MineshaftGen extends StructureGenerator
         if (rand.nextInt(80) < Math.max(Math.abs(chunkX), Math.abs(chunkZ)))
         {
             LocalWorld world = WorldHelper.toLocalWorld(worldMC);
-            LocalBiome biome = world.getCalculatedBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
+            LocalBiome biome = world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
             if (rand.nextDouble() * 100.0 < biome.getBiomeConfig().mineshaftsRarity)
             {
                 return true;

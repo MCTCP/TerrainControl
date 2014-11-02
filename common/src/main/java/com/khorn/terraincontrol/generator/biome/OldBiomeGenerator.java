@@ -62,7 +62,7 @@ public class OldBiomeGenerator extends BiomeGenerator
             paramArrayOfBiomeBase = new int[xSize * zSize];
         }
 
-        WorldConfig worldConfig = world.getSettings().worldConfig;
+        WorldConfig worldConfig = world.getConfigs().getWorldConfig();
         this.oldTemperature1 = this.temperatureGenerator1.a(this.oldTemperature1, x, z, xSize, xSize, 0.025000000372529D / worldConfig.oldBiomeSize, 0.025000000372529D / worldConfig.oldBiomeSize, 0.25D);
         this.oldWetness = this.wetnessGenerator.a(this.oldWetness, x, z, xSize, xSize, 0.0500000007450581D / worldConfig.oldBiomeSize, 0.0500000007450581D / worldConfig.oldBiomeSize, 0.3333333333333333D);
         this.oldTemperature2 = this.temperatureGenerator2.a(this.oldTemperature2, x, z, xSize, xSize, 0.25D / worldConfig.oldBiomeSize, 0.25D / worldConfig.oldBiomeSize, 0.5882352941176471D);

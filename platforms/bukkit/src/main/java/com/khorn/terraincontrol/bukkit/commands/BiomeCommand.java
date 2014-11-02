@@ -39,7 +39,7 @@ public class BiomeCommand extends BaseCommand
             return true;
         }
 
-        LocalBiome biome = world.getCalculatedBiome(x, z);
+        LocalBiome biome = world.getBiome(x, z);
         BiomeIds biomeIds = biome.getIds();
 
         sender.sendMessage(MESSAGE_COLOR + "According to the biome generator, you are in the " + VALUE_COLOR + biome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR
@@ -55,7 +55,7 @@ public class BiomeCommand extends BaseCommand
         {
             try
             {
-                LocalBiome savedBiome = world.getBiome(x, z);
+                LocalBiome savedBiome = world.getSavedBiome(x, z);
                 BiomeIds savedIds = savedBiome.getIds();
                 sender.sendMessage(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR
                         + savedBiome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR

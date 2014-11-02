@@ -74,13 +74,13 @@ public final class BukkitMojangSettings implements MojangSettings
     @Override
     public LocalMaterialData getSurfaceBlock()
     {
-        return new BukkitMaterialData(biomeBase.ai, 0);
+        return BukkitMaterialData.ofMinecraftBlock(biomeBase.ai, 0);
     }
 
     @Override
     public LocalMaterialData getGroundBlock()
     {
-        return new BukkitMaterialData(biomeBase.ak, 0);
+        return BukkitMaterialData.ofMinecraftBlock(biomeBase.ak, 0);
     }
 
     @Override

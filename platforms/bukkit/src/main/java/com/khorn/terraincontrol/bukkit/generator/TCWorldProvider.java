@@ -27,7 +27,7 @@ public class TCWorldProvider extends WorldProviderNormal
     @Override
     public int getSeaLevel()
     {
-        return localWorld.getSettings().worldConfig.waterLevelMax;
+        return localWorld.getConfigs().getWorldConfig().waterLevelMax;
     }
 
     @Override

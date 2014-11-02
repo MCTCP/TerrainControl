@@ -5,7 +5,8 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.configuration.ConfigProvider;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorNewOctaves;
 import com.khorn.terraincontrol.generator.resource.Resource;
@@ -18,15 +19,15 @@ import java.util.Random;
 public class ObjectSpawner
 {
 
-    private WorldSettings worldSettings;
-    private Random rand;
-    private LocalWorld world;
-    private NoiseGeneratorNewOctaves noiseGen;
+    private final ConfigProvider configProvider;
+    private final Random rand;
+    private final LocalWorld world;
+    private final NoiseGeneratorNewOctaves noiseGen;
     private double[] reusableChunkNoiseArray;
 
-    public ObjectSpawner(WorldSettings configs, LocalWorld localWorld)
+    public ObjectSpawner(ConfigProvider configProvider, LocalWorld localWorld)
     {
-        this.worldSettings = configs;
+        this.configProvider = configProvider;
         this.rand = new Random();
         this.world = localWorld;
         this.noiseGen = new NoiseGeneratorNewOctaves(new Random(world.getSeed()), 4);
@@ -39,7 +40,7 @@ public class ObjectSpawner
         int z = chunkCoord.getChunkZ() * 16;
 
         // Get the biome of the other corner
-        LocalBiome biome = world.getCalculatedBiome(x + 15, z + 15);
+        LocalBiome biome = world.getBiome(x + 15, z + 15);
 
         // Null check
         if (biome == null)
@@ -51,7 +52,8 @@ public class ObjectSpawner
         BiomeConfig biomeConfig = biome.getBiomeConfig();
 
         // Get the random generator
-        long resourcesSeed = worldSettings.worldConfig.resourcesSeed != 0L ? worldSettings.worldConfig.resourcesSeed : world.getSeed();
+        WorldConfig worldConfig = configProvider.getWorldConfig();
+        long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
         this.rand.setSeed(resourcesSeed);
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
@@ -80,7 +82,7 @@ public class ObjectSpawner
         freezeChunk(chunkCoord);
 
         // Replace blocks
-        world.replaceBlocks();
+        world.replaceBlocks(chunkCoord);
 
         // Mark population ended
         TerrainControl.firePopulationEndEvent(world, rand, hasGeneratedAVillage, chunkCoord);
@@ -91,20 +93,21 @@ public class ObjectSpawner
     {
         this.reusableChunkNoiseArray = this.noiseGen.a(this.reusableChunkNoiseArray, chunkCoord.getChunkX() * 16, chunkCoord.getChunkZ() * 16, 16, 16, 0.0625D, 0.0625D, 1.0D);
 
-        int x = chunkCoord.getChunkX() * 16 + 8;
-        int z = chunkCoord.getChunkZ() * 16 + 8;
-        for (int i = 0; i < 16; i++)
+        int x = chunkCoord.getBlockXCenter();
+        int z = chunkCoord.getBlockZCenter();
+        for (int i = 0; i < ChunkCoordinate.CHUNK_X_SIZE; i++)
         {
-            for (int j = 0; j < 16; j++)
+            for (int j = 0; j < ChunkCoordinate.CHUNK_Z_SIZE; j++)
             {
-                int blockToFreezeX = x + i;
-                int blockToFreezeZ = z + j;
+                int blockToReplaceX = x + i;
+                int blockToReplaceZ = z + j;
                 // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
-                LocalBiome biome = this.world.getCalculatedBiome(blockToFreezeX, blockToFreezeZ);
+                LocalBiome biome = this.world.getBiome(blockToReplaceX, blockToReplaceZ);
                 if (biome != null)
                 {
                     double noise = this.reusableChunkNoiseArray[i + j * 16];
-                    biome.getBiomeConfig().surfaceAndGroundControl.spawn(world, noise, blockToFreezeX, blockToFreezeZ);
+                    BiomeConfig biomeConfig = biome.getBiomeConfig();
+                    biomeConfig.surfaceAndGroundControl.spawn(world, biomeConfig, noise, blockToReplaceX, blockToReplaceZ);
                 }
             }
         }
@@ -129,7 +132,7 @@ public class ObjectSpawner
     protected void freezeColumn(int x, int z, LocalMaterialData snowMaterial)
     {
         // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
-        LocalBiome biome = world.getCalculatedBiome(x, z);
+        LocalBiome biome = world.getBiome(x, z);
         if (biome != null)
         {
             BiomeConfig biomeConfig = biome.getBiomeConfig();

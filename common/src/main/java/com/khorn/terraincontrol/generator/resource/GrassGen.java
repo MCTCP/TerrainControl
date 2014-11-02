@@ -93,7 +93,8 @@ public class GrassGen extends Resource
             LocalMaterialData id;
 
             // Fix y position
-            while (((id = world.getMaterial(centerX, centerY, centerZ)).isMaterial(DefaultMaterial.AIR) || id.isMaterial(DefaultMaterial.LEAVES) || id.isMaterial(DefaultMaterial.LEAVES_2)) && (centerY > 0))
+            while (((id = world.getMaterial(centerX, centerY, centerZ)).isAir() || id.isMaterial(DefaultMaterial.LEAVES) || id
+                    .isMaterial(DefaultMaterial.LEAVES_2)) && (centerY > 0))
             {
                 centerY--;
             }
@@ -127,7 +128,8 @@ public class GrassGen extends Resource
             int y = world.getHighestBlockYAt(x, z);
 
             LocalMaterialData material;
-            while (((material = world.getMaterial(x, y, z)).isMaterial(DefaultMaterial.AIR) || material.isMaterial(DefaultMaterial.LEAVES) || material.isMaterial(DefaultMaterial.LEAVES_2)) && (y > 0))
+            while (((material = world.getMaterial(x, y, z)).isAir() || material.isMaterial(DefaultMaterial.LEAVES) || material
+                    .isMaterial(DefaultMaterial.LEAVES_2)) && (y > 0))
                 y--;
 
             if ((!world.isEmpty(x, y + 1, z)) || (!sourceBlocks.contains(world.getMaterial(x, y, z))))

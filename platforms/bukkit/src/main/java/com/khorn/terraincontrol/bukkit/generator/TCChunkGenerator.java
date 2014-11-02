@@ -1,11 +1,10 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
-import com.khorn.terraincontrol.util.ChunkCoordinate;
-
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;
@@ -50,9 +49,9 @@ public class TCChunkGenerator extends ChunkGenerator
      */
     public void onInitialize(BukkitWorld _world)
     {
-        this.chunkProviderTC = new ChunkProviderTC(_world.getSettings(), _world);
+        this.chunkProviderTC = new ChunkProviderTC(_world.getConfigs(), _world);
 
-        WorldConfig.TerrainMode mode = _world.getSettings().worldConfig.ModeTerrain;
+        WorldConfig.TerrainMode mode = _world.getConfigs().getWorldConfig().ModeTerrain;
 
         if (mode == WorldConfig.TerrainMode.Normal || mode == WorldConfig.TerrainMode.OldGenerator)
             this.BlockPopulator.add(new TCBlockPopulator(_world));
@@ -85,28 +84,10 @@ public class TCChunkGenerator extends ChunkGenerator
 
         if (this.NotGenerate)
             return new byte[16][];
-        byte[] BlockArray = this.chunkProviderTC.generate(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
+        ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
+        BukkitChunkBuffer chunkBuffer = new BukkitChunkBuffer(chunkCoord);
+        this.chunkProviderTC.generate(chunkBuffer);
 
-        byte[][] SectionBlocks = new byte[16][];
-
-        // TODO Too slow, for fix need change generator output.
-        int max_y = BlockArray.length / 256;
-        for (int _x = 0; _x < 16; _x++)
-            for (int _z = 0; _z < 16; _z++)
-                for (int y = 0; y < max_y; y++)
-                {
-                    byte block = BlockArray[(_x << ChunkProviderTC.HEIGHT_BITS_PLUS_FOUR | _z << ChunkProviderTC.HEIGHT_BITS | y)];
-                    if (block != 0)
-                    {
-                        int sectionId = y >> 4;
-                        if (SectionBlocks[sectionId] == null)
-                        {
-                            SectionBlocks[sectionId] = new byte[4096];
-                        }
-                        SectionBlocks[sectionId][(y & 0xF) << 8 | _z << 4 | _x] = block;
-                    }
-                }
-        return SectionBlocks;
-
+        return chunkBuffer.accessBytes();
     }
 }

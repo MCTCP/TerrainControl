@@ -276,7 +276,7 @@ public class SaplingListener
     {
         try
         {
-            LocalBiome biome = world.getBiome(x, z);
+            LocalBiome biome = world.getSavedBiome(x, z);
             TerrainControl.log(LogMarker.INFO, "Biome: {}" + biome.getName());
             return biome.getBiomeConfig().getSaplingGen(type);
         } catch (BiomeNotFoundException e)

@@ -42,7 +42,7 @@ public class UseWorld implements CustomObject
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-        for (CustomObject object : world.getSettings().worldConfig.customObjects)
+        for (CustomObject object : world.getConfigs().getCustomObjects())
         {
             if (object.hasPreferenceToSpawnIn(world.getBiome(x, z)))
             {
@@ -61,21 +61,22 @@ public class UseWorld implements CustomObject
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
 
-        WorldConfig worldSettings = world.getSettings().worldConfig;
+        WorldConfig worldConfig = world.getConfigs().getWorldConfig();
+        CustomObjectCollection customObjects = world.getConfigs().getCustomObjects();
 
-        if (worldSettings.customObjects.isEmpty())
+        if (customObjects.isEmpty())
             return false;
 
         boolean objectSpawned = false;
         int spawnattemps = 0;
         while (!objectSpawned)
         {
-            if (spawnattemps > worldSettings.objectSpawnRatio)
+            if (spawnattemps > worldConfig.objectSpawnRatio)
                 return false;
 
             spawnattemps++;
 
-            CustomObject selectedObject = worldSettings.customObjects.get(random.nextInt(worldSettings.customObjects.size()));
+            CustomObject selectedObject = customObjects.getRandomObject(random);
 
             if (!selectedObject.hasPreferenceToSpawnIn(world.getBiome(x, z)))
                 continue;
@@ -93,21 +94,22 @@ public class UseWorld implements CustomObject
         // Pick one object, try to spawn that, if that fails, try with another
         // object, as long as the objectSpawnRatio cap isn't reached.
 
-        WorldConfig worldSettings = world.getSettings().worldConfig;
+        WorldConfig worldConfig = world.getConfigs().getWorldConfig();
+        CustomObjectCollection customObjects = world.getConfigs().getCustomObjects();
 
-        if (worldSettings.customObjects.isEmpty())
+        if (customObjects.isEmpty())
             return false;
 
         boolean objectSpawned = false;
         int spawnattemps = 0;
         while (!objectSpawned)
         {
-            if (spawnattemps > worldSettings.objectSpawnRatio)
+            if (spawnattemps > worldConfig.objectSpawnRatio)
                 return false;
 
             spawnattemps++;
 
-            CustomObject selectedObject = worldSettings.customObjects.get(rand.nextInt(worldSettings.customObjects.size()));
+            CustomObject selectedObject = customObjects.getRandomObject(rand);
 
             if (!selectedObject.hasPreferenceToSpawnIn(world.getBiome(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter())))
                 continue;

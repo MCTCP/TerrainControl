@@ -1,7 +1,11 @@
 package com.khorn.terraincontrol.generator.terrain;
 
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -19,10 +23,12 @@ public class CanyonsGen extends TerrainGenBase
         this.worldSettings = wrk;
     }
 
-    protected void a(long paramLong, ChunkCoordinate generatingChunk, byte[] paramArrayOfByte, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
+    protected void a(long paramLong, ChunkBuffer generatingChunkBuffer, double paramDouble1, double paramDouble2, double paramDouble3,
+            float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
     {
         Random localRandom = new Random(paramLong);
 
+        ChunkCoordinate generatingChunk = generatingChunkBuffer.getChunkCoordinate();
         double d1 = generatingChunk.getBlockXCenter();
         double d2 = generatingChunk.getBlockZCenter();
 
@@ -85,8 +91,8 @@ public class CanyonsGen extends TerrainGenBase
             int k = MathHelper.floor(paramDouble1 - d3) - generatingChunk.getBlockX() - 1;
             int m = MathHelper.floor(paramDouble1 + d3) - generatingChunk.getBlockX() + 1;
 
-            int n = MathHelper.floor(paramDouble2 - d4) - 1;
-            int i1 = MathHelper.floor(paramDouble2 + d4) + 1;
+            int maxY = MathHelper.floor(paramDouble2 - d4) - 1;
+            int minY = MathHelper.floor(paramDouble2 + d4) + 1;
 
             int i2 = MathHelper.floor(paramDouble3 - d3) - generatingChunk.getBlockZ() - 1;
             int i3 = MathHelper.floor(paramDouble3 + d3) - generatingChunk.getBlockZ() + 1;
@@ -96,10 +102,10 @@ public class CanyonsGen extends TerrainGenBase
             if (m > 16)
                 m = 16;
 
-            if (n < 1)
-                n = 1;
-            if (i1 > worldSettings.worldHeightCap - 8)
-                i1 = worldSettings.worldHeightCap - 8;
+            if (maxY < 1)
+                maxY = 1;
+            if (minY > worldSettings.worldHeightCap - 8)
+                minY = worldSettings.worldHeightCap - 8;
 
             if (i2 < 0)
                 i2 = 0;
@@ -107,24 +113,24 @@ public class CanyonsGen extends TerrainGenBase
                 i3 = 16;
 
             int i4 = 0;
-            int i8;
-            for (int i5 = k; (i4 == 0) && (i5 < m); i5++)
+            for (int localZ = k; (i4 == 0) && (localZ < m); localZ++)
             {
-                for (int i6 = i2; (i4 == 0) && (i6 < i3); i6++)
+                for (int localX = i2; (i4 == 0) && (localX < i3); localX++)
                 {
-                    for (int i7 = i1 + 1; (i4 == 0) && (i7 >= n - 1); i7--)
+                    for (int localY = minY + 1; (i4 == 0) && (localY >= maxY - 1); localY--)
                     {
-                        i8 = (i5 * 16 + i6) * ChunkCoordinate.CHUNK_Y_SIZE + i7;
-                        if (i7 < 0)
+                        if (localY < 0)
                             continue;
-                        if (i7 < worldSettings.worldHeightCap)
+                        if (localY < worldSettings.worldHeightCap)
                         {
-                            if ((paramArrayOfByte[i8] == DefaultMaterial.WATER.id) || (paramArrayOfByte[i8] == DefaultMaterial.STATIONARY_WATER.id))
+                            LocalMaterialData materialAtPosition = generatingChunkBuffer.getBlock(localX, localY, localZ);
+                            if (materialAtPosition.isMaterial(DefaultMaterial.WATER)
+                                    || materialAtPosition.isMaterial(DefaultMaterial.STATIONARY_WATER))
                             {
                                 i4 = 1;
                             }
-                            if ((i7 != n - 1) && (i5 != k) && (i5 != m - 1) && (i6 != i2) && (i6 != i3 - 1))
-                                i7 = n;
+                            if ((localY != maxY - 1) && (localZ != k) && (localZ != m - 1) && (localX != i2) && (localX != i3 - 1))
+                                localY = maxY;
                         }
                     }
                 }
@@ -133,38 +139,43 @@ public class CanyonsGen extends TerrainGenBase
             {
                 continue;
             }
-            for (int i5 = k; i5 < m; i5++)
+            for (int localZ = k; localZ < m; localZ++)
             {
-                double d9 = (i5 + generatingChunk.getBlockX() + 0.5D - paramDouble1) / d3;
-                for (i8 = i2; i8 < i3; i8++)
+                double d9 = (localZ + generatingChunk.getBlockX() + 0.5D - paramDouble1) / d3;
+                for (int localX = i2; localX < i3; localX++)
                 {
-                    double d10 = (i8 + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
-                    int i9 = (i5 * 16 + i8) * ChunkCoordinate.CHUNK_Y_SIZE + i1;
-                    int i10 = 0;
+                    LocalBiome biome = world.getBiome(localX + generatingChunk.getBlockX(), localZ + generatingChunk.getBlockZ());
+                    BiomeConfig biomeConfig = biome.getBiomeConfig();
+                    double d10 = (localX + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
+                    boolean grassFound = false;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
-                        for (int i11 = i1 - 1; i11 >= n; i11--)
+                        for (int localY = minY; localY >= maxY; localY--)
                         {
-                            double d11 = (i11 + 0.5D - paramDouble2) / d4;
-                            if ((d9 * d9 + d10 * d10) * this.a[i11] + d11 * d11 / 6.0D < 1.0D)
+                            double d11 = ((localY - 1) + 0.5D - paramDouble2) / d4;
+                            if ((d9 * d9 + d10 * d10) * this.a[localY - 1] + d11 * d11 / 6.0D < 1.0D)
                             {
-                                int i12 = paramArrayOfByte[i9];
-                                if (i12 == DefaultMaterial.GRASS.id)
-                                    i10 = 1;
-                                if ((i12 == DefaultMaterial.STONE.id) || (i12 == DefaultMaterial.DIRT.id) || (i12 == DefaultMaterial.GRASS.id))
+                                LocalMaterialData material = generatingChunkBuffer.getBlock(localX, localY, localZ);
+                                if (material.isMaterial(DefaultMaterial.GRASS))
+                                    grassFound = true;
+                                if (material.equals(biomeConfig.stoneBlock) || material.isMaterial(DefaultMaterial.DIRT)
+                                        || material.isMaterial(DefaultMaterial.GRASS))
                                 {
-                                    if (i11 < 10)
+                                    if (localY - 1 < 10)
                                     {
-                                        paramArrayOfByte[i9] = (byte) DefaultMaterial.LAVA.id;
+                                        generatingChunkBuffer.setBlock(localX, localY, localZ, lava);
                                     } else
                                     {
-                                        paramArrayOfByte[i9] = 0;
-                                        if ((i10 != 0) && (paramArrayOfByte[(i9 - 1)] == DefaultMaterial.DIRT.id))
-                                            paramArrayOfByte[(i9 - 1)] = (byte) DefaultMaterial.GRASS.id;
+                                        generatingChunkBuffer.setBlock(localX, localY, localZ, air);
+                                        if ((grassFound != false)
+                                                && (generatingChunkBuffer.getBlock(localX, localY - 1, localZ)
+                                                        .isMaterial(DefaultMaterial.DIRT)))
+                                        {
+                                            generatingChunkBuffer.setBlock(localX, localY - 1, localZ, biomeConfig.surfaceBlock);
+                                        }
                                     }
                                 }
                             }
-                            i9--;
                         }
                     }
                 }
@@ -175,7 +186,7 @@ public class CanyonsGen extends TerrainGenBase
     }
 
     @Override
-    protected void generateChunk(ChunkCoordinate currentChunk, ChunkCoordinate originalChunk, byte[] paramArrayOfByte)
+    protected void generateChunk(ChunkCoordinate currentChunk, ChunkBuffer generatingChunkBuffer)
     {
         if (this.random.nextInt(100) >= this.worldSettings.canyonRarity)
             return;
@@ -193,7 +204,7 @@ public class CanyonsGen extends TerrainGenBase
 
             int size = this.random.nextInt(this.worldSettings.canyonMaxLength - this.worldSettings.canyonMinLength) + this.worldSettings.canyonMinLength;
 
-            a(this.random.nextLong(), originalChunk, paramArrayOfByte, d1, d2, d3, f3, f1, f2, size, this.worldSettings.canyonDepth);
+            a(this.random.nextLong(), generatingChunkBuffer, d1, d2, d3, f3, f1, f2, size, this.worldSettings.canyonDepth);
         }
     }
 }

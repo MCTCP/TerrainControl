@@ -89,7 +89,7 @@ public class ForgeEngine extends TerrainControlEngine
         net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(input);
         if (block != null)
         {
-            return new ForgeMaterialData(block, 0);
+            return ForgeMaterialData.ofMinecraftBlock(block, 0);
         }
 
         try
@@ -124,12 +124,12 @@ public class ForgeEngine extends TerrainControlEngine
         net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(blockName);
         if (block != null)
         {
-            return new ForgeMaterialData(block, blockData);
+            return ForgeMaterialData.ofMinecraftBlock(block, blockData);
         }
         DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
         if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
         {
-            return new ForgeMaterialData(defaultMaterial, blockData);
+            return ForgeMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
         }
 
         // Failed
@@ -139,7 +139,7 @@ public class ForgeEngine extends TerrainControlEngine
     @Override
     public LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
     {
-        return new ForgeMaterialData(defaultMaterial, blockData);
+        return ForgeMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
     }
 
 }

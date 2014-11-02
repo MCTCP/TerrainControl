@@ -23,15 +23,15 @@ class CachedBiomeGenerator extends BiomeGenerator
         /**
          * The array of biome types stored in this BiomeCache.Block.
          */
-        int[] biomes = new int[256];
+        private int[] biomes = new int[ChunkCoordinate.CHUNK_X_SIZE * ChunkCoordinate.CHUNK_Z_SIZE];
         /**
          * The last time this BiomeCacheBlock was accessed, in milliseconds.
          */
-        long lastAccessTime;
+        private long lastAccessTime;
 
         Block(BiomeGenerator generator, ChunkCoordinate chunkCoord)
         {
-            biomes = generator.getBiomes(null, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), ChunkCoordinate.CHUNK_X_SIZE,
+            biomes = generator.getBiomes(biomes, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), ChunkCoordinate.CHUNK_X_SIZE,
                     ChunkCoordinate.CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
         }
 
@@ -142,7 +142,15 @@ class CachedBiomeGenerator extends BiomeGenerator
     {
         if (xSize == ChunkCoordinate.CHUNK_X_SIZE && zSize == ChunkCoordinate.CHUNK_Z_SIZE && (x & 0xF) == 0 && (z & 0xF) == 0)
         {
-            return getCachedBiomes(ChunkCoordinate.fromBlockCoords(x, z));
+            if (biomeArray == null || biomeArray.length < xSize * zSize)
+            {
+                biomeArray = new int[xSize * zSize];
+            }
+            int[] cachedBiomes = getCachedBiomes(ChunkCoordinate.fromBlockCoords(x, z));
+            // Avoid leaking references to the cached array - Minecraft likes
+            // to change those arrays, corrupting the cache
+            System.arraycopy(cachedBiomes, 0, biomeArray, 0, xSize * zSize);
+            return biomeArray;
         }
         return generator.getBiomes(biomeArray, x, z, xSize, zSize, type);
     }

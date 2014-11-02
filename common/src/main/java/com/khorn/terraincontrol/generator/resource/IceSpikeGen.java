@@ -8,7 +8,6 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -156,7 +155,7 @@ public class IceSpikeGen extends Resource
                     {
                         LocalMaterialData sourceBlock = par1World.getMaterial(x + var11, y + var8, z + var13);
 
-                        if (sourceBlock.isMaterial(DefaultMaterial.AIR) || sourceBlocks.contains(sourceBlock))
+                        if (sourceBlock.isAir() || sourceBlocks.contains(sourceBlock))
                         {
                             par1World.setBlock(x + var11, y + var8, z + var13, this.material);
                         }
@@ -165,7 +164,7 @@ public class IceSpikeGen extends Resource
                         {
                             sourceBlock = par1World.getMaterial(x + var11, y - var8, z + var13);
 
-                            if (sourceBlock.isMaterial(DefaultMaterial.AIR) || sourceBlocks.contains(sourceBlock))
+                            if (sourceBlock.isAir() || sourceBlocks.contains(sourceBlock))
                             {
                                 par1World.setBlock(x + var11, y - var8, z + var13, this.material);
                             }
@@ -205,7 +204,7 @@ public class IceSpikeGen extends Resource
                     {
                         LocalMaterialData var18 = par1World.getMaterial(x + var16, var11, z + var10);
 
-                        if (var18.isMaterial(DefaultMaterial.AIR) || sourceBlocks.contains(var18) || var18.equals(this.material))
+                        if (var18.isAir() || sourceBlocks.contains(var18) || var18.equals(this.material))
                         {
                             par1World.setBlock(x + var16, var11, z + var10, this.material);
                             --var11;
