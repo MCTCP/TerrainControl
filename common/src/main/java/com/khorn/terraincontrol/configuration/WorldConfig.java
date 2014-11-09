@@ -598,9 +598,9 @@ public class WorldConfig extends ConfigFile
         writer.setting(WorldStandardValues.BIOME_RARITY_SCALE, this.BiomeRarityScale);
 
         writer.smallTitle("Biome Groups");
-        
-        WriteBiomeGroups(writer);
-        
+
+        writeBiomeGroups(writer);
+
         writer.smallTitle("Biome lists");
 
         writer.comment("Don't forget to register your custom biomes first in CustomBiomes!");
@@ -899,8 +899,8 @@ public class WorldConfig extends ConfigFile
         writer.setting(WorldStandardValues.MAX_TEMPERATURE, this.maxTemperature);
 
     }
-    
-    private void WriteBiomeGroups(SettingsWriter writer) throws IOException
+
+    private void writeBiomeGroups(SettingsWriter writer) throws IOException
     {
         for (BiomeGroup bg : this.biomeGroupManager.getGroups())
         {
