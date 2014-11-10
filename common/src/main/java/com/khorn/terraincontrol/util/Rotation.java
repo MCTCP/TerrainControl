@@ -68,9 +68,9 @@ public enum Rotation
      * @param rotation The previous rotation.
      * @return The next rotation.
      */
-    public static Rotation next(Rotation rotation)
+    public Rotation next()
     {
-        int id = rotation.getRotationId();
+        int id = getRotationId();
         id++;
         if (id >= values().length)
         {
