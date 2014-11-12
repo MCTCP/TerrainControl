@@ -1,6 +1,8 @@
 package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.util.BoundingBox;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.Random;
@@ -117,6 +119,36 @@ public class CustomObjectCoordinate
     @Override
     public int hashCode()
     {
-        return (Integer.valueOf(x).hashCode() >> 13) ^ (Integer.valueOf(y).hashCode() >> 7) ^ Integer.valueOf(z).hashCode() ^ object.getName().hashCode() ^ rotation.toString().hashCode();
+        return (x >> 13) ^ (y >> 7) ^ z ^ object.getName().hashCode() ^ rotation.toString().hashCode();
+    }
+
+    /**
+     * Gets the chunk that should populate for this object.
+     * @return The chunk.
+     */
+    public ChunkCoordinate getPopulatingChunk()
+    {
+        // In the past we simply returned the chunk populating for the origin
+        // of the object. However, the origin is not guaranteed to be at the
+        // center of the object. We need to know the exact center to choose
+        // the appropriate spawning chunk.
+        int centerX;
+        int centerZ;
+        if (object instanceof StructuredCustomObject)
+        {
+            // Calculate the actual center of the object, based on all blocks
+            // of the object
+            BoundingBox box = ((StructuredCustomObject) object).getBoundingBox(rotation);
+            centerX = x + box.getMinX() + (box.getWidth() / 2);
+            centerZ = z + box.getMinZ() + (box.getDepth() / 2);
+        } else
+        {
+            // Just assume the author of the object placed the origin near the
+            // center
+            centerX = x;
+            centerZ = z;
+        }
+
+        return ChunkCoordinate.getPopulatingChunk(centerX, centerZ);
     }
 }

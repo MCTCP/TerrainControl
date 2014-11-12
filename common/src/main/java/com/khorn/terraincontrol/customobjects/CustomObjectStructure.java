@@ -37,15 +37,16 @@ public class CustomObjectStructure
 
         // Calculate all branches and add them to a list
         objectsToSpawn = new LinkedHashMap<ChunkCoordinate, Set<CustomObjectCoordinate>>();
-        addToChunk(start); // Add the object itself
+        addToSpawnList(start); // Add the object itself
         addBranches(start, 1);
     }
 
-    protected void addBranches(CustomObjectCoordinate coordObject, int depth)
+    private void addBranches(CustomObjectCoordinate coordObject, int depth)
     {
         for (Branch branch : coordObject.getStructuredObject().getBranches(coordObject.getRotation()))
         {
-            CustomObjectCoordinate childCoordObject = branch.toCustomObjectCoordinate(world, random, coordObject.getX(), coordObject.getY(), coordObject.getZ());
+            CustomObjectCoordinate childCoordObject = branch.toCustomObjectCoordinate(world, random, coordObject.getX(),
+                    coordObject.getY(), coordObject.getZ());
 
             // Don't add null objects
             if (childCoordObject == null)
@@ -54,7 +55,7 @@ public class CustomObjectStructure
             }
 
             // Add this object to the chunk
-            addToChunk(childCoordObject);
+            addToSpawnList(childCoordObject);
 
             // Also add the branches of this object
             if (depth < maxBranchDepth)
@@ -64,16 +65,22 @@ public class CustomObjectStructure
         }
     }
 
-    public void addToChunk(CustomObjectCoordinate coordObject)
+    /**
+     * Adds the object to the spawn list of each chunk that the object
+     * touches.
+     * @param coordObject The object.
+     */
+    void addToSpawnList(CustomObjectCoordinate coordObject)
     {
-        ChunkCoordinate chunkCoordinate = ChunkCoordinate.getPopulatingChunk(coordObject.getX(), coordObject.getZ());
+        ChunkCoordinate chunkCoordinate = coordObject.getPopulatingChunk();
+
         Set<CustomObjectCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
         if (objectsInChunk == null)
         {
             objectsInChunk = new LinkedHashSet<CustomObjectCoordinate>();
+            objectsToSpawn.put(chunkCoordinate, objectsInChunk);
         }
         objectsInChunk.add(coordObject);
-        objectsToSpawn.put(chunkCoordinate, objectsInChunk);
     }
 
     public void spawnForChunk(ChunkCoordinate chunkCoordinate)

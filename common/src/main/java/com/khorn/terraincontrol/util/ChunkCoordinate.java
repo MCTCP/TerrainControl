@@ -84,6 +84,28 @@ public class ChunkCoordinate
     /**
      * Gets the coordinates of the chunk that is responsible for populating
      * the given block.
+     *
+     * <p>During terrain population, these four chunks are
+     * guaranteed to be loaded when the top-left chunk is being populated:
+     * <pre>
+     * +--------+--------+ . = no changes in blocks for now
+     * |........|........| # = blocks are replaced
+     * |....####|####....|
+     * |....####|####....|
+     * +--------+--------+
+     * |....####|####....|
+     * |....####|####....|
+     * |........|........|
+     * +--------+--------+
+     * </pre>
+     * This offset makes it possible for objects like trees to extend a little
+     * bit outside the area marked with <code>#</code> without hitting
+     * unloaded chunks.
+     *
+     * <p>This method essentially returns the top left chunk for the whole
+     * area marked with <code>#</code>, even though only 1/4 of that area is
+     * actually in the top left chunk.
+     *
      * @param blockX X coordinate of the block.
      * @param blockZ Z coordinate of the block.
      * @return The coordinates of the chunk.
@@ -168,5 +190,22 @@ public class ChunkCoordinate
     public boolean coordsMatch(int chunkX, int chunkZ)
     {
         return this.chunkX == chunkX && this.chunkZ == chunkZ;
+    }
+
+    /**
+     * Gets whether this chunk is responsible for populating the given block.
+     * Calling this method is equivalent to calling
+     * {@code equals(ChunkCoordinate.{@link #getPopulatingChunk(int, int) getPopulatingChunk}(blockX,blockZ))}, but
+     * this method saves you from creating one unnecessary object.
+     * @param blockX X position of the block.
+     * @param blockZ Z position of the block.
+     * @return True if this chunk coordinate contains that block, false
+     * otherwise.
+     */
+    public boolean populatesForBlock(int blockX, int blockZ)
+    {
+        return coordsMatch(
+                MathHelper.floor((blockX - CHUNK_HALF_X_SIZE) / (double) CHUNK_X_SIZE),
+                MathHelper.floor((blockZ - CHUNK_HALF_Z_SIZE) / (double) CHUNK_Z_SIZE));
     }
 }
