@@ -33,7 +33,7 @@ public final class BiomeGroupManager
      */
     public void registerGroup(BiomeGroup newGroup)
     {
-        if (isRoomForMoreGroups(newGroup.getName()))
+        if (isRoomForMoreGroups())
         {
             BiomeGroup existingWithSameName = nameToGroup.get(newGroup.getName());
             if (existingWithSameName != null)
@@ -42,7 +42,7 @@ public final class BiomeGroupManager
                 idToGroup.put(existingWithSameName.getGroupid(), newGroup);
             } else
             {
-                int newGroupId = getGroupCount();
+                int newGroupId = getNextGroupId();
                 newGroup.setGroupid(newGroupId);
 
                 nameToGroup.put(newGroup.getName(), newGroup);
@@ -54,9 +54,25 @@ public final class BiomeGroupManager
         }
     }
 
-    private boolean isRoomForMoreGroups(String name)
+    /**
+     * Gets the next group id. This group id is based on which group ids are
+     * currently in used.
+     * @return The next group id.
+     */
+    private int getNextGroupId()
     {
-        return getGroupCount() < MAX_BIOME_GROUP_COUNT;
+        // Adding +1 ensures that the id 0 will never be in use. The id 0
+        // seems to be used as a null value by the biome generator
+        return getGroupCount() + 1;
+    }
+
+    /**
+     * Checks if the next group id will still fit in the group limit.
+     * @return True if the next group id will fit, false otherwise.
+     */
+    private boolean isRoomForMoreGroups()
+    {
+        return getNextGroupId() < MAX_BIOME_GROUP_COUNT;
     }
 
     /**
