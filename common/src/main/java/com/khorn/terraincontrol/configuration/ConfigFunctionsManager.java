@@ -17,7 +17,10 @@ public class ConfigFunctionsManager
         // Also store in this class
         this.configFunctions = new HashMap<String, Class<? extends ConfigFunction<?>>>();
 
-        // Add vanilla resources
+        // Functions in WorldConfigs
+        registerConfigFunction("BiomeGroup", BiomeGroup.class);
+
+        // Functions in BiomeConfigs
         registerConfigFunction("AboveWaterRes", AboveWaterGen.class);
         registerConfigFunction("Boulder", BoulderGen.class);
         registerConfigFunction("Cactus", CactusGen.class);

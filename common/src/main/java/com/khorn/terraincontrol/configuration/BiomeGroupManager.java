@@ -4,12 +4,8 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.logging.LogMarker;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+
+import java.util.*;
 
 public class BiomeGroupManager
 {
@@ -22,7 +18,7 @@ public class BiomeGroupManager
 
     public BiomeGroupManager()
     {
-        TerrainControl.getConfigFunctionsManager().registerConfigFunction("BiomeGroup", BiomeGroup.class);
+
     }
 
     public BiomeGroup registerGroup(BiomeGroup newGroup)
