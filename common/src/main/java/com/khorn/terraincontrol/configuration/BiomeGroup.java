@@ -2,26 +2,17 @@ package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public class BiomeGroup extends ConfigFunction<WorldConfig>
+import java.util.*;
+import java.util.Map.Entry;
+
+public final class BiomeGroup extends ConfigFunction<WorldConfig>
 {
 
     private int groupid;
@@ -33,44 +24,55 @@ public class BiomeGroup extends ConfigFunction<WorldConfig>
     protected static double freezeTemp;
     private Map<String, LocalBiome> biomes = new LinkedHashMap<String, LocalBiome>(32);
 
-    public BiomeGroup(){
-        
-    }
-    
-    public BiomeGroup(WorldConfig config, String[] args)
+    /**
+     * Empty constructor, needed for reading this group.
+     * @see #BiomeGroup(WorldConfig, String, int, int, List) Constructor to
+     * properly initialize this biome group manually.
+     */
+    public BiomeGroup()
     {
-        this.setHolder(config);
-        try
-        {
-            this.load(Arrays.asList(args));
-        } catch (InvalidConfigException ex)
-        {
-            Logger.getLogger(BiomeGroup.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
     }
 
-    public BiomeGroup(WorldConfig config, Setting<List<String>> defaultBiomeGroup)
+    /**
+     * Creates a new biome group based on the given settings. Using these
+     * settings makes sure that:
+     * <ul>
+     *  <li>values from old configs are read correctly.</li>
+     *  <li>proper default settings are used, as specified by those settings.</li>
+     * </ul>
+     * @param config     WorldConfig this biome group will be in.
+     * @param biomeNames Setting used to read the names of the biomes in this
+     *                   group. The name of this setting will be used as the
+     *                   name of the group.
+     * @param size       Setting used for reading the size of the group.
+     * @param rarity     Setting used for reading the rarity of the group.
+     * @return The group.
+     */
+    public static BiomeGroup ofSettings(WorldConfig config, Setting<List<String>> biomeNames, Setting<Integer> size, Setting<Integer> rarity)
     {
-        this.setHolder(config);
-        this.name = defaultBiomeGroup.getName();
-        LinkedList<String> args = new LinkedList<String>(defaultBiomeGroup.getDefaultValue());
-        args.addFirst(name);
-        try
-        {
-            load(args);
-        } catch (InvalidConfigException ex)
-        {
-            Logger.getLogger(BiomeGroup.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        String groupName = biomeNames.getName();
+        List<String> biomeNameValues = config.readSettings(biomeNames);
+        int sizeValue = config.readSettings(size);
+        int rarityValue = config.readSettings(rarity);
+        return new BiomeGroup(config, groupName, sizeValue, rarityValue, biomeNameValues);
     }
 
+    /**
+     * Creates a new <code>BiomeGroup</code>.
+     * @param config    WorldConfig this biome group is part of.
+     * @param groupName The name of this group.
+     * @param size      Size value of this biome group.
+     * @param rarity    Rarity value of this biome group.
+     * @param biomes    List of names of the biomes that spawn in this group.
+     */
     public BiomeGroup(WorldConfig config, String groupName, int size, int rarity, List<String> biomes)
     {
         this.setHolder(config);
         this.name = groupName;
         this.generationDepth = size;
         this.groupRarity = rarity;
-        for (String biome : filterBiomes(biomes))
+        for (String biome : biomes)
         {
             this.biomes.put(biome, null);
         }
@@ -84,7 +86,7 @@ public class BiomeGroup extends ConfigFunction<WorldConfig>
         this.name = args.get(0);
         this.generationDepth = readInt(args.get(1), 0, getHolder().GenerationDepth);
         this.groupRarity = readInt(args.get(2), 1, Integer.MAX_VALUE);
-        for (String biome : filterBiomes(readBiomes(args, 3)))
+        for (String biome : readBiomes(args, 3))
         {
             this.biomes.put(biome, null);
         }
@@ -92,11 +94,13 @@ public class BiomeGroup extends ConfigFunction<WorldConfig>
 
     public void loadBiomeData(LocalWorld world)
     {
-        for (String biome : this.biomes.keySet())
+        for (Iterator<Entry<String, LocalBiome>> it = this.biomes.entrySet().iterator(); it.hasNext();)
         {
-            LocalBiome localBiome = world.getBiomeByName(biome);
+            Entry<String, LocalBiome> entry = it.next();
+            String biomeName = entry.getKey();
+            LocalBiome localBiome = world.getBiomeByName(biomeName);
             this.avgTemp += localBiome.getBiomeConfig().biomeTemperature;
-            this.biomes.put(biome, localBiome);
+            entry.setValue(localBiome);
         }
         this.avgTemp /= this.biomes.size();
     }
@@ -111,26 +115,6 @@ public class BiomeGroup extends ConfigFunction<WorldConfig>
     public String makeString()
     {
         return "BiomeGroup(" + name + ", " + generationDepth + ", " + groupRarity + ", " + StringHelper.join(biomes.keySet(), ", ") + ")";
-    }
-
-    protected ArrayList<String> filterBiomes(List<String> biomes)
-    {
-        ArrayList<String> output = new ArrayList<String>(32);
-        Set<String> customBiomes = this.getHolder().customBiomeGenerationIds.keySet();
-        for (String key : biomes)
-        {
-            key = key.trim();
-            if (customBiomes.contains(key))
-            {
-                output.add(key);
-                continue;
-            }
-
-            if (DefaultBiome.Contain(key))
-                output.add(key);
-
-        }
-        return output;
     }
 
     /**
@@ -148,17 +132,32 @@ public class BiomeGroup extends ConfigFunction<WorldConfig>
      */
     protected List<String> readBiomes(List<String> strings, int start) throws InvalidConfigException
     {
-        List<String> readBiomes = new LinkedList<String>();
-        for (ListIterator<String> it = strings.listIterator(start); it.hasNext();)
-        {
-            readBiomes.add(it.next());
-        }
-        return readBiomes;
+        return new ArrayList<String>(strings.subList(start, strings.size()));
     }
 
     public String getName()
     {
         return name;
+    }
+
+    /**
+     * Filters the biomes in this group, removing all biomes that have an
+     * unrecognized name.
+     * @param customBiomeNames Set of known custom biomes.
+     */
+    void filterBiomes(Set<String> customBiomeNames)
+    {
+        for (Iterator<String> it = this.biomes.keySet().iterator(); it.hasNext();)
+        {
+            String biomeName = it.next();
+            if (DefaultBiome.Contain(biomeName) || customBiomeNames.contains(biomeName))
+            {
+                continue;
+            }
+            // Invalid biome name, remove
+            TerrainControl.log(LogMarker.WARN, "Invalid biome name {} in biome group {}", biomeName, this.name);
+            it.remove();
+        }
     }
 
     public List<String> getBiomes()
@@ -221,7 +220,7 @@ public class BiomeGroup extends ConfigFunction<WorldConfig>
 //        }
         return map;
     }
-    
+
     public int getGroupRarity()
     {
         return groupRarity;
@@ -235,6 +234,16 @@ public class BiomeGroup extends ConfigFunction<WorldConfig>
     public int getGenerationDepth()
     {
         return generationDepth;
+    }
+
+    /**
+     * Gets whether this group has any biomes.
+     * @return True if the group has no biomes and is thus empty, false
+     * if the group has biomes.
+     */
+    public boolean hasNoBiomes()
+    {
+        return biomes.isEmpty();
     }
 
 }

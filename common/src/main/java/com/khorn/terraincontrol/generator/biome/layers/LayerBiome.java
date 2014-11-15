@@ -38,7 +38,7 @@ public class LayerBiome extends Layer
 
                 if ((currentPiece & BiomeGroupBits) != 0 && (currentPiece & BiomeBits) == 0)    // has biomegroup bits but not biome bits
                 {
-                    BiomeGroup group = manager.getGroup((currentPiece & BiomeGroupBits) >> BiomeGroupShift);
+                    BiomeGroup group = manager.getGroupById((currentPiece & BiomeGroupBits) >> BiomeGroupShift);
                     SortedMap<Integer, LocalBiome> possibleBiomes = group.getDepthMap(depth);
                     //>>	Get Max Rarity
                     if (!possibleBiomes.isEmpty())

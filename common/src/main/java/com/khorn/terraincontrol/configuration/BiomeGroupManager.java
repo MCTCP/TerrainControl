@@ -7,13 +7,17 @@ import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.util.*;
 
-public class BiomeGroupManager
+/**
+ * Manages a collection of biome groups that are accesible by their name and
+ * id.
+ *
+ */
+public final class BiomeGroupManager
 {
 
     public static final int MAX_BIOME_GROUP_COUNT = 127;
-    private int groupCount = 0;
     private int cumulativeGroupRarity = 0;
-    private Map<String, Integer> nameToId = new LinkedHashMap<String, Integer>(4);
+    private Map<String, BiomeGroup> nameToGroup = new LinkedHashMap<String, BiomeGroup>(4);
     private Map<Integer, BiomeGroup> idToGroup = new LinkedHashMap<Integer, BiomeGroup>(4);
 
     public BiomeGroupManager()
@@ -21,76 +25,88 @@ public class BiomeGroupManager
 
     }
 
-    public BiomeGroup registerGroup(BiomeGroup newGroup)
+    /**
+     * Registers a new group. If the group could not be added (for example
+     * because the maximum amount of biomes has been reached) a message is
+     * logged and the group is not registered.
+     * @param newGroup The group to register.
+     */
+    public void registerGroup(BiomeGroup newGroup)
     {
-        return __register(newGroup);
-    }
-    
-    public BiomeGroup registerGroup(WorldConfig config, String[] args)
-    {
-        BiomeGroup newGroup = new BiomeGroup(config, args);
-        return __register(newGroup);
-    }
-
-    public BiomeGroup registerGroup(WorldConfig config, String groupName, int size, int rarity, List<String> biomes)
-    {
-        BiomeGroup newGroup = new BiomeGroup(config, groupName, size, rarity, biomes);
-        return __register(newGroup);
-    }
-
-    private BiomeGroup __register(BiomeGroup newGroup)
-    {
-        if (canAddGroup(newGroup.getName()))
+        if (isRoomForMoreGroups(newGroup.getName()))
         {
-            Integer existing = nameToId.get(newGroup.getName());
-            if (existing != null)
+            BiomeGroup existingWithSameName = nameToGroup.get(newGroup.getName());
+            if (existingWithSameName != null)
             {
-                newGroup.setGroupid(existing);
-                idToGroup.put(existing, newGroup);
+                newGroup.setGroupid(existingWithSameName.getGroupid());
+                idToGroup.put(existingWithSameName.getGroupid(), newGroup);
             } else
             {
-                nameToId.put(newGroup.getName(), ++groupCount);
-                newGroup.setGroupid(groupCount);
-                idToGroup.put(groupCount, newGroup);
+                int newGroupId = getGroupCount();
+                newGroup.setGroupid(newGroupId);
+
+                nameToGroup.put(newGroup.getName(), newGroup);
+                idToGroup.put(newGroupId, newGroup);
             }
-            return newGroup;
-        }
-        return null;
-    }
-
-    private boolean canAddGroup(String name)
-    {
-        if (groupCount < MAX_BIOME_GROUP_COUNT)
+        } else
         {
-            return true;
+            TerrainControl.log(LogMarker.WARN, "Biome group `{}` could not be added. Max biome group count reached.", newGroup.getName());
         }
-        TerrainControl.log(LogMarker.WARN, "Biome group `{}` could not be added. Max biome group count reached.", name);
-        return false;
     }
 
-    public BiomeGroup getGroup(Integer id)
+    private boolean isRoomForMoreGroups(String name)
     {
-        return idToGroup.get(id);
+        return getGroupCount() < MAX_BIOME_GROUP_COUNT;
     }
 
-    public BiomeGroup getGroup(String name)
+    /**
+     * Gets the group with the given group id.
+     * @param groupId Id of the group.
+     * @return The group, or null if no such group exists.
+     */
+    public BiomeGroup getGroupById(int groupId)
     {
-        return getGroup(nameToId.get(name));
+        return idToGroup.get(groupId);
     }
 
+    /**
+     * Gets the group with the given name.
+     * @param name Name of the group, case sensitive.
+     * @return The group.
+     */
+    public BiomeGroup getGroupByName(String name)
+    {
+        return nameToGroup.get(name);
+    }
+
+    /**
+     * Gets all groups.
+     * @return All groups.
+     */
     public Collection<BiomeGroup> getGroups()
     {
         return idToGroup.values();
     }
 
-    public int size()
+    /**
+     * Gets the amount of groups currently registered. Calling this method is
+     * equivalent to calling {@code getGroups().size()}.
+     * @return The amount of groups.
+     */
+    public int getGroupCount()
     {
-        return groupCount;
+        return idToGroup.size();
     }
 
-    public boolean isEmpty()
+    /**
+     * Gets whether there are no groups registered. Calling this method is
+     * equivalent to calling {@code getGroups().isEmpty()}.
+     * @return True if there are no groups registered, false if there are
+     * groups registered.
+     */
+    public boolean hasNoGroups()
     {
-        return groupCount == 0;
+        return idToGroup.isEmpty();
     }
 
     public SortedMap<Integer, BiomeGroup> getGroupDepthMap(int depth)
@@ -126,7 +142,7 @@ public class BiomeGroupManager
 
     public SortedMap<Integer, LocalBiome> getBiomeDepthMap(int groupId, int depth)
     {
-        return getGroup(groupId).getDepthMap(depth);
+        return getGroupById(groupId).getDepthMap(depth);
     }
 
     public boolean isBiomeDepthMapEmpty(int depth)
@@ -144,11 +160,30 @@ public class BiomeGroupManager
         Integer[] totalRarity = map.keySet().toArray(new Integer[map.size()]);
         return totalRarity[totalRarity.length - 1];
     }
-    
-    public void processBiomeData(LocalWorld world){
+
+    void processBiomeData(LocalWorld world)
+    {
         for (BiomeGroup entry : idToGroup.values())
         {
-                entry.loadBiomeData(world);
+            entry.loadBiomeData(world);
+        }
+    }
+
+    /**
+     * Filters all biome names in the groups. Invalid biomes names will be
+     * removed.
+     * @param customBiomeNames Set of all custom biomes in the world.
+     */
+    void filterBiomes(Set<String> customBiomeNames)
+    {
+        for (Iterator<BiomeGroup> it = idToGroup.values().iterator(); it.hasNext();)
+        {
+            BiomeGroup group = it.next();
+            group.filterBiomes(customBiomeNames);
+            if (group.hasNoBiomes())
+            {
+                it.remove();
+            }
         }
     }
 

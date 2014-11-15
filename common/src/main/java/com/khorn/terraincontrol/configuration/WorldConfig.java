@@ -282,6 +282,7 @@ public class WorldConfig extends ConfigFile
         riverRarity = lowerThanOrEqualTo(riverRarity, GenerationDepth);
         riverSize = lowerThanOrEqualTo(riverSize, GenerationDepth - riverRarity);
 
+        biomeGroupManager.filterBiomes(customBiomeGenerationIds.keySet());
         IsleBiomes = filterBiomes(IsleBiomes, customBiomeGenerationIds.keySet());
         BorderBiomes = filterBiomes(BorderBiomes, customBiomeGenerationIds.keySet());
 
@@ -360,7 +361,7 @@ public class WorldConfig extends ConfigFile
         this.randomRivers = readSettings(WorldStandardValues.RANDOM_RIVERS);
 
         // Biome Groups
-        ReadBiomeGroups();
+        readBiomeGroups();
         
         // Specialized Biomes
         this.IsleBiomes = readSettings(WorldStandardValues.ISLE_BIOMES);
@@ -457,7 +458,7 @@ public class WorldConfig extends ConfigFile
         this.oldTerrainGenerator = this.ModeTerrain == TerrainMode.OldGenerator;
     }
 
-    private void ReadBiomeGroups()
+    private void readBiomeGroups()
     {
         for (ConfigFunction<WorldConfig> res : reader.getConfigFunctions(this, false))
         {
@@ -469,36 +470,19 @@ public class WorldConfig extends ConfigFile
                 }
             }
         }
-        if (this.biomeGroupManager.isEmpty())
+        if (this.biomeGroupManager.hasNoGroups())
         {
+            // No BiomeGroup declarations, we need to create some
+            // The old settings are read for this, they either have old values
+            // that need to be imported, or they have suitable default values
+            BiomeGroup normalGroup = BiomeGroup.ofSettings(this, WorldStandardValues.NORMAL_BIOMES,
+                    WorldStandardValues.LAND_SIZE, WorldStandardValues.LAND_RARITY);
+            this.biomeGroupManager.registerGroup(normalGroup);
 
-            //>>	Here, either someone has deleted their BiomeGroups to reset to default or we are on old settings
-            //>>	Check for old settings
-            List<String> v1_6_4NormalGroup = readSettings(WorldStandardValues.NORMAL_BIOMES, null);
-            BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.NORMAL_BIOMES);
-            if (v1_6_4NormalGroup != null)
-            {
-                int normalRarity = readSettings(WorldStandardValues.LAND_RARITY, normalGroup.getGroupRarity());
-                int normalSize = readSettings(WorldStandardValues.LAND_SIZE, normalGroup.getGenerationDepth());
-                this.biomeGroupManager.registerGroup(this, normalGroup.getName(), normalSize, normalRarity, v1_6_4NormalGroup);
-            }
-
-            List<String> v1_6_4IceGroup = readSettings(WorldStandardValues.ICE_BIOMES, null);
-            BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.ICE_BIOMES);
-            if (v1_6_4IceGroup != null)
-            {
-                int iceRarity = readSettings(WorldStandardValues.ICE_RARITY, iceGroup.getGroupRarity());
-                int iceSize = readSettings(WorldStandardValues.ICE_SIZE, iceGroup.getGenerationDepth());
-                this.biomeGroupManager.registerGroup(this, iceGroup.getName(), iceSize, iceRarity, v1_6_4IceGroup);
-            }
-
-            if (biomeGroupManager.isEmpty())
-            {
-                biomeGroupManager.registerGroup(normalGroup);
-                biomeGroupManager.registerGroup(iceGroup);
-            }
+            BiomeGroup iceGroup = BiomeGroup.ofSettings(this, WorldStandardValues.ICE_BIOMES,
+                    WorldStandardValues.ICE_SIZE, WorldStandardValues.ICE_RARITY);
+            this.biomeGroupManager.registerGroup(iceGroup);
         }
-
     }
 
     private void ReadCustomBiomes()
