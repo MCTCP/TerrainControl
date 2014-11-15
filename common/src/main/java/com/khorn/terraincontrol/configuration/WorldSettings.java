@@ -38,7 +38,7 @@ public class WorldSettings implements ConfigProvider
     private File settingsDir;
     private CustomObjectCollection customObjects;
     public WorldConfig worldConfig;
-    private BiomeGroupManager biomeGroupManager = new BiomeGroupManager();
+    private BiomeGroupManager biomeGroupManager;
 
     /**
      * Holds all biome configs. Generation Id => BiomeConfig
@@ -70,14 +70,25 @@ public class WorldSettings implements ConfigProvider
         this.settingsDir = settingsDir;
         this.world = world;
         this.checkOnly = checkOnly;
+        this.biomes = new LocalBiome[world.getMaxBiomesCount()];
+
+        loadSettings();
+    }
+
+    /**
+     * Loads all settings. Expects the biomes array to be empty (filled with
+     * nulls), the savedBiomes collection to be empty and the biomesCount
+     * field to be zero.
+     */
+    private void loadSettings()
+    {
+        biomeGroupManager = new BiomeGroupManager();
 
         loadCustomObjects();
         loadWorldConfig();
-
-        this.biomes = new LocalBiome[world.getMaxBiomesCount()];
         loadBiomes();
 
-        // >> We have to wait for the loading in order to get things like
+        // We have to wait for the loading in order to get things like
         // temperature
         biomeGroupManager.processBiomeData(world);
     }
@@ -177,9 +188,7 @@ public class WorldSettings implements ConfigProvider
         this.biomesCount = 0;
 
         // Load again
-        loadCustomObjects();
-        loadWorldConfig();
-        loadBiomes();
+        loadSettings();
     }
 
     private String readSettings(Map<String, BiomeConfig> biomeConfigs)
