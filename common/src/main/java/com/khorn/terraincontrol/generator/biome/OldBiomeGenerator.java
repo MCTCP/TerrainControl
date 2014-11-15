@@ -8,6 +8,11 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.util.Random;
 
+/**
+ * Biome generator used in Minecraft Alpha 1.2.0 - Beta 1.7.3, can be
+ * customized a little bit by settings in the WorldConfig.
+ *
+ */
 public class OldBiomeGenerator extends BiomeGenerator
 {
 

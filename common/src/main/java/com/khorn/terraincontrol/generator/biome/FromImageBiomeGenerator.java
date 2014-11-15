@@ -1,15 +1,23 @@
 package com.khorn.terraincontrol.generator.biome;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.generator.biome.layers.Layer;
+import com.khorn.terraincontrol.generator.biome.layers.LayerFactory;
 
 /**
- * Extends the NormalBiomeMode. The code that makes it generate differently can be found inside the layer code.
+ * Generates biomes from the image specified by the WorldConfig.
  *
  */
-public class FromImageBiomeGenerator extends NormalBiomeGenerator
+public class FromImageBiomeGenerator extends LayeredBiomeGenerator
 {
     public FromImageBiomeGenerator(LocalWorld world)
     {
         super(world);
+    }
+
+    @Override
+    protected Layer[] initLayers()
+    {
+        return LayerFactory.createFromImage(world);
     }
 }
