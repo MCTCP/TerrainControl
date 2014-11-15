@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.configuration.io.SettingsReader;
 import com.khorn.terraincontrol.customobjects.*;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
+import com.khorn.terraincontrol.util.BoundingBox;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
@@ -259,5 +260,11 @@ public class BO3 implements StructuredCustomObject
     public StructurePartSpawnHeight getStructurePartSpawnHeight()
     {
         return this.settings.spawnHeight.toStructurePartSpawnHeight();
+    }
+
+    @Override
+    public BoundingBox getBoundingBox(Rotation rotation)
+    {
+        return this.settings.boundingBoxes[rotation.getRotationId()];
     }
 }

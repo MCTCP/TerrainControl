@@ -119,21 +119,11 @@ public interface LocalWorld
      * hitting potentially unloaded chunks.
      *
      * <p>
-     * Populalators may place blocks in already populated chunks, which would
+     * Populators may place blocks in already populated chunks, which would
      * cause those blocks to be never replaced. ReplacedBlocks uses the same
-     * 8-block offset to minimize this risk. This is what happens when the top
-     * left chunk has it's blocks replaced:
-     * <pre>
-     * +--------+--------+ . = no changes in blocks for now
-     * |........|........| # = blocks are replaced
-     * |....####|####....|
-     * |....####|####....|
-     * +--------+--------+
-     * |....####|####....|
-     * |....####|####....|
-     * |........|........|
-     * +--------+--------+
-     * </pre?
+     * 8-block offset to minimize this risk.
+     * @see ChunkCoordinate#getPopulatingChunk(int, int) Explanation about the
+     * population offset.
      * @param chunkCoord The top left chunk for ReplacedBlocks.
      */
     public void replaceBlocks(ChunkCoordinate chunkCoord);

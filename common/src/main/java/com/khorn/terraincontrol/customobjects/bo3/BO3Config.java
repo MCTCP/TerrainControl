@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
+import com.khorn.terraincontrol.util.BoundingBox;
 import com.khorn.terraincontrol.util.MaterialSet;
 
 import java.io.IOException;
@@ -44,6 +45,8 @@ public class BO3Config extends ConfigFile
     public BO3Check[][] bo3Checks = new BO3Check[4][];
     public int maxBranchDepth;
     public BranchFunction[][] branches = new BranchFunction[4][];
+
+    public BoundingBox[] boundingBoxes = new BoundingBox[4];
 
     /**
      * Creates a BO3Config from a file.
@@ -157,7 +160,8 @@ public class BO3Config extends ConfigFile
 
     private void readResources()
     {
-        ArrayList<BlockFunction> tempBlocksList = new ArrayList<BlockFunction>();
+        BoundingBox box = BoundingBox.newEmptyBox();
+        List<BlockFunction> tempBlocksList = new ArrayList<BlockFunction>();
         List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
         List<BranchFunction> tempBranchesList = new ArrayList<BranchFunction>();
 
@@ -167,7 +171,9 @@ public class BO3Config extends ConfigFile
             {
                 if (res instanceof BlockFunction)
                 {
-                    tempBlocksList.add((BlockFunction) res);
+                    BlockFunction block = (BlockFunction) res;
+                    box.expandToFit(block.x, block.y, block.z);
+                    tempBlocksList.add(block);
                 } else if (res instanceof BO3Check)
                 {
                     tempChecksList.add((BO3Check) res);
@@ -185,6 +191,7 @@ public class BO3Config extends ConfigFile
         blocks[0] = tempBlocksList.toArray(new BlockFunction[tempBlocksList.size()]);
         bo3Checks[0] = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
         branches[0] = tempBranchesList.toArray(new BranchFunction[tempBranchesList.size()]);
+        boundingBoxes[0] = box;
     }
 
     public void writeResources(SettingsWriter writer) throws IOException
@@ -293,6 +300,8 @@ public class BO3Config extends ConfigFile
             {
                 branches[i][j] = branches[i - 1][j].rotate();
             }
+            // Bounding box
+            boundingBoxes[i] = boundingBoxes[i - 1].rotate();
         }
     }
 

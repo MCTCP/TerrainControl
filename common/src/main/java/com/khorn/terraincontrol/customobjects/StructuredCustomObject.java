@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.customobjects;
 
+import com.khorn.terraincontrol.util.BoundingBox;
 import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.Random;
@@ -50,4 +51,11 @@ public interface StructuredCustomObject extends CustomObject
      * @return The height.
      */
     public StructurePartSpawnHeight getStructurePartSpawnHeight();
+
+    /**
+     * Gets the bounding box of this object if it is rotated in the given way.
+     * @param rotation The rotation of the object.
+     * @return The bounding box.
+     */
+    public BoundingBox getBoundingBox(Rotation rotation);
 }

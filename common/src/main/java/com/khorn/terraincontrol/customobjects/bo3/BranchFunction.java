@@ -53,7 +53,7 @@ public class BranchFunction extends BO3Function implements Branch
         rotatedBranch.branches = new TreeSet<BranchNode>();
         for (BranchNode holder : this.branches)
         {
-            rotatedBranch.branches.add(new BranchNode(Rotation.next(holder.getRotation()), holder.getChance(), holder.getCustomObject()));
+            rotatedBranch.branches.add(new BranchNode(holder.getRotation().next(), holder.getChance(), holder.getCustomObject()));
         }
         return rotatedBranch;
     }
