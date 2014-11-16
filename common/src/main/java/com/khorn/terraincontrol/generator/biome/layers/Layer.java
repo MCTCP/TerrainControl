@@ -214,11 +214,6 @@ public abstract class Layer
         return biomes[this.nextInt(biomes.length)];
     }
 
-    protected int getGroupRandomInArray(int... biomes)
-    {
-        return biomes[this.nextGroupInt(biomes.length)];
-    }
-
     protected int getRandomOf4(int a, int b, int c, int d)
     {
         return b == c && c == d

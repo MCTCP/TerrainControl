@@ -3,10 +3,9 @@ package com.khorn.terraincontrol.generator.biome.layers;
 import com.khorn.terraincontrol.configuration.BiomeGroup;
 import com.khorn.terraincontrol.configuration.BiomeGroupManager;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
+
 import java.util.Map.Entry;
 import java.util.SortedMap;
-
-import static com.khorn.terraincontrol.generator.biome.layers.Layer.IceBit;
 
 public class LayerBiomeGroups extends Layer
 {
@@ -47,7 +46,6 @@ public class LayerBiomeGroups extends Layer
                             {   
                                 if (group.getValue() != null){
                                     currentPiece |= (group.getValue().getGroupid() << BiomeGroupShift) |
-//                                                    (group.getValue().getGroupid() + 15) |
                                                     //>>	If the average temp of the group is cold
                                                     ((group.getValue().isColdGroup() && freezeGroups) ? IceBit : 0);
                                 }
