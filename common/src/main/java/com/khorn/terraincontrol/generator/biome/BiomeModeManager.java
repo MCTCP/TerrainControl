@@ -20,6 +20,7 @@ public class BiomeModeManager
     public final Class<NormalBiomeGenerator> NORMAL = register("Normal", NormalBiomeGenerator.class);
     public final Class<FromImageBiomeGenerator> FROM_IMAGE = register("FromImage", FromImageBiomeGenerator.class);
     public final Class<OldBiomeGenerator> OLD_GENERATOR = register("OldGenerator", OldBiomeGenerator.class);
+    public final Class<BeforeGroupsBiomeGenerator> BEFORE_GROUPS = register("BeforeGroups", BeforeGroupsBiomeGenerator.class);
 
     /**
      * Register a biome manager. Should be called before the config files

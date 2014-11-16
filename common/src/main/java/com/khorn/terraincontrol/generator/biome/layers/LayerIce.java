@@ -13,6 +13,13 @@ public class LayerIce extends Layer
         this.child = childLayer;
     }
 
+    public LayerIce(long seed, Layer childLayer, int _rarity)
+    {
+        super(seed);
+        this.child = childLayer;
+        this.rarity = 101 - _rarity;
+    }
+
     @Override
     public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
     {

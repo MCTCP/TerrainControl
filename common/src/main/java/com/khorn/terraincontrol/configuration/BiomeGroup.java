@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
@@ -49,13 +50,36 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
      * @param rarity     Setting used for reading the rarity of the group.
      * @return The group.
      */
-    public static BiomeGroup ofSettings(WorldConfig config, Setting<List<String>> biomeNames, Setting<Integer> size, Setting<Integer> rarity)
+    private static BiomeGroup ofSettings(WorldConfig config, Setting<List<String>> biomeNames, Setting<Integer> size,
+            Setting<Integer> rarity)
     {
         String groupName = biomeNames.getName();
         List<String> biomeNameValues = config.readSettings(biomeNames);
         int sizeValue = config.readSettings(size);
         int rarityValue = config.readSettings(rarity);
         return new BiomeGroup(config, groupName, sizeValue, rarityValue, biomeNameValues);
+    }
+
+    /**
+     * Creates a biome group with the normal biomes.
+     * @param config The world config. The biome lists are read from this config.
+     * @return The biome group.
+     */
+    public static BiomeGroup createNormalGroup(WorldConfig config)
+    {
+        return ofSettings(config, WorldStandardValues.NORMAL_BIOMES,
+                WorldStandardValues.LAND_SIZE, WorldStandardValues.LAND_RARITY);
+    }
+
+    /**
+     * Creates a biome group with the ice biomes.
+     * @param config The world config. The biome lists are read from this config.
+     * @return The biome group.
+     */
+    public static BiomeGroup createIceGroup(WorldConfig config)
+    {
+        return ofSettings(config, WorldStandardValues.ICE_BIOMES,
+                WorldStandardValues.ICE_SIZE, WorldStandardValues.ICE_RARITY);
     }
 
     /**

@@ -475,12 +475,10 @@ public class WorldConfig extends ConfigFile
             // No BiomeGroup declarations, we need to create some
             // The old settings are read for this, they either have old values
             // that need to be imported, or they have suitable default values
-            BiomeGroup normalGroup = BiomeGroup.ofSettings(this, WorldStandardValues.NORMAL_BIOMES,
-                    WorldStandardValues.LAND_SIZE, WorldStandardValues.LAND_RARITY);
+            BiomeGroup normalGroup = BiomeGroup.createNormalGroup(this);
             this.biomeGroupManager.registerGroup(normalGroup);
 
-            BiomeGroup iceGroup = BiomeGroup.ofSettings(this, WorldStandardValues.ICE_BIOMES,
-                    WorldStandardValues.ICE_SIZE, WorldStandardValues.ICE_RARITY);
+            BiomeGroup iceGroup = BiomeGroup.createIceGroup(this);
             this.biomeGroupManager.registerGroup(iceGroup);
         }
     }
