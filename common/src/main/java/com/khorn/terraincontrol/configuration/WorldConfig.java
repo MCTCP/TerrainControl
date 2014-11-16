@@ -200,8 +200,6 @@ public class WorldConfig extends ConfigFile
         this.worldObjects = customObjects;
         this.customObjects = customObjects.getAll();
 
-        // Read the WorldConfig file
-        this.readConfigSettings();
         // Fix older names
         this.renameOldSettings();
         // Set the local fields based on what was read from the file
