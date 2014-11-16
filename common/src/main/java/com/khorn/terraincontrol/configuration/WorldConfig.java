@@ -530,17 +530,19 @@ public class WorldConfig extends ConfigFile
 
         writer.comment("Possible terrain modes:");
         writer.comment("   Normal - use all features");
-        writer.comment("   OldGenerator - generate land like Beta 1.7.3 generator");
         writer.comment("   TerrainTest - generate only terrain without any resources");
         writer.comment("   NotGenerate - generate empty chunks");
         writer.comment("   Default - use default terrain generator");
+        writer.comment("   OldGenerator - Minecraft Beta 1.7.3-like land generator");
         writer.setting(WorldStandardValues.TERRAIN_MODE, this.ModeTerrain);
 
         writer.comment("Possible biome modes:");
         writer.comment("   Normal - use all features");
         writer.comment("   FromImage - get biomes from image file");
-        writer.comment("   OldGenerator - generate biome like the Beta 1.7.3 generator");
         writer.comment("   Default - use default Notch biome generator");
+        writer.comment("For old maps two more modes are available:");
+        writer.comment("   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes");
+        writer.comment("   OldGenerator - Minecraft Beta 1.7.3 biome generator");
         writer.setting(WorldStandardValues.BIOME_MODE, TerrainControl.getBiomeModeManager().getName(biomeMode));
 
         // Custom biomes
