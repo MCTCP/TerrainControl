@@ -271,6 +271,13 @@ public class WorldConfig extends ConfigFile
         // WorldHeightBits was split into two different settings
         renameOldSetting("WorldHeightBits", WorldStandardValues.WORLD_HEIGHT_SCALE_BITS);
         renameOldSetting("WorldHeightBits", WorldStandardValues.WORLD_HEIGHT_CAP_BITS);
+
+        // Put BiomeMode in compatibility mode when the old setting
+        // NormalBiomes is found
+        if (this.reader.hasSetting(WorldStandardValues.NORMAL_BIOMES))
+        {
+            this.reader.putSetting(WorldStandardValues.BIOME_MODE, "BeforeGroups");
+        }
     }
 
     @Override
@@ -472,7 +479,7 @@ public class WorldConfig extends ConfigFile
         }
         if (this.biomeGroupManager.hasNoGroups())
         {
-            // No BiomeGroup declarations, we need to create some
+            // No BiomeGroup declarations, we need to create some defaults
             // The old settings are read for this, they either have old values
             // that need to be imported, or they have suitable default values
             BiomeGroup normalGroup = BiomeGroup.createNormalGroup(this);
