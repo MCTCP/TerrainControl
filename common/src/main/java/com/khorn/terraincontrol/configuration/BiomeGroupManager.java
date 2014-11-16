@@ -38,8 +38,9 @@ public final class BiomeGroupManager
             BiomeGroup existingWithSameName = nameToGroup.get(newGroup.getName());
             if (existingWithSameName != null)
             {
-                newGroup.setGroupid(existingWithSameName.getGroupid());
-                idToGroup.put(existingWithSameName.getGroupid(), newGroup);
+                TerrainControl.log(LogMarker.WARN, "Two biome groups have the same name \"{}\". Removing the second one.",
+                        newGroup.getName());
+                TerrainControl.printStackTrace(LogMarker.WARN, new Exception());
             } else
             {
                 int newGroupId = getNextGroupId();
@@ -50,7 +51,7 @@ public final class BiomeGroupManager
             }
         } else
         {
-            TerrainControl.log(LogMarker.WARN, "Biome group `{}` could not be added. Max biome group count reached.", newGroup.getName());
+            TerrainControl.log(LogMarker.WARN, "Biome group \"{}\" could not be added. Max biome group count reached.", newGroup.getName());
         }
     }
 
