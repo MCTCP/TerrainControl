@@ -109,25 +109,25 @@ public final class LayerFactory
                 {
                     for (int t = 0; t < biomeConfig.biomeRarity; t++)
                         normalBiomes.add(biome);
-
+                    normalGroup.totalGroupRarity -= biomeConfig.biomeRarity;
                 }
 
                 if (iceGroup.contains(biomeConfig.getName()))
                 {
                     for (int t = 0; t < biomeConfig.biomeRarity; t++)
                         iceBiomes.add(biome);
-                    iceGroup.setGroupRarity(iceGroup.getGroupRarity() - biomeConfig.biomeRarity);
+                    iceGroup.totalGroupRarity -= biomeConfig.biomeRarity;
                 }
 
             }
 
             if (!normalBiomes.isEmpty())
-                normalBiomeMap[i] = normalBiomes.toArray(new LocalBiome[normalBiomes.size() + normalGroup.getGroupRarity()]);
+                normalBiomeMap[i] = normalBiomes.toArray(new LocalBiome[normalBiomes.size() + normalGroup.totalGroupRarity]);
             else
                 normalBiomeMap[i] = new LocalBiome[0];
 
             if (!iceBiomes.isEmpty())
-                iceBiomeMap[i] = iceBiomes.toArray(new LocalBiome[iceBiomes.size() + iceGroup.getGroupRarity()]);
+                iceBiomeMap[i] = iceBiomes.toArray(new LocalBiome[iceBiomes.size() + iceGroup.totalGroupRarity]);
             else
                 iceBiomeMap[i] = new LocalBiome[0];
 

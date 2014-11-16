@@ -26,6 +26,14 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     private Map<String, LocalBiome> biomes = new LinkedHashMap<String, LocalBiome>(32);
 
     /**
+     * Variable used by the the ungrouped biome generator. This generator
+     * needs to modify this variable. Directly after calling
+     * {@link #loadBiomeData(LocalWorld)} it has the value of
+     * {@link #getGroupRarity()} plus the biome rarity values of each biome.
+     */
+    public int totalGroupRarity;
+
+    /**
      * Empty constructor, needed for reading this group.
      * @see #BiomeGroup(WorldConfig, String, int, int, List) Constructor to
      * properly initialize this biome group manually.
@@ -116,17 +124,29 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
         }
     }
 
-    public void loadBiomeData(LocalWorld world)
+    /**
+     * Does general post-initialization bookkeeping, like adding the
+     * LocalBiome instances and initializing the average temperature and
+     * group rarity.
+     * @param world Used to look up biomes.
+     */
+    void loadBiomeData(LocalWorld world)
     {
+        float totalTemp = 0;
+        this.totalGroupRarity = this.groupRarity;
         for (Iterator<Entry<String, LocalBiome>> it = this.biomes.entrySet().iterator(); it.hasNext();)
         {
             Entry<String, LocalBiome> entry = it.next();
             String biomeName = entry.getKey();
+
             LocalBiome localBiome = world.getBiomeByName(biomeName);
-            this.avgTemp += localBiome.getBiomeConfig().biomeTemperature;
             entry.setValue(localBiome);
+
+            BiomeConfig biomeConfig = localBiome.getBiomeConfig();
+            totalTemp += biomeConfig.biomeTemperature;
+            this.totalGroupRarity += biomeConfig.biomeRarity;
         }
-        this.avgTemp /= this.biomes.size();
+        this.avgTemp = totalTemp / this.biomes.size();
     }
 
     @Override
@@ -191,12 +211,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
 
     public boolean contains(String name)
     {
-        for (String biome : this.biomes.keySet())
-        {
-            if (biome.equals(name))
-                return true;
-        }
-        return false;
+        return this.biomes.containsKey(name);
     }
 
     public void setGroupid(int groupid)
@@ -238,21 +253,12 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
                 map.put(cumulativeBiomeRarity, biome.getValue());
             }
         }
-//        if (cumulativeBiomeRarity < map.size() * 100)
-//        {
-//            map.put(map.size() * 100, null);
-//        }
         return map;
     }
 
     public int getGroupRarity()
     {
         return groupRarity;
-    }
-
-    public void setGroupRarity(int newRarity)
-    {
-        this.groupRarity = newRarity;
     }
 
     public int getGenerationDepth()
