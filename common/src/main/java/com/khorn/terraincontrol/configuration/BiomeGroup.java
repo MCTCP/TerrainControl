@@ -22,7 +22,6 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     private int generationDepth = 0;
     private float avgTemp = 0;
     private boolean coldGroup = false;
-    protected static double freezeTemp;
     private Map<String, LocalBiome> biomes = new LinkedHashMap<String, LocalBiome>(32);
 
     /**

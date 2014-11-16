@@ -349,9 +349,9 @@ public class WorldConfig extends ConfigFile
 
         // Ice Area Settings
         this.FrozenOcean = readSettings(WorldStandardValues.FROZEN_OCEAN);
-        BiomeGroup.freezeTemp = this.FrozenOceanTemperature = readSettings(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE);
+        this.FrozenOceanTemperature = readSettings(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE);
         this.FreezeAllColdGroupBiomes = readSettings(WorldStandardValues.GROUP_FREEZE_ENABLED);
-        
+
         // Rivers
 
         this.riverRarity = readSettings(WorldStandardValues.RIVER_RARITY);
