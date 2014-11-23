@@ -44,7 +44,7 @@ public final class BiomeGroupManager
             } else
             {
                 int newGroupId = getNextGroupId();
-                newGroup.setGroupid(newGroupId);
+                newGroup.setGroupId(newGroupId);
 
                 nameToGroup.put(newGroup.getName(), newGroup);
                 idToGroup.put(newGroupId, newGroup);

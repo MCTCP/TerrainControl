@@ -45,7 +45,7 @@ public class LayerBiomeGroups extends Layer
                             if (newGroupRarity/entropy < group.getKey())
                             {   
                                 if (group.getValue() != null){
-                                    currentPiece |= (group.getValue().getGroupid() << BiomeGroupShift) |
+                                    currentPiece |= (group.getValue().getGroupId() << BiomeGroupShift) |
                                                     //>>	If the average temp of the group is cold
                                                     ((group.getValue().isColdGroup() && freezeGroups) ? IceBit : 0);
                                 }

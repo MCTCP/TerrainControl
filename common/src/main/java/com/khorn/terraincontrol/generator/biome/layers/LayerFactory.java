@@ -30,7 +30,7 @@ public final class LayerFactory
      */
     public static Layer[] createNormal(LocalWorld world)
     {
-        Layer mainLayer = initmainLayer(world);
+        Layer mainLayer = initMainLayer(world);
 
         Layer zoomedLayer = new LayerZoomVoronoi(10L, mainLayer);
         zoomedLayer.initWorldGenSeed(world.getSeed());
@@ -46,7 +46,7 @@ public final class LayerFactory
     public static Layer[] createFromImage(LocalWorld world)
     {
         WorldConfig worldConfig = world.getConfigs().getWorldConfig();
-        Layer mainLayer = initmainLayer(world);
+        Layer mainLayer = initMainLayer(world);
         if (worldConfig.imageMode == WorldConfig.ImageMode.ContinueNormal)
         {
             mainLayer = new LayerFromImage(1L, mainLayer, worldConfig, world);
@@ -242,14 +242,14 @@ public final class LayerFactory
                 mainLayer = new LayerFromImage(1L, null, worldConfig, world);
         }
 
-        Layer ZoomedLayer = new LayerZoomVoronoi(10L, mainLayer);
+        Layer zoomedLayer = new LayerZoomVoronoi(10L, mainLayer);
 
-        ZoomedLayer.initWorldGenSeed(world.getSeed());
+        zoomedLayer.initWorldGenSeed(world.getSeed());
 
-        return new Layer[] {mainLayer, ZoomedLayer};
+        return new Layer[] {mainLayer, zoomedLayer};
     }
 
-    private static Layer initmainLayer(LocalWorld world)
+    private static Layer initMainLayer(LocalWorld world)
     {
         ConfigProvider configs = world.getConfigs();
         WorldConfig worldConfig = configs.getWorldConfig();

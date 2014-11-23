@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 public final class BiomeGroup extends ConfigFunction<WorldConfig>
 {
 
-    private int groupid;
+    private int groupId;
     private String name;
     private int groupRarity;
     private int generationDepth = 0;
@@ -213,20 +213,20 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
         return this.biomes.containsKey(name);
     }
 
-    public void setGroupid(int groupid)
+    public void setGroupId(int groupid)
     {
         if (groupid <= BiomeGroupManager.MAX_BIOME_GROUP_COUNT)
         {
-            this.groupid = groupid;
+            this.groupId = groupid;
         } else
         {
-            this.groupid = -1;
+            this.groupId = -1;
         }
     }
 
-    public int getGroupid()
+    public int getGroupId()
     {
-        return this.groupid;
+        return this.groupId;
     }
 
     public boolean isColdGroup()
