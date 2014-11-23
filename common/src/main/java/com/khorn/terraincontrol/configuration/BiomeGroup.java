@@ -13,6 +13,13 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import java.util.*;
 import java.util.Map.Entry;
 
+/**
+ * Biomes are spawned in groups so that biomes of the same type are near each
+ * other, and completely different biomes (desert vs taiga) don't spawn next
+ * to each other.
+ *
+ * <p>This class represents such a biome group.
+ */
 public final class BiomeGroup extends ConfigFunction<WorldConfig>
 {
 
@@ -21,7 +28,6 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     private int groupRarity;
     private int generationDepth = 0;
     private float avgTemp = 0;
-    private boolean coldGroup = false;
     private Map<String, LocalBiome> biomes = new LinkedHashMap<String, LocalBiome>(32);
 
     /**
@@ -112,7 +118,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     @Override
     protected void load(List<String> args) throws InvalidConfigException
     {
-        //>>	Must have atleast a GroupName and a Biome that belongs to it
+        // Must have at least a GroupName and a Biome that belongs to it
         assureSize(4, args);
         this.name = args.get(0);
         this.generationDepth = readInt(args.get(1), 0, getHolder().GenerationDepth);
@@ -163,13 +169,10 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     /**
      * Reads all biomes from the start position until the end of the
      * list.
-     * <p/>
      * @param strings The input strings.
      * @param start   The position to start. The first element in the list
      *                has index 0, the last one size() - 1.
-     * <p/>
      * @return All biome names.
-     * <p/>
      * @throws InvalidConfigException If one of the elements in the list is
      *                                not a valid block id.
      */
@@ -178,6 +181,10 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
         return new ArrayList<String>(strings.subList(start, strings.size()));
     }
 
+    /**
+     * Gets the name of this biome group.
+     * @return The name.
+     */
     public String getName()
     {
         return name;
@@ -203,41 +210,64 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
         }
     }
 
-    public List<String> getBiomes()
-    {
-        return Collections.unmodifiableList(new ArrayList<String>(biomes.keySet()));
-    }
-
-    public boolean contains(String name)
+    /**
+     * Gets whether this group contains the given biome. Biome name is case
+     * sensitive.
+     * @param name Name of the biome.
+     * @return True if this group contains the given biome, false otherwise.
+     */
+    public boolean containsBiome(String name)
     {
         return this.biomes.containsKey(name);
     }
 
-    public void setGroupId(int groupid)
+    /**
+     * Sets the group id to the given value. Don't use this if the group is
+     * already registered in a collection.
+     * @param groupId The new group id.
+     * @throws IllegalArgumentException If the group id is larger than
+     * {@link BiomeGroupManager#MAX_BIOME_GROUP_COUNT}.
+     */
+    void setGroupId(int groupId)
     {
-        if (groupid <= BiomeGroupManager.MAX_BIOME_GROUP_COUNT)
+        if (groupId > BiomeGroupManager.MAX_BIOME_GROUP_COUNT)
         {
-            this.groupId = groupid;
-        } else
-        {
-            this.groupId = -1;
+            throw new IllegalArgumentException("Tried to set group id to " + groupId
+                    + ", max allowed is " + BiomeGroupManager.MAX_BIOME_GROUP_COUNT);
         }
+
+        this.groupId = groupId;
     }
 
+    /**
+     * Gets the numerical id for this group. Group ids are sequential and
+     * based on the order they are placed in the configuration files.
+     * @return The numerical id.
+     */
     public int getGroupId()
     {
         return this.groupId;
     }
 
+    /**
+     * Gets whether this group is considered cold. This is based on the
+     * average temperatures of the biomes in the group.
+     * @return True if the group is cold, false otherwise.
+     */
     public boolean isColdGroup()
     {
-        return this.coldGroup || this.avgTemp < 0.33;
+        return this.avgTemp < 0.33;
     }
 
     @Override
     public boolean isAnalogousTo(ConfigFunction<WorldConfig> other)
     {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (other instanceof BiomeGroup)
+        {
+            BiomeGroup group = (BiomeGroup) other;
+            return group.name.equalsIgnoreCase(this.name);
+        }
+        return false;
     }
 
     public SortedMap<Integer, LocalBiome> getDepthMap(int depth)

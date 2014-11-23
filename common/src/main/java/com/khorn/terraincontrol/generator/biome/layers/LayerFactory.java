@@ -105,14 +105,14 @@ public final class LayerFactory
 
                 if (biomeConfig.biomeSize != i)
                     continue;
-                if (normalGroup.contains(biomeConfig.getName()))
+                if (normalGroup.containsBiome(biomeConfig.getName()))
                 {
                     for (int t = 0; t < biomeConfig.biomeRarity; t++)
                         normalBiomes.add(biome);
                     normalGroup.totalGroupRarity -= biomeConfig.biomeRarity;
                 }
 
-                if (iceGroup.contains(biomeConfig.getName()))
+                if (iceGroup.containsBiome(biomeConfig.getName()))
                 {
                     for (int t = 0; t < biomeConfig.biomeRarity; t++)
                         iceBiomes.add(biome);
