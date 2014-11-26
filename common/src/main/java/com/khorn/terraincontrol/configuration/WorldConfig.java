@@ -275,6 +275,10 @@ public class WorldConfig extends ConfigFile
         if (this.reader.hasSetting(WorldStandardValues.NORMAL_BIOMES))
         {
             this.reader.putSetting(WorldStandardValues.BIOME_MODE, "BeforeGroups");
+
+            // And don't create the new biome groups
+            this.reader.putSetting(WorldStandardValues.HOT_BIOMES, Collections.<String> emptyList());
+            this.reader.putSetting(WorldStandardValues.COLD_BIOMES, Collections.<String> emptyList());
         }
     }
 
@@ -485,6 +489,12 @@ public class WorldConfig extends ConfigFile
 
             BiomeGroup iceGroup = BiomeGroup.createIceGroup(this);
             this.biomeGroupManager.registerGroup(iceGroup);
+
+            BiomeGroup hotGroup = BiomeGroup.createHotGroup(this);
+            this.biomeGroupManager.registerGroup(hotGroup);
+
+            BiomeGroup coldGroup = BiomeGroup.createColdGroup(this);
+            this.biomeGroupManager.registerGroup(coldGroup);
         }
     }
 

@@ -27,6 +27,7 @@ public class WorldStandardValues extends Settings
      * by snow.
      */
     public static final float SNOW_AND_ICE_MAX_TEMP = 0.15F;
+    public static final float ICE_GROUP_MAX_TEMP = 0.33F;
 
     public static final Setting<ConfigMode> SETTINGS_MODE = enumSetting("SettingsMode", ConfigMode.WriteAll);
     public static final Setting<TerrainMode> TERRAIN_MODE = enumSetting("TerrainMode", TerrainMode.Normal);
@@ -101,10 +102,12 @@ public class WorldStandardValues extends Settings
             BEDROCK_BLOCK = new MaterialSetting("BedrockobBlock", DefaultMaterial.BEDROCK);
 
     public static final Setting<List<String>>
-            //>>	1.6.4 Biome pseudo-groups
-            NORMAL_BIOMES = stringListSetting("NormalBiomes", "4" , "97" ,"Desert", "Forest",
-                    "Extreme Hills", "Swampland", "Plains", "Taiga", "Jungle"),
-            ICE_BIOMES = stringListSetting("IceBiomes", "3", "15" ,"Ice Plains"),
+            // Default biome groups
+            NORMAL_BIOMES = stringListSetting("NormalBiomes", "Forest", "Roofed Forest", "Extreme Hills", "Plains", "Birch Forest",
+                    "Swampland"),
+            ICE_BIOMES = stringListSetting("IceBiomes", "Ice Plains", "Cold Taiga"),
+            COLD_BIOMES = stringListSetting("ColdBiomes", "Forest", "Extreme Hills", "Taiga", "Plains"),
+            HOT_BIOMES = stringListSetting("HotBiomes", "Desert", "Savanna", "Plains"),
             //>>	Special Lists
             ISLE_BIOMES = stringListSetting("IsleBiomes", "MushroomIsland",
                     "Ice Mountains", "DesertHills", "ForestHills", "TaigaHills",

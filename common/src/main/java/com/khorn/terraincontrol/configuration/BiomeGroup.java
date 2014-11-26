@@ -96,6 +96,28 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     }
 
     /**
+     * Creates a biome group with the default hot biomes.
+     * @param config The world config.
+     * @return The biome group.
+     */
+    public static BiomeGroup createHotGroup(WorldConfig config)
+    {
+        return ofSettings(config, WorldStandardValues.HOT_BIOMES,
+                WorldStandardValues.LAND_SIZE, WorldStandardValues.LAND_RARITY);
+    }
+
+    /**
+     * Creates a biome group with the default cold biomes.
+     * @param config The world config.
+     * @return The biome group.
+     */
+    public static BiomeGroup createColdGroup(WorldConfig config)
+    {
+        return ofSettings(config, WorldStandardValues.COLD_BIOMES,
+                WorldStandardValues.LAND_SIZE, WorldStandardValues.LAND_RARITY);
+    }
+
+    /**
      * Creates a new <code>BiomeGroup</code>.
      * @param config    WorldConfig this biome group is part of.
      * @param groupName The name of this group.
@@ -256,7 +278,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
      */
     public boolean isColdGroup()
     {
-        return this.avgTemp < 0.33;
+        return this.avgTemp < WorldStandardValues.ICE_GROUP_MAX_TEMP;
     }
 
     @Override
