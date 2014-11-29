@@ -113,9 +113,9 @@ public class CanyonsGen extends TerrainGenBase
                 i3 = 16;
 
             int i4 = 0;
-            for (int localZ = k; (i4 == 0) && (localZ < m); localZ++)
+            for (int localX = k; (i4 == 0) && (localX < m); localX++)
             {
-                for (int localX = i2; (i4 == 0) && (localX < i3); localX++)
+                for (int localZ = i2; (i4 == 0) && (localZ < i3); localZ++)
                 {
                     for (int localY = minY + 1; (i4 == 0) && (localY >= maxY - 1); localY--)
                     {
@@ -129,7 +129,7 @@ public class CanyonsGen extends TerrainGenBase
                             {
                                 i4 = 1;
                             }
-                            if ((localY != maxY - 1) && (localZ != k) && (localZ != m - 1) && (localX != i2) && (localX != i3 - 1))
+                            if ((localY != maxY - 1) && (localX != k) && (localX != m - 1) && (localZ != i2) && (localZ != i3 - 1))
                                 localY = maxY;
                         }
                     }
@@ -139,14 +139,14 @@ public class CanyonsGen extends TerrainGenBase
             {
                 continue;
             }
-            for (int localZ = k; localZ < m; localZ++)
+            for (int localX = k; localX < m; localX++)
             {
-                double d9 = (localZ + generatingChunk.getBlockX() + 0.5D - paramDouble1) / d3;
-                for (int localX = i2; localX < i3; localX++)
+                double d9 = (localX + generatingChunk.getBlockX() + 0.5D - paramDouble1) / d3;
+                for (int localZ = i2; localZ < i3; localZ++)
                 {
-                    LocalBiome biome = world.getBiome(localX + generatingChunk.getBlockX(), localZ + generatingChunk.getBlockZ());
+                    LocalBiome biome = world.getBiome(localZ + generatingChunk.getBlockX(), localX + generatingChunk.getBlockZ());
                     BiomeConfig biomeConfig = biome.getBiomeConfig();
-                    double d10 = (localX + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
+                    double d10 = (localZ + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
                     boolean grassFound = false;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
