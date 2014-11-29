@@ -78,16 +78,16 @@ public class TCChunkGenerator extends ChunkGenerator
     }
 
     @Override
-    public byte[][] generateBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes)
+    public short[][] generateExtBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes)
     {
         makeSureWorldIsInitialized(world);
 
         if (this.NotGenerate)
-            return new byte[16][];
+            return new short[16][];
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
         BukkitChunkBuffer chunkBuffer = new BukkitChunkBuffer(chunkCoord);
         this.chunkProviderTC.generate(chunkBuffer);
 
-        return chunkBuffer.accessBytes();
+        return chunkBuffer.accessRawValues();
     }
 }
