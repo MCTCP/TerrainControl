@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings.EntityCategory;
 import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_7_R4.*;
+import net.minecraft.server.v1_8_R1.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

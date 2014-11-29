@@ -2,11 +2,10 @@ package com.khorn.terraincontrol.bukkit.generator.structures;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
-import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_7_R4.*;
+import net.minecraft.server.v1_8_R1.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +73,7 @@ public class RareBuildingGen extends StructureGenerator
 
         int var5 = chunkX / this.maxDistanceBetweenScatteredFeatures;
         int var6 = chunkZ / this.maxDistanceBetweenScatteredFeatures;
-        Random random = this.c.A(var5, var6, 14357617);
+        Random random = this.c.a(var5, var6, 14357617);
         var5 *= this.maxDistanceBetweenScatteredFeatures;
         var6 *= this.maxDistanceBetweenScatteredFeatures;
         var5 += random.nextInt(this.maxDistanceBetweenScatteredFeatures - this.minDistanceBetweenScatteredFeatures);
@@ -82,11 +81,11 @@ public class RareBuildingGen extends StructureGenerator
 
         if (var3 == var5 && var4 == var6)
         {
-            int biomeAtPosition = WorldHelper.getGenerationId(this.c.getWorldChunkManager().getBiome(var3 * 16 + 8, var4 * 16 + 8));
+            BiomeBase biomeAtPosition = this.c.getWorldChunkManager().getBiome(new BlockPosition(var3 * 16 + 8, 0, var4 * 16 + 8));
 
             for (BiomeBase biome : biomeList)
             {
-                if (biomeAtPosition == WorldHelper.getGenerationId(biome))
+                if (biomeAtPosition.equals(biome))
                 {
                     return true;
                 }
@@ -119,9 +118,9 @@ public class RareBuildingGen extends StructureGenerator
         a(null, world, chunkX, chunkZ, null);
     }
 
-    public void place(World world, Random random, int chunkX, int chunkZ)
+    public void place(World world, Random random, ChunkCoordIntPair chunk)
     {
-        a(world, random, chunkX, chunkZ);
+        a(world, random, chunk);
     }
 
     @Override

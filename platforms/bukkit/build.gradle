@@ -6,14 +6,10 @@ apply plugin: 'java'
 archivesBaseName = "terraincontrol-bukkit"
 description = "TerrainControl for Bukkit"
 ext.ideProjectName = "TerrainControl-Bukkit"
-ext.bukkitVersion = "1.7.10-R0.1-SNAPSHOT"
+ext.bukkitVersion = "1.8-R0.1-SNAPSHOT"
 
 repositories
 {
-    maven // Mirror for Bukkit and CraftBukkit
-    {
-        url "http://repo.md-5.net/content/groups/public"
-    }
     mavenCentral() // For log4j
     mavenLocal()
 }
@@ -21,8 +17,13 @@ repositories
 dependencies
 {
     testCompile 'junit:junit:4+'
-    compile 'org.bukkit:bukkit:' + project.ext.bukkitVersion
-    compile 'org.bukkit:craftbukkit:' + project.ext.bukkitVersion
+    // You'll need to download Spigot Server and API manually
+	// There are no public repos for these files
+    // http://www.spigotmc.org/threads/bukkit-craftbukkit-spigot-1-8.36598/
+    // The BuildTools.jar file will automatically install it in mavenLocal
+    // so chances are it's already there if you have used BuildTools earlier
+    compile 'org.spigotmc:spigot-api:' + project.ext.bukkitVersion
+    compile 'org.spigotmc:spigot:' + project.ext.bukkitVersion
     compile project(':common')
     compile 'org.apache.logging.log4j:log4j-api:2.0-beta9'
     compile 'org.apache.logging.log4j:log4j-core:2.0-beta9'

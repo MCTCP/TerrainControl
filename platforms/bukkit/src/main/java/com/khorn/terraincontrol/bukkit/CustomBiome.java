@@ -6,10 +6,10 @@ import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_7_R4.BiomeBase;
-import net.minecraft.server.v1_7_R4.BiomeMeta;
+import net.minecraft.server.v1_8_R1.BiomeBase;
+import net.minecraft.server.v1_8_R1.BiomeMeta;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_7_R4.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_8_R1.block.CraftBlock;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -75,10 +75,10 @@ public class CustomBiome extends BiomeBase
     @SuppressWarnings("unchecked")
     public void setEffects(BiomeConfig config)
     {
-        this.am = config.biomeHeight;
-        this.an = config.biomeVolatility;
-        this.ai = ((BukkitMaterialData) config.surfaceBlock).internalBlock();
-        this.ak = ((BukkitMaterialData) config.groundBlock).internalBlock();
+        this.an = config.biomeHeight;
+        this.ao = config.biomeVolatility;
+        this.ak = ((BukkitMaterialData) config.surfaceBlock).internalBlock();
+        this.al = ((BukkitMaterialData) config.groundBlock).internalBlock();
         this.temperature = config.biomeTemperature;
         this.humidity = config.biomeWetness;
         if (this.humidity == 0)
@@ -87,10 +87,10 @@ public class CustomBiome extends BiomeBase
         }
 
         // Mob spawning
-        addMobs(this.as, config.spawnMonsters);
-        addMobs(this.at, config.spawnCreatures);
-        addMobs(this.au, config.spawnWaterCreatures);
-        addMobs(this.av, config.spawnAmbientCreatures);
+        addMobs(this.at, config.spawnMonsters);
+        addMobs(this.au, config.spawnCreatures);
+        addMobs(this.av, config.spawnWaterCreatures);
+        addMobs(this.aw, config.spawnAmbientCreatures);
     }
 
     // Adds the mobs to the internal list.

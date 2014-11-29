@@ -15,10 +15,11 @@ import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
+import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
-import net.minecraft.server.v1_7_R4.*;
-import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
+import net.minecraft.server.v1_8_R1.*;
+import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
 
 import java.util.*;
 
@@ -168,47 +169,46 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void PlaceDungeons(Random rand, int x, int y, int z)
     {
-        new WorldGenDungeons().generate(this.world, rand, x, y, z);
+        new WorldGenDungeons().generate(this.world, rand, new BlockPosition(x, y, z));
     }
 
     @Override
     public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z)
     {
+        BlockPosition blockPos = new BlockPosition(x, y, z);
         switch (type)
         {
             case Tree:
-                return tree.generate(this.world, rand, x, y, z);
+                return tree.generate(this.world, rand, blockPos);
             case BigTree:
-                bigTree.a(1.0D, 1.0D, 1.0D);
-                return bigTree.generate(this.world, rand, x, y, z);
+                return bigTree.generate(this.world, rand, blockPos);
             case Forest:
             case Birch:
-                return birchTree.generate(this.world, rand, x, y, z);
+                return birchTree.generate(this.world, rand, blockPos);
             case TallBirch:
-                return longBirchTree.generate(this.world, rand, x, y, z);
+                return longBirchTree.generate(this.world, rand, blockPos);
             case HugeMushroom:
-                hugeMushroom.a(1.0D, 1.0D, 1.0D);
-                return hugeMushroom.generate(this.world, rand, x, y, z);
+                return hugeMushroom.generate(this.world, rand, blockPos);
             case SwampTree:
-                return swampTree.generate(this.world, rand, x, y, z);
+                return swampTree.generate(this.world, rand, blockPos);
             case Taiga1:
-                return taigaTree1.generate(this.world, rand, x, y, z);
+                return taigaTree1.generate(this.world, rand, blockPos);
             case Taiga2:
-                return taigaTree2.generate(this.world, rand, x, y, z);
+                return taigaTree2.generate(this.world, rand, blockPos);
             case JungleTree:
-                return jungleTree.generate(this.world, rand, x, y, z);
+                return jungleTree.generate(this.world, rand, blockPos);
             case GroundBush:
-                return groundBush.generate(this.world, rand, x, y, z);
+                return groundBush.generate(this.world, rand, blockPos);
             case CocoaTree:
-                return cocoaTree.generate(this.world, rand, x, y, z);
+                return cocoaTree.generate(this.world, rand, blockPos);
             case Acacia:
-                return acaciaTree.generate(this.world, rand, x, y, z);
+                return acaciaTree.generate(this.world, rand, blockPos);
             case DarkOak:
-                return darkOakTree.generate(this.world, rand, x, y, z);
+                return darkOakTree.generate(this.world, rand, blockPos);
             case HugeTaiga1:
-                return hugeTaigaTree1.generate(this.world, rand, x, y, z);
+                return hugeTaigaTree1.generate(this.world, rand, blockPos);
             case HugeTaiga2:
-                return hugeTaigaTree2.generate(this.world, rand, x, y, z);
+                return hugeTaigaTree2.generate(this.world, rand, blockPos);
             default:
                 throw new AssertionError("Failed to handle tree of type " + type.toString());
         }
@@ -217,20 +217,19 @@ public class BukkitWorld implements LocalWorld
     @Override
     public boolean placeDefaultStructures(Random random, ChunkCoordinate chunkCoord)
     {
-        int chunkX = chunkCoord.getChunkX();
-        int chunkZ = chunkCoord.getChunkZ();
-
+        ChunkCoordIntPair chunkIntPair = new ChunkCoordIntPair(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
         boolean villageGenerated = false;
+
         if (this.settings.worldConfig.strongholdsEnabled)
-            this.strongholdGen.place(this.world, random, chunkX, chunkZ);
+            this.strongholdGen.place(this.world, random, chunkIntPair);
         if (this.settings.worldConfig.mineshaftsEnabled)
-            this.mineshaftGen.place(this.world, random, chunkX, chunkZ);
+            this.mineshaftGen.place(this.world, random, chunkIntPair);
         if (this.settings.worldConfig.villagesEnabled)
-            villageGenerated = this.villageGen.place(this.world, random, chunkX, chunkZ);
+            villageGenerated = this.villageGen.place(this.world, random, chunkIntPair);
         if (this.settings.worldConfig.rareBuildingsEnabled)
-            this.pyramidsGen.place(this.world, random, chunkX, chunkZ);
+            this.pyramidsGen.place(this.world, random, chunkIntPair);
         if (this.settings.worldConfig.netherFortressesEnabled)
-            this.netherFortress.place(this.world, random, chunkX, chunkZ);
+            this.netherFortress.place(this.world, random, chunkIntPair);
 
         return villageGenerated;
     }
@@ -278,8 +277,8 @@ public class BukkitWorld implements LocalWorld
                         LocalMaterialData[][] replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;
                         for (int sectionY = 0; sectionY < 16; sectionY++)
                         {
-                            Block block = section.getTypeId(sectionX, sectionY, sectionZ);
-                            int blockId = Block.getId(block);
+                            IBlockData block = section.getType(sectionX, sectionY, sectionZ);
+                            int blockId = Block.getId(block.getBlock());
                             if (replaceArray[blockId] == null)
                                 continue;
 
@@ -291,8 +290,7 @@ public class BukkitWorld implements LocalWorld
                             if (replaceTo == null || replaceTo.getBlockId() == blockId)
                                 continue;
 
-                            section.setTypeId(sectionX, sectionY, sectionZ, replaceTo.internalBlock());
-                            section.setData(sectionX, sectionY, sectionZ, replaceTo.getBlockData());
+                            section.setType(sectionX, sectionY, sectionZ, replaceTo.internalBlock());
                         }
                     }
                 }
@@ -335,7 +333,7 @@ public class BukkitWorld implements LocalWorld
             {
                 return null;
             }
-            if (world.chunkProvider.isChunkLoaded(chunkX, chunkZ))
+            if (world.chunkProviderServer.isChunkLoaded(chunkX, chunkZ))
             {
                 return world.getChunkAt(chunkX, chunkZ);
             }
@@ -383,22 +381,26 @@ public class BukkitWorld implements LocalWorld
         {
             return true;
         }
-        return chunk.getType(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
+        return chunk.getTypeAbs(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
     }
 
     @Override
     public LocalMaterialData getMaterial(int x, int y, int z)
     {
         Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null)
+        if (chunk == null || y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
         {
-            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR, 0);
+            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR);
         }
 
-        z &= 0xF;
-        x &= 0xF;
+        // There's no chunk.getType(x,y,z), only chunk.getType(BlockPosition)
+        // so we use this little hack.
+        // Creating a block position for every block lookup is expensive and
+        // a major cause of Minecraft 1.8's performance degradation:
+        // http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1272953-optifine?comment=43757
+        IBlockData blockData = chunk.getSections()[y >> 4].getType(x & 0xF, y & 0xF, z & 0xF);
 
-        return BukkitMaterialData.ofMinecraftBlock(chunk.getType(x, y, z), chunk.getData(x, y, z));
+        return BukkitMaterialData.ofMinecraftBlockData(blockData);
     }
 
     @Override
@@ -415,7 +417,7 @@ public class BukkitWorld implements LocalWorld
             return;
         }
 
-        Block block = ((BukkitMaterialData) material).internalBlock();
+        IBlockData blockData = ((BukkitMaterialData) material).internalBlock();
 
         // Get chunk from (faster) custom cache
         Chunk chunk = this.getChunk(x, y, z);
@@ -426,17 +428,16 @@ public class BukkitWorld implements LocalWorld
             return;
         }
 
+        BlockPosition blockPos = new BlockPosition(x, y, z);
+
         // Temporarily make static, so that torches etc. don't pop off
-        boolean oldStatic = world.isStatic;
-        world.isStatic = true;
-        chunk.a(x & 15, y, z & 15, block, material.getBlockData());
-        world.isStatic = oldStatic;
+        chunk.a(blockPos, blockData);
 
         // Relight and update players
-        world.A(x, y, z);
+        world.x(blockPos);
         if (!world.isStatic)
         {
-            world.notify(x, y, z);
+            world.notify(blockPos);
         }
     }
 
@@ -448,13 +449,12 @@ public class BukkitWorld implements LocalWorld
         {
             return -1;
         }
-        z &= 0xF;
-        x &= 0xF;
-        int y = chunk.b(x, z);
+
+        int y = chunk.b(x & 0xf, z & 0xf);
 
         // Fix for incorrect light map
         boolean incorrectHeightMap = false;
-        while (y < getHeightCap() && chunk.getType(x, y, z).getMaterial().blocksLight())
+        while (y < getHeightCap() && chunk.getTypeAbs(x, y, z).getMaterial().blocksLight())
         {
             y++;
             incorrectHeightMap = true;
@@ -462,7 +462,7 @@ public class BukkitWorld implements LocalWorld
         if (incorrectHeightMap)
         {
             // Let Minecraft know that it made an error
-            world.A(x, y, z); // world.relight
+            world.x(new BlockPosition(x, y, z)); // world.relight
         }
 
         return y;
@@ -535,7 +535,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public int getLightLevel(int x, int y, int z)
     {
-        return world.j(x, y, z); // world.getBlockAndSkyLightAsItWereDay
+        return world.k(new BlockPosition(x, y, z)); // world.getBlockAndSkyLightAsItWereDay
     }
 
     @Override
@@ -696,11 +696,12 @@ public class BukkitWorld implements LocalWorld
         if (biomeGenerator instanceof BukkitVanillaBiomeGenerator)
         {
             // Let our biome generator depend on Minecraft's
-            ((BukkitVanillaBiomeGenerator) biomeGenerator).setWorldChunkManager(this.world.worldProvider.e);
+            ((BukkitVanillaBiomeGenerator) biomeGenerator).setWorldChunkManager(this.world.worldProvider.m());
         } else
         {
             // Let Minecraft's biome generator depend on ours
-            this.world.worldProvider.e = new TCWorldChunkManager(this, biomeGenerator);
+            ReflectionHelper.setFirstFieldOfType(this.world.worldProvider,
+                    WorldChunkManager.class, new TCWorldChunkManager(this, biomeGenerator));
         }
     }
 
@@ -742,7 +743,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
     {
-        return getBiomeById(world.getBiome(x, z).id);
+        return getBiomeById(world.getBiome(new BlockPosition(x, 0, z)).id);
     }
 
     @Override
@@ -755,7 +756,7 @@ public class BukkitWorld implements LocalWorld
         nmsTag.setInt("y", y);
         nmsTag.setInt("z", z);
         // Add that data to the current tile entity in the world
-        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
         if (tileEntity != null)
         {
             tileEntity.a(nmsTag); // tileEntity.load
@@ -769,7 +770,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public NamedBinaryTag getMetadata(int x, int y, int z)
     {
-        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
         if (tileEntity == null)
         {
             return null;

@@ -3,8 +3,9 @@ package com.khorn.terraincontrol.bukkit.generator;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
-import net.minecraft.server.v1_7_R4.BiomeBase;
-import net.minecraft.server.v1_7_R4.WorldChunkManager;
+import net.minecraft.server.v1_8_R1.BiomeBase;
+import net.minecraft.server.v1_8_R1.BlockPosition;
+import net.minecraft.server.v1_8_R1.WorldChunkManager;
 
 /**
  * A biome generator that gets its information from Mojang's WorldChunkManager.
@@ -69,7 +70,7 @@ public class BukkitVanillaBiomeGenerator extends VanillaBiomeGenerator {
     @Override
     public int getBiome(int x, int z)
     {
-        return worldChunkManager.getBiome(x, z).id;
+        return worldChunkManager.getBiome(new BlockPosition(x, 0, z)).id;
     }
 
     @Override

@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import net.minecraft.server.v1_7_R4.Block;
+import net.minecraft.server.v1_8_R1.Block;
 
 import java.io.File;
 
@@ -45,10 +45,10 @@ public class BukkitEngine extends TerrainControlEngine
         // This is so that things like "minecraft:stone" aren't parsed
         // as the block "minecraft" with data "stone", but instead as the
         // block "minecraft:stone" with no block data.
-        Block block = Block.b(input);
+        Block block = Block.getByName(input);
         if (block != null)
         {
-            return BukkitMaterialData.ofMinecraftBlock(block, 0);
+            return BukkitMaterialData.ofMinecraftBlock(block);
         }
 
         try
@@ -65,7 +65,7 @@ public class BukkitEngine extends TerrainControlEngine
     private LocalMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
     {
         String blockName = input;
-        int blockData = 0;
+        int blockData = -1;
 
         // When there is a . or a : in the name, extract block data
         int splitIndex = input.lastIndexOf(":");
@@ -79,16 +79,29 @@ public class BukkitEngine extends TerrainControlEngine
             blockData = Integer.parseInt(input.substring(splitIndex + 1));
         }
 
-        // Get the material belonging to the block and data
-        Block block = Block.b(blockName);
+        // Parse block name
+        Block block = Block.getByName(blockName);
+        if (block == null)
+        {
+            DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
+            if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+            {
+                block = Block.getById(defaultMaterial.id);
+            }
+        }
+
+        // Get the block
         if (block != null)
         {
-            return BukkitMaterialData.ofMinecraftBlock(block, blockData);
-        }
-        DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
-        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
-        {
-            return BukkitMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
+            if (blockData == -1)
+            {
+                // Use default
+                return BukkitMaterialData.ofMinecraftBlock(block);
+            } else
+            {
+                // Use specified data
+                return BukkitMaterialData.ofMinecraftBlockData(block.fromLegacyData(blockData));
+            }
         }
 
         // Failed

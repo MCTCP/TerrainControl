@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_7_R4.*;
+import net.minecraft.server.v1_8_R1.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,12 +59,12 @@ public class StrongholdGen extends StructureGenerator
                 ArrayList arraylist = new ArrayList();
 
                 Collections.addAll(arraylist, this.allowedBiomes);
-                ChunkPosition chunkposition = this.c.getWorldChunkManager().a((i1 << 4) + 8, (j1 << 4) + 8, 112, arraylist, random);
+                BlockPosition chunkposition = this.c.getWorldChunkManager().a((i1 << 4) + 8, (j1 << 4) + 8, 112, arraylist, random);
 
                 if (chunkposition != null)
                 {
-                    i1 = chunkposition.x >> 4;
-                    j1 = chunkposition.z >> 4;
+                    i1 = chunkposition.getX() >> 4;
+                    j1 = chunkposition.getZ() >> 4;
                 }
 
                 this.structureCoords[l] = new ChunkCoordIntPair(i1, j1);
@@ -94,7 +94,7 @@ public class StrongholdGen extends StructureGenerator
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    protected List o_()
+    protected List y_()
     {
         ArrayList arraylist = new ArrayList();
         ChunkCoordIntPair[] achunkcoordintpair = this.structureCoords;
@@ -130,9 +130,9 @@ public class StrongholdGen extends StructureGenerator
         a(null, world, chunkX, chunkZ, null);
     }
 
-    public void place(World world, Random random, int chunkX, int chunkZ)
+    public void place(World world, Random random, ChunkCoordIntPair chunk)
     {
-        a(world, random, chunkX, chunkZ);
+        a(world, random, chunk);
     }
 
     @Override

@@ -2,13 +2,11 @@ package com.khorn.terraincontrol.bukkit.generator.structures;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
-import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_7_R4.*;
+import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
+import net.minecraft.server.v1_8_R1.*;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
 
@@ -21,7 +19,7 @@ public class VillageStart extends StructureStart
     public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
         List<StructurePiece> villagePieces = WorldGenVillagePieces.a(random, size);
-        
+
         int startX = (chunkX << 4) + 2;
         int startZ = (chunkZ << 4) + 2;
         WorldGenVillageStartPiece startPiece = new WorldGenVillageStartPiece(world.getWorldChunkManager(), 0, random, startX, startZ, villagePieces, size);
@@ -37,8 +35,8 @@ public class VillageStart extends StructureStart
         
         this.a.add(startPiece);
         startPiece.a(startPiece, this.a, random);
-        List<StructurePiece> arraylist1 = startPiece.j;
-        List<StructurePiece> arraylist2 = startPiece.i;
+        List<StructurePiece> arraylist1 = startPiece.g;
+        List<StructurePiece> arraylist2 = startPiece.f;
 
         int componentCount;
 
@@ -89,22 +87,7 @@ public class VillageStart extends StructureStart
      */
     private void changeToSandstoneVillage(WorldGenVillageStartPiece subject, boolean sandstoneVillage)
     {
-        for (Field field : WorldGenVillageStartPiece.class.getFields())
-        {
-            if (field.getType().toString().equals("boolean"))
-            {
-                try
-                {
-                    field.setAccessible(true);
-                    field.setBoolean(subject, sandstoneVillage);
-                    break;
-                } catch (Exception e)
-                {
-                    TerrainControl.log(LogMarker.FATAL, "Cannot make village a sandstone village!");
-                    TerrainControl.printStackTrace(LogMarker.FATAL, e);
-                }
-            }
-        }
+        ReflectionHelper.setFirstFieldOfType(subject, boolean.class, sandstoneVillage);
     }
 
     @Override
