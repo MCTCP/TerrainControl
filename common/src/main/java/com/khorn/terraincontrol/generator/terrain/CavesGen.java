@@ -189,11 +189,16 @@ public class CavesGen extends TerrainGenBase
                                         generatingChunkBuffer.setBlock(local_x, local_y, local_z, air);
 
                                         // Replace supporting sand with
-                                        // sandstone. TODO: support red
-                                        // sand(stone) in Minecraft 1.8
-                                        if (materialAbove.isMaterial(DefaultMaterial.SAND) && materialAbove.getBlockData() == 0)
+                                        // sandstone.
+                                        if (materialAbove.isMaterial(DefaultMaterial.SAND))
                                         {
-                                            generatingChunkBuffer.setBlock(local_x, local_y + 1, local_z, sandstone);
+                                            if (materialAbove.getBlockData() == 0)
+                                            {
+                                                generatingChunkBuffer.setBlock(local_x, local_y + 1, local_z, sandstone);
+                                            } else
+                                            {
+                                                generatingChunkBuffer.setBlock(local_x, local_y + 1, local_z, redSandstone);
+                                            }
                                         }
 
                                         // If grass was just deleted, try to
