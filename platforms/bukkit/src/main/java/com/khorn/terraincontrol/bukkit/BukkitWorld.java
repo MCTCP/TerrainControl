@@ -398,8 +398,13 @@ public class BukkitWorld implements LocalWorld
         // Creating a block position for every block lookup is expensive and
         // a major cause of Minecraft 1.8's performance degradation:
         // http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1272953-optifine?comment=43757
-        IBlockData blockData = chunk.getSections()[y >> 4].getType(x & 0xF, y & 0xF, z & 0xF);
+        ChunkSection section = chunk.getSections()[y >> 4];
+        if (section == null)
+        {
+            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR);
+        }
 
+        IBlockData blockData = section.getType(x & 0xF, y & 0xF, z & 0xF);
         return BukkitMaterialData.ofMinecraftBlockData(blockData);
     }
 
