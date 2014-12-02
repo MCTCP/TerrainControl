@@ -32,7 +32,8 @@ public class BiomeStandardValues extends Settings
             FOLIAGE_COLOR_IS_MULTIPLIER = booleanSetting("FoliageColorIsMultiplier", true),
             DISABLE_BIOME_HEIGHT = booleanSetting("DisableBiomeHeight", false),
             STRONGHOLDS_ENABLED = WorldStandardValues.STRONGHOLDS_ENABLED,
-            NETHER_FORTRESSES_ENABLED = WorldStandardValues.NETHER_FORTRESSES_ENABLED;
+            NETHER_FORTRESSES_ENABLED = WorldStandardValues.NETHER_FORTRESSES_ENABLED,
+            OCEAN_MONUMENTS_ENABLED = WorldStandardValues.OCEAN_MONUMENTS_ENABLED;
 
     public static final Setting<String>
             BIOME_CONFIG_EXTENSION = stringSetting("BiomeConfigExtension", ".bc"),

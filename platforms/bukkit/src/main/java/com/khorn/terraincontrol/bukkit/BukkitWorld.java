@@ -47,7 +47,8 @@ public class BukkitWorld implements LocalWorld
     public VillageGen villageGen;
     public MineshaftGen mineshaftGen;
     public RareBuildingGen pyramidsGen;
-    public NetherFortressGen netherFortress;
+    public NetherFortressGen netherFortressGen;
+    public OceanMonumentGen oceanMonumentGen;
 
     private WorldGenTrees tree;
     private WorldGenAcaciaTree acaciaTree;
@@ -163,7 +164,9 @@ public class BukkitWorld implements LocalWorld
         if (this.settings.worldConfig.rareBuildingsEnabled)
             this.pyramidsGen.prepare(this.world, chunkX, chunkZ);
         if (this.settings.worldConfig.netherFortressesEnabled)
-            this.netherFortress.prepare(this.world, chunkX, chunkZ);
+            this.netherFortressGen.prepare(this.world, chunkX, chunkZ);
+        if (this.settings.worldConfig.oceanMonumentsEnabled)
+            this.oceanMonumentGen.prepare(this.world, chunkX, chunkZ);
     }
 
     @Override
@@ -229,7 +232,9 @@ public class BukkitWorld implements LocalWorld
         if (this.settings.worldConfig.rareBuildingsEnabled)
             this.pyramidsGen.place(this.world, random, chunkIntPair);
         if (this.settings.worldConfig.netherFortressesEnabled)
-            this.netherFortress.place(this.world, random, chunkIntPair);
+            this.netherFortressGen.place(this.world, random, chunkIntPair);
+        if (this.settings.worldConfig.oceanMonumentsEnabled)
+            this.oceanMonumentGen.place(this.world, random, chunkIntPair);
 
         return villageGenerated;
     }
@@ -663,7 +668,8 @@ public class BukkitWorld implements LocalWorld
                     this.villageGen = new VillageGen(settings);
                     this.mineshaftGen = new MineshaftGen();
                     this.pyramidsGen = new RareBuildingGen(settings);
-                    this.netherFortress = new NetherFortressGen();
+                    this.netherFortressGen = new NetherFortressGen();
+                    this.oceanMonumentGen = new OceanMonumentGen(settings);
                 case NotGenerate:
                 case TerrainTest:
                     this.generator.onInitialize(this);

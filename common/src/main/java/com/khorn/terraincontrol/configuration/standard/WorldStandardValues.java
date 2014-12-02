@@ -74,7 +74,9 @@ public class WorldStandardValues extends Settings
             VILLAGE_DISTANCE = intSetting("VillageDistance", 32, 9, 10000),
             VILLAGE_SIZE = intSetting("VillageSize", 0, 0, 10),
             MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS = intSetting("MinimumDistanceBetweenRareBuildings", 9, 1, 10000),
-            MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS = intSetting("MaximumDistanceBetweenRareBuildings", 32, 1, 10000);
+            MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS = intSetting("MaximumDistanceBetweenRareBuildings", 32, 1, 10000),
+            OCEAN_MONUMENT_GRID_SIZE = intSetting("OceanMonumentGridSize", 32, 1, 10000),
+            OCEAN_MONUMENT_RANDOM_OFFSET = intSetting("OceanMonumentRandomOffset", 26, 0, 10000);
 
     public static final Setting<Boolean>
             RIVERS_ENABLED = booleanSetting("RiversEnabled", true),
@@ -92,6 +94,7 @@ public class WorldStandardValues extends Settings
             VILLAGES_ENABLED = booleanSetting("VillagesEnabled", true),
             MINESHAFTS_ENABLED = booleanSetting("MineshaftsEnabled", true),
             RARE_BUILDINGS_ENABLED = booleanSetting("RareBuildingsEnabled", true),
+            OCEAN_MONUMENTS_ENABLED = booleanSetting("OceanMonumentsEnabled", true),
             POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false);
 
     public static final Setting<LocalMaterialData>
