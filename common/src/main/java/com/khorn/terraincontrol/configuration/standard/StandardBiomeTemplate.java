@@ -70,6 +70,7 @@ public class StandardBiomeTemplate
     public int defaultGrassColor = 0xFFFFFF;
     public int defaultFoliageColor = 0xFFFFFF;
     public boolean defaultStrongholds = true;
+    public boolean defaultOceanMonuments = false;
     public VillageType defaultVillageType = VillageType.disabled;
     public RareBuildingType defaultRareBuildingType = RareBuildingType.disabled;
     public int defaultEmeraldOre = 0;

@@ -1,10 +1,12 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.server.v1_8_R1.*;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -21,8 +23,7 @@ import java.util.Random;
 public class OceanMonumentGen extends StructureGenerator
 {
 
-    private final List<BiomeBase> monumentSpawnBiomes = Arrays.asList(BiomeBase.OCEAN, BiomeBase.DEEP_OCEAN, BiomeBase.RIVER,
-            BiomeBase.FROZEN_OCEAN, BiomeBase.FROZEN_RIVER);
+    private final List<BiomeBase> monumentSpawnBiomes;
 
     private int randomOffset;
     private int gridSize;
@@ -31,7 +32,17 @@ public class OceanMonumentGen extends StructureGenerator
     {
         this.gridSize = settings.getWorldConfig().oceanMonumentGridSize;
         this.randomOffset = settings.getWorldConfig().oceanMonumentRandomOffset;
+        this.monumentSpawnBiomes = new ArrayList<BiomeBase>();
 
+        for (LocalBiome biome : settings.getBiomeArray())
+        {
+            if (biome == null || !biome.getBiomeConfig().oceanMonumentsEnabled)
+            {
+                continue;
+            }
+
+            monumentSpawnBiomes.add(((BukkitBiome) biome).getHandle());
+        }
     }
 
     @Override

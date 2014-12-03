@@ -791,7 +791,7 @@ public class WorldConfig extends ConfigFile
 
         writer.comment("Ocean monuments are placed on the corners of a grid, with a random offset added to each corner.");
         writer.comment("The first variable is the size of the grid in chunks.");
-        writer.comment("Setting this to 5 will give a grid with cells of 5x5 chunks.");
+        writer.comment("Setting this to 8 will give a grid with cells of 8x8 chunks.");
         writer.setting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE, this.oceanMonumentGridSize);
 
         writer.comment("Random offset from each corner in chunks, on both the x and z axis.");

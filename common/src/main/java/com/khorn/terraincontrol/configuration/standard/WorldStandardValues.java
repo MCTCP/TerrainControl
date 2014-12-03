@@ -75,7 +75,7 @@ public class WorldStandardValues extends Settings
             VILLAGE_SIZE = intSetting("VillageSize", 0, 0, 10),
             MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS = intSetting("MinimumDistanceBetweenRareBuildings", 9, 1, 10000),
             MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS = intSetting("MaximumDistanceBetweenRareBuildings", 32, 1, 10000),
-            OCEAN_MONUMENT_GRID_SIZE = intSetting("OceanMonumentGridSize", 32, 1, 10000),
+            OCEAN_MONUMENT_GRID_SIZE = intSetting("OceanMonumentGridSize", 32, 5, 10000),
             OCEAN_MONUMENT_RANDOM_OFFSET = intSetting("OceanMonumentRandomOffset", 26, 0, 10000);
 
     public static final Setting<Boolean>
