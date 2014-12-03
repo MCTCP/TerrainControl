@@ -12,16 +12,15 @@ repositories
 {
     mavenCentral() // For log4j
     mavenLocal()
+    maven 
+    {   // For Spigot, no official repo at time of writing
+        url = "http://rutgerkok.nl/repo" 
+    }
 }
 
 dependencies
 {
     testCompile 'junit:junit:4+'
-    // You'll need to download Spigot Server and API manually
-	// There are no public repos for these files
-    // http://www.spigotmc.org/threads/bukkit-craftbukkit-spigot-1-8.36598/
-    // The BuildTools.jar file will automatically install it in mavenLocal
-    // so chances are it's already there if you have used BuildTools earlier
     compile 'org.spigotmc:spigot-api:' + project.ext.bukkitVersion
     compile 'org.spigotmc:spigot:' + project.ext.bukkitVersion
     compile project(':common')
