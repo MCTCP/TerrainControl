@@ -6,10 +6,10 @@ import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.entity.monster.EntityWitch;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
-import net.minecraft.world.gen.structure.MapGenStructure;
-import net.minecraft.world.gen.structure.StructureStart;
+import net.minecraft.world.gen.structure.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +22,7 @@ public class RareBuildingGen extends MapGenStructure
     /**
      * contains possible spawns for scattered features
      */
-    @SuppressWarnings("rawtypes")
-    private List scatteredFeatureSpawnList;
+    private List<SpawnListEntry> scatteredFeatureSpawnList;
 
     /**
      * the maximum distance between scattered features
@@ -83,7 +82,8 @@ public class RareBuildingGen extends MapGenStructure
 
         if (var3 == var5 && var4 == var6)
         {
-            BiomeGenBase biomeAtPosition = this.worldObj.getWorldChunkManager().getBiomeGenAt(var3 * 16 + 8, var4 * 16 + 8);
+            BiomeGenBase biomeAtPosition = this.worldObj.getWorldChunkManager()
+                    .func_180631_a(new BlockPos(var3 * 16 + 8, 0, var4 * 16 + 8));
 
             for (BiomeGenBase biome : biomeList)
             {
@@ -106,14 +106,28 @@ public class RareBuildingGen extends MapGenStructure
     /**
      * returns possible spawns for scattered features
      */
-    @SuppressWarnings({"rawtypes", "UnusedDeclaration"})
-    public List getScatteredFeatureSpawnList()
+    public List<SpawnListEntry> getMonsterSpawnList()
     {
         return this.scatteredFeatureSpawnList;
     }
 
+    public boolean isSwampHutAtLocation(BlockPos blockPos)
+    {
+        StructureStart structurestart = this.func_175797_c(blockPos);
+
+        if (structurestart != null && structurestart instanceof MapGenScatteredFeature.Start && !structurestart.getComponents().isEmpty())
+        {
+            StructureComponent structurecomponent = (StructureComponent) structurestart.getComponents().getFirst();
+            return structurecomponent instanceof ComponentScatteredFeaturePieces.SwampHut;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     @Override
-    public String func_143025_a()
+    public String getStructureName()
     {
         return StructureNames.RARE_BUILDING;
     }

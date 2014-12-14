@@ -27,7 +27,7 @@ apply plugin: 'forge'
 archivesBaseName = "terraincontrol-forge"
 description = "TerrainControl for Minecraft Forge"
 ext.ideProjectName = "TerrainControl-Forge"
-ext.forgeVersion = "1.7.10-10.13.0.1160"
+ext.forgeVersion = "1.8-11.14.0.1268-1.8"
 minecraft.version = ext.forgeVersion
 
 repositories

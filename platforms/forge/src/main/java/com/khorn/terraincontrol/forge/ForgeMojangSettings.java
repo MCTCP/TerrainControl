@@ -62,25 +62,25 @@ public final class ForgeMojangSettings implements MojangSettings
     @Override
     public float getSurfaceHeight()
     {
-        return biomeBase.rootHeight;
+        return biomeBase.minHeight;
     }
 
     @Override
     public float getSurfaceVolatility()
     {
-        return biomeBase.heightVariation;
+        return biomeBase.maxHeight;
     }
 
     @Override
     public LocalMaterialData getSurfaceBlock()
     {
-        return ForgeMaterialData.ofMinecraftBlock(biomeBase.topBlock, 0);
+        return ForgeMaterialData.ofMinecraftBlockState(biomeBase.topBlock);
     }
 
     @Override
     public LocalMaterialData getGroundBlock()
     {
-        return ForgeMaterialData.ofMinecraftBlock(biomeBase.fillerBlock, 0);
+        return ForgeMaterialData.ofMinecraftBlockState(biomeBase.fillerBlock);
     }
 
     @Override

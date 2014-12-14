@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.biome.BiomeGenBase;
 
 public class ForgeBiome implements LocalBiome
@@ -76,7 +77,7 @@ public class ForgeBiome implements LocalBiome
     @Override
     public float getTemperatureAt(int x, int y, int z)
     {
-        return biomeBase.getFloatTemperature(x, y, z);
+        return biomeBase.func_180626_a(new BlockPos(x, y, z));
     }
 
     @Override

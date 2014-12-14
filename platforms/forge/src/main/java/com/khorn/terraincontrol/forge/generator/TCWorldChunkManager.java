@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
-import net.minecraft.world.ChunkPosition;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.gen.structure.MapGenVillage;
@@ -30,9 +30,9 @@ public class TCWorldChunkManager extends WorldChunkManager
 
     // get biome
     @Override
-    public BiomeGenBase getBiomeGenAt(int paramInt1, int paramInt2)
+    public BiomeGenBase func_180631_a(BlockPos blockPos)
     {
-        return localWorld.getBiomeById(biomeGenerator.getBiome(paramInt1, paramInt2)).getHandle();
+        return localWorld.getBiomeById(biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
     }
 
     // rain
@@ -109,7 +109,7 @@ public class TCWorldChunkManager extends WorldChunkManager
 
     @Override
     @SuppressWarnings("rawtypes")
-    public ChunkPosition findBiomePosition(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
+    public BlockPos findBiomePosition(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
     {
         int i = paramInt1 - paramInt3 >> 2;
         int j = paramInt2 - paramInt3 >> 2;
@@ -119,7 +119,7 @@ public class TCWorldChunkManager extends WorldChunkManager
         int n = k - i + 1;
         int i1 = m - j + 1;
         int[] arrayOfInt = this.biomeGenerator.getBiomesUnZoomed(null, i, j, n, i1, OutputType.DEFAULT_FOR_WORLD);
-        ChunkPosition localChunkPosition = null;
+        BlockPos blockPos = null;
         int i2 = 0;
         for (int i3 = 0; i3 < arrayOfInt.length; i3++)
         {
@@ -128,13 +128,13 @@ public class TCWorldChunkManager extends WorldChunkManager
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
             BiomeGenBase localBiomeBase = BiomeGenBase.getBiome(arrayOfInt[i3]);
-            if ((!paramList.contains(localBiomeBase)) || ((localChunkPosition != null) && (paramRandom.nextInt(i2 + 1) != 0)))
+            if ((!paramList.contains(localBiomeBase)) || ((blockPos != null) && (paramRandom.nextInt(i2 + 1) != 0)))
                 continue;
-            localChunkPosition = new ChunkPosition(i4, 0, i5);
+            blockPos = new BlockPos(i4, 0, i5);
             i2++;
         }
 
-        return localChunkPosition;
+        return blockPos;
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.forge.generator;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 
@@ -57,7 +58,7 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
     @Override
     public int getBiome(int x, int z)
     {
-        return worldChunkManager.getBiomeGenAt(x, z).biomeID;
+        return worldChunkManager.func_180631_a(new BlockPos(x, 0, z)).biomeID;
     }
 
     @Override

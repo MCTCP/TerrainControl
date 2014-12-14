@@ -12,13 +12,13 @@ import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
+import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.FileHelper;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -444,7 +444,7 @@ public class WorldSettings implements ConfigProvider
     }
 
     @Override
-    public void writeToStream(DataOutputStream stream) throws IOException
+    public void writeToStream(DataOutput stream) throws IOException
     {
         // General information
         ConfigFile.writeStringToStream(stream, worldConfig.getName());

@@ -90,7 +90,7 @@ public class VillageGen extends MapGenStructure
     }
 
     @Override
-    public String func_143025_a()
+    public String getStructureName()
     {
         return StructureNames.VILLAGE;
     }

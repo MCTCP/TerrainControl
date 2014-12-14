@@ -45,13 +45,13 @@ public final class MobSpawnGroupHelper
         switch (type)
         {
             case MONSTER:
-                return EnumCreatureType.monster;
+                return EnumCreatureType.MONSTER;
             case CREATURE:
-                return EnumCreatureType.creature;
+                return EnumCreatureType.CREATURE;
             case AMBIENT_CREATURE:
-                return EnumCreatureType.ambient;
+                return EnumCreatureType.AMBIENT;
             case WATER_CREATURE:
-                return EnumCreatureType.waterCreature;
+                return EnumCreatureType.WATER_CREATURE;
         }
         throw new AssertionError("Unknown mob type: " + type);
     }

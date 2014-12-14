@@ -3,19 +3,19 @@ package com.khorn.terraincontrol.forge.events;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.resource.SaplingGen;
 import com.khorn.terraincontrol.generator.resource.SaplingType;
-import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import cpw.mods.fml.common.eventhandler.Event.Result;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Random;
 
@@ -27,17 +27,13 @@ public class SaplingListener
         private final LocalMaterialData material;
         private final SaplingType saplingType;
 
-        private int x;
-        private final int y;
-        private int z;
+        private BlockPos blockPos;
 
-        private SaplingGrower(LocalWorld world, int x, int y, int z)
+        private SaplingGrower(LocalWorld world, BlockPos blockPos)
         {
             this.world = world;
-            this.material = world.getMaterial(x, y, z);
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.material = world.getMaterial(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+            this.blockPos = blockPos;
 
             // Check whether block is a sapling
             if (!this.material.isMaterial(DefaultMaterial.SAPLING))
@@ -70,6 +66,9 @@ public class SaplingListener
          */
         private boolean findFourSaplings()
         {
+            int x = blockPos.getX();
+            int y = blockPos.getY();
+            int z = blockPos.getZ();
             for (int treeOffsetX = 0; treeOffsetX >= -1; --treeOffsetX)
             {
                 for (int treeOffsetZ = 0; treeOffsetZ >= -1; --treeOffsetZ)
@@ -80,8 +79,7 @@ public class SaplingListener
                             && isSameSapling(material, world.getMaterial(x + treeOffsetX + 1, y, z + treeOffsetZ + 1)))
                     {
                         // Found! Adjust internal position
-                        x = x + treeOffsetX;
-                        z = z + treeOffsetZ;
+                        blockPos = blockPos.add(treeOffsetX, 0, treeOffsetZ);
                         return true;
                     }
                 }
@@ -157,6 +155,7 @@ public class SaplingListener
     {
         World world = event.world;
         LocalWorld localWorld = WorldHelper.toLocalWorld(world);
+        BlockPos blockPos = event.pos;
 
         if (localWorld == null)
         {
@@ -164,7 +163,7 @@ public class SaplingListener
             return;
         }
 
-        SaplingGrower saplingGrower = new SaplingGrower(localWorld, event.x, event.y, event.z);
+        SaplingGrower saplingGrower = new SaplingGrower(localWorld, blockPos);
         
         if (saplingGrower.saplingType == null)
         {
@@ -173,7 +172,7 @@ public class SaplingListener
         }
 
         // Get the sapling generator
-        SaplingGen saplingGen = this.getSaplingGen(localWorld, saplingGrower.saplingType, saplingGrower.x, saplingGrower.z);
+        SaplingGen saplingGen = this.getSaplingGen(localWorld, saplingGrower.saplingType, saplingGrower.blockPos);
         if (saplingGen == null)
         {
             // No sapling generator set for this sapling
@@ -186,22 +185,24 @@ public class SaplingListener
         event.setResult(Result.DENY);
 
         // Remove saplings
+        IBlockState air = Blocks.air.getDefaultState();
         if (saplingGrower.saplingType.requiresFourSaplings())
         {
-            world.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z, Blocks.air);
-            world.setBlock(saplingGrower.x + 1, saplingGrower.y, saplingGrower.z, Blocks.air);
-            world.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z + 1, Blocks.air);
-            world.setBlock(saplingGrower.x + 1, saplingGrower.y, saplingGrower.z + 1, Blocks.air);
+            world.setBlockState(saplingGrower.blockPos, air);
+            world.setBlockState(saplingGrower.blockPos.add(1, 0, 0), air);
+            world.setBlockState(saplingGrower.blockPos.add(0, 0, 1), air);
+            world.setBlockState(saplingGrower.blockPos.add(1, 0, 1), air);
         } else
         {
-            world.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z, Blocks.air);
+            world.setBlockState(saplingGrower.blockPos, air);
         }
 
         // Try ten times to grow sapling
         boolean saplingGrown = false;
         for (int i = 0; i < 10; i++)
         {
-            if (saplingGen.growSapling(localWorld, new Random(), saplingGrower.x, saplingGrower.y, saplingGrower.z))
+            if (saplingGen.growSapling(localWorld, new Random(), saplingGrower.blockPos.getX(),
+                    saplingGrower.blockPos.getY(), saplingGrower.blockPos.getZ()))
             {
                 saplingGrown = true;
                 break;
@@ -211,15 +212,18 @@ public class SaplingListener
         if (!saplingGrown)
         {
             // Restore sapling
+            int saplingX = saplingGrower.blockPos.getX();
+            int saplingY = saplingGrower.blockPos.getY();
+            int saplingZ = saplingGrower.blockPos.getZ();
             if (saplingGrower.saplingType.requiresFourSaplings())
             {
-                localWorld.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z, saplingGrower.material);
-                localWorld.setBlock(saplingGrower.x + 1, saplingGrower.y, saplingGrower.z, saplingGrower.material);
-                localWorld.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z + 1, saplingGrower.material);
-                localWorld.setBlock(saplingGrower.x + 1, saplingGrower.y, saplingGrower.z + 1, saplingGrower.material);
+                localWorld.setBlock(saplingX, saplingY, saplingZ, saplingGrower.material);
+                localWorld.setBlock(saplingX + 1, saplingY, saplingZ, saplingGrower.material);
+                localWorld.setBlock(saplingX, saplingY, saplingZ + 1, saplingGrower.material);
+                localWorld.setBlock(saplingX + 1, saplingY, saplingZ + 1, saplingGrower.material);
             } else
             {
-                localWorld.setBlock(saplingGrower.x, saplingGrower.y, saplingGrower.z, saplingGrower.material);
+                localWorld.setBlock(saplingX, saplingY, saplingZ, saplingGrower.material);
             }
         }
 
@@ -239,10 +243,10 @@ public class SaplingListener
         SaplingGen gen = null;
         if (event.block == Blocks.red_mushroom_block)
         {
-            gen = getSaplingGen(localWorld, SaplingType.RedMushroom, event.x, event.z);
+            gen = getSaplingGen(localWorld, SaplingType.RedMushroom, event.pos);
         } else if (event.block == Blocks.brown_mushroom_block)
         {
-            gen = getSaplingGen(localWorld, SaplingType.BrownMushroom, event.x, event.z);
+            gen = getSaplingGen(localWorld, SaplingType.BrownMushroom, event.pos);
         }
         if (gen == null)
         {
@@ -252,13 +256,13 @@ public class SaplingListener
 
         // Generate mushroom
         event.setResult(Result.ALLOW);
-        event.world.setBlock(event.x, event.y, event.z, Blocks.air);
+        event.world.setBlockState(event.pos, Blocks.air.getDefaultState());
 
         boolean mushroomGrown = false;
         Random random = new Random();
         for (int i = 0; i < 10; i++)
         {
-            if (gen.growSapling(localWorld, random, event.x, event.y, event.z))
+            if (gen.growSapling(localWorld, random, event.pos.getX(), event.pos.getY(), event.pos.getZ()))
             {
                 mushroomGrown = true;
                 break;
@@ -267,17 +271,16 @@ public class SaplingListener
         if (!mushroomGrown)
         {
             // Restore mushroom
-            event.world.setBlock(event.x, event.y, event.z, event.block, 0, 3);
+            event.world.setBlockState(event.pos, event.block);
         }
     }
 
     // Can return null
-    public SaplingGen getSaplingGen(LocalWorld world, SaplingType type, int x, int z)
+    public SaplingGen getSaplingGen(LocalWorld world, SaplingType type, BlockPos blockPos)
     {
         try
         {
-            LocalBiome biome = world.getSavedBiome(x, z);
-            TerrainControl.log(LogMarker.INFO, "Biome: {}" + biome.getName());
+            LocalBiome biome = world.getSavedBiome(blockPos.getX(), blockPos.getZ());
             return biome.getBiomeConfig().getSaplingGen(type);
         } catch (BiomeNotFoundException e)
         {

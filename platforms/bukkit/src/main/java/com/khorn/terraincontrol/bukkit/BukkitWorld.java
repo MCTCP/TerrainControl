@@ -440,7 +440,6 @@ public class BukkitWorld implements LocalWorld
 
         BlockPosition blockPos = new BlockPosition(x, y, z);
 
-        // Temporarily make static, so that torches etc. don't pop off
         chunk.a(blockPos, blockData);
 
         // Relight and update players

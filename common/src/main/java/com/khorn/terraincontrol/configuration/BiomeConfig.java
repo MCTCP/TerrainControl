@@ -22,7 +22,7 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
-import java.io.DataOutputStream;
+import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -973,7 +973,7 @@ public class BiomeConfig extends ConfigFile
         reader.putSetting(setting, groups);
     }
 
-    public void writeToStream(DataOutputStream stream) throws IOException
+    public void writeToStream(DataOutput stream) throws IOException
     {
         writeStringToStream(stream, getName());
 

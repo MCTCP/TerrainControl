@@ -12,10 +12,11 @@ import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import net.minecraft.block.BlockSand;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.IProgressUpdate;
-import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 
@@ -90,12 +91,6 @@ public class ChunkProvider implements IChunkProvider
     }
 
     @Override
-    public Chunk loadChunk(int i, int i1)
-    {
-        return provideChunk(i, i1);
-    }
-
-    @Override
     public void populate(IChunkProvider ChunkProvider, int x, int z)
     {
         if (this.TestMode)
@@ -129,24 +124,40 @@ public class ChunkProvider implements IChunkProvider
         return "TerrainControlLevelSource";
     }
 
+    // getPossibleCreatures
     @Override
-    public List<?> getPossibleCreatures(EnumCreatureType paramaca, int paramInt1, int paramInt2, int paramInt3)
+    public List<SpawnListEntry> func_177458_a(EnumCreatureType paramaca, BlockPos blockPos)
     {
-        BiomeGenBase Biome = this.worldHandle.getBiomeGenForCoords(paramInt1, paramInt3);
-        if (Biome == null)
+        WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
+        BiomeGenBase biomeBase = this.worldHandle.getBiomeGenForCoords(blockPos);
+
+        if (worldConfig.rareBuildingsEnabled)
         {
-            return null;
+            if (paramaca == EnumCreatureType.MONSTER && this.world.rareBuildingGen.isSwampHutAtLocation(blockPos))
+            {
+                return this.world.rareBuildingGen.getMonsterSpawnList();
+            }
         }
-        return Biome.getSpawnableList(paramaca);
+        if (worldConfig.oceanMonumentsEnabled)
+        {
+            if (paramaca == EnumCreatureType.MONSTER && this.world.oceanMonumentGen.func_175796_a(this.worldHandle, blockPos))
+            {
+                return this.world.oceanMonumentGen.getMonsterSpawnList();
+            }
+        }
+        @SuppressWarnings("unchecked")
+        List<SpawnListEntry> returnList = biomeBase.getSpawnableList(paramaca);
+        return returnList;
     }
 
+    // findNearestStructure
     @Override
-    public ChunkPosition func_147416_a(World world, String s, int x, int y, int z)
+    public BlockPos func_180513_a(World worldIn, String s, BlockPos blockPos)
     {
         // Gets the nearest stronghold
         if (("Stronghold".equals(s)) && (this.world.strongholdGen != null))
         {
-            return this.world.strongholdGen.func_151545_a(world, x, y, z);
+            return this.world.strongholdGen.func_180706_b(worldIn, blockPos);
         }
         return null;
     }
@@ -158,27 +169,33 @@ public class ChunkProvider implements IChunkProvider
     }
 
     @Override
-    public void recreateStructures(int chunkX, int chunkZ)
+    public void func_180514_a(Chunk p_180514_1_, int chunkX, int chunkZ)
     {
-        if (world.mineshaftGen != null)
+        // recreateStructures
+        WorldConfig worldConfig = world.getConfigs().getWorldConfig();
+        if (worldConfig.mineshaftsEnabled)
         {
-            world.mineshaftGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
+            world.mineshaftGen.func_175792_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
-        if (world.villageGen != null)
+        if (worldConfig.villagesEnabled)
         {
-            world.villageGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
+            world.villageGen.func_175792_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
-        if (world.strongholdGen != null)
+        if (worldConfig.strongholdsEnabled)
         {
-            world.strongholdGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
+            world.strongholdGen.func_175792_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
-        if (world.rareBuildingGen != null)
+        if (worldConfig.rareBuildingsEnabled)
         {
-            world.rareBuildingGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
+            world.rareBuildingGen.func_175792_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
-        if (world.netherFortressGen != null)
+        if (worldConfig.netherFortressesEnabled)
         {
-            world.netherFortressGen.func_151539_a(this, world.getWorld(), chunkX, chunkZ, null);
+            world.netherFortressGen.func_175792_a(this, world.getWorld(), chunkX, chunkZ, null);
+        }
+        if (worldConfig.oceanMonumentsEnabled)
+        {
+            world.oceanMonumentGen.func_175792_a(this, world.getWorld(), chunkX, chunkZ, null);
         }
     }
 
@@ -187,4 +204,28 @@ public class ChunkProvider implements IChunkProvider
     {
         // Empty, just like Minecraft's ChunkProviderGenerate
     }
+
+    @Override
+    public Chunk func_177459_a(BlockPos blockPos)
+    {
+        // provideChunkForBlock
+        return provideChunk(blockPos.getX() >> 4, blockPos.getZ() >> 4);
+    }
+
+    @Override
+    public boolean func_177460_a(IChunkProvider chunkProvider, Chunk chunk, int chunkX, int chunkZ)
+    {
+        // retroGen -> generated ocean monument in existing chunks in vanilla
+        // Disabled, as
+        // * it's not enabled in the Bukkit version, as Spigot's
+        // generator API doesn't support it
+        // * people updating to 1.8 might be surprised why this monument
+        // spawns
+        // in existing chunks of their customized ocean biome
+        // * changing the spawn settings of ocean monuments makes them spawn
+        // at different positions, so extra monuments will be spawned in old
+        // chunks
+        return false;
+    }
+
 }

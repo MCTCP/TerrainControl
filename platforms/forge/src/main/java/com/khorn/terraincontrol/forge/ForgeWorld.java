@@ -18,9 +18,12 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.SpawnerAnimals;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -56,6 +59,7 @@ public class ForgeWorld implements LocalWorld
     public MineshaftGen mineshaftGen;
     public RareBuildingGen rareBuildingGen;
     public NetherFortressGen netherFortressGen;
+    public OceanMonumentGen oceanMonumentGen;
 
     private WorldGenDungeons dungeonGen;
 
@@ -180,61 +184,62 @@ public class ForgeWorld implements LocalWorld
     public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
     {
         if (this.settings.worldConfig.strongholdsEnabled)
-            this.strongholdGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
+            this.strongholdGen.func_175792_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.mineshaftsEnabled)
-            this.mineshaftGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
+            this.mineshaftGen.func_175792_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.villagesEnabled && dry)
-            this.villageGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
+            this.villageGen.func_175792_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.rareBuildingsEnabled)
-            this.rareBuildingGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
+            this.rareBuildingGen.func_175792_a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.netherFortressesEnabled)
-            this.netherFortressGen.func_151539_a(null, this.world, chunkX, chunkZ, null);
+            this.netherFortressGen.func_175792_a(null, this.world, chunkX, chunkZ, null);
+        if (this.settings.worldConfig.oceanMonumentsEnabled)
+            this.oceanMonumentGen.func_175792_a(null, this.world, chunkX, chunkZ, null);
     }
 
     @Override
     public void PlaceDungeons(Random rand, int x, int y, int z)
     {
-        dungeonGen.generate(this.world, rand, x, y, z);
+        dungeonGen.generate(this.world, rand, new BlockPos(x, y, z));
     }
 
     @Override
     public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z)
     {
+        BlockPos blockPos = new BlockPos(x, y, z);
         switch (type)
         {
             case Tree:
-                return tree.generate(this.world, rand, x, y, z);
+                return tree.generate(this.world, rand, blockPos);
             case BigTree:
-                bigTree.setScale(1.0D, 1.0D, 1.0D);
-                return bigTree.generate(this.world, rand, x, y, z);
+                return bigTree.generate(this.world, rand, blockPos);
             case Forest:
             case Birch:
-                return birchTree.generate(this.world, rand, x, y, z);
+                return birchTree.generate(this.world, rand, blockPos);
             case TallBirch:
-                return longBirchTree.generate(this.world, rand, x, y, z);
+                return longBirchTree.generate(this.world, rand, blockPos);
             case HugeMushroom:
-                hugeMushroom.setScale(1.0D, 1.0D, 1.0D);
-                return hugeMushroom.generate(this.world, rand, x, y, z);
+                return hugeMushroom.generate(this.world, rand, blockPos);
             case SwampTree:
-                return swampTree.generate(this.world, rand, x, y, z);
+                return swampTree.generate(this.world, rand, blockPos);
             case Taiga1:
-                return taigaTree1.generate(this.world, rand, x, y, z);
+                return taigaTree1.generate(this.world, rand, blockPos);
             case Taiga2:
-                return taigaTree2.generate(this.world, rand, x, y, z);
+                return taigaTree2.generate(this.world, rand, blockPos);
             case JungleTree:
-                return jungleTree.generate(this.world, rand, x, y, z);
+                return jungleTree.generate(this.world, rand, blockPos);
             case GroundBush:
-                return groundBush.generate(this.world, rand, x, y, z);
+                return groundBush.generate(this.world, rand, blockPos);
             case CocoaTree:
-                return cocoaTree.generate(this.world, rand, x, y, z);
+                return cocoaTree.generate(this.world, rand, blockPos);
             case Acacia:
-                return acaciaTree.generate(this.world, rand, x, y, z);
+                return acaciaTree.generate(this.world, rand, blockPos);
             case DarkOak:
-                return darkOakTree.generate(this.world, rand, x, y, z);
+                return darkOakTree.generate(this.world, rand, blockPos);
             case HugeTaiga1:
-                return hugeTaigaTree1.generate(this.world, rand, x, y, z);
+                return hugeTaigaTree1.generate(this.world, rand, blockPos);
             case HugeTaiga2:
-                return hugeTaigaTree2.generate(this.world, rand, x, y, z);
+                return hugeTaigaTree2.generate(this.world, rand, blockPos);
             default:
                 throw new AssertionError("Failed to handle tree of type " + type.toString());
         }
@@ -243,20 +248,21 @@ public class ForgeWorld implements LocalWorld
     @Override
     public boolean placeDefaultStructures(Random rand, ChunkCoordinate chunkCoord)
     {
-        int chunkX = chunkCoord.getChunkX();
-        int chunkZ = chunkCoord.getChunkZ();
+        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 
         boolean isVillagePlaced = false;
         if (this.settings.worldConfig.strongholdsEnabled)
-            this.strongholdGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
+            this.strongholdGen.func_175794_a(this.world, rand, chunkCoordIntPair);
         if (this.settings.worldConfig.mineshaftsEnabled)
-            this.mineshaftGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
+            this.mineshaftGen.func_175794_a(this.world, rand, chunkCoordIntPair);
         if (this.settings.worldConfig.villagesEnabled)
-            isVillagePlaced = this.villageGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
+            isVillagePlaced = this.villageGen.func_175794_a(this.world, rand, chunkCoordIntPair);
         if (this.settings.worldConfig.rareBuildingsEnabled)
-            this.rareBuildingGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
+            this.rareBuildingGen.func_175794_a(this.world, rand, chunkCoordIntPair);
         if (this.settings.worldConfig.netherFortressesEnabled)
-            this.netherFortressGen.generateStructuresInChunk(this.world, rand, chunkX, chunkZ);
+            this.netherFortressGen.func_175794_a(this.world, rand, chunkCoordIntPair);
+        if (this.settings.worldConfig.oceanMonumentsEnabled)
+            this.oceanMonumentGen.func_175794_a(this.world, rand, chunkCoordIntPair);
 
         return isVillagePlaced;
     }
@@ -317,9 +323,7 @@ public class ForgeWorld implements LocalWorld
                             if (replaceTo == null || replaceTo.getBlockId() == blockId)
                                 continue;
 
-                            // section.setBlock(....)
-                            section.func_150818_a(sectionX, sectionY, sectionZ, replaceTo.internalBlock());
-                            section.setExtBlockMetadata(sectionX, sectionY, sectionZ, replaceTo.getBlockData());
+                            section.set(sectionX, sectionY, sectionZ, replaceTo.internalBlock());
                         }
                     }
                 }
@@ -418,15 +422,24 @@ public class ForgeWorld implements LocalWorld
     public LocalMaterialData getMaterial(int x, int y, int z)
     {
         Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null)
+        if (chunk == null || y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
         {
-            return ForgeMaterialData.ofMinecraftBlock(Blocks.air, 0);
+            return ForgeMaterialData.ofMinecraftBlock(Blocks.air);
         }
 
-        z &= 0xF;
-        x &= 0xF;
+        // There's no chunk.getType(x,y,z), only chunk.getType(BlockPosition)
+        // so we use this little hack.
+        // Creating a block position for every block lookup is expensive and
+        // a major cause of Minecraft 1.8's performance degradation:
+        // http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1272953-optifine?comment=43757
+        ExtendedBlockStorage section = chunk.getBlockStorageArray()[y >> 4];
+        if (section == null)
+        {
+            return ForgeMaterialData.ofMinecraftBlock(Blocks.air);
+        }
 
-        return ForgeMaterialData.ofMinecraftBlock(chunk.getBlock(x, y, z), chunk.getBlockMetadata(x, y, z));
+        IBlockState blockState = section.get(x & 0xF, y & 0xF, z & 0xF);
+        return ForgeMaterialData.ofMinecraftBlockState(blockState);
     }
 
     @Override
@@ -437,10 +450,13 @@ public class ForgeWorld implements LocalWorld
          * whether the names are still correct. Often, you'll also need to
          * rewrite parts of this method for newer block place logic.
          */
+
         if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
         {
             return;
         }
+
+        IBlockState blockState = ((ForgeMaterialData) material).internalBlock();
 
         // Get chunk from (faster) custom cache
         Chunk chunk = this.getChunk(x, y, z);
@@ -451,18 +467,15 @@ public class ForgeWorld implements LocalWorld
             return;
         }
 
-        // Temporarily make remote, so that torches etc. don't pop off
-        boolean oldStatic = world.isRemote;
-        world.isRemote = true;
-        // chunk.setBlockAndMetadata(...)
-        chunk.func_150807_a(x & 15, y, z & 15, ((ForgeMaterialData) material).internalBlock(), material.getBlockData());
-        world.isRemote = oldStatic;
+        BlockPos blockPos = new BlockPos(x, y, z);
+
+        chunk.setBlockState(blockPos, blockState);
 
         // Relight and update players
-        world.func_147451_t(x, y, z); // world.updateAllLightTypes
+        world.checkLight(blockPos);
         if (!world.isRemote)
         {
-            world.markBlockForUpdate(x, y, z);
+            world.markBlockForUpdate(blockPos);
         }
     }
 
@@ -471,17 +484,25 @@ public class ForgeWorld implements LocalWorld
     {
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
-            return -1;
-        z &= 0xF;
-        x &= 0xF;
-        int y = chunk.getHeightValue(x, z);
-        int maxSearchY = y + 5; // Don't search too far away
-        // while(chunk.getBlock(...) != ...)
-        while (chunk.getBlock(x, y, z) != Blocks.air && y <= maxSearchY)
         {
-            // Fix for incorrect lightmap
-            y += 1;
+            return -1;
         }
+
+        int y = chunk.getHeight(x & 0xf, z & 0xf);
+
+        // Fix for incorrect light map
+        boolean incorrectHeightMap = false;
+        while (y < getHeightCap() && chunk.getBlock(x, y, z).getMaterial().blocksLight())
+        {
+            y++;
+            incorrectHeightMap = true;
+        }
+        if (incorrectHeightMap)
+        {
+            // Let Minecraft know that it made an error
+            world.checkLight(new BlockPos(x, y, z));
+        }
+
         return y;
     }
 
@@ -554,7 +575,7 @@ public class ForgeWorld implements LocalWorld
     public int getLightLevel(int x, int y, int z)
     {
         // Actually, this calculates the block and skylight as it were day.
-        return world.getFullBlockLightValue(x, y, z);
+        return world.getLight(new BlockPos(x, y, z));
     }
 
     @Override
@@ -627,6 +648,7 @@ public class ForgeWorld implements LocalWorld
         this.mineshaftGen = new MineshaftGen();
         this.rareBuildingGen = new RareBuildingGen(configs);
         this.netherFortressGen = new NetherFortressGen();
+        this.oceanMonumentGen = new OceanMonumentGen(configs);
 
         this.tree = new WorldGenTrees(false);
         this.acaciaTree = new WorldGenSavannaTree(false);
@@ -678,7 +700,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
     {
-        return getBiomeById(world.getBiomeGenForCoords(x, z).biomeID);
+        return getBiomeById(world.getBiomeGenForCoords(new BlockPos(x, 0, z)).biomeID);
     }
 
     @Override
@@ -691,7 +713,7 @@ public class ForgeWorld implements LocalWorld
         nmsTag.setInteger("y", y);
         nmsTag.setInteger("z", z);
         // Add that data to the current tile entity in the world
-        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
         if (tileEntity != null)
         {
             tileEntity.readFromNBT(nmsTag);
@@ -705,7 +727,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public NamedBinaryTag getMetadata(int x, int y, int z)
     {
-        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
         if (tileEntity == null)
         {
             return null;

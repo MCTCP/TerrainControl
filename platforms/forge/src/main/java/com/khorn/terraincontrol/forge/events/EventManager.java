@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.events.EventHandler;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.*;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate;
@@ -48,6 +49,7 @@ public class EventManager extends EventHandler
         ForgeWorld world = (ForgeWorld) localWorld;
         int blockX = chunkX * CHUNK_X_SIZE;
         int blockZ = chunkZ * CHUNK_Z_SIZE;
+        BlockPos blockPos = new BlockPos(blockX, 0, blockZ);
 
         // Convert to Forge event and fire
         if (resource instanceof DungeonGen ||
@@ -66,24 +68,23 @@ public class EventManager extends EventHandler
             {
                 // Fire ore generation start event
                 MinecraftForge.ORE_GEN_BUS
-                        .post(new OreGenEvent.Pre(world.getWorld(), random, blockX, blockZ));
+                        .post(new OreGenEvent.Pre(world.getWorld(), random, blockPos));
                 setOreGenerationBegun(world, true);
             }
             // Fire ore generation event
             GenerateMinable.EventType forgeEvent = getOreEventType(resource.getMaterial());
-            return TerrainGen.generateOre(world.getWorld(), random, null, blockX, blockZ, forgeEvent);
+            return TerrainGen.generateOre(world.getWorld(), random, null, blockPos, forgeEvent);
         } else
         {
             if (!hasDecorationBegun(world))
             {
                 // Fire decoration start event
-                MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Pre(world.getWorld(), random, blockX, chunkZ
-                        * CHUNK_Z_SIZE));
+                MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Pre(world.getWorld(), random, blockPos));
                 setDecorationBegun(world, true);
             }
             // Fire decoration event
             Decorate.EventType forgeEvent = getDecorateEventType(resource.getMaterial());
-            return TerrainGen.decorate(world.getWorld(), random, blockX, blockZ, forgeEvent);
+            return TerrainGen.decorate(world.getWorld(), random, blockPos, forgeEvent);
         }
     }
 
@@ -97,8 +98,8 @@ public class EventManager extends EventHandler
         setOreGenerationBegun(world, false);
 
         // Fire event
-        PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Pre(world.getChunkGenerator(), world.getWorld(), random, chunkX
-                * CHUNK_X_SIZE, chunkZ * CHUNK_Z_SIZE, villageInChunk);
+        PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Pre(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ,
+                villageInChunk);
         MinecraftForge.EVENT_BUS.post(forgeEvent);
     }
 
@@ -108,26 +109,27 @@ public class EventManager extends EventHandler
         ForgeWorld world = (ForgeWorld) localWorld;
         int blockX = chunkX * CHUNK_X_SIZE;
         int blockZ = chunkZ * CHUNK_Z_SIZE;
+        BlockPos blockPos = new BlockPos(blockX, 0, blockZ);
 
         // Fire all events
 
         // Decoration close
         if (hasDecorationBegun(world))
         {
-            MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Post(world.getWorld(), random, blockX, blockZ));
+            MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Post(world.getWorld(), random, blockPos));
             setDecorationBegun(world, false);
         }
 
         // Ore generation close
         if (hasOreGenerationBegun(world))
         {
-            MinecraftForge.ORE_GEN_BUS.post(new OreGenEvent.Post(world.getWorld(), random, blockX, blockZ));
+            MinecraftForge.ORE_GEN_BUS.post(new OreGenEvent.Post(world.getWorld(), random, blockPos));
             setOreGenerationBegun(world, false);
         }
 
         // Population close
-        final PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Post(world.getChunkGenerator(), world.getWorld(), random, blockX,
-                blockZ, villageInChunk);
+        final PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Post(world.getChunkGenerator(), world.getWorld(), random, chunkX,
+                chunkZ, villageInChunk);
         MinecraftForge.EVENT_BUS.post(forgeEvent);
 
         // There is no need to call GameRegistry.generateWorld, because it is done by the Chunk Provider in Forge.

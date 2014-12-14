@@ -8,8 +8,8 @@ import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -89,7 +89,7 @@ public class ForgeEngine extends TerrainControlEngine
         net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(input);
         if (block != null)
         {
-            return ForgeMaterialData.ofMinecraftBlock(block, 0);
+            return ForgeMaterialData.ofMinecraftBlock(block);
         }
 
         try
@@ -124,7 +124,7 @@ public class ForgeEngine extends TerrainControlEngine
         net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(blockName);
         if (block != null)
         {
-            return ForgeMaterialData.ofMinecraftBlock(block, blockData);
+            return ForgeMaterialData.ofMinecraftBlockState(block.getStateFromMeta(blockData));
         }
         DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
         if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
