@@ -5,24 +5,23 @@ apply plugin: 'java'
 // Project properties
 archivesBaseName = "terraincontrol-bukkit"
 description = "TerrainControl for Bukkit"
-ext.ideProjectName = "TerrainControl-Bukkit"
-ext.bukkitVersion = "1.7.10-R0.1-SNAPSHOT"
+ext.bukkitVersion = "1.8-R0.1-SNAPSHOT"
 
 repositories
 {
-    maven // Mirror for Bukkit and CraftBukkit
-    {
-        url "http://repo.md-5.net/content/groups/public"
-    }
     mavenCentral() // For log4j
     mavenLocal()
+    maven 
+    {   // For Spigot, no official repo at time of writing
+        url = "http://rutgerkok.nl/repo" 
+    }
 }
 
 dependencies
 {
     testCompile 'junit:junit:4+'
-    compile 'org.bukkit:bukkit:' + project.ext.bukkitVersion
-    compile 'org.bukkit:craftbukkit:' + project.ext.bukkitVersion
+    compile 'org.spigotmc:spigot-api:' + project.ext.bukkitVersion
+    compile 'org.spigotmc:spigot:' + project.ext.bukkitVersion
     compile project(':common')
     compile 'org.apache.logging.log4j:log4j-api:2.0-beta9'
     compile 'org.apache.logging.log4j:log4j-core:2.0-beta9'

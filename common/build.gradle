@@ -5,7 +5,6 @@ apply plugin: 'java'
 // Project properties
 archivesBaseName = "terraincontrol-common"
 description = "Core files of TerrainControl"
-ext.ideProjectName = "TerrainControl-Common"
 
 repositories
 {

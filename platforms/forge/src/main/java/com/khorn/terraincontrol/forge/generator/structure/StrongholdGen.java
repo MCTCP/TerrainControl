@@ -4,8 +4,8 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.structure.MapGenStronghold;
 import net.minecraft.world.gen.structure.MapGenStructure;
@@ -63,12 +63,13 @@ public class StrongholdGen extends MapGenStructure
                 int var11 = (int) Math.round(Math.sin(randomNumBetween0and2PI) * var8);
                 ArrayList var12 = new ArrayList();
                 Collections.addAll(var12, this.allowedBiomeGenBases);
-                ChunkPosition var13 = this.worldObj.getWorldChunkManager().findBiomePosition((var10 << 4) + 8, (var11 << 4) + 8, 112, var12, random);
+                BlockPos var13 = this.worldObj.getWorldChunkManager().findBiomePosition((var10 << 4) + 8, (var11 << 4) + 8, 112, var12,
+                        random);
 
                 if (var13 != null)
                 {
-                    var10 = var13.chunkPosX >> 4;
-                    var11 = var13.chunkPosZ >> 4;
+                    var10 = var13.getX() >> 4;
+                    var11 = var13.getZ() >> 4;
                 }
 
                 this.structureCoords[i] = new ChunkCoordIntPair(var10, var11);
@@ -102,15 +103,15 @@ public class StrongholdGen extends MapGenStructure
      * been run, or null if not relevant to this structure generator.
      */
     @Override
-    protected List<ChunkPosition> getCoordList()
+    protected List<BlockPos> getCoordList()
     {       
-        ArrayList<ChunkPosition> chunkPositions = new ArrayList<ChunkPosition>();
+        List<BlockPos> chunkPositions = new ArrayList<BlockPos>();
 
         for (ChunkCoordIntPair structureCoord : structureCoords)
         {
             if (structureCoord != null)
             {
-                chunkPositions.add(structureCoord.func_151349_a(64));
+                chunkPositions.add(structureCoord.getCenterBlock(64));
             }
         }
 
@@ -131,7 +132,7 @@ public class StrongholdGen extends MapGenStructure
     }
 
     @Override
-    public String func_143025_a()
+    public String getStructureName()
     {
         return StructureNames.STRONGHOLD;
     }

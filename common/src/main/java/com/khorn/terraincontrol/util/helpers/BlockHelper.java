@@ -92,6 +92,7 @@ public class BlockHelper
             case QUARTZ_STAIRS:
             case ACACIA_STAIRS:
             case DARK_OAK_STAIRS:
+            case RED_SANDSTONE_STAIRS:
                 switch (data)
                 {
                     case 2:
@@ -133,6 +134,11 @@ public class BlockHelper
 
             case WOODEN_DOOR:
             case IRON_DOOR_BLOCK:
+            case SPRUCE_DOOR:
+            case BIRCH_DOOR:
+            case JUNGLE_DOOR:
+            case ACACIA_DOOR:
+            case DARK_OAK_DOOR:
                 int topHalf = data & 0x8;
                 int swung = data & 0x4;
                 int withoutFlags = data & ~(0x8 | 0x4);
@@ -150,7 +156,21 @@ public class BlockHelper
                 break;
 
             case SIGN_POST:
+            case STANDING_BANNER:
                 return (data + 12) % 16;
+
+            case WALL_BANNER:
+                switch (data)
+                {
+                    case 5:
+                        return 2;
+                    case 4:
+                        return 3;
+                    case 2:
+                        return 4;
+                    case 3:
+                        return 5;
+                }
 
             case LADDER:
             case WALL_SIGN:
@@ -225,6 +245,7 @@ public class BlockHelper
                 break;
 
             case TRAP_DOOR:
+            case IRON_TRAPDOOR:
                 int withoutOrientation = data & ~0x3;
                 int orientation = data & 0x3;
                 switch (orientation)
@@ -266,6 +287,11 @@ public class BlockHelper
                 return ((data >> 1) | (data << 3)) & 0xf;
 
             case FENCE_GATE:
+            case SPRUCE_FENCE_GATE:
+            case BIRCH_FENCE_GATE:
+            case JUNGLE_FENCE_GATE:
+            case DARK_OAK_FENCE_GATE:
+            case ACACIA_FENCE_GATE:
                 return ((data + 3) & 0x3) | (data & ~0x3);
 
             case COCOA:
@@ -295,6 +321,7 @@ public class BlockHelper
                     return 4;
                 if (data == 4)
                     return 3;
+
         }
 
         return data;

@@ -6,13 +6,16 @@ import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
+import java.io.DataOutput;
 import java.io.IOException;
 
 public class PlayerTracker
@@ -42,8 +45,11 @@ public class PlayerTracker
         ConfigProvider configs = worldTC.getConfigs();
 
         // Serialize it
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        DataOutputStream stream = new DataOutputStream(outputStream);
+        ByteBuf nettyBuffer = Unpooled.buffer();
+        PacketBuffer mojangBuffer = new PacketBuffer(nettyBuffer);
+        @SuppressWarnings("resource")
+        // ^ It's writing to memory
+        DataOutput stream = new ByteBufOutputStream(nettyBuffer);
         try
         {
             stream.writeInt(PluginStandardValues.ProtocolVersion);
@@ -54,7 +60,7 @@ public class PlayerTracker
         }
 
         // Make the packet
-        S3FPacketCustomPayload packet = new S3FPacketCustomPayload(PluginStandardValues.ChannelName, outputStream.toByteArray());
+        S3FPacketCustomPayload packet = new S3FPacketCustomPayload(PluginStandardValues.ChannelName, mojangBuffer);
 
         // Send the packet
         player.playerNetServerHandler.sendPacket(packet);

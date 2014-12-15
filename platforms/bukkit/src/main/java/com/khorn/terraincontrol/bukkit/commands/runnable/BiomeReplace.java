@@ -3,9 +3,9 @@ package com.khorn.terraincontrol.bukkit.commands.runnable;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_7_R4.*;
+import net.minecraft.server.v1_8_R1.*;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -70,7 +70,7 @@ public class BiomeReplace implements Runnable
             return;
         }
 
-        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) world.getHandle().chunkProvider;
+        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) world.getHandle().chunkProviderServer;
         int chunksRewritten = 0;
 
         try

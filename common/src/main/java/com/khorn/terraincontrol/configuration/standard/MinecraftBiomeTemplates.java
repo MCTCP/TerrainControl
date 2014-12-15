@@ -51,6 +51,7 @@ public class MinecraftBiomeTemplates
             this.defaultStrongholds = false;
             this.defaultRiverBiome = "";
             this.defaultTree = new Object[] {1, TreeType.BigTree, 1, TreeType.Tree, 9};
+            this.defaultOceanMonuments = true;
         }
     }
 
@@ -173,6 +174,7 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0x0000FF;
             this.defaultStrongholds = false;
             this.defaultTree = new Object[] {1, TreeType.BigTree, 1, TreeType.Tree, 9};
+            this.defaultOceanMonuments = true;
         }
     }
 
@@ -194,15 +196,13 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class FrozenOcean extends MinecraftBiomeTemplate
+    public static class FrozenOcean extends Ocean
     {
         public FrozenOcean(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
 
             this.defaultColor = 0x9090A0;
-            this.defaultStrongholds = false;
-            this.defaultRiverBiome = "";
         }
     }
 
@@ -214,6 +214,7 @@ public class MinecraftBiomeTemplates
 
             this.defaultColor = 0xA0A0FF;
             this.defaultStrongholds = false;
+            this.defaultOceanMonuments = true;
         }
     }
 

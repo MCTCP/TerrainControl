@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 
-import java.io.DataOutputStream;
+import java.io.DataOutput;
 import java.io.IOException;
 
 /**
@@ -50,7 +50,7 @@ public interface ConfigProvider
      * @param stream The stream to write to.
      * @throws IOException If an {@code IOException} is thrown by the stream.
      */
-    void writeToStream(DataOutputStream stream) throws IOException;
+    void writeToStream(DataOutput stream) throws IOException;
 
     /**
      * Gets all custom objects of this world.

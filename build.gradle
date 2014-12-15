@@ -8,11 +8,6 @@ allprojects
     version = "2.7.0-SNAPSHOT"
     group = "com.khorn.terraincontrol"
 
-    // Give this a value in a child project to change the name in your IDE
-    // Otherwise it will use the default name. In the case of the project
-    // 'platforms:bukkit', the default name is invalid because it contains a slash
-    ext.ideProjectName = null
-
     // Version of the shadow plugin
     ext.shadowVersion = '1.0.2'
 }
@@ -32,24 +27,6 @@ subprojects
 
         // Generate IntelliJ IDEA config files
         task.apply plugin: 'idea'
-
-        // Change project name in Eclipse
-        // See comment above about the ideProjectName
-        task.eclipse.project.file.whenMerged
-        {   project ->
-
-            if (task.project.ext.ideProjectName != null)
-            {
-                project.name = task.project.ext.ideProjectName
-            }
-        }
-
-        // Since we're renaming projects, we need to rename the
-        // dependency 'common' to 'TerrainControl-Common'
-        task.eclipse.classpath.file.whenMerged
-        {   classpath ->
-            classpath.entries.findAll{ entry -> entry.path == "/common" }*.path = "/TerrainControl-Common"
-        }
 
     }
 

@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.bukkit.BukkitMaterialData;
 import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
-import net.minecraft.server.v1_7_R4.Blocks;
+import net.minecraft.server.v1_8_R1.Blocks;
 
 class BukkitChunkBuffer implements ChunkBuffer
 {
@@ -14,7 +14,7 @@ class BukkitChunkBuffer implements ChunkBuffer
     private static final int CHUNK_SECTION_VOLUME = CHUNK_SECTION_SIZE * CHUNK_SECTION_SIZE * CHUNK_SECTION_SIZE;
 
     private final ChunkCoordinate chunkCoord;
-    private final byte[][] sections = new byte[CHUNK_Y_SIZE / CHUNK_SECTION_SIZE][];
+    private final short[][] sections = new short[CHUNK_Y_SIZE / CHUNK_SECTION_SIZE][];
 
     /**
      * Creates a new {@code BukkitChunkBuffer}.
@@ -28,11 +28,11 @@ class BukkitChunkBuffer implements ChunkBuffer
     }
 
     /**
-     * Gets access to the byte array.
+     * Gets access to the raw data.
      * 
      * @return The byte array.
      */
-    byte[][] accessBytes()
+    short[][] accessRawValues()
     {
         return sections;
     }
@@ -41,13 +41,13 @@ class BukkitChunkBuffer implements ChunkBuffer
     public LocalMaterialData getBlock(int blockX, int blockY, int blockZ)
     {
         int sectionId = getSectionId(blockY);
-        byte[] section = sections[sectionId];
+        short[] section = sections[sectionId];
         if (section == null)
         {
-            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR, 0);
+            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR);
         }
 
-        byte blockId = section[getPositionInSectionArray(blockX, blockY, blockZ)];
+        short blockId = section[getPositionInSectionArray(blockX, blockY, blockZ)];
         return BukkitMaterialData.ofIds(blockId, 0);
     }
 
@@ -84,13 +84,13 @@ class BukkitChunkBuffer implements ChunkBuffer
     public void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material)
     {
         int sectionId = getSectionId(blockY);
-        byte[] section = sections[sectionId];
+        short[] section = sections[sectionId];
         if (section == null)
         {
-            section = new byte[CHUNK_SECTION_VOLUME];
+            section = new short[CHUNK_SECTION_VOLUME];
             sections[sectionId] = section;
         }
-        section[getPositionInSectionArray(blockX, blockY, blockZ)] = (byte) material.getBlockId();
+        section[getPositionInSectionArray(blockX, blockY, blockZ)] = (short) material.getBlockId();
     }
 
 }

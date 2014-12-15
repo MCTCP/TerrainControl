@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.bukkit.commands.runnable.MapWriter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -111,7 +111,7 @@ public class MapCommand extends BaseCommand
 
         MapWriter map = new MapWriter(world.getHandle(), size, angle, sender, offsetX, offsetZ, label);
 
-        map.run();
+        this.plugin.getServer().getScheduler().runTask(this.plugin, map);
 
         return true;
     }

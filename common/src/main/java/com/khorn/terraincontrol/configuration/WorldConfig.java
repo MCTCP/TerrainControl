@@ -139,6 +139,11 @@ public class WorldConfig extends ConfigFile
     // value is 1 chunk lower
     public int maximumDistanceBetweenRareBuildings;
 
+    // Ocean monuments
+    public boolean oceanMonumentsEnabled;
+    public int oceanMonumentGridSize;
+    public int oceanMonumentRandomOffset;
+
     // Other structures
     public boolean mineshaftsEnabled;
     public boolean netherFortressesEnabled;
@@ -323,6 +328,7 @@ public class WorldConfig extends ConfigFile
         bedrockBlock = bedrockBlock.withBlockData(0);
 
         maximumDistanceBetweenRareBuildings = higherThan(maximumDistanceBetweenRareBuildings, minimumDistanceBetweenRareBuildings);
+        oceanMonumentRandomOffset = lowerThanOrEqualTo(oceanMonumentRandomOffset, oceanMonumentGridSize);
 
         if (biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && ModeTerrain != TerrainMode.OldGenerator)
         {
@@ -417,6 +423,10 @@ public class WorldConfig extends ConfigFile
         this.rareBuildingsEnabled = readSettings(WorldStandardValues.RARE_BUILDINGS_ENABLED);
         this.minimumDistanceBetweenRareBuildings = readSettings(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
         this.maximumDistanceBetweenRareBuildings = readSettings(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
+
+        this.oceanMonumentsEnabled = readSettings(WorldStandardValues.OCEAN_MONUMENTS_ENABLED);
+        this.oceanMonumentRandomOffset = readSettings(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET);
+        this.oceanMonumentGridSize = readSettings(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE);
 
         this.mineshaftsEnabled = readSettings(WorldStandardValues.MINESHAFTS_ENABLED);
         this.netherFortressesEnabled = readSettings(WorldStandardValues.NETHER_FORTRESSES_ENABLED);
@@ -815,6 +825,21 @@ public class WorldConfig extends ConfigFile
 
         writer.comment("The maximum distance between rare buildings in chunks.");
         writer.setting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.maximumDistanceBetweenRareBuildings);
+
+        // Ocean monuments
+        writer.smallTitle("Ocean monuments");
+
+        writer.comment("Whether ocean monuments are enabled.");
+        writer.setting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, this.oceanMonumentsEnabled);
+
+        writer.comment("Ocean monuments are placed on the corners of a grid, with a random offset added to each corner.");
+        writer.comment("The first variable is the size of the grid in chunks.");
+        writer.comment("Setting this to 8 will give a grid with cells of 8x8 chunks.");
+        writer.setting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE, this.oceanMonumentGridSize);
+
+        writer.comment("Random offset from each corner in chunks, on both the x and z axis.");
+        writer.comment("May not be smaller than 0, and may not be larger than " + WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE + ".");
+        writer.setting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET, this.oceanMonumentRandomOffset);
 
         // Other structures
         writer.smallTitle("Other structures");

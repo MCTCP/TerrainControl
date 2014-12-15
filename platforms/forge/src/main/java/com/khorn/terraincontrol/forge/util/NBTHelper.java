@@ -98,28 +98,37 @@ public class NBTHelper
             return null;
         }
 
-        NamedBinaryTag.Type listType = NamedBinaryTag.Type.values()[nmsListTag.func_150303_d()];
+        NamedBinaryTag.Type listType = NamedBinaryTag.Type.values()[nmsListTag.getTagType()];
         NamedBinaryTag listTag = new NamedBinaryTag(name, listType);
 
         // Add all child tags
         for (int i = 0; i < nmsListTag.tagCount(); i++)
         {
+            NBTBase nmsChildTag = nmsListTag.get(i);
             switch (listType)
             {
-                case TAG_Int_Array:
-                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.func_150306_c(i)));
+                case TAG_End:
                     break;
+                case TAG_Byte:
+                case TAG_Short:
+                case TAG_Int:
+                case TAG_Long:
                 case TAG_Float:
-                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.func_150308_e(i)));
-                    break;
                 case TAG_Double:
-                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.func_150309_d(i)));
-                    break;
+                case TAG_Byte_Array:
                 case TAG_String:
-                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.getStringTagAt(i)));
+                case TAG_Int_Array:
+                    listTag.addTag(new NamedBinaryTag(listType, null, getValueFromNms(nmsChildTag)));
+                    break;
+                case TAG_List:
+                    NamedBinaryTag listChildTag = getNBTFromNMSTagList(null, (NBTTagList) nmsChildTag);
+                    if (listChildTag != null)
+                    {
+                        listTag.addTag(listChildTag);
+                    }
                     break;
                 case TAG_Compound:
-                    listTag.addTag(getNBTFromNMSTagCompound(null, nmsListTag.getCompoundTagAt(i)));
+                    listTag.addTag(getNBTFromNMSTagCompound(null, (NBTTagCompound) nmsChildTag));
                     break;
                 default:
                     TerrainControl.log(LogMarker.INFO, "Cannot convert list subtype {} from it's NMS value", new Object[] {listType});
@@ -134,7 +143,7 @@ public class NBTHelper
     /**
      * Gets the value from a nms tag (since that object doesn't have a simple
      * value field)
-     * 
+     *
      * @param nmsTag
      * @return
      */
@@ -144,23 +153,23 @@ public class NBTHelper
         switch (type)
         {
             case TAG_Byte:
-                return ((NBTTagByte) nmsTag).func_150290_f();
+                return ((NBTTagByte) nmsTag).getByte();
             case TAG_Short:
-                return ((NBTTagShort) nmsTag).func_150289_e();
+                return ((NBTTagShort) nmsTag).getShort();
             case TAG_Int:
-                return ((NBTTagInt) nmsTag).func_150287_d();
+                return ((NBTTagInt) nmsTag).getInt();
             case TAG_Long:
-                return ((NBTTagLong) nmsTag).func_150291_c();
+                return ((NBTTagLong) nmsTag).getLong();
             case TAG_Float:
-                return ((NBTTagFloat) nmsTag).func_150288_h();
+                return ((NBTTagFloat) nmsTag).getFloat();
             case TAG_Double:
-                return ((NBTTagDouble) nmsTag).func_150286_g();
+                return ((NBTTagDouble) nmsTag).getDouble();
             case TAG_Byte_Array:
-                return ((NBTTagByteArray) nmsTag).func_150292_c();
+                return ((NBTTagByteArray) nmsTag).getByteArray();
             case TAG_String:
-                return ((NBTTagString) nmsTag).func_150285_a_();
+                return ((NBTTagString) nmsTag).getString();
             case TAG_Int_Array:
-                return ((NBTTagIntArray) nmsTag).func_150302_c();
+                return ((NBTTagIntArray) nmsTag).getIntArray();
             default:
                 // Cannot read this from a tag
                 throw new IllegalArgumentException(type + "doesn't have a simple value!");

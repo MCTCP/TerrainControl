@@ -199,7 +199,7 @@ public abstract class ConfigFile
         return output;
     }
 
-    protected static void writeStringToStream(DataOutputStream stream, String value) throws IOException
+    protected static void writeStringToStream(DataOutput stream, String value) throws IOException
     {
         byte[] bytes = value.getBytes();
         stream.writeShort(bytes.length);

@@ -22,7 +22,7 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
-import java.io.DataOutputStream;
+import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -112,6 +112,7 @@ public class BiomeConfig extends ConfigFile
 
     // Structures
     public boolean strongholdsEnabled;
+    public boolean oceanMonumentsEnabled;
     public boolean netherFortressesEnabled;
 
     public enum VillageType
@@ -286,6 +287,7 @@ public class BiomeConfig extends ConfigFile
         this.configRiverWaterLevel = readSettings(BiomeStandardValues.RIVER_WATER_LEVEL);
 
         this.strongholdsEnabled = readSettings(BiomeStandardValues.STRONGHOLDS_ENABLED, defaultSettings.defaultStrongholds);
+        this.oceanMonumentsEnabled = readSettings(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, defaultSettings.defaultOceanMonuments);
         this.netherFortressesEnabled = readSettings(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, true);
         this.villageType = readSettings(BiomeStandardValues.VILLAGE_TYPE, defaultSettings.defaultVillageType);
         this.mineshaftsRarity = readSettings(BiomeStandardValues.MINESHAFT_RARITY);
@@ -712,6 +714,9 @@ public class BiomeConfig extends ConfigFile
         writer.comment("Minecraft will ignore this setting.");
         writer.setting(BiomeStandardValues.STRONGHOLDS_ENABLED, strongholdsEnabled);
 
+        writer.comment("Whether an Ocean Monument can be placed in this biome.");
+        writer.setting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, oceanMonumentsEnabled);
+
         writer.comment("Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
         writer.setting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, netherFortressesEnabled);
 
@@ -968,7 +973,7 @@ public class BiomeConfig extends ConfigFile
         reader.putSetting(setting, groups);
     }
 
-    public void writeToStream(DataOutputStream stream) throws IOException
+    public void writeToStream(DataOutput stream) throws IOException
     {
         writeStringToStream(stream, getName());
 

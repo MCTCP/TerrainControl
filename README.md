@@ -16,14 +16,14 @@ TerrainControl is an advanced world generator for Minecraft. Through various con
 <li>Visual settings like custom foliage colors (TerrainControl client required)</li>
 <li>Essentially everything!</li>
 </ul>
-To learn more, check out <a href="https://github.com/Wickth/TerrainControl/wiki/Features"><strong>all of TerrainControl's features</strong></a>!
+To learn more, check out <a href="https://github.com/MCTCP/TerrainControl/wiki/Features"><strong>all of TerrainControl's features</strong></a>!
 
 ## Links
 * [Project home at BukkitDev](http://dev.bukkit.org/bukkit-plugins/terrain-control/)
-* [Wiki](https://github.com/Wickth/TerrainControl/wiki/)
-* [Forum](http://dev.bukkit.org/bukkit-plugins/terrain-control/forum/)
+* [Wiki](https://github.com/MCTCP/TerrainControl/wiki/)
+* [Forum](http://forum.mctcp.com/)
 * [Downloads at BukkitDev](http://dev.bukkit.org/bukkit-plugins/terrain-control/files/)
-* [Installation instructions](https://github.com/Wickth/TerrainControl/wiki/Installation-instructions)
-* [Compile instructions](https://github.com/Wickth/TerrainControl/wiki/Developer-page#wiki-compiling)
-* [Version history](https://github.com/Wickth/TerrainControl/wiki/Version-history)
+* [Installation instructions](https://github.com/MCTCP/TerrainControl/wiki/Installation-instructions)
+* [Compile instructions](https://github.com/MCTCP/TerrainControl/wiki/Developer-page#wiki-compiling)
+* [Version history](https://github.com/MCTCP/TerrainControl/wiki/Version-history)
 * [Build server at mctcp.com](http://build.mctcp.com/job/TerrainControl%20-%20Master%20-%20Gradle/default/)

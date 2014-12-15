@@ -5,10 +5,7 @@ import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_7_R4.BiomeBase;
-import net.minecraft.server.v1_7_R4.StructureGenerator;
-import net.minecraft.server.v1_7_R4.StructureStart;
-import net.minecraft.server.v1_7_R4.World;
+import net.minecraft.server.v1_8_R1.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +63,7 @@ public class VillageGen extends StructureGenerator
 
         int i1 = chunkX / this.distance;
         int j1 = chunkZ / this.distance;
-        Random random = this.c.A(i1, j1, 10387312);
+        Random random = this.c.a(i1, j1, 10387312);
 
         i1 *= this.distance;
         j1 *= this.distance;
@@ -103,13 +100,12 @@ public class VillageGen extends StructureGenerator
      *
      * @param world  The world to spawn in.
      * @param random The random number generator for the seed.
-     * @param chunkX The x coord of the chunk
-     * @param chunkZ The y coord of the chunk.
+     * @param chunk The x and z coord of the chunk
      * @return Whether a village was generated successfully.
      */
-    public boolean place(World world, Random random, int chunkX, int chunkZ)
+    public boolean place(World world, Random random, ChunkCoordIntPair chunk)
     {
-        return a(world, random, chunkX, chunkZ);
+        return a(world, random, chunk);
     }
 
     @Override

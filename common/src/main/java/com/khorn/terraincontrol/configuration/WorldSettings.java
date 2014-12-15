@@ -18,7 +18,7 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.FileHelper;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -450,7 +450,7 @@ public class WorldSettings implements ConfigProvider
     }
 
     @Override
-    public void writeToStream(DataOutputStream stream) throws IOException
+    public void writeToStream(DataOutput stream) throws IOException
     {
         // General information
         ConfigFile.writeStringToStream(stream, worldConfig.getName());

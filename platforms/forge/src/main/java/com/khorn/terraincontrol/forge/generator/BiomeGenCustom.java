@@ -93,17 +93,17 @@ public class BiomeGenCustom extends BiomeGenBase
         this.fillerBlock = baseBiome.fillerBlock;
         this.topBlock = baseBiome.topBlock;
         this.color = baseBiome.color;
-        this.rootHeight = baseBiome.rootHeight;
-        this.heightVariation = baseBiome.heightVariation;
+        this.minHeight = baseBiome.minHeight;
+        this.maxHeight = baseBiome.maxHeight;
         this.temperature = baseBiome.temperature;
 
         this.theBiomeDecorator = baseBiome.theBiomeDecorator;
         this.waterColorMultiplier = baseBiome.waterColorMultiplier;
 
-        this.spawnableMonsterList = baseBiome.getSpawnableList(EnumCreatureType.monster);
-        this.spawnableCreatureList = baseBiome.getSpawnableList(EnumCreatureType.creature);
-        this.spawnableWaterCreatureList = baseBiome.getSpawnableList(EnumCreatureType.waterCreature);
-        this.spawnableCaveCreatureList = baseBiome.getSpawnableList(EnumCreatureType.ambient);
+        this.spawnableMonsterList = baseBiome.getSpawnableList(EnumCreatureType.MONSTER);
+        this.spawnableCreatureList = baseBiome.getSpawnableList(EnumCreatureType.CREATURE);
+        this.spawnableWaterCreatureList = baseBiome.getSpawnableList(EnumCreatureType.WATER_CREATURE);
+        this.spawnableCaveCreatureList = baseBiome.getSpawnableList(EnumCreatureType.AMBIENT);
     }
 
     // Sky color from Temp

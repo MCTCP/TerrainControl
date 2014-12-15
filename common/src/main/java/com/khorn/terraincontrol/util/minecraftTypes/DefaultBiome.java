@@ -35,6 +35,7 @@ import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.J
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.JungleHills;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.JungleMountains;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MegaSpruceTaiga;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MegaSpruceTaigaHills;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MegaTaiga;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.MegaTaigaHills;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Mesa;
@@ -199,11 +200,7 @@ public enum DefaultBiome
     ROOFED_FOREST_MOUNTAINS(157, "Roofed Forest M", RoofedForestMountains.class),
     COLD_TAIGA_MOUNTAINS(158, "Cold Taiga M", ColdTaigaMountains.class),
     MEGA_SPRUCE_TAIGA(160, "Mega Spruce Taiga", MegaSpruceTaiga.class),
-    // MEGA_SPRUCE_TAIGA_HILLS(161, "Mega Spruce Taiga Hills", MegaSpruceTaigaHills.class),
-    // ^ This biome is bugged and doesn't generate properly in Minecraft
-    // It registers itself with the wrong id - net.minecraft.server.BiomeBase.getBiome(161)
-    // returns the Mega Spruce Taiga biome
-    // TODO check if this is fixed in Minecraft 1.7.3
+    MEGA_SPRUCE_TAIGA_HILLS(161, "Mega Spruce Taiga Hills", MegaSpruceTaigaHills.class),
     EXTREME_HILLS_PLUS_MOUNTAINS(162, "Extreme Hills+ M", ExtremeHillsPlusMountains.class),
     SAVANNA_MOUNTAINS(163, "Savanna M", SavannaMountains.class),
     SAVANNA_PLATEAU_MOUNTAINS(164, "Savanna Plateau M", SavannaPlateauMountains.class),
