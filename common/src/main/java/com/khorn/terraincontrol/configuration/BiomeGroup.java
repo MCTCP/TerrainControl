@@ -33,7 +33,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     /**
      * Variable used by the the ungrouped biome generator. This generator
      * needs to modify this variable. Directly after calling
-     * {@link #loadBiomeData(LocalWorld)} it has the value of
+     * {@link #processBiomeData(LocalWorld)} it has the value of
      * {@link #getGroupRarity()} plus the biome rarity values of each biome.
      */
     public int totalGroupRarity;
@@ -157,10 +157,10 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
      * group rarity.
      * @param world Used to look up biomes.
      */
-    void loadBiomeData(LocalWorld world)
+    public void processBiomeData(LocalWorld world)
     {
         float totalTemp = 0;
-        this.totalGroupRarity = this.groupRarity;
+        this.totalGroupRarity = 0;
         for (Iterator<Entry<String, LocalBiome>> it = this.biomes.entrySet().iterator(); it.hasNext();)
         {
             Entry<String, LocalBiome> entry = it.next();

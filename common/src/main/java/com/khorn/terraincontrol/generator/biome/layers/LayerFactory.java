@@ -83,10 +83,12 @@ public final class LayerFactory
         if (normalGroup == null)
         {
             normalGroup = BiomeGroup.createNormalGroup(worldConfig);
+            normalGroup.processBiomeData(world);
         }
         if (iceGroup == null)
         {
             iceGroup = BiomeGroup.createIceGroup(worldConfig);
+            iceGroup.processBiomeData(world);
         }
 
         LocalBiome[][] normalBiomeMap = new LocalBiome[worldConfig.GenerationDepth + 1][];

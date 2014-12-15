@@ -182,7 +182,7 @@ public final class BiomeGroupManager
     {
         for (BiomeGroup entry : idToGroup.values())
         {
-            entry.loadBiomeData(world);
+            entry.processBiomeData(world);
         }
     }
 
