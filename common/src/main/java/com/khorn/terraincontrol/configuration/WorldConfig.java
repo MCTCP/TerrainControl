@@ -592,8 +592,10 @@ public class WorldConfig extends ConfigFile
         WriteCustomBiomes(writer);
 
         // Settings for BiomeMode:Normal
-        writer.bigTitle("Settings for BiomeMode:Normal");
-        writer.comment("Also applies if you are using BiomeMode:FromImage and ImageMode:ContinueNormal.");
+        writer.bigTitle("Settings for BiomeMode: Normal");
+        writer.comment("Also applies if you are using BiomeMode: FromImage with ImageMode: ContinueNormal, or");
+        writer.comment("if you are using BiomeMode: BeforeGroups");
+        writer.comment("");
 
         writer.comment("Important value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.");
         writer.comment("Large %/total area biomes (Continents) must be set small, (limit=0)");
@@ -613,6 +615,7 @@ public class WorldConfig extends ConfigFile
         writer.smallTitle("Biome lists");
 
         writer.comment("Don't forget to register your custom biomes first in CustomBiomes!");
+        writer.comment("");
 
         writer.comment("Biomes used as isles in other biomes. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.");
         writer.setting(WorldStandardValues.ISLE_BIOMES, this.IsleBiomes);
@@ -625,7 +628,7 @@ public class WorldConfig extends ConfigFile
         writer.comment("Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
         writer.setting(WorldStandardValues.LAND_RARITY, this.LandRarity);
 
-        writer.comment("Land size from 0 to GenerationDepth.");
+        writer.comment("Land size from 0 to GenerationDepth. Biome groups are placed on this.");
         writer.setting(WorldStandardValues.LAND_SIZE, this.LandSize);
 
         writer.comment("Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
@@ -635,7 +638,7 @@ public class WorldConfig extends ConfigFile
 
         writer.comment("Set this to false to stop the ocean from freezing near when an \"ice area\" intersects with an ocean.");
         writer.setting(WorldStandardValues.FROZEN_OCEAN, this.FrozenOcean);
-        
+
         writer.comment("This is the biome temperature when water freezes if \"FrozenOcean\" is set to true.");
         writer.comment("This used to be the case for all biomes in the \"IceBiomes\" list. Default: 0.15; Min: 0.0; Max: 2.0");
         writer.comment("Temperature Reference from Vanilla: <0.15 for snow, 0.15 - 0.95 for rain, or >1.0 for dry");
@@ -926,6 +929,20 @@ public class WorldConfig extends ConfigFile
 
     private void writeBiomeGroups(SettingsWriter writer) throws IOException
     {
+        writer.comment("Minecraft groups similar biomes together, so that they spawn next to each other.");
+        writer.comment("");
+        writer.comment("Syntax: BiomeGroup(Name, Size, Rarity, BiomeName[, AnotherName[, ...]])");
+        writer.comment("Name - just for clarity, choose something descriptive");
+        writer.comment("Size - layer to generate on, from 0 to GenerationDepth. All biomes in the group must have a BiomeSize");
+        writer.comment("       larger than or equal to this value.");
+        writer.comment("Rarity - relative spawn chances.");
+        writer.comment("BiomeName... - names of the biome that spawn in the group. Case sensitive.");
+        writer.comment("");
+        writer.comment("Note: if you're using BiomeMode: BeforeGroups, only the biome names of the groups named NormalBiomes");
+        writer.comment("and IceBiomes and the size and rarity of the group named IceBiomes will be used. Other groups are");
+        writer.comment("ignored. The size and rarity of the NormalBiomes group is ignored as well, use LandSize and");
+        writer.comment("LandRarity instead.");
+        writer.comment("");
         for (BiomeGroup bg : this.biomeGroupManager.getGroups())
         {
             writer.function(bg);
