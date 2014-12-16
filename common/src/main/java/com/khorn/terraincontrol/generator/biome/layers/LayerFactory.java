@@ -5,7 +5,6 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.util.ArrayList;
@@ -272,38 +271,32 @@ public final class LayerFactory
 
             if (worldConfig.LandSize == depth)
             {
-                TerrainControl.log(LogMarker.INFO, "Adding Land at depth {}", depth);
                 mainLayer = new LayerLand(1L, mainLayer, worldConfig.LandRarity);
                 mainLayer = new LayerZoomFuzzy(2000L, mainLayer);
             }
 
             if (depth < (worldConfig.LandSize + worldConfig.LandFuzzy))
             {
-                TerrainControl.log(LogMarker.INFO, "Fuzzy Time! at depth {}", depth);
                 mainLayer = new LayerLandRandom(depth, mainLayer);
             }
 
             if (!groupManager.isGroupDepthMapEmpty(depth))
             {
-                TerrainControl.log(LogMarker.INFO, "Groups are mapped at depth {}", depth);
                 mainLayer = new LayerBiomeGroups(mainLayer, groupManager, depth, worldConfig.FreezeAllColdGroupBiomes);
             }
 
             if (!groupManager.isBiomeDepthMapEmpty(depth))
             {
                 mainLayer = new LayerBiome(200, mainLayer, groupManager, depth, worldConfig.FrozenOceanTemperature);
-                TerrainControl.log(LogMarker.INFO, "Biomes are mapped at depth {}", depth);
             }
 
             if (depth == 3)
             {
-                TerrainControl.log(LogMarker.INFO, "Ice added at depth {}", depth);
                 mainLayer = new LayerIce(depth, mainLayer);
             }
 
             if (worldConfig.riverRarity == depth)
             {
-                TerrainControl.log(LogMarker.INFO, "River Init at depth {}", depth);
                 if (worldConfig.randomRivers)
                 {
                     RiverLayer = new LayerRiverInit(155, RiverLayer);
@@ -314,7 +307,6 @@ public final class LayerFactory
 
             if ((worldConfig.GenerationDepth - worldConfig.riverSize) == depth)
             {
-                TerrainControl.log(LogMarker.INFO, "RIVERS! at depth {}", depth);
                 if (worldConfig.randomRivers)
                     RiverLayer = new LayerRiver(5 + depth, RiverLayer);
                 else
