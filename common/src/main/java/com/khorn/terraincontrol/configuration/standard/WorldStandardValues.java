@@ -114,7 +114,7 @@ public class WorldStandardValues extends Settings
             //>>	Special Lists
             ISLE_BIOMES = stringListSetting("IsleBiomes", "MushroomIsland",
                     "Ice Mountains", "DesertHills", "ForestHills", "TaigaHills",
-                    "River", "JungleHills"),
+                    "River", "JungleHills", "Cold Taiga Hills"),
             BORDER_BIOMES = stringListSetting("BorderBiomes",
                     "MushroomIslandShore", "Beach", "Extreme Hills Edge"),
             CUSTOM_BIOMES = stringListSetting("CustomBiomes");
