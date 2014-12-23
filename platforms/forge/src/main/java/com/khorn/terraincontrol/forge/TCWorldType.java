@@ -64,7 +64,7 @@ public class TCWorldType extends WorldType
         }
 
         this.worldTC = new ForgeWorld(world.getSaveHandler().getWorldDirectoryName());
-        WorldSettings config = new WorldSettings(worldDirectory, worldTC, false);
+        WorldSettings config = new WorldSettings(worldDirectory, worldTC);
         this.worldTC.Init(world, config);
 
         Class<? extends BiomeGenerator> biomeGenClass = worldTC.getConfigs().getWorldConfig().biomeMode;

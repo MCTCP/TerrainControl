@@ -159,7 +159,7 @@ public class TCPlugin extends JavaPlugin
 
         // Load settings
         File baseFolder = getWorldSettingsFolder(worldName);
-        WorldSettings configs = new WorldSettings(baseFolder, localWorld, false);
+        WorldSettings configs = new WorldSettings(baseFolder, localWorld);
         localWorld.setSettings(configs);
 
         // Add the world to the to-do list

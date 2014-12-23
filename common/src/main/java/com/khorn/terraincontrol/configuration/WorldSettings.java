@@ -54,21 +54,14 @@ public class WorldSettings implements ConfigProvider
     private final Collection<LocalBiome> savedBiomes = new HashSet<LocalBiome>();
 
     /**
-     * Set this to true to skip indexing of settings and avoiding tampering
-     * with the array in Minecraft's BiomeBase class.
-     */
-    private final boolean checkOnly;
-
-    /**
      * The number of loaded biomes.
      */
     private int biomesCount;
 
-    public WorldSettings(File settingsDir, LocalWorld world, boolean checkOnly)
+    public WorldSettings(File settingsDir, LocalWorld world)
     {
         this.settingsDir = settingsDir;
         this.world = world;
-        this.checkOnly = checkOnly;
 
         loadCustomObjects();
         loadWorldConfig();
@@ -195,12 +188,6 @@ public class WorldSettings implements ConfigProvider
 
             // Settings reading
             biomeConfig.process();
-
-            // Skip indexing when only checking
-            if (this.checkOnly)
-            {
-                continue;
-            }
 
             // Check generation id range
             int generationId = biomeConfig.generationId;
@@ -370,7 +357,6 @@ public class WorldSettings implements ConfigProvider
     // Read settings from the network
     public WorldSettings(DataInputStream stream, LocalWorld world) throws IOException
     {
-        this.checkOnly = false;
         // We need a valid CustomObjects object with things like the trees in
         // it, so that the configs can load without errors
         // An empty CustomObjects instance with the global objects as fallback
