@@ -8,8 +8,7 @@ public enum TCPerm
     CMD_LIST("cmd.list"),
     CMD_MAP("cmd.map"),
     CMD_RELOAD("cmd.reload"),
-    CMD_SPAWN("cmd.spawn"),
-    CMD_REPLACE("cmd.replace"),;
+    CMD_SPAWN("cmd.spawn");
 
     public final String node;
 

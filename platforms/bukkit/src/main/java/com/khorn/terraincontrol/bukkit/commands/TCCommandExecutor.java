@@ -53,7 +53,6 @@ public class TCCommandExecutor implements CommandExecutor
         this.AddCommand(new BiomeCommand(plugin));
         this.AddCommand(new SpawnCommand(plugin));
         this.AddCommand(new MapCommand(plugin));
-        this.AddCommand(new ReplaceBiomeCommand(plugin));
         this.AddCommand(this.helpCommand);
     }
 
