@@ -100,7 +100,13 @@ public class BukkitEngine extends TerrainControlEngine
             } else
             {
                 // Use specified data
-                return BukkitMaterialData.ofMinecraftBlockData(block.fromLegacyData(blockData));
+                try
+                {
+                    return BukkitMaterialData.ofMinecraftBlockData(block.fromLegacyData(blockData));
+                } catch (IllegalArgumentException e)
+                {
+                    throw new InvalidConfigException("Illegal block data for the block type, cannot use " + input);
+                }
             }
         }
 
