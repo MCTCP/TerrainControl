@@ -170,7 +170,6 @@ public class MinecraftBiomeTemplates
 
             this.defaultSize = 8;
             this.defaultRarity = 95;
-            this.defaultIsle.add(DefaultBiome.SWAMPLAND.Name);
             this.defaultColor = 0x0000FF;
             this.defaultStrongholds = false;
             this.defaultTree = new Object[] {1, TreeType.BigTree, 1, TreeType.Tree, 9};
