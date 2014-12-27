@@ -41,12 +41,11 @@ public class WorldConfig extends ConfigFile
     @Deprecated
     public final List<CustomObject> customObjects;
 
-    public List<String> NormalBiomes = new ArrayList<String>();
-    public List<String> IceBiomes = new ArrayList<String>();
+    // Biome Groups and special biome lists
+    public BiomeGroupManager biomeGroupManager;
+    
     public List<String> IsleBiomes = new ArrayList<String>();
     public List<String> BorderBiomes = new ArrayList<String>();
-
-    public int maxSmoothRadius = 2;
 
     // For old biome generator
     public double oldBiomeSize;
@@ -63,11 +62,12 @@ public class WorldConfig extends ConfigFile
     public int LandRarity;
     public int LandSize;
     public int LandFuzzy;
-
-    public int IceRarity;
-    public int IceSize;
-
+    
+    public int maxSmoothRadius = 2;
+    
     public boolean FrozenOcean;
+    public boolean FreezeAllColdGroupBiomes;
+    public double FrozenOceanTemperature;
 
     // Rivers
 
@@ -176,16 +176,13 @@ public class WorldConfig extends ConfigFile
 
     public boolean BiomeConfigsHaveReplacement = false;
 
-    public int normalBiomesRarity;
-    public int iceBiomesRarity;
-
     public int worldHeightScaleBits;
     public int worldHeightScale;
     public int worldHeightCapBits;
     public int worldHeightCap;
 
     public long resourcesSeed;
-
+    
     /**
      * Creates a WorldConfig from the WorldConfig.ini file found in the given
      * directory.
@@ -194,7 +191,8 @@ public class WorldConfig extends ConfigFile
      *            in.
      * @param world The LocalWorld instance of the world.
      */
-    public WorldConfig(SettingsReader settingsReader, LocalWorld world, CustomObjectCollection customObjects)
+    public WorldConfig(SettingsReader settingsReader, BiomeGroupManager biomeGroupManager, LocalWorld world,
+            CustomObjectCollection customObjects)
     {
         super(settingsReader);
         if (settingsReader.getFile() != null) {
@@ -202,12 +200,11 @@ public class WorldConfig extends ConfigFile
         } else {
             settingsDir = new File(".");
         }
+        this.biomeGroupManager = biomeGroupManager;
 
         this.worldObjects = customObjects;
         this.customObjects = customObjects.getAll();
 
-        // Read the WorldConfig file
-        this.readConfigSettings();
         // Fix older names
         this.renameOldSettings();
         // Set the local fields based on what was read from the file
@@ -277,6 +274,17 @@ public class WorldConfig extends ConfigFile
         // WorldHeightBits was split into two different settings
         renameOldSetting("WorldHeightBits", WorldStandardValues.WORLD_HEIGHT_SCALE_BITS);
         renameOldSetting("WorldHeightBits", WorldStandardValues.WORLD_HEIGHT_CAP_BITS);
+
+        // Put BiomeMode in compatibility mode when the old setting
+        // NormalBiomes is found
+        if (this.reader.hasSetting(WorldStandardValues.NORMAL_BIOMES))
+        {
+            this.reader.putSetting(WorldStandardValues.BIOME_MODE, "BeforeGroups");
+
+            // And don't create the new biome groups
+            this.reader.putSetting(WorldStandardValues.HOT_BIOMES, Collections.<String> emptyList());
+            this.reader.putSetting(WorldStandardValues.COLD_BIOMES, Collections.<String> emptyList());
+        }
     }
 
     @Override
@@ -284,13 +292,11 @@ public class WorldConfig extends ConfigFile
     {
         LandSize = lowerThanOrEqualTo(LandSize, GenerationDepth);
         LandFuzzy = lowerThanOrEqualTo(LandFuzzy, GenerationDepth - LandSize);
-        IceSize = lowerThanOrEqualTo(IceSize, GenerationDepth);
 
         riverRarity = lowerThanOrEqualTo(riverRarity, GenerationDepth);
         riverSize = lowerThanOrEqualTo(riverSize, GenerationDepth - riverRarity);
 
-        NormalBiomes = filterBiomes(NormalBiomes, customBiomeGenerationIds.keySet());
-        IceBiomes = filterBiomes(IceBiomes, customBiomeGenerationIds.keySet());
+        biomeGroupManager.filterBiomes(customBiomeGenerationIds.keySet());
         IsleBiomes = filterBiomes(IsleBiomes, customBiomeGenerationIds.keySet());
         BorderBiomes = filterBiomes(BorderBiomes, customBiomeGenerationIds.keySet());
 
@@ -356,10 +362,10 @@ public class WorldConfig extends ConfigFile
         this.LandSize = readSettings(WorldStandardValues.LAND_SIZE);
         this.LandFuzzy = readSettings(WorldStandardValues.LAND_FUZZY);
 
-        this.IceRarity = readSettings(WorldStandardValues.ICE_RARITY);
-        this.IceSize = readSettings(WorldStandardValues.ICE_SIZE);
-
+        // Ice Area Settings
         this.FrozenOcean = readSettings(WorldStandardValues.FROZEN_OCEAN);
+        this.FrozenOceanTemperature = readSettings(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE);
+        this.FreezeAllColdGroupBiomes = readSettings(WorldStandardValues.GROUP_FREEZE_ENABLED);
 
         // Rivers
 
@@ -369,9 +375,10 @@ public class WorldConfig extends ConfigFile
         this.improvedRivers = readSettings(WorldStandardValues.IMPROVED_RIVERS);
         this.randomRivers = readSettings(WorldStandardValues.RANDOM_RIVERS);
 
-        // Biomes
-        this.NormalBiomes = readSettings(WorldStandardValues.NORMAL_BIOMES);
-        this.IceBiomes = readSettings(WorldStandardValues.ICE_BIOMES);
+        // Biome Groups
+        readBiomeGroups();
+        
+        // Specialized Biomes
         this.IsleBiomes = readSettings(WorldStandardValues.ISLE_BIOMES);
         this.BorderBiomes = readSettings(WorldStandardValues.BORDER_BIOMES);
         ReadCustomBiomes();
@@ -470,6 +477,37 @@ public class WorldConfig extends ConfigFile
         this.oldTerrainGenerator = this.ModeTerrain == TerrainMode.OldGenerator;
     }
 
+    private void readBiomeGroups()
+    {
+        for (ConfigFunction<WorldConfig> res : reader.getConfigFunctions(this, false))
+        {
+            if (res != null && res.getHolderType() != null)
+            {
+                if (res instanceof BiomeGroup && res.isValid())
+                {
+                    biomeGroupManager.registerGroup((BiomeGroup) res);
+                }
+            }
+        }
+        if (this.biomeGroupManager.hasNoGroups())
+        {
+            // No BiomeGroup declarations, we need to create some defaults
+            // The old settings are read for this, they either have old values
+            // that need to be imported, or they have suitable default values
+            BiomeGroup normalGroup = BiomeGroup.createNormalGroup(this);
+            this.biomeGroupManager.registerGroup(normalGroup);
+
+            BiomeGroup iceGroup = BiomeGroup.createIceGroup(this);
+            this.biomeGroupManager.registerGroup(iceGroup);
+
+            BiomeGroup hotGroup = BiomeGroup.createHotGroup(this);
+            this.biomeGroupManager.registerGroup(hotGroup);
+
+            BiomeGroup coldGroup = BiomeGroup.createColdGroup(this);
+            this.biomeGroupManager.registerGroup(coldGroup);
+        }
+    }
+
     private void ReadCustomBiomes()
     {
 
@@ -517,17 +555,19 @@ public class WorldConfig extends ConfigFile
 
         writer.comment("Possible terrain modes:");
         writer.comment("   Normal - use all features");
-        writer.comment("   OldGenerator - generate land like Beta 1.7.3 generator");
         writer.comment("   TerrainTest - generate only terrain without any resources");
         writer.comment("   NotGenerate - generate empty chunks");
         writer.comment("   Default - use default terrain generator");
+        writer.comment("   OldGenerator - Minecraft Beta 1.7.3-like land generator");
         writer.setting(WorldStandardValues.TERRAIN_MODE, this.ModeTerrain);
 
         writer.comment("Possible biome modes:");
         writer.comment("   Normal - use all features");
         writer.comment("   FromImage - get biomes from image file");
-        writer.comment("   OldGenerator - generate biome like the Beta 1.7.3 generator");
         writer.comment("   Default - use default Notch biome generator");
+        writer.comment("For old maps two more modes are available:");
+        writer.comment("   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes");
+        writer.comment("   OldGenerator - Minecraft Beta 1.7.3 biome generator");
         writer.setting(WorldStandardValues.BIOME_MODE, TerrainControl.getBiomeModeManager().getName(biomeMode));
 
         // Custom biomes
@@ -552,8 +592,10 @@ public class WorldConfig extends ConfigFile
         WriteCustomBiomes(writer);
 
         // Settings for BiomeMode:Normal
-        writer.bigTitle("Settings for BiomeMode:Normal");
-        writer.comment("Also applies if you are using BiomeMode:FromImage and ImageMode:ContinueNormal.");
+        writer.bigTitle("Settings for BiomeMode: Normal");
+        writer.comment("Also applies if you are using BiomeMode: FromImage with ImageMode: ContinueNormal, or");
+        writer.comment("if you are using BiomeMode: BeforeGroups");
+        writer.comment("");
 
         writer.comment("Important value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.");
         writer.comment("Large %/total area biomes (Continents) must be set small, (limit=0)");
@@ -566,15 +608,14 @@ public class WorldConfig extends ConfigFile
         writer.comment("fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
         writer.setting(WorldStandardValues.BIOME_RARITY_SCALE, this.BiomeRarityScale);
 
+        writer.smallTitle("Biome Groups");
+
+        writeBiomeGroups(writer);
+
         writer.smallTitle("Biome lists");
 
         writer.comment("Don't forget to register your custom biomes first in CustomBiomes!");
-
-        writer.comment("Biomes generated normal way. Names are case sensitive.");
-        writer.setting(WorldStandardValues.NORMAL_BIOMES, this.NormalBiomes);
-
-        writer.comment("Biomes generated in \"ice areas\". Names are case sensitive.");
-        writer.setting(WorldStandardValues.ICE_BIOMES, this.IceBiomes);
+        writer.comment("");
 
         writer.comment("Biomes used as isles in other biomes. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.");
         writer.setting(WorldStandardValues.ISLE_BIOMES, this.IsleBiomes);
@@ -587,22 +628,27 @@ public class WorldConfig extends ConfigFile
         writer.comment("Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
         writer.setting(WorldStandardValues.LAND_RARITY, this.LandRarity);
 
-        writer.comment("Land size from 0 to GenerationDepth.");
+        writer.comment("Land size from 0 to GenerationDepth. Biome groups are placed on this.");
         writer.setting(WorldStandardValues.LAND_SIZE, this.LandSize);
 
         writer.comment("Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
         writer.setting(WorldStandardValues.LAND_FUZZY, this.LandFuzzy);
 
-        writer.smallTitle("Ice area settings (for IceBiomes)");
-
-        writer.comment("Rarity of the \"ice areas\" from 100 to 1. 100 = ice world, 1 = no IceBiomes");
-        writer.setting(WorldStandardValues.ICE_RARITY, this.IceRarity);
-
-        writer.comment("Ice area size from 0 to GenerationDepth.");
-        writer.setting(WorldStandardValues.ICE_SIZE, this.IceSize);
+        writer.smallTitle("Ice area settings");
 
         writer.comment("Set this to false to stop the ocean from freezing near when an \"ice area\" intersects with an ocean.");
         writer.setting(WorldStandardValues.FROZEN_OCEAN, this.FrozenOcean);
+
+        writer.comment("This is the biome temperature when water freezes if \"FrozenOcean\" is set to true.");
+        writer.comment("This used to be the case for all biomes in the \"IceBiomes\" list. Default: 0.15; Min: 0.0; Max: 2.0");
+        writer.comment("Temperature Reference from Vanilla: <0.15 for snow, 0.15 - 0.95 for rain, or >1.0 for dry");
+        writer.setting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, this.FrozenOceanTemperature);
+        
+        writer.comment("If the average of all biome temperatures in a biome group is less than \"OceanFreezingTemperature\", then:");
+        writer.comment(" - When this setting is true, all biomes in the group will have frozen oceans");
+        writer.comment(" - When this setting is false, only biomes with a temperature below \"OceanFreezingTemperature\" will have frozen oceans");
+        writer.comment("Default: false");
+        writer.setting(WorldStandardValues.GROUP_FREEZE_ENABLED, this.FreezeAllColdGroupBiomes);
 
         writer.smallTitle("Rivers");
 
@@ -879,6 +925,29 @@ public class WorldConfig extends ConfigFile
         writer.setting(WorldStandardValues.MIN_TEMPERATURE, this.minTemperature);
         writer.setting(WorldStandardValues.MAX_TEMPERATURE, this.maxTemperature);
 
+    }
+
+    private void writeBiomeGroups(SettingsWriter writer) throws IOException
+    {
+        writer.comment("Minecraft groups similar biomes together, so that they spawn next to each other.");
+        writer.comment("");
+        writer.comment("Syntax: BiomeGroup(Name, Size, Rarity, BiomeName[, AnotherName[, ...]])");
+        writer.comment("Name - just for clarity, choose something descriptive");
+        writer.comment("Size - layer to generate on, from 0 to GenerationDepth. All biomes in the group must have a BiomeSize");
+        writer.comment("       larger than or equal to this value.");
+        writer.comment("Rarity - relative spawn chances.");
+        writer.comment("BiomeName... - names of the biome that spawn in the group. Case sensitive.");
+        writer.comment("");
+        writer.comment("Note: if you're using BiomeMode: BeforeGroups, only the biome names of the groups named NormalBiomes");
+        writer.comment("and IceBiomes and the size and rarity of the group named IceBiomes will be used. Other groups are");
+        writer.comment("ignored. The size and rarity of the NormalBiomes group is ignored as well, use LandSize and");
+        writer.comment("LandRarity instead.");
+        writer.comment("");
+        for (BiomeGroup bg : this.biomeGroupManager.getGroups())
+        {
+            writer.function(bg);
+        }
+        writer.comment("");
     }
 
     private void WriteCustomBiomes(SettingsWriter writer) throws IOException

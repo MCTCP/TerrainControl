@@ -1,20 +1,26 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.configuration.BiomeGroup;
+import com.khorn.terraincontrol.configuration.BiomeGroupManager;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 
 public class LayerBiome extends Layer
 {
 
-    private LocalBiome[] biomes;
-    private LocalBiome[] ice_biomes;
+    private BiomeGroupManager manager;
+    private int depth;
+    private double freezeTemp;
 
-    public LayerBiome(long seed, Layer childLayer, LocalBiome[] biomes, LocalBiome[] ice_biomes)
+    public LayerBiome(long seed, Layer childLayer, BiomeGroupManager groupManager, int depth, double freezeTemp)
     {
         super(seed);
         this.child = childLayer;
-        this.biomes = biomes;
-        this.ice_biomes = ice_biomes;
+        this.manager = groupManager;
+        this.depth = depth;
+        this.freezeTemp = freezeTemp;
     }
 
     @Override
@@ -30,18 +36,27 @@ public class LayerBiome extends Layer
                 initChunkSeed(j + x, i + z);
                 int currentPiece = childInts[(j + i * xSize)];
 
-                if ((currentPiece & BiomeBits) == 0)    // without biome
+                if ((currentPiece & BiomeGroupBits) != 0 && (currentPiece & BiomeBits) == 0)    // has biomegroup bits but not biome bits
                 {
-                    if (this.biomes.length > 0 && (currentPiece & IceBit) == 0) // Normal Biome
+                    BiomeGroup group = manager.getGroupById((currentPiece & BiomeGroupBits) >> BiomeGroupShift);
+                    SortedMap<Integer, LocalBiome> possibleBiomes = group.getDepthMap(depth);
+                    //>>	Get Max Rarity
+                    if (!possibleBiomes.isEmpty())
                     {
-                        LocalBiome biome = this.biomes[nextInt(this.biomes.length)];
-                        if (biome != null)
-                            currentPiece |= biome.getIds().getGenerationId();
-                    } else if (this.ice_biomes.length > 0 && (currentPiece & IceBit) != 0) //Ice biome
-                    {
-                        LocalBiome biome = this.ice_biomes[nextInt(this.ice_biomes.length)];
-                        if (biome != null)
-                            currentPiece |= biome.getIds().getGenerationId();
+                        int newBiomeRarity = nextInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleBiomes));
+                        //>>	Spawn the biome based on the rarity spectrum
+                        for (Entry<Integer, LocalBiome> biome : possibleBiomes.entrySet())
+                        {
+                            if (newBiomeRarity < biome.getKey())
+                            {
+                                if (biome.getValue() != null){
+                                    currentPiece |= biome.getValue().getIds().getGenerationId() |
+                                                    //>>	Set IceBit based on Biome Temperature
+                                                    (biome.getValue().getBiomeConfig().biomeTemperature <= freezeTemp ? IceBit : 0);
+                                }
+                                break;
+                            }
+                        }
                     }
                 }
                 thisInts[(j + i * xSize)] = currentPiece;

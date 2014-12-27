@@ -475,6 +475,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x31554A;
+            this.defaultRarity = 35;
         }
     }
 

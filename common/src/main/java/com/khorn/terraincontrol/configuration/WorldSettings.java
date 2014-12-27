@@ -38,10 +38,11 @@ public class WorldSettings implements ConfigProvider
     private File settingsDir;
     private CustomObjectCollection customObjects;
     public WorldConfig worldConfig;
+    private BiomeGroupManager biomeGroupManager;
 
     /**
      * Holds all biome configs. Generation Id => BiomeConfig
-     * 
+     * <p>
      * Must be simple array for fast access. Warning: some ids may contain
      * null values, always check.
      */
@@ -62,12 +63,27 @@ public class WorldSettings implements ConfigProvider
     {
         this.settingsDir = settingsDir;
         this.world = world;
+        this.biomes = new LocalBiome[world.getMaxBiomesCount()];
+
+        loadSettings();
+    }
+
+    /**
+     * Loads all settings. Expects the biomes array to be empty (filled with
+     * nulls), the savedBiomes collection to be empty and the biomesCount
+     * field to be zero.
+     */
+    private void loadSettings()
+    {
+        biomeGroupManager = new BiomeGroupManager();
 
         loadCustomObjects();
         loadWorldConfig();
-
-        this.biomes = new LocalBiome[world.getMaxBiomesCount()];
         loadBiomes();
+
+        // We have to wait for the loading in order to get things like
+        // temperature
+        biomeGroupManager.processBiomeData(world);
     }
 
     private void loadCustomObjects()
@@ -95,8 +111,10 @@ public class WorldSettings implements ConfigProvider
     private void loadWorldConfig()
     {
         File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
-        this.worldConfig = new WorldConfig(new FileSettingsReader(world.getName(), worldConfigFile), world, customObjects);
+        this.worldConfig = new WorldConfig(new FileSettingsReader(world.getName(), worldConfigFile), biomeGroupManager, world,
+                customObjects);
         FileSettingsWriter.writeToFile(worldConfig, worldConfig.SettingsMode);
+
     }
 
     private void loadBiomes()
@@ -121,7 +139,7 @@ public class WorldSettings implements ConfigProvider
             String biomeName = entry.getKey();
             int generationId = entry.getValue();
             biomesToLoad.add(new BiomeLoadInstruction(biomeName, generationId, new StandardBiomeTemplate(
-                    worldConfig.worldHeightScale)));
+                                                      worldConfig.worldHeightScale)));
         }
 
         // Load all files
@@ -163,9 +181,7 @@ public class WorldSettings implements ConfigProvider
         this.biomesCount = 0;
 
         // Load again
-        loadCustomObjects();
-        loadWorldConfig();
-        loadBiomes();
+        loadSettings();
     }
 
     private String readSettings(Map<String, BiomeConfig> biomeConfigs)
@@ -194,8 +210,8 @@ public class WorldSettings implements ConfigProvider
             if (generationId < 0 || generationId >= world.getMaxBiomesCount())
             {
                 TerrainControl.log(LogMarker.ERROR,
-                        "The biome id of the {} biome, {}, is too high. It must be between 0 and {}, inclusive.",
-                        biomeConfig.getName(), generationId, world.getMaxBiomesCount() - 1);
+                                   "The biome id of the {} biome, {}, is too high. It must be between 0 and {}, inclusive.",
+                                   biomeConfig.getName(), generationId, world.getMaxBiomesCount() - 1);
                 TerrainControl.log(LogMarker.ERROR, "The biome has been prevented from loading.");
                 continue;
             }
@@ -204,7 +220,7 @@ public class WorldSettings implements ConfigProvider
             if (biomes[generationId] != null)
             {
                 TerrainControl.log(LogMarker.FATAL, "Duplicate biome id {} ({} and {})!", generationId, biomes[generationId].getName(),
-                        biomeConfig.getName());
+                                   biomeConfig.getName());
                 TerrainControl.log(LogMarker.FATAL, "The biome {} has been prevented from loading.", new Object[] {biomeConfig.getName()});
                 TerrainControl.log(LogMarker.INFO, "If you are updating an old pre-Minecraft 1.7 world, please read this wiki page:");
                 TerrainControl.log(LogMarker.INFO, "https://github.com/Wickth/TerrainControl/wiki/Upgrading-an-old-map-to-Minecraft-1.7");
@@ -221,7 +237,7 @@ public class WorldSettings implements ConfigProvider
                 {
                     biomeConfig.replaceToBiomeName = "";
                     TerrainControl.log(LogMarker.WARN, "Invalid ReplaceToBiomeName in biome {}: biome {} doesn't exist", biomeConfig.getName(),
-                            biomeConfig.replaceToBiomeName);
+                                       biomeConfig.replaceToBiomeName);
                 } else
                 {
                     savedId = replaceToConfig.generationId;
@@ -232,12 +248,12 @@ public class WorldSettings implements ConfigProvider
             if (savedId >= world.getMaxSavedBiomesCount())
             {
                 TerrainControl.log(LogMarker.ERROR,
-                        "Biomes with an id between {} and {} (inclusive) must have a valid ReplaceToBiomeName setting:",
-                        world.getMaxBiomesCount(), world.getMaxSavedBiomesCount() - 1);
+                                   "Biomes with an id between {} and {} (inclusive) must have a valid ReplaceToBiomeName setting:",
+                                   world.getMaxBiomesCount(), world.getMaxSavedBiomesCount() - 1);
                 TerrainControl.log(LogMarker.ERROR, "Minecraft can only save biomes with an id between 0 and {}, inclusive.",
-                        world.getMaxBiomesCount() - 1);
+                                   world.getMaxBiomesCount() - 1);
                 TerrainControl.log(LogMarker.ERROR, "This means that the biome {} with map file id {} had to be prevented from loading.",
-                        biomeConfig.getName(), savedId);
+                                   biomeConfig.getName(), savedId);
                 continue;
             }
 
@@ -255,16 +271,6 @@ public class WorldSettings implements ConfigProvider
             if (!this.worldConfig.BiomeConfigsHaveReplacement)
             {
                 this.worldConfig.BiomeConfigsHaveReplacement = biomeConfig.replacedBlocks.hasReplaceSettings();
-            }
-
-            // Indexing BiomeRarity
-            if (this.worldConfig.NormalBiomes.contains(biomeConfig.getName()))
-            {
-                this.worldConfig.normalBiomesRarity += biomeConfig.biomeRarity;
-            }
-            if (this.worldConfig.IceBiomes.contains(biomeConfig.getName()))
-            {
-                this.worldConfig.iceBiomesRarity += biomeConfig.biomeRarity;
             }
 
             // Indexing MaxSmoothRadius
@@ -367,7 +373,7 @@ public class WorldSettings implements ConfigProvider
         SettingsReader worldSettingsReader = new MemorySettingsReader(world.getName());
         worldSettingsReader.putSetting(WorldStandardValues.WORLD_FOG, stream.readInt());
         worldSettingsReader.putSetting(WorldStandardValues.WORLD_NIGHT_FOG, stream.readInt());
-        worldConfig = new WorldConfig(worldSettingsReader, world, customObjects);
+        worldConfig = new WorldConfig(worldSettingsReader, biomeGroupManager, world, customObjects);
 
         // Custom biomes + ids
         int count = stream.readInt();
@@ -420,7 +426,7 @@ public class WorldSettings implements ConfigProvider
             {
                 TerrainControl.log(LogMarker.WARN, "========================");
                 TerrainControl.log(LogMarker.WARN, "Fould old `BiomeConfigs` folder, but it could not be renamed to `", biomeFolderName,
-                        "`!");
+                                   "`!");
                 TerrainControl.log(LogMarker.WARN, "Please rename the folder manually.");
                 TerrainControl.log(LogMarker.WARN, "========================");
                 biomeFolderName = "BiomeConfigs";
@@ -443,9 +449,7 @@ public class WorldSettings implements ConfigProvider
         for (Integer generationId : worldConfig.customBiomeGenerationIds.values())
         {
             LocalBiome biome = biomes[generationId];
-            if (!biome.getIds().isVirtual()) {
-                nonVirtualCustomBiomes.add(biome);
-            }
+            if (!biome.getIds().isVirtual()) nonVirtualCustomBiomes.add(biome);
         }
 
         // Write them to the stream
@@ -463,7 +467,7 @@ public class WorldSettings implements ConfigProvider
             if (biome == null)
             {
                 continue;
-            } 
+            }
             stream.writeInt(biome.getIds().getSavedId());
             biome.getBiomeConfig().writeToStream(stream);
         }

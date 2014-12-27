@@ -7,10 +7,10 @@ import com.khorn.terraincontrol.generator.biome.layers.LayerFactory;
 /**
  * This is the normal biome mode, which has all of Terrain Control's features.
  */
-public class NormalBiomeGenerator extends LayeredBiomeGenerator
+public class BeforeGroupsBiomeGenerator extends LayeredBiomeGenerator
 {
 
-    public NormalBiomeGenerator(LocalWorld world)
+    public BeforeGroupsBiomeGenerator(LocalWorld world)
     {
         super(world);
     }
@@ -18,7 +18,7 @@ public class NormalBiomeGenerator extends LayeredBiomeGenerator
     @Override
     protected Layer[] initLayers()
     {
-        return LayerFactory.createNormal(world);
+        return LayerFactory.createBeforeGroups(world);
     }
 
 }
