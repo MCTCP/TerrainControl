@@ -245,7 +245,10 @@ public class WorldConfig extends ConfigFile
         // NormalBiomes is found, and create default groups
         if (this.reader.hasSetting(WorldStandardValues.NORMAL_BIOMES))
         {
-            this.reader.putSetting(WorldStandardValues.BIOME_MODE, "BeforeGroups");
+            if (readSettings(WorldStandardValues.BIOME_MODE).equals("Normal"))
+            {
+                this.reader.putSetting(WorldStandardValues.BIOME_MODE, "BeforeGroups");
+            }
 
             int landSize = readSettings(WorldStandardValues.LAND_SIZE);
             int landRarity = readSettings(WorldStandardValues.LAND_RARITY);
