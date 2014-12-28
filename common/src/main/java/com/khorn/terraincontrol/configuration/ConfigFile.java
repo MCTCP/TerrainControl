@@ -1,12 +1,9 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
-import com.khorn.terraincontrol.configuration.io.FileSettingsWriter;
 import com.khorn.terraincontrol.configuration.io.SettingsReader;
 import com.khorn.terraincontrol.configuration.io.SettingsWriter;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
-import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.io.*;
@@ -14,16 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Abstract base class for all configuration files. Configuration files read
+ * the desired settings from a {@link SettingsReader}, and write them on
+ * request to a {@link SettingsWriter}.
+ *
+ */
 public abstract class ConfigFile
 {
-    public final SettingsReader reader;
-    /**
-     * Use {@link #getName()}.
-     */
-    @Deprecated
-    public final String name;
-    @Deprecated
-    public final File file;
+    protected final SettingsReader reader;
 
     /**
      * True if the file does not exist yet on disk, false otherwise. Used to
@@ -33,7 +29,6 @@ public abstract class ConfigFile
 
     /**
      * Creates a new configuration file.
-     * <p/>
      * @param name   Name of the thing that is being read,
      *               like Plains or MyBO3. May not be null.
      * @param reader Settings reader
@@ -42,9 +37,6 @@ public abstract class ConfigFile
     {
         this.reader = reader;
         this.isNewConfig = reader.isNewConfig();
-
-        this.file = reader.getFile();
-        this.name = reader.getName();
     }
 
     /**
@@ -72,11 +64,14 @@ public abstract class ConfigFile
     }
 
     /**
-     * Sets the config mode and opens the writer for writing. After writing is
-     * done, the writer is closed.
-     * @param writer The writer.
-     * @param configMode
-     * @throws IOException
+     * Writes all settings of this configuration file to the provided writer.
+     * This method can be called at any time after the settings are fully read.
+     * @param writer     The writer to write the setings to.
+     * @param configMode The mode to use while writing the settings. May not
+     * be {@link ConfigMode#WriteDisable}.
+     * @throws IOException If one of the methods on the writer throws an
+     * {@link IOException}, or if the {@code configMode} is
+     * {@link ConfigMode#WriteDisable}.
      */
     public void write(SettingsWriter writer, ConfigMode configMode) throws IOException
     {
@@ -96,27 +91,29 @@ public abstract class ConfigFile
     }
 
     /**
-     * @deprecated 29 May 2014
-     * @see {@link FileSettingsWriter#writeToFile(ConfigFile, ConfigMode)}
+     * Methods that subclasses must override to write the actual settings.
+     * @param writer The writer to write the setings to.
+     * @throws IOException If one of the methods on the writer throws an
+     * {@link IOException}.
      */
-    @Deprecated
-    public void writeSettingsFile(boolean comments)
-    {
-        FileSettingsWriter.writeToFile(this, comments ? ConfigMode.WriteAll : ConfigMode.WriteWithoutComments);
-    }
-
-    public void logIOError(IOException e)
-    {
-        TerrainControl.log(LogMarker.ERROR, "Failed to write to file {}", file);
-        TerrainControl.printStackTrace(LogMarker.ERROR, e);
-    }
-
     protected abstract void writeConfigSettings(SettingsWriter writer) throws IOException;
 
+    /**
+     * Called once to read all configuration settings from the
+     * {@link SettingsReader} provided to the constructor.
+     */
     protected abstract void readConfigSettings();
 
+    /**
+     * Called directly after {@link #readConfigSettings()} to fix impossible
+     * combinations of settings.
+     */
     protected abstract void correctSettings();
 
+    /**
+     * Called before {@link #readConfigSettings()} to rewrite configs in old
+     * formats to the modern format, so that they can be read.
+     */
     protected abstract void renameOldSettings();
 
     /**
@@ -126,7 +123,7 @@ public abstract class ConfigFile
      * @param oldValue Name of the old setting.
      * @param newValue The new setting.
      */
-    protected void renameOldSetting(String oldValue, Setting<?> newValue)
+    protected final void renameOldSetting(String oldValue, Setting<?> newValue)
     {
         reader.renameOldSetting(oldValue, newValue);
     }
@@ -138,7 +135,7 @@ public abstract class ConfigFile
      * @param minimumValue The minimum value.
      * @return The corrected value.
      */
-    protected int higherThan(int currentValue, int minimumValue)
+    protected final int higherThan(int currentValue, int minimumValue)
     {
         if (currentValue <= minimumValue)
         {
@@ -154,7 +151,7 @@ public abstract class ConfigFile
      * @param minimumValue The minimum value.
      * @return The corrected value.
      */
-    protected double higherThan(double currentValue, double minimumValue)
+    protected final double higherThan(double currentValue, double minimumValue)
     {
         if (currentValue < minimumValue)
         {
@@ -170,7 +167,7 @@ public abstract class ConfigFile
      * @param maximumValue The maximum value.
      * @return The corrected value.
      */
-    protected int lowerThanOrEqualTo(int currentValue, int maximumValue)
+    protected final int lowerThanOrEqualTo(int currentValue, int maximumValue)
     {
         if (currentValue > maximumValue)
         {

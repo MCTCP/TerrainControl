@@ -212,7 +212,7 @@ public class BO3 implements StructuredCustomObject
     @Override
     public CustomObject applySettings(SettingsReader extraSettings)
     {
-        extraSettings.setFallbackReader(this.settings.reader);
+        extraSettings.setFallbackReader(this.settings.getReader());
         return new BO3(this, extraSettings);
     }
 

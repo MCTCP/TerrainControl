@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -46,75 +45,6 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     public BiomeGroup()
     {
 
-    }
-
-    /**
-     * Creates a new biome group based on the given settings. Using these
-     * settings makes sure that:
-     * <ul>
-     *  <li>values from old configs are read correctly.</li>
-     *  <li>proper default settings are used, as specified by those settings.</li>
-     * </ul>
-     * @param config     WorldConfig this biome group will be in.
-     * @param biomeNames Setting used to read the names of the biomes in this
-     *                   group. The name of this setting will be used as the
-     *                   name of the group.
-     * @param size       Setting used for reading the size of the group.
-     * @param rarity     Setting used for reading the rarity of the group.
-     * @return The group.
-     */
-    private static BiomeGroup ofSettings(WorldConfig config, Setting<List<String>> biomeNames, Setting<Integer> size,
-            Setting<Integer> rarity)
-    {
-        String groupName = biomeNames.getName();
-        List<String> biomeNameValues = config.readSettings(biomeNames);
-        int sizeValue = config.readSettings(size);
-        int rarityValue = config.readSettings(rarity);
-        return new BiomeGroup(config, groupName, sizeValue, rarityValue, biomeNameValues);
-    }
-
-    /**
-     * Creates a biome group with the normal biomes.
-     * @param config The world config. The biome lists are read from this config.
-     * @return The biome group.
-     */
-    public static BiomeGroup createNormalGroup(WorldConfig config)
-    {
-        return ofSettings(config, WorldStandardValues.NORMAL_BIOMES,
-                WorldStandardValues.LAND_SIZE, WorldStandardValues.LAND_RARITY);
-    }
-
-    /**
-     * Creates a biome group with the ice biomes.
-     * @param config The world config. The biome lists are read from this config.
-     * @return The biome group.
-     */
-    public static BiomeGroup createIceGroup(WorldConfig config)
-    {
-        return ofSettings(config, WorldStandardValues.ICE_BIOMES,
-                WorldStandardValues.ICE_SIZE, WorldStandardValues.ICE_RARITY);
-    }
-
-    /**
-     * Creates a biome group with the default hot biomes.
-     * @param config The world config.
-     * @return The biome group.
-     */
-    public static BiomeGroup createHotGroup(WorldConfig config)
-    {
-        return ofSettings(config, WorldStandardValues.HOT_BIOMES,
-                WorldStandardValues.LAND_SIZE, WorldStandardValues.LAND_RARITY);
-    }
-
-    /**
-     * Creates a biome group with the default cold biomes.
-     * @param config The world config.
-     * @return The biome group.
-     */
-    public static BiomeGroup createColdGroup(WorldConfig config)
-    {
-        return ofSettings(config, WorldStandardValues.COLD_BIOMES,
-                WorldStandardValues.LAND_SIZE, WorldStandardValues.LAND_RARITY);
     }
 
     /**

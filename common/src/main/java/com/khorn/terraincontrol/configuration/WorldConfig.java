@@ -8,7 +8,6 @@ import com.khorn.terraincontrol.configuration.io.SettingsWriter;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -35,11 +34,6 @@ public class WorldConfig extends ConfigFile
 
     // Holds all world CustomObjects.
     public final CustomObjectCollection worldObjects;
-    /**
-     * @deprecated Use {@link #worldObjects} instead.
-     */
-    @Deprecated
-    public final List<CustomObject> customObjects;
 
     // Biome Groups and special biome lists
     public BiomeGroupManager biomeGroupManager;
@@ -191,7 +185,7 @@ public class WorldConfig extends ConfigFile
      *            in.
      * @param world The LocalWorld instance of the world.
      */
-    public WorldConfig(SettingsReader settingsReader, BiomeGroupManager biomeGroupManager, LocalWorld world,
+    public WorldConfig(SettingsReader settingsReader, LocalWorld world,
             CustomObjectCollection customObjects)
     {
         super(settingsReader);
@@ -200,10 +194,8 @@ public class WorldConfig extends ConfigFile
         } else {
             settingsDir = new File(".");
         }
-        this.biomeGroupManager = biomeGroupManager;
 
         this.worldObjects = customObjects;
-        this.customObjects = customObjects.getAll();
 
         // Fix older names
         this.renameOldSettings();
@@ -211,8 +203,6 @@ public class WorldConfig extends ConfigFile
         this.readConfigSettings();
         // Clamp Settings to acceptable values
         this.correctSettings();
-
-        ReadWorldCustomObjects();
 
         // Check biome ids, These are the names from the worldConfig file
         // Corrects any instances of incorrect biome id.
@@ -239,30 +229,6 @@ public class WorldConfig extends ConfigFile
         }
     }
 
-    private void ReadWorldCustomObjects()
-    {
-        customObjectsDirectory = new File(this.settingsDir, WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
-
-        File oldCustomObjectsDirectory = new File(settingsDir, "BOBPlugins");
-        if (oldCustomObjectsDirectory.exists())
-        {
-            if (!oldCustomObjectsDirectory.renameTo(new File(settingsDir, WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME)))
-            {
-                TerrainControl.log(LogMarker.WARN, "Fould old BOBPlugins folder, but it cannot be renamed to WorldObjects.");
-                TerrainControl.log(LogMarker.WARN, "Please move the BO2s manually and delete BOBPlugins afterwards.");
-            }
-        }
-
-        if (!customObjectsDirectory.exists())
-        {
-            if (!customObjectsDirectory.mkdirs())
-            {
-                TerrainControl.log(LogMarker.WARN, "Can`t create WorldObjects folder. No write permissions?");
-                return;
-            }
-        }
-    }
-
     @Override
     protected void renameOldSettings()
     {
@@ -276,14 +242,25 @@ public class WorldConfig extends ConfigFile
         renameOldSetting("WorldHeightBits", WorldStandardValues.WORLD_HEIGHT_CAP_BITS);
 
         // Put BiomeMode in compatibility mode when the old setting
-        // NormalBiomes is found
+        // NormalBiomes is found, and create default groups
         if (this.reader.hasSetting(WorldStandardValues.NORMAL_BIOMES))
         {
             this.reader.putSetting(WorldStandardValues.BIOME_MODE, "BeforeGroups");
 
-            // And don't create the new biome groups
-            this.reader.putSetting(WorldStandardValues.HOT_BIOMES, Collections.<String> emptyList());
-            this.reader.putSetting(WorldStandardValues.COLD_BIOMES, Collections.<String> emptyList());
+            int landSize = readSettings(WorldStandardValues.LAND_SIZE);
+            int landRarity = readSettings(WorldStandardValues.LAND_RARITY);
+            List<String> normalBiomes = readSettings(WorldStandardValues.NORMAL_BIOMES);
+            BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL,
+                    landSize, landRarity, normalBiomes);
+
+            int iceSize = readSettings(WorldStandardValues.ICE_SIZE);
+            int iceRarity = readSettings(WorldStandardValues.ICE_RARITY);
+            List<String> iceBiomes = readSettings(WorldStandardValues.ICE_BIOMES);
+            BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE,
+                    iceSize, iceRarity, iceBiomes);
+
+            this.reader.addConfigFunction(normalGroup);
+            this.reader.addConfigFunction(iceGroup);
         }
     }
 
@@ -479,6 +456,11 @@ public class WorldConfig extends ConfigFile
 
     private void readBiomeGroups()
     {
+        this.biomeGroupManager = new BiomeGroupManager();
+        if (this.isNewConfig)
+        {
+            createDefaultBiomeGroups();
+        }
         for (ConfigFunction<WorldConfig> res : reader.getConfigFunctions(this, false))
         {
             if (res != null && res.getHolderType() != null)
@@ -489,23 +471,25 @@ public class WorldConfig extends ConfigFile
                 }
             }
         }
-        if (this.biomeGroupManager.hasNoGroups())
-        {
-            // No BiomeGroup declarations, we need to create some defaults
-            // The old settings are read for this, they either have old values
-            // that need to be imported, or they have suitable default values
-            BiomeGroup normalGroup = BiomeGroup.createNormalGroup(this);
-            this.biomeGroupManager.registerGroup(normalGroup);
+    }
 
-            BiomeGroup iceGroup = BiomeGroup.createIceGroup(this);
-            this.biomeGroupManager.registerGroup(iceGroup);
+    private void createDefaultBiomeGroups()
+    {
+        BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL, 0, 97,
+                Arrays.asList("Forest", "Roofed Forest", "Extreme Hills", "Plains", "Birch Forest", "Swampland"));
+        this.biomeGroupManager.registerGroup(normalGroup);
 
-            BiomeGroup hotGroup = BiomeGroup.createHotGroup(this);
-            this.biomeGroupManager.registerGroup(hotGroup);
+        BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE, 3, 90,
+                Arrays.asList("Ice Plains", "Cold Taiga"));
+        this.biomeGroupManager.registerGroup(iceGroup);
 
-            BiomeGroup coldGroup = BiomeGroup.createColdGroup(this);
-            this.biomeGroupManager.registerGroup(coldGroup);
-        }
+        BiomeGroup hotGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.HOT, 0, 97,
+                Arrays.asList("Desert", "Savanna", "Plains"));
+        this.biomeGroupManager.registerGroup(hotGroup);
+
+        BiomeGroup coldGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.COLD, 0, 97,
+                Arrays.asList("Forest", "Extreme Hills", "Taiga", "Plains"));
+        this.biomeGroupManager.registerGroup(coldGroup);
     }
 
     private void ReadCustomBiomes()

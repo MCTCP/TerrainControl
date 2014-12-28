@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.customobjects;
 
-import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.bo2.BO2Loader;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Loader;
@@ -45,12 +44,6 @@ public class CustomObjectManager
     private final Map<String, CustomObjectLoader> loaders;
     private final CustomObjectCollection globalCustomObjects;
 
-    /**
-     * @deprecated Use {@link #getGlobalObjects()} instead.
-     */
-    @Deprecated
-    public final Map<String, CustomObject> globalObjects;
-
     public CustomObjectManager()
     {
         // These are the actual lists, not just a copy.
@@ -61,7 +54,6 @@ public class CustomObjectManager
         registerCustomObjectLoader("bo3", new BO3Loader());
 
         this.globalCustomObjects = new CustomObjectCollection();
-        this.globalObjects = globalCustomObjects.accessMap();
 
         // Put some default CustomObjects
         for (TreeType type : TreeType.values())
@@ -134,25 +126,6 @@ public class CustomObjectManager
             loader.onShutdown();
         }
         loaders.clear();
-    }
-
-    /**
-     * @deprecated Use
-     * {@code world.getConfigs().getCustomObjects().getObjectByName(String)}.
-     */
-    @Deprecated
-    public CustomObject getCustomObject(String name, LocalWorld world)
-    {
-        return world.getConfigs().getCustomObjects().getObjectByName(name);
-    }
-
-    /**
-     * @deprecated Use {@code getGlobalObjects().getObjectByName(String)}.
-     */
-    @Deprecated
-    public CustomObject getCustomObject(String name)
-    {
-        return globalCustomObjects.getObjectByName(name);
     }
 
 }

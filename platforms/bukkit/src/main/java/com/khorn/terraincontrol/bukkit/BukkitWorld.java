@@ -554,13 +554,6 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    @Deprecated
-    public WorldSettings getSettings()
-    {
-        return this.settings;
-    }
-
-    @Override
     public ConfigProvider getConfigs()
     {
         return this.settings;

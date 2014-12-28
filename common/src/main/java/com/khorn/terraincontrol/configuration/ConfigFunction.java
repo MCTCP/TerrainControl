@@ -284,25 +284,6 @@ public abstract class ConfigFunction<T>
         this.holder = holder;
     }
 
-    /**
-     * @deprecated Use {@link #invalidate(String, List, String)} to invalidate
-     * the object. Manually validating an object is no longer needed.
-     * Re-validating is no longer possible, just create a new instance.
-     */
-    @Deprecated
-    public final void setValid(boolean valid)
-    {
-        if (valid == false)
-        {
-            throw new UnsupportedOperationException("Use the invalidate method");
-        }
-        if (valid == true && !isValid())
-        {
-            throw new UnsupportedOperationException("Revalidating objects is no longer supported");
-        }
-        // So (valid == true && isValid()), so it's safe to do nothing
-    }
-
     public final String write()
     {
         if (!valid)

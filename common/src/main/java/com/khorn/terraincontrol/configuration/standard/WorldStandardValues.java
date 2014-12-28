@@ -29,6 +29,14 @@ public class WorldStandardValues extends Settings
     public static final float SNOW_AND_ICE_MAX_TEMP = 0.15F;
     public static final float ICE_GROUP_MAX_TEMP = 0.33F;
 
+    public static class BiomeGroupNames
+    {
+        public static final String NORMAL = "NormalBiomes";
+        public static final String ICE = "IceBiomes";
+        public static final String COLD = "ColdBiomes";
+        public static final String HOT = "HotBiomes";
+    }
+
     public static final Setting<ConfigMode> SETTINGS_MODE = enumSetting("SettingsMode", ConfigMode.WriteAll);
     public static final Setting<TerrainMode> TERRAIN_MODE = enumSetting("TerrainMode", TerrainMode.Normal);
     public static final Setting<ImageMode> IMAGE_MODE = enumSetting("ImageMode", ImageMode.Mirror);
@@ -105,13 +113,6 @@ public class WorldStandardValues extends Settings
             BEDROCK_BLOCK = new MaterialSetting("BedrockobBlock", DefaultMaterial.BEDROCK);
 
     public static final Setting<List<String>>
-            // Default biome groups
-            NORMAL_BIOMES = stringListSetting("NormalBiomes", "Forest", "Roofed Forest", "Extreme Hills", "Plains", "Birch Forest",
-                    "Swampland"),
-            ICE_BIOMES = stringListSetting("IceBiomes", "Ice Plains", "Cold Taiga"),
-            COLD_BIOMES = stringListSetting("ColdBiomes", "Forest", "Extreme Hills", "Taiga", "Plains"),
-            HOT_BIOMES = stringListSetting("HotBiomes", "Desert", "Savanna", "Plains"),
-            //>>	Special Lists
             ISLE_BIOMES = stringListSetting("IsleBiomes", "MushroomIsland",
                     "Ice Mountains", "DesertHills", "ForestHills", "TaigaHills",
                     "JungleHills", "Cold Taiga Hills"),
@@ -140,5 +141,8 @@ public class WorldStandardValues extends Settings
     // Deprecated settings
     public static final Setting<Boolean> FROZEN_RIVERS = booleanSetting("FrozenRivers", true);
     public static final Setting<Integer> CUSTOM_TREE_CHANCE = intSetting("CustomTreeChance", 0, 0, 100);
+    public static final Setting<List<String>> NORMAL_BIOMES = stringListSetting("NormalBiomes", "Desert", "Forest", "Extreme Hills",
+            "Swampland", "Plains", "Taiga", "Jungle", "River");
+    public static final Setting<List<String>> ICE_BIOMES = stringListSetting("IceBiomes", "Ice Plains");
 
 }

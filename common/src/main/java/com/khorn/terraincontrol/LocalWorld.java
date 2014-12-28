@@ -3,7 +3,6 @@ package com.khorn.terraincontrol;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
-import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
@@ -179,13 +178,6 @@ public interface LocalWorld
     public boolean isLoaded(int x, int y, int z);
 
     // Other information
-    /**
-     * @deprecated Use {@link #getConfigs()} instead, which returns an
-     * interface and allows for another implementation than
-     * {@link WorldSettings}.
-     */
-    @Deprecated
-    public WorldSettings getSettings();
 
     /**
      * Gets the configuration objects of this world.

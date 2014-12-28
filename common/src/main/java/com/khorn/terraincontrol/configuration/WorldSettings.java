@@ -38,7 +38,6 @@ public class WorldSettings implements ConfigProvider
     private File settingsDir;
     private CustomObjectCollection customObjects;
     public WorldConfig worldConfig;
-    private BiomeGroupManager biomeGroupManager;
 
     /**
      * Holds all biome configs. Generation Id => BiomeConfig
@@ -75,7 +74,6 @@ public class WorldSettings implements ConfigProvider
      */
     private void loadSettings()
     {
-        biomeGroupManager = new BiomeGroupManager();
 
         loadCustomObjects();
         loadWorldConfig();
@@ -83,7 +81,7 @@ public class WorldSettings implements ConfigProvider
 
         // We have to wait for the loading in order to get things like
         // temperature
-        biomeGroupManager.processBiomeData(world);
+        worldConfig.biomeGroupManager.processBiomeData(world);
     }
 
     private void loadCustomObjects()
@@ -111,8 +109,7 @@ public class WorldSettings implements ConfigProvider
     private void loadWorldConfig()
     {
         File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
-        this.worldConfig = new WorldConfig(new FileSettingsReader(world.getName(), worldConfigFile), biomeGroupManager, world,
-                customObjects);
+        this.worldConfig = new WorldConfig(new FileSettingsReader(world.getName(), worldConfigFile), world, customObjects);
         FileSettingsWriter.writeToFile(worldConfig, worldConfig.SettingsMode);
 
     }
@@ -373,7 +370,7 @@ public class WorldSettings implements ConfigProvider
         SettingsReader worldSettingsReader = new MemorySettingsReader(world.getName());
         worldSettingsReader.putSetting(WorldStandardValues.WORLD_FOG, stream.readInt());
         worldSettingsReader.putSetting(WorldStandardValues.WORLD_NIGHT_FOG, stream.readInt());
-        worldConfig = new WorldConfig(worldSettingsReader, biomeGroupManager, world, customObjects);
+        worldConfig = new WorldConfig(worldSettingsReader, world, customObjects);
 
         // Custom biomes + ids
         int count = stream.readInt();

@@ -220,11 +220,4 @@ public class CustomObjectCollection implements Iterable<CustomObject>
         return objects.isEmpty();
     }
 
-    /**
-     * Internal method to provide backwards compatibility in CustomObjectManager.
-     */
-    Map<String, CustomObject> accessMap()
-    {
-        return objectsByName;
-    }
 }

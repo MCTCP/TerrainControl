@@ -65,6 +65,15 @@ public class BO3Config extends ConfigFile
         rotateBlocksAndChecks();
     }
 
+    /**
+     * Gets access to the settings reader used by this BO3 config.
+     * @return The settings reader.
+     */
+    public SettingsReader getReader()
+    {
+        return this.reader;
+    }
+
     @Override
     protected void writeConfigSettings(SettingsWriter writer) throws IOException
     {

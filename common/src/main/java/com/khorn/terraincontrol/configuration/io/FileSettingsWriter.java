@@ -50,8 +50,14 @@ public class FileSettingsWriter implements SettingsWriter
             config.write(writer, configMode);
         } catch (IOException e)
         {
-            config.logIOError(e);
+            logIOError(e, file);
         }
+    }
+
+    private static void logIOError(IOException e, File file)
+    {
+        TerrainControl.log(LogMarker.ERROR, "Failed to write to file {}", file);
+        TerrainControl.printStackTrace(LogMarker.ERROR, e);
     }
 
     private final File file;

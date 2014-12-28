@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -81,12 +82,14 @@ public final class LayerFactory
         BiomeGroup iceGroup = worldGroupManager.getGroupByName(WorldStandardValues.ICE_BIOMES.getName());
         if (normalGroup == null)
         {
-            normalGroup = BiomeGroup.createNormalGroup(worldConfig);
+            // Create an empty group to avoid having to check for null
+            // everywhere
+            normalGroup = new BiomeGroup(worldConfig, "", 0, 0, Collections.<String> emptyList());
             normalGroup.processBiomeData(world);
         }
         if (iceGroup == null)
         {
-            iceGroup = BiomeGroup.createIceGroup(worldConfig);
+            iceGroup = new BiomeGroup(worldConfig, "", 0, 0, Collections.<String> emptyList());
             iceGroup.processBiomeData(world);
         }
 
