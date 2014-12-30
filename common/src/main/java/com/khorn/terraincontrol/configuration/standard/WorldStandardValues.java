@@ -35,6 +35,9 @@ public class WorldStandardValues extends Settings
         public static final String ICE = "IceBiomes";
         public static final String COLD = "ColdBiomes";
         public static final String HOT = "HotBiomes";
+        public static final String MESA = "MesaBiomes";
+        public static final String JUNGLE = "JungleBiomes";
+        public static final String MEGA_TAIGA = "Mega TaigaBiomes";
     }
 
     public static final Setting<ConfigMode> SETTINGS_MODE = enumSetting("SettingsMode", ConfigMode.WriteAll);
