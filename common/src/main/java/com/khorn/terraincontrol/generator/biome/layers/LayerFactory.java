@@ -189,29 +189,31 @@ public final class LayerFactory
                     continue;
 
                 BiomeConfig biomeConfig = biome.getBiomeConfig();
-                if (biomeConfig.biomeSize != depth)
-                    continue;
 
-                if (worldConfig.IsleBiomes.contains(biomeConfig.getName()) && biomeConfig.isleInBiome != null)
+                if (biomeConfig.biomeSizeWhenIsle == depth
+                        && worldConfig.IsleBiomes.contains(biomeConfig.getName())
+                        && biomeConfig.isleInBiome != null)
                 {
                     int id = biome.getIds().getGenerationId();
 
-                    LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + id, mainLayer);
-                    layerBiome.biome = biome;
+                    LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(4000 + id, mainLayer);
+                    layerBiomeIsle.biome = biome;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
                         int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
                         if (islandIn == DefaultBiome.OCEAN.Id)
-                            layerBiome.inOcean = true;
+                            layerBiomeIsle.inOcean = true;
                         else
-                            layerBiome.biomeIsles[islandIn] = true;
+                            layerBiomeIsle.biomeIsles[islandIn] = true;
                     }
 
-                    layerBiome.chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarity;
-                    mainLayer = layerBiome;
+                    layerBiomeIsle.chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarityWhenIsle;
+                    mainLayer = layerBiomeIsle;
                 }
 
-                if (worldConfig.BorderBiomes.contains(biomeConfig.getName()) && biomeConfig.biomeIsBorder != null)
+                if (biomeConfig.biomeSizeWhenBorder == depth
+                        && worldConfig.BorderBiomes.contains(biomeConfig.getName())
+                        && biomeConfig.biomeIsBorder != null)
                 {
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)
@@ -324,29 +326,31 @@ public final class LayerFactory
                     continue;
 
                 BiomeConfig biomeConfig = biome.getBiomeConfig();
-                if (biomeConfig.biomeSize != depth)
-                    continue;
 
-                if (worldConfig.IsleBiomes.contains(biomeConfig.getName()) && biomeConfig.isleInBiome != null)
+                if (biomeConfig.biomeSizeWhenIsle == depth
+                        && worldConfig.IsleBiomes.contains(biomeConfig.getName())
+                        && biomeConfig.isleInBiome != null)
                 {
                     int id = biome.getIds().getGenerationId();
 
-                    LayerBiomeInBiome layerBiome = new LayerBiomeInBiome(4000 + id, mainLayer);
-                    layerBiome.biome = biome;
+                    LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(4000 + id, mainLayer);
+                    layerBiomeIsle.biome = biome;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
                         int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
                         if (islandIn == DefaultBiome.OCEAN.Id)
-                            layerBiome.inOcean = true;
+                            layerBiomeIsle.inOcean = true;
                         else
-                            layerBiome.biomeIsles[islandIn] = true;
+                            layerBiomeIsle.biomeIsles[islandIn] = true;
                     }
 
-                    layerBiome.chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarity;
-                    mainLayer = layerBiome;
+                    layerBiomeIsle.chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarityWhenIsle;
+                    mainLayer = layerBiomeIsle;
                 }
 
-                if (worldConfig.BorderBiomes.contains(biomeConfig.getName()) && biomeConfig.biomeIsBorder != null)
+                if (biomeConfig.biomeSizeWhenBorder == depth
+                        && worldConfig.BorderBiomes.contains(biomeConfig.getName())
+                        && biomeConfig.biomeIsBorder != null)
                 {
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)

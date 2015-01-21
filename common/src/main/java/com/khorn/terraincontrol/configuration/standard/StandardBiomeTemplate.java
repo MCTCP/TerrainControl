@@ -63,7 +63,10 @@ public class StandardBiomeTemplate
     public ArrayList<String> defaultNotBorderNear = new ArrayList<String>();
     public String defaultRiverBiome = DefaultBiome.RIVER.Name;
     public int defaultSize = 4;
+    public int defaultSizeWhenIsle = 6;
+    public int defaultSizeWhenBorder = 8;
     public int defaultRarity = 100;
+    public int defaultRarityWhenIsle = 97;
     public int defaultColor = 0x000000;
     public int defaultWaterLily = 0;
     public int defaultWaterColorMultiplier = 0xFFFFFF;

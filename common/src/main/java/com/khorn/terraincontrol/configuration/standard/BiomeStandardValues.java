@@ -43,7 +43,10 @@ public class BiomeStandardValues extends Settings
 
     public static final Setting<Integer>
             BIOME_SIZE = intSetting("BiomeSize", 5, 0, 20),
+            BIOME_SIZE_WHEN_ISLE = intSetting("BiomeSizeWhenIsle", 5, 0, 20),
+            BIOME_SIZE_WHEN_BORDER = intSetting("BiomeSizeWhenBorder", 5, 0, 20),
             BIOME_RARITY = intSetting("BiomeRarity", 100, 0, Integer.MAX_VALUE),
+            BIOME_RARITY_WHEN_ISLE = intSetting("BiomeRarityWhenIsle", 100, 0, Integer.MAX_VALUE),
             SMOOTH_RADIUS = intSetting("SmoothRadius", 2, 0, 32),
             RIVER_WATER_LEVEL = intSetting("RiverWaterLevel", 63, WORLD_DEPTH, WORLD_HEIGHT),
             WATER_LEVEL_MAX = WorldStandardValues.WATER_LEVEL_MAX,

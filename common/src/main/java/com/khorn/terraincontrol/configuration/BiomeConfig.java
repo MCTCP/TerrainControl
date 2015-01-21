@@ -44,7 +44,10 @@ public class BiomeConfig extends ConfigFile
     public double[] riverHeightMatrix;
 
     public int biomeSize;
+    public int biomeSizeWhenIsle;
+    public int biomeSizeWhenBorder;
     public int biomeRarity;
+    public int biomeRarityWhenIsle;
 
     public int biomeColor;
 
@@ -229,14 +232,17 @@ public class BiomeConfig extends ConfigFile
         this.doResourceInheritance = readSettings(BiomeStandardValues.RESOURCE_INHERITANCE);
         this.biomeSize = readSettings(BiomeStandardValues.BIOME_SIZE, defaultSettings.defaultSize);
         this.biomeRarity = readSettings(BiomeStandardValues.BIOME_RARITY, defaultSettings.defaultRarity);
+        this.biomeRarityWhenIsle = readSettings(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE, defaultSettings.defaultRarityWhenIsle);
 
         this.biomeColor = readSettings(BiomeStandardValues.BIOME_COLOR, defaultSettings.defaultColor);
 
         this.riverBiome = readSettings(BiomeStandardValues.RIVER_BIOME, defaultSettings.defaultRiverBiome);
 
         this.isleInBiome = readSettings(BiomeStandardValues.ISLE_IN_BIOME, defaultSettings.defaultIsle);
+        this.biomeSizeWhenIsle = readSettings(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE, defaultSettings.defaultSizeWhenIsle);
         this.biomeIsBorder = readSettings(BiomeStandardValues.BIOME_IS_BORDER, defaultSettings.defaultBorder);
         this.notBorderNear = readSettings(BiomeStandardValues.NOT_BORDER_NEAR, defaultSettings.defaultNotBorderNear);
+        this.biomeSizeWhenBorder = readSettings(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, defaultSettings.defaultSizeWhenBorder);
 
         this.biomeTemperature = readSettings(BiomeStandardValues.BIOME_TEMPERATURE, defaultSettings.defaultBiomeTemperature);
         this.biomeWetness = readSettings(BiomeStandardValues.BIOME_WETNESS, defaultSettings.defaultBiomeWetness);
@@ -425,20 +431,23 @@ public class BiomeConfig extends ConfigFile
 
         writer.comment("Biome size from 0 to GenerationDepth. Defines in which biome layer this biome will be generated (see GenerationDepth).");
         writer.comment("Higher numbers give a smaller biome, lower numbers a larger biome.");
-        writer.comment("Oceans and rivers are generated using a dirrerent algorithm in the default settings,");
-        writer.comment("(they aren't in one of the biome lists), so this setting won't affect them.");
+        writer.comment("Note: only applies to biomes spawned as part of a BiomeGroup (see WorldConfig).");
+        writer.comment("For biomes spawned as isles, borders or rivers other settings are available.");
+        writer.comment("Isle biomes:   " + BiomeStandardValues.BIOME_SIZE_WHEN_ISLE + " (see below)");
+        writer.comment("Border biomes: " + BiomeStandardValues.BIOME_SIZE_WHEN_BORDER + " (see below)");
+        writer.comment("River biomes:  " + WorldStandardValues.RIVER_SIZE + " (see WorldConfig)");
         writer.setting(BiomeStandardValues.BIOME_SIZE, this.biomeSize);
 
         writer.comment("Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.");
         writer.comment("Example for normal biome :");
         writer.comment("  100 rarity mean 1/6 chance than other ( with 6 default normal biomes).");
         writer.comment("  50 rarity mean 1/11 chance than other");
-        writer.comment("For isle biome this is chance to spawn isle in good place.");
-        writer.comment("Don`t work on Ocean and River (frozen versions too) biomes until not added as normal biome.");
+        writer.comment("For isle biomes see the " + BiomeStandardValues.BIOME_RARITY_WHEN_ISLE + " setting below.");
+        writer.comment("Doesn`t work on Ocean and River (frozen versions too) biomes when not added as normal biome.");
         writer.setting(BiomeStandardValues.BIOME_RARITY, this.biomeRarity);
 
         writer.comment("The hexadecimal color value of this biome. Used in the output of the /tc map command,");
-        writer.comment("and used in the input of BiomeMode:FromImage.");
+        writer.comment("and used in the input of BiomeMode: FromImage.");
         writer.setting(BiomeStandardValues.BIOME_COLOR, this.biomeColor);
 
         if (this.defaultSettings.isCustomBiome)
@@ -454,17 +463,44 @@ public class BiomeConfig extends ConfigFile
         }
 
         writer.smallTitle("Isle biomes only");
+        writer.comment("To spawn a biome as an isle, you need to add it first to the");
+        writer.comment(WorldStandardValues.ISLE_BIOMES + " list in the WorldConfig.");
+        writer.comment("");
 
-        writer.comment("Biome name list where this biome will be spawned as isle. Like Mushroom isle in Ocean.  This work only if this biome is in IsleBiomes in world config");
+        writer.comment("List of biomes in which this biome will spawn as an isle.");
+        writer.comment("For example, Mushroom Isles spawn inside the Ocean biome.");
         writer.setting(BiomeStandardValues.ISLE_IN_BIOME, this.isleInBiome);
 
-        writer.smallTitle("Border biomes only");
+        writer.comment("Size of this biome when spawned as an ilse biome.");
+        writer.comment("Valid values range from 0 to GenerationDepth.");
+        writer.comment("Larger numbers give *smaller* islands. The biome must be smaller than the biome it's going");
+        writer.comment("to spawn in, so the " + BiomeStandardValues.BIOME_SIZE_WHEN_ISLE
+                + " number must be larger than the " + BiomeStandardValues.BIOME_SIZE + " of the other biome.");
+        writer.setting(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE, this.biomeSizeWhenIsle);
 
-        writer.comment("Biome name list where this biome will be border.Like Mushroom isle shore. Use is compared as IsleInBiome");
+        writer.comment("Rarity of this biome when spawned as an ilse biome.");
+        writer.setting(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE, this.biomeRarityWhenIsle);
+
+        writer.smallTitle("Border biomes only");
+        writer.comment("To spawn a biome as a border, you need to add it first to the");
+        writer.comment(WorldStandardValues.BORDER_BIOMES + " list in the WorldConfig.");
+        writer.comment("");
+
+        writer.comment("List of biomes this biome can be a border of.");
+        writer.comment("For example, the Beach biome is a border on the Ocean biome, so");
+        writer.comment("it can spawn anywhere on the border of an ocean.");
         writer.setting(BiomeStandardValues.BIOME_IS_BORDER, this.biomeIsBorder);
 
-        writer.comment("Biome name list near border is not applied. ");
+        writer.comment("List of biomes that cancel spawning of this biome.");
+        writer.comment("For example, the Beach biome will never spawn next to an Extreme Hills biome.");
         writer.setting(BiomeStandardValues.NOT_BORDER_NEAR, this.notBorderNear);
+
+        writer.comment("Size of this biome when spawned as a border biome.");
+        writer.comment("Valid values range from 0 to GenerationDepth.");
+        writer.comment("Larger numbers give *smaller* borders. The biome must be smaller than the biome it's going");
+        writer.comment("to spawn in, so the " + BiomeStandardValues.BIOME_SIZE_WHEN_BORDER
+                + " number must be larger than the " + BiomeStandardValues.BIOME_SIZE + " of the other biome.");
+        writer.setting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, this.biomeSizeWhenBorder);
 
         // Terrain height and volatility
         writer.bigTitle("Terrain height and volatility");
@@ -808,7 +844,10 @@ public class BiomeConfig extends ConfigFile
     {
         this.biomeExtends = (this.biomeExtends == null || this.biomeExtends.equals("null")) ? "" : this.biomeExtends;
         this.biomeSize = lowerThanOrEqualTo(biomeSize, worldConfig.GenerationDepth);
+        this.biomeSizeWhenIsle = lowerThanOrEqualTo(biomeSizeWhenIsle, worldConfig.GenerationDepth);
+        this.biomeSizeWhenBorder = lowerThanOrEqualTo(biomeSizeWhenBorder, worldConfig.GenerationDepth);
         this.biomeRarity = lowerThanOrEqualTo(biomeRarity, worldConfig.BiomeRarityScale);
+        this.biomeRarityWhenIsle = lowerThanOrEqualTo(biomeRarityWhenIsle, worldConfig.BiomeRarityScale);
 
         this.isleInBiome = filterBiomes(this.isleInBiome, this.worldConfig.customBiomeGenerationIds.keySet());
         this.biomeIsBorder = filterBiomes(this.biomeIsBorder, this.worldConfig.customBiomeGenerationIds.keySet());
@@ -960,6 +999,27 @@ public class BiomeConfig extends ConfigFile
         if (reader.getSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES_ADD_DEFAULTS, false))
         {
             addDefaultMobGroups(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, defaultSettings.defaultAmbientCreatures);
+        }
+
+        // *WhenBorder, *WhenIsle
+        // Used to be shared with the base setting
+        if (!this.isNewConfig)
+        {
+            if (!reader.hasSetting(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE))
+            {
+                reader.putSetting(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE,
+                        readSettings(BiomeStandardValues.BIOME_SIZE));
+            }
+            if (!reader.hasSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER))
+            {
+                reader.putSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER,
+                        readSettings(BiomeStandardValues.BIOME_SIZE));
+            }
+            if (!reader.hasSetting(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE))
+            {
+                reader.putSetting(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE,
+                        readSettings(BiomeStandardValues.BIOME_RARITY));
+            }
         }
     }
 

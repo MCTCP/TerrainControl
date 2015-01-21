@@ -239,8 +239,8 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
 
             this.defaultColor = 0xA0A0A0;
-            this.defaultSize = 6;
-            this.defaultRarity = 97;
+            this.defaultSizeWhenIsle = 6;
+            this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.ICE_PLAINS.Name);
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
         }
@@ -256,9 +256,9 @@ public class MinecraftBiomeTemplates
             this.defaultMushroom = 2;
             this.defaultGrass = 0;
             this.defaultDandelions = 0;
-            this.defaultRarity = 1;
+            this.defaultRarityWhenIsle = 1;
             this.defaultRiverBiome = "";
-            this.defaultSize = 6;
+            this.defaultSizeWhenIsle = 6;
             this.defaultIsle.add(DefaultBiome.OCEAN.Name);
             this.defaultIsle.add(DefaultBiome.DEEP_OCEAN.Name);
             this.defaultColor = 0xFF00FF;
@@ -274,7 +274,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultSize = 9;
+            this.defaultSizeWhenBorder = 9;
             this.defaultBorder.add(DefaultBiome.MUSHROOM_ISLAND.Name);
             this.defaultColor = 0xA000FF;
             this.defaultTree = null; // No mushrooms on the shore
@@ -287,7 +287,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultSize = 8;
+            this.defaultSizeWhenBorder = 8;
             this.defaultBorder.add(DefaultBiome.OCEAN.Name);
             this.defaultNotBorderNear.add(DefaultBiome.RIVER.Name);
             this.defaultNotBorderNear.add(DefaultBiome.SWAMPLAND.Name);
@@ -308,8 +308,8 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
 
             this.defaultWaterLakes = false;
-            this.defaultSize = 6;
-            this.defaultRarity = 97;
+            this.defaultSizeWhenIsle = 6;
+            this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.DESERT.Name);
             this.defaultDeadBush = 4;
             this.defaultGrass = 0;
@@ -329,8 +329,8 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultSize = 6;
-            this.defaultRarity = 97;
+            this.defaultSizeWhenIsle = 6;
+            this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.FOREST.Name);
             this.defaultGrass = 15;
             this.defaultColor = 0x22551C;
@@ -343,8 +343,8 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultSize = 6;
-            this.defaultRarity = 97;
+            this.defaultSizeWhenIsle = 6;
+            this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.TAIGA.Name);
             this.defaultGrass = 10;
             this.defaultColor = 0x163933;
@@ -358,7 +358,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultSize = 8;
+            this.defaultSizeWhenBorder = 8;
             this.defaultBorder.add(DefaultBiome.EXTREME_HILLS.Name);
             this.defaultColor = 0x72789A;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[0];
@@ -399,7 +399,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x628B17;
-            this.defaultSize = 8;
+            this.defaultSizeWhenBorder = 8;
             this.defaultBorder.add(DefaultBiome.JUNGLE.Name);
         }
     }
@@ -411,7 +411,7 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x000030;
             this.defaultIsle.add(DefaultBiome.OCEAN.Name);
-            this.defaultSize = 3;
+            this.defaultSizeWhenIsle = 3;
         }
     }
 
@@ -449,8 +449,8 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x1F5F32;
-            this.defaultSize = 6;
-            this.defaultRarity = 97;
+            this.defaultSizeWhenIsle = 6;
+            this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.BIRCH_FOREST.Name);
         }
     }
@@ -484,8 +484,8 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x243F36;
-            this.defaultSize = 6;
-            this.defaultRarity = 97;
+            this.defaultSizeWhenIsle = 6;
+            this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.COLD_TAIGA.Name);
         }
     }
@@ -514,7 +514,7 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x454F3E;
             this.defaultSize = 6;
-            this.defaultRarity = 97;
+            this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.MEGA_TAIGA.Name);
         }
     }
@@ -550,8 +550,8 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0xA79D64;
-            this.defaultSize = 6;
-            this.defaultRarity = 97;
+            this.defaultSizeWhenIsle = 6;
+            this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.SAVANNA.Name);
         }
     }
@@ -706,7 +706,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x5A8015;
-            this.defaultSize = 8;
+            this.defaultSizeWhenBorder = 8;
             this.defaultBorder.add(DefaultBiome.JUNGLE_MOUNTAINS.Name);
         }
     }
@@ -729,8 +729,8 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x1F502E;
             this.defaultTree = new Object[] {10, TreeType.TallBirch, 80};
-            this.defaultSize = 6;
-            this.defaultRarity = 97;
+            this.defaultSizeWhenIsle = 6;
+            this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.BIRCH_FOREST_MOUNTAINS.Name);
         }
     }
@@ -807,8 +807,8 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x99905C;
-            this.defaultSize = 6;
-            this.defaultRarity = 97;
+            this.defaultSizeWhenIsle = 6;
+            this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.SAVANNA_MOUNTAINS.Name);
         }
     }

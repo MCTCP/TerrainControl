@@ -34,7 +34,7 @@ public class LayerBiomeBorder extends Layer
     {
         int[] childInts = this.child.getInts(cache, x - 1, z - 1, xSize + 2, zSize + 2);
         int[] thisInts = cache.getArray(xSize * zSize);
-        
+
         for (int zi = 0; zi < zSize; zi++)
         {
             for (int xi = 0; xi < xSize; xi++)
