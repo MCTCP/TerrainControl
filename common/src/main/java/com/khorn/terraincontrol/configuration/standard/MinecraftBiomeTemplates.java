@@ -116,6 +116,8 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
+            this.defaultRarityWhenIsle = 96;
+            this.defaultIsle.add("Plains");
             this.defaultGrass = 30;
             this.defaultColor = 0x056621;
             this.defaultTree = new Object[] {10, TreeType.Birch, 20, TreeType.Tree, 100};

@@ -117,7 +117,7 @@ public class WorldStandardValues extends Settings
 
     public static final Setting<List<String>>
             ISLE_BIOMES = stringListSetting("IsleBiomes", "MushroomIsland",
-                    "Ice Mountains", "DesertHills", "ForestHills", "TaigaHills",
+                    "Ice Mountains", "DesertHills", "ForestHills", "Forest", "TaigaHills",
                     "JungleHills", "Cold Taiga Hills"),
             BORDER_BIOMES = stringListSetting("BorderBiomes",
                     "MushroomIslandShore", "Beach", "Extreme Hills Edge"),
