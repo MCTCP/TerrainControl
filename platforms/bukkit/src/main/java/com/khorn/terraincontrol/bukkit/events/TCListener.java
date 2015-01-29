@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.bukkit.events;
 
 import com.khorn.terraincontrol.bukkit.TCPlugin;
-import com.khorn.terraincontrol.bukkit.commands.MapCommand;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -9,14 +8,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TCListener implements Listener
 {
@@ -71,19 +66,5 @@ public class TCListener implements Listener
             tcSender.send(player);
         }
     }
-    
-    //>>	TESTING CODE, REMOVE WHEN DONE
-    /**/    @EventHandler
-    /**/    public void onPlayerJoin(PlayerJoinEvent event)
-    /**/    {
-    /**/        if (event.getPlayer().getDisplayName().equalsIgnoreCase("timethor"))
-    /**/        {
-    /**/            List<String> args = new ArrayList<String>();
-    /**/            args.add("-s");
-    /**/            args.add("600");
-    /**/            new MapCommand(this.tcPlugin).onCommand(event.getPlayer(), args);
-    /**/        }
-    /**/    }
-    //>>	END TESTING CODE, REMOVE WHEN DONE
 
 }
