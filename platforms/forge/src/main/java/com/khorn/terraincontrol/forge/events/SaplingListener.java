@@ -186,7 +186,8 @@ public class SaplingListener
 
         // Remove saplings
         IBlockState air = Blocks.air.getDefaultState();
-        if (saplingGrower.saplingType.requiresFourSaplings())
+        boolean wideTrunk = saplingGrower.saplingType.requiresFourSaplings();
+        if (wideTrunk)
         {
             world.setBlockState(saplingGrower.blockPos, air);
             world.setBlockState(saplingGrower.blockPos.add(1, 0, 0), air);
@@ -199,9 +200,10 @@ public class SaplingListener
 
         // Try ten times to grow sapling
         boolean saplingGrown = false;
+        Random random = new Random();
         for (int i = 0; i < 10; i++)
         {
-            if (saplingGen.growSapling(localWorld, new Random(), saplingGrower.blockPos.getX(),
+            if (saplingGen.growSapling(localWorld, random, wideTrunk, saplingGrower.blockPos.getX(),
                     saplingGrower.blockPos.getY(), saplingGrower.blockPos.getZ()))
             {
                 saplingGrown = true;
@@ -262,7 +264,7 @@ public class SaplingListener
         Random random = new Random();
         for (int i = 0; i < 10; i++)
         {
-            if (gen.growSapling(localWorld, random, event.pos.getX(), event.pos.getY(), event.pos.getZ()))
+            if (gen.growSapling(localWorld, random, false, event.pos.getX(), event.pos.getY(), event.pos.getZ()))
             {
                 mushroomGrown = true;
                 break;

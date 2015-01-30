@@ -47,7 +47,8 @@ class SaplingListener
         }
 
         // Adjust position for bigger saplings
-        if (saplingType.requiresFourSaplings())
+        boolean wideTrunk = saplingType.requiresFourSaplings();
+        if (wideTrunk)
         {
             Location lowestXZ = searchLowestXZLocation(location.getBlockY(), event.getBlocks());
             if (lowestXZ == null)
@@ -66,9 +67,10 @@ class SaplingListener
 
         // Try 10 times to spawn tree
         boolean success = false;
+        Random random = new Random();
         for (int i = 0; i < 10; i++)
         {
-            if (sapling.growSapling(world, new Random(), location.getBlockX(), location.getBlockY(), location.getBlockZ()))
+            if (sapling.growSapling(world, random, wideTrunk, location.getBlockX(), location.getBlockY(), location.getBlockZ()))
             {
                 success = true;
                 break;
@@ -105,13 +107,13 @@ class SaplingListener
         BlockState lowestXZ = null;
         for (BlockState blockState : blocks)
         {
-            // Check if block has correct y
+            // Ignore blocks at incorrect y
             if (blockState.getY() != y)
             {
                 continue;
             }
 
-            // Check if block is a log
+            // Ignore blocks that are not a log
             if (blockState.getType() != Material.LOG && blockState.getType() != Material.LOG_2)
             {
                 continue;

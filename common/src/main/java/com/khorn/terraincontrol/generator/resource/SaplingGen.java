@@ -7,9 +7,7 @@ import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.Rotation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Represents a custom sapling generator. This generator can grow vanilla trees,
@@ -22,6 +20,16 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
     public List<String> treeNames;
     public List<Integer> treeChances;
     public SaplingType saplingType;
+
+    private static final Map<Rotation, int[]> TREE_OFFSET;
+    static
+    {
+        TREE_OFFSET = new EnumMap<Rotation, int[]>(Rotation.class);
+        TREE_OFFSET.put(Rotation.NORTH, new int[] {0, 0});
+        TREE_OFFSET.put(Rotation.EAST, new int[] {1, 0});
+        TREE_OFFSET.put(Rotation.SOUTH, new int[] {1, 1});
+        TREE_OFFSET.put(Rotation.WEST, new int[] {0, 1});
+    }
 
     @Override
     public Class<BiomeConfig> getHolderType()
@@ -73,14 +81,39 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         return output + ")";
     }
 
-    public boolean growSapling(LocalWorld world, Random random, int x, int y, int z)
+    /**
+     * Grows a tree from this sapling.
+     * @param world      World to spawn in.
+     * @param random     Random number generator.
+     * @param isWideTree Whether the tree is a wide (2x2 trunk) tree. Used to
+     *                   correctly rotate those trees.
+     * @param x          X to spawn. For wide trees, this is the lowest x of
+     *                   the trunk.
+     * @param y          Y to spawn.
+     * @param z          Z to spawn. For wide trees, this is the lowest z of
+     *                   the trunk.
+     * @return Whether a tree was grown.
+     */
+    public boolean growSapling(LocalWorld world, Random random, boolean isWideTree, int x, int y, int z)
     {
         for (int treeNumber = 0; treeNumber < trees.size(); treeNumber++)
         {
             if (random.nextInt(100) < treeChances.get(treeNumber))
             {
-                Rotation rotation = trees.get(treeNumber).canRotateRandomly() ? Rotation.getRandomRotation(random) : Rotation.NORTH;
-                if (trees.get(treeNumber).spawnForced(world, random, rotation, x, y, z))
+                CustomObject tree = trees.get(treeNumber);
+                Rotation rotation = tree.canRotateRandomly() ? Rotation.getRandomRotation(random) : Rotation.NORTH;
+
+                // Correct spawn location for rotated wide trees
+                int spawnX = x;
+                int spawnZ = z;
+                if (isWideTree)
+                {
+                    int[] offset = TREE_OFFSET.get(rotation);
+                    spawnX += offset[0];
+                    spawnZ += offset[1];
+                }
+
+                if (tree.spawnForced(world, random, rotation, spawnX, y, spawnZ))
                 {
                     // Success!
                     return true;
