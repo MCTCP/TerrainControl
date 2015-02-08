@@ -92,6 +92,13 @@ public class MinecraftBiomeTemplates
                     this.worldHeight, DefaultMaterial.SAND};
             this.defaultVillageType = VillageType.sandstone;
             this.defaultRareBuildingType = RareBuildingType.desertPyramid;
+            this.defaultBorder.add(DefaultBiome.MESA.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.OCEAN.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.MESA_PLATEAU.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.MESA_PLATEAU_FOREST.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.MESA_PLATEAU_MOUNTAINS.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.MESA_PLATEAU_FOREST_MOUNTAINS.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.MESA_BRYCE.Name);
         }
     }
 
@@ -298,6 +305,7 @@ public class MinecraftBiomeTemplates
             this.defaultNotBorderNear.add(DefaultBiome.DEEP_OCEAN.Name);
             this.defaultNotBorderNear.add(DefaultBiome.COLD_BEACH.Name);
             this.defaultNotBorderNear.add(DefaultBiome.STONE_BEACH.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.MESA.Name);
             this.defaultColor = 0xFADE55;
             this.defaultStrongholds = false;
         }
@@ -322,6 +330,10 @@ public class MinecraftBiomeTemplates
                     this.worldHeight, DefaultMaterial.SAND};
             this.defaultVillageType = VillageType.sandstone;
             this.defaultRareBuildingType = RareBuildingType.desertPyramid;
+
+            // Don't inherit border properties of the Desert biome
+            this.defaultBorder.clear();
+            this.defaultNotBorderNear.clear();
         }
     }
 
@@ -599,6 +611,8 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0xCA8C65;
+            this.defaultIsle.add(DefaultBiome.MESA.Name);
+            this.defaultRarityWhenIsle = 99;
         }
     }
 
@@ -621,6 +635,10 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0xE58208;
             this.defaultWaterLakes = true;
             this.defaultRarity = 10;
+
+            // Don't inherit border properties of the Desert biome
+            this.defaultBorder.clear();
+            this.defaultNotBorderNear.clear();
         }
     }
 
@@ -823,6 +841,9 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0xE45627;
             this.defaultRarity = 10;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {MesaSurfaceGenerator.NAME_BRYCE};
+            this.defaultIsle.add(DefaultBiome.MESA.Name);
+            this.defaultSizeWhenIsle = 5;
+            this.defaultRarityWhenIsle = 90;
         }
     }
 
@@ -832,6 +853,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0xA68F5F;
+            this.defaultRarityWhenIsle = 90;
         }
     }
 
@@ -841,6 +863,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0xB77F5C;
+            this.defaultRarityWhenIsle = 90;
         }
     }
 
