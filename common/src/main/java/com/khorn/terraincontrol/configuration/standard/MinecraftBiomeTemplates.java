@@ -386,7 +386,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultGrass = 20;
+            this.defaultGrass = 60;
             this.defaultFerns = 20;
             this.defaultPoppies = 4;
             this.defaultDandelions = 4;
@@ -394,6 +394,7 @@ public class MinecraftBiomeTemplates
             this.defaultRareBuildingType = RareBuildingType.jungleTemple;
             this.defaultTree = new Object[] {50, TreeType.BigTree, 10, TreeType.GroundBush, 50, TreeType.JungleTree, 35,
                     TreeType.CocoaTree, 100};
+            this.defaultMelons = 1;
         }
     }
 

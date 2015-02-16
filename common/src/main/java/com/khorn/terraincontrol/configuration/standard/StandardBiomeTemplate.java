@@ -49,6 +49,7 @@ public class StandardBiomeTemplate
     public int defaultMushroom = 0;
     public int defaultReed = 0;
     public int defaultCactus = 0;
+    public int defaultMelons = 0;
     public int defaultWaterSand = 3;
     public int defaultWaterGravel = 1;
     public Object[] defaultWell; // Parameters for well resource
@@ -239,6 +240,13 @@ public class StandardBiomeTemplate
             resources.add(Resource.createResource(config, IceSpikeGen.class, DefaultMaterial.PACKED_ICE, SpikeType.Basement, 2, 100,
                     iceSpikeDepositMinHeight,
                     iceSpikeDepositMaxHeight, DefaultMaterial.ICE, DefaultMaterial.DIRT, DefaultMaterial.SNOW_BLOCK));
+        }
+
+        // Melons (need to be spawned before trees)
+        if (this.defaultMelons > 0)
+        {
+            resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.MELON_BLOCK, this.defaultMelons,
+                    flowerDepositRarity, flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         // Trees
