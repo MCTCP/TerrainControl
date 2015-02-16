@@ -156,17 +156,17 @@ public class BukkitWorld implements LocalWorld
     public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
     {
         if (this.settings.worldConfig.strongholdsEnabled)
-            this.strongholdGen.prepare(this.world, chunkX, chunkZ);
+            this.strongholdGen.a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.mineshaftsEnabled)
-            this.mineshaftGen.prepare(this.world, chunkX, chunkZ);
+            this.mineshaftGen.a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.villagesEnabled && dry)
-            this.villageGen.prepare(this.world, chunkX, chunkZ);
+            this.villageGen.a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.rareBuildingsEnabled)
-            this.pyramidsGen.prepare(this.world, chunkX, chunkZ);
+            this.pyramidsGen.a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.netherFortressesEnabled)
-            this.netherFortressGen.prepare(this.world, chunkX, chunkZ);
+            this.netherFortressGen.a(null, this.world, chunkX, chunkZ, null);
         if (this.settings.worldConfig.oceanMonumentsEnabled)
-            this.oceanMonumentGen.prepare(this.world, chunkX, chunkZ);
+            this.oceanMonumentGen.a(null, this.world, chunkX, chunkZ, null);
     }
 
     @Override
@@ -224,17 +224,17 @@ public class BukkitWorld implements LocalWorld
         boolean villageGenerated = false;
 
         if (this.settings.worldConfig.strongholdsEnabled)
-            this.strongholdGen.place(this.world, random, chunkIntPair);
+            this.strongholdGen.a(this.world, random, chunkIntPair);
         if (this.settings.worldConfig.mineshaftsEnabled)
-            this.mineshaftGen.place(this.world, random, chunkIntPair);
+            this.mineshaftGen.a(this.world, random, chunkIntPair);
         if (this.settings.worldConfig.villagesEnabled)
-            villageGenerated = this.villageGen.place(this.world, random, chunkIntPair);
+            villageGenerated = this.villageGen.a(this.world, random, chunkIntPair);
         if (this.settings.worldConfig.rareBuildingsEnabled)
-            this.pyramidsGen.place(this.world, random, chunkIntPair);
+            this.pyramidsGen.a(this.world, random, chunkIntPair);
         if (this.settings.worldConfig.netherFortressesEnabled)
-            this.netherFortressGen.place(this.world, random, chunkIntPair);
+            this.netherFortressGen.a(this.world, random, chunkIntPair);
         if (this.settings.worldConfig.oceanMonumentsEnabled)
-            this.oceanMonumentGen.place(this.world, random, chunkIntPair);
+            this.oceanMonumentGen.a(this.world, random, chunkIntPair);
 
         return villageGenerated;
     }

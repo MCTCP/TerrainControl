@@ -79,22 +79,13 @@ public class TCPlugin extends JavaPlugin
             setEnabled(false);
         } else
         {
-            boolean cauldron = false;
-            if (Bukkit.getVersion().contains("Cauldron"))
-            {
-                // We're on Cauldron, so enable some remappings
-                cauldron = true;
-                TerrainControl.log(LogMarker.INFO, "Cauldron detected.");
-            }
-
             // Register vanilla generator
             TerrainControl.getBiomeModeManager().register(VanillaBiomeGenerator.GENERATOR_NAME, BukkitVanillaBiomeGenerator.class);
 
             // Register structures
             try
             {
-                String methodName = cauldron ? "func_143034_b" : "b";
-                Method registerStructure = WorldGenFactory.class.getDeclaredMethod(methodName, Class.class, String.class);
+                Method registerStructure = WorldGenFactory.class.getDeclaredMethod("b", Class.class, String.class);
                 registerStructure.setAccessible(true);
                 registerStructure.invoke(null, RareBuildingStart.class, StructureNames.RARE_BUILDING);
                 registerStructure.invoke(null, VillageStart.class, StructureNames.VILLAGE);

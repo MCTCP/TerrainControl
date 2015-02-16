@@ -4,7 +4,10 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R1.*;
+import net.minecraft.server.v1_8_R1.StructureGenerator;
+import net.minecraft.server.v1_8_R1.StructureStart;
+import net.minecraft.server.v1_8_R1.World;
+import net.minecraft.server.v1_8_R1.WorldGenMineshaftStart;
 
 import java.util.Random;
 
@@ -33,18 +36,6 @@ public class MineshaftGen extends StructureGenerator
     protected StructureStart b(int i, int j)
     {
         return new WorldGenMineshaftStart(this.c, this.b, i, j);
-    }
-
-    // Two methods to help Cauldron dynamically rename things.
-    // It has problems with classes that extend native Minecraft classes
-    public void prepare(World world, int chunkX, int chunkZ)
-    {
-        a(null, world, chunkX, chunkZ, null);
-    }
-
-    public void place(World world, Random random, ChunkCoordIntPair chunk)
-    {
-        a(world, random, chunk);
     }
 
     @Override

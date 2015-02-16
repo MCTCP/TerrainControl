@@ -4,7 +4,10 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R1.*;
+import net.minecraft.server.v1_8_R1.BiomeBase;
+import net.minecraft.server.v1_8_R1.StructureGenerator;
+import net.minecraft.server.v1_8_R1.StructureStart;
+import net.minecraft.server.v1_8_R1.WorldGenMonumentStart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,15 +100,4 @@ public class OceanMonumentGen extends StructureGenerator
         return new WorldGenMonumentStart(this.c, this.b, i, j);
     }
 
-    // Two methods to help Cauldron dynamically rename things.
-    // It has problems with classes that extend native Minecraft classes
-    public void prepare(World world, int chunkX, int chunkZ)
-    {
-        a(null, world, chunkX, chunkZ, null);
-    }
-
-    public void place(World world, Random random, ChunkCoordIntPair chunk)
-    {
-        a(world, random, chunk);
-    }
 }

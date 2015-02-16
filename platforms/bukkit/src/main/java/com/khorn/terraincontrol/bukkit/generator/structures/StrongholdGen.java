@@ -123,18 +123,6 @@ public class StrongholdGen extends StructureGenerator
         return strongholdStart;
     }
 
-    // Two methods to help MCPC+ dynamically rename things.
-    // It has problems with classes that extend native Minecraft classes
-    public void prepare(World world, int chunkX, int chunkZ)
-    {
-        a(null, world, chunkX, chunkZ, null);
-    }
-
-    public void place(World world, Random random, ChunkCoordIntPair chunk)
-    {
-        a(world, random, chunk);
-    }
-
     @Override
     public String a()
     {
