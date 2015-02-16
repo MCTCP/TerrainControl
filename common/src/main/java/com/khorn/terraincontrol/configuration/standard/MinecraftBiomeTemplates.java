@@ -374,6 +374,7 @@ public class MinecraftBiomeTemplates
 
             this.defaultSizeWhenBorder = 8;
             this.defaultBorder.add(DefaultBiome.EXTREME_HILLS.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.EXTREME_HILLS_PLUS.Name);
             this.defaultColor = 0x72789A;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[0];
         }
@@ -455,6 +456,8 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x307444;
             this.defaultTree = new Object[] {10, TreeType.Birch, 80};
+            // Forest spawns as an isle in Plains, BirchForest shouldn't
+            this.defaultIsle.clear();
         }
     }
 
@@ -464,9 +467,8 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x1F5F32;
-            this.defaultSizeWhenIsle = 6;
-            this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.BIRCH_FOREST.Name);
+            this.defaultRarityWhenIsle = 97;
         }
     }
 
@@ -542,6 +544,8 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0x507050;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[0];
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 66, TreeType.BigTree, 10, TreeType.Tree, 100};
+            this.defaultIsle.add(DefaultBiome.EXTREME_HILLS.Name);
+            this.defaultRarityWhenIsle = 97;
         }
     }
 
@@ -743,15 +747,15 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class BirchForestHillsMountains extends BirchForestMountains
+    public static class BirchForestHillsMountains extends BirchForestHills
     {
         public BirchForestHillsMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x1F502E;
             this.defaultTree = new Object[] {10, TreeType.TallBirch, 80};
-            this.defaultSizeWhenIsle = 6;
             this.defaultRarityWhenIsle = 97;
+            this.defaultIsle.clear();
             this.defaultIsle.add(DefaultBiome.BIRCH_FOREST_MOUNTAINS.Name);
         }
     }
@@ -805,6 +809,9 @@ public class MinecraftBiomeTemplates
             this.defaultRarity = 10;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, -1.0,
                     DefaultMaterial.GRASS, DefaultMaterial.DIRT, 2.0, DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, 10.0};
+            // Override IsleInBiome: Extreme Hills of Extreme Hills+
+            this.defaultIsle.clear();
+            this.defaultIsle.add(DefaultBiome.EXTREME_HILLS_MOUNTAINS.Name);
         }
     }
 
