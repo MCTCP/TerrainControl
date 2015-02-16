@@ -121,14 +121,6 @@ public class TCPlugin extends JavaPlugin
             TerrainControl.log(LogMarker.DEBUG, "Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
             return new TCChunkGenerator(this);
         }
-        if (worldName.equals("test"))
-        {
-            TerrainControl.log(LogMarker.DEBUG,
-                               "Ignoring world with the name \"test\". This is not a valid world name, ",
-                               "as it's used by Multiverse to check if \"TerrainControl\" a valid generator name. ",
-                               "So if you were just using /mv create, don't worry about this message.");
-            return new TCChunkGenerator(this);
-        }
 
         // Check if not already enabled
         BukkitWorld world = worlds.get(worldName);
