@@ -116,7 +116,7 @@ public class WorldStandardValues extends Settings
             BEDROCK_BLOCK = new MaterialSetting("BedrockobBlock", DefaultMaterial.BEDROCK);
 
     public static final Setting<List<String>>
-            ISLE_BIOMES = stringListSetting("IsleBiomes", "MushroomIsland",
+            ISLE_BIOMES = stringListSetting("IsleBiomes", "Deep Ocean", "MushroomIsland",
                     "Ice Mountains", "DesertHills", "ForestHills", "Forest", "TaigaHills",
                     "JungleHills", "Cold Taiga Hills", "Mesa Plateau", "Mesa Plateau F",
                     "Mesa Plateau M", "Mesa Plateau F M", "Mesa (Bryce)"),

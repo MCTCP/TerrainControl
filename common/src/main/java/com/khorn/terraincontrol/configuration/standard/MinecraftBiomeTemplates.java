@@ -425,7 +425,8 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x000030;
             this.defaultIsle.add(DefaultBiome.OCEAN.Name);
-            this.defaultSizeWhenIsle = 3;
+            this.defaultSizeWhenIsle = 4;
+            this.defaultRarityWhenIsle = 100;
         }
     }
 
