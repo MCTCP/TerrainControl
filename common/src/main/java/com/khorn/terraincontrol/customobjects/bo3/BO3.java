@@ -77,7 +77,7 @@ public class BO3 implements StructuredCustomObject
         {
             variance = random.nextInt(variance + 1);
         }
-        return offset + variance;
+        return MathHelper.clamp(offset + variance, TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override
@@ -166,7 +166,7 @@ public class BO3 implements StructuredCustomObject
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
         BlockFunction[] blocks = settings.blocks[rotation.getRotationId()];
-        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeStyle, settings.extrudeThroughBlocks);
+        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
         // Spawn
 
         for (BlockFunction block : blocks)
@@ -198,15 +198,11 @@ public class BO3 implements StructuredCustomObject
             y = world.getSolidHeight(x, z);
         }
         int spawnOffset = this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
-        if (spawnOffset != 0)
-        {
-            y += spawnOffset;
-        }
         if (!canSpawnAt(world, rotation, x, y, z))
         {
             return false;
         }
-        return spawnForced(world, random, rotation, x, y, z);
+        return spawnForced(world, random, rotation, x, y + spawnOffset, z);
     }
 
     @Override

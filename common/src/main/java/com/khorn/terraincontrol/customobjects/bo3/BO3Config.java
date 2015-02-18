@@ -50,11 +50,11 @@ public class BO3Config extends ConfigFile
 
     // Options to allow better control over spawning of BO3
     //  Extrusion
-    public BO3Settings.ExtrudeStyle extrudeStyle;
-    public MaterialSet              extrudeThroughBlocks;
+    public BO3Settings.ExtrudeMode extrudeMode;
+    public MaterialSet             extrudeThroughBlocks;
     //  Extra spawn height settings
-    public int                      spawnHeightOffset;
-    public int                      spawnHeightVariance;
+    public int                     spawnHeightOffset;
+    public int                     spawnHeightVariance;
 
     /**
      * Creates a BO3Config from a file.
@@ -132,7 +132,7 @@ public class BO3Config extends ConfigFile
 
         writer.smallTitle("Extrusion settings");
         writer.comment("The style of extrusion you wish to use - BottomDown, TopUp, None (Default)");
-        writer.setting(BO3Settings.EXTRUDE_STYLE, extrudeStyle);
+        writer.setting(BO3Settings.EXTRUDE_MODE, extrudeMode);
         writer.comment("The blocks to extrude your BO3 through");
         writer.setting(BO3Settings.EXTRUDE_THROUGH_BLOCKS, extrudeThroughBlocks);
 
@@ -179,7 +179,7 @@ public class BO3Config extends ConfigFile
         spawnHeight = readSettings(BO3Settings.SPAWN_HEIGHT);
         spawnHeightOffset = readSettings(BO3Settings.SPAWN_HEIGHT_OFFSET);
         spawnHeightVariance = readSettings(BO3Settings.SPAWN_HEIGHT_VARIANCE);
-        extrudeStyle = readSettings(BO3Settings.EXTRUDE_STYLE);
+        extrudeMode = readSettings(BO3Settings.EXTRUDE_MODE);
         extrudeThroughBlocks = readSettings(BO3Settings.EXTRUDE_THROUGH_BLOCKS);
         minHeight = readSettings(BO3Settings.MIN_HEIGHT);
         maxHeight = readSettings(BO3Settings.MAX_HEIGHT);

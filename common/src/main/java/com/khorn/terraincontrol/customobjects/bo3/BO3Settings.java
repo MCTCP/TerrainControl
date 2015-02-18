@@ -43,7 +43,7 @@ public class BO3Settings extends Settings
     // Enum settings
     public static final Setting<OutsideSourceBlock> OUTSIDE_SOURCE_BLOCK = enumSetting("OutsideSourceBlock", OutsideSourceBlock.placeAnyway);
     public static final Setting<SpawnHeightEnum>    SPAWN_HEIGHT         = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
-    public static final Setting<ExtrudeStyle>       EXTRUDE_STYLE        = enumSetting("ExtrudeStyle", ExtrudeStyle.None);
+    public static final Setting<ExtrudeMode>        EXTRUDE_MODE         = enumSetting("ExtrudeMode", ExtrudeMode.None);
 
     // The spawn height
     public static enum SpawnHeightEnum
@@ -66,21 +66,36 @@ public class BO3Settings extends Settings
     }
 
     // How an object should be extended to a surface
-    public static enum ExtrudeStyle
+    public static enum ExtrudeMode
     {
-        None(0),
-        BottomDown(TerrainControl.WORLD_HEIGHT),
-        TopUp(TerrainControl.WORLD_DEPTH);
+        None(-1, -1),
+        BottomDown(TerrainControl.WORLD_HEIGHT, TerrainControl.WORLD_DEPTH),
+        TopUp(TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
 
+        /**
+         * Defines where calculation should begin
+         */
         private int startingHeight = 0;
-        ExtrudeStyle(int height)
+
+        /**
+         * Defines where calculation should end
+         */
+        private int endingHeight = 0;
+
+        ExtrudeMode(int heightStart, int heightEnd)
         {
-            this.startingHeight = height;
+            this.startingHeight = heightStart;
+            this.endingHeight = heightEnd;
         }
 
         public int getStartingHeight()
         {
             return startingHeight;
+        }
+
+        public int getEndingHeight()
+        {
+            return endingHeight;
         }
     }
 

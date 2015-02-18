@@ -21,7 +21,7 @@ public class ObjectExtrusionHelper
     /**
      * The style to use for extruding; Currently either BottomDown or TopUp
      */
-    private BO3Settings.ExtrudeStyle extrudeStyle;
+    private BO3Settings.ExtrudeMode extrudeMode;
 
     /**
      * These materials are the set of materials that are allow to be extruded through; That is, as soon as we find a
@@ -30,7 +30,7 @@ public class ObjectExtrusionHelper
     private MaterialSet extrudeThroughBlocks;
 
     /**
-     * These blocks are the blocks that are found to be at the location dictated by the extrudeStyle, and will be
+     * These blocks are the blocks that are found to be at the location dictated by the extrudeMode, and will be
      * extruded until hitting a material not listed in extrudeThroughBlocks
      */
     private ArrayList<BlockFunction> blocksToExtrude = new ArrayList<BlockFunction>();
@@ -38,14 +38,14 @@ public class ObjectExtrusionHelper
     /**
      * Constructor
      *
-     * @param extrudeStyle         The style of extrusion to perform
+     * @param extrudeMode          The style of extrusion to perform
      * @param extrudeThroughBlocks The types of materials to allow extrusion to act upon
      */
-    public ObjectExtrusionHelper(BO3Settings.ExtrudeStyle extrudeStyle, MaterialSet extrudeThroughBlocks)
+    public ObjectExtrusionHelper(BO3Settings.ExtrudeMode extrudeMode, MaterialSet extrudeThroughBlocks)
     {
-        this.extrudeStyle = extrudeStyle;
+        this.extrudeMode = extrudeMode;
         this.extrudeThroughBlocks = extrudeThroughBlocks;
-        blockExtrusionY = extrudeStyle.getStartingHeight();
+        blockExtrusionY = extrudeMode.getStartingHeight();
     }
 
     /**
@@ -57,13 +57,13 @@ public class ObjectExtrusionHelper
      */
     public void addBlock(BlockFunction block)
     {
-        if (extrudeStyle != BO3Settings.ExtrudeStyle.None)
+        if (extrudeMode != BO3Settings.ExtrudeMode.None)
         {
-            if (extrudeStyle == BO3Settings.ExtrudeStyle.BottomDown && block.y < blockExtrusionY)
+            if (extrudeMode == BO3Settings.ExtrudeMode.BottomDown && block.y < blockExtrusionY)
             {
                 blocksToExtrude.clear();
                 blockExtrusionY = block.y;
-            } else if (extrudeStyle == BO3Settings.ExtrudeStyle.TopUp && block.y > blockExtrusionY)
+            } else if (extrudeMode == BO3Settings.ExtrudeMode.TopUp && block.y > blockExtrusionY)
             {
                 blocksToExtrude.clear();
                 blockExtrusionY = block.y;
@@ -89,18 +89,18 @@ public class ObjectExtrusionHelper
     {
         for (BlockFunction block : blocksToExtrude)
         {
-            if (extrudeStyle == BO3Settings.ExtrudeStyle.BottomDown)
+            if (extrudeMode == BO3Settings.ExtrudeMode.BottomDown)
             {
                 for (int yi = y + block.y - 1;
-                     yi > extrudeStyle.getStartingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
+                     yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
                      --yi)
                 {
                     block.spawn(world, random, x + block.x, yi, z + block.z);
                 }
-            } else if (extrudeStyle == BO3Settings.ExtrudeStyle.TopUp)
+            } else if (extrudeMode == BO3Settings.ExtrudeMode.TopUp)
             {
                 for (int yi = y + block.y + 1;
-                     yi < extrudeStyle.getStartingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
+                     yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
                      ++yi)
                 {
                     block.spawn(world, random, x + block.x, yi, z + block.z);
