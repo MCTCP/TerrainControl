@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.customobjects.bo3;
 import static com.khorn.terraincontrol.TerrainControl.WORLD_DEPTH;
 import static com.khorn.terraincontrol.TerrainControl.WORLD_HEIGHT;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.configuration.settingType.Settings;
 import com.khorn.terraincontrol.customobjects.StructurePartSpawnHeight;
@@ -37,13 +38,12 @@ public class BO3Settings extends Settings
 
     public static final Setting<MaterialSet>
             SOURCE_BLOCKS = materialSetSetting("SourceBlocks", DefaultMaterial.AIR),
-            EXTEND_THROUGH_BLOCKS = materialSetSetting("ExtendThroughBlocks", DefaultMaterial.AIR)
-    ;
+            EXTRUDE_THROUGH_BLOCKS = materialSetSetting("ExtrudeThroughBlocks", DefaultMaterial.AIR);
 
     // Enum settings
     public static final Setting<OutsideSourceBlock> OUTSIDE_SOURCE_BLOCK = enumSetting("OutsideSourceBlock", OutsideSourceBlock.placeAnyway);
-    public static final Setting<SpawnHeightEnum> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
-    public static final Setting<ExtendStyle> EXTEND_STYLE = enumSetting("ExtendStyle", ExtendStyle.None);
+    public static final Setting<SpawnHeightEnum>    SPAWN_HEIGHT         = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
+    public static final Setting<ExtrudeStyle>       EXTRUDE_STYLE        = enumSetting("ExtrudeStyle", ExtrudeStyle.None);
 
     // The spawn height
     public static enum SpawnHeightEnum
@@ -66,11 +66,22 @@ public class BO3Settings extends Settings
     }
 
     // How an object should be extended to a surface
-    public static enum ExtendStyle
+    public static enum ExtrudeStyle
     {
-        None,
-        BottomDown,
-        TopUp
+        None(0),
+        BottomDown(TerrainControl.WORLD_HEIGHT),
+        TopUp(TerrainControl.WORLD_DEPTH);
+
+        private int startingHeight = 0;
+        ExtrudeStyle(int height)
+        {
+            this.startingHeight = height;
+        }
+
+        public int getStartingHeight()
+        {
+            return startingHeight;
+        }
     }
 
     // What to do when outside the source block

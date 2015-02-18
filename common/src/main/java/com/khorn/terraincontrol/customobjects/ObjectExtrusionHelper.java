@@ -9,75 +9,101 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- *
+ * This class aids in the task of finding the blocks at the top or bottom of a collection of blocks
  */
 public class ObjectExtrusionHelper
 {
-    private int                     extrusionLevelCurrent;
-    private BO3Settings.ExtendStyle extendStyle;
-    private MaterialSet             extrudeThroughBlocks;
-    private ArrayList<BlockFunction> extrusionBlocks = new ArrayList<BlockFunction>();
+    /**
+     * The Y coordinate of the appropriate level to be extruding blocks from
+     */
+    private int blockExtrusionY;
 
-    public ObjectExtrusionHelper(BO3Settings.ExtendStyle extendStyle, MaterialSet extrudeThroughBlocks)
+    /**
+     * The style to use for extruding; Currently either BottomDown or TopUp
+     */
+    private BO3Settings.ExtrudeStyle extrudeStyle;
+
+    /**
+     * These materials are the set of materials that are allow to be extruded through; That is, as soon as we find a
+     * block in the world that is not in this list, we will stop extruding the BO3
+     */
+    private MaterialSet extrudeThroughBlocks;
+
+    /**
+     * These blocks are the blocks that are found to be at the location dictated by the extrudeStyle, and will be
+     * extruded until hitting a material not listed in extrudeThroughBlocks
+     */
+    private ArrayList<BlockFunction> blocksToExtrude = new ArrayList<BlockFunction>();
+
+    /**
+     * Constructor
+     *
+     * @param extrudeStyle         The style of extrusion to perform
+     * @param extrudeThroughBlocks The types of materials to allow extrusion to act upon
+     */
+    public ObjectExtrusionHelper(BO3Settings.ExtrudeStyle extrudeStyle, MaterialSet extrudeThroughBlocks)
     {
-        this.extendStyle = extendStyle;
+        this.extrudeStyle = extrudeStyle;
         this.extrudeThroughBlocks = extrudeThroughBlocks;
-        if (extendStyle == BO3Settings.ExtendStyle.BottomDown)
-        {
-            extrusionLevelCurrent = 256;
-        } else
-        {
-            extrusionLevelCurrent = 0;
-        }
+        blockExtrusionY = extrudeStyle.getStartingHeight();
     }
 
-    public void checkAndAdd(BlockFunction block)
+    /**
+     * Determines if the block is one we wish to add to the list of blocks to be extruded. If it is, it will be added
+     * otherwise, nothing happens. Any blocks added to the list that are on a level not optimal to the current level
+     * will be purged to create the optimal list of blocks to extrude
+     *
+     * @param block
+     */
+    public void addBlock(BlockFunction block)
     {
-        if (extendStyle != BO3Settings.ExtendStyle.None)
+        if (extrudeStyle != BO3Settings.ExtrudeStyle.None)
         {
-            if (extendStyle == BO3Settings.ExtendStyle.BottomDown && block.y < extrusionLevelCurrent)
+            if (extrudeStyle == BO3Settings.ExtrudeStyle.BottomDown && block.y < blockExtrusionY)
             {
-                extrusionBlocks.clear();
-                extrusionLevelCurrent = block.y;
-            } else if (extendStyle == BO3Settings.ExtendStyle.TopUp && block.y > extrusionLevelCurrent)
+                blocksToExtrude.clear();
+                blockExtrusionY = block.y;
+            } else if (extrudeStyle == BO3Settings.ExtrudeStyle.TopUp && block.y > blockExtrusionY)
             {
-                extrusionBlocks.clear();
-                extrusionLevelCurrent = block.y;
+                blocksToExtrude.clear();
+                blockExtrusionY = block.y;
             }
-            if (block.y == extrusionLevelCurrent)
+            if (block.y == blockExtrusionY)
             {
-                extrusionBlocks.add(block);
+                blocksToExtrude.add(block);
             }
         }
     }
 
+    /**
+     * This method takes that blocks that have been added to this and extrudes them individually until a block outside
+     * of the extrudeThroughBlocks has been hit
+     *
+     * @param world  The LocalWorld to extrude block in
+     * @param random The random generator to use to spawning
+     * @param x      The BO3 base X spawn location
+     * @param y      The BO3 base Y spawn location
+     * @param z      The BO3 base Z spawn location
+     */
     public void extrude(LocalWorld world, Random random, int x, int y, int z)
     {
-        for (BlockFunction block : extrusionBlocks)
+        for (BlockFunction block : blocksToExtrude)
         {
-            if (extendStyle == BO3Settings.ExtendStyle.BottomDown)
+            if (extrudeStyle == BO3Settings.ExtrudeStyle.BottomDown)
             {
-                for (int yi = y + block.y - 1; yi > 0; --yi)
+                for (int yi = y + block.y - 1;
+                     yi > extrudeStyle.getStartingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
+                     --yi)
                 {
-                    if (extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z)))
-                    {
-                        block.spawn(world, random, x + block.x, yi, z + block.z);
-                    } else
-                    {
-                        break;
-                    }
+                    block.spawn(world, random, x + block.x, yi, z + block.z);
                 }
-            } else if (extendStyle == BO3Settings.ExtendStyle.TopUp)
+            } else if (extrudeStyle == BO3Settings.ExtrudeStyle.TopUp)
             {
-                for (int yi = y + block.y + 1; yi < 255; ++yi)
+                for (int yi = y + block.y + 1;
+                     yi < extrudeStyle.getStartingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
+                     ++yi)
                 {
-                    if (extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z)))
-                    {
-                        block.spawn(world, random, x + block.x, yi, z + block.z);
-                    } else
-                    {
-                        break;
-                    }
+                    block.spawn(world, random, x + block.x, yi, z + block.z);
                 }
             }
         }

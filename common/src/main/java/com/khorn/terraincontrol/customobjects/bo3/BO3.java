@@ -166,7 +166,7 @@ public class BO3 implements StructuredCustomObject
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
         BlockFunction[] blocks = settings.blocks[rotation.getRotationId()];
-        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extendStyle, settings.extendThroughBlocks);
+        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeStyle, settings.extrudeThroughBlocks);
         // Spawn
 
         for (BlockFunction block : blocks)
@@ -175,7 +175,7 @@ public class BO3 implements StructuredCustomObject
             {
                 block.spawn(world, random, x + block.x, y + block.y, z + block.z);
             }
-            oeh.checkAndAdd(block);
+            oeh.addBlock(block);
         }
         oeh.extrude(world, random, x, y, z);
         return true;

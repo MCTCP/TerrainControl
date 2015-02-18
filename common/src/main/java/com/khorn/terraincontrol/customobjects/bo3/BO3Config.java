@@ -48,11 +48,13 @@ public class BO3Config extends ConfigFile
 
     public BoundingBox[] boundingBoxes = new BoundingBox[4];
 
-    // Options allow better control over spawning of BO3
-    public BO3Settings.ExtendStyle extendStyle;
-    public MaterialSet             extendThroughBlocks;
-    public int                     spawnHeightOffset;
-    public int                     spawnHeightVariance;
+    // Options to allow better control over spawning of BO3
+    //  Extrusion
+    public BO3Settings.ExtrudeStyle extrudeStyle;
+    public MaterialSet              extrudeThroughBlocks;
+    //  Extra spawn height settings
+    public int                      spawnHeightOffset;
+    public int                      spawnHeightVariance;
 
     /**
      * Creates a BO3Config from a file.
@@ -128,9 +130,11 @@ public class BO3Config extends ConfigFile
         writer.comment("Ex. SpawnHeightOffset = 3, SpawnHeightVariance = 3; This object will spawn 3 to 6 blocks above the original spot it would have spawned");
         writer.setting(BO3Settings.SPAWN_HEIGHT_VARIANCE, spawnHeightVariance);
 
-        writer.smallTitle("Extend settings: Style = BottomDown, TopUp, or None");
-        writer.setting(BO3Settings.EXTEND_STYLE, extendStyle);
-        writer.setting(BO3Settings.EXTEND_THROUGH_BLOCKS, extendThroughBlocks);
+        writer.smallTitle("Extrusion settings");
+        writer.comment("The style of extrusion you wish to use - BottomDown, TopUp, None (Default)");
+        writer.setting(BO3Settings.EXTRUDE_STYLE, extrudeStyle);
+        writer.comment("The blocks to extrude your BO3 through");
+        writer.setting(BO3Settings.EXTRUDE_THROUGH_BLOCKS, extrudeThroughBlocks);
 
         writer.comment("The height limits for the BO3.");
         writer.setting(BO3Settings.MIN_HEIGHT, minHeight);
@@ -175,8 +179,8 @@ public class BO3Config extends ConfigFile
         spawnHeight = readSettings(BO3Settings.SPAWN_HEIGHT);
         spawnHeightOffset = readSettings(BO3Settings.SPAWN_HEIGHT_OFFSET);
         spawnHeightVariance = readSettings(BO3Settings.SPAWN_HEIGHT_VARIANCE);
-        extendStyle = readSettings(BO3Settings.EXTEND_STYLE);
-        extendThroughBlocks = readSettings(BO3Settings.EXTEND_THROUGH_BLOCKS);
+        extrudeStyle = readSettings(BO3Settings.EXTRUDE_STYLE);
+        extrudeThroughBlocks = readSettings(BO3Settings.EXTRUDE_THROUGH_BLOCKS);
         minHeight = readSettings(BO3Settings.MIN_HEIGHT);
         maxHeight = readSettings(BO3Settings.MAX_HEIGHT);
         maxBranchDepth = readSettings(BO3Settings.MAX_BRANCH_DEPTH);
