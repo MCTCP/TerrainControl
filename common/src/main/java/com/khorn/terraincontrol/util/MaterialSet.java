@@ -51,16 +51,16 @@ public class MaterialSet
         if (input.equalsIgnoreCase(ALL_MATERIALS))
         {
             this.allMaterials = true;
-            return;
         }
         if (input.equalsIgnoreCase(SOLID_MATERIALS))
         {
             this.allSolidMaterials = true;
-            return;
         }
         if (input.equalsIgnoreCase(NON_SOLID_MATERIALS))
         {
             this.allNonSolidMaterials = true;
+        }
+        if (this.allMaterials || this.allSolidMaterials || this.allNonSolidMaterials){
             return;
         }
 
