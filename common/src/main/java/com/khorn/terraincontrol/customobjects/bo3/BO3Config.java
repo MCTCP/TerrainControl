@@ -21,36 +21,42 @@ public class BO3Config extends ConfigFile
 {
 
     public Map<String, CustomObject> otherObjectsInDirectory;
-    public String author;
-    public String description;
-    public ConfigMode settingsMode;
-    public boolean tree;
-    public int frequency;
-    public double rarity;
-    public boolean rotateRandomly;
-    public SpawnHeightEnum spawnHeight;
-    public int minHeight;
-    public int maxHeight;
+    public String                    author;
+    public String                    description;
+    public ConfigMode                settingsMode;
+    public boolean                   tree;
+    public int                       frequency;
+    public double                    rarity;
+    public boolean                   rotateRandomly;
+    public SpawnHeightEnum           spawnHeight;
+    public int                       minHeight;
+    public int                       maxHeight;
     /*
      * Using ArrayList instead of List to avoid breaking BO3Tools.
      * Eventually we probably want to get rid entirely of (Array)List<String>
      * for biome lists and use a proper BiomeList.
      */
-    public ArrayList<String> excludedBiomes;
-    public MaterialSet sourceBlocks;
-    public int maxPercentageOutsideSourceBlock;
-    public OutsideSourceBlock outsideSourceBlock;
-    public BlockFunction[][] blocks = new BlockFunction[4][]; // four
-                                                              // rotations
-    public BO3Check[][] bo3Checks = new BO3Check[4][];
+    public ArrayList<String>         excludedBiomes;
+    public MaterialSet               sourceBlocks;
+    public int                       maxPercentageOutsideSourceBlock;
+    public OutsideSourceBlock        outsideSourceBlock;
+    public BlockFunction[][] blocks    = new BlockFunction[4][]; // four
+    // rotations
+    public BO3Check[][]      bo3Checks = new BO3Check[4][];
     public int maxBranchDepth;
     public BranchFunction[][] branches = new BranchFunction[4][];
 
     public BoundingBox[] boundingBoxes = new BoundingBox[4];
 
+    // Options allow better control over spawning of BO3
+    public BO3Settings.ExtendStyle extendStyle;
+    public MaterialSet             extendThroughBlocks;
+    public int                     spawnHeightOffset;
+    public int                     spawnHeightVariance;
+
     /**
      * Creates a BO3Config from a file.
-     * 
+     *
      * @param name The name of the BO3 without the extension.
      * @param file The file of the BO3.
      */
@@ -67,6 +73,7 @@ public class BO3Config extends ConfigFile
 
     /**
      * Gets access to the settings reader used by this BO3 config.
+     *
      * @return The settings reader.
      */
     public SettingsReader getReader()
@@ -113,6 +120,18 @@ public class BO3Config extends ConfigFile
         writer.comment("The spawn height of the BO3 - randomY, highestBlock or highestSolidBlock.");
         writer.setting(BO3Settings.SPAWN_HEIGHT, spawnHeight);
 
+        writer.comment("The offset from the spawn height to spawn this BO3");
+        writer.comment("Ex. SpawnHeight = highestSolidBlock, SpawnHeightOffset = 3; This object will spawn 3 blocks above the highest solid block");
+        writer.setting(BO3Settings.SPAWN_HEIGHT_OFFSET, spawnHeightOffset);
+
+        writer.comment("A random amount to offset the spawn location from the spawn offset height");
+        writer.comment("Ex. SpawnHeightOffset = 3, SpawnHeightVariance = 3; This object will spawn 3 to 6 blocks above the original spot it would have spawned");
+        writer.setting(BO3Settings.SPAWN_HEIGHT_VARIANCE, spawnHeightVariance);
+
+        writer.smallTitle("Extend settings: Style = BottomDown, TopUp, or None");
+        writer.setting(BO3Settings.EXTEND_STYLE, extendStyle);
+        writer.setting(BO3Settings.EXTEND_THROUGH_BLOCKS, extendThroughBlocks);
+
         writer.comment("The height limits for the BO3.");
         writer.setting(BO3Settings.MIN_HEIGHT, minHeight);
         writer.setting(BO3Settings.MAX_HEIGHT, maxHeight);
@@ -154,6 +173,10 @@ public class BO3Config extends ConfigFile
         rarity = readSettings(BO3Settings.RARITY);
         rotateRandomly = readSettings(BO3Settings.ROTATE_RANDOMLY);
         spawnHeight = readSettings(BO3Settings.SPAWN_HEIGHT);
+        spawnHeightOffset = readSettings(BO3Settings.SPAWN_HEIGHT_OFFSET);
+        spawnHeightVariance = readSettings(BO3Settings.SPAWN_HEIGHT_VARIANCE);
+        extendStyle = readSettings(BO3Settings.EXTEND_STYLE);
+        extendThroughBlocks = readSettings(BO3Settings.EXTEND_THROUGH_BLOCKS);
         minHeight = readSettings(BO3Settings.MIN_HEIGHT);
         maxHeight = readSettings(BO3Settings.MAX_HEIGHT);
         maxBranchDepth = readSettings(BO3Settings.MAX_BRANCH_DEPTH);

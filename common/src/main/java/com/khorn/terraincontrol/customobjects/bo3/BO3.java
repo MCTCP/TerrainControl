@@ -20,9 +20,9 @@ import java.util.Random;
 
 public class BO3 implements StructuredCustomObject
 {
-    private BO3Config settings;
-    private final String name;
-    private final File file;
+    private       BO3Config settings;
+    private final String    name;
+    private final File      file;
 
     /**
      * Creates a BO3 from a file.
@@ -43,8 +43,7 @@ public class BO3 implements StructuredCustomObject
     }
 
     /**
-     * Creates a BO3 with the specified settings. Ignores the settings in the
-     * settings file.
+     * Creates a BO3 with the specified settings. Ignores the settings in the settings file.
      *
      * @param oldObject     The object where this object is based on
      * @param extraSettings The settings to override
@@ -55,6 +54,30 @@ public class BO3 implements StructuredCustomObject
         FileSettingsWriter.writeToFile(this.settings, this.settings.settingsMode);
         this.name = settings.getName();
         this.file = settings.getFile();
+    }
+
+    /**
+     * Computes the offset and variance for spawning a bo3
+     *
+     * @param world
+     * @param offset
+     * @param variance
+     *
+     * @return
+     */
+    public int getOffsetAndVariance(Random random, int offset, int variance)
+    {
+        if (variance == 0)
+        {
+            return offset;
+        } else if (variance < 0)
+        {
+            variance = -random.nextInt(MathHelper.abs(variance) + 1);
+        } else
+        {
+            variance = random.nextInt(variance + 1);
+        }
+        return offset + variance;
     }
 
     @Override
@@ -143,15 +166,18 @@ public class BO3 implements StructuredCustomObject
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
         BlockFunction[] blocks = settings.blocks[rotation.getRotationId()];
-
+        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extendStyle, settings.extendThroughBlocks);
         // Spawn
+
         for (BlockFunction block : blocks)
         {
             if (settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway || settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z)))
             {
                 block.spawn(world, random, x + block.x, y + block.y, z + block.z);
             }
+            oeh.checkAndAdd(block);
         }
+        oeh.extrude(world, random, x, y, z);
         return true;
     }
 
@@ -170,6 +196,11 @@ public class BO3 implements StructuredCustomObject
         if (settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
         {
             y = world.getSolidHeight(x, z);
+        }
+        int spawnOffset = this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
+        if (spawnOffset != 0)
+        {
+            y += spawnOffset;
         }
         if (!canSpawnAt(world, rotation, x, y, z))
         {
@@ -219,7 +250,8 @@ public class BO3 implements StructuredCustomObject
     @Override
     public boolean hasPreferenceToSpawnIn(LocalBiome biome)
     {
-        if (settings.excludedBiomes.contains("All") || settings.excludedBiomes.contains("all") || settings.excludedBiomes.contains(biome.getName()))
+        if (settings.excludedBiomes.contains("All") || settings.excludedBiomes.contains("all") || settings.excludedBiomes
+                .contains(biome.getName()))
         {
             return false;
         }
@@ -245,7 +277,9 @@ public class BO3 implements StructuredCustomObject
         {
             Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
             int height = MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight);
-            return new CustomObjectCoordinate(this, rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16));
+            return new CustomObjectCoordinate(
+                    this, rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16)
+            );
         }
         return null;
     }

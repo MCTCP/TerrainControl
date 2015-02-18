@@ -19,9 +19,11 @@ public class MaterialSet
 {
     private static String ALL_MATERIALS = "All";
     private static String SOLID_MATERIALS = "Solid";
+    private static String NON_SOLID_MATERIALS = "Non-Solid";
 
-    private boolean allSolidMaterials = false;
     private boolean allMaterials = false;
+    private boolean allSolidMaterials = false;
+    private boolean allNonSolidMaterials = false;
 
     private int[] materialIntSet = new int[0];
     private Set<MaterialSetEntry> materials = new LinkedHashSet<MaterialSetEntry>();
@@ -54,6 +56,11 @@ public class MaterialSet
         if (input.equalsIgnoreCase(SOLID_MATERIALS))
         {
             this.allSolidMaterials = true;
+            return;
+        }
+        if (input.equalsIgnoreCase(NON_SOLID_MATERIALS))
+        {
+            this.allNonSolidMaterials = true;
             return;
         }
 
@@ -122,6 +129,10 @@ public class MaterialSet
         {
             return true;
         }
+        if (allNonSolidMaterials && !material.isSolid())
+        {
+            return true;
+        }
 
         // Try to update int set
         updateIntSet();
@@ -160,6 +171,11 @@ public class MaterialSet
         {
             builder.append(SOLID_MATERIALS).append(',');
         }
+        // Check for non-solid materials
+        if (allNonSolidMaterials)
+        {
+            builder.append(NON_SOLID_MATERIALS).append(',');
+        }
         // Add all other materials
         for (MaterialSetEntry material : materials)
         {
@@ -190,6 +206,10 @@ public class MaterialSet
         if (this.allSolidMaterials)
         {
             rotated.allSolidMaterials = true;
+        }
+        if (this.allNonSolidMaterials)
+        {
+            rotated.allNonSolidMaterials = true;
         }
         rotated.intSetUpToDate = false;
         for (MaterialSetEntry material : this.materials)

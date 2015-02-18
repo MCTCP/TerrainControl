@@ -87,6 +87,10 @@ public class MathHelper
         return floatNumber > truncated ? truncated + 1 : truncated;
     }
 
+    public static int clamp(int check, int min, int max){
+        return check > max ? max : (check < min ? min : check);
+    }
+
     private MathHelper()
     {
     }

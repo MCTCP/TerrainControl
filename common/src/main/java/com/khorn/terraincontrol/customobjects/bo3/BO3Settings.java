@@ -24,7 +24,9 @@ public class BO3Settings extends Settings
             MIN_HEIGHT = intSetting("MinHeight", 0, WORLD_DEPTH, WORLD_HEIGHT),
             MAX_HEIGHT = intSetting("MaxHeight", 256, WORLD_DEPTH, WORLD_HEIGHT),
             MAX_BRANCH_DEPTH = intSetting("MaxBranchDepth", 10, 1, 100),
-            MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK = intSetting("MaxPercentageOutsideSourceBlock", 100, 0, 100);
+            MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK = intSetting("MaxPercentageOutsideSourceBlock", 100, 0, 100),
+            SPAWN_HEIGHT_OFFSET = intSetting("SpawnHeightOffset", 0, -255, 255),
+            SPAWN_HEIGHT_VARIANCE = intSetting("SpawnHeightVariance", 0, -255, 255);
 
     public static final Setting<String>
             AUTHOR = stringSetting("Author", "Unknown"),
@@ -33,11 +35,15 @@ public class BO3Settings extends Settings
 
     public static final Setting<List<String>> EXCLUDED_BIOMES = stringListSetting("ExcludedBiomes", "All");
 
-    public static final Setting<MaterialSet> SOURCE_BLOCKS = materialSetSetting("SourceBlocks", DefaultMaterial.AIR);
+    public static final Setting<MaterialSet>
+            SOURCE_BLOCKS = materialSetSetting("SourceBlocks", DefaultMaterial.AIR),
+            EXTEND_THROUGH_BLOCKS = materialSetSetting("ExtendThroughBlocks", DefaultMaterial.AIR)
+    ;
 
     // Enum settings
     public static final Setting<OutsideSourceBlock> OUTSIDE_SOURCE_BLOCK = enumSetting("OutsideSourceBlock", OutsideSourceBlock.placeAnyway);
     public static final Setting<SpawnHeightEnum> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
+    public static final Setting<ExtendStyle> EXTEND_STYLE = enumSetting("ExtendStyle", ExtendStyle.None);
 
     // The spawn height
     public static enum SpawnHeightEnum
@@ -57,6 +63,14 @@ public class BO3Settings extends Settings
         {
             return height;
         }
+    }
+
+    // How an object should be extended to a surface
+    public static enum ExtendStyle
+    {
+        None,
+        BottomDown,
+        TopUp
     }
 
     // What to do when outside the source block
