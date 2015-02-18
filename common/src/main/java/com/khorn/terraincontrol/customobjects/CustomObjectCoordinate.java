@@ -9,7 +9,6 @@ import java.util.Random;
 
 /**
  * Holds a custom object along with the absolute spawn coordinates.
- *
  */
 public class CustomObjectCoordinate
 {
@@ -46,7 +45,7 @@ public class CustomObjectCoordinate
 
     /**
      * Returns the object of this coordinate.
-     * 
+     *
      * @return The object.
      */
     public CustomObject getObject()
@@ -58,7 +57,7 @@ public class CustomObjectCoordinate
      * Returns the object of this coordinate, casted to a
      * StructuredCustomObject. Will throw a ClassCastExcpetion
      * if the object isn't a StructuredCustomObject
-     * 
+     *
      * @return The casted object.
      */
     public StructuredCustomObject getStructuredObject()

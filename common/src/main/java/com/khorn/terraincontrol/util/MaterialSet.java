@@ -19,7 +19,7 @@ public class MaterialSet
 {
     private static String ALL_MATERIALS = "All";
     private static String SOLID_MATERIALS = "Solid";
-    private static String NON_SOLID_MATERIALS = "Non-Solid";
+    private static String NON_SOLID_MATERIALS = "NonSolid";
 
     private boolean allMaterials = false;
     private boolean allSolidMaterials = false;
@@ -60,7 +60,8 @@ public class MaterialSet
         {
             this.allNonSolidMaterials = true;
         }
-        if (this.allMaterials || this.allSolidMaterials || this.allNonSolidMaterials){
+        if (this.allMaterials || this.allSolidMaterials || this.allNonSolidMaterials)
+        {
             return;
         }
 
@@ -74,6 +75,7 @@ public class MaterialSet
 
     /**
      * Adds the entry to this material set.
+     *
      * @param entry The entry to add, may not be null.
      */
     public void add(MaterialSetEntry entry)

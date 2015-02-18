@@ -20,9 +20,9 @@ import java.util.Random;
 
 public class BO3 implements StructuredCustomObject
 {
-    private       BO3Config settings;
-    private final String    name;
-    private final File      file;
+    private BO3Config settings;
+    private final String name;
+    private final File file;
 
     /**
      * Creates a BO3 from a file.

@@ -89,7 +89,6 @@ public abstract class Settings
      * {@link Settings#materialSetSetting(String, DefaultMaterial...)} is the
      * suggested alternative.
      * @see MaterialSetSetting
-     * 
      */
     protected static final Setting<MaterialSet> materialSetSetting(String name, String... defaultValues)
     {
@@ -111,7 +110,7 @@ public abstract class Settings
     {
         return new MobGroupListSetting(name);
     }
-    
+
     /**
      * @see ReplacedBlocksSetting
      */
@@ -127,7 +126,7 @@ public abstract class Settings
     {
         return new StringSetting(name, defaultValue);
     }
-    
+
     /**
      * @see StringListSetting
      */
@@ -135,7 +134,7 @@ public abstract class Settings
     {
         return new StringListSetting(name, defaultValues);
     }
-    
+
     /**
      * @see SurfaceGeneratorSetting
      */

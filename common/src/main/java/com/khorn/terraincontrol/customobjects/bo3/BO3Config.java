@@ -21,28 +21,28 @@ public class BO3Config extends ConfigFile
 {
 
     public Map<String, CustomObject> otherObjectsInDirectory;
-    public String                    author;
-    public String                    description;
-    public ConfigMode                settingsMode;
-    public boolean                   tree;
-    public int                       frequency;
-    public double                    rarity;
-    public boolean                   rotateRandomly;
-    public SpawnHeightEnum           spawnHeight;
-    public int                       minHeight;
-    public int                       maxHeight;
+    public String author;
+    public String description;
+    public ConfigMode settingsMode;
+    public boolean tree;
+    public int frequency;
+    public double rarity;
+    public boolean rotateRandomly;
+    public SpawnHeightEnum spawnHeight;
+    public int minHeight;
+    public int maxHeight;
     /*
      * Using ArrayList instead of List to avoid breaking BO3Tools.
      * Eventually we probably want to get rid entirely of (Array)List<String>
      * for biome lists and use a proper BiomeList.
      */
-    public ArrayList<String>         excludedBiomes;
-    public MaterialSet               sourceBlocks;
-    public int                       maxPercentageOutsideSourceBlock;
-    public OutsideSourceBlock        outsideSourceBlock;
-    public BlockFunction[][] blocks    = new BlockFunction[4][]; // four
+    public ArrayList<String> excludedBiomes;
+    public MaterialSet sourceBlocks;
+    public int maxPercentageOutsideSourceBlock;
+    public OutsideSourceBlock outsideSourceBlock;
+    public BlockFunction[][] blocks = new BlockFunction[4][]; // four
     // rotations
-    public BO3Check[][]      bo3Checks = new BO3Check[4][];
+    public BO3Check[][] bo3Checks = new BO3Check[4][];
     public int maxBranchDepth;
     public BranchFunction[][] branches = new BranchFunction[4][];
 
@@ -51,10 +51,10 @@ public class BO3Config extends ConfigFile
     // Options to allow better control over spawning of BO3
     //  Extrusion
     public BO3Settings.ExtrudeMode extrudeMode;
-    public MaterialSet             extrudeThroughBlocks;
+    public MaterialSet extrudeThroughBlocks;
     //  Extra spawn height settings
-    public int                     spawnHeightOffset;
-    public int                     spawnHeightVariance;
+    public int spawnHeightOffset;
+    public int spawnHeightVariance;
 
     /**
      * Creates a BO3Config from a file.

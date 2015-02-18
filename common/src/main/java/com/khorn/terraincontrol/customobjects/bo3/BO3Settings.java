@@ -42,8 +42,8 @@ public class BO3Settings extends Settings
 
     // Enum settings
     public static final Setting<OutsideSourceBlock> OUTSIDE_SOURCE_BLOCK = enumSetting("OutsideSourceBlock", OutsideSourceBlock.placeAnyway);
-    public static final Setting<SpawnHeightEnum>    SPAWN_HEIGHT         = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
-    public static final Setting<ExtrudeMode>        EXTRUDE_MODE         = enumSetting("ExtrudeMode", ExtrudeMode.None);
+    public static final Setting<SpawnHeightEnum> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
+    public static final Setting<ExtrudeMode> EXTRUDE_MODE = enumSetting("ExtrudeMode", ExtrudeMode.None);
 
     // The spawn height
     public static enum SpawnHeightEnum
