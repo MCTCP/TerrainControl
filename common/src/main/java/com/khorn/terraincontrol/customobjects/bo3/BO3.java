@@ -197,12 +197,13 @@ public class BO3 implements StructuredCustomObject
         {
             y = world.getSolidHeight(x, z);
         }
-        int spawnOffset = this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
+        //  Offset by static and random settings values
+        y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
         if (!canSpawnAt(world, rotation, x, y, z))
         {
             return false;
         }
-        return spawnForced(world, random, rotation, x, y + spawnOffset, z);
+        return spawnForced(world, random, rotation, x, y, z);
     }
 
     @Override

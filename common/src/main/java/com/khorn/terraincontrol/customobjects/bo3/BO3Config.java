@@ -29,6 +29,14 @@ public class BO3Config extends ConfigFile
     public double rarity;
     public boolean rotateRandomly;
     public SpawnHeightEnum spawnHeight;
+    //  Extra spawn height settings
+    public int spawnHeightOffset;
+    public int spawnHeightVariance;
+
+    //  Extrusion
+    public BO3Settings.ExtrudeMode extrudeMode;
+    public MaterialSet extrudeThroughBlocks;
+    
     public int minHeight;
     public int maxHeight;
     /*
@@ -47,14 +55,6 @@ public class BO3Config extends ConfigFile
     public BranchFunction[][] branches = new BranchFunction[4][];
 
     public BoundingBox[] boundingBoxes = new BoundingBox[4];
-
-    // Options to allow better control over spawning of BO3
-    //  Extrusion
-    public BO3Settings.ExtrudeMode extrudeMode;
-    public MaterialSet extrudeThroughBlocks;
-    //  Extra spawn height settings
-    public int spawnHeightOffset;
-    public int spawnHeightVariance;
 
     /**
      * Creates a BO3Config from a file.
