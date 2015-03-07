@@ -5,7 +5,10 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
-import net.minecraft.server.v1_8_R1.*;
+import net.minecraft.server.v1_8_R2.*;
+import net.minecraft.server.v1_8_R2.WorldGenVillagePieces.WorldGenVillagePieceWeight;
+import net.minecraft.server.v1_8_R2.WorldGenVillagePieces.WorldGenVillageRoadPiece;
+import net.minecraft.server.v1_8_R2.WorldGenVillagePieces.WorldGenVillageStartPiece;
 
 import java.util.List;
 import java.util.Random;
@@ -15,10 +18,9 @@ public class VillageStart extends StructureStart
     // well ... thats what it does
     private boolean hasMoreThanTwoComponents = false;
 
-    @SuppressWarnings("unchecked")
     public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
-        List<StructurePiece> villagePieces = WorldGenVillagePieces.a(random, size);
+        List<WorldGenVillagePieceWeight> villagePieces = WorldGenVillagePieces.a(random, size);
 
         int startX = (chunkX << 4) + 2;
         int startZ = (chunkZ << 4) + 2;

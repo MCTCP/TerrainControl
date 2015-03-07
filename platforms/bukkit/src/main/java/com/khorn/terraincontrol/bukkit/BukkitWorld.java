@@ -18,8 +18,8 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
-import net.minecraft.server.v1_8_R1.*;
-import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
+import net.minecraft.server.v1_8_R2.*;
+import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
 
 import java.util.*;
 
@@ -444,7 +444,7 @@ public class BukkitWorld implements LocalWorld
 
         // Relight and update players
         world.x(blockPos);
-        if (!world.isStatic)
+        if (!world.isClientSide)
         {
             world.notify(blockPos);
         }
@@ -670,9 +670,19 @@ public class BukkitWorld implements LocalWorld
                     break;
             }
 
+            // Initialize trees
+            IBlockData jungleLog = Blocks.LOG.getBlockData()
+                    .set(BlockLog1.VARIANT, BlockWood.EnumLogVariant.JUNGLE);
+            IBlockData jungleLeaves = Blocks.LEAVES.getBlockData()
+                    .set(BlockLeaves1.VARIANT, BlockWood.EnumLogVariant.JUNGLE)
+                    .set(BlockLeaves.CHECK_DECAY, false);
+            IBlockData oakLeaves = Blocks.LEAVES.getBlockData()
+                    .set(BlockLeaves1.VARIANT, BlockWood.EnumLogVariant.OAK)
+                    .set(BlockLeaves.CHECK_DECAY, false);
+
             this.tree = new WorldGenTrees(false);
             this.acaciaTree = new WorldGenAcaciaTree(false);
-            this.cocoaTree = new WorldGenTrees(false, 5, 3, 3, true);
+            this.cocoaTree = new WorldGenTrees(false, 5, jungleLog, jungleLeaves, true);
             this.bigTree = new WorldGenBigTree(false);
             this.birchTree = new WorldGenForest(false, false);
             this.darkOakTree = new WorldGenForestTree(false);
@@ -683,8 +693,8 @@ public class BukkitWorld implements LocalWorld
             this.hugeMushroom = new WorldGenHugeMushroom();
             this.hugeTaigaTree1 = new WorldGenMegaTree(false, false);
             this.hugeTaigaTree2 = new WorldGenMegaTree(false, true);
-            this.jungleTree = new WorldGenJungleTree(false, 10, 20, 3, 3);
-            this.groundBush = new WorldGenGroundBush(3, 0);
+            this.jungleTree = new WorldGenJungleTree(false, 10, 20, jungleLog, jungleLeaves);
+            this.groundBush = new WorldGenGroundBush(jungleLog, oakLeaves);
 
             this.initialized = true;
         } else

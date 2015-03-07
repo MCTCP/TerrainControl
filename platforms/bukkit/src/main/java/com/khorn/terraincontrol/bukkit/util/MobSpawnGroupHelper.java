@@ -4,7 +4,9 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings.EntityCategory;
 import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_8_R1.*;
+import net.minecraft.server.v1_8_R2.*;
+import net.minecraft.server.v1_8_R2.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_8_R2.WeightedRandom.WeightedRandomChoice;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -18,8 +20,8 @@ import java.util.Map;
  */
 public final class MobSpawnGroupHelper
 {
-    private static final Map<Class<? extends Entity>, String> CLASS_TO_NAME_MAP;
-    private static final Map<String, Class<? extends Entity>> NAME_TO_CLASS_MAP;
+    private static final Map<Class<? extends EntityInsentient>, String> CLASS_TO_NAME_MAP;
+    private static final Map<String, Class<? extends EntityInsentient>> NAME_TO_CLASS_MAP;
     private static final Field WEIGHT_FIELD;
 
     static
@@ -29,13 +31,15 @@ public final class MobSpawnGroupHelper
             Field classToNameMapField = EntityTypes.class.getDeclaredField("d");
             classToNameMapField.setAccessible(true);
             @SuppressWarnings("unchecked")
-            Map<Class<? extends Entity>, String> classToNameMap = (Map<Class<? extends Entity>, String>) classToNameMapField.get(null);
+            Map<Class<? extends EntityInsentient>, String> classToNameMap = (Map<Class<? extends EntityInsentient>, String>) classToNameMapField
+                    .get(null);
             CLASS_TO_NAME_MAP = classToNameMap;
 
             Field nameToClassMapField = EntityTypes.class.getDeclaredField("c");
             nameToClassMapField.setAccessible(true);
             @SuppressWarnings("unchecked")
-            Map<String, Class<? extends Entity>> nameToClassMap = (Map<String, Class<? extends Entity>>) nameToClassMapField.get(null);
+            Map<String, Class<? extends EntityInsentient>> nameToClassMap = (Map<String, Class<? extends EntityInsentient>>) nameToClassMapField
+                    .get(null);
             NAME_TO_CLASS_MAP = nameToClassMap;
 
             WEIGHT_FIELD = WeightedRandomChoice.class.getDeclaredField("a");
@@ -102,7 +106,6 @@ public final class MobSpawnGroupHelper
      */
     public static List<WeightedMobSpawnGroup> getListFromMinecraftBiome(BiomeBase biome, EntityCategory type)
     {
-        @SuppressWarnings("unchecked")
         Collection<BiomeMeta> mobList = biome.getMobs(toEnumCreatureType(type));
         return fromMinecraftList(mobList);
     }
@@ -134,7 +137,7 @@ public final class MobSpawnGroupHelper
         List<BiomeMeta> biomeList = new ArrayList<BiomeMeta>();
         for (WeightedMobSpawnGroup mobGroup : weightedMobSpawnGroups)
         {
-            Class<? extends Entity> entityClass = toMinecraftClass(mobGroup.getInternalName());
+            Class<? extends EntityInsentient> entityClass = toMinecraftClass(mobGroup.getInternalName());
             if (entityClass != null)
             {
                 biomeList.add(new BiomeMeta(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
@@ -155,7 +158,7 @@ public final class MobSpawnGroupHelper
      * @param mobName The mob name.
      * @return The entity class, or null if not found.
      */
-    static Class<? extends Entity> toMinecraftClass(String mobName)
+    static Class<? extends EntityInsentient> toMinecraftClass(String mobName)
     {
         return NAME_TO_CLASS_MAP.get(mobName);
     }

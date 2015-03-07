@@ -4,7 +4,9 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R1.*;
+import net.minecraft.server.v1_8_R2.*;
+import net.minecraft.server.v1_8_R2.WorldGenStronghold.WorldGenStronghold2Start;
+import net.minecraft.server.v1_8_R2.WorldGenStrongholdPieces.WorldGenStrongholdStart;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,10 +95,9 @@ public class StrongholdGen extends StructureGenerator
     }
 
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    protected List y_()
+    protected List<BlockPosition> z_()
     {
-        ArrayList arraylist = new ArrayList();
+        ArrayList<BlockPosition> arraylist = new ArrayList<BlockPosition>();
         ChunkCoordIntPair[] achunkcoordintpair = this.structureCoords;
 
         for (ChunkCoordIntPair chunkcoordintpair : achunkcoordintpair)

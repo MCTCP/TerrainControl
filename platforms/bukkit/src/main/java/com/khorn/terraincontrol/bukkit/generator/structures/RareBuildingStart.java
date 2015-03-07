@@ -3,13 +3,15 @@ package com.khorn.terraincontrol.bukkit.generator.structures;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import net.minecraft.server.v1_8_R1.*;
+import net.minecraft.server.v1_8_R2.*;
+import net.minecraft.server.v1_8_R2.WorldGenRegistration.WorldGenJungleTemple;
+import net.minecraft.server.v1_8_R2.WorldGenRegistration.WorldGenPyramidPiece;
+import net.minecraft.server.v1_8_R2.WorldGenRegistration.WorldGenWitchHut;
 
 import java.util.Random;
 
 public class RareBuildingStart extends StructureStart
 {
-    @SuppressWarnings("unchecked")
     public RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
     {
         LocalWorld localWorld = WorldHelper.toLocalWorld(world);

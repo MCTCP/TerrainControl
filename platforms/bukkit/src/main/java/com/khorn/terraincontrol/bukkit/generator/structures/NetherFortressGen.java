@@ -4,7 +4,9 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R1.*;
+import net.minecraft.server.v1_8_R2.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_8_R2.*;
+import net.minecraft.server.v1_8_R2.WorldGenNether.WorldGenNetherStart;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,10 +4,10 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R1.StructureGenerator;
-import net.minecraft.server.v1_8_R1.StructureStart;
-import net.minecraft.server.v1_8_R1.World;
-import net.minecraft.server.v1_8_R1.WorldGenMineshaftStart;
+import net.minecraft.server.v1_8_R2.StructureGenerator;
+import net.minecraft.server.v1_8_R2.StructureStart;
+import net.minecraft.server.v1_8_R2.World;
+import net.minecraft.server.v1_8_R2.WorldGenMineshaftStart;
 
 import java.util.Random;
 
