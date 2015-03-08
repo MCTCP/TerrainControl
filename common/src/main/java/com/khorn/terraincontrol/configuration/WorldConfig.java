@@ -357,7 +357,7 @@ public class WorldConfig extends ConfigFile
 
         // Biome Groups
         readBiomeGroups();
-        
+
         // Specialized Biomes
         this.IsleBiomes = readSettings(WorldStandardValues.ISLE_BIOMES);
         this.BorderBiomes = readSettings(WorldStandardValues.BORDER_BIOMES);
@@ -479,19 +479,22 @@ public class WorldConfig extends ConfigFile
     private void createDefaultBiomeGroups()
     {
         BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL, 0, 97,
-                Arrays.asList("Forest", "Roofed Forest", "Extreme Hills", "Plains", "Birch Forest", "Swampland"));
+                Arrays.asList("Forest", "Roofed Forest", "Extreme Hills", "Plains",
+                        "Birch Forest", "Swampland", "Flower Forest", "Roofed Forest M",
+                        "Extreme Hills+", "Sunflower Plains", "Birch Forest M", "Swampland M"));
         this.biomeGroupManager.registerGroup(normalGroup);
 
         BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE, 3, 90,
-                Arrays.asList("Ice Plains", "Cold Taiga"));
+                Arrays.asList("Ice Plains", "Cold Taiga", "Ice Plains Spikes", "Cold Taiga M"));
         this.biomeGroupManager.registerGroup(iceGroup);
 
         BiomeGroup hotGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.HOT, 0, 97,
-                Arrays.asList("Desert", "Savanna", "Plains"));
+                Arrays.asList("Desert", "Savanna", "Plains", "Desert M", "Savanna M", "Sunflower Plains"));
         this.biomeGroupManager.registerGroup(hotGroup);
 
         BiomeGroup coldGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.COLD, 0, 97,
-                Arrays.asList("Forest", "Extreme Hills", "Taiga", "Plains"));
+                Arrays.asList("Forest", "Extreme Hills", "Taiga", "Plains",
+                        "Flower Forest", "Extreme Hills+", "Taiga M", "Sunflower Plains"));
         this.biomeGroupManager.registerGroup(coldGroup);
 
         BiomeGroup mesaGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.MESA, 1, 40,
@@ -499,11 +502,11 @@ public class WorldConfig extends ConfigFile
         this.biomeGroupManager.registerGroup(mesaGroup);
 
         BiomeGroup jungleGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.JUNGLE, 1, 40,
-                Arrays.asList("Jungle"));
+                Arrays.asList("Jungle", "Jungle M"));
         this.biomeGroupManager.registerGroup(jungleGroup);
 
         BiomeGroup megaTaigaGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.MEGA_TAIGA, 1, 40,
-                Arrays.asList("Mega Taiga"));
+                Arrays.asList("Mega Taiga", "Mega Spruce Taiga"));
         this.biomeGroupManager.registerGroup(megaTaigaGroup);
     }
 

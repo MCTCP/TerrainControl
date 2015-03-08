@@ -39,6 +39,13 @@ public class MinecraftBiomeTemplates
             this.defaultWaterCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.WATER_CREATURE);
             this.defaultAmbientCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.AMBIENT_CREATURE);
         }
+
+        protected void clearDefaultBorder()
+        {
+            this.defaultBorder.clear();
+            this.defaultNotBorderNear.clear();
+            this.defaultSizeWhenBorder = 8;
+        }
     }
 
     public static class Ocean extends MinecraftBiomeTemplate
@@ -124,7 +131,7 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
 
             this.defaultRarityWhenIsle = 96;
-            this.defaultIsle.add("Plains");
+            this.defaultIsle.add(DefaultBiome.PLAINS.Name);
             this.defaultGrass = 30;
             this.defaultColor = 0x056621;
             this.defaultTree = new Object[] {10, TreeType.Birch, 20, TreeType.Tree, 100};
@@ -144,6 +151,13 @@ public class MinecraftBiomeTemplates
             this.defaultGrass = 10;
             this.defaultColor = 0x0B6659;
             this.defaultTree = new Object[] {10, TreeType.Taiga1, 35, TreeType.Taiga2, 100};
+
+            // Place taiga on the border of Mega Taiga
+            this.defaultBorder.add(DefaultBiome.MEGA_TAIGA.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.MEGA_SPRUCE_TAIGA.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.MEGA_TAIGA_HILLS.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.MEGA_SPRUCE_TAIGA_HILLS.Name);
+            this.defaultSizeWhenBorder = 6;
         }
     }
 
@@ -332,8 +346,7 @@ public class MinecraftBiomeTemplates
             this.defaultRareBuildingType = RareBuildingType.desertPyramid;
 
             // Don't inherit border properties of the Desert biome
-            this.defaultBorder.clear();
-            this.defaultNotBorderNear.clear();
+            this.clearDefaultBorder();
         }
     }
 
@@ -356,6 +369,7 @@ public class MinecraftBiomeTemplates
         public TaigaHills(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
+            this.clearDefaultBorder();
 
             this.defaultSizeWhenIsle = 6;
             this.defaultRarityWhenIsle = 97;
@@ -491,6 +505,8 @@ public class MinecraftBiomeTemplates
         public ColdTaiga(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
+            this.clearDefaultBorder();
+
             this.defaultColor = 0x31554A;
             this.defaultRarity = 35;
         }
@@ -501,6 +517,7 @@ public class MinecraftBiomeTemplates
         public ColdTaigaHills(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
+
             this.defaultColor = 0x243F36;
             this.defaultSizeWhenIsle = 6;
             this.defaultRarityWhenIsle = 97;
@@ -643,8 +660,7 @@ public class MinecraftBiomeTemplates
             this.defaultRarity = 10;
 
             // Don't inherit border properties of the Desert biome
-            this.defaultBorder.clear();
-            this.defaultNotBorderNear.clear();
+            this.clearDefaultBorder();
         }
     }
 
@@ -687,6 +703,8 @@ public class MinecraftBiomeTemplates
         public TaigaMountains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
+            this.clearDefaultBorder();
+
             this.defaultColor = 0x0A5B4F;
             this.defaultRarity = 10;
         }
@@ -786,7 +804,7 @@ public class MinecraftBiomeTemplates
         public MegaSpruceTaiga(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            this.defaultColor = 0x598110;
+            this.defaultColor = 0x818E79;
             this.defaultRarity = 10;
             this.defaultTree = new Object[] {10, TreeType.HugeTaiga2, 8, TreeType.HugeTaiga1, 30, TreeType.Taiga1, 33, TreeType.Taiga2, 100};
         }
@@ -798,6 +816,8 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x475141;
+
+            this.defaultIsle.add(DefaultBiome.MEGA_SPRUCE_TAIGA.Name);
         }
     }
 
