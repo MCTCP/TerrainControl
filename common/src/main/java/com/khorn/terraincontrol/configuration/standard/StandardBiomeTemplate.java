@@ -52,6 +52,7 @@ public class StandardBiomeTemplate
     public int defaultMelons = 0;
     public int defaultWaterSand = 3;
     public int defaultWaterGravel = 1;
+    public int defaultSwampy = 0;
     public Object[] defaultWell; // Parameters for well resource
     public float defaultBiomeSurface = 0.1F;
     public float defaultBiomeVolatility = 0.3F;
@@ -247,6 +248,12 @@ public class StandardBiomeTemplate
         {
             resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.MELON_BLOCK, this.defaultMelons,
                     flowerDepositRarity, flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+        }
+
+        // Melons (need to be spawned before trees)
+        if (this.defaultSwampy > 0)
+        {
+            resources.add(Resource.createResource(config, SwampyGen.class, DefaultMaterial.WATER, DefaultMaterial.WATER_LILY, 62, DefaultMaterial.WATER, DefaultMaterial.STATIONARY_WATER));
         }
 
         // Trees

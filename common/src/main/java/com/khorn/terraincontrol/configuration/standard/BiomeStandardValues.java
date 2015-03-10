@@ -234,11 +234,11 @@ public class BiomeStandardValues extends Settings
 
     public static final int tulipDepositRarity = 25;
 
-    public static final int redMushroomDepositRarity = 50;
+    public static final int redMushroomDepositRarity = 12;
     public static final int redMushroomDepositMinAltitude = 0;
     public static final int redMushroomDepositMaxAltitude = 128;
 
-    public static final int brownMushroomDepositRarity = 50;
+    public static final int brownMushroomDepositRarity = 25;
     public static final int brownMushroomDepositMinAltitude = 0;
     public static final int brownMushroomDepositMaxAltitude = 128;
 
