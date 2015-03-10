@@ -253,7 +253,8 @@ public class StandardBiomeTemplate
         // Melons (need to be spawned before trees)
         if (this.defaultSwampy > 0)
         {
-            resources.add(Resource.createResource(config, SwampyGen.class, DefaultMaterial.WATER, DefaultMaterial.WATER_LILY, 62, DefaultMaterial.WATER, DefaultMaterial.STATIONARY_WATER));
+            resources.add(Resource.createResource(config, SwampyGen.class, DefaultMaterial.STATIONARY_WATER, DefaultMaterial.WATER_LILY,
+                    62, DefaultMaterial.GRASS));
         }
 
         // Trees

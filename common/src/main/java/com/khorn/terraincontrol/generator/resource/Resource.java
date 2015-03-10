@@ -22,10 +22,6 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     protected LocalMaterialData material;
     protected int frequency;
     protected double rarity;
-    /**
-     * Allows a resource to be uniformily be applied to every y value in a chunk
-     */
-    protected boolean uniformSpawn = false;
 
     @Override
     public Class<BiomeConfig> getHolderType()
@@ -34,12 +30,16 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     }
 
     /**
-     * Spawns the resource at this position, ignoring rarity and frequency.
-     * <p/>
+     * Spawns the resource on a specific column. This method is normally
+     * called by {@link #spawnInChunk(LocalWorld, Random, boolean,
+     * ChunkCoordinate)}, which calls it for random columns in the chunk
+     * based on the frequency and rarity of the resource..
+     *
+     * <p>
      * If you want chunk-control over the resource, override spawnInChunk
-     * instead, and leave this method blank.
-     * <p/>
+     * instead. In that case, you are allowed to leave this method blank.
      * @param world          The world.
+     * @param random         Random number generator based on the world seed.
      * @param villageInChunk Whether there is a village in the chunk.
      * @param x              The block x.
      * @param z              The block z.
@@ -47,10 +47,8 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     public abstract void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z);
 
     /**
-     * Spawns the resource normally. Can be cancelled by an event.
-     * <p/>
-     * If you want to override this, override spawnInChunk instead.
-     * <p/>
+     * Spawns the resource normally. Fires an event, which can be used to
+     * cancel spawning.
      * @param world          The world.
      * @param random         The random number generator.
      * @param villageInChunk Whether there is a village in the chunk.
@@ -58,7 +56,6 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
      */
     public final void process(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-
         // Don't process invalid resources OR Fire event
         if (!isValid() || !TerrainControl.fireResourceProcessEvent(this, world,
                 random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ()))
@@ -71,8 +68,11 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     }
 
     /**
-     * Called once per chunk, instead of once per attempt.
-     * <p/>
+     * Places the resource in a chunk. The default implementation simply calls
+     * {@link #spawn(LocalWorld, Random, boolean, int, int)} for random points
+     * in the chunk, based on the frequency and rarity. Subclasses can
+     * override this for more fine-tuned behaviour.
+     * 
      * @param world          The world.
      * @param random         The random number generator.
      * @param villageInChunk Whether there is a village in the chunk.
@@ -80,41 +80,25 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
      */
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        if (this.uniformSpawn == false)
+        int chunkX = chunkCoord.getBlockXCenter();
+        int chunkZ = chunkCoord.getBlockZCenter();
+        for (int t = 0; t < frequency; t++)
         {
-            int chunkX = chunkCoord.getBlockXCenter();
-            int chunkZ = chunkCoord.getBlockZCenter();
-            for (int t = 0; t < frequency; t++)
-            {
-                if (random.nextDouble() * 100.0 > rarity)
-                    continue;
-                int x = chunkX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-                int z = chunkZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-                spawn(world, random, false, x, z);
-            }
-        } else {
-            int chunkX = chunkCoord.getBlockX();
-            int chunkZ = chunkCoord.getBlockZ();
-            for (int z0 = 0; z0 < ChunkCoordinate.CHUNK_Z_SIZE; z0++)
-            {
-                for (int x0 = 0; x0 < ChunkCoordinate.CHUNK_X_SIZE; x0++)
-                {
-                    int x = chunkX + x0;
-                    int z = chunkZ + z0;
-                    spawn(world, random, false, x, z);
-                }
-            }
+            if (random.nextDouble() * 100.0 > rarity)
+                continue;
+            int x = chunkX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+            int z = chunkZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+            spawn(world, random, false, x, z);
         }
     }
 
     /**
-     * Convenience method for creating a resource. Used to create the
-     * default resources.
-     * <p/>
-     * @param config
-     * @param clazz
-     * @param args
-     * <p/>
+     * Convenience method for creating a resource. Used to create the default
+     * resources.
+     * @param config Biome config the resource will be in.
+     * @param clazz  Class of the resource.
+     * @param args   Parameters for the resource. The result of toString() of
+     *               each arg will be passed to the resource.
      * @return A resource based on the given parameters.
      */
     public static Resource createResource(BiomeConfig config, Class<? extends Resource> clazz, Object... args)
@@ -143,7 +127,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
         {
             TerrainControl.log(LogMarker.FATAL, "Invalid default resource! Please report! {}: {}", new Object[]
             {
-                clazz.getName(), e.getMessage()
+                    clazz.getName(), e.getMessage()
             });
             TerrainControl.printStackTrace(LogMarker.FATAL, e);
             throw new RuntimeException(e);
@@ -169,8 +153,8 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     }
 
     /**
-     * Returns the material. Resources that don't have a material will return null.
-     * <p/>
+     * Returns the material. Resources that don't have a material will return
+     * null.
      * @return The material of the resource this object represents.
      */
     public LocalMaterialData getMaterial()
@@ -180,8 +164,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
 
     /**
      * Returns whether or not the two resources are property-wise equal.
-     * <p/>
-     * @return
+     * @return {@inheritDoc}
      */
     @Override
     public boolean equals(Object other)
@@ -204,18 +187,18 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
         }
 
         return this.material.equals(compare.material)
-               && this.frequency == compare.frequency
-               && this.rarity == compare.rarity;
+                && this.frequency == compare.frequency
+                && this.rarity == compare.rarity;
     }
 
     @Override
     public int hashCode()
     {
         int hash = 5;
-        hash = 53 * hash + (this.material == null? 0 : material.hashCode());
+        hash = 53 * hash + (this.material == null ? 0 : material.hashCode());
         hash = 53 * hash + this.frequency;
         hash = 53 * hash + (int) (Double.doubleToLongBits(this.rarity) ^ (Double.doubleToLongBits(this.rarity) >>> 32));
         return hash;
     }
-    
+
 }

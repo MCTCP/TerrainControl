@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorOldOctaves;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
 
 import java.util.List;
@@ -15,10 +16,11 @@ public class SwampyGen extends Resource
     /**
      * To get swampy swamps, we need our own noise generator here
      */
-    private NoiseGeneratorOldOctaves noise;
+    private NoiseGeneratorOldOctaves noiseGen;
     private Random random;
-    protected LocalMaterialData material2;
-    private MaterialSet materialcheck;
+    protected LocalMaterialData decorationAboveReplacements;
+    private MaterialSet sourceBlocks;
+    private int spawnY;
 
     @Override
     public void load(List<String> args) throws InvalidConfigException
@@ -26,33 +28,47 @@ public class SwampyGen extends Resource
         assureSize(4, args);
 
         material = readMaterial(args.get(0));
-        material2 = readMaterial(args.get(1));
-        frequency = readInt(args.get(2), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        materialcheck = readMaterials(args,3);
-        //  Statics
-        uniformSpawn = true;
+        decorationAboveReplacements = readMaterial(args.get(1));
+        spawnY = readInt(args.get(2), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        sourceBlocks = readMaterials(args, 3);
         random = new Random(2345L);
-        noise = new NoiseGeneratorOldOctaves(random, 1);
+        noiseGen = new NoiseGeneratorOldOctaves(random, 1);
+    }
+
+    @Override
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    {
+        int chunkX = chunkCoord.getBlockXCenter();
+        int chunkZ = chunkCoord.getBlockZCenter();
+        for (int z0 = 0; z0 < ChunkCoordinate.CHUNK_Z_SIZE; z0++)
+        {
+            for (int x0 = 0; x0 < ChunkCoordinate.CHUNK_X_SIZE; x0++)
+            {
+                int x = chunkX + x0;
+                int z = chunkZ + z0;
+                spawn(world, random, false, x, z);
+            }
+        }
     }
 
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
         int y = world.getHighestBlockYAt(x, z) - 1;
-        if (y != frequency)
+        if (y != spawnY)
             return;
 
-        double yNoise = noise.getYNoise((double) x * 0.25D, (double) z * 0.25D);
+        double yNoise = noiseGen.getYNoise((double) x * 0.25D, (double) z * 0.25D);
         if (yNoise > 0.0D)
         {
             LocalMaterialData materialAtLocation = world.getMaterial(x, y, z);
-            if (!materialcheck.contains(materialAtLocation))
+            if (sourceBlocks.contains(materialAtLocation))
             {
                 world.setBlock(x, y, z, material);
 
                 if (yNoise < 0.12D)
                 {
-                    world.setBlock(x, y + 1, z, material2);
+                    world.setBlock(x, y + 1, z, decorationAboveReplacements);
                 }
             }
         }
@@ -61,7 +77,7 @@ public class SwampyGen extends Resource
     @Override
     public String makeString()
     {
-        return "Swampy(" + material + "," + material2 + "," + frequency + "," + materialcheck.toString() + ")";
+        return "Swampy(" + material + "," + decorationAboveReplacements + "," + spawnY + "," + sourceBlocks + ")";
     }
 
 }
