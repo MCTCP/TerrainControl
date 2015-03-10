@@ -7,17 +7,17 @@ import java.util.Random;
 public class NoiseGeneratorPerlinOctaves
 {
 
-    private NoiseGeneratorPerlin[] a;
-    private int b;
+    private NoiseGeneratorPerlin[] noiseArray;
+    private int numOctaves;
 
-    public NoiseGeneratorPerlinOctaves(Random random, int i)
+    public NoiseGeneratorPerlinOctaves(Random random, int numOctaves)
     {
-        this.b = i;
-        this.a = new NoiseGeneratorPerlin[i];
+        this.numOctaves = numOctaves;
+        this.noiseArray = new NoiseGeneratorPerlin[numOctaves];
 
-        for (int j = 0; j < i; ++j)
+        for (int j = 0; j < numOctaves; ++j)
         {
-            this.a[j] = new NoiseGeneratorPerlin(random);
+            this.noiseArray[j] = new NoiseGeneratorPerlin(random);
         }
     }
 
@@ -36,7 +36,7 @@ public class NoiseGeneratorPerlinOctaves
 
         double d3 = 1.0D;
 
-        for (int l1 = 0; l1 < this.b; ++l1)
+        for (int l1 = 0; l1 < this.numOctaves; ++l1)
         {
             double d4 = (double) xOffset * d3 * xScale;
             double d5 = (double) yOffset * d3 * yScale;
@@ -50,7 +50,7 @@ public class NoiseGeneratorPerlinOctaves
             j2 %= 16777216L;
             d4 += (double) i2;
             d6 += (double) j2;
-            this.a[l1].populateNoiseArray3D(doubleArray, d4, d5, d6, xSize, ySize, zSize, xScale * d3, yScale * d3, zScale * d3, d3);
+            this.noiseArray[l1].populateNoiseArray3D(doubleArray, d4, d5, d6, xSize, ySize, zSize, xScale * d3, yScale * d3, zScale * d3, d3);
             d3 /= 2.0D;
         }
 
@@ -75,7 +75,7 @@ public class NoiseGeneratorPerlinOctaves
 
         double d3 = 1.0D;
 
-        for (int l1 = 0; l1 < this.b; ++l1)
+        for (int l1 = 0; l1 < this.numOctaves; ++l1)
         {
             double d4 = (double) xOffset * d3 * xScale;
             double d6 = (double) zOffset * d3 * zScale;
@@ -88,7 +88,7 @@ public class NoiseGeneratorPerlinOctaves
             j2 %= 16777216L;
             d4 += (double) i2;
             d6 += (double) j2;
-            this.a[l1].populateNoiseArray2D(doubleArray, d4, d6, xSize, zSize, xScale * d3, zScale * d3, d3);
+            this.noiseArray[l1].populateNoiseArray2D(doubleArray, d4, d6, xSize, zSize, xScale * d3, zScale * d3, d3);
             d3 /= 2.0D;
         }
 
