@@ -35,6 +35,7 @@ public class ConfigFunctionsManager
         registerConfigFunction("Reed", ReedGen.class);
         registerConfigFunction("Sapling", SaplingGen.class);
         registerConfigFunction("SmallLake", SmallLakeGen.class);
+        registerConfigFunction("Swampy", SwampyGen.class);
         registerConfigFunction("Tree", TreeGen.class);
         registerConfigFunction("UndergroundLake", UndergroundLakeGen.class);
         registerConfigFunction("UnderWaterOre", UnderWaterOreGen.class);

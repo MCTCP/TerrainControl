@@ -22,6 +22,10 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
     protected LocalMaterialData material;
     protected int frequency;
     protected double rarity;
+    /**
+     * Allows a resource to be uniformily be applied to every y value in a chunk
+     */
+    protected boolean uniformSpawn = false;
 
     @Override
     public Class<BiomeConfig> getHolderType()
@@ -76,13 +80,30 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
      */
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        for (int t = 0; t < frequency; t++)
+        if (this.uniformSpawn == false)
         {
-            if (random.nextDouble() * 100.0 > rarity)
-                continue;
-            int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-            int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-            spawn(world, random, false, x, z);
+            int chunkX = chunkCoord.getBlockXCenter();
+            int chunkZ = chunkCoord.getBlockZCenter();
+            for (int t = 0; t < frequency; t++)
+            {
+                if (random.nextDouble() * 100.0 > rarity)
+                    continue;
+                int x = chunkX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+                int z = chunkZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+                spawn(world, random, false, x, z);
+            }
+        } else {
+            int chunkX = chunkCoord.getBlockX();
+            int chunkZ = chunkCoord.getBlockZ();
+            for (int z0 = 0; z0 < ChunkCoordinate.CHUNK_Z_SIZE; z0++)
+            {
+                for (int x0 = 0; x0 < ChunkCoordinate.CHUNK_X_SIZE; x0++)
+                {
+                    int x = chunkX + x0;
+                    int z = chunkZ + z0;
+                    spawn(world, random, false, x, z);
+                }
+            }
         }
     }
 
