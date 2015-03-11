@@ -173,7 +173,7 @@ public class MinecraftBiomeTemplates
             this.defaultWaterSand = 0;
             this.defaultWaterGravel = 0;
             this.defaultWaterLily = 4;
-            this.defaultSwampy = 1;
+            this.defaultSwampPatches = 1;
             this.defaultDandelions = 0;
             this.defaultBlueOrchids = 2;
             this.defaultColor = 0x07F9B2;

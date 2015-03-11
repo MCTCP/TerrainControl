@@ -679,6 +679,7 @@ public class BiomeConfig extends ConfigFile
         writer.comment("UnderWaterOre(BlockName,Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");
         writer.comment("CustomObject(Object[,AnotherObject[,...]])");
         writer.comment("CustomStructure([Object,Object_Chance[,AnotherObject,Object_Chance[,...]]])");
+        writer.comment("SurfacePatch(BlockName,DecorationBlockName,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....]");
         writer.comment("Tree(Frequency,TreeType,TreeTypeChance[,AdditionalTreeType,AdditionalTreeTypeChance.....])");
         writer.comment("Plant(PlantType,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])");
         writer.comment("Grass(PlantType,Grouped/NotGrouped,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])");

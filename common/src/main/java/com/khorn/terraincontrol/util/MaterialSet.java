@@ -17,9 +17,23 @@ import java.util.Set;
  */
 public class MaterialSet
 {
-    private static String ALL_MATERIALS = "All";
-    private static String SOLID_MATERIALS = "Solid";
-    private static String NON_SOLID_MATERIALS = "NonSolid";
+    /**
+     * Keyword that adds all materials to the set when used in
+     * {@link #parseAndAdd(String)}.
+     */
+    public static final String ALL_MATERIALS = "All";
+
+    /**
+     * Keyword that adds all solid materials to the set when used in
+     * {@link #parseAndAdd(String)}.
+     */
+    public static final String SOLID_MATERIALS = "Solid";
+
+    /**
+     * Keyword that adds all non solid materials to the set when used in
+     * {@link #parseAndAdd(String)}.
+     */
+    public static final String NON_SOLID_MATERIALS = "NonSolid";
 
     private boolean allMaterials = false;
     private boolean allSolidMaterials = false;
@@ -70,6 +84,53 @@ public class MaterialSet
 
         // Add to set
         add(new MaterialSetEntry(material, checkIncludesBlockData));
+    }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (allMaterials ? 1231 : 1237);
+        result = prime * result + (allNonSolidMaterials ? 1231 : 1237);
+        result = prime * result + (allSolidMaterials ? 1231 : 1237);
+        result = prime * result + materials.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        MaterialSet other = (MaterialSet) obj;
+        if (allMaterials != other.allMaterials)
+        {
+            return false;
+        }
+        if (allNonSolidMaterials != other.allNonSolidMaterials)
+        {
+            return false;
+        }
+        if (allSolidMaterials != other.allSolidMaterials)
+        {
+            return false;
+        }
+        if (!materials.equals(other.materials))
+        {
+            return false;
+        }
+        return true;
     }
 
     /**

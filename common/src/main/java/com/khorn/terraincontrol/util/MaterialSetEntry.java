@@ -29,7 +29,7 @@ public class MaterialSetEntry
      * {@link LocalMaterialData#hashCode()} or
      * {@link LocalMaterialData#hashCodeWithoutBlockData()}. This means that
      * the hashCode is unique.
-     * 
+     *
      * @return The unique hashCode.
      */
     @Override

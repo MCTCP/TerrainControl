@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.resource.IceSpikeGen.SpikeType;
+import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
@@ -52,7 +53,7 @@ public class StandardBiomeTemplate
     public int defaultMelons = 0;
     public int defaultWaterSand = 3;
     public int defaultWaterGravel = 1;
-    public int defaultSwampy = 0;
+    public int defaultSwampPatches = 0;
     public Object[] defaultWell; // Parameters for well resource
     public float defaultBiomeSurface = 0.1F;
     public float defaultBiomeVolatility = 0.3F;
@@ -251,10 +252,10 @@ public class StandardBiomeTemplate
         }
 
         // Melons (need to be spawned before trees)
-        if (this.defaultSwampy > 0)
+        if (this.defaultSwampPatches > 0)
         {
-            resources.add(Resource.createResource(config, SwampyGen.class, DefaultMaterial.STATIONARY_WATER, DefaultMaterial.WATER_LILY,
-                    62, DefaultMaterial.GRASS));
+            resources.add(Resource.createResource(config, SurfacePatchGen.class, DefaultMaterial.STATIONARY_WATER, DefaultMaterial.WATER_LILY,
+                    62, 62, MaterialSet.SOLID_MATERIALS));
         }
 
         // Trees
