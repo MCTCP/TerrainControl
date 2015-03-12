@@ -4,12 +4,10 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.bukkit.events.TCListener;
 import com.khorn.terraincontrol.bukkit.generator.BukkitVanillaBiomeGenerator;
-import com.khorn.terraincontrol.bukkit.generator.TCBlockPopulator;
 import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
 import com.khorn.terraincontrol.bukkit.generator.structures.RareBuildingStart;
 import com.khorn.terraincontrol.bukkit.generator.structures.VillageStart;
 import com.khorn.terraincontrol.bukkit.metrics.BukkitMetricsHelper;
-import com.khorn.terraincontrol.configuration.WorldConfig.TerrainMode;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
@@ -121,7 +119,7 @@ public class TCPlugin extends JavaPlugin
         if (worldName.isEmpty())
         {
             TerrainControl.log(LogMarker.DEBUG, "Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
-            return new TCChunkGenerator();
+            return new TCChunkGenerator(this);
         }
 
         // Check if not already enabled
@@ -158,7 +156,7 @@ public class TCPlugin extends JavaPlugin
             case TerrainTest:
             case OldGenerator:
             case NotGenerate:
-                generator = new TCChunkGenerator();
+                generator = new TCChunkGenerator(this);
                 break;
             case Default:
                 break;
@@ -190,19 +188,9 @@ public class TCPlugin extends JavaPlugin
             // Enable and register the world
             bukkitWorld.enable(world);
             this.worlds.put(world.getName(), bukkitWorld);
-            addPopulator(world, bukkitWorld);
 
             // Show message
             TerrainControl.log(LogMarker.INFO, "World {} is now enabled!", (Object) bukkitWorld.getName());
-        }
-    }
-
-    private void addPopulator(World world, BukkitWorld bukkitWorld)
-    {
-        TerrainMode terrainMode = bukkitWorld.getConfigs().getWorldConfig().ModeTerrain;
-        if (terrainMode != TerrainMode.TerrainTest && terrainMode != TerrainMode.NotGenerate)
-        {
-            world.getPopulators().add(new TCBlockPopulator(bukkitWorld));
         }
     }
 

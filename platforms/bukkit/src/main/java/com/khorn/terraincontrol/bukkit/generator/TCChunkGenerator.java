@@ -1,21 +1,45 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
-import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
+import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class TCChunkGenerator extends ChunkGenerator
 {
     private ChunkProviderTC chunkProviderTC;
+    private ArrayList<BlockPopulator> BlockPopulator = new ArrayList<BlockPopulator>();
     private boolean NotGenerate = false;
-    private boolean initialized = false;
+    private TCPlugin plugin;
+
+    public TCChunkGenerator(TCPlugin _plugin)
+    {
+        this.plugin = _plugin;
+    }
+
+    /**
+     * Initializes the world if it hasn't already been initialized.
+     * 
+     * @param world
+     *            The world of this generator.
+     */
+    private void makeSureWorldIsInitialized(World world)
+    {
+        if (this.chunkProviderTC == null)
+        {
+            // Not yet initialized, do it now
+            this.plugin.onWorldInit(world);
+        }
+    }
 
     /**
      * Called whenever a BukkitWorld instance becomes available.
@@ -25,21 +49,30 @@ public class TCChunkGenerator extends ChunkGenerator
      */
     public void onInitialize(BukkitWorld _world)
     {
-        Preconditions.checkState(!this.initialized, "Already initialized");
-
         this.chunkProviderTC = new ChunkProviderTC(_world.getConfigs(), _world);
 
         WorldConfig.TerrainMode mode = _world.getConfigs().getWorldConfig().ModeTerrain;
 
+        if (mode == WorldConfig.TerrainMode.Normal || mode == WorldConfig.TerrainMode.OldGenerator)
+            this.BlockPopulator.add(new TCBlockPopulator(_world));
+
         if (mode == WorldConfig.TerrainMode.NotGenerate)
             this.NotGenerate = true;
+    }
 
-        this.initialized = true;
+    @Override
+    public List<BlockPopulator> getDefaultPopulators(World world)
+    {
+        makeSureWorldIsInitialized(world);
+
+        return this.BlockPopulator;
     }
 
     @Override
     public boolean canSpawn(World world, int x, int z)
     {
+        makeSureWorldIsInitialized(world);
+
         Material material = world.getHighestBlockAt(x, z).getType();
         return material.isSolid();
     }
@@ -47,6 +80,8 @@ public class TCChunkGenerator extends ChunkGenerator
     @Override
     public short[][] generateExtBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes)
     {
+        makeSureWorldIsInitialized(world);
+
         if (this.NotGenerate)
             return new short[16][];
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
