@@ -1,16 +1,14 @@
 package com.khorn.terraincontrol.forge;
 
-import com.khorn.terraincontrol.LocalMaterialData;
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.util.helpers.BlockHelper;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.util.helpers.BlockHelper;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
@@ -18,12 +16,6 @@ import java.util.Map;
  */
 public class ForgeMaterialData implements LocalMaterialData
 {
-    /**
-     * Caches all unique blocks with their BukkitMaterialData equivalent. If
-     * uncached you'll easily see more than 50000 BukkitMaterialData instances
-     * in memory.
-     */
-    private static final Map<IBlockState, ForgeMaterialData> CACHE = new HashMap<IBlockState, ForgeMaterialData>();
 
     /**
      * Gets a {@code BukkitMaterialData} of the given id and data.
@@ -67,17 +59,7 @@ public class ForgeMaterialData implements LocalMaterialData
      */
     public static ForgeMaterialData ofMinecraftBlockState(IBlockState blockData)
     {
-        ForgeMaterialData cached = CACHE.get(blockData);
-        if (cached != null)
-        {
-            // Found cache entry
-            return cached;
-        }
-
-        // Create cache entry
-        ForgeMaterialData newObject = new ForgeMaterialData(blockData);
-        CACHE.put(blockData, newObject);
-        return newObject;
+        return new ForgeMaterialData(blockData);
     }
 
     private final IBlockState blockData;

@@ -9,21 +9,12 @@ import net.minecraft.server.v1_8_R2.BlockFalling;
 import net.minecraft.server.v1_8_R2.Blocks;
 import net.minecraft.server.v1_8_R2.IBlockData;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
  * 
  */
 public class BukkitMaterialData implements LocalMaterialData
 {
-    /**
-     * Caches all unique blocks with their BukkitMaterialData equivalent. If
-     * uncached you'll easily see more than 50000 BukkitMaterialData instances
-     * in memory.
-     */
-    private static final Map<IBlockData, BukkitMaterialData> CACHE = new HashMap<IBlockData, BukkitMaterialData>();
 
     /**
      * Gets a {@code BukkitMaterialData} of the given id and data.
@@ -67,17 +58,7 @@ public class BukkitMaterialData implements LocalMaterialData
      */
     public static BukkitMaterialData ofMinecraftBlockData(IBlockData blockData)
     {
-        BukkitMaterialData cached = CACHE.get(blockData);
-        if (cached != null)
-        {
-            // Found cache entry
-            return cached;
-        }
-
-        // Create cache entry
-        BukkitMaterialData newObject = new BukkitMaterialData(blockData);
-        CACHE.put(blockData, newObject);
-        return newObject;
+        return new BukkitMaterialData(blockData);
     }
 
     private final IBlockData blockData;
