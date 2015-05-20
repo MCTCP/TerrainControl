@@ -5,10 +5,10 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
-import net.minecraft.server.v1_8_R2.*;
-import net.minecraft.server.v1_8_R2.WorldGenVillagePieces.WorldGenVillagePieceWeight;
-import net.minecraft.server.v1_8_R2.WorldGenVillagePieces.WorldGenVillageRoadPiece;
-import net.minecraft.server.v1_8_R2.WorldGenVillagePieces.WorldGenVillageStartPiece;
+import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_8_R3.WorldGenVillagePieces.WorldGenVillagePieceWeight;
+import net.minecraft.server.v1_8_R3.WorldGenVillagePieces.WorldGenVillageRoadPiece;
+import net.minecraft.server.v1_8_R3.WorldGenVillagePieces.WorldGenVillageStartPiece;
 
 import java.util.List;
 import java.util.Random;

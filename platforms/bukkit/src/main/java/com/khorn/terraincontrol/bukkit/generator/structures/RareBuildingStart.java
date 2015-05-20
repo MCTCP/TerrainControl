@@ -3,10 +3,10 @@ package com.khorn.terraincontrol.bukkit.generator.structures;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import net.minecraft.server.v1_8_R2.*;
-import net.minecraft.server.v1_8_R2.WorldGenRegistration.WorldGenJungleTemple;
-import net.minecraft.server.v1_8_R2.WorldGenRegistration.WorldGenPyramidPiece;
-import net.minecraft.server.v1_8_R2.WorldGenRegistration.WorldGenWitchHut;
+import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_8_R3.WorldGenRegistration.WorldGenJungleTemple;
+import net.minecraft.server.v1_8_R3.WorldGenRegistration.WorldGenPyramidPiece;
+import net.minecraft.server.v1_8_R3.WorldGenRegistration.WorldGenWitchHut;
 
 import java.util.Random;
 

@@ -4,9 +4,9 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R2.*;
-import net.minecraft.server.v1_8_R2.WorldGenStronghold.WorldGenStronghold2Start;
-import net.minecraft.server.v1_8_R2.WorldGenStrongholdPieces.WorldGenStrongholdStart;
+import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_8_R3.WorldGenStronghold.WorldGenStronghold2Start;
+import net.minecraft.server.v1_8_R3.WorldGenStrongholdPieces.WorldGenStrongholdStart;
 
 import java.util.ArrayList;
 import java.util.Collections;

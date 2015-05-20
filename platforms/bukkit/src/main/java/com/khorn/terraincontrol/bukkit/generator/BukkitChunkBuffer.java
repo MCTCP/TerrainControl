@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.bukkit.BukkitMaterialData;
 import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
-import net.minecraft.server.v1_8_R2.Blocks;
+import net.minecraft.server.v1_8_R3.Blocks;
 
 class BukkitChunkBuffer implements ChunkBuffer
 {

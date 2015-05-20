@@ -4,8 +4,8 @@ import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import net.minecraft.server.v1_8_R2.BiomeBase;
-import net.minecraft.server.v1_8_R2.BlockPosition;
+import net.minecraft.server.v1_8_R3.BiomeBase;
+import net.minecraft.server.v1_8_R3.BlockPosition;
 
 /**
  * The BukkitBiome is basically a wrapper for the BiomeBase. If you look at

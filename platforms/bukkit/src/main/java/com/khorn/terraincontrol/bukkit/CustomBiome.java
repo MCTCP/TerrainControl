@@ -6,9 +6,9 @@ import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_8_R2.BiomeBase;
+import net.minecraft.server.v1_8_R3.BiomeBase;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_8_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
 
 import java.lang.reflect.Field;
 import java.util.List;
