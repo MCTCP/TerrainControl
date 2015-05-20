@@ -56,6 +56,7 @@ public abstract class Setting<T>
      *
      * <p>The default implementation simply calls <code>String.valueOf(value)
      * </code>, but more sophisticated approaches can be made.
+     * @param value The setting.
      * @return The value.
      */
     public String write(T value)

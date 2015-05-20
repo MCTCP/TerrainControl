@@ -22,7 +22,8 @@ public interface StructuredCustomObject extends CustomObject
     /**
      * Returns a list of all branches in this object. Null is not a valid
      * return value, return an empty list instead.
-     * 
+     *
+     * @param rotation The rotation for the branches.
      * @return A list of all branches in this object.
      */
     public Branch[] getBranches(Rotation rotation);
@@ -30,7 +31,8 @@ public interface StructuredCustomObject extends CustomObject
     /**
      * Create a coordinate for this at a random position in the chunk.
      * Should respect it's own rarity setting. Can return null.
-     * 
+     *
+     * @param random Random number generator based on the world seed.
      * @param chunkX The chunk x.
      * @param chunkZ The chunk z.
      * @return The CustomObjectCoordinate

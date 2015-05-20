@@ -181,9 +181,9 @@ public class WorldConfig extends ConfigFile
      * Creates a WorldConfig from the WorldConfig.ini file found in the given
      * directory.
      * 
-     * @param settingsDir The settings directory where the WorldConfig.ini is
-     *            in.
-     * @param world The LocalWorld instance of the world.
+     * @param settingsReader The raw settings of the WorldConfig.
+     * @param world          The LocalWorld instance of the world.
+     * @param customObjects  The customs objects of the world.
      */
     public WorldConfig(SettingsReader settingsReader, LocalWorld world,
             CustomObjectCollection customObjects)

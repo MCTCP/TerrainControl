@@ -25,8 +25,8 @@ public final class LayerFactory
 
     /**
      * Creates a pair of layers for use with the normal biome mode.
-     * @param world
-     * @return
+     * @param world World to create layers for.
+     * @return The pair of layers.
      */
     public static Layer[] createNormal(LocalWorld world)
     {

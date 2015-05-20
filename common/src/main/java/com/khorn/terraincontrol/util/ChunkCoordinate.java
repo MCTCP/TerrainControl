@@ -195,7 +195,7 @@ public class ChunkCoordinate
     /**
      * Gets whether this chunk is responsible for populating the given block.
      * Calling this method is equivalent to calling
-     * {@code equals(ChunkCoordinate.{@link #getPopulatingChunk(int, int) getPopulatingChunk}(blockX,blockZ))}, but
+     * <code>equals(ChunkCoordinate.{@link #getPopulatingChunk(int, int) getPopulatingChunk}(blockX,blockZ))</code>, but
      * this method saves you from creating one unnecessary object.
      * @param blockX X position of the block.
      * @param blockZ Z position of the block.

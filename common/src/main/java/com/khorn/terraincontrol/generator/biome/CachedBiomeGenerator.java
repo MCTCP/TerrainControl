@@ -122,6 +122,8 @@ class CachedBiomeGenerator extends BiomeGenerator
 
     /**
      * Returns a biome cache block at location specified.
+     * @param chunkCoord The chunk to get the cache entry for.
+     * @return The biome cache block.
      */
     private CachedBiomeGenerator.Block getBiomeCacheBlock(ChunkCoordinate chunkCoord)
     {
@@ -170,6 +172,8 @@ class CachedBiomeGenerator extends BiomeGenerator
     /**
      * Returns the array of cached biome types in the BiomeCacheBlock at the
      * given location.
+     * @param chunkCoord The chunk to get cached biomes for.
+     * @return The biomes.
      */
     public int[] getCachedBiomes(ChunkCoordinate chunkCoord)
     {

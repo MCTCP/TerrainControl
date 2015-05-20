@@ -24,10 +24,11 @@ public interface SettingsReader
 
     /**
      * Adds a ConfigFunction to this reader, so that it can be read back
-     * using {@link #getConfigFunctions(Object)}. If this reader doesn't
+     * using {@link #getConfigFunctions(Object, boolean)}. If this reader doesn't
      * support ConfigFunctions, this method does nothing.
      *
-     * @param <T> The type of the function. Must match the type used in {@link #getConfigFunctions(Object)}.
+     * @param <T>      The type of the function. Must match the type used in
+     *                 {@link #getConfigFunctions(Object, boolean)}.
      * @param function The function to add.
      */
     <T> void addConfigFunction(ConfigFunction<T> function);
@@ -74,6 +75,8 @@ public interface SettingsReader
      * <p>Implementations are allowed to return an empty collection, even
      * when there are settings present. Note that legacy config files may not
      * get parsed correctly then.
+     *
+     * @return The raw settings.
      */
     Iterable<Entry<String, String>> getRawSettings();
 

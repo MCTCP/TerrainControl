@@ -374,8 +374,7 @@ public class BiomeConfig extends ConfigFile
      * Merges two sets of resources. The child set will override any element
      * of the parent that it can.
      *
-     * @param parent
-     * @param child
+     * @param parent The parent biome config.
      */
     public void merge(BiomeConfig parent)
     {

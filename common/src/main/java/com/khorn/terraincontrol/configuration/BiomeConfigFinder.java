@@ -30,7 +30,6 @@ public class BiomeConfigFinder
      *            configs.
      * @param preferredBiomeFileExtension Biome files that do not exist yet
      *            are created with this extension.
-     * @param biomeConfigsStore Stores all biome configs.
      */
     public BiomeConfigFinder(WorldConfig worldConfig, String preferredBiomeFileExtension)
     {
@@ -44,6 +43,8 @@ public class BiomeConfigFinder
      * 
      * @param directories The directories to search in.
      * @param biomesToLoad The biomes to load.
+     *
+     * @return The biome configs.
      */
     public Map<String, BiomeConfig> loadBiomesFromDirectories(Collection<File> directories, Collection<BiomeLoadInstruction> biomesToLoad)
     {

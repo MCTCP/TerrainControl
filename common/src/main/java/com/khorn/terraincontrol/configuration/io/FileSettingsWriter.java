@@ -17,7 +17,7 @@ public class FileSettingsWriter implements SettingsWriter
     /**
      * Writes this configuration settings to a file. It will use the file
      * returned by {@link ConfigFile#getFile()}. If writing fails, the error
-     * is logged using {@link ConfigFile#logIOError(IOException)}.
+     * is logged.
      *
      * @param config     The configuration to write to disk.
      * @param configMode The configuration mode. If this is set to
@@ -30,7 +30,7 @@ public class FileSettingsWriter implements SettingsWriter
 
     /**
      * Writes the configuration settings to the given file. If writing fails,
-     * the error is logged using {@link ConfigFile#logIOError(IOException)}.
+     * the error is logged.
      *
      * @param config     The configuration to write to disk.
      * @param file       The file to write to.

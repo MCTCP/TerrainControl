@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.generator.biome;
 
-@SuppressWarnings("rawtypes")
 public class ArraysCacheManager
 {
 

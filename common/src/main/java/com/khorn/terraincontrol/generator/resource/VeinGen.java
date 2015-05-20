@@ -77,7 +77,7 @@ public class VeinGen extends Resource
 
     /**
      * Returns the vein that starts in the chunk.
-     * <p/>
+     * @param world  The world to spawn in.
      * @param chunkX The x of the chunk.
      * @param chunkZ The z of the chunk.
      * @return The vein that starts in the chunk, or null if there is no

@@ -65,7 +65,6 @@ public enum Rotation
 
     /**
      * Returns the next rotation. NORTH -> WEST -> SOUTH -> EAST
-     * @param rotation The previous rotation.
      * @return The next rotation.
      */
     public Rotation next()

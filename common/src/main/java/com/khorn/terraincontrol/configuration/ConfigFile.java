@@ -33,7 +33,7 @@ public abstract class ConfigFile
      *               like Plains or MyBO3. May not be null.
      * @param reader Settings reader
      */
-    protected ConfigFile(SettingsReader reader) throws IllegalArgumentException
+    protected ConfigFile(SettingsReader reader)
     {
         this.reader = reader;
         this.isNewConfig = reader.isNewConfig();

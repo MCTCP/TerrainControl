@@ -59,8 +59,9 @@ public class BO3Config extends ConfigFile
     /**
      * Creates a BO3Config from a file.
      *
-     * @param name The name of the BO3 without the extension.
-     * @param file The file of the BO3.
+     * @param reader                  The settings of the BO3.
+     * @param otherObjectsInDirectory Other objects in the directory, for
+     *                                referencing them.
      */
     public BO3Config(SettingsReader reader, Map<String, CustomObject> otherObjectsInDirectory)
     {

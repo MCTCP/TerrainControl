@@ -54,10 +54,12 @@ public interface CustomObject
     /**
      * Spawns the object at the given position. It shouldn't execute any checks.
      *
-     * @param world
-     * @param x
-     * @param y
-     * @param z
+     * @param world    World to spawn in.
+     * @param random   Random number generator based on the world seed.
+     * @param rotation Rotation to spawn the object in.
+     * @param x        X coord of the object origin.
+     * @param y        Y coord of the object origin.
+     * @param z        Z coord of the object origin.
      * @return Whether the attempt was successful. (It should never fail, but you never know.)
      */
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);
@@ -66,10 +68,11 @@ public interface CustomObject
      * Returns whether the location would theoretically allow the object to
      * spawn there. Frequency/rarity is ignored.
      *
-     * @param world The world to check.
-     * @param x     X coord of the object origin.
-     * @param y     Y coord of the object origin.
-     * @param z     Z coord of the object origin.
+     * @param world    The world to check.
+     * @param rotation Rotation to spawn the object in.
+     * @param x        X coord of the object origin.
+     * @param y        Y coord of the object origin.
+     * @param z        Z coord of the object origin.
      * @return Whether the location allows for this object.
      */
     public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z);
@@ -79,9 +82,10 @@ public interface CustomObject
      * location by itself. If the object isn't a tree, it shouldn't spawn and it
      * should return false.
      *
-     * @param world
-     * @param x
-     * @param z
+     * @param world  World to spawn the object.
+     * @param random Random number generator based on the world seed.
+     * @param x      X coord of the object origin.
+     * @param z      Z coord of the object origin.
      * @return Whether the attempt was successful.
      */
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z);
@@ -111,8 +115,8 @@ public interface CustomObject
      * Returns whether this object would like to spawn in this biome. BO2s will
      * return whether this biome is in their spawnInBiome setting.
      *
-     * @param biome
-     * @return
+     * @param biome The biome.
+     * @return True if the object is set to spawn in this biome, false otherwise.
      */
     public boolean hasPreferenceToSpawnIn(LocalBiome biome);
 }

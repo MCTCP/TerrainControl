@@ -94,6 +94,7 @@ public class CustomObjectCollection implements Iterable<CustomObject>
      *
      * @param loaders   The custom object loaders.
      * @param directory The directory to load from.
+     * @return The objects in the directory.
      */
     private static Map<String, CustomObject> loadObjectsRecursive(Map<String, CustomObjectLoader> loaders, File directory)
     {
@@ -170,7 +171,6 @@ public class CustomObjectCollection implements Iterable<CustomObject>
      * it will return this modified copy.
      *
      * @param string The string to parse.
-     * @param config The config to search in
      * @return A CustomObject, or null if no one was found.
      */
     public CustomObject parseCustomObject(String string)

@@ -51,14 +51,10 @@ public class ConfigFunctionsManager
 
     /**
      * Returns a config function with the given name.
-     * <p/>
      * @param name               The name of the config function.
      * @param holder             The holder of the config function.
      *                           WorldConfig or BO3.
-     * @param locationOfResource The location of the config function, for
-     *                           example TaigaBiomeConfig.ini.
      * @param args               The args of the function.
-     * <p/>
      * @return A config function with the given name, or null of it wasn't
      *         found.
      */

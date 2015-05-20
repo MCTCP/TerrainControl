@@ -40,5 +40,5 @@ public interface ChunkBuffer {
      *               - 1), inclusive.
      * @return The block material.
      */
-    LocalMaterialData getBlock(int x, int y, int z);
+    LocalMaterialData getBlock(int blockX, int blockY, int blockZ);
 }

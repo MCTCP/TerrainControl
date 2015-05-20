@@ -59,11 +59,11 @@ public class BO3 implements StructuredCustomObject
     /**
      * Computes the offset and variance for spawning a bo3
      *
-     * @param world
-     * @param offset
-     * @param variance
+     * @param random   Random number generator.
+     * @param offset   Base spawn offset.
+     * @param variance Max variance from this offset.
      *
-     * @return
+     * @return The sum of the offset and variance.
      */
     public int getOffsetAndVariance(Random random, int offset, int variance)
     {

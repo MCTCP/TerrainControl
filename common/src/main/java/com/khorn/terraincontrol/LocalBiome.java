@@ -41,16 +41,16 @@ public interface LocalBiome
 
     /**
      * Gets the temperature at the given position, if this biome would be
-     * there. This temperature is based on the {@link #getTemperature()}
-     * value, but it will be lower at higher altitudes.
-     * 
+     * there. This temperature is based on a base temperature value, but it
+     * will be lower at higher altitudes.
+     *
      * @param x The x position in the world.
      * @param y The y position in the world.
      * @param z The z position in the world.
      * @return The temperature.
      */
     float getTemperatureAt(int x, int y, int z);
-    
+
     /**
      * Gets the {@link BiomeConfig} of this biome, which holds all settings
      * of this biome.

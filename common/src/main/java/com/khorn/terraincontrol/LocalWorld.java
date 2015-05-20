@@ -130,6 +130,9 @@ public interface LocalWorld
     /**
      * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the
      * terrain generation. Calling this method will place the mobs.
+     * @param biome      Biome to place the mobs of.
+     * @param random     Random number generator.
+     * @param chunkCoord The chunk to spawn the mobs in.
      */
     public void placePopulationMobs(LocalBiome biome, Random random, ChunkCoordinate chunkCoord);
 
@@ -165,11 +168,17 @@ public interface LocalWorld
 
     /**
      * Returns the block above the highest solid block.
+     * @param x Block x.
+     * @param z Block z.
+     * @return The y location of the block above the highest solid block.
      */
     public int getSolidHeight(int x, int z);
 
     /**
      * Returns the block above the highest block.
+     * @param x Block x.
+     * @param z Block z.
+     * @return The y location of the block above the highest block.
      */
     public int getHighestBlockYAt(int x, int z);
 

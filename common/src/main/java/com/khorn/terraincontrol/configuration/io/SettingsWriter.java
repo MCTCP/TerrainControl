@@ -74,9 +74,11 @@ public interface SettingsWriter
 
     /**
      * Writes given setting to the config file.
-     * @param setting       The setting to write.
-     * @param settingsValue The value of the setting to write.
+     * @param setting The setting to write.
+     * @param value   The value of the setting to write.
      * @throws IOException When an IO error occurs.
+     * @throws IllegalStateException If this method is called before
+     * {@link #open()}.
      */
     <S> void setting(Setting<S> setting, S value) throws IOException, IllegalStateException;
 

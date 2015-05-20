@@ -50,7 +50,7 @@ public class NamedBinaryTag
     }
 
     /**
-     * Create a new TAG_List with an empty list. Use {@link Tag#addTag(Tag)}
+     * Create a new TAG_List with an empty list. Use {@link NamedBinaryTag#addTag(NamedBinaryTag)}
      * to add tags later.
      *
      * @param name     name for this tag or null to create an unnamed tag.
@@ -225,6 +225,7 @@ public class NamedBinaryTag
 
     /**
      * Add a tag to a TAG_List or a TAG_Compound.
+     * @param tag The tag to add.
      */
     public void addTag(NamedBinaryTag tag)
     {
@@ -244,6 +245,8 @@ public class NamedBinaryTag
 
     /**
      * Add a tag to a TAG_List or a TAG_Compound at the specified index.
+     * @param tag   The tag to add.
+     * @param index Index of the tag.
      */
     public void insertTag(NamedBinaryTag tag, int index)
     {
@@ -265,6 +268,7 @@ public class NamedBinaryTag
     /**
      * Remove a tag from a TAG_List or a TAG_Compound at the specified index.
      *
+     * @param index Index of the tag.
      * @return the removed tag
      */
     public NamedBinaryTag removeTag(int index)
@@ -360,6 +364,7 @@ public class NamedBinaryTag
      * Read a tag and its nested tags from an InputStream.
      *
      * @param is stream to read from, like a FileInputStream
+     * @param compressed True if the stream is GZIP-compressed, false otherwise.
      * @return NBT tag or structure read from the InputStream
      * @throws IOException if there was no valid NBT structure in the
      *             InputStream or if another IOException occurred.

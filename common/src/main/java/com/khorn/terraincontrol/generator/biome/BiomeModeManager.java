@@ -23,10 +23,11 @@ public class BiomeModeManager
     public final Class<BeforeGroupsBiomeGenerator> BEFORE_GROUPS = register("BeforeGroups", BeforeGroupsBiomeGenerator.class);
 
     /**
-     * Register a biome manager. Should be called before the config files
+     * Register a biome register. Should be called before the config files
      * are read.
-     * @param manager The biome manager to register.
-     * @return The biome manager that was just registered.
+     * @param name Name of the biome generator, used in config files.
+     * @param clazz The biome generator to register.
+     * @return The biome register that was just registered.
      */
     public <T extends BiomeGenerator> Class<T> register(String name, Class<T> clazz)
     {

@@ -13,15 +13,13 @@ import java.util.List;
 public abstract class ConfigFunction<T>
 {
     /**
-     * Convenience method for creating a config function. Used to create
-     * the
-     * default config functions.
+     * Creates a {@link ConfigFunction} from the given parameters. Used to create
+     * resources programmatically.
      *
-     * @param <T>
-     * @param clazz
-     * @param args
-     *              <p/>
-     * @return
+     * @param holder The holder of the resource.
+     * @param clazz  The class of the resoucrce.
+     * @param args   The arguments for the resource.
+     * @return The configuration function.
      */
     public static final <T> ConfigFunction<T> create(T holder, Class<? extends ConfigFunction<T>> clazz, Object... args)
     {
@@ -115,7 +113,7 @@ public abstract class ConfigFunction<T>
     }
 
     /**
-     * Gets the class of the holder. The {@link #getHolder()holder of this
+     * Gets the class of the holder. The {@link #getHolder() holder of this
      * resource} will be an instance of this type. Multiple invocations of
      * this method on the same instance must always yield the same result.
      *
@@ -157,7 +155,8 @@ public abstract class ConfigFunction<T>
      * not equal. This should return true if two resources are of the same class
      * and if critical element are the same. For example source blocks. This 
      * will be used to test if a resource should be overridden via inheritance.
-     * @return
+     * @param other The resource to compare with.
+     * @return True if the resources are similar, false otherwise.
      */
     public abstract boolean isAnalogousTo(ConfigFunction<T> other);
 
@@ -181,7 +180,7 @@ public abstract class ConfigFunction<T>
      * @throws InvalidConfigException If the syntax is invalid.
      */
     protected abstract void load(List<String> args) throws InvalidConfigException;
-    
+
     /**
      * Formats the material list as a string list.
      * @param materials The set of materials to be converted
@@ -191,7 +190,7 @@ public abstract class ConfigFunction<T>
     {
         return "," + materials.toString();
     }
-    
+
     /**
      * Gets a String representation, like Tree(10,BigTree,50,Tree,100)
      * @return A String representation, like Tree(10,BigTree,50,Tree,100)
@@ -233,6 +232,7 @@ public abstract class ConfigFunction<T>
      * Returns the material with the given name.
      * @param string Name of the material, case insensitive.
      * @return The material.
+     * @throws InvalidConfigException If no material exists with the given name.
      */
     protected final LocalMaterialData readMaterial(String string) throws InvalidConfigException
     {
@@ -276,8 +276,7 @@ public abstract class ConfigFunction<T>
      * Sets the holder to the given parameter. Must only be used when manually
      * constructing this function. The holder must of the type returned by
      * {@link #getHolderType()}.
-     * @param holder The hoilder.
-     * @see #init(Object, List).
+     * @param holder The holder.
      */
     public final void setHolder(T holder)
     {

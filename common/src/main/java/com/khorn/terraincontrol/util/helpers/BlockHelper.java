@@ -7,10 +7,10 @@ public class BlockHelper
 
     /**
      * Rotate the block. North -> west - > south - > east
-     * 
-     * @param type
-     * @param data
-     * @return
+     *
+     * @param mat  Material of the block.
+     * @param data Block data.
+     * @return The rotated block data.
      */
     @SuppressWarnings({"PointlessBitwiseExpression", "incomplete-switch"})
     public static int rotateData(DefaultMaterial mat, int data)

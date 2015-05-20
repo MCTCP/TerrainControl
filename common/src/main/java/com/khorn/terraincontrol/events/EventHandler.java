@@ -32,11 +32,12 @@ public abstract class EventHandler
      * This event should NOT be used to modify data in the object or the world.
      * However, you can cancel the event by returning false.
      *
-     * @param object The object that is about to spawn.
-     * @param world  The world where it will spawn.
-     * @param x      The x of the object origin.
-     * @param y      The y of the object origin.
-     * @param z      The z of the object origin.
+     * @param object      The object that is about to spawn.
+     * @param world       The world where it will spawn.
+     * @param x           The x of the object origin.
+     * @param y           The y of the object origin.
+     * @param z           The z of the object origin.
+     * @param isCancelled True if the event was cancelled by another handler.
      * @return Whether the event should be cancelled. You cannot "uncancel"
      *         events, so returning true when the event is already cancelled
      *         does nothing.
@@ -55,11 +56,13 @@ public abstract class EventHandler
      * @param villageInChunk Whether there is a village in the current chunk.
      * @param chunkX         The x coordinate of the chunk the resource will spawn in.
      * @param chunkZ         The z coordinate of the chunk the resource will spawn in.
+     * @param isCancelled    True if the event was cancelled by another handler.
      * @return Whether the event should be cancelled. You cannot "uncancel"
      *         events, so returning true when the event is already cancelled
      *         does nothing.
      */
-    public boolean onResourceProcess(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ, boolean isCancelled)
+    public boolean onResourceProcess(Resource resource, LocalWorld world, Random random,
+            boolean villageInChunk, int chunkX, int chunkZ, boolean isCancelled)
     {
         return true;
     }
