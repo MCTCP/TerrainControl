@@ -725,16 +725,16 @@ public class WorldConfig extends ConfigFile
         // Blocks
         writer.bigTitle("Blocks");
 
-        writer.comment("Attempts to replace all surface stone with biome surface block");
+        writer.comment("Attempts to replace all surface stone with biome surface block.");
         writer.setting(WorldStandardValues.REMOVE_SURFACE_STONE, this.removeSurfaceStone);
 
-        writer.comment("Disable bottom of map bedrock generation");
+        writer.comment("Disable bottom of map bedrock generation. Doesn't affect bedrock on the ceiling of the map.");
         writer.setting(WorldStandardValues.DISABLE_BEDROCK, this.disableBedrock);
 
-        writer.comment("Enable ceiling of map bedrock generation");
+        writer.comment("Enable ceiling of map bedrock generation.");
         writer.setting(WorldStandardValues.CEILING_BEDROCK, this.ceilingBedrock);
 
-        writer.comment("Make bottom layer of bedrock flat");
+        writer.comment("Make layer of bedrock flat.");
         writer.setting(WorldStandardValues.FLAT_BEDROCK, this.flatBedrock);
 
         writer.comment("Block used as bedrock. No block data allowed.");
@@ -975,11 +975,6 @@ public class WorldConfig extends ConfigFile
     public double getFractureVertical()
     {
         return this.fractureVertical < 0.0D ? 1.0D / (Math.abs(this.fractureVertical) + 1.0D) : this.fractureVertical + 1.0D;
-    }
-
-    public boolean createAdminium(int y)
-    {
-        return (!this.disableBedrock) && ((!this.flatBedrock) || (y == 0));
     }
 
     public enum TerrainMode

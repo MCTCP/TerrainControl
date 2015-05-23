@@ -36,6 +36,8 @@ public class ChunkProviderTC
     public static final int HEIGHT_BITS = 8;
     public static final int HEIGHT_BITS_PLUS_FOUR = HEIGHT_BITS + 4;
 
+    private static final int BEDROCK_LAYER_HEIGHT = 5;
+
     // Some hardcoded materials, not changeable in configs
     private final LocalMaterialData air = TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0);
     private final LocalMaterialData sandstone = TerrainControl.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
@@ -303,7 +305,8 @@ public class ChunkProviderTC
                 // The following code is executed for each column in the chunk
 
                 // Get the current biome config and some properties
-                final BiomeConfig biomeConfig = this.configProvider.getBiomeByIdOrNull(this.biomeArray[(x + z * CHUNK_X_SIZE)]).getBiomeConfig();
+                final BiomeConfig biomeConfig = this.configProvider.getBiomeByIdOrNull(this.biomeArray[(x + z * CHUNK_X_SIZE)])
+                        .getBiomeConfig();
                 final float currentTemperature = biomeConfig.biomeTemperature;
                 final int surfaceBlocksNoise = (int) (this.noise4[(x + z * CHUNK_X_SIZE)] / 3.0D + 3.0D + this.random.nextDouble() * 0.25D);
 
@@ -322,9 +325,9 @@ public class ChunkProviderTC
                 final int currentWaterLevel = this.waterLevel[z + x * 16];
                 for (int y = CHUNK_Y_SIZE - 1; y >= 0; y--)
                 {
-                    if (y < 5 && (worldConfig.createAdminium(y)) && y <= this.random.nextInt(5))
+                    if (mustCreateBedrockAt(worldConfig, y, this.random))
                     {
-                        // Place bottom bedrock
+                        // Place bedrock
                         chunkBuffer.setBlock(x, y, z, worldConfig.bedrockBlock);
                     } else
                     {
@@ -401,6 +404,45 @@ public class ChunkProviderTC
         }
 
         return dryBlocksOnSurface > 250;
+    }
+
+    private boolean mustCreateBedrockAt(WorldConfig worldConfig, int y, Random random)
+    {
+        // The "- 2" that appears in this method, comes from that heightCap -
+        // 1 is the highest place where a block can be placed, and heightCap -
+        // 2 is the highest place where bedrock can be generated to make sure
+        // there are no light glitches - see #117
+
+        // Handle flat bedrock
+        if (worldConfig.flatBedrock)
+        {
+            if (!worldConfig.disableBedrock && y == 0)
+            {
+                return true;
+            }
+            if (worldConfig.ceilingBedrock && y >= this.heightCap - 2)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        // Otherwise we have normal bedrock
+        if (!worldConfig.disableBedrock && y < 5)
+        {
+            return y <= this.random.nextInt(BEDROCK_LAYER_HEIGHT);
+        }
+        if (worldConfig.ceilingBedrock)
+        {
+            int amountBelowHeightCap = this.heightCap - y - 2;
+            if (amountBelowHeightCap < 0 || amountBelowHeightCap > BEDROCK_LAYER_HEIGHT)
+            {
+                return false;
+            }
+
+            return amountBelowHeightCap <= this.random.nextInt(BEDROCK_LAYER_HEIGHT);
+        }
+        return false;
     }
 
     private void generateTerrainNoise(int xOffset, int yOffset, int zOffset, int maxYSections, int usedYSections)
