@@ -176,7 +176,8 @@ public class WorldConfig extends ConfigFile
     public int worldHeightCap;
 
     public long resourcesSeed;
-    
+    public int maximumCustomStructureRadius;
+
     /**
      * Creates a WorldConfig from the WorldConfig.ini file found in the given
      * directory.
@@ -408,6 +409,7 @@ public class WorldConfig extends ConfigFile
         this.oceanMonumentRandomOffset = readSettings(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET);
         this.oceanMonumentGridSize = readSettings(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE);
 
+        this.maximumCustomStructureRadius = readSettings(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS);
         this.mineshaftsEnabled = readSettings(WorldStandardValues.MINESHAFTS_ENABLED);
         this.netherFortressesEnabled = readSettings(WorldStandardValues.NETHER_FORTRESSES_ENABLED);
 
@@ -845,6 +847,12 @@ public class WorldConfig extends ConfigFile
         writer.comment("Random offset from each corner in chunks, on both the x and z axis.");
         writer.comment("May not be smaller than 0, and may not be larger than " + WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE + ".");
         writer.setting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET, this.oceanMonumentRandomOffset);
+
+        // Custom structures
+        writer.smallTitle("Custom structues");
+        writer.comment("Maximum radius of custom structures in chunks. Custom structures are spawned by");
+        writer.comment("the CustomStructure resource in the biome configuration files.");
+        writer.setting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius);
 
         // Other structures
         writer.smallTitle("Other structures");

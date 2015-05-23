@@ -63,7 +63,7 @@ public class CustomStructureGen extends Resource
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         // Find all structures that reach this chunk, and spawn them
-        int searchRadius = 5; // Maybe add a setting for this?
+        int searchRadius = world.getConfigs().getWorldConfig().maximumCustomStructureRadius;
 
         int currentChunkX = chunkCoord.getChunkX();
         int currentChunkZ = chunkCoord.getChunkZ();
