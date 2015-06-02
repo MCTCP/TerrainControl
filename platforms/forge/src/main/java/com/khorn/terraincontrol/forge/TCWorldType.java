@@ -79,9 +79,9 @@ public class TCWorldType extends WorldType
      * Gets the appropriate WorldChunkManager. For the vanilla biome
      * generator we have to use WorldChunkManager, for other biome modes
      * TCWorldChunkManager is the right option.
-     * @param world         ForgeWorld instance, needed to instantiate the
-     *                      WorldChunkManager.
-     * @param biomeGenClass Biome generator class.
+     * @param world          ForgeWorld instance, needed to instantiate the
+     *                       WorldChunkManager.
+     * @param biomeGenerator Biome generator.
      * @return The most appropriate WorldChunkManager.
      */
     private WorldChunkManager createWorldChunkManager(ForgeWorld world, BiomeGenerator biomeGenerator)

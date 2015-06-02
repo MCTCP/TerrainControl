@@ -15,9 +15,10 @@ public class NBTHelper
     /**
      * Converts a net.minecraft.server compound NBT tag to a
      * net.minecraftwiki.wiki.NBTClass NBT compound tag.
-     * 
-     * @param nmsTag
-     * @return
+     *
+     * @param name   Name of the Minecraft tag.
+     * @param nmsTag The Minecraft tag.
+     * @return The converted tag.
      */
     @SuppressWarnings("unchecked")
     // ^ We know that NBTTagCompound.map is a Map<String, NBTBase>
@@ -86,9 +87,10 @@ public class NBTHelper
     /**
      * Converts a net.minecraft.server list NBT tag to a
      * net.minecraftwiki.wiki.NBTClass NBT list tag.
-     * 
-     * @param nmsListTag
-     * @return
+     *
+     * @param name       Name of the Minecraft tag.
+     * @param nmsListTag The Minecraft tag.
+     * @return The converted tag.
      */
     private static NamedBinaryTag getNBTFromNMSTagList(String name, NBTTagList nmsListTag)
     {
@@ -180,8 +182,8 @@ public class NBTHelper
      * Converts a net.minecraftwiki.wiki.NBTClass NBT compound tag into an
      * net.minecraft.server NBT compound tag.
      * 
-     * @param compoundTag
-     * @return
+     * @param compoundTag Our tag.
+     * @return The Minecraft tag.
      */
     public static NBTTagCompound getNMSFromNBTTagCompound(NamedBinaryTag compoundTag)
     {

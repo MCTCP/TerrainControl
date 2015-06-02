@@ -14,7 +14,7 @@ import net.minecraft.world.biome.WorldChunkManager;
  * This can be somewhat dangerous, because a subclass for WorldChunkManager,
  * {@link TCWorldChunkManager}, gets its information from a BiomeGenerator. This
  * would cause infinite recursion. To combat this, a check has been added to
- * {@link #getWorldChunkManager()}.
+ * {@link #setWorldChunkManager(WorldChunkManager)}.
  *
  */
 public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {

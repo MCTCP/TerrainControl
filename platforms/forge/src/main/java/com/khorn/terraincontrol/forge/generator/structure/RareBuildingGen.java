@@ -104,7 +104,8 @@ public class RareBuildingGen extends MapGenStructure
     }
 
     /**
-     * returns possible spawns for scattered features
+     * Returns possible spawn mobs for scattered features
+     * @return The possible mobs.
      */
     public List<SpawnListEntry> getMonsterSpawnList()
     {

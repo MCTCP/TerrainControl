@@ -365,6 +365,8 @@ public class Metrics
 
     /**
      * Generic method that posts a plugin to the metrics website
+     * @param isPing True if this post is a ping.
+     * @throws IOException If posting fails.
      */
     private void postPlugin(final boolean isPing) throws IOException
     {
@@ -550,8 +552,8 @@ public class Metrics
     /**
      * GZip compress a string of bytes
      *
-     * @param input
-     * @return
+     * @param input String to compress.
+     * @return The compressed bytes.
      */
     public static byte[] gzip(String input)
     {
@@ -693,6 +695,7 @@ public class Metrics
      *
      * @param text the text to encode
      * @return the encoded text, as UTF-8
+     * @throws UnsupportedEncodingException If UTF-8 encoding is not supported.
      */
     private static String urlEncode(final String text) throws UnsupportedEncodingException
     {

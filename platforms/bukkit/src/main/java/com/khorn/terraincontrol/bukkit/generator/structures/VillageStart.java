@@ -34,7 +34,7 @@ public class VillageStart extends StructureStart
             // Ignore removed custom biomes
             changeToSandstoneVillage(startPiece, biome.getBiomeConfig().villageType == VillageType.sandstone);
         }
-        
+
         this.a.add(startPiece);
         startPiece.a(startPiece, this.a, random);
         List<StructurePiece> arraylist1 = startPiece.g;
@@ -74,16 +74,17 @@ public class VillageStart extends StructureStart
 
         this.hasMoreThanTwoComponents = componentCount > 2;
     }
-    
+
     public VillageStart()
     {
         // Required by Minecraft's structure loading code
     }
-    
+
     /**
-     * Just sets the first boolean it can find in the
-     * WorldGenVillageStartPiece.class to sandstoneVillage.
-     * <p/>
+     * Changes a village to a sandstone village. (Just sets the first boolean it
+     * can find in the WorldGenVillageStartPiece.class to sandstoneVillage.)
+     *
+     * @param subject          The village.
      * @param sandstoneVillage Whether the village should be a sandstone
      *                         village.
      */

@@ -21,8 +21,9 @@ public class BukkitBiome implements LocalBiome
 
     /**
      * Wraps the vanilla biome into a LocalBiome instance.
-     * 
-     * @param biome The vanilla biome to wrap.
+     *
+     * @param biomeConfig Configuration file of the biome.
+     * @param biome       The vanilla biome to wrap.
      * @return The wrapped biome.
      */
     public static BukkitBiome forVanillaBiome(BiomeConfig biomeConfig, BiomeBase biome)
@@ -31,10 +32,10 @@ public class BukkitBiome implements LocalBiome
     }
 
     /**
-     * Creates and registers a new custom biome with the given name and ids.
+     * Creates and registers a new custom biome with the config and ids.
      * 
-     * @param name Name of the custom biome.
-     * @param biomeIds Ids of the custom biome.
+     * @param biomeConfig Config of the custom biome.
+     * @param biomeIds    Ids of the custom biome.
      * @return The custom biome.
      */
     public static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)

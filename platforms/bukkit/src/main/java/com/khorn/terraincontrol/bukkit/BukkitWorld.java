@@ -7,7 +7,9 @@ import com.khorn.terraincontrol.bukkit.generator.TCWorldChunkManager;
 import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
 import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
-import com.khorn.terraincontrol.configuration.*;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
+import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
@@ -597,7 +599,7 @@ public class BukkitWorld implements LocalWorld
      * Sets the new settings and deprecates any references to the old
      * settings, if any.
      * 
-     * @param worldConfig The new settings.
+     * @param newSettings The new settings.
      */
     public void setSettings(WorldSettings newSettings)
     {
@@ -621,8 +623,8 @@ public class BukkitWorld implements LocalWorld
 
     /**
      * Enables/reloads this BukkitWorld. If you are reloading, don't forget to
-     * set the new settings first using {@link #setSettings(WorldConfig)}.
-     * 
+     * set the new settings first using {@link #setSettings(WorldSettings)}.
+     *
      * @param world The world that needs to be enabled.
      */
     public void enable(org.bukkit.World world)

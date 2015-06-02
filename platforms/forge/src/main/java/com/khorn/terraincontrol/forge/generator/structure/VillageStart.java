@@ -82,7 +82,8 @@ public class VillageStart extends StructureStart
     /**
      * Just sets the first boolean it can find in the
      * WorldGenVillageStartPiece.class to sandstoneVillage.
-     * <p/>
+     *
+     * @param subject          The village.
      * @param sandstoneVillage Whether the village should be a sandstone
      *                         village.
      */
