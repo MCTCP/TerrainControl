@@ -5,8 +5,10 @@ import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R3.*;
-import net.minecraft.server.v1_8_R3.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_8_R3.BiomeBase;
+import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_8_R3.StructureGenerator;
+import net.minecraft.server.v1_8_R3.StructureStart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +17,6 @@ import java.util.Random;
 public class RareBuildingGen extends StructureGenerator
 {
     public List<BiomeBase> biomeList;
-
-    /**
-     * contains possible spawns for scattered features
-     */
-    @SuppressWarnings("rawtypes")
-    private List scatteredFeatureSpawnList;
 
     /**
      * the maximum distance between scattered features
@@ -32,7 +28,6 @@ public class RareBuildingGen extends StructureGenerator
      */
     private int minDistanceBetweenScatteredFeatures;
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public RareBuildingGen(WorldSettings configs)
     {
         biomeList = new ArrayList<BiomeBase>();
@@ -47,12 +42,10 @@ public class RareBuildingGen extends StructureGenerator
             }
         }
 
-        this.scatteredFeatureSpawnList = new ArrayList();
         this.maxDistanceBetweenScatteredFeatures = configs.worldConfig.maximumDistanceBetweenRareBuildings;
         // Minecraft's internal minimum distance is one chunk lower than TC's
         // value
         this.minDistanceBetweenScatteredFeatures = configs.worldConfig.minimumDistanceBetweenRareBuildings - 1;
-        this.scatteredFeatureSpawnList.add(new BiomeMeta(EntityWitch.class, 1, 1, 1));
     }
 
     @Override
@@ -101,15 +94,6 @@ public class RareBuildingGen extends StructureGenerator
     protected StructureStart b(int chunkX, int chunkZ)
     {
         return new RareBuildingStart(this.c, this.b, chunkX, chunkZ);
-    }
-
-    /**
-     * returns possible spawns for scattered features
-     */
-    @SuppressWarnings({"rawtypes", "UnusedDeclaration"})
-    public List getScatteredFeatureSpawnList()
-    {
-        return this.scatteredFeatureSpawnList;
     }
 
     @Override
