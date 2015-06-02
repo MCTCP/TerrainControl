@@ -9,7 +9,7 @@ allprojects
     group = "com.khorn.terraincontrol"
 
     // Version of the shadow plugin
-    ext.shadowVersion = '1.0.2'
+    ext.shadowVersion = '1.2.1'
 }
 
 // Information for all subprojects
