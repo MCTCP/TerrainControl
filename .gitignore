@@ -30,24 +30,28 @@ localexport.jardesc
 forgeInfo
 
 # Minecraft, Bukkit and Forge files
-platforms/bukkit/logs
-platforms/forge/banned-players.txt
-platforms/forge/banned-ips.txt
-platforms/forge/crash-reports
-platforms/forge/logs
-platforms/forge/mods
-platforms/forge/config
-platforms/forge/options.txt
-platforms/forge/ops.txt
-platforms/forge/saves
-platforms/forge/server.properties
-platforms/forge/white-list.txt
-platforms/forge**/*.dat
-platforms/forge**/level.dat_old
-platforms/forge**/session.lock
-platforms/forge**/*.mca
-platforms/forge**/*.json
-platforms/forge/run
+/config/
+/logs/
+/mods/
+/platforms/bukkit/logs
+/platforms/forge/banned-players.txt
+/platforms/forge/banned-ips.txt
+/platforms/forge/crash-reports
+/platforms/forge/eula.txt
+/platforms/forge/logs
+/platforms/forge/mods
+/platforms/forge/config
+/platforms/forge/options.txt
+/platforms/forge/ops.txt
+/platforms/forge/saves
+/platforms/forge/server.properties
+/platforms/forge/white-list.txt
+/platforms/forge**/*.dat
+/platforms/forge**/level.dat_old
+/platforms/forge**/session.lock
+/platforms/forge**/*.mca
+/platforms/forge**/*.json
+/platforms/forge/run
 
 # Filesystem dust
 Thumbs.db
