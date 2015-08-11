@@ -1,14 +1,13 @@
 package com.khorn.terraincontrol.forge;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockFalling;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockFalling;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
@@ -113,7 +112,7 @@ public class ForgeMaterialData implements LocalMaterialData
         DefaultMaterial defaultMaterial = toDefaultMaterial();
 
         byte data = getBlockData();
-        boolean nonDefaultData = !block.getBlockState().equals(this.blockData);
+        boolean nonDefaultData = !block.getDefaultState().equals(this.blockData);
         // Note that the above line is not equivalent to data != 0, as for
         // example pumpkins have a default data value of 2
 
