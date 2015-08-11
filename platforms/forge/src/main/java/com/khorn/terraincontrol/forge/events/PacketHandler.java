@@ -65,7 +65,6 @@ public class PacketHandler
                     wrappedStream.close();
 
                     worldTC.InitM(worldMC, config);
-                    TerrainControl.log(LogMarker.INFO, Arrays.toString(stream.array()));
                 }
 
                 TerrainControl.log(LogMarker.INFO, "Config received from server");
@@ -86,10 +85,10 @@ public class PacketHandler
             }
         } catch (Exception e)
         {
-            sendMessage(EnumChatFormatting.RED, "Error receiving packet.");
             TerrainControl.log(LogMarker.FATAL, "Failed to receive packet");
             TerrainControl.printStackTrace(LogMarker.FATAL, e);
             TerrainControl.log(LogMarker.FATAL, "Packet contents: {}", Arrays.toString(stream.array()));
+            sendMessage(EnumChatFormatting.RED, "Error receiving packet.");
         }
     }
 
