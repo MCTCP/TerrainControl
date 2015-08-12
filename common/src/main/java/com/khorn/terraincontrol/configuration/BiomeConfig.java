@@ -574,13 +574,13 @@ public class BiomeConfig extends ConfigFile
 
         writer.bigTitle("Blocks");
 
-        writer.comment("Change this to generate something else than stone in the biome. Doesn't support block data.");
+        writer.comment("Change this to generate something else than stone in the biome.");
         writer.setting(BiomeStandardValues.STONE_BLOCK, this.stoneBlock);
 
-        writer.comment("Surface block, usually GRASS. Doesn't support block data.");
+        writer.comment("Surface block, usually GRASS.");
         writer.setting(BiomeStandardValues.SURFACE_BLOCK, this.surfaceBlock);
 
-        writer.comment("Block from stone to surface, like dirt in most biomes. Doesn't support block data.");
+        writer.comment("Block from stone to surface, like dirt in most biomes.");
         writer.setting(BiomeStandardValues.GROUND_BLOCK, this.groundBlock);
 
         writer.comment("Setting for biomes with more complex surface and ground blocks.");

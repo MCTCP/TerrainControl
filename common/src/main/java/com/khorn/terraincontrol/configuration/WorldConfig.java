@@ -303,11 +303,6 @@ public class WorldConfig extends ConfigFile
 
         waterLevelMax = higherThan(waterLevelMax, waterLevelMin);
 
-        // Remove illegal block data (the chunk generator will ignore block data)
-        waterBlock = waterBlock.withBlockData(0);
-        iceBlock = iceBlock.withBlockData(0);
-        bedrockBlock = bedrockBlock.withBlockData(0);
-
         maximumDistanceBetweenRareBuildings = higherThan(maximumDistanceBetweenRareBuildings, minimumDistanceBetweenRareBuildings);
         oceanMonumentRandomOffset = lowerThanOrEqualTo(oceanMonumentRandomOffset, oceanMonumentGridSize);
 
@@ -739,7 +734,7 @@ public class WorldConfig extends ConfigFile
         writer.comment("Make layer of bedrock flat.");
         writer.setting(WorldStandardValues.FLAT_BEDROCK, this.flatBedrock);
 
-        writer.comment("Block used as bedrock. No block data allowed.");
+        writer.comment("Block used as bedrock.");
         writer.setting(WorldStandardValues.BEDROCK_BLOCK, this.bedrockBlock);
 
         writer.comment("Set this to false to disable the bounds check during chunk population.");
@@ -765,10 +760,10 @@ public class WorldConfig extends ConfigFile
         writer.setting(WorldStandardValues.WATER_LEVEL_MAX, this.waterLevelMax);
         writer.setting(WorldStandardValues.WATER_LEVEL_MIN, this.waterLevelMin);
 
-        writer.comment("Block used as water in WaterLevel. No block data allowed.");
+        writer.comment("Block used as water in WaterLevel.");
         writer.setting(WorldStandardValues.WATER_BLOCK, this.waterBlock);
 
-        writer.comment("BlockId used as ice. No block data allowed.");
+        writer.comment("Block used as ice.");
         writer.setting(WorldStandardValues.ICE_BLOCK, this.iceBlock);
 
         writer.comment("Seed used for the resource generation. Can only be numeric. Set to 0 to use the world seed.");
