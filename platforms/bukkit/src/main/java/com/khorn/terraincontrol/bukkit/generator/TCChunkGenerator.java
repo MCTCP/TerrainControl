@@ -1,9 +1,11 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -78,16 +80,31 @@ public class TCChunkGenerator extends ChunkGenerator
     }
 
     @Override
-    public short[][] generateExtBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes)
+    public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biome)
     {
         makeSureWorldIsInitialized(world);
 
+        ChunkData chunkData = createChunkData(world);
+
         if (this.NotGenerate)
-            return new short[16][];
+            return chunkData;
+
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
-        BukkitChunkBuffer chunkBuffer = new BukkitChunkBuffer(chunkCoord);
+        BukkitChunkBuffer chunkBuffer = new BukkitChunkBuffer(chunkCoord, chunkData);
         this.chunkProviderTC.generate(chunkBuffer);
 
-        return chunkBuffer.accessRawValues();
+        return chunkData;
+    }
+
+    @Override
+    public short[][] generateExtBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes)
+    {
+        // Newer versions of Spigot call generateChunkData first
+        // So when this method is called, we have an outdated Spigot build
+        TerrainControl.log(LogMarker.FATAL, "- ------------------------------------------------------------- -");
+        TerrainControl.log(LogMarker.FATAL, "Outdated Spigot detected!");
+        TerrainControl.log(LogMarker.FATAL, "Please update Spigot to a build released in august 2015 or later.");
+        TerrainControl.log(LogMarker.FATAL, "- ------------------------------------------------------------- -");
+        throw new UnsupportedOperationException("Please update Spigot to a build released in august 2015 or later.");
     }
 }
