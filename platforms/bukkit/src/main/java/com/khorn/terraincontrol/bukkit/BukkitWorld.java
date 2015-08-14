@@ -411,8 +411,9 @@ public class BukkitWorld implements LocalWorld
             return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR);
         }
 
-        IBlockData blockData = section.getType(x & 0xF, y & 0xF, z & 0xF);
-        return BukkitMaterialData.ofMinecraftBlockData(blockData);
+        // Parsing the id ourselves is faster than calling section.getType
+        int combinedId = section.getIdArray()[(y & 0xf) << 8 | (z & 0xf) << 4 | x & 0xf];
+        return BukkitMaterialData.ofIds(combinedId >> 4, combinedId & 0xf);
     }
 
     @Override

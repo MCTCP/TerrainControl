@@ -6,14 +6,13 @@ import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockFalling;
-import net.minecraft.server.v1_8_R3.Blocks;
 import net.minecraft.server.v1_8_R3.IBlockData;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
  * 
  */
-public class BukkitMaterialData implements LocalMaterialData
+public final class BukkitMaterialData implements LocalMaterialData
 {
 
     /**
@@ -24,9 +23,7 @@ public class BukkitMaterialData implements LocalMaterialData
      */
     public static BukkitMaterialData ofIds(int id, int data)
     {
-        Block block = Block.getById(id);
-        IBlockData blockData = block.fromLegacyData(data);
-        return ofMinecraftBlockData(blockData);
+        return new BukkitMaterialData(id, data);
     }
 
     /**
@@ -48,7 +45,7 @@ public class BukkitMaterialData implements LocalMaterialData
      */
     public static BukkitMaterialData ofMinecraftBlock(Block block)
     {
-        return ofMinecraftBlockData(block.getBlockData());
+        return ofIds(Block.getId(block), 0);
     }
 
     /**
@@ -58,14 +55,23 @@ public class BukkitMaterialData implements LocalMaterialData
      */
     public static BukkitMaterialData ofMinecraftBlockData(IBlockData blockData)
     {
-        return new BukkitMaterialData(blockData);
+        Block block = blockData.getBlock();
+        return new BukkitMaterialData(Block.getId(block), block.toLegacyData(blockData));
     }
 
-    private final IBlockData blockData;
+    /**
+     * Block id and data, calculated as {@code blockId << 4 | blockData}, or
+     * without binary operators: {@code blockId * 16 + blockData}.
+     *
+     * <p>Note that Minecraft's Block.getCombinedId uses another format (at
+     * least in Minecraft 1.8). However, Minecraft's ChunkSection uses the same
+     * format as this field.
+     */
+    private final int combinedBlockId;
 
-    private BukkitMaterialData(IBlockData blockData)
+    private BukkitMaterialData(int blockId, int blockData)
     {
-        this.blockData = blockData;
+        this.combinedBlockId = blockId << 4 | blockData;
     }
 
     @Override
@@ -86,7 +92,7 @@ public class BukkitMaterialData implements LocalMaterialData
             return false;
         }
         BukkitMaterialData other = (BukkitMaterialData) obj;
-        if (!blockData.equals(other.blockData))
+        if (combinedBlockId != other.combinedBlockId)
         {
             return false;
         }
@@ -96,23 +102,23 @@ public class BukkitMaterialData implements LocalMaterialData
     @Override
     public byte getBlockData()
     {
-        return (byte) blockData.getBlock().toLegacyData(blockData);
+        return (byte) (combinedBlockId & 15);
     }
 
     @Override
     public int getBlockId()
     {
-        return Block.getId(blockData.getBlock());
+        return combinedBlockId >> 4;
     }
 
     @Override
     public String getName()
     {
-        Block block = blockData.getBlock();
+        Block block = Block.getById(getBlockId());
         DefaultMaterial defaultMaterial = toDefaultMaterial();
 
         byte data = getBlockData();
-        boolean nonDefaultData = !block.getBlockData().equals(this.blockData);
+        boolean nonDefaultData = block.toLegacyData(block.getBlockData()) != data;
         // Note that the above line is not equivalent to data != 0, as for
         // example pumpkins have a default data value of 2
 
@@ -121,9 +127,9 @@ public class BukkitMaterialData implements LocalMaterialData
             // Use Minecraft's name
             if (nonDefaultData)
             {
-                return Block.REGISTRY.c(blockData.getBlock()) + ":" + data;
+                return Block.REGISTRY.c(block) + ":" + data;
             }
-            return Block.REGISTRY.c(blockData.getBlock()).toString();
+            return Block.REGISTRY.c(block).toString();
         } else
         {
             // Use our name
@@ -139,7 +145,7 @@ public class BukkitMaterialData implements LocalMaterialData
     public int hashCode()
     {
         // From 4096 to 69632 when there are 4096 block ids
-        return TerrainControl.SUPPORTED_BLOCK_IDS + getBlockId() * 16 + getBlockData();
+        return TerrainControl.SUPPORTED_BLOCK_IDS + combinedBlockId;
     }
 
     @Override
@@ -152,7 +158,7 @@ public class BukkitMaterialData implements LocalMaterialData
     @Override
     public boolean isLiquid()
     {
-        return blockData.getBlock().getMaterial().isLiquid();
+        return Block.getById(getBlockId()).getMaterial().isLiquid();
     }
 
     @Override
@@ -171,7 +177,7 @@ public class BukkitMaterialData implements LocalMaterialData
             return defaultMaterial.isSolid();
         }
 
-        return blockData.getBlock().getMaterial().isSolid();
+        return Block.getById(getBlockId()).getMaterial().isSolid();
     }
 
     @Override
@@ -194,13 +200,13 @@ public class BukkitMaterialData implements LocalMaterialData
             return this;
         }
 
-        Block block = this.blockData.getBlock();
+        Block block = Block.getById(getBlockId());
         return ofMinecraftBlockData(block.fromLegacyData(i));
     }
 
     public IBlockData internalBlock()
     {
-        return blockData;
+        return Block.getById(getBlockId()).fromLegacyData(getBlockData());
     }
 
     @Override
@@ -215,7 +221,7 @@ public class BukkitMaterialData implements LocalMaterialData
             int newData = BlockHelper.rotateData(defaultMaterial, blockDataByte);
             if (newData != blockDataByte)
             {
-                return ofMinecraftBlockData(blockData.getBlock().fromLegacyData(newData));
+                return ofDefaultMaterial(defaultMaterial, newData);
             }
         }
 
@@ -225,13 +231,13 @@ public class BukkitMaterialData implements LocalMaterialData
 
     @Override
     public boolean isAir() {
-        return blockData.getBlock() == Blocks.AIR;
+        return combinedBlockId == 0;
     }
 
     @Override
     public boolean canFall()
     {
-        return blockData.getBlock() instanceof BlockFalling;
+        return Block.getById(getBlockId()) instanceof BlockFalling;
     }
 
 }
