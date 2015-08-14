@@ -1,84 +1,117 @@
 package com.khorn.terraincontrol.generator.surface;
 
+import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Y_SIZE;
+
 import com.khorn.terraincontrol.LocalMaterialData;
-import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.util.helpers.StringHelper;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.generator.ChunkBuffer;
+import com.khorn.terraincontrol.generator.GeneratingChunk;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+/**
+ * Implementation of {@link SurfaceGenerator} that does absolutely nothing.
+ *
+ */
 public class SimpleSurfaceGenerator implements SurfaceGenerator
 {
-    public static class LayerChoice implements Comparable<LayerChoice>
-    {
-        public final LocalMaterialData surfaceBlock;
-        public final LocalMaterialData groundBlock;
-        public final float maxNoise;
-
-        public LayerChoice(LocalMaterialData surfaceBlock, LocalMaterialData groundBlock, float maxNoise)
-        {
-            this.surfaceBlock = surfaceBlock;
-            this.groundBlock = groundBlock;
-            this.maxNoise = maxNoise;
-        }
-
-        @Override
-        public int compareTo(LayerChoice that)
-        {
-            float delta = this.maxNoise - that.maxNoise;
-            // The number 65565 is just randomly chosen, any positive number
-            // works fine as long as it can represent the floating point delta
-            // as an integer
-            return (int) (delta * 65565);
-        }
-    }
-
-    // Must be sorted based on the noise field
-    private List<LayerChoice> layerChoices;
-
-    public SimpleSurfaceGenerator(String[] args) throws InvalidConfigException
-    {
-        if (args.length < 2)
-        {
-            throw new InvalidConfigException("Needs at least two arguments");
-        }
-        
-        layerChoices = new ArrayList<LayerChoice>();
-        for (int i = 0; i < args.length - 2; i += 3)
-        {
-            LocalMaterialData surfaceBlock = TerrainControl.readMaterial(args[i]);
-            LocalMaterialData groundBlock = TerrainControl.readMaterial(args[i+1]);
-            float maxNoise = (float) StringHelper.readDouble(args[i + 2], -20, 20);
-            layerChoices.add(new LayerChoice(surfaceBlock, groundBlock, maxNoise));
-        }
-        Collections.sort(layerChoices);
-    }
+    private final LocalMaterialData air = TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0);
+    private final LocalMaterialData sandstone = TerrainControl.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
 
     @Override
-    public void spawn(LocalWorld world, BiomeConfig config, double noise, int x, int z)
+    public void spawn(GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
     {
-        int y = world.getSolidHeight(x, z) - 1;
-        if (config == null || !world.getMaterial(x, y, z).equals(config.surfaceBlock))
+        spawnColumn(biomeConfig.surfaceBlock, biomeConfig.groundBlock, generatingChunk, chunkBuffer, biomeConfig, xInWorld & 0xf, zInWorld & 0xf);
+    }
+
+    protected final void spawnColumn(LocalMaterialData defaultSurfaceBlock, LocalMaterialData defaultGroundBlock, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int x, int z)
+    {
+        WorldConfig worldConfig = biomeConfig.worldConfig;
+        float currentTemperature = biomeConfig.biomeTemperature;
+        int surfaceBlocksNoise = (int) (generatingChunk.getNoise(x, z) / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
+
+        // Bedrock on the ceiling
+        if (worldConfig.ceilingBedrock)
         {
-            // Not the correct surface block here, so don't replace it
-            // This can happen when another chunk populated part of this chunk
-            return;
+            // Moved one block lower to fix lighting issues
+            chunkBuffer.setBlock(x, generatingChunk.heightCap - 2, z, worldConfig.bedrockBlock);
         }
 
-        for (LayerChoice layer : this.layerChoices)
+        // Loop from map height to zero to place bedrock and surface
+        // blocks
+        LocalMaterialData currentSurfaceBlock = defaultSurfaceBlock;
+        LocalMaterialData currentGroundBlock = defaultGroundBlock;
+        int surfaceBlocksCount = -1;
+        final int currentWaterLevel = generatingChunk.getWaterLevel(x, z);
+        for (int y = CHUNK_Y_SIZE - 1; y >= 0; y--)
         {
-            if (noise <= layer.maxNoise)
+            if (generatingChunk.mustCreateBedrockAt(worldConfig, y))
             {
-                world.setBlock(x, y, z, layer.surfaceBlock);
-                for (int i = 1; i < 4; i++)
+                // Place bedrock
+                chunkBuffer.setBlock(x, y, z, worldConfig.bedrockBlock);
+            } else
+            {
+                // Surface blocks logic (grass, dirt, sand, sandstone)
+                final LocalMaterialData blockOnCurrentPos = chunkBuffer.getBlock(x, y, z);
+
+                if (blockOnCurrentPos.isAir())
                 {
-                    world.setBlock(x, y - i, z, layer.groundBlock);
+                    // Reset when air is found
+                    surfaceBlocksCount = -1;
+                } else if (blockOnCurrentPos.equals(biomeConfig.stoneBlock))
+                {
+                    if (surfaceBlocksCount == -1)
+                    {
+                        // Set when variable was reset
+                        if (surfaceBlocksNoise <= 0 && !worldConfig.removeSurfaceStone)
+                        {
+                            currentSurfaceBlock = air;
+                            currentGroundBlock = biomeConfig.stoneBlock;
+                        } else if ((y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1))
+                        {
+                            currentSurfaceBlock = defaultSurfaceBlock;
+                            currentGroundBlock = defaultGroundBlock;
+                        }
+
+                        // Use blocks for the top of the water instead
+                        // when on water
+                        if ((y < currentWaterLevel) && (y > worldConfig.waterLevelMin) && currentSurfaceBlock.isAir())
+                        {
+                            if (currentTemperature < WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
+                            {
+                                currentSurfaceBlock = biomeConfig.iceBlock;
+                            } else
+                            {
+                                currentSurfaceBlock = biomeConfig.waterBlock;
+                            }
+                        }
+
+                        // Place surface block
+                        surfaceBlocksCount = surfaceBlocksNoise;
+                        if (y >= currentWaterLevel - 1)
+                        {
+                            chunkBuffer.setBlock(x, y, z, currentSurfaceBlock);
+                        } else
+                        {
+                            chunkBuffer.setBlock(x, y, z, currentGroundBlock);
+                        }
+
+                    } else if (surfaceBlocksCount > 0)
+                    {
+                        // Place ground block
+                        surfaceBlocksCount--;
+                        chunkBuffer.setBlock(x, y, z, currentGroundBlock);
+
+                        // Place sandstone under stand
+                        if ((surfaceBlocksCount == 0) && (currentGroundBlock.isMaterial(DefaultMaterial.SAND)))
+                        {
+                            surfaceBlocksCount = generatingChunk.random.nextInt(4);
+                            currentGroundBlock = sandstone;
+                        }
+                    }
                 }
-                return;
             }
         }
     }
@@ -86,19 +119,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
     @Override
     public String toString()
     {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (LayerChoice groundLayer : this.layerChoices)
-        {
-            stringBuilder.append(groundLayer.surfaceBlock);
-            stringBuilder.append(',').append(' ');
-            stringBuilder.append(groundLayer.groundBlock);
-            stringBuilder.append(',').append(' ');
-            stringBuilder.append(groundLayer.maxNoise);
-            stringBuilder.append(',').append(' ');
-        }
-        // Delete last ", "
-        stringBuilder.deleteCharAt(stringBuilder.length() - 2);
-        return stringBuilder.toString();
+        // Make sure that empty name is written to the config files
+        return "";
     }
-
 }

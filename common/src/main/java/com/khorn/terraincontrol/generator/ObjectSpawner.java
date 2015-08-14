@@ -22,15 +22,13 @@ public class ObjectSpawner
     private final ConfigProvider configProvider;
     private final Random rand;
     private final LocalWorld world;
-    private final NoiseGeneratorNewOctaves noiseGen;
-    private double[] reusableChunkNoiseArray;
 
     public ObjectSpawner(ConfigProvider configProvider, LocalWorld localWorld)
     {
         this.configProvider = configProvider;
         this.rand = new Random();
         this.world = localWorld;
-        this.noiseGen = new NoiseGeneratorNewOctaves(new Random(world.getSeed()), 4);
+        new NoiseGeneratorNewOctaves(new Random(world.getSeed()), 4);
     }
 
     public void populate(ChunkCoordinate chunkCoord)
@@ -65,9 +63,6 @@ public class ObjectSpawner
         // Mark population started
         world.startPopulation(chunkCoord);
         TerrainControl.firePopulationStartEvent(world, rand, hasGeneratedAVillage, chunkCoord);
-        
-        // Complex surface blocks
-        placeComplexSurfaceBlocks(chunkCoord);
 
         // Resource sequence
         for (Resource res : biomeConfig.resourceSequence)
@@ -87,30 +82,6 @@ public class ObjectSpawner
         // Mark population ended
         TerrainControl.firePopulationEndEvent(world, rand, hasGeneratedAVillage, chunkCoord);
         world.endPopulation();
-    }
-    
-    protected void placeComplexSurfaceBlocks(ChunkCoordinate chunkCoord)
-    {
-        this.reusableChunkNoiseArray = this.noiseGen.a(this.reusableChunkNoiseArray, chunkCoord.getChunkX() * 16, chunkCoord.getChunkZ() * 16, 16, 16, 0.0625D, 0.0625D, 1.0D);
-
-        int x = chunkCoord.getBlockXCenter();
-        int z = chunkCoord.getBlockZCenter();
-        for (int i = 0; i < ChunkCoordinate.CHUNK_X_SIZE; i++)
-        {
-            for (int j = 0; j < ChunkCoordinate.CHUNK_Z_SIZE; j++)
-            {
-                int blockToReplaceX = x + i;
-                int blockToReplaceZ = z + j;
-                // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
-                LocalBiome biome = this.world.getBiome(blockToReplaceX, blockToReplaceZ);
-                if (biome != null)
-                {
-                    double noise = this.reusableChunkNoiseArray[i + j * 16];
-                    BiomeConfig biomeConfig = biome.getBiomeConfig();
-                    biomeConfig.surfaceAndGroundControl.spawn(world, biomeConfig, noise, blockToReplaceX, blockToReplaceZ);
-                }
-            }
-        }
     }
 
     protected void freezeChunk(ChunkCoordinate chunkCoord)

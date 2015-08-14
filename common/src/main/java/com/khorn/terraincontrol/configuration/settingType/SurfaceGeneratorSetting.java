@@ -2,8 +2,8 @@ package com.khorn.terraincontrol.configuration.settingType;
 
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.surface.MesaSurfaceGenerator;
-import com.khorn.terraincontrol.generator.surface.NullSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
+import com.khorn.terraincontrol.generator.surface.MultipleLayersSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
@@ -22,7 +22,7 @@ class SurfaceGeneratorSetting extends Setting<SurfaceGenerator>
     @Override
     public SurfaceGenerator getDefaultValue()
     {
-        return new NullSurfaceGenerator();
+        return new SimpleSurfaceGenerator();
     }
 
     @Override
@@ -36,9 +36,9 @@ class SurfaceGeneratorSetting extends Setting<SurfaceGenerator>
                 return mesa;
             }
             String[] parts = StringHelper.readCommaSeperatedString(string);
-            return new SimpleSurfaceGenerator(parts);
+            return new MultipleLayersSurfaceGenerator(parts);
         }
-        return new NullSurfaceGenerator();
+        return new SimpleSurfaceGenerator();
     }
 
 }

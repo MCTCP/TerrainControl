@@ -15,7 +15,7 @@ import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.UseBiome;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resource.*;
-import com.khorn.terraincontrol.generator.surface.NullSurfaceGenerator;
+import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
@@ -345,7 +345,7 @@ public class BiomeConfig extends ConfigFile
             }
         } else
         {
-            defaultSetting = new NullSurfaceGenerator();
+            defaultSetting = new SimpleSurfaceGenerator();
         }
 
         return readSettings(BiomeStandardValues.SURFACE_AND_GROUND_CONTROL, defaultSetting);

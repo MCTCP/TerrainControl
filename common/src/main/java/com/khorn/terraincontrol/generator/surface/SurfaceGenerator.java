@@ -1,7 +1,8 @@
 package com.khorn.terraincontrol.generator.surface;
 
-import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.generator.ChunkBuffer;
+import com.khorn.terraincontrol.generator.GeneratingChunk;
 
 /**
  * Minecraft 1.7 added block data support to the initial terrain generation.
@@ -19,14 +20,13 @@ public interface SurfaceGenerator
 
     /**
      * Spawns this surface layer in the world.
-     * 
-     * @param world The world to spawn in.
-     * @param biomeConfig The biome config to use for the settings.
-     * @param noise The noise value, from -1 to 1.
-     * @param x X position in the world.
-     * @param z Z position in the world.
+     * @param generatingChunk Information about the chunk being generated.
+     * @param chunkBuffer     The chunk buffer.
+     * @param biomeConfig     The biome config to use for the settings.
+     * @param xInWorld        X position in the world.
+     * @param zInWorld        Z position in the world.
      */
-    void spawn(LocalWorld world, BiomeConfig biomeConfig, double noise, int x, int z);
+    void spawn(GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld);
 
     /**
      * Writes the settings used to a string. There must be a constructor to

@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.generator;
 
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
-import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Y_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
 import com.khorn.terraincontrol.LocalMaterialData;
@@ -36,11 +35,7 @@ public class ChunkProviderTC
     public static final int HEIGHT_BITS = 8;
     public static final int HEIGHT_BITS_PLUS_FOUR = HEIGHT_BITS + 4;
 
-    private static final int BEDROCK_LAYER_HEIGHT = 5;
-
-    // Some hardcoded materials, not changeable in configs
     private final LocalMaterialData air = TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0);
-    private final LocalMaterialData sandstone = TerrainControl.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
 
     private final Random random;
     private final NoiseGeneratorPerlinOctaves noiseGen1;
@@ -291,12 +286,14 @@ public class ChunkProviderTC
     protected boolean addBiomeBlocksAndCheckWater(ChunkBuffer chunkBuffer)
     {
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
-        WorldConfig worldConfig = configProvider.getWorldConfig();
+
         int dryBlocksOnSurface = 256;
 
         final double d1 = 0.03125D;
         this.noise4 = this.noiseGen4.a(this.noise4, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_X_SIZE, CHUNK_Z_SIZE, d1 * 2.0D,
                 d1 * 2.0D, 1.0D);
+
+        GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, noise4, heightCap);
 
         for (int x = 0; x < CHUNK_X_SIZE; x++)
         {
@@ -307,91 +304,8 @@ public class ChunkProviderTC
                 // Get the current biome config and some properties
                 final BiomeConfig biomeConfig = this.configProvider.getBiomeByIdOrNull(this.biomeArray[(x + z * CHUNK_X_SIZE)])
                         .getBiomeConfig();
-                final float currentTemperature = biomeConfig.biomeTemperature;
-                final int surfaceBlocksNoise = (int) (this.noise4[(x + z * CHUNK_X_SIZE)] / 3.0D + 3.0D + this.random.nextDouble() * 0.25D);
 
-                // Bedrock on the ceiling
-                if (worldConfig.ceilingBedrock)
-                {
-                    // Moved one block lower to fix lighting issues
-                    chunkBuffer.setBlock(x, this.heightCap - 2, z, worldConfig.bedrockBlock);
-                }
-
-                // Loop from map height to zero to place bedrock and surface
-                // blocks
-                LocalMaterialData currentSurfaceBlock = biomeConfig.surfaceBlock;
-                LocalMaterialData currentGroundBlock = biomeConfig.groundBlock;
-                int surfaceBlocksCount = -1;
-                final int currentWaterLevel = this.waterLevel[z + x * 16];
-                for (int y = CHUNK_Y_SIZE - 1; y >= 0; y--)
-                {
-                    if (mustCreateBedrockAt(worldConfig, y, this.random))
-                    {
-                        // Place bedrock
-                        chunkBuffer.setBlock(x, y, z, worldConfig.bedrockBlock);
-                    } else
-                    {
-                        // Surface blocks logic (grass, dirt, sand, sandstone)
-                        final LocalMaterialData blockOnCurrentPos = chunkBuffer.getBlock(x, y, z);
-
-                        if (blockOnCurrentPos.isAir())
-                        {
-                            // Reset when air is found
-                            surfaceBlocksCount = -1;
-                        } else if (blockOnCurrentPos.equals(biomeConfig.stoneBlock))
-                        {
-                            if (surfaceBlocksCount == -1)
-                            {
-                                // Set when variable was reset
-                                if (surfaceBlocksNoise <= 0 && !worldConfig.removeSurfaceStone)
-                                {
-                                    currentSurfaceBlock = air;
-                                    currentGroundBlock = biomeConfig.stoneBlock;
-                                } else if ((y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1))
-                                {
-                                    currentSurfaceBlock = biomeConfig.surfaceBlock;
-                                    currentGroundBlock = biomeConfig.groundBlock;
-                                }
-
-                                // Use blocks for the top of the water instead
-                                // when on water
-                                if ((y < currentWaterLevel) && (y > worldConfig.waterLevelMin) && currentSurfaceBlock.isAir())
-                                {
-                                    if (currentTemperature < 0.15F)
-                                    {
-                                        currentSurfaceBlock = biomeConfig.iceBlock;
-                                    } else
-                                    {
-                                        currentSurfaceBlock = biomeConfig.waterBlock;
-                                    }
-                                }
-
-                                // Place surface block
-                                surfaceBlocksCount = surfaceBlocksNoise;
-                                if (y >= currentWaterLevel - 1)
-                                {
-                                    chunkBuffer.setBlock(x, y, z, currentSurfaceBlock);
-                                } else
-                                {
-                                    chunkBuffer.setBlock(x, y, z, currentGroundBlock);
-                                }
-
-                            } else if (surfaceBlocksCount > 0)
-                            {
-                                // Place ground block
-                                surfaceBlocksCount--;
-                                chunkBuffer.setBlock(x, y, z, currentGroundBlock);
-
-                                // Place sandstone under stand
-                                if ((surfaceBlocksCount == 0) && (currentGroundBlock.isMaterial(DefaultMaterial.SAND)))
-                                {
-                                    surfaceBlocksCount = this.random.nextInt(4);
-                                    currentGroundBlock = sandstone;
-                                }
-                            }
-                        }
-                    }
-                }
+                biomeConfig.surfaceAndGroundControl.spawn(generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 
                 // Count how many water there is
                 if (chunkBuffer.getBlock(x, biomeConfig.waterLevelMax, z).equals(biomeConfig.waterBlock))
@@ -406,44 +320,6 @@ public class ChunkProviderTC
         return dryBlocksOnSurface > 250;
     }
 
-    private boolean mustCreateBedrockAt(WorldConfig worldConfig, int y, Random random)
-    {
-        // The "- 2" that appears in this method, comes from that heightCap -
-        // 1 is the highest place where a block can be placed, and heightCap -
-        // 2 is the highest place where bedrock can be generated to make sure
-        // there are no light glitches - see #117
-
-        // Handle flat bedrock
-        if (worldConfig.flatBedrock)
-        {
-            if (!worldConfig.disableBedrock && y == 0)
-            {
-                return true;
-            }
-            if (worldConfig.ceilingBedrock && y >= this.heightCap - 2)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        // Otherwise we have normal bedrock
-        if (!worldConfig.disableBedrock && y < 5)
-        {
-            return y <= this.random.nextInt(BEDROCK_LAYER_HEIGHT);
-        }
-        if (worldConfig.ceilingBedrock)
-        {
-            int amountBelowHeightCap = this.heightCap - y - 2;
-            if (amountBelowHeightCap < 0 || amountBelowHeightCap > BEDROCK_LAYER_HEIGHT)
-            {
-                return false;
-            }
-
-            return amountBelowHeightCap <= this.random.nextInt(BEDROCK_LAYER_HEIGHT);
-        }
-        return false;
-    }
 
     private void generateTerrainNoise(int xOffset, int yOffset, int zOffset, int maxYSections, int usedYSections)
     {
