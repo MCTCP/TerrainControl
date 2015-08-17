@@ -75,6 +75,9 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
                 return;
             }
         }
+
+        // Fall back on normal column
+        spawnColumn(config.surfaceBlock, config.groundBlock, generatingChunkInfo, chunkBuffer, config, x, z);
     }
 
     @Override
