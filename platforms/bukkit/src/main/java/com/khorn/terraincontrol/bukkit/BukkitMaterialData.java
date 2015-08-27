@@ -45,7 +45,7 @@ public final class BukkitMaterialData implements LocalMaterialData
      */
     public static BukkitMaterialData ofMinecraftBlock(Block block)
     {
-        return ofIds(Block.getId(block), 0);
+        return ofIds(Block.getId(block), block.toLegacyData(block.getBlockData()));
     }
 
     /**
