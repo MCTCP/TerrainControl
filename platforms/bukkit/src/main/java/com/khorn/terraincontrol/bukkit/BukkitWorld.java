@@ -59,7 +59,8 @@ public class BukkitWorld implements LocalWorld
     private WorldGenTrees cocoaTree;
     private WorldGenForestTree darkOakTree;
     private WorldGenGroundBush groundBush;
-    private WorldGenHugeMushroom hugeMushroom;
+    private WorldGenHugeMushroom hugeBrownMushroom;
+    private WorldGenHugeMushroom hugeRedMushroom;
     private WorldGenMegaTree hugeTaigaTree1;
     private WorldGenMegaTree hugeTaigaTree2;
     private WorldGenJungleTree jungleTree;
@@ -193,7 +194,17 @@ public class BukkitWorld implements LocalWorld
             case TallBirch:
                 return longBirchTree.generate(this.world, rand, blockPos);
             case HugeMushroom:
-                return hugeMushroom.generate(this.world, rand, blockPos);
+                if (rand.nextBoolean())
+                {
+                    return hugeBrownMushroom.generate(this.world, rand, blockPos);
+                } else
+                {
+                    return hugeRedMushroom.generate(this.world, rand, blockPos);
+                }
+            case HugeRedMushroom:
+                return hugeRedMushroom.generate(this.world, rand, blockPos);
+            case HugeBrownMushroom:
+                return hugeBrownMushroom.generate(this.world, rand, blockPos);
             case SwampTree:
                 return swampTree.generate(this.world, rand, blockPos);
             case Taiga1:
@@ -693,7 +704,8 @@ public class BukkitWorld implements LocalWorld
             this.swampTree = new WorldGenSwampTree();
             this.taigaTree1 = new WorldGenTaiga1();
             this.taigaTree2 = new WorldGenTaiga2(false);
-            this.hugeMushroom = new WorldGenHugeMushroom();
+            this.hugeBrownMushroom = new WorldGenHugeMushroom(Blocks.BROWN_MUSHROOM_BLOCK);
+            this.hugeRedMushroom = new WorldGenHugeMushroom(Blocks.RED_MUSHROOM_BLOCK);
             this.hugeTaigaTree1 = new WorldGenMegaTree(false, false);
             this.hugeTaigaTree2 = new WorldGenMegaTree(false, true);
             this.jungleTree = new WorldGenJungleTree(false, 10, 20, jungleLog, jungleLeaves);

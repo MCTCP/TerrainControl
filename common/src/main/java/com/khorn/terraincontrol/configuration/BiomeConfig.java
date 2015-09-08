@@ -698,8 +698,9 @@ public class BiomeConfig extends ConfigFile
         writer.comment("Rarity:         chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass.");
         writer.comment("MinAltitude and MaxAltitude: height limits.");
         writer.comment("BlockSource:    mean where or whereupon resource will be placed ");
-        writer.comment("TreeType:       Tree (original oak tree) - BigTree - Birch - TallBirch - SwampTree");
-        writer.comment("                HugeMushroom (not a tree but still counts) - Taiga1 - Taiga2 - HugeTaiga1 - HugeTaiga2");
+        writer.comment("TreeType:       Tree (original oak tree) - BigTree - Birch - TallBirch - SwampTree -");
+        writer.comment("                HugeMushroom (randomly red or brown) - HugeRedMushroom - HugeBrownMushroom -");
+        writer.comment("                Taiga1 - Taiga2 - HugeTaiga1 - HugeTaiga2 -");
         writer.comment("                JungleTree (the huge jungle tree) - GroundBush - CocoaTree (smaller jungle tree)");
         writer.comment("                DarkOak (from the roofed forest biome) - Acacia");
         writer.comment("                You can also use your own custom objects, as long as they have set Tree to true in their settings.");

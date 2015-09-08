@@ -17,6 +17,8 @@ public enum TreeType
     Forest("Birch"),
     GroundBush,
     HugeMushroom,
+    HugeRedMushroom,
+    HugeBrownMushroom,
     JungleTree,
     SwampTree,
     Taiga1,

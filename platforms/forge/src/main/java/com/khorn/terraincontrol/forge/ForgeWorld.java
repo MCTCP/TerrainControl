@@ -70,7 +70,8 @@ public class ForgeWorld implements LocalWorld
     private WorldGenTrees cocoaTree;
     private WorldGenCanopyTree darkOakTree;
     private WorldGenShrub groundBush;
-    private WorldGenBigMushroom hugeMushroom;
+    private WorldGenBigMushroom hugeRedMushroom;
+    private WorldGenBigMushroom hugeBrownMushroom;
     private WorldGenMegaPineTree hugeTaigaTree1;
     private WorldGenMegaPineTree hugeTaigaTree2;
     private WorldGenMegaJungle jungleTree;
@@ -219,7 +220,17 @@ public class ForgeWorld implements LocalWorld
             case TallBirch:
                 return longBirchTree.generate(this.world, rand, blockPos);
             case HugeMushroom:
-                return hugeMushroom.generate(this.world, rand, blockPos);
+                if (rand.nextBoolean())
+                {
+                    return hugeBrownMushroom.generate(this.world, rand, blockPos);
+                } else
+                {
+                    return hugeRedMushroom.generate(this.world, rand, blockPos);
+                }
+            case HugeRedMushroom:
+                return hugeRedMushroom.generate(this.world, rand, blockPos);
+            case HugeBrownMushroom:
+                return hugeBrownMushroom.generate(this.world, rand, blockPos);
             case SwampTree:
                 return swampTree.generate(this.world, rand, blockPos);
             case Taiga1:
@@ -653,7 +664,8 @@ public class ForgeWorld implements LocalWorld
         this.swampTree = new WorldGenSwamp();
         this.taigaTree1 = new WorldGenTaiga1();
         this.taigaTree2 = new WorldGenTaiga2(false);
-        this.hugeMushroom = new WorldGenBigMushroom();
+        this.hugeRedMushroom = new WorldGenBigMushroom(1);
+        this.hugeBrownMushroom = new WorldGenBigMushroom(0);
         this.hugeTaigaTree1 = new WorldGenMegaPineTree(false, false);
         this.hugeTaigaTree2 = new WorldGenMegaPineTree(false, true);
         this.jungleTree = new WorldGenMegaJungle(false, 10, 20, 3, 3);
