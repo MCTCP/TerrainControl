@@ -5,7 +5,7 @@ defaultTasks 'removeOldReleases', 'build', 'createReleaseJar', 'install'
 
 allprojects
 {
-    version = "2.7.2"
+    version = "2.7.3-SNAPSHOT"
     group = "com.khorn.terraincontrol"
 
     // Version of the shadow plugin
