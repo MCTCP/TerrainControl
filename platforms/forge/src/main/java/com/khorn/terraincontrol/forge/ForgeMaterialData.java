@@ -198,6 +198,13 @@ public class ForgeMaterialData implements LocalMaterialData
         return ofMinecraftBlockState(block.getStateFromMeta(i));
     }
 
+    @Override
+    public LocalMaterialData withDefaultBlockData()
+    {
+        Block block = blockData.getBlock();
+        return this.withBlockData(block.getMetaFromState(block.getDefaultState()));
+    }
+
     public IBlockState internalBlock()
     {
         return blockData;

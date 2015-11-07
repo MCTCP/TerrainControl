@@ -99,13 +99,22 @@ public interface LocalMaterialData
     boolean isMaterial(DefaultMaterial material);
 
     /**
-     * Gets an new instance with the block data changed.
-     * 
+     * Gets an instance with the same material as this object, but with the
+     * given block data. This instance is not modified.
+     *
      * @param newData
      *            The new block data.
-     * @return The new instance.
+     * @return An instance with the given block data.
      */
     LocalMaterialData withBlockData(int newData);
+
+    /**
+     * Gets an instance with the same material as this object, but the default
+     * block data of the material. This instance is not modified.
+     *
+     * @return An instance with the default block data.
+     */
+    LocalMaterialData withDefaultBlockData();
 
     /**
      * Gets whether this material equals another material. The block data is

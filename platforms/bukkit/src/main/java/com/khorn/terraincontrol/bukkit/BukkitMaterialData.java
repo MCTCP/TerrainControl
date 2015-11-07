@@ -204,6 +204,14 @@ public final class BukkitMaterialData implements LocalMaterialData
         return ofMinecraftBlockData(block.fromLegacyData(i));
     }
 
+    @Override
+    public LocalMaterialData withDefaultBlockData()
+    {
+        Block block = Block.getById(getBlockId());
+        byte defaultData = (byte) block.toLegacyData(block.getBlockData());
+        return this.withBlockData(defaultData);
+    }
+
     public IBlockData internalBlock()
     {
         return Block.getById(getBlockId()).fromLegacyData(getBlockData());

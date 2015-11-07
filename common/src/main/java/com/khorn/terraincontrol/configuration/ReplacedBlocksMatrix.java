@@ -44,7 +44,7 @@ public class ReplacedBlocksMatrix
                 throw new InvalidConfigException("Replace parts must be in the format (from,to) or (from,to,minHeight,maxHeight)");
             }
 
-            from = TerrainControl.readMaterial(values[0]).withBlockData(0);
+            from = TerrainControl.readMaterial(values[0]).withDefaultBlockData();
             to = TerrainControl.readMaterial(values[1]);
 
             if (values.length == 4)
