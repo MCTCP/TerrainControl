@@ -1,6 +1,6 @@
 ##  TerrainControl
 
-TerrainControl is an advanced world generator for Minecraft. Through various configuration files it gives the user control over almost every aspect of Minecraft terrain generation, with no knowledge of Java required. It can be used on Bukkit or Forge servers and on singleplayer with Forge. Terrain Control is the successor to the old <a href="http://www.minecraftforum.net/topic/313991-phoenixterrainmod/">PhoenixTerrainMod</a>, which was based on the popular <a href="http://www.minecraftforum.net/topic/71565-biomemod/">BiomeTerrainMod</a>. Terrain Control is maintained by <a href="http://dev.bukkit.org/profiles/Khoorn/">Khoorn</a> (known as <a href="/Wickth">Wickth</a> on GitHub).
+TerrainControl is an advanced world generator for Minecraft. Through various configuration files it gives the user control over almost every aspect of Minecraft terrain generation, with no knowledge of Java required. It can be used on Bukkit or Forge servers and on singleplayer with Forge. Terrain Control is the successor to the old <a href="http://www.minecraftforum.net/topic/313991-phoenixterrainmod/">PhoenixTerrainMod</a>, which was based on the popular <a href="http://www.minecraftforum.net/topic/71565-biomemod/">BiomeTerrainMod</a>. 
 
 <ul>
 <li>Control horizontal and vertical noise of terrain generation</li>
@@ -19,11 +19,15 @@ TerrainControl is an advanced world generator for Minecraft. Through various con
 To learn more, check out <a href="https://github.com/MCTCP/TerrainControl/wiki/Features"><strong>all of TerrainControl's features</strong></a>!
 
 ## Links
-* [Project home at BukkitDev](http://dev.bukkit.org/bukkit-plugins/terrain-control/)
+* Project home at [Minecraft Forums](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2554291-terraincontrol-advanced-world-generator) / [SpigotMC](https://www.spigotmc.org/resources/terraincontrol.2214/) / [BukkitDev](http://dev.bukkit.org/bukkit-plugins/terrain-control/)
 * [Wiki](https://github.com/MCTCP/TerrainControl/wiki/)
 * [Forum](http://forum.mctcp.com/)
-* [Downloads at BukkitDev](http://dev.bukkit.org/bukkit-plugins/terrain-control/files/)
-* [Installation instructions](https://github.com/MCTCP/TerrainControl/wiki/Installation-instructions)
-* [Compile instructions](https://github.com/MCTCP/TerrainControl/wiki/Developer-page#wiki-compiling)
+* [Releases](https://github.com/MCTCP/TerrainControl/releases)
+* [Latest Dev Build](http://build.mctcp.com/job/TerrainControl%20-%20Master%20-%20Gradle/default/lastStableBuild/)
+* [Installation](https://github.com/MCTCP/TerrainControl/wiki/Installation-instructions) & [Compilation](https://github.com/MCTCP/TerrainControl/wiki/Developer-page#wiki-compiling) instructions
 * [Version history](https://github.com/MCTCP/TerrainControl/wiki/Version-history)
-* [Build server at mctcp.com](http://build.mctcp.com/job/TerrainControl%20-%20Master%20-%20Gradle/default/)
+
+## Maintainers
+* <a href="https://github.com/rutgerkok">Rutger Kok</a>
+* <a href="https://github.com/Timethor">Timethor</a>
+* <a href="http://dev.bukkit.org/profiles/Khoorn/">Khoorn</a> (known as <a href="https://github.com/Wickth">Wickth</a> on GitHub)
