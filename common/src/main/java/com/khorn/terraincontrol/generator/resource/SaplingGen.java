@@ -159,4 +159,9 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         return other.getClass().equals(getClass()) && saplingType.equals(((SaplingGen)other).saplingType);
     }
 
+    public int getPriority()
+    {
+        return -30;
+    }
+
 }

@@ -42,4 +42,8 @@ public class AboveWaterGen extends Resource
         return "AboveWaterRes(" + material + "," + frequency + "," + rarity + ")";
     }
 
+    public int getPriority()
+    {
+        return -11;
+    }
 }

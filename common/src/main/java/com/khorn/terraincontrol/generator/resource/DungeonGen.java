@@ -71,4 +71,9 @@ public class DungeonGen extends Resource
                && this.maxAltitude == compare.maxAltitude;
     }
 
+    public int getPriority()
+    {
+        return -20;
+    }
+
 }

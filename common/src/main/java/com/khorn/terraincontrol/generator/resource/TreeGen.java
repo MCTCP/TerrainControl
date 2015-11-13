@@ -129,6 +129,9 @@ public class TreeGen extends Resource
                && (this.treeChances == null ? this.treeChances == compare.treeChances
                    : this.treeChances.equals(compare.treeChances));
     }
-    
-    
+
+    public int getPriority()
+    {
+        return -31;
+    }
 }

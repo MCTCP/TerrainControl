@@ -141,4 +141,9 @@ public class VeinGen extends Resource
         return hash;
     }
 
+    public int getPriority()
+    {
+        return 9;
+    }
+
 }

@@ -144,4 +144,9 @@ public class SurfacePatchGen extends Resource
                 + minAltitude + "," + maxAltitude + "," + sourceBlocks + ")";
     }
 
+    public int getPriority()
+    {
+        return -10;
+    }
+
 }

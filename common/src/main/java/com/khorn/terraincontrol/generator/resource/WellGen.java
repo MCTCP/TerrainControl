@@ -161,4 +161,9 @@ public class WellGen extends Resource
                && this.water.equals(compare.water);
     }
 
+    public int getPriority()
+    {
+        return 0;
+    }
+
 }

@@ -86,4 +86,9 @@ public class BoulderGen extends Resource
         return "Boulder(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
 
+    public int getPriority()
+    {
+        return -22;
+    }
+
 }

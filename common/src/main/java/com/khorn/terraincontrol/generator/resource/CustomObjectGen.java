@@ -105,4 +105,9 @@ public class CustomObjectGen extends Resource
                    : this.objectNames.equals(compare.objectNames));
     }
 
+    public int getPriority()
+    {
+        return -40;
+    }
+
 }

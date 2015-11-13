@@ -165,5 +165,10 @@ public class SmallLakeGen extends Resource
                && this.maxAltitude == compare.maxAltitude
                && Arrays.equals(this.BooleanBuffer, compare.BooleanBuffer);
     }
+
+    public int getPriority()
+    {
+        return 1;
+    }
     
 }

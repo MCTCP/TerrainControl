@@ -155,6 +155,11 @@ public class CustomStructureGen extends Resource
                && (this.objectNames == null ? this.objectNames == compare.objectNames
                    : this.objectNames.equals(compare.objectNames));
     }
+
+    public int getPriority()
+    {
+        return -41;
+    }
     
     
 

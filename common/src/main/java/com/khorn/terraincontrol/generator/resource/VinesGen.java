@@ -120,4 +120,8 @@ public class VinesGen extends Resource
         return hash;
     }
 
+    public int getPriority()
+    {
+        return -50;
+    }
 }

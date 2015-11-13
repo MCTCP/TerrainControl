@@ -89,4 +89,9 @@ public class UnderWaterOreGen extends Resource
                && this.size == compare.size;
     }
 
+    public int getPriority()
+    {
+        return -12;
+    }
+
 }

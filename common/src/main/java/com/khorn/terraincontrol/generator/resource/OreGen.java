@@ -125,6 +125,10 @@ public class OreGen extends Resource
                && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
                    : this.sourceBlocks.equals(compare.sourceBlocks));
     }
-    
+
+    public int getPriority()
+    {
+        return 10;
+    }
 
 }

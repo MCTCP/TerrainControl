@@ -128,4 +128,9 @@ public class UndergroundLakeGen extends Resource
                && this.maxSize == compare.maxSize;
     }
 
+    public int getPriority()
+    {
+        return 3;
+    }
+
 }

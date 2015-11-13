@@ -62,7 +62,7 @@ public class ObjectSpawner
         TerrainControl.firePopulationStartEvent(world, rand, hasGeneratedAVillage, chunkCoord);
 
         // Resource sequence
-        for (Resource res : biomeConfig.resourceSequence)
+        for (Resource res : Resource.getSortedResourceSequence(biomeConfig.resourceSequence))
         {
             res.process(world, rand, hasGeneratedAVillage, chunkCoord);
         }

@@ -234,4 +234,9 @@ public class IceSpikeGen extends Resource
         return super.isAnalogousTo(other) && ((IceSpikeGen) other).type == this.type;
     }
 
+    public int getPriority()
+    {
+        return -21;
+    }
+
 }

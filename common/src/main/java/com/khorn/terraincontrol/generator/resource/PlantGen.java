@@ -86,4 +86,9 @@ public class PlantGen extends Resource
                    : this.sourceBlocks.equals(compare.sourceBlocks));
     }
 
+    public int getPriority()
+    {
+        return -33;
+    }
+
 }

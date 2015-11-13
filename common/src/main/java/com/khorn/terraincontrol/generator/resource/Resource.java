@@ -9,19 +9,18 @@ import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Represents a Resource: something that can generate in the world.
  */
-public abstract class Resource extends ConfigFunction<BiomeConfig>
+public abstract class Resource extends ConfigFunction<BiomeConfig> implements Comparable<Resource>
 {
 
     protected LocalMaterialData material;
     protected int frequency;
     protected double rarity;
+
 
     @Override
     public Class<BiomeConfig> getHolderType()
@@ -199,6 +198,25 @@ public abstract class Resource extends ConfigFunction<BiomeConfig>
         hash = 53 * hash + this.frequency;
         hash = 53 * hash + (int) (Double.doubleToLongBits(this.rarity) ^ (Double.doubleToLongBits(this.rarity) >>> 32));
         return hash;
+    }
+
+    public int getPriority()
+    {
+        return 0;
+    }
+
+    @Override
+    public int compareTo(Resource o)
+    {
+        return Integer.compare(o.getPriority(), this.getPriority());
+    }
+
+    public static Resource[] getSortedResourceSequence(Collection<Resource> resourceCollection)
+    {
+        Resource[] resourcesArray = new Resource[resourceCollection.size()];
+        Resource[] resources = resourceCollection.toArray(resourcesArray);
+        Arrays.sort(resources);
+        return resources;
     }
 
 }

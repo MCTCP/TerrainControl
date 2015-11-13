@@ -105,4 +105,9 @@ public class LiquidGen extends Resource
                    : this.sourceBlocks.equals(compare.sourceBlocks));
     }
 
+    public int getPriority()
+    {
+        return 2;
+    }
+
 }
