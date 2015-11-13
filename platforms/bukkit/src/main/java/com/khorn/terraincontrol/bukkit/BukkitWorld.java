@@ -265,16 +265,15 @@ public class BukkitWorld implements LocalWorld
         Chunk[] cache = getChunkCache(chunkCoord);
 
         // Replace the blocks
-        replaceBlocks(cache[0], 8, 8);
-        replaceBlocks(cache[1], 0, 8);
-        replaceBlocks(cache[2], 8, 0);
-        replaceBlocks(cache[3], 0, 0);
+        for(int i = 0; i < 4; i++) {
+            replaceBlocks(cache[i], 0, 0, 16);
+        }
     }
 
-    private void replaceBlocks(Chunk rawChunk, int startXInChunk, int startZInChunk)
+    private void replaceBlocks(Chunk rawChunk, int startXInChunk, int startZInChunk, int size)
     {
-        int endXInChunk = startXInChunk + 8;
-        int endZInChunk = startZInChunk + 8;
+        int endXInChunk = startXInChunk + size;
+        int endZInChunk = startZInChunk + size;
         int worldStartX = rawChunk.locX * 16;
         int worldStartZ = rawChunk.locZ * 16;
 
@@ -511,14 +510,12 @@ public class BukkitWorld implements LocalWorld
     {
         if (this.chunkCache == null || !topLeft.coordsMatch(this.chunkCache[0].locX, this.chunkCache[0].locZ))
         {
-            // Cache is invalid, most likely because two chunks are being
-            // populated at once
+            // Cache is invalid, most likely because two chunks are being populated at once
             if (this.settings.worldConfig.populationBoundsCheck)
             {
-                // ... but this can never happen, as startPopulation() checks
-                // for this if populationBoundsCheck is set to true
-                // So we have a bug
-                throw new IllegalStateException("chunkCache is null");
+                // ... but this can never happen, as startPopulation() checks for this if populationBoundsCheck is set
+                // to true. So we must have a bug.
+                throw new IllegalStateException("chunkCache is null! You've got a bug!");
             } else
             {
                 // Use a temporary cache, best we can do
@@ -535,7 +532,10 @@ public class BukkitWorld implements LocalWorld
         {
             for (int indexZ = 0; indexZ <= 1; indexZ++)
             {
-                chunkCache[indexX | (indexZ << 1)] = world.getChunkAt(topLeft.getChunkX() + indexX, topLeft.getChunkZ() + indexZ);
+                chunkCache[indexX | (indexZ << 1)] = world.getChunkAt(
+                        topLeft.getChunkX() + indexX,
+                        topLeft.getChunkZ() + indexZ
+                );
             }
         }
         return chunkCache;
