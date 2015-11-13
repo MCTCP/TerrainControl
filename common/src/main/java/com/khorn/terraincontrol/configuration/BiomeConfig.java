@@ -17,6 +17,7 @@ import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
+import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -76,6 +77,7 @@ public class BiomeConfig extends ConfigFile
     public int waterLevelMin;
     public LocalMaterialData waterBlock;
     public LocalMaterialData iceBlock;
+    public boolean useTemperatureForSnowHeight;
     public int riverWaterLevel;
 
     private int configWaterLevelMax;
@@ -198,6 +200,36 @@ public class BiomeConfig extends ConfigFile
         }
     }
 
+    /**
+     * This is a pretty weak map from -0.5 to ~-0.8 (min vanilla temperature)
+     *
+     * TODO: We should probably make this more configurable in the future?
+     *
+     * @param temp The temp to get snow height for
+     * @return A value from 0 to 7 to be used for snow height
+     */
+    public int getSnowHeight(float temp)
+    {
+        if (this.useTemperatureForSnowHeight)
+        {
+            if (temp <= -.75)
+                return 7;
+            if (temp <= -.7)
+                return 6;
+            if (temp <= -.65)
+                return 5;
+            if (temp <= -.575)
+                return 4;
+            if (temp <= -.55)
+                return 3;
+            if (temp <= -.525)
+                return 2;
+            if (temp <= -.5)
+                return 1;
+        }
+        return 0;
+    }
+
     public void outputToFile()
     {
         if (!processHasRun)
@@ -245,6 +277,7 @@ public class BiomeConfig extends ConfigFile
         this.biomeSizeWhenBorder = readSettings(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, defaultSettings.defaultSizeWhenBorder);
 
         this.biomeTemperature = readSettings(BiomeStandardValues.BIOME_TEMPERATURE, defaultSettings.defaultBiomeTemperature);
+        this.useTemperatureForSnowHeight = readSettings(BiomeStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT);
         this.biomeWetness = readSettings(BiomeStandardValues.BIOME_WETNESS, defaultSettings.defaultBiomeWetness);
 
         if (this.defaultSettings.isCustomBiome)
@@ -632,6 +665,12 @@ public class BiomeConfig extends ConfigFile
             writer.comment("On default biomes, this won't do anything except changing the grass and leaves colors slightly.");
         }
         writer.setting(BiomeStandardValues.BIOME_TEMPERATURE, this.biomeTemperature);
+
+        writer.comment("In Vanilla Minecraft, all snow is 1 layer high. When this setting is set to true, snow height is");
+        writer.comment("determined by biome temperature and therefore height.");
+        writer.comment("For now: A block temp > -.5 yields a single snow layer. A block temp < -.75 yields max snow layers.");
+        writer.comment("All values in the range -.75 < temp < -.5 are evenly distributed.");
+        writer.setting(BiomeStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT, this.useTemperatureForSnowHeight);
 
         writer.comment("Biome wetness. Float value from 0.0 to 1.0.");
         if (this.defaultSettings.isCustomBiome)

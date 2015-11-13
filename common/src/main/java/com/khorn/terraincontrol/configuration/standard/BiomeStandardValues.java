@@ -27,6 +27,7 @@ public class BiomeStandardValues extends Settings
 
     public static final Setting<Boolean>
             RESOURCE_INHERITANCE = booleanSetting("ResourceInheritance", true),
+            USE_TEMPERATURE_FOR_SNOW_HEIGHT = booleanSetting("UseTemperatureForSnowHeight", false),
             USE_WORLD_WATER_LEVEL = booleanSetting("UseWorldWaterLevel", true),
             GRASS_COLOR_IS_MULTIPLIER = booleanSetting("GrassColorIsMultiplier", true),
             FOLIAGE_COLOR_IS_MULTIPLIER = booleanSetting("FoliageColorIsMultiplier", true),
