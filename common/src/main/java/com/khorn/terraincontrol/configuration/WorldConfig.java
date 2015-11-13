@@ -149,6 +149,10 @@ public class WorldConfig extends ConfigFile
     public int waterLevelMin;
     public LocalMaterialData waterBlock;
     public LocalMaterialData iceBlock;
+    public LocalMaterialData cooledLavaBlock;
+    public boolean betterSnowFall;
+    public boolean fullyFreezeLakes;
+    public boolean useTemperatureForSnowHeight;
 
     public double fractureHorizontal;
     public double fractureVertical;
@@ -343,8 +347,12 @@ public class WorldConfig extends ConfigFile
         this.FrozenOceanTemperature = readSettings(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE);
         this.FreezeAllColdGroupBiomes = readSettings(WorldStandardValues.GROUP_FREEZE_ENABLED);
 
-        // Rivers
+        // Freeze & Snow Settings
+        this.useTemperatureForSnowHeight = readSettings(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT);
+        this.betterSnowFall = readSettings(WorldStandardValues.BETTER_SNOW_FALL);
+        this.fullyFreezeLakes = readSettings(WorldStandardValues.FULLY_FREEZE_LAKES);
 
+        // Rivers
         this.riverRarity = readSettings(WorldStandardValues.RIVER_RARITY);
         this.riverSize = readSettings(WorldStandardValues.RIVER_SIZE);
         this.riversEnabled = readSettings(WorldStandardValues.RIVERS_ENABLED);
@@ -433,6 +441,9 @@ public class WorldConfig extends ConfigFile
         this.waterLevelMin = readSettings(WorldStandardValues.WATER_LEVEL_MIN);
         this.waterBlock = readSettings(WorldStandardValues.WATER_BLOCK);
         this.iceBlock = readSettings(WorldStandardValues.ICE_BLOCK);
+
+        // Lava
+        this.cooledLavaBlock = readSettings(WorldStandardValues.COOLED_LAVA_BLOCK);
 
         // Fracture
         this.fractureHorizontal = readSettings(WorldStandardValues.FRACTURE_HORIZONTAL);
@@ -755,7 +766,8 @@ public class WorldConfig extends ConfigFile
             writer.setting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES, this.populateUsingSavedBiomes);
         }
 
-        writer.smallTitle("Water and ice");
+        writer.smallTitle("Water / Lava & Frozen States");
+
         writer.comment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
         writer.setting(WorldStandardValues.WATER_LEVEL_MAX, this.waterLevelMax);
         writer.setting(WorldStandardValues.WATER_LEVEL_MIN, this.waterLevelMin);
@@ -765,6 +777,30 @@ public class WorldConfig extends ConfigFile
 
         writer.comment("Block used as ice.");
         writer.setting(WorldStandardValues.ICE_BLOCK, this.iceBlock);
+
+        writer.comment("Block used as cooled or frozen lava.");
+        writer.comment("Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes");
+        writer.setting(WorldStandardValues.COOLED_LAVA_BLOCK, this.cooledLavaBlock);
+
+        writer.comment("==== WORLD ONLY ====");
+        writer.comment("");
+
+        writer.comment("By Default in cold biomes, lakes freeze but only water exposed to sky is frozen.");
+        writer.comment("Setting this to true causes any lake in a cold biome with at least one block exposed to sky to completely freeze");
+        writer.setting(WorldStandardValues.FULLY_FREEZE_LAKES, this.fullyFreezeLakes);
+
+        writer.comment("By Default, all snow is 1 layer high. When this setting is set to true, snow height is");
+        writer.comment("determined by biome temperature and therefore height.");
+        writer.comment("For now: A block temp > -.5 yields a single snow layer. A block temp < -.75 yields max snow layers.");
+        writer.comment("All values in the range -.75 < temp < -.5 are evenly distributed.");
+        writer.setting(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT, this.useTemperatureForSnowHeight);
+
+        writer.comment("By Default, snow falls on the highest block only.");
+        writer.comment("Setting this to true will cause snow to fall through leaves but leave a little snow on the way");
+        writer.setting(WorldStandardValues.BETTER_SNOW_FALL, this.betterSnowFall);
+
+
+        writer.bigTitle("Resources");
 
         writer.comment("Seed used for the resource generation. Can only be numeric. Set to 0 to use the world seed.");
         writer.setting(WorldStandardValues.RESOURCES_SEED, this.resourcesSeed);

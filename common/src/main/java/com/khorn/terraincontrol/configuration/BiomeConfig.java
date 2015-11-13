@@ -17,7 +17,6 @@ import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
-import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -77,13 +76,15 @@ public class BiomeConfig extends ConfigFile
     public int waterLevelMin;
     public LocalMaterialData waterBlock;
     public LocalMaterialData iceBlock;
-    public boolean useTemperatureForSnowHeight;
+    public LocalMaterialData cooledLavaBlock;
+
     public int riverWaterLevel;
 
     private int configWaterLevelMax;
     private int configWaterLevelMin;
     private LocalMaterialData configWaterBlock;
     private LocalMaterialData configIceBlock;
+    private LocalMaterialData configCooledLavaBlock;
     private int configRiverWaterLevel;
 
     public int skyColor;
@@ -188,6 +189,7 @@ public class BiomeConfig extends ConfigFile
                 this.waterLevelMin = worldConfig.waterLevelMin;
                 this.waterBlock = worldConfig.waterBlock;
                 this.iceBlock = worldConfig.iceBlock;
+                this.cooledLavaBlock = worldConfig.cooledLavaBlock;
                 this.riverWaterLevel = worldConfig.waterLevelMax;
             } else
             {
@@ -195,6 +197,7 @@ public class BiomeConfig extends ConfigFile
                 this.waterLevelMin = this.configWaterLevelMin;
                 this.waterBlock = this.configWaterBlock;
                 this.iceBlock = this.configIceBlock;
+                this.cooledLavaBlock = this.configCooledLavaBlock;
                 this.riverWaterLevel = this.configRiverWaterLevel;
             }
         }
@@ -210,7 +213,7 @@ public class BiomeConfig extends ConfigFile
      */
     public int getSnowHeight(float temp)
     {
-        if (this.useTemperatureForSnowHeight)
+        if (this.worldConfig.useTemperatureForSnowHeight)
         {
             if (temp <= -.75)
                 return 7;
@@ -277,7 +280,6 @@ public class BiomeConfig extends ConfigFile
         this.biomeSizeWhenBorder = readSettings(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, defaultSettings.defaultSizeWhenBorder);
 
         this.biomeTemperature = readSettings(BiomeStandardValues.BIOME_TEMPERATURE, defaultSettings.defaultBiomeTemperature);
-        this.useTemperatureForSnowHeight = readSettings(BiomeStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT);
         this.biomeWetness = readSettings(BiomeStandardValues.BIOME_WETNESS, defaultSettings.defaultBiomeWetness);
 
         if (this.defaultSettings.isCustomBiome)
@@ -305,6 +307,7 @@ public class BiomeConfig extends ConfigFile
         this.configWaterLevelMin = readSettings(BiomeStandardValues.WATER_LEVEL_MIN);
         this.configWaterBlock = readSettings(BiomeStandardValues.WATER_BLOCK);
         this.configIceBlock = readSettings(BiomeStandardValues.ICE_BLOCK);
+        this.configCooledLavaBlock = readSettings(BiomeStandardValues.COOLED_LAVA_BLOCK);
 
         this.skyColor = readSettings(BiomeStandardValues.SKY_COLOR);
         this.waterColor = readSettings(BiomeStandardValues.WATER_COLOR, defaultSettings.defaultWaterColorMultiplier);
@@ -637,9 +640,9 @@ public class BiomeConfig extends ConfigFile
         writer.comment("Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
         writer.setting(BiomeStandardValues.REPLACED_BLOCKS, replacedBlocks);
 
-        writer.smallTitle("Water and ice");
+        writer.smallTitle("Water / Lava & Frozen States");
 
-        writer.comment("Set this to false to use the water and ice settings of this biome.");
+        writer.comment("Set this to false to use the \"Water / Lava & Frozen States\" settings of this biome.");
         writer.setting(BiomeStandardValues.USE_WORLD_WATER_LEVEL, this.useWorldWaterLevel);
 
         writer.comment("Set water level. Every empty between this levels will be fill water or another block from WaterBlock.");
@@ -651,6 +654,10 @@ public class BiomeConfig extends ConfigFile
 
         writer.comment("Block used as ice. Ice only spawns if the BiomeTemperture is low enough.");
         writer.setting(BiomeStandardValues.ICE_BLOCK, this.configIceBlock);
+
+        writer.comment("Block used as cooled or frozen lava.");
+        writer.comment("Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes");
+        writer.setting(WorldStandardValues.COOLED_LAVA_BLOCK, this.cooledLavaBlock);
 
         writer.bigTitle("Visuals and weather");
         writer.comment("Most of the settings here only have an effect on players with the client version of Terrain Control installed.");
@@ -665,12 +672,6 @@ public class BiomeConfig extends ConfigFile
             writer.comment("On default biomes, this won't do anything except changing the grass and leaves colors slightly.");
         }
         writer.setting(BiomeStandardValues.BIOME_TEMPERATURE, this.biomeTemperature);
-
-        writer.comment("In Vanilla Minecraft, all snow is 1 layer high. When this setting is set to true, snow height is");
-        writer.comment("determined by biome temperature and therefore height.");
-        writer.comment("For now: A block temp > -.5 yields a single snow layer. A block temp < -.75 yields max snow layers.");
-        writer.comment("All values in the range -.75 < temp < -.5 are evenly distributed.");
-        writer.setting(BiomeStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT, this.useTemperatureForSnowHeight);
 
         writer.comment("Biome wetness. Float value from 0.0 to 1.0.");
         if (this.defaultSettings.isCustomBiome)

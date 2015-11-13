@@ -97,6 +97,9 @@ public class WorldStandardValues extends Settings
             RANDOM_RIVERS = booleanSetting("RandomRivers", false),
             IMPROVED_RIVERS = booleanSetting("ImprovedRivers", false),
             FROZEN_OCEAN = booleanSetting("FrozenOcean", true),
+            USE_TEMPERATURE_FOR_SNOW_HEIGHT = booleanSetting("UseTemperatureForSnowHeight", false),
+            BETTER_SNOW_FALL = booleanSetting("BetterSnowFall", false),
+            FULLY_FREEZE_LAKES = booleanSetting("FullyFreezeLakes", false),
             EVEN_CAVE_DISTRIBUTION = booleanSetting("EvenCaveDistrubution", false),
             DISABLE_BEDROCK = booleanSetting("DisableBedrock", false),
             CEILING_BEDROCK = booleanSetting("CeilingBedrock", false),
@@ -114,6 +117,7 @@ public class WorldStandardValues extends Settings
     public static final Setting<LocalMaterialData>
             WATER_BLOCK = new MaterialSetting("WaterBlock", DefaultMaterial.STATIONARY_WATER),
             ICE_BLOCK = new MaterialSetting("IceBlock", DefaultMaterial.ICE),
+            COOLED_LAVA_BLOCK = new MaterialSetting("CooledLavaBlock", DefaultMaterial.STATIONARY_LAVA),
             BEDROCK_BLOCK = new MaterialSetting("BedrockobBlock", DefaultMaterial.BEDROCK);
 
     public static final Setting<List<String>>
