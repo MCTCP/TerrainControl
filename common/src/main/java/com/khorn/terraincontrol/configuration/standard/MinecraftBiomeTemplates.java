@@ -316,6 +316,12 @@ public class MinecraftBiomeTemplates
             this.defaultNotBorderNear.add(DefaultBiome.RIVER.Name);
             this.defaultNotBorderNear.add(DefaultBiome.SWAMPLAND.Name);
             this.defaultNotBorderNear.add(DefaultBiome.EXTREME_HILLS.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.ICE_PLAINS_SPIKES.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.ICE_PLAINS.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.COLD_TAIGA.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.COLD_TAIGA_HILLS.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.COLD_TAIGA_MOUNTAINS.Name);
+            this.defaultNotBorderNear.add(DefaultBiome.ICE_MOUNTAINS.Name);
             this.defaultNotBorderNear.add(DefaultBiome.MUSHROOM_ISLAND.Name);
             this.defaultNotBorderNear.add(DefaultBiome.DEEP_OCEAN.Name);
             this.defaultNotBorderNear.add(DefaultBiome.COLD_BEACH.Name);
