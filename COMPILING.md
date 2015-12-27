@@ -18,29 +18,29 @@ a Forge mod in `platforms/forge/build/distributions` and a file that runs
 on both in `releases/build/distributions`.
 
 ## Eclipse
+
+### Before you start
 First, we need a decompiled version of Minecraft, this makes it much easier to
 create mods. Run `./gradlew setupDecompWorkspace` in the TerrainControl
 directory. You will need to rerun this command every time the Forge version
 TerrainControl is built against changes.
 
-Now there are two ways to open TerrainControl in Eclipse:
+### Importing the project
+If you have Eclipse Mars.1 or newer, you can simply use `File` -> `Import` ->
+`Gradle` -> `Gradle Project` and import the TerrainControl directory.
 
-* Manually: run `./gradlew eclipse`. In Eclipse, choose `File` -> `Import`
-  -> `General` -> `Existing Projects into Workspace` and select the
-  TerrainControl directory. You need to rerun the `./gradlew eclipse` whenever
-  any of our dependencies (Spigot, Forge, etc.) are updated.
-* Using the Buildship plugin: first, make sure you have Eclipse Mars or newer
-  installed. If not, download it from eclipse.org. Then make sure the Buildship
-  plugin is installed. If not, choose `Help` -> `Eclipse Marketplace` and
-  install Buildship. Then choose `File` -> `Import` -> `Gradle` ->
-  `Gradle Project` and import the TerrainControl directory.
+If you want to use an older version of Eclipse, things are a little bit more
+complicated. Run `./gradlew eclipse` in the TerrainControl directory. Then,
+in Eclipse, choose `File` -> `Import` -> `General` ->
+`Existing Projects into Workspace` and select the TerrainControl directory.
+You need to rerun the `./gradlew eclipse` whenever any of our dependencies
+(Spigot, Forge, etc.) are updated.
 
+### Running the Forge client or server
 In the Forge version of TerrainControl two classes are included to help you run
 the project from your IDE. Click `Run` -> `Edit Configurations...` -> `+`
 -> `Application`. Use `forge` as the module (for the classpath) and use either
-the 
-
-`com.khorn.terraincontrol.forge.launch.TCLaunchForgeClient` or the
+the `com.khorn.terraincontrol.forge.launch.TCLaunchForgeClient` or the
 `com.khorn.terraincontrol.forge.launch.TCLaunchForgeServer` class and
 press the Run button in the menu bar to run the Forge client or server.
 
