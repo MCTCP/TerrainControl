@@ -24,7 +24,8 @@ To learn more, check out <a href="https://github.com/MCTCP/TerrainControl/wiki/F
 * [Forum](http://forum.mctcp.com/)
 * [Releases](https://github.com/MCTCP/TerrainControl/releases)
 * [Latest Dev Build](http://build.mctcp.com/job/TerrainControl%20-%20Master%20-%20Gradle/default/lastStableBuild/)
-* [Installation](https://github.com/MCTCP/TerrainControl/wiki/Installation-instructions) & [Compilation](https://github.com/MCTCP/TerrainControl/wiki/Developer-page#wiki-compiling) instructions
+* [Installation](https://github.com/MCTCP/TerrainControl/wiki/Installation-instructions) for Spigot and Forge
+* [Compilation](./COMPILING.md) instructions for command-line, Eclipse and IntelliJ
 * [Version history](https://github.com/MCTCP/TerrainControl/wiki/Version-history)
 
 ## Maintainers
