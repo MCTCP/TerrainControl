@@ -19,8 +19,9 @@ subprojects
 
     task.plugins.withType(org.gradle.api.plugins.JavaBasePlugin)
     {
-        // We're still on Java 6
-        sourceCompatibility = '1.6'
+        // We're still on Java 7
+        sourceCompatibility = '1.7'
+        targetCompatibility = '1.7'
 
         // Generate Eclipse config files when using "gradle eclipse"
         task.apply plugin: 'eclipse'
