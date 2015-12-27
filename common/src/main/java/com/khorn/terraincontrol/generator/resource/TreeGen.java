@@ -122,8 +122,8 @@ public class TreeGen extends Resource
         if (getClass() != other.getClass())
             return false;
         final TreeGen compare = (TreeGen) other;
-        return (this.treeNames == null ? this.treeNames == compare.treeNames
-                : this.treeNames.equals(compare.treeNames))
+        return (this.trees == null ? this.trees == compare.trees
+                : this.trees.equals(compare.trees))
                && (this.treeNames == null ? this.treeNames == compare.treeNames
                    : this.treeNames.equals(compare.treeNames))
                && (this.treeChances == null ? this.treeChances == compare.treeChances
