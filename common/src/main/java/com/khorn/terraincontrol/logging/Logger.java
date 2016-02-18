@@ -54,25 +54,31 @@ public class Logger
      */
     public void log(Marker level, String message, Object... params)
     {
-        String levelName = level.getName();
-        StringBuilder sb = new StringBuilder(50).append('[').append(PLUGIN_NAME).append("] [")
-            .append(levelName.substring(levelName.lastIndexOf('.')+1)) //>>	only get the basic name not the FQN
-            .append("] ").append(message);
         if (LogMarker.compare(logLevel, level) >= 0)
         {//>>	Only log messages that we want to see...
+
+            StringBuilder sb = new StringBuilder(50).append('[').append(PLUGIN_NAME).append("] ");
+
             //>>	Log Fatal, Error, and Warn as what they are without Markers.
             if (LogMarker.compare(LogMarker.FATAL, level) == 0)
             {
                 baseLogger.fatal(sb.toString(), params);
             } else if (LogMarker.compare(LogMarker.ERROR, level) == 0)
             {
-                baseLogger.error(sb.toString(), params);
+                baseLogger.error(sb.append(message).toString(), params);
             } else if (LogMarker.compare(LogMarker.WARN, level) == 0)
             {
-                baseLogger.warn(sb.toString(), params);
+                baseLogger.warn(sb.append(message).toString(), params);
+            } else if (LogMarker.compare(LogMarker.INFO, level) == 0)
+            {
+                baseLogger.info(sb.append(message).toString(), params);
             } else
             {//>>	Otherwise log the message as info and tag it with a marker
-                baseLogger.info(level, sb.toString(), params);
+                String levelName = level.getName();
+                sb.append("[")
+                        .append(levelName.substring(levelName.lastIndexOf('.')+1)) //>> only get the basic name not the FQN
+                        .append("] ");
+                baseLogger.info(level, sb.append(message).toString(), params);
             }
         }
     }
