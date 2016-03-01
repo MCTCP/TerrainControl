@@ -93,6 +93,7 @@ public class BlockHelper
             case ACACIA_STAIRS:
             case DARK_OAK_STAIRS:
             case RED_SANDSTONE_STAIRS:
+            case PURPUR_STAIRS:
                 switch (data)
                 {
                     case 2:
@@ -160,6 +161,10 @@ public class BlockHelper
                 return (data + 12) % 16;
 
             case WALL_BANNER:
+            case END_ROD:
+            case COMMAND:
+            case COMMAND_REPEATING:
+            case COMMAND_CHAIN:
                 switch (data)
                 {
                     case 5:
@@ -321,7 +326,14 @@ public class BlockHelper
                     return 4;
                 if (data == 4)
                     return 3;
+                break;
 
+            case PURPUR_PILLAR:
+                if (data == 4)
+                    return 8;
+                if (data == 8)
+                    return 4;
+                break;
         }
 
         return data;

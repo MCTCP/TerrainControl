@@ -213,7 +213,22 @@ public enum DefaultMaterial
     JUNGLE_DOOR(195, false),
     ACACIA_DOOR(196, false),
     DARK_OAK_DOOR(197, false),
-    UNKNOWN_BLOCK(255);
+    END_ROD(198, false),
+    CHORUS_PLANT(199, false),
+    CHORUS_FLOWER(200, false),
+    PURPUR_BLOCK(201),
+    PURPUR_PILLAR(202),
+    PURPUR_STAIRS(203, false),
+    PURPUR_DOUBLE_SLAB(204),
+    PURPUR_SLAB(205, false),
+    END_BRICKS(206),
+    BEETROOT_BLOCK(207, false),
+    GRASS_PATH(208, false),
+    END_GATEWAY(209, false),
+    COMMAND_REPEATING(210),
+    COMMAND_CHAIN(211),
+    STRUCTURE_BLOCK(255, false),
+    UNKNOWN_BLOCK(254);
     /**
      * The ID of the material
      */

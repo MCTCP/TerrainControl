@@ -32,6 +32,7 @@ public enum MobNames
     RABBIT("Rabbit", "rabbit"),
     SHEEP("Sheep", "sheep"),
     SILVERFISH("Silverfish", "silverfish", "silver_fish"),
+    SHULKER("Shulker", "shulker"),
     SKELETON("Skeleton", "skeleton"),
     SLIME("Slime", "slime"),
     SNOWMAN("SnowMan", "snowman"),
