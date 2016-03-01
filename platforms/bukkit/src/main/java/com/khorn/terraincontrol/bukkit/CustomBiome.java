@@ -17,7 +17,7 @@ import java.util.List;
 public class CustomBiome extends BiomeBase
 {
     public final int generationId;
-    
+
     /**
      * Mojang made the methods on BiomeBase.a protected (so only accessable for
      * classes in the package net.minecraft.world.biome package and for
@@ -25,16 +25,30 @@ public class CustomBiome extends BiomeBase
      * BiomeBase.a.
      *
      */
-    private static class BiomeBase_a extends BiomeBase.a {
+    private static class BiomeBase_a extends BiomeBase.a
+    {
 
         public BiomeBase_a(String name, BiomeConfig biomeConfig)
         {
             super(name);
+
+            // Minecraft doesn't like temperatures between 0.1 and 0.2, so avoid
+            // them: round them to either 0.1 or 0.2
+            float adjustedTemperature = biomeConfig.biomeTemperature;
+            if (adjustedTemperature >= 0.1 && adjustedTemperature <= 0.2)
+            {
+                if (adjustedTemperature >= 1.5)
+                    adjustedTemperature = 0.2f;
+                else
+                    adjustedTemperature = 0.1f;
+            }
+
             c(biomeConfig.biomeHeight);
             d(biomeConfig.biomeVolatility);
-            a(biomeConfig.biomeTemperature);
+            a(adjustedTemperature);
             b(biomeConfig.biomeWetness);
-            if (biomeConfig.biomeWetness <= 0.0001) {
+            if (biomeConfig.biomeWetness <= 0.0001)
+            {
                 a(); // disableRain()
             }
         }
@@ -83,7 +97,8 @@ public class CustomBiome extends BiomeBase
         this.generationId = biomeConfig.generationId;
 
         // Sanity check
-        if (this.getTemperature() != biomeConfig.biomeTemperature) {
+        if (this.getHumidity() != biomeConfig.biomeWetness)
+        {
             throw new AssertionError("Biome temperature mismatch");
         }
 
