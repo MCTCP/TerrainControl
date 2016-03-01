@@ -105,7 +105,7 @@ public class RareBuildingGen extends StructureGenerator
         return StructureNames.RARE_BUILDING;
     }
 
-    public class RareBuildingStart extends StructureStart
+    public static class RareBuildingStart extends StructureStart
     {
         public RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
         {
