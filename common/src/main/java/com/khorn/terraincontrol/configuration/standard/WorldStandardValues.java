@@ -81,7 +81,7 @@ public class WorldStandardValues extends Settings
             CANYON_MIN_LENGTH = intSetting("CanyonMinLength", 84, 1, 500),
             CANYON_MAX_LENGTH = intSetting("CanyonMaxLength", 112, 1, 500),
             OBJECT_SPAWN_RATIO = intSetting("ObjectSpawnRatio", 1, 1, 1000),
-            STRONGHOLD_COUNT = intSetting("StrongholdCount", 3, 0, 1000),
+            STRONGHOLD_COUNT = intSetting("StrongholdCount", 128, 0, 1000),
             STRONGHOLD_SPREAD = intSetting("StrongholdSpread", 3, 1, 1000),
             VILLAGE_DISTANCE = intSetting("VillageDistance", 32, 9, 10000),
             VILLAGE_SIZE = intSetting("VillageSize", 0, 0, 10),

@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.util;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.CustomBiome;
-import net.minecraft.server.v1_8_R3.BiomeBase;
+import net.minecraft.server.v1_9_R1.BiomeBase;
 
 public abstract class WorldHelper
 {
@@ -14,7 +14,7 @@ public abstract class WorldHelper
      * @param world The world.
      * @return The LocalWorld, or null if there is none.
      */
-    public static LocalWorld toLocalWorld(net.minecraft.server.v1_8_R3.World world)
+    public static LocalWorld toLocalWorld(net.minecraft.server.v1_9_R1.World world)
     {
         return TerrainControl.getWorld(world.getWorld().getName());
     }
@@ -44,7 +44,18 @@ public abstract class WorldHelper
         {
             return ((CustomBiome) biomeBase).generationId;
         }
-        return biomeBase.id;
+        return BiomeBase.a(biomeBase);
+    }
+
+    /**
+     * Gets the saved id of the given biome.
+     *
+     * @param biomeBase The biome.
+     * @return The id.
+     */
+    public static int getSavedId(BiomeBase biomeBase)
+    {
+        return BiomeBase.a(biomeBase);
     }
 
     private WorldHelper()

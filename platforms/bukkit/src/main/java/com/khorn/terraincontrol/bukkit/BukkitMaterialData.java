@@ -4,9 +4,9 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import net.minecraft.server.v1_8_R3.Block;
-import net.minecraft.server.v1_8_R3.BlockFalling;
-import net.minecraft.server.v1_8_R3.IBlockData;
+import net.minecraft.server.v1_9_R1.Block;
+import net.minecraft.server.v1_9_R1.BlockFalling;
+import net.minecraft.server.v1_9_R1.IBlockData;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
@@ -127,9 +127,9 @@ public final class BukkitMaterialData implements LocalMaterialData
             // Use Minecraft's name
             if (nonDefaultData)
             {
-                return Block.REGISTRY.c(block) + ":" + data;
+                return Block.REGISTRY.b(block) + ":" + data;
             }
-            return Block.REGISTRY.c(block).toString();
+            return Block.REGISTRY.b(block).toString();
         } else
         {
             // Use our name
@@ -158,7 +158,7 @@ public final class BukkitMaterialData implements LocalMaterialData
     @Override
     public boolean isLiquid()
     {
-        return Block.getById(getBlockId()).getMaterial().isLiquid();
+        return this.internalBlock().getMaterial().isLiquid();
     }
 
     @Override
@@ -177,7 +177,7 @@ public final class BukkitMaterialData implements LocalMaterialData
             return defaultMaterial.isSolid();
         }
 
-        return Block.getById(getBlockId()).getMaterial().isSolid();
+        return this.internalBlock().getMaterial().isSolid();
     }
 
     @Override

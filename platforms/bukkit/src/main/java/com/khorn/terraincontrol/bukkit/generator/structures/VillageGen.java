@@ -1,13 +1,17 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R3.BiomeBase;
-import net.minecraft.server.v1_8_R3.StructureGenerator;
-import net.minecraft.server.v1_8_R3.StructureStart;
+import net.minecraft.server.v1_9_R1.*;
+import net.minecraft.server.v1_9_R1.WorldGenVillagePieces.WorldGenVillagePieceWeight;
+import net.minecraft.server.v1_9_R1.WorldGenVillagePieces.WorldGenVillageRoadPiece;
+import net.minecraft.server.v1_9_R1.WorldGenVillagePieces.WorldGenVillageStartPiece;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +69,7 @@ public class VillageGen extends StructureGenerator
 
         int i1 = chunkX / this.distance;
         int j1 = chunkZ / this.distance;
-        Random random = this.c.a(i1, j1, 10387312);
+        Random random = this.g.a(i1, j1, 10387312);
 
         i1 *= this.distance;
         j1 *= this.distance;
@@ -73,7 +77,7 @@ public class VillageGen extends StructureGenerator
         j1 += random.nextInt(this.distance - this.minimumDistance);
         if (k == i1 && l == j1)
         {
-            boolean flag = this.c.getWorldChunkManager().a(k * 16 + 8, l * 16 + 8, 0, villageSpawnBiomes);
+            boolean flag = this.g.getWorldChunkManager().a(k * 16 + 8, l * 16 + 8, 0, villageSpawnBiomes);
 
             if (flag)
             {
@@ -87,12 +91,114 @@ public class VillageGen extends StructureGenerator
     @Override
     protected StructureStart b(int chunkX, int chunkZ)
     {
-        return new VillageStart(this.c, this.b, chunkX, chunkZ, this.size);
+        return new VillageStart(this.g, this.f, chunkX, chunkZ, this.size);
     }
 
     @Override
     public String a()
     {
         return StructureNames.VILLAGE;
+    }
+
+    public static class VillageStart extends StructureStart
+    {
+        // well ... thats what it does
+        private boolean hasMoreThanTwoComponents = false;
+
+        public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)
+        {
+            List<WorldGenVillagePieceWeight> villagePieces = WorldGenVillagePieces.a(random, size);
+
+            int startX = (chunkX << 4) + 2;
+            int startZ = (chunkZ << 4) + 2;
+            WorldGenVillageStartPiece startPiece = new WorldGenVillageStartPiece(world.getWorldChunkManager(), 0, random, startX, startZ, villagePieces, size);
+
+            // Apply the villageType setting
+            LocalWorld worldTC = WorldHelper.toLocalWorld(world);
+            LocalBiome biome = worldTC.getBiome(startX, startZ);
+            if (biome != null)
+            {
+                // Ignore removed custom biomes
+                changeToSandstoneVillage(startPiece, biome.getBiomeConfig().villageType == VillageType.sandstone);
+            }
+
+            this.a.add(startPiece);
+            startPiece.a(startPiece, this.a, random);
+            List<StructurePiece> arraylist1 = startPiece.g;
+            List<StructurePiece> arraylist2 = startPiece.f;
+
+            int componentCount;
+
+            while (!arraylist1.isEmpty() || !arraylist2.isEmpty())
+            {
+                StructurePiece structurepiece;
+
+                if (arraylist1.isEmpty())
+                {
+                    componentCount = random.nextInt(arraylist2.size());
+                    structurepiece = arraylist2.remove(componentCount);
+                    structurepiece.a(startPiece, this.a, random);
+                } else
+                {
+                    componentCount = random.nextInt(arraylist1.size());
+                    structurepiece = arraylist1.remove(componentCount);
+                    structurepiece.a(startPiece, this.a, random);
+                }
+            }
+
+            this.c();
+            componentCount = 0;
+
+            for (Object anA : this.a)
+            {
+                StructurePiece structurepiece1 = (StructurePiece) anA;
+
+                if (!(structurepiece1 instanceof WorldGenVillageRoadPiece))
+                {
+                    ++componentCount;
+                }
+            }
+
+            this.hasMoreThanTwoComponents = componentCount > 2;
+        }
+
+        public VillageStart()
+        {
+            // Required by Minecraft's structure loading code
+        }
+
+        /**
+         * Changes a village to a sandstone village. (Just sets the first
+         * boolean it can find in the WorldGenVillageStartPiece.class to
+         * sandstoneVillage.)
+         *
+         * @param subject The village.
+         * @param sandstoneVillage Whether the village should be a sandstone
+         *            village.
+         */
+        private void changeToSandstoneVillage(WorldGenVillageStartPiece subject, boolean sandstoneVillage)
+        {
+            ReflectionHelper.setFirstFieldOfType(subject, boolean.class, sandstoneVillage);
+        }
+
+        @Override
+        public boolean a()
+        {
+            return this.hasMoreThanTwoComponents;
+        }
+
+        @Override
+        public void a(NBTTagCompound nbttagcompound)
+        {
+            super.a(nbttagcompound);
+            nbttagcompound.setBoolean("Valid", this.hasMoreThanTwoComponents);
+        }
+
+        @Override
+        public void b(NBTTagCompound nbttagcompound)
+        {
+            super.b(nbttagcompound);
+            this.hasMoreThanTwoComponents = nbttagcompound.getBoolean("Valid");
+        }
     }
 }

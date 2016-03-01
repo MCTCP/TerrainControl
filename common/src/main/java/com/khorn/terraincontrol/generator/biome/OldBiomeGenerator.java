@@ -41,25 +41,6 @@ public class OldBiomeGenerator extends BiomeGenerator
         }
     }
 
-    @Override
-    public float[] getRainfall(float[] temp_out, int x, int z, int x_size, int z_size)
-    {
-        if ((temp_out == null) || (temp_out.length < x_size * z_size))
-        {
-            temp_out = new float[x_size * z_size];
-        }
-        //???>>	Is this needed? I cant find a usage...
-        int[] temp_biomeBases = new int[x_size * z_size];
-        this.getBiomes(temp_biomeBases, x, z, x_size, z_size);
-
-        for (int i = 0; i < temp_out.length; i++)
-        {
-            temp_out[i] = (float) this.oldWetness[i];
-        }
-
-        return temp_out;
-    }
-
     public int[] getBiomes(int[] paramArrayOfBiomeBase, int x, int z, int xSize, int zSize)
     {
         if ((paramArrayOfBiomeBase == null) || (paramArrayOfBiomeBase.length < xSize * zSize))

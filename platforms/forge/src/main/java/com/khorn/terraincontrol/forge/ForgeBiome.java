@@ -35,6 +35,9 @@ public class ForgeBiome implements LocalBiome
             biome.biomeBase.copyBiome(previousBiome);
         }
 
+        // Apply our own settings
+        biome.biomeBase.setEffects(biomeConfig);
+
         return biome;
     }
 
@@ -49,12 +52,6 @@ public class ForgeBiome implements LocalBiome
     public boolean isCustom()
     {
         return true;
-    }
-
-    @Override
-    public void setEffects()
-    {
-        biomeBase.setEffects(biomeConfig);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
-import net.minecraft.server.v1_8_R3.WorldProvider;
-import net.minecraft.server.v1_8_R3.WorldProviderNormal;
+import net.minecraft.server.v1_9_R1.WorldProvider;
+import net.minecraft.server.v1_9_R1.WorldProviderNormal;
 
 /**
  * We extend this file to be able to set the sea level.
@@ -20,20 +20,14 @@ public class TCWorldProvider extends WorldProviderNormal
         this.localWorld = localWorld;
         this.oldWorldProvider = oldWorldProvider;
         this.a(localWorld.getWorld());
-        this.d = oldWorldProvider.n();
-        this.e = oldWorldProvider.o();
+        this.d = oldWorldProvider.l();
+        this.e = oldWorldProvider.m();
     }
 
     @Override
     public int getSeaLevel()
     {
         return localWorld.getConfigs().getWorldConfig().waterLevelMax;
-    }
-
-    @Override
-    public String getName()
-    {
-        return "Overworld";
     }
 
     /**

@@ -5,21 +5,21 @@ import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
 import com.khorn.terraincontrol.bukkit.events.TCListener;
 import com.khorn.terraincontrol.bukkit.generator.BukkitVanillaBiomeGenerator;
 import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
-import com.khorn.terraincontrol.bukkit.generator.structures.RareBuildingStart;
-import com.khorn.terraincontrol.bukkit.generator.structures.VillageStart;
+import com.khorn.terraincontrol.bukkit.generator.structures.RareBuildingGen.RareBuildingStart;
+import com.khorn.terraincontrol.bukkit.generator.structures.VillageGen.VillageStart;
 import com.khorn.terraincontrol.bukkit.metrics.BukkitMetricsHelper;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R3.BiomeBase;
-import net.minecraft.server.v1_8_R3.WorldGenFactory;
+import net.minecraft.server.v1_9_R1.Biomes;
+import net.minecraft.server.v1_9_R1.WorldGenFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_9_R1.block.CraftBlock;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -138,7 +138,7 @@ public class TCPlugin extends JavaPlugin
         // Hack to initialize CraftBukkit's biome mappings
         // This is really needed. Try for yourself if you don't believe it,
         // you will get a java.lang.IllegalArgumentException when adding biomes
-        CraftBlock.biomeBaseToBiome(BiomeBase.OCEAN);
+        CraftBlock.biomeBaseToBiome(Biomes.a);
 
         // Load settings
         File baseFolder = getWorldSettingsFolder(worldName);

@@ -4,8 +4,8 @@ import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import net.minecraft.server.v1_8_R3.BiomeBase;
-import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_9_R1.BiomeBase;
+import net.minecraft.server.v1_9_R1.BlockPosition;
 
 /**
  * The BukkitBiome is basically a wrapper for the BiomeBase. If you look at
@@ -40,13 +40,14 @@ public class BukkitBiome implements LocalBiome
      */
     public static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        return new BukkitBiome(biomeConfig, CustomBiome.createInstance(biomeConfig.getName(), biomeIds));
+        return new BukkitBiome(biomeConfig, CustomBiome.createInstance(biomeConfig, biomeIds));
     }
 
     protected BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
     {
         this.biomeBase = biome;
-        this.biomeIds = new BiomeIds(WorldHelper.getGenerationId(biomeBase), biomeBase.id);
+        int savedBiomeId =  BiomeBase.a(biomeBase);
+        this.biomeIds = new BiomeIds(WorldHelper.getGenerationId(biomeBase), savedBiomeId);
         this.biomeConfig = biomeConfig;
         this.isCustom = biome instanceof CustomBiome;
     }
@@ -60,15 +61,6 @@ public class BukkitBiome implements LocalBiome
     public BiomeBase getHandle()
     {
         return biomeBase;
-    }
-
-    @Override
-    public void setEffects()
-    {
-        if (isCustom)
-        {
-            ((CustomBiome) this.biomeBase).setEffects(this.biomeConfig);
-        }
     }
 
     @Override

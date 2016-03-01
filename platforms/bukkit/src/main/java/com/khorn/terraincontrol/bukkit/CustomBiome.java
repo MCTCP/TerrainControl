@@ -6,9 +6,10 @@ import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_8_R3.BiomeBase;
+import net.minecraft.server.v1_9_R1.BiomeBase;
+import net.minecraft.server.v1_9_R1.MinecraftKey;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_9_R1.block.CraftBlock;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -16,6 +17,28 @@ import java.util.List;
 public class CustomBiome extends BiomeBase
 {
     public final int generationId;
+    
+    /**
+     * Mojang made the methods on BiomeBase.a protected (so only accessable for
+     * classes in the package net.minecraft.world.biome package and for
+     * subclasses of BiomeBase.a). To get around this, we have to subclass
+     * BiomeBase.a.
+     *
+     */
+    private static class BiomeBase_a extends BiomeBase.a {
+
+        public BiomeBase_a(String name, BiomeConfig biomeConfig)
+        {
+            super(name);
+            c(biomeConfig.biomeHeight);
+            d(biomeConfig.biomeVolatility);
+            a(biomeConfig.biomeTemperature);
+            b(biomeConfig.biomeWetness);
+            if (biomeConfig.biomeWetness <= 0.0001) {
+                a(); // disableRain()
+            }
+        }
+    }
 
     /**
      * Creates a CustomBiome instance. Minecraft automatically registers those
@@ -23,72 +46,55 @@ public class CustomBiome extends BiomeBase
      * biomes (the shouldn't overwrite real biomes), so we restore the old
      * biome, unregistering the virtual biome.
      *
-     * @param name Name of the biome.
+     * @param biomeConfig Settings of the biome
      * @param biomeIds Ids of the biome.
      * @return The CustomBiome instance.
      */
-    public static CustomBiome createInstance(String name, BiomeIds biomeIds)
+    public static CustomBiome createInstance(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        if (biomeIds.isVirtual())
-        {
-            // Don't register (the only way to do this on Bukkit is to restore
-            // the original biome afterwards)
-            BiomeBase toRestore = BiomeBase.getBiome(biomeIds.getSavedId());
-            CustomBiome customBiome = new CustomBiome(name, biomeIds);
-            BiomeBase.getBiomes()[biomeIds.getSavedId()] = toRestore;
+        CustomBiome customBiome = new CustomBiome(biomeConfig);
 
-            return customBiome;
-        } else
-        {
-            // Just register normally
-            return new CustomBiome(name, biomeIds);
-        }
-    }
-
-    @SuppressWarnings("MismatchedReadAndWriteOfArray")
-    private CustomBiome(String name, BiomeIds biomeIds)
-    {
-        super(biomeIds.getSavedId());
-        this.generationId = biomeIds.getGenerationId();
-        this.a(name);
-
-        // Insert the biome in CraftBukkit's biome mapping
         if (!biomeIds.isVirtual())
         {
+            // Insert the biome in Minecraft's biome mapping
+            BiomeBase.REGISTRY_ID.a(biomeIds.getSavedId(), new MinecraftKey(biomeConfig.getName()), customBiome);
+
+            // Insert the biome in CraftBukkit's biome mapping
             try
             {
                 Field biomeMapping = CraftBlock.class.getDeclaredField("BIOME_MAPPING");
                 biomeMapping.setAccessible(true);
                 Biome[] mappingArray = (Biome[]) biomeMapping.get(null);
 
-                mappingArray[id] = Biome.OCEAN;
-
+                mappingArray[biomeIds.getSavedId()] = Biome.OCEAN;
             } catch (Exception e)
             {
                 TerrainControl.log(LogMarker.FATAL, "Couldn't update Bukkit's biome mappings!");
                 TerrainControl.printStackTrace(LogMarker.FATAL, e);
             }
         }
+
+        return customBiome;
     }
 
-    public void setEffects(BiomeConfig config)
+    private CustomBiome(BiomeConfig biomeConfig)
     {
-        this.an = config.biomeHeight;
-        this.ao = config.biomeVolatility;
-        this.ak = ((BukkitMaterialData) config.surfaceBlock).internalBlock();
-        this.al = ((BukkitMaterialData) config.groundBlock).internalBlock();
-        this.temperature = config.biomeTemperature;
-        this.humidity = config.biomeWetness;
-        if (this.humidity == 0)
-        {
-            this.b(); // this.disableRain()
+        super(new BiomeBase_a(biomeConfig.getName(), biomeConfig));
+        this.generationId = biomeConfig.generationId;
+
+        // Sanity check
+        if (this.getTemperature() != biomeConfig.biomeTemperature) {
+            throw new AssertionError("Biome temperature mismatch");
         }
 
+        this.r = ((BukkitMaterialData) biomeConfig.surfaceBlock).internalBlock();
+        this.s = ((BukkitMaterialData) biomeConfig.groundBlock).internalBlock();
+
         // Mob spawning
-        addMobs(this.at, config.spawnMonsters);
-        addMobs(this.au, config.spawnCreatures);
-        addMobs(this.av, config.spawnWaterCreatures);
-        addMobs(this.aw, config.spawnAmbientCreatures);
+        addMobs(this.u, biomeConfig.spawnMonsters);
+        addMobs(this.v, biomeConfig.spawnCreatures);
+        addMobs(this.w, biomeConfig.spawnWaterCreatures);
+        addMobs(this.x, biomeConfig.spawnAmbientCreatures);
     }
 
     // Adds the mobs to the internal list.

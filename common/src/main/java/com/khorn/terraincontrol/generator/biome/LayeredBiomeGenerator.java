@@ -57,27 +57,6 @@ public abstract class LayeredBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public float[] getRainfall(float[] paramArrayOfFloat, int x, int y, int x_size, int z_size)
-    {
-        if ((paramArrayOfFloat == null) || (paramArrayOfFloat.length < x_size * z_size))
-        {
-            paramArrayOfFloat = new float[x_size * z_size];
-        }
-        ArraysCache cache = ArraysCacheManager.GetCache();
-        cache.outputType = defaultOutputType;
-
-        int[] arrayOfInt = this.biomeLayer.getInts(cache, x, y, x_size, z_size);
-        ArraysCacheManager.ReleaseCache(cache);
-        for (int i = 0; i < x_size * z_size; i++)
-        {
-            float f1 = world.getBiomeById(arrayOfInt[i]).getBiomeConfig().biomeWetness;
-            paramArrayOfFloat[i] = f1;
-        }
-
-        return paramArrayOfFloat;
-    }
-
-    @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         if ((biomeArray == null) || (biomeArray.length < x_size * z_size))

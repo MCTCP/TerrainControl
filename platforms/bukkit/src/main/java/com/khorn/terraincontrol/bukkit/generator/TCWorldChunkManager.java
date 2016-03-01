@@ -4,10 +4,10 @@ import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
-import net.minecraft.server.v1_8_R3.BiomeBase;
-import net.minecraft.server.v1_8_R3.BlockPosition;
-import net.minecraft.server.v1_8_R3.WorldChunkManager;
-import net.minecraft.server.v1_8_R3.WorldGenVillage;
+import net.minecraft.server.v1_9_R1.BiomeBase;
+import net.minecraft.server.v1_9_R1.BlockPosition;
+import net.minecraft.server.v1_9_R1.WorldChunkManager;
+import net.minecraft.server.v1_9_R1.WorldGenVillage;
 
 import java.util.List;
 import java.util.Random;
@@ -32,12 +32,6 @@ public class TCWorldChunkManager extends WorldChunkManager
     public BiomeBase getBiome(BlockPosition blockPos)
     {
         return localWorld.getBiomeById(biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
-    }
-
-    @Override
-    public float[] getWetness(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
-    {
-        return biomeGenerator.getRainfall(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
     }
 
     @Override
@@ -78,15 +72,14 @@ public class TCWorldChunkManager extends WorldChunkManager
         return paramArrayOfBiomeBase;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     // areBiomesViable
-    public boolean a(int paramInt1, int paramInt2, int paramInt3, List paramList)
+    public boolean a(int paramInt1, int paramInt2, int paramInt3, List<BiomeBase> paramList)
     {
         // Hack for villages in other biomes
         // (The alternative would be to completely override the village spawn
         // code)
-        if (paramList == WorldGenVillage.d && localWorld.villageGen != null)
+        if (paramList == WorldGenVillage.a && localWorld.villageGen != null)
         {
             paramList = localWorld.villageGen.villageSpawnBiomes;
         }

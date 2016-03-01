@@ -4,10 +4,10 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R3.BiomeBase;
-import net.minecraft.server.v1_8_R3.StructureGenerator;
-import net.minecraft.server.v1_8_R3.StructureStart;
-import net.minecraft.server.v1_8_R3.WorldGenMonument.WorldGenMonumentStart;
+import net.minecraft.server.v1_9_R1.BiomeBase;
+import net.minecraft.server.v1_9_R1.StructureGenerator;
+import net.minecraft.server.v1_9_R1.StructureStart;
+import net.minecraft.server.v1_9_R1.WorldGenMonument.WorldGenMonumentStart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +73,7 @@ public class OceanMonumentGen extends StructureGenerator
 
         int structureChunkX = chunkX / this.gridSize;
         int structureChunkZ = chunkZ / this.gridSize;
-        Random random = this.c.a(structureChunkX, structureChunkZ, 10387313);
+        Random random = this.g.a(structureChunkX, structureChunkZ, 10387313);
 
         structureChunkX *= this.gridSize;
         structureChunkZ *= this.gridSize;
@@ -83,7 +83,7 @@ public class OceanMonumentGen extends StructureGenerator
         structureChunkZ += (random.nextInt(this.randomOffset + 1) + random.nextInt(this.randomOffset + 1)) / 2;
         if (originalChunkX == structureChunkX && originalChunkZ == structureChunkZ)
         {
-            boolean flag = this.c.getWorldChunkManager().a(originalChunkX * 16 + 8, originalChunkZ * 16 + 8, 29, monumentSpawnBiomes);
+            boolean flag = this.g.getWorldChunkManager().a(originalChunkX * 16 + 8, originalChunkZ * 16 + 8, 29, monumentSpawnBiomes);
 
             if (flag)
             {
@@ -97,7 +97,7 @@ public class OceanMonumentGen extends StructureGenerator
     @Override
     protected StructureStart b(int i, int j)
     {
-        return new WorldGenMonumentStart(this.c, this.b, i, j);
+        return new WorldGenMonumentStart(this.g, this.f, i, j);
     }
 
 }

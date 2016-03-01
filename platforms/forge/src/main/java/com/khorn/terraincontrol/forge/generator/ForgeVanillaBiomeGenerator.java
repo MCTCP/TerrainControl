@@ -39,12 +39,6 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
     }
 
     @Override
-    public float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int x_size, int z_size)
-    {
-        return worldChunkManager.getRainfall(paramArrayOfFloat, x, z, x_size, z_size);
-    }
-
-    @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
         biomeGenBaseArray = worldChunkManager.getBiomeGenAt(biomeGenBaseArray, x, z, x_size, z_size, true);

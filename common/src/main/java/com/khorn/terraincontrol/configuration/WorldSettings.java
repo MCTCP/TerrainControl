@@ -287,9 +287,6 @@ public class WorldSettings implements ConfigProvider
                 int color = biomeConfig.biomeColor;
                 this.worldConfig.biomeColorMap.put(color, biome.getIds().getGenerationId());
             }
-
-            // Setting effects
-            biome.setEffects();
         }
 
         if (this.biomesCount > 0)
@@ -406,7 +403,6 @@ public class WorldSettings implements ConfigProvider
             LocalBiome biome = world.createBiomeFor(config, new BiomeIds(id));
 
             biomes[id] = biome;
-            biome.setEffects();
         }
 
         savedBiomes.addAll(Arrays.asList(biomes));

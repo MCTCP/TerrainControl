@@ -1,14 +1,17 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R3.BiomeBase;
-import net.minecraft.server.v1_8_R3.BlockPosition;
-import net.minecraft.server.v1_8_R3.StructureGenerator;
-import net.minecraft.server.v1_8_R3.StructureStart;
+import net.minecraft.server.v1_9_R1.*;
+import net.minecraft.server.v1_9_R1.WorldGenRegistration.WorldGenJungleTemple;
+import net.minecraft.server.v1_9_R1.WorldGenRegistration.WorldGenPyramidPiece;
+import net.minecraft.server.v1_9_R1.WorldGenRegistration.WorldGenWitchHut;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +70,7 @@ public class RareBuildingGen extends StructureGenerator
 
         int var5 = chunkX / this.maxDistanceBetweenScatteredFeatures;
         int var6 = chunkZ / this.maxDistanceBetweenScatteredFeatures;
-        Random random = this.c.a(var5, var6, 14357617);
+        Random random = this.g.a(var5, var6, 14357617);
         var5 *= this.maxDistanceBetweenScatteredFeatures;
         var6 *= this.maxDistanceBetweenScatteredFeatures;
         var5 += random.nextInt(this.maxDistanceBetweenScatteredFeatures - this.minDistanceBetweenScatteredFeatures);
@@ -75,7 +78,7 @@ public class RareBuildingGen extends StructureGenerator
 
         if (var3 == var5 && var4 == var6)
         {
-            BiomeBase biomeAtPosition = this.c.getWorldChunkManager().getBiome(new BlockPosition(var3 * 16 + 8, 0, var4 * 16 + 8));
+            BiomeBase biomeAtPosition = this.g.getWorldChunkManager().getBiome(new BlockPosition(var3 * 16 + 8, 0, var4 * 16 + 8));
 
             for (BiomeBase biome : biomeList)
             {
@@ -93,12 +96,55 @@ public class RareBuildingGen extends StructureGenerator
     // getStructureStart
     protected StructureStart b(int chunkX, int chunkZ)
     {
-        return new RareBuildingStart(this.c, this.b, chunkX, chunkZ);
+        return new RareBuildingStart(this.g, this.f, chunkX, chunkZ);
     }
 
     @Override
     public String a()
     {
         return StructureNames.RARE_BUILDING;
+    }
+
+    public class RareBuildingStart extends StructureStart
+    {
+        public RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
+        {
+            LocalWorld localWorld = WorldHelper.toLocalWorld(world);
+            BiomeConfig biomeConfig = localWorld.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8).getBiomeConfig();
+            StructurePiece building;
+            switch (biomeConfig.rareBuildingType)
+            {
+                case desertPyramid:
+                    building = new WorldGenPyramidPiece(random, chunkX * 16, chunkZ * 16);
+                    break;
+                case jungleTemple:
+                    building = new WorldGenJungleTemple(random, chunkX * 16, chunkZ * 16);
+                    break;
+                case swampHut:
+                    building = new WorldGenWitchHut(random, chunkX * 16, chunkZ * 16);
+                    break;
+                case disabled:
+                default:
+                    // Should never happen, but on biome borders there is chance
+                    // that a
+                    // structure gets started in a biome where it shouldn't.
+                    building = null;
+                    break;
+            }
+
+            if (building != null)
+            {
+                // Add building to components
+                this.a.add(building);
+            }
+
+            // Update boundingbox
+            this.d();
+        }
+
+        public RareBuildingStart()
+        {
+            // Required by Minecraft's structure loading code
+        }
     }
 }

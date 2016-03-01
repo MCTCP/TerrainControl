@@ -7,8 +7,8 @@ import com.khorn.terraincontrol.bukkit.commands.BaseCommand;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.logging.LogMarker;
-import net.minecraft.server.v1_8_R3.BiomeBase;
-import net.minecraft.server.v1_8_R3.World;
+import net.minecraft.server.v1_9_R1.BiomeBase;
+import net.minecraft.server.v1_9_R1.World;
 import org.bukkit.command.CommandSender;
 
 import java.awt.Color;
@@ -214,7 +214,7 @@ public class MapWriter implements Runnable
             temperature = world.getBiomeById(WorldHelper.getGenerationId(biome)).getBiomeConfig().biomeTemperature;
         } else
         {
-            temperature = biome.temperature;
+            temperature = biome.getTemperature();
         }
 
         // Prevents us from going around the color wheel twice or getting into

@@ -181,12 +181,6 @@ class CachedBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int xSize, int zSize)
-    {
-        return generator.getRainfall(paramArrayOfFloat, x, z, xSize, zSize);
-    }
-
-    @Override
     public boolean isCached()
     {
         return true;

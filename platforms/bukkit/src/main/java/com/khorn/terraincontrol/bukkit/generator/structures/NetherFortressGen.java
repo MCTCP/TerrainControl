@@ -4,9 +4,9 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R3.BiomeBase.BiomeMeta;
-import net.minecraft.server.v1_8_R3.*;
-import net.minecraft.server.v1_8_R3.WorldGenNether.WorldGenNetherStart;
+import net.minecraft.server.v1_9_R1.*;
+import net.minecraft.server.v1_9_R1.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_9_R1.WorldGenNether.WorldGenNetherStart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +25,7 @@ public class NetherFortressGen extends StructureGenerator
         this.spawnList.add(new BiomeMeta(EntityMagmaCube.class, 3, 4, 4));
     }
 
-    @SuppressWarnings("rawtypes")
-    public List b()
+    public List<BiomeMeta> b()
     {
         return this.spawnList;
     }
@@ -35,8 +34,8 @@ public class NetherFortressGen extends StructureGenerator
     @Override
     protected boolean a(int chunkX, int chunkZ)
     {
-        Random rand = this.b;
-        World worldObj = this.c;
+        Random rand = this.f;
+        World worldObj = this.g;
 
         int var3 = chunkX >> 4;
         int var4 = chunkZ >> 4;
@@ -67,7 +66,7 @@ public class NetherFortressGen extends StructureGenerator
     @Override
     protected StructureStart b(int i, int j)
     {
-        return new WorldGenNetherStart(this.c, this.b, i, j);
+        return new WorldGenNetherStart(this.g, this.f, i, j);
     }
 
     @Override

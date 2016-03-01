@@ -39,7 +39,9 @@ public class TCWorldChunkManager extends WorldChunkManager
     @Override
     public float[] getRainfall(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
-        return biomeGenerator.getRainfall(paramArrayOfFloat, paramInt1, paramInt2, paramInt3, paramInt4);
+        // unimplemented, as it is not used anymore by Minecraft 1.8 (Minecraft
+        // 1.9 removes it completely)
+        return paramArrayOfFloat; 
     }
 
     @Override

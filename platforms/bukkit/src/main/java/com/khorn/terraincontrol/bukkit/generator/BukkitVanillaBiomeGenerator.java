@@ -1,11 +1,12 @@
 package com.khorn.terraincontrol.bukkit.generator;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
-import net.minecraft.server.v1_8_R3.BiomeBase;
-import net.minecraft.server.v1_8_R3.BlockPosition;
-import net.minecraft.server.v1_8_R3.WorldChunkManager;
+import net.minecraft.server.v1_9_R1.BiomeBase;
+import net.minecraft.server.v1_9_R1.BlockPosition;
+import net.minecraft.server.v1_9_R1.WorldChunkManager;
 
 /**
  * A biome generator that gets its information from Mojang's WorldChunkManager.
@@ -46,14 +47,8 @@ public class BukkitVanillaBiomeGenerator extends VanillaBiomeGenerator {
         if (biomeArray == null || biomeArray.length < xSize * zSize)
             biomeArray = new int[xSize * zSize];
         for (int i = 0; i < xSize * zSize; i++)
-            biomeArray[i] = biomeGenBaseArray[i].id;
+            biomeArray[i] = WorldHelper.getSavedId(biomeGenBaseArray[i]);
         return biomeArray;
-    }
-
-    @Override
-    public float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int x_size, int z_size)
-    {
-        return worldChunkManager.getWetness(paramArrayOfFloat, x, z, x_size, z_size);
     }
 
     @Override
@@ -63,14 +58,14 @@ public class BukkitVanillaBiomeGenerator extends VanillaBiomeGenerator {
         if (biomeArray == null || biomeArray.length < xSize * z_size)
             biomeArray = new int[xSize * z_size];
         for (int i = 0; i < xSize * z_size; i++)
-            biomeArray[i] = biomeGenBaseArray[i].id;
+            biomeArray[i] = WorldHelper.getSavedId(biomeGenBaseArray[i]);
         return biomeArray;
     }
 
     @Override
     public int getBiome(int x, int z)
     {
-        return worldChunkManager.getBiome(new BlockPosition(x, 0, z)).id;
+        return WorldHelper.getSavedId(worldChunkManager.getBiome(new BlockPosition(x, 0, z)));
     }
 
     @Override

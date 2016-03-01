@@ -54,8 +54,6 @@ public abstract class BiomeGenerator
         return getBiomes(biomeArray, x, z, xSize, zSize, type);
     }
 
-    public abstract float[] getRainfall(float[] paramArrayOfFloat, int x, int z, int xSize, int zSize);
-
     /**
      * Gets the detailed biomes. Each column in the world is represented by
      * one position in the array.

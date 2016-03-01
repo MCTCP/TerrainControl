@@ -17,12 +17,6 @@ public interface LocalBiome
     boolean isCustom();
 
     /**
-     * Sets the post generator effects. For the client it are things like
-     * colors. For the server it are things like mob spawning.
-     */
-    void setEffects();
-
-    /**
      * Gets the name of this biome, like Plains. For vanilla biomes, this is
      * the name Mojang gave to them, for custom biomes the name is decided by
      * the server owner in the WorldConfig.

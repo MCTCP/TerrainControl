@@ -4,10 +4,10 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_8_R3.StructureGenerator;
-import net.minecraft.server.v1_8_R3.StructureStart;
-import net.minecraft.server.v1_8_R3.World;
-import net.minecraft.server.v1_8_R3.WorldGenMineshaftStart;
+import net.minecraft.server.v1_9_R1.StructureGenerator;
+import net.minecraft.server.v1_9_R1.StructureStart;
+import net.minecraft.server.v1_9_R1.World;
+import net.minecraft.server.v1_9_R1.WorldGenMineshaftStart;
 
 import java.util.Random;
 
@@ -17,8 +17,8 @@ public class MineshaftGen extends StructureGenerator
     @Override
     protected boolean a(int chunkX, int chunkZ)
     {
-        Random rand = b;
-        World worldMC = c;
+        Random rand = this.f;
+        World worldMC = this.g;
         if (rand.nextInt(80) < Math.max(Math.abs(chunkX), Math.abs(chunkZ)))
         {
             LocalWorld world = WorldHelper.toLocalWorld(worldMC);
@@ -35,7 +35,7 @@ public class MineshaftGen extends StructureGenerator
     @Override
     protected StructureStart b(int i, int j)
     {
-        return new WorldGenMineshaftStart(this.c, this.b, i, j);
+        return new WorldGenMineshaftStart(this.g, this.f, i, j);
     }
 
     @Override
