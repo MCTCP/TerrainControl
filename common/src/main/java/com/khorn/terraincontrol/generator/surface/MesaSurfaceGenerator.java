@@ -78,16 +78,15 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
 
     private LocalMaterialData getBlockData(int i, int j, int k)
     {
-        int l = (int) Math.round(this.noiseGenBlockData.a((double) i * 1.0D / 512.0D, (double) i * 1.0D / 512.0D) * 2.0D);
+        int l = (int) Math.round(this.noiseGenBlockData.a(i * 1.0D / 512.0D, i * 1.0D / 512.0D) * 2.0D);
 
         return this.blockDataValuesArray[(j + l + 64) % 64];
     }
 
-    private void initializeSmallByteArray(long worldSeed)
+    private void initializeSmallByteArray(Random random)
     {
         this.blockDataValuesArray = new LocalMaterialData[64];
         Arrays.fill(this.blockDataValuesArray, this.hardenedClay);
-        Random random = new Random(worldSeed);
 
         this.noiseGenBlockData = new NoiseGeneratorNewOctaves(random, 1);
 
@@ -181,7 +180,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         double noise = generatingChunk.getNoise(x, z);
         if (this.blockDataValuesArray == null)
         {
-            this.initializeSmallByteArray(generatingChunk.getSeed());
+            this.initializeSmallByteArray(generatingChunk.random);
         }
 
         // Bryce spike calculations
@@ -190,7 +189,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         {
             if (this.noiseGenBryce1 == null || this.noiseGenBryce2 == null)
             {
-                Random newRandom = new Random(generatingChunk.getSeed());
+                Random newRandom = new Random(generatingChunk.random.nextLong());
 
                 this.noiseGenBryce1 = new NoiseGeneratorNewOctaves(newRandom, 4);
                 this.noiseGenBryce2 = new NoiseGeneratorNewOctaves(newRandom, 1);
@@ -327,6 +326,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
 
     }
 
+    @Override
     public String toString()
     {
         if (this.isForestMesa)
