@@ -208,7 +208,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
     @Override
     public int compareTo(Resource o)
     {
-        return Integer.compare(o.getPriority(), this.getPriority());
+        return o.getPriority() - this.getPriority();
     }
 
     public static Resource[] getSortedResourceSequence(Collection<Resource> resourceCollection)
