@@ -146,7 +146,7 @@ public class VillageGen extends StructureGenerator
                 }
             }
 
-            this.c();
+            this.d();
             componentCount = 0;
 
             for (Object anA : this.a)
