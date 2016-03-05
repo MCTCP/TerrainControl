@@ -62,7 +62,7 @@ public class Logger
             //>>	Log Fatal, Error, and Warn as what they are without Markers.
             if (LogMarker.compare(LogMarker.FATAL, level) == 0)
             {
-                baseLogger.fatal(sb.toString(), params);
+                baseLogger.fatal(sb.append(message).toString(), params);
             } else if (LogMarker.compare(LogMarker.ERROR, level) == 0)
             {
                 baseLogger.error(sb.append(message).toString(), params);

@@ -1,17 +1,13 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.BiomeIds;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
-import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import net.minecraft.server.v1_9_R1.BiomeBase;
 import net.minecraft.server.v1_9_R1.MinecraftKey;
-import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_9_R1.block.CraftBlock;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 public class CustomBiome extends BiomeBase
@@ -71,21 +67,8 @@ public class CustomBiome extends BiomeBase
         if (!biomeIds.isVirtual())
         {
             // Insert the biome in Minecraft's biome mapping
-            BiomeBase.REGISTRY_ID.a(biomeIds.getSavedId(), new MinecraftKey(biomeConfig.getName()), customBiome);
-
-            // Insert the biome in CraftBukkit's biome mapping
-            try
-            {
-                Field biomeMapping = CraftBlock.class.getDeclaredField("BIOME_MAPPING");
-                biomeMapping.setAccessible(true);
-                Biome[] mappingArray = (Biome[]) biomeMapping.get(null);
-
-                mappingArray[biomeIds.getSavedId()] = Biome.OCEAN;
-            } catch (Exception e)
-            {
-                TerrainControl.log(LogMarker.FATAL, "Couldn't update Bukkit's biome mappings!");
-                TerrainControl.printStackTrace(LogMarker.FATAL, e);
-            }
+            MinecraftKey biomeName = new MinecraftKey(PluginStandardValues.PLUGIN_NAME, biomeConfig.getName());
+            BiomeBase.REGISTRY_ID.a(biomeIds.getSavedId(), biomeName, customBiome);
         }
 
         return customBiome;

@@ -135,11 +135,6 @@ public class TCPlugin extends JavaPlugin
         // Create BukkitWorld instance
         BukkitWorld localWorld = new BukkitWorld(worldName);
 
-        // Hack to initialize CraftBukkit's biome mappings
-        // This is really needed. Try for yourself if you don't believe it,
-        // you will get a java.lang.IllegalArgumentException when adding biomes
-        CraftBlock.biomeBaseToBiome(Biomes.a);
-
         // Load settings
         File baseFolder = getWorldSettingsFolder(worldName);
         WorldSettings configs = new WorldSettings(baseFolder, localWorld);
