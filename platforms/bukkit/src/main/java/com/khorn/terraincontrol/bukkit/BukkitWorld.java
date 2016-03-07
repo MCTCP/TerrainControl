@@ -21,7 +21,9 @@ import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.server.v1_9_R1.*;
+import net.minecraft.server.v1_9_R1.BlockPosition.MutableBlockPosition;
 import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_9_R1.block.CraftBlockState;
 
 import java.util.*;
 
@@ -440,14 +442,22 @@ public class BukkitWorld implements LocalWorld
 
         BlockPosition blockPos = new BlockPosition(x, y, z);
 
-        chunk.a(blockPos, blockData);
-
-        // Relight and update players
-        world.w(blockPos); // world.relight
-        if (!world.isClientSide)
+        IBlockData oldBlockData = chunk.a(blockPos, blockData);
+        if (oldBlockData == null)
         {
-            world.m(blockPos); // world.notifyOfBlockChange
+            return;
         }
+
+        if (blockData.c() != oldBlockData.c() || blockData.d() != oldBlockData.d())
+        {
+            // Relight
+            world.methodProfiler.a("checkLight");
+            world.w(blockPos);
+            world.methodProfiler.b();
+        }
+
+        // Update client
+        world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2);
     }
 
     @Override
