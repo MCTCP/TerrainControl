@@ -139,7 +139,8 @@ public class BiomeConfig extends ConfigFile
         disabled,
         desertPyramid,
         jungleTemple,
-        swampHut
+        swampHut,
+        igloo
 
     }
 
@@ -803,7 +804,7 @@ public class BiomeConfig extends ConfigFile
         writer.comment("The mineshaft rarity from 0 to 100. 0 = no mineshafts, 1 = default rarity, 100 = a wooden chaos.");
         writer.setting(BiomeStandardValues.MINESHAFT_RARITY, mineshaftsRarity);
 
-        writer.comment("The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut or disabled.");
+        writer.comment("The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut, igloo or disabled.");
         writer.setting(BiomeStandardValues.RARE_BUILDING_TYPE, rareBuildingType);
 
         writer.bigTitle("Mob spawning");

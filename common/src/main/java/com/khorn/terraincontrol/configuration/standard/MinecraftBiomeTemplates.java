@@ -253,6 +253,7 @@ public class MinecraftBiomeTemplates
             this.defaultGrass = 20;
             this.defaultGrassIsGrouped = true;
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 15};
+            this.defaultRareBuildingType = RareBuildingType.igloo;
         }
     }
 
@@ -516,6 +517,7 @@ public class MinecraftBiomeTemplates
 
             this.defaultColor = 0x31554A;
             this.defaultRarity = 35;
+            this.defaultRareBuildingType = RareBuildingType.igloo;
         }
     }
 
@@ -529,6 +531,7 @@ public class MinecraftBiomeTemplates
             this.defaultSizeWhenIsle = 6;
             this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.COLD_TAIGA.Name);
+            this.defaultRareBuildingType = RareBuildingType.disabled;
         }
     }
 
@@ -738,6 +741,7 @@ public class MinecraftBiomeTemplates
             this.defaultDandelions = 0;
             this.defaultGrass = 0;
             this.defaultIceSpikes = true;
+            this.defaultRareBuildingType = RareBuildingType.disabled;
         }
     }
 
@@ -803,6 +807,7 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x2E5046;
             this.defaultRarity = 10;
+            this.defaultRareBuildingType = RareBuildingType.disabled;
         }
     }
 
