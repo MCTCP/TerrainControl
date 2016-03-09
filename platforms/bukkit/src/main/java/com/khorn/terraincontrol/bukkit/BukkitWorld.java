@@ -21,9 +21,7 @@ import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.server.v1_9_R1.*;
-import net.minecraft.server.v1_9_R1.BlockPosition.MutableBlockPosition;
 import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_9_R1.block.CraftBlockState;
 
 import java.util.*;
 
