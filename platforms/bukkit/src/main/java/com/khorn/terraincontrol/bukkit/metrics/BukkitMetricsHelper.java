@@ -68,6 +68,14 @@ public class BukkitMetricsHelper extends MetricsHelper
                     return vanillaMode;
                 }
             });
+            usedBiomeModesGraph.addPlotter(new Metrics.Plotter("BeforeGroups")
+            {
+                @Override
+                public int getValue()
+                {
+                    return beforeGroupsBiomeMode;
+                }
+            });
             usedBiomeModesGraph.addPlotter(new Metrics.Plotter("OldGenerator")
             {
                 @Override

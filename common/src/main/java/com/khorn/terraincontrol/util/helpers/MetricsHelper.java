@@ -14,6 +14,7 @@ public abstract class MetricsHelper
     protected int fromImageMode = 0;
     protected int vanillaMode = 0;
     protected int oldBiomeMode = 0;
+    protected int beforeGroupsBiomeMode = 0;
     protected int customMode = 0;
 
     /**
@@ -40,6 +41,9 @@ public abstract class MetricsHelper
                 } else if (clazz.equals(OldBiomeGenerator.class))
                 {
                     oldBiomeMode++;
+                } else if (clazz.equals(BeforeGroupsBiomeGenerator.class))
+                {
+                    beforeGroupsBiomeMode++;
                 } else
                 {
                     customMode++;
