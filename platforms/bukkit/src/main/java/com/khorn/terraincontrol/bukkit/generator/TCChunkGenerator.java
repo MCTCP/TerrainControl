@@ -96,15 +96,4 @@ public class TCChunkGenerator extends ChunkGenerator
         return chunkData;
     }
 
-    @Override
-    public short[][] generateExtBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes)
-    {
-        // Newer versions of Spigot call generateChunkData first
-        // So when this method is called, we have an outdated Spigot build
-        TerrainControl.log(LogMarker.FATAL, "- ------------------------------------------------------------- -");
-        TerrainControl.log(LogMarker.FATAL, "Outdated Spigot detected!");
-        TerrainControl.log(LogMarker.FATAL, "Please update Spigot to a build released in august 2015 or later.");
-        TerrainControl.log(LogMarker.FATAL, "- ------------------------------------------------------------- -");
-        throw new UnsupportedOperationException("Please update Spigot to a build released in august 2015 or later.");
-    }
 }
