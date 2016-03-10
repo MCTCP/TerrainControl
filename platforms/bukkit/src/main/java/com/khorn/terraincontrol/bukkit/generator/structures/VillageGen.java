@@ -178,7 +178,7 @@ public class VillageGen extends StructureGenerator
          */
         private void changeToSandstoneVillage(WorldGenVillageStartPiece subject, boolean sandstoneVillage)
         {
-            ReflectionHelper.setFirstFieldOfType(subject, boolean.class, sandstoneVillage);
+            ReflectionHelper.setValueInFieldOfType(subject, boolean.class, sandstoneVillage);
         }
 
         @Override

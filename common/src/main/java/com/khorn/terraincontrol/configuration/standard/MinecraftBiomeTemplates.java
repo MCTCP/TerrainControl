@@ -183,6 +183,7 @@ public class MinecraftBiomeTemplates
             this.defaultGrass = 30;
             this.defaultRareBuildingType = RareBuildingType.swampHut;
             this.defaultTree = new Object[] {2, TreeType.SwampTree, 100};
+            this.defaultStrongholds = false;
         }
     }
 
@@ -469,6 +470,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0xFAF0C0;
+            this.defaultStrongholds = false;
         }
     }
 

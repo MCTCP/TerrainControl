@@ -22,6 +22,7 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_9_R1.generator.CustomChunkGenerator;
 
 import java.util.*;
 
@@ -671,6 +672,9 @@ public class BukkitWorld implements LocalWorld
                     this.pyramidsGen = new RareBuildingGen(settings);
                     this.netherFortressGen = new NetherFortressGen();
                     this.oceanMonumentGen = new OceanMonumentGen(settings);
+
+                    // Inject our own ChunkGenerator
+                    injectStrongholdGenerator(this.strongholdGen);
                 case NotGenerate:
                 case TerrainTest:
                     this.generator.onInitialize(this);
@@ -723,8 +727,17 @@ public class BukkitWorld implements LocalWorld
         } else
         {
             // Let Minecraft's biome generator depend on ours
-            ReflectionHelper.setFirstFieldOfType(this.world.worldProvider,
+            ReflectionHelper.setValueInFieldOfType(this.world.worldProvider,
                     WorldChunkManager.class, new TCWorldChunkManager(this, biomeGenerator));
+        }
+    }
+
+    private void injectStrongholdGenerator(WorldGenStronghold strongholdGen)
+    {
+        ChunkProviderServer chunkProvider = this.world.getChunkProviderServer();
+        ChunkGenerator chunkGenerator = ReflectionHelper.getValueInFieldOfType(chunkProvider, ChunkGenerator.class);
+        if (chunkGenerator instanceof CustomChunkGenerator) {
+            ReflectionHelper.setValueInFieldOfType(chunkGenerator, WorldGenStronghold.class, strongholdGen);
         }
     }
 
@@ -738,6 +751,9 @@ public class BukkitWorld implements LocalWorld
         {
             world.worldProvider = ((TCWorldProvider) world.worldProvider).getOldWorldProvider();
         }
+
+        // Restore vanilla stronghold generator
+        this.injectStrongholdGenerator(new WorldGenStronghold());
     }
 
     public void setChunkGenerator(TCChunkGenerator _generator)
