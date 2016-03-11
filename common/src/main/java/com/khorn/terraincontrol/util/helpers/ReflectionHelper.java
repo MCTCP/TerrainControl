@@ -58,7 +58,12 @@ public final class ReflectionHelper
         try
         {
             field.setAccessible(true);
-            return fieldType.cast(field.get(on));
+            // We can't use fieldType.cast(...) instead of an unchecked cast to
+            // T: the cast method does not work for primitive types (i.e.
+            // int.class), as field.get always returns a boxed type
+            @SuppressWarnings("unchecked")
+            T fieldValue = (T) field.get(on);
+            return fieldValue;
         } catch (IllegalAccessException e)
         {
             // Cannot happen, we just made the field accessible
@@ -83,12 +88,19 @@ public final class ReflectionHelper
 
                 if (result != null)
                 {
-                    throw new NoSuchFieldError("Two fields of type " + fieldType + " in " + searchClass + ": " + field.getName() + " and " + result.getName());
+                    throw new NoSuchFieldError("Two fields of type " + fieldType + " in " + onClass + ": " + field.getName() + " and " + result.getName());
                 }
 
                 result = field;
             }
 
+            if (result != null)
+            {
+                // Found single field in class, stop searching
+                break;
+            }
+
+            // Not yet found, continue search in super class
             onClass = onClass.getSuperclass();
         }
 
