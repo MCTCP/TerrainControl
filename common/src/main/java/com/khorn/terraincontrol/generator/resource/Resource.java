@@ -211,12 +211,4 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
         return o.getPriority() - this.getPriority();
     }
 
-    public static Resource[] getSortedResourceSequence(Collection<Resource> resourceCollection)
-    {
-        Resource[] resourcesArray = new Resource[resourceCollection.size()];
-        Resource[] resources = resourceCollection.toArray(resourcesArray);
-        Arrays.sort(resources);
-        return resources;
-    }
-
 }

@@ -448,6 +448,11 @@ public class StandardBiomeTemplate
             resources.add(Resource.createResource(config, WellGen.class, this.defaultWell));
         }
 
+        // Sort resources according to their natural other
+        // (Sorting the resources here is easier and less error prone than
+        // keeping the order of this method in sync with the natural resource
+        // order)
+        Collections.sort(resources);
         return resources;
     }
 }

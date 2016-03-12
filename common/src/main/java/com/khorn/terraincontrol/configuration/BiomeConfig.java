@@ -857,7 +857,7 @@ public class BiomeConfig extends ConfigFile
 
     private void WriteResources(SettingsWriter writer) throws IOException
     {
-        for (Resource resource : Resource.getSortedResourceSequence(this.resourceSequence))
+        for (Resource resource : this.resourceSequence)
         {
             writer.function(resource);
         }
