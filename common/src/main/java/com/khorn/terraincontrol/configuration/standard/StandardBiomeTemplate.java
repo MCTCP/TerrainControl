@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.resource.IceSpikeGen.SpikeType;
+import com.khorn.terraincontrol.generator.terrain.TerrainShapeBase;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -84,6 +85,8 @@ public class StandardBiomeTemplate
     public int defaultBoulder = 0;
     public Object[] defaultSurfaceSurfaceAndGroundControl = new Object[0];
     public boolean defaultIceSpikes;
+    public boolean defaultDisableBiomeHeight;
+    public double[] defaultCustomHeightControl = new double[TerrainShapeBase.PIECES_PER_CHUNK_Y + 1];;
 
     public List<WeightedMobSpawnGroup> defaultCreatures = Arrays.asList(
             new WeightedMobSpawnGroup(MobNames.SHEEP, 12, 4, 4),

@@ -54,6 +54,11 @@ public abstract class TerrainShapeBase implements Closeable
     public static final int PIECES_PER_CHUNK_X = ChunkCoordinate.CHUNK_X_SIZE / PIECE_X_SIZE;
 
     /**
+     * The amount of noise pieces that fit inside a chunk on the y axis.
+     */
+    public static final int PIECES_PER_CHUNK_Y = ChunkCoordinate.CHUNK_Y_SIZE / PIECE_Y_SIZE;
+
+    /**
      * The amount of noise pieces that fit inside a chunk on the z axis.
      */
     public static final int PIECES_PER_CHUNK_Z = ChunkCoordinate.CHUNK_Z_SIZE / PIECE_Z_SIZE;

@@ -17,6 +17,7 @@ import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
+import com.khorn.terraincontrol.generator.terrain.TerrainShapeBase;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -321,7 +322,7 @@ public class BiomeConfig extends ConfigFile
         this.volatilityRaw2 = readSettings(BiomeStandardValues.VOLATILITY_2);
         this.volatilityWeightRaw1 = readSettings(BiomeStandardValues.VOLATILITY_WEIGHT_1);
         this.volatilityWeightRaw2 = readSettings(BiomeStandardValues.VOLATILITY_WEIGHT_2);
-        this.disableNotchHeightControl = readSettings(BiomeStandardValues.DISABLE_BIOME_HEIGHT);
+        this.disableNotchHeightControl = readSettings(BiomeStandardValues.DISABLE_BIOME_HEIGHT, defaultSettings.defaultDisableBiomeHeight);
         this.maxAverageHeight = readSettings(BiomeStandardValues.MAX_AVERAGE_HEIGHT);
         this.maxAverageDepth = readSettings(BiomeStandardValues.MAX_AVERAGE_DEPTH);
 
@@ -353,15 +354,15 @@ public class BiomeConfig extends ConfigFile
 
         this.ReadCustomObjectSettings();
         this.ReadResourceSettings();
-        this.heightMatrix = new double[this.worldConfig.worldHeightCap / 8 + 1];
-        this.readHeightSettings(this.heightMatrix, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL);
-        this.riverHeightMatrix = new double[this.worldConfig.worldHeightCap / 8 + 1];
-        this.readHeightSettings(this.riverHeightMatrix, BiomeStandardValues.RIVER_CUSTOM_HEIGHT_CONTROL);
+        this.heightMatrix = new double[this.worldConfig.worldHeightCap / TerrainShapeBase.PIECE_Y_SIZE + 1];
+        this.readHeightSettings(this.heightMatrix, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, defaultSettings.defaultCustomHeightControl);
+        this.riverHeightMatrix = new double[this.worldConfig.worldHeightCap / TerrainShapeBase.PIECE_Y_SIZE + 1];
+        this.readHeightSettings(this.riverHeightMatrix, BiomeStandardValues.RIVER_CUSTOM_HEIGHT_CONTROL, defaultSettings.defaultCustomHeightControl);
     }
 
-    private void readHeightSettings(double[] heightMatrix, Setting<double[]> setting)
+    private void readHeightSettings(double[] heightMatrix, Setting<double[]> setting, double[] defaultValue)
     {
-        double[] keys = readSettings(setting);
+        double[] keys = readSettings(setting, defaultValue);
         for (int i = 0; i < heightMatrix.length && i < keys.length; i++)
                 heightMatrix[i] = keys[i];
     }

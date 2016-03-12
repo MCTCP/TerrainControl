@@ -7,6 +7,8 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
+import java.util.Arrays;
+
 /**
  * Class to hold all default settings of all default biomes.
  * 
@@ -648,6 +650,18 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0xCA8C65;
             this.defaultIsle.add(DefaultBiome.MESA.Name);
             this.defaultRarityWhenIsle = 99;
+        }
+    }
+
+    public static class TheVoid extends MinecraftBiomeTemplate
+    {
+        public TheVoid(MojangSettings mojangSettings, int worldHeight)
+        {
+            super(mojangSettings, worldHeight);
+            this.defaultColor = 0xB6D0FF;
+            this.defaultDisableBiomeHeight = true;
+            this.defaultStrongholds = false;
+            Arrays.fill(this.defaultCustomHeightControl, -100);
         }
     }
 

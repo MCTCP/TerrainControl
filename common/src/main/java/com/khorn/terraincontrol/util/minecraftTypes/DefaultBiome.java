@@ -64,6 +64,7 @@ import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.S
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.Taiga;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.TaigaHills;
 import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.TaigaMountains;
+import com.khorn.terraincontrol.configuration.standard.MinecraftBiomeTemplates.TheVoid;
 import com.khorn.terraincontrol.configuration.standard.*;
 import com.khorn.terraincontrol.logging.LogMarker;
 
@@ -186,6 +187,7 @@ public enum DefaultBiome
     MESA(37, "Mesa", Mesa.class),
     MESA_PLATEAU_FOREST(38, "Mesa Plateau F", MesaPlateauForest.class),
     MESA_PLATEAU(39, "Mesa Plateau", MesaPlateau.class),
+    THE_VOID(127, "The Void", TheVoid.class),
     SUNFLOWER_PLAINS(129, "Sunflower Plains", SunflowerPlains.class),
     DESERT_MOUNTAINS(130, "Desert M", DesertMountains.class),
     EXTREME_HILLS_MOUNTAINS(131, "Extreme Hills M", ExtremeHillsMountains.class),
