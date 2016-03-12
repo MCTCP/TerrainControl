@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
+import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
@@ -64,11 +65,28 @@ public class CustomBiome extends BiomeBase
     {
         CustomBiome customBiome = new CustomBiome(biomeConfig);
 
-        if (!biomeIds.isVirtual())
+        // Insert the biome in Minecraft's biome mapping
+        MinecraftKey biomeName = new MinecraftKey(PluginStandardValues.PLUGIN_NAME, biomeConfig.getName());
+        int savedBiomeId = biomeIds.getSavedId();
+        if (biomeIds.isVirtual())
         {
-            // Insert the biome in Minecraft's biome mapping
-            MinecraftKey biomeName = new MinecraftKey(PluginStandardValues.PLUGIN_NAME, biomeConfig.getName());
+            // Virtual biomes hack: register, then let original biome overwrite
+            // In this way, the id --> biome mapping returns the original biome,
+            // and the biome --> id mapping returns savedBiomeId for both the
+            // original and custom biome
+            BiomeBase existingBiome = BiomeBase.getBiome(savedBiomeId);
+            MinecraftKey existingBiomeName = BiomeBase.REGISTRY_ID.b(existingBiome);
+            BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeName, customBiome);
+            BiomeBase.REGISTRY_ID.a(savedBiomeId, existingBiomeName, existingBiome);
+        } else {
+            // Normal insertion
             BiomeBase.REGISTRY_ID.a(biomeIds.getSavedId(), biomeName, customBiome);
+        }
+
+        // Sanity check: check if biome was actually registered
+        int registeredSavedId = WorldHelper.getSavedId(customBiome);
+        if (registeredSavedId != savedBiomeId) {
+            throw new AssertionError("Biome " + biomeConfig.getName() + " is not properly registered: got id " + registeredSavedId + ", should be " + savedBiomeId);
         }
 
         return customBiome;
