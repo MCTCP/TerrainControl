@@ -186,29 +186,29 @@ public class WorldSettings implements ConfigProvider
         StringBuilder loadedBiomeNames = new StringBuilder();
         for (BiomeConfig biomeConfig : biomeConfigs.values())
         {
-            if (biomeConfig == null)
-            {
-                continue;
-            }
-
-            // Statistics of the loaded biomes
-            this.biomesCount++;
-            loadedBiomeNames.append(biomeConfig.getName());
-            loadedBiomeNames.append(", ");
-
             // Inheritance
             processInheritance(biomeConfigs, biomeConfig, 0);
 
             // Settings reading
             biomeConfig.process();
+        }
+
+        // Now that all settings are loaded, we can index them,
+        // cross-reference between biomes, etc.
+        for (BiomeConfig biomeConfig : biomeConfigs.values())
+        {
+            // Statistics of the loaded biomes
+            this.biomesCount++;
+            loadedBiomeNames.append(biomeConfig.getName());
+            loadedBiomeNames.append(", ");
 
             // Check generation id range
             int generationId = biomeConfig.generationId;
             if (generationId < 0 || generationId >= world.getMaxBiomesCount())
             {
                 TerrainControl.log(LogMarker.ERROR,
-                                   "The biome id of the {} biome, {}, is too high. It must be between 0 and {}, inclusive.",
-                                   biomeConfig.getName(), generationId, world.getMaxBiomesCount() - 1);
+                        "The biome id of the {} biome, {}, is too high. It must be between 0 and {}, inclusive.",
+                        biomeConfig.getName(), generationId, world.getMaxBiomesCount() - 1);
                 TerrainControl.log(LogMarker.ERROR, "The biome has been prevented from loading.");
                 continue;
             }
@@ -217,13 +217,12 @@ public class WorldSettings implements ConfigProvider
             if (biomes[generationId] != null)
             {
                 TerrainControl.log(LogMarker.FATAL, "Duplicate biome id {} ({} and {})!", generationId, biomes[generationId].getName(),
-                                   biomeConfig.getName());
-                TerrainControl.log(LogMarker.FATAL, "The biome {} has been prevented from loading.", new Object[] {biomeConfig.getName()});
+                        biomeConfig.getName());
+                TerrainControl.log(LogMarker.FATAL, "The biome {} has been prevented from loading.", new Object[]{biomeConfig.getName()});
                 TerrainControl.log(LogMarker.INFO, "If you are updating an old pre-Minecraft 1.7 world, please read this wiki page:");
                 TerrainControl.log(LogMarker.INFO, "https://github.com/Wickth/TerrainControl/wiki/Upgrading-an-old-map-to-Minecraft-1.7");
                 continue;
             }
-
             // Get correct saved id (defaults to generation id, but can be set
             // to use the generation id of another biome)
             int savedId = biomeConfig.generationId;
@@ -232,9 +231,14 @@ public class WorldSettings implements ConfigProvider
                 BiomeConfig replaceToConfig = biomeConfigs.get(biomeConfig.replaceToBiomeName);
                 if (replaceToConfig == null)
                 {
-                    biomeConfig.replaceToBiomeName = "";
                     TerrainControl.log(LogMarker.WARN, "Invalid ReplaceToBiomeName in biome {}: biome {} doesn't exist", biomeConfig.getName(),
-                                       biomeConfig.replaceToBiomeName);
+                            biomeConfig.replaceToBiomeName);
+                    biomeConfig.replaceToBiomeName = "";
+                } else if (!replaceToConfig.replaceToBiomeName.isEmpty())
+                {
+                    TerrainControl.log(LogMarker.WARN, "Invalid ReplaceToBiomeName in biome {}: biome {} also has a ReplaceToBiomeName value",
+                            biomeConfig.getName(), biomeConfig.replaceToBiomeName);
+                    biomeConfig.replaceToBiomeName = "";
                 } else
                 {
                     savedId = replaceToConfig.generationId;
@@ -245,12 +249,12 @@ public class WorldSettings implements ConfigProvider
             if (savedId >= world.getMaxSavedBiomesCount())
             {
                 TerrainControl.log(LogMarker.ERROR,
-                                   "Biomes with an id between {} and {} (inclusive) must have a valid ReplaceToBiomeName setting:",
-                                   world.getMaxBiomesCount(), world.getMaxSavedBiomesCount() - 1);
+                        "Biomes with an id between {} and {} (inclusive) must have a valid ReplaceToBiomeName setting:",
+                        world.getMaxBiomesCount(), world.getMaxSavedBiomesCount() - 1);
                 TerrainControl.log(LogMarker.ERROR, "Minecraft can only save biomes with an id between 0 and {}, inclusive.",
-                                   world.getMaxBiomesCount() - 1);
+                        world.getMaxBiomesCount() - 1);
                 TerrainControl.log(LogMarker.ERROR, "This means that the biome {} with map file id {} had to be prevented from loading.",
-                                   biomeConfig.getName(), savedId);
+                        biomeConfig.getName(), savedId);
                 continue;
             }
 
