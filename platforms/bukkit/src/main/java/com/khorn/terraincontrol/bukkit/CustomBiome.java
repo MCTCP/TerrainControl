@@ -20,7 +20,6 @@ public class CustomBiome extends BiomeBase
      * classes in the package net.minecraft.world.biome package and for
      * subclasses of BiomeBase.a). To get around this, we have to subclass
      * BiomeBase.a.
-     *
      */
     private static class BiomeBase_a extends BiomeBase.a
     {
@@ -58,7 +57,7 @@ public class CustomBiome extends BiomeBase
      * biome, unregistering the virtual biome.
      *
      * @param biomeConfig Settings of the biome
-     * @param biomeIds Ids of the biome.
+     * @param biomeIds    Ids of the biome.
      * @return The CustomBiome instance.
      */
     public static CustomBiome createInstance(BiomeConfig biomeConfig, BiomeIds biomeIds)
@@ -82,18 +81,22 @@ public class CustomBiome extends BiomeBase
                 // custom biome that is loaded after this virtual biome, so it
                 // will soon be registered
                 BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeName, customBiome);
-            } else {
+            } else
+            {
                 MinecraftKey existingBiomeName = BiomeBase.REGISTRY_ID.b(existingBiome);
+                BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeName, customBiome);
                 BiomeBase.REGISTRY_ID.a(savedBiomeId, existingBiomeName, existingBiome);
             }
-        } else {
+        } else
+        {
             // Normal insertion
             BiomeBase.REGISTRY_ID.a(biomeIds.getSavedId(), biomeName, customBiome);
         }
 
         // Sanity check: check if biome was actually registered
         int registeredSavedId = WorldHelper.getSavedId(customBiome);
-        if (registeredSavedId != savedBiomeId) {
+        if (registeredSavedId != savedBiomeId)
+        {
             throw new AssertionError("Biome " + biomeConfig.getName() + " is not properly registered: got id " + registeredSavedId + ", should be " + savedBiomeId);
         }
 
