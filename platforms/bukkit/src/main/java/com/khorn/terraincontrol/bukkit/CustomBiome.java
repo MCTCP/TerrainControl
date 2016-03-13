@@ -75,9 +75,17 @@ public class CustomBiome extends BiomeBase
             // and the biome --> id mapping returns savedBiomeId for both the
             // original and custom biome
             BiomeBase existingBiome = BiomeBase.getBiome(savedBiomeId);
-            MinecraftKey existingBiomeName = BiomeBase.REGISTRY_ID.b(existingBiome);
-            BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeName, customBiome);
-            BiomeBase.REGISTRY_ID.a(savedBiomeId, existingBiomeName, existingBiome);
+
+            if (existingBiome == null)
+            {
+                // Original biome not yet registered. This is because it's a
+                // custom biome that is loaded after this virtual biome, so it
+                // will soon be registered
+                BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeName, customBiome);
+            } else {
+                MinecraftKey existingBiomeName = BiomeBase.REGISTRY_ID.b(existingBiome);
+                BiomeBase.REGISTRY_ID.a(savedBiomeId, existingBiomeName, existingBiome);
+            }
         } else {
             // Normal insertion
             BiomeBase.REGISTRY_ID.a(biomeIds.getSavedId(), biomeName, customBiome);
