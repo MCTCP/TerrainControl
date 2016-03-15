@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.BiomeIds;
+import com.khorn.terraincontrol.bukkit.util.EnumHelper;
 import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
@@ -8,6 +9,7 @@ import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import net.minecraft.server.v1_9_R1.BiomeBase;
 import net.minecraft.server.v1_9_R1.MinecraftKey;
+import org.bukkit.block.Biome;
 
 import java.util.List;
 
@@ -65,7 +67,8 @@ public class CustomBiome extends BiomeBase
         CustomBiome customBiome = new CustomBiome(biomeConfig);
 
         // Insert the biome in Minecraft's biome mapping
-        MinecraftKey biomeName = new MinecraftKey(PluginStandardValues.PLUGIN_NAME, biomeConfig.getName());
+        String biomeNameWithoutSpaces = biomeConfig.getName().replace(' ', '_');
+        MinecraftKey biomeKey = new MinecraftKey(PluginStandardValues.PLUGIN_NAME, biomeNameWithoutSpaces);
         int savedBiomeId = biomeIds.getSavedId();
         if (biomeIds.isVirtual())
         {
@@ -80,17 +83,18 @@ public class CustomBiome extends BiomeBase
                 // Original biome not yet registered. This is because it's a
                 // custom biome that is loaded after this virtual biome, so it
                 // will soon be registered
-                BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeName, customBiome);
+                BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeKey, customBiome);
             } else
             {
-                MinecraftKey existingBiomeName = BiomeBase.REGISTRY_ID.b(existingBiome);
-                BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeName, customBiome);
-                BiomeBase.REGISTRY_ID.a(savedBiomeId, existingBiomeName, existingBiome);
+                MinecraftKey existingBiomeKey = BiomeBase.REGISTRY_ID.b(existingBiome);
+                BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeKey, customBiome);
+                BiomeBase.REGISTRY_ID.a(savedBiomeId, existingBiomeKey, existingBiome);
             }
         } else
         {
             // Normal insertion
-            BiomeBase.REGISTRY_ID.a(biomeIds.getSavedId(), biomeName, customBiome);
+            BiomeBase.REGISTRY_ID.a(biomeIds.getSavedId(), biomeKey, customBiome);
+            EnumHelper.addEnum(Biome.class, biomeNameWithoutSpaces.toUpperCase(), new Class[0], new Object[0]);
         }
 
         // Sanity check: check if biome was actually registered
