@@ -182,7 +182,9 @@ public final class LayerFactory
             }
 
             LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
+            LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(mainLayer, world.getSeed());
             boolean haveBorder = false;
+            boolean haveIsle = false;
             for (LocalBiome biome : configs.getBiomeArray())
             {
                 if (biome == null)
@@ -194,21 +196,16 @@ public final class LayerFactory
                         && worldConfig.IsleBiomes.contains(biomeConfig.getName())
                         && biomeConfig.isleInBiome != null)
                 {
-                    int id = biome.getIds().getGenerationId();
-
-                    LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(4000 + id, mainLayer);
-                    layerBiomeIsle.biome = biome;
+                    haveIsle = true;
+                    boolean[] biomeCanSpawnIn = new boolean[1024];
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
                         int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
-                        if (islandIn == DefaultBiome.OCEAN.Id)
-                            layerBiomeIsle.inOcean = true;
-                        else
-                            layerBiomeIsle.biomeIsles[islandIn] = true;
+                        biomeCanSpawnIn[islandIn] = true;
                     }
 
-                    layerBiomeIsle.chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarityWhenIsle;
-                    mainLayer = layerBiomeIsle;
+                    int chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarityWhenIsle;
+                    layerBiomeIsle.addIsle(biome, chance, biomeCanSpawnIn);
                 }
 
                 if (biomeConfig.biomeSizeWhenBorder == depth
@@ -225,6 +222,11 @@ public final class LayerFactory
                 }
             }
 
+            if (haveIsle)
+            {
+                layerBiomeIsle.child = mainLayer;
+                mainLayer = layerBiomeIsle;
+            }
             if (haveBorder)
             {
                 layerBiomeBorder.child = mainLayer;
@@ -319,7 +321,9 @@ public final class LayerFactory
             }
 
             LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
+            LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(mainLayer, world.getSeed());
             boolean haveBorder = false;
+            boolean haveIsle = false;
             for (LocalBiome biome : configs.getBiomeArray())
             {
                 if (biome == null)
@@ -331,21 +335,16 @@ public final class LayerFactory
                         && worldConfig.IsleBiomes.contains(biomeConfig.getName())
                         && biomeConfig.isleInBiome != null)
                 {
-                    int id = biome.getIds().getGenerationId();
-
-                    LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(4000 + id, mainLayer);
-                    layerBiomeIsle.biome = biome;
+                    haveIsle = true;
+                    boolean[] biomeCanSpawnIn = new boolean[1024];
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
                         int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
-                        if (islandIn == DefaultBiome.OCEAN.Id)
-                            layerBiomeIsle.inOcean = true;
-                        else
-                            layerBiomeIsle.biomeIsles[islandIn] = true;
+                        biomeCanSpawnIn[islandIn] = true;
                     }
 
-                    layerBiomeIsle.chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarityWhenIsle;
-                    mainLayer = layerBiomeIsle;
+                    int chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarityWhenIsle;
+                    layerBiomeIsle.addIsle(biome, chance, biomeCanSpawnIn);
                 }
 
                 if (biomeConfig.biomeSizeWhenBorder == depth
@@ -359,6 +358,12 @@ public final class LayerFactory
                         layerBiomeBorder.addBiome(biome, replaceFrom, world);
                     }
                 }
+            }
+
+            if (haveIsle)
+            {
+                layerBiomeIsle.child = mainLayer;
+                mainLayer = layerBiomeIsle;
             }
 
             if (haveBorder)

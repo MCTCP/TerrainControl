@@ -34,10 +34,10 @@ public class LayerMixWithRiver extends Layer
     private Layer riverLayer;
 
     @Override
-    public void initWorldGenSeed(long seed)
+    public void initWorldGenSeed(long worldSeed)
     {
-        super.initWorldGenSeed(seed);
-        riverLayer.initWorldGenSeed(seed + 31337);
+        super.initWorldGenSeed(worldSeed);
+        riverLayer.initWorldGenSeed(worldSeed + 31337);
     }
 
     @Override

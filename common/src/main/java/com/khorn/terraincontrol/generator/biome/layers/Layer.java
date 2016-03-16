@@ -45,26 +45,23 @@ public abstract class Layer
 
     /**
      * A general seed kept for use in world generation
-     * <p>
-     * @see initWorldGenSeed
+     * @see #initWorldGenSeed(long)
      */
-    protected long worldGenSeed;
+    protected long scrambledWorldSeed;
 
     /**
      * This seed is used for general random number generation within the Layers
-     * system. It is based off of both the worldGenSeed and baseSeed.
-     * <p>
-     * @see initWorldGenSeed
-     * @see initChunkSeed
+     * system. It is based off of both the scrambledWorldSeed and baseSeed.
+     * @see #initWorldGenSeed(long)
+     * @see #initChunkSeed(long, long)
      */
-    private long chunkSeed;
+    private long scrambledChunkSeed;
 
     /**
      * This seed is used for generating random numbers for biome groups
-     * <p>
-     * @see initGroupSeed
+     * @see #initGroupSeed(long, long)
      */
-    private long groupSeed;
+    private long scrambledGroupSeed;
 
     /**
      * The layer to process before this one. getInts() should call
@@ -131,79 +128,93 @@ public abstract class Layer
         return (selection & LandBit) != 0 ? (selection & BiomeBits) : 0;
     }
 
+    private static long getScrambledBaseSeed(long baseSeed)
+    {
+        long scrambledBaseSeed = baseSeed;
+        scrambledBaseSeed *= (scrambledBaseSeed * 6364136223846793005L + 1442695040888963407L);
+        scrambledBaseSeed += baseSeed;
+        scrambledBaseSeed *= (scrambledBaseSeed * 6364136223846793005L + 1442695040888963407L);
+        scrambledBaseSeed += baseSeed;
+        scrambledBaseSeed *= (scrambledBaseSeed * 6364136223846793005L + 1442695040888963407L);
+        scrambledBaseSeed += baseSeed;
+        return scrambledBaseSeed;
+    }
 
+    protected static long getScrambledWorldSeed(long baseSeed, long worldSeed)
+    {
+        long scrambledBaseSeed = getScrambledBaseSeed(baseSeed);
+        long scrambledWorldSeed = worldSeed;
+        scrambledWorldSeed *= (scrambledWorldSeed * 6364136223846793005L + 1442695040888963407L);
+        scrambledWorldSeed += scrambledBaseSeed;
+        scrambledWorldSeed *= (scrambledWorldSeed * 6364136223846793005L + 1442695040888963407L);
+        scrambledWorldSeed += scrambledBaseSeed;
+        scrambledWorldSeed *= (scrambledWorldSeed * 6364136223846793005L + 1442695040888963407L);
+        scrambledWorldSeed += scrambledBaseSeed;
+        return scrambledWorldSeed;
+    }
 
     protected Layer(long seed)
     {
         this.baseSeed = seed;
-        this.baseSeed *= (this.baseSeed * 6364136223846793005L + 1442695040888963407L);
-        this.baseSeed += seed;
-        this.baseSeed *= (this.baseSeed * 6364136223846793005L + 1442695040888963407L);
-        this.baseSeed += seed;
-        this.baseSeed *= (this.baseSeed * 6364136223846793005L + 1442695040888963407L);
-        this.baseSeed += seed;
     }
 
     public Layer()
     {
     }
 
-    public void initWorldGenSeed(long seed)
+
+
+    public void initWorldGenSeed(long worldSeed)
     {
-        this.worldGenSeed = seed;
         if (this.child != null)
-            this.child.initWorldGenSeed(seed);
-        this.worldGenSeed *= (this.worldGenSeed * 6364136223846793005L + 1442695040888963407L);
-        this.worldGenSeed += this.baseSeed;
-        this.worldGenSeed *= (this.worldGenSeed * 6364136223846793005L + 1442695040888963407L);
-        this.worldGenSeed += this.baseSeed;
-        this.worldGenSeed *= (this.worldGenSeed * 6364136223846793005L + 1442695040888963407L);
-        this.worldGenSeed += this.baseSeed;
+            this.child.initWorldGenSeed(worldSeed);
+
+        this.scrambledWorldSeed = getScrambledWorldSeed(this.baseSeed, worldSeed);
     }
 
     protected void initChunkSeed(long x, long z)
     {
-        this.chunkSeed = this.worldGenSeed;
-        this.chunkSeed *= (this.chunkSeed * 6364136223846793005L + 1442695040888963407L);
-        this.chunkSeed += x;
-        this.chunkSeed *= (this.chunkSeed * 6364136223846793005L + 1442695040888963407L);
-        this.chunkSeed += z;
-        this.chunkSeed *= (this.chunkSeed * 6364136223846793005L + 1442695040888963407L);
-        this.chunkSeed += x;
-        this.chunkSeed *= (this.chunkSeed * 6364136223846793005L + 1442695040888963407L);
-        this.chunkSeed += z;
+        this.scrambledChunkSeed = this.scrambledWorldSeed;
+        this.scrambledChunkSeed *= (this.scrambledChunkSeed * 6364136223846793005L + 1442695040888963407L);
+        this.scrambledChunkSeed += x;
+        this.scrambledChunkSeed *= (this.scrambledChunkSeed * 6364136223846793005L + 1442695040888963407L);
+        this.scrambledChunkSeed += z;
+        this.scrambledChunkSeed *= (this.scrambledChunkSeed * 6364136223846793005L + 1442695040888963407L);
+        this.scrambledChunkSeed += x;
+        this.scrambledChunkSeed *= (this.scrambledChunkSeed * 6364136223846793005L + 1442695040888963407L);
+        this.scrambledChunkSeed += z;
     }
 
     protected void initGroupSeed(long x, long z)
     {
-        this.groupSeed = this.chunkSeed;
-        this.groupSeed *= (this.groupSeed * 6364136223846793005L + 1442695040888963407L);
-        this.groupSeed += x;
-        this.groupSeed *= (this.groupSeed * 6364136223846793005L + 1442695040888963407L);
-        this.groupSeed += z;
-        this.groupSeed *= (this.groupSeed * 6364136223846793005L + 1442695040888963407L);
-        this.groupSeed += x;
-        this.groupSeed *= (this.groupSeed * 6364136223846793005L + 1442695040888963407L);
-        this.groupSeed += z;
+        this.scrambledGroupSeed = this.scrambledChunkSeed;
+        this.scrambledGroupSeed *= (this.scrambledGroupSeed * 6364136223846793005L + 1442695040888963407L);
+        this.scrambledGroupSeed += x;
+        this.scrambledGroupSeed *= (this.scrambledGroupSeed * 6364136223846793005L + 1442695040888963407L);
+        this.scrambledGroupSeed += z;
+        this.scrambledGroupSeed *= (this.scrambledGroupSeed * 6364136223846793005L + 1442695040888963407L);
+        this.scrambledGroupSeed += x;
+        this.scrambledGroupSeed *= (this.scrambledGroupSeed * 6364136223846793005L + 1442695040888963407L);
+        this.scrambledGroupSeed += z;
     }
 
     protected int nextInt(int x)
     {
-        int i = (int) ((this.chunkSeed >> 24) % x);
+        int i = (int) ((this.scrambledChunkSeed >> 24) % x);
         if (i < 0)
             i += x;
-        this.chunkSeed *= (this.chunkSeed * 6364136223846793005L + 1442695040888963407L);
-        this.chunkSeed += this.worldGenSeed;
+        this.scrambledChunkSeed *= (this.scrambledChunkSeed * 6364136223846793005L + 1442695040888963407L);
+        this.scrambledChunkSeed += this.scrambledWorldSeed;
         return i;
     }
 
     protected int nextGroupInt(int x)
     {
-        int i = (int) ((this.groupSeed >> 24) % x);
+        int i = (int) ((this.scrambledGroupSeed >> 24) % x);
         if (i < 0)
             i += x;
-        this.groupSeed *= (this.groupSeed * 6364136223846793005L + 1442695040888963407L);
-        this.groupSeed += this.chunkSeed;
+        this.scrambledGroupSeed *= (this.scrambledGroupSeed * 6364136223846793005L + 1442695040888963407L);
+        this.scrambledGroupSeed += this.scrambledChunkSeed;
         return i;
     }
 
