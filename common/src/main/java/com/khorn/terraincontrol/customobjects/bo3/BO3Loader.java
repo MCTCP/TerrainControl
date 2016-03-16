@@ -1,10 +1,12 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.io.*;
 import java.util.HashMap;
@@ -36,8 +38,6 @@ public class BO3Loader implements CustomObjectLoader
         return new BO3(objectName, file);
     }
 
-    // Actually, we use tryToClose(..) to close the stream
-    @SuppressWarnings("resource")
     public static NamedBinaryTag loadMetadata(String name, File bo3File)
     {
         String path = bo3File.getParent() + File.separator + name;
@@ -48,6 +48,13 @@ public class BO3Loader implements CustomObjectLoader
             return loadedTags.get(path);
         }
 
+        NamedBinaryTag tag = loadTileEntityFromNBT(path);
+        registerMetadata(path, tag);
+        return tag;
+    }
+
+    private static NamedBinaryTag loadTileEntityFromNBT(String path)
+    {
         // Load from file
         NamedBinaryTag metadata;
         FileInputStream stream = null;
@@ -57,31 +64,35 @@ public class BO3Loader implements CustomObjectLoader
             stream = new FileInputStream(path);
             // Get the tag
             metadata = NamedBinaryTag.readFrom(stream, true);
-            stream.close();
         } catch (FileNotFoundException e)
         {
             // File not found
             TerrainControl.log(LogMarker.WARN, "NBT file {} not found", (Object) path);
-            tryToClose(stream);
             return null;
         } catch (IOException e)
         {
-            // Not a compressed NBT file, try uncompressed
             tryToClose(stream);
+
+            // Not a compressed NBT file, try uncompressed
+            FileInputStream streamForUncompressed = null;
             try
             {
                 // Read it from a file next to the BO3
-                stream = new FileInputStream(path);
+                streamForUncompressed = new FileInputStream(path);
                 // Get the tag
-                metadata = NamedBinaryTag.readFrom(stream, false);
-                stream.close();
+                metadata = NamedBinaryTag.readFrom(streamForUncompressed, false);
             } catch (IOException corruptFile)
             {
                 TerrainControl.log(LogMarker.FATAL, "Failed to read NBT meta file: ", e.getMessage());
                 TerrainControl.printStackTrace(LogMarker.FATAL, corruptFile);
-                tryToClose(stream);
                 return null;
+            } finally
+            {
+                tryToClose(streamForUncompressed);
             }
+        } finally
+        {
+            tryToClose(stream);
         }
 
         // The file can be structured in two ways:
@@ -89,33 +100,30 @@ public class BO3Loader implements CustomObjectLoader
         // 2. chest.nbt with a Compound tag in it with all the data
 
         // Check for type 1 by searching for an id tag
-        NamedBinaryTag[] values = (NamedBinaryTag[]) metadata.getValue();
-        for (NamedBinaryTag subTag : values)
+        NamedBinaryTag idTag = metadata.getTag("id");
+        if (idTag != null)
         {
-            if (subTag.getName() != null && subTag.getName().equals("id") && subTag.getType().equals(NamedBinaryTag.Type.TAG_String))
-            {
-                // Found id tag, so return the root tag
-                return metadata;
-            }
+            // Found id tag, so return the root tag
+            return metadata;
         }
         // No id tag found, so check for type 2
-        try
+        if (metadata.getValue() instanceof NamedBinaryTag[])
         {
-            return registerMetadata(path, ((NamedBinaryTag[]) metadata.getValue())[0]);
-        } catch (Exception e)
-        {
-            TerrainControl.log(LogMarker.WARN, "Structure of NBT file is incorrect: ", e.getMessage());
-            return null;
+            NamedBinaryTag[] subtag = (NamedBinaryTag[]) metadata.getValue();
+            if (subtag.length != 0)
+            {
+                return subtag[0];
+            }
         }
-
+        // Unknown/bad structure
+        TerrainControl.log(LogMarker.WARN, "Structure of NBT file is incorrect: ");
+        return null;
     }
 
     /**
      * Caches and returns the provided Meta data
-     * <p/>
      * @param pathOnDisk The path of the meta data
      * @param metadata   The Tag object to be cached
-     * <p/>
      * @return the meta data that was cached
      */
     public static NamedBinaryTag registerMetadata(String pathOnDisk, NamedBinaryTag metadata)

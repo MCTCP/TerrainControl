@@ -37,6 +37,7 @@ public class BukkitWorld implements LocalWorld
     private CustomObjectStructureCache structureCache;
     private String name;
     private BiomeGenerator biomeGenerator;
+    private DataConverter dataConverter;
 
     private static int nextBiomeId = DefaultBiome.values().length;
 
@@ -661,6 +662,7 @@ public class BukkitWorld implements LocalWorld
             // Things that need to be done only when enabling
             // for the first time
             this.structureCache = new CustomObjectStructureCache(this);
+            this.dataConverter = DataConverterRegistry.a();
 
             switch (this.settings.worldConfig.ModeTerrain)
             {
@@ -795,6 +797,9 @@ public class BukkitWorld implements LocalWorld
         nmsTag.setInt("x", x);
         nmsTag.setInt("y", y);
         nmsTag.setInt("z", z);
+        // Update to current Minecraft format (maybe we want to do this at
+        // server startup instead, and then save the result?)
+        nmsTag = this.dataConverter.a(DataConverterTypes.BLOCK_ENTITY, nmsTag, -1);
         // Add that data to the current tile entity in the world
         TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
         if (tileEntity != null)
@@ -802,8 +807,8 @@ public class BukkitWorld implements LocalWorld
             tileEntity.a(nmsTag); // tileEntity.load
         } else
         {
-            TerrainControl.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", new Object[] {
-                    nmsTag.getString("id"), x, y, z, getMaterial(x, y, z)});
+            TerrainControl.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}",
+                    nmsTag.getString("id"), x, y, z, getMaterial(x, y, z));
         }
     }
 
