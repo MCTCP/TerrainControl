@@ -424,40 +424,53 @@ public class BukkitWorld implements LocalWorld
          * rewrite parts of this method for newer block place logic.
          */
 
-        if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
+        try
         {
-            return;
-        }
+            if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
+            {
+                return;
+            }
 
-        IBlockData blockData = ((BukkitMaterialData) material).internalBlock();
+            IBlockData blockData = ((BukkitMaterialData) material).internalBlock();
 
-        // Get chunk from (faster) custom cache
-        Chunk chunk = this.getChunk(x, y, z);
+            // Get chunk from (faster) custom cache
+            Chunk chunk = this.getChunk(x, y, z);
 
-        if (chunk == null)
+            if (chunk == null)
+            {
+                // Chunk is unloaded
+                return;
+            }
+
+            BlockPosition blockPos = new BlockPosition(x, y, z);
+
+            IBlockData oldBlockData = chunk.a(blockPos, blockData);
+            if (oldBlockData == null)
+            {
+                return;
+            }
+
+            if (blockData.c() != oldBlockData.c() || blockData.d() != oldBlockData.d())
+            {
+                // Relight
+                world.methodProfiler.a("checkLight");
+                world.w(blockPos);
+                world.methodProfiler.b();
+            }
+
+            // Update client
+            world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2);
+        } catch (Throwable t)
         {
-            // Chunk is unloaded
-            return;
+            String populatingChunkInfo = this.chunkCache == null? "(no chunk)" :
+                    this.chunkCache[0].locX + "," + this.chunkCache[0].locZ;
+            // Add location info to error
+            RuntimeException runtimeException = new RuntimeException("Error setting "
+                    + material + " block at " + x + "," + y + "," + z
+                    + " while populating chunk " + populatingChunkInfo, t);
+            runtimeException.setStackTrace(new StackTraceElement[0]);
+            throw runtimeException;
         }
-
-        BlockPosition blockPos = new BlockPosition(x, y, z);
-
-        IBlockData oldBlockData = chunk.a(blockPos, blockData);
-        if (oldBlockData == null)
-        {
-            return;
-        }
-
-        if (blockData.c() != oldBlockData.c() || blockData.d() != oldBlockData.d())
-        {
-            // Relight
-            world.methodProfiler.a("checkLight");
-            world.w(blockPos);
-            world.methodProfiler.b();
-        }
-
-        // Update client
-        world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2);
     }
 
     @Override
