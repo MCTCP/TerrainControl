@@ -72,7 +72,7 @@ public class VillageGen extends MapGenStructure
 
         if (var3 == var5 && var4 == var6)
         {
-            boolean canSpawn = this.worldObj.getWorldChunkManager().areBiomesViable(var3 * 16 + 8, var4 * 16 + 8, 0, villageSpawnBiomes);
+            boolean canSpawn = this.worldObj.getBiomeProvider().areBiomesViable(var3 * 16 + 8, var4 * 16 + 8, 0, villageSpawnBiomes);
 
             if (canSpawn)
             {

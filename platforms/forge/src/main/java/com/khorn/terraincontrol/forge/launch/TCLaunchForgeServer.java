@@ -18,8 +18,10 @@ public final class TCLaunchForgeServer
 
     public static void main(String[] extraArgs) throws IOException
     {
+        LaunchEnvironment environment = new LaunchEnvironment();
         // Set some system properties
         System.setProperty("fml.ignoreInvalidMinecraftCertificates", "true");
+        System.setProperty("net.minecraftforge.gradle.GradleStart.srg.srg-mcp", environment.getMcpFile());
 
         // Add nogui arg
         String[] allArgs = Arrays.copyOf(extraArgs, extraArgs.length + 1);

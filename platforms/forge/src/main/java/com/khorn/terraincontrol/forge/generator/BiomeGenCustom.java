@@ -3,8 +3,8 @@ package com.khorn.terraincontrol.forge.generator;
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
-import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.biome.BiomeGenBase;
 
@@ -12,6 +12,36 @@ import java.util.List;
 
 public class BiomeGenCustom extends BiomeGenBase
 {
+    /**
+     * Extension of BiomeProperties so that we are able to access the protected
+     * methods.
+     */
+    private static class BiomePropertiesCustom extends BiomeProperties
+    {
+        BiomePropertiesCustom(BiomeConfig biomeConfig)
+        {
+            super(biomeConfig.getName());
+            this.setBaseHeight(biomeConfig.biomeHeight);
+            this.setHeightVariation(biomeConfig.biomeVolatility);
+            this.setRainfall(biomeConfig.biomeWetness);
+            this.setWaterColor(biomeConfig.waterColor);
+            float safeTemperature = biomeConfig.biomeTemperature;
+            if (safeTemperature >= 0.1 && safeTemperature <= 0.2)
+            {
+                // Avoid temperatures between 0.1 and 0.2, Minecraft restriction
+                safeTemperature = safeTemperature >= 1.5 ? 0.2f : 0.1f;
+            }
+            this.setTemperature(safeTemperature);
+            if (biomeConfig.biomeWetness <= 0.0001)
+            {
+                this.setRainDisabled();
+            }
+            if (biomeConfig.biomeTemperature <= WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
+            {
+                this.setSnowEnabled();
+            }
+        }
+    }
 
     private int skyColor;
     private int grassColor;
@@ -24,30 +54,11 @@ public class BiomeGenCustom extends BiomeGenBase
 
     public final int generationId;
 
-    public BiomeGenCustom(String name, BiomeIds id)
+    public BiomeGenCustom(BiomeConfig config, BiomeIds id)
     {
-        super(id.getSavedId(), // Use the saved id for Minecraft compatibility
-                !id.isVirtual() // Only register non-virtual biomes
-        );
-        this.setBiomeName(name);
+        super(new BiomePropertiesCustom(config));
         this.generationId = id.getGenerationId();
-    }
 
-    /**
-     * Needs a BiomeConfig that has all the visual settings present.
-     * 
-     * @param config
-     */
-    @SuppressWarnings("unchecked")
-    public void setEffects(BiomeConfig config)
-    {
-        this.temperature = config.biomeTemperature;
-        this.rainfall = config.biomeWetness;
-        if (this.rainfall == 0)
-        {
-            this.setDisableRain();
-        }
-        this.waterColorMultiplier = config.waterColor;
         this.skyColor = config.skyColor;
         this.grassColor = config.grassColor;
         this.grassColorIsMultiplier = config.grassColorIsMultiplier;
@@ -65,13 +76,6 @@ public class BiomeGenCustom extends BiomeGenBase
         addMobs(this.spawnableCreatureList, config.spawnCreatures);
         addMobs(this.spawnableWaterCreatureList, config.spawnWaterCreatures);
         addMobs(this.spawnableCaveCreatureList, config.spawnAmbientCreatures);
-
-        // color ?
-        // this.x = 522674;
-
-        // duno.
-        // this.A = 9154376;
-
     }
 
     // Adds the mobs to the internal list
@@ -81,31 +85,6 @@ public class BiomeGenCustom extends BiomeGenBase
         internalList.addAll(MobSpawnGroupHelper.toMinecraftlist(configList));
     }
 
-    /**
-     * Copies all properties from another biome. Later on, some properties may
-     * get overwritten or modified by {@link #setEffects(BiomeConfig)}. Other
-     * properties are not used by Terrain Control, but may be used by other
-     * mods.
-     * @param baseBiome The biome to copy the settings from.
-     */
-    public void copyBiome(BiomeGenBase baseBiome)
-    {
-        this.fillerBlock = baseBiome.fillerBlock;
-        this.topBlock = baseBiome.topBlock;
-        this.color = baseBiome.color;
-        this.minHeight = baseBiome.minHeight;
-        this.maxHeight = baseBiome.maxHeight;
-        this.temperature = baseBiome.temperature;
-
-        this.theBiomeDecorator = baseBiome.theBiomeDecorator;
-        this.waterColorMultiplier = baseBiome.waterColorMultiplier;
-
-        this.spawnableMonsterList = baseBiome.getSpawnableList(EnumCreatureType.MONSTER);
-        this.spawnableCreatureList = baseBiome.getSpawnableList(EnumCreatureType.CREATURE);
-        this.spawnableWaterCreatureList = baseBiome.getSpawnableList(EnumCreatureType.WATER_CREATURE);
-        this.spawnableCaveCreatureList = baseBiome.getSpawnableList(EnumCreatureType.AMBIENT);
-    }
-
     // Sky color from Temp
     @Override
     public int getSkyColorByTemp(float v)
@@ -113,7 +92,6 @@ public class BiomeGenCustom extends BiomeGenBase
         return this.skyColor;
     }
 
-    // getGrassColorAtCoords
     @Override
     public int getModdedBiomeGrassColor(int original)
     {
@@ -121,7 +99,7 @@ public class BiomeGenCustom extends BiomeGenBase
             return original;
         if (grassColorIsMultiplier)
         {
-            return ((ColorizerFoliage.getFoliageColor(Math.min(temperature, 1.0f), rainfall) & 0xFEFEFE) + grassColor) / 2;
+            return ((ColorizerFoliage.getFoliageColor(Math.min(getTemperature(), 1.0f), getRainfall()) & 0xFEFEFE) + grassColor) / 2;
         } else
         {
             return grassColor;
@@ -129,7 +107,6 @@ public class BiomeGenCustom extends BiomeGenBase
 
     }
 
-    // getFoliageColorAtCoords
     @Override
     public int getModdedBiomeFoliageColor(int original)
     {
@@ -137,7 +114,7 @@ public class BiomeGenCustom extends BiomeGenBase
             return original;
         if (foliageColorIsMultiplier)
         {
-            return ((ColorizerFoliage.getFoliageColor(Math.min(temperature, 1.0f), rainfall) & 0xFEFEFE) + foliageColor) / 2;
+            return ((ColorizerFoliage.getFoliageColor(Math.min(getTemperature(), 1.0f), getRainfall()) & 0xFEFEFE) + foliageColor) / 2;
         } else
         {
             return foliageColor;
@@ -147,7 +124,7 @@ public class BiomeGenCustom extends BiomeGenBase
     @Override
     public String toString()
     {
-        return "BiomeGenCustom of " + biomeName;
+        return "BiomeGenCustom of " + getBiomeName();
     }
 
 }

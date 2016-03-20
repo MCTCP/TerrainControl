@@ -10,7 +10,7 @@ import com.khorn.terraincontrol.generator.resource.SaplingType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
@@ -59,9 +59,9 @@ public class SaplingListener
 
         /**
          * Gets whether the saplings are placed in a 2x2 pattern. If successful,
-         * it adjusts {@link SaplingGrower#x} and {@link SaplingGrower#z} to
-         * represent the top left sapling (with the lowest x and z).
-         * 
+         * it adjusts {@link SaplingGrower#blockPos} to represent the top left
+         * sapling (with the lowest x and z).
+         *
          * @return Whether the saplings are placed in a 2x2 pattern.
          */
         private boolean findFourSaplings()

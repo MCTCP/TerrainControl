@@ -12,7 +12,6 @@ import java.util.Random;
 
 public class RareBuildingStart extends StructureStart
 {
-    @SuppressWarnings("unchecked")
     public RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
     {
         LocalWorld localWorld = WorldHelper.toLocalWorld(world);
@@ -28,6 +27,9 @@ public class RareBuildingStart extends StructureStart
                 break;
             case swampHut:
                 building = new ComponentScatteredFeaturePieces.SwampHut(random, chunkX * 16, chunkZ * 16);
+                break;
+            case igloo:
+                building = new ComponentScatteredFeaturePieces.Igloo(random, chunkX * 16, chunkZ * 16);
                 break;
             case disabled:
             default:

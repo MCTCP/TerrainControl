@@ -146,8 +146,8 @@ public class NBTHelper
      * Gets the value from a nms tag (since that object doesn't have a simple
      * value field)
      *
-     * @param nmsTag
-     * @return
+     * @param nmsTag The Minecraft tag.
+     * @return The value in the tag.
      */
     private static Object getValueFromNms(NBTBase nmsTag)
     {
@@ -220,11 +220,11 @@ public class NBTHelper
     }
 
     /**
-     * Converts a net.minecraftwiki.wiki.NBTClass NBT list tag into an
-     * net.minecraft.server NBT list tag.
-     * 
-     * @param listTag
-     * @return
+     * Converts a TerrainControl NBT list tag into an net.minecraft.server NBT
+     * list tag.
+     *
+     * @param listTag The TerrainControl list tag.
+     * @return The Minecraft list tag.
      */
     private static NBTTagList getNMSFromNBTTagList(NamedBinaryTag listTag)
     {
@@ -261,12 +261,12 @@ public class NBTHelper
     }
 
     /**
-     * Creates a net.minecraft.server.NBTBase tag. Doesn't work for ends,
-     * lists and compounds.
-     * 
-     * @param type
-     * @param value
-     * @return
+     * Creates a Minecraft NBTBase tag. Doesn't work for ends, lists and
+     * compounds.
+     *
+     * @param type Type of the tag.
+     * @param value Value of the tag.
+     * @return The Minecraft NBTBast tag.
      */
     private static NBTBase createTagNms(NamedBinaryTag.Type type, Object value)
     {

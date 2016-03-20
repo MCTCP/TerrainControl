@@ -30,28 +30,40 @@ localexport.jardesc
 forgeInfo
 
 # Minecraft, Bukkit and Forge files
+# (Eclipse uses ./plaftforms/forge/ as the root when running Forge, IntelliJ uses ./)
 /config/
 /logs/
 /mods/
+/saves/
+/run/
+/banned-players.txt
+/banned-ips.txt
+/crash-reports
+/eula.txt
+/config
+/options.txt
+/ops.txt
+/server.properties
+/white-list.txt
+level.dat_old
+session.lock
+*.dat
+*.mca
+*.json
 /platforms/bukkit/logs
 /platforms/forge/banned-players.txt
 /platforms/forge/banned-ips.txt
 /platforms/forge/crash-reports
 /platforms/forge/eula.txt
-/platforms/forge/logs
-/platforms/forge/mods
-/platforms/forge/config
+/platforms/forge/logs/
+/platforms/forge/mods/
+/platforms/forge/config/
 /platforms/forge/options.txt
 /platforms/forge/ops.txt
-/platforms/forge/saves
+/platforms/forge/saves/
 /platforms/forge/server.properties
 /platforms/forge/white-list.txt
-/platforms/forge**/*.dat
-/platforms/forge**/level.dat_old
-/platforms/forge**/session.lock
-/platforms/forge**/*.mca
-/platforms/forge**/*.json
-/platforms/forge/run
+/platforms/forge/run/
 
 # Filesystem dust
 Thumbs.db

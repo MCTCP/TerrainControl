@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.structure.MapGenStronghold;
@@ -58,12 +58,12 @@ public class StrongholdGen extends MapGenStructure
 
             for (int i = 0; i < this.structureCoords.length; ++i)
             {
-                double var8 = (1.25D * (double) var6 + random.nextDouble()) * this.distance * (double) var6;
+                double var8 = (1.25D * var6 + random.nextDouble()) * this.distance * var6;
                 int var10 = (int) Math.round(Math.cos(randomNumBetween0and2PI) * var8);
                 int var11 = (int) Math.round(Math.sin(randomNumBetween0and2PI) * var8);
                 ArrayList var12 = new ArrayList();
                 Collections.addAll(var12, this.allowedBiomeGenBases);
-                BlockPos var13 = this.worldObj.getWorldChunkManager().findBiomePosition((var10 << 4) + 8, (var11 << 4) + 8, 112, var12,
+                BlockPos var13 = this.worldObj.getBiomeProvider().findBiomePosition((var10 << 4) + 8, (var11 << 4) + 8, 112, var12,
                         random);
 
                 if (var13 != null)
@@ -73,7 +73,7 @@ public class StrongholdGen extends MapGenStructure
                 }
 
                 this.structureCoords[i] = new ChunkCoordIntPair(var10, var11);
-                randomNumBetween0and2PI += (Math.PI * 2D) * (double) var6 / (double) this.spread;
+                randomNumBetween0and2PI += (Math.PI * 2D) * var6 / this.spread;
 
                 if (i == this.spread)
                 {
@@ -123,7 +123,7 @@ public class StrongholdGen extends MapGenStructure
     {
         MapGenStronghold.Start start = new MapGenStronghold.Start(this.worldObj, this.rand, par1, par2);
 
-        while (start.getComponents().isEmpty() || ((StructureStrongholdPieces.Stairs2) start.getComponents().get(0)).strongholdPortalRoom == null)
+        while (start.func_186161_c().isEmpty() || ((StructureStrongholdPieces.Stairs2) start.func_186161_c().get(0)).strongholdPortalRoom == null)
         {
             start = new MapGenStronghold.Start(this.worldObj, this.rand, par1, par2);
         }

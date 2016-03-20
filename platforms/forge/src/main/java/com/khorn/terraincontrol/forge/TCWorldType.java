@@ -5,14 +5,14 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
-import com.khorn.terraincontrol.forge.generator.TCWorldChunkManager;
+import com.khorn.terraincontrol.forge.generator.TCBiomeProvider;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.WorldChunkManager;
-import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.biome.BiomeProvider;
+import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -27,21 +27,21 @@ public class TCWorldType extends WorldType
         super(paramString);
     }
 
+    @Override
     @SideOnly(Side.CLIENT)
     public boolean showWorldInfoNotice()
     {
         return true;
     }
 
-    // Actually: getBiomeManager
     @Override
-    public WorldChunkManager getChunkManager(World world)
+    public BiomeProvider getBiomeProvider(World world)
     {
         try
         {
             if (world instanceof WorldClient)
             {
-                return super.getChunkManager(world);
+                return super.getBiomeProvider(world);
             }
         } catch (NoClassDefFoundError e)
         {
@@ -53,7 +53,7 @@ public class TCWorldType extends WorldType
         ForgeWorld.restoreBiomes();
 
         // Load everything
-        File worldDirectory = new File(TerrainControl.getEngine().getTCDataFolder(), "worlds" + File.separator + world.getSaveHandler().getWorldDirectoryName());
+        File worldDirectory = new File(TerrainControl.getEngine().getTCDataFolder(), "worlds" + File.separator + world.getSaveHandler().getWorldDirectory().getName());
 
         if (!worldDirectory.exists())
         {
@@ -63,42 +63,43 @@ public class TCWorldType extends WorldType
                 System.out.println("TerrainControl: cant create folder " + worldDirectory.getAbsolutePath());
         }
 
-        this.worldTC = new ForgeWorld(world.getSaveHandler().getWorldDirectoryName());
+        this.worldTC = new ForgeWorld(world.getSaveHandler().getWorldDirectory().getName());
         WorldSettings config = new WorldSettings(worldDirectory, worldTC);
         this.worldTC.Init(world, config);
 
         Class<? extends BiomeGenerator> biomeGenClass = worldTC.getConfigs().getWorldConfig().biomeMode;
         BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().createCached(biomeGenClass, worldTC);
-        WorldChunkManager chunkManager = createWorldChunkManager(worldTC, biomeManager);
+        BiomeProvider chunkManager = createBiomeProvider(worldTC, biomeManager);
         this.worldTC.setBiomeManager(biomeManager);
 
         return chunkManager;
     }
 
     /**
-     * Gets the appropriate WorldChunkManager. For the vanilla biome
-     * generator we have to use WorldChunkManager, for other biome modes
-     * TCWorldChunkManager is the right option.
-     * @param world          ForgeWorld instance, needed to instantiate the
-     *                       WorldChunkManager.
+     * Gets the appropriate BiomeProvider. For the vanilla biome generator we
+     * have to use BiomeProvider, for other biome modes TCWorldChunkManager is
+     * the right option.
+     * 
+     * @param world ForgeWorld instance, needed to instantiate the
+     *            WorldChunkManager.
      * @param biomeGenerator Biome generator.
      * @return The most appropriate WorldChunkManager.
      */
-    private WorldChunkManager createWorldChunkManager(ForgeWorld world, BiomeGenerator biomeGenerator)
+    private BiomeProvider createBiomeProvider(ForgeWorld world, BiomeGenerator biomeGenerator)
     {
         if (biomeGenerator instanceof ForgeVanillaBiomeGenerator)
         {
-            WorldChunkManager worldChunkManager = super.getChunkManager(world.getWorld());
-            ((ForgeVanillaBiomeGenerator) biomeGenerator).setWorldChunkManager(worldChunkManager);
+            BiomeProvider worldChunkManager = super.getBiomeProvider(world.getWorld());
+            ((ForgeVanillaBiomeGenerator) biomeGenerator).setBiomeProvider(worldChunkManager);
             return worldChunkManager;
         } else
         {
-            return new TCWorldChunkManager(this.worldTC, biomeGenerator);
+            return new TCBiomeProvider(this.worldTC, biomeGenerator);
         }
     }
 
     @Override
-    public IChunkProvider getChunkGenerator(World world, String generatorOptions)
+    public IChunkGenerator getChunkGenerator(World world, String generatorOptions)
     {
         if (this.worldTC.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
         {

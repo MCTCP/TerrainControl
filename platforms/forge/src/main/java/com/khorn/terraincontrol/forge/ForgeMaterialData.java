@@ -152,7 +152,7 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public boolean isLiquid()
     {
-        return blockData.getBlock().getMaterial().isLiquid();
+        return blockData.getMaterial().isLiquid();
     }
 
     @Override
@@ -171,7 +171,7 @@ public class ForgeMaterialData implements LocalMaterialData
             return defaultMaterial.isSolid();
         }
 
-        return blockData.getBlock().getMaterial().isSolid();
+        return blockData.getMaterial().isSolid();
     }
 
     @Override
@@ -232,7 +232,7 @@ public class ForgeMaterialData implements LocalMaterialData
 
     @Override
     public boolean isAir() {
-        return blockData.getBlock().getMaterial() == Material.air;
+        return blockData.getMaterial() == Material.air;
     }
 
     @Override

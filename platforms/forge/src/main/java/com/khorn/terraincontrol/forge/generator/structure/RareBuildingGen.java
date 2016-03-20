@@ -1,12 +1,13 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
+import com.google.common.collect.Iterables;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.entity.monster.EntityWitch;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import net.minecraft.world.gen.structure.*;
@@ -82,15 +83,11 @@ public class RareBuildingGen extends MapGenStructure
 
         if (var3 == var5 && var4 == var6)
         {
-            BiomeGenBase biomeAtPosition = this.worldObj.getWorldChunkManager()
-                    .func_180631_a(new BlockPos(var3 * 16 + 8, 0, var4 * 16 + 8));
+            BiomeGenBase biomeAtPosition = this.worldObj.getBiomeProvider().getBiomeGenerator(new BlockPos(var3 * 16 + 8, 0, var4 * 16 + 8));
 
-            for (BiomeGenBase biome : biomeList)
+            if (biomeList.contains(biomeAtPosition))
             {
-                if (biomeAtPosition.biomeID == biome.biomeID)
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
@@ -116,9 +113,9 @@ public class RareBuildingGen extends MapGenStructure
     {
         StructureStart structurestart = this.func_175797_c(blockPos);
 
-        if (structurestart != null && structurestart instanceof MapGenScatteredFeature.Start && !structurestart.getComponents().isEmpty())
+        if (structurestart != null && structurestart instanceof MapGenScatteredFeature.Start && !structurestart.func_186161_c().isEmpty())
         {
-            StructureComponent structurecomponent = (StructureComponent) structurestart.getComponents().getFirst();
+            StructureComponent structurecomponent = Iterables.getFirst(structurestart.func_186161_c(), null);
             return structurecomponent instanceof ComponentScatteredFeaturePieces.SwampHut;
         }
         else

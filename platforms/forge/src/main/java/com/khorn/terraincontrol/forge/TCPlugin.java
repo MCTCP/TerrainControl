@@ -57,7 +57,7 @@ public class TCPlugin
         }
 
         // Register player tracker, for sending configs.
-        FMLCommonHandler.instance().bus().register(new PlayerTracker());
+        MinecraftForge.EVENT_BUS.register(new PlayerTracker());
 
         // Register sapling tracker, for custom tree growth.
         SaplingListener saplingListener = new SaplingListener();

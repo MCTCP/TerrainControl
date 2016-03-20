@@ -6,6 +6,7 @@ import com.khorn.terraincontrol.configuration.standard.MojangSettings.EntityCate
 import com.khorn.terraincontrol.logging.LogMarker;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
@@ -13,7 +14,6 @@ import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Methods for conversion between mob lists in Minecraft and in the plugin.
@@ -21,19 +21,6 @@ import java.util.Map;
  */
 public final class MobSpawnGroupHelper
 {
-    private static final Map<Class<? extends Entity>, String> CLASS_TO_NAME_MAP;
-    private static final Map<String, Class<? extends Entity>> NAME_TO_CLASS_MAP;
-
-    static
-    {
-        @SuppressWarnings("unchecked")
-        Map<Class<? extends Entity>, String> classToNameMap = (Map<Class<? extends Entity>, String>) EntityList.classToStringMapping;
-        CLASS_TO_NAME_MAP = classToNameMap;
-
-        @SuppressWarnings("unchecked")
-        Map<String, Class<? extends Entity>> nameToClassMap = (Map<String, Class<? extends Entity>>) EntityList.stringToClassMapping;;
-        NAME_TO_CLASS_MAP = nameToClassMap;
-    }
 
     /**
      * Transforms our MobType into Minecraft's EnumCreatureType.
@@ -74,7 +61,6 @@ public final class MobSpawnGroupHelper
      */
     public static List<WeightedMobSpawnGroup> getListFromMinecraftBiome(BiomeGenBase biome, EntityCategory type)
     {
-        @SuppressWarnings("unchecked")
         Collection<SpawnListEntry> mobList = biome.getSpawnableList(toEnumCreatureType(type));
         return fromMinecraftList(mobList);
     }
@@ -106,7 +92,7 @@ public final class MobSpawnGroupHelper
         List<SpawnListEntry> biomeList = new ArrayList<SpawnListEntry>();
         for (WeightedMobSpawnGroup mobGroup : weightedMobSpawnGroups)
         {
-            Class<? extends Entity> entityClass = toMinecraftClass(mobGroup.getInternalName());
+            Class<? extends EntityLiving> entityClass = toMinecraftClass(mobGroup.getInternalName());
             if (entityClass != null)
             {
                 biomeList.add(new SpawnListEntry(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
@@ -127,9 +113,14 @@ public final class MobSpawnGroupHelper
      * @param mobName The mob name.
      * @return The entity class, or null if not found.
      */
-    static Class<? extends Entity> toMinecraftClass(String mobName)
+    static Class<? extends EntityLiving> toMinecraftClass(String mobName)
     {
-        return NAME_TO_CLASS_MAP.get(mobName);
+        Class<? extends Entity> clazz = EntityList.stringToClassMapping.get(mobName);
+        if (EntityLiving.class.isAssignableFrom(clazz))
+        {
+            return clazz.asSubclass(EntityLiving.class);
+        }
+        return null;
     }
 
     /**
@@ -139,6 +130,6 @@ public final class MobSpawnGroupHelper
      */
     private static String fromMinecraftClass(Class<?> entityClass)
     {
-        return CLASS_TO_NAME_MAP.get(entityClass);
+        return EntityList.classToStringMapping.get(entityClass);
     }
 }

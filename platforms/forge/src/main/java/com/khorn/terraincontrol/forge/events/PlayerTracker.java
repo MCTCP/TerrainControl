@@ -11,7 +11,7 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.server.S3FPacketCustomPayload;
+import net.minecraft.network.play.server.SPacketCustomPayload;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
@@ -47,8 +47,7 @@ public class PlayerTracker
         // Serialize it
         ByteBuf nettyBuffer = Unpooled.buffer();
         PacketBuffer mojangBuffer = new PacketBuffer(nettyBuffer);
-        @SuppressWarnings("resource")
-        // ^ It's writing to memory
+
         DataOutput stream = new ByteBufOutputStream(nettyBuffer);
         try
         {
@@ -60,7 +59,7 @@ public class PlayerTracker
         }
 
         // Make the packet
-        S3FPacketCustomPayload packet = new S3FPacketCustomPayload(PluginStandardValues.ChannelName, mojangBuffer);
+        SPacketCustomPayload packet = new SPacketCustomPayload(PluginStandardValues.ChannelName, mojangBuffer);
 
         // Send the packet
         player.playerNetServerHandler.sendPacket(packet);

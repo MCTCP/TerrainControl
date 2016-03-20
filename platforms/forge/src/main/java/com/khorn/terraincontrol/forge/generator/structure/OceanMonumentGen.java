@@ -5,7 +5,8 @@ import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.entity.monster.EntityGuardian;
-import net.minecraft.util.BlockPos;
+import net.minecraft.init.Biomes;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
 import net.minecraft.world.gen.structure.MapGenStructure;
@@ -68,12 +69,12 @@ public class OceanMonumentGen extends MapGenStructure
 
         if (k == i1 && l == j1)
         {
-            if (this.worldObj.getWorldChunkManager().func_180300_a(new BlockPos(k * 16 + 8, 64, l * 16 + 8), (BiomeGenBase) null) != BiomeGenBase.deepOcean)
+            if (this.worldObj.getBiomeProvider().getBiomeGenerator(new BlockPos(k * 16 + 8, 64, l * 16 + 8), (BiomeGenBase) null) != Biomes.deepOcean)
             {
                 return false;
             }
 
-            boolean flag = this.worldObj.getWorldChunkManager().areBiomesViable(k * 16 + 8, l * 16 + 8, 29, monumentSpawnBiomes);
+            boolean flag = this.worldObj.getBiomeProvider().areBiomesViable(k * 16 + 8, l * 16 + 8, 29, monumentSpawnBiomes);
 
             if (flag)
             {

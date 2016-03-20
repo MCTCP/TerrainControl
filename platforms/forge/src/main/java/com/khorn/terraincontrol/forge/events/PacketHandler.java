@@ -10,10 +10,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
@@ -73,11 +73,11 @@ public class PacketHandler
                 // Server or client is outdated
                 if (serverProtocolVersion > PluginStandardValues.ProtocolVersion)
                 {
-                    sendMessage(EnumChatFormatting.GREEN, "The server is running a newer version of " + PluginStandardValues.PLUGIN_NAME
+                    sendMessage(TextFormatting.GREEN, "The server is running a newer version of " + PluginStandardValues.PLUGIN_NAME
                             + ". Please update!");
                 } else
                 {
-                    sendMessage(EnumChatFormatting.YELLOW, "The server is running an outdated version of "
+                    sendMessage(TextFormatting.YELLOW, "The server is running an outdated version of "
                             + PluginStandardValues.PLUGIN_NAME + ". Cannot load custom biome colors and weather.");
                 }
                 TerrainControl.log(LogMarker.WARN, "Server has different protocol version. Client: {} Server: {}",
@@ -88,7 +88,7 @@ public class PacketHandler
             TerrainControl.log(LogMarker.FATAL, "Failed to receive packet");
             TerrainControl.printStackTrace(LogMarker.FATAL, e);
             TerrainControl.log(LogMarker.FATAL, "Packet contents: {}", Arrays.toString(stream.array()));
-            sendMessage(EnumChatFormatting.RED, "Error receiving packet.");
+            sendMessage(TextFormatting.RED, "Error receiving packet.");
         }
     }
 
@@ -97,11 +97,11 @@ public class PacketHandler
      * @param color The color of the message.
      * @param message The message to send.
      */
-    private void sendMessage(EnumChatFormatting color, String message)
+    private void sendMessage(TextFormatting color, String message)
     {
-        IChatComponent chat = new ChatComponentText(PluginStandardValues.PLUGIN_NAME + ": " + message);
+        ITextComponent chat = new TextComponentString(PluginStandardValues.PLUGIN_NAME + ": " + message);
 
-        ChatStyle chatStyle = new ChatStyle();
+        Style chatStyle = new Style();
         chatStyle.setColor(color);
         chat.setChatStyle(chatStyle);
 

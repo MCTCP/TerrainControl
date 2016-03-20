@@ -1,47 +1,49 @@
 package com.khorn.terraincontrol.forge.generator;
 
+import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.WorldChunkManager;
+import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.structure.MapGenVillage;
 
 import java.util.List;
 import java.util.Random;
 
 /**
- * Minecraft's biome generator class is WorldChunkManager, we use
- * BiomeGenerator. This class provides a bridge between the two, allowing us
- * to use custom biome generators.
+ * Minecraft's biome generator class is {@link BiomeProvider}, we use
+ * {@link BiomeGenerator}. This class provides a bridge between the two,
+ * allowing us to use custom biome generators.
  */
-public class TCWorldChunkManager extends WorldChunkManager
+public class TCBiomeProvider extends BiomeProvider
 {
     private final BiomeGenerator biomeGenerator;
     private final ForgeWorld localWorld;
 
-    public TCWorldChunkManager(ForgeWorld world, BiomeGenerator biomeGenerator)
+    public TCBiomeProvider(ForgeWorld world, BiomeGenerator biomeGenerator)
     {
         this.localWorld = world;
         this.biomeGenerator = biomeGenerator;
     }
 
-    // get biome
     @Override
-    public BiomeGenBase func_180631_a(BlockPos blockPos)
+    public BiomeGenBase getBiomeGenerator(BlockPos blockPos)
     {
         return localWorld.getBiomeById(biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
     }
 
-    // rain
     @Override
-    public float[] getRainfall(float[] paramArrayOfFloat, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public BiomeGenBase getBiomeGenerator(BlockPos pos, BiomeGenBase defaultOption)
     {
-        // unimplemented, as it is not used anymore by Minecraft 1.8 (Minecraft
-        // 1.9 removes it completely)
-        return paramArrayOfFloat; 
+        ForgeBiome biome = localWorld.getBiomeByIdOrNull(biomeGenerator.getBiome(pos.getX(), pos.getZ()));
+        if (biome != null)
+        {
+            return biome.getHandle();
+        }
+        return defaultOption;
     }
 
     @Override

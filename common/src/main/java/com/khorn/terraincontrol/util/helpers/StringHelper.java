@@ -29,6 +29,27 @@ public abstract class StringHelper
             ret.append(list[i]);
         }
         return ret.toString();
+    }    
+
+    /**
+     * Turns the given name into a name suitable for computers, so without
+     * strange chars that wouldn't be valid in a Java field.
+     * @param name The original name.
+     * @return The modified name
+     */
+    public static String toComputerFriendlyName(String name)
+    {
+        char[] charArray = name.toCharArray();
+        for (int i = 0; i < charArray.length; i++) {
+            if (!Character.isJavaIdentifierPart(charArray[i]))
+            {
+                charArray[i] = '_';
+            } else
+            {
+                charArray[i] = Character.toLowerCase(charArray[i]);
+            }
+        }
+        return new String(charArray);
     }
 
     /**

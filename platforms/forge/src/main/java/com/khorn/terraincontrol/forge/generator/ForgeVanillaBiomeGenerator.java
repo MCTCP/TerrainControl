@@ -3,24 +3,24 @@ package com.khorn.terraincontrol.forge.generator;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.WorldChunkManager;
+import net.minecraft.world.biome.BiomeProvider;
 
 /**
  * A biome generator that gets its information from Mojang's WorldChunkManager.
  *
  * <p>
  * This can be somewhat dangerous, because a subclass for WorldChunkManager,
- * {@link TCWorldChunkManager}, gets its information from a BiomeGenerator. This
+ * {@link TCBiomeProvider}, gets its information from a BiomeGenerator. This
  * would cause infinite recursion. To combat this, a check has been added to
- * {@link #setWorldChunkManager(WorldChunkManager)}.
+ * {@link #setBiomeProvider(BiomeProvider)}.
  *
  */
 public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
 
     private BiomeGenBase[] biomeGenBaseArray;
-    private WorldChunkManager worldChunkManager;
+    private BiomeProvider worldChunkManager;
 
     public ForgeVanillaBiomeGenerator(LocalWorld world)
     {
@@ -34,7 +34,7 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = biomeGenBaseArray[i].biomeID;
+            biomeArray[i] = BiomeGenBase.getIdForBiome(biomeGenBaseArray[i]);
         return biomeArray;
     }
 
@@ -45,14 +45,14 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = biomeGenBaseArray[i].biomeID;
+            biomeArray[i] = BiomeGenBase.getIdForBiome(biomeGenBaseArray[i]);
         return biomeArray;
     }
 
     @Override
     public int getBiome(int x, int z)
     {
-        return worldChunkManager.func_180631_a(new BlockPos(x, 0, z)).biomeID;
+        return BiomeGenBase.getIdForBiome(worldChunkManager.getBiomeGenerator(new BlockPos(x, 0, z)));
     }
 
     @Override
@@ -68,21 +68,20 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
     }
 
     /**
-     * Sets the vanilla WorldChunkManager. Must be called before generating
+     * Sets the vanilla {@link BiomeProvider}. Must be called before generating
      * any biomes.
-     * @param worldChunkManager The vanilla WorldChunkManager.
+     *
+     * @param biomeProvider The vanilla {@link BiomeProvider}.
      */
-    public void setWorldChunkManager(WorldChunkManager worldChunkManager)
+    public void setBiomeProvider(BiomeProvider biomeProvider)
     {
-        if (worldChunkManager instanceof TCWorldChunkManager)
+        if (biomeProvider instanceof TCBiomeProvider)
         {
-            // TCWorldChunkManager is unusable, as it just asks the
+            // TCBiomeProvider is unusable, as it just asks the
             // BiomeGenerator for the biomes, creating an infinite loop
-            throw new IllegalArgumentException(getClass()
-                    + " expects a vanilla WorldChunkManager, "
-                    + worldChunkManager.getClass() + " given");
+            throw new IllegalArgumentException(getClass() + " expects a vanilla BiomeProvider, " + biomeProvider.getClass() + " given");
         }
-        this.worldChunkManager = worldChunkManager;
+        this.worldChunkManager = biomeProvider;
     }
 
 }

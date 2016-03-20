@@ -50,25 +50,25 @@ public final class ForgeMojangSettings implements MojangSettings
     @Override
     public float getTemperature()
     {
-        return biomeBase.temperature;
+        return biomeBase.getTemperature();
     }
 
     @Override
     public float getWetness()
     {
-        return biomeBase.rainfall;
+        return biomeBase.getRainfall();
     }
 
     @Override
     public float getSurfaceHeight()
     {
-        return biomeBase.minHeight;
+        return biomeBase.getBaseHeight();
     }
 
     @Override
     public float getSurfaceVolatility()
     {
-        return biomeBase.maxHeight;
+        return biomeBase.getHeightVariation();
     }
 
     @Override
