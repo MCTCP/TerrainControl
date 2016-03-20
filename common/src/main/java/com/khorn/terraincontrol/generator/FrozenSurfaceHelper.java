@@ -31,11 +31,11 @@ public class FrozenSurfaceHelper
      */
     protected void freezeChunk(ChunkCoordinate chunkCoord)
     {
-        int x = chunkCoord.getChunkX() * 16 + 8;
-        int z = chunkCoord.getChunkZ() * 16 + 8;
-        for (int i = 0; i < 16; i++)
+        int x = chunkCoord.getBlockXCenter();
+        int z = chunkCoord.getBlockZCenter();
+        for (int i = 0; i < ChunkCoordinate.CHUNK_X_SIZE; i++)
         {
-            for (int j = 0; j < 16; j++)
+            for (int j = 0; j < ChunkCoordinate.CHUNK_Z_SIZE; j++)
             {
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;

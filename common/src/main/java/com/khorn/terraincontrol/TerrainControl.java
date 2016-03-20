@@ -183,8 +183,8 @@ public class TerrainControl
      * Logs the messages with the given importance. Message will be
      * prefixed with [TerrainControl], so don't do that yourself.
      * <p>
-     * @param message The messages to log.
-     * @param level   The severity of the message
+     * @param messages The messages to log.
+     * @param level    The severity of the message
      */
     public static void log(Marker level, List<String> messages)
     {

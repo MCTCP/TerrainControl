@@ -7,6 +7,8 @@ import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
 import net.minecraft.server.v1_9_R1.BiomeBase;
 import net.minecraft.server.v1_9_R1.MinecraftKey;
 import org.bukkit.block.Biome;
@@ -49,6 +51,10 @@ public class CustomBiome extends BiomeBase
             {
                 a(); // disableRain()
             }
+            if (biomeConfig.biomeTemperature <= WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
+            {
+                b(); // enableSnowfall()
+            }
         }
     }
 
@@ -67,7 +73,7 @@ public class CustomBiome extends BiomeBase
         CustomBiome customBiome = new CustomBiome(biomeConfig);
 
         // Insert the biome in Minecraft's biome mapping
-        String biomeNameWithoutSpaces = biomeConfig.getName().replace(' ', '_');
+        String biomeNameWithoutSpaces = StringHelper.toComputerFriendlyName(biomeConfig.getName());
         MinecraftKey biomeKey = new MinecraftKey(PluginStandardValues.PLUGIN_NAME, biomeNameWithoutSpaces);
         int savedBiomeId = biomeIds.getSavedId();
         if (biomeIds.isVirtual())
