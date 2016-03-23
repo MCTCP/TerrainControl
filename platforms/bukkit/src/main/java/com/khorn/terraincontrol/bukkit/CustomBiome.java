@@ -100,6 +100,12 @@ public class CustomBiome extends BiomeBase
         {
             // Normal insertion
             BiomeBase.REGISTRY_ID.a(biomeIds.getSavedId(), biomeKey, customBiome);
+        }
+
+        // Add biome to Bukkit enum if it's not there yet
+        try {
+            Biome.valueOf(biomeNameWithoutSpaces.toUpperCase());
+        } catch (IllegalArgumentException e) {
             EnumHelper.addEnum(Biome.class, biomeNameWithoutSpaces.toUpperCase(), new Class[0], new Object[0]);
         }
 
