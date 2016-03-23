@@ -42,6 +42,10 @@ public class RandomBlockFunction extends BlockFunction
 
             // Parse chance and metadata
             i++;
+            if (i >= size)
+            {
+                throw new InvalidConfigException("Missing chance parameter");
+            }
             try
             {
                 blockChances[blockCount] = (byte) readInt(args.get(i), 1, 100);
@@ -59,6 +63,10 @@ public class RandomBlockFunction extends BlockFunction
 
                 // Get the chance
                 i++;
+                if (i >= size)
+                {
+                    throw new InvalidConfigException("Missing chance parameter");
+                }
                 blockChances[blockCount] = (byte) readInt(args.get(i), 1, 100);
             }
 
