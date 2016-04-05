@@ -123,7 +123,7 @@ public class StrongholdGen extends MapGenStructure
     {
         MapGenStronghold.Start start = new MapGenStronghold.Start(this.worldObj, this.rand, par1, par2);
 
-        while (start.func_186161_c().isEmpty() || ((StructureStrongholdPieces.Stairs2) start.func_186161_c().get(0)).strongholdPortalRoom == null)
+        while (start.getComponents().isEmpty() || ((StructureStrongholdPieces.Stairs2) start.getComponents().get(0)).strongholdPortalRoom == null)
         {
             start = new MapGenStronghold.Start(this.worldObj, this.rand, par1, par2);
         }

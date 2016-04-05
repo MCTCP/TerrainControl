@@ -7,9 +7,9 @@ import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
+import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import com.khorn.terraincontrol.forge.generator.ChunkProvider;
 import com.khorn.terraincontrol.forge.generator.structure.*;
-import com.khorn.terraincontrol.forge.util.BiomeRegistryBackup;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -52,8 +52,6 @@ public class ForgeWorld implements LocalWorld
     private static final int MAX_SAVED_BIOMES_COUNT = 255;
     private static final int STANDARD_WORLD_HEIGHT = 128;
 
-    private static BiomeRegistryBackup biomesToRestore = BiomeRegistryBackup.EMPTY_BACKUP;
-
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
     public StrongholdGen strongholdGen;
@@ -84,27 +82,27 @@ public class ForgeWorld implements LocalWorld
 
     private Chunk[] chunkCache;
 
-    public static void restoreBiomes()
-    {
-        biomesToRestore.restore(GameData.getBiomeRegistry());
-        nextBiomeId = 0;
-    }
-
     public ForgeWorld(String _name)
     {
         this.name = _name;
 
-        // Save all original vanilla biomes, so that they can be restored
-        // later on
-        biomesToRestore = new BiomeRegistryBackup(GameData.getBiomeRegistry());
         nextBiomeId = DefaultBiome.values().length;
     }
 
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        ForgeBiome biome = ForgeBiome.createBiome(biomeConfig, biomeIds);
-        ForgeBiome.registerBiome(biome);
+        BiomeGenBase minecraftBiome = BiomeGenBase.getBiomeForId(biomeIds.getGenerationId());
+        boolean registerBiome = false;
+        if (minecraftBiome == null) {
+            minecraftBiome = new BiomeGenCustom(biomeConfig, biomeIds);
+            registerBiome = true;
+        }
+        ForgeBiome biome = ForgeBiome.forBiome(biomeConfig, minecraftBiome);
+        if (registerBiome)
+        {
+            ForgeBiome.registerBiome(biome);
+        }
 
         this.biomeNames.put(biome.getName(), biome);
 
@@ -733,8 +731,8 @@ public class ForgeWorld implements LocalWorld
             tileEntity.readFromNBT(nmsTag);
         } else
         {
-            TerrainControl.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", new Object[]{
-                    nmsTag.getString("id"), x, y, z, getMaterial(x, y, z)});
+            TerrainControl.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}",
+                    nmsTag.getString("id"), x, y, z, getMaterial(x, y, z));
         }
     }
 

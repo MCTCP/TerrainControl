@@ -68,7 +68,7 @@ public class ForgeEngine extends TerrainControlEngine
         } catch (Throwable e)
         {
             dataFolder = new File("mods" + File.separator + "TerrainControl");
-            System.out.println("Could not reflect the Minecraft directory, save location may be unpredicatble.");
+            TerrainControl.log(LogMarker.WARN, "Could not reflect the Minecraft directory, save location may be unpredicatble.");
             TerrainControl.printStackTrace(LogMarker.FATAL, e);
         }
         return dataFolder;
@@ -83,77 +83,7 @@ public class ForgeEngine extends TerrainControlEngine
     @Override
     public LocalMaterialData readMaterial(String input) throws InvalidConfigException
     {
-        // Try parsing as an internal Minecraft name
-        // This is so that things like "minecraft:stone" aren't parsed
-        // as the block "minecraft" with data "stone", but instead as the
-        // block "minecraft:stone" with no block data.
-        net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(input);
-        if (block != null)
-        {
-            return ForgeMaterialData.ofMinecraftBlock(block);
-        }
-
-        try
-        {
-            // Try block(:data) syntax
-            return getMaterial0(input);
-        } catch (NumberFormatException e)
-        {
-            throw new InvalidConfigException("Unknown material: " + input);
-        }
-
-    }
-
-    private LocalMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
-    {
-        String blockName = input;
-        int blockData = -1;
-
-        // When there is a . or a : in the name, extract block data
-        int splitIndex = input.lastIndexOf(":");
-        if (splitIndex == -1)
-        {
-            splitIndex = input.lastIndexOf(".");
-        }
-        if (splitIndex != -1)
-        {
-            blockName = input.substring(0, splitIndex);
-            blockData = Integer.parseInt(input.substring(splitIndex + 1));
-        }
-
-        // Parse block name
-        Block block = Block.getBlockFromName(blockName);
-        if (block == null)
-        {
-            DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
-            if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
-            {
-                block = Block.getBlockById(defaultMaterial.id);
-            }
-        }
-
-        // Get the block
-        if (block != null)
-        {
-            if (blockData == -1)
-            {
-                // Use default
-                return ForgeMaterialData.ofMinecraftBlock(block);
-            } else
-            {
-                // Use specified data
-                try
-                {
-                    return ForgeMaterialData.ofMinecraftBlockState(block.getStateFromMeta(blockData));
-                } catch (IllegalArgumentException e)
-                {
-                    throw new InvalidConfigException("Illegal block data for the block type, cannot use " + input);
-                }
-            }
-        }
-
-        // Failed
-        throw new InvalidConfigException("Unknown material: " + input);
+        return ForgeMaterialData.ofString(input);
     }
 
     @Override

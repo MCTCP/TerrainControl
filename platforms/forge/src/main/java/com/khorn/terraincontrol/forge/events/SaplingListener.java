@@ -153,9 +153,9 @@ public class SaplingListener
     @SubscribeEvent
     public void onSaplingGrow(SaplingGrowTreeEvent event)
     {
-        World world = event.world;
+        World world = event.getWorld();
         LocalWorld localWorld = WorldHelper.toLocalWorld(world);
-        BlockPos blockPos = event.pos;
+        BlockPos blockPos = event.getPos();
 
         if (localWorld == null)
         {
@@ -234,7 +234,7 @@ public class SaplingListener
     @SubscribeEvent
     public void onBonemealUse(BonemealEvent event)
     {
-        LocalWorld localWorld = WorldHelper.toLocalWorld(event.world);
+        LocalWorld localWorld = WorldHelper.toLocalWorld(event.getWorld());
         if (localWorld == null)
         {
             // World not managed by Terrain Control
@@ -243,12 +243,12 @@ public class SaplingListener
 
         // Get sapling gen
         SaplingGen gen = null;
-        if (event.block == Blocks.red_mushroom_block)
+        if (event.getBlock() == Blocks.red_mushroom_block)
         {
-            gen = getSaplingGen(localWorld, SaplingType.RedMushroom, event.pos);
-        } else if (event.block == Blocks.brown_mushroom_block)
+            gen = getSaplingGen(localWorld, SaplingType.RedMushroom, event.getPos());
+        } else if (event.getBlock() == Blocks.brown_mushroom_block)
         {
-            gen = getSaplingGen(localWorld, SaplingType.BrownMushroom, event.pos);
+            gen = getSaplingGen(localWorld, SaplingType.BrownMushroom, event.getPos());
         }
         if (gen == null)
         {
@@ -258,13 +258,13 @@ public class SaplingListener
 
         // Generate mushroom
         event.setResult(Result.ALLOW);
-        event.world.setBlockState(event.pos, Blocks.air.getDefaultState());
+        event.getWorld().setBlockState(event.getPos(), Blocks.air.getDefaultState());
 
         boolean mushroomGrown = false;
         Random random = new Random();
         for (int i = 0; i < 10; i++)
         {
-            if (gen.growSapling(localWorld, random, false, event.pos.getX(), event.pos.getY(), event.pos.getZ()))
+            if (gen.growSapling(localWorld, random, false, event.getPos().getX(), event.getPos().getY(), event.getPos().getZ()))
             {
                 mushroomGrown = true;
                 break;
@@ -273,12 +273,12 @@ public class SaplingListener
         if (!mushroomGrown)
         {
             // Restore mushroom
-            event.world.setBlockState(event.pos, event.block);
+            event.getWorld().setBlockState(event.getPos(), event.getBlock());
         }
     }
 
     // Can return null
-    public SaplingGen getSaplingGen(LocalWorld world, SaplingType type, BlockPos blockPos)
+    private SaplingGen getSaplingGen(LocalWorld world, SaplingType type, BlockPos blockPos)
     {
         try
         {

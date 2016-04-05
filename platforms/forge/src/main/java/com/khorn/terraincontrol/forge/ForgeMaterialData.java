@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.forge;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.block.Block;
@@ -16,13 +17,87 @@ import net.minecraft.block.state.IBlockState;
 public class ForgeMaterialData implements LocalMaterialData
 {
 
+    public static ForgeMaterialData ofString(String input) throws InvalidConfigException
+    {
+        // Try parsing as an internal Minecraft name
+        // This is so that things like "minecraft:stone" aren't parsed
+        // as the block "minecraft" with data "stone", but instead as the
+        // block "minecraft:stone" with no block data.
+        net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(input);
+        if (block != null)
+        {
+            return ForgeMaterialData.ofMinecraftBlock(block);
+        }
+
+        try
+        {
+            // Try block(:data) syntax
+            return getMaterial0(input);
+        } catch (NumberFormatException e)
+        {
+            throw new InvalidConfigException("Unknown material: " + input);
+        }
+    }
+
+    private static ForgeMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
+    {
+        String blockName = input;
+        int blockData = -1;
+
+        // When there is a . or a : in the name, extract block data
+        int splitIndex = input.lastIndexOf(":");
+        if (splitIndex == -1)
+        {
+            splitIndex = input.lastIndexOf(".");
+        }
+        if (splitIndex != -1)
+        {
+            blockName = input.substring(0, splitIndex);
+            blockData = Integer.parseInt(input.substring(splitIndex + 1));
+        }
+
+        // Parse block name
+        Block block = Block.getBlockFromName(blockName);
+        if (block == null)
+        {
+            DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
+            if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+            {
+                block = Block.getBlockById(defaultMaterial.id);
+            }
+        }
+
+        // Get the block
+        if (block != null)
+        {
+            if (blockData == -1)
+            {
+                // Use default
+                return ForgeMaterialData.ofMinecraftBlock(block);
+            } else
+            {
+                // Use specified data
+                try
+                {
+                    return ForgeMaterialData.ofMinecraftBlockState(block.getStateFromMeta(blockData));
+                } catch (IllegalArgumentException e)
+                {
+                    throw new InvalidConfigException("Illegal block data for the block type, cannot use " + input);
+                }
+            }
+        }
+
+        // Failed
+        throw new InvalidConfigException("Unknown material: " + input);
+    }
+
     /**
      * Gets a {@code BukkitMaterialData} of the given id and data.
      * @param id   The block id.
      * @param data The block data.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static ForgeMaterialData ofIds(int id, int data)
+    private static ForgeMaterialData ofIds(int id, int data)
     {
         Block block = Block.getBlockById(id);
         IBlockState blockData = block.getStateFromMeta(data);
@@ -35,7 +110,7 @@ public class ForgeMaterialData implements LocalMaterialData
      * @param data     The block data.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static ForgeMaterialData ofDefaultMaterial(DefaultMaterial material, int data)
+    static ForgeMaterialData ofDefaultMaterial(DefaultMaterial material, int data)
     {
         return ofIds(material.id, data);
     }
@@ -46,7 +121,7 @@ public class ForgeMaterialData implements LocalMaterialData
      * @param block The material.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static ForgeMaterialData ofMinecraftBlock(Block block)
+    static ForgeMaterialData ofMinecraftBlock(Block block)
     {
         return ofMinecraftBlockState(block.getDefaultState());
     }

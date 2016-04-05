@@ -27,10 +27,10 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 // Project properties
 archivesBaseName = "terraincontrol-forge"
 description = "TerrainControl for Minecraft Forge"
-ext.forgeVersion = "1.9-12.16.0.1770-1.9"
+ext.forgeVersion = "1.9-12.16.0.1846-1.9"
 minecraft.version = ext.forgeVersion
 minecraft.runDir = "run"
-minecraft.mappings = "snapshot_20160312"
+minecraft.mappings = "snapshot_20160404"
 
 repositories
 {
@@ -41,6 +41,7 @@ repositories
 dependencies
 {
     compile project(':common')
+    compile 'com.google.guava:guava:17.0'
 }
 
 // Replace text in mcmod.info

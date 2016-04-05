@@ -49,9 +49,6 @@ public class TCWorldType extends WorldType
             // server. Continue normally.
         }
 
-        // Restore old biomes
-        ForgeWorld.restoreBiomes();
-
         // Load everything
         File worldDirectory = new File(TerrainControl.getEngine().getTCDataFolder(), "worlds" + File.separator + world.getSaveHandler().getWorldDirectory().getName());
 

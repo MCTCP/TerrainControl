@@ -14,29 +14,27 @@ import net.minecraftforge.fml.common.registry.GameData;
 
 public class ForgeBiome implements LocalBiome
 {
-    private final BiomeGenCustom biomeBase;
+    private final BiomeGenBase biomeBase;
     private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
 
     /**
      * Creates a new biome with the given name and id.
      * 
-     * @param biomeConfig The config of the biome.
-     * @param biomeIds The ids of the biome.
+     * @param biomeConfig    The config of the biome.
+     * @param minecraftBiome The Minecraft instance of the biome.
      * @return The registered biome.
      */
-    public static ForgeBiome createBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
+    public static ForgeBiome forBiome(BiomeConfig biomeConfig, BiomeGenBase minecraftBiome)
     {
-        // Register new biome
-        ForgeBiome biome = new ForgeBiome(biomeConfig, new BiomeGenCustom(biomeConfig, biomeIds));
-        return biome;
+        return new ForgeBiome(biomeConfig, minecraftBiome);
     }
 
     /**
      * Registers the biome to the biome registry.
      * @param forgeBiome The biome.
      */
-    public static void registerBiome(ForgeBiome forgeBiome)
+    static void registerBiome(ForgeBiome forgeBiome)
     {
         FMLControlledNamespacedRegistry<BiomeGenBase> registry = GameData.getBiomeRegistry();
         ResourceLocation name;
@@ -50,17 +48,19 @@ public class ForgeBiome implements LocalBiome
         registry.register(forgeBiome.biomeIds.getSavedId(), name, forgeBiome.biomeBase);
     }
 
-    private ForgeBiome(BiomeConfig biomeConfig, BiomeGenCustom biome)
+    private ForgeBiome(BiomeConfig biomeConfig, BiomeGenBase biome)
     {
         this.biomeBase = biome;
-        this.biomeIds = new BiomeIds(biome.generationId, BiomeGenBase.getIdForBiome(biome));
+        int savedId = BiomeGenBase.getIdForBiome(biome);
+        int generationId = (biome instanceof  BiomeGenCustom)? ((BiomeGenCustom) biome).generationId : savedId;
+        this.biomeIds = new BiomeIds(generationId, savedId);
         this.biomeConfig = biomeConfig;
     }
 
     @Override
     public boolean isCustom()
     {
-        return true;
+        return biomeBase instanceof BiomeGenCustom;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ForgeBiome implements LocalBiome
         return biomeBase.getBiomeName();
     }
 
-    public BiomeGenCustom getHandle()
+    public BiomeGenBase getHandle()
     {
         return biomeBase;
     }

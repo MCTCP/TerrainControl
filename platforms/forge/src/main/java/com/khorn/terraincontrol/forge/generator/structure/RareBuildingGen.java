@@ -113,9 +113,9 @@ public class RareBuildingGen extends MapGenStructure
     {
         StructureStart structurestart = this.func_175797_c(blockPos);
 
-        if (structurestart != null && structurestart instanceof MapGenScatteredFeature.Start && !structurestart.func_186161_c().isEmpty())
+        if (structurestart != null && structurestart instanceof MapGenScatteredFeature.Start && !structurestart.getComponents().isEmpty())
         {
-            StructureComponent structurecomponent = Iterables.getFirst(structurestart.func_186161_c(), null);
+            StructureComponent structurecomponent = Iterables.getFirst(structurestart.getComponents(), null);
             return structurecomponent instanceof ComponentScatteredFeaturePieces.SwampHut;
         }
         else

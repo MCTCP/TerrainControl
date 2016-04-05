@@ -26,7 +26,7 @@ import java.util.Random;
 /**
  * Translates TerrainControl events into MinecraftForge terrain events.
  */
-public class EventManager extends EventHandler
+public class TCToForgeEventConverter extends EventHandler
 {
     /*
      * Forge uses the *block* x and z, Terrain Control and Forge Modloader use

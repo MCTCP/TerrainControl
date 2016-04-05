@@ -38,7 +38,7 @@ public class PacketHandler
         // This method receives the TerrainControl packet with the custom
         // biome colors and weather.
 
-        FMLProxyPacket receivedPacket = event.packet;
+        FMLProxyPacket receivedPacket = event.getPacket();
 
         // We're on the client, receive the packet
         ByteBuf stream = receivedPacket.payload();
@@ -49,9 +49,6 @@ public class PacketHandler
             if (serverProtocolVersion == clientProtocolVersion)
             {
                 // Server sent config
-
-                // Restore old biomes
-                ForgeWorld.restoreBiomes();
 
                 if (stream.readableBytes() > 4)
                 {
@@ -103,7 +100,7 @@ public class PacketHandler
 
         Style chatStyle = new Style();
         chatStyle.setColor(color);
-        chat.setChatStyle(chatStyle);
+        chat.setStyle(chatStyle);
 
         Minecraft.getMinecraft().thePlayer.addChatMessage(chat);
     }

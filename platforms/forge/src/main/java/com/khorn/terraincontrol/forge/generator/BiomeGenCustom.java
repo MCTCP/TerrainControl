@@ -5,11 +5,15 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.biome.BiomeGenBase;
 
 import java.util.List;
 
+/**
+ * Used for all custom biomes.
+ */
 public class BiomeGenCustom extends BiomeGenBase
 {
     /**
@@ -44,13 +48,6 @@ public class BiomeGenCustom extends BiomeGenBase
     }
 
     private int skyColor;
-    private int grassColor;
-    private boolean grassColorIsMultiplier;
-    private int foliageColor;
-    private boolean foliageColorIsMultiplier;
-
-    private boolean grassColorSet = false;
-    private boolean foliageColorSet = false;
 
     public final int generationId;
 
@@ -60,16 +57,6 @@ public class BiomeGenCustom extends BiomeGenBase
         this.generationId = id.getGenerationId();
 
         this.skyColor = config.skyColor;
-        this.grassColor = config.grassColor;
-        this.grassColorIsMultiplier = config.grassColorIsMultiplier;
-        this.foliageColor = config.foliageColor;
-        this.foliageColorIsMultiplier = config.foliageColorIsMultiplier;
-
-        if (this.grassColor != 0xffffff)
-            this.grassColorSet = true;
-
-        if (this.foliageColor != 0xffffff)
-            this.foliageColorSet = true;
 
         // Mob spawning
         addMobs(this.spawnableMonsterList, config.spawnMonsters);
@@ -90,35 +77,6 @@ public class BiomeGenCustom extends BiomeGenBase
     public int getSkyColorByTemp(float v)
     {
         return this.skyColor;
-    }
-
-    @Override
-    public int getModdedBiomeGrassColor(int original)
-    {
-        if (!this.grassColorSet)
-            return original;
-        if (grassColorIsMultiplier)
-        {
-            return ((ColorizerFoliage.getFoliageColor(Math.min(getTemperature(), 1.0f), getRainfall()) & 0xFEFEFE) + grassColor) / 2;
-        } else
-        {
-            return grassColor;
-        }
-
-    }
-
-    @Override
-    public int getModdedBiomeFoliageColor(int original)
-    {
-        if (!this.foliageColorSet)
-            return original;
-        if (foliageColorIsMultiplier)
-        {
-            return ((ColorizerFoliage.getFoliageColor(Math.min(getTemperature(), 1.0f), getRainfall()) & 0xFEFEFE) + foliageColor) / 2;
-        } else
-        {
-            return foliageColor;
-        }
     }
 
     @Override
