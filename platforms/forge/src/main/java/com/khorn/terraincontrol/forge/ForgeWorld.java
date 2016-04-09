@@ -677,6 +677,8 @@ public class ForgeWorld implements LocalWorld
         this.groundBush = new WorldGenShrub(jungleLog, jungleLeaves);
 
         this.generator = new ChunkProvider(this);
+
+        world.setSeaLevel(configs.worldConfig.waterLevelMax);
     }
 
     public void setBiomeManager(BiomeGenerator manager)

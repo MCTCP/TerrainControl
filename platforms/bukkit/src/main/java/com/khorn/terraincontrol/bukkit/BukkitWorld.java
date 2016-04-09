@@ -670,6 +670,9 @@ public class BukkitWorld implements LocalWorld
         biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeModeClass, this);
         injectWorldChunkManager(biomeGenerator);
 
+        // Set sea level
+        mcWorld.b(this.settings.worldConfig.waterLevelMax);
+
         if (!initialized)
         {
             // Things that need to be done only when enabling
