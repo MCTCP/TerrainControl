@@ -11,6 +11,7 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.block.Block;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -22,7 +23,7 @@ public class ForgeEngine extends TerrainControlEngine
 
     public ForgeEngine(TCWorldType worldType)
     {
-        super(FMLCommonHandler.instance().getFMLLogger());
+        super(new ForgeLogger());
         this.worldType = worldType;
     }
 

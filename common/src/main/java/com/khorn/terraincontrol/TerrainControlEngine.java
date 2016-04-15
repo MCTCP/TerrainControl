@@ -12,7 +12,6 @@ import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
 import com.khorn.terraincontrol.generator.resource.Resource;
-import com.khorn.terraincontrol.logging.LogFactory;
 import com.khorn.terraincontrol.logging.Logger;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -33,14 +32,9 @@ public abstract class TerrainControlEngine
     private PluginConfig pluginConfig;
     private Logger logger;
 
-    public TerrainControlEngine()
+    public TerrainControlEngine(Logger logger)
     {
-        logger = LogFactory.getLogger();
-    }
-
-    public TerrainControlEngine(org.apache.logging.log4j.Logger log4jLogger)
-    {
-        logger = LogFactory.getLogger(log4jLogger);
+        this.logger = logger;
     }
 
     /**

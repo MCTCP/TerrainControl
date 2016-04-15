@@ -9,9 +9,9 @@ import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
 import com.khorn.terraincontrol.generator.resource.Resource;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import org.apache.logging.log4j.Marker;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -54,7 +54,7 @@ public class TerrainControl
 
     /**
      * @see TerrainControlEngine#firePopulationEndEvent(LocalWorld, Random,
-     * boolean, int, int)
+     * boolean, ChunkCoordinate)
      */
     public static void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
@@ -63,7 +63,7 @@ public class TerrainControl
 
     /**
      * @see TerrainControlEngine#firePopulationStartEvent(LocalWorld, Random,
-     * boolean, int, int)
+     * boolean, ChunkCoordinate)
      */
     public static void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
@@ -186,7 +186,7 @@ public class TerrainControl
      * @param messages The messages to log.
      * @param level    The severity of the message
      */
-    public static void log(Marker level, List<String> messages)
+    public static void log(LogMarker level, List<String> messages)
     {
         engine.getLogger().log(level, messages);
     }
@@ -201,7 +201,7 @@ public class TerrainControl
      * @param params  The parameters belonging to {0...} in the message
      *                string
      */
-    public static void log(Marker level, String message, Object... params)
+    public static void log(LogMarker level, String message, Object... params)
     {
         engine.getLogger().log(level, message, params);
     }
@@ -214,7 +214,7 @@ public class TerrainControl
      * @param ifLevel  the Log level to test for
      * @param messages The messages to log.
      */
-    public static void logIfLevel(Marker ifLevel, List<String> messages)
+    public static void logIfLevel(LogMarker ifLevel, List<String> messages)
     {
         engine.getLogger().logIfLevel(ifLevel, messages);
     }
@@ -230,7 +230,7 @@ public class TerrainControl
      * @param params  The parameters belonging to {0...} in the message
      *                string
      */
-    public static void logIfLevel(Marker ifLevel, String message, Object... params)
+    public static void logIfLevel(LogMarker ifLevel, String message, Object... params)
     {
         engine.getLogger().logIfLevel(ifLevel, message, params);
     }
@@ -244,7 +244,7 @@ public class TerrainControl
      * @param max      The maximum Log level to test for
      * @param messages The messages to log.
      */
-    public static void logIfLevel(Marker min, Marker max, List<String> messages)
+    public static void logIfLevel(LogMarker min, LogMarker max, List<String> messages)
     {
         engine.getLogger().logIfLevel(min, max, messages);
     }
@@ -261,7 +261,7 @@ public class TerrainControl
      * @param params  The parameters belonging to {0...} in the message
      *                string
      */
-    public static void logIfLevel(Marker min, Marker max, String message, Object... params)
+    public static void logIfLevel(LogMarker min, LogMarker max, String message, Object... params)
     {
         engine.getLogger().logIfLevel(min, max, message, params);
     }
@@ -272,7 +272,7 @@ public class TerrainControl
      * @param level The log level to log this stack trace at
      * @param e     The Throwable object to obtain stack trace information from
      */
-    public static void printStackTrace(Marker level, Throwable e)
+    public static void printStackTrace(LogMarker level, Throwable e)
     {
         printStackTrace(level, e, Integer.MAX_VALUE);
     }
@@ -286,7 +286,7 @@ public class TerrainControl
      *                 from
      * @param maxDepth The max number of trace elements to print
      */
-    public static void printStackTrace(Marker level, Throwable e, int maxDepth)
+    public static void printStackTrace(LogMarker level, Throwable e, int maxDepth)
     {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);

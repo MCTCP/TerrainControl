@@ -1,149 +1,101 @@
 package com.khorn.terraincontrol.logging;
 
-import com.khorn.terraincontrol.configuration.PluginConfig;
-import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
-import org.apache.logging.log4j.Marker;
 
 import java.util.List;
 
-public class Logger
+public abstract class Logger
 {
 
-    private org.apache.logging.log4j.Logger baseLogger;
-    public static final String PLUGIN_NAME = PluginStandardValues.ChannelName;
-    private Marker logLevel;
+    protected LogMarker minimumLevel;
 
-    protected Logger(org.apache.logging.log4j.Logger logger)
+    public void setLevel(LogMarker level)
     {
-        logLevel = PluginConfig.LogLevels.Standard.getLevel();
-        baseLogger = logger;
-    }
-
-    public org.apache.logging.log4j.Logger getBaseLogger()
-    {
-        return baseLogger;
-    }
-
-    public void setLevel(Marker level)
-    {
-        logLevel = level;
+        minimumLevel = level;
     }
 
     /**
-     * Logs the message(s) with the given importance. Message will be
-     * prefixed with [TerrainControl], so don't do that yourself.
-     * <p/>
+     * Logs the message(s) with the given importance. Message will be prefixed
+     * with [TerrainControl], so don't do that yourself.
+     *
      * @param level   The severity of the message
      * @param message The messages to log
      */
-    public void log(Marker level, List<String> message)
+    public void log(LogMarker level, List<String> message)
     {
         log(level, "{}", (Object) StringHelper.join(message, " "));
     }
 
     /**
-     * Logs a format string message with the given importance. Message will
-     * be prefixed with [TerrainControl], so don't do that yourself.
-     * <p/>
+     * Logs a format string message with the given importance. Message will be
+     * prefixed with [TerrainControl], so don't do that yourself.
+     *
      * @param level   The severity of the message
-     * @param message The messages to log formatted similar to Logger.log()
-     *                with the same args.
-     * @param params  The parameters belonging to {0...} in the message
-     *                string
+     * @param message The messages to log formatted similar to Logger.log() with
+     *                the same args.
+     * @param params  The parameters belonging to {0...} in the message string
      */
-    public void log(Marker level, String message, Object... params)
-    {
-        if (LogMarker.compare(logLevel, level) >= 0)
-        {//>>	Only log messages that we want to see...
-
-            StringBuilder sb = new StringBuilder(50).append('[').append(PLUGIN_NAME).append("] ");
-
-            //>>	Log Fatal, Error, and Warn as what they are without Markers.
-            if (LogMarker.compare(LogMarker.FATAL, level) == 0)
-            {
-                baseLogger.fatal(sb.append(message).toString(), params);
-            } else if (LogMarker.compare(LogMarker.ERROR, level) == 0)
-            {
-                baseLogger.error(sb.append(message).toString(), params);
-            } else if (LogMarker.compare(LogMarker.WARN, level) == 0)
-            {
-                baseLogger.warn(sb.append(message).toString(), params);
-            } else if (LogMarker.compare(LogMarker.INFO, level) == 0)
-            {
-                baseLogger.info(sb.append(message).toString(), params);
-            } else
-            {//>>	Otherwise log the message as info and tag it with a marker
-                String levelName = level.getName();
-                sb.append("[")
-                        .append(levelName.substring(levelName.lastIndexOf('.')+1)) //>> only get the basic name not the FQN
-                        .append("] ");
-                baseLogger.info(level, sb.append(message).toString(), params);
-            }
-        }
-    }
+    public abstract void log(LogMarker level, String message, Object... params);
 
     /**
-     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
-     * level matches the level provided. Message will be prefixed with
+     * Logs the message(s) with the given importance <b>ONLY IF</b> logger level
+     * matches the level provided. Message will be prefixed with
      * [TerrainControl], so don't do that yourself.
-     * <p/>
+     *
      * @param ifLevel  the Log level to test for
      * @param messages The messages to log.
      */
-    public void logIfLevel(Marker ifLevel, List<String> messages)
+    public void logIfLevel(LogMarker ifLevel, List<String> messages)
     {
-        if (LogMarker.compare(logLevel, ifLevel) == 0)
+        if (minimumLevel == ifLevel)
             log(ifLevel, messages);
     }
 
     /**
-     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
-     * level matches the level provided. Message will be prefixed with
+     * Logs the message(s) with the given importance <b>ONLY IF</b> logger level
+     * matches the level provided. Message will be prefixed with
      * [TerrainControl], so don't do that yourself.
-     * <p/>
+     *
      * @param ifLevel the Log level to test for
-     * @param message The messages to log formatted similar to
-     *                Logger.log() with the same args.
-     * @param params  The parameters belonging to {0...} in the message
-     *                string
+     * @param message The messages to log formatted similar to Logger.log() with
+     *                the same args.
+     * @param params  The parameters belonging to {0...} in the message string
      */
-    public void logIfLevel(Marker ifLevel, String message, Object... params)
+    public void logIfLevel(LogMarker ifLevel, String message, Object... params)
     {
-        if (LogMarker.compare(logLevel, ifLevel) == 0)
+        if (minimumLevel == ifLevel)
             log(ifLevel, message, params);
     }
 
     /**
-     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
-     * level is between the min/max provided. Message will be prefixed with
+     * Logs the message(s) with the given importance <b>ONLY IF</b> logger level
+     * is between the min/max provided. Message will be prefixed with
      * [TerrainControl], so don't do that yourself.
-     * <p/>
+     *
      * @param min      The minimum Log level to test for
      * @param max      The maximum Log level to test for
      * @param messages The messages to log.
      */
-    public void logIfLevel(Marker min, Marker max, List<String> messages)
+    public void logIfLevel(LogMarker min, LogMarker max, List<String> messages)
     {
-        if (LogMarker.compare(logLevel, max) <= 0 && LogMarker.compare(logLevel, min) >= 0)
+        if (minimumLevel.compareTo(max) <= 0 && minimumLevel.compareTo(min) >= 0)
             log(max, messages);
     }
 
     /**
-     * Logs the message(s) with the given importance <b>ONLY IF</b> logger
-     * level is between the min/max provided. Message will be prefixed with
+     * Logs the message with the given importance <b>ONLY IF</b> logger level
+     * is between the min/max provided. Message will be prefixed with
      * [TerrainControl], so don't do that yourself.
-     * <p/>
+     *
      * @param min     The minimum Log level to test for
      * @param max     The maximum Log level to test for
-     * @param message The messages to log formatted similar to
-     *                Logger.log() with the same args.
-     * @param params  The parameters belonging to {0...} in the message
-     *                string
+     * @param message The messages to log formatted similar to Logger.log() with
+     *                the same args.
+     * @param params  The parameters belonging to {0...} in the message string
      */
-    public void logIfLevel(Marker min, Marker max, String message, Object... params)
+    public void logIfLevel(LogMarker min, LogMarker max, String message, Object... params)
     {
-        if (LogMarker.compare(logLevel, max) <= 0 && LogMarker.compare(logLevel, min) >= 0)
+        if (minimumLevel.compareTo(max) <= 0 && minimumLevel.compareTo(min) >= 0)
             log(max, message, params);
     }
 

@@ -17,6 +17,7 @@ public class BukkitEngine extends TerrainControlEngine
 
     public BukkitEngine(TCPlugin plugin)
     {
+        super(new BukkitLogger(plugin.getLogger()));
         this.plugin = plugin;
     }
 

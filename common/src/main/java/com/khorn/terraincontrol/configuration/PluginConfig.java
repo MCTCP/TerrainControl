@@ -8,8 +8,6 @@ import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.logging.LogMarker;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Marker;
 
 import java.io.IOException;
 
@@ -22,37 +20,30 @@ public final class PluginConfig extends ConfigFile
 
     public ConfigMode SettingsMode;
 
-    public static enum LogLevels
+    public enum LogLevels
     {
 
-        Off(LogMarker.ERROR, Level.ERROR.intLevel()),
-        Quiet(LogMarker.WARN, Level.WARN.intLevel()),
-        Standard(LogMarker.INFO, Level.INFO.intLevel()),
-        Debug(LogMarker.DEBUG, Level.DEBUG.intLevel()),
-        Trace(LogMarker.TRACE, Level.TRACE.intLevel());
-        private final Marker marker;
-        private final int value;
+        Off(LogMarker.ERROR),
+        Quiet(LogMarker.WARN),
+        Standard(LogMarker.INFO),
+        Debug(LogMarker.DEBUG),
+        Trace(LogMarker.TRACE);
+        private final LogMarker marker;
 
-        private LogLevels(Marker marker, int value)
+        LogLevels(LogMarker marker)
         {
             this.marker = marker;
-            this.value = value;
         }
 
-        public Marker getLevel()
+        public LogMarker getLevel()
         {
             return marker;
         }
 
-        public int getValue()
-        {
-            return value;
-        }
-
     }
 
-    public LogLevels LogLevel = LogLevels.Standard;
-    public String biomeConfigExtension;
+    private LogLevels LogLevel = LogLevels.Standard;
+    String biomeConfigExtension;
 
     public PluginConfig(SettingsReader settingsReader)
     {
@@ -77,10 +68,8 @@ public final class PluginConfig extends ConfigFile
         if (!BiomeStandardValues.BiomeConfigExtensions.contains(this.biomeConfigExtension))
         {
             String newExtension = BiomeStandardValues.BIOME_CONFIG_EXTENSION.getDefaultValue();
-            TerrainControl.log(LogMarker.WARN, "BiomeConfig file extension {} is invalid, changing to {}", new Object[]
-            {
-                this.biomeConfigExtension, newExtension
-            });
+            TerrainControl.log(LogMarker.WARN, "BiomeConfig file extension {} is invalid, changing to {}",
+                this.biomeConfigExtension, newExtension);
             this.biomeConfigExtension = newExtension;
         }
 
