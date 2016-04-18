@@ -192,7 +192,7 @@ public final class LayerFactory
 
                 BiomeConfig biomeConfig = biome.getBiomeConfig();
 
-                if (biomeConfig.biomeSizeWhenIsle == depth
+                if (biomeConfig.biomeSize == depth
                         && worldConfig.IsleBiomes.contains(biomeConfig.getName())
                         && biomeConfig.isleInBiome != null)
                 {
@@ -205,11 +205,11 @@ public final class LayerFactory
                     	    biomeCanSpawnIn[islandIn] = true;
                     }
 
-                    int chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarityWhenIsle;
+                    int chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarity;
                     layerBiomeIsle.addIsle(biome, chance, biomeCanSpawnIn);
                 }
 
-                if (biomeConfig.biomeSizeWhenBorder == depth
+                if (biomeConfig.biomeSize == depth
                         && worldConfig.BorderBiomes.contains(biomeConfig.getName())
                         && biomeConfig.biomeIsBorder != null)
                 {
