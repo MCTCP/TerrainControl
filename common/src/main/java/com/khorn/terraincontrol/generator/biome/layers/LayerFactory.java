@@ -200,9 +200,7 @@ public final class LayerFactory
                     boolean[] biomeCanSpawnIn = new boolean[1024];
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
-                        int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
-                        if (islandIn != DefaultBiome.OCEAN.Id)
-                    	    biomeCanSpawnIn[islandIn] = true;
+            	        biomeCanSpawnIn[world.getBiomeByName(islandInName).getIds().getGenerationId()] = true;
                     }
 
                     int chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarity;
@@ -340,9 +338,7 @@ public final class LayerFactory
                     boolean[] biomeCanSpawnIn = new boolean[1024];
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
-                        int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
-                        if (islandIn != DefaultBiome.OCEAN.Id)
-                	        biomeCanSpawnIn[islandIn] = true;
+            	        biomeCanSpawnIn[world.getBiomeByName(islandInName).getIds().getGenerationId()] = true;
                     }
 
                     int chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarityWhenIsle;
