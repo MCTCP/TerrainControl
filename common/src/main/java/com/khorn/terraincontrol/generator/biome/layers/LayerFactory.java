@@ -198,15 +198,19 @@ public final class LayerFactory
                 {
                     haveIsle = true;
                     boolean[] biomeCanSpawnIn = new boolean[1024];
+                    boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
                         int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
-                        if (islandIn != DefaultBiome.OCEAN.Id)
-                    	    biomeCanSpawnIn[islandIn] = true;
+                        if (islandIn == DefaultBiome.OCEAN.Id)
+                        {
+                        	inOcean = true;
+                        } else {
+                        	biomeCanSpawnIn[islandIn] = true;
+                        }
                     }
-
                     int chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarity;
-                    layerBiomeIsle.addIsle(biome, chance, biomeCanSpawnIn);
+                    layerBiomeIsle.addIsle(biome, chance, biomeCanSpawnIn, inOcean);
                 }
 
                 if (biomeConfig.biomeSize == depth
@@ -338,15 +342,20 @@ public final class LayerFactory
                 {
                     haveIsle = true;
                     boolean[] biomeCanSpawnIn = new boolean[1024];
+                    boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
                         int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
-                        if (islandIn != DefaultBiome.OCEAN.Id)
-                	        biomeCanSpawnIn[islandIn] = true;
+                        if (islandIn == DefaultBiome.OCEAN.Id)
+                        {
+                        	inOcean = true;
+                        } else {
+                        	biomeCanSpawnIn[islandIn] = true;
+                        }
                     }
 
                     int chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarityWhenIsle;
-                    layerBiomeIsle.addIsle(biome, chance, biomeCanSpawnIn);
+                    layerBiomeIsle.addIsle(biome, chance, biomeCanSpawnIn, inOcean);
                 }
 
                 if (biomeConfig.biomeSizeWhenBorder == depth
