@@ -1,0 +1,108 @@
+package com.khorn.terraincontrol.forge;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.command.ICommand;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
+
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.WorldSettings;
+
+public class TCCommandHandler implements ICommand
+{ 
+    private final ArrayList aliases;
+ 
+    public TCCommandHandler() 
+    { 
+        aliases = new ArrayList(); 
+
+        aliases.add("tc"); 
+
+        aliases.add("tc"); 
+    } 
+  
+    @Override 
+    public String getCommandName() 
+    { 
+        return "tc"; 
+
+    } 
+
+    @Override         
+    public String getCommandUsage(ICommandSender var1) 
+    { 
+        //return "worldinfo <text>"; 
+    	return "tc";
+    } 
+
+    @Override 
+    public java.util.List getCommandAliases() 
+    { 
+        return this.aliases;
+    } 
+
+    @Override 
+    public void processCommand(ICommandSender sender, String[] argString)
+    { 
+        World world = sender.getEntityWorld();
+        
+        if (!world.isRemote) // Server side 
+        {
+        	if(argString == null || argString.length == 0)
+        	{
+        		sender.addChatMessage(new ChatComponentText("-- TerrainControl --"));
+				sender.addChatMessage(new ChatComponentText("Commands:"));
+				sender.addChatMessage(new ChatComponentText("/tc worldinfo - Show author and description information for this world."));
+				sender.addChatMessage(new ChatComponentText("/tc biome - Show biome information for any biome at the player's coordinates."));
+        	}
+        	else if(argString[0].equals("worldinfo"))
+        	{                
+    			WorldConfig worldConfig = ((WorldSettings)TerrainControl.getEngine().getWorld(sender.getEntityWorld().getWorldInfo().getWorldName()).getConfigs()).worldConfig;
+    			sender.addChatMessage(new ChatComponentText("-- World info --"));
+    			sender.addChatMessage(new ChatComponentText("Author: " + worldConfig.author));
+    			sender.addChatMessage(new ChatComponentText("Description: " + worldConfig.description)); 
+        	}
+        	else if(argString[0].equals("biome"))
+        	{                
+    			BiomeGenBase biome = sender.getEntityWorld().getBiomeGenForCoords(sender.getPlayerCoordinates().posX,sender.getPlayerCoordinates().posZ);
+    			sender.addChatMessage(new ChatComponentText("-- Biome info --"));
+    			sender.addChatMessage(new ChatComponentText("Name: " + biome.biomeName));
+    			sender.addChatMessage(new ChatComponentText("Id: " + biome.biomeID));
+        	}
+        }
+    } 
+
+    @Override 
+    public boolean canCommandSenderUseCommand(ICommandSender var1) 
+    { 
+        return true;
+
+    } 
+
+    @Override 
+    public boolean isUsernameIndex(String[] var1, int var2) 
+    { 
+        // TODO Auto-generated method stub 
+
+        return false;
+
+    }
+
+	@Override
+	public int compareTo(Object arg0) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List addTabCompletionOptions(ICommandSender arg0, String[] arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}
+
