@@ -15,8 +15,8 @@ public class LayerBiomeInBiome extends Layer
         short biomeId;
         int chance = 10;
         boolean[] canSpawnIn = new boolean[1024];
-
         long scrambledWorldSeed;
+        boolean inOcean = false;
     }
 
     private final long worldSeed;
@@ -34,12 +34,13 @@ public class LayerBiomeInBiome extends Layer
      * @param chance The isle spawns when nextInt(chance) == 0.
      * @param biomeCanSpawnIn The biomes the isle can spawn in.
      */
-    public void addIsle(LocalBiome biome, int chance, boolean[] biomeCanSpawnIn)
+    public void addIsle(LocalBiome biome, int chance, boolean[] biomeCanSpawnIn, boolean inOcean)
     {
         Isle isle = new Isle();
         isle.biomeId = (short) biome.getIds().getGenerationId();
         isle.chance = chance;
         isle.canSpawnIn = biomeCanSpawnIn;
+        isle.inOcean = inOcean;
 
         // Pre-calculate the seeds unique for this layer
         // (keep in mind that the resulting world seed is based on the base seed)
@@ -74,7 +75,7 @@ public class LayerBiomeInBiome extends Layer
                     this.scrambledWorldSeed = isle.scrambledWorldSeed;
                     initChunkSeed(xi + x, zi + z);
                     boolean alreadySpawned = false;
-                    if (isle.canSpawnIn[DefaultBiome.OCEAN.Id])
+                    if (isle.inOcean)
                     {
                         int nwCheck = childInts[(xi + 0 + (zi) * xSize0)] & LandBit;
                         int neCheck = childInts[(xi + 2 + (zi) * xSize0)] & LandBit;
