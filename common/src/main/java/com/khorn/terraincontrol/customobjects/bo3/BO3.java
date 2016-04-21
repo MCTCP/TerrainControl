@@ -185,6 +185,10 @@ public class BO3 implements StructuredCustomObject
     {
         Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int y = 0;
+        if (settings.spawnHeight == SpawnHeightEnum.staticY)
+        {
+            y = settings.minHeight;
+        }
         if (settings.spawnHeight == SpawnHeightEnum.randomY)
         {
             y = MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight);

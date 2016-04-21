@@ -120,7 +120,7 @@ public class BO3Config extends ConfigFile
         writer.comment("If you set this to true, the BO3 will be placed with a random rotation.");
         writer.setting(BO3Settings.ROTATE_RANDOMLY, rotateRandomly);
 
-        writer.comment("The spawn height of the BO3 - randomY, highestBlock or highestSolidBlock.");
+        writer.comment("The spawn height of the BO3 - staticY, randomY, highestBlock or highestSolidBlock.");
         writer.setting(BO3Settings.SPAWN_HEIGHT, spawnHeight);
 
         writer.comment("The offset from the spawn height to spawn this BO3");
@@ -131,15 +131,18 @@ public class BO3Config extends ConfigFile
         writer.comment("Ex. SpawnHeightOffset = 3, SpawnHeightVariance = 3; This object will spawn 3 to 6 blocks above the original spot it would have spawned");
         writer.setting(BO3Settings.SPAWN_HEIGHT_VARIANCE, spawnHeightVariance);
 
+        writer.smallTitle("Height Limits for the BO3.");
+        writer.comment("When in randomY mode used as the minimum Y or in staticY mode as the actual Y to spawn this BO3 at.");
+        writer.setting(BO3Settings.MIN_HEIGHT, minHeight);
+        writer.comment("When in randomY mode used as the maximum Y to spawn this BO3 at.");
+        writer.comment("NOTE: This value will be silently corrected to minHeight + 1 if it is equal or less!");
+        writer.setting(BO3Settings.MAX_HEIGHT, maxHeight);
+
         writer.smallTitle("Extrusion settings");
         writer.comment("The style of extrusion you wish to use - BottomDown, TopUp, None (Default)");
         writer.setting(BO3Settings.EXTRUDE_MODE, extrudeMode);
         writer.comment("The blocks to extrude your BO3 through");
         writer.setting(BO3Settings.EXTRUDE_THROUGH_BLOCKS, extrudeThroughBlocks);
-
-        writer.comment("The height limits for the BO3.");
-        writer.setting(BO3Settings.MIN_HEIGHT, minHeight);
-        writer.setting(BO3Settings.MAX_HEIGHT, maxHeight);
 
         writer.comment("Objects can have other objects attacthed to it: branches. Branches can also");
         writer.comment("have branches attached to it, which can also have branches, etc. This is the");
