@@ -49,7 +49,7 @@ public class BO3Settings extends Settings
     public static enum SpawnHeightEnum
     {
         randomY(StructurePartSpawnHeight.PROVIDED),
-        staticY(StructurePartSpawnHeight.PROVIDED),
+        atMinY(StructurePartSpawnHeight.PROVIDED),
         highestBlock(StructurePartSpawnHeight.HIGHEST_BLOCK),
         highestSolidBlock(StructurePartSpawnHeight.HIGHEST_SOLID_BLOCK);
 
