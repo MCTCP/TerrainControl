@@ -50,8 +50,7 @@ public class WorldStandardValues extends Settings
             IMAGE_FILE = stringSetting("ImageFile", "map.png"),
             IMAGE_FILL_BIOME = stringSetting("ImageFillBiome", "Ocean"),
             AUTHOR = stringSetting("Author", "Unknown"),
-            DESCRIPTION = stringSetting("Description", "No description given"),
-    		WORLD_SEED = stringSetting("WorldSeed", "");
+            DESCRIPTION = stringSetting("Description", "No description given");
 
     public static final Setting<Integer>
             WORLD_HEIGHT_SCALE_BITS = intSetting("WorldHeightScaleBits", 7, 5, 8),

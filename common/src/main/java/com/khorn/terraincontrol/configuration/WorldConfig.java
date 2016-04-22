@@ -185,8 +185,6 @@ public class WorldConfig extends ConfigFile
     // Settings for console commands
     public String author;
     public String description;
-    // Used by Forge world creation menu
-    public String worldSeed;
 
     /**
      * Creates a WorldConfig from the WorldConfig.ini file found in the given
@@ -472,7 +470,6 @@ public class WorldConfig extends ConfigFile
         
         this.author = readSettings(WorldStandardValues.AUTHOR);
         this.description = readSettings(WorldStandardValues.DESCRIPTION);
-        this.worldSeed = readSettings(WorldStandardValues.WORLD_SEED);
     }
 
     private void readBiomeGroups()
@@ -983,11 +980,6 @@ public class WorldConfig extends ConfigFile
         writer.bigTitle("Description");        
         writer.comment("A short description of this world configuration");
         writer.setting(WorldStandardValues.DESCRIPTION, this.description);
-
-        writer.bigTitle("World Seed");        
-        writer.comment("The seed that will be used for this world unless it is overriden in the world creation menu.");
-        writer.comment("Leave blank for a random seed.");
-        writer.setting(WorldStandardValues.WORLD_SEED, this.worldSeed);
     }
 
     private void writeBiomeGroups(SettingsWriter writer) throws IOException
