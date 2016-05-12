@@ -8,10 +8,10 @@ import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_9_R1.*;
-import net.minecraft.server.v1_9_R1.WorldGenVillagePieces.WorldGenVillagePieceWeight;
-import net.minecraft.server.v1_9_R1.WorldGenVillagePieces.WorldGenVillageRoadPiece;
-import net.minecraft.server.v1_9_R1.WorldGenVillagePieces.WorldGenVillageStartPiece;
+import net.minecraft.server.v1_9_R2.*;
+import net.minecraft.server.v1_9_R2.WorldGenVillagePieces.WorldGenVillagePieceWeight;
+import net.minecraft.server.v1_9_R2.WorldGenVillagePieces.WorldGenVillageRoadPiece;
+import net.minecraft.server.v1_9_R2.WorldGenVillagePieces.WorldGenVillageStartPiece;
 
 import java.util.ArrayList;
 import java.util.List;

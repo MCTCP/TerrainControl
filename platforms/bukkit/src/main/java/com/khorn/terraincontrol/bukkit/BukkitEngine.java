@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import net.minecraft.server.v1_9_R1.Block;
+import net.minecraft.server.v1_9_R2.Block;
 
 import java.io.File;
 
@@ -63,6 +63,7 @@ public class BukkitEngine extends TerrainControlEngine
 
     }
 
+    @SuppressWarnings("deprecation")
     private LocalMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
     {
         String blockName = input;

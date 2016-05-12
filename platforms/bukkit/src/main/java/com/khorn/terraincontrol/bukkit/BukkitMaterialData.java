@@ -4,9 +4,9 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import net.minecraft.server.v1_9_R1.Block;
-import net.minecraft.server.v1_9_R1.BlockFalling;
-import net.minecraft.server.v1_9_R1.IBlockData;
+import net.minecraft.server.v1_9_R2.Block;
+import net.minecraft.server.v1_9_R2.BlockFalling;
+import net.minecraft.server.v1_9_R2.IBlockData;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
@@ -192,6 +192,7 @@ public final class BukkitMaterialData implements LocalMaterialData
         return getName();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public LocalMaterialData withBlockData(int i)
     {
@@ -212,6 +213,7 @@ public final class BukkitMaterialData implements LocalMaterialData
         return this.withBlockData(defaultData);
     }
 
+    @SuppressWarnings("deprecation")
     public IBlockData internalBlock()
     {
         return Block.getById(getBlockId()).fromLegacyData(getBlockData());

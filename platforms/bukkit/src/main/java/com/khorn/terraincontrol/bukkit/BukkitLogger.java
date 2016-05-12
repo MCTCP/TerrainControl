@@ -5,8 +5,6 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.logging.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import java.util.logging.Level;
-
 /**
  * Implementation of {@link Logger} for Bukkit.
  */

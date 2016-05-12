@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.util;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
-import net.minecraft.server.v1_9_R1.*;
+import net.minecraft.server.v1_9_R2.*;
 
 import java.lang.reflect.Field;
 import java.util.Map;

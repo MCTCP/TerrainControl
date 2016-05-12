@@ -6,14 +6,10 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
-import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_9_R1.*;
-import net.minecraft.server.v1_9_R1.WorldGenStronghold.WorldGenStronghold2Start;
+import net.minecraft.server.v1_9_R2.BiomeBase;
+import net.minecraft.server.v1_9_R2.WorldGenStronghold;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
 
 public class StrongholdGen extends WorldGenStronghold
 {

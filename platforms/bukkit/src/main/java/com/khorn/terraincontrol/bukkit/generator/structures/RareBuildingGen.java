@@ -8,11 +8,11 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_9_R1.*;
-import net.minecraft.server.v1_9_R1.WorldGenRegistration.b;
-import net.minecraft.server.v1_9_R1.WorldGenRegistration.WorldGenJungleTemple;
-import net.minecraft.server.v1_9_R1.WorldGenRegistration.WorldGenPyramidPiece;
-import net.minecraft.server.v1_9_R1.WorldGenRegistration.WorldGenWitchHut;
+import net.minecraft.server.v1_9_R2.*;
+import net.minecraft.server.v1_9_R2.WorldGenRegistration.b;
+import net.minecraft.server.v1_9_R2.WorldGenRegistration.WorldGenJungleTemple;
+import net.minecraft.server.v1_9_R2.WorldGenRegistration.WorldGenPyramidPiece;
+import net.minecraft.server.v1_9_R2.WorldGenRegistration.WorldGenWitchHut;
 
 import java.util.ArrayList;
 import java.util.List;

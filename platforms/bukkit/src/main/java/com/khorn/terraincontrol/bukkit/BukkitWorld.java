@@ -20,9 +20,9 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
-import net.minecraft.server.v1_9_R1.*;
-import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_9_R1.generator.CustomChunkGenerator;
+import net.minecraft.server.v1_9_R2.*;
+import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_9_R2.generator.CustomChunkGenerator;
 
 import java.util.*;
 
@@ -352,7 +352,7 @@ public class BukkitWorld implements LocalWorld
             {
                 return null;
             }
-            if (world.getChunkProviderServer().isChunkLoaded(chunkX, chunkZ))
+            if (world.getChunkProviderServer().isLoaded(chunkX, chunkZ))
             {
                 return world.getChunkAt(chunkX, chunkZ);
             }
