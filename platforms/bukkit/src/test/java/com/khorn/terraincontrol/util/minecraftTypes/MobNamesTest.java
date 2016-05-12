@@ -16,7 +16,7 @@ public class MobNamesTest
     {
         for (EntityType type : EntityType.values())
         {
-            if (type.isAlive() && type.isSpawnable())
+            if (type.isAlive() && type.isSpawnable() && type != EntityType.ARMOR_STAND)
             {
                 // Throws IllegalArgumentException if no entry exists
                 MobNames.valueOf(type.toString());
