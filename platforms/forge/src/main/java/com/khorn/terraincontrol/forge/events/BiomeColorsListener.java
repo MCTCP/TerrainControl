@@ -1,9 +1,7 @@
 package com.khorn.terraincontrol.forge.events;
 
 import com.google.common.base.Function;
-import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.event.terraingen.BiomeEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;

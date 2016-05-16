@@ -29,8 +29,6 @@ public abstract class ConfigFile
 
     /**
      * Creates a new configuration file.
-     * @param name   Name of the thing that is being read,
-     *               like Plains or MyBO3. May not be null.
      * @param reader Settings reader
      */
     protected ConfigFile(SettingsReader reader)
@@ -42,6 +40,7 @@ public abstract class ConfigFile
     /**
      * Reads a setting. If the setting has an invalid value,
      * a message is logged and the default value is returned.
+     * @param <T>     Type of the setting value.
      * @param setting The setting to read.
      * @return The value of the setting.
      */
@@ -54,6 +53,7 @@ public abstract class ConfigFile
      * Reads a setting. This method allows you to provide another default
      * value. If the setting has an invalid value, a message is logged and
      * the default value is returned.
+     * @param <T>          Type of the setting value.
      * @param setting      The setting to read.
      * @param defaultValue Default value for the setting.
      * @return The value of the setting.

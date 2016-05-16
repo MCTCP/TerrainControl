@@ -84,6 +84,7 @@ public interface SettingsReader
      * Reads a setting. This method allows you to provide another default
      * value. If the setting has an invalid value, a message is logged and
      * the default value is returned.
+     * @param <S>          Type of the value of the setting.
      * @param setting      The setting to read.
      * @param defaultValue Default value for the setting.
      * @return The value of the setting.
@@ -117,6 +118,7 @@ public interface SettingsReader
     /**
      * Forces a setting to have another value when reading. Optional
      * operation, may have an empty implementation.
+     * @param <S>     Type of the value of the setting.
      * @param setting The setting to set.
      * @param value   The value of the setting.
      */

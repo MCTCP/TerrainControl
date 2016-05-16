@@ -1,9 +1,9 @@
 package com.khorn.terraincontrol.configuration.standard;
 
-import java.util.List;
-
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+
+import java.util.List;
 
 /**
  * Some default settings are provided by Mojang, so that they don't have to be

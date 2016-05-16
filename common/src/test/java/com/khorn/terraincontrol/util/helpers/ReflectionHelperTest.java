@@ -1,11 +1,11 @@
 package com.khorn.terraincontrol.util.helpers;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Rutger on 11-3-2016.

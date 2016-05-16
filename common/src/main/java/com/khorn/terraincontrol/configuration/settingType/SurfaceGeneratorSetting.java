@@ -2,8 +2,8 @@ package com.khorn.terraincontrol.configuration.settingType;
 
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.surface.MesaSurfaceGenerator;
-import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.MultipleLayersSurfaceGenerator;
+import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
 import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 

@@ -2,7 +2,6 @@ package com.khorn.terraincontrol.generator.biome.layers;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.exception;
 
-import java.util.Collection;
-
 import com.khorn.terraincontrol.util.helpers.StringHelper;
+
+import java.util.Collection;
 
 /**
  * Thrown when a biome is not found. This exception has been created to avoid

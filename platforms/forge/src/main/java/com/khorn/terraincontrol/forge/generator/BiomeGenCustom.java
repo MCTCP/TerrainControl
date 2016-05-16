@@ -5,8 +5,6 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.biome.BiomeGenBase;
 
 import java.util.List;

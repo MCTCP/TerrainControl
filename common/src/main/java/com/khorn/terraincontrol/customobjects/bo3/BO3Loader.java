@@ -1,12 +1,10 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.io.*;
 import java.util.HashMap;

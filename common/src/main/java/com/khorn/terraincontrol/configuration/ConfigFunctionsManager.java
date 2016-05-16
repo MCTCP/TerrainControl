@@ -51,6 +51,7 @@ public class ConfigFunctionsManager
 
     /**
      * Returns a config function with the given name.
+     * @param <T>                Type of the holder of the config function.
      * @param name               The name of the config function.
      * @param holder             The holder of the config function.
      *                           WorldConfig or BO3.

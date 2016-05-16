@@ -74,6 +74,7 @@ public interface SettingsWriter
 
     /**
      * Writes given setting to the config file.
+     * @param <S>     Type of the value of the setting.
      * @param setting The setting to write.
      * @param value   The value of the setting to write.
      * @throws IOException When an IO error occurs.

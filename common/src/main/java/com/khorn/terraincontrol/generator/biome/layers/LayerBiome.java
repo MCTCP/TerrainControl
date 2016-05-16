@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeGroup;
 import com.khorn.terraincontrol.configuration.BiomeGroupManager;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
+
 import java.util.Map.Entry;
 import java.util.SortedMap;
 

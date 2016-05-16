@@ -1,16 +1,17 @@
 package com.khorn.terraincontrol.configuration;
 
+import static com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup.fromJson;
+import static com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup.toJson;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RunWith(JUnit4.class)
 public class WeightedMobSpawnGroupTest
