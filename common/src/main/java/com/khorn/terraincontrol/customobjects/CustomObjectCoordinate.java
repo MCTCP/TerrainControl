@@ -8,7 +8,7 @@ import com.khorn.terraincontrol.util.Rotation;
 import java.util.Random;
 
 /**
- * Holds a custom object along with the absolute spawn coordinates.
+ * Represents an object along with its location in the world.
  */
 public class CustomObjectCoordinate
 {
@@ -53,24 +53,12 @@ public class CustomObjectCoordinate
         return object;
     }
 
-    /**
-     * Returns the object of this coordinate, casted to a
-     * StructuredCustomObject. Will throw a ClassCastExcpetion
-     * if the object isn't a StructuredCustomObject
-     *
-     * @return The casted object.
-     */
-    public StructuredCustomObject getStructuredObject()
-    {
-        return (StructuredCustomObject) object;
-    }
-
     public Rotation getRotation()
     {
         return rotation;
     }
 
-    public boolean spawnWithChecks(LocalWorld world, StructurePartSpawnHeight height, Random random)
+    boolean spawnWithChecks(LocalWorld world, StructurePartSpawnHeight height, Random random)
     {
         int y = height.getCorrectY(world, x, this.y, z);
         if (!object.canSpawnAt(world, rotation, x, y, z))
@@ -125,7 +113,7 @@ public class CustomObjectCoordinate
      * Gets the chunk that should populate for this object.
      * @return The chunk.
      */
-    public ChunkCoordinate getPopulatingChunk()
+    ChunkCoordinate getPopulatingChunk()
     {
         // In the past we simply returned the chunk populating for the origin
         // of the object. However, the origin is not guaranteed to be at the

@@ -2,15 +2,16 @@ package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.helpers.RandomHelper;
 
 import java.util.*;
 
 /**
- * This class creates the branch structure based on one parent object, and spawns all
- * objects that should spawn in a chunk.
- * 
- * Although it shouldn't be too slow to recalculate, a structure cache should be kept.
+ * Represents a collection of all {@link CustomObject}s in a structure. It is
+ * calculated by finding the branches of one object, then finding the branches
+ * of those branches, etc., until
+ * {@link StructuredCustomObject#getMaxBranchDepth()} is reached.
  *
  */
 public class CustomObjectStructure
@@ -19,20 +20,21 @@ public class CustomObjectStructure
     protected LocalWorld world;
     protected CustomObjectCoordinate start;
     protected StructurePartSpawnHeight height;
-    protected Map<ChunkCoordinate, Set<CustomObjectCoordinate>> objectsToSpawn;
-    protected int maxBranchDepth;
+    private Map<ChunkCoordinate, Set<CustomObjectCoordinate>> objectsToSpawn;
+    private int maxBranchDepth;
 
-    public CustomObjectStructure(LocalWorld world, CustomObjectCoordinate start)
+    CustomObjectStructure(LocalWorld world, CustomObjectCoordinate start)
     {
         if (!(start.getObject() instanceof StructuredCustomObject))
         {
             throw new IllegalArgumentException("Start object has to be a structure!");
         }
+        StructuredCustomObject object = (StructuredCustomObject) start.getObject();
 
         this.world = world;
         this.start = start;
-        this.height = start.getStructuredObject().getStructurePartSpawnHeight();
-        this.maxBranchDepth = start.getStructuredObject().getMaxBranchDepth();
+        this.height = object.getStructurePartSpawnHeight();
+        this.maxBranchDepth = object.getMaxBranchDepth();
         random = RandomHelper.getRandomForCoords(start.getX(), start.getY(), start.getZ(), world.getSeed());
 
         // Calculate all branches and add them to a list
@@ -43,7 +45,7 @@ public class CustomObjectStructure
 
     private void addBranches(CustomObjectCoordinate coordObject, int depth)
     {
-        for (Branch branch : coordObject.getStructuredObject().getBranches(coordObject.getRotation()))
+        for (Branch branch : getBranches(coordObject.getObject(), coordObject.getRotation()))
         {
             CustomObjectCoordinate childCoordObject = branch.toCustomObjectCoordinate(world, random, coordObject.getX(),
                     coordObject.getY(), coordObject.getZ());
@@ -65,12 +67,21 @@ public class CustomObjectStructure
         }
     }
 
+    private Branch[] getBranches(CustomObject customObject, Rotation rotation)
+    {
+        if (customObject instanceof StructuredCustomObject)
+        {
+            return ((StructuredCustomObject) customObject).getBranches(rotation);
+        }
+        return new Branch[0];
+    }
+
     /**
      * Adds the object to the spawn list of each chunk that the object
      * touches.
      * @param coordObject The object.
      */
-    void addToSpawnList(CustomObjectCoordinate coordObject)
+    private void addToSpawnList(CustomObjectCoordinate coordObject)
     {
         ChunkCoordinate chunkCoordinate = coordObject.getPopulatingChunk();
 
@@ -83,6 +94,10 @@ public class CustomObjectStructure
         objectsInChunk.add(coordObject);
     }
 
+    /**
+     * Spawns all the objects that should be spawned in that chunk.
+     * @param chunkCoordinate The chunk to spawn in.
+     */
     public void spawnForChunk(ChunkCoordinate chunkCoordinate)
     {
         Set<CustomObjectCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
