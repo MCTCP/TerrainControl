@@ -250,17 +250,6 @@ public class FileSettingsReader implements SettingsReader
         } catch (IOException e)
         {
             TerrainControl.printStackTrace(LogMarker.FATAL, e);
-
-            if (settingsReader != null)
-            {
-                try
-                {
-                    settingsReader.close();
-                } catch (IOException localIOException1)
-                {
-                    TerrainControl.printStackTrace(LogMarker.FATAL, localIOException1);
-                }
-            }
         } finally
         {
             if (settingsReader != null)
