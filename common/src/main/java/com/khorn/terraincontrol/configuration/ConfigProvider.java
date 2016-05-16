@@ -3,9 +3,6 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 
-import java.io.DataOutput;
-import java.io.IOException;
-
 /**
  * Provides the configuration objects of a world. This includes:
  *
@@ -44,13 +41,6 @@ public interface ConfigProvider
      * method does nothing.
      */
     void reload();
-
-    /**
-     * Writes the settings to the stream in the config packet format.
-     * @param stream The stream to write to.
-     * @throws IOException If an {@code IOException} is thrown by the stream.
-     */
-    void writeToStream(DataOutput stream) throws IOException;
 
     /**
      * Gets all custom objects of this world.

@@ -196,9 +196,9 @@ public class ForgeMaterialData implements LocalMaterialData
             // Use Minecraft's name
             if (nonDefaultData)
             {
-                return Block.blockRegistry.getNameForObject(blockData.getBlock()) + ":" + data;
+                return Block.REGISTRY.getNameForObject(blockData.getBlock()) + ":" + data;
             }
-            return Block.blockRegistry.getNameForObject(blockData.getBlock()).toString();
+            return Block.REGISTRY.getNameForObject(blockData.getBlock()).toString();
         } else
         {
             // Use our name
@@ -307,7 +307,7 @@ public class ForgeMaterialData implements LocalMaterialData
 
     @Override
     public boolean isAir() {
-        return blockData.getMaterial() == Material.air;
+        return blockData.getMaterial() == Material.AIR;
     }
 
     @Override

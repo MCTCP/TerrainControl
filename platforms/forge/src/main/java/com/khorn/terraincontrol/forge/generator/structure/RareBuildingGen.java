@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.forge.generator.structure;
 import com.google.common.collect.Iterables;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
-import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.entity.monster.EntityWitch;
@@ -36,11 +36,11 @@ public class RareBuildingGen extends MapGenStructure
     private int minDistanceBetweenScatteredFeatures;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public RareBuildingGen(WorldSettings configs)
+    public RareBuildingGen(ServerConfigProvider configs)
     {
         biomeList = new ArrayList<BiomeGenBase>();
 
-        for (LocalBiome biome : configs.biomes)
+        for (LocalBiome biome : configs.getBiomeArray())
         {
             if (biome == null)
                 continue;
@@ -51,9 +51,9 @@ public class RareBuildingGen extends MapGenStructure
         }
 
         this.scatteredFeatureSpawnList = new ArrayList();
-        this.maxDistanceBetweenScatteredFeatures = configs.worldConfig.maximumDistanceBetweenRareBuildings;
+        this.maxDistanceBetweenScatteredFeatures = configs.getWorldConfig().maximumDistanceBetweenRareBuildings;
         // Minecraft's internal minimum distance is one lower than TC's value
-        this.minDistanceBetweenScatteredFeatures = configs.worldConfig.minimumDistanceBetweenRareBuildings - 1;
+        this.minDistanceBetweenScatteredFeatures = configs.getWorldConfig().minimumDistanceBetweenRareBuildings - 1;
         this.scatteredFeatureSpawnList.add(new SpawnListEntry(EntityWitch.class, 1, 1, 1));
     }
 
@@ -111,7 +111,7 @@ public class RareBuildingGen extends MapGenStructure
 
     public boolean isSwampHutAtLocation(BlockPos blockPos)
     {
-        StructureStart structurestart = this.func_175797_c(blockPos);
+        StructureStart structurestart = this.getStructureAt(blockPos);
 
         if (structurestart != null && structurestart instanceof MapGenScatteredFeature.Start && !structurestart.getComponents().isEmpty())
         {

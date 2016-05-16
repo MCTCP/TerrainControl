@@ -1,8 +1,8 @@
 package com.khorn.terraincontrol.forge.events;
 
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.ClientConfigProvider;
 import com.khorn.terraincontrol.configuration.ConfigFile;
-import com.khorn.terraincontrol.configuration.WorldSettings;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -58,7 +58,7 @@ public class PacketHandler
                     DataInputStream wrappedStream = new DataInputStream(new ByteBufInputStream(stream));
                     String worldName = ConfigFile.readStringFromStream(wrappedStream);
                     ForgeWorld worldTC = new ForgeWorld(worldName);
-                    WorldSettings config = new WorldSettings(wrappedStream, worldTC);
+                    ClientConfigProvider config = new ClientConfigProvider(wrappedStream, worldTC);
                     wrappedStream.close();
 
                     worldTC.InitM(worldMC, config);

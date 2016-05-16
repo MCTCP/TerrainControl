@@ -88,7 +88,7 @@ public class TCBiomeProvider extends BiomeProvider
         // Hack for StructureVillagePieces.getNextComponentVillagePath(..)
         // (The alternative would be to completely override the village spawn
         // code)
-        if (paramList == MapGenVillage.villageSpawnBiomes)
+        if (paramList == MapGenVillage.VILLAGE_SPAWN_BIOMES)
         {
             paramList = localWorld.villageGen.villageSpawnBiomes;
         }

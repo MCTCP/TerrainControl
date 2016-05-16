@@ -69,7 +69,7 @@ public class OceanMonumentGen extends MapGenStructure
 
         if (k == i1 && l == j1)
         {
-            if (this.worldObj.getBiomeProvider().getBiomeGenerator(new BlockPos(k * 16 + 8, 64, l * 16 + 8), (BiomeGenBase) null) != Biomes.deepOcean)
+            if (this.worldObj.getBiomeProvider().getBiomeGenerator(new BlockPos(k * 16 + 8, 64, l * 16 + 8), (BiomeGenBase) null) != Biomes.DEEP_OCEAN)
             {
                 return false;
             }

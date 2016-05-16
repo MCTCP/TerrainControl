@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.bukkit.events;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.TCPlugin;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
+import com.khorn.terraincontrol.configuration.ConfigToNetworkSender;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.logging.LogMarker;
 import org.bukkit.World;
@@ -37,7 +38,7 @@ public class TCSender
             try
             {
                 stream.writeInt(PluginStandardValues.ProtocolVersion);
-                configs.writeToStream(stream);
+                ConfigToNetworkSender.send(configs, stream);
                 stream.flush();
             } catch (IOException e)
             {

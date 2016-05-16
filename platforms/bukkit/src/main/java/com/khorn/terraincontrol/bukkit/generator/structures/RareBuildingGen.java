@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
-import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.server.v1_9_R2.*;
 import net.minecraft.server.v1_9_R2.WorldGenRegistration.b;
@@ -32,11 +32,11 @@ public class RareBuildingGen extends StructureGenerator
      */
     private int minDistanceBetweenScatteredFeatures;
 
-    public RareBuildingGen(WorldSettings configs)
+    public RareBuildingGen(ServerConfigProvider configs)
     {
         biomeList = new ArrayList<BiomeBase>();
 
-        for (LocalBiome biome : configs.biomes)
+        for (LocalBiome biome : configs.getBiomeArray())
         {
             if (biome == null)
                 continue;
@@ -46,10 +46,10 @@ public class RareBuildingGen extends StructureGenerator
             }
         }
 
-        this.maxDistanceBetweenScatteredFeatures = configs.worldConfig.maximumDistanceBetweenRareBuildings;
+        this.maxDistanceBetweenScatteredFeatures = configs.getWorldConfig().maximumDistanceBetweenRareBuildings;
         // Minecraft's internal minimum distance is one chunk lower than TC's
         // value
-        this.minDistanceBetweenScatteredFeatures = configs.worldConfig.minimumDistanceBetweenRareBuildings - 1;
+        this.minDistanceBetweenScatteredFeatures = configs.getWorldConfig().minimumDistanceBetweenRareBuildings - 1;
     }
 
     @Override

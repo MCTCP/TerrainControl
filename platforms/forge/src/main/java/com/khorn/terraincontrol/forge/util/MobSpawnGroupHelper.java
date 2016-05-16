@@ -115,7 +115,7 @@ public final class MobSpawnGroupHelper
      */
     static Class<? extends EntityLiving> toMinecraftClass(String mobName)
     {
-        Class<? extends Entity> clazz = EntityList.stringToClassMapping.get(mobName);
+        Class<? extends Entity> clazz = EntityList.NAME_TO_CLASS.get(mobName);
         if (EntityLiving.class.isAssignableFrom(clazz))
         {
             return clazz.asSubclass(EntityLiving.class);
@@ -130,6 +130,6 @@ public final class MobSpawnGroupHelper
      */
     private static String fromMinecraftClass(Class<?> entityClass)
     {
-        return EntityList.classToStringMapping.get(entityClass);
+        return EntityList.CLASS_TO_NAME.get(entityClass);
     }
 }

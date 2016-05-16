@@ -8,7 +8,7 @@ import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
 import com.khorn.terraincontrol.bukkit.generator.structures.RareBuildingGen.RareBuildingStart;
 import com.khorn.terraincontrol.bukkit.generator.structures.VillageGen.VillageStart;
 import com.khorn.terraincontrol.bukkit.metrics.BukkitMetricsHelper;
-import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -135,7 +135,7 @@ public class TCPlugin extends JavaPlugin
 
         // Load settings
         File baseFolder = getWorldSettingsFolder(worldName);
-        WorldSettings configs = new WorldSettings(baseFolder, localWorld);
+        ServerConfigProvider configs = new ServerConfigProvider(baseFolder, localWorld);
         localWorld.setSettings(configs);
 
         // Add the world to the to-do list
@@ -143,7 +143,7 @@ public class TCPlugin extends JavaPlugin
 
         // Get the right chunk generator
         TCChunkGenerator generator = null;
-        switch (configs.worldConfig.ModeTerrain)
+        switch (configs.getWorldConfig().ModeTerrain)
         {
             case Normal:
             case TerrainTest:

@@ -8,9 +8,10 @@ import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryNamespaced;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
-import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ForgeBiome implements LocalBiome
 {
@@ -36,7 +37,8 @@ public class ForgeBiome implements LocalBiome
      */
     static void registerBiome(ForgeBiome forgeBiome)
     {
-        FMLControlledNamespacedRegistry<BiomeGenBase> registry = GameData.getBiomeRegistry();
+        GameRegistry.findRegistry(BiomeGenBase.class);
+        FMLControlledNamespacedRegistry<BiomeGenBase> registry = (FMLControlledNamespacedRegistry<BiomeGenBase>) BiomeGenBase.REGISTRY;
         ResourceLocation name;
         if (forgeBiome.isCustom())
         {

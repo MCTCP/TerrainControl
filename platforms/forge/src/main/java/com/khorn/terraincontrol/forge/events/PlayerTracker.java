@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.forge.events;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
+import com.khorn.terraincontrol.configuration.ConfigToNetworkSender;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -52,7 +53,7 @@ public class PlayerTracker
         try
         {
             stream.writeInt(PluginStandardValues.ProtocolVersion);
-            configs.writeToStream(stream);
+            ConfigToNetworkSender.send(configs, stream);
         } catch (IOException e)
         {
             TerrainControl.printStackTrace(LogMarker.FATAL, e);

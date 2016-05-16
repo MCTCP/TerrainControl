@@ -42,8 +42,8 @@ public class VillageStart extends StructureStart
 
         this.components.add(startPiece);
         startPiece.buildComponent(startPiece, this.components, random);
-        List<StructureComponent> var8 = startPiece.field_74930_j;
-        List<StructureComponent> var9 = startPiece.field_74932_i;
+        List<StructureComponent> var8 = startPiece.pendingRoads;
+        List<StructureComponent> var9 = startPiece.pendingHouses;
         int var10;
 
         while (!var8.isEmpty() || !var9.isEmpty())

@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.forge;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.TCBiomeProvider;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
@@ -60,8 +60,8 @@ public class TCWorldType extends WorldType
                 System.out.println("TerrainControl: cant create folder " + worldDirectory.getAbsolutePath());
         }
 
-        this.worldTC = new ForgeWorld(world.getSaveHandler().getWorldDirectory().getName());
-        WorldSettings config = new WorldSettings(worldDirectory, worldTC);
+        this.worldTC = new ForgeWorld(world.getWorldInfo().getWorldName());
+        ServerConfigProvider config = new ServerConfigProvider(worldDirectory, worldTC);
         this.worldTC.Init(world, config);
 
         Class<? extends BiomeGenerator> biomeGenClass = worldTC.getConfigs().getWorldConfig().biomeMode;

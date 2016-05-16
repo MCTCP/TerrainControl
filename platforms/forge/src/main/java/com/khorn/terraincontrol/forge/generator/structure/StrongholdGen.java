@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.configuration.WorldSettings;
+import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.util.math.BlockPos;
@@ -26,15 +26,15 @@ public class StrongholdGen extends MapGenStructure
     private double distance;
     private int spread;
 
-    public StrongholdGen(WorldSettings configs)
+    public StrongholdGen(ServerConfigProvider configs)
     {
-        this.distance = configs.worldConfig.strongholdDistance;
-        this.structureCoords = new ChunkCoordIntPair[configs.worldConfig.strongholdCount];
-        this.spread = configs.worldConfig.strongholdSpread;
+        this.distance = configs.getWorldConfig().strongholdDistance;
+        this.structureCoords = new ChunkCoordIntPair[configs.getWorldConfig().strongholdCount];
+        this.spread = configs.getWorldConfig().strongholdSpread;
 
         allowedBiomeGenBases = new ArrayList<BiomeGenBase>();
 
-        for (LocalBiome biome : configs.biomes)
+        for (LocalBiome biome : configs.getBiomeArray())
         {
             if (biome == null)
                 continue;

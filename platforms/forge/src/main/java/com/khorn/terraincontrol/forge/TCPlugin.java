@@ -3,12 +3,10 @@ package com.khorn.terraincontrol.forge;
 import com.google.common.base.Function;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.forge.events.*;
-import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
@@ -20,15 +18,11 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
-
-import javax.annotation.Nullable;
-import java.io.File;
 
 @Mod(modid = "TerrainControl", name = "TerrainControl", acceptableRemoteVersions = "*")
 public class TCPlugin

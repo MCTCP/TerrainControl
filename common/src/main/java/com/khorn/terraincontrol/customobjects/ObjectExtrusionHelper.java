@@ -53,7 +53,7 @@ public class ObjectExtrusionHelper
      * otherwise, nothing happens. Any blocks added to the list that are on a level not optimal to the current level
      * will be purged to create the optimal list of blocks to extrude
      *
-     * @param block
+     * @param block The block to add.
      */
     public void addBlock(BlockFunction block)
     {

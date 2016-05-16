@@ -16,7 +16,7 @@ public abstract class WorldHelper
      */
     public static LocalWorld toLocalWorld(World world)
     {
-        String worldName = world.getSaveHandler().getWorldDirectory().getName();
+        String worldName = world.getWorldInfo().getWorldName();
         return TerrainControl.getWorld(worldName);
     }
 

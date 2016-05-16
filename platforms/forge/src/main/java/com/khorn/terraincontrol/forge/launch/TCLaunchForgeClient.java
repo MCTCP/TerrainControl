@@ -17,7 +17,6 @@ public final class TCLaunchForgeClient
         LaunchEnvironment environment = new LaunchEnvironment();
         String[] requiredArgs = {"--version", environment.getMinecraftVersion(),
                 "--tweakClass", net.minecraftforge.fml.common.launcher.FMLTweaker.class.getName(),
-                "--tweakClass", "net.minecraftforge.gradle.tweakers.CoremodTweaker",
                 "--assetIndex", environment.getMinecraftVersion(),
                 "--assetsDir", environment.getAssetsPath(),
                 "--accessToken", "foo",

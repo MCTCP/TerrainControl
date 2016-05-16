@@ -164,7 +164,7 @@ public class SaplingListener
         }
 
         SaplingGrower saplingGrower = new SaplingGrower(localWorld, blockPos);
-        
+
         if (saplingGrower.saplingType == null)
         {
             // Unsupported sapling
@@ -185,7 +185,7 @@ public class SaplingListener
         event.setResult(Result.DENY);
 
         // Remove saplings
-        IBlockState air = Blocks.air.getDefaultState();
+        IBlockState air = Blocks.AIR.getDefaultState();
         boolean wideTrunk = saplingGrower.saplingType.requiresFourSaplings();
         if (wideTrunk)
         {
@@ -243,10 +243,10 @@ public class SaplingListener
 
         // Get sapling gen
         SaplingGen gen = null;
-        if (event.getBlock() == Blocks.red_mushroom_block)
+        if (event.getBlock() == Blocks.RED_MUSHROOM_BLOCK)
         {
             gen = getSaplingGen(localWorld, SaplingType.RedMushroom, event.getPos());
-        } else if (event.getBlock() == Blocks.brown_mushroom_block)
+        } else if (event.getBlock() == Blocks.BROWN_MUSHROOM_BLOCK)
         {
             gen = getSaplingGen(localWorld, SaplingType.BrownMushroom, event.getPos());
         }
@@ -258,7 +258,7 @@ public class SaplingListener
 
         // Generate mushroom
         event.setResult(Result.ALLOW);
-        event.getWorld().setBlockState(event.getPos(), Blocks.air.getDefaultState());
+        event.getWorld().setBlockState(event.getPos(), Blocks.AIR.getDefaultState());
 
         boolean mushroomGrown = false;
         Random random = new Random();
