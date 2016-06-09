@@ -29,6 +29,7 @@ public enum MobNames
     OCELOT("Ozelot", "ozelot", "Ocelot", "ocelot"),
     PIG("Pig", "pig"),
     PIG_ZOMBIE("PigZombie", "pigzombie", "pig_zombie"),
+    POLAR_BEAR("PolarBear", "polarbear", "polar_bear"),
     RABBIT("Rabbit", "rabbit"),
     SHEEP("Sheep", "sheep"),
     SILVERFISH("Silverfish", "silverfish", "silver_fish"),
