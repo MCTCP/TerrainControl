@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import net.minecraft.server.v1_9_R2.Block;
+import net.minecraft.server.v1_10_R1.Block;
 
 import java.io.File;
 

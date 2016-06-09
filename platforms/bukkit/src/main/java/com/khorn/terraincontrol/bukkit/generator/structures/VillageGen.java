@@ -1,5 +1,9 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
@@ -8,14 +12,17 @@ import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_9_R2.*;
-import net.minecraft.server.v1_9_R2.WorldGenVillagePieces.WorldGenVillagePieceWeight;
-import net.minecraft.server.v1_9_R2.WorldGenVillagePieces.WorldGenVillageRoadPiece;
-import net.minecraft.server.v1_9_R2.WorldGenVillagePieces.WorldGenVillageStartPiece;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import net.minecraft.server.v1_10_R1.BiomeBase;
+import net.minecraft.server.v1_10_R1.NBTTagCompound;
+import net.minecraft.server.v1_10_R1.StructureGenerator;
+import net.minecraft.server.v1_10_R1.StructurePiece;
+import net.minecraft.server.v1_10_R1.StructureStart;
+import net.minecraft.server.v1_10_R1.World;
+import net.minecraft.server.v1_10_R1.WorldGenVillagePieces;
+import net.minecraft.server.v1_10_R1.WorldGenVillagePieces.WorldGenVillagePieceWeight;
+import net.minecraft.server.v1_10_R1.WorldGenVillagePieces.WorldGenVillageRoadPiece;
+import net.minecraft.server.v1_10_R1.WorldGenVillagePieces.WorldGenVillageStartPiece;
 
 public class VillageGen extends StructureGenerator
 {
@@ -124,8 +131,8 @@ public class VillageGen extends StructureGenerator
 
             this.a.add(startPiece);
             startPiece.a(startPiece, this.a, random);
-            List<StructurePiece> arraylist1 = startPiece.g;
-            List<StructurePiece> arraylist2 = startPiece.f;
+            List<StructurePiece> arraylist1 = startPiece.f;
+            List<StructurePiece> arraylist2 = startPiece.e;
 
             int componentCount;
 

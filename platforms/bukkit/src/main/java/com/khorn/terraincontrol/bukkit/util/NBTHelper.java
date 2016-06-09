@@ -1,13 +1,25 @@
 package com.khorn.terraincontrol.bukkit.util;
 
-import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.logging.LogMarker;
-import com.khorn.terraincontrol.util.NamedBinaryTag;
-import net.minecraft.server.v1_9_R2.*;
-
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
+
+import net.minecraft.server.v1_10_R1.NBTBase;
+import net.minecraft.server.v1_10_R1.NBTTagByte;
+import net.minecraft.server.v1_10_R1.NBTTagByteArray;
+import net.minecraft.server.v1_10_R1.NBTTagCompound;
+import net.minecraft.server.v1_10_R1.NBTTagDouble;
+import net.minecraft.server.v1_10_R1.NBTTagFloat;
+import net.minecraft.server.v1_10_R1.NBTTagInt;
+import net.minecraft.server.v1_10_R1.NBTTagIntArray;
+import net.minecraft.server.v1_10_R1.NBTTagList;
+import net.minecraft.server.v1_10_R1.NBTTagLong;
+import net.minecraft.server.v1_10_R1.NBTTagShort;
+import net.minecraft.server.v1_10_R1.NBTTagString;
 
 public class NBTHelper
 {
@@ -100,7 +112,7 @@ public class NBTHelper
             return null;
         }
 
-        NamedBinaryTag.Type listType = NamedBinaryTag.Type.values()[nmsListTag.d()];
+        NamedBinaryTag.Type listType = NamedBinaryTag.Type.values()[nmsListTag.g()];
         NamedBinaryTag listTag = new NamedBinaryTag(name, listType);
 
         // Add all child tags
@@ -160,7 +172,7 @@ public class NBTHelper
             case TAG_Byte_Array:
                 return ((NBTTagByteArray) nmsTag).c();
             case TAG_String:
-                return ((NBTTagString) nmsTag).a_();
+                return ((NBTTagString) nmsTag).c_();
             case TAG_Int_Array:
                 return ((NBTTagIntArray) nmsTag).c();
             default:

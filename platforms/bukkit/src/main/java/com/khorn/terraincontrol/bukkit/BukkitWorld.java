@@ -17,9 +17,9 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
-import net.minecraft.server.v1_9_R2.*;
-import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_9_R2.generator.CustomChunkGenerator;
+import net.minecraft.server.v1_10_R1.*;
+import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_10_R1.generator.CustomChunkGenerator;
 
 import java.util.*;
 

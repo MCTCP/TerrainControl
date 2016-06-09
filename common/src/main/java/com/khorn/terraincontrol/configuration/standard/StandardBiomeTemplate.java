@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.configuration.standard;
 import static com.khorn.terraincontrol.configuration.standard.BiomeStandardValues.*;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.BiomeConfig.MineshaftType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
@@ -80,6 +81,7 @@ public class StandardBiomeTemplate
     public boolean defaultOceanMonuments = false;
     public VillageType defaultVillageType = VillageType.disabled;
     public RareBuildingType defaultRareBuildingType = RareBuildingType.disabled;
+    public MineshaftType defaultMineshaftType = MineshaftType.normal;
     public int defaultEmeraldOre = 0;
     public boolean defaultHasVines;
     public int defaultBoulder = 0;

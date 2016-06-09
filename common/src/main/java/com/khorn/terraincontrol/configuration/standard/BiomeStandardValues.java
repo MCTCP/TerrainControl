@@ -4,6 +4,7 @@ import static com.khorn.terraincontrol.TerrainControl.WORLD_DEPTH;
 import static com.khorn.terraincontrol.TerrainControl.WORLD_HEIGHT;
 
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.configuration.BiomeConfig.MineshaftType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix;
@@ -101,6 +102,7 @@ public class BiomeStandardValues extends Settings
             SPAWN_AMBIENT_CREATURES = mobGroupListSetting("SpawnAmbientCreatures");
 
     public static final Setting<VillageType> VILLAGE_TYPE = enumSetting("VillageType", VillageType.disabled);
+    public static final Setting<MineshaftType> MINESHAFT_TYPE = enumSetting("MineshaftType", MineshaftType.normal);
     public static final Setting<RareBuildingType> RARE_BUILDING_TYPE = enumSetting("RareBuildingType", RareBuildingType.disabled);
 
     public static final Setting<SurfaceGenerator> SURFACE_AND_GROUND_CONTROL = surfaceGeneratorSetting("SurfaceAndGroundControl");

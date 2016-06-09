@@ -124,25 +124,30 @@ public class BiomeConfig extends ConfigFile
 
     public enum VillageType
     {
-
         disabled,
         wood,
         sandstone
-
     }
 
     public VillageType villageType;
+
+    public enum MineshaftType
+    {
+        disabled,
+        normal,
+        mesa
+    }
+
+    public MineshaftType mineshaftType = MineshaftType.normal;
     public double mineshaftsRarity;
 
     public enum RareBuildingType
     {
-
         disabled,
         desertPyramid,
         jungleTemple,
         swampHut,
         igloo
-
     }
 
     public RareBuildingType rareBuildingType;
@@ -335,6 +340,7 @@ public class BiomeConfig extends ConfigFile
         this.netherFortressesEnabled = readSettings(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, true);
         this.villageType = readSettings(BiomeStandardValues.VILLAGE_TYPE, defaultSettings.defaultVillageType);
         this.mineshaftsRarity = readSettings(BiomeStandardValues.MINESHAFT_RARITY);
+        this.mineshaftType = readSettings(BiomeStandardValues.MINESHAFT_TYPE, defaultSettings.defaultMineshaftType);
         this.rareBuildingType = readSettings(BiomeStandardValues.RARE_BUILDING_TYPE, defaultSettings.defaultRareBuildingType);
 
         if (this.defaultSettings.isCustomBiome)
@@ -802,7 +808,12 @@ public class BiomeConfig extends ConfigFile
         writer.comment("The village type in this biome. Can be wood, sandstone or disabled.");
         writer.setting(BiomeStandardValues.VILLAGE_TYPE, villageType);
 
+        writer.comment("The mineshaft type in this biome. Can be normal, mesa or disabled.");
+        writer.setting(BiomeStandardValues.MINESHAFT_TYPE, mineshaftType);
+
         writer.comment("The mineshaft rarity from 0 to 100. 0 = no mineshafts, 1 = default rarity, 100 = a wooden chaos.");
+        writer.comment("Note that mineshafts will never spawn, regardless of this setting, if ");
+        writer.comment(BiomeStandardValues.MINESHAFT_TYPE + " was set to " + MineshaftType.disabled);
         writer.setting(BiomeStandardValues.MINESHAFT_RARITY, mineshaftsRarity);
 
         writer.comment("The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut, igloo or disabled.");

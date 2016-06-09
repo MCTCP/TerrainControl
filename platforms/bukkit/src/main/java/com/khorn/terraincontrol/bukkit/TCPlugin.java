@@ -13,7 +13,7 @@ import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_9_R2.WorldGenFactory;
+import net.minecraft.server.v1_10_R1.WorldGenFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;

@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.configuration.standard;
 
+import com.khorn.terraincontrol.configuration.BiomeConfig.MineshaftType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.generator.surface.MesaSurfaceGenerator;
@@ -619,6 +620,7 @@ public class MinecraftBiomeTemplates
             this.defaultReed = 5;
             this.defaultCactus = 10;
             this.defaultGrass = 0;
+            this.defaultMineshaftType = MineshaftType.mesa;
         }
     }
 
