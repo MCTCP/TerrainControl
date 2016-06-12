@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.MaterialSet;
+import com.khorn.terraincontrol.util.helpers.RandomHelper;
 
 import java.util.List;
 import java.util.Random;
@@ -19,7 +20,7 @@ public class PlantGen extends Resource
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
-        int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
+        int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
         for (int i = 0; i < 64; i++)
         {
@@ -47,7 +48,7 @@ public class PlantGen extends Resource
         frequency = readInt(args.get(1), 1, 100);
         rarity = readRarity(args.get(2));
         minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude, TerrainControl.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 5);
     }
 
@@ -86,6 +87,7 @@ public class PlantGen extends Resource
                    : this.sourceBlocks.equals(compare.sourceBlocks));
     }
 
+    @Override
     public int getPriority()
     {
         return -33;

@@ -9,10 +9,10 @@ import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.server.v1_10_R1.*;
-import net.minecraft.server.v1_10_R1.WorldGenRegistration.b;
 import net.minecraft.server.v1_10_R1.WorldGenRegistration.WorldGenJungleTemple;
 import net.minecraft.server.v1_10_R1.WorldGenRegistration.WorldGenPyramidPiece;
 import net.minecraft.server.v1_10_R1.WorldGenRegistration.WorldGenWitchHut;
+import net.minecraft.server.v1_10_R1.WorldGenRegistration.b;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,8 +74,8 @@ public class RareBuildingGen extends StructureGenerator
         Random random = this.g.a(var5, var6, 14357617);
         var5 *= this.maxDistanceBetweenScatteredFeatures;
         var6 *= this.maxDistanceBetweenScatteredFeatures;
-        var5 += random.nextInt(this.maxDistanceBetweenScatteredFeatures - this.minDistanceBetweenScatteredFeatures);
-        var6 += random.nextInt(this.maxDistanceBetweenScatteredFeatures - this.minDistanceBetweenScatteredFeatures);
+        var5 += random.nextInt(this.maxDistanceBetweenScatteredFeatures - this.minDistanceBetweenScatteredFeatures + 1);
+        var6 += random.nextInt(this.maxDistanceBetweenScatteredFeatures - this.minDistanceBetweenScatteredFeatures + 1);
 
         if (var3 == var5 && var4 == var6)
         {

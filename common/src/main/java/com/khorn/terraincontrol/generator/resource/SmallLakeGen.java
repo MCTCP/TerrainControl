@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.helpers.RandomHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Arrays;
@@ -29,7 +30,7 @@ public class SmallLakeGen extends Resource
         x -= 8;
         z -= 8;
 
-        int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
+        int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
         // Search any free space
         while ((y > 5) && (world.isEmpty(x, y, z)))
@@ -126,7 +127,7 @@ public class SmallLakeGen extends Resource
         frequency = readInt(args.get(1), 1, 100);
         rarity = readRarity(args.get(2));
         minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override
@@ -166,6 +167,7 @@ public class SmallLakeGen extends Resource
                && Arrays.equals(this.BooleanBuffer, compare.BooleanBuffer);
     }
 
+    @Override
     public int getPriority()
     {
         return 1;

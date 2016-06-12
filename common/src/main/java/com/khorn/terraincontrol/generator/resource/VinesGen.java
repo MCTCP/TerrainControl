@@ -22,7 +22,7 @@ public class VinesGen extends Resource
         int _z = z;
         int y = minAltitude;
 
-        while (y < maxAltitude)
+        while (y <= maxAltitude)
         {
             if (world.isEmpty(_x, y, _z))
             {
@@ -85,7 +85,7 @@ public class VinesGen extends Resource
         frequency = readInt(args.get(0), 1, 100);
         rarity = readRarity(args.get(1));
         minAltitude = readInt(args.get(2), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(3), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(3), minAltitude, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override
@@ -120,6 +120,7 @@ public class VinesGen extends Resource
         return hash;
     }
 
+    @Override
     public int getPriority()
     {
         return -50;

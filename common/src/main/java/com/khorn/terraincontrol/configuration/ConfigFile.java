@@ -129,17 +129,17 @@ public abstract class ConfigFile
     }
 
     /**
-     * Silently corrects the given number so that it is higher than the
-     * minimum value.
+     * Silently corrects the given number so that it is higher than or equal to
+     * the minimum value.
      * @param currentValue The current value, will be corrected if needed.
      * @param minimumValue The minimum value.
      * @return The corrected value.
      */
-    protected final int higherThan(int currentValue, int minimumValue)
+    protected final int higherThanOrEqualTo(int currentValue, int minimumValue)
     {
-        if (currentValue <= minimumValue)
+        if (currentValue < minimumValue)
         {
-            return minimumValue + 1;
+            return minimumValue;
         }
         return currentValue;
     }

@@ -129,14 +129,14 @@ public class BiomeStandardValues extends Settings
     public static final int SmallLakeWaterRarity = 7;
     public static final int SmallLakeLavaRarity = 1;
     public static final int SmallLakeMinAltitude = 8;
-    public static final int SmallLakeMaxAltitude = 120;
+    public static final int SmallLakeMaxAltitude = 119;
 
     public static final int undergroundLakeFrequency = 2;
     public static final int undergroundLakeRarity = 5;
     public static final int undergroundLakeMinSize = 50;
     public static final int undergroundLakeMaxSize = 60;
     public static final int undergroundLakeMinAltitude = 0;
-    public static final int undergroundLakeMaxAltitude = 50;
+    public static final int undergroundLakeMaxAltitude = 49;
 
     public static final int dungeonRarity = 100;
     public static final int dungeonFrequency = 8;
@@ -146,73 +146,73 @@ public class BiomeStandardValues extends Settings
     public static final int dirtDepositFrequency = 10;
     public static final int dirtDepositSize = 33;
     public static final int dirtDepositMinAltitude = 0;
-    public static final int dirtDepositMaxAltitude = 256;
+    public static final int dirtDepositMaxAltitude = 255;
 
     public static final int gravelDepositRarity = 100;
     public static final int gravelDepositFrequency = 8;
     public static final int gravelDepositSize = 33;
     public static final int gravelDepositMinAltitude = 0;
-    public static final int gravelDepositMaxAltitude = 256;
+    public static final int gravelDepositMaxAltitude = 255;
 
     public static final int graniteDepositRarity = 100;
     public static final int graniteDepositFrequency = 10;
     public static final int graniteDepositSize = 33;
     public static final int graniteDepositMinAltitude = 0;
-    public static final int graniteDepositMaxAltitude = 80;
+    public static final int graniteDepositMaxAltitude = 79;
 
     public static final int dioriteDepositRarity = 100;
     public static final int dioriteDepositFrequency = 10;
     public static final int dioriteDepositSize = 33;
     public static final int dioriteDepositMinAltitude = 0;
-    public static final int dioriteDepositMaxAltitude = 80;
+    public static final int dioriteDepositMaxAltitude = 79;
 
     public static final int andesiteDepositRarity = 100;
     public static final int andesiteDepositFrequency = 10;
     public static final int andesiteDepositSize = 33;
     public static final int andesiteDepositMinAltitude = 0;
-    public static final int andesiteDepositMaxAltitude = 80;
+    public static final int andesiteDepositMaxAltitude = 79;
 
     public static final int coalDepositRarity = 100;
     public static final int coalDepositFrequency = 20;
     public static final int coalDepositSize = 17;
     public static final int coalDepositMinAltitude = 0;
-    public static final int coalDepositMaxAltitude = 128;
+    public static final int coalDepositMaxAltitude = 127;
 
     public static final int ironDepositRarity = 100;
     public static final int ironDepositFrequency = 20;
     public static final int ironDepositSize = 9;
     public static final int ironDepositMinAltitude = 0;
-    public static final int ironDepositMaxAltitude = 64;
+    public static final int ironDepositMaxAltitude = 63;
 
     public static final int goldDepositRarity = 100;
     public static final int goldDepositFrequency = 2;
     public static final int goldDepositSize = 9;
     public static final int goldDepositMinAltitude = 0;
-    public static final int goldDepositMaxAltitude = 32;
+    public static final int goldDepositMaxAltitude = 31;
 
     public static final int redstoneDepositRarity = 100;
     public static final int redstoneDepositFrequency = 8;
     public static final int redstoneDepositSize = 8;
     public static final int redstoneDepositMinAltitude = 0;
-    public static final int redstoneDepositMaxAltitude = 16;
+    public static final int redstoneDepositMaxAltitude = 15;
 
     public static final int diamondDepositRarity = 100;
     public static final int diamondDepositFrequency = 1;
     public static final int diamondDepositSize = 8;
     public static final int diamondDepositMinAltitude = 0;
-    public static final int diamondDepositMaxAltitude = 16;
+    public static final int diamondDepositMaxAltitude = 15;
 
     public static final int lapislazuliDepositRarity = 100;
     public static final int lapislazuliDepositFrequency = 1;
     public static final int lapislazuliDepositSize = 7;
     public static final int lapislazuliDepositMinAltitude = 0;
-    public static final int lapislazuliDepositMaxAltitude = 16;
+    public static final int lapislazuliDepositMaxAltitude = 15;
 
     public static final int emeraldDepositRarity = 100;
     public static final int emeraldDepositFrequency = 1;
     public static final int emeraldDepositSize = 5;
     public static final int emeraldDepositMinAltitude = 4;
-    public static final int emeraldDepositMaxAltitude = 32;
+    public static final int emeraldDepositMaxAltitude = 31;
 
     public static final int waterClayDepositRarity = 100;
     public static final int waterClayDepositFrequency = 1;
@@ -226,24 +226,20 @@ public class BiomeStandardValues extends Settings
 
     public static final int roseDepositRarity = 100;
     public static final int roseDepositMinAltitude = 0;
-    public static final int roseDepositMaxAltitude = 128;
 
     public static final int blueOrchidDepositRarity = 100;
     public static final int blueOrchidDepositMinAltitude = 0;
 
     public static final int flowerDepositRarity = 100;
     public static final int flowerDepositMinAltitude = 0;
-    public static final int flowerDepositMaxAltitude = 128;
 
     public static final int tulipDepositRarity = 25;
 
     public static final int redMushroomDepositRarity = 12;
     public static final int redMushroomDepositMinAltitude = 0;
-    public static final int redMushroomDepositMaxAltitude = 128;
 
     public static final int brownMushroomDepositRarity = 25;
     public static final int brownMushroomDepositMinAltitude = 0;
-    public static final int brownMushroomDepositMaxAltitude = 128;
 
     public static final int longGrassDepositRarity = 100;
     public static final int longGrassGroupedDepositRarity = 60;
@@ -256,29 +252,24 @@ public class BiomeStandardValues extends Settings
     public static final int pumpkinDepositRarity = 3;
     public static final int pumpkinDepositFrequency = 1;
     public static final int pumpkinDepositMinAltitude = 0;
-    public static final int pumpkinDepositMaxAltitude = 128;
 
     public static final int reedDepositRarity = 100;
     public static final int reedDepositMinAltitude = 0;
-    public static final int reedDepositMaxAltitude = 128;
 
     public static final int cactusDepositRarity = 100;
     public static final int cactusDepositMinAltitude = 0;
-    public static final int cactusDepositMaxAltitude = 128;
 
     public static final int vinesRarity = 100;
     public static final int vinesFrequency = 50;
-    public static final int vinesMinAltitude = 64;
+    public static final int vinesMinAltitude = 63;
 
     public static final int waterSourceDepositRarity = 100;
     public static final int waterSourceDepositFrequency = 20;
     public static final int waterSourceDepositMinAltitude = 8;
-    public static final int waterSourceDepositMaxAltitude = 128;
 
     public static final int lavaSourceDepositRarity = 100;
     public static final int lavaSourceDepositFrequency = 10;
     public static final int lavaSourceDepositMinAltitude = 8;
-    public static final int lavaSourceDepositMaxAltitude = 128;
 
     public static final int boulderDepositRarity = 30;
     public static final int boulderDepositMinAltitude = 0;

@@ -13,6 +13,7 @@ import com.khorn.terraincontrol.util.BoundingBox;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
+import com.khorn.terraincontrol.util.helpers.RandomHelper;
 
 import java.io.File;
 import java.util.Map;
@@ -191,7 +192,7 @@ public class BO3 implements StructuredCustomObject
         }
         if (settings.spawnHeight == SpawnHeightEnum.randomY)
         {
-            y = MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight);
+            y = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
         }
         if (settings.spawnHeight == SpawnHeightEnum.highestBlock)
         {
@@ -277,7 +278,7 @@ public class BO3 implements StructuredCustomObject
         if (settings.rarity > random.nextDouble() * 100.0)
         {
             Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
-            int height = MathHelper.getRandomNumberInRange(random, settings.minHeight, settings.maxHeight);
+            int height = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
             return new CustomObjectCoordinate(
                     this, rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16)
             );

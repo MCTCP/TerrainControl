@@ -8,16 +8,17 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
+import com.khorn.terraincontrol.util.helpers.RandomHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Random;
 
-public class CanyonsGen extends TerrainGenBase
+public class RavinesGen extends TerrainGenBase
 {
     private float[] a = new float[1024];
     private WorldConfig worldSettings;
 
-    public CanyonsGen(WorldConfig wrk, LocalWorld world)
+    public RavinesGen(WorldConfig wrk, LocalWorld world)
     {
         super(world);
         this.worldSettings = wrk;
@@ -188,10 +189,10 @@ public class CanyonsGen extends TerrainGenBase
     @Override
     protected void generateChunk(ChunkCoordinate currentChunk, ChunkBuffer generatingChunkBuffer)
     {
-        if (this.random.nextInt(100) >= this.worldSettings.canyonRarity)
+        if (this.random.nextInt(100) >= this.worldSettings.ravineRarity)
             return;
         double d1 = currentChunk.getBlockX() + this.random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-        double d2 = this.random.nextInt(this.worldSettings.canyonMaxAltitude - this.worldSettings.canyonMinAltitude) + this.worldSettings.canyonMinAltitude;
+        double d2 = RandomHelper.numberInRange(random, this.worldSettings.ravineMinAltitude, this.worldSettings.ravineMaxAltitude);
         double d3 = currentChunk.getBlockZ() + this.random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
         int i = 1;
@@ -202,9 +203,9 @@ public class CanyonsGen extends TerrainGenBase
             float f2 = (this.random.nextFloat() - 0.5F) * 2.0F / 8.0F;
             float f3 = (this.random.nextFloat() * 2.0F + this.random.nextFloat()) * 2.0F;
 
-            int size = this.random.nextInt(this.worldSettings.canyonMaxLength - this.worldSettings.canyonMinLength) + this.worldSettings.canyonMinLength;
+            int size = RandomHelper.numberInRange(random, this.worldSettings.ravineMinLength, this.worldSettings.ravineMaxLength);
 
-            a(this.random.nextLong(), generatingChunkBuffer, d1, d2, d3, f3, f1, f2, size, this.worldSettings.canyonDepth);
+            a(this.random.nextLong(), generatingChunkBuffer, d1, d2, d3, f3, f1, f2, size, this.worldSettings.ravineDepth);
         }
     }
 }

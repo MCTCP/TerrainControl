@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
+import com.khorn.terraincontrol.util.helpers.RandomHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Random;
@@ -276,9 +277,9 @@ public class CavesGen extends TerrainGenBase
             double y;
 
             if (this.worldSettings.evenCaveDistribution)
-                y = this.random.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude) + this.worldSettings.caveMinAltitude;
+                y = RandomHelper.numberInRange(random, this.worldSettings.caveMinAltitude, this.worldSettings.caveMaxAltitude);
             else
-                y = this.random.nextInt(this.random.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude) + 1) + this.worldSettings.caveMinAltitude;
+                y = this.random.nextInt(this.random.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude + 1) + 1) + this.worldSettings.caveMinAltitude;
 
             double z = chunkCoord.getBlockZ() + this.random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
@@ -292,7 +293,7 @@ public class CavesGen extends TerrainGenBase
 
             if ((largeCaveSpawned) || (this.random.nextInt(100) <= this.worldSettings.caveSystemPocketChance - 1))
             {
-                count += this.random.nextInt(this.worldSettings.caveSystemPocketMaxSize - this.worldSettings.caveSystemPocketMinSize) + this.worldSettings.caveSystemPocketMinSize;
+                count += RandomHelper.numberInRange(random, this.worldSettings.caveSystemPocketMinSize, this.worldSettings.caveSystemPocketMaxSize);
             }
             while (count > 0)
             {

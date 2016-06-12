@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
+import com.khorn.terraincontrol.util.helpers.RandomHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.List;
@@ -21,11 +22,11 @@ public class UndergroundLakeGen extends Resource
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
-        int y = rand.nextInt(maxAltitude - minAltitude) + minAltitude;
+        int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
         if (y >= world.getHighestBlockYAt(x, z))
             return;
-        int size = rand.nextInt(maxSize - minSize) + minSize;
+        int size = RandomHelper.numberInRange(rand, minSize, maxSize);
 
         float mPi = rand.nextFloat() * 3.141593F;
 
@@ -85,11 +86,11 @@ public class UndergroundLakeGen extends Resource
 
         assureSize(6, args);
         minSize = readInt(args.get(0), 1, 25);
-        maxSize = readInt(args.get(1), minSize + 1, 60);
+        maxSize = readInt(args.get(1), minSize, 60);
         frequency = readInt(args.get(2), 1, 100);
         rarity = readRarity(args.get(3));
         minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(5), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(5), minAltitude, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override
@@ -128,6 +129,7 @@ public class UndergroundLakeGen extends Resource
                && this.maxSize == compare.maxSize;
     }
 
+    @Override
     public int getPriority()
     {
         return 3;

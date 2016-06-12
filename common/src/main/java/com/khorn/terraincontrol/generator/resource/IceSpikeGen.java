@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
+import com.khorn.terraincontrol.util.helpers.RandomHelper;
 
 import java.util.List;
 import java.util.Random;
@@ -79,7 +80,7 @@ public class IceSpikeGen extends Resource
 
     public void spawnBasement(LocalWorld world, Random random,int x, int z)
     {
-        int y = MathHelper.getRandomNumberInRange(random, this.minAltitude, this.maxAltitude);
+        int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
 
         while ((world.isEmpty(x, y, z)) && (y > 2))
         {
@@ -114,7 +115,7 @@ public class IceSpikeGen extends Resource
 
     public void spawnSpike(LocalWorld par1World, Random random, int x, int z, boolean hugeSpike)
     {
-        int y = MathHelper.getRandomNumberInRange(random, minAltitude, maxAltitude);
+        int y = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
         while (par1World.isEmpty(x, y, z) && y > 2)
         {
             --y;
@@ -140,7 +141,7 @@ public class IceSpikeGen extends Resource
 
         for (var8 = 0; var8 < var6; ++var8)
         {
-            float var9 = (1.0F - (float) var8 / (float) var6) * (float) var7;
+            float var9 = (1.0F - (float) var8 / (float) var6) * var7;
             var10 = MathHelper.ceil(var9);
 
             for (var11 = -var10; var11 <= var10; ++var11)
@@ -234,6 +235,7 @@ public class IceSpikeGen extends Resource
         return super.isAnalogousTo(other) && ((IceSpikeGen) other).type == this.type;
     }
 
+    @Override
     public int getPriority()
     {
         return -21;

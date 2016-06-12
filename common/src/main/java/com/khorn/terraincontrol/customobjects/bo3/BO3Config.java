@@ -306,7 +306,7 @@ public class BO3Config extends ConfigFile
     @Override
     protected void correctSettings()
     {
-        maxHeight = higherThan(maxHeight, minHeight);
+        maxHeight = higherThanOrEqualTo(maxHeight, minHeight);
     }
 
     @Override

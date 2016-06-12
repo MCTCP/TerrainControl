@@ -37,7 +37,7 @@ public class ChunkProviderTC
     private final ConfigProvider configProvider;
 
     private final TerrainGenBase caveGen;
-    private final TerrainGenBase canyonGen;
+    private final TerrainGenBase ravineGen;
 
     private int[] biomeArray;
     // Water level for each column
@@ -59,7 +59,7 @@ public class ChunkProviderTC
         this.noiseGen4 = new NoiseGeneratorNewOctaves(this.random, 4);
 
         this.caveGen = new CavesGen(configs.getWorldConfig(), this.localWorld);
-        this.canyonGen = new CanyonsGen(configs.getWorldConfig(), this.localWorld);
+        this.ravineGen = new RavinesGen(configs.getWorldConfig(), this.localWorld);
     }
 
     public void generate(ChunkBuffer chunkBuffer)
@@ -74,7 +74,7 @@ public class ChunkProviderTC
         boolean dry = addBiomeBlocksAndCheckWater(chunkBuffer);
 
         this.caveGen.generate(chunkBuffer);
-        this.canyonGen.generate(chunkBuffer);
+        this.ravineGen.generate(chunkBuffer);
 
         WorldConfig worldConfig = configProvider.getWorldConfig();
         if (worldConfig.ModeTerrain == WorldConfig.TerrainMode.Normal || worldConfig.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)

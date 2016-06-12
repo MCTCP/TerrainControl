@@ -26,6 +26,19 @@ public class RandomHelper
         random.setSeed(x * l1 + z * l2 ^ seed);
         return random;
     }
+
+    /**
+     * Returns a random number between min and max, inclusive.
+     * 
+     * @param random The random number generator.
+     * @param min The minimum value.
+     * @param max The maximum value.
+     * @return A random number between min and max, inclusive.
+     */
+    public static int numberInRange(Random random, int min, int max)
+    {
+        return min + random.nextInt(max - min + 1);
+    }
     
     /**
      * Gets a Random generator with a random seed. However, the same input

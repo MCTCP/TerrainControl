@@ -76,7 +76,7 @@ public class BoulderGen extends Resource
         frequency = readInt(args.get(1), 1, 5000);
         rarity = readRarity(args.get(2));
         minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude, TerrainControl.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 5);
     }
 
@@ -86,6 +86,7 @@ public class BoulderGen extends Resource
         return "Boulder(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
 
+    @Override
     public int getPriority()
     {
         return -22;

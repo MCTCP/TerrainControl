@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
+import com.khorn.terraincontrol.util.helpers.RandomHelper;
 
 import java.util.Random;
 
@@ -54,7 +55,7 @@ class Vein
             if (random.nextInt(100) < gen.oreRarity)
             {
                 int oreX = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-                int oreY = MathHelper.getRandomNumberInRange(random, gen.minAltitude, gen.maxAltitude);
+                int oreY = RandomHelper.numberInRange(random, gen.minAltitude, gen.maxAltitude);
                 int oreZ = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
                 if ((oreX - x) * (oreX - x) + (oreY - y) * (oreY - y) + (oreZ - z) * (oreZ - z) < sizeSquared)

@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.io.SettingsReader;
 import com.khorn.terraincontrol.configuration.io.SettingsWriter;
+import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
@@ -108,13 +109,13 @@ public class WorldConfig extends ConfigFile
     public int caveSystemPocketMaxSize;
     public boolean evenCaveDistribution;
 
-    // Canyons
-    public int canyonRarity;
-    public int canyonMinAltitude;
-    public int canyonMaxAltitude;
-    public int canyonMinLength;
-    public int canyonMaxLength;
-    public double canyonDepth;
+    // Ravines
+    public int ravineRarity;
+    public int ravineMinAltitude;
+    public int ravineMaxAltitude;
+    public int ravineMinLength;
+    public int ravineMaxLength;
+    public double ravineDepth;
 
     // Strongholds
     public boolean strongholdsEnabled;
@@ -274,6 +275,30 @@ public class WorldConfig extends ConfigFile
             this.reader.addConfigFunction(normalGroup);
             this.reader.addConfigFunction(iceGroup);
         }
+
+        // Migrate bounds
+        if (this.reader.hasSetting(WorldStandardValues.CANYON_DEPTH))
+        {
+            renameOldSetting("CanyonDepth", WorldStandardValues.RAVINE_DEPTH);
+            renameOldSetting("CanyonRarity", WorldStandardValues.RAVINE_RARITY);
+            renameOldSetting("CanyonMinAltitude", WorldStandardValues.RAVINE_MIN_ALTITUDE);
+            renameOldSetting("CanyonMaxAltitude", WorldStandardValues.RAVINE_MAX_ALTITUDE);
+            renameOldSetting("CanyonMinLength", WorldStandardValues.RAVINE_MIN_LENGTH);
+            renameOldSetting("CanyonMaxLength", WorldStandardValues.RAVINE_MAX_LENGTH);
+
+            decrementByOne(WorldStandardValues.CAVE_MAX_ALTITUDE);
+            decrementByOne(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE);
+            decrementByOne(WorldStandardValues.RAVINE_MAX_ALTITUDE);
+            decrementByOne(WorldStandardValues.RAVINE_MAX_LENGTH);
+        }
+    }
+
+    private void decrementByOne(Setting<Integer> setting)
+    {
+        if (this.reader.hasSetting(setting))
+        {
+            this.reader.putSetting(setting, this.reader.getSetting(setting, setting.getDefaultValue()) - 1);
+        }
     }
 
     @Override
@@ -304,14 +329,14 @@ public class WorldConfig extends ConfigFile
         maxMoisture = higherThan(maxMoisture, minMoisture);
         maxTemperature = higherThan(maxTemperature, minTemperature);
 
-        caveMaxAltitude = higherThan(caveMaxAltitude, caveMinAltitude);
-        caveSystemPocketMaxSize = higherThan(caveSystemPocketMaxSize, caveSystemPocketMinSize);
-        canyonMaxAltitude = higherThan(canyonMaxAltitude, canyonMinAltitude);
-        canyonMaxLength = higherThan(canyonMaxLength, canyonMinLength);
+        caveMaxAltitude = higherThanOrEqualTo(caveMaxAltitude, caveMinAltitude);
+        caveSystemPocketMaxSize = higherThanOrEqualTo(caveSystemPocketMaxSize, caveSystemPocketMinSize);
+        ravineMaxAltitude = higherThanOrEqualTo(ravineMaxAltitude, ravineMinAltitude);
+        ravineMaxLength = higherThanOrEqualTo(ravineMaxLength, ravineMinLength);
 
-        waterLevelMax = higherThan(waterLevelMax, waterLevelMin);
+        waterLevelMax = higherThanOrEqualTo(waterLevelMax, waterLevelMin);
 
-        maximumDistanceBetweenRareBuildings = higherThan(maximumDistanceBetweenRareBuildings, minimumDistanceBetweenRareBuildings);
+        maximumDistanceBetweenRareBuildings = higherThanOrEqualTo(maximumDistanceBetweenRareBuildings, minimumDistanceBetweenRareBuildings);
         oceanMonumentRandomOffset = lowerThanOrEqualTo(oceanMonumentRandomOffset, oceanMonumentGridSize);
 
         if (biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && ModeTerrain != TerrainMode.OldGenerator)
@@ -432,13 +457,13 @@ public class WorldConfig extends ConfigFile
         this.caveSystemPocketMaxSize = readSettings(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE);
         this.evenCaveDistribution = readSettings(WorldStandardValues.EVEN_CAVE_DISTRIBUTION);
 
-        // Canyons
-        this.canyonRarity = readSettings(WorldStandardValues.CANYON_RARITY);
-        this.canyonMinAltitude = readSettings(WorldStandardValues.CANYON_MIN_ALTITUDE);
-        this.canyonMaxAltitude = readSettings(WorldStandardValues.CANYON_MAX_ALTITUDE);
-        this.canyonMinLength = readSettings(WorldStandardValues.CANYON_MIN_LENGTH);
-        this.canyonMaxLength = readSettings(WorldStandardValues.CANYON_MAX_LENGTH);
-        this.canyonDepth = readSettings(WorldStandardValues.CANYON_DEPTH);
+        // Ravines
+        this.ravineRarity = readSettings(WorldStandardValues.RAVINE_RARITY);
+        this.ravineMinAltitude = readSettings(WorldStandardValues.RAVINE_MIN_ALTITUDE);
+        this.ravineMaxAltitude = readSettings(WorldStandardValues.RAVINE_MAX_ALTITUDE);
+        this.ravineMinLength = readSettings(WorldStandardValues.RAVINE_MIN_LENGTH);
+        this.ravineMaxLength = readSettings(WorldStandardValues.RAVINE_MAX_LENGTH);
+        this.ravineDepth = readSettings(WorldStandardValues.RAVINE_DEPTH);
 
         // Water
         this.waterLevelMax = readSettings(WorldStandardValues.WATER_LEVEL_MAX);
@@ -955,14 +980,14 @@ public class WorldConfig extends ConfigFile
         writer.comment("load times at world creation.");
         writer.setting(WorldStandardValues.EVEN_CAVE_DISTRIBUTION, this.evenCaveDistribution);
 
-        // Canyon settings
-        writer.bigTitle("Canyon settings");
-        writer.setting(WorldStandardValues.CANYON_RARITY, this.canyonRarity);
-        writer.setting(WorldStandardValues.CANYON_MIN_ALTITUDE, this.canyonMinAltitude);
-        writer.setting(WorldStandardValues.CANYON_MAX_ALTITUDE, this.canyonMaxAltitude);
-        writer.setting(WorldStandardValues.CANYON_MIN_LENGTH, this.canyonMinLength);
-        writer.setting(WorldStandardValues.CANYON_MAX_LENGTH, this.canyonMaxLength);
-        writer.setting(WorldStandardValues.CANYON_DEPTH, this.canyonDepth);
+        // Ravine settings
+        writer.bigTitle("Ravine settings");
+        writer.setting(WorldStandardValues.RAVINE_RARITY, this.ravineRarity);
+        writer.setting(WorldStandardValues.RAVINE_MIN_ALTITUDE, this.ravineMinAltitude);
+        writer.setting(WorldStandardValues.RAVINE_MAX_ALTITUDE, this.ravineMaxAltitude);
+        writer.setting(WorldStandardValues.RAVINE_MIN_LENGTH, this.ravineMinLength);
+        writer.setting(WorldStandardValues.RAVINE_MAX_LENGTH, this.ravineMaxLength);
+        writer.setting(WorldStandardValues.RAVINE_DEPTH, this.ravineDepth);
 
         // Settings for BiomeMode:OldGenerator
         writer.bigTitle("Settings for BiomeMode:OldGenerator");

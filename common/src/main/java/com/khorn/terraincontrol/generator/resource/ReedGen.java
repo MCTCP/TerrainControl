@@ -41,7 +41,7 @@ public class ReedGen extends Resource
         frequency = readInt(args.get(1), 1, 100);
         rarity = readRarity(args.get(2));
         minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(4), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude, TerrainControl.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 5);
     }
 
@@ -80,6 +80,7 @@ public class ReedGen extends Resource
                    : this.sourceBlocks.equals(compare.sourceBlocks));
     }
 
+    @Override
     public int getPriority()
     {
         return -34;

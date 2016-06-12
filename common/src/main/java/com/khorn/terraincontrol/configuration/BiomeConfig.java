@@ -913,7 +913,7 @@ public class BiomeConfig extends ConfigFile
         this.volatilityWeight1 = (this.volatilityWeightRaw1 - 0.5D) * 24.0D;
         this.volatilityWeight2 = (0.5D - this.volatilityWeightRaw2) * 24.0D;
 
-        this.waterLevelMax = lowerThanOrEqualTo(waterLevelMax, this.waterLevelMin);
+        this.waterLevelMax = higherThanOrEqualTo(waterLevelMax, this.waterLevelMin);
 
         this.replaceToBiomeName = (DefaultBiome.Contain(this.replaceToBiomeName) || this.worldConfig.customBiomeGenerationIds.keySet().contains(
                 this.replaceToBiomeName)) ? this.replaceToBiomeName : "";
@@ -921,7 +921,7 @@ public class BiomeConfig extends ConfigFile
         this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.customBiomeGenerationIds.keySet().contains(this.riverBiome)) ? this.riverBiome
                 : "";
     }
-    
+
     /**
      * Some settings used to be in the WorldConfig but are now in the
      * BiomeConfig. This method moves such a setting over.

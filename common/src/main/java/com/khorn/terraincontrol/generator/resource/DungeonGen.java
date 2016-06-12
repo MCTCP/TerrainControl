@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.helpers.RandomHelper;
 
 import java.util.List;
 import java.util.Random;
@@ -23,13 +24,13 @@ public class DungeonGen extends Resource
         frequency = readInt(args.get(0), 1, 100);
         rarity = readRarity(args.get(1));
         minAltitude = readInt(args.get(2), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(3), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(3), minAltitude, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override
     public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
     {
-        int y = random.nextInt(maxAltitude - minAltitude) + minAltitude;
+        int y = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
         world.PlaceDungeons(random, x, y, z);
     }
 
@@ -71,6 +72,7 @@ public class DungeonGen extends Resource
                && this.maxAltitude == compare.maxAltitude;
     }
 
+    @Override
     public int getPriority()
     {
         return -20;

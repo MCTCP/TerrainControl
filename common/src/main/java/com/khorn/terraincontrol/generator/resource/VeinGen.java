@@ -5,7 +5,6 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
-import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.helpers.RandomHelper;
 
 import java.util.List;
@@ -63,7 +62,7 @@ public class VeinGen extends Resource
         oreFrequency = readInt(args.get(5), 1, 100);
         oreRarity = readInt(args.get(6), 1, 100);
         minAltitude = readInt(args.get(7), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT - 1);
-        maxAltitude = readInt(args.get(8), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(8), minAltitude, TerrainControl.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 9);
     }
 
@@ -91,9 +90,9 @@ public class VeinGen extends Resource
         if (random.nextDouble() * 100.0 < veinRarity)
         {
             int veinX = chunkX * 16 + random.nextInt(16) + 8;
-            int veinY = MathHelper.getRandomNumberInRange(random, minAltitude, maxAltitude);
+            int veinY = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
             int veinZ = chunkZ * 16 + random.nextInt(16) + 8;
-            int veinSize = MathHelper.getRandomNumberInRange(random, minRadius, maxRadius);
+            int veinSize = RandomHelper.numberInRange(random, minRadius, maxRadius);
             return new Vein(veinX, veinY, veinZ, veinSize);
         }
 
@@ -141,6 +140,7 @@ public class VeinGen extends Resource
         return hash;
     }
 
+    @Override
     public int getPriority()
     {
         return 9;

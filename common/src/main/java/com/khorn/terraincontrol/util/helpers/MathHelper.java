@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.util.helpers;
 
-import java.util.Random;
-
 public class MathHelper
 {
     private static float[] a = new float[65536];
@@ -25,13 +23,13 @@ public class MathHelper
     {
         int i = (int) d0;
 
-        return d0 < (double) i ? i - 1 : i;
+        return d0 < i ? i - 1 : i;
     }
 
     public static long floor_double_long(double d)
     {
         long l = (long) d;
-        return d >= (double) l ? l : l - 1L;
+        return d >= l ? l : l - 1L;
     }
 
     public static int abs(int number)
@@ -43,19 +41,6 @@ public class MathHelper
         {
             return -number;
         }
-    }
-
-    /**
-     * Returns a random number between min and max, inclusive.
-     * 
-     * @param random The random number generator.
-     * @param min The minimum value.
-     * @param max The maximum value.
-     * @return A random number between min and max, inclusive.
-     */
-    public static int getRandomNumberInRange(Random random, int min, int max)
-    {
-        return min + random.nextInt(max - min + 1);
     }
 
     static
