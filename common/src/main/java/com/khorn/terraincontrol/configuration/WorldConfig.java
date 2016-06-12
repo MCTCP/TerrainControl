@@ -586,14 +586,23 @@ public class WorldConfig extends ConfigFile
     @Override
     protected void writeConfigSettings(SettingsWriter writer) throws IOException
     {
-        // The modes
-        writer.bigTitle("The modes");
-        writer.comment("What Terrain Control does with the config files.");
+        // About the world
+        writer.bigTitle("WorldConfig");
+        writer.comment("The author of this world");
+        writer.setting(WorldStandardValues.AUTHOR, this.author);
+
+        writer.comment("A short description of this world");
+        writer.setting(WorldStandardValues.DESCRIPTION, this.description);
+
+        writer.comment("What " + PluginStandardValues.PLUGIN_NAME + " does with the config files.");
         writer.comment("Possible modes:");
         writer.comment("   WriteAll - default");
         writer.comment("   WriteWithoutComments - write config files without help comments");
         writer.comment("   WriteDisable - doesn't write to the config files, it only reads. Doesn't auto-update the configs. Use with care!");
         writer.setting(WorldStandardValues.SETTINGS_MODE, this.SettingsMode);
+
+        // The modes
+        writer.bigTitle("The modes");
 
         writer.comment("Possible terrain modes:");
         writer.comment("   Normal - use all features");
@@ -997,14 +1006,6 @@ public class WorldConfig extends ConfigFile
         writer.setting(WorldStandardValues.MAX_MOISTURE, this.maxMoisture);
         writer.setting(WorldStandardValues.MIN_TEMPERATURE, this.minTemperature);
         writer.setting(WorldStandardValues.MAX_TEMPERATURE, this.maxTemperature);
-
-        writer.bigTitle("Author");        
-        writer.comment("The author of this world configuration");
-        writer.setting(WorldStandardValues.AUTHOR, this.author);
-        
-        writer.bigTitle("Description");        
-        writer.comment("A short description of this world configuration");
-        writer.setting(WorldStandardValues.DESCRIPTION, this.description);
     }
 
     private void writeBiomeGroups(SettingsWriter writer) throws IOException
