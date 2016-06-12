@@ -127,9 +127,10 @@ public final class BoundingBox implements Cloneable
     /**
      * Makes this bounding box fit the given block exactly. The bounding box
      * will have a resulting volume of 1.
-     * @param x
-     * @param y
-     * @param z
+     * 
+     * @param x The x of the given block.
+     * @param y The y of the given block.
+     * @param z The z of the given block.
      */
     private void setToOneBlockVolume(int x, int y, int z)
     {

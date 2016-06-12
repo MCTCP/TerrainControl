@@ -12,6 +12,11 @@ import java.util.Collection;
  */
 public class BiomeNotFoundException extends RuntimeException {
 
+    /**
+     * Generated serial version id, to prevent compiler warnings.
+     */
+    private static final long serialVersionUID = 6832663686946138366L;
+
     private final String biomeName;
 
     /**

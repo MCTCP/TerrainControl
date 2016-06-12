@@ -8,7 +8,6 @@ import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryNamespaced;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;

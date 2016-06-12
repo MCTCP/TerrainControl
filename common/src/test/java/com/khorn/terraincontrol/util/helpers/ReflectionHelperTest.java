@@ -15,6 +15,7 @@ public class ReflectionHelperTest
     // Just an easy to follow class hierarchy:
     public static class Animal
     {
+        @SuppressWarnings("unused") // Used by reflection
         private boolean hungry = false;
         protected List<Animal> friends = new ArrayList<Animal>();
     }
@@ -27,7 +28,9 @@ public class ReflectionHelperTest
 
     public static class Dog extends Animal
     {
+        @SuppressWarnings("unused") // Used by reflection
         private String name = "Pluto";
+        @SuppressWarnings("unused") // Used by reflection
         private String owner = "Mickey";
     }
 
@@ -49,7 +52,7 @@ public class ReflectionHelperTest
     public void testGetInParent()
     {
         Monkey monkey = new Monkey();
-        List<Animal> friends = ReflectionHelper.getValueInFieldOfType(monkey, List.class);
+        List<?> friends = ReflectionHelper.getValueInFieldOfType(monkey, List.class);
         assertEquals(monkey.friends, friends);
     }
 

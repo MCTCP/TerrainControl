@@ -158,7 +158,7 @@ public enum DefaultBiome
     public final String Name;
     /**
      * Default settings of this biome. Access this using
-     * {@link DefaultBiomeSettings#getDefaultSettings(com.khorn.terraincontrol.LocalBiome, int)}
+     * {@link DefaultBiome#getLoadInstructions(MojangSettings, int)}
      */
     private final Class<? extends MinecraftBiomeTemplate> defaultSettingsClass;
     /**
