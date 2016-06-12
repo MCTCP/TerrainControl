@@ -70,6 +70,7 @@ public class BlockHelper
             case LOG:
             case LOG_2:
             case HAY_BLOCK:
+            case BONE_BLOCK:
                 switch (data / 4)
                 {
                     case 1:

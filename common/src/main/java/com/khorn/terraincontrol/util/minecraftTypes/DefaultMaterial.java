@@ -227,6 +227,12 @@ public enum DefaultMaterial
     END_GATEWAY(209, false),
     COMMAND_REPEATING(210),
     COMMAND_CHAIN(211),
+    FROSTED_ICE(212),
+    MAGMA(213),
+    NETHER_WART_BLOCK(214, false),
+    RED_NETHER_BRICK(215),
+    BONE_BLOCK(216),
+    STRUCTURE_VOID(217, false),
     STRUCTURE_BLOCK(255, false),
     UNKNOWN_BLOCK(254);
     /**
