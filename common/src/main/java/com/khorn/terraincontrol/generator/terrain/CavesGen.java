@@ -189,19 +189,6 @@ public class CavesGen extends TerrainGenBase
                                     {
                                         generatingChunkBuffer.setBlock(local_x, local_y, local_z, air);
 
-                                        // Replace supporting sand with
-                                        // sandstone.
-                                        if (materialAbove.isMaterial(DefaultMaterial.SAND))
-                                        {
-                                            if (materialAbove.getBlockData() == 0)
-                                            {
-                                                generatingChunkBuffer.setBlock(local_x, local_y + 1, local_z, sandstone);
-                                            } else
-                                            {
-                                                generatingChunkBuffer.setBlock(local_x, local_y + 1, local_z, redSandstone);
-                                            }
-                                        }
-
                                         // If grass was just deleted, try to
                                         // move it down
                                         if (grassFound
