@@ -212,16 +212,6 @@ public class BO3 implements StructuredCustomObject
     }
 
     @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
-    {
-        if (settings.tree)
-        {
-            return spawn(world, random, x, z);
-        }
-        return false;
-    }
-
-    @Override
     public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         boolean atLeastOneObjectHasSpawned = false;

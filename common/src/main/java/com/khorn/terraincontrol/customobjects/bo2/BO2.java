@@ -221,12 +221,6 @@ public class BO2 extends ConfigFile implements CustomObject
     }
 
     @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
-    {
-        return spawn(world, random, x, z);
-    }
-
-    @Override
     public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
     {
 

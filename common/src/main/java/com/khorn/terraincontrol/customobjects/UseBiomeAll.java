@@ -14,19 +14,6 @@ public class UseBiomeAll extends UseBiome
     }
 
     @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
-    {
-        for (CustomObject object : getPossibleObjectsAt(world, x, z))
-        {
-            if (object.spawnAsTree(world, random, x, z))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         boolean spawnedAtLeastOneObject = false;

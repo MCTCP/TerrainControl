@@ -70,23 +70,17 @@ public class TreeObject implements CustomObject
     }
 
     @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
-    {
-        int y = world.getHighestBlockYAt(x, z);
-        if (y < minHeight || y > maxHeight)
-        {
-            return false;
-        }
-        return world.PlaceTree(type, random, x, y, z);
-    }
-
-    @Override
     public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
-        // A tree has no rarity, so spawn it once in the chunk
+        // A tree has no frequency or rarity, so spawn it once in the chunk
         int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
         int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-        return spawnAsTree(world, random, x, z);
+        int y = world.getHighestBlockYAt(x, z);
+        if (canSpawnAt(world, Rotation.NORTH, x, y, z))
+        {
+            return spawnForced(world, random, Rotation.NORTH, x, y, z);
+        }
+        return false;
     }
 
     @Override
@@ -104,7 +98,11 @@ public class TreeObject implements CustomObject
     @Override
     public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {
-        return true; // We can only guess...
+        if (y < minHeight || y > maxHeight)
+        {
+            return false;
+        }
+        return true;
     }
 
     @Override

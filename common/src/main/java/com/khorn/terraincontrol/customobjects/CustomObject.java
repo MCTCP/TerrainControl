@@ -78,19 +78,6 @@ public interface CustomObject
     public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z);
 
     /**
-     * Spawns the object at the given position. It should search a suitable y
-     * location by itself. If the object isn't a tree, it shouldn't spawn and it
-     * should return false.
-     *
-     * @param world  World to spawn the object.
-     * @param random Random number generator based on the world seed.
-     * @param x      X coord of the object origin.
-     * @param z      Z coord of the object origin.
-     * @return Whether the attempt was successful.
-     */
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z);
-
-    /**
      * Spawns the object one or more times in a chunk. The object can search a good y position by
      * itself.
      *

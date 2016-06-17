@@ -59,36 +59,6 @@ public class UseBiome implements CustomObject
     }
 
     @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
-    {
-        List<CustomObject> possibleObjects = getPossibleObjectsAt(world, x, z);
-
-        // Pick one object, try to spawn that, if that fails, try with another
-        // object, as long as the objectSpawnRatio cap isn't reached.
-        int objectSpawnRatio = world.getConfigs().getWorldConfig().objectSpawnRatio;
-
-        if (possibleObjects.isEmpty())
-            return false;
-
-        boolean objectSpawned = false;
-        int spawnattemps = 0;
-        while (!objectSpawned)
-        {
-            if (spawnattemps > objectSpawnRatio)
-                return false;
-
-            spawnattemps++;
-
-            CustomObject selectedObject = possibleObjects.get(random.nextInt(possibleObjects.size()));
-
-            // Process the object
-            objectSpawned = selectedObject.spawnAsTree(world, random, x, x);
-
-        }
-        return objectSpawned;
-    }
-
-    @Override
     public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         List<CustomObject> possibleObjects = getPossibleObjectsAt(world, chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter());

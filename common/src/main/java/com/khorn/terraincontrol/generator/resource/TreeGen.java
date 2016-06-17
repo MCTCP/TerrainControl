@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,18 +25,35 @@ public class TreeGen extends Resource
     {
         for (int i = 0; i < frequency; i++)
         {
-            for (int treeNumber = 0; treeNumber < trees.size(); treeNumber++)
+            spawnTree(world, random, chunkCoord);
+        }
+    }
+
+    private void spawnTree(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
+    {
+        for (int treeKind = 0; treeKind < trees.size(); treeKind++)
+        {
+            if (random.nextInt(100) >= treeChances.get(treeKind))
             {
-                if (random.nextInt(100) < treeChances.get(treeNumber))
-                {
-                    int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-                    int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-                    if (trees.get(treeNumber).spawnAsTree(world, random, x, z))
-                    {
-                        // Success, on to the next tree!
-                        break;
-                    }
-                }
+                // Try another tree
+                continue;
+            }
+
+            int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+            int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+            int y = world.getHighestBlockYAt(x, z);
+            CustomObject tree = trees.get(treeKind);
+
+            if (!tree.canSpawnAt(world, Rotation.NORTH, x, y, z))
+            {
+                // Try another tree
+                continue;
+            }
+
+            if (tree.spawnForced(world, random, Rotation.NORTH, x, y, z))
+            {
+                // Success!
+                return;
             }
         }
     }
@@ -88,11 +106,14 @@ public class TreeGen extends Resource
     @Override
     public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other)
     {
-        if (getClass() == other.getClass()){
-            try {
+        if (getClass() == other.getClass())
+        {
+            try
+            {
                 TreeGen otherO = (TreeGen) other;
                 return otherO.treeNames.size() == this.treeNames.size() && otherO.treeNames.containsAll(this.treeNames);
-            } catch (Exception ex){
+            } catch (Exception ex)
+            {
                 TerrainControl.log(LogMarker.WARN, ex.getMessage());
             }
         }
@@ -124,12 +145,13 @@ public class TreeGen extends Resource
         final TreeGen compare = (TreeGen) other;
         return (this.trees == null ? this.trees == compare.trees
                 : this.trees.equals(compare.trees))
-               && (this.treeNames == null ? this.treeNames == compare.treeNames
-                   : this.treeNames.equals(compare.treeNames))
-               && (this.treeChances == null ? this.treeChances == compare.treeChances
-                   : this.treeChances.equals(compare.treeChances));
+                && (this.treeNames == null ? this.treeNames == compare.treeNames
+                        : this.treeNames.equals(compare.treeNames))
+                && (this.treeChances == null ? this.treeChances == compare.treeChances
+                        : this.treeChances.equals(compare.treeChances));
     }
 
+    @Override
     public int getPriority()
     {
         return -31;

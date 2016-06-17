@@ -56,39 +56,6 @@ public class UseWorld implements CustomObject
     }
 
     @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
-    {
-        // Pick one object, try to spawn that, if that fails, try with another
-        // object, as long as the objectSpawnRatio cap isn't reached.
-
-        WorldConfig worldConfig = world.getConfigs().getWorldConfig();
-        CustomObjectCollection customObjects = world.getConfigs().getCustomObjects();
-
-        if (customObjects.isEmpty())
-            return false;
-
-        boolean objectSpawned = false;
-        int spawnattemps = 0;
-        while (!objectSpawned)
-        {
-            if (spawnattemps > worldConfig.objectSpawnRatio)
-                return false;
-
-            spawnattemps++;
-
-            CustomObject selectedObject = customObjects.getRandomObject(random);
-
-            if (!selectedObject.hasPreferenceToSpawnIn(world.getBiome(x, z)))
-                continue;
-
-            // Process the object
-            objectSpawned = selectedObject.spawnAsTree(world, random, x, z);
-
-        }
-        return objectSpawned;
-    }
-
-    @Override
     public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
     {
         // Pick one object, try to spawn that, if that fails, try with another
