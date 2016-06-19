@@ -2,7 +2,6 @@ package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix.ReplacedBlocksInstruction;
 import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
