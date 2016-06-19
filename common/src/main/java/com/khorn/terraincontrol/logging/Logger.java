@@ -7,7 +7,7 @@ import java.util.List;
 public abstract class Logger
 {
 
-    protected LogMarker minimumLevel;
+    protected LogMarker minimumLevel = LogMarker.INFO;
 
     public void setLevel(LogMarker level)
     {
