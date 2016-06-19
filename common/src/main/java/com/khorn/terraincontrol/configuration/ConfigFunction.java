@@ -54,7 +54,6 @@ public abstract class ConfigFunction<T>
         return configFunction;
     }
 
-    
     /**
      * Has a value when valid == false, otherwise null.
      */

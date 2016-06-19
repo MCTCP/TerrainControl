@@ -1,32 +1,21 @@
 package com.khorn.terraincontrol.configuration.io;
 
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.ConfigFile;
-import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
-import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 
-public class FileSettingsWriter implements SettingsWriter
+/**
+ * A class for writing a {@link SettingsMap} to a file.
+ *
+ */
+public final class FileSettingsWriter
 {
-    /**
-     * Writes this configuration settings to a file. It will use the file
-     * returned by {@link ConfigFile#getFile()}. If writing fails, the error
-     * is logged.
-     *
-     * @param config     The configuration to write to disk.
-     * @param configMode The configuration mode. If this is set to
-     * WriteDisable, this method does nothing.
-     */
-    public static final void writeToFile(ConfigFile config, ConfigMode configMode)
-    {
-        writeToFile(config, config.getFile(), configMode);
-    }
 
     /**
      * Writes the configuration settings to the given file. If writing fails,
@@ -37,17 +26,18 @@ public class FileSettingsWriter implements SettingsWriter
      * @param configMode The configuration mode. If this is set to
      * WriteDisable, this method does nothing.
      */
-    public static final void writeToFile(ConfigFile config, File file, ConfigMode configMode)
+    public static final void writeToFile(SettingsMap config, File file, ConfigMode configMode)
     {
         if (configMode == ConfigMode.WriteDisable)
         {
             return;
         }
 
+        boolean writeComments = configMode != ConfigMode.WriteWithoutComments;
+        FileSettingsWriter writer = new FileSettingsWriter(file, writeComments);
         try
         {
-            SettingsWriter writer = new FileSettingsWriter(file);
-            config.write(writer, configMode);
+            writer.write(config);
         } catch (IOException e)
         {
             logIOError(e, file);
@@ -61,23 +51,72 @@ public class FileSettingsWriter implements SettingsWriter
     }
 
     private final File file;
-    private boolean writeComments;
-    private BufferedWriter writer;
+    private final boolean writeComments;
 
-    public FileSettingsWriter(ConfigFile configFile)
-    {
-        this.file = configFile.getFile();
-    }
-
-    public FileSettingsWriter(File file)
+    public FileSettingsWriter(File file, boolean writeComments)
     {
         this.file = file;
+        this.writeComments = writeComments;
     }
 
-    @Override
-    public void bigTitle(String title) throws IOException
+    /**
+     * Writes the settings map to the file.
+     * @param settingsMap The settings map.
+     * @throws IOException If an IO error occurs.
+     */
+    public void write(SettingsMap settingsMap) throws IOException
     {
-        checkState();
+        BufferedWriter writer = null;
+        try
+        {
+            File directory = file.getParentFile();
+            if (!directory.exists() && !directory.mkdirs())
+            {
+                throw new IOException("Could not create directory '" + file.getParentFile() + "'");
+            }
+
+            writer = new BufferedWriter(new FileWriter(file));
+            for (RawSettingValue entry : settingsMap.getRawSettings())
+            {
+                writeEntry(writer, entry);
+            }
+        } finally
+        {
+            if (writer != null)
+            {
+                writer.close();
+            }
+        }
+    }
+
+    private void writeEntry(BufferedWriter writer, RawSettingValue value) throws IOException
+    {
+        switch (value.getType())
+        {
+            case BIG_TITLE:
+                bigTitle(writer, value.getRawValue());
+                comments(writer, value.getComments());
+                break;
+            case SMALL_TITLE:
+                smallTitle(writer, value.getRawValue());
+                comments(writer, value.getComments());
+                break;
+            case PLAIN_SETTING:
+                comments(writer, value.getComments());
+                writer.write(value.getRawValue());
+                writer.newLine();
+                writer.newLine();
+                break;
+            default:
+                comments(writer, value.getComments());
+                writer.write(value.getRawValue());
+                writer.newLine();
+                break;
+        }
+    }
+
+    private void bigTitle(BufferedWriter writer, String title) throws IOException
+    {
         writer.newLine();
         writer.write("#######################################################################");
         writer.newLine();
@@ -104,39 +143,19 @@ public class FileSettingsWriter implements SettingsWriter
         writer.newLine();
     }
 
-    private void checkState() throws IllegalStateException
+    private void comments(BufferedWriter writer, Collection<String> comments) throws IOException
     {
-        if (writer == null)
-        {
-            throw new IllegalStateException("Not started writing yet");
-        }
-    }
-
-    @Override
-    public void close()
-    {
-        if (writer == null)
-        {
-            // Can happen if file opening failed, ignore
+        if (!this.writeComments)
             return;
-        }
 
-        try
+        for (String comment : comments)
         {
-            writer.flush();
-            writer.close();
-        } catch (IOException e)
-        {
-            TerrainControl.log(LogMarker.WARN, "Failed to close file {} ({})",
-                    file.getAbsolutePath(), e.getMessage());
+            comment(writer, comment);
         }
-        writer = null;
     }
 
-    @Override
-    public void comment(String comment) throws IOException
+    private void comment(BufferedWriter writer, String comment) throws IOException
     {
-        checkState();
         if (!this.writeComments)
             return;
         if (comment.length() > 0)
@@ -144,55 +163,8 @@ public class FileSettingsWriter implements SettingsWriter
         writer.newLine();
     }
 
-    @Override
-    public void function(ConfigFunction<?> function) throws IOException
+    private void smallTitle(BufferedWriter writer, String title) throws IOException
     {
-        checkState();
-        writer.write(function.write());
-        writer.newLine();
-    }
-
-    @Override
-    public File getFile()
-    {
-        return file;
-    }
-
-    @Override
-    public void open() throws IOException
-    {
-        file.getParentFile().mkdirs();
-        writer = new BufferedWriter(new FileWriter(file));
-    }
-
-    @Override
-    public void setConfigMode(ConfigMode configMode)
-    {
-        if (configMode == ConfigMode.WriteAll)
-        {
-            this.writeComments = true;
-        } else if (configMode == ConfigMode.WriteWithoutComments)
-        {
-            this.writeComments = false;
-        } else
-        {
-            throw new IllegalArgumentException("Invalid config mode: " + configMode);
-        }
-    }
-
-    @Override
-    public <T> void setting(Setting<T> setting, T value) throws IOException
-    {
-        checkState();
-        writer.write(setting.getName() + ": " + setting.write(value));
-        writer.newLine();
-        writer.newLine();
-    }
-
-    @Override
-    public void smallTitle(String title) throws IOException
-    {
-        checkState();
         int titleLength = title.length();
         StringBuilder rowBuilder = new StringBuilder(titleLength + 4);
         for (int i = 0; i < titleLength + 4; i++)

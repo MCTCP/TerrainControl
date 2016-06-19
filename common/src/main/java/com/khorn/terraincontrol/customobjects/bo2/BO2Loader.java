@@ -11,7 +11,7 @@ public class BO2Loader implements CustomObjectLoader
     @Override
     public CustomObject loadFromFile(String objectName, File file)
     {
-        return new BO2(new FileSettingsReader(objectName, file));
+        return new BO2(FileSettingsReader.read(objectName, file));
     }
 
     @Override

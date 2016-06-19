@@ -1,6 +1,8 @@
 package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.configuration.io.BracketSettingsReader;
+import com.khorn.terraincontrol.configuration.io.SettingsMap;
+import com.khorn.terraincontrol.configuration.io.SimpleSettingsMap;
 import com.khorn.terraincontrol.util.helpers.FileHelper;
 
 import java.io.File;
@@ -190,7 +192,9 @@ public class CustomObjectCollection implements Iterable<CustomObject>
 
         if (object != null && objectExtraSettings.length() != 0)
         {
-            object = object.applySettings(new BracketSettingsReader(object.getName(), objectExtraSettings));
+            SettingsMap extraSettings = new SimpleSettingsMap(object.getName(), false);
+            BracketSettingsReader.readInto(extraSettings, objectExtraSettings);
+            object = object.applySettings(extraSettings);
         }
 
         return object;

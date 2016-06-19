@@ -1,132 +1,74 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
-import com.khorn.terraincontrol.configuration.io.SettingsReader;
-import com.khorn.terraincontrol.configuration.io.SettingsWriter;
-import com.khorn.terraincontrol.configuration.settingType.Setting;
+import com.khorn.terraincontrol.configuration.io.SettingsMap;
+import com.khorn.terraincontrol.configuration.io.SimpleSettingsMap;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.EOFException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 /**
  * Abstract base class for all configuration files. Configuration files read
- * the desired settings from a {@link SettingsReader}, and write them on
- * request to a {@link SettingsWriter}.
+ * the desired settings from a {@link SettingsMap}, and can then write the
+ * settings back to such a map.
  *
  */
 public abstract class ConfigFile
 {
-    protected final SettingsReader reader;
+    private final String configName;
 
     /**
-     * True if the file does not exist yet on disk, false otherwise. Used to
-     * provide backwards compatible default settings.
+     * Creates a new config file.
+     *
+     * @param configName The name of the config. For worlds, this is the world
+     *                   name, for biomes this is the biome name, etc.
      */
-    protected final boolean isNewConfig;
-
-    /**
-     * Creates a new configuration file.
-     * @param reader Settings reader
-     */
-    protected ConfigFile(SettingsReader reader)
+    protected ConfigFile(String configName)
     {
-        this.reader = reader;
-        this.isNewConfig = reader.isNewConfig();
+        this.configName = configName;
     }
 
     /**
-     * Reads a setting. If the setting has an invalid value,
-     * a message is logged and the default value is returned.
-     * @param <T>     Type of the setting value.
-     * @param setting The setting to read.
-     * @return The value of the setting.
+     * Gets all settings of this config file.
+     * @return All settings.
      */
-    protected <T> T readSettings(Setting<T> setting)
+    public SettingsMap getSettingsAsMap()
     {
-        return readSettings(setting, setting.getDefaultValue());
-    }
-
-    /**
-     * Reads a setting. This method allows you to provide another default
-     * value. If the setting has an invalid value, a message is logged and
-     * the default value is returned.
-     * @param <T>          Type of the setting value.
-     * @param setting      The setting to read.
-     * @param defaultValue Default value for the setting.
-     * @return The value of the setting.
-     */
-    protected <T> T readSettings(Setting<T> setting, T defaultValue)
-    {
-        return reader.getSetting(setting, defaultValue);
-    }
-
-    /**
-     * Writes all settings of this configuration file to the provided writer.
-     * This method can be called at any time after the settings are fully read.
-     * @param writer     The writer to write the setings to.
-     * @param configMode The mode to use while writing the settings. May not
-     * be {@link ConfigMode#WriteDisable}.
-     * @throws IOException If one of the methods on the writer throws an
-     * {@link IOException}, or if the {@code configMode} is
-     * {@link ConfigMode#WriteDisable}.
-     */
-    public void write(SettingsWriter writer, ConfigMode configMode) throws IOException
-    {
-        if (configMode == ConfigMode.WriteDisable)
-        {
-            throw new IOException("ConfigMode is " + ConfigMode.WriteDisable);
-        }
-        writer.setConfigMode(configMode);
-        try
-        {
-            writer.open();
-            writeConfigSettings(writer);
-        } finally
-        {
-            writer.close();
-        }
+        SettingsMap settingsMap = new SimpleSettingsMap(configName, false);
+        writeConfigSettings(settingsMap);
+        return settingsMap;
     }
 
     /**
      * Methods that subclasses must override to write the actual settings.
-     * @param writer The writer to write the setings to.
-     * @throws IOException If one of the methods on the writer throws an
-     * {@link IOException}.
+     * @param settingsMap The map to write the settings to.
      */
-    protected abstract void writeConfigSettings(SettingsWriter writer) throws IOException;
+    protected abstract void writeConfigSettings(SettingsMap settingsMap);
 
     /**
      * Called once to read all configuration settings from the
-     * {@link SettingsReader} provided to the constructor.
+     * {@link SettingsMap} provided to the constructor.
+     * @param reader The settings reader.
      */
-    protected abstract void readConfigSettings();
+    protected abstract void readConfigSettings(SettingsMap reader);
 
     /**
-     * Called directly after {@link #readConfigSettings()} to fix impossible
-     * combinations of settings.
+     * Called directly after {@link #readConfigSettings(SettingsMap)} to fix
+     * impossible combinations of settings.
      */
     protected abstract void correctSettings();
 
     /**
-     * Called before {@link #readConfigSettings()} to rewrite configs in old
-     * formats to the modern format, so that they can be read.
+     * Called before {@link #readConfigSettings(SettingsMap)} to rewrite
+     * configs in old formats to the modern format, so that they can be read.
+     * @param reader The settings reader.
      */
-    protected abstract void renameOldSettings();
-
-    /**
-     * Renames an old setting. If the old setting isn't found, this does
-     * nothing.
-     *
-     * @param oldValue Name of the old setting.
-     * @param newValue The new setting.
-     */
-    protected final void renameOldSetting(String oldValue, Setting<?> newValue)
-    {
-        reader.renameOldSetting(oldValue, newValue);
-    }
+    protected abstract void renameOldSettings(SettingsMap reader);
 
     /**
      * Silently corrects the given number so that it is higher than or equal to
@@ -196,7 +138,7 @@ public abstract class ConfigFile
         return output;
     }
 
-    protected static void writeStringToStream(DataOutput stream, String value) throws IOException
+    public static void writeStringToStream(DataOutput stream, String value) throws IOException
     {
         byte[] bytes = value.getBytes();
         stream.writeShort(bytes.length);
@@ -219,17 +161,7 @@ public abstract class ConfigFile
      */
     public String getName()
     {
-        return reader.getName();
-    }
-
-    /**
-     * Gets the file this config will be written to. May be null if the config
-     * will never be written.
-     * @return The file.
-     */
-    public File getFile()
-    {
-        return reader.getFile();
+        return configName;
     }
 
 }

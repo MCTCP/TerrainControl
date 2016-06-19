@@ -5,19 +5,17 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
-import com.khorn.terraincontrol.configuration.io.SettingsReader;
-import com.khorn.terraincontrol.configuration.io.SettingsWriter;
+import com.khorn.terraincontrol.configuration.io.RawSettingValue;
+import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 
 /**
@@ -25,6 +23,13 @@ import java.util.Random;
  */
 public class BO2 extends ConfigFile implements CustomObject
 {
+    /**
+     * It's annoying that we have to keep all raw BO2 settings in memory. The
+     * reason is that our config writing system doesn't support the BO2 syntax,
+     * so we can't simply use the output of
+     * {@link #writeConfigSettings(SettingsMap)}, as we do for other configs.
+     */
+    private final SettingsMap settingsMap;
 
     public ObjectCoordinate[][] data = new ObjectCoordinate[4][];
 
@@ -64,20 +69,21 @@ public class BO2 extends ConfigFile implements CustomObject
 
     public int branchLimit;
 
-    public BO2(SettingsReader reader)
+    public BO2(SettingsMap settingsMap)
     {
-        super(reader);
+        super(settingsMap.getName());
+        this.settingsMap = settingsMap;
     }
 
     @Override
     public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
     {
-        enable();
+        enable(settingsMap);
     }
 
-    private void enable()
+    private void enable(SettingsMap settings)
     {
-        readConfigSettings();
+        readConfigSettings(settings);
         correctSettings();
     }
 
@@ -245,62 +251,62 @@ public class BO2 extends ConfigFile implements CustomObject
     }
 
     @Override
-    public CustomObject applySettings(SettingsReader extraSettings)
+    public CustomObject applySettings(SettingsMap extraSettings)
     {
-        extraSettings.setFallbackReader(this.reader);
+        extraSettings.setFallback(this.settingsMap);
         BO2 bo2WithSettings = new BO2(extraSettings);
-        bo2WithSettings.enable();
+        bo2WithSettings.enable(extraSettings);
         return bo2WithSettings;
     }
 
     @Override
-    protected void writeConfigSettings(SettingsWriter writer) throws IOException
+    protected void writeConfigSettings(SettingsMap writer)
     {
         // It doesn't write.
     }
 
     @Override
-    protected void readConfigSettings()
+    protected void readConfigSettings(SettingsMap reader)
     {
-        this.version = readSettings(BO2Settings.VERSION);
+        this.version = reader.getSetting(BO2Settings.VERSION);
 
-        this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE);
-        this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE);
+        this.spawnOnBlockType = reader.getSetting(BO2Settings.SPAWN_ON_BLOCK_TYPE);
+        this.collisionBlockType = reader.getSetting(BO2Settings.COLLISTION_BLOCK_TYPE);
 
-        this.spawnInBiome = readSettings(BO2Settings.SPAWN_IN_BIOME);
+        this.spawnInBiome = reader.getSetting(BO2Settings.SPAWN_IN_BIOME);
 
-        this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT);
-        this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS);
-        this.spawnWater = readSettings(BO2Settings.SPAWN_WATER);
-        this.spawnLava = readSettings(BO2Settings.SPAWN_LAVA);
-        this.spawnAboveGround = readSettings(BO2Settings.SPAWN_ABOVE_GROUND);
-        this.spawnUnderGround = readSettings(BO2Settings.SPAWN_UNDER_GROUND);
+        this.spawnSunlight = reader.getSetting(BO2Settings.SPAWN_SUNLIGHT);
+        this.spawnDarkness = reader.getSetting(BO2Settings.SPAWN_DARKNESS);
+        this.spawnWater = reader.getSetting(BO2Settings.SPAWN_WATER);
+        this.spawnLava = reader.getSetting(BO2Settings.SPAWN_LAVA);
+        this.spawnAboveGround = reader.getSetting(BO2Settings.SPAWN_ABOVE_GROUND);
+        this.spawnUnderGround = reader.getSetting(BO2Settings.SPAWN_UNDER_GROUND);
 
-        this.underFill = readSettings(BO2Settings.UNDER_FILL);
+        this.underFill = reader.getSetting(BO2Settings.UNDER_FILL);
 
-        this.randomRotation = readSettings(BO2Settings.RANDON_ROTATION);
-        this.dig = readSettings(BO2Settings.DIG);
-        this.tree = readSettings(BO2Settings.TREE);
-        this.branch = readSettings(BO2Settings.BRANCH);
-        this.diggingBranch = readSettings(BO2Settings.DIGGING_BRANCH);
-        this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION);
-        this.rarity = readSettings(BO2Settings.RARITY);
-        this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE);
-        this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN);
-        this.spawnElevationMax = readSettings(BO2Settings.SPAWN_ELEVATION_MAX);
+        this.randomRotation = reader.getSetting(BO2Settings.RANDON_ROTATION);
+        this.dig = reader.getSetting(BO2Settings.DIG);
+        this.tree = reader.getSetting(BO2Settings.TREE);
+        this.branch = reader.getSetting(BO2Settings.BRANCH);
+        this.diggingBranch = reader.getSetting(BO2Settings.DIGGING_BRANCH);
+        this.needsFoundation = reader.getSetting(BO2Settings.NEEDS_FOUNDATION);
+        this.rarity = reader.getSetting(BO2Settings.RARITY);
+        this.collisionPercentage = reader.getSetting(BO2Settings.COLLISION_PERCENTAGE);
+        this.spawnElevationMin = reader.getSetting(BO2Settings.SPAWN_ELEVATION_MIN);
+        this.spawnElevationMax = reader.getSetting(BO2Settings.SPAWN_ELEVATION_MAX);
 
-        this.groupFrequencyMin = readSettings(BO2Settings.GROUP_FREQUENCY_MIN);
-        this.groupFrequencyMax = readSettings(BO2Settings.GROUP_FREQUENCY_MAX);
-        this.groupSeparationMin = readSettings(BO2Settings.GROUP_SEPERATION_MIN);
-        this.groupSeparationMax = readSettings(BO2Settings.GROUP_SEPERATION_MAX);
+        this.groupFrequencyMin = reader.getSetting(BO2Settings.GROUP_FREQUENCY_MIN);
+        this.groupFrequencyMax = reader.getSetting(BO2Settings.GROUP_FREQUENCY_MAX);
+        this.groupSeparationMin = reader.getSetting(BO2Settings.GROUP_SEPERATION_MIN);
+        this.groupSeparationMax = reader.getSetting(BO2Settings.GROUP_SEPERATION_MAX);
         // >> Is this not used anymore? Netbeans finds no references to it
         // >> Nothing other than this line references BO2Settings.groupId
         // either...
-        this.groupId = readSettings(BO2Settings.GROUP_ID);
+        this.groupId = reader.getSetting(BO2Settings.GROUP_ID);
 
-        this.branchLimit = readSettings(BO2Settings.BRANCH_LIMIT);
+        this.branchLimit = reader.getSetting(BO2Settings.BRANCH_LIMIT);
 
-        this.ReadCoordinates();
+        this.readCoordinates(reader);
     }
 
     @Override
@@ -310,18 +316,22 @@ public class BO2 extends ConfigFile implements CustomObject
     }
 
     @Override
-    protected void renameOldSettings()
+    protected void renameOldSettings(SettingsMap reader)
     {
         // Stub method
     }
 
-    private void ReadCoordinates()
+    private void readCoordinates(SettingsMap reader)
     {
         ArrayList<ObjectCoordinate> coordinates = new ArrayList<ObjectCoordinate>();
 
-        for (Entry<String, String> line : reader.getRawSettings())
+        for (RawSettingValue line : reader.getRawSettings())
         {
-            ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(line.getKey(), line.getValue());
+            String[] lineSplit = line.getRawValue().split(":", 2);
+            if (lineSplit.length != 2)
+                continue;
+
+            ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(lineSplit[0], lineSplit[1]);
             if (buffer != null)
                 coordinates.add(buffer);
         }

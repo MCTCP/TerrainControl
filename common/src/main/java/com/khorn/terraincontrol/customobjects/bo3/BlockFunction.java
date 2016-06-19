@@ -35,7 +35,7 @@ public class BlockFunction extends BO3Function
         material = readMaterial(args.get(3));
         if (args.size() == 5)
         {
-            metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().getFile());
+            metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().directory);
             if (metaDataTag != null)
             {
                 hasMetaData = true;

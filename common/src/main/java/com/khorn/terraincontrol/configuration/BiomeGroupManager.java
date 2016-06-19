@@ -178,7 +178,7 @@ public final class BiomeGroupManager
         return totalRarity[totalRarity.length - 1];
     }
 
-    void processBiomeData(LocalWorld world)
+    public void processBiomeData(LocalWorld world)
     {
         for (BiomeGroup entry : idToGroup.values())
         {
@@ -191,7 +191,7 @@ public final class BiomeGroupManager
      * removed.
      * @param customBiomeNames Set of all custom biomes in the world.
      */
-    void filterBiomes(Set<String> customBiomeNames)
+    public void filterBiomes(Set<String> customBiomeNames)
     {
         for (Iterator<BiomeGroup> it = idToGroup.values().iterator(); it.hasNext();)
         {

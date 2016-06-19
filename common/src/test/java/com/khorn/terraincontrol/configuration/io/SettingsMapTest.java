@@ -8,20 +8,17 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-public abstract class AbstractSettingsReaderTest
+public class SettingsMapTest
 {
-    /**
-     * For readers returned by {@link #getExistingReader(Setting, Object)} it
-     * may be necessary to clean up things, like deleting temporary files.
-     * @param reader The reader to clean up.
-     */
-    protected abstract void cleanupCrumbs(SettingsReader reader);
 
     /**
      * Gets a settings reader with no settings present.
      * @return The reader.
      */
-    protected abstract SettingsReader getEmptyReader();
+    protected SettingsMap getEmptyReader()
+    {
+        return new SimpleSettingsMap("Test", false);
+    }
 
     /**
      * Gets a settings reader with the given setting and value present.
@@ -32,9 +29,13 @@ public abstract class AbstractSettingsReaderTest
      * @param setting The setting present.
      * @param value The value.
      * @return The settings reader.
-     * @throws IOException If the settings reader could not be created.
      */
-    protected abstract <S> SettingsReader getExistingReader(Setting<S> setting, S value) throws IOException;
+    protected <S> SettingsMap getExistingReader(Setting<S> setting, S value)
+    {
+        SettingsMap settings = getEmptyReader();
+        settings.putSetting(setting, value);
+        return settings;
+    }
 
     /**
      * Get an empty config reader, check if it returns the default value for a
@@ -47,7 +48,7 @@ public abstract class AbstractSettingsReaderTest
         String defaultValue = "map.png";
         String changedValue = "customfile.png";
 
-        SettingsReader reader = getEmptyReader();
+        SettingsMap reader = getEmptyReader();
 
         // Reader is empty, so first we get the default value
         assertEquals(defaultValue, reader.getSetting(WorldStandardValues.IMAGE_FILE, defaultValue));
@@ -72,14 +73,11 @@ public abstract class AbstractSettingsReaderTest
         String imageFileOverridden = "overridden.png";
 
         // Read it, replace value
-        SettingsReader reader = getExistingReader(WorldStandardValues.IMAGE_FILE, imageFileInConfig);
+        SettingsMap reader = getExistingReader(WorldStandardValues.IMAGE_FILE, imageFileInConfig);
         reader.putSetting(WorldStandardValues.IMAGE_FILE, imageFileOverridden);
 
         // Check if value is replaced
         assertEquals(imageFileOverridden, reader.getSetting(WorldStandardValues.IMAGE_FILE, imageFileDefault));
-
-        // Cleanup
-        cleanupCrumbs(reader);
     }
 
     /**
@@ -94,10 +92,7 @@ public abstract class AbstractSettingsReaderTest
         String expectedImageFile = "myMap.png";
 
         // Read it back
-        SettingsReader reader = getExistingReader(WorldStandardValues.IMAGE_FILE, expectedImageFile);
+        SettingsMap reader = getExistingReader(WorldStandardValues.IMAGE_FILE, expectedImageFile);
         assertEquals(expectedImageFile, reader.getSetting(WorldStandardValues.IMAGE_FILE, "wrong.png"));
-
-        // Cleanup
-        cleanupCrumbs(reader);
     }
 }

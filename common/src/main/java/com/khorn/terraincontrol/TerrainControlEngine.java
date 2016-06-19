@@ -218,9 +218,9 @@ public abstract class TerrainControlEngine
 
         // Do pluginConfig loading and then log anything that happened
         // LogManager and PluginConfig are now decoupled, thank the lord!
-        pluginConfig = new PluginConfig(new FileSettingsReader("PluginConfig", new File(getTCDataFolder(),
-                PluginStandardValues.ConfigFilename)));
-        FileSettingsWriter.writeToFile(pluginConfig, pluginConfig.SettingsMode);
+        File pluginConfigFile = new File(getTCDataFolder(), PluginStandardValues.ConfigFilename);
+        pluginConfig = new PluginConfig(FileSettingsReader.read("PluginConfig", pluginConfigFile));
+        FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.SettingsMode);
         logger.setLevel(pluginConfig.getLogLevel().getLevel());
 
         // Fire start event

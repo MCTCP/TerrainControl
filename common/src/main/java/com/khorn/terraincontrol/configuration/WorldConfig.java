@@ -3,8 +3,7 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.io.SettingsReader;
-import com.khorn.terraincontrol.configuration.io.SettingsWriter;
+import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
@@ -15,7 +14,6 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -38,7 +36,7 @@ public class WorldConfig extends ConfigFile
 
     // Biome Groups and special biome lists
     public BiomeGroupManager biomeGroupManager;
-    
+
     public List<String> IsleBiomes = new ArrayList<String>();
     public List<String> BorderBiomes = new ArrayList<String>();
 
@@ -57,9 +55,9 @@ public class WorldConfig extends ConfigFile
     public int LandRarity;
     public int LandSize;
     public int LandFuzzy;
-    
+
     public int maxSmoothRadius = 2;
-    
+
     public boolean FrozenOcean;
     public boolean FreezeAllColdGroupBiomes;
     public double FrozenOceanTemperature;
@@ -190,27 +188,24 @@ public class WorldConfig extends ConfigFile
     /**
      * Creates a WorldConfig from the WorldConfig.ini file found in the given
      * directory.
-     * 
+     *
+     * @param settingsDir    The directory the WorldConfig is in.
      * @param settingsReader The raw settings of the WorldConfig.
      * @param world          The LocalWorld instance of the world.
      * @param customObjects  The customs objects of the world.
      */
-    public WorldConfig(SettingsReader settingsReader, LocalWorld world,
+    public WorldConfig(File settingsDir, SettingsMap settingsReader, LocalWorld world,
             CustomObjectCollection customObjects)
     {
-        super(settingsReader);
-        if (settingsReader.getFile() != null) {
-            settingsDir = settingsReader.getFile().getParentFile();
-        } else {
-            settingsDir = new File(".");
-        }
+        super(settingsReader.getName());
 
+        this.settingsDir = settingsDir;
         this.worldObjects = customObjects;
 
         // Fix older names
-        this.renameOldSettings();
+        this.renameOldSettings(settingsReader);
         // Set the local fields based on what was read from the file
-        this.readConfigSettings();
+        this.readConfigSettings(settingsReader);
         // Clamp Settings to acceptable values
         this.correctSettings();
 
@@ -240,64 +235,63 @@ public class WorldConfig extends ConfigFile
     }
 
     @Override
-    protected void renameOldSettings()
+    protected void renameOldSettings(SettingsMap reader)
     {
-        renameOldSetting("WaterLevel", WorldStandardValues.WATER_LEVEL_MAX);
-        renameOldSetting("ModeTerrain", WorldStandardValues.TERRAIN_MODE);
-        renameOldSetting("ModeBiome", WorldStandardValues.BIOME_MODE);
-        renameOldSetting("NetherFortressEnabled", WorldStandardValues.NETHER_FORTRESSES_ENABLED);
-        renameOldSetting("PyramidsEnabled", WorldStandardValues.RARE_BUILDINGS_ENABLED);
+        reader.renameOldSetting("WaterLevel", WorldStandardValues.WATER_LEVEL_MAX);
+        reader.renameOldSetting("ModeTerrain", WorldStandardValues.TERRAIN_MODE);
+        reader.renameOldSetting("ModeBiome", WorldStandardValues.BIOME_MODE);
+        reader.renameOldSetting("NetherFortressEnabled", WorldStandardValues.NETHER_FORTRESSES_ENABLED);
+        reader.renameOldSetting("PyramidsEnabled", WorldStandardValues.RARE_BUILDINGS_ENABLED);
         // WorldHeightBits was split into two different settings
-        renameOldSetting("WorldHeightBits", WorldStandardValues.WORLD_HEIGHT_SCALE_BITS);
-        renameOldSetting("WorldHeightBits", WorldStandardValues.WORLD_HEIGHT_CAP_BITS);
+        reader.renameOldSetting("WorldHeightBits", WorldStandardValues.WORLD_HEIGHT_SCALE_BITS);
+        reader.renameOldSetting("WorldHeightBits", WorldStandardValues.WORLD_HEIGHT_CAP_BITS);
 
         // Put BiomeMode in compatibility mode when the old setting
         // NormalBiomes is found, and create default groups
-        if (this.reader.hasSetting(WorldStandardValues.NORMAL_BIOMES))
+        if (reader.hasSetting(WorldStandardValues.NORMAL_BIOMES))
         {
-            if (readSettings(WorldStandardValues.BIOME_MODE).equals("Normal"))
+            if (reader.getSetting(WorldStandardValues.BIOME_MODE).equals("Normal"))
             {
-                this.reader.putSetting(WorldStandardValues.BIOME_MODE, "BeforeGroups");
+                reader.putSetting(WorldStandardValues.BIOME_MODE, "BeforeGroups");
             }
 
-            int landSize = readSettings(WorldStandardValues.LAND_SIZE);
-            int landRarity = readSettings(WorldStandardValues.LAND_RARITY);
-            List<String> normalBiomes = readSettings(WorldStandardValues.NORMAL_BIOMES);
+            int landSize = reader.getSetting(WorldStandardValues.LAND_SIZE);
+            int landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY);
+            List<String> normalBiomes = reader.getSetting(WorldStandardValues.NORMAL_BIOMES);
             BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL,
                     landSize, landRarity, normalBiomes);
 
-            int iceSize = readSettings(WorldStandardValues.ICE_SIZE);
-            int iceRarity = readSettings(WorldStandardValues.ICE_RARITY);
-            List<String> iceBiomes = readSettings(WorldStandardValues.ICE_BIOMES);
+            int iceSize = reader.getSetting(WorldStandardValues.ICE_SIZE);
+            int iceRarity = reader.getSetting(WorldStandardValues.ICE_RARITY);
+            List<String> iceBiomes = reader.getSetting(WorldStandardValues.ICE_BIOMES);
             BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE,
                     iceSize, iceRarity, iceBiomes);
 
-            this.reader.addConfigFunction(normalGroup);
-            this.reader.addConfigFunction(iceGroup);
+            reader.addConfigFunctions(Arrays.asList(normalGroup, iceGroup));
         }
 
         // Migrate bounds
-        if (this.reader.hasSetting(WorldStandardValues.CANYON_DEPTH))
+        if (reader.hasSetting(WorldStandardValues.CANYON_DEPTH))
         {
-            renameOldSetting("CanyonDepth", WorldStandardValues.RAVINE_DEPTH);
-            renameOldSetting("CanyonRarity", WorldStandardValues.RAVINE_RARITY);
-            renameOldSetting("CanyonMinAltitude", WorldStandardValues.RAVINE_MIN_ALTITUDE);
-            renameOldSetting("CanyonMaxAltitude", WorldStandardValues.RAVINE_MAX_ALTITUDE);
-            renameOldSetting("CanyonMinLength", WorldStandardValues.RAVINE_MIN_LENGTH);
-            renameOldSetting("CanyonMaxLength", WorldStandardValues.RAVINE_MAX_LENGTH);
+            reader.renameOldSetting("CanyonDepth", WorldStandardValues.RAVINE_DEPTH);
+            reader.renameOldSetting("CanyonRarity", WorldStandardValues.RAVINE_RARITY);
+            reader.renameOldSetting("CanyonMinAltitude", WorldStandardValues.RAVINE_MIN_ALTITUDE);
+            reader.renameOldSetting("CanyonMaxAltitude", WorldStandardValues.RAVINE_MAX_ALTITUDE);
+            reader.renameOldSetting("CanyonMinLength", WorldStandardValues.RAVINE_MIN_LENGTH);
+            reader.renameOldSetting("CanyonMaxLength", WorldStandardValues.RAVINE_MAX_LENGTH);
 
-            decrementByOne(WorldStandardValues.CAVE_MAX_ALTITUDE);
-            decrementByOne(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE);
-            decrementByOne(WorldStandardValues.RAVINE_MAX_ALTITUDE);
-            decrementByOne(WorldStandardValues.RAVINE_MAX_LENGTH);
+            decrementByOne(reader, WorldStandardValues.CAVE_MAX_ALTITUDE);
+            decrementByOne(reader, WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE);
+            decrementByOne(reader, WorldStandardValues.RAVINE_MAX_ALTITUDE);
+            decrementByOne(reader, WorldStandardValues.RAVINE_MAX_LENGTH);
         }
     }
 
-    private void decrementByOne(Setting<Integer> setting)
+    private void decrementByOne(SettingsMap reader, Setting<Integer> setting)
     {
-        if (this.reader.hasSetting(setting))
+        if (reader.hasSetting(setting))
         {
-            this.reader.putSetting(setting, this.reader.getSetting(setting, setting.getDefaultValue()) - 1);
+            reader.putSetting(setting, reader.getSetting(setting) - 1);
         }
     }
 
@@ -348,72 +342,72 @@ public class WorldConfig extends ConfigFile
     }
 
     @Override
-    protected void readConfigSettings()
+    protected void readConfigSettings(SettingsMap reader)
     {
         // Main modes
-        this.SettingsMode = readSettings(WorldStandardValues.SETTINGS_MODE);
-        this.ModeTerrain = readSettings(WorldStandardValues.TERRAIN_MODE);
-        this.biomeMode = TerrainControl.getBiomeModeManager().getBiomeManager(readSettings(WorldStandardValues.BIOME_MODE));
+        this.SettingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE);
+        this.ModeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE);
+        this.biomeMode = TerrainControl.getBiomeModeManager().getBiomeManager(reader.getSetting(WorldStandardValues.BIOME_MODE));
 
         // World and water height
-        this.worldHeightCapBits = readSettings(WorldStandardValues.WORLD_HEIGHT_CAP_BITS);
+        this.worldHeightCapBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_CAP_BITS);
         this.worldHeightCap = 1 << this.worldHeightCapBits;
-        this.worldHeightScaleBits = readSettings(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS);
+        this.worldHeightScaleBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS);
         this.worldHeightScaleBits = lowerThanOrEqualTo(this.worldHeightScaleBits, this.worldHeightCapBits);
         this.worldHeightScale = 1 << this.worldHeightScaleBits;
         this.waterLevelMax = worldHeightCap / 2 - 1;
 
         // Biome placement
-        this.GenerationDepth = readSettings(WorldStandardValues.GENERATION_DEPTH);
+        this.GenerationDepth = reader.getSetting(WorldStandardValues.GENERATION_DEPTH);
 
-        this.BiomeRarityScale = readSettings(WorldStandardValues.BIOME_RARITY_SCALE);
-        this.LandRarity = readSettings(WorldStandardValues.LAND_RARITY);
-        this.LandSize = readSettings(WorldStandardValues.LAND_SIZE);
-        this.LandFuzzy = readSettings(WorldStandardValues.LAND_FUZZY);
+        this.BiomeRarityScale = reader.getSetting(WorldStandardValues.BIOME_RARITY_SCALE);
+        this.LandRarity = reader.getSetting(WorldStandardValues.LAND_RARITY);
+        this.LandSize = reader.getSetting(WorldStandardValues.LAND_SIZE);
+        this.LandFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY);
 
         // Ice Area Settings
-        this.FrozenOcean = readSettings(WorldStandardValues.FROZEN_OCEAN);
-        this.FrozenOceanTemperature = readSettings(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE);
-        this.FreezeAllColdGroupBiomes = readSettings(WorldStandardValues.GROUP_FREEZE_ENABLED);
+        this.FrozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN);
+        this.FrozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE);
+        this.FreezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED);
 
         // Freeze & Snow Settings
-        this.useTemperatureForSnowHeight = readSettings(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT);
-        this.betterSnowFall = readSettings(WorldStandardValues.BETTER_SNOW_FALL);
-        this.fullyFreezeLakes = readSettings(WorldStandardValues.FULLY_FREEZE_LAKES);
+        this.useTemperatureForSnowHeight = reader.getSetting(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT);
+        this.betterSnowFall = reader.getSetting(WorldStandardValues.BETTER_SNOW_FALL);
+        this.fullyFreezeLakes = reader.getSetting(WorldStandardValues.FULLY_FREEZE_LAKES);
 
         // Rivers
-        this.riverRarity = readSettings(WorldStandardValues.RIVER_RARITY);
-        this.riverSize = readSettings(WorldStandardValues.RIVER_SIZE);
-        this.riversEnabled = readSettings(WorldStandardValues.RIVERS_ENABLED);
-        this.improvedRivers = readSettings(WorldStandardValues.IMPROVED_RIVERS);
-        this.randomRivers = readSettings(WorldStandardValues.RANDOM_RIVERS);
+        this.riverRarity = reader.getSetting(WorldStandardValues.RIVER_RARITY);
+        this.riverSize = reader.getSetting(WorldStandardValues.RIVER_SIZE);
+        this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED);
+        this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS);
+        this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS);
 
         // Biome Groups
-        readBiomeGroups();
+        readBiomeGroups(reader);
 
         // Specialized Biomes
-        this.IsleBiomes = readSettings(WorldStandardValues.ISLE_BIOMES);
-        this.BorderBiomes = readSettings(WorldStandardValues.BORDER_BIOMES);
-        ReadCustomBiomes();
+        this.IsleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES);
+        this.BorderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES);
+        readCustomBiomes(reader);
 
         // Images
-        this.imageMode = readSettings(WorldStandardValues.IMAGE_MODE);
-        this.imageFile = this.readSettings(WorldStandardValues.IMAGE_FILE);
-        this.imageOrientation = this.readSettings(WorldStandardValues.IMAGE_ORIENTATION);
-        this.imageFillBiome = this.readSettings(WorldStandardValues.IMAGE_FILL_BIOME);
-        this.imageXOffset = this.readSettings(WorldStandardValues.IMAGE_X_OFFSET);
-        this.imageZOffset = this.readSettings(WorldStandardValues.IMAGE_Z_OFFSET);
+        this.imageMode = reader.getSetting(WorldStandardValues.IMAGE_MODE);
+        this.imageFile = reader.getSetting(WorldStandardValues.IMAGE_FILE);
+        this.imageOrientation = reader.getSetting(WorldStandardValues.IMAGE_ORIENTATION);
+        this.imageFillBiome = reader.getSetting(WorldStandardValues.IMAGE_FILL_BIOME);
+        this.imageXOffset = reader.getSetting(WorldStandardValues.IMAGE_X_OFFSET);
+        this.imageZOffset = reader.getSetting(WorldStandardValues.IMAGE_Z_OFFSET);
 
         // Old biomes
-        this.oldBiomeSize = readSettings(WorldStandardValues.OLD_BIOME_SIZE);
-        this.minMoisture = readSettings(WorldStandardValues.MIN_MOISTURE);
-        this.maxMoisture = readSettings(WorldStandardValues.MAX_MOISTURE);
-        this.minTemperature = readSettings(WorldStandardValues.MIN_TEMPERATURE);
-        this.maxTemperature = readSettings(WorldStandardValues.MAX_TEMPERATURE);
+        this.oldBiomeSize = reader.getSetting(WorldStandardValues.OLD_BIOME_SIZE);
+        this.minMoisture = reader.getSetting(WorldStandardValues.MIN_MOISTURE);
+        this.maxMoisture = reader.getSetting(WorldStandardValues.MAX_MOISTURE);
+        this.minTemperature = reader.getSetting(WorldStandardValues.MIN_TEMPERATURE);
+        this.maxTemperature = reader.getSetting(WorldStandardValues.MAX_TEMPERATURE);
 
         // Fog
-        this.WorldFog = readSettings(WorldStandardValues.WORLD_FOG);
-        this.WorldNightFog = readSettings(WorldStandardValues.WORLD_NIGHT_FOG);
+        this.WorldFog = reader.getSetting(WorldStandardValues.WORLD_FOG);
+        this.WorldNightFog = reader.getSetting(WorldStandardValues.WORLD_NIGHT_FOG);
 
         this.WorldFogR = ((WorldFog & 0xFF0000) >> 16) / 255F;
         this.WorldFogG = ((WorldFog & 0xFF00) >> 8) / 255F;
@@ -424,83 +418,83 @@ public class WorldConfig extends ConfigFile
         this.WorldNightFogB = (WorldNightFog & 0xFF) / 255F;
 
         // Structures
-        this.strongholdsEnabled = readSettings(WorldStandardValues.STRONGHOLDS_ENABLED);
-        this.strongholdCount = readSettings(WorldStandardValues.STRONGHOLD_COUNT);
-        this.strongholdDistance = readSettings(WorldStandardValues.STRONGHOLD_DISTANCE);
-        this.strongholdSpread = readSettings(WorldStandardValues.STRONGHOLD_SPREAD);
+        this.strongholdsEnabled = reader.getSetting(WorldStandardValues.STRONGHOLDS_ENABLED);
+        this.strongholdCount = reader.getSetting(WorldStandardValues.STRONGHOLD_COUNT);
+        this.strongholdDistance = reader.getSetting(WorldStandardValues.STRONGHOLD_DISTANCE);
+        this.strongholdSpread = reader.getSetting(WorldStandardValues.STRONGHOLD_SPREAD);
 
-        this.villagesEnabled = readSettings(WorldStandardValues.VILLAGES_ENABLED);
-        this.villageDistance = readSettings(WorldStandardValues.VILLAGE_DISTANCE);
-        this.villageSize = readSettings(WorldStandardValues.VILLAGE_SIZE);
+        this.villagesEnabled = reader.getSetting(WorldStandardValues.VILLAGES_ENABLED);
+        this.villageDistance = reader.getSetting(WorldStandardValues.VILLAGE_DISTANCE);
+        this.villageSize = reader.getSetting(WorldStandardValues.VILLAGE_SIZE);
 
-        this.rareBuildingsEnabled = readSettings(WorldStandardValues.RARE_BUILDINGS_ENABLED);
-        this.minimumDistanceBetweenRareBuildings = readSettings(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
-        this.maximumDistanceBetweenRareBuildings = readSettings(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
+        this.rareBuildingsEnabled = reader.getSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED);
+        this.minimumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
+        this.maximumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
 
-        this.oceanMonumentsEnabled = readSettings(WorldStandardValues.OCEAN_MONUMENTS_ENABLED);
-        this.oceanMonumentRandomOffset = readSettings(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET);
-        this.oceanMonumentGridSize = readSettings(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE);
+        this.oceanMonumentsEnabled = reader.getSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED);
+        this.oceanMonumentRandomOffset = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET);
+        this.oceanMonumentGridSize = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE);
 
-        this.maximumCustomStructureRadius = readSettings(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS);
-        this.mineshaftsEnabled = readSettings(WorldStandardValues.MINESHAFTS_ENABLED);
-        this.netherFortressesEnabled = readSettings(WorldStandardValues.NETHER_FORTRESSES_ENABLED);
+        this.maximumCustomStructureRadius = reader.getSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS);
+        this.mineshaftsEnabled = reader.getSetting(WorldStandardValues.MINESHAFTS_ENABLED);
+        this.netherFortressesEnabled = reader.getSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED);
 
         // Caves
-        this.caveRarity = readSettings(WorldStandardValues.CAVE_RARITY);
-        this.caveFrequency = readSettings(WorldStandardValues.CAVE_FREQUENCY);
-        this.caveMinAltitude = readSettings(WorldStandardValues.CAVE_MIN_ALTITUDE);
-        this.caveMaxAltitude = readSettings(WorldStandardValues.CAVE_MAX_ALTITUDE);
-        this.individualCaveRarity = readSettings(WorldStandardValues.INDIVIDUAL_CAVE_RARITY);
-        this.caveSystemFrequency = readSettings(WorldStandardValues.CAVE_SYSTEM_FREQUENCY);
-        this.caveSystemPocketChance = readSettings(WorldStandardValues.CAVE_SYSTEM_POCKET_CHANCE);
-        this.caveSystemPocketMinSize = readSettings(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE);
-        this.caveSystemPocketMaxSize = readSettings(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE);
-        this.evenCaveDistribution = readSettings(WorldStandardValues.EVEN_CAVE_DISTRIBUTION);
+        this.caveRarity = reader.getSetting(WorldStandardValues.CAVE_RARITY);
+        this.caveFrequency = reader.getSetting(WorldStandardValues.CAVE_FREQUENCY);
+        this.caveMinAltitude = reader.getSetting(WorldStandardValues.CAVE_MIN_ALTITUDE);
+        this.caveMaxAltitude = reader.getSetting(WorldStandardValues.CAVE_MAX_ALTITUDE);
+        this.individualCaveRarity = reader.getSetting(WorldStandardValues.INDIVIDUAL_CAVE_RARITY);
+        this.caveSystemFrequency = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_FREQUENCY);
+        this.caveSystemPocketChance = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_CHANCE);
+        this.caveSystemPocketMinSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE);
+        this.caveSystemPocketMaxSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE);
+        this.evenCaveDistribution = reader.getSetting(WorldStandardValues.EVEN_CAVE_DISTRIBUTION);
 
         // Ravines
-        this.ravineRarity = readSettings(WorldStandardValues.RAVINE_RARITY);
-        this.ravineMinAltitude = readSettings(WorldStandardValues.RAVINE_MIN_ALTITUDE);
-        this.ravineMaxAltitude = readSettings(WorldStandardValues.RAVINE_MAX_ALTITUDE);
-        this.ravineMinLength = readSettings(WorldStandardValues.RAVINE_MIN_LENGTH);
-        this.ravineMaxLength = readSettings(WorldStandardValues.RAVINE_MAX_LENGTH);
-        this.ravineDepth = readSettings(WorldStandardValues.RAVINE_DEPTH);
+        this.ravineRarity = reader.getSetting(WorldStandardValues.RAVINE_RARITY);
+        this.ravineMinAltitude = reader.getSetting(WorldStandardValues.RAVINE_MIN_ALTITUDE);
+        this.ravineMaxAltitude = reader.getSetting(WorldStandardValues.RAVINE_MAX_ALTITUDE);
+        this.ravineMinLength = reader.getSetting(WorldStandardValues.RAVINE_MIN_LENGTH);
+        this.ravineMaxLength = reader.getSetting(WorldStandardValues.RAVINE_MAX_LENGTH);
+        this.ravineDepth = reader.getSetting(WorldStandardValues.RAVINE_DEPTH);
 
         // Water
-        this.waterLevelMax = readSettings(WorldStandardValues.WATER_LEVEL_MAX);
-        this.waterLevelMin = readSettings(WorldStandardValues.WATER_LEVEL_MIN);
-        this.waterBlock = readSettings(WorldStandardValues.WATER_BLOCK);
-        this.iceBlock = readSettings(WorldStandardValues.ICE_BLOCK);
+        this.waterLevelMax = reader.getSetting(WorldStandardValues.WATER_LEVEL_MAX);
+        this.waterLevelMin = reader.getSetting(WorldStandardValues.WATER_LEVEL_MIN);
+        this.waterBlock = reader.getSetting(WorldStandardValues.WATER_BLOCK);
+        this.iceBlock = reader.getSetting(WorldStandardValues.ICE_BLOCK);
 
         // Lava
-        this.cooledLavaBlock = readSettings(WorldStandardValues.COOLED_LAVA_BLOCK);
+        this.cooledLavaBlock = reader.getSetting(WorldStandardValues.COOLED_LAVA_BLOCK);
 
         // Fracture
-        this.fractureHorizontal = readSettings(WorldStandardValues.FRACTURE_HORIZONTAL);
-        this.fractureVertical = readSettings(WorldStandardValues.FRACTURE_VERTICAL);
+        this.fractureHorizontal = reader.getSetting(WorldStandardValues.FRACTURE_HORIZONTAL);
+        this.fractureVertical = reader.getSetting(WorldStandardValues.FRACTURE_VERTICAL);
 
         // Bedrock
-        this.disableBedrock = readSettings(WorldStandardValues.DISABLE_BEDROCK);
-        this.ceilingBedrock = readSettings(WorldStandardValues.CEILING_BEDROCK);
-        this.flatBedrock = readSettings(WorldStandardValues.FLAT_BEDROCK);
-        this.bedrockBlock = readSettings(WorldStandardValues.BEDROCK_BLOCK);
+        this.disableBedrock = reader.getSetting(WorldStandardValues.DISABLE_BEDROCK);
+        this.ceilingBedrock = reader.getSetting(WorldStandardValues.CEILING_BEDROCK);
+        this.flatBedrock = reader.getSetting(WorldStandardValues.FLAT_BEDROCK);
+        this.bedrockBlock = reader.getSetting(WorldStandardValues.BEDROCK_BLOCK);
 
         // Misc
-        this.removeSurfaceStone = readSettings(WorldStandardValues.REMOVE_SURFACE_STONE);
-        this.objectSpawnRatio = readSettings(WorldStandardValues.OBJECT_SPAWN_RATIO);
-        this.resourcesSeed = readSettings(WorldStandardValues.RESOURCES_SEED);
-        this.populationBoundsCheck = readSettings(WorldStandardValues.POPULATION_BOUNDS_CHECK);
-        this.populateUsingSavedBiomes = readSettings(WorldStandardValues.POPULATE_USING_SAVED_BIOMES);
+        this.removeSurfaceStone = reader.getSetting(WorldStandardValues.REMOVE_SURFACE_STONE);
+        this.objectSpawnRatio = reader.getSetting(WorldStandardValues.OBJECT_SPAWN_RATIO);
+        this.resourcesSeed = reader.getSetting(WorldStandardValues.RESOURCES_SEED);
+        this.populationBoundsCheck = reader.getSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK);
+        this.populateUsingSavedBiomes = reader.getSetting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES);
 
         this.oldTerrainGenerator = this.ModeTerrain == TerrainMode.OldGenerator;
-        
-        this.author = readSettings(WorldStandardValues.AUTHOR);
-        this.description = readSettings(WorldStandardValues.DESCRIPTION);
+
+        this.author = reader.getSetting(WorldStandardValues.AUTHOR);
+        this.description = reader.getSetting(WorldStandardValues.DESCRIPTION);
     }
 
-    private void readBiomeGroups()
+    private void readBiomeGroups(SettingsMap reader)
     {
         this.biomeGroupManager = new BiomeGroupManager();
-        if (this.isNewConfig)
+        if (reader.isNewConfig())
         {
             createDefaultBiomeGroups();
         }
@@ -550,10 +544,10 @@ public class WorldConfig extends ConfigFile
         this.biomeGroupManager.registerGroup(megaTaigaGroup);
     }
 
-    private void ReadCustomBiomes()
+    private void readCustomBiomes(SettingsMap reader)
     {
 
-        List<String> biomes = this.readSettings(WorldStandardValues.CUSTOM_BIOMES);
+        List<String> biomes = reader.getSetting(WorldStandardValues.CUSTOM_BIOMES);
 
         for (String biome : biomes)
         {
@@ -584,454 +578,431 @@ public class WorldConfig extends ConfigFile
     }
 
     @Override
-    protected void writeConfigSettings(SettingsWriter writer) throws IOException
+    protected void writeConfigSettings(SettingsMap writer)
     {
         // About the world
         writer.bigTitle("WorldConfig");
-        writer.comment("The author of this world");
-        writer.setting(WorldStandardValues.AUTHOR, this.author);
+        writer.putSetting(WorldStandardValues.AUTHOR, this.author,
+                "The author of this world");
 
-        writer.comment("A short description of this world");
-        writer.setting(WorldStandardValues.DESCRIPTION, this.description);
+        writer.putSetting(WorldStandardValues.DESCRIPTION, this.description,
+                "A short description of this world");
 
-        writer.comment("What " + PluginStandardValues.PLUGIN_NAME + " does with the config files.");
-        writer.comment("Possible modes:");
-        writer.comment("   WriteAll - default");
-        writer.comment("   WriteWithoutComments - write config files without help comments");
-        writer.comment("   WriteDisable - doesn't write to the config files, it only reads. Doesn't auto-update the configs. Use with care!");
-        writer.setting(WorldStandardValues.SETTINGS_MODE, this.SettingsMode);
+        writer.putSetting(WorldStandardValues.SETTINGS_MODE, this.SettingsMode,
+                "What " + PluginStandardValues.PLUGIN_NAME + " does with the config files.",
+                "Possible modes:",
+                "   WriteAll - default",
+                "   WriteWithoutComments - write config files without help comments",
+                "   WriteDisable - doesn't write to the config files, it only reads. Doesn't auto-update the configs. Use with care!");
 
         // The modes
         writer.bigTitle("The modes");
 
-        writer.comment("Possible terrain modes:");
-        writer.comment("   Normal - use all features");
-        writer.comment("   TerrainTest - generate only terrain without any resources");
-        writer.comment("   NotGenerate - generate empty chunks");
-        writer.comment("   Default - use default terrain generator");
-        writer.comment("   OldGenerator - Minecraft Beta 1.7.3-like land generator");
-        writer.setting(WorldStandardValues.TERRAIN_MODE, this.ModeTerrain);
+        writer.putSetting(WorldStandardValues.TERRAIN_MODE, this.ModeTerrain,
+                "Possible terrain modes:",
+                "   Normal - use all features",
+                "   TerrainTest - generate only terrain without any resources",
+                "   NotGenerate - generate empty chunks",
+                "   Default - use default terrain generator",
+                "   OldGenerator - Minecraft Beta 1.7.3-like land generator");
 
-        writer.comment("Possible biome modes:");
-        writer.comment("   Normal - use all features");
-        writer.comment("   FromImage - get biomes from image file");
-        writer.comment("   Default - use default Notch biome generator");
-        writer.comment("For old maps two more modes are available:");
-        writer.comment("   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes");
-        writer.comment("   OldGenerator - Minecraft Beta 1.7.3 biome generator");
-        writer.setting(WorldStandardValues.BIOME_MODE, TerrainControl.getBiomeModeManager().getName(biomeMode));
+        writer.putSetting(WorldStandardValues.BIOME_MODE, TerrainControl.getBiomeModeManager().getName(biomeMode),
+                "Possible biome modes:",
+                "   Normal - use all features",
+                "   FromImage - get biomes from image file",
+                "   Default - use default Notch biome generator",
+                "For old maps two more modes are available:",
+                "   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes",
+                "   OldGenerator - Minecraft Beta 1.7.3 biome generator");
 
         // Custom biomes
         writer.bigTitle("Custom biomes");
-        writer.comment("You need to register your custom biomes here. This setting will make Terrain Control");
-        writer.comment("generate setting files for them. However, it won't place them in the world automatically.");
-        writer.comment("See the settings for your BiomeMode below on how to add them to the world.");
-        writer.comment("");
-        writer.comment("Syntax: CustomBiomes:BiomeName:id[,AnotherBiomeName:id[,...]]");
-        writer.comment("Example: CustomBiomes:TestBiome1:30,BiomeTest2:31");
-        writer.comment("This will add two biomes and generate the BiomeConfigs for them.");
-        writer.comment("All changes here need a server restart.");
-        writer.comment("");
-        writer.comment("Due to the way Mojang's loading code works, all biome ids need to be unique");
-        writer.comment("on the server. If you don't do this, the client will display the biomes just fine,");
-        writer.comment("but the server can think it is another biome with the same id. This will cause saplings,");
-        writer.comment("snowfall and mobs to work as in the other biome.");
-        writer.comment("");
-        writer.comment("The available ids range from 0 to 1023 and the ids 0-39 and 129-167 are taken by vanilla.");
-        writer.comment("The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome.");
 
         WriteCustomBiomes(writer);
 
         // Settings for BiomeMode:Normal
-        writer.bigTitle("Settings for BiomeMode: Normal");
-        writer.comment("Also applies if you are using BiomeMode: FromImage with ImageMode: ContinueNormal, or");
-        writer.comment("if you are using BiomeMode: BeforeGroups");
-        writer.comment("");
+        writer.bigTitle("Settings for BiomeMode: Normal",
+                "Also used in BiomeMode:FromImage when ImageMode is set to ContinueNormal");
 
-        writer.comment("Important value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.");
-        writer.comment("Large %/total area biomes (Continents) must be set small, (limit=0)");
-        writer.comment("Small %/total area biomes (Oasis,Mountain Peaks) must be larger (limit=GenerationDepth)");
-        writer.comment("This could also represent \"Total number of biome sizes\" ");
-        writer.comment("Small values (about 1-2) and Large values (about 20) may affect generator performance.");
-        writer.setting(WorldStandardValues.GENERATION_DEPTH, this.GenerationDepth);
+        writer.putSetting(WorldStandardValues.GENERATION_DEPTH, this.GenerationDepth,
+                "Important value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.",
+                "Large %/total area biomes (Continents) must be set small, (limit=0)",
+                "Small %/total area biomes (Oasis,Mountain Peaks) must be larger (limit=GenerationDepth)",
+                "This could also represent \"Total number of biome sizes\" ",
+                "Small values (about 1-2) and Large values (about 20) may affect generator performance.");
 
-        writer.comment("Max biome rarity from 1 to infinity. By default this is 100, but you can raise it for");
-        writer.comment("fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
-        writer.setting(WorldStandardValues.BIOME_RARITY_SCALE, this.BiomeRarityScale);
+        writer.putSetting(WorldStandardValues.BIOME_RARITY_SCALE, this.BiomeRarityScale,
+                "Max biome rarity from 1 to infinity. By default this is 100, but you can raise it for",
+                "fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
 
-        writer.smallTitle("Biome Groups");
+        // Biome groups
+        writer.smallTitle("Biome Groups",
+                "Minecraft groups similar biomes together, so that they spawn next to each other.",
+                "",
+                "Syntax: BiomeGroup(Name, Size, Rarity, BiomeName[, AnotherName[, ...]])",
+                "Name - just for clarity, choose something descriptive",
+                "Size - layer to generate on, from 0 to GenerationDepth. All biomes in the group must have a BiomeSize",
+                "       larger than or equal to this value.",
+                "Rarity - relative spawn chances.",
+                "BiomeName... - names of the biome that spawn in the group. Case sensitive.",
+                "",
+                "Note: if you're using BiomeMode: BeforeGroups, only the biome names of the groups named NormalBiomes",
+                "and IceBiomes and the size and rarity of the group named IceBiomes will be used. Other groups are",
+                "ignored. The size and rarity of the NormalBiomes group is ignored as well, use LandSize and",
+                "LandRarity instead.",
+                "");
 
-        writeBiomeGroups(writer);
+        writer.addConfigFunctions(this.biomeGroupManager.getGroups());
 
-        writer.smallTitle("Biome lists");
+        // Biome lists
+        writer.smallTitle("Biome lists",
+                "Don't forget to register your custom biomes first in CustomBiomes!",
+                "");
 
-        writer.comment("Don't forget to register your custom biomes first in CustomBiomes!");
-        writer.comment("");
+        writer.putSetting(WorldStandardValues.ISLE_BIOMES, this.IsleBiomes,
+                "Biomes used as isles in other biomes. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.",
 
-        writer.comment("Biomes used as isles in other biomes. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.");
-        writer.setting(WorldStandardValues.ISLE_BIOMES, this.IsleBiomes);
+                "Biomes used as borders of other biomes. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
 
-        writer.comment("Biomes used as borders of other biomes. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
-        writer.setting(WorldStandardValues.BORDER_BIOMES, this.BorderBiomes);
+        writer.putSetting(WorldStandardValues.BORDER_BIOMES, this.BorderBiomes);
 
         writer.smallTitle("Landmass settings (for NormalBiomes)");
 
-        writer.comment("Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
-        writer.setting(WorldStandardValues.LAND_RARITY, this.LandRarity);
+        writer.putSetting(WorldStandardValues.LAND_RARITY, this.LandRarity,
+                "Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
 
-        writer.comment("Land size from 0 to GenerationDepth. Biome groups are placed on this.");
-        writer.setting(WorldStandardValues.LAND_SIZE, this.LandSize);
+        writer.putSetting(WorldStandardValues.LAND_SIZE, this.LandSize,
+                "Land size from 0 to GenerationDepth. Biome groups are placed on this.");
 
-        writer.comment("Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
-        writer.setting(WorldStandardValues.LAND_FUZZY, this.LandFuzzy);
+        writer.putSetting(WorldStandardValues.LAND_FUZZY, this.LandFuzzy,
+                "Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
 
         writer.smallTitle("Ice area settings");
 
-        writer.comment("Set this to false to stop the ocean from freezing near when an \"ice area\" intersects with an ocean.");
-        writer.setting(WorldStandardValues.FROZEN_OCEAN, this.FrozenOcean);
+        writer.putSetting(WorldStandardValues.FROZEN_OCEAN, this.FrozenOcean,
+                "Set this to false to stop the ocean from freezing near when an \"ice area\" intersects with an ocean.");
 
-        writer.comment("This is the biome temperature when water freezes if \"FrozenOcean\" is set to true.");
-        writer.comment("This used to be the case for all biomes in the \"IceBiomes\" list. Default: 0.15; Min: 0.0; Max: 2.0");
-        writer.comment("Temperature Reference from Vanilla: <0.15 for snow, 0.15 - 0.95 for rain, or >1.0 for dry");
-        writer.setting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, this.FrozenOceanTemperature);
-        
-        writer.comment("If the average of all biome temperatures in a biome group is less than \"OceanFreezingTemperature\", then:");
-        writer.comment(" - When this setting is true, all biomes in the group will have frozen oceans");
-        writer.comment(" - When this setting is false, only biomes with a temperature below \"OceanFreezingTemperature\" will have frozen oceans");
-        writer.comment("Default: false");
-        writer.setting(WorldStandardValues.GROUP_FREEZE_ENABLED, this.FreezeAllColdGroupBiomes);
+        writer.putSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, this.FrozenOceanTemperature,
+                "This is the biome temperature when water freezes if \"FrozenOcean\" is set to true.",
+                "This used to be the case for all biomes in the \"IceBiomes\" list. Default: 0.15; Min: 0.0; Max: 2.0",
+                "Temperature Reference from Vanilla: <0.15 for snow, 0.15 - 0.95 for rain, or >1.0 for dry");
+
+        writer.putSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, this.FreezeAllColdGroupBiomes,
+                "If the average of all biome temperatures in a biome group is less than \"OceanFreezingTemperature\", then:",
+                " - When this setting is true, all biomes in the group will have frozen oceans",
+                " - When this setting is false, only biomes with a temperature below \"OceanFreezingTemperature\" will have frozen oceans",
+                "Default: false");
 
         writer.smallTitle("Rivers");
 
-        writer.comment("River rarity. Must be from 0 to GenerationDepth.");
-        writer.setting(WorldStandardValues.RIVER_RARITY, this.riverRarity);
+        writer.putSetting(WorldStandardValues.RIVER_RARITY, this.riverRarity,
+                "River rarity. Must be from 0 to GenerationDepth.");
 
-        writer.comment("River size from 0 to GenerationDepth - RiverRarity");
-        writer.setting(WorldStandardValues.RIVER_SIZE, this.riverSize);
+        writer.putSetting(WorldStandardValues.RIVER_SIZE, this.riverSize,
+                "River size from 0 to GenerationDepth - RiverRarity");
 
-        writer.comment("Set this to false to prevent the river generator from doing anything.");
-        writer.setting(WorldStandardValues.RIVERS_ENABLED, this.riversEnabled);
+        writer.putSetting(WorldStandardValues.RIVERS_ENABLED, this.riversEnabled,
+                "Set this to false to prevent the river generator from doing anything.");
 
-        writer.comment("When this is set to false, the standard river generator of Minecraft will be used.");
-        writer.comment("This means that a technical biome, determined by the RiverBiome setting of the biome");
-        writer.comment("the river is flowing through, will be used to generate the river.");
-        writer.comment("");
-        writer.comment("When enabled, the rivers won't use a technical biome in your world anymore, instead");
-        writer.comment("you can control them using the river settings in the BiomeConfigs.");
-        writer.setting(WorldStandardValues.IMPROVED_RIVERS, this.improvedRivers);
+        writer.putSetting(WorldStandardValues.IMPROVED_RIVERS, this.improvedRivers,
+                "When this is set to false, the standard river generator of Minecraft will be used.",
+                "This means that a technical biome, determined by the RiverBiome setting of the biome",
+                "the river is flowing through, will be used to generate the river.",
+                "",
+                "When enabled, the rivers won't use a technical biome in your world anymore, instead",
+                "you can control them using the river settings in the BiomeConfigs.");
 
-        writer.comment("When set to true the rivers will no longer follow biome border most of the time.");
-        writer.setting(WorldStandardValues.RANDOM_RIVERS, this.randomRivers);
+        writer.putSetting(WorldStandardValues.RANDOM_RIVERS, this.randomRivers,
+                "When set to true the rivers will no longer follow biome border most of the time.");
 
         // Settings for BiomeMode:FromImage
         writer.bigTitle("Settings for BiomeMode:FromImage");
 
-        writer.comment("Possible modes when generator outside image boundaries: Repeat, ContinueNormal, FillEmpty");
-        writer.comment("   Repeat - repeat image");
-        writer.comment("   Mirror - advanced repeat image mode");
-        writer.comment("   ContinueNormal - continue normal generation");
-        writer.comment("   FillEmpty - fill by biome in \"ImageFillBiome settings\" ");
-        writer.setting(WorldStandardValues.IMAGE_MODE, this.imageMode);
+        writer.putSetting(WorldStandardValues.IMAGE_MODE, this.imageMode,
+                "Possible modes when generator outside image boundaries: Repeat, ContinueNormal, FillEmpty",
+                "   Repeat - repeat image",
+                "   Mirror - advanced repeat image mode",
+                "   ContinueNormal - continue normal generation",
+                "   FillEmpty - fill by biome in \"ImageFillBiome settings\" ");
 
-        writer.comment("Source png file for FromImage biome mode.");
-        writer.setting(WorldStandardValues.IMAGE_FILE, this.imageFile);
+        writer.putSetting(WorldStandardValues.IMAGE_FILE, this.imageFile,
+                "Source png file for FromImage biome mode.");
 
-        writer.comment("Where the png's north is oriented? Possible values: North, East, South, West");
-        writer.comment("   North - the top of your picture if north (no any rotation)");
-        writer.comment("   West - previous behavior (you should rotate png CCW manually)");
-        writer.comment("   East - png should be rotated CW manually");
-        writer.comment("   South - rotate png 180 degrees before generating world");
-        writer.setting(WorldStandardValues.IMAGE_ORIENTATION, this.imageOrientation);
+        writer.putSetting(WorldStandardValues.IMAGE_ORIENTATION, this.imageOrientation,
+                "Where the png's north is oriented? Possible values: North, East, South, West",
+                "   North - the top of your picture if north (no any rotation)",
+                "   West - previous behavior (you should rotate png CCW manually)",
+                "   East - png should be rotated CW manually",
+                "   South - rotate png 180 degrees before generating world");
 
-        writer.comment("Biome name for fill outside image boundaries with FillEmpty mode.");
-        writer.setting(WorldStandardValues.IMAGE_FILL_BIOME, this.imageFillBiome);
+        writer.putSetting(WorldStandardValues.IMAGE_FILL_BIOME, this.imageFillBiome,
+                "Biome name for fill outside image boundaries with FillEmpty mode.");
 
-        writer.comment("Shifts map position from x=0 and z=0 coordinates.");
-        writer.setting(WorldStandardValues.IMAGE_X_OFFSET, this.imageXOffset);
-        writer.setting(WorldStandardValues.IMAGE_Z_OFFSET, this.imageZOffset);
+        writer.putSetting(WorldStandardValues.IMAGE_X_OFFSET, this.imageXOffset,
+                "Shifts map position from x=0 and z=0 coordinates.");
+        writer.putSetting(WorldStandardValues.IMAGE_Z_OFFSET, this.imageZOffset);
 
         // Terrain height and volatility
         writer.bigTitle("Terrain height and volatility");
 
-        writer.comment("Scales the height of the world. Adding 1 to this doubles the");
-        writer.comment("height of the terrain, substracting 1 to this halves the height");
-        writer.comment("of the terrain. Values must be between 5 and 8, inclusive.");
-        writer.setting(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS, this.worldHeightScaleBits);
+        writer.putSetting(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS, this.worldHeightScaleBits,
+                "Scales the height of the world. Adding 1 to this doubles the",
+                "height of the terrain, substracting 1 to this halves the height",
+                "of the terrain. Values must be between 5 and 8, inclusive.");
 
-        writer.comment("Height cap of the base terrain. Setting this to 7 makes no terrain");
-        writer.comment("generate above y = 2 ^ 7 = 128. Doesn't affect resources (trees, objects, etc.).");
-        writer.comment("Values must be between 5 and 8, inclusive. Values may not be lower");
-        writer.comment("than WorldHeightScaleBits.");
-        writer.setting(WorldStandardValues.WORLD_HEIGHT_CAP_BITS, this.worldHeightCapBits);
+        writer.putSetting(WorldStandardValues.WORLD_HEIGHT_CAP_BITS, this.worldHeightCapBits,
+                "Height cap of the base terrain. Setting this to 7 makes no terrain",
+                "generate above y = 2 ^ 7 = 128. Doesn't affect resources (trees, objects, etc.).",
+                "Values must be between 5 and 8, inclusive. Values may not be lower",
+                "than WorldHeightScaleBits.");
 
-        writer.comment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured horizontally.");
-        writer.setting(WorldStandardValues.FRACTURE_HORIZONTAL, this.fractureHorizontal);
+        writer.putSetting(WorldStandardValues.FRACTURE_HORIZONTAL, this.fractureHorizontal,
+                "Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured horizontally.");
 
-        writer.comment("Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured vertically.");
-        writer.comment("Positive values will lead to large cliffs/overhangs, floating islands, and/or a cavern world depending on other settings.");
-        writer.setting(WorldStandardValues.FRACTURE_VERTICAL, this.fractureVertical);
+        writer.putSetting(WorldStandardValues.FRACTURE_VERTICAL, this.fractureVertical,
+                "Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured vertically.",
+                "Positive values will lead to large cliffs/overhangs, floating islands, and/or a cavern world depending on other settings.");
 
         // Blocks
         writer.bigTitle("Blocks");
 
-        writer.comment("Attempts to replace all surface stone with biome surface block.");
-        writer.setting(WorldStandardValues.REMOVE_SURFACE_STONE, this.removeSurfaceStone);
+        writer.putSetting(WorldStandardValues.REMOVE_SURFACE_STONE, this.removeSurfaceStone,
+                "Attempts to replace all surface stone with biome surface block.");
 
-        writer.comment("Disable bottom of map bedrock generation. Doesn't affect bedrock on the ceiling of the map.");
-        writer.setting(WorldStandardValues.DISABLE_BEDROCK, this.disableBedrock);
+        writer.putSetting(WorldStandardValues.DISABLE_BEDROCK, this.disableBedrock,
+                "Disable bottom of map bedrock generation. Doesn't affect bedrock on the ceiling of the map.");
 
-        writer.comment("Enable ceiling of map bedrock generation.");
-        writer.setting(WorldStandardValues.CEILING_BEDROCK, this.ceilingBedrock);
+        writer.putSetting(WorldStandardValues.CEILING_BEDROCK, this.ceilingBedrock,
+                "Enable ceiling of map bedrock generation.");
 
-        writer.comment("Make layer of bedrock flat.");
-        writer.setting(WorldStandardValues.FLAT_BEDROCK, this.flatBedrock);
+        writer.putSetting(WorldStandardValues.FLAT_BEDROCK, this.flatBedrock,
+                "Make layer of bedrock flat.");
 
-        writer.comment("Block used as bedrock.");
-        writer.setting(WorldStandardValues.BEDROCK_BLOCK, this.bedrockBlock);
+        writer.putSetting(WorldStandardValues.BEDROCK_BLOCK, this.bedrockBlock,
+                "Block used as bedrock.");
 
-        writer.comment("Set this to false to disable the bounds check during chunk population.");
-        writer.comment("While this allows you to spawn larger objects, it also makes terrain generation");
-        writer.comment("dependant on the direction you explored the world in.");
-        writer.setting(WorldStandardValues.POPULATION_BOUNDS_CHECK, this.populationBoundsCheck);
+        writer.putSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK, this.populationBoundsCheck,
+                "Set this to false to disable the bounds check during chunk population.",
+                "While this allows you to spawn larger objects, it also makes terrain generation",
+                "dependant on the direction you explored the world in.");
 
         if (this.populateUsingSavedBiomes)
         {
-            writer.comment("Advanced setting, only written to this file when set to true.");
-            writer.comment("If it is set to true the biome populator will use the biome ids present in the");
-            writer.comment("chunk data, ignoring the biome generator. This is useful if you have a premade");
-            writer.comment("map made with for example WorldPainter, but still want to populate it using "
-                    + PluginStandardValues.PLUGIN_NAME + ".");
-            writer.comment("Using this together with " + BiomeStandardValues.REPLACE_TO_BIOME_NAME + " is discouraged: it uses the biome");
-            writer.comment("specified in " + BiomeStandardValues.REPLACE_TO_BIOME_NAME
-                    + " to populate the chunk, instead of the biome itself.");
-            writer.setting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES, this.populateUsingSavedBiomes);
+
+            writer.putSetting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES, this.populateUsingSavedBiomes,
+                    "Advanced setting, only written to this file when set to true.",
+                    "If it is set to true the biome populator will use the biome ids present in the",
+                    "chunk data, ignoring the biome generator. This is useful if you have a premade",
+                    "map made with for example WorldPainter, but still want to populate it using "
+                            + PluginStandardValues.PLUGIN_NAME + ".",
+                    "Using this together with " + BiomeStandardValues.REPLACE_TO_BIOME_NAME + " is discouraged: it uses the biome",
+                    "specified in " + BiomeStandardValues.REPLACE_TO_BIOME_NAME
+                            + " to populate the chunk, instead of the biome itself.");
         }
 
         writer.smallTitle("Water / Lava & Frozen States");
 
-        writer.comment("Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
-        writer.setting(WorldStandardValues.WATER_LEVEL_MAX, this.waterLevelMax);
-        writer.setting(WorldStandardValues.WATER_LEVEL_MIN, this.waterLevelMin);
+        writer.putSetting(WorldStandardValues.WATER_LEVEL_MAX, this.waterLevelMax,
+                "Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
+        writer.putSetting(WorldStandardValues.WATER_LEVEL_MIN, this.waterLevelMin);
 
-        writer.comment("Block used as water in WaterLevel.");
-        writer.setting(WorldStandardValues.WATER_BLOCK, this.waterBlock);
+        writer.putSetting(WorldStandardValues.WATER_BLOCK, this.waterBlock,
+                "Block used as water in WaterLevel.");
 
-        writer.comment("Block used as ice.");
-        writer.setting(WorldStandardValues.ICE_BLOCK, this.iceBlock);
+        writer.putSetting(WorldStandardValues.ICE_BLOCK, this.iceBlock,
+                "Block used as ice.");
 
-        writer.comment("Block used as cooled or frozen lava.");
-        writer.comment("Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes");
-        writer.setting(WorldStandardValues.COOLED_LAVA_BLOCK, this.cooledLavaBlock);
+        writer.putSetting(WorldStandardValues.COOLED_LAVA_BLOCK, this.cooledLavaBlock,
+                "Block used as cooled or frozen lava.",
+                "Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes");
 
-        writer.comment("==== WORLD ONLY ====");
-        writer.comment("");
+        writer.smallTitle("World only");
 
-        writer.comment("By Default in cold biomes, lakes freeze but only water exposed to sky is frozen.");
-        writer.comment("Setting this to true causes any lake in a cold biome with at least one block exposed to sky to completely freeze");
-        writer.setting(WorldStandardValues.FULLY_FREEZE_LAKES, this.fullyFreezeLakes);
+        writer.putSetting(WorldStandardValues.FULLY_FREEZE_LAKES, this.fullyFreezeLakes,
+                "By Default in cold biomes, lakes freeze but only water exposed to sky is frozen.",
+                "Setting this to true causes any lake in a cold biome with at least one block exposed to sky to completely freeze");
 
-        writer.comment("By Default, all snow is 1 layer high. When this setting is set to true, snow height is");
-        writer.comment("determined by biome temperature and therefore height.");
-        writer.comment("For now: A block temp > -.5 yields a single snow layer. A block temp < -.75 yields max snow layers.");
-        writer.comment("All values in the range -.75 < temp < -.5 are evenly distributed.");
-        writer.setting(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT, this.useTemperatureForSnowHeight);
+        writer.putSetting(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT, this.useTemperatureForSnowHeight,
+                "By Default, all snow is 1 layer high. When this setting is set to true, snow height is",
+                "determined by biome temperature and therefore height.",
+                "For now: A block temp > -.5 yields a single snow layer. A block temp < -.75 yields max snow layers.",
+                "All values in the range -.75 < temp < -.5 are evenly distributed.");
 
-        writer.comment("By Default, snow falls on the highest block only.");
-        writer.comment("Setting this to true will cause snow to fall through leaves but leave a little snow on the way");
-        writer.setting(WorldStandardValues.BETTER_SNOW_FALL, this.betterSnowFall);
-
+        writer.putSetting(WorldStandardValues.BETTER_SNOW_FALL, this.betterSnowFall,
+                "By Default, snow falls on the highest block only.",
+                "Setting this to true will cause snow to fall through leaves but leave a little snow on the way");
 
         writer.bigTitle("Resources");
 
-        writer.comment("Seed used for the resource generation. Can only be numeric. Set to 0 to use the world seed.");
-        writer.setting(WorldStandardValues.RESOURCES_SEED, this.resourcesSeed);
+        writer.putSetting(WorldStandardValues.RESOURCES_SEED, this.resourcesSeed,
+                "Seed used for the resource generation. Can only be numeric. Set to 0 to use the world seed.");
 
         if (objectSpawnRatio != 1)
         {
             // Write the old objectSpawnRatio
 
-            writer.comment("LEGACY setting for compability with old worlds. This setting should be kept at 1.");
-            writer.comment("If the setting is set at 1, the setting will vanish from the config file. Readd it");
-            writer.comment("manually with another value and it will be back.");
-            writer.comment("");
-            writer.comment("When using the UseWorld or UseBiome keyword for spawning custom objects, Terrain Control");
-            writer.comment("spawns one of the possible custom objects. There is of course a chance that");
-            writer.comment("the chosen object cannot spawn. This setting tells TC how many times it should");
-            writer.comment("try to spawn that object.");
-            writer.comment("This setting doesn't affect growing saplings anymore.");
-            writer.setting(WorldStandardValues.OBJECT_SPAWN_RATIO, this.objectSpawnRatio);
+            writer.putSetting(WorldStandardValues.OBJECT_SPAWN_RATIO, this.objectSpawnRatio,
+                    "LEGACY setting for compability with old worlds. This setting should be kept at 1.",
+                    "If the setting is set at 1, the setting will vanish from the config file. Readd it",
+                    "manually with another value and it will be back.",
+                    "",
+                    "When using the UseWorld or UseBiome keyword for spawning custom objects, Terrain Control",
+                    "spawns one of the possible custom objects. There is of course a chance that",
+                    "the chosen object cannot spawn. This setting tells TC how many times it should",
+                    "try to spawn that object.",
+                    "This setting doesn't affect growing saplings anymore.");
         }
 
         // Structures
-        writer.bigTitle("Structures");
-        writer.comment("Generate-structures in the server.properties file is ignored by Terrain Control. Use these settings instead.");
-        writer.comment("");
+        writer.bigTitle("Structures",
+                "Generate-structures in the server.properties file is ignored by Terrain Control. Use these settings instead.",
+                "");
 
         // Strongholds
         writer.smallTitle("Strongholds");
-        writer.comment("Set this to false to prevent the stronghold generator from doing anything.");
-        writer.setting(WorldStandardValues.STRONGHOLDS_ENABLED, this.strongholdsEnabled);
 
-        writer.comment("The number of strongholds in the world.");
-        writer.setting(WorldStandardValues.STRONGHOLD_COUNT, this.strongholdCount);
+        writer.putSetting(WorldStandardValues.STRONGHOLDS_ENABLED, this.strongholdsEnabled,
+                "Set this to false to prevent the stronghold generator from doing anything.");
 
-        writer.comment("How far strongholds are from the spawn and other strongholds (minimum is 1.0, default is 32.0).");
-        writer.setting(WorldStandardValues.STRONGHOLD_DISTANCE, this.strongholdDistance);
+        writer.putSetting(WorldStandardValues.STRONGHOLD_COUNT, this.strongholdCount,
+                "The number of strongholds in the world.");
 
-        writer.comment("How concentrated strongholds are around the spawn (minimum is 1, default is 3). Lower number, lower concentration.");
-        writer.setting(WorldStandardValues.STRONGHOLD_SPREAD, this.strongholdSpread);
+        writer.putSetting(WorldStandardValues.STRONGHOLD_DISTANCE, this.strongholdDistance,
+                "How far strongholds are from the spawn and other strongholds (minimum is 1.0, default is 32.0).");
+
+        writer.putSetting(WorldStandardValues.STRONGHOLD_SPREAD, this.strongholdSpread,
+                "How concentrated strongholds are around the spawn (minimum is 1, default is 3). Lower number, lower concentration.");
 
         // Villages
         writer.smallTitle("Villages");
-        writer.comment("Whether the villages are enabled or not.");
-        writer.setting(WorldStandardValues.VILLAGES_ENABLED, this.villagesEnabled);
 
-        writer.comment("The size of the village. Larger is bigger. Normal worlds have 0 as default, superflat worlds 1.");
-        writer.setting(WorldStandardValues.VILLAGE_SIZE, this.villageSize);
+        writer.putSetting(WorldStandardValues.VILLAGES_ENABLED, this.villagesEnabled,
+                "Whether the villages are enabled or not.");
 
-        writer.comment("The minimum distance between the village centers in chunks. Minimum value is 9.");
-        writer.setting(WorldStandardValues.VILLAGE_DISTANCE, this.villageDistance);
+        writer.putSetting(WorldStandardValues.VILLAGE_SIZE, this.villageSize,
+                "The size of the village. Larger is bigger. Normal worlds have 0 as default, superflat worlds 1.");
+
+        writer.putSetting(WorldStandardValues.VILLAGE_DISTANCE, this.villageDistance,
+                "The minimum distance between the village centers in chunks. Minimum value is 9.");
 
         // Rare buildings
-        writer.smallTitle("Rare buildings");
-        writer.comment("Rare buildings are either desert pyramids, jungle temples or swamp huts.");
+        writer.smallTitle("Rare buildings",
+                "Rare buildings are either desert pyramids, jungle temples or swamp huts.");
 
-        writer.comment("Whether rare buildings are enabled.");
-        writer.setting(WorldStandardValues.RARE_BUILDINGS_ENABLED, this.rareBuildingsEnabled);
+        writer.putSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED, this.rareBuildingsEnabled,
+                "Whether rare buildings are enabled.");
 
-        writer.comment("The minimum distance between rare buildings in chunks.");
-        writer.setting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.minimumDistanceBetweenRareBuildings);
+        writer.putSetting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.minimumDistanceBetweenRareBuildings,
+                "The minimum distance between rare buildings in chunks.");
 
-        writer.comment("The maximum distance between rare buildings in chunks.");
-        writer.setting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.maximumDistanceBetweenRareBuildings);
+        writer.putSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.maximumDistanceBetweenRareBuildings,
+                "The maximum distance between rare buildings in chunks.");
 
         // Ocean monuments
         writer.smallTitle("Ocean monuments");
 
-        writer.comment("Whether ocean monuments are enabled.");
-        writer.setting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, this.oceanMonumentsEnabled);
+        writer.putSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, this.oceanMonumentsEnabled,
+                "Whether ocean monuments are enabled.");
 
-        writer.comment("Ocean monuments are placed on the corners of a grid, with a random offset added to each corner.");
-        writer.comment("The first variable is the size of the grid in chunks.");
-        writer.comment("Setting this to 8 will give a grid with cells of 8x8 chunks.");
-        writer.setting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE, this.oceanMonumentGridSize);
+        writer.putSetting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE, this.oceanMonumentGridSize,
+                "Ocean monuments are placed on the corners of a grid, with a random offset added to each corner.",
+                "The first variable is the size of the grid in chunks.",
+                "Setting this to 8 will give a grid with cells of 8x8 chunks.");
 
-        writer.comment("Random offset from each corner in chunks, on both the x and z axis.");
-        writer.comment("May not be smaller than 0, and may not be larger than " + WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE + ".");
-        writer.setting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET, this.oceanMonumentRandomOffset);
+        writer.putSetting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET, this.oceanMonumentRandomOffset,
+                "Random offset from each corner in chunks, on both the x and z axis.",
+                "May not be smaller than 0, and may not be larger than " + WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE + ".");
 
         // Custom structures
         writer.smallTitle("Custom structues");
-        writer.comment("Maximum radius of custom structures in chunks. Custom structures are spawned by");
-        writer.comment("the CustomStructure resource in the biome configuration files.");
-        writer.setting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius);
+
+        writer.putSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius,
+                "Maximum radius of custom structures in chunks. Custom structures are spawned by",
+                "the CustomStructure resource in the biome configuration files.");
 
         // Other structures
         writer.smallTitle("Other structures");
-        writer.setting(WorldStandardValues.MINESHAFTS_ENABLED, this.mineshaftsEnabled);
-        writer.setting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, this.netherFortressesEnabled);
+        writer.putSetting(WorldStandardValues.MINESHAFTS_ENABLED, this.mineshaftsEnabled);
+        writer.putSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, this.netherFortressesEnabled);
 
         // Visual settings
-        writer.bigTitle("Visual settings");
-        writer.comment("Warning this section will work only for players with the single version of Terrain Control installed.");
+        writer.bigTitle("Visual settings",
+                "Warning: this section will work only for players with the single version of Terrain Control installed.");
 
-        writer.comment("World fog color");
-        writer.setting(WorldStandardValues.WORLD_FOG, this.WorldFog);
+        writer.putSetting(WorldStandardValues.WORLD_FOG, this.WorldFog,
+                "World fog color");
 
-        writer.comment("World night fog color");
-        writer.setting(WorldStandardValues.WORLD_NIGHT_FOG, this.WorldNightFog);
+        writer.putSetting(WorldStandardValues.WORLD_NIGHT_FOG, this.WorldNightFog,
+                "World night fog color");
 
         // Cave settings (still using code from Bucyruss' BiomeTerrainMod)
         writer.bigTitle("Cave settings");
 
-        writer.comment("This controls the odds that a given chunk will host a single cave and/or the start of a cave system.");
-        writer.setting(WorldStandardValues.CAVE_RARITY, this.caveRarity);
+        writer.putSetting(WorldStandardValues.CAVE_RARITY, this.caveRarity,
+                "This controls the odds that a given chunk will host a single cave and/or the start of a cave system.");
 
-        writer.comment("The number of times the cave generation algorithm will attempt to create single caves and cave");
-        writer.comment("systems in the given chunk. This value is larger because the likelihood for the cave generation");
-        writer.comment("algorithm to bailout is fairly high and it is used in a randomizer that trends towards lower");
-        writer.comment("random numbers. With an input of 40 (default) the randomizer will result in an average random");
-        writer.comment("result of 5 to 6. This can be turned off by setting evenCaveDistribution (below) to true.");
-        writer.setting(WorldStandardValues.CAVE_FREQUENCY, this.caveFrequency);
+        writer.putSetting(WorldStandardValues.CAVE_FREQUENCY, this.caveFrequency,
+                "The number of times the cave generation algorithm will attempt to create single caves and cave",
+                "systems in the given chunk. This value is larger because the likelihood for the cave generation",
+                "algorithm to bailout is fairly high and it is used in a randomizer that trends towards lower",
+                "random numbers. With an input of 40 (default) the randomizer will result in an average random",
+                "result of 5 to 6. This can be turned off by setting evenCaveDistribution (below) to true.");
 
-        writer.comment("Sets the minimum and maximum altitudes at which caves will be generated. These values are");
-        writer.comment("used in a randomizer that trends towards lower numbers so that caves become more frequent");
-        writer.comment("the closer you get to the bottom of the map. Setting even cave distribution (above) to true");
-        writer.comment("will turn off this randomizer and use a flat random number generator that will create an even");
-        writer.comment("density of caves at all altitudes.");
-        writer.setting(WorldStandardValues.CAVE_MIN_ALTITUDE, this.caveMinAltitude);
-        writer.setting(WorldStandardValues.CAVE_MAX_ALTITUDE, this.caveMaxAltitude);
+        writer.putSetting(WorldStandardValues.CAVE_MIN_ALTITUDE, this.caveMinAltitude,
+                "Sets the minimum and maximum altitudes at which caves will be generated. These values are",
+                "used in a randomizer that trends towards lower numbers so that caves become more frequent",
+                "the closer you get to the bottom of the map. Setting even cave distribution (above) to true",
+                "will turn off this randomizer and use a flat random number generator that will create an even",
+                "density of caves at all altitudes.");
+        writer.putSetting(WorldStandardValues.CAVE_MAX_ALTITUDE, this.caveMaxAltitude);
 
-        writer.comment("The odds that the cave generation algorithm will generate a single cavern without an accompanying");
-        writer.comment("cave system. Note that whenever the algorithm generates an individual cave it will also attempt to");
-        writer.comment("generate a pocket of cave systems in the vicinity (no guarantee of connection or that the cave system");
-        writer.comment("will actually be created).");
-        writer.setting(WorldStandardValues.INDIVIDUAL_CAVE_RARITY, this.individualCaveRarity);
+        writer.putSetting(WorldStandardValues.INDIVIDUAL_CAVE_RARITY, this.individualCaveRarity,
+                "The odds that the cave generation algorithm will generate a single cavern without an accompanying",
+                "cave system. Note that whenever the algorithm generates an individual cave it will also attempt to",
+                "generate a pocket of cave systems in the vicinity (no guarantee of connection or that the cave system",
+                "will actually be created).");
 
-        writer.comment("The number of times the algorithm will attempt to start a cave system in a given chunk per cycle of");
-        writer.comment("the cave generation algorithm (see cave frequency setting above). Note that setting this value too");
-        writer.comment("high with an accompanying high cave frequency value can cause extremely long world generation time.");
-        writer.setting(WorldStandardValues.CAVE_SYSTEM_FREQUENCY, this.caveSystemFrequency);
+        writer.putSetting(WorldStandardValues.CAVE_SYSTEM_FREQUENCY, this.caveSystemFrequency,
+                "The number of times the algorithm will attempt to start a cave system in a given chunk per cycle of",
+                "the cave generation algorithm (see cave frequency setting above). Note that setting this value too",
+                "high with an accompanying high cave frequency value can cause extremely long world generation time.");
 
-        writer.comment("This can be set to create an additional chance that a cave system pocket (a higher than normal");
-        writer.comment("density of cave systems) being started in a given chunk. Normally, a cave pocket will only be");
-        writer.comment("attempted if an individual cave is generated, but this will allow more cave pockets to be generated");
-        writer.comment("in addition to the individual cave trigger.");
-        writer.setting(WorldStandardValues.CAVE_SYSTEM_POCKET_CHANCE, this.caveSystemPocketChance);
+        writer.putSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_CHANCE, this.caveSystemPocketChance,
+                "This can be set to create an additional chance that a cave system pocket (a higher than normal",
+                "density of cave systems) being started in a given chunk. Normally, a cave pocket will only be",
+                "attempted if an individual cave is generated, but this will allow more cave pockets to be generated",
+                "in addition to the individual cave trigger.");
 
-        writer.comment("The minimum and maximum size that a cave system pocket can be. This modifies/overrides the");
-        writer.comment("cave system frequency setting (above) when triggered.");
-        writer.setting(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE, this.caveSystemPocketMinSize);
-        writer.setting(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE, this.caveSystemPocketMaxSize);
+        writer.putSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE, this.caveSystemPocketMinSize,
+                "The minimum and maximum size that a cave system pocket can be. This modifies/overrides the",
+                "cave system frequency setting (above) when triggered.");
+        writer.putSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE, this.caveSystemPocketMaxSize);
 
-        writer.comment("Setting this to true will turn off the randomizer for cave frequency (above). Do note that");
-        writer.comment("if you turn this on you will probably want to adjust the cave frequency down to avoid long");
-        writer.comment("load times at world creation.");
-        writer.setting(WorldStandardValues.EVEN_CAVE_DISTRIBUTION, this.evenCaveDistribution);
+        writer.putSetting(WorldStandardValues.EVEN_CAVE_DISTRIBUTION, this.evenCaveDistribution,
+                "Setting this to true will turn off the randomizer for cave frequency (above). Do note that",
+                "if you turn this on you will probably want to adjust the cave frequency down to avoid long",
+                "load times at world creation.");
 
         // Ravine settings
         writer.bigTitle("Ravine settings");
-        writer.setting(WorldStandardValues.RAVINE_RARITY, this.ravineRarity);
-        writer.setting(WorldStandardValues.RAVINE_MIN_ALTITUDE, this.ravineMinAltitude);
-        writer.setting(WorldStandardValues.RAVINE_MAX_ALTITUDE, this.ravineMaxAltitude);
-        writer.setting(WorldStandardValues.RAVINE_MIN_LENGTH, this.ravineMinLength);
-        writer.setting(WorldStandardValues.RAVINE_MAX_LENGTH, this.ravineMaxLength);
-        writer.setting(WorldStandardValues.RAVINE_DEPTH, this.ravineDepth);
+        writer.putSetting(WorldStandardValues.RAVINE_RARITY, this.ravineRarity);
+        writer.putSetting(WorldStandardValues.RAVINE_MIN_ALTITUDE, this.ravineMinAltitude);
+        writer.putSetting(WorldStandardValues.RAVINE_MAX_ALTITUDE, this.ravineMaxAltitude);
+        writer.putSetting(WorldStandardValues.RAVINE_MIN_LENGTH, this.ravineMinLength);
+        writer.putSetting(WorldStandardValues.RAVINE_MAX_LENGTH, this.ravineMaxLength);
+        writer.putSetting(WorldStandardValues.RAVINE_DEPTH, this.ravineDepth);
 
         // Settings for BiomeMode:OldGenerator
-        writer.bigTitle("Settings for BiomeMode:OldGenerator");
-        writer.comment("This generator works only with old terrain generator!");
-        writer.setting(WorldStandardValues.OLD_BIOME_SIZE, this.oldBiomeSize);
-        writer.setting(WorldStandardValues.MIN_MOISTURE, this.minMoisture);
-        writer.setting(WorldStandardValues.MAX_MOISTURE, this.maxMoisture);
-        writer.setting(WorldStandardValues.MIN_TEMPERATURE, this.minTemperature);
-        writer.setting(WorldStandardValues.MAX_TEMPERATURE, this.maxTemperature);
+        writer.bigTitle("Settings for BiomeMode:OldGenerator",
+                "This generator works only with old terrain generator!");
+        writer.putSetting(WorldStandardValues.OLD_BIOME_SIZE, this.oldBiomeSize);
+        writer.putSetting(WorldStandardValues.MIN_MOISTURE, this.minMoisture);
+        writer.putSetting(WorldStandardValues.MAX_MOISTURE, this.maxMoisture);
+        writer.putSetting(WorldStandardValues.MIN_TEMPERATURE, this.minTemperature);
+        writer.putSetting(WorldStandardValues.MAX_TEMPERATURE, this.maxTemperature);
     }
 
-    private void writeBiomeGroups(SettingsWriter writer) throws IOException
-    {
-        writer.comment("Minecraft groups similar biomes together, so that they spawn next to each other.");
-        writer.comment("");
-        writer.comment("Syntax: BiomeGroup(Name, Size, Rarity, BiomeName[, AnotherName[, ...]])");
-        writer.comment("Name - just for clarity, choose something descriptive");
-        writer.comment("Size - layer to generate on, from 0 to GenerationDepth. All biomes in the group must have a BiomeSize");
-        writer.comment("       larger than or equal to this value.");
-        writer.comment("Rarity - relative spawn chances.");
-        writer.comment("BiomeName... - names of the biome that spawn in the group. Case sensitive.");
-        writer.comment("");
-        writer.comment("Note: if you're using BiomeMode: BeforeGroups, only the biome names of the groups named NormalBiomes");
-        writer.comment("and IceBiomes and the size and rarity of the group named IceBiomes will be used. Other groups are");
-        writer.comment("ignored. The size and rarity of the NormalBiomes group is ignored as well, use LandSize and");
-        writer.comment("LandRarity instead.");
-        writer.comment("");
-        for (BiomeGroup bg : this.biomeGroupManager.getGroups())
-        {
-            writer.function(bg);
-        }
-        writer.comment("");
-    }
-
-    private void WriteCustomBiomes(SettingsWriter writer) throws IOException
+    private void WriteCustomBiomes(SettingsMap writer)
     {
         List<String> output = new ArrayList<String>();
         // Custom biome id
@@ -1043,7 +1014,23 @@ public class WorldConfig extends ConfigFile
             Entry<String, Integer> entry = it.next();
             output.add(entry.getKey() + ":" + entry.getValue());
         }
-        writer.setting(WorldStandardValues.CUSTOM_BIOMES, output);
+        writer.putSetting(WorldStandardValues.CUSTOM_BIOMES, output,
+                "You need to register your custom biomes here. This setting will make Terrain Control",
+                "generate setting files for them. However, it won't place them in the world automatically.",
+                "See the settings for your BiomeMode below on how to add them to the world.",
+                "",
+                "Syntax: CustomBiomes:BiomeName:id[,AnotherBiomeName:id[,...]]",
+                "Example: CustomBiomes:TestBiome1:30,BiomeTest2:31",
+                "This will add two biomes and generate the BiomeConfigs for them.",
+                "All changes here need a server restart.",
+                "",
+                "Due to the way Mojang's loading code works, all biome ids need to be unique",
+                "on the server. If you don't do this, the client will display the biomes just fine,",
+                "but the server can think it is another biome with the same id. This will cause saplings,",
+                "snowfall and mobs to work as in the other biome.",
+                "",
+                "The available ids range from 0 to 1023 and the ids 0-39 and 129-167 are taken by vanilla.",
+                "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome.");
     }
 
     public double getFractureHorizontal()

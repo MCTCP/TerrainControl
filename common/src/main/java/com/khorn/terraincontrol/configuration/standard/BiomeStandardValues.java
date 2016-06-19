@@ -4,11 +4,11 @@ import static com.khorn.terraincontrol.TerrainControl.WORLD_DEPTH;
 import static com.khorn.terraincontrol.TerrainControl.WORLD_HEIGHT;
 
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix;
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.BiomeConfig.MineshaftType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
-import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix;
-import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.settingType.DoubleArraySetting;
 import com.khorn.terraincontrol.configuration.settingType.MaterialSetting;
 import com.khorn.terraincontrol.configuration.settingType.Setting;

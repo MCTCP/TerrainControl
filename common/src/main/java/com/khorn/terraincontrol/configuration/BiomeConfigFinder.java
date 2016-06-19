@@ -2,7 +2,8 @@ package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
-import com.khorn.terraincontrol.configuration.io.SettingsReader;
+import com.khorn.terraincontrol.configuration.io.SettingsMap;
+import com.khorn.terraincontrol.configuration.io.SimpleSettingsMap;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.logging.LogMarker;
 
@@ -12,15 +13,70 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class searches for the appropriate BiomeConfig for each LocalBiome.
- * You give it a list of folders to search in, and it will find all
- * BiomeConfigs. Files will be created for non-existing BiomeConfigs.
+ * This class searches for the appropriate file for each biome.
+ * You give it a list of folders to search in, and it will find the location of
+ * all BiomeConfigs. Files will be created for non-existing BiomeConfigs.
  * 
  */
-public class BiomeConfigFinder
+public final class BiomeConfigFinder
 {
+    /**
+     * A stub for a {@link BiomeConfig}. At this stage, the raw settings are
+     * already loaded. Setting reading must not start before the inheritance
+     * settings are processed.
+     */
+    public final class BiomeConfigStub
+    {
+        private final SettingsMap settings;
+        private final File file;
+        private final BiomeLoadInstruction loadInstructions;
+        public boolean biomeExtendsProcessed = false;
 
-    private final WorldConfig worldConfig;
+        private BiomeConfigStub(SettingsMap settings, File file, BiomeLoadInstruction loadInstructions)
+        {
+            super();
+            this.settings = settings;
+            this.file = file;
+            this.loadInstructions = loadInstructions;
+        }
+
+        /**
+         * Gets the file the biome is stored in.
+         * @return The file.
+         */
+        public File getFile()
+        {
+            return file;
+        }
+
+        /**
+         * Gets the instructions used for loading the biome.
+         * @return The instructions.
+         */
+        public BiomeLoadInstruction getLoadInstructions()
+        {
+            return loadInstructions;
+        }
+
+        /**
+         * Gets the settings for the biome.
+         * @return The settings.
+         */
+        public SettingsMap getSettings()
+        {
+            return settings;
+        }
+
+        /**
+         * Gets the name of this biome.
+         * @return The name.
+         */
+        public String getBiomeName()
+        {
+            return loadInstructions.getBiomeName();
+        }
+    }
+
     private final String preferredBiomeFileExtension;
 
     /**
@@ -33,22 +89,20 @@ public class BiomeConfigFinder
      */
     public BiomeConfigFinder(WorldConfig worldConfig, String preferredBiomeFileExtension)
     {
-        this.worldConfig = worldConfig;
         this.preferredBiomeFileExtension = preferredBiomeFileExtension;
     }
 
     /**
-     * Loads the specified BiomeConfigs, searching in the specified
-     * directories.
+     * Finds the biomes in the given directories.
      * 
      * @param directories The directories to search in.
      * @param biomesToLoad The biomes to load.
      *
-     * @return The biome configs.
+     * @return A map of biome name --> location on disk.
      */
-    public Map<String, BiomeConfig> loadBiomesFromDirectories(Collection<File> directories, Collection<BiomeLoadInstruction> biomesToLoad)
+    public Map<String, BiomeConfigStub> findBiomes(Collection<File> directories, Collection<BiomeLoadInstruction> biomesToLoad)
     {
-        Map<String, BiomeConfig> biomeConfigsStore = new HashMap<String, BiomeConfig>();
+        Map<String, BiomeConfigStub> biomeConfigsStore = new HashMap<String, BiomeConfigStub>();
 
         // Switch to a Map<String, LocalBiome>
         Map<String, BiomeLoadInstruction> remainingBiomes = new HashMap<String, BiomeLoadInstruction>();
@@ -72,7 +126,9 @@ public class BiomeConfigFinder
         for (BiomeLoadInstruction localBiome : remainingBiomes.values())
         {
             File newConfigFile = new File(preferredDirectory, toFileName(localBiome));
-            loadBiomeFromFile(biomeConfigsStore, newConfigFile, localBiome);
+            SettingsMap settings = new SimpleSettingsMap(localBiome.getBiomeName(), false);
+            BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, newConfigFile, localBiome);
+            biomeConfigsStore.put(localBiome.getBiomeName(), biomeConfigStub);
         }
 
         return biomeConfigsStore;
@@ -81,13 +137,12 @@ public class BiomeConfigFinder
     /**
      * Loads the biomes from the given directory.
      * 
-     * @param biomeConfigsStore Map to store all the loaded biome configs
-     *            in.
-     * @param directory The directory to load from.
-     * @param remainingBiomes The biomes that should still be loaded. When a
-     *            biome is found, it is removed from this map.
+     * @param biomeConfigsStore Map to store all the found biome configs in.
+     * @param directory         The directory to load from.
+     * @param remainingBiomes   The biomes that should still be loaded. When a
+     *                          biome is found, it is removed from this map.
      */
-    private void loadBiomesFromDirectory(Map<String, BiomeConfig> biomeConfigsStore, File directory, Map<String, BiomeLoadInstruction> remainingBiomes)
+    private void loadBiomesFromDirectory(Map<String, BiomeConfigStub> biomeConfigsStore, File directory, Map<String, BiomeLoadInstruction> remainingBiomes)
     {
         for (File file : directory.listFiles())
         {
@@ -117,26 +172,12 @@ public class BiomeConfigFinder
             }
 
             // Load biome and remove it from the todo list
-            loadBiomeFromFile(biomeConfigsStore, file, biome);
+            File renamedFile = renameBiomeFile(file, biome);
+            SettingsMap settings = FileSettingsReader.read(biomeName, renamedFile);
+            BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, file, biome);
+            biomeConfigsStore.put(biomeName, biomeConfigStub);
             remainingBiomes.remove(biome.getBiomeName());
         }
-    }
-
-    /**
-     * Loads a single biome from a the specified file. When there is an id
-     * conflict, the biome won't load and a message will be printed.
-     * 
-     * @param biomeConfigsStore The maps to store the biomeConfig in.
-     * @param file The file to load the biome from.
-     * @param loadInstruction The biome that should be loaded from the file.
-     */
-    private void loadBiomeFromFile(Map<String, BiomeConfig> biomeConfigsStore, File file, BiomeLoadInstruction loadInstruction)
-    {
-        // Load biome
-        File renamedFile = renameBiomeFile(file, loadInstruction);
-        SettingsReader reader = new FileSettingsReader(loadInstruction.getBiomeName(), renamedFile);
-        BiomeConfig biomeConfig = new BiomeConfig(reader, loadInstruction, worldConfig);
-        biomeConfigsStore.put(loadInstruction.getBiomeName(), biomeConfig);
     }
 
     /**
@@ -171,18 +212,6 @@ public class BiomeConfigFinder
     }
 
     /**
-     * Gets the name of the file the biome should be saved in. This will use
-     * the extension as defined in the PluginConfig.ini file.
-     * 
-     * @param biome The biome.
-     * @return The name of the file the biome should be saved in.
-     */
-    private String toFileName(BiomeLoadInstruction biome)
-    {
-        return biome.getBiomeName() + this.preferredBiomeFileExtension;
-    }
-
-    /**
      * Extracts the biome name out of the file name.
      * 
      * @param file The file to extract the biome name out of.
@@ -202,6 +231,18 @@ public class BiomeConfigFinder
 
         // Invalid file name
         return null;
+    }
+
+    /**
+     * Gets the name of the file the biome should be saved in. This will use
+     * the extension as defined in the PluginConfig.ini file.
+     * 
+     * @param biome The biome.
+     * @return The name of the file the biome should be saved in.
+     */
+    private String toFileName(BiomeLoadInstruction biome)
+    {
+        return biome.getBiomeName() + this.preferredBiomeFileExtension;
     }
 
 }

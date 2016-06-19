@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.customobjects;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.io.SettingsReader;
+import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.configuration.settingType.Settings;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
@@ -38,7 +38,7 @@ public class TreeObject implements CustomObject
         // Stub method
     }
 
-    public TreeObject(TreeType type, SettingsReader settings)
+    public TreeObject(TreeType type, SettingsMap settings)
     {
         this.type = type;
         this.minHeight = settings.getSetting(TreeSettings.MIN_HEIGHT, TreeSettings.MIN_HEIGHT.getDefaultValue());
@@ -84,7 +84,7 @@ public class TreeObject implements CustomObject
     }
 
     @Override
-    public CustomObject applySettings(SettingsReader settings)
+    public CustomObject applySettings(SettingsMap settings)
     {
         return new TreeObject(type, settings);
     }

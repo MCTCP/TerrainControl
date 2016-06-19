@@ -3,10 +3,10 @@ package com.khorn.terraincontrol.configuration.standard;
 import static com.khorn.terraincontrol.configuration.standard.BiomeStandardValues.*;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.BiomeConfig.MineshaftType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
-import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.resource.IceSpikeGen.SpikeType;
 import com.khorn.terraincontrol.generator.terrain.TerrainShapeBase;

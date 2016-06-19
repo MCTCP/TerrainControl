@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.io.SettingsReader;
+import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 
@@ -92,11 +92,11 @@ public interface CustomObject
      * Creates a new object with all settings applied.
      *
      * @param settings The settings. The settings of the existing object will
-     * be {@link SettingsReader#setFallbackReader(SettingsReader) set as a
+     * be {@link SettingsMap#setFallback(SettingsMap) set as a
      * fallback}.
      * @return A copy of this object will all the settings applied.
      */
-    public CustomObject applySettings(SettingsReader settings);
+    public CustomObject applySettings(SettingsMap settings);
 
     /**
      * Returns whether this object would like to spawn in this biome. BO2s will

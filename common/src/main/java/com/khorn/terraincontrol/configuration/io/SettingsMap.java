@@ -1,11 +1,11 @@
 package com.khorn.terraincontrol.configuration.io;
 
 import com.khorn.terraincontrol.configuration.ConfigFunction;
+import com.khorn.terraincontrol.configuration.io.RawSettingValue.ValueType;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
 
-import java.io.File;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map.Entry;
 
 /**
  * This interface allows you to retrieve settings.
@@ -19,19 +19,16 @@ import java.util.Map.Entry;
  * before being read.
  *
  */
-public interface SettingsReader
+public interface SettingsMap
 {
 
     /**
-     * Adds a ConfigFunction to this reader, so that it can be read back
-     * using {@link #getConfigFunctions(Object, boolean)}. If this reader doesn't
-     * support ConfigFunctions, this method does nothing.
+     * Adds a {@link ConfigFunction} to this settings map, so that it can be read back
+     * using {@link #getConfigFunctions(Object, boolean)}.
      *
-     * @param <T>      The type of the function. Must match the type used in
-     *                 {@link #getConfigFunctions(Object, boolean)}.
-     * @param function The function to add.
+     * @param functions The function to add.
      */
-    <T> void addConfigFunction(ConfigFunction<T> function);
+    void addConfigFunctions(Collection<? extends ConfigFunction<?>> functions);
 
     /**
      * Gets all ConfigFunctions in this configuration. If this reader doesn't
@@ -39,19 +36,11 @@ public interface SettingsReader
      *
      * @param <T> The type of the config functions.
      * @param holder      The holder of all config functions.
-     * @param useFallback True if the {@link #setFallbackReader(SettingsReader)
+     * @param useFallback True if the {@link #setFallback(SettingsMap)
      * fallback reader} must be used, false otherwise.
      * @return The config functions.
      */
     <T> List<ConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback);
-
-    /**
-     * Gets the file this reader if reading from. Will be null if this reader
-     * doesn't read from a file.
-     *
-     * @return The file, or null if not reading from a file.
-     */
-    File getFile();
 
     /**
      * Gets the name of this config file. For worlds, this is the world name,
@@ -62,23 +51,20 @@ public interface SettingsReader
     String getName();
 
     /**
-     * Gets all the raw settings in the object, for when some special parsing
-     * is needed.
-     *
-     * <p>In general, this method should be avoided. The settings and config
-     * functions system should already fit most use cases. The names of all
-     * settings should be known beforehand.
-     *
-     * <p>One use case of this method is to parse some kind of legacy config
-     * file with dynamic keys, like a BO2 file.
-     *
-     * <p>Implementations are allowed to return an empty collection, even
-     * when there are settings present. Note that legacy config files may not
-     * get parsed correctly then.
+     * Gets all settings in this config file in an unparsed state.
      *
      * @return The raw settings.
      */
-    Iterable<Entry<String, String>> getRawSettings();
+    Iterable<RawSettingValue> getRawSettings();
+
+    /**
+     * Reads a setting. If the setting does not exist, the default value for the
+     * setting is returned.
+     * @param <S>     Type of the value of the setting.
+     * @param setting The setting to read.
+     * @return The setting value.
+     */
+    <S> S getSetting(Setting<S> setting);
 
     /**
      * Reads a setting. This method allows you to provide another default
@@ -116,13 +102,22 @@ public interface SettingsReader
     boolean isNewConfig();
 
     /**
-     * Forces a setting to have another value when reading. Optional
-     * operation, may have an empty implementation.
-     * @param <S>     Type of the value of the setting.
-     * @param setting The setting to set.
-     * @param value   The value of the setting.
+     * Adds a setting to this map, overwriting existing settings with the same name.
+     * @param <S>      Type of the value of the setting.
+     * @param setting  The setting to set.
+     * @param value    The value of the setting.
+     * @param comments Comments for the setting. Each comment is written on its
+     *                 own line.
      */
-    <S> void putSetting(Setting<S> setting, S value);
+    <S> void putSetting(Setting<S> setting, S value, String... comments);
+
+    /**
+     * Adds a raw setting to this map. If this setting has a type of
+     * {@link ValueType#PLAIN_SETTING}, it will overwrite existing settings with
+     * the same name. 
+     * @param value Raw value for the setting.
+     */
+    void addRawSetting(RawSettingValue value);
 
     /**
      * Renames an old setting. If the old setting isn't found, this does
@@ -140,5 +135,22 @@ public interface SettingsReader
      *
      * @param reader The reader to fall back.
      */
-    void setFallbackReader(SettingsReader reader);
+    void setFallback(SettingsMap reader);
+
+    /**
+     * Adds a big title to the config file. New setting added after this title
+     * will be placed below this title.
+     * @param title    The title text.
+     * @param comments Comments directly after the title.
+     */
+    void smallTitle(String title, String... comments);
+
+    /**
+     * Adds a small title to the config file. New setting added after this title
+     * will be placed below this title.
+     * @param title    The title text.
+     * @param comments Comments directly after the title.
+     */
+    void bigTitle(String title, String... comments);
+
 }

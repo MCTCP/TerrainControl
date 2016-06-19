@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.customobjects;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.configuration.io.SettingsReader;
+import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 
@@ -89,7 +89,7 @@ public class UseWorld implements CustomObject
     }
 
     @Override
-    public CustomObject applySettings(SettingsReader settings)
+    public CustomObject applySettings(SettingsMap settings)
     {
         // Not supported
         return this;

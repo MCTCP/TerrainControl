@@ -2,62 +2,37 @@ package com.khorn.terraincontrol.configuration.io;
 
 import static org.junit.Assert.assertEquals;
 
-import com.khorn.terraincontrol.configuration.settingType.Setting;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.Iterator;
 
-@RunWith(JUnit4.class)
-public class FileSettingsReaderTest extends AbstractSettingsReaderTest
+public class FileSettingsReaderTest
 {
 
-    @Override
-    protected void cleanupCrumbs(SettingsReader reader)
-    {
-        reader.getFile().delete();
-    }
+    public String fileContentsString = "Author: TerrainControl\n"
+            + "\n"
+            + "Description:    File to test setting reading\n";
 
-    @Override
-    protected FileSettingsReader getEmptyReader()
-    {
-        return new FileSettingsReader("Test", new File("nonExistantTestFile.txt"));
-    }
-
-    @Override
-    protected <S> SettingsReader getExistingReader(Setting<S> setting, S value) throws IOException
-    {
-        File file = File.createTempFile("tcTestFile", ".ini");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        writer.write(setting.getName() + ": " + setting.write(value));
-        writer.flush();
-        writer.close();
-
-        return new FileSettingsReader("TestConfig", file);
-    }
-
-    /**
-     * Create two readers: one from an non-existent file and one from an
-     * existing file. Make sure that isNewConfig returns the appropriate
-     * values.
-     * @throws IOException If the temporary file can't be created
-     */
     @Test
-    public void testIsNewConfig() throws IOException
+    public void testReading() throws IOException
     {
-        // Test with non-existant file
-        SettingsReader emptyReader = getEmptyReader();
-        assertEquals(true, emptyReader.isNewConfig());
+        FileSettingsReader reader = new FileSettingsReader();
+        SettingsMap settingsMap = new SimpleSettingsMap("Test", false);
+        BufferedReader fileContents = new BufferedReader(new StringReader(fileContentsString));
 
-        // Test with existing file
-        File file = File.createTempFile("tcTestIsNewConfig", ".ini");
-        file.createNewFile();
-        SettingsReader readingExistingFile = new FileSettingsReader("Test", file);
-        assertEquals(false, readingExistingFile.isNewConfig());
-        file.delete();
+        reader.readIntoMap(settingsMap, fileContents);
+
+        // Test normat retrieval
+        assertEquals("TerrainControl", settingsMap.getSetting(WorldStandardValues.AUTHOR));
+        assertEquals("File to test setting reading", settingsMap.getSetting(WorldStandardValues.DESCRIPTION));
+
+        // Test iterating over raw settings
+        Iterator<RawSettingValue> it = settingsMap.getRawSettings().iterator();
+        assertEquals("Author: TerrainControl", it.next().getRawValue());
+        assertEquals("Description:    File to test setting reading", it.next().getRawValue());
     }
 }

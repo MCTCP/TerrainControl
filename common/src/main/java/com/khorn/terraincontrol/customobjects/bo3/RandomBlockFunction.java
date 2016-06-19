@@ -54,7 +54,7 @@ public class RandomBlockFunction extends BlockFunction
                 // Maybe it's a NBT file?
 
                 // Get the file
-                NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().getFile());
+                NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().directory);
                 if (metaData != null)
                 {
                     metaDataNames[blockCount] = args.get(i);

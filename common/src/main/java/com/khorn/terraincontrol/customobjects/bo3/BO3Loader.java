@@ -36,9 +36,9 @@ public class BO3Loader implements CustomObjectLoader
         return new BO3(objectName, file);
     }
 
-    public static NamedBinaryTag loadMetadata(String name, File bo3File)
+    public static NamedBinaryTag loadMetadata(String name, File bo3Folder)
     {
-        String path = bo3File.getParent() + File.separator + name;
+        String path = bo3Folder + File.separator + name;
 
         if (loadedTags.containsKey(path))
         {

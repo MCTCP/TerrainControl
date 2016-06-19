@@ -123,7 +123,7 @@ public class BranchFunction extends BO3Function implements Branch
         double cumulativeChance = 0;
         for (i = 3; i < args.size() - 2; i += 3)
         {
-            CustomObject object = getHolder().otherObjectsInDirectory.get(args.get(i).toLowerCase());
+            CustomObject object = getHolder().otherObjects.get(args.get(i).toLowerCase());
             if (object == null)
             {
                 throw new InvalidConfigException("The " + this.getConfigName() + " `" + args.get(i) + "` was not found. Make sure to place it in the same directory.");
