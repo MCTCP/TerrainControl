@@ -213,13 +213,10 @@ public abstract class ConfigFunction<T>
     /**
      * Parses the string and returns a number between minValue and
      * maxValue.
-     * <p/>
-     * @param string
-     * @param minValue
-     * @param maxValue
-     * <p/>
-     * @return
-     * <p/>
+     * @param string   The string to be parsed as an int.
+     * @param minValue The minimum allowed value.
+     * @param maxValue The maximum allowed value.
+     * @return The int, between min and max (inclusive).
      * @throws InvalidConfigException If the number is invalid.
      */
     protected final int readInt(String string, int minValue, int maxValue) throws InvalidConfigException

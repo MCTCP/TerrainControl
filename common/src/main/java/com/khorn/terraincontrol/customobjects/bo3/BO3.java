@@ -28,8 +28,8 @@ public class BO3 implements StructuredCustomObject
     /**
      * Creates a BO3 from a file.
      *
-     * @param name
-     * @param file
+     * @param name Name of the BO3.
+     * @param file File of the BO3. If the file does not exist, a BO3 with the default settings is created.
      */
     public BO3(String name, File file)
     {
@@ -202,7 +202,7 @@ public class BO3 implements StructuredCustomObject
         {
             y = world.getSolidHeight(x, z);
         }
-        //  Offset by static and random settings values
+        // Offset by static and random settings values
         y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
         if (!canSpawnAt(world, rotation, x, y, z))
         {
