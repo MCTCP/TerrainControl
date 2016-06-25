@@ -84,6 +84,12 @@ public final class SimpleSettingsMap implements SettingsMap
             String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
             List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));
             ConfigFunction<T> function = manager.getConfigFunction(functionName, holder, args);
+            if (function == null)
+            {
+                // Function is in wrong config file, allowed for config file
+                // inheritance
+                continue;
+            }
             result.add(function);
             if (!function.isValid())
             {
@@ -219,6 +225,12 @@ public final class SimpleSettingsMap implements SettingsMap
     public void bigTitle(String title, String... comments)
     {
         this.settingsCache.put(nextDummyKey(), RawSettingValue.create(ValueType.BIG_TITLE, title).withComments(comments));
+    }
+
+    @Override
+    public String toString()
+    {
+        return "SimpleSettingsMap [name=" + name + ", fallback=" + fallback + "]";
     }
 
 }

@@ -126,7 +126,8 @@ public final class BiomeConfigFinder
         for (BiomeLoadInstruction localBiome : remainingBiomes.values())
         {
             File newConfigFile = new File(preferredDirectory, toFileName(localBiome));
-            SettingsMap settings = new SimpleSettingsMap(localBiome.getBiomeName(), false);
+            boolean isNewConfig = true; // no file exists yet
+            SettingsMap settings = new SimpleSettingsMap(localBiome.getBiomeName(), isNewConfig);
             BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, newConfigFile, localBiome);
             biomeConfigsStore.put(localBiome.getBiomeName(), biomeConfigStub);
         }

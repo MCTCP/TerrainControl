@@ -51,13 +51,15 @@ public class ConfigFunctionsManager
 
     /**
      * Returns a config function with the given name.
-     * @param <T>                Type of the holder of the config function.
-     * @param name               The name of the config function.
-     * @param holder             The holder of the config function.
-     *                           WorldConfig or BO3.
-     * @param args               The args of the function.
-     * @return A config function with the given name, or null of it wasn't
-     *         found.
+     * @param <T>    Type of the holder of the config function.
+     * @param name   The name of the config function.
+     * @param holder The holder of the config function, like
+     *               {@link WorldConfig}.
+     * @param args   The args of the function.
+     * @return A config function with the given name, or null if the config
+     * function requires another holder. If invalid or non-existing config
+     * functions, it returns ab {@link ConfigFunction#isValid() invalid
+     * function}.
      */
     @SuppressWarnings("unchecked")
     // It's checked with if (!clazz.isAssignableFrom(holder.getClass()))
@@ -84,7 +86,7 @@ public class ConfigFunctionsManager
         boolean matchingTypes = holder.getClass().isAssignableFrom(configFunction.getHolderType());
         if (!matchingTypes)
         {
-            return new ErroredFunction<T>(name, holder, args, "Resource " + name + " cannot be placed in this config file");
+            return null;
         }
 
         // Initialize the function
