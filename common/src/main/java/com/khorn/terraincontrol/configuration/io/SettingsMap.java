@@ -55,7 +55,7 @@ public interface SettingsMap
      *
      * @return The raw settings.
      */
-    Iterable<RawSettingValue> getRawSettings();
+    Collection<RawSettingValue> getRawSettings();
 
     /**
      * Reads a setting. If the setting does not exist, the default value for the

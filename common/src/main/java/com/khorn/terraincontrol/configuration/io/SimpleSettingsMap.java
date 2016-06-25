@@ -29,7 +29,7 @@ public final class SimpleSettingsMap implements SettingsMap
      * over this map.
      */
     private final Map<String, RawSettingValue> settingsCache;
-    private boolean isNewConfig;
+    private final boolean isNewConfig;
     private int dummyKeyIndex = 0;
 
     /**
@@ -42,6 +42,7 @@ public final class SimpleSettingsMap implements SettingsMap
         this.name = name;
         this.settingsCache = new LinkedHashMap<String, RawSettingValue>();
         this.configFunctions = new ArrayList<RawSettingValue>();
+        this.isNewConfig = isNewConfig;
     }
 
     /**
@@ -107,7 +108,7 @@ public final class SimpleSettingsMap implements SettingsMap
     }
 
     @Override
-    public Iterable<RawSettingValue> getRawSettings()
+    public Collection<RawSettingValue> getRawSettings()
     {
         return Collections.unmodifiableCollection(this.settingsCache.values());
     }
