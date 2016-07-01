@@ -9,9 +9,10 @@ ext.bukkitVersion = "1.10-R0.1-SNAPSHOT"
 
 repositories
 {
+    mavenLocal() // For Spigot Server
     mavenCentral() // For log4j
     maven 
-    {   // For Spigot Server, no official repo at time of writing
+    {   // Fallback for Spigot Server, no official repo exists
         url = "http://rutgerkok.nl/repo" 
     }
     maven
