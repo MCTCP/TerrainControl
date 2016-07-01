@@ -119,22 +119,10 @@ public class CustomObjectCoordinate
         // of the object. However, the origin is not guaranteed to be at the
         // center of the object. We need to know the exact center to choose
         // the appropriate spawning chunk.
-        int centerX;
-        int centerZ;
-        if (object instanceof StructuredCustomObject)
-        {
-            // Calculate the actual center of the object, based on all blocks
-            // of the object
-            BoundingBox box = ((StructuredCustomObject) object).getBoundingBox(rotation);
-            centerX = x + box.getMinX() + (box.getWidth() / 2);
-            centerZ = z + box.getMinZ() + (box.getDepth() / 2);
-        } else
-        {
-            // Just assume the author of the object placed the origin near the
-            // center
-            centerX = x;
-            centerZ = z;
-        }
+
+        BoundingBox box = object.getBoundingBox(rotation);
+        int centerX = x + box.getMinX() + (box.getWidth() / 2);
+        int centerZ = z + box.getMinZ() + (box.getDepth() / 2);
 
         return ChunkCoordinate.getPopulatingChunk(centerX, centerZ);
     }

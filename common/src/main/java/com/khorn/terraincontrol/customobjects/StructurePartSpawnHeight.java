@@ -6,12 +6,10 @@ import com.khorn.terraincontrol.LocalWorld;
  * Class to get the spawn height of objects part of a structure.
  * Three default implementations are provided.
  * <p />
- * Structures consist of multiple {@link StructuredCustomObject}s. Structures
- * can be quite big, so not all parts are in loaded chunks. An initial guess
- * of the y coordinate of all parts is made when starting a structure.
- * However, when the spawn height depends on the terrain this guess will be
- * incorrect. The purpose of this class is to correct the y location just
- * before the object is spawned.
+ * Structures consist of multiple {@link CustomObject}s. Structures can be quite
+ * big, so not all parts are in loaded chunks. Initially, the y location of some
+ * part of the structure may be unknown. The purpose of this class is to correct
+ * the y location just before the object is spawned.
  * <p />
  * It is up to the object that started the structure to provide the correct
  * implementation. Structures like villages want all their parts to be placed

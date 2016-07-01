@@ -7,7 +7,6 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructure;
-import com.khorn.terraincontrol.customobjects.StructuredCustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
@@ -19,14 +18,14 @@ import java.util.Random;
 
 public class CustomStructureGen extends Resource
 {
-    private List<StructuredCustomObject> objects;
+    private List<CustomObject> objects;
     private List<Double> objectChances;
     private List<String> objectNames;
 
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
-        objects = new ArrayList<StructuredCustomObject>();
+        objects = new ArrayList<CustomObject>();
         objectNames = new ArrayList<String>();
         objectChances = new ArrayList<Double>();
         for (int i = 0; i < args.size() - 1; i += 2)
@@ -36,11 +35,11 @@ public class CustomStructureGen extends Resource
             {
                 throw new InvalidConfigException("No custom object found with the name " + args.get(i));
             }
-            if (!(object instanceof StructuredCustomObject) || ((StructuredCustomObject) object).getBranches(Rotation.NORTH).length == 0)
+            if (object.getBranches(Rotation.NORTH).length == 0)
             {
-                throw new InvalidConfigException("The object " + args.get(i) + " isn't a structure");
+                throw new InvalidConfigException("The object " + args.get(i) + " isn't a structure: it has no branches");
             }
-            objects.add((StructuredCustomObject) object);
+            objects.add(object);
             objectNames.add(args.get(i));
             objectChances.add(readRarity(args.get(i + 1)));
         }
@@ -156,11 +155,10 @@ public class CustomStructureGen extends Resource
                    : this.objectNames.equals(compare.objectNames));
     }
 
+    @Override
     public int getPriority()
     {
         return -41;
     }
-    
-    
 
 }

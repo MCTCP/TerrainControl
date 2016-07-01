@@ -7,10 +7,15 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.io.RawSettingValue;
 import com.khorn.terraincontrol.configuration.io.SettingsMap;
+import com.khorn.terraincontrol.customobjects.Branch;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
+import com.khorn.terraincontrol.customobjects.StructurePartSpawnHeight;
+import com.khorn.terraincontrol.util.BoundingBox;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.Rotation;
+import com.khorn.terraincontrol.util.helpers.RandomHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.ArrayList;
@@ -360,6 +365,49 @@ public class BO2 extends ConfigFile implements CustomObject
     public boolean hasPreferenceToSpawnIn(LocalBiome biome)
     {
         return spawnInBiome.contains(biome.getName()) || spawnInBiome.contains("All");
+    }
+
+    @Override
+    public BoundingBox getBoundingBox(Rotation rotation)
+    {
+        // We just
+        return BoundingBox.newEmptyBox();
+    }
+
+    @Override
+    public Branch[] getBranches(Rotation rotation)
+    {
+        return new Branch[0];
+    }
+
+    @Override
+    public int getMaxBranchDepth()
+    {
+        return 0;
+    }
+
+    @Override
+    public StructurePartSpawnHeight getStructurePartSpawnHeight()
+    {
+        return StructurePartSpawnHeight.PROVIDED;
+    }
+
+    @Override
+    public boolean hasBranches()
+    {
+        return false;
+    }
+
+    @Override
+    public CustomObjectCoordinate makeCustomObjectCoordinate(Random random, int chunkX, int chunkZ)
+    {
+        if (rarity > random.nextDouble() * 100.0)
+        {
+            Rotation rotation = Rotation.getRandomRotation(random);
+            int height = RandomHelper.numberInRange(random, this.spawnElevationMin, this.spawnElevationMax);
+            return new CustomObjectCoordinate(this, rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16));
+        }
+        return null;
     }
 
 }

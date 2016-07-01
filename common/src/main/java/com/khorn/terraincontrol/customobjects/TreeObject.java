@@ -6,6 +6,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.configuration.settingType.Settings;
+import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
@@ -13,7 +14,15 @@ import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import java.util.Map;
 import java.util.Random;
 
-public class TreeObject implements CustomObject
+/**
+ * A Minecraft tree, viewed as a custom object.
+ *
+ * <p>For historical reasons, TreeObject implements {@link CustomObject} instead
+ * of just {@link SpawnableObject}. We can probably refactor the Tree resource
+ * to accept {@link SpawnableObject}s instead of {@link CustomObject}s, so that
+ * all the extra methods are no longer needed.
+ */
+public class TreeObject extends SimpleObject
 {
     private static class TreeSettings extends Settings
     {
@@ -103,13 +112,6 @@ public class TreeObject implements CustomObject
             return false;
         }
         return true;
-    }
-
-    @Override
-    public boolean canRotateRandomly()
-    {
-        // Trees cannot be rotated
-        return false;
     }
 
 }

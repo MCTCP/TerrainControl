@@ -13,7 +13,7 @@ import java.util.Random;
 /**
  * UseWorld is a keyword that spawns the objects in the WorldObjects folder.
  */
-public class UseWorld implements CustomObject
+public class UseWorld extends SimpleObject
 {
     @Override
     public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)

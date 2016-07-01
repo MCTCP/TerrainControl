@@ -10,6 +10,7 @@ import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.khorn.terraincontrol.util.BoundingBox;
 import com.khorn.terraincontrol.util.MaterialSet;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultStructurePart;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -241,9 +242,13 @@ public class BO3Config extends ConfigFile
                 "All the blocks used in the BO3 are listed here. Possible blocks:",
                 "Block(x,y,z,id[.data][,nbtfile.nbt)",
                 "RandomBlock(x,y,z,id[:data][,nbtfile.nbt],chance[,id[:data][,nbtfile.nbt],chance[,...]])",
-                "So RandomBlock(0,0,0,CHEST,chest.nbt,50,CHEST,anotherchest.nbt,100) will spawn a chest at",
-                "the BO3 origin, and give it a 50% chance to have the contents of chest.nbt, or, if that",
-                "fails, a 100% percent chance to have the contents of anotherchest.nbt.");
+                " So RandomBlock(0,0,0,CHEST,chest.nbt,50,CHEST,anotherchest.nbt,100) will spawn a chest at",
+                " the BO3 origin, and give it a 50% chance to have the contents of chest.nbt, or, if that",
+                " fails, a 100% percent chance to have the contents of anotherchest.nbt.",
+                "MinecraftObject(x,y,z,name)",
+                " Spawns an object in the Mojang NBT structure format. For example, ",
+                " MinecraftObject(0,0,0," + DefaultStructurePart.IGLOO_BOTTOM.getPath() + ")",
+                " spawns the bottom part of an igloo.");
 
         writer.addConfigFunctions(Arrays.asList(blocks[0]));
 

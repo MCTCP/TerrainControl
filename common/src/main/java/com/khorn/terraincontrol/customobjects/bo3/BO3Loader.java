@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -21,13 +22,18 @@ public class BO3Loader implements CustomObjectLoader
     public BO3Loader()
     {
         // Register BO3 ConfigFunctions
-        TerrainControl.getConfigFunctionsManager().registerConfigFunction("Block", BlockFunction.class);
-        TerrainControl.getConfigFunctionsManager().registerConfigFunction("Branch", BranchFunction.class);
-        TerrainControl.getConfigFunctionsManager().registerConfigFunction("WeightedBranch", WeightedBranchFunction.class);
-        TerrainControl.getConfigFunctionsManager().registerConfigFunction("RandomBlock", RandomBlockFunction.class);
-        TerrainControl.getConfigFunctionsManager().registerConfigFunction("BlockCheck", BlockCheck.class);
-        TerrainControl.getConfigFunctionsManager().registerConfigFunction("BlockCheckNot", BlockCheckNot.class);
-        TerrainControl.getConfigFunctionsManager().registerConfigFunction("LightCheck", LightCheck.class);
+        ConfigFunctionsManager registry = TerrainControl.getConfigFunctionsManager();
+        registry.registerConfigFunction("Block", BlockFunction.class);
+        registry.registerConfigFunction("Branch", BranchFunction.class);
+        registry.registerConfigFunction("WeightedBranch",
+                WeightedBranchFunction.class);
+        registry.registerConfigFunction("RandomBlock",
+                RandomBlockFunction.class);
+        registry.registerConfigFunction("MinecraftObject",
+                MinecraftObjectFunction.class);
+        registry.registerConfigFunction("BlockCheck", BlockCheck.class);
+        registry.registerConfigFunction("BlockCheckNot", BlockCheckNot.class);
+        registry.registerConfigFunction("LightCheck", LightCheck.class);
     }
 
     @Override

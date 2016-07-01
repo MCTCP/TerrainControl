@@ -19,7 +19,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.Random;
 
-public class BO3 implements StructuredCustomObject
+public class BO3 implements CustomObject
 {
     private BO3Config settings;
     private final String name;

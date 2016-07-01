@@ -11,7 +11,7 @@ import java.util.*;
  * Represents a collection of all {@link CustomObject}s in a structure. It is
  * calculated by finding the branches of one object, then finding the branches
  * of those branches, etc., until
- * {@link StructuredCustomObject#getMaxBranchDepth()} is reached.
+ * {@link CustomObject#getMaxBranchDepth()} is reached.
  *
  */
 public class CustomObjectStructure
@@ -25,11 +25,7 @@ public class CustomObjectStructure
 
     CustomObjectStructure(LocalWorld world, CustomObjectCoordinate start)
     {
-        if (!(start.getObject() instanceof StructuredCustomObject))
-        {
-            throw new IllegalArgumentException("Start object has to be a structure!");
-        }
-        StructuredCustomObject object = (StructuredCustomObject) start.getObject();
+        CustomObject object = start.getObject();
 
         this.world = world;
         this.start = start;
@@ -69,11 +65,7 @@ public class CustomObjectStructure
 
     private Branch[] getBranches(CustomObject customObject, Rotation rotation)
     {
-        if (customObject instanceof StructuredCustomObject)
-        {
-            return ((StructuredCustomObject) customObject).getBranches(rotation);
-        }
-        return new Branch[0];
+        return customObject.getBranches(rotation);
     }
 
     /**

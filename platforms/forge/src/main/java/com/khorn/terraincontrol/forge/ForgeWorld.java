@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import com.khorn.terraincontrol.forge.generator.ChunkProvider;
 import com.khorn.terraincontrol.forge.generator.structure.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
+import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
@@ -20,6 +21,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -28,6 +30,8 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.feature.*;
+import net.minecraft.world.gen.structure.template.Template;
+import net.minecraft.world.gen.structure.template.TemplateManager;
 
 import java.util.*;
 
@@ -762,6 +766,19 @@ public class ForgeWorld implements LocalWorld
     public BiomeGenerator getBiomeGenerator()
     {
         return biomeGenerator;
+    }
+
+    @Override
+    public SpawnableObject getMojangStructurePart(String name)
+    {
+        ResourceLocation resourceLocation = new ResourceLocation(name);
+        TemplateManager mojangStructureParts = world.getSaveHandler().getStructureTemplateManager();
+        Template mojangStructurePart = mojangStructureParts.getTemplate(world.getMinecraftServer(), resourceLocation);
+        if (mojangStructurePart == null)
+        {
+            return null;
+        }
+        return new MojangStructurePart(name, mojangStructurePart);
     }
 
 }

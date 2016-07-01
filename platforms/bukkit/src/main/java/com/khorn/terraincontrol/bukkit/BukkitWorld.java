@@ -10,6 +10,7 @@ import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
+import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
@@ -853,6 +854,19 @@ public class BukkitWorld implements LocalWorld
     @Override
     public BiomeGenerator getBiomeGenerator() {
         return biomeGenerator;
+    }
+
+    @Override
+    public SpawnableObject getMojangStructurePart(String name)
+    {
+        MinecraftKey minecraftKey = new MinecraftKey(name);
+        DefinedStructureManager mojangStructureParts = world.getDataManager().h();
+        DefinedStructure mojangStructurePart = mojangStructureParts.a(world.getMinecraftServer(), minecraftKey);
+        if (mojangStructurePart == null)
+        {
+            return null;
+        }
+        return new MojangStructurePart(name, mojangStructurePart);
     }
 
 }

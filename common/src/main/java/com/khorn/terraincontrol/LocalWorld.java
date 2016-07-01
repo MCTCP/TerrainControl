@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
+import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
@@ -105,6 +106,13 @@ public interface LocalWorld
     public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z);
 
     public boolean placeDefaultStructures(Random rand, ChunkCoordinate chunkCoord);
+
+    /**
+     * Gets a structure part in Mojang's structure format.
+     * @param name Full name of the structure.
+     * @return The structure, or null if it does not exist.
+     */
+    SpawnableObject getMojangStructurePart(String name);
 
     /**
      * Executes ReplacedBlocks.

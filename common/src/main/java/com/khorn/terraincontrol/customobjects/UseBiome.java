@@ -14,7 +14,7 @@ import java.util.Random;
  * UseBiome is a keyword that spawns the objects in the BiomeConfig/BiomeObjects
  * setting.
  */
-public class UseBiome implements CustomObject
+public class UseBiome extends SimpleObject
 {
     public List<CustomObject> getPossibleObjectsAt(LocalWorld world, int x, int z)
     {
