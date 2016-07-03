@@ -38,13 +38,25 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     public int totalGroupRarity;
 
     /**
-     * Empty constructor, needed for reading this group.
+     * Loads the biome group using the provided settings.
+     * @param config The world config.
+     * @param args   The settings to be parsed.
+     * @throws InvalidConfigException When the config is invalid.
      * @see #BiomeGroup(WorldConfig, String, int, int, List) Constructor to
      * properly initialize this biome group manually.
      */
-    public BiomeGroup()
+    public BiomeGroup(WorldConfig config, List<String> args) throws InvalidConfigException
     {
-
+        super(config);
+        // Must have at least a GroupName and a Biome that belongs to it
+        assureSize(4, args);
+        this.name = args.get(0);
+        this.generationDepth = readInt(args.get(1), 0, config.GenerationDepth);
+        this.groupRarity = readInt(args.get(2), 1, Integer.MAX_VALUE);
+        for (String biome : readBiomes(args, 3))
+        {
+            this.biomes.put(biome, null);
+        }
     }
 
     /**
@@ -57,25 +69,11 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
      */
     public BiomeGroup(WorldConfig config, String groupName, int size, int rarity, List<String> biomes)
     {
-        this.setHolder(config);
+        super(config);
         this.name = groupName;
         this.generationDepth = size;
         this.groupRarity = rarity;
         for (String biome : biomes)
-        {
-            this.biomes.put(biome, null);
-        }
-    }
-
-    @Override
-    protected void load(List<String> args) throws InvalidConfigException
-    {
-        // Must have at least a GroupName and a Biome that belongs to it
-        assureSize(4, args);
-        this.name = args.get(0);
-        this.generationDepth = readInt(args.get(1), 0, getHolder().GenerationDepth);
-        this.groupRarity = readInt(args.get(2), 1, Integer.MAX_VALUE);
-        for (String biome : readBiomes(args, 3))
         {
             this.biomes.put(biome, null);
         }
@@ -107,13 +105,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     }
 
     @Override
-    public Class<WorldConfig> getHolderType()
-    {
-        return WorldConfig.class;
-    }
-
-    @Override
-    public String makeString()
+    public String toString()
     {
         return "BiomeGroup(" + name + ", " + generationDepth + ", " + groupRarity + ", " + StringHelper.join(biomes.keySet(), ", ") + ")";
     }

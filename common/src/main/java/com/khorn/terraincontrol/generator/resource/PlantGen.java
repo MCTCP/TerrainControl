@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.generator.resource;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.RandomHelper;
@@ -11,62 +12,30 @@ import java.util.Random;
 
 public class PlantGen extends Resource
 {
-    private PlantType plant;
+    private final int maxAltitude;
 
-    private int minAltitude;
-    private int maxAltitude;
-    private MaterialSet sourceBlocks;
+    private final int minAltitude;
+    private final PlantType plant;
+    private final MaterialSet sourceBlocks;
 
-    @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
+    public PlantGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
-        int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
-
-        for (int i = 0; i < 64; i++)
-        {
-            int j = x + rand.nextInt(8) - rand.nextInt(8);
-            int k = y + rand.nextInt(4) - rand.nextInt(4);
-            int m = z + rand.nextInt(8) - rand.nextInt(8);
-            if ((!world.isEmpty(j, k, m)) || (!sourceBlocks.contains(world.getMaterial(j, k - 1, m))))
-                continue;
-
-            plant.spawn(world, j, k, m);
-        }
-    }
-
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
-    {
+        super(biomeConfig);
         assureSize(6, args);
 
         plant = PlantType.getPlant(args.get(0));
-        
+
         // Not used for terrain generation, they are used by the Forge
         // implementation to fire Forge events.
         material = plant.getBottomMaterial();
 
         frequency = readInt(args.get(1), 1, 100);
         rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(4), minAltitude, TerrainControl.WORLD_HEIGHT);
+        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH,
+                TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude,
+                TerrainControl.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 5);
-    }
-
-    @Override
-    public String makeString()
-    {
-        return "Plant(" + plant.getName() + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int hash = 7;
-        hash = 71 * hash + super.hashCode();
-        hash = 71 * hash + this.minAltitude;
-        hash = 71 * hash + this.maxAltitude;
-        hash = 71 * hash + (this.sourceBlocks != null ? this.sourceBlocks.hashCode() : 0);
-        return hash;
     }
 
     @Override
@@ -91,6 +60,40 @@ public class PlantGen extends Resource
     public int getPriority()
     {
         return -33;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 71 * hash + super.hashCode();
+        hash = 71 * hash + this.minAltitude;
+        hash = 71 * hash + this.maxAltitude;
+        hash = 71 * hash + (this.sourceBlocks != null ? this.sourceBlocks.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Plant(" + plant.getName() + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
+    }
+
+    @Override
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
+    {
+        int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
+
+        for (int i = 0; i < 64; i++)
+        {
+            int j = x + rand.nextInt(8) - rand.nextInt(8);
+            int k = y + rand.nextInt(4) - rand.nextInt(4);
+            int m = z + rand.nextInt(8) - rand.nextInt(8);
+            if ((!world.isEmpty(j, k, m)) || (!sourceBlocks.contains(world.getMaterial(j, k - 1, m))))
+                continue;
+
+            plant.spawn(world, j, k, m);
+        }
     }
 
 }

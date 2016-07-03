@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.generator.resource;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.util.List;
@@ -8,9 +9,9 @@ import java.util.Random;
 
 public class AboveWaterGen extends Resource
 {
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
+    public AboveWaterGen(BiomeConfig config, List<String> args) throws InvalidConfigException
     {
+        super(config);
         assureSize(3, args);
 
         material = readMaterial(args.get(0));
@@ -37,11 +38,12 @@ public class AboveWaterGen extends Resource
     }
 
     @Override
-    public String makeString()
+    public String toString()
     {
         return "AboveWaterRes(" + material + "," + frequency + "," + rarity + ")";
     }
 
+    @Override
     public int getPriority()
     {
         return -11;

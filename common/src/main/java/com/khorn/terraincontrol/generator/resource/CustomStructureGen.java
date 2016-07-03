@@ -22,9 +22,9 @@ public class CustomStructureGen extends Resource
     private List<Double> objectChances;
     private List<String> objectNames;
 
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
+    public CustomStructureGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
+        super(biomeConfig);
         objects = new ArrayList<CustomObject>();
         objectNames = new ArrayList<String>();
         objectChances = new ArrayList<Double>();
@@ -80,7 +80,7 @@ public class CustomStructureGen extends Resource
     }
 
     @Override
-    public String makeString()
+    public String toString()
     {
         if (objects.isEmpty())
         {

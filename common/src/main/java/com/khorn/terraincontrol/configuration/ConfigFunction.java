@@ -3,74 +3,36 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.generator.resource.ReedGen;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A config function resides in a {@link ConfigFile}. In such a file, it looks
+ * like a function call: {@code FunctionName(arg1,arg2,...)}.
+ *
+ * <p>In addition to implementing the abstract methods, each non-abstract
+ * subclass must have a constructor that takes exactly two args. The first one
+ * is for the instance of the config file that contains the function (called
+ * "the holder"), the second one is a {@code List<String>} that contains the
+ * arguments. The constructor must then parse the arguments. When it encounters
+ * an invalid argument, it must throw a {@link InvalidConfigException}.
+ *
+ * <p>See {@link ReedGen} for an example of a such a constructor.
+ *
+ * @param <T> The holder type (type of the class that contains the
+ * {@link ConfigFunction}).
+ */
 public abstract class ConfigFunction<T>
 {
-    /**
-     * Creates a {@link ConfigFunction} from the given parameters. Used to create
-     * resources programmatically.
-     *
-     * @param holder The holder of the resource.
-     * @param clazz  The class of the resoucrce.
-     * @param args   The arguments for the resource.
-     * @return The configuration function.
-     */
-    public static final <T> ConfigFunction<T> create(T holder, Class<? extends ConfigFunction<T>> clazz, Object... args)
+    private final T holder;
+
+    public ConfigFunction(T holder)
     {
-        List<String> stringArgs = new ArrayList<String>(args.length);
-        for (Object arg : args)
-        {
-            stringArgs.add("" + arg);
-        }
-
-        ConfigFunction<T> configFunction;
-        try
-        {
-            configFunction = clazz.newInstance();
-        } catch (InstantiationException e)
-        {
-            return null;
-        } catch (IllegalAccessException e)
-        {
-            return null;
-        }
-        configFunction.setHolder(holder);
-        try
-        {
-            configFunction.load(stringArgs);
-        } catch (InvalidConfigException e)
-        {
-            TerrainControl.log(LogMarker.FATAL, "Invalid default config function! Please report! {}: {}",
-                    clazz.getName(), e.getMessage());
-            TerrainControl.printStackTrace(LogMarker.FATAL, e);
-        }
-
-        return configFunction;
+        this.holder = holder;
     }
-
-    /**
-     * Has a value when valid == false, otherwise null.
-     */
-    private String error;
-
-    private T holder;
-    /**
-     * Only has a value when {@link #invalidate(String, List, String)} is
-     * called.
-     */
-    private List<String> inputArgs;
-    /**
-     * Only has a value when {@link #invalidate(String, List, String)} is
-     * called.
-     */
-    private String inputName;
-    private boolean valid = true;
 
     /**
      * Checks the size of the given list.
@@ -88,65 +50,12 @@ public abstract class ConfigFunction<T>
     }
 
     /**
-     * Gets the error that occurred while reading this resource.
-     * @return The error.
-     * @throws IllegalStateException If the object {@link #isValid() is
-     * valid}, so no error occurred.
-     */
-    public final String getError() throws IllegalStateException
-    {
-        if (isValid())
-        {
-            throw new IllegalStateException("Function is valid, so no error");
-        }
-        return error;
-    }
-
-    /**
      * Gets the holder of this config function.
      * @return The holder.
      */
     protected final T getHolder()
     {
         return holder;
-    }
-
-    /**
-     * Gets the class of the holder. The {@link #getHolder() holder of this
-     * resource} will be an instance of this type. Multiple invocations of
-     * this method on the same instance must always yield the same result.
-     *
-     * <p>This method is intended to combat Java's type erasure: it provides
-     * access to the type parameter T.
-     * @return The class.
-     */
-    public abstract Class<T> getHolderType();
-
-    /**
-     * Initializes the function: the holder is set and the arguments are read.
-     * @param holder The holder to set. Must be of the type returned by
-     *               {@link #getHolderType()}.
-     * @param args   Arguments to parse.
-     * @throws InvalidConfigException If the arguments are invalid.
-     */
-    public final void init(T holder, List<String> args) throws InvalidConfigException
-    {
-        this.holder = holder;
-        load(args);
-    }
-
-    /**
-     * Invalidates this resource.
-     * @param name  Name of this resource, for output.
-     * @param args  Arguments used in this resource, for output.
-     * @param error Error message detailing what went wrong.
-     */
-    public final void invalidate(String name, List<String> args, String error)
-    {
-        valid = false;
-        this.inputName = name;
-        this.inputArgs = args;
-        this.error = error;
     }
 
     /**
@@ -160,27 +69,6 @@ public abstract class ConfigFunction<T>
     public abstract boolean isAnalogousTo(ConfigFunction<T> other);
 
     /**
-     * Returns true if this ConfigFunction has a correct syntax.
-     * Returns false if the read method hasn't been called yet,
-     * or if the function has an incorrect syntax.
-     * <p/>
-     * @return Whether this ConfigFunction has a correct syntax.
-     */
-    public final boolean isValid()
-    {
-        return valid;
-    }
-
-    /**
-     * Parses the arguments. {@link #setHolder(Object)} must be called prior
-     * to calling this method, as this method is allowed to use
-     * {@link #getHolder()}.
-     * @param args The arguments to parse.
-     * @throws InvalidConfigException If the syntax is invalid.
-     */
-    protected abstract void load(List<String> args) throws InvalidConfigException;
-
-    /**
      * Formats the material list as a string list.
      * @param materials The set of materials to be converted
      * @return A string in the format ",materialName,materialName,etc"
@@ -191,10 +79,11 @@ public abstract class ConfigFunction<T>
     }
 
     /**
-     * Gets a String representation, like Tree(10,BigTree,50,Tree,100)
+     * Gets a String representation, like Tree(10,BigTree,50,Tree,100).
      * @return A String representation, like Tree(10,BigTree,50,Tree,100)
      */
-    public abstract String makeString();
+    @Override
+    public abstract String toString();
 
     /**
      * Parses the string and returns a number between minValue and
@@ -266,30 +155,6 @@ public abstract class ConfigFunction<T>
     protected final double readRarity(String string) throws InvalidConfigException
     {
         return StringHelper.readDouble(string, 0.000001, 100);
-    }
-
-    /**
-     * Sets the holder to the given parameter. Must only be used when manually
-     * constructing this function. The holder must of the type returned by
-     * {@link #getHolderType()}.
-     * @param holder The holder.
-     */
-    public final void setHolder(T holder)
-    {
-        this.holder = holder;
-    }
-
-    public final String write()
-    {
-        if (!valid)
-        {
-            // Show error message
-            return "## INVALID " + inputName.toUpperCase() + " - " + error + " ##" + System.getProperty("line.separator") + inputName + "("
-                    + StringHelper.join(inputArgs, ",") + ")";
-        } else
-        {
-            return makeString();
-        }
     }
 
 }

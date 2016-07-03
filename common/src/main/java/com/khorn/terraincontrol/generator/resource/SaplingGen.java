@@ -16,11 +16,6 @@ import java.util.*;
  */
 public class SaplingGen extends ConfigFunction<BiomeConfig>
 {
-    public List<CustomObject> trees;
-    public List<String> treeNames;
-    public List<Integer> treeChances;
-    public SaplingType saplingType;
-
     private static final Map<Rotation, int[]> TREE_OFFSET;
     static
     {
@@ -31,15 +26,14 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         TREE_OFFSET.put(Rotation.WEST, new int[] {0, 1});
     }
 
-    @Override
-    public Class<BiomeConfig> getHolderType()
-    {
-        return BiomeConfig.class;
-    }
+    public SaplingType saplingType;
+    public List<Integer> treeChances;
+    public List<String> treeNames;
+    public List<CustomObject> trees;
 
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
+    public SaplingGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
+        super(biomeConfig);
         assureSize(3, args);
 
         saplingType = SaplingType.get(args.get(0));
@@ -69,16 +63,56 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         }
     }
 
-    @Override
-    public String makeString()
+    /**
+     * Creates a {@link SaplingGen} instance.
+     * @param biomeConfig     The biome config.
+     * @param saplingType     The sapling type.
+     * @param typesAndChances Pairs of two objects. The first entry in each pair
+     *                        must be, after transformation using
+     *                        {@link Object#toString()}, a valid tree name. The
+     *                        second entry in each pair must be an instance of
+     *                        {@link Number}, this is the spawn chance
+     *                        percentage.
+     */
+    public SaplingGen(BiomeConfig biomeConfig, SaplingType saplingType, Object... typesAndChances)
     {
-        String output = "Sapling(" + saplingType;
-
-        for (int i = 0; i < treeNames.size(); i++)
+        super(biomeConfig);
+        this.saplingType = saplingType;
+        for (int i = 0; i < typesAndChances.length - 1; i += 2)
         {
-            output += "," + treeNames.get(i) + "," + treeChances.get(i);
+            String treeName = typesAndChances[i].toString();
+            int chance = ((Number) typesAndChances[i + 1]).intValue();
+            CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(
+                    treeName);
+
+            trees.add(object);
+            treeNames.add(treeName);
+            treeChances.add(chance);
         }
-        return output + ")";
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final SaplingGen compare = (SaplingGen) other;
+        return this.saplingType == compare.saplingType
+                && (this.treeNames == null ? this.treeNames == compare.treeNames
+                        : this.treeNames.equals(compare.treeNames))
+                && (this.treeNames == null ? this.treeNames == compare.treeNames
+                        : this.treeNames.equals(compare.treeNames))
+                && (this.treeChances == null ? this.treeChances == compare.treeChances
+                        : this.treeChances.equals(compare.treeChances));
+    }
+
+    public int getPriority()
+    {
+        return -30;
     }
 
     /**
@@ -135,33 +169,21 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
     }
 
     @Override
-    public boolean equals(Object other)
-    {
-        if (other == null)
-            return false;
-        if (other == this)
-            return true;
-        if (getClass() != other.getClass())
-            return false;
-        final SaplingGen compare = (SaplingGen) other;
-        return this.saplingType == compare.saplingType
-                && (this.treeNames == null ? this.treeNames == compare.treeNames
-                        : this.treeNames.equals(compare.treeNames))
-                && (this.treeNames == null ? this.treeNames == compare.treeNames
-                        : this.treeNames.equals(compare.treeNames))
-                && (this.treeChances == null ? this.treeChances == compare.treeChances
-                        : this.treeChances.equals(compare.treeChances));
-    }
-
-    @Override
     public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other)
     {
         return other.getClass().equals(getClass()) && saplingType.equals(((SaplingGen)other).saplingType);
     }
 
-    public int getPriority()
+    @Override
+    public String toString()
     {
-        return -30;
+        String output = "Sapling(" + saplingType;
+
+        for (int i = 0; i < treeNames.size(); i++)
+        {
+            output += "," + treeNames.get(i) + "," + treeChances.get(i);
+        }
+        return output + ")";
     }
 
 }

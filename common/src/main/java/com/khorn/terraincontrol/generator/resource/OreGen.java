@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.generator.resource;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.MaterialSet;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
@@ -12,10 +13,69 @@ import java.util.Random;
 
 public class OreGen extends Resource
 {
-    private int minAltitude;
-    private int maxAltitude;
-    private int maxSize;
-    private MaterialSet sourceBlocks;
+    private final int maxAltitude;
+    private final int maxSize;
+    private final int minAltitude;
+    private final MaterialSet sourceBlocks;
+
+    public OreGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
+    {
+        super(biomeConfig);
+        assureSize(7, args);
+
+        material = readMaterial(args.get(0));
+        maxSize = readInt(args.get(1), 1, 128);
+        frequency = readInt(args.get(2), 1, 100);
+        rarity = readRarity(args.get(3));
+        minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH,
+                TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(5), minAltitude,
+                TerrainControl.WORLD_HEIGHT);
+        sourceBlocks = readMaterials(args, 6);
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final OreGen compare = (OreGen) other;
+        return this.maxSize == compare.maxSize
+               && this.minAltitude == compare.minAltitude
+               && this.maxAltitude == compare.maxAltitude
+               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
+                   : this.sourceBlocks.equals(compare.sourceBlocks));
+    }
+
+    @Override
+    public int getPriority()
+    {
+        return 10;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 11 * hash + super.hashCode();
+        hash = 11 * hash + this.minAltitude;
+        hash = 11 * hash + this.maxAltitude;
+        hash = 11 * hash + this.maxSize;
+        hash = 11 * hash + (this.sourceBlocks != null ? this.sourceBlocks.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Ore(" + material + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
+    }
 
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
@@ -74,63 +134,6 @@ public class OreGen extends Resource
                 }
             }
         }
-    }
-
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
-    {
-        assureSize(7, args);
-
-        material = readMaterial(args.get(0));
-        maxSize = readInt(args.get(1), 1, 128);
-        frequency = readInt(args.get(2), 1, 100);
-        rarity = readRarity(args.get(3));
-        minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(5), minAltitude, TerrainControl.WORLD_HEIGHT);
-        sourceBlocks = readMaterials(args, 6);
-    }
-
-    @Override
-    public String makeString()
-    {
-        return "Ore(" + material + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int hash = 5;
-        hash = 11 * hash + super.hashCode();
-        hash = 11 * hash + this.minAltitude;
-        hash = 11 * hash + this.maxAltitude;
-        hash = 11 * hash + this.maxSize;
-        hash = 11 * hash + (this.sourceBlocks != null ? this.sourceBlocks.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object other)
-    {
-        if (!super.equals(other))
-            return false;
-        if (other == null)
-            return false;
-        if (other == this)
-            return true;
-        if (getClass() != other.getClass())
-            return false;
-        final OreGen compare = (OreGen) other;
-        return this.maxSize == compare.maxSize
-               && this.minAltitude == compare.minAltitude
-               && this.maxAltitude == compare.maxAltitude
-               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
-                   : this.sourceBlocks.equals(compare.sourceBlocks));
-    }
-
-    @Override
-    public int getPriority()
-    {
-        return 10;
     }
 
 }

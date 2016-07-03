@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.generator.resource;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
@@ -13,45 +14,19 @@ import java.util.Random;
 public class VeinGen extends Resource
 {
 
-    public double veinRarity; // Chance for the vein to spawn in a chunk
-    public int minRadius; // Minimum size of the vein in blocks (inclusive)
+    public int maxAltitude; // Maximum altitude of the vein
     public int maxRadius; // Maximum size of the vein in blocks (inclusive)
-    public int oreSize; // Average size of a ore in the vein
+    public int minAltitude; // Minimum altitude of the vein
+    public int minRadius; // Minimum size of the vein in blocks (inclusive)
     public int oreFrequency; // Frequency of the ores in the vein
     public int oreRarity; // Rarity of the ores in the vein
-    public int minAltitude; // Minimum altitude of the vein
-    public int maxAltitude; // Maximum altitude of the vein
+    public int oreSize; // Average size of a ore in the vein
     public MaterialSet sourceBlocks; // Blocks for the ore to spawn in
+    public double veinRarity; // Chance for the vein to spawn in a chunk
 
-    @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public VeinGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
-    }
-
-    @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
-    {
-        // Find all veins that reach this chunk, and spawn them
-        int searchRadius = (this.maxRadius + 15) / 16;
-
-        int currentChunkX = chunkCoord.getChunkX();
-        int currentChunkZ = chunkCoord.getChunkZ();
-        for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)
-        {
-            for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
-            {
-                Vein vein = getVeinStartInChunk(world, searchChunkX, searchChunkZ);
-                if (vein != null && vein.reachesChunk(currentChunkX, currentChunkZ))
-                {
-                    vein.spawn(world, random, chunkCoord, this);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
-    {
+        super(biomeConfig);
         assureSize(9, args);
 
         material = readMaterial(args.get(0));
@@ -61,17 +36,41 @@ public class VeinGen extends Resource
         oreSize = readInt(args.get(4), 1, 64);
         oreFrequency = readInt(args.get(5), 1, 100);
         oreRarity = readInt(args.get(6), 1, 100);
-        minAltitude = readInt(args.get(7), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT - 1);
-        maxAltitude = readInt(args.get(8), minAltitude, TerrainControl.WORLD_HEIGHT);
+        minAltitude = readInt(args.get(7), TerrainControl.WORLD_DEPTH,
+                TerrainControl.WORLD_HEIGHT - 1);
+        maxAltitude = readInt(args.get(8), minAltitude,
+                TerrainControl.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 9);
     }
 
     @Override
-    public String makeString()
+    public boolean equals(Object other)
     {
-        String result = "Vein(" + material + "," + minRadius + "," + maxRadius + "," + veinRarity + ",";
-        result += oreSize + "," + oreFrequency + "," + oreRarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
-        return result;
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final VeinGen compare = (VeinGen) other;
+        return this.veinRarity == compare.veinRarity
+               && this.minRadius == compare.minRadius
+               && this.maxRadius == compare.maxRadius
+               && this.oreSize == compare.oreSize
+               && this.oreFrequency == compare.oreFrequency
+               && this.oreRarity == compare.oreRarity
+               && this.minAltitude == compare.minAltitude
+               && this.maxAltitude == compare.maxAltitude
+               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
+                   : this.sourceBlocks.equals(compare.sourceBlocks));
+    }
+
+    @Override
+    public int getPriority()
+    {
+        return 9;
     }
 
     /**
@@ -100,30 +99,6 @@ public class VeinGen extends Resource
     }
 
     @Override
-    public boolean equals(Object other)
-    {
-        if (!super.equals(other))
-            return false;
-        if (other == null)
-            return false;
-        if (other == this)
-            return true;
-        if (getClass() != other.getClass())
-            return false;
-        final VeinGen compare = (VeinGen) other;
-        return this.veinRarity == compare.veinRarity
-               && this.minRadius == compare.minRadius
-               && this.maxRadius == compare.maxRadius
-               && this.oreSize == compare.oreSize
-               && this.oreFrequency == compare.oreFrequency
-               && this.oreRarity == compare.oreRarity
-               && this.minAltitude == compare.minAltitude
-               && this.maxAltitude == compare.maxAltitude
-               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
-                   : this.sourceBlocks.equals(compare.sourceBlocks));
-    }
-
-    @Override
     public int hashCode()
     {
         int hash = 3;
@@ -141,9 +116,37 @@ public class VeinGen extends Resource
     }
 
     @Override
-    public int getPriority()
+    public String toString()
     {
-        return 9;
+        String result = "Vein(" + material + "," + minRadius + "," + maxRadius + "," + veinRarity + ",";
+        result += oreSize + "," + oreFrequency + "," + oreRarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
+        return result;
+    }
+
+    @Override
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    {
+    }
+
+    @Override
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    {
+        // Find all veins that reach this chunk, and spawn them
+        int searchRadius = (this.maxRadius + 15) / 16;
+
+        int currentChunkX = chunkCoord.getChunkX();
+        int currentChunkZ = chunkCoord.getChunkZ();
+        for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)
+        {
+            for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
+            {
+                Vein vein = getVeinStartInChunk(world, searchChunkX, searchChunkZ);
+                if (vein != null && vein.reachesChunk(currentChunkX, currentChunkZ))
+                {
+                    vein.spawn(world, random, chunkCoord, this);
+                }
+            }
+        }
     }
 
 }

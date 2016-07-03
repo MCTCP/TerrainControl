@@ -500,9 +500,9 @@ public class WorldConfig extends ConfigFile
         }
         for (ConfigFunction<WorldConfig> res : reader.getConfigFunctions(this, false))
         {
-            if (res != null && res.getHolderType() != null)
+            if (res != null)
             {
-                if (res instanceof BiomeGroup && res.isValid())
+                if (res instanceof BiomeGroup)
                 {
                     biomeGroupManager.registerGroup((BiomeGroup) res);
                 }

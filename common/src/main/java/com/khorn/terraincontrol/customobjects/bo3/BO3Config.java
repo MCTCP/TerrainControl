@@ -208,23 +208,20 @@ public class BO3Config extends ConfigFile
 
         for (ConfigFunction<BO3Config> res : reader.getConfigFunctions(this, true))
         {
-            if (res.isValid())
+            if (res instanceof BlockFunction)
             {
-                if (res instanceof BlockFunction)
-                {
-                    BlockFunction block = (BlockFunction) res;
-                    box.expandToFit(block.x, block.y, block.z);
-                    tempBlocksList.add(block);
-                } else if (res instanceof BO3Check)
-                {
-                    tempChecksList.add((BO3Check) res);
-                } else if (res instanceof WeightedBranchFunction)
-                {
-                    tempBranchesList.add((WeightedBranchFunction) res);
-                } else if (res instanceof BranchFunction)
-                {
-                    tempBranchesList.add((BranchFunction) res);
-                }
+                BlockFunction block = (BlockFunction) res;
+                box.expandToFit(block.x, block.y, block.z);
+                tempBlocksList.add(block);
+            } else if (res instanceof BO3Check)
+            {
+                tempChecksList.add((BO3Check) res);
+            } else if (res instanceof WeightedBranchFunction)
+            {
+                tempBranchesList.add((WeightedBranchFunction) res);
+            } else if (res instanceof BranchFunction)
+            {
+                tempBranchesList.add((BranchFunction) res);
             }
         }
 

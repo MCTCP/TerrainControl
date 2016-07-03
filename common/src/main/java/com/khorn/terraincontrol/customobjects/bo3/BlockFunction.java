@@ -23,9 +23,9 @@ public class BlockFunction extends BO3Function
     public NamedBinaryTag metaDataTag;
     public String metaDataName;
 
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
+    public BlockFunction(BO3Config config, List<String> args) throws InvalidConfigException
     {
+        super(config);
         assureSize(4, args);
         // Those limits are arbitrary, LocalWorld.setBlock will limit it
         // correctly based on what chunks can be accessed
@@ -44,8 +44,13 @@ public class BlockFunction extends BO3Function
         }
     }
 
+    protected BlockFunction(BO3Config config)
+    {
+        super(config);
+    }
+
     @Override
-    public String makeString()
+    public String toString()
     {
         String start = "Block(" + x + ',' + y + ',' + z + ',' + material;
         if (hasMetaData)
@@ -58,7 +63,7 @@ public class BlockFunction extends BO3Function
     @Override
     public BlockFunction rotate()
     {
-        BlockFunction rotatedBlock = new BlockFunction();
+        BlockFunction rotatedBlock = new BlockFunction(getHolder());
         rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;

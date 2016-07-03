@@ -22,9 +22,9 @@ public class MinecraftObjectFunction extends BlockFunction
     public int z;
     public Rotation rotation = Rotation.NORTH;
 
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
+    public MinecraftObjectFunction(BO3Config config, List<String> args) throws InvalidConfigException
     {
+        super(config);
         assureSize(4, args);
         // Those limits are arbitrary, LocalWorld.setBlock will limit it
         // correctly based on what chunks can be accessed
@@ -34,8 +34,13 @@ public class MinecraftObjectFunction extends BlockFunction
         structurePart = DefaultStructurePart.getDefaultStructurePart(args.get(3));
     }
 
+    public MinecraftObjectFunction(BO3Config holder)
+    {
+        super(holder);
+    }
+
     @Override
-    public String makeString()
+    public String toString()
     {
         return "MinecraftObject(" + x + ',' + y + ',' + z + ',' + structurePart + ')';
     }
@@ -43,7 +48,7 @@ public class MinecraftObjectFunction extends BlockFunction
     @Override
     public MinecraftObjectFunction rotate()
     {
-        MinecraftObjectFunction rotatedBlock = new MinecraftObjectFunction();
+        MinecraftObjectFunction rotatedBlock = new MinecraftObjectFunction(getHolder());
         rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;

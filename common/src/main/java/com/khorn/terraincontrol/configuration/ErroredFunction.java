@@ -1,42 +1,29 @@
 package com.khorn.terraincontrol.configuration;
 
-import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
 import java.util.List;
 
-final class ErroredFunction<T> extends ConfigFunction<T>
+public final class ErroredFunction<T> extends ConfigFunction<T>
 {
-    private final Class<T> holder;
     private final String name;
     private final List<String> args;
+    public final String error;
 
     ErroredFunction(String name, T holder, List<String> args, String error)
     {
-        @SuppressWarnings("unchecked")
-        Class<T> holderClass = (Class<T>) holder.getClass();
-        this.holder = holderClass;
+        super(holder);
         this.name = name;
         this.args = args;
-        this.invalidate(name, args, error);
+        this.error = error;
     }
 
     @Override
-    public Class<T> getHolderType()
+    public String toString()
     {
-        return holder;
-    }
-
-    @Override
-    protected void load(List<String> args) throws InvalidConfigException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String makeString()
-    {
-        return name + "(" + StringHelper.join(args, ",") + ")";
+        return "## INVALID " + name.toUpperCase() + " - " + error + " ##" + System.getProperty(
+                "line.separator") + name + "(" + StringHelper.join(args,
+                        ",") + ")";
     }
 
     @Override

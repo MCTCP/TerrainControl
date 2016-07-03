@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.generator.resource;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.helpers.RandomHelper;
@@ -14,10 +15,69 @@ import java.util.Random;
 public class UndergroundLakeGen extends Resource
 {
 
-    private int minSize;
-    private int maxSize;
-    private int minAltitude;
-    private int maxAltitude;
+    private final int maxAltitude;
+    private final int maxSize;
+    private final int minAltitude;
+    private final int minSize;
+
+    public UndergroundLakeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
+    {
+        super(biomeConfig);
+        material = TerrainControl.toLocalMaterialData(
+                DefaultMaterial.STATIONARY_WATER, 0);
+
+        assureSize(6, args);
+        minSize = readInt(args.get(0), 1, 25);
+        maxSize = readInt(args.get(1), minSize, 60);
+        frequency = readInt(args.get(2), 1, 100);
+        rarity = readRarity(args.get(3));
+        minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH,
+                TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(5), minAltitude,
+                TerrainControl.WORLD_HEIGHT);
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final UndergroundLakeGen compare = (UndergroundLakeGen) other;
+        return this.maxAltitude == compare.maxAltitude
+               && this.minAltitude == compare.minAltitude
+               && this.minSize == compare.minSize
+               && this.maxSize == compare.maxSize;
+    }
+
+    @Override
+    public int getPriority()
+    {
+        return 3;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        hash = 29 * hash + super.hashCode();
+        hash = 29 * hash + this.minSize;
+        hash = 29 * hash + this.maxSize;
+        hash = 29 * hash + this.minAltitude;
+        hash = 29 * hash + this.maxAltitude;
+        return hash;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "UnderGroundLake(" + minSize + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
+    }
 
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
@@ -77,62 +137,6 @@ public class UndergroundLakeGen extends Resource
                         }
                     }
         }
-    }
-
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
-    {
-        material = TerrainControl.toLocalMaterialData(DefaultMaterial.STATIONARY_WATER, 0);
-
-        assureSize(6, args);
-        minSize = readInt(args.get(0), 1, 25);
-        maxSize = readInt(args.get(1), minSize, 60);
-        frequency = readInt(args.get(2), 1, 100);
-        rarity = readRarity(args.get(3));
-        minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(5), minAltitude, TerrainControl.WORLD_HEIGHT);
-    }
-
-    @Override
-    public String makeString()
-    {
-        return "UnderGroundLake(" + minSize + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int hash = 3;
-        hash = 29 * hash + super.hashCode();
-        hash = 29 * hash + this.minSize;
-        hash = 29 * hash + this.maxSize;
-        hash = 29 * hash + this.minAltitude;
-        hash = 29 * hash + this.maxAltitude;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object other)
-    {
-        if (!super.equals(other))
-            return false;
-        if (other == null)
-            return false;
-        if (other == this)
-            return true;
-        if (getClass() != other.getClass())
-            return false;
-        final UndergroundLakeGen compare = (UndergroundLakeGen) other;
-        return this.maxAltitude == compare.maxAltitude
-               && this.minAltitude == compare.minAltitude
-               && this.minSize == compare.minSize
-               && this.maxSize == compare.maxSize;
-    }
-
-    @Override
-    public int getPriority()
-    {
-        return 3;
     }
 
 }

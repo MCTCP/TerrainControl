@@ -9,10 +9,9 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
 public abstract class BO3Function extends ConfigFunction<BO3Config>
 {
 
-    @Override
-    public Class<BO3Config> getHolderType()
+    public BO3Function(BO3Config holder)
     {
-        return BO3Config.class;
+        super(holder);
     }
 
     /**

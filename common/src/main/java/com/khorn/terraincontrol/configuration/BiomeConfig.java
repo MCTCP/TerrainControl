@@ -87,7 +87,7 @@ public class BiomeConfig extends ConfigFile
     public int foliageColor;
     public boolean foliageColorIsMultiplier;
 
-    public List<Resource> resourceSequence = new ArrayList<Resource>();
+    public List<ConfigFunction<BiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<BiomeConfig>>();
 
     private Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
 
@@ -365,16 +365,15 @@ public class BiomeConfig extends ConfigFile
     {
         for (ConfigFunction<BiomeConfig> res : settings.getConfigFunctions(this, this.doResourceInheritance))
         {
-            // Do not include DoResourceInheritance() as a resource
-            if (res != null && res.getHolderType() != null)
+            if (res != null)
             {
-                if (res instanceof SaplingGen && res.isValid())
+                if (res instanceof SaplingGen)
                 {
                     SaplingGen sapling = (SaplingGen) res;
                     this.saplingGrowers.put(sapling.saplingType, sapling);
-                } else if (res instanceof Resource)
+                } else
                 {
-                    this.resourceSequence.add((Resource) res);
+                    this.resourceSequence.add(res);
                 }
             }
         }
@@ -854,8 +853,12 @@ public class BiomeConfig extends ConfigFile
             if (!settings.getSetting(BiomeStandardValues.DISABLE_NOTCH_PONDS, false))
             {
                 settings.addConfigFunctions(Arrays.<ConfigFunction<?>> asList(
-                        ConfigFunction.create(this, SmallLakeGen.class, DefaultMaterial.WATER, 4, 7, 8, worldConfig.worldHeightCap),
-                        ConfigFunction.create(this, SmallLakeGen.class, DefaultMaterial.LAVA, 2, 3, 8, worldConfig.worldHeightCap - 8)));
+                        Resource.createResource(this, SmallLakeGen.class,
+                                DefaultMaterial.WATER, 4, 7, 8,
+                                worldConfig.worldHeightCap),
+                        Resource.createResource(this, SmallLakeGen.class,
+                                DefaultMaterial.LAVA, 2, 3, 8,
+                                worldConfig.worldHeightCap - 8)));
             }
         }
 
@@ -863,15 +866,16 @@ public class BiomeConfig extends ConfigFile
         int customTreeChance = settings.getSetting(WorldStandardValues.CUSTOM_TREE_CHANCE, 0);
         if (customTreeChance == 100)
         {
-            settings.addConfigFunctions(Collections.singleton(ConfigFunction.create(this, SaplingGen.class, "All", "UseWorld", 100)));
+            settings.addConfigFunctions(Collections.singleton(
+                    new SaplingGen(this, SaplingType.All, "UseWorld", 100)));
         }
         if (customTreeChance > 0 && customTreeChance < 100)
         {
             settings.addConfigFunctions(Arrays.<ConfigFunction<?>> asList(
-                    ConfigFunction.create(this, SaplingGen.class, SaplingType.Oak, "UseWorld", customTreeChance, TreeType.BigTree, 10, TreeType.Tree, 100),
-                    ConfigFunction.create(this, SaplingGen.class, SaplingType.Redwood, "UseWorld", customTreeChance, TreeType.Taiga2, 100),
-                    ConfigFunction.create(this, SaplingGen.class, SaplingType.Birch, "UseWorld", customTreeChance, TreeType.Birch, 100),
-                    ConfigFunction.create(this, SaplingGen.class, SaplingType.SmallJungle, "UseWorld", customTreeChance, TreeType.CocoaTree, 100)));
+                    new SaplingGen(this, SaplingType.Oak, "UseWorld", customTreeChance, TreeType.BigTree, 10, TreeType.Tree, 100),
+                    new SaplingGen(this, SaplingType.Redwood, "UseWorld", customTreeChance, TreeType.Taiga2, 100),
+                    new SaplingGen(this, SaplingType.Birch, "UseWorld", customTreeChance, TreeType.Birch, 100),
+                    new SaplingGen(this, SaplingType.SmallJungle, "UseWorld", customTreeChance, TreeType.CocoaTree, 100)));
         }
 
         // FrozenRivers

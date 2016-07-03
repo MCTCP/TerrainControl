@@ -3,6 +3,8 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resource.*;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,12 +59,11 @@ public class ConfigFunctionsManager
      *               {@link WorldConfig}.
      * @param args   The args of the function.
      * @return A config function with the given name, or null if the config
-     * function requires another holder. If invalid or non-existing config
-     * functions, it returns ab {@link ConfigFunction#isValid() invalid
-     * function}.
+     * function requires another holder. For invalid or non-existing config
+     * functions, it returns an instance of {@link ErroredFunction}.
      */
     @SuppressWarnings("unchecked")
-    // It's checked with if (!clazz.isAssignableFrom(holder.getClass()))
+    // It's checked with clazz.getConstructor(holder.getClass(), ...))
     public <T> ConfigFunction<T> getConfigFunction(String name, T holder, List<String> args)
     {
         // Get the class of the config function
@@ -73,31 +74,30 @@ public class ConfigFunctionsManager
         }
 
         // Get a config function
-        ConfigFunction<T> configFunction;
         try
         {
-            configFunction = (ConfigFunction<T>) clazz.newInstance();
-        } catch (Exception e)
+            Constructor<? extends ConfigFunction<?>> constructor = clazz.getConstructor(
+                    holder.getClass(), List.class);
+            return (ConfigFunction<T>) constructor.newInstance(holder, args);
+        } catch (NoSuchMethodException e1)
         {
-            throw new RuntimeException("Reflection error while loading the resources: ", e);
-        }
-
-        // Check if config function is of the right type
-        boolean matchingTypes = holder.getClass().isAssignableFrom(configFunction.getHolderType());
-        if (!matchingTypes)
-        {
+            // Probably uses another holder type
             return null;
-        }
-
-        // Initialize the function
-        try
+        } catch (InstantiationException e)
         {
-            configFunction.init(holder, args);
-        } catch (InvalidConfigException e)
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e)
         {
-            configFunction.invalidate(name, args, e.getMessage());
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e)
+        {
+            Throwable cause = e.getCause();
+            if (cause instanceof InvalidConfigException)
+            {
+                return new ErroredFunction<T>(name, holder, args, cause.getMessage());
+            }
+            throw new RuntimeException(e);
         }
-        return configFunction;
     }
 
 }

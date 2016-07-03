@@ -9,6 +9,7 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
  */
 public abstract class BO3Check extends BO3Function
 {
+
     /** 
      * X position relative to the object origin.
      */
@@ -21,6 +22,11 @@ public abstract class BO3Check extends BO3Function
      * Z position relative to the object origin.
      */
     public int z;
+
+    public BO3Check(BO3Config holder)
+    {
+        super(holder);
+    }
 
     /**
      * Returns whether this check would prevent spawning at the given position.
@@ -35,7 +41,6 @@ public abstract class BO3Check extends BO3Function
      * @return Whether this check prevents the BO3 from spawning.
      */
     public abstract boolean preventsSpawn(LocalWorld world, int x, int y, int z);
-    
 
     /**
      * This implementation of

@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.generator.resource;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.MaterialSet;
 
@@ -14,6 +15,21 @@ public class BoulderGen extends Resource
     private MaterialSet sourceBlocks;
     private int minAltitude;
     private int maxAltitude;
+
+    public BoulderGen(BiomeConfig config, List<String> args) throws InvalidConfigException
+    {
+        super(config);
+        assureSize(6, args);
+
+        material = readMaterial(args.get(0));
+        frequency = readInt(args.get(1), 1, 5000);
+        rarity = readRarity(args.get(2));
+        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH,
+                TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude,
+                TerrainControl.WORLD_HEIGHT);
+        sourceBlocks = readMaterials(args, 5);
+    }
 
     @Override
     public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
@@ -68,20 +84,7 @@ public class BoulderGen extends Resource
     }
 
     @Override
-    public void load(List<String> args) throws InvalidConfigException
-    {
-        assureSize(6, args);
-
-        material = readMaterial(args.get(0));
-        frequency = readInt(args.get(1), 1, 5000);
-        rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(4), minAltitude, TerrainControl.WORLD_HEIGHT);
-        sourceBlocks = readMaterials(args, 5);
-    }
-
-    @Override
-    public String makeString()
+    public String toString()
     {
         return "Boulder(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }

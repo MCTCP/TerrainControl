@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorNewOctaves;
@@ -55,16 +56,18 @@ public class ObjectSpawner
         this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
 
         // Generate structures
-        boolean hasGeneratedAVillage = world.placeDefaultStructures(rand, chunkCoord);
+        boolean hasVillage = world.placeDefaultStructures(rand, chunkCoord);
 
         // Mark population started
         world.startPopulation(chunkCoord);
-        TerrainControl.firePopulationStartEvent(world, rand, hasGeneratedAVillage, chunkCoord);
+        TerrainControl.firePopulationStartEvent(world, rand, hasVillage,
+                chunkCoord);
 
         // Resource sequence
-        for (Resource res : biomeConfig.resourceSequence)
+        for (ConfigFunction<BiomeConfig> res : biomeConfig.resourceSequence)
         {
-            res.process(world, rand, hasGeneratedAVillage, chunkCoord);
+            if (res instanceof Resource)
+                ((Resource) res).process(world, rand, hasVillage, chunkCoord);
         }
 
         // Animals
@@ -77,7 +80,7 @@ public class ObjectSpawner
         world.replaceBlocks(chunkCoord);
 
         // Mark population ended
-        TerrainControl.firePopulationEndEvent(world, rand, hasGeneratedAVillage, chunkCoord);
+        TerrainControl.firePopulationEndEvent(world, rand, hasVillage, chunkCoord);
         world.endPopulation();
     }
 

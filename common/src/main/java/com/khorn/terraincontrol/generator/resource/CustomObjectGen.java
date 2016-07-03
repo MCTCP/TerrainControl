@@ -19,9 +19,9 @@ public class CustomObjectGen extends Resource
     private List<CustomObject> objects;
     private List<String> objectNames;
 
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
+    public CustomObjectGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
+        super(biomeConfig);
         if (args.isEmpty() || (args.size() == 1 && args.get(0).trim().isEmpty()))
         {
             // Backwards compatibility
@@ -58,7 +58,7 @@ public class CustomObjectGen extends Resource
     }
 
     @Override
-    public String makeString()
+    public String toString()
     {
         return "CustomObject(" + StringHelper.join(objectNames, ",") + ")";
     }
@@ -105,6 +105,7 @@ public class CustomObjectGen extends Resource
                    : this.objectNames.equals(compare.objectNames));
     }
 
+    @Override
     public int getPriority()
     {
         return -40;

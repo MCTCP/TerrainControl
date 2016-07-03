@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.generator.resource;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.MaterialSet;
 
@@ -12,17 +13,17 @@ import java.util.Random;
 public class WellGen extends Resource
 {
 
-    private int minAltitude;
-    private int maxAltitude;
+    private final int maxAltitude;
+    private final int minAltitude;
 
-    private LocalMaterialData slab;
-    private LocalMaterialData water;
+    private final LocalMaterialData slab;
+    private final LocalMaterialData water;
 
-    private MaterialSet sourceBlocks;
+    private final MaterialSet sourceBlocks;
 
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
+    public WellGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
+        super(biomeConfig);
         assureSize(8, args);
 
         material = readMaterial(args.get(0));
@@ -33,6 +34,52 @@ public class WellGen extends Resource
         minAltitude = readInt(args.get(5), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
         maxAltitude = readInt(args.get(6), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 7);
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final WellGen compare = (WellGen) other;
+        return this.maxAltitude == compare.maxAltitude
+               && this.minAltitude == compare.minAltitude
+               && this.slab.equals(compare.slab)
+               && this.sourceBlocks.equals(compare.sourceBlocks)
+               && this.water.equals(compare.water);
+    }
+
+    @Override
+    public int getPriority()
+    {
+        return 0;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        hash = 17 * hash + super.hashCode();
+        hash = 17 * hash + this.minAltitude;
+        hash = 17 * hash + this.maxAltitude;
+        hash = 17 * hash + this.slab.hashCode();
+        hash = 17 * hash + this.water.hashCode();
+        hash = 17 * hash + this.sourceBlocks.hashCode();
+        return hash;
+    }
+
+    @Override
+    public String toString()
+    {
+        String output = "Well(" + material + "," + slab + "," + water + ",";
+        output += frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + this.makeMaterials(sourceBlocks) + ")";
+        return output;
     }
 
     @Override
@@ -119,51 +166,6 @@ public class WellGen extends Resource
             world.setBlock(x + 1, y + i, z - 1, material);
             world.setBlock(x + 1, y + i, z + 1, material);
         }
-    }
-
-    @Override
-    public String makeString()
-    {
-        String output = "Well(" + material + "," + slab + "," + water + ",";
-        output += frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + this.makeMaterials(sourceBlocks) + ")";
-        return output;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int hash = 3;
-        hash = 17 * hash + super.hashCode();
-        hash = 17 * hash + this.minAltitude;
-        hash = 17 * hash + this.maxAltitude;
-        hash = 17 * hash + this.slab.hashCode();
-        hash = 17 * hash + this.water.hashCode();
-        hash = 17 * hash + this.sourceBlocks.hashCode();
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object other)
-    {
-        if (!super.equals(other))
-            return false;
-        if (other == null)
-            return false;
-        if (other == this)
-            return true;
-        if (getClass() != other.getClass())
-            return false;
-        final WellGen compare = (WellGen) other;
-        return this.maxAltitude == compare.maxAltitude
-               && this.minAltitude == compare.minAltitude
-               && this.slab.equals(compare.slab)
-               && this.sourceBlocks.equals(compare.sourceBlocks)
-               && this.water.equals(compare.water);
-    }
-
-    public int getPriority()
-    {
-        return 0;
     }
 
 }

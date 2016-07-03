@@ -17,9 +17,9 @@ public class RandomBlockFunction extends BlockFunction
 
     public int blockCount = 0;
 
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
+    public RandomBlockFunction(BO3Config config, List<String> args) throws InvalidConfigException
     {
+        super(config);
         assureSize(5, args);
         x = readInt(args.get(0), -100, 100);
         y = readInt(args.get(1), -100, 100);
@@ -75,8 +75,13 @@ public class RandomBlockFunction extends BlockFunction
         }
     }
 
+    private RandomBlockFunction(BO3Config config)
+    {
+        super(config);
+    }
+
     @Override
-    public String makeString()
+    public String toString()
     {
         String text = "RandomBlock(" + x + "," + y + "," + z;
         for (int i = 0; i < blockCount; i++)
@@ -95,7 +100,7 @@ public class RandomBlockFunction extends BlockFunction
     @Override
     public RandomBlockFunction rotate()
     {
-        RandomBlockFunction rotatedBlock = new RandomBlockFunction();
+        RandomBlockFunction rotatedBlock = new RandomBlockFunction(getHolder());
         rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;

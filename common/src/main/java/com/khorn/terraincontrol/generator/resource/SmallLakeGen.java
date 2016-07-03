@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.generator.resource;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.RandomHelper;
@@ -15,8 +16,64 @@ import java.util.Random;
 public class SmallLakeGen extends Resource
 {
     private final boolean[] BooleanBuffer = new boolean[2048];
-    public int minAltitude;
     public int maxAltitude;
+    public int minAltitude;
+
+    public SmallLakeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
+    {
+        super(biomeConfig);
+        assureSize(5, args);
+        material = readMaterial(args.get(0));
+        frequency = readInt(args.get(1), 1, 100);
+        rarity = readRarity(args.get(2));
+        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH,
+                TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(4), minAltitude,
+                TerrainControl.WORLD_HEIGHT);
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final SmallLakeGen compare = (SmallLakeGen) other;
+        TerrainControl.log(LogMarker.DEBUG, "Equals::{}", new Object[]{this.minAltitude == compare.minAltitude
+               && this.maxAltitude == compare.maxAltitude
+               && Arrays.equals(this.BooleanBuffer, compare.BooleanBuffer)});
+        return this.minAltitude == compare.minAltitude
+               && this.maxAltitude == compare.maxAltitude
+               && Arrays.equals(this.BooleanBuffer, compare.BooleanBuffer);
+    }
+
+    @Override
+    public int getPriority()
+    {
+        return 1;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        hash = 41 * hash + super.hashCode();
+        hash = 41 * hash + Arrays.hashCode(this.BooleanBuffer);
+        hash = 41 * hash + this.minAltitude;
+        hash = 41 * hash + this.maxAltitude;
+        return hash;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "SmallLake(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
+    }
 
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
@@ -117,60 +174,6 @@ public class SmallLakeGen extends Resource
             }
 
         }
-    }
-
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
-    {
-        assureSize(5, args);
-        material = readMaterial(args.get(0));
-        frequency = readInt(args.get(1), 1, 100);
-        rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(4), minAltitude, TerrainControl.WORLD_HEIGHT);
-    }
-
-    @Override
-    public String makeString()
-    {
-        return "SmallLake(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int hash = 3;
-        hash = 41 * hash + super.hashCode();
-        hash = 41 * hash + Arrays.hashCode(this.BooleanBuffer);
-        hash = 41 * hash + this.minAltitude;
-        hash = 41 * hash + this.maxAltitude;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object other)
-    {
-        if (!super.equals(other))
-            return false;
-        if (other == null)
-            return false;
-        if (other == this)
-            return true;
-        if (getClass() != other.getClass())
-            return false;
-        final SmallLakeGen compare = (SmallLakeGen) other;
-        TerrainControl.log(LogMarker.DEBUG, "Equals::{}", new Object[]{this.minAltitude == compare.minAltitude
-               && this.maxAltitude == compare.maxAltitude
-               && Arrays.equals(this.BooleanBuffer, compare.BooleanBuffer)});
-        return this.minAltitude == compare.minAltitude
-               && this.maxAltitude == compare.maxAltitude
-               && Arrays.equals(this.BooleanBuffer, compare.BooleanBuffer);
-    }
-
-    @Override
-    public int getPriority()
-    {
-        return 1;
     }
     
 }

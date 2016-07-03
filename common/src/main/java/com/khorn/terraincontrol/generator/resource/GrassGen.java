@@ -20,13 +20,13 @@ public class GrassGen extends Resource
         NotGrouped
     }
 
-    private MaterialSet sourceBlocks;
-    private PlantType plant;
     private GroupOption groupOption;
+    private PlantType plant;
+    private final MaterialSet sourceBlocks;
 
-    @Override
-    public void load(List<String> args) throws InvalidConfigException
+    public GrassGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
+        super(biomeConfig);
         assureSize(5, args);
 
         // The syntax for the first to arguments used to be blockId,blockData
@@ -63,23 +63,52 @@ public class GrassGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public boolean equals(Object other)
     {
-        // Handled by spawnInChunk().
+        if (!super.equals(other))
+            return false;
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (getClass() != other.getClass())
+            return false;
+        final GrassGen compare = (GrassGen) other;
+        return (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
+                : this.sourceBlocks.equals(compare.sourceBlocks));
     }
 
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    public int getPriority()
     {
-        switch (groupOption)
-        {
-            case Grouped:
-                spawnGrouped(world, random, chunkCoord);
-                break;
-            case NotGrouped:
-                spawnNotGrouped(world, random, chunkCoord);
-                break;
-        }
+        return -32;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 11 * hash + super.hashCode();
+        hash = 11 * hash + (this.sourceBlocks != null ? this.sourceBlocks.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other)
+    {
+        return getClass() == other.getClass() && ((GrassGen) other).plant.equals(plant);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Grass(" + plant.getName() + "," + groupOption + "," + frequency + "," + rarity + makeMaterials(sourceBlocks) + ")";
+    }
+
+    @Override
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    {
+        // Handled by spawnInChunk().
     }
 
     protected void spawnGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
@@ -117,6 +146,20 @@ public class GrassGen extends Resource
         }
     }
 
+    @Override
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    {
+        switch (groupOption)
+        {
+            case Grouped:
+                spawnGrouped(world, random, chunkCoord);
+                break;
+            case NotGrouped:
+                spawnNotGrouped(world, random, chunkCoord);
+                break;
+        }
+    }
+
     protected void spawnNotGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         for (int t = 0; t < frequency; t++)
@@ -136,48 +179,6 @@ public class GrassGen extends Resource
                 continue;
             plant.spawn(world, x, y + 1, z);
         }
-    }
-
-    @Override
-    public String makeString()
-    {
-        return "Grass(" + plant.getName() + "," + groupOption + "," + frequency + "," + rarity + makeMaterials(sourceBlocks) + ")";
-    }
-
-    @Override
-    public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other)
-    {
-        return getClass() == other.getClass() && ((GrassGen) other).plant.equals(plant);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int hash = 7;
-        hash = 11 * hash + super.hashCode();
-        hash = 11 * hash + (this.sourceBlocks != null ? this.sourceBlocks.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object other)
-    {
-        if (!super.equals(other))
-            return false;
-        if (other == null)
-            return false;
-        if (other == this)
-            return true;
-        if (getClass() != other.getClass())
-            return false;
-        final GrassGen compare = (GrassGen) other;
-        return (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
-                : this.sourceBlocks.equals(compare.sourceBlocks));
-    }
-
-    public int getPriority()
-    {
-        return -32;
     }
 
 }

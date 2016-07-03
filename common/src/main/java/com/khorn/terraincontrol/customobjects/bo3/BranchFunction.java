@@ -43,10 +43,22 @@ public class BranchFunction extends BO3Function implements Branch
      */
     public double totalChance = -1;
 
+    public BranchFunction(BO3Config config, List<String> args) throws InvalidConfigException
+    {
+        super(config);
+        branches = new TreeSet<BranchNode>();
+        readArgs(args, false);
+    }
+
+    protected BranchFunction(BO3Config config)
+    {
+        super(config);
+    }
+
     @Override
     public BranchFunction rotate()
     {
-        BranchFunction rotatedBranch = new BranchFunction();
+        BranchFunction rotatedBranch = new BranchFunction(getHolder());
         rotatedBranch.x = z;
         rotatedBranch.y = y;
         rotatedBranch.z = -x;
@@ -59,14 +71,7 @@ public class BranchFunction extends BO3Function implements Branch
     }
 
     @Override
-    public void load(List<String> args) throws InvalidConfigException
-    {
-        branches = new TreeSet<BranchNode>();
-        readArgs(args, false);
-    }
-
-    @Override
-    public String makeString()
+    public String toString()
     {
         StringBuilder output = new StringBuilder(getConfigName())
             .append('(')

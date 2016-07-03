@@ -17,18 +17,18 @@ public class IceSpikeGen extends Resource
 {
     public static enum SpikeType {
         Basement,
-        SmallSpike,
-        HugeSpike;
+        HugeSpike,
+        SmallSpike;
     }
 
-    private int maxAltitude;
-    private int minAltitude;
+    private final int maxAltitude;
+    private final int minAltitude;
+    private final MaterialSet sourceBlocks;
     private SpikeType type;
-    private MaterialSet sourceBlocks;
 
-    @Override
-    protected void load(List<String> args) throws InvalidConfigException
+    public IceSpikeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
+        super(biomeConfig);
         assureSize(2, args);
 
         material = readMaterial(args.get(0));
@@ -57,7 +57,20 @@ public class IceSpikeGen extends Resource
     }
 
     @Override
-    public String makeString()
+    public int getPriority()
+    {
+        return -21;
+    }
+
+    @Override
+    public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other)
+    {
+        // Enforces shape as well
+        return super.isAnalogousTo(other) && ((IceSpikeGen) other).type == this.type;
+    }
+
+    @Override
+    public String toString()
     {
         return "IceSpike(" + material + "," + type + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
@@ -226,19 +239,6 @@ public class IceSpikeGen extends Resource
                 }
             }
         }
-    }
-
-    @Override
-    public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other)
-    {
-        // Enforces shape as well
-        return super.isAnalogousTo(other) && ((IceSpikeGen) other).type == this.type;
-    }
-
-    @Override
-    public int getPriority()
-    {
-        return -21;
     }
 
 }

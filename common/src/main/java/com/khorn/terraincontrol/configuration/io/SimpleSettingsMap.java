@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.configuration.io;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
+import com.khorn.terraincontrol.configuration.ErroredFunction;
 import com.khorn.terraincontrol.configuration.io.RawSettingValue.ValueType;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
@@ -64,7 +65,8 @@ public final class SimpleSettingsMap implements SettingsMap
     {
         for (ConfigFunction<?> function : functions)
         {
-            RawSettingValue value = RawSettingValue.create(ValueType.FUNCTION, function.write());
+            RawSettingValue value = RawSettingValue.create(ValueType.FUNCTION,
+                    function.toString());
 
             configFunctions.add(value);
             settingsCache.put(nextDummyKey(), value);
@@ -91,10 +93,12 @@ public final class SimpleSettingsMap implements SettingsMap
                 continue;
             }
             result.add(function);
-            if (!function.isValid())
+            if (function instanceof ErroredFunction)
             {
                 TerrainControl.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}",
-                        functionName, this.name, configFunctionLine.getLineNumber(), function.getError());
+                        functionName, this.name,
+                        configFunctionLine.getLineNumber(),
+                        ((ErroredFunction<?>) function).error);
             }
         }
 
