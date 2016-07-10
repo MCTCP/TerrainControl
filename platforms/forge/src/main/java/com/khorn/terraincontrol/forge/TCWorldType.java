@@ -1,13 +1,17 @@
 package com.khorn.terraincontrol.forge;
 
+import java.io.File;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.TCBiomeProvider;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+import com.khorn.terraincontrol.logging.LogMarker;
+
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -15,8 +19,6 @@ import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.io.File;
 
 public class TCWorldType extends WorldType
 {
@@ -54,10 +56,10 @@ public class TCWorldType extends WorldType
 
         if (!worldDirectory.exists())
         {
-            System.out.println("TerrainControl: settings does not exist, creating defaults");
+            TerrainControl.log(LogMarker.INFO, "settings does not exist, creating defaults");
 
             if (!worldDirectory.mkdirs())
-                System.out.println("TerrainControl: cant create folder " + worldDirectory.getAbsolutePath());
+                TerrainControl.log(LogMarker.WARN, "cant create folder " + worldDirectory.getAbsolutePath());
         }
 
         this.worldTC = new ForgeWorld(world.getWorldInfo().getWorldName());
