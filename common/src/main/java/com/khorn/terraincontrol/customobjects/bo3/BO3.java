@@ -116,7 +116,7 @@ public class BO3 implements CustomObject
     @Override
     public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {
-        BlockFunction[] blocks = settings.blocks[rotation.getRotationId()];
+        BO3PlaceableFunction[] blocks = settings.blocks[rotation.getRotationId()];
         BO3Check[] checks = settings.bo3Checks[rotation.getRotationId()];
 
         // Height check
@@ -137,7 +137,7 @@ public class BO3 implements CustomObject
 
         // Check for source blocks
         int blocksOutsideSourceBlock = 0;
-        for (BlockFunction block : blocks)
+        for (BO3PlaceableFunction block : blocks)
         {
             if (!world.isLoaded(x + block.x, y + block.y, z + block.z))
             {
@@ -175,17 +175,20 @@ public class BO3 implements CustomObject
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-        BlockFunction[] blocks = settings.blocks[rotation.getRotationId()];
+        BO3PlaceableFunction[] blocks = settings.blocks[rotation.getRotationId()];
         ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
         // Spawn
 
-        for (BlockFunction block : blocks)
+        for (BO3PlaceableFunction block : blocks)
         {
             if (settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway || settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z)))
             {
                 block.spawn(world, random, x + block.x, y + block.y, z + block.z);
             }
-            oeh.addBlock(block);
+            if (block instanceof BlockFunction)
+            {
+                oeh.addBlock((BlockFunction) block);
+            }
         }
         oeh.extrude(world, random, x, y, z);
         return true;

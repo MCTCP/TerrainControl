@@ -52,7 +52,7 @@ public class BO3Config extends ConfigFile
     public MaterialSet sourceBlocks;
     public int maxPercentageOutsideSourceBlock;
     public OutsideSourceBlock outsideSourceBlock;
-    public BlockFunction[][] blocks = new BlockFunction[4][]; // four
+    public BO3PlaceableFunction[][] blocks = new BO3PlaceableFunction[4][]; // four
     // rotations
     public BO3Check[][] bo3Checks = new BO3Check[4][];
     public int maxBranchDepth;
@@ -202,15 +202,15 @@ public class BO3Config extends ConfigFile
     private void readConfigFunctions(SettingsMap reader)
     {
         BoundingBox box = BoundingBox.newEmptyBox();
-        List<BlockFunction> tempBlocksList = new ArrayList<BlockFunction>();
+        List<BO3PlaceableFunction> tempBlocksList = new ArrayList<BO3PlaceableFunction>();
         List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
         List<BranchFunction> tempBranchesList = new ArrayList<BranchFunction>();
 
         for (ConfigFunction<BO3Config> res : reader.getConfigFunctions(this, true))
         {
-            if (res instanceof BlockFunction)
+            if (res instanceof BO3PlaceableFunction)
             {
-                BlockFunction block = (BlockFunction) res;
+                BO3PlaceableFunction block = (BO3PlaceableFunction) res;
                 box.expandToFit(block.x, block.y, block.z);
                 tempBlocksList.add(block);
             } else if (res instanceof BO3Check)
@@ -226,7 +226,7 @@ public class BO3Config extends ConfigFile
         }
 
         // Store the blocks
-        blocks[0] = tempBlocksList.toArray(new BlockFunction[tempBlocksList.size()]);
+        blocks[0] = tempBlocksList.toArray(new BO3PlaceableFunction[tempBlocksList.size()]);
         bo3Checks[0] = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
         branches[0] = tempBranchesList.toArray(new BranchFunction[tempBranchesList.size()]);
         boundingBoxes[0] = box;
@@ -306,7 +306,7 @@ public class BO3Config extends ConfigFile
         for (int i = 1; i < 4; i++)
         {
             // Blocks (blocks[i - 1] is previous rotation)
-            blocks[i] = new BlockFunction[blocks[i - 1].length];
+            blocks[i] = new BO3PlaceableFunction[blocks[i - 1].length];
             for (int j = 0; j < blocks[i].length; j++)
             {
                 blocks[i][j] = blocks[i - 1][j].rotate();

@@ -12,14 +12,10 @@ import java.util.Random;
 /**
  * Represents a block in a BO3.
  */
-public class BlockFunction extends BO3Function
+public class BlockFunction extends BO3PlaceableFunction
 {
 
-    public LocalMaterialData material;
-    public int x;
-    public int y;
-    public int z;
-    public boolean hasMetaData;
+    public final LocalMaterialData material;
     public NamedBinaryTag metaDataTag;
     public String metaDataName;
 
@@ -38,22 +34,25 @@ public class BlockFunction extends BO3Function
             metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().directory);
             if (metaDataTag != null)
             {
-                hasMetaData = true;
                 metaDataName = args.get(4);
             }
         }
     }
 
-    protected BlockFunction(BO3Config config)
+    public BlockFunction(BO3Config config, int x, int y, int z, LocalMaterialData material)
     {
         super(config);
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.material = material;
     }
 
     @Override
     public String toString()
     {
         String start = "Block(" + x + ',' + y + ',' + z + ',' + material;
-        if (hasMetaData)
+        if (metaDataName != null)
         {
             start += ',' + metaDataName;
         }
@@ -63,35 +62,18 @@ public class BlockFunction extends BO3Function
     @Override
     public BlockFunction rotate()
     {
-        BlockFunction rotatedBlock = new BlockFunction(getHolder());
-        rotatedBlock.x = z;
-        rotatedBlock.y = y;
-        rotatedBlock.z = -x;
-        rotatedBlock.material = material.rotate();
-        rotatedBlock.hasMetaData = hasMetaData;
+        BlockFunction rotatedBlock = new BlockFunction(getHolder(), z, y, -x, material);
         rotatedBlock.metaDataTag = metaDataTag;
         rotatedBlock.metaDataName = metaDataName;
 
         return rotatedBlock;
     }
 
-    /**
-     * Spawns this block at the position. The saved x, y and z in this block are
-     * ignored.
-     * <p/>
-     * @param world  The world to spawn in.
-     * @param random The random number generator.
-     * @param x      The absolute x to spawn. The x-position in this object is
-     *               ignored.
-     * @param y      The absolute y to spawn. The y-position in this object is
-     *               ignored.
-     * @param z      The absolute z to spawn. The z-position in this object is
-     *               ignored.
-     */
+    @Override
     public void spawn(LocalWorld world, Random random, int x, int y, int z)
     {
         world.setBlock(x, y, z, material);
-        if (hasMetaData)
+        if (metaDataTag != null)
         {
             world.attachMetadata(x, y, z, metaDataTag);
         }

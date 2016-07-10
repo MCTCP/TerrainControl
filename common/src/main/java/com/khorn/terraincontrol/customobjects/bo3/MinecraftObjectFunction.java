@@ -13,13 +13,10 @@ import java.util.Random;
 /**
  * Represents a block in a BO3.
  */
-public class MinecraftObjectFunction extends BlockFunction
+public class MinecraftObjectFunction extends BO3PlaceableFunction
 {
 
     public DefaultStructurePart structurePart;
-    public int x;
-    public int y;
-    public int z;
     public Rotation rotation = Rotation.NORTH;
 
     public MinecraftObjectFunction(BO3Config config, List<String> args) throws InvalidConfigException

@@ -2,13 +2,14 @@ package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 
 import java.util.List;
 import java.util.Random;
 
-public class RandomBlockFunction extends BlockFunction
+public class RandomBlockFunction extends BO3PlaceableFunction
 {
     public LocalMaterialData[] blocks;
     public byte[] blockChances;
@@ -132,5 +133,16 @@ public class RandomBlockFunction extends BlockFunction
                 break;
             }
         }
+    }
+
+    @Override
+    public boolean isAnalogousTo(ConfigFunction<BO3Config> other)
+    {
+        if (!getClass().equals(other.getClass()))
+        {
+            return false;
+        }
+        RandomBlockFunction block = (RandomBlockFunction) other;
+        return block.x == x && block.y == y && block.z == z;
     }
 }
