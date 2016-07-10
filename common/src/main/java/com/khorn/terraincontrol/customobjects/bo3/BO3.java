@@ -87,6 +87,15 @@ public class BO3 implements CustomObject
         return name;
     }
 
+    /**
+     * Gets the file the BO3 is stored in.
+     * @return The file.
+     */
+    public File getFile()
+    {
+        return file;
+    }
+
     public BO3Config getSettings()
     {
         return settings;

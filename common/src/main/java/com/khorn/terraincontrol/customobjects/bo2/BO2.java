@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFile;
+import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
 import com.khorn.terraincontrol.configuration.io.RawSettingValue;
 import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.customobjects.Branch;
@@ -18,6 +19,7 @@ import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.helpers.RandomHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ public class BO2 extends ConfigFile implements CustomObject
      * {@link #writeConfigSettings(SettingsMap)}, as we do for other configs.
      */
     private final SettingsMap settingsMap;
+    private final File file;
 
     public ObjectCoordinate[][] data = new ObjectCoordinate[4][];
 
@@ -74,10 +77,28 @@ public class BO2 extends ConfigFile implements CustomObject
 
     public int branchLimit;
 
-    public BO2(SettingsMap settingsMap)
+    /**
+     * Creates a BO2 from a file.
+     * @param objectName Name of the object.
+     * @param file The file to read the settings from.
+     */
+    public BO2(String objectName, File file)
     {
-        super(settingsMap.getName());
-        this.settingsMap = settingsMap;
+        super(objectName);
+        this.file = file;
+        this.settingsMap = FileSettingsReader.read(objectName, file);
+    }
+
+    /**
+     * Creates a BO2, ignoring the settings in the file.
+     * @param settings The actual settings.
+     * @param file The file that appears in {@link #getFile()}.
+     */
+    private BO2(SettingsMap settings, File file)
+    {
+        super(settings.getName());
+        this.file = file;
+        this.settingsMap = settings;
     }
 
     @Override
@@ -108,6 +129,15 @@ public class BO2 extends ConfigFile implements CustomObject
     public boolean canRotateRandomly()
     {
         return randomRotation;
+    }
+
+    /**
+     * Gets the file that this BO2 was read from.
+     * @return The file.
+     */
+    public File getFile()
+    {
+        return file;
     }
 
     @Override
@@ -259,8 +289,7 @@ public class BO2 extends ConfigFile implements CustomObject
     public CustomObject applySettings(SettingsMap extraSettings)
     {
         extraSettings.setFallback(this.settingsMap);
-        BO2 bo2WithSettings = new BO2(extraSettings);
-        bo2WithSettings.enable(extraSettings);
+        BO2 bo2WithSettings = new BO2(extraSettings, file);
         return bo2WithSettings;
     }
 
