@@ -445,7 +445,12 @@ public class BukkitWorld implements LocalWorld
 
             BlockPosition blockPos = new BlockPosition(x, y, z);
 
+            // Disable nearby block physics and set block
+            boolean oldCaptureBlockStates = this.world.captureBlockStates;
+            this.world.captureBlockStates = true;
             IBlockData oldBlockData = chunk.a(blockPos, blockData);
+            this.world.captureBlockStates = oldCaptureBlockStates;
+
             if (oldBlockData == null)
             {
                 return;
