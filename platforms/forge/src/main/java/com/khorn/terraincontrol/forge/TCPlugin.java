@@ -12,7 +12,7 @@ import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -61,10 +61,10 @@ public class TCPlugin
         MinecraftForge.EVENT_BUS.register(saplingListener);
 
         // Register colorizer, for biome colors
-        Function<BiomeGenBase, BiomeConfig> getBiomeConfig = new Function<BiomeGenBase, BiomeConfig>()
+        Function<Biome, BiomeConfig> getBiomeConfig = new Function<Biome, BiomeConfig>()
         {
             @Override
-            public BiomeConfig apply(BiomeGenBase input)
+            public BiomeConfig apply(Biome input)
             {
                 LocalBiome biome = engine.getWorld().getBiomeByName(input.getBiomeName());
                 if (biome == null)

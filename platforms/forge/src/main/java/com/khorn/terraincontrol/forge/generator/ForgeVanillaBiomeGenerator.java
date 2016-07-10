@@ -3,8 +3,9 @@ package com.khorn.terraincontrol.forge.generator;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
+
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
 
 /**
@@ -19,7 +20,7 @@ import net.minecraft.world.biome.BiomeProvider;
  */
 public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
 
-    private BiomeGenBase[] biomeGenBaseArray;
+    private Biome[] BiomeArray;
     private BiomeProvider worldChunkManager;
 
     public ForgeVanillaBiomeGenerator(LocalWorld world)
@@ -30,29 +31,29 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
     @Override
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
-        biomeGenBaseArray = worldChunkManager.getBiomesForGeneration(biomeGenBaseArray, x, z, x_size, z_size);
+        BiomeArray = worldChunkManager.getBiomesForGeneration(BiomeArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = BiomeGenBase.getIdForBiome(biomeGenBaseArray[i]);
+            biomeArray[i] = Biome.getIdForBiome(BiomeArray[i]);
         return biomeArray;
     }
 
     @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
-        biomeGenBaseArray = worldChunkManager.getBiomeGenAt(biomeGenBaseArray, x, z, x_size, z_size, true);
+        BiomeArray = worldChunkManager.getBiomes(BiomeArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = BiomeGenBase.getIdForBiome(biomeGenBaseArray[i]);
+            biomeArray[i] = Biome.getIdForBiome(BiomeArray[i]);
         return biomeArray;
     }
 
     @Override
     public int getBiome(int x, int z)
     {
-        return BiomeGenBase.getIdForBiome(worldChunkManager.getBiomeGenerator(new BlockPos(x, 0, z)));
+        return Biome.getIdForBiome(worldChunkManager.getBiome(new BlockPos(x, 0, z)));
     }
 
     @Override

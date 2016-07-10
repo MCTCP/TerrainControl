@@ -5,7 +5,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
 
@@ -18,7 +18,7 @@ public class VillageGen extends MapGenStructure
     /**
      * A list of all the biomes villages can spawn in.
      */
-    public List<BiomeGenBase> villageSpawnBiomes;
+    public List<Biome> villageSpawnBiomes;
 
     /**
      * Village size, 0 for normal, 1 for flat map
@@ -34,7 +34,7 @@ public class VillageGen extends MapGenStructure
         minimumDistance = 8;
 
         // Add all village biomes to the list
-        villageSpawnBiomes = new ArrayList<BiomeGenBase>();
+        villageSpawnBiomes = new ArrayList<Biome>();
         for (LocalBiome biome : configs.getBiomeArray())
         {
             if (biome == null)

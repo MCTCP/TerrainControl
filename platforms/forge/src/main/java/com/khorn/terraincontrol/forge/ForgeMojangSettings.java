@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
  */
 public final class ForgeMojangSettings implements MojangSettings
 {
-    private final BiomeGenBase biomeBase;
+    private final Biome biomeBase;
 
     /**
      * Creates an instance that provides access to the default settings of the
@@ -27,7 +27,7 @@ public final class ForgeMojangSettings implements MojangSettings
      */
     public static MojangSettings fromId(int biomeId)
     {
-        return fromBiomeBase(BiomeGenBase.getBiome(biomeId));
+        return fromBiomeBase(Biome.getBiome(biomeId));
     }
 
     /**
@@ -37,12 +37,12 @@ public final class ForgeMojangSettings implements MojangSettings
      * @param biomeBase The biome.
      * @return The settings.
      */
-    public static MojangSettings fromBiomeBase(BiomeGenBase biomeBase)
+    public static MojangSettings fromBiomeBase(Biome biomeBase)
     {
         return new ForgeMojangSettings(biomeBase);
     }
 
-    private ForgeMojangSettings(BiomeGenBase biomeBase)
+    private ForgeMojangSettings(Biome biomeBase)
     {
         this.biomeBase = biomeBase;
     }

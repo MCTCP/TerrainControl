@@ -1,17 +1,18 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
+import java.util.Random;
+
 import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.util.Rotation;
+
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
 import net.minecraft.world.gen.structure.template.Template;
-
-import java.util.Random;
 
 /**
  * Makes a Minecraft {@link Template} useable as a
@@ -38,7 +39,8 @@ public final class MojangStructurePart implements SpawnableObject
         BlockPos blockPos = new BlockPos(x, y, z);
         net.minecraft.util.Rotation rotationMc = toMinecraftRotation(rotation);
 
-        PlacementSettings spawnSettings = new PlacementSettings().setRotation(rotationMc).setChunk(new ChunkCoordIntPair(blockPos));
+        PlacementSettings spawnSettings = new PlacementSettings().setRotation(rotationMc).setChunk(
+                new ChunkPos(blockPos));
         spawnObject.addBlocksToWorld(worldMc, blockPos, spawnSettings);
         return true;
     }

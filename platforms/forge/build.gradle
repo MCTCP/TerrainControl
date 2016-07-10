@@ -18,7 +18,7 @@ buildscript
     }
     dependencies
     {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
     }
 }
 
@@ -27,10 +27,10 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 // Project properties
 archivesBaseName = "terraincontrol-forge"
 description = "TerrainControl for Minecraft Forge"
-ext.forgeVersion = "1.9-12.16.1.1904"
+ext.forgeVersion = "1.10.2-12.18.0.2009" // 2009 is just the build number
 minecraft.version = ext.forgeVersion
 minecraft.runDir = "run"
-minecraft.mappings = "snapshot_20160514"
+minecraft.mappings = "snapshot_20160708"
 
 repositories
 {

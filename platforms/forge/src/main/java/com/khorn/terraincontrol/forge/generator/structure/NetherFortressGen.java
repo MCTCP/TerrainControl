@@ -8,7 +8,7 @@ import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityMagmaCube;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
+import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.gen.structure.MapGenNetherBridge;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;

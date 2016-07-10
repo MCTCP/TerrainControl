@@ -5,14 +5,14 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 
 import java.util.List;
 
 /**
  * Used for all custom biomes.
  */
-public class BiomeGenCustom extends BiomeGenBase
+public class BiomeGenCustom extends Biome
 {
     /**
      * Extension of BiomeProperties so that we are able to access the protected

@@ -3,6 +3,8 @@ package com.khorn.terraincontrol.forge.generator;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
+import java.util.List;
+
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.ForgeWorld;
@@ -10,16 +12,15 @@ import com.khorn.terraincontrol.generator.ChunkProviderTC;
 import com.khorn.terraincontrol.generator.ObjectSpawner;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+
 import net.minecraft.block.BlockSand;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkGenerator;
-
-import java.util.List;
 
 public class ChunkProvider implements IChunkGenerator
 {
@@ -97,7 +98,7 @@ public class ChunkProvider implements IChunkGenerator
     public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType paramaca, BlockPos blockPos)
     {
         WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
-        BiomeGenBase biomeBase = this.worldHandle.getBiomeGenForCoords(blockPos);
+        Biome biomeBase = this.worldHandle.getBiomeForCoordsBody(blockPos);
 
         if (worldConfig.rareBuildingsEnabled)
         {

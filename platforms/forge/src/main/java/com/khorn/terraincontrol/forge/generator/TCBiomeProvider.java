@@ -1,17 +1,18 @@
 package com.khorn.terraincontrol.forge.generator;
 
+import java.util.List;
+import java.util.Random;
+
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.structure.MapGenVillage;
-
-import java.util.List;
-import java.util.Random;
 
 /**
  * Minecraft's biome generator class is {@link BiomeProvider}, we use
@@ -30,13 +31,13 @@ public class TCBiomeProvider extends BiomeProvider
     }
 
     @Override
-    public BiomeGenBase getBiomeGenerator(BlockPos blockPos)
+    public Biome getBiome(BlockPos blockPos)
     {
         return localWorld.getBiomeById(biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
     }
 
     @Override
-    public BiomeGenBase getBiomeGenerator(BlockPos pos, BiomeGenBase defaultOption)
+    public Biome getBiome(BlockPos pos, Biome defaultOption)
     {
         ForgeBiome biome = localWorld.getBiomeByIdOrNull(biomeGenerator.getBiome(pos.getX(), pos.getZ()));
         if (biome != null)
@@ -47,13 +48,13 @@ public class TCBiomeProvider extends BiomeProvider
     }
 
     @Override
-    public BiomeGenBase[] getBiomesForGeneration(BiomeGenBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public Biome[] getBiomesForGeneration(Biome[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
     {
         int[] arrayOfInt = this.biomeGenerator.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4,
                 OutputType.DEFAULT_FOR_WORLD);
         if (paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
         {
-            paramArrayOfBiomeBase = new BiomeGenBase[arrayOfInt.length];
+            paramArrayOfBiomeBase = new Biome[arrayOfInt.length];
         }
 
         for (int i = 0; i < paramInt3 * paramInt4; i++)
@@ -65,12 +66,12 @@ public class TCBiomeProvider extends BiomeProvider
     }
 
     @Override
-    public BiomeGenBase[] getBiomeGenAt(BiomeGenBase[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
+    public Biome[] getBiomes(Biome[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
     {
         int[] arrayOfInt = this.biomeGenerator.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4, OutputType.DEFAULT_FOR_WORLD);
         if (paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
         {
-            paramArrayOfBiomeBase = new BiomeGenBase[arrayOfInt.length];
+            paramArrayOfBiomeBase = new Biome[arrayOfInt.length];
         }
 
         for (int i = 0; i < paramInt3 * paramInt4; i++)
@@ -100,10 +101,10 @@ public class TCBiomeProvider extends BiomeProvider
 
         int n = k - i + 1;
         int i1 = m - j + 1;
-        BiomeGenBase[] arrayOfInt = this.getBiomesForGeneration(null, i, j, n, i1);
+        Biome[] arrayOfInt = this.getBiomesForGeneration(null, i, j, n, i1);
         for (int i2 = 0; i2 < n * i1; i2++)
         {
-            BiomeGenBase localBiomeBase = arrayOfInt[i2];
+            Biome localBiomeBase = arrayOfInt[i2];
             if (!paramList.contains(localBiomeBase))
                 return false;
         }
@@ -131,7 +132,7 @@ public class TCBiomeProvider extends BiomeProvider
                 continue;
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            BiomeGenBase localBiomeBase = BiomeGenBase.getBiome(arrayOfInt[i3]);
+            Biome localBiomeBase = Biome.getBiome(arrayOfInt[i3]);
             if ((!paramList.contains(localBiomeBase)) || ((blockPos != null) && (paramRandom.nextInt(i2 + 1) != 0)))
                 continue;
             blockPos = new BlockPos(i4, 0, i5);

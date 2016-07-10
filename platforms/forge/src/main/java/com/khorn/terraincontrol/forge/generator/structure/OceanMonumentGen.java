@@ -1,35 +1,37 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.configuration.ConfigProvider;
-import com.khorn.terraincontrol.forge.ForgeBiome;
-import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.entity.monster.EntityGuardian;
-import net.minecraft.init.Biomes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
-import net.minecraft.world.gen.structure.MapGenStructure;
-import net.minecraft.world.gen.structure.StructureOceanMonument;
-import net.minecraft.world.gen.structure.StructureStart;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.configuration.ConfigProvider;
+import com.khorn.terraincontrol.forge.ForgeBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+
+import net.minecraft.entity.monster.EntityGuardian;
+import net.minecraft.init.Biomes;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biome.SpawnListEntry;
+import net.minecraft.world.biome.BiomeProvider;
+import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.StructureOceanMonument;
+import net.minecraft.world.gen.structure.StructureStart;
+
 public class OceanMonumentGen extends MapGenStructure
 {
     private int gridSize;
     private int randomOffset;
-    private final List<BiomeGenBase> monumentSpawnBiomes;
+    private final List<Biome> monumentSpawnBiomes;
     private final List<SpawnListEntry> mobList;
 
     public OceanMonumentGen(ConfigProvider settings)
     {
         this.gridSize = settings.getWorldConfig().oceanMonumentGridSize;
         this.randomOffset = settings.getWorldConfig().oceanMonumentRandomOffset;
-        this.monumentSpawnBiomes = new ArrayList<BiomeGenBase>();
+        this.monumentSpawnBiomes = new ArrayList<Biome>();
         this.mobList = Arrays.asList(new SpawnListEntry(EntityGuardian.class, 1, 2, 4));
 
         for (LocalBiome biome : settings.getBiomeArray())
@@ -69,7 +71,8 @@ public class OceanMonumentGen extends MapGenStructure
 
         if (k == i1 && l == j1)
         {
-            if (this.worldObj.getBiomeProvider().getBiomeGenerator(new BlockPos(k * 16 + 8, 64, l * 16 + 8), (BiomeGenBase) null) != Biomes.DEEP_OCEAN)
+            BiomeProvider biomeProvider = this.worldObj.getBiomeProvider();
+            if (biomeProvider.getBiome(new BlockPos(k * 16 + 8, 64, l * 16 + 8), (Biome) null) != Biomes.DEEP_OCEAN)
             {
                 return false;
             }

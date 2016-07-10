@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
+import java.util.*;
+
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
@@ -15,6 +17,7 @@ import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
+
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -23,17 +26,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
-
-import java.util.*;
 
 public class ForgeWorld implements LocalWorld
 {
@@ -92,13 +93,15 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        BiomeGenBase minecraftBiome = BiomeGenBase.getBiomeForId(biomeIds.getGenerationId());
+        Biome minecraftBiome = Biome.getBiomeForId(biomeIds.getGenerationId());
         boolean registerBiome = false;
-        if (minecraftBiome == null) {
+        if (minecraftBiome == null)
+        {
+            // No existing biome, create new one
             minecraftBiome = new BiomeGenCustom(biomeConfig, biomeIds);
             registerBiome = true;
         }
-        ForgeBiome biome = ForgeBiome.forBiome(biomeConfig, minecraftBiome);
+        ForgeBiome biome = ForgeBiome.forBiome(biomeConfig, minecraftBiome, biomeIds);
         if (registerBiome)
         {
             ForgeBiome.registerBiome(biome);
@@ -250,7 +253,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public boolean placeDefaultStructures(Random rand, ChunkCoordinate chunkCoord)
     {
-        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+        ChunkPos chunkCoordIntPair = new ChunkPos(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
         WorldConfig worldConfig = this.settings.getWorldConfig();
 
         boolean isVillagePlaced = false;
@@ -714,8 +717,8 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
     {
-        BiomeGenBase savedBiome = world.getBiomeGenForCoords(new BlockPos(x, 0, z));
-        int biomeId = BiomeGenBase.getIdForBiome(savedBiome);
+        Biome savedBiome = world.getBiomeForCoordsBody(new BlockPos(x, 0, z));
+        int biomeId = Biome.getIdForBiome(savedBiome);
         return getBiomeById(biomeId);
     }
 

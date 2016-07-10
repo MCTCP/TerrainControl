@@ -1,24 +1,25 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import com.google.common.collect.Iterables;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.gen.structure.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 public class RareBuildingGen extends MapGenStructure
 {
-    public List<BiomeGenBase> biomeList;
+    public List<Biome> biomeList;
 
     /**
      * contains possible spawns for scattered features
@@ -38,7 +39,7 @@ public class RareBuildingGen extends MapGenStructure
     @SuppressWarnings({"unchecked", "rawtypes"})
     public RareBuildingGen(ServerConfigProvider configs)
     {
-        biomeList = new ArrayList<BiomeGenBase>();
+        biomeList = new ArrayList<Biome>();
 
         for (LocalBiome biome : configs.getBiomeArray())
         {
@@ -83,7 +84,8 @@ public class RareBuildingGen extends MapGenStructure
 
         if (var3 == var5 && var4 == var6)
         {
-            BiomeGenBase biomeAtPosition = this.worldObj.getBiomeProvider().getBiomeGenerator(new BlockPos(var3 * 16 + 8, 0, var4 * 16 + 8));
+            Biome biomeAtPosition = this.worldObj.getBiomeProvider().getBiome(
+                    new BlockPos(var3 * 16 + 8, 0, var4 * 16 + 8));
 
             if (biomeList.contains(biomeAtPosition))
             {

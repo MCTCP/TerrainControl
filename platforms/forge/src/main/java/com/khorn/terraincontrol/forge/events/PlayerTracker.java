@@ -1,5 +1,8 @@
 package com.khorn.terraincontrol.forge.events;
 
+import java.io.DataOutput;
+import java.io.IOException;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
@@ -7,6 +10,7 @@ import com.khorn.terraincontrol.configuration.ConfigToNetworkSender;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
@@ -15,9 +19,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SPacketCustomPayload;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-
-import java.io.DataOutput;
-import java.io.IOException;
 
 public class PlayerTracker
 {
@@ -63,7 +64,7 @@ public class PlayerTracker
         SPacketCustomPayload packet = new SPacketCustomPayload(PluginStandardValues.ChannelName, mojangBuffer);
 
         // Send the packet
-        player.playerNetServerHandler.sendPacket(packet);
+        player.connection.sendPacket(packet);
     }
 
 }

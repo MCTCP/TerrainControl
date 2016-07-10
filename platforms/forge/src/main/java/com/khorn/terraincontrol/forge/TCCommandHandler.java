@@ -1,20 +1,21 @@
 package com.khorn.terraincontrol.forge;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
+
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import net.minecraft.world.biome.Biome;
 
 final class TCCommandHandler implements ICommand
 {
@@ -73,10 +74,10 @@ final class TCCommandHandler implements ICommand
                 }
             } else if (argString[0].equals("biome"))
             {
-                BiomeGenBase biome = sender.getEntityWorld().getBiomeGenForCoords(sender.getPosition());
+                Biome biome = sender.getEntityWorld().getBiomeForCoordsBody(sender.getPosition());
                 sender.addChatMessage(new TextComponentString("-- Biome info --"));
                 sender.addChatMessage(new TextComponentString("Name: " + biome.getBiomeName()));
-                sender.addChatMessage(new TextComponentString("Id: " + BiomeGenBase.getIdForBiome(biome)));
+                sender.addChatMessage(new TextComponentString("Id: " + Biome.getIdForBiome(biome)));
             } else
             {
                 sender.addChatMessage(new TextComponentString("Unknown command. Type /tc for a list of commands."));

@@ -1,38 +1,39 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
-import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.configuration.ServerConfigProvider;
-import com.khorn.terraincontrol.forge.ForgeBiome;
-import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.gen.structure.MapGenStronghold;
-import net.minecraft.world.gen.structure.MapGenStructure;
-import net.minecraft.world.gen.structure.StructureStart;
-import net.minecraft.world.gen.structure.StructureStrongholdPieces;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.configuration.ServerConfigProvider;
+import com.khorn.terraincontrol.forge.ForgeBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.structure.MapGenStronghold;
+import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.StructureStart;
+import net.minecraft.world.gen.structure.StructureStrongholdPieces;
+
 public class StrongholdGen extends MapGenStructure
 {
-    private List<BiomeGenBase> allowedBiomeGenBases;
+    private List<Biome> allowedBiomes;
 
     private boolean ranBiomeCheck;
-    private ChunkCoordIntPair[] structureCoords;
+    private ChunkPos[] structureCoords;
     private double distance;
     private int spread;
 
     public StrongholdGen(ServerConfigProvider configs)
     {
         this.distance = configs.getWorldConfig().strongholdDistance;
-        this.structureCoords = new ChunkCoordIntPair[configs.getWorldConfig().strongholdCount];
+        this.structureCoords = new ChunkPos[configs.getWorldConfig().strongholdCount];
         this.spread = configs.getWorldConfig().strongholdSpread;
 
-        allowedBiomeGenBases = new ArrayList<BiomeGenBase>();
+        allowedBiomes = new ArrayList<Biome>();
 
         for (LocalBiome biome : configs.getBiomeArray())
         {
@@ -40,7 +41,7 @@ public class StrongholdGen extends MapGenStructure
                 continue;
             if (biome.getBiomeConfig().strongholdsEnabled)
             {
-                allowedBiomeGenBases.add(((ForgeBiome) biome).getHandle());
+                allowedBiomes.add(((ForgeBiome) biome).getHandle());
             }
         }
     }
@@ -62,7 +63,7 @@ public class StrongholdGen extends MapGenStructure
                 int var10 = (int) Math.round(Math.cos(randomNumBetween0and2PI) * var8);
                 int var11 = (int) Math.round(Math.sin(randomNumBetween0and2PI) * var8);
                 ArrayList var12 = new ArrayList();
-                Collections.addAll(var12, this.allowedBiomeGenBases);
+                Collections.addAll(var12, this.allowedBiomes);
                 BlockPos var13 = this.worldObj.getBiomeProvider().findBiomePosition((var10 << 4) + 8, (var11 << 4) + 8, 112, var12,
                         random);
 
@@ -72,7 +73,7 @@ public class StrongholdGen extends MapGenStructure
                     var11 = var13.getZ() >> 4;
                 }
 
-                this.structureCoords[i] = new ChunkCoordIntPair(var10, var11);
+                this.structureCoords[i] = new ChunkPos(var10, var11);
                 randomNumBetween0and2PI += (Math.PI * 2D) * var6 / this.spread;
 
                 if (i == this.spread)
@@ -85,9 +86,9 @@ public class StrongholdGen extends MapGenStructure
             this.ranBiomeCheck = true;
         }
 
-        ChunkCoordIntPair[] structureCoordsLocal = this.structureCoords;
+        ChunkPos[] structureCoordsLocal = this.structureCoords;
 
-        for (ChunkCoordIntPair structureCoord : structureCoordsLocal)
+        for (ChunkPos structureCoord : structureCoordsLocal)
         {
             if (par1 == structureCoord.chunkXPos && par2 == structureCoord.chunkZPos)
             {
@@ -104,10 +105,10 @@ public class StrongholdGen extends MapGenStructure
      */
     @Override
     protected List<BlockPos> getCoordList()
-    {       
+    {
         List<BlockPos> chunkPositions = new ArrayList<BlockPos>();
 
-        for (ChunkCoordIntPair structureCoord : structureCoords)
+        for (ChunkPos structureCoord : structureCoords)
         {
             if (structureCoord != null)
             {

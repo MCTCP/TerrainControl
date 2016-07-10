@@ -6,56 +6,59 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
+
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ForgeBiome implements LocalBiome
 {
-    private final BiomeGenBase biomeBase;
+    private final Biome biomeBase;
     private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
 
     /**
      * Creates a new biome with the given name and id.
      * 
-     * @param biomeConfig    The config of the biome.
+     * @param biomeConfig The config of the biome.
      * @param minecraftBiome The Minecraft instance of the biome.
+     * @param biomeIds The ids of the biome.
      * @return The registered biome.
      */
-    public static ForgeBiome forBiome(BiomeConfig biomeConfig, BiomeGenBase minecraftBiome)
+    public static ForgeBiome forBiome(BiomeConfig biomeConfig, Biome minecraftBiome, BiomeIds biomeIds)
     {
-        return new ForgeBiome(biomeConfig, minecraftBiome);
+        return new ForgeBiome(biomeConfig, minecraftBiome, biomeIds);
     }
 
     /**
      * Registers the biome to the biome registry.
      * @param forgeBiome The biome.
      */
+    @SuppressWarnings("deprecation") // we must use the specified id
     static void registerBiome(ForgeBiome forgeBiome)
     {
-        GameRegistry.findRegistry(BiomeGenBase.class);
-        FMLControlledNamespacedRegistry<BiomeGenBase> registry = (FMLControlledNamespacedRegistry<BiomeGenBase>) BiomeGenBase.REGISTRY;
-        ResourceLocation name;
-        if (forgeBiome.isCustom())
+        GameRegistry.findRegistry(Biome.class);
+        FMLControlledNamespacedRegistry<Biome> registry = (FMLControlledNamespacedRegistry<Biome>) Biome.REGISTRY;
+
+        String biomeNameForRegistry = StringHelper.toComputerFriendlyName(forgeBiome.getName());
+        ResourceLocation name = new ResourceLocation(PluginStandardValues.PLUGIN_NAME, biomeNameForRegistry);
+        int idForRegistry = forgeBiome.biomeIds.getSavedId();
+        registry.register(idForRegistry, name, forgeBiome.biomeBase);
+
+        int actualId = registry.getId(forgeBiome.biomeBase);
+        if (actualId != idForRegistry)
         {
-            name = new ResourceLocation(PluginStandardValues.PLUGIN_NAME, StringHelper.toComputerFriendlyName(forgeBiome.getName()));
-        } else {
-            BiomeGenBase currentlyRegistered = registry.getObjectById(forgeBiome.biomeIds.getSavedId());
-            name = registry.getNameForObject(currentlyRegistered);
+            throw new RuntimeException("Got another id assigned than the desired one");
         }
-        registry.register(forgeBiome.biomeIds.getSavedId(), name, forgeBiome.biomeBase);
     }
 
-    private ForgeBiome(BiomeConfig biomeConfig, BiomeGenBase biome)
+    private ForgeBiome(BiomeConfig biomeConfig, Biome biome, BiomeIds biomeIds)
     {
         this.biomeBase = biome;
-        int savedId = BiomeGenBase.getIdForBiome(biome);
-        int generationId = (biome instanceof  BiomeGenCustom)? ((BiomeGenCustom) biome).generationId : savedId;
-        this.biomeIds = new BiomeIds(generationId, savedId);
         this.biomeConfig = biomeConfig;
+        this.biomeIds = biomeIds;
     }
 
     @Override
@@ -70,7 +73,7 @@ public class ForgeBiome implements LocalBiome
         return biomeBase.getBiomeName();
     }
 
-    public BiomeGenBase getHandle()
+    public Biome getHandle()
     {
         return biomeBase;
     }

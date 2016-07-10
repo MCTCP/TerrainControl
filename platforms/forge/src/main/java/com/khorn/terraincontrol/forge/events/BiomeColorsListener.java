@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.forge.events;
 
 import com.google.common.base.Function;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.event.terraingen.BiomeEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -12,9 +12,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  */
 public final class BiomeColorsListener
 {
-    private final Function<BiomeGenBase, BiomeConfig> getBiomeConfig;
+    private final Function<Biome, BiomeConfig> getBiomeConfig;
 
-    public BiomeColorsListener(Function<BiomeGenBase, BiomeConfig> getBiomeConfig)
+    public BiomeColorsListener(Function<Biome, BiomeConfig> getBiomeConfig)
     {
         this.getBiomeConfig = getBiomeConfig;
     }

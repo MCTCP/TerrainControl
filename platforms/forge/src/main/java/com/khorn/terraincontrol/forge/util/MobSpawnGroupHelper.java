@@ -8,8 +8,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biome.SpawnListEntry;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +48,7 @@ public final class MobSpawnGroupHelper
      * @param biomeMeta Minecraft's type.
      * @return Our type.
      */
-    private static WeightedMobSpawnGroup fromMinecraftGroup(BiomeGenBase.SpawnListEntry biomeMeta)
+    private static WeightedMobSpawnGroup fromMinecraftGroup(Biome.SpawnListEntry biomeMeta)
     {
         return new WeightedMobSpawnGroup(fromMinecraftClass(biomeMeta.entityClass), biomeMeta.itemWeight, biomeMeta.minGroupCount, biomeMeta.maxGroupCount);
     }
@@ -59,7 +59,7 @@ public final class MobSpawnGroupHelper
      * @param type  The category.
      * @return The spawn list for the given category.
      */
-    public static List<WeightedMobSpawnGroup> getListFromMinecraftBiome(BiomeGenBase biome, EntityCategory type)
+    public static List<WeightedMobSpawnGroup> getListFromMinecraftBiome(Biome biome, EntityCategory type)
     {
         Collection<SpawnListEntry> mobList = biome.getSpawnableList(toEnumCreatureType(type));
         return fromMinecraftList(mobList);
