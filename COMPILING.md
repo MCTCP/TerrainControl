@@ -18,23 +18,27 @@ a Forge mod in `platforms/forge/build/distributions` and a file that runs
 on both in `releases/build/distributions`.
 
 ## Eclipse
+First of all, ForgeGradle and Eclipse are not the best friends. Sometimes, you'll
+find out that things don't work anymore. When things do work however, you have a
+nice test environment where you can quickly make changes to TerrainControl.
 
 ### Before you start
-First, we need a decompiled version of Minecraft, this makes it much easier to
-create mods. Run `./gradlew setupDecompWorkspace` in the TerrainControl
-directory. You will need to rerun this command every time the Forge version
-TerrainControl is built against changes.
+Normally, you'd just use the import option of Eclipse. However, ForgeGradle
+requires us to run another command first. Run the command
+`./gradlew setupDecompWorkspace` in the TerrainControl directory. This command
+decompiles Minecraft, so that you can quickly jump to the Minecraft source code
+from Eclipse.
+
+Sometimes this command will fail if the Forge web servers are offline. In that
+case, simply try running the command again.
 
 ### Importing the project
-If you have Eclipse Mars.1 or newer, you can simply use `File` -> `Import` ->
-`Gradle` -> `Gradle Project` and import the TerrainControl directory.
+Make sure you have a recent version of Eclipse installed. Eclipse Neon should
+work, and the slightly older Eclipse Mars.1 should work too. Older versions,
+including the original Eclipse Mars release, will not work.
 
-If you want to use an older version of Eclipse, things are a little bit more
-complicated. Run `./gradlew eclipse` in the TerrainControl directory. Then,
-in Eclipse, choose `File` -> `Import` -> `General` ->
-`Existing Projects into Workspace` and select the TerrainControl directory.
-You need to rerun the `./gradlew eclipse` whenever any of our dependencies
-(Spigot, Forge, etc.) are updated.
+To import TerrainControl, use `File` -> `Import` -> `Gradle` -> `Gradle Project`
+and import the TerrainControl directory.
 
 ### Running the Forge client or server
 In the Forge version of TerrainControl two classes are included to help you run
@@ -43,6 +47,23 @@ the project from your IDE. Click `Run` -> `Edit Configurations...` -> `+`
 the `com.khorn.terraincontrol.forge.launch.TCLaunchForgeClient` or the
 `com.khorn.terraincontrol.forge.launch.TCLaunchForgeServer` class and
 press the Run button in the menu bar to run the Forge client or server.
+
+### Formatting the source code
+If you are familiar with the Eclipse code formatter, you can use our
+[Eclipse formatting settings][] to automatically format the source code.
+
+Don't worry too much about the code formatting; it is easy for us to correct
+the code formatting when you submit a pull request. Focus on what the code
+actually does!
+
+### When you run into a problem with Eclipse
+When you run into a problem that you cannot solve, there's always the option to
+reset everything.
+
+* Delete the projects in Eclipse (but don't delete the files on disk)
+* Run `git clean -fdx` to remove all build files.
+* Run `./gradlew setupDecompWorkspace` again.
+* Import the project in Eclipse again.
 
 ## IntelliJ
 First, we need a decompiled version of Minecraft, this makes it much easier to
@@ -63,3 +84,4 @@ To launch the server version, repeat the above steps, but use the main class
 
 [ZIP file]: https://github.com/MCTCP/TerrainControl/archive/master.zip
 [JDK 7]: http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
+[Eclipse formatting settings]: https://dl.dropboxusercontent.com/u/23288978/terraincontrol/TerrainControl.xml
