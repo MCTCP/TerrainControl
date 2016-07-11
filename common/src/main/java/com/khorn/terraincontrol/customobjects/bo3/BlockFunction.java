@@ -62,7 +62,7 @@ public class BlockFunction extends BO3PlaceableFunction
     @Override
     public BlockFunction rotate()
     {
-        BlockFunction rotatedBlock = new BlockFunction(getHolder(), z, y, -x, material);
+        BlockFunction rotatedBlock = new BlockFunction(getHolder(), z, y, -x, material.rotate());
         rotatedBlock.metaDataTag = metaDataTag;
         rotatedBlock.metaDataName = metaDataName;
 
