@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
 import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.*;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.SpawnableObject;
@@ -458,10 +459,13 @@ public class BukkitWorld implements LocalWorld
 
             if (blockData.c() != oldBlockData.c() || blockData.d() != oldBlockData.d())
             {
-                // Relight
-                world.methodProfiler.a("checkLight");
-                world.w(blockPos);
-                world.methodProfiler.b();
+                if (isSafeForLightUpdates(chunk, x, z))
+                {
+                    // Relight
+                    world.methodProfiler.a("checkLight");
+                    world.w(blockPos);
+                    world.methodProfiler.b();
+                }
             }
 
             // Update client
@@ -477,6 +481,30 @@ public class BukkitWorld implements LocalWorld
             runtimeException.setStackTrace(new StackTraceElement[0]);
             throw runtimeException;
         }
+    }
+
+    /**
+     * When a light update hits an unloaded chunk, Minecraft unfortunately
+     * attempts to generate this chunk. When this happens, two chunks will be
+     * populated at the same time, which crashes the server. We must prevent
+     * this by checking beforehand whether a light update will touch unloaded
+     * chunks. If this is the case, the light update must be skipped.
+     * @param currentChunk Current chunk (contains the following x and z)
+     * @param x Block x in the world.
+     * @param z Block z in the world.
+     * @return True if it is safe to perform a light update at this location.
+     */
+    private boolean isSafeForLightUpdates(Chunk currentChunk, int x, int z)
+    {
+        int xInChunk = x & 0xf;
+        int zInChunk = z & 0xf;
+        if (xInChunk == 0 || xInChunk == 15 || zInChunk == 0 || zInChunk == 15)
+        {
+            // We're at the edge of a chunk
+            // Ensure a larger region is loaded
+            return currentChunk.areNeighborsLoaded(2);
+        }
+        return currentChunk.areNeighborsLoaded(1);
     }
 
     @Override
@@ -512,8 +540,8 @@ public class BukkitWorld implements LocalWorld
         if (this.chunkCache != null && settings.getWorldConfig().populationBoundsCheck)
         {
             throw new IllegalStateException("Chunk is already being populated."
-                    + " This may be a bug in Terrain Control, but it may also be"
-                    + " another mod that is poking in unloaded chunks. Set"
+                    + " This may be a bug in " + PluginStandardValues.PLUGIN_NAME + ", but it may also be"
+                    + " another mod that is poking in unloaded chunks.\nSet"
                     + " PopulationBoundsCheck to false in the WorldConfig to"
                     + " disable this error.");
         }
