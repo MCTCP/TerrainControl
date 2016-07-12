@@ -145,14 +145,15 @@ public class TreeGen extends Resource
             int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
             int y = world.getHighestBlockYAt(x, z);
             CustomObject tree = trees.get(treeKind);
+            Rotation rotation = Rotation.getRandomRotation(random);
 
-            if (!tree.canSpawnAt(world, Rotation.NORTH, x, y, z))
+            if (!tree.canSpawnAt(world, rotation, x, y, z))
             {
                 // Try another tree
                 continue;
             }
 
-            if (tree.spawnForced(world, random, Rotation.NORTH, x, y, z))
+            if (tree.spawnForced(world, random, rotation, x, y, z))
             {
                 // Success!
                 return;
