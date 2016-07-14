@@ -143,7 +143,6 @@ public class BiomeConfig extends ConfigFile
 
     public RareBuildingType rareBuildingType;
 
-    public final int generationId;
     public StandardBiomeTemplate defaultSettings;
     public WorldConfig worldConfig;
 
@@ -156,7 +155,6 @@ public class BiomeConfig extends ConfigFile
     public BiomeConfig(BiomeLoadInstruction loadInstruction, SettingsMap settings, WorldConfig worldConfig)
     {
         super(loadInstruction.getBiomeName());
-        this.generationId = loadInstruction.getGenerationId();
         this.worldConfig = worldConfig;
         this.defaultSettings = loadInstruction.getBiomeTemplate();
 

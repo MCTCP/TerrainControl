@@ -70,7 +70,7 @@ public class CustomBiome extends BiomeBase
      */
     public static CustomBiome createInstance(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        CustomBiome customBiome = new CustomBiome(biomeConfig);
+        CustomBiome customBiome = new CustomBiome(biomeConfig, biomeIds);
 
         // Insert the biome in Minecraft's biome mapping
         String biomeNameWithoutSpaces = StringHelper.toComputerFriendlyName(biomeConfig.getName());
@@ -119,10 +119,10 @@ public class CustomBiome extends BiomeBase
         return customBiome;
     }
 
-    private CustomBiome(BiomeConfig biomeConfig)
+    private CustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
         super(new BiomeBase_a(biomeConfig.getName(), biomeConfig));
-        this.generationId = biomeConfig.generationId;
+        this.generationId = biomeIds.getGenerationId();
 
         // Sanity check
         if (this.getHumidity() != biomeConfig.biomeWetness)

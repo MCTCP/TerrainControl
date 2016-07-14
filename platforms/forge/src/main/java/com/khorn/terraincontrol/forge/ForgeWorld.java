@@ -93,23 +93,19 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        Biome minecraftBiome = Biome.getBiomeForId(biomeIds.getGenerationId());
-        boolean registerBiome = false;
-        if (minecraftBiome == null)
+        Biome biome = BiomeGenCustom.getOrCreateBiome(biomeConfig, biomeIds);
+
+        int requestedGenerationId = biomeIds.getGenerationId();
+        int allocatedGenerationId = Biome.getIdForBiome(biome);
+        if (requestedGenerationId != allocatedGenerationId)
         {
-            // No existing biome, create new one
-            minecraftBiome = new BiomeGenCustom(biomeConfig, biomeIds);
-            registerBiome = true;
-        }
-        ForgeBiome biome = ForgeBiome.forBiome(biomeConfig, minecraftBiome, biomeIds);
-        if (registerBiome)
-        {
-            ForgeBiome.registerBiome(biome);
+            TerrainControl.log(LogMarker.INFO, "Asked to register {} with id {}, succeeded with id {}",
+                    biomeConfig.getName(), requestedGenerationId, allocatedGenerationId);
         }
 
-        this.biomeNames.put(biome.getName(), biome);
-
-        return biome;
+        LocalBiome localBiome = ForgeBiome.forBiome(biomeConfig, biome);
+        this.biomeNames.put(biome.getBiomeName(), localBiome);
+        return localBiome;
     }
 
     @Override

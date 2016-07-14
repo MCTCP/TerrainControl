@@ -16,6 +16,7 @@ import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.FileHelper;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import java.io.File;
 import java.util.*;
@@ -220,6 +221,27 @@ public final class ServerConfigProvider implements ConfigProvider
         return loadedBiomes;
     }
 
+    /**
+     * Gets the generation id that the given biome should have, based on
+     * {@link DefaultBiome the default biomes} and
+     * {@link WorldConfig#customBiomeGenerationIds the CustomBiomes setting}.
+     * @param biomeConfig The biome.
+     * @return The preferred generation id.
+     */
+    private int getRequestedGenerationId(BiomeConfig biomeConfig)
+    {
+        Integer requestedGenerationId = DefaultBiome.getId(biomeConfig.getName());
+        if (requestedGenerationId == null)
+        {
+            requestedGenerationId = biomeConfig.worldConfig.customBiomeGenerationIds.get(biomeConfig.getName());
+        }
+        if (requestedGenerationId == null)
+        {
+            throw new RuntimeException(biomeConfig.getName() + " is not a default biome and not a custom biome. This is a bug!");
+        }
+        return requestedGenerationId;
+    }
+
     private String indexSettings(Map<String, BiomeConfig> loadedBiomes)
     {
         StringBuilder loadedBiomeNames = new StringBuilder();
@@ -233,30 +255,11 @@ public final class ServerConfigProvider implements ConfigProvider
             loadedBiomeNames.append(biomeConfig.getName());
             loadedBiomeNames.append(", ");
 
-            // Check generation id range
-            int generationId = biomeConfig.generationId;
-            if (generationId < 0 || generationId >= world.getMaxBiomesCount())
-            {
-                TerrainControl.log(LogMarker.ERROR,
-                        "The biome id of the {} biome, {}, is too high. It must be between 0 and {}, inclusive.",
-                        biomeConfig.getName(), generationId, world.getMaxBiomesCount() - 1);
-                TerrainControl.log(LogMarker.ERROR, "The biome has been prevented from loading.");
-                continue;
-            }
+            int requestedGenerationId = getRequestedGenerationId(biomeConfig);
 
-            // Check for id conflicts
-            if (biomes[generationId] != null)
-            {
-                TerrainControl.log(LogMarker.FATAL, "Duplicate biome id {} ({} and {})!", generationId, biomes[generationId].getName(),
-                        biomeConfig.getName());
-                TerrainControl.log(LogMarker.FATAL, "The biome {} has been prevented from loading.", new Object[] {biomeConfig.getName()});
-                TerrainControl.log(LogMarker.INFO, "If you are updating an old pre-Minecraft 1.7 world, please read this wiki page:");
-                TerrainControl.log(LogMarker.INFO, "https://github.com/Wickth/TerrainControl/wiki/Upgrading-an-old-map-to-Minecraft-1.7");
-                continue;
-            }
             // Get correct saved id (defaults to generation id, but can be set
             // to use the generation id of another biome)
-            int savedId = biomeConfig.generationId;
+            int requestedSavedId = requestedGenerationId;
             if (!biomeConfig.replaceToBiomeName.isEmpty())
             {
                 BiomeConfig replaceToConfig = loadedBiomes.get(biomeConfig.replaceToBiomeName);
@@ -272,26 +275,18 @@ public final class ServerConfigProvider implements ConfigProvider
                     biomeConfig.replaceToBiomeName = "";
                 } else
                 {
-                    savedId = replaceToConfig.generationId;
+                    requestedSavedId = getRequestedGenerationId(replaceToConfig);
                 }
             }
 
-            // Check saved id range
-            if (savedId >= world.getMaxSavedBiomesCount())
-            {
-                TerrainControl.log(LogMarker.ERROR,
-                        "Biomes with an id between {} and {} (inclusive) must have a valid ReplaceToBiomeName setting:",
-                        world.getMaxBiomesCount(), world.getMaxSavedBiomesCount() - 1);
-                TerrainControl.log(LogMarker.ERROR, "Minecraft can only save biomes with an id between 0 and {}, inclusive.",
-                        world.getMaxBiomesCount() - 1);
-                TerrainControl.log(LogMarker.ERROR, "This means that the biome {} with map file id {} had to be prevented from loading.",
-                        biomeConfig.getName(), savedId);
-                continue;
-            }
-
             // Create biome
-            LocalBiome biome = world.createBiomeFor(biomeConfig, new BiomeIds(generationId, savedId));
-            this.biomes[biome.getIds().getGenerationId()] = biome;
+            LocalBiome biome = world.createBiomeFor(biomeConfig, new BiomeIds(requestedGenerationId, requestedSavedId));
+
+            int generationId = biome.getIds().getGenerationId();
+
+            this.biomes[generationId] = biome;
+            // Update WorldConfig with actual id
+            worldConfig.customBiomeGenerationIds.put(biome.getName(), generationId);
 
             // If not virtual, add to saved biomes set
             if (!biome.getIds().isVirtual())

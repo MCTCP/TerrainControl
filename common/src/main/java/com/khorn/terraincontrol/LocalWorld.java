@@ -21,12 +21,13 @@ public interface LocalWorld
     /**
      * Creates a LocalBiome instance for the given biome.
      * @param biomeConfig The settings for the biome, which are saved in
-     *                    the LocalBiome instance.
-     * @param biomeIds    The ids of the biome, used to register the
-     *                    LocalBiome instance.
+     * the LocalBiome instance.
+     * @param requestedBiomeIds The ids of the biome, used to register the
+     * LocalBiome instance. The implementation is allowed to use another id if
+     * necessary.
      * @return The LocalBiome instance.
      */
-    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds);
+    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds requestedBiomeIds);
 
     /**
      * Gets how many different biome ids are in the world. Biome ids will start

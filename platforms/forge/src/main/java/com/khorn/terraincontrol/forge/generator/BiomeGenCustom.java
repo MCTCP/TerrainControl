@@ -1,13 +1,19 @@
 package com.khorn.terraincontrol.forge.generator;
 
+import java.util.List;
+
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
-import net.minecraft.world.biome.Biome;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
-import java.util.List;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 /**
  * Used for all custom biomes.
@@ -45,13 +51,37 @@ public class BiomeGenCustom extends Biome
         }
     }
 
+    public static Biome getOrCreateBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
+    {
+        if (DefaultBiome.Contain(biomeConfig.getName()))
+        {
+            // This is a default biome, retrieve by id
+            return Biome.getBiome(biomeIds.getGenerationId());
+        }
+
+        String biomeNameForRegistry = StringHelper.toComputerFriendlyName(biomeConfig.getName());
+        ResourceLocation registryKey = new ResourceLocation(PluginStandardValues.PLUGIN_NAME, biomeNameForRegistry);
+        Biome alreadyRegisteredBiome = Biome.REGISTRY.getObject(registryKey);
+        if (alreadyRegisteredBiome != null)
+        {
+            // Check if registered earlier
+            return alreadyRegisteredBiome;
+        }
+
+        // No existing biome, create new one
+        BiomeGenCustom biome = new BiomeGenCustom(biomeConfig, registryKey, biomeIds);
+        GameRegistry.register(biome);
+        return biome;
+    }
+
     private int skyColor;
 
     public final int generationId;
 
-    public BiomeGenCustom(BiomeConfig config, BiomeIds id)
+    public BiomeGenCustom(BiomeConfig config, ResourceLocation registryKey, BiomeIds id)
     {
         super(new BiomePropertiesCustom(config));
+        setRegistryName(registryKey);
         this.generationId = id.getGenerationId();
 
         this.skyColor = config.skyColor;
