@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.forge;
 
 import com.google.common.base.Function;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
@@ -12,6 +13,7 @@ import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
@@ -66,7 +68,10 @@ public class TCPlugin
             @Override
             public BiomeConfig apply(Biome input)
             {
-                LocalBiome biome = engine.getWorld().getBiomeByName(input.getBiomeName());
+                LocalWorld world = engine.getWorld();
+                if (world == null)
+                    return null;
+                LocalBiome biome = world.getBiomeByName(input.getBiomeName());
                 if (biome == null)
                     return null;
                 return biome.getBiomeConfig();
