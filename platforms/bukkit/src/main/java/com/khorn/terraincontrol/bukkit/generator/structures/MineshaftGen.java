@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.MineshaftType;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.server.v1_10_R1.*;
 
@@ -40,7 +41,8 @@ public class MineshaftGen extends StructureGenerator
     protected StructureStart b(int chunkX, int chunkZ)
     {
         LocalWorld world = WorldHelper.toLocalWorld(this.g);
-        LocalBiome biome = world.getBiome(chunkX << 4 + 8, chunkZ << 4 + 8);
+        LocalBiome biome = world.getBiome(chunkX * ChunkCoordinate.CHUNK_X_SIZE + 8,
+                chunkZ * ChunkCoordinate.CHUNK_Z_SIZE + 8);
         BiomeConfig biomeConfig = biome.getBiomeConfig();
         WorldGenMineshaft.Type mineshaftType = WorldGenMineshaft.Type.NORMAL;
         if (biomeConfig.mineshaftType == MineshaftType.mesa)
