@@ -525,7 +525,7 @@ public class BukkitWorld implements LocalWorld
             y++;
             incorrectHeightMap = true;
         }
-        if (incorrectHeightMap)
+        if (incorrectHeightMap && isSafeForLightUpdates(chunk, x, z))
         {
             // Let Minecraft know that it made an error
             world.w(new BlockPosition(x, y, z)); // world.relight
