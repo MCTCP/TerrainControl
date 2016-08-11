@@ -27,7 +27,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 // Project properties
 archivesBaseName = "terraincontrol-forge"
 description = "TerrainControl for Minecraft Forge"
-ext.forgeVersion = "1.10.2-12.18.0.2009" // 2009 is just the build number
+ext.forgeVersion = "1.10.2-12.18.1.2050"
 minecraft.version = ext.forgeVersion
 minecraft.runDir = "run"
 minecraft.mappings = "snapshot_20160708"

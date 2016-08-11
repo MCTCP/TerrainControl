@@ -8,12 +8,13 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.ConfigToNetworkSender;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
-import com.khorn.terraincontrol.forge.util.WorldHelper;
+import com.khorn.terraincontrol.forge.WorldLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
+import jline.internal.Preconditions;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SPacketCustomPayload;
@@ -22,6 +23,13 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
 public class PlayerTracker
 {
+
+    private final WorldLoader worldLoader;
+
+    public PlayerTracker(WorldLoader worldLoader)
+    {
+        this.worldLoader = Preconditions.checkNotNull(worldLoader);
+    }
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
@@ -37,8 +45,8 @@ public class PlayerTracker
         }
 
         EntityPlayerMP player = (EntityPlayerMP) event.player;
-        
-        LocalWorld worldTC = WorldHelper.toLocalWorld(player.getEntityWorld());
+
+        LocalWorld worldTC = worldLoader.getWorld(player.getEntityWorld());
         if (worldTC == null)
         {
             // World not loaded

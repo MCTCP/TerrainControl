@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.forge.generator;
 
-import java.util.List;
-
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
@@ -10,10 +8,12 @@ import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
-
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.RegistryNamespaced;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import java.util.List;
 
 /**
  * Used for all custom biomes.
@@ -59,18 +59,23 @@ public class BiomeGenCustom extends Biome
             return Biome.getBiome(biomeIds.getGenerationId());
         }
 
+        // This is a custom biome, get or register it
         String biomeNameForRegistry = StringHelper.toComputerFriendlyName(biomeConfig.getName());
-        ResourceLocation registryKey = new ResourceLocation(PluginStandardValues.PLUGIN_NAME, biomeNameForRegistry);
-        Biome alreadyRegisteredBiome = Biome.REGISTRY.getObject(registryKey);
+        ResourceLocation registryKey = new ResourceLocation(PluginStandardValues.PLUGIN_NAME.toLowerCase(), biomeNameForRegistry);
+
+        // Check if registered earlier
+        @SuppressWarnings("unchecked")
+        RegistryNamespaced<ResourceLocation, Biome> registry = ((RegistryNamespaced<ResourceLocation, Biome>) GameRegistry.findRegistry(
+                Biome.class));
+        Biome alreadyRegisteredBiome = registry.getObject(registryKey);
         if (alreadyRegisteredBiome != null)
         {
-            // Check if registered earlier
             return alreadyRegisteredBiome;
         }
 
         // No existing biome, create new one
         BiomeGenCustom biome = new BiomeGenCustom(biomeConfig, registryKey, biomeIds);
-        GameRegistry.register(biome);
+        registry.register(biomeIds.getGenerationId(), biome.getRegistryName(), biome);
         return biome;
     }
 

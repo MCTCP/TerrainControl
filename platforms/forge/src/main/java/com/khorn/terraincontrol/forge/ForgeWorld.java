@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.forge;
 
 import java.util.*;
 
+import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
@@ -21,6 +22,7 @@ import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -29,6 +31,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
@@ -99,7 +102,7 @@ public class ForgeWorld implements LocalWorld
         int allocatedGenerationId = Biome.getIdForBiome(biome);
         if (requestedGenerationId != allocatedGenerationId)
         {
-            TerrainControl.log(LogMarker.INFO, "Asked to register {} with id {}, succeeded with id {}",
+            TerrainControl.log(LogMarker.INFO, "Asked to register {} with id {}, but succeeded with id {}",
                     biomeConfig.getName(), requestedGenerationId, allocatedGenerationId);
         }
 
@@ -630,19 +633,41 @@ public class ForgeWorld implements LocalWorld
         return this.generator;
     }
 
-    public void InitM(World world, ClientConfigProvider config)
+    public void provideClientConfigs(WorldClient world, ClientConfigProvider config)
     {
         this.settings = config;
         this.world = world;
         this.seed = world.getSeed();
     }
 
-    public void Init(World world, ServerConfigProvider configs)
+    /**
+     * Call this method when the configs are loaded.
+     * @param configs The configs.
+     */
+    public void provideConfigs(ServerConfigProvider configs)
     {
+        Preconditions.checkNotNull(configs, "configs");
         this.settings = configs;
+    }
+
+    /**
+     * Call this method when the Minecraft world is loaded. Call this method
+     * after {@link #provideConfigs(ServerConfigProvider)} has been called.
+     * @param world The Minecraft world.
+     */
+    public void provideWorldInstance(WorldServer world)
+    {
+        Preconditions.checkNotNull(world, "world");
+        Preconditions.checkState(this.world == null, "world was already initialized");
+        Preconditions.checkState(this.settings instanceof ServerConfigProvider,
+                "server configs must be provided first");
+
+        ServerConfigProvider configs = (ServerConfigProvider) this.settings;
 
         this.world = world;
         this.seed = world.getSeed();
+        world.setSeaLevel(configs.getWorldConfig().waterLevelMax);
+
         this.structureCache = new CustomObjectStructureCache(this);
 
         this.dungeonGen = new WorldGenDungeons();
@@ -678,8 +703,6 @@ public class ForgeWorld implements LocalWorld
         this.groundBush = new WorldGenShrub(jungleLog, jungleLeaves);
 
         this.generator = new ChunkProvider(this);
-
-        world.setSeaLevel(configs.getWorldConfig().waterLevelMax);
     }
 
     public void setBiomeManager(BiomeGenerator manager)

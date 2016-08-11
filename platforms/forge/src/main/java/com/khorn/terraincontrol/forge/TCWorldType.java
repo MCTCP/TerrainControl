@@ -1,19 +1,18 @@
 package com.khorn.terraincontrol.forge;
 
-import java.io.File;
-
+import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.TCBiomeProvider;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
-import com.khorn.terraincontrol.logging.LogMarker;
 
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.IChunkGenerator;
@@ -22,11 +21,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TCWorldType extends WorldType
 {
-    public ForgeWorld worldTC;
 
-    public TCWorldType(String paramString)
+    private final WorldLoader worldLoader;
+
+    public TCWorldType(WorldLoader worldLoader)
     {
-        super(paramString);
+        super(PluginStandardValues.PLUGIN_NAME);
+        this.worldLoader = Preconditions.checkNotNull(worldLoader, "worldLoader");
     }
 
     @Override
@@ -37,13 +38,14 @@ public class TCWorldType extends WorldType
     }
 
     @Override
-    public BiomeProvider getBiomeProvider(World world)
+    public BiomeProvider getBiomeProvider(World mcWorld)
     {
+        // Ignore client worlds
         try
         {
-            if (world instanceof WorldClient)
+            if (mcWorld instanceof WorldClient)
             {
-                return super.getBiomeProvider(world);
+                return super.getBiomeProvider(mcWorld);
             }
         } catch (NoClassDefFoundError e)
         {
@@ -52,26 +54,14 @@ public class TCWorldType extends WorldType
         }
 
         // Load everything
-        File worldDirectory = new File(TerrainControl.getEngine().getTCDataFolder(), "worlds" + File.separator + world.getSaveHandler().getWorldDirectory().getName());
+        ForgeWorld world = worldLoader.demandServerWorld((WorldServer) mcWorld);
 
-        if (!worldDirectory.exists())
-        {
-            TerrainControl.log(LogMarker.INFO, "settings does not exist, creating defaults");
+        Class<? extends BiomeGenerator> biomeGenClass = world.getConfigs().getWorldConfig().biomeMode;
+        BiomeGenerator biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeGenClass, world);
+        BiomeProvider mcBiomeGenerator = createBiomeProvider(world, biomeGenerator);
+        world.setBiomeManager(biomeGenerator);
 
-            if (!worldDirectory.mkdirs())
-                TerrainControl.log(LogMarker.WARN, "cant create folder " + worldDirectory.getAbsolutePath());
-        }
-
-        this.worldTC = new ForgeWorld(world.getWorldInfo().getWorldName());
-        ServerConfigProvider config = new ServerConfigProvider(worldDirectory, worldTC);
-        this.worldTC.Init(world, config);
-
-        Class<? extends BiomeGenerator> biomeGenClass = worldTC.getConfigs().getWorldConfig().biomeMode;
-        BiomeGenerator biomeManager = TerrainControl.getBiomeModeManager().createCached(biomeGenClass, worldTC);
-        BiomeProvider chunkManager = createBiomeProvider(worldTC, biomeManager);
-        this.worldTC.setBiomeManager(biomeManager);
-
-        return chunkManager;
+        return mcBiomeGenerator;
     }
 
     /**
@@ -93,24 +83,25 @@ public class TCWorldType extends WorldType
             return worldChunkManager;
         } else
         {
-            return new TCBiomeProvider(this.worldTC, biomeGenerator);
+            return new TCBiomeProvider(world, biomeGenerator);
         }
     }
 
     @Override
-    public IChunkGenerator getChunkGenerator(World world, String generatorOptions)
+    public IChunkGenerator getChunkGenerator(World mcWorld, String generatorOptions)
     {
-        if (this.worldTC.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
+        ForgeWorld world = worldLoader.getWorld(WorldHelper.getName(mcWorld));
+        if (world.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
         {
-            return this.worldTC.getChunkGenerator();
+            return world.getChunkGenerator();
         } else
-            return super.getChunkGenerator(world, generatorOptions);
+            return super.getChunkGenerator(mcWorld, generatorOptions);
     }
 
     @Override
     public int getMinimumSpawnHeight(World mcWorld)
     {
-        LocalWorld world = WorldHelper.toLocalWorld(mcWorld);
+        LocalWorld world = this.worldLoader.getWorld(mcWorld);
         if (world == null)
         {
             // MCPC+ has an interesting load order sometimes

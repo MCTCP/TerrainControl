@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.forge.util;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+
 import net.minecraft.world.World;
 
 public abstract class WorldHelper
@@ -16,8 +17,17 @@ public abstract class WorldHelper
      */
     public static LocalWorld toLocalWorld(World world)
     {
-        String worldName = world.getWorldInfo().getWorldName();
-        return TerrainControl.getWorld(worldName);
+        return TerrainControl.getWorld(getName(world));
+    }
+
+    /**
+     * Gets the name of the given world.
+     * @param world The world.
+     * @return The name.
+     */
+    public static String getName(World world)
+    {
+        return world.getWorldInfo().getWorldName();
     }
 
     private WorldHelper()

@@ -1,42 +1,29 @@
 package com.khorn.terraincontrol.forge;
 
+import java.io.File;
+
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-import net.minecraftforge.fml.common.Loader;
-
-import java.io.File;
-import java.lang.reflect.Field;
 
 public class ForgeEngine extends TerrainControlEngine
 {
 
-    protected TCWorldType worldType;
+    protected WorldLoader worldLoader;
 
-    public ForgeEngine(TCWorldType worldType)
+    public ForgeEngine(WorldLoader worldLoader)
     {
         super(new ForgeLogger());
-        this.worldType = worldType;
+        this.worldLoader = worldLoader;
     }
 
     @Override
     public LocalWorld getWorld(String name)
     {
-        LocalWorld world = worldType.worldTC;
-        if (world == null)
-        {
-            return null;
-        }
-        if (world.getName().equals(name))
-        {
-            return world;
-        }
-        return null;
+        return worldLoader.getWorld(name);
     }
 
     /**
@@ -51,25 +38,13 @@ public class ForgeEngine extends TerrainControlEngine
      */
     public LocalWorld getWorld()
     {
-        return worldType.worldTC;
+        return worldLoader.getMainWorld();
     }
 
     @Override
     public File getTCDataFolder()
     {
-        File dataFolder;
-        try
-        {
-            Field minecraftDir = Loader.class.getDeclaredField("minecraftDir");
-            minecraftDir.setAccessible(true);
-            dataFolder = new File((File) minecraftDir.get(null), "mods" + File.separator + "TerrainControl");
-        } catch (Throwable e)
-        {
-            dataFolder = new File("mods" + File.separator + "TerrainControl");
-            TerrainControl.log(LogMarker.WARN, "Could not reflect the Minecraft directory, save location may be unpredicatble.");
-            TerrainControl.printStackTrace(LogMarker.FATAL, e);
-        }
-        return dataFolder;
+        return worldLoader.getConfigsFolder();
     }
 
     @Override

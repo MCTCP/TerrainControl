@@ -1,11 +1,14 @@
 package com.khorn.terraincontrol.forge.events;
 
+import java.io.DataInputStream;
+import java.util.Arrays;
+
+import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.ClientConfigProvider;
-import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
-import com.khorn.terraincontrol.forge.ForgeWorld;
+import com.khorn.terraincontrol.forge.WorldLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import net.minecraft.client.Minecraft;
@@ -20,17 +23,21 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketE
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
-import java.io.DataInputStream;
-import java.util.Arrays;
-
 public class PacketHandler
 {
+    private final WorldLoader worldLoader;
+
+    public PacketHandler(WorldLoader worldLoader)
+    {
+        this.worldLoader = Preconditions.checkNotNull(worldLoader);
+    }
 
     @SubscribeEvent
     public void onServerPacket(ServerCustomPacketEvent event)
     {
 
     }
+
 
     @SubscribeEvent
     public void onClientPacket(ClientCustomPacketEvent event)
@@ -49,19 +56,18 @@ public class PacketHandler
             if (serverProtocolVersion == clientProtocolVersion)
             {
                 // Server sent config
+                WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
 
-                if (stream.readableBytes() > 4)
+                if (stream.readableBytes() > 4 && worldMC != null)
                 {
-                    // If the packet wasn't empty, add the new biomes
-                    WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
+                    // If the packet wasn't empty, and the client world exists:
+                    // add the new biomes.
+                    // (If no client world exists yet, then we're on a local
+                    // server, and we can discard the packet.)
 
                     DataInputStream wrappedStream = new DataInputStream(new ByteBufInputStream(stream));
-                    String worldName = ConfigFile.readStringFromStream(wrappedStream);
-                    ForgeWorld worldTC = new ForgeWorld(worldName);
-                    ClientConfigProvider config = new ClientConfigProvider(wrappedStream, worldTC);
-                    wrappedStream.close();
 
-                    worldTC.InitM(worldMC, config);
+                    worldLoader.demandClientWorld(worldMC, wrappedStream);
                 }
 
                 TerrainControl.log(LogMarker.INFO, "Config received from server");

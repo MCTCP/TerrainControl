@@ -1,13 +1,13 @@
 package com.khorn.terraincontrol.forge;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
-import com.khorn.terraincontrol.forge.util.WorldHelper;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -19,13 +19,12 @@ import net.minecraft.world.biome.Biome;
 
 final class TCCommandHandler implements ICommand
 {
-    private final List<String> aliases;
+    private final List<String> aliases = Arrays.asList("tc");
+    private final WorldLoader worldLoader;
 
-    TCCommandHandler()
+    TCCommandHandler(WorldLoader worldLoader)
     {
-        aliases = new ArrayList<String>();
-
-        aliases.add("tc");
+        this.worldLoader = Preconditions.checkNotNull(worldLoader);
     }
 
     @Override
@@ -61,7 +60,7 @@ final class TCCommandHandler implements ICommand
                 sender.addChatMessage(new TextComponentString("/tc biome - Show biome information for any biome at the player's coordinates."));
             } else if (argString[0].equals("worldinfo"))
             {
-                LocalWorld localWorld = WorldHelper.toLocalWorld(sender.getEntityWorld());
+                LocalWorld localWorld = worldLoader.getWorld(sender.getEntityWorld());
                 if (localWorld != null)
                 {
                     WorldConfig worldConfig = localWorld.getConfigs().getWorldConfig();

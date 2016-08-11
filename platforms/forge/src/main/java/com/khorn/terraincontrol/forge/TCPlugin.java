@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge;
 
+import java.io.File;
+
 import com.google.common.base.Function;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
@@ -18,29 +20,38 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = "TerrainControl", name = "TerrainControl", acceptableRemoteVersions = "*")
+@Mod(modid = "terraincontrol", name = "TerrainControl", acceptableRemoteVersions = "*")
 public class TCPlugin
 {
+    private WorldLoader worldLoader;
 
     @EventHandler
     public void load(FMLInitializationEvent event)
     {
         // This is the place where the mod starts loading
+        File configsDir = new File(Loader.instance().getConfigDir(), "TerrainControl");
+        worldLoader = new WorldLoader(configsDir);
 
-        final ForgeEngine engine = new ForgeEngine(new TCWorldType(PluginStandardValues.PLUGIN_NAME));
+        // Create the world type. WorldType registers itself in the constructor
+        // - that is Mojang code, so don't blame me
+        new TCWorldType(worldLoader);
 
-        // Start TerrainControl engine, and Register world type
+        // Start TerrainControl engine
+        final ForgeEngine engine = new ForgeEngine(worldLoader);
         TerrainControl.setEngine(engine);
 
-        // Register Default biome generator
+        // Register Default biome generator to TerrainControl
         engine.getBiomeModeManager().register(VanillaBiomeGenerator.GENERATOR_NAME, ForgeVanillaBiomeGenerator.class);
 
         // Register village and rare building starts
@@ -51,14 +62,14 @@ public class TCPlugin
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
             FMLEventChannel eventDrivenChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PluginStandardValues.ChannelName);
-            eventDrivenChannel.register(new PacketHandler());
+            eventDrivenChannel.register(new PacketHandler(worldLoader));
         }
 
         // Register player tracker, for sending configs.
-        MinecraftForge.EVENT_BUS.register(new PlayerTracker());
+        MinecraftForge.EVENT_BUS.register(new PlayerTracker(worldLoader));
 
         // Register sapling tracker, for custom tree growth.
-        SaplingListener saplingListener = new SaplingListener();
+        SaplingListener saplingListener = new SaplingListener(worldLoader);
         MinecraftForge.TERRAIN_GEN_BUS.register(saplingListener);
         MinecraftForge.EVENT_BUS.register(saplingListener);
 
@@ -85,9 +96,20 @@ public class TCPlugin
     }
 
     @EventHandler
-    public void serverLoad(FMLServerStartingEvent event)
+    public void serverAboutToStart(FMLServerAboutToStartEvent event)
     {
-        event.registerServerCommand(new TCCommandHandler());
+        worldLoader.onWorldAboutToLoad(event.getServer());
     }
 
+    @EventHandler
+    public void serverLoad(FMLServerStartingEvent event)
+    {
+        event.registerServerCommand(new TCCommandHandler(worldLoader));
+    }
+
+    @EventHandler
+    public void serverStopped(FMLServerStoppingEvent event)
+    {
+        worldLoader.onServerStopped();
+    }
 }
