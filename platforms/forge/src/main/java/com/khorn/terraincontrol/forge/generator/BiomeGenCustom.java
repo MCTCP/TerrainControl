@@ -75,7 +75,9 @@ public class BiomeGenCustom extends Biome
 
         // No existing biome, create new one
         BiomeGenCustom biome = new BiomeGenCustom(biomeConfig, registryKey, biomeIds);
-        registry.register(biomeIds.getGenerationId(), biome.getRegistryName(), biome);
+        if (!biomeIds.isVirtual()) {
+            registry.register(biomeIds.getGenerationId(), biome.getRegistryName(), biome);
+        }
         return biome;
     }
 
