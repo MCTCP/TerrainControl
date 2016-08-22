@@ -14,6 +14,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -65,12 +67,49 @@ public final class WorldLoader
         return getWorld(WorldHelper.getName(world));
     }
 
+    /**
+     * For a dedicated server, we need to register custom biomes
+     * really early, even before we can know that TerrainControl
+     * is the desired world type. As a workaround, we tentatively
+     * load the configs if a config folder exists in the usual
+     * location.
+     * @param server The Minecraft server.
+     */
     public void onWorldAboutToLoad(MinecraftServer server)
     {
-        // Empty!
+        if (!server.isDedicatedServer())
+        {
+            // Registry works differently on singleplayer
+            // We cannot load things yet
+            return;
+        }
+
+        String worldName = server.getFolderName();
+        File worldConfigsFolder = this.getWorldDir(worldName);
+        if (!worldConfigsFolder.exists())
+        {
+            // TerrainControl is probably not enabled for this world
+            return;
+        }
+
+        ForgeWorld world = new ForgeWorld(worldName);
+        TerrainControl.log(LogMarker.INFO, "Loading configs for world \"{}\"..", world.getName());
+        ServerConfigProvider configs = new ServerConfigProvider(worldConfigsFolder, world);
+        world.provideConfigs(configs);
+        this.worldOrNull = world;
     }
 
     public void onServerStopped()
+    {
+        unloadWorld();
+    }
+
+    public void onQuitFromServer()
+    {
+        unloadWorld();
+    }
+
+    private void unloadWorld()
     {
         ForgeWorld world = this.worldOrNull;
         if (world != null)
@@ -101,19 +140,27 @@ public final class WorldLoader
 
     public ForgeWorld demandServerWorld(WorldServer mcWorld)
     {
-        ForgeWorld world = new ForgeWorld(WorldHelper.getName(mcWorld));
+        ForgeWorld world = this.worldOrNull;
+        if (world == null) {
+            world = new ForgeWorld(WorldHelper.getName(mcWorld));
 
-        TerrainControl.log(LogMarker.INFO, "Loading configs for world \"{}\"...", world.getName());
-        File worldConfigsDir = new File(configsDir, "worlds/" + world.getName());
-        ServerConfigProvider configs = new ServerConfigProvider(worldConfigsDir, world);
-        world.provideConfigs(configs);
+            TerrainControl.log(LogMarker.INFO, "Loading configs for world \"{}\"....", world.getName());
+            File worldConfigsDir = getWorldDir(world.getName());
+            ServerConfigProvider configs = new ServerConfigProvider(worldConfigsDir, world);
+            world.provideConfigs(configs);
+            this.worldOrNull = world;
+        }
+
         world.provideWorldInstance(mcWorld);
-
-        this.worldOrNull = world;
 
         return world;
     }
+    
+    private File getWorldDir(String worldName) {
+        return new File(configsDir, "worlds/" + worldName);
+    }
 
+    @SideOnly(Side.CLIENT)
     public void demandClientWorld(WorldClient mcWorld, DataInputStream wrappedStream) throws IOException
     {
         ForgeWorld world = new ForgeWorld(ConfigFile.readStringFromStream(wrappedStream));

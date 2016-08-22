@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-import java.io.File;
-
 import com.google.common.base.Function;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
@@ -15,7 +13,6 @@ import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
@@ -30,6 +27,8 @@ import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+
+import java.io.File;
 
 @Mod(modid = "terraincontrol", name = "TerrainControl", acceptableRemoteVersions = "*")
 public class TCPlugin
@@ -61,8 +60,10 @@ public class TCPlugin
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
+            ClientNetworkHandler networkHandler = new ClientNetworkHandler(worldLoader);
             FMLEventChannel eventDrivenChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PluginStandardValues.ChannelName);
-            eventDrivenChannel.register(new PacketHandler(worldLoader));
+            eventDrivenChannel.register(networkHandler);
+            MinecraftForge.EVENT_BUS.register(networkHandler);
         }
 
         // Register player tracker, for sending configs.

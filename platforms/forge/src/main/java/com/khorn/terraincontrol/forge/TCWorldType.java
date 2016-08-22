@@ -10,7 +10,6 @@ import com.khorn.terraincontrol.forge.generator.TCBiomeProvider;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
@@ -41,16 +40,9 @@ public class TCWorldType extends WorldType
     public BiomeProvider getBiomeProvider(World mcWorld)
     {
         // Ignore client worlds
-        try
+        if (mcWorld.isRemote)
         {
-            if (mcWorld instanceof WorldClient)
-            {
-                return super.getBiomeProvider(mcWorld);
-            }
-        } catch (NoClassDefFoundError e)
-        {
-            // There isn't a WorldClient class, so we are on a stand-alone
-            // server. Continue normally.
+            return super.getBiomeProvider(mcWorld);
         }
 
         // Load everything

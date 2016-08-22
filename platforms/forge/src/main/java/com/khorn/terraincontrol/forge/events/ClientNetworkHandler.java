@@ -1,14 +1,10 @@
 package com.khorn.terraincontrol.forge.events;
 
-import java.io.DataInputStream;
-import java.util.Arrays;
-
 import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.WorldLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import net.minecraft.client.Minecraft;
@@ -20,27 +16,23 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
-public class PacketHandler
+import java.io.DataInputStream;
+import java.util.Arrays;
+
+public class ClientNetworkHandler
 {
     private final WorldLoader worldLoader;
 
-    public PacketHandler(WorldLoader worldLoader)
+    public ClientNetworkHandler(WorldLoader worldLoader)
     {
         this.worldLoader = Preconditions.checkNotNull(worldLoader);
     }
 
     @SubscribeEvent
-    public void onServerPacket(ServerCustomPacketEvent event)
-    {
-
-    }
-
-
-    @SubscribeEvent
-    public void onClientPacket(ClientCustomPacketEvent event)
+    public void onPacketReceive(ClientCustomPacketEvent event)
     {
         // This method receives the TerrainControl packet with the custom
         // biome colors and weather.
@@ -109,6 +101,12 @@ public class PacketHandler
         chat.setStyle(chatStyle);
 
         Minecraft.getMinecraft().thePlayer.addChatMessage(chat);
+    }
+
+    @SubscribeEvent
+    public void onDisconnect(ClientDisconnectionFromServerEvent event)
+    {
+        this.worldLoader.onQuitFromServer();
     }
 
 }

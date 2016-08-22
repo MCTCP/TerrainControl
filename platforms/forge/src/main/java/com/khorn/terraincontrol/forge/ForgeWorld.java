@@ -38,6 +38,8 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ForgeWorld implements LocalWorld
 {
@@ -633,6 +635,7 @@ public class ForgeWorld implements LocalWorld
         return this.generator;
     }
 
+    @SideOnly(Side.CLIENT)
     public void provideClientConfigs(WorldClient world, ClientConfigProvider config)
     {
         this.settings = config;
