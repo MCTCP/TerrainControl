@@ -1,9 +1,9 @@
 [
 {
-  "modid": "TerrainControl",
+  "modid": "terraincontrol",
   "name": "TerrainControl",
   "description": "Advanced custom world generator. Based on R-T-B's PhoenixTerrainMod, which itself is based on Bucyruss' BiomeTerrainMod.",
-  "url": "http://dev.bukkit.org/bukkit-plugins/terrain-control/",
+  "url": "http://forum.mctcp.com/",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "updateUrl": "",
