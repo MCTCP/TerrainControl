@@ -75,7 +75,7 @@ public class DungeonGen extends Resource
     public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
     {
         int y = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
-        world.PlaceDungeons(random, x, y, z);
+        world.placeDungeon(random, x, y, z);
     }
 
 }

@@ -12,6 +12,12 @@ package com.khorn.terraincontrol.util;
  * thousands of blocks, and that you can have hundreds of BO3s on the server.)
  * You can create a defensive clone of the bounding box using the
  * {@link #clone()} method.
+ * 
+ * <p>Note that the max coords of the bounding box are exclusive. This means
+ * that a box of (0, 0, 0) to (1, 1, 1) contains only one block, not 8. This is
+ * unlike Minecraft's boundig box, where that box would include 8 blocks. Our
+ * design allows us to calculate the width/height/depth of the box using simple
+ * calculations like {@code maxX - minX}.
  */
 public final class BoundingBox implements Cloneable
 {
@@ -112,6 +118,13 @@ public final class BoundingBox implements Cloneable
         {
             maxZ = z + 1;
         }
+    }
+
+    public void expandToFitChunk(ChunkCoordinate chunk)
+    {
+        expandToFit(chunk.getBlockX(), 0, chunk.getBlockZ());
+        expandToFit(chunk.getBlockX() + ChunkCoordinate.CHUNK_X_SIZE, ChunkCoordinate.CHUNK_Y_SIZE,
+                chunk.getBlockZ() + ChunkCoordinate.CHUNK_Z_SIZE);
     }
 
     /**

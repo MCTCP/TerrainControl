@@ -3,10 +3,10 @@ package com.khorn.terraincontrol.configuration.standard;
 import static com.khorn.terraincontrol.configuration.standard.BiomeStandardValues.*;
 
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.BiomeConfig.MineshaftType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.resource.IceSpikeGen.SpikeType;
 import com.khorn.terraincontrol.generator.terrain.TerrainShapeBase;
@@ -89,6 +89,7 @@ public class StandardBiomeTemplate
     public boolean defaultIceSpikes;
     public boolean defaultDisableBiomeHeight;
     public double[] defaultCustomHeightControl = new double[TerrainShapeBase.PIECES_PER_CHUNK_Y + 1];;
+    public double defaultFossilRarity = 0;
 
     public List<WeightedMobSpawnGroup> defaultCreatures = Arrays.asList(
             new WeightedMobSpawnGroup(MobNames.SHEEP, 12, 4, 4),
@@ -143,6 +144,12 @@ public class StandardBiomeTemplate
         // Dungeon
         resources.add(Resource.createResource(config, DungeonGen.class, dungeonFrequency, dungeonRarity, dungeonMinAltitude,
                 this.worldHeight));
+        
+        // Fossil
+        if (defaultFossilRarity > 0)
+        {
+            resources.add(Resource.createResource(config, FossilGen.class, defaultFossilRarity));
+        }
 
         // Dirt
         resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIRT, dirtDepositSize, dirtDepositFrequency,

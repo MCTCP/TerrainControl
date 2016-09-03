@@ -75,7 +75,7 @@ public class TreeObject extends SimpleObject
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-        return world.PlaceTree(type, random, x, y, z);
+        return world.placeTree(type, random, x, y, z);
     }
 
     @Override

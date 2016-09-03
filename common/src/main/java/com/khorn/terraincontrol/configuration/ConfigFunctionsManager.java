@@ -30,6 +30,7 @@ public class ConfigFunctionsManager
         registerConfigFunction("CustomStructure", CustomStructureGen.class);
         registerConfigFunction("Dungeon", DungeonGen.class);
         registerConfigFunction("Grass", GrassGen.class);
+        registerConfigFunction("Fossil", FossilGen.class);
         registerConfigFunction("IceSpike", IceSpikeGen.class);
         registerConfigFunction("Liquid", LiquidGen.class);
         registerConfigFunction("Ore", OreGen.class);

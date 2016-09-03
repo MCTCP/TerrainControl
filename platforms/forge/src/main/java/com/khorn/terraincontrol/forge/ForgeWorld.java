@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-import java.util.*;
-
 import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.*;
@@ -18,7 +16,6 @@ import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
-
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -40,6 +37,8 @@ import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.*;
 
 public class ForgeWorld implements LocalWorld
 {
@@ -68,6 +67,7 @@ public class ForgeWorld implements LocalWorld
     public OceanMonumentGen oceanMonumentGen;
 
     private WorldGenDungeons dungeonGen;
+    private WorldGenFossils fossilGen;
 
     private WorldGenTrees tree;
     private WorldGenSavannaTree acaciaTree;
@@ -194,13 +194,19 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void PlaceDungeons(Random rand, int x, int y, int z)
+    public boolean placeDungeon(Random rand, int x, int y, int z)
     {
-        dungeonGen.generate(this.world, rand, new BlockPos(x, y, z));
+        return dungeonGen.generate(this.world, rand, new BlockPos(x, y, z));
     }
 
     @Override
-    public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z)
+    public boolean placeFossil(Random rand, ChunkCoordinate chunkCoord)
+    {
+        return fossilGen.generate(this.world, rand, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+    }
+
+    @Override
+    public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
     {
         BlockPos blockPos = new BlockPos(x, y, z);
         switch (type)
@@ -247,7 +253,7 @@ public class ForgeWorld implements LocalWorld
             case HugeTaiga2:
                 return hugeTaigaTree2.generate(this.world, rand, blockPos);
             default:
-                throw new AssertionError("Failed to handle tree of type " + type.toString());
+                throw new RuntimeException("Failed to handle tree of type " + type.toString());
         }
     }
 
@@ -674,6 +680,7 @@ public class ForgeWorld implements LocalWorld
         this.structureCache = new CustomObjectStructureCache(this);
 
         this.dungeonGen = new WorldGenDungeons();
+        this.fossilGen = new WorldGenFossils();
         this.strongholdGen = new StrongholdGen(configs);
 
         this.villageGen = new VillageGen(configs);

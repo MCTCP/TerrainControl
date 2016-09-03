@@ -53,6 +53,9 @@ public class BukkitWorld implements LocalWorld
     public NetherFortressGen netherFortressGen;
     public OceanMonumentGen oceanMonumentGen;
 
+    private WorldGenDungeons dungeon;
+    private WorldGenFossils fossil;
+
     private WorldGenTrees tree;
     private WorldGenAcaciaTree acaciaTree;
     private WorldGenBigTree bigTree;
@@ -176,13 +179,19 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void PlaceDungeons(Random rand, int x, int y, int z)
+    public boolean placeDungeon(Random rand, int x, int y, int z)
     {
-        new WorldGenDungeons().generate(this.world, rand, new BlockPosition(x, y, z));
+        return dungeon.generate(world, rand, new BlockPosition(x, y, z));
     }
 
     @Override
-    public boolean PlaceTree(TreeType type, Random rand, int x, int y, int z)
+    public boolean placeFossil(Random rand, ChunkCoordinate chunkCoord)
+    {
+        return fossil.generate(world, rand, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+    }
+
+    @Override
+    public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
     {
         BlockPosition blockPos = new BlockPosition(x, y, z);
         switch (type)
@@ -229,7 +238,7 @@ public class BukkitWorld implements LocalWorld
             case HugeTaiga2:
                 return hugeTaigaTree2.generate(this.world, rand, blockPos);
             default:
-                throw new AssertionError("Failed to handle tree of type " + type.toString());
+                throw new RuntimeException("Failed to handle tree of type " + type.toString());
         }
     }
 
@@ -734,6 +743,9 @@ public class BukkitWorld implements LocalWorld
                 case Default:
                     break;
             }
+
+            this.dungeon = new WorldGenDungeons();
+            this.fossil = new WorldGenFossils();
 
             // Initialize trees
             IBlockData jungleLog = Blocks.LOG.getBlockData()

@@ -109,6 +109,7 @@ public class MinecraftBiomeTemplates
             this.defaultNotBorderNear.add(DefaultBiome.MESA_PLATEAU_MOUNTAINS.Name);
             this.defaultNotBorderNear.add(DefaultBiome.MESA_PLATEAU_FOREST_MOUNTAINS.Name);
             this.defaultNotBorderNear.add(DefaultBiome.MESA_BRYCE.Name);
+            this.defaultFossilRarity = 1.156; // 1/64 chance of spawning
         }
     }
 
@@ -187,6 +188,7 @@ public class MinecraftBiomeTemplates
             this.defaultRareBuildingType = RareBuildingType.swampHut;
             this.defaultTree = new Object[] {2, TreeType.SwampTree, 100};
             this.defaultStrongholds = false;
+            this.defaultFossilRarity = 1.156; // 1/64 chance of spawning
         }
     }
 
