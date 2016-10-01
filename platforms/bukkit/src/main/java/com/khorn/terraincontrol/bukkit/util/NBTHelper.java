@@ -1,25 +1,13 @@
 package com.khorn.terraincontrol.bukkit.util;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
+import net.minecraft.server.v1_10_R1.*;
 
-import net.minecraft.server.v1_10_R1.NBTBase;
-import net.minecraft.server.v1_10_R1.NBTTagByte;
-import net.minecraft.server.v1_10_R1.NBTTagByteArray;
-import net.minecraft.server.v1_10_R1.NBTTagCompound;
-import net.minecraft.server.v1_10_R1.NBTTagDouble;
-import net.minecraft.server.v1_10_R1.NBTTagFloat;
-import net.minecraft.server.v1_10_R1.NBTTagInt;
-import net.minecraft.server.v1_10_R1.NBTTagIntArray;
-import net.minecraft.server.v1_10_R1.NBTTagList;
-import net.minecraft.server.v1_10_R1.NBTTagLong;
-import net.minecraft.server.v1_10_R1.NBTTagShort;
-import net.minecraft.server.v1_10_R1.NBTTagString;
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class NBTHelper
 {
@@ -158,23 +146,32 @@ public class NBTHelper
         switch (type)
         {
             case TAG_Byte:
-                return ((NBTTagByte) nmsTag).f();
+                byte theByte = ((NBTTagByte) nmsTag).g();
+                return theByte;
             case TAG_Short:
-                return ((NBTTagShort) nmsTag).e();
+                short theShort = ((NBTTagShort) nmsTag).f();
+                return theShort;
             case TAG_Int:
-                return ((NBTTagInt) nmsTag).d();
+                int theInt = ((NBTTagInt) nmsTag).e();
+                return theInt;
             case TAG_Long:
-                return ((NBTTagLong) nmsTag).c();
+                long theLong = ((NBTTagLong) nmsTag).d();
+                return theLong;
             case TAG_Float:
-                return ((NBTTagFloat) nmsTag).h();
+                float theFloat = ((NBTTagFloat) nmsTag).i();
+                return theFloat;
             case TAG_Double:
-                return ((NBTTagDouble) nmsTag).g();
+                double theDouble = ((NBTTagDouble) nmsTag).h();
+                return theDouble;
             case TAG_Byte_Array:
-                return ((NBTTagByteArray) nmsTag).c();
+                byte[] theByteArray = ((NBTTagByteArray) nmsTag).c();
+                return theByteArray;
             case TAG_String:
-                return ((NBTTagString) nmsTag).c_();
+                String theString = ((NBTTagString) nmsTag).c_();
+                return theString;
             case TAG_Int_Array:
-                return ((NBTTagIntArray) nmsTag).c();
+                int[] theIntArray = ((NBTTagIntArray) nmsTag).d();
+                return theIntArray;
             default:
                 // Cannot read this from a tag
                 throw new IllegalArgumentException(type + "doesn't have a simple value!");
