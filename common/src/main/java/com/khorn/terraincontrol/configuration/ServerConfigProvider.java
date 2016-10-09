@@ -246,9 +246,17 @@ public final class ServerConfigProvider implements ConfigProvider
     {
         StringBuilder loadedBiomeNames = new StringBuilder();
 
+        List<BiomeConfig> loadedBiomeList = new ArrayList<BiomeConfig>(loadedBiomes.values());
+        Collections.sort(loadedBiomeList, new Comparator<BiomeConfig>() {
+            @Override
+            public int compare(BiomeConfig a, BiomeConfig b) {
+                return getRequestedGenerationId(a) - getRequestedGenerationId(b);
+            }
+        });
+
         // Now that all settings are loaded, we can index them,
         // cross-reference between biomes, etc.
-        for (BiomeConfig biomeConfig : loadedBiomes.values())
+        for (BiomeConfig biomeConfig : loadedBiomeList)
         {
             // Statistics of the loaded biomes
             this.biomesCount++;
