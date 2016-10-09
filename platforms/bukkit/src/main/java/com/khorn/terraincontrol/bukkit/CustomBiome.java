@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.BiomeIds;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.util.EnumHelper;
 import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
@@ -8,6 +9,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import net.minecraft.server.v1_10_R1.BiomeBase;
 import net.minecraft.server.v1_10_R1.MinecraftKey;
@@ -17,6 +19,7 @@ import java.util.List;
 
 public class CustomBiome extends BiomeBase
 {
+    private static final int MAX_TC_BIOME_ID = 1023;
     public final int generationId;
 
     /**
@@ -76,6 +79,16 @@ public class CustomBiome extends BiomeBase
         String biomeNameWithoutSpaces = StringHelper.toComputerFriendlyName(biomeConfig.getName());
         MinecraftKey biomeKey = new MinecraftKey(PluginStandardValues.PLUGIN_NAME, biomeNameWithoutSpaces);
         int savedBiomeId = biomeIds.getSavedId();
+
+        // We need to init array size because Mojang uses a strange custom
+        // ArrayList. RegistryID arrays are not correctly (but randomly!) copied
+        // when resized.
+        if(BiomeBase.getBiome(MAX_TC_BIOME_ID) == null) {
+            BiomeBase.REGISTRY_ID.a(MAX_TC_BIOME_ID,
+                    new MinecraftKey(PluginStandardValues.PLUGIN_NAME, "null"),
+                    new CustomBiome(biomeConfig, new BiomeIds(MAX_TC_BIOME_ID, MAX_TC_BIOME_ID)));
+        }
+
         if (biomeIds.isVirtual())
         {
             // Virtual biomes hack: register, then let original biome overwrite
@@ -90,16 +103,25 @@ public class CustomBiome extends BiomeBase
                 // custom biome that is loaded after this virtual biome, so it
                 // will soon be registered
                 BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeKey, customBiome);
+                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
             } else
             {
                 MinecraftKey existingBiomeKey = BiomeBase.REGISTRY_ID.b(existingBiome);
                 BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeKey, customBiome);
                 BiomeBase.REGISTRY_ID.a(savedBiomeId, existingBiomeKey, existingBiome);
+
+                // String existingBiomeName = existingBiome.getClass().getSimpleName();
+                // if(existingBiome instanceof CustomBiome) {
+                //     existingBiomeName = String.valueOf(((CustomBiome) existingBiome).generationId);
+                // }
+                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId() /*, existingBiomeName*/ );
             }
         } else
         {
             // Normal insertion
-            BiomeBase.REGISTRY_ID.a(biomeIds.getSavedId(), biomeKey, customBiome);
+            BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeKey, customBiome);
+
+            TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
         }
 
         // Add biome to Bukkit enum if it's not there yet
@@ -116,7 +138,22 @@ public class CustomBiome extends BiomeBase
             throw new AssertionError("Biome " + biomeConfig.getName() + " is not properly registered: got id " + registeredSavedId + ", should be " + savedBiomeId);
         }
 
+        checkRegistry();
+
         return customBiome;
+    }
+
+    /**
+     * Check if biome ID registry is well filled.
+     */
+    private static void checkRegistry() {
+        for(int i = 168; i >= 0; --i) {
+            BiomeBase biome = getBiome(i);
+            if(biome != null && biome instanceof CustomBiome && ((CustomBiome) biome).generationId != i) {
+                throw new AssertionError("Biome ID #" + i + " returns custom biome #" +
+                        ((CustomBiome) biome).generationId + " instead of its own.");
+            }
+        }
     }
 
     private CustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
