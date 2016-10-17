@@ -41,7 +41,7 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
             TerrainControl.log(LogMarker.TRACE, "  {} trying to spawn! #{}", branch.getCustomObject().getName(), branch.getChance());
             if (branch.getChance() >= randomChance)
             {
-                TerrainControl.log(LogMarker.TRACE, "  Successful Spawn");
+                TerrainControl.log(LogMarker.DEBUG, "  Successful Spawn {} at {},{},{}",branch.getCustomObject().getName(),x + this.x, y + this.y, z + this.z);
                 return new CustomObjectCoordinate(branch.getCustomObject(), branch.getRotation(), x + this.x, y + this.y, z + this.z);
             }
         }
