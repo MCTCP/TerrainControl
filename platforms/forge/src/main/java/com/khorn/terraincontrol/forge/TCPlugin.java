@@ -80,12 +80,21 @@ public class TCPlugin
             @Override
             public BiomeConfig apply(Biome input)
             {
-                LocalWorld world = engine.getWorld();
-                if (world == null)
-                    return null;
-                LocalBiome biome = world.getBiomeByName(input.getBiomeName());
+                LocalBiome biome = null;
+                for (LocalWorld world : worldLoader.worlds.values())
+                {
+                    biome = world.getBiomeByName(input.getBiomeName());
+                    if (biome != null)
+                    {
+                        break;
+                    }
+                }
+
                 if (biome == null)
+                {
                     return null;
+                }
+
                 return biome.getBiomeConfig();
             }
         };
