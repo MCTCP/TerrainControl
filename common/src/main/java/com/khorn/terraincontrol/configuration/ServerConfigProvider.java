@@ -284,6 +284,7 @@ public final class ServerConfigProvider implements ConfigProvider
                 } else
                 {
                     requestedSavedId = getRequestedGenerationId(replaceToConfig);
+                    TerrainControl.log(LogMarker.INFO, "Biome {} has a ReplaceToBiomeName specified of {}", biomeConfig.getName(), biomeConfig.replaceToBiomeName);
                 }
             }
 

@@ -1,11 +1,15 @@
 package com.khorn.terraincontrol.forge.generator;
 
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.logging.LogMarker;
+
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
+
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import net.minecraft.util.ResourceLocation;
@@ -70,6 +74,7 @@ public class BiomeGenCustom extends Biome
         Biome alreadyRegisteredBiome = registry.getObject(registryKey);
         if (alreadyRegisteredBiome != null)
         {
+            TerrainControl.log(LogMarker.INFO, "Biome {} already registered, skipping.", biomeNameForRegistry);
             return alreadyRegisteredBiome;
         }
 

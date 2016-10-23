@@ -101,11 +101,13 @@ public class ForgeWorld implements LocalWorld
         Biome biome = BiomeGenCustom.getOrCreateBiome(biomeConfig, biomeIds);
 
         int requestedGenerationId = biomeIds.getGenerationId();
+        int requestedSavedId = biomeIds.getSavedId();
         int allocatedGenerationId = Biome.getIdForBiome(biome);
+
         if (requestedGenerationId != allocatedGenerationId)
         {
-            TerrainControl.log(LogMarker.INFO, "Asked to register {} with id {}, but succeeded with id {}",
-                    biomeConfig.getName(), requestedGenerationId, allocatedGenerationId);
+            TerrainControl.log(LogMarker.INFO, "Asked to register biome {} with id {}, but succeeded with generation id {} and save id {}", 
+                    biomeConfig.getName(), requestedGenerationId,allocatedGenerationId ,requestedSavedId);
         }
 
         LocalBiome localBiome = ForgeBiome.forBiome(biomeConfig, biome);
