@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.events.EventPriority;
+import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.events.*;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
@@ -83,10 +84,13 @@ public class TCPlugin
                 LocalBiome biome = null;
                 for (LocalWorld world : worldLoader.worlds.values())
                 {
-                    biome = world.getBiomeByName(input.getBiomeName());
-                    if (biome != null)
+                    try
                     {
+                        biome = world.getBiomeByName(input.getBiomeName());
                         break;
+                    } catch (BiomeNotFoundException e)
+                    {
+                        // Ignored, try in next world
                     }
                 }
 
