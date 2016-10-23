@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * Responsible for loading and unloading the world.
@@ -31,7 +32,7 @@ public final class WorldLoader
 {
 
     private final File configsDir;
-    private ForgeWorld worldOrNull;
+    public final HashMap<String, ForgeWorld> worlds = new HashMap<String, ForgeWorld>();
 
     WorldLoader(File configsDir)
     {
@@ -40,21 +41,7 @@ public final class WorldLoader
 
     public ForgeWorld getWorld(String name)
     {
-        ForgeWorld world = this.worldOrNull;
-        if (world == null)
-        {
-            return null;
-        }
-        if (!world.getName().equals(name))
-        {
-            return null;
-        }
-        return world;
-    }
-
-    public LocalWorld getMainWorld()
-    {
-        return worldOrNull;
+        return worlds.get(name);
     }
 
     public File getConfigsFolder()
@@ -96,7 +83,7 @@ public final class WorldLoader
         TerrainControl.log(LogMarker.INFO, "Loading configs for world \"{}\"..", world.getName());
         ServerConfigProvider configs = new ServerConfigProvider(worldConfigsFolder, world);
         world.provideConfigs(configs);
-        this.worldOrNull = world;
+        worlds.put(worldName,  world);
     }
 
     public void onServerStopped()
@@ -111,14 +98,14 @@ public final class WorldLoader
 
     private void unloadWorld()
     {
-        ForgeWorld world = this.worldOrNull;
-        if (world != null)
+        for (ForgeWorld world : worlds.values())
         {
-            TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-            markBiomeIdsAsFree(world);
+            if (world != null)
+            {
+                TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
+                markBiomeIdsAsFree(world);
+            }
         }
-
-        this.worldOrNull = null;
     }
 
     /**
@@ -140,18 +127,16 @@ public final class WorldLoader
 
     public ForgeWorld demandServerWorld(WorldServer mcWorld)
     {
-        ForgeWorld world = this.worldOrNull;
-        if (world == null) {
-            world = new ForgeWorld(WorldHelper.getName(mcWorld));
+        String worldName = WorldHelper.getName(mcWorld);
+        ForgeWorld world = new ForgeWorld(worldName);
 
-            TerrainControl.log(LogMarker.INFO, "Loading configs for world \"{}\"....", world.getName());
-            File worldConfigsDir = getWorldDir(world.getName());
-            ServerConfigProvider configs = new ServerConfigProvider(worldConfigsDir, world);
-            world.provideConfigs(configs);
-            this.worldOrNull = world;
-        }
+        TerrainControl.log(LogMarker.INFO,  "Loading configs for world \"{}\"....", world.getName());
 
+        File worldConfigsDir = getWorldDir(world.getName());
+        ServerConfigProvider configs = new ServerConfigProvider(worldConfigsDir, world);
+        world.provideConfigs(configs);
         world.provideWorldInstance(mcWorld);
+        worlds.put(worldName,  world);
 
         return world;
     }
@@ -166,11 +151,7 @@ public final class WorldLoader
         ForgeWorld world = new ForgeWorld(ConfigFile.readStringFromStream(wrappedStream));
         ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world);
         world.provideClientConfigs(mcWorld, configs);
-
-        if (this.worldOrNull == null)
-        {
-            this.worldOrNull = world;
-        }
+        worlds.put(world.getName(), world);
     }
 
 }

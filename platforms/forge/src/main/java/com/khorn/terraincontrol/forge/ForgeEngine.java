@@ -26,21 +26,6 @@ public class ForgeEngine extends TerrainControlEngine
         return worldLoader.getWorld(name);
     }
 
-    /**
-     * Gets the world loaded by Terrain Control.
-     * <p />
-     * Note: this method may be removed in the future, when multiworld support
-     * is introduced.
-     * <p/>
-     * <p>
-     * @return The world loaded by Terrain Control, or null if no world is
-     *         loaded.
-     */
-    public LocalWorld getWorld()
-    {
-        return worldLoader.getMainWorld();
-    }
-
     @Override
     public File getTCDataFolder()
     {
