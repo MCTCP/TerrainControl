@@ -418,11 +418,14 @@ public class BiomeConfig extends ConfigFile
         writer.putSetting(BiomeStandardValues.BIOME_SIZE, this.biomeSize,
                 "Biome size from 0 to GenerationDepth. Defines in which biome layer this biome will be generated (see GenerationDepth).",
                 "Higher numbers give a smaller biome, lower numbers a larger biome.",
-                "Note: only applies to biomes spawned as part of a BiomeGroup (see WorldConfig).",
-                "For biomes spawned as isles, borders or rivers other settings are available.",
-                "Isle biomes:   " + BiomeStandardValues.BIOME_SIZE_WHEN_ISLE + " (see below)",
-                "Border biomes: " + BiomeStandardValues.BIOME_SIZE_WHEN_BORDER + " (see below)",
-                "River biomes:  " + WorldStandardValues.RIVER_SIZE + " (see WorldConfig)");
+                "How this setting is used depends on the value of BiomeMode in the WorldConfig.",
+                "It will be used for:",
+                "- normal biomes, ice biomes, isle biomes and border biomes when BiomeMode is set to BeforeGroups",
+                "- biomes spawned as part of a BiomeGroup when BiomeMode is set to Normal.",
+                "  For biomes spawned as isles, borders or rivers other settings are available.",
+                "  Isle biomes:   " + BiomeStandardValues.BIOME_SIZE_WHEN_ISLE + " (see below)",
+                "  Border biomes: " + BiomeStandardValues.BIOME_SIZE_WHEN_BORDER + " (see below)",
+                "  River biomes:  " + WorldStandardValues.RIVER_SIZE + " (see WorldConfig)");
 
         writer.putSetting(BiomeStandardValues.BIOME_RARITY, this.biomeRarity,
                 "Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.",
@@ -455,14 +458,14 @@ public class BiomeConfig extends ConfigFile
                 "For example, Mushroom Isles spawn inside the Ocean biome.");
 
         writer.putSetting(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE, this.biomeSizeWhenIsle,
-                "Size of this biome when spawned as an ilse biome.",
+                "Size of this biome when spawned as an isle biome in BiomeMode: Normal.",
                 "Valid values range from 0 to GenerationDepth.",
                 "Larger numbers give *smaller* islands. The biome must be smaller than the biome it's going",
                 "to spawn in, so the " + BiomeStandardValues.BIOME_SIZE_WHEN_ISLE
                         + " number must be larger than the " + BiomeStandardValues.BIOME_SIZE + " of the other biome.");
 
         writer.putSetting(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE, this.biomeRarityWhenIsle,
-                "Rarity of this biome when spawned as an ilse biome.");
+                "Rarity of this biome when spawned as an isle biome in BiomeMode: Normal.");
 
         writer.smallTitle("Border biomes only",
                 "To spawn a biome as a border, you need to add it first to the",
@@ -479,7 +482,7 @@ public class BiomeConfig extends ConfigFile
                 "For example, the Beach biome will never spawn next to an Extreme Hills biome.");
 
         writer.putSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, this.biomeSizeWhenBorder,
-                "Size of this biome when spawned as a border biome.",
+                "Size of this biome when spawned as a border biome in BiomeMode: Normal.",
                 "Valid values range from 0 to GenerationDepth.",
                 "Larger numbers give *smaller* borders. The biome must be smaller than the biome it's going",
                 "to spawn in, so the " + BiomeStandardValues.BIOME_SIZE_WHEN_BORDER
