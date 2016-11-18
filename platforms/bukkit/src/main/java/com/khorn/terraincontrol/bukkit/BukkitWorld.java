@@ -19,9 +19,9 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
-import net.minecraft.server.v1_10_R1.*;
-import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_10_R1.generator.CustomChunkGenerator;
+import net.minecraft.server.v1_11_R1.*;
+import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_11_R1.generator.CustomChunkGenerator;
 
 import java.util.*;
 
@@ -477,8 +477,8 @@ public class BukkitWorld implements LocalWorld
                 }
             }
 
-            // Update client
-            world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2);
+            // Notify world: (2 | 16) == update client, don't update observers
+            world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2 | 16);
         } catch (Throwable t)
         {
             String populatingChunkInfo = this.chunkCache == null? "(no chunk)" :

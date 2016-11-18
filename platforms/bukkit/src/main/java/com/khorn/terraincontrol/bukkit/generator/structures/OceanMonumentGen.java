@@ -4,10 +4,8 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_10_R1.BiomeBase;
-import net.minecraft.server.v1_10_R1.StructureGenerator;
-import net.minecraft.server.v1_10_R1.StructureStart;
-import net.minecraft.server.v1_10_R1.WorldGenMonument.WorldGenMonumentStart;
+import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_11_R1.WorldGenMonument.WorldGenMonumentStart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +44,12 @@ public class OceanMonumentGen extends StructureGenerator
 
             monumentSpawnBiomes.add(((BukkitBiome) biome).getHandle());
         }
+    }
+
+    public BlockPosition getNearestGeneratedFeature(World var1, BlockPosition var2, boolean var3)
+    {
+        this.g = var1;
+        return a(var1, this, var2, this.gridSize, this.gridSize - this.randomOffset - 1, 10387313, true, 100, var3);
     }
 
     @Override

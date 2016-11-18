@@ -8,11 +8,11 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_10_R1.*;
-import net.minecraft.server.v1_10_R1.WorldGenRegistration.WorldGenJungleTemple;
-import net.minecraft.server.v1_10_R1.WorldGenRegistration.WorldGenPyramidPiece;
-import net.minecraft.server.v1_10_R1.WorldGenRegistration.WorldGenWitchHut;
-import net.minecraft.server.v1_10_R1.WorldGenRegistration.b;
+import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_11_R1.WorldGenRegistration.WorldGenJungleTemple;
+import net.minecraft.server.v1_11_R1.WorldGenRegistration.WorldGenPyramidPiece;
+import net.minecraft.server.v1_11_R1.WorldGenRegistration.WorldGenWitchHut;
+import net.minecraft.server.v1_11_R1.WorldGenRegistration.b;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +50,12 @@ public class RareBuildingGen extends StructureGenerator
         // Minecraft's internal minimum distance is one chunk lower than TC's
         // value
         this.minDistanceBetweenScatteredFeatures = configs.getWorldConfig().minimumDistanceBetweenRareBuildings - 1;
+    }
+
+    public BlockPosition getNearestGeneratedFeature(World world, BlockPosition blockposition, boolean flag)
+    {
+        this.g = world;
+        return a(world, this, blockposition, this.maxDistanceBetweenScatteredFeatures, this.minDistanceBetweenScatteredFeatures - 1, 14357617, false, 100, flag);
     }
 
     @Override

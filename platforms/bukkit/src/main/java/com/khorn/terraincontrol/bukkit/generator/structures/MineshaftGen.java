@@ -7,7 +7,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.MineshaftType;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_10_R1.*;
+import net.minecraft.server.v1_11_R1.*;
 
 import java.util.Random;
 
@@ -35,6 +35,39 @@ public class MineshaftGen extends StructureGenerator
         }
 
         return false;
+    }
+
+    public BlockPosition getNearestGeneratedFeature(World var1, BlockPosition var2, boolean var3)
+    {
+        boolean var4 = true;
+        int var5 = var2.getX() >> 4;
+        int var6 = var2.getZ() >> 4;
+
+        for (int var7 = 0; var7 <= 1000; ++var7)
+        {
+            for (int var8 = -var7; var8 <= var7; ++var8)
+            {
+                boolean var9 = var8 == -var7 || var8 == var7;
+
+                for (int var10 = -var7; var10 <= var7; ++var10)
+                {
+                    boolean var11 = var10 == -var7 || var10 == var7;
+                    if (var9 || var11)
+                    {
+                        int var12 = var5 + var8;
+                        int var13 = var6 + var10;
+                        this.f.setSeed((long)(var12 ^ var13) ^ var1.getSeed());
+                        this.f.nextInt();
+                        if (this.a(var12, var13) && (!var3 || !var1.b(var12, var13)))
+                        {
+                            return new BlockPosition((var12 << 4) + 8, 64, (var13 << 4) + 8);
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     @Override

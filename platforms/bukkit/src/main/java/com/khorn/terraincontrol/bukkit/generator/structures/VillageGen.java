@@ -13,16 +13,10 @@ import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 
-import net.minecraft.server.v1_10_R1.BiomeBase;
-import net.minecraft.server.v1_10_R1.NBTTagCompound;
-import net.minecraft.server.v1_10_R1.StructureGenerator;
-import net.minecraft.server.v1_10_R1.StructurePiece;
-import net.minecraft.server.v1_10_R1.StructureStart;
-import net.minecraft.server.v1_10_R1.World;
-import net.minecraft.server.v1_10_R1.WorldGenVillagePieces;
-import net.minecraft.server.v1_10_R1.WorldGenVillagePieces.WorldGenVillagePieceWeight;
-import net.minecraft.server.v1_10_R1.WorldGenVillagePieces.WorldGenVillageRoadPiece;
-import net.minecraft.server.v1_10_R1.WorldGenVillagePieces.WorldGenVillageStartPiece;
+import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillagePieceWeight;
+import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillageRoadPiece;
+import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillageStartPiece;
 
 public class VillageGen extends StructureGenerator
 {
@@ -56,6 +50,12 @@ public class VillageGen extends StructureGenerator
                 villageSpawnBiomes.add(((BukkitBiome) biome).getHandle());
             }
         }
+    }
+
+    public BlockPosition getNearestGeneratedFeature(World world, BlockPosition blockposition, boolean flag)
+    {
+        this.g = world;
+        return a(world, this, blockposition, this.distance, this.minimumDistance, 10387312, false, 100, flag);
     }
 
     @Override

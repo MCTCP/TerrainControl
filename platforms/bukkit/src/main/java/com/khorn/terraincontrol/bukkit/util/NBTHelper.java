@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.util;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
-import net.minecraft.server.v1_10_R1.*;
+import net.minecraft.server.v1_11_R1.*;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -161,7 +161,7 @@ public class NBTHelper
                 float theFloat = ((NBTTagFloat) nmsTag).i();
                 return theFloat;
             case TAG_Double:
-                double theDouble = ((NBTTagDouble) nmsTag).h();
+                double theDouble = ((NBTTagDouble) nmsTag).asDouble();
                 return theDouble;
             case TAG_Byte_Array:
                 byte[] theByteArray = ((NBTTagByteArray) nmsTag).c();
