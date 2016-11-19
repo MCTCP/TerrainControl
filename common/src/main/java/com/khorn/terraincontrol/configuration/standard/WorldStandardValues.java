@@ -57,7 +57,7 @@ public class WorldStandardValues extends Settings
             WORLD_HEIGHT_CAP_BITS = intSetting("WorldHeightCapBits", 8, 5, 8),
             GENERATION_DEPTH = intSetting("GenerationDepth", 10, 1, 20),
             BIOME_RARITY_SCALE = intSetting("BiomeRarityScale", 100, 1, Integer.MAX_VALUE),
-            LAND_RARITY = intSetting("LandRarity", 97, 1, 100),
+            LAND_RARITY = intSetting("LandRarity", 99, 1, 100),
             LAND_SIZE = intSetting("LandSize", 0, 0, 20),
             LAND_FUZZY = intSetting("LandFuzzy", 6, 0, 20),
             ICE_RARITY = intSetting("IceRarity", 90, 1, 100),
