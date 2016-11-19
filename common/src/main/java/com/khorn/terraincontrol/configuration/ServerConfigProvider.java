@@ -199,9 +199,6 @@ public final class ServerConfigProvider implements ConfigProvider
 
         for (BiomeConfigStub biomeConfigStub : biomeConfigStubs.values())
         {
-            // Allow to let world settings influence biome settings
-            biomeConfigStub.getSettings().setFallback(worldConfigSettings);
-
             // Inheritance
             processInheritance(biomeConfigStubs, biomeConfigStub, 0);
 
