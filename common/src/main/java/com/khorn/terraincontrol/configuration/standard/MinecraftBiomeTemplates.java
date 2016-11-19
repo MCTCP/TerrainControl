@@ -512,6 +512,7 @@ public class MinecraftBiomeTemplates
             this.defaultTree = new Object[] {20, TreeType.HugeMushroom, 3, TreeType.DarkOak, 66, TreeType.Birch, 20, TreeType.Tree, 100};
             this.defaultTallFlowers = 1;
             this.defaultPoppies = 4;
+            this.defaultMansions = true;
         }
     }
 

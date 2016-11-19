@@ -37,9 +37,9 @@ public class MineshaftGen extends StructureGenerator
         return false;
     }
 
+    @Override
     public BlockPosition getNearestGeneratedFeature(World var1, BlockPosition var2, boolean var3)
     {
-        boolean var4 = true;
         int var5 = var2.getX() >> 4;
         int var6 = var2.getZ() >> 4;
 
@@ -56,7 +56,7 @@ public class MineshaftGen extends StructureGenerator
                     {
                         int var12 = var5 + var8;
                         int var13 = var6 + var10;
-                        this.f.setSeed((long)(var12 ^ var13) ^ var1.getSeed());
+                        this.f.setSeed(var12 ^ var13 ^ var1.getSeed());
                         this.f.nextInt();
                         if (this.a(var12, var13) && (!var3 || !var1.b(var12, var13)))
                         {

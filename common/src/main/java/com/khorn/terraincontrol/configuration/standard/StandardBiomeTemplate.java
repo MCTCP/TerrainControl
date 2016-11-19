@@ -79,6 +79,7 @@ public class StandardBiomeTemplate
     public int defaultFoliageColor = 0xFFFFFF;
     public boolean defaultStrongholds = true;
     public boolean defaultOceanMonuments = false;
+    public boolean defaultMansions = false;
     public VillageType defaultVillageType = VillageType.disabled;
     public RareBuildingType defaultRareBuildingType = RareBuildingType.disabled;
     public MineshaftType defaultMineshaftType = MineshaftType.normal;

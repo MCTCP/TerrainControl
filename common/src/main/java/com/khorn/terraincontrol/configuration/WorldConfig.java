@@ -126,11 +126,15 @@ public class WorldConfig extends ConfigFile
     public int villageSize;
     public int villageDistance; // Has a minimum of 9
 
-    // Pyramids (also swamp huts and jungle temples)
+    // Rare buildings (also swamp huts and jungle temples)
     public boolean rareBuildingsEnabled;
-    public int minimumDistanceBetweenRareBuildings; // Minecraft's internal
-    // value is 1 chunk lower
+    public int minimumDistanceBetweenRareBuildings;
     public int maximumDistanceBetweenRareBuildings;
+
+    // Mansions
+    public boolean mansionsEnabled;
+    public int minimumDistanceBetweenMansions;
+    public int maximumDistanceBetweenMansions;
 
     // Ocean monuments
     public boolean oceanMonumentsEnabled;
@@ -331,6 +335,7 @@ public class WorldConfig extends ConfigFile
         waterLevelMax = higherThanOrEqualTo(waterLevelMax, waterLevelMin);
 
         maximumDistanceBetweenRareBuildings = higherThanOrEqualTo(maximumDistanceBetweenRareBuildings, minimumDistanceBetweenRareBuildings);
+        maximumDistanceBetweenMansions = higherThanOrEqualTo(maximumDistanceBetweenMansions, minimumDistanceBetweenMansions);
         oceanMonumentRandomOffset = lowerThanOrEqualTo(oceanMonumentRandomOffset, oceanMonumentGridSize);
 
         if (biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && ModeTerrain != TerrainMode.OldGenerator)
@@ -430,6 +435,10 @@ public class WorldConfig extends ConfigFile
         this.rareBuildingsEnabled = reader.getSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED);
         this.minimumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
         this.maximumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
+
+        this.mansionsEnabled = reader.getSetting(WorldStandardValues.MANSIONS_ENABLED);
+        this.minimumDistanceBetweenMansions = reader.getSetting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_MANSIONS);
+        this.maximumDistanceBetweenMansions = reader.getSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_MANSIONS);
 
         this.oceanMonumentsEnabled = reader.getSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED);
         this.oceanMonumentRandomOffset = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET);
@@ -897,6 +906,19 @@ public class WorldConfig extends ConfigFile
 
         writer.putSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.maximumDistanceBetweenRareBuildings,
                 "The maximum distance between rare buildings in chunks.");
+
+        // Mansions
+        writer.smallTitle("Mansions",
+                "Woodland mansions are big houses inhabited by illagers that normally spawn in the roofed forest biome.");
+
+        writer.putSetting(WorldStandardValues.MANSIONS_ENABLED, this.mansionsEnabled, "Whether mansions are enabled.");
+
+        writer.putSetting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_MANSIONS, this.minimumDistanceBetweenMansions,
+                "The minimum distance between the origin of mansions in chunks. Note that mansions",
+                "may spawn a few chunks from their origin, so this value is not entirely accurate.");
+
+        writer.putSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_MANSIONS, this.maximumDistanceBetweenMansions,
+                "The maximum distance between the origin of mansions in chunks.");
 
         // Ocean monuments
         writer.smallTitle("Ocean monuments");

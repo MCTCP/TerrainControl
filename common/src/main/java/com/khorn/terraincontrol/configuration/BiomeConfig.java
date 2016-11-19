@@ -112,6 +112,7 @@ public class BiomeConfig extends ConfigFile
     public boolean strongholdsEnabled;
     public boolean oceanMonumentsEnabled;
     public boolean netherFortressesEnabled;
+    public boolean mansionsEnabled;
 
     public enum VillageType
     {
@@ -301,6 +302,8 @@ public class BiomeConfig extends ConfigFile
         this.strongholdsEnabled = settings.getSetting(BiomeStandardValues.STRONGHOLDS_ENABLED, defaultSettings.defaultStrongholds);
         this.oceanMonumentsEnabled = settings.getSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, defaultSettings.defaultOceanMonuments);
         this.netherFortressesEnabled = settings.getSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, true);
+        this.mansionsEnabled = settings.getSetting(BiomeStandardValues.MANSIONS_ENABLED,
+                defaultSettings.defaultMansions);
         this.villageType = settings.getSetting(BiomeStandardValues.VILLAGE_TYPE, defaultSettings.defaultVillageType);
         this.mineshaftsRarity = settings.getSetting(BiomeStandardValues.MINESHAFT_RARITY);
         this.mineshaftType = settings.getSetting(BiomeStandardValues.MINESHAFT_TYPE, defaultSettings.defaultMineshaftType);
@@ -740,6 +743,9 @@ public class BiomeConfig extends ConfigFile
 
         writer.putSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, netherFortressesEnabled,
                 "Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
+
+        writer.putSetting(BiomeStandardValues.MANSIONS_ENABLED, mansionsEnabled,
+                "Whether Woodland Mansions are enabled in this biome.");
 
         writer.putSetting(BiomeStandardValues.VILLAGE_TYPE, villageType,
                 "The village type in this biome. Can be wood, sandstone or disabled.");

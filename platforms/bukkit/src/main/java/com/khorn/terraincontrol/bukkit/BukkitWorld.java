@@ -49,7 +49,8 @@ public class BukkitWorld implements LocalWorld
     public StrongholdGen strongholdGen;
     public VillageGen villageGen;
     public MineshaftGen mineshaftGen;
-    public RareBuildingGen pyramidsGen;
+    public RareBuildingGen rareBuildingGen;
+    public MansionGen mansionGen;
     public NetherFortressGen netherFortressGen;
     public OceanMonumentGen oceanMonumentGen;
 
@@ -171,11 +172,13 @@ public class BukkitWorld implements LocalWorld
         if (worldConfig.villagesEnabled && dry)
             this.villageGen.a(this.world, chunkX, chunkZ, null);
         if (worldConfig.rareBuildingsEnabled)
-            this.pyramidsGen.a(this.world, chunkX, chunkZ, null);
+            this.rareBuildingGen.a(this.world, chunkX, chunkZ, null);
         if (worldConfig.netherFortressesEnabled)
             this.netherFortressGen.a(this.world, chunkX, chunkZ, null);
         if (worldConfig.oceanMonumentsEnabled)
             this.oceanMonumentGen.a(this.world, chunkX, chunkZ, null);
+        if (worldConfig.mansionsEnabled)
+            this.mansionGen.a(this.world, chunkX, chunkZ, null);
     }
 
     @Override
@@ -256,11 +259,13 @@ public class BukkitWorld implements LocalWorld
         if (worldConfig.villagesEnabled)
             villageGenerated = this.villageGen.a(this.world, random, chunkIntPair);
         if (worldConfig.rareBuildingsEnabled)
-            this.pyramidsGen.a(this.world, random, chunkIntPair);
+            this.rareBuildingGen.a(this.world, random, chunkIntPair);
         if (worldConfig.netherFortressesEnabled)
             this.netherFortressGen.a(this.world, random, chunkIntPair);
         if (worldConfig.oceanMonumentsEnabled)
             this.oceanMonumentGen.a(this.world, random, chunkIntPair);
+        if (worldConfig.mansionsEnabled)
+            this.mansionGen.a(this.world, random, chunkIntPair);
 
         return villageGenerated;
     }
@@ -730,7 +735,8 @@ public class BukkitWorld implements LocalWorld
                     this.strongholdGen = new StrongholdGen(settings);
                     this.villageGen = new VillageGen(settings);
                     this.mineshaftGen = new MineshaftGen();
-                    this.pyramidsGen = new RareBuildingGen(settings);
+                    this.rareBuildingGen = new RareBuildingGen(settings);
+                    this.mansionGen = new MansionGen(settings);
                     this.netherFortressGen = new NetherFortressGen();
                     this.oceanMonumentGen = new OceanMonumentGen(settings);
 

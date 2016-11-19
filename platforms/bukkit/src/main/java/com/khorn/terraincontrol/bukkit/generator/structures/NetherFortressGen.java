@@ -63,9 +63,9 @@ public class NetherFortressGen extends StructureGenerator
         }
     }
 
+    @Override
     public BlockPosition getNearestGeneratedFeature(World var1, BlockPosition var2, boolean var3)
     {
-        boolean var4 = true;
         int var5 = var2.getX() >> 4;
         int var6 = var2.getZ() >> 4;
 

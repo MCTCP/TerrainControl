@@ -4,11 +4,11 @@ import static com.khorn.terraincontrol.TerrainControl.WORLD_DEPTH;
 import static com.khorn.terraincontrol.TerrainControl.WORLD_HEIGHT;
 
 import com.khorn.terraincontrol.LocalMaterialData;
-import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix;
-import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.BiomeConfig.MineshaftType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
+import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix;
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.settingType.DoubleArraySetting;
 import com.khorn.terraincontrol.configuration.settingType.MaterialSetting;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
@@ -34,7 +34,8 @@ public class BiomeStandardValues extends Settings
             DISABLE_BIOME_HEIGHT = booleanSetting("DisableBiomeHeight", false),
             STRONGHOLDS_ENABLED = WorldStandardValues.STRONGHOLDS_ENABLED,
             NETHER_FORTRESSES_ENABLED = WorldStandardValues.NETHER_FORTRESSES_ENABLED,
-            OCEAN_MONUMENTS_ENABLED = WorldStandardValues.OCEAN_MONUMENTS_ENABLED;
+            OCEAN_MONUMENTS_ENABLED = WorldStandardValues.OCEAN_MONUMENTS_ENABLED,
+            MANSIONS_ENABLED = WorldStandardValues.MANSIONS_ENABLED;
 
     public static final Setting<String>
             BIOME_CONFIG_EXTENSION = stringSetting("BiomeConfigExtension", ".bc"),

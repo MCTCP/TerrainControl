@@ -20,6 +20,7 @@ public class StructureNames
     public static final String STRONGHOLD = "Stronghold";
     public static final String RARE_BUILDING = "TCTemple";
     public static final String OCEAN_MONUMENT = "Monument";
+    public static final String MANSION = "Mansion";
 
     private StructureNames()
     {
