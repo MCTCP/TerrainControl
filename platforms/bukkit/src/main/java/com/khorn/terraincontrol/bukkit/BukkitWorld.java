@@ -1,10 +1,7 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.*;
-import com.khorn.terraincontrol.bukkit.generator.BukkitVanillaBiomeGenerator;
-import com.khorn.terraincontrol.bukkit.generator.TXChunkGenerator;
-import com.khorn.terraincontrol.bukkit.generator.TXWorldChunkManager;
-import com.khorn.terraincontrol.bukkit.generator.TXWorldProvider;
+import com.khorn.terraincontrol.bukkit.generator.*;
 import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.*;
@@ -741,7 +738,7 @@ public class BukkitWorld implements LocalWorld
                     this.oceanMonumentGen = new TXOceanMonumentGen(settings);
 
                     // Inject our own ChunkGenerator
-                    injectStrongholdGenerator(this.strongholdGen);
+                    injectInternalChunkGenerator(new TXInternalChunkGenerator(this, generator));
                 case NotGenerate:
                 case TerrainTest:
                     this.generator.onInitialize(this);
@@ -802,13 +799,14 @@ public class BukkitWorld implements LocalWorld
         }
     }
 
-    private void injectStrongholdGenerator(WorldGenStronghold strongholdGen)
+    private void injectInternalChunkGenerator(CustomChunkGenerator chunkGenerator)
     {
         ChunkProviderServer chunkProvider = this.world.getChunkProviderServer();
-        ChunkGenerator chunkGenerator = chunkProvider.chunkGenerator;
+        ChunkGenerator oldChunkGenerator = chunkProvider.chunkGenerator;
 
-        if (chunkGenerator instanceof CustomChunkGenerator) {
-            ReflectionHelper.setValueInFieldOfType(chunkGenerator, WorldGenStronghold.class, strongholdGen);
+        if (oldChunkGenerator instanceof CustomChunkGenerator)
+        {
+            ReflectionHelper.setValueInFieldOfType(chunkProvider, ChunkGenerator.class, chunkGenerator);
         }
     }
 
@@ -823,8 +821,8 @@ public class BukkitWorld implements LocalWorld
             world.worldProvider = ((TXWorldProvider) world.worldProvider).getOldWorldProvider();
         }
 
-        // Restore vanilla stronghold generator
-        this.injectStrongholdGenerator(new WorldGenStronghold());
+        // Restore vanilla chunk generator
+        this.injectInternalChunkGenerator(new CustomChunkGenerator(world, getSeed(), generator));
     }
 
     public void setChunkGenerator(TXChunkGenerator _generator)
