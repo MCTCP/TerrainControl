@@ -5,8 +5,8 @@ import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
-import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
-import com.khorn.terraincontrol.forge.generator.ChunkProvider;
+import com.khorn.terraincontrol.forge.generator.TXBiome;
+import com.khorn.terraincontrol.forge.generator.TXChunkGenerator;
 import com.khorn.terraincontrol.forge.generator.structure.*;
 import com.khorn.terraincontrol.forge.util.NBTHelper;
 import com.khorn.terraincontrol.generator.SpawnableObject;
@@ -43,7 +43,7 @@ import java.util.*;
 public class ForgeWorld implements LocalWorld
 {
 
-    private ChunkProvider generator;
+    private TXChunkGenerator generator;
     private World world;
     private ConfigProvider settings;
     private CustomObjectStructureCache structureCache;
@@ -59,12 +59,12 @@ public class ForgeWorld implements LocalWorld
 
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
-    public StrongholdGen strongholdGen;
-    public VillageGen villageGen;
-    public MineshaftGen mineshaftGen;
-    public RareBuildingGen rareBuildingGen;
-    public NetherFortressGen netherFortressGen;
-    public OceanMonumentGen oceanMonumentGen;
+    public TXStrongholdGen strongholdGen;
+    public TXVillageGen villageGen;
+    public TXMineshaftGen mineshaftGen;
+    public TXRareBuildingGen rareBuildingGen;
+    public TXNetherFortressGen netherFortressGen;
+    public TXOceanMonumentGen oceanMonumentGen;
 
     private WorldGenDungeons dungeonGen;
     private WorldGenFossils fossilGen;
@@ -98,7 +98,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        Biome biome = BiomeGenCustom.getOrCreateBiome(biomeConfig, biomeIds);
+        Biome biome = TXBiome.getOrCreateBiome(biomeConfig, biomeIds);
 
         int requestedGenerationId = biomeIds.getGenerationId();
         int allocatedGenerationId = Biome.getIdForBiome(biome);
@@ -636,7 +636,7 @@ public class ForgeWorld implements LocalWorld
         return settings.getWorldConfig().worldHeightScale;
     }
 
-    public ChunkProvider getChunkGenerator()
+    public TXChunkGenerator getChunkGenerator()
     {
         return this.generator;
     }
@@ -681,13 +681,13 @@ public class ForgeWorld implements LocalWorld
 
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
-        this.strongholdGen = new StrongholdGen(configs);
+        this.strongholdGen = new TXStrongholdGen(configs);
 
-        this.villageGen = new VillageGen(configs);
-        this.mineshaftGen = new MineshaftGen();
-        this.rareBuildingGen = new RareBuildingGen(configs);
-        this.netherFortressGen = new NetherFortressGen();
-        this.oceanMonumentGen = new OceanMonumentGen(configs);
+        this.villageGen = new TXVillageGen(configs);
+        this.mineshaftGen = new TXMineshaftGen();
+        this.rareBuildingGen = new TXRareBuildingGen(configs);
+        this.netherFortressGen = new TXNetherFortressGen();
+        this.oceanMonumentGen = new TXOceanMonumentGen(configs);
 
         IBlockState jungleLog = Blocks.LOG.getDefaultState()
                 .withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.JUNGLE);
@@ -712,7 +712,7 @@ public class ForgeWorld implements LocalWorld
         this.jungleTree = new WorldGenMegaJungle(false, 10, 20, jungleLog, jungleLeaves);
         this.groundBush = new WorldGenShrub(jungleLog, jungleLeaves);
 
-        this.generator = new ChunkProvider(this);
+        this.generator = new TXChunkGenerator(this);
     }
 
     public void setBiomeManager(BiomeGenerator manager)

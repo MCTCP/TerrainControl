@@ -21,7 +21,7 @@ import java.util.Random;
  * separation - 1</code>
  *
  */
-public class OceanMonumentGen extends StructureGenerator
+public class TXOceanMonumentGen extends StructureGenerator
 {
 
     private final List<BiomeBase> monumentSpawnBiomes;
@@ -29,7 +29,7 @@ public class OceanMonumentGen extends StructureGenerator
     private int randomOffset;
     private int gridSize;
 
-    public OceanMonumentGen(ConfigProvider settings)
+    public TXOceanMonumentGen(ConfigProvider settings)
     {
         this.gridSize = settings.getWorldConfig().oceanMonumentGridSize;
         this.randomOffset = settings.getWorldConfig().oceanMonumentRandomOffset;

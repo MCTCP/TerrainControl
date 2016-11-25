@@ -17,12 +17,12 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
-final class TCCommandHandler implements ICommand
+final class TXCommandHandler implements ICommand
 {
     private final List<String> aliases = Arrays.asList("tc");
     private final WorldLoader worldLoader;
 
-    TCCommandHandler(WorldLoader worldLoader)
+    TXCommandHandler(WorldLoader worldLoader)
     {
         this.worldLoader = Preconditions.checkNotNull(worldLoader);
     }

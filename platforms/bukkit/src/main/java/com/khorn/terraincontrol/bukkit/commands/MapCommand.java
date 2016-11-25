@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
 import com.khorn.terraincontrol.bukkit.TCPerm;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.bukkit.commands.runnable.MapWriter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class MapCommand extends BaseCommand
 {
-    public MapCommand(TCPlugin _plugin)
+    public MapCommand(TXPlugin _plugin)
     {
         super(_plugin);
         name = "map";

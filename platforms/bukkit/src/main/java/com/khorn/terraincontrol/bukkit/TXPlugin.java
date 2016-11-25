@@ -1,12 +1,12 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.bukkit.commands.TCCommandExecutor;
+import com.khorn.terraincontrol.bukkit.commands.TXCommandExecutor;
 import com.khorn.terraincontrol.bukkit.events.TCListener;
 import com.khorn.terraincontrol.bukkit.generator.BukkitVanillaBiomeGenerator;
-import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
-import com.khorn.terraincontrol.bukkit.generator.structures.RareBuildingGen.RareBuildingStart;
-import com.khorn.terraincontrol.bukkit.generator.structures.VillageGen.VillageStart;
+import com.khorn.terraincontrol.bukkit.generator.TXChunkGenerator;
+import com.khorn.terraincontrol.bukkit.generator.structures.TXRareBuildingGen.RareBuildingStart;
+import com.khorn.terraincontrol.bukkit.generator.structures.TXVillageGen.VillageStart;
 import com.khorn.terraincontrol.bukkit.metrics.BukkitMetricsHelper;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
@@ -26,11 +26,11 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class TCPlugin extends JavaPlugin
+public class TXPlugin extends JavaPlugin
 {
 
     public TCListener listener;
-    public TCCommandExecutor commandExecutor;
+    public TXCommandExecutor commandExecutor;
 
     /*
      * Debug setting. Set it to true to make Terrain Control try to disable
@@ -94,7 +94,7 @@ public class TCPlugin extends JavaPlugin
             }
 
             // Start the engine
-            this.commandExecutor = new TCCommandExecutor(this);
+            this.commandExecutor = new TXCommandExecutor(this);
             this.listener = new TCListener(this);
             Bukkit.getMessenger().registerOutgoingPluginChannel(this, PluginStandardValues.ChannelName);
 
@@ -117,7 +117,7 @@ public class TCPlugin extends JavaPlugin
         if (worldName.isEmpty())
         {
             TerrainControl.log(LogMarker.DEBUG, "Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
-            return new TCChunkGenerator(this);
+            return new TXChunkGenerator(this);
         }
 
         // Check if not already enabled
@@ -142,14 +142,14 @@ public class TCPlugin extends JavaPlugin
         this.notInitedWorlds.put(worldName, localWorld);
 
         // Get the right chunk generator
-        TCChunkGenerator generator = null;
+        TXChunkGenerator generator = null;
         switch (configs.getWorldConfig().ModeTerrain)
         {
             case Normal:
             case TerrainTest:
             case OldGenerator:
             case NotGenerate:
-                generator = new TCChunkGenerator(this);
+                generator = new TXChunkGenerator(this);
                 break;
             case Default:
                 break;

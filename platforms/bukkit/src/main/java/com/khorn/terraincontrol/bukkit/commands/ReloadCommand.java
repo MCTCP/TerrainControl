@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.commands;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.logging.LogMarker;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,7 +13,7 @@ import java.util.List;
 public class ReloadCommand extends BaseCommand
 {
     
-    public ReloadCommand(TCPlugin _plugin)
+    public ReloadCommand(TXPlugin _plugin)
     {
         super(_plugin);
         name = "reload";

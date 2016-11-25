@@ -20,14 +20,14 @@ import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
 
-public class OceanMonumentGen extends MapGenStructure
+public class TXOceanMonumentGen extends MapGenStructure
 {
     private int gridSize;
     private int randomOffset;
     private final List<Biome> monumentSpawnBiomes;
     private final List<SpawnListEntry> mobList;
 
-    public OceanMonumentGen(ConfigProvider settings)
+    public TXOceanMonumentGen(ConfigProvider settings)
     {
         this.gridSize = settings.getWorldConfig().oceanMonumentGridSize;
         this.randomOffset = settings.getWorldConfig().oceanMonumentRandomOffset;

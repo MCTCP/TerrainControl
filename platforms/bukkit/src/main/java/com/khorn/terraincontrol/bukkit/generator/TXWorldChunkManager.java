@@ -17,12 +17,12 @@ import java.util.Random;
  * BiomeGenerator. This class provides a bridge between the two, allowing us to
  * use custom biome generators.
  */
-public class TCWorldChunkManager extends WorldChunkManager
+public class TXWorldChunkManager extends WorldChunkManager
 {
     private BukkitWorld localWorld;
     private BiomeGenerator biomeGenerator;
 
-    public TCWorldChunkManager(BukkitWorld world, BiomeGenerator biomeGenerator)
+    public TXWorldChunkManager(BukkitWorld world, BiomeGenerator biomeGenerator)
     {
         this.localWorld = world;
         this.biomeGenerator = biomeGenerator;

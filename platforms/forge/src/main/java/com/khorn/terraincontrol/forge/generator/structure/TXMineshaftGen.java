@@ -13,7 +13,7 @@ import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureMineshaftStart;
 import net.minecraft.world.gen.structure.StructureStart;
 
-public class MineshaftGen extends MapGenStructure
+public class TXMineshaftGen extends MapGenStructure
 {
     @Override
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)

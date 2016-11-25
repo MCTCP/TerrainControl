@@ -40,7 +40,7 @@ public class BukkitBiome implements LocalBiome
      */
     public static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        return new BukkitBiome(biomeConfig, CustomBiome.createInstance(biomeConfig, biomeIds));
+        return new BukkitBiome(biomeConfig, TXBiomeBase.createInstance(biomeConfig, biomeIds));
     }
 
     protected BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
@@ -49,7 +49,7 @@ public class BukkitBiome implements LocalBiome
         int savedBiomeId =  BiomeBase.a(biomeBase);
         this.biomeIds = new BiomeIds(WorldHelper.getGenerationId(biomeBase), savedBiomeId);
         this.biomeConfig = biomeConfig;
-        this.isCustom = biome instanceof CustomBiome;
+        this.isCustom = biome instanceof TXBiomeBase;
     }
 
     @Override

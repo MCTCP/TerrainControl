@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Used for all custom biomes.
  */
-public class BiomeGenCustom extends Biome
+public class TXBiome extends Biome
 {
     /**
      * Extension of BiomeProperties so that we are able to access the protected
@@ -74,7 +74,7 @@ public class BiomeGenCustom extends Biome
         }
 
         // No existing biome, create new one
-        BiomeGenCustom biome = new BiomeGenCustom(biomeConfig, registryKey, biomeIds);
+        TXBiome biome = new TXBiome(biomeConfig, registryKey, biomeIds);
         if (!biomeIds.isVirtual()) {
             registry.register(biomeIds.getGenerationId(), biome.getRegistryName(), biome);
         }
@@ -85,7 +85,7 @@ public class BiomeGenCustom extends Biome
 
     public final int generationId;
 
-    public BiomeGenCustom(BiomeConfig config, ResourceLocation registryKey, BiomeIds id)
+    public TXBiome(BiomeConfig config, ResourceLocation registryKey, BiomeIds id)
     {
         super(new BiomePropertiesCustom(config));
         setRegistryName(registryKey);

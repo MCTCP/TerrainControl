@@ -6,7 +6,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
-import com.khorn.terraincontrol.forge.generator.TCBiomeProvider;
+import com.khorn.terraincontrol.forge.generator.TXBiomeProvider;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 
@@ -18,12 +18,12 @@ import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TCWorldType extends WorldType
+public class TXWorldType extends WorldType
 {
 
     private final WorldLoader worldLoader;
 
-    public TCWorldType(WorldLoader worldLoader)
+    public TXWorldType(WorldLoader worldLoader)
     {
         super(PluginStandardValues.PLUGIN_NAME);
         this.worldLoader = Preconditions.checkNotNull(worldLoader, "worldLoader");
@@ -75,7 +75,7 @@ public class TCWorldType extends WorldType
             return worldChunkManager;
         } else
         {
-            return new TCBiomeProvider(world, biomeGenerator);
+            return new TXBiomeProvider(world, biomeGenerator);
         }
     }
 

@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit.commands;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.util.Rotation;
 import org.bukkit.Material;
@@ -17,7 +17,7 @@ import java.util.Random;
 
 public class SpawnCommand extends BaseCommand
 {
-    public SpawnCommand(TCPlugin _plugin)
+    public SpawnCommand(TXPlugin _plugin)
     {
         super(_plugin);
         name = "spawn";

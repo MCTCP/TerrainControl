@@ -11,7 +11,7 @@ import net.minecraft.server.v1_11_R1.*;
 
 import java.util.Random;
 
-public class MineshaftGen extends StructureGenerator
+public class TXMineshaftGen extends StructureGenerator
 {
     // canSpawnStructureAtCoords
     @Override

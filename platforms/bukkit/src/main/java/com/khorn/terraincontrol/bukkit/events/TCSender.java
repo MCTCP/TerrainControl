@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.bukkit.events;
 
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.ConfigToNetworkSender;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
@@ -16,9 +16,9 @@ import java.io.IOException;
 public class TCSender
 {
     
-    private TCPlugin plugin;
+    private TXPlugin plugin;
 
-    public TCSender(TCPlugin plugin)
+    public TCSender(TXPlugin plugin)
     {
         this.plugin = plugin;
     }

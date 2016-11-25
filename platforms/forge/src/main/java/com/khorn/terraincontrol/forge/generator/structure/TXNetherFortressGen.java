@@ -16,11 +16,11 @@ import net.minecraft.world.gen.structure.StructureStart;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NetherFortressGen extends MapGenStructure
+public class TXNetherFortressGen extends MapGenStructure
 {
     public List<SpawnListEntry> spawnList = new ArrayList<SpawnListEntry>();
 
-    public NetherFortressGen()
+    public TXNetherFortressGen()
     {
         this.spawnList.add(new SpawnListEntry(EntityBlaze.class, 10, 2, 3));
         this.spawnList.add(new SpawnListEntry(EntityPigZombie.class, 5, 4, 4));

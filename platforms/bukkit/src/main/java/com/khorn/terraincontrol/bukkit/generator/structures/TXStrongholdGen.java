@@ -11,10 +11,10 @@ import net.minecraft.server.v1_11_R1.WorldGenStronghold;
 
 import java.util.List;
 
-public class StrongholdGen extends WorldGenStronghold
+public class TXStrongholdGen extends WorldGenStronghold
 {
 
-    public StrongholdGen(ServerConfigProvider configs)
+    public TXStrongholdGen(ServerConfigProvider configs)
     {
         super(ImmutableMap.of(
                 "distance", String.valueOf(configs.getWorldConfig().strongholdDistance),

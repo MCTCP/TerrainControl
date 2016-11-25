@@ -10,12 +10,12 @@ import net.minecraft.server.v1_11_R1.WorldProviderNormal;
  * The value seem to be hardcoded in CraftWorld and we are a bit unsure about if that matters.
  * At least it should be a good thing that we set the value here.
  */
-public class TCWorldProvider extends WorldProviderNormal
+public class TXWorldProvider extends WorldProviderNormal
 {
     protected BukkitWorld localWorld;
     private final WorldProvider oldWorldProvider;
 
-    public TCWorldProvider(BukkitWorld localWorld, WorldProvider oldWorldProvider)
+    public TXWorldProvider(BukkitWorld localWorld, WorldProvider oldWorldProvider)
     {
         this.localWorld = localWorld;
         this.oldWorldProvider = oldWorldProvider;

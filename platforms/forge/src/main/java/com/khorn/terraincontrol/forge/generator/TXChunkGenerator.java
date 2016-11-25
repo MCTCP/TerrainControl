@@ -22,7 +22,7 @@ import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkGenerator;
 
-public class ChunkProvider implements IChunkGenerator
+public class TXChunkGenerator implements IChunkGenerator
 {
 
     private ForgeWorld world;
@@ -38,7 +38,7 @@ public class ChunkProvider implements IChunkGenerator
      */
     private int[] biomeIntArray;
 
-    public ChunkProvider(ForgeWorld _world)
+    public TXChunkGenerator(ForgeWorld _world)
     {
         this.world = _world;
         this.worldHandle = _world.getWorld();

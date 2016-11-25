@@ -17,7 +17,7 @@ import org.bukkit.block.Biome;
 
 import java.util.List;
 
-public class CustomBiome extends BiomeBase
+public class TXBiomeBase extends BiomeBase
 {
     private static final int MAX_TC_BIOME_ID = 1023;
     public final int generationId;
@@ -71,9 +71,9 @@ public class CustomBiome extends BiomeBase
      * @param biomeIds    Ids of the biome.
      * @return The CustomBiome instance.
      */
-    public static CustomBiome createInstance(BiomeConfig biomeConfig, BiomeIds biomeIds)
+    public static TXBiomeBase createInstance(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        CustomBiome customBiome = new CustomBiome(biomeConfig, biomeIds);
+        TXBiomeBase customBiome = new TXBiomeBase(biomeConfig, biomeIds);
 
         // Insert the biome in Minecraft's biome mapping
         String biomeNameWithoutSpaces = StringHelper.toComputerFriendlyName(biomeConfig.getName());
@@ -86,7 +86,7 @@ public class CustomBiome extends BiomeBase
         if(BiomeBase.getBiome(MAX_TC_BIOME_ID) == null) {
             BiomeBase.REGISTRY_ID.a(MAX_TC_BIOME_ID,
                     new MinecraftKey(PluginStandardValues.PLUGIN_NAME, "null"),
-                    new CustomBiome(biomeConfig, new BiomeIds(MAX_TC_BIOME_ID, MAX_TC_BIOME_ID)));
+                    new TXBiomeBase(biomeConfig, new BiomeIds(MAX_TC_BIOME_ID, MAX_TC_BIOME_ID)));
         }
 
         if (biomeIds.isVirtual())
@@ -149,14 +149,14 @@ public class CustomBiome extends BiomeBase
     private static void checkRegistry() {
         for(int i = 168; i >= 0; --i) {
             BiomeBase biome = getBiome(i);
-            if(biome != null && biome instanceof CustomBiome && ((CustomBiome) biome).generationId != i) {
+            if(biome != null && biome instanceof TXBiomeBase && ((TXBiomeBase) biome).generationId != i) {
                 throw new AssertionError("Biome ID #" + i + " returns custom biome #" +
-                        ((CustomBiome) biome).generationId + " instead of its own.");
+                        ((TXBiomeBase) biome).generationId + " instead of its own.");
             }
         }
     }
 
-    private CustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
+    private TXBiomeBase(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
         super(new BiomeBase_a(biomeConfig.getName(), biomeConfig));
         this.generationId = biomeIds.getGenerationId();

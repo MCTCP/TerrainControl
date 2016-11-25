@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit.commands;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,9 +20,9 @@ public abstract class BaseCommand
     public String perm;
     public String usage;
     public boolean workOnConsole;
-    protected TCPlugin plugin;
+    protected TXPlugin plugin;
 
-    public BaseCommand(TCPlugin _plugin)
+    public BaseCommand(TXPlugin _plugin)
     {
         this.plugin = _plugin;
     }

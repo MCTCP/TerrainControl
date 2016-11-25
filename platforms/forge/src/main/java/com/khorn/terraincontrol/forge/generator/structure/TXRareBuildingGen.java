@@ -17,7 +17,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.gen.structure.*;
 
-public class RareBuildingGen extends MapGenStructure
+public class TXRareBuildingGen extends MapGenStructure
 {
     public List<Biome> biomeList;
 
@@ -37,7 +37,7 @@ public class RareBuildingGen extends MapGenStructure
     private int minDistanceBetweenScatteredFeatures;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public RareBuildingGen(ServerConfigProvider configs)
+    public TXRareBuildingGen(ServerConfigProvider configs)
     {
         biomeList = new ArrayList<Biome>();
 
@@ -99,7 +99,7 @@ public class RareBuildingGen extends MapGenStructure
     @Override
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
-        return new RareBuildingStart(this.worldObj, this.rand, chunkX, chunkZ);
+        return new TXRareBuildingStart(this.worldObj, this.rand, chunkX, chunkZ);
     }
 
     /**

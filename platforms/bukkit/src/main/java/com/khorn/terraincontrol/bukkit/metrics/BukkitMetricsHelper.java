@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.bukkit.metrics;
 
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.bukkit.metrics.Metrics.Graph;
 import com.khorn.terraincontrol.util.helpers.MetricsHelper;
 import org.bukkit.Bukkit;
@@ -14,9 +14,9 @@ import java.io.IOException;
  */
 public class BukkitMetricsHelper extends MetricsHelper
 {
-    private final TCPlugin plugin;
+    private final TXPlugin plugin;
 
-    public BukkitMetricsHelper(TCPlugin plugin)
+    public BukkitMetricsHelper(TXPlugin plugin)
     {
         this.plugin = plugin;
 

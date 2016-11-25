@@ -10,11 +10,11 @@ import org.bukkit.generator.BlockPopulator;
 
 import java.util.Random;
 
-public class TCBlockPopulator extends BlockPopulator
+public class TXBlockPopulator extends BlockPopulator
 {
     private ObjectSpawner spawner;
 
-    public TCBlockPopulator(BukkitWorld world)
+    public TXBlockPopulator(BukkitWorld world)
     {
         this.spawner = new ObjectSpawner(world.getConfigs(), world);
     }

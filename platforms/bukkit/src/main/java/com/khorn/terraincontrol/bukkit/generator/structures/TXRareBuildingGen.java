@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class RareBuildingGen extends StructureGenerator
+public class TXRareBuildingGen extends StructureGenerator
 {
     public List<BiomeBase> biomeList;
 
@@ -32,7 +32,7 @@ public class RareBuildingGen extends StructureGenerator
      */
     private int minDistanceBetweenScatteredFeatures;
 
-    public RareBuildingGen(ServerConfigProvider configs)
+    public TXRareBuildingGen(ServerConfigProvider configs)
     {
         biomeList = new ArrayList<BiomeBase>();
 

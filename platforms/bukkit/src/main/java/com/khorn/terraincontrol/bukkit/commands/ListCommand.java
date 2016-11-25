@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.commands;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.TCPerm;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 import org.bukkit.command.CommandSender;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ListCommand extends BaseCommand
 {
-    public ListCommand(TCPlugin _plugin)
+    public ListCommand(TXPlugin _plugin)
     {
         super(_plugin);
         name = "list";

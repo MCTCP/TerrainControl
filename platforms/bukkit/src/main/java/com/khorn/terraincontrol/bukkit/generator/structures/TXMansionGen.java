@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MansionGen extends StructureGenerator
+public class TXMansionGen extends StructureGenerator
 {
     private final int maxDistance;
     private final int minDistance;
@@ -20,7 +20,7 @@ public class MansionGen extends StructureGenerator
     private final List<BiomeBase> biomeList;
     private ChunkProviderGenerate defaultTerrainGeneratorOrNull;
 
-    public MansionGen(ServerConfigProvider configs)
+    public TXMansionGen(ServerConfigProvider configs)
     {
         biomeList = new ArrayList<BiomeBase>();
 

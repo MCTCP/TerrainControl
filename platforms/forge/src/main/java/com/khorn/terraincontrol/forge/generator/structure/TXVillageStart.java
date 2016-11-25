@@ -17,12 +17,12 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
 
-public class VillageStart extends StructureStart
+public class TXVillageStart extends StructureStart
 {
     // well ... thats what it does
     private boolean hasMoreThanTwoComponents = false;
 
-    public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)
+    public TXVillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
         List<PieceWeight> villagePieces = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);
 
@@ -116,7 +116,7 @@ public class VillageStart extends StructureStart
         return this.hasMoreThanTwoComponents;
     }
 
-    public VillageStart()
+    public TXVillageStart()
     {
         // Required by Minecraft's structure loading code
     }

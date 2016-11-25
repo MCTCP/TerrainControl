@@ -10,9 +10,9 @@ import net.minecraft.world.gen.structure.StructureStart;
 
 import java.util.Random;
 
-public class RareBuildingStart extends StructureStart
+public class TXRareBuildingStart extends StructureStart
 {
-    public RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
+    public TXRareBuildingStart(World world, Random random, int chunkX, int chunkZ)
     {
         LocalWorld localWorld = WorldHelper.toLocalWorld(world);
         BiomeConfig biomeConfig = localWorld.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8).getBiomeConfig();
@@ -47,7 +47,7 @@ public class RareBuildingStart extends StructureStart
         this.updateBoundingBox();
     }
 
-    public RareBuildingStart()
+    public TXRareBuildingStart()
     {
         // Required by Minecraft's structure loading code
     }

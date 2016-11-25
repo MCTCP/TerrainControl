@@ -18,7 +18,7 @@ import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillagePieceW
 import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillageRoadPiece;
 import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillageStartPiece;
 
-public class VillageGen extends StructureGenerator
+public class TXVillageGen extends StructureGenerator
 {
 
     /**
@@ -33,7 +33,7 @@ public class VillageGen extends StructureGenerator
     private int distance;
     private int minimumDistance;
 
-    public VillageGen(ServerConfigProvider configs)
+    public TXVillageGen(ServerConfigProvider configs)
     {
         size = configs.getWorldConfig().villageSize;
         distance = configs.getWorldConfig().villageDistance;

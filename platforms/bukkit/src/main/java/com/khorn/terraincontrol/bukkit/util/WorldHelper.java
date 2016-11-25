@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit.util;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.bukkit.CustomBiome;
+import com.khorn.terraincontrol.bukkit.TXBiomeBase;
 import net.minecraft.server.v1_11_R1.BiomeBase;
 
 public abstract class WorldHelper
@@ -40,9 +40,9 @@ public abstract class WorldHelper
      */
     public static int getGenerationId(BiomeBase biomeBase)
     {
-        if (biomeBase instanceof CustomBiome)
+        if (biomeBase instanceof TXBiomeBase)
         {
-            return ((CustomBiome) biomeBase).generationId;
+            return ((TXBiomeBase) biomeBase).generationId;
         }
         return BiomeBase.a(biomeBase);
     }

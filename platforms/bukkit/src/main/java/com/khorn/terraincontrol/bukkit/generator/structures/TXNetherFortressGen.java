@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class NetherFortressGen extends StructureGenerator
+public class TXNetherFortressGen extends StructureGenerator
 {
 
     public List<BiomeMeta> spawnList = new ArrayList<BiomeMeta>();
 
-    public NetherFortressGen()
+    public TXNetherFortressGen()
     {
         this.spawnList.add(new BiomeMeta(EntityBlaze.class, 10, 2, 3));
         this.spawnList.add(new BiomeMeta(EntityPigZombie.class, 5, 4, 4));

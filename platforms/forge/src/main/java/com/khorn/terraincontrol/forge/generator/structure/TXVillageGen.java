@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class VillageGen extends MapGenStructure
+public class TXVillageGen extends MapGenStructure
 {
     /**
      * A list of all the biomes villages can spawn in.
@@ -27,7 +27,7 @@ public class VillageGen extends MapGenStructure
     private int distance;
     private int minimumDistance;
 
-    public VillageGen(ServerConfigProvider configs)
+    public TXVillageGen(ServerConfigProvider configs)
     {
         size = configs.getWorldConfig().villageSize;
         distance = configs.getWorldConfig().villageDistance;
@@ -86,7 +86,7 @@ public class VillageGen extends MapGenStructure
     @Override
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
-        return new VillageStart(this.worldObj, this.rand, chunkX, chunkZ, this.size);
+        return new TXVillageStart(this.worldObj, this.rand, chunkX, chunkZ, this.size);
     }
 
     @Override

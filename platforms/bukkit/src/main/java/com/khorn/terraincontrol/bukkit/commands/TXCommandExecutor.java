@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class TCCommandExecutor implements CommandExecutor
+public class TXCommandExecutor implements CommandExecutor
 {
-    protected final TCPlugin plugin;
+    protected final TXPlugin plugin;
     protected HashMap<String, BaseCommand> commandHashMap = new HashMap<String, BaseCommand>();
     protected HelpCommand helpCommand;
 
-    public TCCommandExecutor(TCPlugin plugin)
+    public TXCommandExecutor(TXPlugin plugin)
     {
         this.plugin = plugin;
         this.helpCommand = new HelpCommand(plugin);

@@ -19,12 +19,12 @@ import net.minecraft.world.gen.structure.MapGenVillage;
  * {@link BiomeGenerator}. This class provides a bridge between the two,
  * allowing us to use custom biome generators.
  */
-public class TCBiomeProvider extends BiomeProvider
+public class TXBiomeProvider extends BiomeProvider
 {
     private final BiomeGenerator biomeGenerator;
     private final ForgeWorld localWorld;
 
-    public TCBiomeProvider(ForgeWorld world, BiomeGenerator biomeGenerator)
+    public TXBiomeProvider(ForgeWorld world, BiomeGenerator biomeGenerator)
     {
         this.localWorld = world;
         this.biomeGenerator = biomeGenerator;

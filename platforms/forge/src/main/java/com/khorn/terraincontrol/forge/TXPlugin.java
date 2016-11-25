@@ -10,8 +10,8 @@ import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.events.*;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
-import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
-import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
+import com.khorn.terraincontrol.forge.generator.structure.TXRareBuildingStart;
+import com.khorn.terraincontrol.forge.generator.structure.TXVillageStart;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.world.biome.Biome;
@@ -32,7 +32,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import java.io.File;
 
 @Mod(modid = "terraincontrol", name = "TerrainControl", acceptableRemoteVersions = "*")
-public class TCPlugin
+public class TXPlugin
 {
     private WorldLoader worldLoader;
 
@@ -45,7 +45,7 @@ public class TCPlugin
 
         // Create the world type. WorldType registers itself in the constructor
         // - that is Mojang code, so don't blame me
-        new TCWorldType(worldLoader);
+        new TXWorldType(worldLoader);
 
         // Start TerrainControl engine
         final ForgeEngine engine = new ForgeEngine(worldLoader);
@@ -55,8 +55,8 @@ public class TCPlugin
         engine.getBiomeModeManager().register(VanillaBiomeGenerator.GENERATOR_NAME, ForgeVanillaBiomeGenerator.class);
 
         // Register village and rare building starts
-        MapGenStructureIO.registerStructure(RareBuildingStart.class, StructureNames.RARE_BUILDING);
-        MapGenStructureIO.registerStructure(VillageStart.class, StructureNames.VILLAGE);
+        MapGenStructureIO.registerStructure(TXRareBuildingStart.class, StructureNames.RARE_BUILDING);
+        MapGenStructureIO.registerStructure(TXVillageStart.class, StructureNames.VILLAGE);
 
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
@@ -118,7 +118,7 @@ public class TCPlugin
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event)
     {
-        event.registerServerCommand(new TCCommandHandler(worldLoader));
+        event.registerServerCommand(new TXCommandHandler(worldLoader));
     }
 
     @EventHandler

@@ -18,7 +18,7 @@ import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.gen.structure.StructureStrongholdPieces;
 
-public class StrongholdGen extends MapGenStructure
+public class TXStrongholdGen extends MapGenStructure
 {
     private List<Biome> allowedBiomes;
 
@@ -27,7 +27,7 @@ public class StrongholdGen extends MapGenStructure
     private double distance;
     private int spread;
 
-    public StrongholdGen(ServerConfigProvider configs)
+    public TXStrongholdGen(ServerConfigProvider configs)
     {
         this.distance = configs.getWorldConfig().strongholdDistance;
         this.structureCoords = new ChunkPos[configs.getWorldConfig().strongholdCount];
