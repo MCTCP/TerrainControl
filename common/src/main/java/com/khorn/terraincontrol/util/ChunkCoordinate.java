@@ -18,8 +18,8 @@ public class ChunkCoordinate
     public static final int CHUNK_X_SIZE = 16;
     public static final int CHUNK_Y_SIZE = 256;
     public static final int CHUNK_Z_SIZE = 16;
-    private static final int CHUNK_HALF_X_SIZE = CHUNK_X_SIZE / 2;
-    private static final int CHUNK_HALF_Z_SIZE = CHUNK_Z_SIZE / 2;
+    private static final int CHUNK_POPULATION_OFFSET_X = CHUNK_X_SIZE / 2 - 1;
+    private static final int CHUNK_POPULATION_OFFSET_Z = CHUNK_Z_SIZE / 2 - 1;
 
     private final int chunkX;
     private final int chunkZ;
@@ -116,8 +116,8 @@ public class ChunkCoordinate
         // be placed in the bottom left corner of a chunk. That's why this
         // formula looks a bit overly complicated.
         return new ChunkCoordinate(
-                MathHelper.floor((blockX - CHUNK_HALF_X_SIZE) / (double) CHUNK_X_SIZE),
-                MathHelper.floor((blockZ - CHUNK_HALF_Z_SIZE) / (double) CHUNK_Z_SIZE));
+                MathHelper.floor((blockX - CHUNK_POPULATION_OFFSET_X) / (double) CHUNK_X_SIZE),
+                MathHelper.floor((blockZ - CHUNK_POPULATION_OFFSET_Z) / (double) CHUNK_Z_SIZE));
     }
 
     /**
@@ -149,7 +149,7 @@ public class ChunkCoordinate
      * @return The x position.
      */
     public int getBlockXCenter() {
-        return chunkX * CHUNK_X_SIZE + CHUNK_HALF_X_SIZE;
+        return chunkX * CHUNK_X_SIZE + CHUNK_POPULATION_OFFSET_X;
     }
     
     /**
@@ -157,7 +157,7 @@ public class ChunkCoordinate
      * @return The z position.
      */
     public int getBlockZCenter() {
-        return chunkZ * CHUNK_Z_SIZE + CHUNK_HALF_Z_SIZE;
+        return chunkZ * CHUNK_Z_SIZE + CHUNK_POPULATION_OFFSET_Z;
     }
 
     /**
@@ -205,7 +205,7 @@ public class ChunkCoordinate
     public boolean populatesForBlock(int blockX, int blockZ)
     {
         return coordsMatch(
-                MathHelper.floor((blockX - CHUNK_HALF_X_SIZE) / (double) CHUNK_X_SIZE),
-                MathHelper.floor((blockZ - CHUNK_HALF_Z_SIZE) / (double) CHUNK_Z_SIZE));
+                MathHelper.floor((blockX - CHUNK_POPULATION_OFFSET_X) / (double) CHUNK_X_SIZE),
+                MathHelper.floor((blockZ - CHUNK_POPULATION_OFFSET_Z) / (double) CHUNK_Z_SIZE));
     }
 }
