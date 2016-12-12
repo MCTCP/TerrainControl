@@ -8,6 +8,7 @@ import net.minecraft.server.v1_11_R1.*;
 import net.minecraft.server.v1_11_R1.WorldGenMonument.WorldGenMonumentStart;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -25,6 +26,7 @@ public class TXOceanMonumentGen extends StructureGenerator
 {
 
     private final List<BiomeBase> monumentSpawnBiomes;
+    private final List<BiomeBase.BiomeMeta> mobList = Arrays.asList(new BiomeBase.BiomeMeta(EntityGuardian.class, 1, 2, 4));
 
     private int randomOffset;
     private int gridSize;
@@ -50,6 +52,11 @@ public class TXOceanMonumentGen extends StructureGenerator
     {
         this.g = var1;
         return a(var1, this, var2, this.gridSize, this.gridSize - this.randomOffset - 1, 10387313, true, 100, var3);
+    }
+
+    public List<BiomeBase.BiomeMeta> getMobs()
+    {
+        return mobList;
     }
 
     @Override

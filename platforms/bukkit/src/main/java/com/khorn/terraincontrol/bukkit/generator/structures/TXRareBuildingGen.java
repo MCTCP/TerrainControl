@@ -15,12 +15,14 @@ import net.minecraft.server.v1_11_R1.WorldGenRegistration.WorldGenWitchHut;
 import net.minecraft.server.v1_11_R1.WorldGenRegistration.b;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 public class TXRareBuildingGen extends StructureGenerator
 {
-    public List<BiomeBase> biomeList;
+    private List<BiomeBase> biomeList;
+    private List<BiomeBase.BiomeMeta> mobList = Arrays.asList(new BiomeBase.BiomeMeta(EntityWitch.class, 1, 1, 1));
 
     /**
      * the maximum distance between scattered features
@@ -50,6 +52,21 @@ public class TXRareBuildingGen extends StructureGenerator
         // Minecraft's internal minimum distance is one chunk lower than TC's
         // value
         this.minDistanceBetweenScatteredFeatures = configs.getWorldConfig().minimumDistanceBetweenRareBuildings - 1;
+    }
+
+    public boolean isWitchHutAt(BlockPosition blockposition) {
+        StructureStart structurestart = this.c(blockposition);
+        if(structurestart != null && structurestart instanceof RareBuildingStart && !structurestart.c().isEmpty()) {
+            StructurePiece structurepiece = (StructurePiece)structurestart.c().get(0);
+            return structurepiece instanceof WorldGenWitchHut;
+        } else {
+            return false;
+        }
+    }
+
+    public List<BiomeBase.BiomeMeta> getWitchHutMobs()
+    {
+        return this.mobList;
     }
 
     public BlockPosition getNearestGeneratedFeature(World world, BlockPosition blockposition, boolean flag)
@@ -114,7 +131,7 @@ public class TXRareBuildingGen extends StructureGenerator
 
     public static class RareBuildingStart extends StructureStart
     {
-        public RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
+        RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
         {
             LocalWorld localWorld = WorldHelper.toLocalWorld(world);
             BiomeConfig biomeConfig = localWorld.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8).getBiomeConfig();

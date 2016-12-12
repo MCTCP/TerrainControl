@@ -4,10 +4,11 @@ import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_11_R1.BlockPosition;
-import net.minecraft.server.v1_11_R1.World;
+import net.minecraft.server.v1_11_R1.*;
 import org.bukkit.craftbukkit.v1_11_R1.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
+
+import java.util.List;
 
 public class TXInternalChunkGenerator extends CustomChunkGenerator
 {
@@ -20,6 +21,27 @@ public class TXInternalChunkGenerator extends CustomChunkGenerator
         Preconditions.checkArgument(generator instanceof TXChunkGenerator, "Generator must be of the plugin");
 
         this.localWorld = world;
+    }
+
+    public List<BiomeBase.BiomeMeta> getMobsFor(EnumCreatureType type, BlockPosition position)
+    {
+        WorldConfig worldConfig = localWorld.getConfigs().getWorldConfig();
+        BiomeBase biomebase = localWorld.getWorld().getBiome(position);
+        if (type == EnumCreatureType.MONSTER
+                && worldConfig.rareBuildingsEnabled
+                && localWorld.rareBuildingGen.isWitchHutAt(position))
+        {
+            return localWorld.rareBuildingGen.getWitchHutMobs();
+        }
+
+        if (type == EnumCreatureType.MONSTER
+                && worldConfig.oceanMonumentsEnabled
+                && localWorld.oceanMonumentGen.a(localWorld.getWorld(), position))
+        {
+            return localWorld.oceanMonumentGen.getMobs();
+        }
+
+        return biomebase.getMobs(type);
     }
 
     @Override
