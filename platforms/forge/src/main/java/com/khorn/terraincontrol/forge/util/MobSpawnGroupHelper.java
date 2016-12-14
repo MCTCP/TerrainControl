@@ -8,8 +8,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -115,8 +118,8 @@ public final class MobSpawnGroupHelper
      */
     static Class<? extends EntityLiving> toMinecraftClass(String mobName)
     {
-        Class<? extends Entity> clazz = EntityList.NAME_TO_CLASS.get(mobName);
-        if (EntityLiving.class.isAssignableFrom(clazz))
+        Class<? extends Entity> clazz = EntityList.getClass(new ResourceLocation(mobName));
+        if (clazz != null && EntityLiving.class.isAssignableFrom(clazz))
         {
             return clazz.asSubclass(EntityLiving.class);
         }
@@ -128,8 +131,13 @@ public final class MobSpawnGroupHelper
      * @param entityClass The entity class.
      * @return The entity name, or null if not found.
      */
-    private static String fromMinecraftClass(Class<?> entityClass)
+    private static String fromMinecraftClass(Class<? extends Entity> entityClass)
     {
-        return EntityList.CLASS_TO_NAME.get(entityClass);
+        EntityEntry entry = EntityRegistry.getEntry(entityClass);
+        if (entry != null) {
+            return entry.getName();
+        }
+
+        return null;
     }
 }
