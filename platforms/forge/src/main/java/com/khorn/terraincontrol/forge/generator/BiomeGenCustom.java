@@ -1,17 +1,19 @@
 package com.khorn.terraincontrol.forge.generator;
 
 import com.khorn.terraincontrol.BiomeIds;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.RegistryNamespaced;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.List;
 
@@ -64,21 +66,51 @@ public class BiomeGenCustom extends Biome
         ResourceLocation registryKey = new ResourceLocation(PluginStandardValues.PLUGIN_NAME.toLowerCase(), biomeNameForRegistry);
 
         // Check if registered earlier
-        @SuppressWarnings("unchecked")
-        RegistryNamespaced<ResourceLocation, Biome> registry = ((RegistryNamespaced<ResourceLocation, Biome>) GameRegistry.findRegistry(
-                Biome.class));
-        Biome alreadyRegisteredBiome = registry.getObject(registryKey);
+        Biome alreadyRegisteredBiome = Biome.REGISTRY.getObject(registryKey);
         if (alreadyRegisteredBiome != null)
         {
             return alreadyRegisteredBiome;
         }
 
         // No existing biome, create new one
-        BiomeGenCustom biome = new BiomeGenCustom(biomeConfig, registryKey, biomeIds);
-        if (!biomeIds.isVirtual()) {
-            registry.register(biomeIds.getGenerationId(), biome.getRegistryName(), biome);
+        BiomeGenCustom customBiome = new BiomeGenCustom(biomeConfig, registryKey, biomeIds);
+        int savedBiomeId = biomeIds.getSavedId();
+
+        if (biomeIds.isVirtual())
+        {
+            // Virtual biomes hack: register, then let original biome overwrite
+            // In this way, the id --> biome mapping returns the original biome,
+            // and the biome --> id mapping returns savedBiomeId for both the
+            // original and custom biome
+            Biome existingBiome = Biome.getBiome(savedBiomeId);
+
+            if (existingBiome == null)
+            {
+                // Original biome not yet registered. This is because it's a
+                // custom biome that is loaded after this virtual biome, so it
+                // will soon be registered
+                Biome.REGISTRY.register(biomeIds.getGenerationId(), registryKey, customBiome);
+                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+            } else
+            {
+                ResourceLocation existingBiomeKey = Biome.REGISTRY.getNameForObject(existingBiome);
+                ForgeEngine forgeEngine = ((ForgeEngine) TerrainControl.getEngine());
+                forgeEngine.registerForgeBiome(biomeIds.getSavedId(), registryKey, customBiome);
+                forgeEngine.registerForgeBiome(biomeIds.getSavedId(), existingBiomeKey, existingBiome);
+                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+            }
+        } else
+        {
+            // Normal insertion
+            Biome.REGISTRY.register(savedBiomeId, registryKey, customBiome);
+            TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
         }
-        return biome;
+
+        if (!BiomeDictionary.isBiomeRegistered(customBiome)) {
+            // register custom biome with Forge's BiomeDictionary
+            BiomeDictionary.makeBestGuess(customBiome);
+        }
+        return customBiome;
     }
 
     private int skyColor;
