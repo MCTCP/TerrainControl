@@ -6,7 +6,7 @@ buildscript
     {
         mavenCentral()
         mavenLocal()
-		jcenter()
+        jcenter()
         maven
         {
             url = "http://files.minecraftforge.net/maven"
@@ -27,10 +27,10 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 // Project properties
 archivesBaseName = "terraincontrol-forge"
 description = "TerrainControl for Minecraft Forge"
-ext.forgeVersion = "1.10.2-12.18.1.2050"
+ext.forgeVersion = "1.11-13.19.1.2189"
 minecraft.version = ext.forgeVersion
 minecraft.runDir = "run"
-minecraft.mappings = "snapshot_20160708"
+minecraft.mappings = "snapshot_20161129"
 
 repositories
 {

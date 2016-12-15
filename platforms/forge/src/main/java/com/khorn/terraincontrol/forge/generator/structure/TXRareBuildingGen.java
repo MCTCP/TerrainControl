@@ -13,6 +13,7 @@ import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.gen.structure.*;
@@ -76,7 +77,7 @@ public class TXRareBuildingGen extends MapGenStructure
 
         int var5 = chunkX / this.maxDistanceBetweenScatteredFeatures;
         int var6 = chunkZ / this.maxDistanceBetweenScatteredFeatures;
-        Random random = this.worldObj.setRandomSeed(var5, var6, 14357617);
+        Random random = this.world.setRandomSeed(var5, var6, 14357617);
         var5 *= this.maxDistanceBetweenScatteredFeatures;
         var6 *= this.maxDistanceBetweenScatteredFeatures;
         var5 += random.nextInt(this.maxDistanceBetweenScatteredFeatures - this.minDistanceBetweenScatteredFeatures);
@@ -84,7 +85,7 @@ public class TXRareBuildingGen extends MapGenStructure
 
         if (var3 == var5 && var4 == var6)
         {
-            Biome biomeAtPosition = this.worldObj.getBiomeProvider().getBiome(
+            Biome biomeAtPosition = this.world.getBiomeProvider().getBiome(
                     new BlockPos(var3 * 16 + 8, 0, var4 * 16 + 8));
 
             if (biomeList.contains(biomeAtPosition))
@@ -99,7 +100,7 @@ public class TXRareBuildingGen extends MapGenStructure
     @Override
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
-        return new TXRareBuildingStart(this.worldObj, this.rand, chunkX, chunkZ);
+        return new TXRareBuildingStart(this.world, this.rand, chunkX, chunkZ);
     }
 
     /**
@@ -130,5 +131,12 @@ public class TXRareBuildingGen extends MapGenStructure
     public String getStructureName()
     {
         return StructureNames.RARE_BUILDING;
+    }
+
+    @Override
+    public BlockPos getClosestStrongholdPos(World worldIn, BlockPos pos, boolean p_180706_3_)
+    {
+        this.world = worldIn;
+        return findNearestStructurePosBySpacing(worldIn, this, pos, this.maxDistanceBetweenScatteredFeatures, 8, 14357617, false, 100, p_180706_3_);
     }
 }

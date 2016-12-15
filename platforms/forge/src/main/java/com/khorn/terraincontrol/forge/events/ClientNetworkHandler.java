@@ -48,7 +48,7 @@ public class ClientNetworkHandler
             if (serverProtocolVersion == clientProtocolVersion)
             {
                 // Server sent config
-                WorldClient worldMC = FMLClientHandler.instance().getClient().theWorld;
+                WorldClient worldMC = FMLClientHandler.instance().getClient().world;
 
                 if (stream.readableBytes() > 4 && worldMC != null)
                 {
@@ -100,7 +100,7 @@ public class ClientNetworkHandler
         chatStyle.setColor(color);
         chat.setStyle(chatStyle);
 
-        Minecraft.getMinecraft().thePlayer.addChatMessage(chat);
+        Minecraft.getMinecraft().player.sendMessage(chat);
     }
 
     @SubscribeEvent

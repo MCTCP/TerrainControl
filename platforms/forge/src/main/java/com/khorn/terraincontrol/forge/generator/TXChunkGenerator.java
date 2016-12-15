@@ -118,12 +118,12 @@ public class TXChunkGenerator implements IChunkGenerator
     }
 
     @Override
-    public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos blockPos)
+    public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position, boolean flag)
     {
         // Gets the nearest stronghold
         if (("Stronghold".equals(structureName)) && (this.world.strongholdGen != null))
         {
-            return this.world.strongholdGen.getClosestStrongholdPos(worldIn, blockPos);
+            return this.world.strongholdGen.getClosestStrongholdPos(worldIn, position, flag);
         }
         return null;
     }
@@ -160,17 +160,7 @@ public class TXChunkGenerator implements IChunkGenerator
     }
 
     @Override
-    public boolean generateStructures(Chunk chunkIn, int x, int z)
-    {
-        // retroGen -> generated ocean monument in existing chunks in vanilla
-        // Disabled, as
-        // * it's not enabled in the Bukkit version, as Spigot's
-        // generator API doesn't support it
-        // * people updating to 1.8 might be surprised why this monument
-        // spawns in existing chunks of their customized ocean biome
-        // * changing the spawn settings of ocean monuments makes them spawn
-        // at different positions, so extra monuments will be spawned in old
-        // chunks
+    public boolean generateStructures(Chunk chunkIn, int x, int z) {
         return false;
     }
 

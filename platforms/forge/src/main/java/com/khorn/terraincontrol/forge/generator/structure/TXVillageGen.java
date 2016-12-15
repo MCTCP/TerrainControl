@@ -5,6 +5,9 @@ import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
@@ -64,7 +67,7 @@ public class TXVillageGen extends MapGenStructure
 
         int var5 = chunkX / this.distance;
         int var6 = chunkZ / this.distance;
-        Random var7 = this.worldObj.setRandomSeed(var5, var6, 10387312);
+        Random var7 = this.world.setRandomSeed(var5, var6, 10387312);
         var5 *= this.distance;
         var6 *= this.distance;
         var5 += var7.nextInt(this.distance - this.minimumDistance);
@@ -72,7 +75,7 @@ public class TXVillageGen extends MapGenStructure
 
         if (var3 == var5 && var4 == var6)
         {
-            boolean canSpawn = this.worldObj.getBiomeProvider().areBiomesViable(var3 * 16 + 8, var4 * 16 + 8, 0, villageSpawnBiomes);
+            boolean canSpawn = this.world.getBiomeProvider().areBiomesViable(var3 * 16 + 8, var4 * 16 + 8, 0, villageSpawnBiomes);
 
             if (canSpawn)
             {
@@ -86,12 +89,19 @@ public class TXVillageGen extends MapGenStructure
     @Override
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
-        return new TXVillageStart(this.worldObj, this.rand, chunkX, chunkZ, this.size);
+        return new TXVillageStart(this.world, this.rand, chunkX, chunkZ, this.size);
     }
 
     @Override
     public String getStructureName()
     {
         return StructureNames.VILLAGE;
+    }
+
+    @Override
+    public BlockPos getClosestStrongholdPos(World worldIn, BlockPos pos, boolean p_180706_3_)
+    {
+        this.world = worldIn;
+        return findNearestStructurePosBySpacing(worldIn, this, pos, this.distance, 8, 10387312, false, 100, p_180706_3_);
     }
 }

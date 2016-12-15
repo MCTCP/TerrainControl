@@ -28,19 +28,19 @@ final class TXCommandHandler implements ICommand
     }
 
     @Override
-    public String getCommandName()
+    public String getName()
     {
         return "tc";
     }
 
     @Override
-    public String getCommandUsage(ICommandSender var1)
+    public String getUsage(ICommandSender var1)
     {
         return "tc";
     }
 
     @Override
-    public List<String> getCommandAliases()
+    public List<String> getAliases()
     {
         return aliases;
     }
@@ -54,32 +54,32 @@ final class TXCommandHandler implements ICommand
         {
             if (argString == null || argString.length == 0)
             {
-                sender.addChatMessage(new TextComponentString("-- TerrainControl --"));
-                sender.addChatMessage(new TextComponentString("Commands:"));
-                sender.addChatMessage(new TextComponentString("/tc worldinfo - Show author and description information for this world."));
-                sender.addChatMessage(new TextComponentString("/tc biome - Show biome information for any biome at the player's coordinates."));
+                sender.sendMessage(new TextComponentString("-- TerrainControl --"));
+                sender.sendMessage(new TextComponentString("Commands:"));
+                sender.sendMessage(new TextComponentString("/tc worldinfo - Show author and description information for this world."));
+                sender.sendMessage(new TextComponentString("/tc biome - Show biome information for any biome at the player's coordinates."));
             } else if (argString[0].equals("worldinfo"))
             {
                 LocalWorld localWorld = worldLoader.getWorld(sender.getEntityWorld());
                 if (localWorld != null)
                 {
                     WorldConfig worldConfig = localWorld.getConfigs().getWorldConfig();
-                    sender.addChatMessage(new TextComponentString("-- World info --"));
-                    sender.addChatMessage(new TextComponentString("Author: " + worldConfig.author));
-                    sender.addChatMessage(new TextComponentString("Description: " + worldConfig.description));
+                    sender.sendMessage(new TextComponentString("-- World info --"));
+                    sender.sendMessage(new TextComponentString("Author: " + worldConfig.author));
+                    sender.sendMessage(new TextComponentString("Description: " + worldConfig.description));
                 } else
                 {
-                    sender.addChatMessage(new TextComponentString(PluginStandardValues.PLUGIN_NAME + " is not enabled for this world."));
+                    sender.sendMessage(new TextComponentString(PluginStandardValues.PLUGIN_NAME + " is not enabled for this world."));
                 }
             } else if (argString[0].equals("biome"))
             {
                 Biome biome = sender.getEntityWorld().getBiomeForCoordsBody(sender.getPosition());
-                sender.addChatMessage(new TextComponentString("-- Biome info --"));
-                sender.addChatMessage(new TextComponentString("Name: " + biome.getBiomeName()));
-                sender.addChatMessage(new TextComponentString("Id: " + Biome.getIdForBiome(biome)));
+                sender.sendMessage(new TextComponentString("-- Biome info --"));
+                sender.sendMessage(new TextComponentString("Name: " + biome.getBiomeName()));
+                sender.sendMessage(new TextComponentString("Id: " + Biome.getIdForBiome(biome)));
             } else
             {
-                sender.addChatMessage(new TextComponentString("Unknown command. Type /tc for a list of commands."));
+                sender.sendMessage(new TextComponentString("Unknown command. Type /tc for a list of commands."));
             }
         }
     }
@@ -87,7 +87,7 @@ final class TXCommandHandler implements ICommand
     @Override
     public boolean checkPermission(MinecraftServer server, ICommandSender sender)
     {
-        return sender.canCommandSenderUseCommand(2, this.getCommandName());
+        return sender.canUseCommand(2, this.getName());
     }
 
     @Override
@@ -99,11 +99,11 @@ final class TXCommandHandler implements ICommand
     @Override
     public int compareTo(ICommand that)
     {
-        return this.getCommandName().compareTo(that.getCommandName());
+        return this.getName().compareTo(that.getName());
     }
 
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
         return Collections.emptyList();
     }

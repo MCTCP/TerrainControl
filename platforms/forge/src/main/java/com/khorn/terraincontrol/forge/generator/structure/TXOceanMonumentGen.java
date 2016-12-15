@@ -13,6 +13,7 @@ import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 import net.minecraft.entity.monster.EntityGuardian;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.biome.BiomeProvider;
@@ -63,7 +64,7 @@ public class TXOceanMonumentGen extends MapGenStructure
 
         int i1 = p_75047_1_ / this.gridSize;
         int j1 = p_75047_2_ / this.gridSize;
-        Random random = this.worldObj.setRandomSeed(i1, j1, 10387313);
+        Random random = this.world.setRandomSeed(i1, j1, 10387313);
         i1 *= this.gridSize;
         j1 *= this.gridSize;
         i1 += (random.nextInt(this.randomOffset + 1) + random.nextInt(this.randomOffset + 1)) / 2;
@@ -71,13 +72,13 @@ public class TXOceanMonumentGen extends MapGenStructure
 
         if (k == i1 && l == j1)
         {
-            BiomeProvider biomeProvider = this.worldObj.getBiomeProvider();
+            BiomeProvider biomeProvider = this.world.getBiomeProvider();
             if (biomeProvider.getBiome(new BlockPos(k * 16 + 8, 64, l * 16 + 8), (Biome) null) != Biomes.DEEP_OCEAN)
             {
                 return false;
             }
 
-            boolean flag = this.worldObj.getBiomeProvider().areBiomesViable(k * 16 + 8, l * 16 + 8, 29, monumentSpawnBiomes);
+            boolean flag = this.world.getBiomeProvider().areBiomesViable(k * 16 + 8, l * 16 + 8, 29, monumentSpawnBiomes);
 
             if (flag)
             {
@@ -97,7 +98,7 @@ public class TXOceanMonumentGen extends MapGenStructure
     @Override
     protected StructureStart getStructureStart(int p_75049_1_, int p_75049_2_)
     {
-        return new StructureOceanMonument.StartMonument(this.worldObj, this.rand, p_75049_1_, p_75049_2_);
+        return new StructureOceanMonument.StartMonument(this.world, this.rand, p_75049_1_, p_75049_2_);
     }
 
     public List<SpawnListEntry> getMonsterSpawnList()
@@ -105,4 +106,9 @@ public class TXOceanMonumentGen extends MapGenStructure
         return this.mobList;
     }
 
+    public BlockPos getClosestStrongholdPos(World worldIn, BlockPos pos, boolean p_180706_3_)
+    {
+        this.world = worldIn;
+        return findNearestStructurePosBySpacing(worldIn, this, pos, this.gridSize, this.gridSize - this.randomOffset - 1, 10387313, true, 100, p_180706_3_);
+    }
 }
