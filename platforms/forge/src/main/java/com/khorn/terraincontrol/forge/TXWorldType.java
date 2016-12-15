@@ -48,10 +48,8 @@ public class TXWorldType extends WorldType
         ForgeWorld world = worldLoader.getWorld(mcWorld.getWorldInfo().getWorldName());
         if (world == null) {
             world = worldLoader.demandServerWorld((WorldServer) mcWorld);
-        } else
-        {
-            world.provideWorldInstance((WorldServer) mcWorld);
         }
+        world.provideWorldInstance((WorldServer) mcWorld);
 
         Class<? extends BiomeGenerator> biomeGenClass = world.getConfigs().getWorldConfig().biomeMode;
         BiomeGenerator biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeGenClass, world);
