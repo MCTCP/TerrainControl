@@ -48,16 +48,18 @@ public class TCBiomeProvider extends BiomeProvider
     }
 
     @Override
-    public Biome[] getBiomesForGeneration(Biome[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4)
+    public Biome[] getBiomesForGeneration(Biome[] paramArrayOfBiomeBase, int x, int z, int width, int height)
     {
-        int[] arrayOfInt = this.biomeGenerator.getBiomesUnZoomed(null, paramInt1, paramInt2, paramInt3, paramInt4,
-                OutputType.DEFAULT_FOR_WORLD);
-        if (paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
+        if (paramArrayOfBiomeBase == null || (paramArrayOfBiomeBase.length < width * height))
         {
-            paramArrayOfBiomeBase = new Biome[arrayOfInt.length];
+            paramArrayOfBiomeBase = new Biome[width * height];
         }
 
-        for (int i = 0; i < paramInt3 * paramInt4; i++)
+        int[] arrayOfInt = this.biomeGenerator.getBiomesUnZoomed(null, x, z, width, height,
+                OutputType.DEFAULT_FOR_WORLD);
+
+        // Replaces ids with BiomeBases
+        for (int i = 0; i < width * height; i++)
         {
             paramArrayOfBiomeBase[i] = this.localWorld.getBiomeById(arrayOfInt[i]).getHandle();
         }
@@ -66,39 +68,39 @@ public class TCBiomeProvider extends BiomeProvider
     }
 
     @Override
-    public Biome[] getBiomes(Biome[] paramArrayOfBiomeBase, int paramInt1, int paramInt2, int paramInt3, int paramInt4, boolean paramBoolean)
+    public Biome[] getBiomes(Biome[] listToReuse, int x, int z, int width, int length, boolean cacheFlag)
     {
-        int[] arrayOfInt = this.biomeGenerator.getBiomes(null, paramInt1, paramInt2, paramInt3, paramInt4,
-                OutputType.DEFAULT_FOR_WORLD);
-        if (paramArrayOfBiomeBase == null || paramArrayOfBiomeBase.length < arrayOfInt.length)
+        if ((listToReuse == null) || (listToReuse.length < width * length))
         {
-            paramArrayOfBiomeBase = new Biome[arrayOfInt.length];
+            listToReuse = new Biome[width * length];
         }
 
-        for (int i = 0; i < paramInt3 * paramInt4; i++)
+        int[] arrayOfInt = this.biomeGenerator.getBiomes(null, x, z, width, length, OutputType.DEFAULT_FOR_WORLD);
+
+        // Replace ids with BiomeBases
+        for (int i = 0; i < width * length; i++)
         {
-            paramArrayOfBiomeBase[i] = this.localWorld.getBiomeById(arrayOfInt[i]).getHandle();
+            listToReuse[i] = this.localWorld.getBiomeById(arrayOfInt[i]).getHandle();
         }
 
-        return paramArrayOfBiomeBase;
+        return listToReuse;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
-    public boolean areBiomesViable(int paramInt1, int paramInt2, int paramInt3, List paramList)
+    public boolean areBiomesViable(int x, int z, int radius, List<Biome> allowed)
     {
-        // Hack for StructureVillagePieces.getNextComponentVillagePath(..)
+        // Hack for villages in other biomes
         // (The alternative would be to completely override the village spawn
         // code)
-        if (paramList == MapGenVillage.VILLAGE_SPAWN_BIOMES)
+        if (allowed == MapGenVillage.VILLAGE_SPAWN_BIOMES && this.localWorld.villageGen != null)
         {
-            paramList = this.localWorld.villageGen.villageSpawnBiomes;
+            allowed = this.localWorld.villageGen.villageSpawnBiomes;
         }
 
-        int i = paramInt1 - paramInt3 >> 2;
-        int j = paramInt2 - paramInt3 >> 2;
-        int k = paramInt1 + paramInt3 >> 2;
-        int m = paramInt2 + paramInt3 >> 2;
+        int i = x - radius >> 2;
+        int j = z - radius >> 2;
+        int k = x + radius >> 2;
+        int m = z + radius >> 2;
 
         int n = k - i + 1;
         int i1 = m - j + 1;
@@ -106,7 +108,7 @@ public class TCBiomeProvider extends BiomeProvider
         for (int i2 = 0; i2 < n * i1; i2++)
         {
             Biome localBiomeBase = arrayOfInt[i2];
-            if (!paramList.contains(localBiomeBase))
+            if (!allowed.contains(localBiomeBase))
                 return false;
         }
 
@@ -114,13 +116,12 @@ public class TCBiomeProvider extends BiomeProvider
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public BlockPos findBiomePosition(int paramInt1, int paramInt2, int paramInt3, List paramList, Random paramRandom)
+    public BlockPos findBiomePosition(int x, int z, int range, List<Biome> biomes, Random random)
     {
-        int i = paramInt1 - paramInt3 >> 2;
-        int j = paramInt2 - paramInt3 >> 2;
-        int k = paramInt1 + paramInt3 >> 2;
-        int m = paramInt2 + paramInt3 >> 2;
+        int i = x - range >> 2;
+        int j = z - range >> 2;
+        int k = x + range >> 2;
+        int m = z + range >> 2;
 
         int n = k - i + 1;
         int i1 = m - j + 1;
@@ -134,7 +135,7 @@ public class TCBiomeProvider extends BiomeProvider
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
             Biome localBiomeBase = Biome.getBiome(arrayOfInt[i3]);
-            if ((!paramList.contains(localBiomeBase)) || ((blockPos != null) && (paramRandom.nextInt(i2 + 1) != 0)))
+            if ((!biomes.contains(localBiomeBase)) || ((blockPos != null) && (random.nextInt(i2 + 1) != 0)))
                 continue;
             blockPos = new BlockPos(i4, 0, i5);
             i2++;

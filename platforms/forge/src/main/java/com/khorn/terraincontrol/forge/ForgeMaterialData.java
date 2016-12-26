@@ -39,6 +39,7 @@ public class ForgeMaterialData implements LocalMaterialData
         }
     }
 
+    @SuppressWarnings("deprecation")
     private static ForgeMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
     {
         String blockName = input;
@@ -97,6 +98,7 @@ public class ForgeMaterialData implements LocalMaterialData
      * @param data The block data.
      * @return The {@code BukkitMateialData} instance.
      */
+    @SuppressWarnings("deprecation")
     private static ForgeMaterialData ofIds(int id, int data)
     {
         Block block = Block.getBlockById(id);
@@ -261,6 +263,7 @@ public class ForgeMaterialData implements LocalMaterialData
         return getName();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public LocalMaterialData withBlockData(int i)
     {
@@ -285,6 +288,7 @@ public class ForgeMaterialData implements LocalMaterialData
         return this.blockData;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public LocalMaterialData rotate()
     {

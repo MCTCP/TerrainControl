@@ -11,30 +11,29 @@ import net.minecraft.world.biome.Biome;
 public class ForgeBiome implements LocalBiome
 {
     private final Biome biomeBase;
+    private final boolean isCustom;
+
+    private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
 
-    /**
-     * Creates a new biome with the given name and id.
-     * 
-     * @param biomeConfig The config of the biome.
-     * @param minecraftBiome The Minecraft instance of the biome.
-     * @return The registered biome.
-     */
-    public static ForgeBiome forBiome(BiomeConfig biomeConfig, Biome minecraftBiome)
-    {
-        return new ForgeBiome(biomeConfig, minecraftBiome);
-    }
-
-    private ForgeBiome(BiomeConfig biomeConfig, Biome biome)
+    public ForgeBiome(Biome biome, BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
         this.biomeBase = biome;
+        this.biomeIds = biomeIds;
         this.biomeConfig = biomeConfig;
+        if (biome instanceof BiomeGenCustom)
+        {
+            this.isCustom = true;
+        } else
+        {
+            this.isCustom = false;
+        }
     }
 
     @Override
     public boolean isCustom()
     {
-        return this.biomeBase instanceof BiomeGenCustom;
+        return this.isCustom;
     }
 
     @Override
@@ -51,11 +50,7 @@ public class ForgeBiome implements LocalBiome
     @Override
     public BiomeIds getIds()
     {
-        if (this.biomeBase instanceof BiomeGenCustom)
-        {
-            return new BiomeIds(((BiomeGenCustom) this.biomeBase).generationId, Biome.getIdForBiome(this.biomeBase));
-        }
-        return new BiomeIds(Biome.getIdForBiome(this.biomeBase));
+        return this.biomeIds;
     }
 
     @Override
