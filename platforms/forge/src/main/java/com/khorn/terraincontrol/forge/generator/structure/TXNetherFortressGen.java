@@ -60,7 +60,7 @@ public class TXNetherFortressGen extends MapGenStructure
                 {
                     return false;
                 }
-                return (chunkZ == (var4 << 4) + 4 + rand.nextInt(8));
+                return (chunkZ == (var4 << 4) + 4 + this.rand.nextInt(8));
             }
         }
     }

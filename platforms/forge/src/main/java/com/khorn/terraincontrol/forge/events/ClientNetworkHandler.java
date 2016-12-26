@@ -59,7 +59,7 @@ public class ClientNetworkHandler
 
                     DataInputStream wrappedStream = new DataInputStream(new ByteBufInputStream(stream));
 
-                    worldLoader.demandClientWorld(worldMC, wrappedStream);
+                    this.worldLoader.demandClientWorld(worldMC, wrappedStream);
                 }
 
                 TerrainControl.log(LogMarker.INFO, "Config received from server");

@@ -42,7 +42,7 @@ final class TXCommandHandler implements ICommand
     @Override
     public List<String> getAliases()
     {
-        return aliases;
+        return this.aliases;
     }
 
     @Override
@@ -60,7 +60,7 @@ final class TXCommandHandler implements ICommand
                 sender.sendMessage(new TextComponentString("/tc biome - Show biome information for any biome at the player's coordinates."));
             } else if (argString[0].equals("worldinfo"))
             {
-                LocalWorld localWorld = worldLoader.getWorld(sender.getEntityWorld());
+                LocalWorld localWorld = this.worldLoader.getWorld(sender.getEntityWorld());
                 if (localWorld != null)
                 {
                     WorldConfig worldConfig = localWorld.getConfigs().getWorldConfig();

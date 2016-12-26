@@ -33,13 +33,13 @@ public class TXBiomeProvider extends BiomeProvider
     @Override
     public Biome getBiome(BlockPos blockPos)
     {
-        return localWorld.getBiomeById(biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
+        return this.localWorld.getBiomeById(this.biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
     }
 
     @Override
     public Biome getBiome(BlockPos pos, Biome defaultOption)
     {
-        ForgeBiome biome = localWorld.getBiomeByIdOrNull(biomeGenerator.getBiome(pos.getX(), pos.getZ()));
+        ForgeBiome biome = this.localWorld.getBiomeByIdOrNull(this.biomeGenerator.getBiome(pos.getX(), pos.getZ()));
         if (biome != null)
         {
             return biome.getHandle();
@@ -59,7 +59,7 @@ public class TXBiomeProvider extends BiomeProvider
 
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = localWorld.getBiomeById(arrayOfInt[i]).getHandle();
+            paramArrayOfBiomeBase[i] = this.localWorld.getBiomeById(arrayOfInt[i]).getHandle();
         }
 
         return paramArrayOfBiomeBase;
@@ -76,7 +76,7 @@ public class TXBiomeProvider extends BiomeProvider
 
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = localWorld.getBiomeById(arrayOfInt[i]).getHandle();
+            paramArrayOfBiomeBase[i] = this.localWorld.getBiomeById(arrayOfInt[i]).getHandle();
         }
 
         return paramArrayOfBiomeBase;
@@ -91,7 +91,7 @@ public class TXBiomeProvider extends BiomeProvider
         // code)
         if (paramList == MapGenVillage.VILLAGE_SPAWN_BIOMES)
         {
-            paramList = localWorld.villageGen.villageSpawnBiomes;
+            paramList = this.localWorld.villageGen.villageSpawnBiomes;
         }
 
         int i = paramInt1 - paramInt3 >> 2;

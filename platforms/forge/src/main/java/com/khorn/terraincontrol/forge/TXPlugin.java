@@ -41,14 +41,14 @@ public class TXPlugin
     {
         // This is the place where the mod starts loading
         File configsDir = new File(Loader.instance().getConfigDir(), "TerrainControl");
-        worldLoader = new WorldLoader(configsDir);
+        this.worldLoader = new WorldLoader(configsDir);
 
         // Create the world type. WorldType registers itself in the constructor
         // - that is Mojang code, so don't blame me
-        new TXWorldType(worldLoader);
+        new TXWorldType(this.worldLoader);
 
         // Start TerrainControl engine
-        final ForgeEngine engine = new ForgeEngine(worldLoader);
+        final ForgeEngine engine = new ForgeEngine(this.worldLoader);
         TerrainControl.setEngine(engine);
 
         // Register Default biome generator to TerrainControl
@@ -61,17 +61,17 @@ public class TXPlugin
         // Register listening channel for listening to received configs.
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
-            ClientNetworkHandler networkHandler = new ClientNetworkHandler(worldLoader);
+            ClientNetworkHandler networkHandler = new ClientNetworkHandler(this.worldLoader);
             FMLEventChannel eventDrivenChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PluginStandardValues.ChannelName);
             eventDrivenChannel.register(networkHandler);
             MinecraftForge.EVENT_BUS.register(networkHandler);
         }
 
         // Register player tracker, for sending configs.
-        MinecraftForge.EVENT_BUS.register(new PlayerTracker(worldLoader));
+        MinecraftForge.EVENT_BUS.register(new PlayerTracker(this.worldLoader));
 
         // Register sapling tracker, for custom tree growth.
-        SaplingListener saplingListener = new SaplingListener(worldLoader);
+        SaplingListener saplingListener = new SaplingListener(this.worldLoader);
         MinecraftForge.TERRAIN_GEN_BUS.register(saplingListener);
         MinecraftForge.EVENT_BUS.register(saplingListener);
 
@@ -82,7 +82,7 @@ public class TXPlugin
             public BiomeConfig apply(Biome input)
             {
                 LocalBiome biome = null;
-                for (LocalWorld world : worldLoader.worlds.values())
+                for (LocalWorld world : TXPlugin.this.worldLoader.worlds.values())
                 {
                     try
                     {
@@ -112,18 +112,18 @@ public class TXPlugin
     @EventHandler
     public void serverAboutToStart(FMLServerAboutToStartEvent event)
     {
-        worldLoader.onWorldAboutToLoad(event.getServer());
+        this.worldLoader.onWorldAboutToLoad(event.getServer());
     }
 
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event)
     {
-        event.registerServerCommand(new TXCommandHandler(worldLoader));
+        event.registerServerCommand(new TXCommandHandler(this.worldLoader));
     }
 
     @EventHandler
     public void serverStopped(FMLServerStoppingEvent event)
     {
-        worldLoader.onServerStopped();
+        this.worldLoader.onServerStopped();
     }
 }

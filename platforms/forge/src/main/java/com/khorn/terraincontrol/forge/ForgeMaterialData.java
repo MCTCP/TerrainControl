@@ -39,6 +39,7 @@ public class ForgeMaterialData implements LocalMaterialData
         }
     }
 
+    @SuppressWarnings("deprecation")
     private static ForgeMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
     {
         String blockName = input;
@@ -97,6 +98,7 @@ public class ForgeMaterialData implements LocalMaterialData
      * @param data The block data.
      * @return The {@code BukkitMateialData} instance.
      */
+    @SuppressWarnings("deprecation")
     private static ForgeMaterialData ofIds(int id, int data)
     {
         Block block = Block.getBlockById(id);
@@ -161,7 +163,7 @@ public class ForgeMaterialData implements LocalMaterialData
             return false;
         }
         ForgeMaterialData other = (ForgeMaterialData) obj;
-        if (!blockData.equals(other.blockData))
+        if (!this.blockData.equals(other.blockData))
         {
             return false;
         }
@@ -171,19 +173,19 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public byte getBlockData()
     {
-        return (byte) blockData.getBlock().getMetaFromState(blockData);
+        return (byte) this.blockData.getBlock().getMetaFromState(this.blockData);
     }
 
     @Override
     public int getBlockId()
     {
-        return Block.getIdFromBlock(blockData.getBlock());
+        return Block.getIdFromBlock(this.blockData.getBlock());
     }
 
     @Override
     public String getName()
     {
-        Block block = blockData.getBlock();
+        Block block = this.blockData.getBlock();
         DefaultMaterial defaultMaterial = toDefaultMaterial();
 
         byte data = getBlockData();
@@ -196,9 +198,9 @@ public class ForgeMaterialData implements LocalMaterialData
             // Use Minecraft's name
             if (nonDefaultData)
             {
-                return Block.REGISTRY.getNameForObject(blockData.getBlock()) + ":" + data;
+                return Block.REGISTRY.getNameForObject(this.blockData.getBlock()) + ":" + data;
             }
-            return Block.REGISTRY.getNameForObject(blockData.getBlock()).toString();
+            return Block.REGISTRY.getNameForObject(this.blockData.getBlock()).toString();
         } else
         {
             // Use our name
@@ -227,7 +229,7 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public boolean isLiquid()
     {
-        return blockData.getMaterial().isLiquid();
+        return this.blockData.getMaterial().isLiquid();
     }
 
     @Override
@@ -246,7 +248,7 @@ public class ForgeMaterialData implements LocalMaterialData
             return defaultMaterial.isSolid();
         }
 
-        return blockData.getMaterial().isSolid();
+        return this.blockData.getMaterial().isSolid();
     }
 
     @Override
@@ -261,6 +263,7 @@ public class ForgeMaterialData implements LocalMaterialData
         return getName();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public LocalMaterialData withBlockData(int i)
     {
@@ -276,15 +279,16 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public LocalMaterialData withDefaultBlockData()
     {
-        Block block = blockData.getBlock();
+        Block block = this.blockData.getBlock();
         return this.withBlockData(block.getMetaFromState(block.getDefaultState()));
     }
 
     public IBlockState internalBlock()
     {
-        return blockData;
+        return this.blockData;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public LocalMaterialData rotate()
     {
@@ -297,7 +301,7 @@ public class ForgeMaterialData implements LocalMaterialData
             int newData = BlockHelper.rotateData(defaultMaterial, blockDataByte);
             if (newData != blockDataByte)
             {
-                return ofMinecraftBlockState(blockData.getBlock().getStateFromMeta(newData));
+                return ofMinecraftBlockState(this.blockData.getBlock().getStateFromMeta(newData));
             }
         }
 
@@ -306,14 +310,15 @@ public class ForgeMaterialData implements LocalMaterialData
     }
 
     @Override
-    public boolean isAir() {
-        return blockData.getMaterial() == Material.AIR;
+    public boolean isAir()
+    {
+        return this.blockData.getMaterial() == Material.AIR;
     }
 
     @Override
     public boolean canFall()
     {
-        return blockData.getBlock() instanceof BlockFalling;
+        return this.blockData.getBlock() instanceof BlockFalling;
     }
 
 }

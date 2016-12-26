@@ -68,20 +68,20 @@ public class SaplingListener
          */
         private boolean findFourSaplings()
         {
-            int x = blockPos.getX();
-            int y = blockPos.getY();
-            int z = blockPos.getZ();
+            int x = this.blockPos.getX();
+            int y = this.blockPos.getY();
+            int z = this.blockPos.getZ();
             for (int treeOffsetX = 0; treeOffsetX >= -1; --treeOffsetX)
             {
                 for (int treeOffsetZ = 0; treeOffsetZ >= -1; --treeOffsetZ)
                 {
-                    if (isSameSapling(material, world.getMaterial(x + treeOffsetX, y, z + treeOffsetZ))
-                            && isSameSapling(material, world.getMaterial(x + treeOffsetX + 1, y, z + treeOffsetZ))
-                            && isSameSapling(material, world.getMaterial(x + treeOffsetX, y, z + treeOffsetZ + 1))
-                            && isSameSapling(material, world.getMaterial(x + treeOffsetX + 1, y, z + treeOffsetZ + 1)))
+                    if (isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX, y, z + treeOffsetZ))
+                            && isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX + 1, y, z + treeOffsetZ))
+                            && isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX, y, z + treeOffsetZ + 1))
+                            && isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX + 1, y, z + treeOffsetZ + 1)))
                     {
                         // Found! Adjust internal position
-                        blockPos = blockPos.add(treeOffsetX, 0, treeOffsetZ);
+                        this.blockPos = this.blockPos.add(treeOffsetX, 0, treeOffsetZ);
                         return true;
                     }
                 }
@@ -163,7 +163,7 @@ public class SaplingListener
     public void onSaplingGrow(SaplingGrowTreeEvent event)
     {
         World world = event.getWorld();
-        LocalWorld localWorld = worldLoader.getWorld(world);
+        LocalWorld localWorld = this.worldLoader.getWorld(world);
         BlockPos blockPos = event.getPos();
 
         if (localWorld == null)

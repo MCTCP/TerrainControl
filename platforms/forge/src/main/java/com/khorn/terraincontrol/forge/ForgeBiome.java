@@ -34,42 +34,42 @@ public class ForgeBiome implements LocalBiome
     @Override
     public boolean isCustom()
     {
-        return biomeBase instanceof TXBiome;
+        return this.biomeBase instanceof TXBiome;
     }
 
     @Override
     public String getName()
     {
-        return biomeBase.getBiomeName();
+        return this.biomeBase.getBiomeName();
     }
 
     public Biome getHandle()
     {
-        return biomeBase;
+        return this.biomeBase;
     }
 
     @Override
     public BiomeIds getIds()
     {
-        if (biomeBase instanceof TXBiome)
+        if (this.biomeBase instanceof TXBiome)
         {
-            return new BiomeIds(((TXBiome) biomeBase).generationId, Biome.getIdForBiome(biomeBase));
+            return new BiomeIds(((TXBiome) this.biomeBase).generationId, Biome.getIdForBiome(this.biomeBase));
         }
-        return new BiomeIds(Biome.getIdForBiome(biomeBase));
+        return new BiomeIds(Biome.getIdForBiome(this.biomeBase));
     }
 
     @Override
     public float getTemperatureAt(int x, int y, int z)
     {
-        return biomeBase.getFloatTemperature(new BlockPos(x, y, z));
+        return this.biomeBase.getFloatTemperature(new BlockPos(x, y, z));
     }
 
     @Override
     public BiomeConfig getBiomeConfig()
     {
-        return biomeConfig;
+        return this.biomeConfig;
     }
-    
+
     @Override
     public String toString()
     {

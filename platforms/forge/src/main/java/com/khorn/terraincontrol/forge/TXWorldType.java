@@ -45,13 +45,11 @@ public class TXWorldType extends WorldType
             return super.getBiomeProvider(mcWorld);
         }
 
-        ForgeWorld world = worldLoader.getWorld(mcWorld.getWorldInfo().getWorldName());
+        ForgeWorld world = this.worldLoader.getWorld(mcWorld.getWorldInfo().getWorldName());
         if (world == null) {
-            world = worldLoader.demandServerWorld((WorldServer) mcWorld);
-        } else
-        {
-            world.provideWorldInstance((WorldServer) mcWorld);
+            world = this.worldLoader.demandServerWorld((WorldServer) mcWorld);
         }
+        world.provideWorldInstance((WorldServer) mcWorld);
 
         Class<? extends BiomeGenerator> biomeGenClass = world.getConfigs().getWorldConfig().biomeMode;
         BiomeGenerator biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeGenClass, world);
@@ -87,7 +85,7 @@ public class TXWorldType extends WorldType
     @Override
     public IChunkGenerator getChunkGenerator(World mcWorld, String generatorOptions)
     {
-        ForgeWorld world = worldLoader.getWorld(WorldHelper.getName(mcWorld));
+        ForgeWorld world = this.worldLoader.getWorld(WorldHelper.getName(mcWorld));
         if (world.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
         {
             return world.getChunkGenerator();

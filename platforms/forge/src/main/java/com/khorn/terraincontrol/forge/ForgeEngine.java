@@ -27,8 +27,8 @@ public class ForgeEngine extends TerrainControlEngine
         this.worldLoader = worldLoader;
         // setup reflection method in order to properly register virtual biomes
         try {
-            ADD_OBJECT_RAW = Biome.REGISTRY.getClass().getDeclaredMethod("addObjectRaw", int.class, ResourceLocation.class, IForgeRegistryEntry.class);
-            ADD_OBJECT_RAW.setAccessible(true);
+            this.ADD_OBJECT_RAW = Biome.REGISTRY.getClass().getDeclaredMethod("addObjectRaw", int.class, ResourceLocation.class, IForgeRegistryEntry.class);
+            this.ADD_OBJECT_RAW.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -55,13 +55,13 @@ public class ForgeEngine extends TerrainControlEngine
     @Override
     public LocalWorld getWorld(String name)
     {
-        return worldLoader.getWorld(name);
+        return this.worldLoader.getWorld(name);
     }
 
     @Override
     public File getTCDataFolder()
     {
-        return worldLoader.getConfigsFolder();
+        return this.worldLoader.getConfigsFolder();
     }
 
     @Override
@@ -81,5 +81,4 @@ public class ForgeEngine extends TerrainControlEngine
     {
         return ForgeMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
     }
-
 }
