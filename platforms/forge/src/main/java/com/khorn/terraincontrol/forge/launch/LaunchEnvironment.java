@@ -12,7 +12,7 @@ final class LaunchEnvironment
 
     String getMcpFile()
     {
-        return this.minecraftGradleDir + "/de/oceanlabs/mcp/mcp_snapshot/" + MCP_VERSION + "/srgs/srg-mcp.srg";
+        return this.minecraftGradleDir + "/de/oceanlabs/mcp/mcp_snapshot/" + MCP_VERSION + "/" + MINECRAFT_VERSION + "/srgs/srg-mcp.srg";
     }
 
     String getLwjglPath()

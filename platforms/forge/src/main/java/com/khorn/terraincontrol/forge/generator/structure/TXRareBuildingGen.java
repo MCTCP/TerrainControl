@@ -120,8 +120,7 @@ public class TXRareBuildingGen extends MapGenStructure
         {
             StructureComponent structurecomponent = Iterables.getFirst(structurestart.getComponents(), null);
             return structurecomponent instanceof ComponentScatteredFeaturePieces.SwampHut;
-        }
-        else
+        } else
         {
             return false;
         }

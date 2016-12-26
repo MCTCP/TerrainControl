@@ -76,4 +76,8 @@ jar
     {
         project(":common").sourceSets.main.output.files
     }
+    manifest
+    {
+        attributes 'FMLAT': 'terraincontrol_at.cfg'
+    }
 }

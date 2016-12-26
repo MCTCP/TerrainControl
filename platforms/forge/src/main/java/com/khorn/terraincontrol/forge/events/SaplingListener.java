@@ -88,7 +88,7 @@ public class SaplingListener
             }
             return false;
         }
-        
+
         /**
          * Checks if the sapling types are the same, ignoring growth stages.
          * @param sapling1 The first material to compare.
@@ -99,7 +99,7 @@ public class SaplingListener
         {
             return sapling1.isMaterial(DefaultMaterial.SAPLING) 
                     && sapling2.isMaterial(DefaultMaterial.SAPLING) 
-                    &&  sapling1.getBlockData() % 8 == sapling2.getBlockData() % 8;
+                    && sapling1.getBlockData() % 8 == sapling2.getBlockData() % 8;
         }
 
         /**

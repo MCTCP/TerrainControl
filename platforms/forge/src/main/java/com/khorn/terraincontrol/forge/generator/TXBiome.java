@@ -10,7 +10,7 @@ import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -22,6 +22,27 @@ import java.util.List;
  */
 public class TXBiome extends Biome
 {
+
+    public static final int MAX_TC_BIOME_ID = 1023;
+
+    private int skyColor;
+
+    public final int generationId;
+
+    private TXBiome(BiomeConfig config, BiomeIds id)
+    {
+        super(new BiomePropertiesCustom(config));
+        this.generationId = id.getGenerationId();
+
+        this.skyColor = config.skyColor;
+
+        // Mob spawning
+        addMobs(this.spawnableMonsterList, config.spawnMonsters);
+        addMobs(this.spawnableCreatureList, config.spawnCreatures);
+        addMobs(this.spawnableWaterCreatureList, config.spawnWaterCreatures);
+        addMobs(this.spawnableCaveCreatureList, config.spawnAmbientCreatures);
+    }
+
     /**
      * Extension of BiomeProperties so that we are able to access the protected
      * methods.
@@ -55,26 +76,32 @@ public class TXBiome extends Biome
 
     public static Biome getOrCreateBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        if (DefaultBiome.Contain(biomeConfig.getName()))
-        {
-            // This is a default biome, retrieve by id
-            return Biome.getBiome(biomeIds.getGenerationId());
-        }
-
         // This is a custom biome, get or register it
         String biomeNameForRegistry = StringHelper.toComputerFriendlyName(biomeConfig.getName());
         ResourceLocation registryKey = new ResourceLocation(PluginStandardValues.PLUGIN_NAME.toLowerCase(), biomeNameForRegistry);
 
         // Check if registered earlier
-        Biome alreadyRegisteredBiome = Biome.REGISTRY.getObject(registryKey);
+        Biome alreadyRegisteredBiome = Biome.REGISTRY.registryObjects.get(registryKey);
         if (alreadyRegisteredBiome != null)
         {
             return alreadyRegisteredBiome;
         }
 
         // No existing biome, create new one
-        TXBiome customBiome = new TXBiome(biomeConfig, registryKey, biomeIds);
+        TXBiome customBiome = new TXBiome(biomeConfig, biomeIds);
         int savedBiomeId = biomeIds.getSavedId();
+        ForgeEngine forgeEngine = ((ForgeEngine) TerrainControl.getEngine());
+
+        // We need to init array size because Mojang uses a strange custom
+        // ArrayList. RegistryID arrays are not correctly (but randomly!) copied
+        // when resized which will cause the ReplaceToBiomeName feature not to
+        // work properly.
+        if (Biome.getBiome(MAX_TC_BIOME_ID) == null)
+        {
+            ResourceLocation maxTcBiomeKey = new ResourceLocation(PluginStandardValues.PLUGIN_NAME.toLowerCase(), "null");
+            forgeEngine.registerForgeBiome(MAX_TC_BIOME_ID, maxTcBiomeKey,
+                    new TXBiome(biomeConfig, new BiomeIds(MAX_TC_BIOME_ID, MAX_TC_BIOME_ID)));
+        }
 
         if (biomeIds.isVirtual())
         {
@@ -82,55 +109,36 @@ public class TXBiome extends Biome
             // In this way, the id --> biome mapping returns the original biome,
             // and the biome --> id mapping returns savedBiomeId for both the
             // original and custom biome
-            Biome existingBiome = Biome.getBiome(savedBiomeId);
-
+            Biome existingBiome = Biome.getBiomeForId(savedBiomeId);
             if (existingBiome == null)
             {
                 // Original biome not yet registered. This is because it's a
                 // custom biome that is loaded after this virtual biome, so it
                 // will soon be registered
-                Biome.REGISTRY.register(biomeIds.getGenerationId(), registryKey, customBiome);
-                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+                forgeEngine.registerForgeBiome(biomeIds.getGenerationId(), registryKey, customBiome);
+                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
+                        biomeIds.getGenerationId());
             } else
             {
-                ResourceLocation existingBiomeKey = Biome.REGISTRY.getNameForObject(existingBiome);
-                ForgeEngine forgeEngine = ((ForgeEngine) TerrainControl.getEngine());
+                ResourceLocation existingBiomeKey = Biome.REGISTRY.inverseObjectRegistry.get(existingBiome);
                 forgeEngine.registerForgeBiome(biomeIds.getSavedId(), registryKey, customBiome);
                 forgeEngine.registerForgeBiome(biomeIds.getSavedId(), existingBiomeKey, existingBiome);
-                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
+                        biomeIds.getGenerationId());
             }
-        } else
+        } else if (savedBiomeId < 256 && !biomeIds.isVirtual())
         {
             // Normal insertion
             Biome.REGISTRY.register(savedBiomeId, registryKey, customBiome);
-            TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+            TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
+                    biomeIds.getGenerationId());
         }
 
         if (!BiomeDictionary.hasAnyType(customBiome)) {
             // register custom biome with Forge's BiomeDictionary
             BiomeDictionary.makeBestGuess(customBiome);
         }
-
         return customBiome;
-    }
-
-    private int skyColor;
-
-    public final int generationId;
-
-    public TXBiome(BiomeConfig config, ResourceLocation registryKey, BiomeIds id)
-    {
-        super(new BiomePropertiesCustom(config));
-        setRegistryName(registryKey);
-        this.generationId = id.getGenerationId();
-
-        this.skyColor = config.skyColor;
-
-        // Mob spawning
-        addMobs(this.spawnableMonsterList, config.spawnMonsters);
-        addMobs(this.spawnableCreatureList, config.spawnCreatures);
-        addMobs(this.spawnableWaterCreatureList, config.spawnWaterCreatures);
-        addMobs(this.spawnableCaveCreatureList, config.spawnAmbientCreatures);
     }
 
     // Adds the mobs to the internal list

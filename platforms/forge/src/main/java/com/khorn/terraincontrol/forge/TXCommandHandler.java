@@ -5,22 +5,30 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Preconditions;
+import com.khorn.terraincontrol.BiomeIds;
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import com.khorn.terraincontrol.exception.BiomeNotFoundException;
+import com.khorn.terraincontrol.forge.util.CommandHelper;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 
 final class TXCommandHandler implements ICommand
 {
     private final List<String> aliases = Arrays.asList("tc");
     private final WorldLoader worldLoader;
+    public static final TextFormatting ERROR_COLOR = TextFormatting.RED;
+    public static final TextFormatting MESSAGE_COLOR = TextFormatting.GREEN;
+    public static final TextFormatting VALUE_COLOR = TextFormatting.DARK_GREEN;
 
     TXCommandHandler(WorldLoader worldLoader)
     {
@@ -48,9 +56,9 @@ final class TXCommandHandler implements ICommand
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] argString)
     {
-        World world = sender.getEntityWorld();
+        World mcWorld = sender.getEntityWorld();
 
-        if (!world.isRemote) // Server side
+        if (!mcWorld.isRemote) // Server side
         {
             if (argString == null || argString.length == 0)
             {
@@ -73,10 +81,48 @@ final class TXCommandHandler implements ICommand
                 }
             } else if (argString[0].equals("biome"))
             {
-                Biome biome = sender.getEntityWorld().getBiomeForCoordsBody(sender.getPosition());
-                sender.sendMessage(new TextComponentString("-- Biome info --"));
-                sender.sendMessage(new TextComponentString("Name: " + biome.getBiomeName()));
-                sender.sendMessage(new TextComponentString("Id: " + Biome.getIdForBiome(biome)));
+                BlockPos pos = sender.getPosition();
+                int x = pos.getX();
+                int y = pos.getY();
+                int z = pos.getZ();
+
+                LocalWorld world = CommandHelper.getWorld(sender, "");
+
+                if (world == null)
+                {
+                    sender.sendMessage(
+                            new TextComponentTranslation(ERROR_COLOR + "TerrainControl is not enabled for this world."));
+                    return;
+                }
+
+                LocalBiome biome = world.getBiome(x, z);
+                BiomeIds biomeIds = biome.getIds();
+                sender.sendMessage(
+                        new TextComponentTranslation(MESSAGE_COLOR + "According to the biome generator, you are in the " + VALUE_COLOR + biome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biomeIds.getGenerationId()));
+
+                if (CommandHelper.containsArgument(argString, "-f"))
+                {
+                    sender.sendMessage(
+                            new TextComponentTranslation(MESSAGE_COLOR + "The base temperature of this biome is " + VALUE_COLOR + biome.getBiomeConfig().biomeTemperature + MESSAGE_COLOR + ", \nat your height it is " + VALUE_COLOR + biome.getTemperatureAt(
+                                    x, y, z)));
+                }
+
+                if (CommandHelper.containsArgument(argString, "-s"))
+                {
+                    try
+                    {
+                        LocalBiome savedBiome = world.getSavedBiome(x, z);
+                        BiomeIds savedIds = savedBiome.getIds();
+                        sender.sendMessage(
+                                new TextComponentTranslation(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + savedIds.getSavedId()));
+                    } catch (BiomeNotFoundException e)
+                    {
+                        sender.sendMessage(
+                                new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
+                    }
+                }
+
+                return;
             } else
             {
                 sender.sendMessage(new TextComponentString("Unknown command. Type /tc for a list of commands."));
