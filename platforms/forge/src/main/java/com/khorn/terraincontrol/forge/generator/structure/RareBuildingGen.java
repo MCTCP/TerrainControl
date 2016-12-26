@@ -39,7 +39,7 @@ public class RareBuildingGen extends MapGenStructure
     @SuppressWarnings({"unchecked", "rawtypes"})
     public RareBuildingGen(ServerConfigProvider configs)
     {
-        biomeList = new ArrayList<Biome>();
+        this.biomeList = new ArrayList<Biome>();
 
         for (LocalBiome biome : configs.getBiomeArray())
         {
@@ -47,7 +47,7 @@ public class RareBuildingGen extends MapGenStructure
                 continue;
             if (biome.getBiomeConfig().rareBuildingType != RareBuildingType.disabled)
             {
-                biomeList.add(((ForgeBiome) biome).getHandle());
+                this.biomeList.add(((ForgeBiome) biome).getHandle());
             }
         }
 
@@ -87,7 +87,7 @@ public class RareBuildingGen extends MapGenStructure
             Biome biomeAtPosition = this.worldObj.getBiomeProvider().getBiome(
                     new BlockPos(var3 * 16 + 8, 0, var4 * 16 + 8));
 
-            if (biomeList.contains(biomeAtPosition))
+            if (this.biomeList.contains(biomeAtPosition))
             {
                 return true;
             }
@@ -119,8 +119,7 @@ public class RareBuildingGen extends MapGenStructure
         {
             StructureComponent structurecomponent = Iterables.getFirst(structurestart.getComponents(), null);
             return structurecomponent instanceof ComponentScatteredFeaturePieces.SwampHut;
-        }
-        else
+        } else
         {
             return false;
         }

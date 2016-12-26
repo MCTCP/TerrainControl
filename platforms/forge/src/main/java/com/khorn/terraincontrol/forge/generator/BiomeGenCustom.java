@@ -90,23 +90,27 @@ public class BiomeGenCustom extends Biome
                 // custom biome that is loaded after this virtual biome, so it
                 // will soon be registered
                 Biome.REGISTRY.register(biomeIds.getGenerationId(), registryKey, customBiome);
-                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
+                        biomeIds.getGenerationId());
             } else
             {
                 ResourceLocation existingBiomeKey = Biome.REGISTRY.getNameForObject(existingBiome);
                 ForgeEngine forgeEngine = ((ForgeEngine) TerrainControl.getEngine());
                 forgeEngine.registerForgeBiome(biomeIds.getSavedId(), registryKey, customBiome);
                 forgeEngine.registerForgeBiome(biomeIds.getSavedId(), existingBiomeKey, existingBiome);
-                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
+                        biomeIds.getGenerationId());
             }
         } else
         {
             // Normal insertion
             Biome.REGISTRY.register(savedBiomeId, registryKey, customBiome);
-            TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+            TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
+                    biomeIds.getGenerationId());
         }
 
-        if (!BiomeDictionary.isBiomeRegistered(customBiome)) {
+        if (!BiomeDictionary.isBiomeRegistered(customBiome))
+        {
             // register custom biome with Forge's BiomeDictionary
             BiomeDictionary.makeBestGuess(customBiome);
         }

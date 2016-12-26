@@ -18,7 +18,7 @@ final class ForgeLogger extends Logger
     @Override
     public void log(LogMarker level, String message, Object... params)
     {
-        if (minimumLevel.compareTo(level) < 0)
+        if (this.minimumLevel.compareTo(level) < 0)
         {
             // Only log messages that we want to see...
             return;
@@ -26,26 +26,26 @@ final class ForgeLogger extends Logger
         switch (level)
         {
             case FATAL:
-                logger.fatal(message, params);
+                this.logger.fatal(message, params);
                 break;
             case ERROR:
-                logger.error(message, params);
+                this.logger.error(message, params);
                 break;
             case WARN:
-                logger.warn(message, params);
+                this.logger.warn(message, params);
                 break;
             case INFO:
-                logger.info(message, params);
+                this.logger.info(message, params);
                 break;
             case DEBUG:
-                logger.debug(message, params);
+                this.logger.debug(message, params);
                 break;
             case TRACE:
-                logger.trace(message, params);
+                this.logger.trace(message, params);
                 break;
             default:
                 // Unknown log level, should never happen
-                logger.info(message, params); // Still log the message
+                this.logger.info(message, params); // Still log the message
                 throw new RuntimeException("Unknown log marker: " + level);
         }
     }

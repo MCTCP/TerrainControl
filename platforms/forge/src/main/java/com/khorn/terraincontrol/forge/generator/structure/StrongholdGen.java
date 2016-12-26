@@ -33,7 +33,7 @@ public class StrongholdGen extends MapGenStructure
         this.structureCoords = new ChunkPos[configs.getWorldConfig().strongholdCount];
         this.spread = configs.getWorldConfig().strongholdSpread;
 
-        allowedBiomes = new ArrayList<Biome>();
+        this.allowedBiomes = new ArrayList<Biome>();
 
         for (LocalBiome biome : configs.getBiomeArray())
         {
@@ -41,7 +41,7 @@ public class StrongholdGen extends MapGenStructure
                 continue;
             if (biome.getBiomeConfig().strongholdsEnabled)
             {
-                allowedBiomes.add(((ForgeBiome) biome).getHandle());
+                this.allowedBiomes.add(((ForgeBiome) biome).getHandle());
             }
         }
     }
@@ -64,8 +64,8 @@ public class StrongholdGen extends MapGenStructure
                 int var11 = (int) Math.round(Math.sin(randomNumBetween0and2PI) * var8);
                 ArrayList var12 = new ArrayList();
                 Collections.addAll(var12, this.allowedBiomes);
-                BlockPos var13 = this.worldObj.getBiomeProvider().findBiomePosition((var10 << 4) + 8, (var11 << 4) + 8, 112, var12,
-                        random);
+                BlockPos var13 = this.worldObj.getBiomeProvider().findBiomePosition((var10 << 4) + 8, (var11 << 4) + 8,
+                        112, var12, random);
 
                 if (var13 != null)
                 {
@@ -108,7 +108,7 @@ public class StrongholdGen extends MapGenStructure
     {
         List<BlockPos> chunkPositions = new ArrayList<BlockPos>();
 
-        for (ChunkPos structureCoord : structureCoords)
+        for (ChunkPos structureCoord : this.structureCoords)
         {
             if (structureCoord != null)
             {

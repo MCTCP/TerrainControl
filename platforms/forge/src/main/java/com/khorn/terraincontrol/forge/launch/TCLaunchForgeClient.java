@@ -10,8 +10,6 @@ package com.khorn.terraincontrol.forge.launch;
 public final class TCLaunchForgeClient
 {
 
-
-
     public static void main(String[] extraArgs)
     {
         LaunchEnvironment environment = new LaunchEnvironment();

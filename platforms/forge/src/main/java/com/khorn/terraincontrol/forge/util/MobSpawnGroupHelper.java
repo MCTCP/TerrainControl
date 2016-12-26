@@ -95,18 +95,18 @@ public final class MobSpawnGroupHelper
             Class<? extends EntityLiving> entityClass = toMinecraftClass(mobGroup.getInternalName());
             if (entityClass != null)
             {
-                biomeList.add(new SpawnListEntry(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
+                biomeList.add(
+                        new SpawnListEntry(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
             } else
             {
                 // The .toLowerCase() is just a safeguard so that we get
                 // notified if this.af is no longer the biome name
-                TerrainControl.log(LogMarker.WARN, "Mob type {} not found",
-                        mobGroup.getInternalName());
+                TerrainControl.log(LogMarker.WARN, "Mob type {} not found", mobGroup.getInternalName());
             }
         }
         return biomeList;
     }
-    
+
     /**
      * Gets the entity class corresponding to the given entity name. This
      * method is the inverse of {@link #fromMinecraftClass(Class)}.

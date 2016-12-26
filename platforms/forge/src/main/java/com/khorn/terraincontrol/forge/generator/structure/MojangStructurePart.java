@@ -41,7 +41,7 @@ public final class MojangStructurePart implements SpawnableObject
 
         PlacementSettings spawnSettings = new PlacementSettings().setRotation(rotationMc).setChunk(
                 new ChunkPos(blockPos));
-        spawnObject.addBlocksToWorld(worldMc, blockPos, spawnSettings);
+        this.spawnObject.addBlocksToWorld(worldMc, blockPos, spawnSettings);
         return true;
     }
 
@@ -65,7 +65,7 @@ public final class MojangStructurePart implements SpawnableObject
     @Override
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
 }

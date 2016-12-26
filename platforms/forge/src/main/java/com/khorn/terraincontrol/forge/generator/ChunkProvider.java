@@ -43,7 +43,7 @@ public class ChunkProvider implements IChunkGenerator
         this.world = _world;
         this.worldHandle = _world.getWorld();
 
-        this.TestMode = world.getConfigs().getWorldConfig().ModeTerrain == WorldConfig.TerrainMode.TerrainTest;
+        this.TestMode = this.world.getConfigs().getWorldConfig().ModeTerrain == WorldConfig.TerrainMode.TerrainTest;
 
         this.generator = new ChunkProviderTC(this.world.getConfigs(), this.world);
         this.spawner = new ObjectSpawner(this.world.getConfigs(), this.world);
@@ -72,14 +72,13 @@ public class ChunkProvider implements IChunkGenerator
     private void fillBiomeArray(Chunk chunk)
     {
         byte[] chunkBiomeArray = chunk.getBiomeArray();
-        ConfigProvider configProvider = world.getConfigs();
-        biomeIntArray = world.getBiomeGenerator().getBiomes(biomeIntArray,
-                chunk.xPosition * CHUNK_X_SIZE, chunk.zPosition * CHUNK_Z_SIZE,
-                CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
+        ConfigProvider configProvider = this.world.getConfigs();
+        this.biomeIntArray = this.world.getBiomeGenerator().getBiomes(this.biomeIntArray, chunk.xPosition * CHUNK_X_SIZE,
+                chunk.zPosition * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
 
         for (int i = 0; i < chunkBiomeArray.length; i++)
         {
-            int generationId = biomeIntArray[i];
+            int generationId = this.biomeIntArray[i];
             chunkBiomeArray[i] = (byte) configProvider.getBiomeByIdOrNull(generationId).getIds().getSavedId();
         }
     }
@@ -132,30 +131,30 @@ public class ChunkProvider implements IChunkGenerator
     public void recreateStructures(Chunk chunkIn, int chunkX, int chunkZ)
     {
         // recreateStructures
-        WorldConfig worldConfig = world.getConfigs().getWorldConfig();
+        WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
         if (worldConfig.mineshaftsEnabled)
         {
-            world.mineshaftGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.mineshaftGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
         if (worldConfig.villagesEnabled)
         {
-            world.villageGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.villageGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
         if (worldConfig.strongholdsEnabled)
         {
-            world.strongholdGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.strongholdGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
         if (worldConfig.rareBuildingsEnabled)
         {
-            world.rareBuildingGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.rareBuildingGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
         if (worldConfig.netherFortressesEnabled)
         {
-            world.netherFortressGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.netherFortressGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
         if (worldConfig.oceanMonumentsEnabled)
         {
-            world.oceanMonumentGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.oceanMonumentGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
     }
 
@@ -163,14 +162,10 @@ public class ChunkProvider implements IChunkGenerator
     public boolean generateStructures(Chunk chunkIn, int x, int z)
     {
         // retroGen -> generated ocean monument in existing chunks in vanilla
-        // Disabled, as
-        // * it's not enabled in the Bukkit version, as Spigot's
-        // generator API doesn't support it
-        // * people updating to 1.8 might be surprised why this monument
-        // spawns in existing chunks of their customized ocean biome
-        // * changing the spawn settings of ocean monuments makes them spawn
-        // at different positions, so extra monuments will be spawned in old
-        // chunks
+        // Disabled, as it's not enabled in the Bukkit version, as Spigot's
+        // generator API doesn't support it people updating to 1.8 might be surprised why this monument
+        // spawns in existing chunks of their customized ocean biome changing the spawn settings of ocean monuments makes them spawn
+        // at different positions, so extra monuments will be spawned in old chunks
         return false;
     }
 

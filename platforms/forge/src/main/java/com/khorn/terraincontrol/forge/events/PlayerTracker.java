@@ -46,7 +46,7 @@ public class PlayerTracker
 
         EntityPlayerMP player = (EntityPlayerMP) event.player;
 
-        LocalWorld worldTC = worldLoader.getWorld(player.getEntityWorld());
+        LocalWorld worldTC = this.worldLoader.getWorld(player.getEntityWorld());
         if (worldTC == null)
         {
             // World not loaded

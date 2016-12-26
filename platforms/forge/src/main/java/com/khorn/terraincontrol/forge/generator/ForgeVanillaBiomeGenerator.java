@@ -18,7 +18,8 @@ import net.minecraft.world.biome.BiomeProvider;
  * {@link #setBiomeProvider(BiomeProvider)}.
  *
  */
-public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
+public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator
+{
 
     private Biome[] BiomeArray;
     private BiomeProvider worldChunkManager;
@@ -31,35 +32,35 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator {
     @Override
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
-        BiomeArray = worldChunkManager.getBiomesForGeneration(BiomeArray, x, z, x_size, z_size);
+        this.BiomeArray = this.worldChunkManager.getBiomesForGeneration(this.BiomeArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = Biome.getIdForBiome(BiomeArray[i]);
+            biomeArray[i] = Biome.getIdForBiome(this.BiomeArray[i]);
         return biomeArray;
     }
 
     @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int x_size, int z_size, OutputType outputType)
     {
-        BiomeArray = worldChunkManager.getBiomes(BiomeArray, x, z, x_size, z_size, true);
+        this.BiomeArray = this.worldChunkManager.getBiomes(this.BiomeArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
             biomeArray = new int[x_size * z_size];
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = Biome.getIdForBiome(BiomeArray[i]);
+            biomeArray[i] = Biome.getIdForBiome(this.BiomeArray[i]);
         return biomeArray;
     }
 
     @Override
     public int getBiome(int x, int z)
     {
-        return Biome.getIdForBiome(worldChunkManager.getBiome(new BlockPos(x, 0, z)));
+        return Biome.getIdForBiome(this.worldChunkManager.getBiome(new BlockPos(x, 0, z)));
     }
 
     @Override
     public void cleanupCache()
     {
-        worldChunkManager.cleanupCache();
+        this.worldChunkManager.cleanupCache();
     }
 
     @Override

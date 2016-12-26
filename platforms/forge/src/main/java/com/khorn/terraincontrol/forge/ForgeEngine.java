@@ -26,28 +26,39 @@ public class ForgeEngine extends TerrainControlEngine
         super(new ForgeLogger());
         this.worldLoader = worldLoader;
         // setup reflection method in order to properly register virtual biomes
-        try {
-            ADD_OBJECT_RAW = Biome.REGISTRY.getClass().getDeclaredMethod("addObjectRaw", int.class, ResourceLocation.class, IForgeRegistryEntry.class);
-            ADD_OBJECT_RAW.setAccessible(true);
-        } catch (NoSuchMethodException e) {
+        try
+        {
+            this.ADD_OBJECT_RAW = Biome.REGISTRY.getClass().getDeclaredMethod("addObjectRaw", int.class,
+                    ResourceLocation.class, IForgeRegistryEntry.class);
+            this.ADD_OBJECT_RAW.setAccessible(true);
+        } catch (NoSuchMethodException e)
+        {
             e.printStackTrace();
-        } catch (SecurityException e) {
+        } catch (SecurityException e)
+        {
             e.printStackTrace();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             e.printStackTrace();
         }
     }
 
     // Used to bypass Forge's API in order to properly register a virtual biome
-    // that would otherwise be blocked by Forge due to virtual biome ID's surpassing 255.
-    public void registerForgeBiome(int id, ResourceLocation resourceLocation, Biome biome) {
-        try {
+    // that would otherwise be blocked by Forge due to virtual biome ID's
+    // surpassing 255.
+    public void registerForgeBiome(int id, ResourceLocation resourceLocation, Biome biome)
+    {
+        try
+        {
             this.ADD_OBJECT_RAW.invoke(Biome.REGISTRY, id, resourceLocation, biome);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             e.printStackTrace();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e)
+        {
             e.printStackTrace();
         }
     }
@@ -55,13 +66,13 @@ public class ForgeEngine extends TerrainControlEngine
     @Override
     public LocalWorld getWorld(String name)
     {
-        return worldLoader.getWorld(name);
+        return this.worldLoader.getWorld(name);
     }
 
     @Override
     public File getTCDataFolder()
     {
-        return worldLoader.getConfigsFolder();
+        return this.worldLoader.getConfigsFolder();
     }
 
     @Override

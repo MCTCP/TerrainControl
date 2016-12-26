@@ -70,8 +70,7 @@ public class TCToForgeEventConverter extends EventHandler
             if (!hasOreGenerationBegun(world))
             {
                 // Fire ore generation start event
-                MinecraftForge.ORE_GEN_BUS
-                        .post(new OreGenEvent.Pre(world.getWorld(), random, blockPos));
+                MinecraftForge.ORE_GEN_BUS.post(new OreGenEvent.Pre(world.getWorld(), random, blockPos));
                 setOreGenerationBegun(world, true);
             }
             // Fire ore generation event
@@ -101,8 +100,7 @@ public class TCToForgeEventConverter extends EventHandler
         setOreGenerationBegun(world, false);
 
         // Fire event
-        PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Pre(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ,
-                villageInChunk);
+        PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Pre(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, villageInChunk);
         MinecraftForge.EVENT_BUS.post(forgeEvent);
     }
 
@@ -131,8 +129,7 @@ public class TCToForgeEventConverter extends EventHandler
         }
 
         // Population close
-        final PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Post(world.getChunkGenerator(), world.getWorld(), random, chunkX,
-                chunkZ, villageInChunk);
+        final PopulateChunkEvent forgeEvent = new PopulateChunkEvent.Post(world.getChunkGenerator(), world.getWorld(), random, chunkX, chunkZ, villageInChunk);
         MinecraftForge.EVENT_BUS.post(forgeEvent);
 
         // There is no need to call GameRegistry.generateWorld, because it is done by the Chunk Provider in Forge.
@@ -153,7 +150,8 @@ public class TCToForgeEventConverter extends EventHandler
             return Decorate.EventType.GRASS;
         if (block.isMaterial(DefaultMaterial.DEAD_BUSH))
             return Decorate.EventType.DEAD_BUSH;
-        if (block.isMaterial(DefaultMaterial.RED_ROSE) || block.isMaterial(DefaultMaterial.YELLOW_FLOWER) || block.isMaterial(DefaultMaterial.DOUBLE_PLANT))
+        if (block.isMaterial(DefaultMaterial.RED_ROSE) || block.isMaterial(
+                DefaultMaterial.YELLOW_FLOWER) || block.isMaterial(DefaultMaterial.DOUBLE_PLANT))
             return Decorate.EventType.FLOWERS;
         if (block.isMaterial(DefaultMaterial.PUMPKIN))
             return Decorate.EventType.PUMPKIN;
@@ -205,21 +203,21 @@ public class TCToForgeEventConverter extends EventHandler
 
     private boolean hasOreGenerationBegun(LocalWorld world)
     {
-        return hasOreGenBegun.get(world.getName());
+        return this.hasOreGenBegun.get(world.getName());
     }
 
     private boolean hasDecorationBegun(LocalWorld world)
     {
-        return hasDecorationBegun.get(world.getName());
+        return this.hasDecorationBegun.get(world.getName());
     }
 
     private void setOreGenerationBegun(LocalWorld world, boolean begun)
     {
-        hasOreGenBegun.put(world.getName(), begun);
+        this.hasOreGenBegun.put(world.getName(), begun);
     }
 
     private void setDecorationBegun(LocalWorld world, boolean begun)
     {
-        hasDecorationBegun.put(world.getName(), begun);
+        this.hasDecorationBegun.put(world.getName(), begun);
     }
 }

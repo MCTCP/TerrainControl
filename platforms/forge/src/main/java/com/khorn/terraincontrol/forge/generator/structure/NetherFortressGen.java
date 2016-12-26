@@ -28,8 +28,7 @@ public class NetherFortressGen extends MapGenStructure
         this.spawnList.add(new SpawnListEntry(EntityMagmaCube.class, 3, 4, 4));
     }
 
-    @SuppressWarnings({"rawtypes", "UnusedDeclaration"})
-    public List getSpawnList()
+    public List<SpawnListEntry> getSpawnList()
     {
         return this.spawnList;
     }
@@ -39,26 +38,26 @@ public class NetherFortressGen extends MapGenStructure
     {
         int var3 = chunkX >> 4;
         int var4 = chunkZ >> 4;
-        rand.setSeed((long) (var3 ^ var4 << 4) ^ worldObj.getSeed());
-        rand.nextInt();
+        this.rand.setSeed((long) (var3 ^ var4 << 4) ^ this.worldObj.getSeed());
+        this.rand.nextInt();
 
-        if (rand.nextInt(3) != 0)
+        if (this.rand.nextInt(3) != 0)
         {
             return false;
         } else
         {
-            if (chunkX != (var3 << 4) + 4 + rand.nextInt(8))
+            if (chunkX != (var3 << 4) + 4 + this.rand.nextInt(8))
             {
                 return false;
             } else
             {
-                LocalWorld world = WorldHelper.toLocalWorld(worldObj);
+                LocalWorld world = WorldHelper.toLocalWorld(this.worldObj);
                 LocalBiome biome = world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
                 if (!biome.getBiomeConfig().netherFortressesEnabled)
                 {
                     return false;
                 }
-                return (chunkZ == (var4 << 4) + 4 + rand.nextInt(8));
+                return (chunkZ == (var4 << 4) + 4 + this.rand.nextInt(8));
             }
         }
     }

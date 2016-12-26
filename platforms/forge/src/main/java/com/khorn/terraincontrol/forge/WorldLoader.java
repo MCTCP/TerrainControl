@@ -41,12 +41,12 @@ public final class WorldLoader
 
     public ForgeWorld getWorld(String name)
     {
-        return worlds.get(name);
+        return this.worlds.get(name);
     }
 
     public File getConfigsFolder()
     {
-        return configsDir;
+        return this.configsDir;
     }
 
     public LocalWorld getWorld(World world)
@@ -83,7 +83,7 @@ public final class WorldLoader
         TerrainControl.log(LogMarker.INFO, "Loading configs for world \"{}\"..", world.getName());
         ServerConfigProvider configs = new ServerConfigProvider(worldConfigsFolder, world);
         world.provideConfigs(configs);
-        worlds.put(worldName,  world);
+        this.worlds.put(worldName, world);
     }
 
     public void onServerStopped()
@@ -98,7 +98,7 @@ public final class WorldLoader
 
     private void unloadWorld()
     {
-        for (ForgeWorld world : worlds.values())
+        for (ForgeWorld world : this.worlds.values())
         {
             if (world != null)
             {
@@ -130,19 +130,20 @@ public final class WorldLoader
         String worldName = WorldHelper.getName(mcWorld);
         ForgeWorld world = new ForgeWorld(worldName);
 
-        TerrainControl.log(LogMarker.INFO,  "Loading configs for world \"{}\"....", world.getName());
+        TerrainControl.log(LogMarker.INFO, "Loading configs for world \"{}\"....", world.getName());
 
         File worldConfigsDir = getWorldDir(world.getName());
         ServerConfigProvider configs = new ServerConfigProvider(worldConfigsDir, world);
         world.provideConfigs(configs);
         world.provideWorldInstance(mcWorld);
-        worlds.put(worldName,  world);
+        this.worlds.put(worldName, world);
 
         return world;
     }
-    
-    private File getWorldDir(String worldName) {
-        return new File(configsDir, "worlds/" + worldName);
+
+    private File getWorldDir(String worldName)
+    {
+        return new File(this.configsDir, "worlds/" + worldName);
     }
 
     @SideOnly(Side.CLIENT)
@@ -151,7 +152,7 @@ public final class WorldLoader
         ForgeWorld world = new ForgeWorld(ConfigFile.readStringFromStream(wrappedStream));
         ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world);
         world.provideClientConfigs(mcWorld, configs);
-        worlds.put(world.getName(), world);
+        this.worlds.put(world.getName(), world);
     }
 
 }

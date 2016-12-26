@@ -41,7 +41,7 @@ public class OceanMonumentGen extends MapGenStructure
                 continue;
             }
 
-            monumentSpawnBiomes.add(((ForgeBiome) biome).getHandle());
+            this.monumentSpawnBiomes.add(((ForgeBiome) biome).getHandle());
         }
     }
 
@@ -77,7 +77,8 @@ public class OceanMonumentGen extends MapGenStructure
                 return false;
             }
 
-            boolean flag = this.worldObj.getBiomeProvider().areBiomesViable(k * 16 + 8, l * 16 + 8, 29, monumentSpawnBiomes);
+            boolean flag = this.worldObj.getBiomeProvider().areBiomesViable(k * 16 + 8, l * 16 + 8, 29,
+                    this.monumentSpawnBiomes);
 
             if (flag)
             {

@@ -59,7 +59,7 @@ public class ClientNetworkHandler
 
                     DataInputStream wrappedStream = new DataInputStream(new ByteBufInputStream(stream));
 
-                    worldLoader.demandClientWorld(worldMC, wrappedStream);
+                    this.worldLoader.demandClientWorld(worldMC, wrappedStream);
                 }
 
                 TerrainControl.log(LogMarker.INFO, "Config received from server");
@@ -68,12 +68,12 @@ public class ClientNetworkHandler
                 // Server or client is outdated
                 if (serverProtocolVersion > PluginStandardValues.ProtocolVersion)
                 {
-                    sendMessage(TextFormatting.GREEN, "The server is running a newer version of " + PluginStandardValues.PLUGIN_NAME
-                            + ". Please update!");
+                    sendMessage(TextFormatting.GREEN,
+                            "The server is running a newer version of " + PluginStandardValues.PLUGIN_NAME + ". Please update!");
                 } else
                 {
-                    sendMessage(TextFormatting.YELLOW, "The server is running an outdated version of "
-                            + PluginStandardValues.PLUGIN_NAME + ". Cannot load custom biome colors and weather.");
+                    sendMessage(TextFormatting.YELLOW,
+                            "The server is running an outdated version of " + PluginStandardValues.PLUGIN_NAME + ". Cannot load custom biome colors and weather.");
                 }
                 TerrainControl.log(LogMarker.WARN, "Server has different protocol version. Client: {} Server: {}",
                         PluginStandardValues.ProtocolVersion, serverProtocolVersion);

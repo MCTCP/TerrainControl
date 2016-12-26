@@ -50,43 +50,43 @@ public final class ForgeMojangSettings implements MojangSettings
     @Override
     public float getTemperature()
     {
-        return biomeBase.getTemperature();
+        return this.biomeBase.getTemperature();
     }
 
     @Override
     public float getWetness()
     {
-        return biomeBase.getRainfall();
+        return this.biomeBase.getRainfall();
     }
 
     @Override
     public float getSurfaceHeight()
     {
-        return biomeBase.getBaseHeight();
+        return this.biomeBase.getBaseHeight();
     }
 
     @Override
     public float getSurfaceVolatility()
     {
-        return biomeBase.getHeightVariation();
+        return this.biomeBase.getHeightVariation();
     }
 
     @Override
     public LocalMaterialData getSurfaceBlock()
     {
-        return ForgeMaterialData.ofMinecraftBlockState(biomeBase.topBlock);
+        return ForgeMaterialData.ofMinecraftBlockState(this.biomeBase.topBlock);
     }
 
     @Override
     public LocalMaterialData getGroundBlock()
     {
-        return ForgeMaterialData.ofMinecraftBlockState(biomeBase.fillerBlock);
+        return ForgeMaterialData.ofMinecraftBlockState(this.biomeBase.fillerBlock);
     }
 
     @Override
     public List<WeightedMobSpawnGroup> getMobSpawnGroup(EntityCategory entityCategory)
     {
-        return MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, entityCategory);
+        return MobSpawnGroupHelper.getListFromMinecraftBiome(this.biomeBase, entityCategory);
     }
 
 }
