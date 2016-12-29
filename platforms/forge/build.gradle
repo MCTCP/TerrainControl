@@ -27,7 +27,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 // Project properties
 archivesBaseName = "terraincontrol-forge"
 description = "TerrainControl for Minecraft Forge"
-ext.forgeVersion = "1.11-13.19.1.2189"
+ext.forgeVersion = "1.11-13.19.1.2199"
 minecraft.version = ext.forgeVersion
 minecraft.runDir = "run"
 minecraft.mappings = "snapshot_20161129"
@@ -75,5 +75,9 @@ jar
     from
     {
         project(":common").sourceSets.main.output.files
+    }
+    manifest
+    {
+        attributes 'FMLAT': 'terraincontrol_at.cfg'
     }
 }

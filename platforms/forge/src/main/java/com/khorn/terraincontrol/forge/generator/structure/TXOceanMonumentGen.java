@@ -42,7 +42,7 @@ public class TXOceanMonumentGen extends MapGenStructure
                 continue;
             }
 
-            monumentSpawnBiomes.add(((ForgeBiome) biome).getHandle());
+            this.monumentSpawnBiomes.add(((ForgeBiome) biome).getHandle());
         }
     }
 
@@ -78,7 +78,7 @@ public class TXOceanMonumentGen extends MapGenStructure
                 return false;
             }
 
-            boolean flag = this.world.getBiomeProvider().areBiomesViable(k * 16 + 8, l * 16 + 8, 29, monumentSpawnBiomes);
+            boolean flag = this.world.getBiomeProvider().areBiomesViable(k * 16 + 8, l * 16 + 8, 29, this.monumentSpawnBiomes);
 
             if (flag)
             {
@@ -106,6 +106,7 @@ public class TXOceanMonumentGen extends MapGenStructure
         return this.mobList;
     }
 
+    @Override
     public BlockPos getClosestStrongholdPos(World worldIn, BlockPos pos, boolean p_180706_3_)
     {
         this.world = worldIn;

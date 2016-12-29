@@ -22,7 +22,7 @@ public class TXStrongholdGen extends MapGenStronghold
                 "count", String.valueOf(configs.getWorldConfig().strongholdCount),
                 "spread",  String.valueOf(configs.getWorldConfig().strongholdSpread)));
 
-        allowedBiomes = new ArrayList<Biome>();
+        this.allowedBiomes = new ArrayList<Biome>();
 
         for (LocalBiome biome : configs.getBiomeArray())
         {
@@ -30,7 +30,7 @@ public class TXStrongholdGen extends MapGenStronghold
                 continue;
             if (biome.getBiomeConfig().strongholdsEnabled)
             {
-                allowedBiomes.add(((ForgeBiome) biome).getHandle());
+                this.allowedBiomes.add(((ForgeBiome) biome).getHandle());
             }
         }
     }

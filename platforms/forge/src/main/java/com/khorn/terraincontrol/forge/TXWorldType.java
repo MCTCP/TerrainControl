@@ -9,9 +9,9 @@ import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.TXBiomeProvider;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
+import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.IChunkGenerator;
@@ -45,50 +45,53 @@ public class TXWorldType extends WorldType
             return super.getBiomeProvider(mcWorld);
         }
 
-        ForgeWorld world = worldLoader.getWorld(mcWorld.getWorldInfo().getWorldName());
-        if (world == null) {
-            world = worldLoader.demandServerWorld((WorldServer) mcWorld);
-        } else
+        ForgeWorld world = this.worldLoader.getOrCreateForgeWorld(mcWorld);
+        if (world == null)
         {
-            world.provideWorldInstance((WorldServer) mcWorld);
+            return super.getBiomeProvider(mcWorld);
         }
 
         Class<? extends BiomeGenerator> biomeGenClass = world.getConfigs().getWorldConfig().biomeMode;
         BiomeGenerator biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeGenClass, world);
-        BiomeProvider mcBiomeGenerator = createBiomeProvider(world, biomeGenerator);
-        world.setBiomeManager(biomeGenerator);
-
-        return mcBiomeGenerator;
+        BiomeProvider biomeProvider = this.createBiomeProvider(world, biomeGenerator);
+        world.setBiomeGenerator(biomeGenerator);
+        return biomeProvider;
     }
 
     /**
      * Gets the appropriate BiomeProvider. For the vanilla biome generator we
-     * have to use BiomeProvider, for other biome modes TCWorldChunkManager is
+     * have to use BiomeProvider, for other biome modes TCBiomeProvider is
      * the right option.
      * 
      * @param world ForgeWorld instance, needed to instantiate the
-     *            WorldChunkManager.
+     *            BiomeProvider.
      * @param biomeGenerator Biome generator.
-     * @return The most appropriate WorldChunkManager.
+     * @return The most appropriate BiomeProvider.
      */
     private BiomeProvider createBiomeProvider(ForgeWorld world, BiomeGenerator biomeGenerator)
     {
+        World mcWorld = world.getWorld();
+        BiomeProvider biomeProvider;
         if (biomeGenerator instanceof ForgeVanillaBiomeGenerator)
         {
-            BiomeProvider worldChunkManager = super.getBiomeProvider(world.getWorld());
-            ((ForgeVanillaBiomeGenerator) biomeGenerator).setBiomeProvider(worldChunkManager);
-            return worldChunkManager;
+            biomeProvider = mcWorld.provider.getBiomeProvider();
+            // Let our biome generator depend on Minecraft's
+            ((ForgeVanillaBiomeGenerator) biomeGenerator).setBiomeProvider(biomeProvider);
         } else
         {
-            return new TXBiomeProvider(world, biomeGenerator);
+            biomeProvider = new TXBiomeProvider(world, biomeGenerator);
+            // Let Minecraft's biome generator depend on ours
+            ReflectionHelper.setValueInFieldOfType(mcWorld.provider, BiomeProvider.class, biomeProvider);
         }
+
+        return biomeProvider;
     }
 
     @Override
     public IChunkGenerator getChunkGenerator(World mcWorld, String generatorOptions)
     {
-        ForgeWorld world = worldLoader.getWorld(WorldHelper.getName(mcWorld));
-        if (world.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
+        ForgeWorld world = this.worldLoader.getWorld(WorldHelper.getName(mcWorld));
+        if (world != null && world.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
         {
             return world.getChunkGenerator();
         } else

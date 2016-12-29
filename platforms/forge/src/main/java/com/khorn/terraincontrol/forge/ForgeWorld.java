@@ -24,6 +24,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.datafix.DataFixer;
+import net.minecraft.util.datafix.DataFixesManager;
+import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -32,6 +35,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
@@ -39,6 +43,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.*;
+
+import javax.annotation.Nullable;
 
 public class ForgeWorld implements LocalWorld
 {
@@ -50,6 +56,7 @@ public class ForgeWorld implements LocalWorld
     private String name;
     private long seed;
     private BiomeGenerator biomeGenerator;
+    private DataFixer dataFixer;
 
     private static int nextBiomeId = 0;
 
@@ -91,26 +98,34 @@ public class ForgeWorld implements LocalWorld
     public ForgeWorld(String _name)
     {
         this.name = _name;
-
         nextBiomeId = DefaultBiome.values().length;
     }
 
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        Biome biome = TXBiome.getOrCreateBiome(biomeConfig, biomeIds);
-
-        int requestedGenerationId = biomeIds.getGenerationId();
-        int allocatedGenerationId = Biome.getIdForBiome(biome);
-        if (requestedGenerationId != allocatedGenerationId)
+        int savedId = biomeIds.getSavedId();
+        Biome biome = Biome.getBiome(savedId);
+        if (biome == null || biomeIds.isVirtual())
         {
-            TerrainControl.log(LogMarker.INFO, "Asked to register {} with id {}, but succeeded with id {}",
-                    biomeConfig.getName(), requestedGenerationId, allocatedGenerationId);
+            biome = TXBiome.getOrCreateBiome(biomeConfig, biomeIds);
+            int requestedGenerationId = biomeIds.getGenerationId();
+            int allocatedGenerationId = Biome.REGISTRY.underlyingIntegerMap.getId(biome);
+            if (requestedGenerationId != allocatedGenerationId && !biomeConfig.defaultSettings.isCustomBiome)
+            {
+                if (requestedGenerationId < 256 && allocatedGenerationId >= 256)
+                {
+                    throw new RuntimeException("Could not allocate the requested id " + requestedGenerationId + " for biome " + biomeConfig.getName() + ". All available id's under 256 have been allocated.\n"
+                        + "To proceed, adjust your WorldConfig or use the ReplaceToBiomeName feature to make the biome virtual.");
+                }
+                TerrainControl.log(LogMarker.INFO, "Asked to register {} with id {}, but succeeded with id {}",
+                        biomeConfig.getName(), requestedGenerationId, allocatedGenerationId);
+            }
         }
 
-        LocalBiome localBiome = ForgeBiome.forBiome(biomeConfig, biome);
-        this.biomeNames.put(biome.getBiomeName(), localBiome);
-        return localBiome;
+        ForgeBiome forgeBiome = new ForgeBiome(biome, biomeConfig, biomeIds);
+        this.biomeNames.put(biome.getBiomeName(), forgeBiome);
+        return forgeBiome;
     }
 
     @Override
@@ -134,10 +149,10 @@ public class ForgeWorld implements LocalWorld
     @Override
     public ForgeBiome getBiomeById(int id) throws BiomeNotFoundException
     {
-        LocalBiome biome = settings.getBiomeByIdOrNull(id);
+        LocalBiome biome = this.settings.getBiomeByIdOrNull(id);
         if (biome == null)
         {
-            throw new BiomeNotFoundException(id, Arrays.asList(settings.getBiomeArray()));
+            throw new BiomeNotFoundException(id, Arrays.asList(this.settings.getBiomeArray()));
         }
         return (ForgeBiome) biome;
     }
@@ -145,16 +160,16 @@ public class ForgeWorld implements LocalWorld
     @Override
     public ForgeBiome getBiomeByIdOrNull(int id)
     {
-        return (ForgeBiome) settings.getBiomeByIdOrNull(id);
+        return (ForgeBiome) this.settings.getBiomeByIdOrNull(id);
     }
 
     @Override
     public LocalBiome getBiomeByName(String name) throws BiomeNotFoundException
     {
-        LocalBiome biome = biomeNames.get(name);
+        LocalBiome biome = this.biomeNames.get(name);
         if (biome == null)
         {
-            throw new BiomeNotFoundException(name, biomeNames.keySet());
+            throw new BiomeNotFoundException(name, this.biomeNames.keySet());
         }
         return biome;
     }
@@ -196,13 +211,13 @@ public class ForgeWorld implements LocalWorld
     @Override
     public boolean placeDungeon(Random rand, int x, int y, int z)
     {
-        return dungeonGen.generate(this.world, rand, new BlockPos(x, y, z));
+        return this.dungeonGen.generate(this.world, rand, new BlockPos(x, y, z));
     }
 
     @Override
     public boolean placeFossil(Random rand, ChunkCoordinate chunkCoord)
     {
-        return fossilGen.generate(this.world, rand, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+        return this.fossilGen.generate(this.world, rand, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
     }
 
     @Override
@@ -212,46 +227,46 @@ public class ForgeWorld implements LocalWorld
         switch (type)
         {
             case Tree:
-                return tree.generate(this.world, rand, blockPos);
+                return this.tree.generate(this.world, rand, blockPos);
             case BigTree:
-                return bigTree.generate(this.world, rand, blockPos);
+                return this.bigTree.generate(this.world, rand, blockPos);
             case Forest:
             case Birch:
-                return birchTree.generate(this.world, rand, blockPos);
+                return this.birchTree.generate(this.world, rand, blockPos);
             case TallBirch:
-                return longBirchTree.generate(this.world, rand, blockPos);
+                return this.longBirchTree.generate(this.world, rand, blockPos);
             case HugeMushroom:
                 if (rand.nextBoolean())
                 {
-                    return hugeBrownMushroom.generate(this.world, rand, blockPos);
+                    return this.hugeBrownMushroom.generate(this.world, rand, blockPos);
                 } else
                 {
-                    return hugeRedMushroom.generate(this.world, rand, blockPos);
+                    return this.hugeRedMushroom.generate(this.world, rand, blockPos);
                 }
             case HugeRedMushroom:
-                return hugeRedMushroom.generate(this.world, rand, blockPos);
+                return this.hugeRedMushroom.generate(this.world, rand, blockPos);
             case HugeBrownMushroom:
-                return hugeBrownMushroom.generate(this.world, rand, blockPos);
+                return this.hugeBrownMushroom.generate(this.world, rand, blockPos);
             case SwampTree:
-                return swampTree.generate(this.world, rand, blockPos);
+                return this.swampTree.generate(this.world, rand, blockPos);
             case Taiga1:
-                return taigaTree1.generate(this.world, rand, blockPos);
+                return this.taigaTree1.generate(this.world, rand, blockPos);
             case Taiga2:
-                return taigaTree2.generate(this.world, rand, blockPos);
+                return this.taigaTree2.generate(this.world, rand, blockPos);
             case JungleTree:
-                return jungleTree.generate(this.world, rand, blockPos);
+                return this.jungleTree.generate(this.world, rand, blockPos);
             case GroundBush:
-                return groundBush.generate(this.world, rand, blockPos);
+                return this.groundBush.generate(this.world, rand, blockPos);
             case CocoaTree:
-                return cocoaTree.generate(this.world, rand, blockPos);
+                return this.cocoaTree.generate(this.world, rand, blockPos);
             case Acacia:
-                return acaciaTree.generate(this.world, rand, blockPos);
+                return this.acaciaTree.generate(this.world, rand, blockPos);
             case DarkOak:
-                return darkOakTree.generate(this.world, rand, blockPos);
+                return this.darkOakTree.generate(this.world, rand, blockPos);
             case HugeTaiga1:
-                return hugeTaigaTree1.generate(this.world, rand, blockPos);
+                return this.hugeTaigaTree1.generate(this.world, rand, blockPos);
             case HugeTaiga2:
-                return hugeTaigaTree2.generate(this.world, rand, blockPos);
+                return this.hugeTaigaTree2.generate(this.world, rand, blockPos);
             default:
                 throw new RuntimeException("Failed to handle tree of type " + type.toString());
         }
@@ -364,7 +379,7 @@ public class ForgeWorld implements LocalWorld
         {
             // Blocks requested outside population step
             // (Tree growing, /tc spawn, etc.)
-            return world.getChunkFromChunkCoords(chunkX, chunkZ);
+            return this.world.getChunkFromChunkCoords(chunkX, chunkZ);
         }
 
         // Restrict to chunks we are currently populating
@@ -381,7 +396,8 @@ public class ForgeWorld implements LocalWorld
             {
                 return null;
             }
-            return world.getChunkProvider().getLoadedChunk(chunkX, chunkZ);
+
+            return this.getLoadedChunkWithoutMarkingActive(chunkX, chunkZ);
         }
     }
 
@@ -479,9 +495,9 @@ public class ForgeWorld implements LocalWorld
 
         BlockPos pos = new BlockPos(x, y, z);
 
-        IBlockState oldState = world.getBlockState(pos);
-        int oldLight = oldState.getLightValue(world, pos);
-        int oldOpacity = oldState.getLightOpacity(world, pos);
+        IBlockState oldState = this.world.getBlockState(pos);
+        int oldLight = oldState.getLightValue(this.world, pos);
+        int oldOpacity = oldState.getLightOpacity(this.world, pos);
 
         IBlockState iblockstate = chunk.setBlockState(pos, newState);
 
@@ -491,14 +507,15 @@ public class ForgeWorld implements LocalWorld
         }
 
         // Relight and update players
-        if (newState.getLightOpacity(world, pos) != oldOpacity || newState.getLightValue(world, pos) != oldLight)
+        if (newState.getLightOpacity(this.world, pos) != oldOpacity || newState.getLightValue(this.world, pos) != oldLight)
         {
-            world.theProfiler.startSection("checkLight");
-            world.checkLight(pos);
-            world.theProfiler.endSection();
+            this.world.theProfiler.startSection("checkLight");
+            this.world.checkLight(pos);
+            this.world.theProfiler.endSection();
         }
 
-        world.markAndNotifyBlock(pos, chunk, iblockstate, newState, 2);
+        // Notify world: (2 | 16) == update client, don't update observers
+        this.world.markAndNotifyBlock(pos, chunk, iblockstate, newState, 2 | 16);
     }
 
     @Override
@@ -522,7 +539,7 @@ public class ForgeWorld implements LocalWorld
         if (incorrectHeightMap)
         {
             // Let Minecraft know that it made an error
-            world.checkLight(new BlockPos(x, y, z));
+            this.world.checkLight(new BlockPos(x, y, z));
         }
 
         return y;
@@ -531,7 +548,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public void startPopulation(ChunkCoordinate chunkCoord)
     {
-        if (this.chunkCache != null && settings.getWorldConfig().populationBoundsCheck)
+        if (this.chunkCache != null && this.settings.getWorldConfig().populationBoundsCheck)
         {
             throw new IllegalStateException("Chunk is already being populated."
                     + " This may be a bug in Terrain Control, but it may also be"
@@ -570,7 +587,7 @@ public class ForgeWorld implements LocalWorld
         {
             for (int indexZ = 0; indexZ <= 1; indexZ++)
             {
-                chunkCache[indexX | (indexZ << 1)] = world.getChunkFromChunkCoords(
+                chunkCache[indexX | (indexZ << 1)] = this.world.getChunkFromChunkCoords(
                         topLeft.getChunkX() + indexX,
                         topLeft.getChunkZ() + indexZ
                 );
@@ -582,7 +599,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public void endPopulation()
     {
-        if (this.chunkCache == null && settings.getWorldConfig().populationBoundsCheck)
+        if (this.chunkCache == null && this.settings.getWorldConfig().populationBoundsCheck)
         {
             throw new IllegalStateException("Chunk is not being populated."
                     + " This may be a bug in Terrain Control, but it may also be"
@@ -597,7 +614,7 @@ public class ForgeWorld implements LocalWorld
     public int getLightLevel(int x, int y, int z)
     {
         // Actually, this calculates the block and skylight as it were day.
-        return world.getLight(new BlockPos(x, y, z));
+        return this.world.getLight(new BlockPos(x, y, z));
     }
 
     @Override
@@ -627,13 +644,13 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getHeightCap()
     {
-        return settings.getWorldConfig().worldHeightCap;
+        return this.settings.getWorldConfig().worldHeightCap;
     }
 
     @Override
     public int getHeightScale()
     {
-        return settings.getWorldConfig().worldHeightScale;
+        return this.settings.getWorldConfig().worldHeightScale;
     }
 
     public TXChunkGenerator getChunkGenerator()
@@ -678,6 +695,7 @@ public class ForgeWorld implements LocalWorld
         world.setSeaLevel(configs.getWorldConfig().waterLevelMax);
 
         this.structureCache = new CustomObjectStructureCache(this);
+        this.dataFixer = DataFixesManager.createFixer();
 
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
@@ -715,9 +733,9 @@ public class ForgeWorld implements LocalWorld
         this.generator = new TXChunkGenerator(this);
     }
 
-    public void setBiomeManager(BiomeGenerator manager)
+    public void setBiomeGenerator(BiomeGenerator generator)
     {
-        this.biomeGenerator = manager;
+        this.biomeGenerator = generator;
     }
 
     public World getWorld()
@@ -746,9 +764,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
     {
-        Biome savedBiome = world.getBiomeForCoordsBody(new BlockPos(x, 0, z));
-        int biomeId = Biome.getIdForBiome(savedBiome);
-        return getBiomeById(biomeId);
+        return getBiomeById(Biome.getIdForBiome(this.world.getBiome(new BlockPos(x, 0, z))));
     }
 
     @Override
@@ -760,22 +776,27 @@ public class ForgeWorld implements LocalWorld
         nmsTag.setInteger("x", x);
         nmsTag.setInteger("y", y);
         nmsTag.setInteger("z", z);
+        // Update to current Minecraft format (maybe we want to do this at
+        // server startup instead, and then save the result?)
+        // TODO: Use datawalker instead
+        //nmsTag = this.dataFixer.process(FixTypes.BLOCK_ENTITY, nmsTag, -1);
         // Add that data to the current tile entity in the world
-        TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+        TileEntity tileEntity = this.world.getTileEntity(new BlockPos(x, y, z));
         if (tileEntity != null)
         {
             tileEntity.readFromNBT(nmsTag);
         } else
         {
-            TerrainControl.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}",
-                    nmsTag.getString("id"), x, y, z, getMaterial(x, y, z));
+            TerrainControl.log(LogMarker.DEBUG,
+                    "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x,
+                    y, z, getMaterial(x, y, z));
         }
     }
 
     @Override
     public NamedBinaryTag getMetadata(int x, int y, int z)
     {
-        TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+        TileEntity tileEntity = this.world.getTileEntity(new BlockPos(x, y, z));
         if (tileEntity == null)
         {
             return null;
@@ -797,15 +818,15 @@ public class ForgeWorld implements LocalWorld
     @Override
     public BiomeGenerator getBiomeGenerator()
     {
-        return biomeGenerator;
+        return this.biomeGenerator;
     }
 
     @Override
     public SpawnableObject getMojangStructurePart(String name)
     {
         ResourceLocation resourceLocation = new ResourceLocation(name);
-        TemplateManager mojangStructureParts = world.getSaveHandler().getStructureTemplateManager();
-        Template mojangStructurePart = mojangStructureParts.getTemplate(world.getMinecraftServer(), resourceLocation);
+        TemplateManager mojangStructureParts = this.world.getSaveHandler().getStructureTemplateManager();
+        Template mojangStructurePart = mojangStructureParts.getTemplate(this.world.getMinecraftServer(), resourceLocation);
         if (mojangStructurePart == null)
         {
             return null;
@@ -813,4 +834,10 @@ public class ForgeWorld implements LocalWorld
         return new MojangStructurePart(name, mojangStructurePart);
     }
 
+    public Chunk getLoadedChunkWithoutMarkingActive(int chunkX, int chunkZ)
+    {
+        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) this.world.getChunkProvider();
+        long i = ChunkPos.asLong(chunkX, chunkZ);
+        return (Chunk) chunkProviderServer.id2ChunkMap.get(i);
+    }
 }

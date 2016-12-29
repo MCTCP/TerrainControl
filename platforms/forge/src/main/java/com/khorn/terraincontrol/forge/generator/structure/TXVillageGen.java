@@ -32,19 +32,19 @@ public class TXVillageGen extends MapGenStructure
 
     public TXVillageGen(ServerConfigProvider configs)
     {
-        size = configs.getWorldConfig().villageSize;
-        distance = configs.getWorldConfig().villageDistance;
-        minimumDistance = 8;
+        this.size = configs.getWorldConfig().villageSize;
+        this.distance = configs.getWorldConfig().villageDistance;
+        this.minimumDistance = 8;
 
         // Add all village biomes to the list
-        villageSpawnBiomes = new ArrayList<Biome>();
+        this.villageSpawnBiomes = new ArrayList<Biome>();
         for (LocalBiome biome : configs.getBiomeArray())
         {
             if (biome == null)
                 continue;
             if (biome.getBiomeConfig().villageType != VillageType.disabled)
             {
-                villageSpawnBiomes.add(((ForgeBiome) biome).getHandle());
+                this.villageSpawnBiomes.add(((ForgeBiome) biome).getHandle());
             }
         }
     }
@@ -75,7 +75,7 @@ public class TXVillageGen extends MapGenStructure
 
         if (var3 == var5 && var4 == var6)
         {
-            boolean canSpawn = this.world.getBiomeProvider().areBiomesViable(var3 * 16 + 8, var4 * 16 + 8, 0, villageSpawnBiomes);
+            boolean canSpawn = this.world.getBiomeProvider().areBiomesViable(var3 * 16 + 8, var4 * 16 + 8, 0, this.villageSpawnBiomes);
 
             if (canSpawn)
             {

@@ -30,19 +30,19 @@ class ForgeChunkBuffer implements ChunkBuffer
     @Override
     public ChunkCoordinate getChunkCoordinate()
     {
-        return chunkCoord;
+        return this.chunkCoord;
     }
 
     @Override
     public void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material)
     {
-        chunkPrimer.setBlockState(blockX, blockY, blockZ, ((ForgeMaterialData) material).internalBlock());
+        this.chunkPrimer.setBlockState(blockX, blockY, blockZ, ((ForgeMaterialData) material).internalBlock());
     }
 
     @Override
     public LocalMaterialData getBlock(int blockX, int blockY, int blockZ)
     {
-        IBlockState blockState = chunkPrimer.getBlockState(blockX, blockY, blockZ);
+        IBlockState blockState = this.chunkPrimer.getBlockState(blockX, blockY, blockZ);
         return ForgeMaterialData.ofMinecraftBlockState(blockState);
     }
 
@@ -55,7 +55,7 @@ class ForgeChunkBuffer implements ChunkBuffer
      */
     Chunk toChunk(World world)
     {
-        return new Chunk(world, chunkPrimer, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+        return new Chunk(world, this.chunkPrimer, this.chunkCoord.getChunkX(), this.chunkCoord.getChunkZ());
     }
 
 }

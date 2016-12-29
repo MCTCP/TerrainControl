@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.forge.events;
+package com.khorn.terraincontrol.forge.client.events;
 
 import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.TerrainControl;
@@ -22,11 +22,11 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import java.io.DataInputStream;
 import java.util.Arrays;
 
-public class ClientNetworkHandler
+public class ClientNetworkEventListener
 {
     private final WorldLoader worldLoader;
 
-    public ClientNetworkHandler(WorldLoader worldLoader)
+    public ClientNetworkEventListener(WorldLoader worldLoader)
     {
         this.worldLoader = Preconditions.checkNotNull(worldLoader);
     }
@@ -34,6 +34,12 @@ public class ClientNetworkHandler
     @SubscribeEvent
     public void onPacketReceive(ClientCustomPacketEvent event)
     {
+        // Ignore if packet was local
+        if (event.getManager().isLocalChannel())
+        {
+            return;
+        }
+
         // This method receives the TerrainControl packet with the custom
         // biome colors and weather.
 
@@ -59,7 +65,7 @@ public class ClientNetworkHandler
 
                     DataInputStream wrappedStream = new DataInputStream(new ByteBufInputStream(stream));
 
-                    worldLoader.demandClientWorld(worldMC, wrappedStream);
+                    this.worldLoader.registerClientWorld(worldMC, wrappedStream);
                 }
 
                 TerrainControl.log(LogMarker.INFO, "Config received from server");
@@ -68,12 +74,12 @@ public class ClientNetworkHandler
                 // Server or client is outdated
                 if (serverProtocolVersion > PluginStandardValues.ProtocolVersion)
                 {
-                    sendMessage(TextFormatting.GREEN, "The server is running a newer version of " + PluginStandardValues.PLUGIN_NAME
-                            + ". Please update!");
+                    sendMessage(TextFormatting.GREEN,
+                            "The server is running a newer version of " + PluginStandardValues.PLUGIN_NAME + ". Please update!");
                 } else
                 {
-                    sendMessage(TextFormatting.YELLOW, "The server is running an outdated version of "
-                            + PluginStandardValues.PLUGIN_NAME + ". Cannot load custom biome colors and weather.");
+                    sendMessage(TextFormatting.YELLOW,
+                            "The server is running an outdated version of " + PluginStandardValues.PLUGIN_NAME + ". Cannot load custom biome colors and weather.");
                 }
                 TerrainControl.log(LogMarker.WARN, "Server has different protocol version. Client: {} Server: {}",
                         PluginStandardValues.ProtocolVersion, serverProtocolVersion);

@@ -11,65 +11,60 @@ import net.minecraft.world.biome.Biome;
 public class ForgeBiome implements LocalBiome
 {
     private final Biome biomeBase;
+    private final boolean isCustom;
+
+    private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
 
-    /**
-     * Creates a new biome with the given name and id.
-     * 
-     * @param biomeConfig The config of the biome.
-     * @param minecraftBiome The Minecraft instance of the biome.
-     * @return The registered biome.
-     */
-    public static ForgeBiome forBiome(BiomeConfig biomeConfig, Biome minecraftBiome)
-    {
-        return new ForgeBiome(biomeConfig, minecraftBiome);
-    }
-
-    private ForgeBiome(BiomeConfig biomeConfig, Biome biome)
+    public ForgeBiome(Biome biome, BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
         this.biomeBase = biome;
+        this.biomeIds = biomeIds;
         this.biomeConfig = biomeConfig;
+        if (biome instanceof TXBiome)
+        {
+            this.isCustom = true;
+        } else
+        {
+            this.isCustom = false;
+        }
     }
 
     @Override
     public boolean isCustom()
     {
-        return biomeBase instanceof TXBiome;
+        return this.isCustom;
     }
 
     @Override
     public String getName()
     {
-        return biomeBase.getBiomeName();
+        return this.biomeBase.getBiomeName();
     }
 
     public Biome getHandle()
     {
-        return biomeBase;
+        return this.biomeBase;
     }
 
     @Override
     public BiomeIds getIds()
     {
-        if (biomeBase instanceof TXBiome)
-        {
-            return new BiomeIds(((TXBiome) biomeBase).generationId, Biome.getIdForBiome(biomeBase));
-        }
-        return new BiomeIds(Biome.getIdForBiome(biomeBase));
+        return this.biomeIds;
     }
 
     @Override
     public float getTemperatureAt(int x, int y, int z)
     {
-        return biomeBase.getFloatTemperature(new BlockPos(x, y, z));
+        return this.biomeBase.getFloatTemperature(new BlockPos(x, y, z));
     }
 
     @Override
     public BiomeConfig getBiomeConfig()
     {
-        return biomeConfig;
+        return this.biomeConfig;
     }
-    
+
     @Override
     public String toString()
     {

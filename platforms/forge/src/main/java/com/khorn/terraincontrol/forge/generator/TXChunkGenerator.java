@@ -43,7 +43,7 @@ public class TXChunkGenerator implements IChunkGenerator
         this.world = _world;
         this.worldHandle = _world.getWorld();
 
-        this.TestMode = world.getConfigs().getWorldConfig().ModeTerrain == WorldConfig.TerrainMode.TerrainTest;
+        this.TestMode = this.world.getConfigs().getWorldConfig().ModeTerrain == WorldConfig.TerrainMode.TerrainTest;
 
         this.generator = new ChunkProviderTC(this.world.getConfigs(), this.world);
         this.spawner = new ObjectSpawner(this.world.getConfigs(), this.world);
@@ -72,14 +72,14 @@ public class TXChunkGenerator implements IChunkGenerator
     private void fillBiomeArray(Chunk chunk)
     {
         byte[] chunkBiomeArray = chunk.getBiomeArray();
-        ConfigProvider configProvider = world.getConfigs();
-        biomeIntArray = world.getBiomeGenerator().getBiomes(biomeIntArray,
+        ConfigProvider configProvider = this.world.getConfigs();
+        this.biomeIntArray = this.world.getBiomeGenerator().getBiomes(this.biomeIntArray,
                 chunk.xPosition * CHUNK_X_SIZE, chunk.zPosition * CHUNK_Z_SIZE,
                 CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
 
         for (int i = 0; i < chunkBiomeArray.length; i++)
         {
-            int generationId = biomeIntArray[i];
+            int generationId = this.biomeIntArray[i];
             chunkBiomeArray[i] = (byte) configProvider.getBiomeByIdOrNull(generationId).getIds().getSavedId();
         }
     }
@@ -132,30 +132,30 @@ public class TXChunkGenerator implements IChunkGenerator
     public void recreateStructures(Chunk chunkIn, int chunkX, int chunkZ)
     {
         // recreateStructures
-        WorldConfig worldConfig = world.getConfigs().getWorldConfig();
+        WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
         if (worldConfig.mineshaftsEnabled)
         {
-            world.mineshaftGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.mineshaftGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
         if (worldConfig.villagesEnabled)
         {
-            world.villageGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.villageGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
         if (worldConfig.strongholdsEnabled)
         {
-            world.strongholdGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.strongholdGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
         if (worldConfig.rareBuildingsEnabled)
         {
-            world.rareBuildingGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.rareBuildingGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
         if (worldConfig.netherFortressesEnabled)
         {
-            world.netherFortressGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.netherFortressGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
         if (worldConfig.oceanMonumentsEnabled)
         {
-            world.oceanMonumentGen.generate(world.getWorld(), chunkX, chunkZ, null);
+            this.world.oceanMonumentGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
     }
 

@@ -20,7 +20,7 @@ public class TXMineshaftGen extends MapGenStructure
     @Override
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)
     {
-        if (rand.nextInt(80) < Math.max(Math.abs(chunkX), Math.abs(chunkZ)))
+        if (this.rand.nextInt(80) < Math.max(Math.abs(chunkX), Math.abs(chunkZ)))
         {
             LocalWorld world = WorldHelper.toLocalWorld(this.world);
             LocalBiome biome = world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
@@ -29,7 +29,7 @@ public class TXMineshaftGen extends MapGenStructure
             {
                 return false;
             }
-            if (rand.nextDouble() * 100.0 < biomeConfig.mineshaftsRarity)
+            if (this.rand.nextDouble() * 100.0 < biomeConfig.mineshaftsRarity)
             {
                 return true;
             }

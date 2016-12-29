@@ -205,21 +205,21 @@ public class TCToForgeEventConverter extends EventHandler
 
     private boolean hasOreGenerationBegun(LocalWorld world)
     {
-        return hasOreGenBegun.get(world.getName());
+        return this.hasOreGenBegun.get(world.getName());
     }
 
     private boolean hasDecorationBegun(LocalWorld world)
     {
-        return hasDecorationBegun.get(world.getName());
+        return this.hasDecorationBegun.get(world.getName());
     }
 
     private void setOreGenerationBegun(LocalWorld world, boolean begun)
     {
-        hasOreGenBegun.put(world.getName(), begun);
+        this.hasOreGenBegun.put(world.getName(), begun);
     }
 
     private void setDecorationBegun(LocalWorld world, boolean begun)
     {
-        hasDecorationBegun.put(world.getName(), begun);
+        this.hasDecorationBegun.put(world.getName(), begun);
     }
 }
