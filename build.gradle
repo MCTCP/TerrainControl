@@ -1,7 +1,7 @@
 // Information for all projects
 
 // The default tasks for all projects
-defaultTasks 'removeOldReleases', 'build', 'createReleaseJar', 'install'
+defaultTasks 'clean', 'build', 'createReleaseJar', 'install'
 
 allprojects
 {
@@ -33,16 +33,4 @@ subprojects
 
     // Generate a pom.xml, upload to local Maven repository
     apply plugin: 'maven'
-}
-
-task removeOldReleases <<
-{
-    allprojects
-    {
-        File distributionsFolder = new File(project.buildDir, "distributions")
-        if (distributionsFolder.exists())
-        {
-            distributionsFolder.deleteDir()
-        }
-    }
 }
