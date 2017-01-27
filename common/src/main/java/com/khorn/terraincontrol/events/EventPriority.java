@@ -8,7 +8,7 @@ public enum EventPriority
     CANCELABLE,
 
     /**
-     * Register with this prioriyt if you want to monitor the event. You cannot
+     * Register with this priority if you want to monitor the event. You cannot
      * cancel the event during this stage.
      */
     MONITOR

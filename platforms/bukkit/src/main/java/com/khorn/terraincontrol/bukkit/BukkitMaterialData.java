@@ -19,7 +19,7 @@ public final class BukkitMaterialData implements LocalMaterialData
      * Gets a {@code BukkitMaterialData} of the given id and data.
      * @param id   The block id.
      * @param data The block data.
-     * @return The {@code BukkitMateialData} instance.
+     * @return The {@code BukkitMaterialData} instance.
      */
     public static BukkitMaterialData ofIds(int id, int data)
     {
@@ -30,7 +30,7 @@ public final class BukkitMaterialData implements LocalMaterialData
      * Gets a {@code BukkitMaterialData} of the given material and data.
      * @param material The material.
      * @param data     The block data.
-     * @return The {@code BukkitMateialData} instance.
+     * @return The {@code BukkitMaterialData} instance.
      */
     public static BukkitMaterialData ofDefaultMaterial(DefaultMaterial material, int data)
     {
@@ -41,7 +41,7 @@ public final class BukkitMaterialData implements LocalMaterialData
      * Gets a {@code BukkitMaterialData} of the given Minecraft block. The
      * default block data (usually 0) will be used.
      * @param block The material.
-     * @return The {@code BukkitMateialData} instance.
+     * @return The {@code BukkitMaterialData} instance.
      */
     public static BukkitMaterialData ofMinecraftBlock(Block block)
     {
@@ -51,7 +51,7 @@ public final class BukkitMaterialData implements LocalMaterialData
     /**
      * Gets a {@code BukkitMaterialData} of the given Minecraft blockData.
      * @param blockData The material an data.
-     * @return The {@code BukkitMateialData} instance.
+     * @return The {@code BukkitMaterialData} instance.
      */
     public static BukkitMaterialData ofMinecraftBlockData(IBlockData blockData)
     {

@@ -8,7 +8,6 @@ import java.util.List;
 
 /**
  * Some methods for string parsing and printing.
- * 
  */
 public abstract class StringHelper
 {

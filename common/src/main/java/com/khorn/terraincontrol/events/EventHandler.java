@@ -8,7 +8,7 @@ import java.util.Random;
 
 /**
  * Inherit this class, override methods as necessary and register it with
- * TerrainControl.registerEventHander(..). If you want to use the onStart(),
+ * TerrainControl.registerEventHandler(..). If you want to use the onStart(),
  * make sure that it is registered before TerrainControl is started.
  */
 public abstract class EventHandler

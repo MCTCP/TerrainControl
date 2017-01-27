@@ -754,7 +754,7 @@ public class WorldConfig extends ConfigFile
 
         writer.putSetting(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS, this.worldHeightScaleBits,
                 "Scales the height of the world. Adding 1 to this doubles the",
-                "height of the terrain, substracting 1 to this halves the height",
+                "height of the terrain, subtracting 1 to this halves the height",
                 "of the terrain. Values must be between 5 and 8, inclusive.");
 
         writer.putSetting(WorldStandardValues.WORLD_HEIGHT_CAP_BITS, this.worldHeightCapBits,
@@ -849,8 +849,8 @@ public class WorldConfig extends ConfigFile
             // Write the old objectSpawnRatio
 
             writer.putSetting(WorldStandardValues.OBJECT_SPAWN_RATIO, this.objectSpawnRatio,
-                    "LEGACY setting for compability with old worlds. This setting should be kept at 1.",
-                    "If the setting is set at 1, the setting will vanish from the config file. Readd it",
+                    "LEGACY setting for compatibility with old worlds. This setting should be kept at 1.",
+                    "If the setting is set at 1, the setting will vanish from the config file. Read it",
                     "manually with another value and it will be back.",
                     "",
                     "When using the UseWorld or UseBiome keyword for spawning custom objects, Terrain Control",
@@ -934,7 +934,7 @@ public class WorldConfig extends ConfigFile
                 "May not be smaller than 0, and may not be larger than " + WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE + ".");
 
         // Custom structures
-        writer.smallTitle("Custom structues");
+        writer.smallTitle("Custom structures");
 
         writer.putSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius,
                 "Maximum radius of custom structures in chunks. Custom structures are spawned by",

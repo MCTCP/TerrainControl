@@ -33,7 +33,7 @@ public class TXChunkGenerator implements IChunkGenerator
     private ObjectSpawner spawner;
 
     /** 
-     * Used in {@link #fillBiomeArray(Chunk)}, to avoid creating
+     * Used in {@link #fillBiomeArray(Chunk)} to avoid creating
      * new int arrays.
      */
     private int[] biomeIntArray;

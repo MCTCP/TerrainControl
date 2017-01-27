@@ -1,8 +1,5 @@
 package com.khorn.terraincontrol.generator.biome;
 
-/**
- * Created by Wicked on 01.08.13.
- */
 public enum OutputType
 {
     FULL,

@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit.util;
 
 import static com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper.fromMinecraftList;
 import static com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper.toMinecraftClass;
-import static com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper.toMinecraftlist;
+import static com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper.toMinecraftList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -48,7 +48,7 @@ public class MobSpawnGroupHelperTest
         List<WeightedMobSpawnGroup> groups = Arrays.asList(
                 new WeightedMobSpawnGroup("minecraft:cow", 10, 2, 5),
                 new WeightedMobSpawnGroup("minecraft:chicken", 8, 3, 6));
-        assertEquals(groups, fromMinecraftList(toMinecraftlist(groups)));
+        assertEquals(groups, fromMinecraftList(toMinecraftList(groups)));
 
     }
 }

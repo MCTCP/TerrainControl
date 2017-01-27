@@ -100,7 +100,7 @@ public enum DefaultStructurePart
     }
 
     /**
-     * Gets the path of the stucture, for example "minecraft:igloo/igloo_top".
+     * Gets the path of the structure, for example "minecraft:igloo/igloo_top".
      * The prefix "minecraft:" means that the file is stored in the Minecraft
      * JAR file.
      * @return The path.

@@ -15,7 +15,7 @@ package com.khorn.terraincontrol.util;
  * 
  * <p>Note that the max coords of the bounding box are exclusive. This means
  * that a box of (0, 0, 0) to (1, 1, 1) contains only one block, not 8. This is
- * unlike Minecraft's boundig box, where that box would include 8 blocks. Our
+ * unlike Minecraft's bounding box, where that box would include 8 blocks. Our
  * design allows us to calculate the width/height/depth of the box using simple
  * calculations like {@code maxX - minX}.
  */

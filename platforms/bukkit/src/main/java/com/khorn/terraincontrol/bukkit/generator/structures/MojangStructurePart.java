@@ -10,9 +10,8 @@ import net.minecraft.server.v1_11_R1.*;
 import java.util.Random;
 
 /**
- * Makes a Minecraft {@link DefinedStructure} useable as a
+ * Makes a Minecraft {@link DefinedStructure} usable as a
  * {@link SpawnableObject}.
- *
  */
 public final class MojangStructurePart implements SpawnableObject
 {

@@ -165,7 +165,7 @@ public class TXRareBuildingGen extends StructureGenerator
                 this.a.add(building);
             }
 
-            // Update boundingbox
+            // Update bounding box
             this.d();
         }
 

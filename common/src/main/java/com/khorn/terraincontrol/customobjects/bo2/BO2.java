@@ -289,8 +289,7 @@ public class BO2 extends ConfigFile implements CustomObject
     public CustomObject applySettings(SettingsMap extraSettings)
     {
         extraSettings.setFallback(this.settingsMap);
-        BO2 bo2WithSettings = new BO2(extraSettings, file);
-        return bo2WithSettings;
+        return new BO2(extraSettings, file);
     }
 
     @Override

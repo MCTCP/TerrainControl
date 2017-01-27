@@ -28,7 +28,7 @@ public class FileSettingsReaderTest
 
         reader.readIntoMap(settingsMap, fileContents);
 
-        // Test normat retrieval
+        // Test normal retrieval
         assertEquals("TerrainControl", settingsMap.getSetting(WorldStandardValues.AUTHOR));
         assertEquals("File to test setting reading", settingsMap.getSetting(WorldStandardValues.DESCRIPTION));
 

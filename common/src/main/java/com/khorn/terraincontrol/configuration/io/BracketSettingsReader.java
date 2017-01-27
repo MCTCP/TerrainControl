@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.configuration.io;
 
 /**
  * Reads settings from a formatted string like:
- * <code>(SettingName=SettingValue;SettingName2=SettingValue2)</code>.
+ * {@code (SettingName=SettingValue;SettingName2=SettingValue2)}.
  *
  */
 public class BracketSettingsReader
@@ -11,8 +11,8 @@ public class BracketSettingsReader
     /**
      * Reads the rawSettings, adds it to settingsMap.
      * @param settingsMap The settings map.
-     * @param rawSettings The raw settings, formateed like 
-     * <code>(SettingName=SettingValue;SettingName2=SettingValue2)</code>.
+     * @param rawSettings The raw settings, formatted like
+     * {@code (SettingName=SettingValue;SettingName2=SettingValue2)}.
      */
     public static void readInto(SettingsMap settingsMap, String rawSettings)
     {

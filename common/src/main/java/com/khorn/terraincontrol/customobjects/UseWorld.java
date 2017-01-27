@@ -68,13 +68,13 @@ public class UseWorld extends SimpleObject
             return false;
 
         boolean objectSpawned = false;
-        int spawnattemps = 0;
+        int spawnAttempts = 0;
         while (!objectSpawned)
         {
-            if (spawnattemps > worldConfig.objectSpawnRatio)
+            if (spawnAttempts > worldConfig.objectSpawnRatio)
                 return false;
 
-            spawnattemps++;
+            spawnAttempts++;
 
             CustomObject selectedObject = customObjects.getRandomObject(rand);
 

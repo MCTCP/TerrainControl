@@ -187,7 +187,7 @@ public enum DefaultBiome
     /**
      * Returns a DefaultBiome object with the given biome ID
      * 
-     * @param id the ID of the DeafultBiome that is to be returned
+     * @param id the ID of the DefaultBiome that is to be returned
      * @return A DefaultBiome with the given ID
      */
     public static DefaultBiome getBiome(int id)

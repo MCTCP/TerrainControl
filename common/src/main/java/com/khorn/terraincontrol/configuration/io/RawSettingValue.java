@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Information about the unparsed value of a setting. It contains what was found
- * in a config file: the line nubmer, the setting value and the comments.
+ * in a config file: the line number, the setting value and the comments.
  */
 public final class RawSettingValue
 {

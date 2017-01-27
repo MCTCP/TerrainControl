@@ -109,7 +109,7 @@ public class TXVillageGen extends StructureGenerator
 
     public static class VillageStart extends StructureStart
     {
-        // well ... thats what it does
+        // well ... that's what it does
         private boolean hasMoreThanTwoComponents = false;
 
         public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)

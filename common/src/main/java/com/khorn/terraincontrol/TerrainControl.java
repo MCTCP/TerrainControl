@@ -91,7 +91,7 @@ public class TerrainControl
     }
 
     /**
-     * Convienence method to quickly get the biome name at the given
+     * Convenience method to quickly get the biome name at the given
      * coordinates. Will return null if the world isn't loaded by Terrain
      * Control.
      * <p>

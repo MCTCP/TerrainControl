@@ -436,7 +436,7 @@ public class BiomeConfig extends ConfigFile
                 "  100 rarity mean 1/6 chance than other ( with 6 default normal biomes).",
                 "  50 rarity mean 1/11 chance than other",
                 "For isle biomes see the " + BiomeStandardValues.BIOME_RARITY_WHEN_ISLE + " setting below.",
-                "Doesn`t work on Ocean and River (frozen versions too) biomes when not added as normal biome.");
+                "Doesn't work on Ocean and River (frozen versions too) biomes when not added as normal biome.");
 
         writer.putSetting(BiomeStandardValues.BIOME_COLOR, this.biomeColor,
                 "The hexadecimal color value of this biome. Used in the output of the /tc map command,",
@@ -513,7 +513,7 @@ public class BiomeConfig extends ConfigFile
                 "If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.");
 
         writer.putSetting(BiomeStandardValues.MAX_AVERAGE_DEPTH, this.maxAverageDepth,
-                "If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the ottom of the ocean) will fall before leveling off when it begins to decrease in elevation. ",
+                "If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the bottom of the ocean) will fall before leveling off when it begins to decrease in elevation. ",
                 "If the value is less than 0, then it will cause the terrain to either fall to a lesser depth before leveling out or increase in height if the value is a large enough negative.");
 
         writer.putSetting(BiomeStandardValues.VOLATILITY_1, this.volatilityRaw1,
@@ -538,7 +538,7 @@ public class BiomeConfig extends ConfigFile
 
         writer.bigTitle("Rivers",
                 "There are two different river systems - the standard one and the improved one.",
-                "See the ImprovedRivers settting in the WorldConfig. Both modes have different",
+                "See the ImprovedRivers setting in the WorldConfig. Both modes have different",
                 "river settings, so carefully read the headers to know which settings you can use.",
                 "");
 
@@ -610,7 +610,7 @@ public class BiomeConfig extends ConfigFile
                 "Block used as water in WaterLevelMax");
 
         writer.putSetting(BiomeStandardValues.ICE_BLOCK, this.configIceBlock,
-                "Block used as ice. Ice only spawns if the BiomeTemperture is low enough.");
+                "Block used as ice. Ice only spawns if the BiomeTemperature is low enough.");
 
         writer.putSetting(WorldStandardValues.COOLED_LAVA_BLOCK, this.cooledLavaBlock,
                 "Block used as cooled or frozen lava.",
@@ -730,7 +730,7 @@ public class BiomeConfig extends ConfigFile
         this.writeCustomObjects(writer);
 
         writer.bigTitle("Structures",
-                "Here you can change, enable or disable the stuctures.",
+                "Here you can change, enable or disable the structures.",
                 "If you have disabled the structure in the WorldConfig, it won't spawn,",
                 "regardless of these settings.");
 
@@ -780,7 +780,7 @@ public class BiomeConfig extends ConfigFile
                     "For example: {\"mob\": \"Ocelot\", \"weight\": 10, \"min\": 2, \"max\": 6}",
                     "For example: {\"mob\": \"MushroomCow\", \"weight\": 5, \"min\": 2, \"max\": 2}",
                     "A json list of mobgroups looks like this: [mobgroup, mobgroup, mobgroup...]",
-                    "This would be an ampty list: []",
+                    "This would be an empty list: []",
                     "You can validate your json here: http://jsonlint.com/",
                     "",
                     "There are four categories of mobs: monsters, creatures, water creatures and ambient creatures.",
@@ -806,16 +806,15 @@ public class BiomeConfig extends ConfigFile
                 "The water creatures (only squids in vanilla) that spawn in this biome");
 
         writer.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.spawnAmbientCreatures,
-                "The ambient creatures (only bats in vanila) that spawn in this biome");
+                "The ambient creatures (only bats in vanilla) that spawn in this biome");
     }
 
     private void writeCustomObjects(SettingsMap writer)
     {
         List<String> objectStrings = new ArrayList<String>(this.biomeObjectStrings.size());
-        for (String objectString : this.biomeObjectStrings)
-        {
-            objectStrings.add(objectString);
-        }
+
+        objectStrings.addAll(this.biomeObjectStrings);
+
         writer.putSetting(BiomeStandardValues.BIOME_OBJECTS, objectStrings,
                 "These objects will spawn when using the UseBiome keyword.");
     }

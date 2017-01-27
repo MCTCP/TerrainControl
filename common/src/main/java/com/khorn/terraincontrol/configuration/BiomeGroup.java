@@ -60,7 +60,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     }
 
     /**
-     * Creates a new <code>BiomeGroup</code>.
+     * Creates a new {@code BiomeGroup}.
      * @param config    WorldConfig this biome group is part of.
      * @param groupName The name of this group.
      * @param size      Size value of this biome group.

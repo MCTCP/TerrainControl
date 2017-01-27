@@ -10,7 +10,6 @@ import java.io.IOException;
 /**
  * Create an instance of this during onEnable. After some time,
  * stats will be sent to mcstats.org.
- *
  */
 public class BukkitMetricsHelper extends MetricsHelper
 {

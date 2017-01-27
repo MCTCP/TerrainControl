@@ -90,8 +90,7 @@ public class TXBiomeProvider extends BiomeProvider
     public boolean areBiomesViable(int x, int z, int radius, List<Biome> allowed)
     {
         // Hack for villages in other biomes
-        // (The alternative would be to completely override the village spawn
-        // code)
+        // (The alternative would be to completely override the village spawn code)
         if (allowed == MapGenVillage.VILLAGE_SPAWN_BIOMES && this.localWorld.villageGen != null)
         {
             allowed = this.localWorld.villageGen.villageSpawnBiomes;

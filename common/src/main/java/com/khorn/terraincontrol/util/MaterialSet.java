@@ -212,7 +212,7 @@ public class MaterialSet
     }
 
     /**
-     * Returns a comma (",") seperated list of all materials in this set.
+     * Returns a comma (",") separated list of all materials in this set.
      * Keywords are left intact. No brackets ("[" or "]") are used at the
      * begin and end of the string.
      *

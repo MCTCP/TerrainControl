@@ -145,7 +145,7 @@ public class BO3Config extends ConfigFile
                 "The blocks to extrude your BO3 through");
 
         writer.putSetting(BO3Settings.MAX_BRANCH_DEPTH, this.maxBranchDepth,
-                "Objects can have other objects attacthed to it: branches. Branches can also",
+                "Objects can have other objects attached to it: branches. Branches can also",
                 "have branches attached to it, which can also have branches, etc. This is the",
                 "maximum branch depth for this objects.");
 

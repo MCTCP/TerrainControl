@@ -105,7 +105,7 @@ public class FrozenSurfaceHelper
      * @param thawedMaterial The material to be checked and if passed, frozen
      * @param frozenMaterial The material to freeze the thawed material to if checks pass
      * @param check1 The first material to check for
-     * @param check2 The second meterial to check for
+     * @param check2 The second material to check for
      */
     private void freezeType(int x, int y, int z, LocalMaterialData thawedMaterial, LocalMaterialData frozenMaterial, DefaultMaterial check1, DefaultMaterial check2)
     {

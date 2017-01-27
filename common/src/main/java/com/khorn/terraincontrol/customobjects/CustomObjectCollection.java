@@ -166,8 +166,8 @@ public class CustomObjectCollection implements Iterable<CustomObject>
     }
 
     /**
-     * Parses a string in the format <code>name(setting1=foo,setting2=bar)
-     * </code>. The object is retrieved using {@link #getObjectByName(String)}.
+     * Parses a string in the format {@code name(setting1=foo,setting2=bar)
+     * }. The object is retrieved using {@link #getObjectByName(String)}.
      * If the object doesn't exist this method will return null. Otherwise, it
      * will apply the given parameters (if any) to a copy of the object, and
      * it will return this modified copy.

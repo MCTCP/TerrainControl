@@ -141,7 +141,7 @@ public final class ServerConfigProvider implements ConfigProvider
         Collection<BiomeLoadInstruction> biomesToLoad = new HashSet<BiomeLoadInstruction>();
         biomesToLoad.addAll(this.world.getDefaultBiomes());
 
-        // This adds all custombiomes that have been listed in WorldConfig to
+        // This adds all custom biomes that have been listed in WorldConfig to
         // the arrayList
         for (Entry<String, Integer> entry : this.worldConfig.customBiomeGenerationIds.entrySet())
         {
@@ -388,7 +388,7 @@ public final class ServerConfigProvider implements ConfigProvider
             if (!oldBiomeConfigs.renameTo(new File(settingsDir, biomeFolderName)))
             {
                 TerrainControl.log(LogMarker.WARN, "========================");
-                TerrainControl.log(LogMarker.WARN, "Fould old `BiomeConfigs` folder, but it could not be renamed to `", biomeFolderName, "`!");
+                TerrainControl.log(LogMarker.WARN, "Found old `BiomeConfigs` folder, but it could not be renamed to `", biomeFolderName, "`!");
                 TerrainControl.log(LogMarker.WARN, "Please rename the folder manually.");
                 TerrainControl.log(LogMarker.WARN, "========================");
                 biomeFolderName = "BiomeConfigs";

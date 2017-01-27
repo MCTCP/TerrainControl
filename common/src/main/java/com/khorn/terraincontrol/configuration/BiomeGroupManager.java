@@ -8,7 +8,7 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import java.util.*;
 
 /**
- * Manages a collection of biome groups that are accesible by their name and
+ * Manages a collection of biome groups that are accessible by their name and
  * id.
  *
  */

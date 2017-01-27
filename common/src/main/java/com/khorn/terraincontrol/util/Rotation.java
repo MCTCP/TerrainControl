@@ -6,7 +6,6 @@ import java.util.Random;
 
 /**
  * An enum to help with CustomObject rotation.
- *
  */
 public enum Rotation
 {
