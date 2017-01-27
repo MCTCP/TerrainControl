@@ -155,17 +155,17 @@ public class ChunkProviderTC
         final int maxYSections = this.heightCap / 8 + 1;
         final int usedYSections = this.heightScale / 8 + 1;
 
-        WorldConfig worldConfig = configProvider.getWorldConfig();
+        WorldConfig worldConfig = this.configProvider.getWorldConfig();
         BiomeGenerator biomeGenerator = this.localWorld.getBiomeGenerator();
         if (worldConfig.improvedRivers)
-            this.riverArray = biomeGenerator.getBiomesUnZoomed(this.riverArray, chunkX * 4 - maxSmoothRadius,
-                    chunkZ * 4 - maxSmoothRadius, NOISE_MAX_X + maxSmoothDiameter, NOISE_MAX_Z + maxSmoothDiameter,
+            this.riverArray = biomeGenerator.getBiomesUnZoomed(this.riverArray, chunkX * 4 - this.maxSmoothRadius,
+                    chunkZ * 4 - this.maxSmoothRadius, NOISE_MAX_X + this.maxSmoothDiameter, NOISE_MAX_Z + this.maxSmoothDiameter,
                     OutputType.ONLY_RIVERS);
 
         if (biomeGenerator.canGenerateUnZoomed())
         {
-            this.biomeArray = biomeGenerator.getBiomesUnZoomed(this.biomeArray, chunkX * 4 - maxSmoothRadius,
-                    chunkZ * 4 - maxSmoothRadius, NOISE_MAX_X + maxSmoothDiameter, NOISE_MAX_Z + maxSmoothDiameter,
+            this.biomeArray = biomeGenerator.getBiomesUnZoomed(this.biomeArray, chunkX * 4 - this.maxSmoothRadius,
+                    chunkZ * 4 - this.maxSmoothRadius, NOISE_MAX_X + this.maxSmoothDiameter, NOISE_MAX_Z + this.maxSmoothDiameter,
                     OutputType.DEFAULT_FOR_WORLD);
         } else
         {
@@ -244,8 +244,7 @@ public class ChunkProviderTC
                             final double d17 = (d12 - d11) * oneFourth;
                             for (int piece_z = 0; piece_z < 4; piece_z++)
                             {
-                                final BiomeConfig biomeConfig = toBiomeConfig(
-                                        this.biomeArray[(z * 4 + piece_z) * 16 + (piece_x + x * 4)]);
+                                final BiomeConfig biomeConfig = toBiomeConfig(this.biomeArray[(z * 4 + piece_z) * 16 + (piece_x + x * 4)]);
                                 final int waterLevelMax = this.waterLevel[(z * 4 + piece_z) * 16 + (piece_x + x * 4)] & 0xFF;
                                 LocalMaterialData block = air;
                                 if (y * 8 + piece_y < waterLevelMax && y * 8 + piece_y > biomeConfig.waterLevelMin)
@@ -294,7 +293,7 @@ public class ChunkProviderTC
         this.noise4 = this.noiseGen4.a(this.noise4, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_X_SIZE,
                 CHUNK_Z_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
 
-        GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, noise4, heightCap);
+        GeneratingChunk generatingChunk = new GeneratingChunk(this.random, this.waterLevel, this.noise4, this.heightCap);
 
         for (int x = 0; x < CHUNK_X_SIZE; x++)
         {
@@ -303,8 +302,7 @@ public class ChunkProviderTC
                 // The following code is executed for each column in the chunk
 
                 // Get the current biome config and some properties
-                final BiomeConfig biomeConfig = this.configProvider.getBiomeByIdOrNull(
-                        this.biomeArray[(x + z * CHUNK_X_SIZE)]).getBiomeConfig();
+                final BiomeConfig biomeConfig = this.configProvider.getBiomeByIdOrNull(this.biomeArray[(x + z * CHUNK_X_SIZE)]).getBiomeConfig();
 
                 biomeConfig.surfaceAndGroundControl.spawn(generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 
@@ -457,7 +455,7 @@ public class ChunkProviderTC
 
     private void oldBiomeFactor(int x, int z, int i4, int ySections, double noiseHeight)
     {
-        BiomeGenerator unwrapped = localWorld.getBiomeGenerator().unwrap();
+        BiomeGenerator unwrapped = this.localWorld.getBiomeGenerator().unwrap();
         if (unwrapped instanceof OldBiomeGenerator)
         {
             OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) unwrapped;

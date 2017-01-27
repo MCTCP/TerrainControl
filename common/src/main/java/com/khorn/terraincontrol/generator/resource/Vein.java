@@ -33,8 +33,8 @@ class Vein
     public boolean reachesChunk(int otherChunkX, int otherChunkZ)
     {
         // Calculate the nearest chunk x and z
-        int chunkX = (x + 8) / 16;
-        int chunkZ = (z + 8) / 16;
+        int chunkX = (this.x + 8) / 16;
+        int chunkZ = (this.z + 8) / 16;
         // Calculate the ceiled chunk size
         int chunkSize = getChunkSize();
 
@@ -48,7 +48,7 @@ class Vein
 
     public void spawn(LocalWorld world, Random random, ChunkCoordinate chunkCoord, VeinGen gen)
     {
-        int sizeSquared = size * size;
+        int sizeSquared = this.size * this.size;
 
         for (int i = 0; i < gen.oreFrequency; i++)
         {

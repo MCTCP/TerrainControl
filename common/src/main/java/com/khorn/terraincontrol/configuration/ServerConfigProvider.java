@@ -92,15 +92,15 @@ public final class ServerConfigProvider implements ConfigProvider
 
         // We have to wait for the loading in order to get things like
         // temperature
-        worldConfig.biomeGroupManager.processBiomeData(world);
+        this.worldConfig.biomeGroupManager.processBiomeData(world);
     }
 
     private void loadCustomObjects()
     {
-        File worldObjectsDir = new File(settingsDir, WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
+        File worldObjectsDir = new File(this.settingsDir, WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
 
         // Migrate folders
-        File oldWorldObjectsDir = new File(settingsDir, "BOBPlugins");
+        File oldWorldObjectsDir = new File(this.settingsDir, "BOBPlugins");
         if (!FileHelper.migrateFolder(oldWorldObjectsDir, worldObjectsDir))
         {
             TerrainControl.log(LogMarker.WARN, "Failed to move old world"
@@ -111,17 +111,17 @@ public final class ServerConfigProvider implements ConfigProvider
 
         Map<String, CustomObjectLoader> objectLoaders = TerrainControl.getCustomObjectManager().getObjectLoaders();
 
-        customObjects = new CustomObjectCollection(objectLoaders, worldObjectsDir);
-        customObjects.setFallback(TerrainControl.getCustomObjectManager().getGlobalObjects());
-        TerrainControl.log(LogMarker.INFO, "{} world custom objects loaded.", customObjects.getAll().size());
+        this.customObjects = new CustomObjectCollection(objectLoaders, worldObjectsDir);
+        this.customObjects.setFallback(TerrainControl.getCustomObjectManager().getGlobalObjects());
+        TerrainControl.log(LogMarker.INFO, "{} world custom objects loaded.", this.customObjects.getAll().size());
     }
 
     private SettingsMap loadWorldConfig()
     {
-        File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
+        File worldConfigFile = new File(this.settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
         SettingsMap settingsMap = FileSettingsReader.read(world.getName(), worldConfigFile);
-        this.worldConfig = new WorldConfig(settingsDir, settingsMap, world, customObjects);
-        FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.SettingsMode);
+        this.worldConfig = new WorldConfig(this.settingsDir, settingsMap, this.world, this.customObjects);
+        FileSettingsWriter.writeToFile(this.worldConfig.getSettingsAsMap(), worldConfigFile, this.worldConfig.SettingsMode);
 
         return settingsMap;
     }
@@ -131,7 +131,7 @@ public final class ServerConfigProvider implements ConfigProvider
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);
         // TerrainControl/worlds/<WorldName>/<WorldBiomes/
-        biomeDirs.add(new File(settingsDir, correctOldBiomeConfigFolder(settingsDir)));
+        biomeDirs.add(new File(this.settingsDir, correctOldBiomeConfigFolder(this.settingsDir)));
         // TerrainControl/GlobalBiomes/
         biomeDirs.add(new File(TerrainControl.getEngine().getTCDataFolder(), PluginStandardValues.BiomeConfigDirectoryName));
 
@@ -139,20 +139,20 @@ public final class ServerConfigProvider implements ConfigProvider
 
         // Build a set of all biomes to load
         Collection<BiomeLoadInstruction> biomesToLoad = new HashSet<BiomeLoadInstruction>();
-        biomesToLoad.addAll(world.getDefaultBiomes());
+        biomesToLoad.addAll(this.world.getDefaultBiomes());
 
         // This adds all custombiomes that have been listed in WorldConfig to
         // the arrayList
-        for (Entry<String, Integer> entry : worldConfig.customBiomeGenerationIds.entrySet())
+        for (Entry<String, Integer> entry : this.worldConfig.customBiomeGenerationIds.entrySet())
         {
             String biomeName = entry.getKey();
             int generationId = entry.getValue();
-            biomesToLoad.add(new BiomeLoadInstruction(biomeName, generationId, new StandardBiomeTemplate(
-                    worldConfig.worldHeightScale)));
+            biomesToLoad.add(new BiomeLoadInstruction(biomeName, generationId,
+                new StandardBiomeTemplate(this.worldConfig.worldHeightScale)));
         }
 
         // Load all files
-        BiomeConfigFinder biomeConfigFinder = new BiomeConfigFinder(worldConfig, TerrainControl.getPluginConfig().biomeConfigExtension);
+        BiomeConfigFinder biomeConfigFinder = new BiomeConfigFinder(this.worldConfig, TerrainControl.getPluginConfig().biomeConfigExtension);
         Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(biomeDirs, biomesToLoad);
 
         // Read all settings
@@ -168,17 +168,17 @@ public final class ServerConfigProvider implements ConfigProvider
     @Override
     public WorldConfig getWorldConfig()
     {
-        return worldConfig;
+        return this.worldConfig;
     }
 
     @Override
     public LocalBiome getBiomeByIdOrNull(int id)
     {
-        if (id < 0 || id > biomes.length)
+        if (id < 0 || id > this.biomes.length)
         {
             return null;
         }
-        return biomes[id];
+        return this.biomes[id];
     }
 
     @Override
@@ -203,7 +203,7 @@ public final class ServerConfigProvider implements ConfigProvider
             processInheritance(biomeConfigStubs, biomeConfigStub, 0);
 
             // Settings reading
-            BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getLoadInstructions(), biomeConfigStub.getSettings(), worldConfig);
+            BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getLoadInstructions(), biomeConfigStub.getSettings(), this.worldConfig);
             loadedBiomes.put(biomeConfigStub.getBiomeName(), biomeConfig);
 
             // Settings writing
@@ -212,7 +212,7 @@ public final class ServerConfigProvider implements ConfigProvider
             {
                 writeFile = new File(writeFile.getAbsolutePath() + ".inherited");
             }
-            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, worldConfig.SettingsMode);
+            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, this.worldConfig.SettingsMode);
         }
 
         return loadedBiomes;
@@ -291,12 +291,12 @@ public final class ServerConfigProvider implements ConfigProvider
 
             this.biomes[generationId] = biome;
             // Update WorldConfig with actual id
-            worldConfig.customBiomeGenerationIds.put(biome.getName(), generationId);
+            this.worldConfig.customBiomeGenerationIds.put(biome.getName(), generationId);
 
             // If not virtual, add to saved biomes set
             if (!biome.getIds().isVirtual())
             {
-                savedBiomes.add(biome);
+                this.savedBiomes.add(biome);
             }
 
             // Indexing ReplacedBlocks
@@ -406,7 +406,7 @@ public final class ServerConfigProvider implements ConfigProvider
     @Override
     public CustomObjectCollection getCustomObjects()
     {
-        return customObjects;
+        return this.customObjects;
     }
 
 }

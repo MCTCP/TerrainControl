@@ -46,7 +46,7 @@ public class BO3Settings extends Settings
     public static final Setting<ExtrudeMode> EXTRUDE_MODE = enumSetting("ExtrudeMode", ExtrudeMode.None);
 
     // The spawn height
-    public static enum SpawnHeightEnum
+    public enum SpawnHeightEnum
     {
         randomY(StructurePartSpawnHeight.PROVIDED),
         atMinY(StructurePartSpawnHeight.PROVIDED),
@@ -55,7 +55,7 @@ public class BO3Settings extends Settings
 
         private StructurePartSpawnHeight height;
 
-        private SpawnHeightEnum(StructurePartSpawnHeight height)
+        SpawnHeightEnum(StructurePartSpawnHeight height)
         {
             this.height = height;
         }
@@ -67,7 +67,7 @@ public class BO3Settings extends Settings
     }
 
     // How an object should be extended to a surface
-    public static enum ExtrudeMode
+    public enum ExtrudeMode
     {
         None(-1, -1),
         BottomDown(TerrainControl.WORLD_HEIGHT, TerrainControl.WORLD_DEPTH),
@@ -101,7 +101,7 @@ public class BO3Settings extends Settings
     }
 
     // What to do when outside the source block
-    public static enum OutsideSourceBlock
+    public enum OutsideSourceBlock
     {
         dontPlace,
         placeAnyway

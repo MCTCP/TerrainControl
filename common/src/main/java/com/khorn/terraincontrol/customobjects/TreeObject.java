@@ -57,7 +57,7 @@ public class TreeObject extends SimpleObject
     @Override
     public String getName()
     {
-        return type.name();
+        return this.type.name();
     }
 
     @Override
@@ -75,7 +75,7 @@ public class TreeObject extends SimpleObject
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-        return world.placeTree(type, random, x, y, z);
+        return world.placeTree(this.type, random, x, y, z);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class TreeObject extends SimpleObject
     @Override
     public CustomObject applySettings(SettingsMap settings)
     {
-        return new TreeObject(type, settings);
+        return new TreeObject(this.type, settings);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class TreeObject extends SimpleObject
     @Override
     public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {
-        if (y < minHeight || y > maxHeight)
+        if (y < this.minHeight || y > this.maxHeight)
         {
             return false;
         }

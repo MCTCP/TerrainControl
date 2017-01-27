@@ -17,10 +17,10 @@ public class CheckCommand extends BaseCommand
     public CheckCommand(TXPlugin _plugin)
     {
         super(_plugin);
-        name = "check";
-        perm = TCPerm.CMD_CHECK.node;
-        usage = "check World_Name";
-        workOnConsole = true;
+        this.name = "check";
+        this.perm = TCPerm.CMD_CHECK.node;
+        this.usage = "check World_Name";
+        this.workOnConsole = true;
     }
 
     @Override

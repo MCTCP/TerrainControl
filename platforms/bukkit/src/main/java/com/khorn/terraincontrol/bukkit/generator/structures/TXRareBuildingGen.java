@@ -104,7 +104,7 @@ public class TXRareBuildingGen extends StructureGenerator
         {
             BiomeBase biomeAtPosition = this.g.getWorldChunkManager().getBiome(new BlockPosition(var3 * 16 + 8, 0, var4 * 16 + 8));
 
-            for (BiomeBase biome : biomeList)
+            for (BiomeBase biome : this.biomeList)
             {
                 if (biomeAtPosition.equals(biome))
                 {

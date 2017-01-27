@@ -26,7 +26,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.DataFixesManager;
-import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -43,8 +42,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.*;
-
-import javax.annotation.Nullable;
 
 public class ForgeWorld implements LocalWorld
 {

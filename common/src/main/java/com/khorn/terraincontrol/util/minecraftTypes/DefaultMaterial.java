@@ -270,7 +270,7 @@ public enum DefaultMaterial
      *            prevent snowfall. Note: this isn't always equal to what
      *            Minecraft calls solid.
      */
-    private DefaultMaterial(int id, boolean solid)
+    DefaultMaterial(int id, boolean solid)
     {
         this.id = id;
         this.solid = solid;
@@ -281,7 +281,7 @@ public enum DefaultMaterial
      * 
      * @param id Id of the material.
      */
-    private DefaultMaterial(int id)
+    DefaultMaterial(int id)
     {
         this.id = id;
         this.solid = true;

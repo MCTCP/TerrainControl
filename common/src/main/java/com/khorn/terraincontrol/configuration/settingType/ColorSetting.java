@@ -33,7 +33,7 @@ class ColorSetting extends Setting<Integer>
         try
         {
             Integer integer = Integer.decode(string);
-            if (integer.intValue() > 0xffffff || integer.intValue() < 0)
+            if (integer > 0xffffff || integer < 0)
             {
                 throw new InvalidConfigException("Color must have 6 hexadecimal digits");
             }
@@ -47,7 +47,7 @@ class ColorSetting extends Setting<Integer>
     @Override
     public String write(Integer value)
     {
-        return "#" + Integer.toHexString(value.intValue() | 0x1000000).substring(1).toUpperCase();
+        return "#" + Integer.toHexString(value | 0x1000000).substring(1).toUpperCase();
     }
 
 }

@@ -116,10 +116,10 @@ public class BukkitWorld implements LocalWorld
     @Override
     public BukkitBiome getBiomeById(int id) throws BiomeNotFoundException
     {
-        LocalBiome biome = settings.getBiomeByIdOrNull(id);
+        LocalBiome biome = this.settings.getBiomeByIdOrNull(id);
         if (biome == null)
         {
-            throw new BiomeNotFoundException(id, Arrays.asList(settings.getBiomeArray()));
+            throw new BiomeNotFoundException(id, Arrays.asList(this.settings.getBiomeArray()));
         }
         return (BukkitBiome) biome;
     }
@@ -127,16 +127,16 @@ public class BukkitWorld implements LocalWorld
     @Override
     public LocalBiome getBiomeByIdOrNull(int id)
     {
-        return settings.getBiomeByIdOrNull(id);
+        return this.settings.getBiomeByIdOrNull(id);
     }
 
     @Override
     public LocalBiome getBiomeByName(String name) throws BiomeNotFoundException
     {
-        LocalBiome biome = biomeNames.get(name);
+        LocalBiome biome = this.biomeNames.get(name);
         if (biome == null)
         {
-            throw new BiomeNotFoundException(name, biomeNames.keySet());
+            throw new BiomeNotFoundException(name, this.biomeNames.keySet());
         }
         return biome;
     }
@@ -181,13 +181,13 @@ public class BukkitWorld implements LocalWorld
     @Override
     public boolean placeDungeon(Random rand, int x, int y, int z)
     {
-        return dungeon.generate(world, rand, new BlockPosition(x, y, z));
+        return dungeon.generate(this.world, rand, new BlockPosition(x, y, z));
     }
 
     @Override
     public boolean placeFossil(Random rand, ChunkCoordinate chunkCoord)
     {
-        return fossil.generate(world, rand, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+        return this.fossil.generate(this.world, rand, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
     }
 
     @Override
@@ -197,46 +197,46 @@ public class BukkitWorld implements LocalWorld
         switch (type)
         {
             case Tree:
-                return tree.generate(this.world, rand, blockPos);
+                return this.tree.generate(this.world, rand, blockPos);
             case BigTree:
-                return bigTree.generate(this.world, rand, blockPos);
+                return this.bigTree.generate(this.world, rand, blockPos);
             case Forest:
             case Birch:
-                return birchTree.generate(this.world, rand, blockPos);
+                return this.birchTree.generate(this.world, rand, blockPos);
             case TallBirch:
-                return longBirchTree.generate(this.world, rand, blockPos);
+                return this.longBirchTree.generate(this.world, rand, blockPos);
             case HugeMushroom:
                 if (rand.nextBoolean())
                 {
-                    return hugeBrownMushroom.generate(this.world, rand, blockPos);
+                    return this.hugeBrownMushroom.generate(this.world, rand, blockPos);
                 } else
                 {
-                    return hugeRedMushroom.generate(this.world, rand, blockPos);
+                    return this.hugeRedMushroom.generate(this.world, rand, blockPos);
                 }
             case HugeRedMushroom:
-                return hugeRedMushroom.generate(this.world, rand, blockPos);
+                return this.hugeRedMushroom.generate(this.world, rand, blockPos);
             case HugeBrownMushroom:
-                return hugeBrownMushroom.generate(this.world, rand, blockPos);
+                return this.hugeBrownMushroom.generate(this.world, rand, blockPos);
             case SwampTree:
-                return swampTree.generate(this.world, rand, blockPos);
+                return this.swampTree.generate(this.world, rand, blockPos);
             case Taiga1:
-                return taigaTree1.generate(this.world, rand, blockPos);
+                return this.taigaTree1.generate(this.world, rand, blockPos);
             case Taiga2:
-                return taigaTree2.generate(this.world, rand, blockPos);
+                return this.taigaTree2.generate(this.world, rand, blockPos);
             case JungleTree:
-                return jungleTree.generate(this.world, rand, blockPos);
+                return this.jungleTree.generate(this.world, rand, blockPos);
             case GroundBush:
-                return groundBush.generate(this.world, rand, blockPos);
+                return this.groundBush.generate(this.world, rand, blockPos);
             case CocoaTree:
-                return cocoaTree.generate(this.world, rand, blockPos);
+                return this.cocoaTree.generate(this.world, rand, blockPos);
             case Acacia:
-                return acaciaTree.generate(this.world, rand, blockPos);
+                return this.acaciaTree.generate(this.world, rand, blockPos);
             case DarkOak:
-                return darkOakTree.generate(this.world, rand, blockPos);
+                return this.darkOakTree.generate(this.world, rand, blockPos);
             case HugeTaiga1:
-                return hugeTaigaTree1.generate(this.world, rand, blockPos);
+                return this.hugeTaigaTree1.generate(this.world, rand, blockPos);
             case HugeTaiga2:
-                return hugeTaigaTree2.generate(this.world, rand, blockPos);
+                return this.hugeTaigaTree2.generate(this.world, rand, blockPos);
             default:
                 throw new RuntimeException("Failed to handle tree of type " + type.toString());
         }
@@ -348,7 +348,7 @@ public class BukkitWorld implements LocalWorld
         {
             // Blocks requested outside population step
             // (Tree growing, /tc spawn, etc.)
-           return world.getChunkAt(chunkX, chunkZ); 
+           return this.world.getChunkAt(chunkX, chunkZ);
         }
 
         // Restrict to chunks we are currently populating
@@ -365,9 +365,9 @@ public class BukkitWorld implements LocalWorld
             {
                 return null;
             }
-            if (world.getChunkProviderServer().isLoaded(chunkX, chunkZ))
+            if (this.world.getChunkProviderServer().isLoaded(chunkX, chunkZ))
             {
-                return world.getChunkAt(chunkX, chunkZ);
+                return this.world.getChunkAt(chunkX, chunkZ);
             }
             return null;
         }
@@ -473,14 +473,14 @@ public class BukkitWorld implements LocalWorld
                 if (isSafeForLightUpdates(chunk, x, z))
                 {
                     // Relight
-                    world.methodProfiler.a("checkLight");
-                    world.w(blockPos);
-                    world.methodProfiler.b();
+                    this.world.methodProfiler.a("checkLight");
+                    this.world.w(blockPos);
+                    this.world.methodProfiler.b();
                 }
             }
 
             // Notify world: (2 | 16) == update client, don't update observers
-            world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2 | 16);
+            this.world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2 | 16);
         } catch (Throwable t)
         {
             String populatingChunkInfo = this.chunkCache == null? "(no chunk)" :
@@ -539,7 +539,7 @@ public class BukkitWorld implements LocalWorld
         if (incorrectHeightMap && isSafeForLightUpdates(chunk, x, z))
         {
             // Let Minecraft know that it made an error
-            world.w(new BlockPosition(x, y, z)); // world.relight
+            this.world.w(new BlockPosition(x, y, z)); // world.relight
         }
 
         return y;
@@ -548,7 +548,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void startPopulation(ChunkCoordinate chunkCoord)
     {
-        if (this.chunkCache != null && settings.getWorldConfig().populationBoundsCheck)
+        if (this.chunkCache != null && this.settings.getWorldConfig().populationBoundsCheck)
         {
             throw new IllegalStateException("Chunk is already being populated."
                     + " This may be a bug in " + PluginStandardValues.PLUGIN_NAME + ", but it may also be"
@@ -587,7 +587,7 @@ public class BukkitWorld implements LocalWorld
         {
             for (int indexZ = 0; indexZ <= 1; indexZ++)
             {
-                chunkCache[indexX | (indexZ << 1)] = world.getChunkAt(
+                chunkCache[indexX | (indexZ << 1)] = this.world.getChunkAt(
                         topLeft.getChunkX() + indexX,
                         topLeft.getChunkZ() + indexZ
                 );
@@ -599,7 +599,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void endPopulation()
     {
-        if (this.chunkCache == null && settings.getWorldConfig().populationBoundsCheck)
+        if (this.chunkCache == null && this.settings.getWorldConfig().populationBoundsCheck)
         {
             throw new IllegalStateException("Chunk is not being populated."
                     + " This may be a bug in Terrain Control, but it may also be"
@@ -613,7 +613,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public int getLightLevel(int x, int y, int z)
     {
-        return world.j(new BlockPosition(x, y, z)); // world.getBlockAndSkyLightAsItWereDay
+        return this.world.j(new BlockPosition(x, y, z)); // world.getBlockAndSkyLightAsItWereDay
     }
 
     @Override
@@ -637,19 +637,19 @@ public class BukkitWorld implements LocalWorld
     @Override
     public long getSeed()
     {
-        return world.getSeed();
+        return this.world.getSeed();
     }
 
     @Override
     public int getHeightCap()
     {
-        return settings.getWorldConfig().worldHeightCap;
+        return this.settings.getWorldConfig().worldHeightCap;
     }
 
     @Override
     public int getHeightScale()
     {
-        return settings.getWorldConfig().worldHeightScale;
+        return this.settings.getWorldConfig().worldHeightScale;
     }
 
     public TXChunkGenerator getChunkGenerator()
@@ -712,13 +712,13 @@ public class BukkitWorld implements LocalWorld
 
         // Inject our own BiomeManager (called WorldChunkManager)
         Class<? extends BiomeGenerator> biomeModeClass = this.settings.getWorldConfig().biomeMode;
-        biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeModeClass, this);
+        this.biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeModeClass, this);
         injectWorldChunkManager(biomeGenerator);
 
         // Set sea level
         mcWorld.b(this.settings.getWorldConfig().waterLevelMax);
 
-        if (!initialized)
+        if (!this.initialized)
         {
             // Things that need to be done only when enabling
             // for the first time
@@ -729,16 +729,16 @@ public class BukkitWorld implements LocalWorld
             {
                 case Normal:
                 case OldGenerator:
-                    this.strongholdGen = new TXStrongholdGen(settings);
-                    this.villageGen = new TXVillageGen(settings);
+                    this.strongholdGen = new TXStrongholdGen(this.settings);
+                    this.villageGen = new TXVillageGen(this.settings);
                     this.mineshaftGen = new TXMineshaftGen();
-                    this.rareBuildingGen = new TXRareBuildingGen(settings);
-                    this.mansionGen = new TXMansionGen(settings);
+                    this.rareBuildingGen = new TXRareBuildingGen(this.settings);
+                    this.mansionGen = new TXMansionGen(this.settings);
                     this.netherFortressGen = new TXNetherFortressGen();
-                    this.oceanMonumentGen = new TXOceanMonumentGen(settings);
+                    this.oceanMonumentGen = new TXOceanMonumentGen(this.settings);
 
                     // Inject our own ChunkGenerator
-                    injectInternalChunkGenerator(new TXInternalChunkGenerator(this, generator));
+                    injectInternalChunkGenerator(new TXInternalChunkGenerator(this, this.generator));
                 case NotGenerate:
                 case TerrainTest:
                     this.generator.onInitialize(this);
@@ -816,13 +816,13 @@ public class BukkitWorld implements LocalWorld
     public void disable()
     {
         // Restore old world provider if replaced
-        if (world.worldProvider instanceof TXWorldProvider)
+        if (this.world.worldProvider instanceof TXWorldProvider)
         {
-            world.worldProvider = ((TXWorldProvider) world.worldProvider).getOldWorldProvider();
+            this.world.worldProvider = ((TXWorldProvider) this.world.worldProvider).getOldWorldProvider();
         }
 
         // Restore vanilla chunk generator
-        this.injectInternalChunkGenerator(new CustomChunkGenerator(world, getSeed(), generator));
+        this.injectInternalChunkGenerator(new CustomChunkGenerator(this.world, getSeed(), this.generator));
     }
 
     public void setChunkGenerator(TXChunkGenerator _generator)
@@ -868,7 +868,7 @@ public class BukkitWorld implements LocalWorld
         // server startup instead, and then save the result?)
         nmsTag = this.dataConverter.a(DataConverterTypes.BLOCK_ENTITY, nmsTag, -1);
         // Add that data to the current tile entity in the world
-        TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
+        TileEntity tileEntity = this.world.getTileEntity(new BlockPosition(x, y, z));
         if (tileEntity != null)
         {
             tileEntity.a(nmsTag); // tileEntity.load
@@ -882,7 +882,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public NamedBinaryTag getMetadata(int x, int y, int z)
     {
-        TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
+        TileEntity tileEntity = this.world.getTileEntity(new BlockPosition(x, y, z));
         if (tileEntity == null)
         {
             return null;
@@ -903,15 +903,15 @@ public class BukkitWorld implements LocalWorld
 
     @Override
     public BiomeGenerator getBiomeGenerator() {
-        return biomeGenerator;
+        return this.biomeGenerator;
     }
 
     @Override
     public SpawnableObject getMojangStructurePart(String name)
     {
         MinecraftKey minecraftKey = new MinecraftKey(name);
-        DefinedStructureManager mojangStructureParts = world.getDataManager().h();
-        DefinedStructure mojangStructurePart = mojangStructureParts.a(world.getMinecraftServer(), minecraftKey);
+        DefinedStructureManager mojangStructureParts = this.world.getDataManager().h();
+        DefinedStructure mojangStructurePart = mojangStructureParts.a(this.world.getMinecraftServer(), minecraftKey);
         if (mojangStructurePart == null)
         {
             return null;

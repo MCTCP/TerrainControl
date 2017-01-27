@@ -136,7 +136,7 @@ public class PlantType
      */
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     /**
@@ -149,17 +149,17 @@ public class PlantType
      */
     public void spawn(LocalWorld world, int x, int y, int z)
     {
-        world.setBlock(x, y, z, bottomBlock);
-        if (topBlock != null)
+        world.setBlock(x, y, z, this.bottomBlock);
+        if (this.topBlock != null)
         {
-            world.setBlock(x, y + 1, z, topBlock);
+            world.setBlock(x, y + 1, z, this.topBlock);
         }
     }
 
     @Override
     public String toString()
     {
-        return name;
+        return this.name;
     }
 
     @Override
@@ -167,8 +167,8 @@ public class PlantType
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((bottomBlock == null) ? 0 : bottomBlock.hashCode());
-        result = prime * result + ((topBlock == null) ? 0 : topBlock.hashCode());
+        result = prime * result + ((this.bottomBlock == null) ? 0 : this.bottomBlock.hashCode());
+        result = prime * result + ((this.topBlock == null) ? 0 : this.topBlock.hashCode());
         return result;
     }
 
@@ -188,23 +188,23 @@ public class PlantType
             return false;
         }
         PlantType other = (PlantType) obj;
-        if (bottomBlock == null)
+        if (this.bottomBlock == null)
         {
             if (other.bottomBlock != null)
             {
                 return false;
             }
-        } else if (!bottomBlock.equals(other.bottomBlock))
+        } else if (!this.bottomBlock.equals(other.bottomBlock))
         {
             return false;
         }
-        if (topBlock == null)
+        if (this.topBlock == null)
         {
             if (other.topBlock != null)
             {
                 return false;
             }
-        } else if (!topBlock.equals(other.topBlock))
+        } else if (!this.topBlock.equals(other.topBlock))
         {
             return false;
         }
@@ -218,7 +218,7 @@ public class PlantType
      */
     public LocalMaterialData getBottomMaterial()
     {
-        return bottomBlock;
+        return this.bottomBlock;
     }
 
     /**
@@ -228,7 +228,7 @@ public class PlantType
      */
     public LocalMaterialData getTopMaterial()
     {
-        return topBlock;
+        return this.topBlock;
     }
 
 }

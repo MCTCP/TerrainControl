@@ -28,9 +28,9 @@ final class BukkitChunkBuffer implements ChunkBuffer
     public LocalMaterialData getBlock(int blockX, int blockY, int blockZ)
     {
         @SuppressWarnings("deprecation")
-        int blockId = chunkData.getTypeId(blockX, blockY, blockZ);
+        int blockId = this.chunkData.getTypeId(blockX, blockY, blockZ);
         @SuppressWarnings("deprecation")
-        byte blockData = chunkData.getData(blockX, blockY, blockZ);
+        byte blockData = this.chunkData.getData(blockX, blockY, blockZ);
         return BukkitMaterialData.ofIds(blockId, blockData);
     }
 
@@ -44,7 +44,7 @@ final class BukkitChunkBuffer implements ChunkBuffer
     @Override
     public void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material)
     {
-        chunkData.setBlock(blockX, blockY, blockZ, material.getBlockId(), material.getBlockData());
+        this.chunkData.setBlock(blockX, blockY, blockZ, material.getBlockId(), material.getBlockData());
     }
 
 }

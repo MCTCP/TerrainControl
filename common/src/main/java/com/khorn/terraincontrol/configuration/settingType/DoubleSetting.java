@@ -25,13 +25,13 @@ class DoubleSetting extends Setting<Double>
     @Override
     public Double getDefaultValue()
     {
-        return defaultValue;
+        return this.defaultValue;
     }
 
     @Override
     public Double read(String string) throws InvalidConfigException
     {
-        return StringHelper.readDouble(string, minValue, maxValue);
+        return StringHelper.readDouble(string, this.minValue, this.maxValue);
     }
 
 }

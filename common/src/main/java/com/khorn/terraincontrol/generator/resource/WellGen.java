@@ -26,14 +26,14 @@ public class WellGen extends Resource
         super(biomeConfig);
         assureSize(8, args);
 
-        material = readMaterial(args.get(0));
-        slab = readMaterial(args.get(1));
-        water = readMaterial(args.get(2));
-        frequency = readInt(args.get(3), 1, 100);
-        rarity = readRarity(args.get(4));
-        minAltitude = readInt(args.get(5), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(6), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
-        sourceBlocks = readMaterials(args, 7);
+        this.material = readMaterial(args.get(0));
+        this.slab = readMaterial(args.get(1));
+        this.water = readMaterial(args.get(2));
+        this.frequency = readInt(args.get(3), 1, 100);
+        this.rarity = readRarity(args.get(4));
+        this.minAltitude = readInt(args.get(5), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        this.maxAltitude = readInt(args.get(6), minAltitude + 1, TerrainControl.WORLD_HEIGHT);
+        this.sourceBlocks = readMaterials(args, 7);
     }
 
     @Override
@@ -77,24 +77,24 @@ public class WellGen extends Resource
     @Override
     public String toString()
     {
-        String output = "Well(" + material + "," + slab + "," + water + ",";
-        output += frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + this.makeMaterials(sourceBlocks) + ")";
-        return output;
+
+        return "Well(" + this.material + "," + this.slab + "," + this.water + "," + this.frequency + "," + this.rarity + "," +
+            this.minAltitude + "," + this.maxAltitude + this.makeMaterials(this.sourceBlocks) + ")";
     }
 
     @Override
     public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
     {
-        int y = random.nextInt(maxAltitude - minAltitude) + minAltitude;
+        int y = random.nextInt(this.maxAltitude - this.minAltitude) + this.minAltitude;
 
-        while (world.isEmpty(x, y, z) && y > minAltitude)
+        while (world.isEmpty(x, y, z) && y > this.minAltitude)
         {
             --y;
         }
 
         LocalMaterialData sourceBlock = world.getMaterial(x, y, z);
 
-        if (!sourceBlocks.contains(sourceBlock))
+        if (!this.sourceBlocks.contains(sourceBlock))
         {
             return;
         }
@@ -118,16 +118,16 @@ public class WellGen extends Resource
             {
                 for (int var9 = -2; var9 <= 2; ++var9)
                 {
-                    world.setBlock(x + j, y + i, z + var9, material);
+                    world.setBlock(x + j, y + i, z + var9, this.material);
                 }
             }
         }
 
-        world.setBlock(x, y, z, water);
-        world.setBlock(x - 1, y, z, water);
-        world.setBlock(x + 1, y, z, water);
-        world.setBlock(x, y, z - 1, water);
-        world.setBlock(x, y, z + 1, water);
+        world.setBlock(x, y, z, this.water);
+        world.setBlock(x - 1, y, z, this.water);
+        world.setBlock(x + 1, y, z, this.water);
+        world.setBlock(x, y, z - 1, this.water);
+        world.setBlock(x, y, z + 1, this.water);
 
         for (i = -2; i <= 2; ++i)
         {
@@ -135,15 +135,15 @@ public class WellGen extends Resource
             {
                 if (i == -2 || i == 2 || j == -2 || j == 2)
                 {
-                    world.setBlock(x + i, y + 1, z + j, material);
+                    world.setBlock(x + i, y + 1, z + j, this.material);
                 }
             }
         }
 
-        world.setBlock(x + 2, y + 1, z, slab);
-        world.setBlock(x - 2, y + 1, z, slab);
-        world.setBlock(x, y + 1, z + 2, slab);
-        world.setBlock(x, y + 1, z - 2, slab);
+        world.setBlock(x + 2, y + 1, z, this.slab);
+        world.setBlock(x - 2, y + 1, z, this.slab);
+        world.setBlock(x, y + 1, z + 2, this.slab);
+        world.setBlock(x, y + 1, z - 2, this.slab);
 
         for (i = -1; i <= 1; ++i)
         {
@@ -151,20 +151,20 @@ public class WellGen extends Resource
             {
                 if (i == 0 && j == 0)
                 {
-                    world.setBlock(x + i, y + 4, z + j, material);
+                    world.setBlock(x + i, y + 4, z + j, this.material);
                 } else
                 {
-                    world.setBlock(x + i, y + 4, z + j, slab);
+                    world.setBlock(x + i, y + 4, z + j, this.slab);
                 }
             }
         }
 
         for (i = 1; i <= 3; ++i)
         {
-            world.setBlock(x - 1, y + i, z - 1, material);
-            world.setBlock(x - 1, y + i, z + 1, material);
-            world.setBlock(x + 1, y + i, z - 1, material);
-            world.setBlock(x + 1, y + i, z + 1, material);
+            world.setBlock(x - 1, y + i, z - 1, this.material);
+            world.setBlock(x - 1, y + i, z + 1, this.material);
+            world.setBlock(x + 1, y + i, z - 1, this.material);
+            world.setBlock(x + 1, y + i, z + 1, this.material);
         }
     }
 

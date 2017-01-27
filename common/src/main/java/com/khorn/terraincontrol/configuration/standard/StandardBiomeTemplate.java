@@ -147,9 +147,9 @@ public class StandardBiomeTemplate
                 this.worldHeight));
         
         // Fossil
-        if (defaultFossilRarity > 0)
+        if (this.defaultFossilRarity > 0)
         {
-            resources.add(Resource.createResource(config, FossilGen.class, defaultFossilRarity));
+            resources.add(Resource.createResource(config, FossilGen.class, this.defaultFossilRarity));
         }
 
         // Dirt
@@ -203,7 +203,7 @@ public class StandardBiomeTemplate
                 lapislazuliDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Emerald ore
-        if (defaultEmeraldOre > 0)
+        if (this.defaultEmeraldOre > 0)
         {
             resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.EMERALD_ORE, emeraldDepositSize,
                     this.defaultEmeraldOre,
@@ -211,10 +211,10 @@ public class StandardBiomeTemplate
         }
 
         // Under water sand
-        if (defaultWaterSand > 0)
+        if (this.defaultWaterSand > 0)
         {
             resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.SAND, waterSandDepositSize,
-                    defaultWaterSand,
+                this.defaultWaterSand,
                     waterSandDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.GRASS));
         }
 
@@ -224,10 +224,10 @@ public class StandardBiomeTemplate
                 waterClayDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.CLAY));
 
         // Under water gravel
-        if (defaultWaterGravel > 0)
+        if (this.defaultWaterGravel > 0)
         {
             resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.GRAVEL, waterGravelDepositSize,
-                    defaultWaterGravel,
+                this.defaultWaterGravel,
                     waterGravelDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.GRASS));
         }
 
@@ -237,7 +237,7 @@ public class StandardBiomeTemplate
         // Boulder
         if (this.defaultBoulder != 0)
         {
-            resources.add(Resource.createResource(config, BoulderGen.class, DefaultMaterial.MOSSY_COBBLESTONE, defaultBoulder,
+            resources.add(Resource.createResource(config, BoulderGen.class, DefaultMaterial.MOSSY_COBBLESTONE, this.defaultBoulder,
                     boulderDepositRarity,
                     boulderDepositMinAltitude, boulderDepositMaxAltitude, DefaultMaterial.GRASS, DefaultMaterial.DIRT,
                     DefaultMaterial.STONE));
@@ -366,12 +366,12 @@ public class StandardBiomeTemplate
         {
             // Red mushroom
             resources.add(Resource.createResource(config, PlantGen.class, PlantType.RedMushroom, this.defaultMushroom,
-                    redMushroomDepositRarity, redMushroomDepositMinAltitude, this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT));
+                    redMushroomDepositRarity, redMushroomDepositMinAltitude, this.worldHeight, this.defaultSurfaceBlock, DefaultMaterial.DIRT));
 
             // Brown mushroom
             resources.add(Resource.createResource(config, PlantGen.class, PlantType.BrownMushroom, this.defaultMushroom,
                     brownMushroomDepositRarity, brownMushroomDepositMinAltitude,
-                    this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT));
+                    this.worldHeight, this.defaultSurfaceBlock, DefaultMaterial.DIRT));
         }
 
         if (this.defaultFerns > 0)

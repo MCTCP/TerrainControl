@@ -25,13 +25,13 @@ class IntSetting extends Setting<Integer>
     @Override
     public Integer getDefaultValue()
     {
-        return defaultValue;
+        return this.defaultValue;
     }
 
     @Override
     public Integer read(String string) throws InvalidConfigException
     {
-        return StringHelper.readInt(string, minValue, maxValue);
+        return StringHelper.readInt(string, this.minValue, this.maxValue);
     }
 
 }

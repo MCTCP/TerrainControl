@@ -54,7 +54,7 @@ public abstract class BO3Check extends BO3Function
             return false;
         }
         BO3Check check = (BO3Check) other;
-        return check.x == x && check.y == y && check.z == z;
+        return check.x == this.x && check.y == this.y && check.z == this.z;
     }
 
     @Override

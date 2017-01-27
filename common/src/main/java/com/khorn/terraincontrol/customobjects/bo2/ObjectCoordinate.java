@@ -23,7 +23,7 @@ public class ObjectCoordinate
         this.BranchDirection = -1;
         this.BranchOdds = -1;
 
-        hash = x + z << 8 + y << 16;
+        this.hash = x + z << 8 + y << 16;
     }
 
 
@@ -41,13 +41,13 @@ public class ObjectCoordinate
     @Override
     public int hashCode()
     {
-        return hash;
+        return this.hash;
     }
 
     public ObjectCoordinate Rotate()
     {
         ObjectCoordinate newCoordinate = new ObjectCoordinate(this.z, this.y, (this.x * -1));
-        newCoordinate.material = material.rotate();
+        newCoordinate.material = this.material.rotate();
         newCoordinate.BranchOdds = this.BranchOdds;
 
         if (this.BranchDirection != -1)
@@ -107,9 +107,6 @@ public class ObjectCoordinate
             return null;
             
         }
-
-
     }
-
 
 }

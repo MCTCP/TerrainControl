@@ -31,7 +31,7 @@ public class TXWorldChunkManager extends WorldChunkManager
     @Override
     public BiomeBase getBiome(BlockPosition blockPos)
     {
-        return localWorld.getBiomeById(biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
+        return this.localWorld.getBiomeById(this.biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
     }
 
     @Override
@@ -66,7 +66,7 @@ public class TXWorldChunkManager extends WorldChunkManager
         // Replace ids with BiomeBases
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = localWorld.getBiomeById(localObject[i]).getHandle();
+            paramArrayOfBiomeBase[i] = this.localWorld.getBiomeById(localObject[i]).getHandle();
         }
 
         return paramArrayOfBiomeBase;
@@ -79,9 +79,9 @@ public class TXWorldChunkManager extends WorldChunkManager
         // Hack for villages in other biomes
         // (The alternative would be to completely override the village spawn
         // code)
-        if (paramList == WorldGenVillage.a && localWorld.villageGen != null)
+        if (paramList == WorldGenVillage.a && this.localWorld.villageGen != null)
         {
-            paramList = localWorld.villageGen.villageSpawnBiomes;
+            paramList = this.localWorld.villageGen.villageSpawnBiomes;
         }
 
         int i = paramInt1 - paramInt3 >> 2;

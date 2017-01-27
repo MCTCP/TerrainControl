@@ -16,10 +16,10 @@ public class ReloadCommand extends BaseCommand
     public ReloadCommand(TXPlugin _plugin)
     {
         super(_plugin);
-        name = "reload";
-        perm = TCPerm.CMD_RELOAD.node;
-        usage = "reload [world_name]";
-        workOnConsole = true;
+        this.name = "reload";
+        this.perm = TCPerm.CMD_RELOAD.node;
+        this.usage = "reload [world_name]";
+        this.workOnConsole = true;
     }
 
     @Override

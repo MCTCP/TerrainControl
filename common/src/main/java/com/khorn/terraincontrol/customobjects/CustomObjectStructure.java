@@ -31,10 +31,10 @@ public class CustomObjectStructure
         this.start = start;
         this.height = object.getStructurePartSpawnHeight();
         this.maxBranchDepth = object.getMaxBranchDepth();
-        random = RandomHelper.getRandomForCoords(start.getX(), start.getY(), start.getZ(), world.getSeed());
+        this.random = RandomHelper.getRandomForCoords(start.getX(), start.getY(), start.getZ(), world.getSeed());
 
         // Calculate all branches and add them to a list
-        objectsToSpawn = new LinkedHashMap<ChunkCoordinate, Set<CustomObjectCoordinate>>();
+        this.objectsToSpawn = new LinkedHashMap<ChunkCoordinate, Set<CustomObjectCoordinate>>();
         addToSpawnList(start); // Add the object itself
         addBranches(start, 1);
     }
@@ -43,7 +43,7 @@ public class CustomObjectStructure
     {
         for (Branch branch : getBranches(coordObject.getObject(), coordObject.getRotation()))
         {
-            CustomObjectCoordinate childCoordObject = branch.toCustomObjectCoordinate(world, random, coordObject.getX(),
+            CustomObjectCoordinate childCoordObject = branch.toCustomObjectCoordinate(this.world, this.random, coordObject.getX(),
                     coordObject.getY(), coordObject.getZ());
 
             // Don't add null objects
@@ -56,7 +56,7 @@ public class CustomObjectStructure
             addToSpawnList(childCoordObject);
 
             // Also add the branches of this object
-            if (depth < maxBranchDepth)
+            if (depth < this.maxBranchDepth)
             {
                 addBranches(childCoordObject, depth + 1);
             }
@@ -77,11 +77,11 @@ public class CustomObjectStructure
     {
         ChunkCoordinate chunkCoordinate = coordObject.getPopulatingChunk();
 
-        Set<CustomObjectCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
+        Set<CustomObjectCoordinate> objectsInChunk = this.objectsToSpawn.get(chunkCoordinate);
         if (objectsInChunk == null)
         {
             objectsInChunk = new LinkedHashSet<CustomObjectCoordinate>();
-            objectsToSpawn.put(chunkCoordinate, objectsInChunk);
+            this.objectsToSpawn.put(chunkCoordinate, objectsInChunk);
         }
         objectsInChunk.add(coordObject);
     }
@@ -92,12 +92,12 @@ public class CustomObjectStructure
      */
     public void spawnForChunk(ChunkCoordinate chunkCoordinate)
     {
-        Set<CustomObjectCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
+        Set<CustomObjectCoordinate> objectsInChunk = this.objectsToSpawn.get(chunkCoordinate);
         if (objectsInChunk != null)
         {
             for (CustomObjectCoordinate coordObject : objectsInChunk)
             {
-                coordObject.spawnWithChecks(world, height, random);
+                coordObject.spawnWithChecks(this.world, this.height, this.random);
             }
         }
     }

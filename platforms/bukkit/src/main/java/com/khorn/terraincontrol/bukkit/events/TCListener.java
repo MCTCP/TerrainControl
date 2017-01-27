@@ -42,7 +42,7 @@ public class TCListener implements Listener
     @EventHandler(priority = EventPriority.NORMAL)
     public void onStructureGrow(StructureGrowEvent event)
     {
-        saplingListener.onStructureGrow(event);
+        this.saplingListener.onStructureGrow(event);
     }
 
 
@@ -52,7 +52,7 @@ public class TCListener implements Listener
         // Sends custom colors on join
         if (event.getChannel().equals(PluginStandardValues.ChannelName))
         {
-            tcSender.send(event.getPlayer());
+            this.tcSender.send(event.getPlayer());
         }
     }
 
@@ -63,7 +63,7 @@ public class TCListener implements Listener
         Player player = event.getPlayer();
         if (player.getListeningPluginChannels().contains(PluginStandardValues.ChannelName))
         {
-            tcSender.send(player);
+            this.tcSender.send(player);
         }
     }
 

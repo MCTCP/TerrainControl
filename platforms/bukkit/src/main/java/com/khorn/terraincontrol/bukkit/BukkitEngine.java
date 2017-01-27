@@ -24,13 +24,13 @@ public class BukkitEngine extends TerrainControlEngine
     @Override
     public LocalWorld getWorld(String name)
     {
-        return plugin.worlds.get(name);
+        return this.plugin.worlds.get(name);
     }
 
     @Override
     public File getTCDataFolder()
     {
-        return plugin.getDataFolder();
+        return this.plugin.getDataFolder();
     }
 
     @Override

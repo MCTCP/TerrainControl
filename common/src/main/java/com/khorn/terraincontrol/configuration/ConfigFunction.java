@@ -55,7 +55,7 @@ public abstract class ConfigFunction<T>
      */
     protected final T getHolder()
     {
-        return holder;
+        return this.holder;
     }
 
     /**

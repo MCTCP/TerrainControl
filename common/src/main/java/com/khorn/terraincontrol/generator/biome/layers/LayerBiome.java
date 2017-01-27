@@ -39,8 +39,8 @@ public class LayerBiome extends Layer
 
                 if ((currentPiece & BiomeGroupBits) != 0 && (currentPiece & BiomeBits) == 0)    // has biomegroup bits but not biome bits
                 {
-                    BiomeGroup group = manager.getGroupById((currentPiece & BiomeGroupBits) >> BiomeGroupShift);
-                    SortedMap<Integer, LocalBiome> possibleBiomes = group.getDepthMap(depth);
+                    BiomeGroup group = this.manager.getGroupById((currentPiece & BiomeGroupBits) >> BiomeGroupShift);
+                    SortedMap<Integer, LocalBiome> possibleBiomes = group.getDepthMap(this.depth);
                     //>>	Get Max Rarity
                     if (!possibleBiomes.isEmpty())
                     {
@@ -53,7 +53,7 @@ public class LayerBiome extends Layer
                                 if (biome.getValue() != null){
                                     currentPiece |= biome.getValue().getIds().getGenerationId() |
                                                     //>>	Set IceBit based on Biome Temperature
-                                                    (biome.getValue().getBiomeConfig().biomeTemperature <= freezeTemp ? IceBit : 0);
+                                                    (biome.getValue().getBiomeConfig().biomeTemperature <= this.freezeTemp ? IceBit : 0);
                                 }
                                 break;
                             }

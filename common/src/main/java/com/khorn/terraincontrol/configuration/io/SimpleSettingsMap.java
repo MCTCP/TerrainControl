@@ -56,8 +56,8 @@ public final class SimpleSettingsMap implements SettingsMap
      */
     private String nextDummyKey()
     {
-        dummyKeyIndex++;
-        return "__key" + dummyKeyIndex;
+        this.dummyKeyIndex++;
+        return "__key" + this.dummyKeyIndex;
     }
 
     @Override
@@ -68,17 +68,17 @@ public final class SimpleSettingsMap implements SettingsMap
             RawSettingValue value = RawSettingValue.create(ValueType.FUNCTION,
                     function.toString());
 
-            configFunctions.add(value);
-            settingsCache.put(nextDummyKey(), value);
+            this.configFunctions.add(value);
+            this.settingsCache.put(nextDummyKey(), value);
         }
     }
 
     @Override
     public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback)
     {
-        List<ConfigFunction<T>> result = new ArrayList<ConfigFunction<T>>(configFunctions.size());
+        List<ConfigFunction<T>> result = new ArrayList<ConfigFunction<T>>(this.configFunctions.size());
         ConfigFunctionsManager manager = TerrainControl.getConfigFunctionsManager();
-        for (RawSettingValue configFunctionLine : configFunctions)
+        for (RawSettingValue configFunctionLine : this.configFunctions)
         {
             String configFunctionString = configFunctionLine.getRawValue();
             int bracketIndex = configFunctionString.indexOf('(');
@@ -103,9 +103,9 @@ public final class SimpleSettingsMap implements SettingsMap
         }
 
         // Add inherited functions
-        if (useFallback && fallback != null)
+        if (useFallback && this.fallback != null)
         {
-            return InheritanceHelper.mergeLists(result, fallback.getConfigFunctions(holder, true));
+            return InheritanceHelper.mergeLists(result, this.fallback.getConfigFunctions(holder, true));
         }
 
         return result;
@@ -114,7 +114,7 @@ public final class SimpleSettingsMap implements SettingsMap
     @Override
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     @Override
@@ -143,14 +143,14 @@ public final class SimpleSettingsMap implements SettingsMap
             } catch (InvalidConfigException e)
             {
                 TerrainControl.log(LogMarker.ERROR, "The value \"{}\" is not valid for the setting {} in {} on line {}: {}",
-                        stringValue, setting, name, stringWithLineNumber.getLineNumber(), e.getMessage());
+                        stringValue, setting, this.name, stringWithLineNumber.getLineNumber(), e.getMessage());
             }
         }
 
         // Try the fallback
-        if (fallback != null)
+        if (this.fallback != null)
         {
-            return fallback.getSetting(setting, defaultValue);
+            return this.fallback.getSetting(setting, defaultValue);
         }
 
         // Return default value
@@ -160,13 +160,13 @@ public final class SimpleSettingsMap implements SettingsMap
     @Override
     public boolean hasSetting(Setting<?> setting)
     {
-        if (settingsCache.containsKey(setting.getName().toLowerCase()))
+        if (this.settingsCache.containsKey(setting.getName().toLowerCase()))
         {
             return true;
         }
-        if (fallback != null)
+        if (this.fallback != null)
         {
-            return fallback.hasSetting(setting);
+            return this.fallback.hasSetting(setting);
         }
         return false;
     }
@@ -174,7 +174,7 @@ public final class SimpleSettingsMap implements SettingsMap
     @Override
     public boolean isNewConfig()
     {
-        return isNewConfig;
+        return this.isNewConfig;
     }
 
     @Override
@@ -234,7 +234,7 @@ public final class SimpleSettingsMap implements SettingsMap
     @Override
     public String toString()
     {
-        return "SimpleSettingsMap [name=" + name + ", fallback=" + fallback + "]";
+        return "SimpleSettingsMap [name=" + this.name + ", fallback=" + this.fallback + "]";
     }
 
 }

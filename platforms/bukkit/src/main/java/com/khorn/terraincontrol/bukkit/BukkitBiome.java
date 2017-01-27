@@ -46,8 +46,8 @@ public class BukkitBiome implements LocalBiome
     protected BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
     {
         this.biomeBase = biome;
-        int savedBiomeId =  BiomeBase.a(biomeBase);
-        this.biomeIds = new BiomeIds(WorldHelper.getGenerationId(biomeBase), savedBiomeId);
+        int savedBiomeId =  BiomeBase.a(this.biomeBase);
+        this.biomeIds = new BiomeIds(WorldHelper.getGenerationId(this.biomeBase), savedBiomeId);
         this.biomeConfig = biomeConfig;
         this.isCustom = biome instanceof TXBiomeBase;
     }
@@ -60,7 +60,7 @@ public class BukkitBiome implements LocalBiome
 
     public BiomeBase getHandle()
     {
-        return biomeBase;
+        return this.biomeBase;
     }
 
     @Override

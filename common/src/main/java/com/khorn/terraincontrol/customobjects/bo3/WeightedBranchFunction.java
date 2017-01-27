@@ -23,20 +23,20 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
     public WeightedBranchFunction(BO3Config config, List<String> args) throws InvalidConfigException
     {
         super(config);
-        branches = new TreeSet<BranchNode>();
-        cumulativeChance = readArgs(args, true);
+        this.branches = new TreeSet<BranchNode>();
+        this.cumulativeChance = readArgs(args, true);
     }
 
     @Override
     public CustomObjectCoordinate toCustomObjectCoordinate(LocalWorld world, Random random, int x, int y, int z)
     {
-        double randomChance = random.nextDouble() * (totalChance != -1
-                                                     ? totalChance
-                                                     : (cumulativeChance >= 100
-                                                        ? cumulativeChance
+        double randomChance = random.nextDouble() * (this.totalChance != -1
+                                                     ? this.totalChance
+                                                     : (this.cumulativeChance >= 100
+                                                        ? this.cumulativeChance
                                                         : 100));
         TerrainControl.log(LogMarker.TRACE, "W-Branch: chance_max - {}", randomChance);
-        for (BranchNode branch : branches)
+        for (BranchNode branch : this.branches)
         {
             TerrainControl.log(LogMarker.TRACE, "  {} trying to spawn! #{}", branch.getCustomObject().getName(), branch.getChance());
             if (branch.getChance() >= randomChance)

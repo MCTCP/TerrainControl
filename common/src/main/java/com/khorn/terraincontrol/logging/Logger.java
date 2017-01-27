@@ -11,7 +11,7 @@ public abstract class Logger
 
     public void setLevel(LogMarker level)
     {
-        minimumLevel = level;
+        this.minimumLevel = level;
     }
 
     /**
@@ -47,7 +47,7 @@ public abstract class Logger
      */
     public void logIfLevel(LogMarker ifLevel, List<String> messages)
     {
-        if (minimumLevel == ifLevel)
+        if (this.minimumLevel == ifLevel)
             log(ifLevel, messages);
     }
 
@@ -63,7 +63,7 @@ public abstract class Logger
      */
     public void logIfLevel(LogMarker ifLevel, String message, Object... params)
     {
-        if (minimumLevel == ifLevel)
+        if (this.minimumLevel == ifLevel)
             log(ifLevel, message, params);
     }
 
@@ -78,7 +78,7 @@ public abstract class Logger
      */
     public void logIfLevel(LogMarker min, LogMarker max, List<String> messages)
     {
-        if (minimumLevel.compareTo(max) <= 0 && minimumLevel.compareTo(min) >= 0)
+        if (this.minimumLevel.compareTo(max) <= 0 && this.minimumLevel.compareTo(min) >= 0)
             log(max, messages);
     }
 
@@ -95,7 +95,7 @@ public abstract class Logger
      */
     public void logIfLevel(LogMarker min, LogMarker max, String message, Object... params)
     {
-        if (minimumLevel.compareTo(max) <= 0 && minimumLevel.compareTo(min) >= 0)
+        if (this.minimumLevel.compareTo(max) <= 0 && this.minimumLevel.compareTo(min) >= 0)
             log(max, message, params);
     }
 

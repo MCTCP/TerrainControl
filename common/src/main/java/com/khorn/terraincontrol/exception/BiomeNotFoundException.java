@@ -53,7 +53,7 @@ public class BiomeNotFoundException extends RuntimeException {
      * @return The name of the biome.
      */
     public String getBiomeName() {
-        return biomeName;
+        return this.biomeName;
     }
 
 }

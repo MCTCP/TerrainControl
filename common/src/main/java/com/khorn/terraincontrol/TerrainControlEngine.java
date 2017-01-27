@@ -48,14 +48,14 @@ public abstract class TerrainControlEngine
     public boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
     {
         boolean success = true;
-        for (EventHandler handler : cancelableEventHandlers)
+        for (EventHandler handler : this.cancelableEventHandlers)
         {
             if (!handler.canCustomObjectSpawn(object, world, x, y, z, !success))
             {
                 success = false;
             }
         }
-        for (EventHandler handler : monitoringEventHandlers)
+        for (EventHandler handler : this.monitoringEventHandlers)
         {
             handler.canCustomObjectSpawn(object, world, x, y, z, !success);
         }
@@ -69,9 +69,9 @@ public abstract class TerrainControlEngine
      */
     public void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        for (EventHandler handler : cancelableEventHandlers)
+        for (EventHandler handler : this.cancelableEventHandlers)
             handler.onPopulateEnd(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
-        for (EventHandler handler : monitoringEventHandlers)
+        for (EventHandler handler : this.monitoringEventHandlers)
             handler.onPopulateEnd(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
     }
 
@@ -83,9 +83,9 @@ public abstract class TerrainControlEngine
      */
     public void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        for (EventHandler handler : cancelableEventHandlers)
+        for (EventHandler handler : this.cancelableEventHandlers)
             handler.onPopulateStart(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
-        for (EventHandler handler : monitoringEventHandlers)
+        for (EventHandler handler : this.monitoringEventHandlers)
             handler.onPopulateStart(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
     }
 
@@ -101,14 +101,14 @@ public abstract class TerrainControlEngine
             int chunkZ)
     {
         boolean success = true;
-        for (EventHandler handler : cancelableEventHandlers)
+        for (EventHandler handler : this.cancelableEventHandlers)
         {
             if (!handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, !success))
             {
                 success = false;
             }
         }
-        for (EventHandler handler : monitoringEventHandlers)
+        for (EventHandler handler : this.monitoringEventHandlers)
         {
             handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, !success);
         }
@@ -162,7 +162,7 @@ public abstract class TerrainControlEngine
      */
     public Logger getLogger()
     {
-        return logger;
+        return this.logger;
     }
 
     /**
@@ -172,7 +172,7 @@ public abstract class TerrainControlEngine
      */
     public PluginConfig getPluginConfig()
     {
-        return pluginConfig;
+        return this.pluginConfig;
     }
 
     /**
@@ -196,46 +196,46 @@ public abstract class TerrainControlEngine
     public void onShutdown()
     {
         // Shutdown all loaders
-        customObjectManager.shutdown();
+        this.customObjectManager.shutdown();
 
         // Null out values to help the garbage collector
-        customObjectManager = null;
-        configFunctionsManager = null;
-        biomeManagers = null;
-        pluginConfig = null;
-        cancelableEventHandlers.clear();
-        monitoringEventHandlers.clear();
-        cancelableEventHandlers = null;
-        monitoringEventHandlers = null;
+        this.customObjectManager = null;
+        this.configFunctionsManager = null;
+        this.biomeManagers = null;
+        this.pluginConfig = null;
+        this.cancelableEventHandlers.clear();
+        this.monitoringEventHandlers.clear();
+        this.cancelableEventHandlers = null;
+        this.monitoringEventHandlers = null;
     }
 
     public void onStart()
     {
         // Start the engine
-        configFunctionsManager = new ConfigFunctionsManager();
-        customObjectManager = new CustomObjectManager();
-        biomeManagers = new BiomeModeManager();
+        this.configFunctionsManager = new ConfigFunctionsManager();
+        this.customObjectManager = new CustomObjectManager();
+        this.biomeManagers = new BiomeModeManager();
 
         // Do pluginConfig loading and then log anything that happened
         // LogManager and PluginConfig are now decoupled, thank the lord!
         File pluginConfigFile = new File(getTCDataFolder(), PluginStandardValues.ConfigFilename);
-        pluginConfig = new PluginConfig(FileSettingsReader.read("PluginConfig", pluginConfigFile));
+        this.pluginConfig = new PluginConfig(FileSettingsReader.read("PluginConfig", pluginConfigFile));
         FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.SettingsMode);
-        logger.setLevel(pluginConfig.getLogLevel().getLevel());
+        this.logger.setLevel(pluginConfig.getLogLevel().getLevel());
 
         // Fire start event
-        for (EventHandler handler : cancelableEventHandlers)
+        for (EventHandler handler : this.cancelableEventHandlers)
         {
             handler.onStart();
         }
-        for (EventHandler handler : monitoringEventHandlers)
+        for (EventHandler handler : this.monitoringEventHandlers)
         {
             handler.onStart();
         }
 
         // Load global objects after the event has been fired, so that custom
         // object types are also taken into account
-        customObjectManager.loadGlobalObjects();
+        this.customObjectManager.loadGlobalObjects();
     }
 
     /**
@@ -247,7 +247,7 @@ public abstract class TerrainControlEngine
      */
     public void registerEventHandler(EventHandler handler)
     {
-        cancelableEventHandlers.add(handler);
+        this.cancelableEventHandlers.add(handler);
     }
 
     /**
@@ -262,10 +262,10 @@ public abstract class TerrainControlEngine
     {
         if (priority == EventPriority.CANCELABLE)
         {
-            cancelableEventHandlers.add(handler);
+            this.cancelableEventHandlers.add(handler);
         } else
         {
-            monitoringEventHandlers.add(handler);
+            this.monitoringEventHandlers.add(handler);
         }
     }
 

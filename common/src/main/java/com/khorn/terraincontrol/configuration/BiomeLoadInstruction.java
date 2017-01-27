@@ -37,9 +37,9 @@ public class BiomeLoadInstruction
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + biomeTemplate.hashCode();
-        result = prime * result + generationId;
-        result = prime * result + name.hashCode();
+        result = prime * result + this.biomeTemplate.hashCode();
+        result = prime * result + this.generationId;
+        result = prime * result + this.name.hashCode();
         return result;
     }
 
@@ -55,15 +55,15 @@ public class BiomeLoadInstruction
             return false;
         }
         BiomeLoadInstruction other = (BiomeLoadInstruction) obj;
-        if (!biomeTemplate.equals(other.biomeTemplate))
+        if (!this.biomeTemplate.equals(other.biomeTemplate))
         {
             return false;
         }
-        if (generationId != other.generationId)
+        if (this.generationId != other.generationId)
         {
             return false;
         }
-        if (!name.equals(other.name))
+        if (!this.name.equals(other.name))
         {
             return false;
         }
@@ -77,7 +77,7 @@ public class BiomeLoadInstruction
      */
     public String getBiomeName()
     {
-        return name;
+        return this.name;
     }
 
     /**
@@ -87,7 +87,7 @@ public class BiomeLoadInstruction
      */
     public StandardBiomeTemplate getBiomeTemplate()
     {
-        return biomeTemplate;
+        return this.biomeTemplate;
     }
 
     /**
@@ -97,7 +97,7 @@ public class BiomeLoadInstruction
      */
     public int getGenerationId()
     {
-        return generationId;
+        return this.generationId;
     }
 
 }

@@ -23,19 +23,17 @@ public class PlantGen extends Resource
         super(biomeConfig);
         assureSize(6, args);
 
-        plant = PlantType.getPlant(args.get(0));
+        this.plant = PlantType.getPlant(args.get(0));
 
         // Not used for terrain generation, they are used by the Forge
         // implementation to fire Forge events.
-        material = plant.getBottomMaterial();
+        this.material = plant.getBottomMaterial();
 
-        frequency = readInt(args.get(1), 1, 100);
-        rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH,
-                TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(4), minAltitude,
-                TerrainControl.WORLD_HEIGHT);
-        sourceBlocks = readMaterials(args, 5);
+        this.frequency = readInt(args.get(1), 1, 100);
+        this.rarity = readRarity(args.get(2));
+        this.minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        this.maxAltitude = readInt(args.get(4), this.minAltitude, TerrainControl.WORLD_HEIGHT);
+        this.sourceBlocks = readMaterials(args, 5);
     }
 
     @Override
@@ -76,23 +74,24 @@ public class PlantGen extends Resource
     @Override
     public String toString()
     {
-        return "Plant(" + plant.getName() + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
+        return "Plant(" + this.plant.getName() + "," + this.frequency + "," +
+            this.rarity + "," + this.minAltitude + "," + this.maxAltitude + makeMaterials(this.sourceBlocks) + ")";
     }
 
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
-        int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
+        int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
 
         for (int i = 0; i < 64; i++)
         {
             int j = x + rand.nextInt(8) - rand.nextInt(8);
             int k = y + rand.nextInt(4) - rand.nextInt(4);
             int m = z + rand.nextInt(8) - rand.nextInt(8);
-            if ((!world.isEmpty(j, k, m)) || (!sourceBlocks.contains(world.getMaterial(j, k - 1, m))))
+            if ((!world.isEmpty(j, k, m)) || (!this.sourceBlocks.contains(world.getMaterial(j, k - 1, m))))
                 continue;
 
-            plant.spawn(world, j, k, m);
+            this.plant.spawn(world, j, k, m);
         }
     }
 

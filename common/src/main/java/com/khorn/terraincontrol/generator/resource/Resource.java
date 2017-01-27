@@ -37,8 +37,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
 
         try
         {
-            return clazz.getConstructor(BiomeConfig.class,
-                    List.class).newInstance(config, stringArgs);
+            return clazz.getConstructor(BiomeConfig.class, List.class).newInstance(config, stringArgs);
         } catch (Exception e)
         {
             throw new RuntimeException(e);
@@ -48,8 +47,6 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
     protected int frequency;
     protected LocalMaterialData material;
     protected double rarity;
-
-
 
     public Resource(BiomeConfig biomeConfig) throws InvalidConfigException
     {

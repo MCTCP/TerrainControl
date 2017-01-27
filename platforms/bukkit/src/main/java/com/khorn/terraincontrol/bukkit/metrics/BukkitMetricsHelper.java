@@ -33,14 +33,14 @@ public class BukkitMetricsHelper extends MetricsHelper
 
     private void startMetrics()
     {
-        calculateBiomeModes(plugin.worlds.values());
+        calculateBiomeModes(this.plugin.worlds.values());
 
         // Thanks to the slightly different package names,
         // this code had to be copy/pasted from the Forge side.
         // When you update this method, also check the Forge class!
         try
         {
-            Metrics metrics = new Metrics(plugin);
+            Metrics metrics = new Metrics(this.plugin);
 
             Graph usedBiomeModesGraph = metrics.createGraph("Biome modes used");
 

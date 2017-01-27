@@ -36,7 +36,7 @@ public class ObjectSpawner
         int z = chunkCoord.getChunkZ() * 16;
 
         // Get the biome of the other corner
-        LocalBiome biome = world.getBiome(x + 15, z + 15);
+        LocalBiome biome = this.world.getBiome(x + 15, z + 15);
 
         // Null check
         if (biome == null)
@@ -48,40 +48,40 @@ public class ObjectSpawner
         BiomeConfig biomeConfig = biome.getBiomeConfig();
 
         // Get the random generator
-        WorldConfig worldConfig = configProvider.getWorldConfig();
-        long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
+        WorldConfig worldConfig = this.configProvider.getWorldConfig();
+        long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : this.world.getSeed();
         this.rand.setSeed(resourcesSeed);
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
         this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
 
         // Generate structures
-        boolean hasVillage = world.placeDefaultStructures(rand, chunkCoord);
+        boolean hasVillage = this.world.placeDefaultStructures(rand, chunkCoord);
 
         // Mark population started
-        world.startPopulation(chunkCoord);
-        TerrainControl.firePopulationStartEvent(world, rand, hasVillage,
+        this.world.startPopulation(chunkCoord);
+        TerrainControl.firePopulationStartEvent(this.world, this.rand, hasVillage,
                 chunkCoord);
 
         // Resource sequence
         for (ConfigFunction<BiomeConfig> res : biomeConfig.resourceSequence)
         {
             if (res instanceof Resource)
-                ((Resource) res).process(world, rand, hasVillage, chunkCoord);
+                ((Resource) res).process(this.world, this.rand, hasVillage, chunkCoord);
         }
 
         // Animals
-        world.placePopulationMobs(biome, rand, chunkCoord);
+        this.world.placePopulationMobs(biome, this.rand, chunkCoord);
 
         // Snow and ice
-        new FrozenSurfaceHelper(world).freezeChunk(chunkCoord);
+        new FrozenSurfaceHelper(this.world).freezeChunk(chunkCoord);
 
         // Replace blocks
-        world.replaceBlocks(chunkCoord);
+        this.world.replaceBlocks(chunkCoord);
 
         // Mark population ended
-        TerrainControl.firePopulationEndEvent(world, rand, hasVillage, chunkCoord);
-        world.endPopulation();
+        TerrainControl.firePopulationEndEvent(this.world, this.rand, hasVillage, chunkCoord);
+        this.world.endPopulation();
     }
 
 }

@@ -16,10 +16,10 @@ public class ListCommand extends BaseCommand
     public ListCommand(TXPlugin _plugin)
     {
         super(_plugin);
-        name = "list";
-        perm = TCPerm.CMD_LIST.node;
-        usage = "list [-w World] [page]";
-        workOnConsole = false;
+        this.name = "list";
+        this.perm = TCPerm.CMD_LIST.node;
+        this.usage = "list [-w World] [page]";
+        this.workOnConsole = false;
     }
 
     @Override

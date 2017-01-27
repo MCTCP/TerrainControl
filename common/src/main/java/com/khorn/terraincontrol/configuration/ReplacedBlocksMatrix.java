@@ -44,17 +44,17 @@ public class ReplacedBlocksMatrix
                 throw new InvalidConfigException("Replace parts must be in the format (from,to) or (from,to,minHeight,maxHeight)");
             }
 
-            from = TerrainControl.readMaterial(values[0]).withDefaultBlockData();
-            to = TerrainControl.readMaterial(values[1]);
+            this.from = TerrainControl.readMaterial(values[0]).withDefaultBlockData();
+            this.to = TerrainControl.readMaterial(values[1]);
 
             if (values.length == 4)
             {
-                minHeight = StringHelper.readInt(values[2], 0, maxAllowedY);
-                maxHeight = StringHelper.readInt(values[3], minHeight, maxAllowedY);
+                this. minHeight = StringHelper.readInt(values[2], 0, maxAllowedY);
+                this.maxHeight = StringHelper.readInt(values[3], minHeight, maxAllowedY);
             } else
             {
-                minHeight = 0;
-                maxHeight = maxAllowedY;
+                this.minHeight = 0;
+                this.maxHeight = maxAllowedY;
             }
         }
 
@@ -80,22 +80,22 @@ public class ReplacedBlocksMatrix
 
         public LocalMaterialData getFrom()
         {
-            return from;
+            return this.from;
         }
 
         public LocalMaterialData getTo()
         {
-            return to;
+            return this.to;
         }
 
         public int getMinHeight()
         {
-            return minHeight;
+            return this.minHeight;
         }
 
         public int getMaxHeight()
         {
-            return maxHeight;
+            return this.maxHeight;
         }
     }
 
@@ -166,7 +166,7 @@ public class ReplacedBlocksMatrix
     public List<ReplacedBlocksInstruction> getInstructions()
     {
         // Note that the returned list is immutable, see setInstructions
-        return instructions;
+        return this.instructions;
     }
 
     /**
@@ -193,13 +193,13 @@ public class ReplacedBlocksMatrix
             int maxHeight = instruction.getMaxHeight();
             LocalMaterialData toBlock = instruction.getTo();
 
-            if (compiledInstructions[fromBlockId] == null)
+            if (this.compiledInstructions[fromBlockId] == null)
             {
-                compiledInstructions[fromBlockId] = new LocalMaterialData[this.maxHeight + 1];
+                this.compiledInstructions[fromBlockId] = new LocalMaterialData[this.maxHeight + 1];
             }
             for (int y = minHeight; y <= maxHeight; y++)
             {
-                compiledInstructions[fromBlockId][y] = toBlock;
+                this.compiledInstructions[fromBlockId][y] = toBlock;
             }
         }
     }

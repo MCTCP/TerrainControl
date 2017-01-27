@@ -23,18 +23,15 @@ public class UndergroundLakeGen extends Resource
     public UndergroundLakeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
-        material = TerrainControl.toLocalMaterialData(
-                DefaultMaterial.STATIONARY_WATER, 0);
+        this.material = TerrainControl.toLocalMaterialData(DefaultMaterial.STATIONARY_WATER, 0);
 
         assureSize(6, args);
-        minSize = readInt(args.get(0), 1, 25);
-        maxSize = readInt(args.get(1), minSize, 60);
-        frequency = readInt(args.get(2), 1, 100);
-        rarity = readRarity(args.get(3));
-        minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH,
-                TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(5), minAltitude,
-                TerrainControl.WORLD_HEIGHT);
+        this.minSize = readInt(args.get(0), 1, 25);
+        this.maxSize = readInt(args.get(1), this.minSize, 60);
+        this.frequency = readInt(args.get(2), 1, 100);
+        this.rarity = readRarity(args.get(3));
+        this.minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        this.maxAltitude = readInt(args.get(5), this.minAltitude, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override
@@ -76,7 +73,8 @@ public class UndergroundLakeGen extends Resource
     @Override
     public String toString()
     {
-        return "UnderGroundLake(" + minSize + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
+        return "UnderGroundLake(" + this.minSize + "," + this.maxSize + "," + this.frequency + "," +
+            this.rarity + "," + this.minAltitude + "," + this.maxAltitude + ")";
     }
 
     @Override

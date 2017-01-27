@@ -20,10 +20,10 @@ public class SpawnCommand extends BaseCommand
     public SpawnCommand(TXPlugin _plugin)
     {
         super(_plugin);
-        name = "spawn";
-        perm = TCPerm.CMD_SPAWN.node;
-        usage = "spawn Name [World]";
-        workOnConsole = false;
+        this.name = "spawn";
+        this.perm = TCPerm.CMD_SPAWN.node;
+        this.usage = "spawn Name [World]";
+        this.workOnConsole = false;
     }
 
     @Override

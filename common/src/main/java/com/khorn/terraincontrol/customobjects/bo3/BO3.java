@@ -47,14 +47,14 @@ public class BO3 implements CustomObject
     {
         this.name = oldObject.name;
         this.file = oldObject.file;
-        this.settings = new BO3Config(settings, file.getParentFile(), oldObject.settings.otherObjects);
+        this.settings = new BO3Config(settings, this.file.getParentFile(), oldObject.settings.otherObjects);
     }
 
     @Override
     public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
     {
-        this.settings = new BO3Config(FileSettingsReader.read(name, file), file.getParentFile(), otherObjectsInDirectory);
-        FileSettingsWriter.writeToFile(this.settings.getSettingsAsMap(), file, this.settings.settingsMode);
+        this.settings = new BO3Config(FileSettingsReader.read(this.name, this.file), this.file.getParentFile(), otherObjectsInDirectory);
+        FileSettingsWriter.writeToFile(this.settings.getSettingsAsMap(), this.file, this.settings.settingsMode);
     }
 
     /**
@@ -84,7 +84,7 @@ public class BO3 implements CustomObject
     @Override
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     /**
@@ -93,18 +93,18 @@ public class BO3 implements CustomObject
      */
     public File getFile()
     {
-        return file;
+        return this.file;
     }
 
     public BO3Config getSettings()
     {
-        return settings;
+        return this.settings;
     }
 
     @Override
     public boolean canSpawnAsTree()
     {
-        return settings.tree;
+        return this.settings.tree;
     }
 
     @Override
@@ -116,11 +116,11 @@ public class BO3 implements CustomObject
     @Override
     public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {
-        BO3PlaceableFunction[] blocks = settings.blocks[rotation.getRotationId()];
-        BO3Check[] checks = settings.bo3Checks[rotation.getRotationId()];
+        BO3PlaceableFunction[] blocks = this.settings.blocks[rotation.getRotationId()];
+        BO3Check[] checks = this.settings.bo3Checks[rotation.getRotationId()];
 
         // Height check
-        if (y < settings.minHeight || y > settings.maxHeight)
+        if (y < this.settings.minHeight || y > this.settings.maxHeight)
         {
             return false;
         }
@@ -144,12 +144,12 @@ public class BO3 implements CustomObject
                 // Cannot spawn BO3, part of world is not loaded
                 return false;
             }
-            if (!settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z)))
+            if (!this.settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z)))
             {
                 blocksOutsideSourceBlock++;
             }
         }
-        if ((((double) blocksOutsideSourceBlock / (double) blocks.length) * 100.0) > settings.maxPercentageOutsideSourceBlock)
+        if ((((double) blocksOutsideSourceBlock / (double) blocks.length) * 100.0) > this.settings.maxPercentageOutsideSourceBlock)
         {
             // Too many blocks outside source block
             return false;
@@ -169,19 +169,19 @@ public class BO3 implements CustomObject
     @Override
     public boolean canRotateRandomly()
     {
-        return settings.rotateRandomly;
+        return this.settings.rotateRandomly;
     }
 
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-        BO3PlaceableFunction[] blocks = settings.blocks[rotation.getRotationId()];
-        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
+        BO3PlaceableFunction[] blocks = this.settings.blocks[rotation.getRotationId()];
+        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(this.settings.extrudeMode, this.settings.extrudeThroughBlocks);
         // Spawn
 
         for (BO3PlaceableFunction block : blocks)
         {
-            if (settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway || settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z)))
+            if (this.settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway || this.settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z)))
             {
                 block.spawn(world, random, x + block.x, y + block.y, z + block.z);
             }
@@ -196,26 +196,26 @@ public class BO3 implements CustomObject
 
     protected boolean spawn(LocalWorld world, Random random, int x, int z)
     {
-        Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
+        Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int y = 0;
-        if (settings.spawnHeight == SpawnHeightEnum.atMinY)
+        if (this.settings.spawnHeight == SpawnHeightEnum.atMinY)
         {
-            y = settings.minHeight;
+            y = this.settings.minHeight;
         }
-        if (settings.spawnHeight == SpawnHeightEnum.randomY)
+        if (this.settings.spawnHeight == SpawnHeightEnum.randomY)
         {
-            y = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
+            y = RandomHelper.numberInRange(random, this.settings.minHeight, this.settings.maxHeight);
         }
-        if (settings.spawnHeight == SpawnHeightEnum.highestBlock)
+        if (this.settings.spawnHeight == SpawnHeightEnum.highestBlock)
         {
             y = world.getHighestBlockYAt(x, z);
         }
-        if (settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
+        if (this.settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
         {
             y = world.getSolidHeight(x, z);
         }
         // Offset by static and random settings values
-        y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
+        y += this.getOffsetAndVariance(random, this.settings.spawnHeightOffset, this.settings.spawnHeightVariance);
         if (!canSpawnAt(world, rotation, x, y, z))
         {
             return false;
@@ -230,9 +230,9 @@ public class BO3 implements CustomObject
 
         int chunkMiddleX = chunkCoord.getBlockXCenter();
         int chunkMiddleZ = chunkCoord.getBlockZCenter();
-        for (int i = 0; i < settings.frequency; i++)
+        for (int i = 0; i < this.settings.frequency; i++)
         {
-            if (settings.rarity > random.nextDouble() * 100.0)
+            if (this.settings.rarity > random.nextDouble() * 100.0)
             {
                 if (spawn(world, random, chunkMiddleX + random.nextInt(16), chunkMiddleZ + random.nextInt(16)))
                 {
@@ -254,7 +254,7 @@ public class BO3 implements CustomObject
     @Override
     public boolean hasPreferenceToSpawnIn(LocalBiome biome)
     {
-        if (settings.excludedBiomes.contains("All") || settings.excludedBiomes.contains("all") || settings.excludedBiomes
+        if (this.settings.excludedBiomes.contains("All") || this.settings.excludedBiomes.contains("all") || this.settings.excludedBiomes
                 .contains(biome.getName()))
         {
             return false;
@@ -265,22 +265,22 @@ public class BO3 implements CustomObject
     @Override
     public boolean hasBranches()
     {
-        return settings.branches[0].length != 0;
+        return this.settings.branches[0].length != 0;
     }
 
     @Override
     public Branch[] getBranches(Rotation rotation)
     {
-        return settings.branches[rotation.getRotationId()];
+        return this.settings.branches[rotation.getRotationId()];
     }
 
     @Override
     public CustomObjectCoordinate makeCustomObjectCoordinate(Random random, int chunkX, int chunkZ)
     {
-        if (settings.rarity > random.nextDouble() * 100.0)
+        if (this.settings.rarity > random.nextDouble() * 100.0)
         {
-            Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
-            int height = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
+            Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
+            int height = RandomHelper.numberInRange(random, this.settings.minHeight, this.settings.maxHeight);
             return new CustomObjectCoordinate(
                     this, rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16)
             );
@@ -291,7 +291,7 @@ public class BO3 implements CustomObject
     @Override
     public int getMaxBranchDepth()
     {
-        return settings.maxBranchDepth;
+        return this.settings.maxBranchDepth;
     }
 
     @Override

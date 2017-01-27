@@ -17,10 +17,10 @@ public class BiomeCommand extends BaseCommand
     public BiomeCommand(TXPlugin _plugin)
     {
         super(_plugin);
-        name = "biome";
-        perm = TCPerm.CMD_BIOME.node;
-        usage = "biome [-f] [-s]";
-        workOnConsole = false;
+        this.name = "biome";
+        this.perm = TCPerm.CMD_BIOME.node;
+        this.usage = "biome [-f] [-s]";
+        this.workOnConsole = false;
     }
 
     @Override

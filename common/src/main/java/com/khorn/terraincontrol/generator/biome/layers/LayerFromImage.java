@@ -27,8 +27,8 @@ public class LayerFromImage extends Layer
     {
         super(seed);
         this.child = childLayer;
-        xOffset = config.imageXOffset;
-        zOffset = config.imageZOffset;
+        this.xOffset = config.imageXOffset;
+        this.zOffset = config.imageZOffset;
         this.imageMode = config.imageMode;
         this.fillBiome = world.getBiomeByName(config.imageFillBiome).getIds().getGenerationId();
 
@@ -89,7 +89,7 @@ public class LayerFromImage extends Layer
                 if (config.biomeColorMap.containsKey(color))
                     this.biomeMap[nColor] = config.biomeColorMap.get(color);
                 else
-                    this.biomeMap[nColor] = fillBiome;
+                    this.biomeMap[nColor] = this.fillBiome;
             }
         } catch (IOException ioexception)
         {
@@ -108,8 +108,8 @@ public class LayerFromImage extends Layer
                 for (int zi = 0; zi < zSize; zi++)
                     for (int xi = 0; xi < xSize; xi++)
                     {
-                        int Buffer_x = (x + xi - xOffset) % this.mapWidth;
-                        int Buffer_z = (z + zi - zOffset) % this.mapHeight;
+                        int Buffer_x = (x + xi - this.xOffset) % this.mapWidth;
+                        int Buffer_z = (z + zi - this.zOffset) % this.mapHeight;
 
                         // Take care of negatives
                         if (Buffer_x < 0)
@@ -124,8 +124,8 @@ public class LayerFromImage extends Layer
                 for (int zi = 0; zi < zSize; zi++)
                     for (int xi = 0; xi < xSize; xi++)
                     {
-                        int Buffer_xq = (x + xi - xOffset) % (2 * this.mapWidth);
-                        int Buffer_zq = (z + zi - zOffset) % (2 * this.mapHeight);
+                        int Buffer_xq = (x + xi - this.xOffset) % (2 * this.mapWidth);
+                        int Buffer_zq = (z + zi - this.zOffset) % (2 * this.mapHeight);
                         if (Buffer_xq < 0)
                             Buffer_xq += 2 * this.mapWidth;
                         if (Buffer_zq < 0)
@@ -146,8 +146,8 @@ public class LayerFromImage extends Layer
                 for (int zi = 0; zi < zSize; zi++)
                     for (int xi = 0; xi < xSize; xi++)
                     {
-                        int Buffer_x = x + xi - xOffset;
-                        int Buffer_z = z + zi - zOffset;
+                        int Buffer_x = x + xi - this.xOffset;
+                        int Buffer_z = z + zi - this.zOffset;
                         if (Buffer_x < 0 || Buffer_x >= this.mapWidth || Buffer_z < 0 || Buffer_z >= this.mapHeight)
                         {
                             if (childBiomes != null)
@@ -163,8 +163,8 @@ public class LayerFromImage extends Layer
                 for (int zi = 0; zi < zSize; zi++)
                     for (int xi = 0; xi < xSize; xi++)
                     {
-                        int Buffer_x = x + xi - xOffset;
-                        int Buffer_z = z + zi - zOffset;
+                        int Buffer_x = x + xi - this.xOffset;
+                        int Buffer_z = z + zi - this.zOffset;
                         if (Buffer_x < 0 || Buffer_x >= this.mapWidth || Buffer_z < 0 || Buffer_z >= this.mapHeight)
                             resultBiomes[(xi + zi * xSize)] = this.fillBiome;
                         else

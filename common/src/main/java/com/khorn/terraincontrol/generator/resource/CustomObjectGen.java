@@ -28,8 +28,8 @@ public class CustomObjectGen extends Resource
             args = new ArrayList<String>();
             args.add("UseWorld");
         }
-        objects = new ArrayList<CustomObject>();
-        objectNames = new ArrayList<String>();
+        this.objects = new ArrayList<CustomObject>();
+        this.objectNames = new ArrayList<String>();
         for (String arg : args)
         {
             CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(arg);
@@ -37,8 +37,8 @@ public class CustomObjectGen extends Resource
             {
                 throw new InvalidConfigException("No custom object found with the name " + arg);
             }
-            objects.add(object);
-            objectNames.add(arg);
+            this.objects.add(object);
+            this.objectNames.add(arg);
         }
     }
 
@@ -51,7 +51,7 @@ public class CustomObjectGen extends Resource
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        for (CustomObject object : objects)
+        for (CustomObject object : this.objects)
         {
             object.process(world, random, chunkCoord);
         }
@@ -60,7 +60,7 @@ public class CustomObjectGen extends Resource
     @Override
     public String toString()
     {
-        return "CustomObject(" + StringHelper.join(objectNames, ",") + ")";
+        return "CustomObject(" + StringHelper.join(this.objectNames, ",") + ")";
     }
 
     @Override

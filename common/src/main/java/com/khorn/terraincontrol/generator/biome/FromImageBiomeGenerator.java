@@ -18,6 +18,6 @@ public class FromImageBiomeGenerator extends LayeredBiomeGenerator
     @Override
     protected Layer[] initLayers()
     {
-        return LayerFactory.createFromImage(world);
+        return LayerFactory.createFromImage(this.world);
     }
 }

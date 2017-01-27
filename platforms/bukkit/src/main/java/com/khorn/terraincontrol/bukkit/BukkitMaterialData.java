@@ -92,7 +92,7 @@ public final class BukkitMaterialData implements LocalMaterialData
             return false;
         }
         BukkitMaterialData other = (BukkitMaterialData) obj;
-        if (combinedBlockId != other.combinedBlockId)
+        if (this.combinedBlockId != other.combinedBlockId)
         {
             return false;
         }
@@ -102,13 +102,13 @@ public final class BukkitMaterialData implements LocalMaterialData
     @Override
     public byte getBlockData()
     {
-        return (byte) (combinedBlockId & 15);
+        return (byte) (this.combinedBlockId & 15);
     }
 
     @Override
     public int getBlockId()
     {
-        return combinedBlockId >> 4;
+        return this.combinedBlockId >> 4;
     }
 
     @Override
@@ -145,7 +145,7 @@ public final class BukkitMaterialData implements LocalMaterialData
     public int hashCode()
     {
         // From 4096 to 69632 when there are 4096 block ids
-        return TerrainControl.SUPPORTED_BLOCK_IDS + combinedBlockId;
+        return TerrainControl.SUPPORTED_BLOCK_IDS + this.combinedBlockId;
     }
 
     @Override
@@ -241,7 +241,7 @@ public final class BukkitMaterialData implements LocalMaterialData
 
     @Override
     public boolean isAir() {
-        return combinedBlockId == 0;
+        return this.combinedBlockId == 0;
     }
 
     @Override

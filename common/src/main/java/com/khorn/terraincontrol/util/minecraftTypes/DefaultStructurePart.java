@@ -107,7 +107,7 @@ public enum DefaultStructurePart
      */
     public String getPath()
     {
-        return path;
+        return this.path;
     }
 
     /**

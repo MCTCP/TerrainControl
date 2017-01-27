@@ -29,18 +29,16 @@ public class VeinGen extends Resource
         super(biomeConfig);
         assureSize(9, args);
 
-        material = readMaterial(args.get(0));
-        minRadius = readInt(args.get(1), 10, 200);
-        maxRadius = readInt(args.get(2), minRadius, 201);
-        veinRarity = readDouble(args.get(3), 0.0000001, 100);
-        oreSize = readInt(args.get(4), 1, 64);
-        oreFrequency = readInt(args.get(5), 1, 100);
-        oreRarity = readInt(args.get(6), 1, 100);
-        minAltitude = readInt(args.get(7), TerrainControl.WORLD_DEPTH,
-                TerrainControl.WORLD_HEIGHT - 1);
-        maxAltitude = readInt(args.get(8), minAltitude,
-                TerrainControl.WORLD_HEIGHT);
-        sourceBlocks = readMaterials(args, 9);
+        this.material = readMaterial(args.get(0));
+        this.minRadius = readInt(args.get(1), 10, 200);
+        this.maxRadius = readInt(args.get(2), this.minRadius, 201);
+        this.veinRarity = readDouble(args.get(3), 0.0000001, 100);
+        this.oreSize = readInt(args.get(4), 1, 64);
+        this.oreFrequency = readInt(args.get(5), 1, 100);
+        this.oreRarity = readInt(args.get(6), 1, 100);
+        this.minAltitude = readInt(args.get(7), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT - 1);
+        this.maxAltitude = readInt(args.get(8), this.minAltitude, TerrainControl.WORLD_HEIGHT);
+        this.sourceBlocks = readMaterials(args, 9);
     }
 
     @Override
@@ -84,14 +82,14 @@ public class VeinGen extends Resource
     public Vein getVeinStartInChunk(LocalWorld world, int chunkX, int chunkZ)
     {
         // Create a random generator that is constant for this chunk and vein
-        Random random = RandomHelper.getRandomForCoords(chunkX, chunkZ, material.hashCode() * (minRadius + maxRadius + 100) + world.getSeed());
+        Random random = RandomHelper.getRandomForCoords(chunkX, chunkZ, this.material.hashCode() * (this.minRadius + this.maxRadius + 100) + world.getSeed());
 
-        if (random.nextDouble() * 100.0 < veinRarity)
+        if (random.nextDouble() * 100.0 < this.veinRarity)
         {
             int veinX = chunkX * 16 + random.nextInt(16) + 8;
-            int veinY = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
+            int veinY = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
             int veinZ = chunkZ * 16 + random.nextInt(16) + 8;
-            int veinSize = RandomHelper.numberInRange(random, minRadius, maxRadius);
+            int veinSize = RandomHelper.numberInRange(random, this.minRadius, this.maxRadius);
             return new Vein(veinX, veinY, veinZ, veinSize);
         }
 
@@ -118,9 +116,8 @@ public class VeinGen extends Resource
     @Override
     public String toString()
     {
-        String result = "Vein(" + material + "," + minRadius + "," + maxRadius + "," + veinRarity + ",";
-        result += oreSize + "," + oreFrequency + "," + oreRarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
-        return result;
+        return "Vein(" + this.material + "," + this.minRadius + "," + this.maxRadius + "," + this.veinRarity + "," + oreSize + "," +
+            this.oreFrequency + "," + this.oreRarity + "," + this.minAltitude + "," + this.maxAltitude + makeMaterials(this.sourceBlocks) + ")";
     }
 
     @Override

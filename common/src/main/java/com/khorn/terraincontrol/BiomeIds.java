@@ -46,7 +46,7 @@ public class BiomeIds
      */
     public boolean isVirtual()
     {
-        return savedId != generationId;
+        return this.savedId != this.generationId;
     }
 
     /**
@@ -56,7 +56,7 @@ public class BiomeIds
      */
     public int getSavedId()
     {
-        return savedId;
+        return this.savedId;
     }
 
     /**
@@ -66,7 +66,7 @@ public class BiomeIds
      */
     public int getGenerationId()
     {
-        return generationId;
+        return this.generationId;
     }
 
     @Override
@@ -74,10 +74,10 @@ public class BiomeIds
     {
         if (isVirtual())
         {
-            return generationId + " (gen), " + savedId + " (saved)";
+            return this.generationId + " (gen), " + this.savedId + " (saved)";
         } else
         {
-            return Integer.toString(savedId);
+            return Integer.toString(this.savedId);
         }
     }
 
@@ -86,36 +86,25 @@ public class BiomeIds
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + savedId;
-        result = prime * result + generationId;
+        result = prime * result + this.savedId;
+        result = prime * result + this.generationId;
         return result;
     }
 
     @Override
     public boolean equals(Object obj)
     {
-        if (this == obj)
-        {
+        if (this == obj) {
             return true;
         }
-        if (obj == null)
-        {
+        if (obj == null) {
             return false;
         }
-        if (!(obj instanceof BiomeIds))
-        {
+        if (!(obj instanceof BiomeIds)) {
             return false;
         }
         BiomeIds other = (BiomeIds) obj;
-        if (savedId != other.savedId)
-        {
-            return false;
-        }
-        if (generationId != other.generationId)
-        {
-            return false;
-        }
-        return true;
+        return this.savedId == other.savedId && this.generationId == other.generationId;
     }
 
 }

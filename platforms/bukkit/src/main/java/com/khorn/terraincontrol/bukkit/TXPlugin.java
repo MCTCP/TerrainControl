@@ -45,7 +45,7 @@ public class TXPlugin extends JavaPlugin
     @Override
     public void onDisable()
     {
-        if (cleanupOnDisable)
+        if (this.cleanupOnDisable)
         {
             // Cleanup worlds
             for (BukkitWorld world : worlds.values())
@@ -63,7 +63,7 @@ public class TXPlugin extends JavaPlugin
     {
 
         TerrainControl.setEngine(new BukkitEngine(this));
-        if (!Bukkit.getWorlds().isEmpty() && !cleanupOnDisable)
+        if (!Bukkit.getWorlds().isEmpty() && !this.cleanupOnDisable)
         {
             // Reload "handling"
             // (worlds are already loaded and TC didn't clean up itself)

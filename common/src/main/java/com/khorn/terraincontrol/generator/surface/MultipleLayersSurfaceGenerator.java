@@ -49,15 +49,15 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
             throw new InvalidConfigException("Needs at least two arguments");
         }
 
-        layerChoices = new ArrayList<LayerChoice>();
+        this.layerChoices = new ArrayList<LayerChoice>();
         for (int i = 0; i < args.length - 2; i += 3)
         {
             LocalMaterialData surfaceBlock = TerrainControl.readMaterial(args[i]);
             LocalMaterialData groundBlock = TerrainControl.readMaterial(args[i+1]);
             float maxNoise = (float) StringHelper.readDouble(args[i + 2], -20, 20);
-            layerChoices.add(new LayerChoice(surfaceBlock, groundBlock, maxNoise));
+            this.layerChoices.add(new LayerChoice(surfaceBlock, groundBlock, maxNoise));
         }
-        Collections.sort(layerChoices);
+        Collections.sort(this.layerChoices);
     }
 
     @Override

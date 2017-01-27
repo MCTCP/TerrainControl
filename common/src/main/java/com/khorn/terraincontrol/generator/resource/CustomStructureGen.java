@@ -25,9 +25,9 @@ public class CustomStructureGen extends Resource
     public CustomStructureGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
-        objects = new ArrayList<CustomObject>();
-        objectNames = new ArrayList<String>();
-        objectChances = new ArrayList<Double>();
+        this.objects = new ArrayList<CustomObject>();
+        this.objectNames = new ArrayList<String>();
+        this.objectChances = new ArrayList<Double>();
         for (int i = 0; i < args.size() - 1; i += 2)
         {
             CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(args.get(i));
@@ -39,9 +39,9 @@ public class CustomStructureGen extends Resource
             {
                 throw new InvalidConfigException("The object " + args.get(i) + " isn't a structure: it has no branches");
             }
-            objects.add(object);
-            objectNames.add(args.get(i));
-            objectChances.add(readRarity(args.get(i + 1)));
+            this.objects.add(object);
+            this.objectNames.add(args.get(i));
+            this.objectChances.add(readRarity(args.get(i + 1)));
         }
 
         // Inject ourselves in the BiomeConfig
@@ -86,25 +86,25 @@ public class CustomStructureGen extends Resource
         {
             return "CustomStructure()";
         }
-        String output = "CustomStructure(" + objectNames.get(0) + "," + objectChances.get(0);
-        for (int i = 1; i < objectNames.size(); i++)
+        String output = "CustomStructure(" + this.objectNames.get(0) + "," + this.objectChances.get(0);
+        for (int i = 1; i < this.objectNames.size(); i++)
         {
-            output += "," + objectNames.get(i) + "," + objectChances.get(i);
+            output += "," + this.objectNames.get(i) + "," + this.objectChances.get(i);
         }
         return output + ")";
     }
 
     public CustomObjectCoordinate getRandomObjectCoordinate(Random random, int chunkX, int chunkZ)
     {
-        if (objects.isEmpty())
+        if (this.objects.isEmpty())
         {
             return null;
         }
-        for (int objectNumber = 0; objectNumber < objects.size(); objectNumber++)
+        for (int objectNumber = 0; objectNumber < this.objects.size(); objectNumber++)
         {
-            if (random.nextDouble() * 100.0 < objectChances.get(objectNumber))
+            if (random.nextDouble() * 100.0 < this.objectChances.get(objectNumber))
             {
-                return objects.get(objectNumber).makeCustomObjectCoordinate(random, chunkX, chunkZ);
+                return this.objects.get(objectNumber).makeCustomObjectCoordinate(random, chunkX, chunkZ);
             }
         }
         return null;

@@ -21,10 +21,10 @@ public class ArraysCache
 
     public void release()
     {
-        smallArraysNext = 0;
-        bigArraysNext = 0;
-        isFree = true;
-        outputType = OutputType.FULL;
+        this.smallArraysNext = 0;
+        this.bigArraysNext = 0;
+        this.isFree = true;
+        this.outputType = OutputType.FULL;
     }
 
     public int[] getArray(int size)
@@ -32,33 +32,33 @@ public class ArraysCache
 
         if (size <= 256)
         {
-            int[] array = smallArrays[smallArraysNext];
+            int[] array = this.smallArrays[this.smallArraysNext];
             if (array == null)
             {
                 array = new int[256];
-                smallArrays[smallArraysNext] = array;
+                this.smallArrays[this.smallArraysNext] = array;
             }
-            smallArraysNext++;
+            this.smallArraysNext++;
 
             return array;
         }
 
         int[] array;
-        if (bigArraysNext == bigArrays.size())
+        if (this.bigArraysNext == this.bigArrays.size())
         {
             array = new int[size];
-            bigArrays.add(array);
+            this.bigArrays.add(array);
         } else
         {
-            array = (int[]) bigArrays.get(bigArraysNext);
+            array = (int[]) this.bigArrays.get(this.bigArraysNext);
             if (array.length < size)
             {
                 array = new int[size];
-                bigArrays.set(bigArraysNext, array);
+                this.bigArrays.set(this.bigArraysNext, array);
             }
         }
 
-        bigArraysNext++;
+        this.bigArraysNext++;
         return array;
 
     }

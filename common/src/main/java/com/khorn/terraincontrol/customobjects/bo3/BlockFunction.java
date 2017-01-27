@@ -25,16 +25,16 @@ public class BlockFunction extends BO3PlaceableFunction
         assureSize(4, args);
         // Those limits are arbitrary, LocalWorld.setBlock will limit it
         // correctly based on what chunks can be accessed
-        x = readInt(args.get(0), -100, 100);
-        y = readInt(args.get(1), -1000, 1000);
-        z = readInt(args.get(2), -100, 100);
-        material = readMaterial(args.get(3));
+        this.x = readInt(args.get(0), -100, 100);
+        this.y = readInt(args.get(1), -1000, 1000);
+        this.z = readInt(args.get(2), -100, 100);
+        this.material = readMaterial(args.get(3));
         if (args.size() == 5)
         {
-            metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().directory);
-            if (metaDataTag != null)
+            this.metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().directory);
+            if (this.metaDataTag != null)
             {
-                metaDataName = args.get(4);
+                this.metaDataName = args.get(4);
             }
         }
     }
@@ -52,9 +52,9 @@ public class BlockFunction extends BO3PlaceableFunction
     public String toString()
     {
         String start = "Block(" + x + ',' + y + ',' + z + ',' + material;
-        if (metaDataName != null)
+        if (this.metaDataName != null)
         {
-            start += ',' + metaDataName;
+            start += ',' + this.metaDataName;
         }
         return start + ')';
     }
@@ -63,8 +63,8 @@ public class BlockFunction extends BO3PlaceableFunction
     public BlockFunction rotate()
     {
         BlockFunction rotatedBlock = new BlockFunction(getHolder(), z, y, -x, material.rotate());
-        rotatedBlock.metaDataTag = metaDataTag;
-        rotatedBlock.metaDataName = metaDataName;
+        rotatedBlock.metaDataTag = this.metaDataTag;
+        rotatedBlock.metaDataName = this.metaDataName;
 
         return rotatedBlock;
     }
@@ -72,10 +72,10 @@ public class BlockFunction extends BO3PlaceableFunction
     @Override
     public void spawn(LocalWorld world, Random random, int x, int y, int z)
     {
-        world.setBlock(x, y, z, material);
-        if (metaDataTag != null)
+        world.setBlock(x, y, z, this.material);
+        if (this.metaDataTag != null)
         {
-            world.attachMetadata(x, y, z, metaDataTag);
+            world.attachMetadata(x, y, z, this.metaDataTag);
         }
     }
 

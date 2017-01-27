@@ -37,7 +37,7 @@ public final class MojangStructurePart implements SpawnableObject
         DefinedStructureInfo spawnSettings = new DefinedStructureInfo().a(rotationMc) // withRotation
                 .a(new ChunkCoordIntPair(blockPos)) // inChunk
                 .a(random); // withRandom
-        spawnObject.a(worldMc, blockPos, spawnSettings, 4);
+        this.spawnObject.a(worldMc, blockPos, spawnSettings, 4);
         return true;
     }
 
@@ -61,7 +61,7 @@ public final class MojangStructurePart implements SpawnableObject
     @Override
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
 }

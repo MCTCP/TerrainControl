@@ -217,8 +217,8 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         }
 
         int waterLevel = generatingChunk.getWaterLevel(x, z);
-        LocalMaterialData currentSurfaceBlock = whiteStainedClay;
-        LocalMaterialData currentGroundBlock = whiteStainedClay;
+        LocalMaterialData currentSurfaceBlock = this.whiteStainedClay;
+        LocalMaterialData currentGroundBlock = this.whiteStainedClay;
         int noisePlusRandomFactor = (int) (noise / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
         boolean cosNoiseIsLargerThanZero = MathHelper.cos((float) (noise / 3.0D * Math.PI)) > 0.0D;
         int k1 = -1;

@@ -30,17 +30,17 @@ public class CustomObjectCoordinate
 
     public int getX()
     {
-        return x;
+        return this.x;
     }
 
     public int getY()
     {
-        return y;
+        return this.y;
     }
 
     public int getZ()
     {
-        return z;
+        return this.z;
     }
 
     /**
@@ -50,22 +50,22 @@ public class CustomObjectCoordinate
      */
     public CustomObject getObject()
     {
-        return object;
+        return this.object;
     }
 
     public Rotation getRotation()
     {
-        return rotation;
+        return this.rotation;
     }
 
     boolean spawnWithChecks(LocalWorld world, StructurePartSpawnHeight height, Random random)
     {
-        int y = height.getCorrectY(world, x, this.y, z);
-        if (!object.canSpawnAt(world, rotation, x, y, z))
+        int y = height.getCorrectY(world, this.x, this.y, this.z);
+        if (!this.object.canSpawnAt(world, this.rotation, this.x, this.y, this.z))
         {
             return false;
         }
-        return object.spawnForced(world, random, rotation, x, y, z);
+        return this.object.spawnForced(world, random, this.rotation, this.x, y, this.z);
     }
 
     @Override
@@ -80,23 +80,23 @@ public class CustomObjectCoordinate
             return false;
         }
         CustomObjectCoordinate otherCoord = (CustomObjectCoordinate) otherObject;
-        if (otherCoord.x != x)
+        if (otherCoord.x != this.x)
         {
             return false;
         }
-        if (otherCoord.y != y)
+        if (otherCoord.y != this.y)
         {
             return false;
         }
-        if (otherCoord.z != z)
+        if (otherCoord.z != this.z)
         {
             return false;
         }
-        if (!otherCoord.rotation.equals(rotation))
+        if (!otherCoord.rotation.equals(this.rotation))
         {
             return false;
         }
-        if (!otherCoord.object.getName().equals(object.getName()))
+        if (!otherCoord.object.getName().equals(this.object.getName()))
         {
             return false;
         }
@@ -106,7 +106,7 @@ public class CustomObjectCoordinate
     @Override
     public int hashCode()
     {
-        return (x >> 13) ^ (y >> 7) ^ z ^ object.getName().hashCode() ^ rotation.toString().hashCode();
+        return (this.x >> 13) ^ (this.y >> 7) ^ this.z ^ this.object.getName().hashCode() ^ this.rotation.toString().hashCode();
     }
 
     /**
@@ -120,7 +120,7 @@ public class CustomObjectCoordinate
         // center of the object. We need to know the exact center to choose
         // the appropriate spawning chunk.
 
-        BoundingBox box = object.getBoundingBox(rotation);
+        BoundingBox box = this.object.getBoundingBox(rotation);
         int centerX = x + box.getMinX() + (box.getWidth() / 2);
         int centerZ = z + box.getMinZ() + (box.getDepth() / 2);
 

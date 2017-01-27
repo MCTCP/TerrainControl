@@ -70,7 +70,7 @@ public class CustomObjectManager
     {
         // Load all global objects (they can overwrite special objects)
         this.globalCustomObjects.load(this.loaders, TerrainControl.getEngine().getGlobalObjectsDirectory());
-        TerrainControl.log(LogMarker.INFO, "{} Global custom objects loaded", globalCustomObjects.getAll().size());
+        TerrainControl.log(LogMarker.INFO, "{} Global custom objects loaded", this.globalCustomObjects.getAll().size());
     }
 
     /**
@@ -83,7 +83,7 @@ public class CustomObjectManager
      */
     public void registerCustomObjectLoader(String extension, CustomObjectLoader loader)
     {
-        loaders.put(extension.toLowerCase(), loader);
+        this.loaders.put(extension.toLowerCase(), loader);
     }
 
     /**
@@ -93,7 +93,7 @@ public class CustomObjectManager
      */
     public void registerGlobalObject(CustomObject object)
     {
-        globalCustomObjects.addLoadedObject(object);
+        this.globalCustomObjects.addLoadedObject(object);
     }
 
     /**
@@ -102,7 +102,7 @@ public class CustomObjectManager
      */
     public CustomObjectCollection getGlobalObjects()
     {
-        return globalCustomObjects;
+        return this.globalCustomObjects;
     }
 
     /**
@@ -112,7 +112,7 @@ public class CustomObjectManager
      */
     public Map<String, CustomObjectLoader> getObjectLoaders()
     {
-        return Collections.unmodifiableMap(loaders);
+        return Collections.unmodifiableMap(this.loaders);
     }
 
     /**
@@ -121,11 +121,11 @@ public class CustomObjectManager
      */
     public void shutdown()
     {
-        for (CustomObjectLoader loader : loaders.values())
+        for (CustomObjectLoader loader : this.loaders.values())
         {
             loader.onShutdown();
         }
-        loaders.clear();
+        this.loaders.clear();
     }
 
 }

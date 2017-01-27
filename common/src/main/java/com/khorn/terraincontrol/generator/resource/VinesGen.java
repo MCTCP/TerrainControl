@@ -29,15 +29,13 @@ public class VinesGen extends Resource
     public VinesGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
-        material = TerrainControl.toLocalMaterialData(DefaultMaterial.VINE, 0);
+        this.material = TerrainControl.toLocalMaterialData(DefaultMaterial.VINE, 0);
 
         assureSize(4, args);
-        frequency = readInt(args.get(0), 1, 100);
-        rarity = readRarity(args.get(1));
-        minAltitude = readInt(args.get(2), TerrainControl.WORLD_DEPTH,
-                TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(3), minAltitude,
-                TerrainControl.WORLD_HEIGHT);
+        this.frequency = readInt(args.get(0), 1, 100);
+        this.rarity = readRarity(args.get(1));
+        this.minAltitude = readInt(args.get(2), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        this.maxAltitude = readInt(args.get(3), this.minAltitude, TerrainControl.WORLD_HEIGHT);
     }
     public boolean canPlace(LocalWorld world, int x, int y, int z, int paramInt4)
     {
@@ -99,7 +97,7 @@ public class VinesGen extends Resource
     @Override
     public String toString()
     {
-        return "Vines(" + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
+        return "Vines(" + this.frequency + "," + this.rarity + "," + this.minAltitude + "," + this.maxAltitude + ")";
     }
 
     @Override
@@ -107,9 +105,9 @@ public class VinesGen extends Resource
     {
         int _x = x;
         int _z = z;
-        int y = minAltitude;
+        int y = this.minAltitude;
 
-        while (y <= maxAltitude)
+        while (y <= this.maxAltitude)
         {
             if (world.isEmpty(_x, y, _z))
             {

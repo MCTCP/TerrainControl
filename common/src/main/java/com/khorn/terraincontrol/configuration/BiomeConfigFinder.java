@@ -46,7 +46,7 @@ public final class BiomeConfigFinder
          */
         public File getFile()
         {
-            return file;
+            return this.file;
         }
 
         /**
@@ -55,7 +55,7 @@ public final class BiomeConfigFinder
          */
         public BiomeLoadInstruction getLoadInstructions()
         {
-            return loadInstructions;
+            return this.loadInstructions;
         }
 
         /**
@@ -64,7 +64,7 @@ public final class BiomeConfigFinder
          */
         public SettingsMap getSettings()
         {
-            return settings;
+            return this.settings;
         }
 
         /**
@@ -73,7 +73,7 @@ public final class BiomeConfigFinder
          */
         public String getBiomeName()
         {
-            return loadInstructions.getBiomeName();
+            return this.loadInstructions.getBiomeName();
         }
     }
 
@@ -225,8 +225,7 @@ public final class BiomeConfigFinder
         {
             if (fileName.endsWith(extension))
             {
-                String biomeName = fileName.substring(0, fileName.lastIndexOf(extension));
-                return biomeName;
+                return fileName.substring(0, fileName.lastIndexOf(extension));
             }
         }
 

@@ -107,7 +107,8 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     @Override
     public String toString()
     {
-        return "BiomeGroup(" + name + ", " + generationDepth + ", " + groupRarity + ", " + StringHelper.join(biomes.keySet(), ", ") + ")";
+        return "BiomeGroup(" + this.name + ", " + this.generationDepth + ", " + this.groupRarity + ", "
+            + StringHelper.join(this.biomes.keySet(), ", ") + ")";
     }
 
     /**
@@ -131,7 +132,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
      */
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     /**
@@ -231,12 +232,12 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
 
     public int getGroupRarity()
     {
-        return groupRarity;
+        return this.groupRarity;
     }
 
     public int getGenerationDepth()
     {
-        return generationDepth;
+        return this.generationDepth;
     }
 
     /**
@@ -246,7 +247,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
      */
     public boolean hasNoBiomes()
     {
-        return biomes.isEmpty();
+        return this.biomes.isEmpty();
     }
 
 }

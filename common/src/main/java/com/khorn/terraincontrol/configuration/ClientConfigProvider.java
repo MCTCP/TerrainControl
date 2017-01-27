@@ -47,7 +47,7 @@ public final class ClientConfigProvider implements ConfigProvider
         SettingsMap worldSettingsReader = new SimpleSettingsMap(world.getName(), false);
         worldSettingsReader.putSetting(WorldStandardValues.WORLD_FOG, stream.readInt());
         worldSettingsReader.putSetting(WorldStandardValues.WORLD_NIGHT_FOG, stream.readInt());
-        worldConfig = new WorldConfig(new File("."), worldSettingsReader, world, customObjects);
+        this.worldConfig = new WorldConfig(new File("."), worldSettingsReader, world, this.customObjects);
 
         // Custom biomes + ids
         int count = stream.readInt();
@@ -55,12 +55,12 @@ public final class ClientConfigProvider implements ConfigProvider
         {
             String biomeName = ConfigFile.readStringFromStream(stream);
             int id = stream.readInt();
-            worldConfig.customBiomeGenerationIds.put(biomeName, id);
+            this.worldConfig.customBiomeGenerationIds.put(biomeName, id);
         }
 
         // BiomeConfigs
         StandardBiomeTemplate defaultSettings = new StandardBiomeTemplate(worldConfig.worldHeightCap);
-        biomes = new LocalBiome[world.getMaxBiomesCount()];
+        this.biomes = new LocalBiome[world.getMaxBiomesCount()];
 
         count = stream.readInt();
         while (count-- > 0)
@@ -81,7 +81,7 @@ public final class ClientConfigProvider implements ConfigProvider
             BiomeConfig config = new BiomeConfig(instruction, biomeReader, worldConfig);
 
             LocalBiome biome = world.createBiomeFor(config, new BiomeIds(id));
-            biomes[id] = biome;
+            this.biomes[id] = biome;
         }
     }
 
@@ -94,11 +94,11 @@ public final class ClientConfigProvider implements ConfigProvider
     @Override
     public LocalBiome getBiomeByIdOrNull(int id)
     {
-        if (id < 0 || id > biomes.length)
+        if (id < 0 || id > this.biomes.length)
         {
             return null;
         }
-        return biomes[id];
+        return this.biomes[id];
     }
 
     @Override

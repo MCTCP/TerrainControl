@@ -36,7 +36,7 @@ public class ChunkCoordinate
      */
     public int getChunkX()
     {
-        return chunkX;
+        return this.chunkX;
     }
 
     /**
@@ -45,13 +45,13 @@ public class ChunkCoordinate
      */
     public int getChunkZ()
     {
-        return chunkZ;
+        return this.chunkZ;
     }
 
     @Override
     public int hashCode()
     {
-        return (chunkX >> 13) ^ chunkZ;
+        return (this.chunkX >> 13) ^ this.chunkZ;
     }
 
     @Override
@@ -141,7 +141,7 @@ public class ChunkCoordinate
     @Override
     public String toString()
     {
-        return chunkX + "," + chunkZ;
+        return this.chunkX + "," + chunkZ;
     }
 
     /**
@@ -149,7 +149,7 @@ public class ChunkCoordinate
      * @return The x position.
      */
     public int getBlockXCenter() {
-        return chunkX * CHUNK_X_SIZE + CHUNK_POPULATION_OFFSET_X;
+        return this.chunkX * CHUNK_X_SIZE + CHUNK_POPULATION_OFFSET_X;
     }
     
     /**
@@ -157,7 +157,7 @@ public class ChunkCoordinate
      * @return The z position.
      */
     public int getBlockZCenter() {
-        return chunkZ * CHUNK_Z_SIZE + CHUNK_POPULATION_OFFSET_Z;
+        return this.chunkZ * CHUNK_Z_SIZE + CHUNK_POPULATION_OFFSET_Z;
     }
 
     /**
@@ -167,7 +167,7 @@ public class ChunkCoordinate
      */
     public int getBlockX()
     {
-        return chunkX * CHUNK_X_SIZE;
+        return this.chunkX * CHUNK_X_SIZE;
     }
 
     /**
@@ -177,7 +177,7 @@ public class ChunkCoordinate
      */
     public int getBlockZ()
     {
-        return chunkZ * CHUNK_Z_SIZE;
+        return this.chunkZ * CHUNK_Z_SIZE;
     }
 
     /**

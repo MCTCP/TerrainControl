@@ -15,13 +15,13 @@ class BooleanSetting extends Setting<Boolean>
     BooleanSetting(String name, boolean defaultValue)
     {
         super(name);
-        this.defaultValue = Boolean.valueOf(defaultValue);
+        this.defaultValue = defaultValue;
     }
 
     @Override
     public Boolean getDefaultValue()
     {
-        return defaultValue;
+        return this.defaultValue;
     }
 
     @Override

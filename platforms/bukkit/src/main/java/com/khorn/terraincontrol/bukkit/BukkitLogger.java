@@ -21,7 +21,7 @@ final class BukkitLogger extends Logger
     @Override
     public void log(LogMarker level, String message, Object... params)
     {
-        if (minimumLevel.compareTo(level) < 0)
+        if (this.minimumLevel.compareTo(level) < 0)
         {
             // Only log messages that we want to see...
             return;
@@ -29,26 +29,26 @@ final class BukkitLogger extends Logger
         switch (level)
         {
             case FATAL:
-                logger.fatal(logPrefix + message, params);
+                this.logger.fatal(this.logPrefix + message, params);
                 break;
             case ERROR:
-                logger.error(logPrefix + message, params);
+                this.logger.error(this.logPrefix + message, params);
                 break;
             case WARN:
-                logger.warn(logPrefix + message, params);
+                this.logger.warn(this.logPrefix + message, params);
                 break;
             case INFO:
-                logger.info(logPrefix + message, params);
+                this.logger.info(this.logPrefix + message, params);
                 break;
             case DEBUG:
-                logger.info(logPrefix + "[Debug] " + message, params);
+                this.logger.info(this.logPrefix + "[Debug] " + message, params);
                 break;
             case TRACE:
-                logger.trace(logPrefix + "[Trace] " + message, params);
+                this.logger.trace(this.logPrefix + "[Trace] " + message, params);
                 break;
             default:
                 // Unknown log level, should never happen
-                logger.info(logPrefix + message, params); // Still log the message
+                this.logger.info(this.logPrefix + message, params); // Still log the message
                 throw new RuntimeException("Unknown log marker: " + level);
         }
     }

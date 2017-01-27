@@ -78,13 +78,13 @@ public class BranchFunction extends BO3Function implements Branch
             .append(x).append(',')
             .append(y).append(',')
             .append(z);
-        for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
+        for (Iterator<BranchNode> it = this.branches.iterator(); it.hasNext();)
         {
             output.append(it.next().toBranchString());
         }
-        if (totalChance != -1)
+        if (this.totalChance != -1)
         {
-            output.append(',').append(totalChance);
+            output.append(',').append(this.totalChance);
         }
         return output.append(')').toString();
     }
@@ -93,10 +93,10 @@ public class BranchFunction extends BO3Function implements Branch
     public CustomObjectCoordinate toCustomObjectCoordinate(LocalWorld world, Random random, int x, int y, int z)
     {
         TerrainControl.log(LogMarker.TRACE, "Branch:");
-        for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
+        for (Iterator<BranchNode> it = this.branches.iterator(); it.hasNext();)
         {
             BranchNode branch = it.next();
-            double randomChance = random.nextDouble() * (totalChance != -1 ? totalChance : 100);
+            double randomChance = random.nextDouble() * (this.totalChance != -1 ? this.totalChance : 100);
             TerrainControl.log(LogMarker.TRACE, "  Needed: {} Obtained: {}", branch.getChance(), randomChance);
             if (randomChance < branch.getChance())
             {
@@ -141,17 +141,17 @@ public class BranchFunction extends BO3Function implements Branch
             {
                 cumulativeChance += branchChance;
                 // CustomObjects are inserted into the Set in ascending chance order with Chance being cumulative.
-                branches.add(new BranchNode(Rotation.getRotation(args.get(i + 1)), cumulativeChance, object));
+                this.branches.add(new BranchNode(Rotation.getRotation(args.get(i + 1)), cumulativeChance, object));
             } else
             {
-                branches.add(new BranchNode(Rotation.getRotation(args.get(i + 1)), branchChance, object));
+                this.branches.add(new BranchNode(Rotation.getRotation(args.get(i + 1)), branchChance, object));
             }
         }
         TerrainControl.log(LogMarker.TRACE, "{}:{}", args.size(), i);
         if (i < args.size())
         {
             TerrainControl.log(LogMarker.TRACE, "{} TotalChance set.", (Object) this.getConfigName());
-            totalChance = readDouble(args.get(i), 0, Double.MAX_VALUE);
+            this.totalChance = readDouble(args.get(i), 0, Double.MAX_VALUE);
         }
         return cumulativeChance;
 
@@ -164,7 +164,7 @@ public class BranchFunction extends BO3Function implements Branch
             return false;
         }
         BranchFunction branch = (BranchFunction) other;
-        return branch.x == x && branch.y == y && branch.z == z;
+        return branch.x == this.x && branch.y == this.y && branch.z == this.z;
     }
 
 }
