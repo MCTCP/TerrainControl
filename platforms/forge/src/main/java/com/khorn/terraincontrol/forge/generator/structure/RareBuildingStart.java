@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.forge.generator.structure;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
+
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.ComponentScatteredFeaturePieces;
 import net.minecraft.world.gen.structure.StructureComponent;
@@ -10,11 +11,18 @@ import net.minecraft.world.gen.structure.StructureStart;
 
 import java.util.Random;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class RareBuildingStart extends StructureStart
 {
     public RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
     {
         LocalWorld localWorld = WorldHelper.toLocalWorld(world);
+        if(localWorld == null)
+        {
+        	localWorld = WorldHelper.toLocalWorld(world);
+        	throw new NotImplementedException();
+        }
         BiomeConfig biomeConfig = localWorld.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8).getBiomeConfig();
         StructureComponent building;
         switch (biomeConfig.rareBuildingType)

@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
+
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
@@ -16,6 +17,8 @@ import net.minecraft.world.gen.structure.StructureVillagePieces.PieceWeight;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class VillageStart extends StructureStart
 {
@@ -32,6 +35,13 @@ public class VillageStart extends StructureStart
 
         // Apply the villageType setting
         LocalWorld worldTC = WorldHelper.toLocalWorld(world);
+        
+        if(worldTC == null)
+        {
+        	worldTC = WorldHelper.toLocalWorld(world);
+        	throw new NotImplementedException();
+        }
+        
         LocalBiome currentBiome = worldTC.getBiome(startX, startZ);
         BiomeConfig config = currentBiome.getBiomeConfig();
         if (config != null)

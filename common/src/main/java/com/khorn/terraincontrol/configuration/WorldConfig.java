@@ -185,6 +185,11 @@ public class WorldConfig extends ConfigFile
     public String author;
     public String description;
 
+	public boolean PreGenerationSafeMode;
+	public int PreGenerationRadius;
+	public int WorldBorderRadius;
+    public String worldSeed;
+    
     /**
      * Creates a WorldConfig from the WorldConfig.ini file found in the given
      * directory.
@@ -194,8 +199,7 @@ public class WorldConfig extends ConfigFile
      * @param world          The LocalWorld instance of the world.
      * @param customObjects  The customs objects of the world.
      */
-    public WorldConfig(File settingsDir, SettingsMap settingsReader, LocalWorld world,
-            CustomObjectCollection customObjects)
+    public WorldConfig(File settingsDir, SettingsMap settingsReader, LocalWorld world, CustomObjectCollection customObjects)
     {
         super(settingsReader.getName());
 
@@ -209,6 +213,20 @@ public class WorldConfig extends ConfigFile
         // Clamp Settings to acceptable values
         this.correctSettings();
 
+		if(TerrainControl.IsNewWorld)
+		{
+			TerrainControl.IsNewWorld = false;
+			if(TerrainControl.PregenerationRadius > -1)
+			{
+				PreGenerationRadius = TerrainControl.PregenerationRadius;
+			}
+			PreGenerationSafeMode = TerrainControl.PreGenerationSafeMode;
+			if(TerrainControl.WorldBorderRadius > -1)
+			{
+				WorldBorderRadius = TerrainControl.WorldBorderRadius;	
+			}					
+		} 
+        
         // Check biome ids, These are the names from the worldConfig file
         // Corrects any instances of incorrect biome id.
         for (Iterator<Entry<String, Integer>> it = customBiomeGenerationIds.entrySet().iterator(); it.hasNext();)
@@ -489,6 +507,12 @@ public class WorldConfig extends ConfigFile
 
         this.author = reader.getSetting(WorldStandardValues.AUTHOR);
         this.description = reader.getSetting(WorldStandardValues.DESCRIPTION);
+        
+        this.PreGenerationRadius = reader.getSetting(WorldStandardValues.PREGENERATION_RADIUS);
+        this.PreGenerationSafeMode = reader.getSetting(WorldStandardValues.PREGENERATION_SAFE_MODE);
+        this.WorldBorderRadius = reader.getSetting(WorldStandardValues.WORLD_BORDER_RADIUS);
+        
+        this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED);
     }
 
     private void readBiomeGroups(SettingsMap reader)
@@ -1000,6 +1024,42 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.MAX_MOISTURE, this.maxMoisture);
         writer.putSetting(WorldStandardValues.MIN_TEMPERATURE, this.minTemperature);
         writer.putSetting(WorldStandardValues.MAX_TEMPERATURE, this.maxTemperature);
+        
+        
+        
+                
+        
+        
+        writer.bigTitle("World Seed");        
+        writer.putSetting(WorldStandardValues.WORLD_SEED, this.worldSeed,
+	        "The seed that will be used for this world unless it is overriden in the world creation menu.",
+	        "Leave blank for a random seed."
+    	);
+        
+        writer.bigTitle("Pre-generation safe mode");
+        writer.putSetting(WorldStandardValues.PREGENERATION_SAFE_MODE, this.PreGenerationSafeMode,
+            "Disabling safe mode can greatly increase pre-generation speed",
+    		"but increases memory usage and may require server reboots during",
+    		"pre-generation. This is recommended only for installations with",
+    		"more than 2GB memory. Pre-generation will automatically resume",
+    		"when entering the world after a server reboot.",               
+    		"Defaults to: true",
+    		"This property is used only by the Minecraft Worlds mod"
+		);
+        
+        writer.bigTitle("Pre-generation radius");        
+        writer.putSetting(WorldStandardValues.PREGENERATION_RADIUS, this.PreGenerationRadius,
+	        "This is the radius in chunks around the spawn chunk within which chunks will automatically be spawned (uses a rectangle, not a circle around the spawn location!",
+			"Defaults to: 0 (disabled)",
+			"This property is used only by the Minecraft Worlds mod"        		
+		);  
+        
+        writer.bigTitle("World border radius");        
+        writer.putSetting(WorldStandardValues.WORLD_BORDER_RADIUS, this.WorldBorderRadius,
+	        "This is the radius in chunks around the spawn chunk within which chunks will have blocks spawned (uses a rectangle, not a circle around the spawn location!)",
+			"Defaults to: 0 (disabled)",
+			"This property is used only by the Minecraft Worlds mod"
+		);        		
     }
 
     private void WriteCustomBiomes(SettingsMap writer)

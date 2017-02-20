@@ -28,6 +28,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,7 +43,6 @@ import javax.annotation.Nullable;
  */
 public final class WorldLoader
 {
-
     private final File configsDir;
     private final Map<String, ServerConfigProvider> configMap = Maps.newHashMap();
     public final HashMap<String, ForgeWorld> worlds = new HashMap<String, ForgeWorld>();
@@ -110,20 +110,27 @@ public final class WorldLoader
 
     public void unloadAllWorlds()
     {
+    	ArrayList<ForgeWorld> worldsToRemove = new ArrayList<ForgeWorld>();
         for (ForgeWorld world : this.worlds.values())
         {
             if (world != null)
             {
-                TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-                this.configMap.remove(world.getName());
-                this.worlds.remove(world.getName());
+            	worldsToRemove.add(world);
             }
+        }
+        for (ForgeWorld worldToRemove : worldsToRemove)
+        {
+            TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", worldToRemove.getName());
+            this.configMap.remove(worldToRemove.getName());
+            TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + worldToRemove.getName());
+            this.worlds.remove(worldToRemove.getName());
         }
     }
 
     public void unloadWorld(ForgeWorld world)
     {
         TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
+        TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + world.getName());
         this.worlds.remove(world.getName());
     }
 
@@ -196,6 +203,7 @@ public final class WorldLoader
                 Biome.REGISTRY.underlyingIntegerMap = underlyingIntegerMap;
             }
             world.provideConfigs(config);
+            TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds add " + worldName);
             this.worlds.put(worldName, world);
         }
 
@@ -204,16 +212,22 @@ public final class WorldLoader
 
     @SideOnly(Side.CLIENT)
     public void onQuitFromServer()
-    {
+    {        
+    	ArrayList<ForgeWorld> worldsToRemove = new ArrayList<ForgeWorld>();
         for (ForgeWorld world : this.worlds.values())
         {
             if (world != null)
             {
-                TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-                markBiomeIdsAsFree(world);
-                this.configMap.remove(world.getName());
-                this.worlds.remove(world.getName());
+            	worldsToRemove.add(world);
             }
+        }
+        for (ForgeWorld worldToRemove : worldsToRemove)
+        {
+            TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", worldToRemove.getName());
+            markBiomeIdsAsFree(worldToRemove);
+            this.configMap.remove(worldToRemove.getName());
+            TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + worldToRemove.getName());
+            this.worlds.remove(worldToRemove.getName());
         }
     }
 
@@ -221,6 +235,7 @@ public final class WorldLoader
     public void unloadClientWorld(ForgeWorld world)
     {
         TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
+        TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + world.getName());
         this.worlds.remove(world.getName());
         markBiomeIdsAsFree(world);
     }
@@ -250,6 +265,7 @@ public final class WorldLoader
         ForgeWorld world = new ForgeWorld(ConfigFile.readStringFromStream(wrappedStream));
         ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world);
         world.provideClientConfigs(mcWorld, configs);
+        TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds add " + world.getName());
         this.worlds.put(world.getName(), world);
     }
 }

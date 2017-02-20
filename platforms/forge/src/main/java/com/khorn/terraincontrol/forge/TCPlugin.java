@@ -13,8 +13,10 @@ import com.khorn.terraincontrol.forge.events.*;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.structure.RareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.VillageStart;
+import com.khorn.terraincontrol.forge.gui.GuiHandler;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.MinecraftForge;
@@ -109,6 +111,8 @@ public class TCPlugin
         };
         MinecraftForge.EVENT_BUS.register(new BiomeColorsListener(getBiomeConfig));
 
+        MinecraftForge.EVENT_BUS.register(new GuiHandler());  
+        
         // Register to our own events, so that they can be fired again as Forge events.
         engine.registerEventHandler(new TCToForgeEventConverter(), EventPriority.CANCELABLE);
     }

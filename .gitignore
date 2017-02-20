@@ -2,6 +2,8 @@
 .classpath
 .project
 .settings
+.metadata
+.recommenders
 
 # NetBeans
 nbproject
@@ -68,3 +70,5 @@ session.lock
 # Filesystem dust
 Thumbs.db
 .DS_Store
+*.lock
+*.launch

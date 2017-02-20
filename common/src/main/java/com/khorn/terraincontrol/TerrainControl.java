@@ -342,5 +342,54 @@ public class TerrainControl
     {
         // Forbidden to instantiate.
     }
+    
+    
+    
+    // PG stuff
+    
+	public static boolean startingPreGeneration = false;
+	public static boolean StructurePlottedAtSpawn = true;
+    
+	public static boolean IsNewWorld;
+	
+	public static long LastPregenCheckTime;
+	public static long LastMobSpawnCheckTime;
+    //public static int AmbientCreatureDespawnRange = 48;
+    //public static int CreatureDespawnRange = 48;
+    //public static int WaterCreatureDespawnRange = 48;
+    
+	public static int PregenerationRadius;
+	public static int WorldBorderRadius;
+	
+	public static int PregeneratedBorderLeft;
+	public static int PregeneratedBorderRight;
+	public static int PregeneratedBorderTop;
+	public static int PregeneratedBorderBottom;
+	
+	public static boolean PreGenerationSafeMode;
+	public static boolean PreGeneratorIsRunning;
+	public static boolean PreGeneratorInitialised;
+	public static String PreGeneratorProgress1 = "";
+	public static String PreGeneratorProgress2 = "";
+	public static String PreGeneratorProgress3 = "";
+	public static String PreGeneratorProgress4 = "";
+	public static String PreGeneratorProgress5 = "";
+	public static int PreGeneratorProgress6;
+	public static String PregenerationWorld = "";
 
+	public static void resetPregenerator()
+    {
+		StructurePlottedAtSpawn = false;
+		startingPreGeneration = true;
+		LastPregenCheckTime = 0;
+		LastMobSpawnCheckTime = 0;
+		
+		StructurePlottedAtSpawn = false;
+		PregeneratedBorderLeft = 0;
+		PregeneratedBorderRight = 0;
+		PregeneratedBorderTop = 0;
+		PregeneratedBorderBottom = 0;
+		
+		PreGeneratorInitialised = false;
+    }
 }

@@ -50,7 +50,8 @@ public class WorldStandardValues extends Settings
             IMAGE_FILE = stringSetting("ImageFile", "map.png"),
             IMAGE_FILL_BIOME = stringSetting("ImageFillBiome", "Ocean"),
             AUTHOR = stringSetting("Author", "Unknown"),
-            DESCRIPTION = stringSetting("Description", "No description given");
+            DESCRIPTION = stringSetting("Description", "No description given"),
+    		WORLD_SEED = stringSetting("WorldSeed", "");
 
     public static final Setting<Integer>
             WORLD_HEIGHT_SCALE_BITS = intSetting("WorldHeightScaleBits", 7, 5, 8),
@@ -91,7 +92,9 @@ public class WorldStandardValues extends Settings
             MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS = intSetting("MaximumDistanceBetweenRareBuildings", 32, 1, 10000),
             OCEAN_MONUMENT_GRID_SIZE = intSetting("OceanMonumentGridSize", 32, 5, 10000),
             OCEAN_MONUMENT_RANDOM_OFFSET = intSetting("OceanMonumentRandomOffset", 26, 0, 10000),
-            MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100);
+            MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100),
+            PREGENERATION_RADIUS = intSetting("PreGenerationRadius", 0, 0, 999999),            		
+            WORLD_BORDER_RADIUS = intSetting("WorldBorderRadius", 0, 0, 999999);
 
     public static final Setting<Boolean>
             RIVERS_ENABLED = booleanSetting("RiversEnabled", true),
@@ -114,7 +117,8 @@ public class WorldStandardValues extends Settings
             MINESHAFTS_ENABLED = booleanSetting("MineshaftsEnabled", true),
             RARE_BUILDINGS_ENABLED = booleanSetting("RareBuildingsEnabled", true),
             OCEAN_MONUMENTS_ENABLED = booleanSetting("OceanMonumentsEnabled", true),
-            POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false);
+            POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),
+    		PREGENERATION_SAFE_MODE = booleanSetting("PreGenerationSafeMode", true);
 
     public static final Setting<LocalMaterialData>
             WATER_BLOCK = new MaterialSetting("WaterBlock", DefaultMaterial.STATIONARY_WATER),
