@@ -90,7 +90,9 @@ public class StandardBiomeTemplate
     public boolean defaultDisableBiomeHeight;
     public double[] defaultCustomHeightControl = new double[TerrainShapeBase.PIECES_PER_CHUNK_Y + 1];;
     public double defaultFossilRarity = 0;
-
+    public String defaultBiomeDictId = "";
+    public String defaultInheritMobsBiomeName = "";
+    
     public List<WeightedMobSpawnGroup> defaultCreatures = Arrays.asList(
             new WeightedMobSpawnGroup(MobNames.SHEEP, 12, 4, 4),
             new WeightedMobSpawnGroup(MobNames.PIG, 10, 4, 4),

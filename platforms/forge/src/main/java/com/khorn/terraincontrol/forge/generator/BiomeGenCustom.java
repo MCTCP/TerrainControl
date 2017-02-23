@@ -13,8 +13,8 @@ import com.khorn.terraincontrol.util.helpers.StringHelper;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,12 +35,19 @@ public class BiomeGenCustom extends Biome
         this.generationId = id.getGenerationId();
 
         this.skyColor = config.skyColor;
+          
+        // TODO: Is clearing really necessary here?
+        
+        this.spawnableMonsterList.clear();
+        this.spawnableCreatureList.clear();
+        this.spawnableCaveCreatureList.clear();
+        this.spawnableWaterCreatureList.clear();
 
         // Mob spawning
-        addMobs(this.spawnableMonsterList, config.spawnMonsters);
-        addMobs(this.spawnableCreatureList, config.spawnCreatures);
-        addMobs(this.spawnableWaterCreatureList, config.spawnWaterCreatures);
-        addMobs(this.spawnableCaveCreatureList, config.spawnAmbientCreatures);
+        addMobs(this.spawnableMonsterList, config.spawnMonstersMerged);//, improvedMobSpawning);
+        addMobs(this.spawnableCreatureList, config.spawnCreaturesMerged);//, improvedMobSpawning);
+        addMobs(this.spawnableWaterCreatureList, config.spawnWaterCreaturesMerged);//, improvedMobSpawning);
+        addMobs(this.spawnableCaveCreatureList, config.spawnAmbientCreaturesMerged);//, improvedMobSpawning);
     }
 
     /**
@@ -70,7 +77,7 @@ public class BiomeGenCustom extends Biome
             if (biomeConfig.biomeTemperature <= WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
             {
                 this.setSnowEnabled();
-            }
+            }             
         }
     }
 
@@ -133,20 +140,8 @@ public class BiomeGenCustom extends Biome
             TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
                     biomeIds.getGenerationId());
         }
-
-        if (!BiomeDictionary.isBiomeRegistered(customBiome))
-        {
-            // register custom biome with Forge's BiomeDictionary
-            BiomeDictionary.makeBestGuess(customBiome);
-        }
+        
         return customBiome;
-    }
-
-    // Adds the mobs to the internal list
-    protected void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)
-    {
-        internalList.clear();
-        internalList.addAll(MobSpawnGroupHelper.toMinecraftlist(configList));
     }
 
     // Sky color from Temp
@@ -161,5 +156,34 @@ public class BiomeGenCustom extends Biome
     {
         return "BiomeGenCustom of " + getBiomeName();
     }
-
+   
+    // Adds the mobs to the internal list
+    protected void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)//, boolean improvedMobSpawning)
+    {    
+    	List<SpawnListEntry> newList = new ArrayList<SpawnListEntry>();
+    	List<SpawnListEntry> newListParent = new ArrayList<SpawnListEntry>();
+    	// Add mobs defined in bc's mob spawning settings
+        List<SpawnListEntry> spawnListEntry = MobSpawnGroupHelper.toMinecraftlist(configList);
+        newList.addAll(spawnListEntry);
+        
+    	for(SpawnListEntry entryParent : internalList)
+    	{
+			boolean bFound = false;
+			for(SpawnListEntry entryChild : newList)
+			{
+				if(entryChild.entityClass.equals(entryParent.entityClass))
+				{
+					bFound = true;
+				}
+			}
+			if(!bFound)
+			{
+				newListParent.add(entryParent);
+			}
+    	}
+    	newList.addAll(newListParent);
+    	
+        internalList.clear();
+        internalList.addAll(newList);
+    }
 }

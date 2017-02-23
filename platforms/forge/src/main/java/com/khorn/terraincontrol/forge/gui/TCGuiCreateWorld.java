@@ -72,13 +72,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     
     private GuiButton btnavailableWorldDelete1;
     private GuiButton btnavailableWorldDelete2;
-    private GuiButton btnavailableWorldDelete3;
-    
-    private GuiTextField txtPregenRadius;
-    
-    private GuiTextField txtWorldBorderRadius;
-    
-    private GuiButton btnPregenerationSafeMode;       
+    private GuiButton btnavailableWorldDelete3;          
 
     private GuiButton btnGameMode;
     private GuiButton btnAllowCheats;
@@ -102,8 +96,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     public void updateScreen()
     {
         this.txtSeed.updateCursorCounter();
-        this.txtWorldBorderRadius.updateCursorCounter();
-        this.txtPregenRadius.updateCursorCounter();
     }
     
     WorldConfig selectedWorldConfig = null;
@@ -240,7 +232,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 
         	GuiHandler.worldName = getCorrectWorldName(this.mc.getSaveLoader(), GuiHandler.worldName);
                         
-            boolean WorldNameExists = false;
             if (this.mc.getSaveLoader().getWorldInfo(GuiHandler.worldName) != null)
             {
             	worldNameHelpText = "Existing world will be deleted!";
@@ -248,7 +239,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             	worldNameHelpText = "New world dir will be created";
             }            
            
-            ArrayList<String> worldNames = new ArrayList<String>();
         	boolean usingPreset = false;
             	        		        	
             File TCWorldsDirectory = new File(TerrainControl.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
@@ -263,9 +253,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             				selectedWorldConfig = GuiHandler.worlds.get(worldDir.getName());
             				if(GuiHandler.selectedWorldName == null || !GuiHandler.selectedWorldName.equals(GuiHandler.worldName))
             				{	
-            					TerrainControl.PreGenerationSafeMode = selectedWorldConfig.PreGenerationSafeMode;
-            					TerrainControl.PregenerationRadius = selectedWorldConfig.PreGenerationRadius;
-            					TerrainControl.WorldBorderRadius = selectedWorldConfig.WorldBorderRadius;
             					GuiHandler.seed = selectedWorldConfig.worldSeed;
             					
             					WorldInfo worldInfo = this.mc.getSaveLoader().getWorldInfo(GuiHandler.worldName);
@@ -294,28 +281,11 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             
             if(usingPreset)
             {
-
             	worldNameHelpText2 = "Using existing settings";
-            	
-            	//if(resetTextFields)
-            	{
-	                txtPregenRadius.setText(TerrainControl.PregenerationRadius + "");		                
-	                txtWorldBorderRadius.setText(TerrainControl.WorldBorderRadius + "");;
-	            	
-                	if(TerrainControl.PreGenerationSafeMode)
-                	{
-                		this.btnPregenerationSafeMode.displayString = "Enabled";
-                	} else {
-                		this.btnPregenerationSafeMode.displayString = "Disabled";
-                	}
-	                
-                    txtSeed.setText(GuiHandler.seed);	                   
-            	}                	
+                txtSeed.setText(GuiHandler.seed);
             } else {
-            	
             	GuiHandler.selectedWorldName = null;
-            	selectedWorldConfig = null;
-            	
+            	selectedWorldConfig = null;            	
             	worldNameHelpText2 = "Using default settings";
             }
 			btnavailableWorldClone.enabled = GuiHandler.selectedWorldName != null;
@@ -357,11 +327,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 	@Override
     public void confirmClicked(boolean ok, int worldId)
     {			
-		if(explainingSafeMode)
-		{
-			this.mc.displayGuiScreen(new TCGuiCreateWorld(new TCGuiSelectCreateWorldMode()));
-		}			
-		else if(askDeleteSettings)
+		if(askDeleteSettings)
 		{
 			if(ok)
 			{
@@ -405,9 +371,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                     	}
                 		selectedWorldConfig = GuiHandler.worlds.get(GuiHandler.selectedWorldName);
 						
-    					TerrainControl.PreGenerationSafeMode = selectedWorldConfig.PreGenerationSafeMode;
-    					TerrainControl.PregenerationRadius = selectedWorldConfig.PreGenerationRadius;
-    					TerrainControl.WorldBorderRadius = selectedWorldConfig.WorldBorderRadius;
     					GuiHandler.seed = selectedWorldConfig.worldSeed;
     					
     					WorldInfo worldInfo = this.mc.getSaveLoader().getWorldInfo(GuiHandler.selectedWorldName);        					
@@ -423,10 +386,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                 		GuiHandler.selectedWorldName = null;
 	                	selectedWorldConfig = null;
 	                	
-	                	GuiHandler.seed = "";
-						TerrainControl.WorldBorderRadius = 0;
-						TerrainControl.PregenerationRadius = 0;
-						TerrainControl.PreGenerationSafeMode = true;							
+	                	GuiHandler.seed = "";							
                 	}
                 	
 					// Create new world dir?
@@ -442,9 +402,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 		else if(askModCompatContinue)
 		{
 			if(ok)
-			{		
-				//TerrainControl.resetPregenerator();
-				
+			{				
 				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
 			} else {
 				this.mc.displayGuiScreen(new TCGuiCreateWorld(new TCGuiSelectCreateWorldMode()));
@@ -497,9 +455,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 					txtWorldName.setText(GuiHandler.newWorldName);
 					
 					GuiHandler.seed = "";
-					TerrainControl.WorldBorderRadius = 0;
-					TerrainControl.PregenerationRadius = 0;
-					TerrainControl.PreGenerationSafeMode = true;
 					
 					GuiHandler.gameModeString = "survival";
 					GuiHandler.hardCore = false;
@@ -526,23 +481,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 	    }
 	    folder.delete();
 	} 
-			
-	boolean explainingSafeMode = false;
-    public GuiYesNo explainSafeMode(GuiYesNoCallback p_152129_0_)
-    {
-    	askDeleteSettings = false;
-    	selectingWorldName = false;	    
-    	askModCompatContinue = false;
-    	explainingSafeMode = true;
-    	    	
-        String s1 = "Pre-generation is faster without safe mode but MC may run out of memory.";
-        String s2 = "If so MC will crash intentionally, restart MC and enter the world to continue.";
-        String s3 = "Okay";
-        String s4 = "Got it";
-        
-        GuiYesNo guiyesno = new GuiYesNo(p_152129_0_, s1, s2, s3, s4, 0);
-        return guiyesno;
-    }
 	
 	boolean askDeleteSettings = false;
 	
@@ -551,7 +489,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     	askDeleteSettings = true;
     	selectingWorldName = false;
     	askModCompatContinue = false;
-    	explainingSafeMode = false;
     	
         String s1 = "Delete the TerrainControl world settings for '" + worldName + "'?";
         String s2 = "This will also delete any world (directory) named '" + worldName + "'";
@@ -568,16 +505,11 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     	askDeleteSettings = false;
     	selectingWorldName = false;	    	
     	askModCompatContinue = true;
-    	explainingSafeMode = false;
     	
-    	String bop = "Biomes o' plenty may cause crashes. ";
-    	String fc = "FastCraft detected, pre-generator";
-    	
-        String s1 = biomesOPlentyEnabled ? bop + (fastcraftEnabled ? fc : "") : (fastcraftEnabled ? fc : "");
-        String s2 = fastcraftEnabled ? "progress screen disabled. Use the launcher log instead." : "";
+        String s1 = "Biomes o' plenty may cause crashes. ";
         String s3 = "Continue";
         String s4 = "Back";
-        GuiYesNo guiyesno = new GuiYesNo(p_152129_0_, s1, s2, s3, s4, 0);
+        GuiYesNo guiyesno = new GuiYesNo(p_152129_0_, s1, "", s3, s4, 0);
         return guiyesno;
     }
     
@@ -588,37 +520,9 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     {
         if (txtSeed.isFocused())
         {
-            txtSeed.textboxKeyTyped(p_73869_1_, p_73869_2_);
-            try
-            {
-            	GuiHandler.seed = Long.parseLong(txtSeed.getText()) + "";
-            } catch(NumberFormatException ex)
-            {
-            	GuiHandler.seed = ""; 
-            }
+            txtSeed.textboxKeyTyped(p_73869_1_, p_73869_2_);           
+            GuiHandler.seed = txtSeed.getText();
         }
-        else if (txtPregenRadius.isFocused())
-        {
-            txtPregenRadius.textboxKeyTyped(p_73869_1_, p_73869_2_);
-            try
-            {
-            	TerrainControl.PregenerationRadius = Integer.parseInt(txtPregenRadius.getText());
-            } catch(NumberFormatException ex)
-            {
-            	TerrainControl.PregenerationRadius = 0; 
-            }
-        }
-        else if (txtWorldBorderRadius.isFocused())
-        {
-            txtWorldBorderRadius.textboxKeyTyped(p_73869_1_, p_73869_2_);
-            try
-            {
-            	TerrainControl.WorldBorderRadius = Integer.parseInt(txtWorldBorderRadius.getText());
-            } catch(NumberFormatException ex)
-            {
-            	TerrainControl.WorldBorderRadius = 0; 
-            }
-        }             
 
         if (p_73869_2_ == 28 || p_73869_2_ == 156)
         {
@@ -638,8 +542,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 
         this.txtSeed.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
         this.txtWorldName.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
-        this.txtPregenRadius.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
-        this.txtWorldBorderRadius.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
     }
 
     WorldSettings worldsettings = null;
@@ -717,19 +619,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         	{
         		nextPage();
         	}            	
-            if (button.id == 2) // Pre-generation Safe mode
-            {
-            	if(this.btnPregenerationSafeMode.displayString == "Enabled")
-            	{
-            		this.btnPregenerationSafeMode.displayString = "Disabled";
-        			TerrainControl.PreGenerationSafeMode = false;
-					GuiYesNo guiyesno = explainSafeMode(this);
-					this.mc.displayGuiScreen(guiyesno);
-            	} else {
-            		this.btnPregenerationSafeMode.displayString = "Enabled";
-            		TerrainControl.PreGenerationSafeMode = true;
-            	}
-            }
             if (button.id == 1) // Cancel
             {
                 this.mc.displayGuiScreen(this.sender);
@@ -780,18 +669,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                 {
                 	worldsettings.enableCommands();
                 }
-                
-                int a = -1;                    		
-                int b = -1; 
-                                                                          
-                TerrainControl.PregeneratedBorderTop = 0;
-                TerrainControl.PregeneratedBorderRight = 0;
-                TerrainControl.PregeneratedBorderBottom = 0;
-                TerrainControl.PregeneratedBorderLeft = 0;
-               
-                TerrainControl.LastPregenCheckTime = 0;
-                                   
-            	TerrainControl.IsNewWorld = true;
                 
                 // Clear existing pre-generator and structurecache data
                 // Do this here in the Forge layer instead of in common since this only applies to Forge atm.
@@ -865,18 +742,11 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     				}
     			}
     			
-    			if(TerrainControl.PregenerationRadius > 0 && fastcraftEnabled)
-    			{
-					GuiYesNo guiyesno = askModCompatContinue(this, fastcraftEnabled, biomesOPlentyEnabled);
-					this.mc.displayGuiScreen(guiyesno);
-    			}
-    			else if(biomesOPlentyEnabled)
+    			if(biomesOPlentyEnabled)
             	{
 					GuiYesNo guiyesno = askModCompatContinue(this, false, biomesOPlentyEnabled);
 					this.mc.displayGuiScreen(guiyesno);        				
-				} else {
-					TerrainControl.resetPregenerator();
-					
+				} else {					
     				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
     			}
             }
@@ -916,7 +786,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         	    	askDeleteSettings = false;
         	    	selectingWorldName = true;	    
         	    	askModCompatContinue = false;
-        	    	explainingSafeMode = false;
         	    	
         	        FillAvailableWorlds();
         	        TCGuiEnterWorldName guiRenameWorld = new TCGuiEnterWorldName(this, GuiHandler.selectedWorldName);
@@ -930,17 +799,14 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     	    	askDeleteSettings = false;
     	    	selectingWorldName = true;	    
     	    	askModCompatContinue = false;
-    	    	explainingSafeMode = false;
             	
     	        FillAvailableWorlds();
-    	        TCGuiEnterWorldName guiRenameWorld = new TCGuiEnterWorldName(this, "New world");
+    	        TCGuiEnterWorldName guiRenameWorld = new TCGuiEnterWorldName(this, "New World");
 				this.mc.displayGuiScreen(guiRenameWorld);
             }
         }
     }
-    
-	boolean derping;
-	
+
     private void updateButtons()
     {
     	if(GuiHandler.hardCore)
@@ -1029,24 +895,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         this.buttonList.add(btnavailableWorldDelete3);
         
         FillAvailableWorlds();
-        
-        // Pre-generation radius
-        this.txtPregenRadius = new GuiTextField(23, this.fontRendererObj, this.width / 2 - 164, 159 + heightOffset, 50, 20);
-        this.txtPregenRadius.setText(TerrainControl.PregenerationRadius + "");            
-        
-        // Pre-generator safe mode
-        btnPregenerationSafeMode = new GuiButton(2, this.width / 2 - 164 + 125, 161 + heightOffset, 50, 20, TerrainControl.PreGenerationSafeMode ? "Enabled" : "Disabled");
-        this.buttonList.add(btnPregenerationSafeMode);
-        
-        // World border
-        this.txtWorldBorderRadius = new GuiTextField(24, this.fontRendererObj, this.width / 2 - 164 + 210, 159 + heightOffset, 50, 20);
-        this.txtWorldBorderRadius.setText(TerrainControl.WorldBorderRadius + "");
-
-        // TODO: Fix pre-generator and world borders
-        this.txtPregenRadius.setVisible(false);
-        btnPregenerationSafeMode.visible = false;
-        this.txtWorldBorderRadius.setVisible(false);
-                
+                       
         btnGameMode = new GuiButton(11, this.width / 2 - 166, 188 - heightOffset1 + heightOffset, 122, 20, I18n.format("selectWorld.gameMode", new Object[0]));
         btnAllowCheats = new GuiButton(12, this.width / 2 - 39, 188 - heightOffset1 + heightOffset, 100, 20, I18n.format("selectWorld.allowCommands", new Object[0]));
         btnBonusChest = new GuiButton(13, this.width / 2 + 66, 188 - heightOffset1 + heightOffset, 100, 20, I18n.format("selectWorld.bonusItems", new Object[0]));
@@ -1086,23 +935,6 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         this.drawString(this.fontRendererObj, I18n.format("selectWorld.enterSeed", new Object[0]), this.width / 2 - 164, 88 + heightOffset, -6250336);
         this.drawString(this.fontRendererObj, I18n.format("selectWorld.seedInfo", new Object[0]), this.width / 2 - 164, 126 + heightOffset, -6250336);
         this.txtSeed.drawTextBox();
-
-        // TODO: Fix pre-generator and world borders
-        
-        // Pre-generation Radius 
-        //this.drawString(this.fontRendererObj, "Pre-generation radius", this.width / 2 - 164, 145, -6250336);
-
-        // Pre-generation safe mode
-        //this.drawString(this.fontRendererObj, "Safe mode", this.width / 2 - 164 + 125, 145, -6250336);
-        
-        // World border Radius
-        //this.drawString(this.fontRendererObj, "World border radius", this.width / 2 - 164 + 210, 145, -6250336);           
-        
-        //this.drawString(this.fontRendererObj, "chunks", this.width / 2 - 164 + 60, 165, -6250336);
-        //this.drawString(this.fontRendererObj, "chunks", this.width / 2 - 164 + 210 + 60, 165, -6250336);
-        
-        //this.txtPregenRadius.drawTextBox();
-        //this.txtWorldBorderRadius.drawTextBox();
 
         super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
     }

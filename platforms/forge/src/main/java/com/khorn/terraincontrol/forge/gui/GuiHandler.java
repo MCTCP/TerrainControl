@@ -1,21 +1,13 @@
 package com.khorn.terraincontrol.forge.gui;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 
-import org.lwjgl.input.Keyboard;
-
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiCreateWorld;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.GuiWorldSelection;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -39,17 +31,13 @@ public class GuiHandler implements IGuiHandler
     public static HashMap<String,WorldConfig> worlds = new HashMap<String, WorldConfig>();
     public static int pageNumber = 0;
 	
-    public Class lastGuiOpened = null;
+    public Class<? extends GuiScreen> lastGuiOpened = null;
     
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void openGui(GuiOpenEvent event)
     {
-        if (!(event.getGui() instanceof TCGuiWorldCreationLoadingScreen) && (TerrainControl.PreGeneratorIsRunning || TerrainControl.startingPreGeneration))
-        {
-        	event.setGui(new TCGuiWorldCreationLoadingScreen());
-        }
-        else if (event.getGui() instanceof GuiCreateWorld && lastGuiOpened.equals(TCGuiWorldSelection.class) && !selecting)
+    	if (event.getGui() instanceof GuiCreateWorld && lastGuiOpened.equals(TCGuiWorldSelection.class) && !selecting)
         {
             event.setGui(new TCGuiSelectCreateWorldMode());
         }
@@ -58,7 +46,10 @@ public class GuiHandler implements IGuiHandler
             event.setGui(new TCGuiWorldSelection(new GuiMainMenu()));
         }
         selecting = false;
-        lastGuiOpened = event.getGui().getClass();
+        if(event.getGui() != null)
+        {
+        	lastGuiOpened = event.getGui().getClass();
+        }
     }
     
     @SideOnly(Side.CLIENT)

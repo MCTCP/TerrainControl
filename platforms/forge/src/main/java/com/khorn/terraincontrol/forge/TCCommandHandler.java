@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.forge;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -15,12 +16,16 @@ import com.khorn.terraincontrol.forge.util.CommandHelper;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome.SpawnListEntry;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeDictionary.Type;
 
 final class TCCommandHandler implements ICommand
 {
@@ -67,7 +72,7 @@ final class TCCommandHandler implements ICommand
                 sender.addChatMessage(
                         new TextComponentString("/tc worldinfo - Show author and description information for this world."));
                 sender.addChatMessage(
-                        new TextComponentString("/tc biome - Show biome information for any biome at the player's coordinates."));
+                        new TextComponentString("/tc biome (-f, -s, -d, -m) - Show biome information for any biome at the player's coordinates."));
             } else if (argString[0].equals("worldinfo"))
             {
                 LocalWorld localWorld = this.worldLoader.getWorld(sender.getEntityWorld());
@@ -123,6 +128,58 @@ final class TCCommandHandler implements ICommand
                         sender.addChatMessage(
                                 new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
                     }
+                }
+                
+                if (CommandHelper.containsArgument(argString, "-d"))
+                {
+                    try
+                    {
+                        ForgeBiome savedBiome = (ForgeBiome)world.getSavedBiome(x, z);
+                        
+            			Type[] types = BiomeDictionary.getTypesForBiome(savedBiome.biomeBase);
+            			String typesString = "";
+            			for(Type type : types)
+            			{
+            				if(typesString.length() == 0)
+            				{
+            					typesString += type.name();
+            				} else {
+            					typesString += ", " + type.name();
+            				}
+            			}                          
+                        sender.addChatMessage(
+                                new TextComponentTranslation(MESSAGE_COLOR + "BiomeDict: " + VALUE_COLOR + typesString));
+                    } catch (BiomeNotFoundException e)
+                    {
+                        sender.addChatMessage(
+                                new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
+                    }
+                }
+                
+                if (CommandHelper.containsArgument(argString, "-m"))
+                {
+                    try
+                    {
+	                	ForgeBiome calculatedBiome = (ForgeBiome)world.getCalculatedBiome(x, z);
+	                	
+	                    sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "-- Biome mob spawning settings --"));
+		            	for(EnumCreatureType creatureType : EnumCreatureType.values())
+		            	{
+		            		sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + creatureType.name() + ": "));
+			    			ArrayList<SpawnListEntry> creatureList = (ArrayList<SpawnListEntry>)calculatedBiome.biomeBase.getSpawnableList(creatureType);
+			    			if(creatureList != null && creatureList.size() > 0)
+			    			{
+			    				for(SpawnListEntry spawnListEntry : creatureList)
+			    				{
+			    					sender.addChatMessage(new TextComponentTranslation(VALUE_COLOR + "{\"mob\": \"" + spawnListEntry.entityClass + "\", \"weight\": " + spawnListEntry.itemWeight + ", \"min\": " + spawnListEntry.minGroupCount + ", \"max\": " + spawnListEntry.maxGroupCount + "}"));
+			    				}
+			    			}
+		            	}
+	                } catch (BiomeNotFoundException e)
+	                {
+	                    sender.addChatMessage(
+	                            new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
+	                }
                 }
 
                 return;

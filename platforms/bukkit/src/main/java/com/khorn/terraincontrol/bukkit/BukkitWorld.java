@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
 import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.*;
+import com.khorn.terraincontrol.configuration.BiomeConfigFinder.BiomeConfigStub;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
@@ -19,7 +20,9 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
+
 import net.minecraft.server.v1_10_R1.*;
+
 import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_10_R1.generator.CustomChunkGenerator;
 
@@ -79,8 +82,7 @@ public class BukkitWorld implements LocalWorld
     {
         this.name = _name;
     }
-
-    @Override
+    
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
         BukkitBiome biome;
@@ -913,5 +915,16 @@ public class BukkitWorld implements LocalWorld
         }
         return new MojangStructurePart(name, mojangStructurePart);
     }
+
+    // Below methods are only used by Forge (yeah that violates the interface segregation principle, don't care...)
+    
+    @Override
+    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
+    {
+    	return createBiomeFor(biomeConfig, biomeIds);
+    }
+
+    @Override
+    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub) { }
 
 }

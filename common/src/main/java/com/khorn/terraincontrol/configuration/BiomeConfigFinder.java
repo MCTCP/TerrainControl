@@ -5,11 +5,14 @@ import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
 import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.configuration.io.SimpleSettingsMap;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
+import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.logging.LogMarker;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,13 +34,123 @@ public final class BiomeConfigFinder
         private final File file;
         private final BiomeLoadInstruction loadInstructions;
         public boolean biomeExtendsProcessed = false;
-
+        
+        // Mob inheritance has to be done before the configs are actually loaded
+        // Unfortunately can't handle this like BiomeExtends so have to put these
+        // here and pass them to the BiomeConfig when it is created
+        
+        public boolean inheritMobsBiomeNameProcessed = false;        
+       
+        public List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
+        public List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
+        public List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
+        public List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
+        
+        public List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
+        public List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+        public List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+        public List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();        
+                        
         private BiomeConfigStub(SettingsMap settings, File file, BiomeLoadInstruction loadInstructions)
         {
             super();
             this.settings = settings;
             this.file = file;
             this.loadInstructions = loadInstructions;
+            
+            // Load mob settings here so we can process mob inheritance before loading the BiomeConfigs.
+            
+            StandardBiomeTemplate defaultSettings = loadInstructions.getBiomeTemplate();
+            
+            // Apply default values only when no mob spawning settings are present in the config
+            if(settings.hasSetting(BiomeStandardValues.SPAWN_MONSTERS))
+            {
+    	        this.spawnMonsters = settings.getSetting(BiomeStandardValues.SPAWN_MONSTERS, null);
+    	        if(this.spawnMonsters == null)
+    	        {
+    	        	this.spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
+    	        }
+            } else {
+        		this.spawnMonsters = defaultSettings.defaultMonsters;
+            }
+
+            if(settings.hasSetting(BiomeStandardValues.SPAWN_CREATURES))
+            {
+    	    	this.spawnCreatures = settings.getSetting(BiomeStandardValues.SPAWN_CREATURES, new ArrayList<WeightedMobSpawnGroup>());
+    	        if(this.spawnCreatures == null)
+    	        {
+    	        	this.spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
+    	        }
+            } else {
+            	this.spawnCreatures = defaultSettings.defaultCreatures;
+            }
+
+            if(settings.hasSetting(BiomeStandardValues.SPAWN_WATER_CREATURES))
+            {
+    	    	this.spawnWaterCreatures = settings.getSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, new ArrayList<WeightedMobSpawnGroup>());    	
+    	        if(this.spawnWaterCreatures == null)
+    	        {
+    	        	this.spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
+    	        }
+            } else {
+            	this.spawnWaterCreatures = defaultSettings.defaultWaterCreatures;
+            }
+            
+            if(settings.hasSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES))
+            {
+    	    	this.spawnAmbientCreatures = settings.getSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, new ArrayList<WeightedMobSpawnGroup>());
+    	        if(this.spawnAmbientCreatures == null)
+    	        {
+    	        	this.spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
+    	        }
+            } else {
+            	this.spawnAmbientCreatures = defaultSettings.defaultAmbientCreatures;
+            }
+        	
+    		this.spawnMonstersMerged.addAll(this.spawnMonsters);
+    		this.spawnCreaturesMerged.addAll(this.spawnCreatures);
+    		
+    		this.spawnWaterCreaturesMerged.addAll(this.spawnWaterCreatures);
+    		this.spawnAmbientCreaturesMerged.addAll(this.spawnAmbientCreatures);
+        }
+        
+        public void mergeMobs(BiomeConfigStub parent)
+        {
+        	spawnMonstersMerged = mergeMobs(spawnMonstersMerged, parent.spawnMonstersMerged);
+        	spawnCreaturesMerged = mergeMobs(spawnCreaturesMerged, parent.spawnCreaturesMerged);
+        	spawnAmbientCreaturesMerged = mergeMobs(spawnAmbientCreaturesMerged, parent.spawnAmbientCreaturesMerged);
+        	spawnWaterCreaturesMerged = mergeMobs(spawnWaterCreaturesMerged, parent.spawnWaterCreaturesMerged);
+        	    	
+            inheritMobsBiomeNameProcessed = true;
+        }
+        
+        public List<WeightedMobSpawnGroup> mergeMobs(List<WeightedMobSpawnGroup> childSpawnableMonsterList, List<WeightedMobSpawnGroup> parentSpawnableMonsterList)
+        {
+        	// Inherit only mobs that do not appear in this biomes' list
+        	// This way a biome's mob spawn settings can override inherited settings.
+        	
+        	List<WeightedMobSpawnGroup> newSpawnableMobsList = new ArrayList<WeightedMobSpawnGroup>();
+        	newSpawnableMobsList.addAll(childSpawnableMonsterList);
+        	if(parentSpawnableMonsterList != null)
+        	{
+    	    	for(WeightedMobSpawnGroup weightedMobSpawnGroupParent : parentSpawnableMonsterList)
+    	    	{
+    	    		boolean bFound = false;
+    	    		for(WeightedMobSpawnGroup weightedMobSpawnGroupChild : childSpawnableMonsterList)
+    	    		{
+    	    			if(weightedMobSpawnGroupChild.mob.toLowerCase().trim().equals(weightedMobSpawnGroupParent.mob.toLowerCase().trim()))
+    	    			{
+    	    				bFound = true;
+    	    				break;
+    	    			}
+    	    		}
+    	    		if(!bFound)
+    	    		{
+    	    			newSpawnableMobsList.add(weightedMobSpawnGroupParent);
+    	    		}
+    	    	}
+        	}
+        	return newSpawnableMobsList;
         }
 
         /**

@@ -10,14 +10,14 @@ import net.minecraft.world.biome.Biome;
 
 public class ForgeBiome implements LocalBiome
 {
-    private final Biome biomeBase;
+	public final Biome biomeBase;
     private final boolean isCustom;
 
     private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
 
     public ForgeBiome(Biome biome, BiomeConfig biomeConfig, BiomeIds biomeIds)
-    {
+    {    	
         this.biomeBase = biome;
         this.biomeIds = biomeIds;
         this.biomeConfig = biomeConfig;

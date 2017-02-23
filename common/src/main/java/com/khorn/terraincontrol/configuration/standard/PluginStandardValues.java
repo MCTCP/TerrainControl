@@ -26,5 +26,10 @@ public class PluginStandardValues extends Settings
      * Name of the plugin, "TerrainControl".
      */
     public static final String PLUGIN_NAME = "TerrainControl";
-
+    
+    
+    /**
+     * Shows detailed information about mob and BO3 spawning that is useful for TC world devs.
+     */
+    public static final Setting<Boolean> SPAWN_LOG = booleanSetting("SpawnLog", false);
 }

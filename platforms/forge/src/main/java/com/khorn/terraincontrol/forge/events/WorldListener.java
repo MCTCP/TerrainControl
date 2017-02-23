@@ -18,6 +18,7 @@ public class WorldListener
         this.worldLoader = worldLoader;
     }
 
+    // TODO: This method should not be called by DimensionManager when switching dimensions (main -> nether -> main). Find out why it is being called
     @SubscribeEvent
     public void onWorldUnload(WorldEvent.Unload event)
     {
@@ -27,7 +28,9 @@ public class WorldListener
         {
             return;
         }
-
-        this.worldLoader.unloadWorld(forgeWorld);
+        if(mcWorld.provider.getDimension() == 0) // Temporary fix, this may break multi-world support (I assume it uses dimensions to load other worlds?) 
+        {
+        	this.worldLoader.unloadWorld(forgeWorld);
+        }
     }
 }

@@ -78,6 +78,7 @@ public final class PluginConfig extends ConfigFile
         this.SettingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE);
         this.LogLevel = reader.getSetting(PluginStandardValues.LogLevel);
         this.biomeConfigExtension = reader.getSetting(BiomeStandardValues.BIOME_CONFIG_EXTENSION);
+        this.SpawnLog = reader.getSetting(PluginStandardValues.SPAWN_LOG);
     }
 
     @Override
@@ -119,7 +120,11 @@ public final class PluginConfig extends ConfigFile
                 "You may change this by choosing between the following extensions:",
                 "BiomeConfig.ini, .biome, .bc, .bc.ini, and .biome.ini",
                 " ",
-                "Defaults to: .bc");
+                "Defaults to: .bc");         
+        
+        writer.putSetting(PluginStandardValues.SPAWN_LOG, this.SpawnLog,
+		        "Shows detailed information about mob and BO3 spawning that is useful for TC world devs.",
+		        "Defaults to: false"); 
     }
 
     public LogLevels getLogLevel()
@@ -127,4 +132,8 @@ public final class PluginConfig extends ConfigFile
         return LogLevel;
     }
 
+	/**
+	 * Shows detailed information about mob and BO3 spawning that is useful for TC world devs.
+	 */
+	public boolean SpawnLog = false;    
 }

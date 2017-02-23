@@ -10,8 +10,10 @@ import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 
@@ -23,7 +25,6 @@ import java.io.IOException;
  */
 public final class ClientConfigProvider implements ConfigProvider
 {
-
     private CustomObjectCollection customObjects;
     private WorldConfig worldConfig;
 
@@ -76,11 +77,72 @@ public final class ClientConfigProvider implements ConfigProvider
             biomeReader.putSetting(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER, stream.readBoolean());
             biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR, stream.readInt());
             biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, stream.readBoolean());
+                        
+            // TODO: Are these really necessary? (animals seem to be spawning on Forge SP when they shouldnt be without this)
+            
+            try
+            {
+	            String spawnMonsters = ConfigFile.readStringFromStream(stream);
+	            try {
+					biomeReader.putSetting(BiomeStandardValues.SPAWN_MONSTERS, WeightedMobSpawnGroup.fromJson(spawnMonsters));
+				} catch (InvalidConfigException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            } catch(EOFException ex) { }
+            
+            try
+            {
+	            String spawnCreatures = ConfigFile.readStringFromStream(stream);
+	            try {
+					biomeReader.putSetting(BiomeStandardValues.SPAWN_CREATURES, WeightedMobSpawnGroup.fromJson(spawnCreatures));
+				} catch (InvalidConfigException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            } catch(EOFException ex) { }            
 
+            try
+            {
+	            String spawnWaterCreatures = ConfigFile.readStringFromStream(stream);
+	            try {
+					biomeReader.putSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, WeightedMobSpawnGroup.fromJson(spawnWaterCreatures));
+				} catch (InvalidConfigException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            } catch(EOFException ex) { }
+            
+            try
+            {
+	            String spawnAmbientCreatures = ConfigFile.readStringFromStream(stream);
+	            try {
+					biomeReader.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, WeightedMobSpawnGroup.fromJson(spawnAmbientCreatures));
+				} catch (InvalidConfigException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            } catch(EOFException ex) { }
+
+            // TODO: Are these really necessary?
+            
+            try
+            {
+                String biomeDictId = ConfigFile.readStringFromStream(stream);            
+                biomeReader.putSetting(BiomeStandardValues.BIOME_DICT_ID, biomeDictId);
+            } catch(EOFException ex) { }            
+            
+            try
+            {
+                String inheritedMobsBiomeName = ConfigFile.readStringFromStream(stream);            
+                biomeReader.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, inheritedMobsBiomeName);
+            } catch(EOFException ex) { }            
+
+            
             BiomeLoadInstruction instruction = new BiomeLoadInstruction(biomeName, id, defaultSettings);
-            BiomeConfig config = new BiomeConfig(instruction, biomeReader, worldConfig);
+            BiomeConfig config = new BiomeConfig(instruction, null, biomeReader, worldConfig);
 
-            LocalBiome biome = world.createBiomeFor(config, new BiomeIds(id));
+            LocalBiome biome = world.createBiomeFor(config, new BiomeIds(id), this);
             biomes[id] = biome;
         }
     }

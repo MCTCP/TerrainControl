@@ -212,20 +212,6 @@ public class WorldConfig extends ConfigFile
         this.readConfigSettings(settingsReader);
         // Clamp Settings to acceptable values
         this.correctSettings();
-
-		if(TerrainControl.IsNewWorld)
-		{
-			TerrainControl.IsNewWorld = false;
-			if(TerrainControl.PregenerationRadius > -1)
-			{
-				PreGenerationRadius = TerrainControl.PregenerationRadius;
-			}
-			PreGenerationSafeMode = TerrainControl.PreGenerationSafeMode;
-			if(TerrainControl.WorldBorderRadius > -1)
-			{
-				WorldBorderRadius = TerrainControl.WorldBorderRadius;	
-			}					
-		} 
         
         // Check biome ids, These are the names from the worldConfig file
         // Corrects any instances of incorrect biome id.

@@ -3,6 +3,7 @@ package com.khorn.terraincontrol;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
+import com.khorn.terraincontrol.configuration.BiomeConfigFinder.BiomeConfigStub;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.SpawnableObject;
@@ -27,7 +28,7 @@ public interface LocalWorld
      * necessary.
      * @return The LocalBiome instance.
      */
-    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds requestedBiomeIds);
+    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider);
 
     /**
      * Gets how many different biome ids are in the world. Biome ids will start
@@ -227,5 +228,7 @@ public interface LocalWorld
      * @return The vertical scale of the world.
      */
     public int getHeightScale();
+    
+    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub);   
 
 }

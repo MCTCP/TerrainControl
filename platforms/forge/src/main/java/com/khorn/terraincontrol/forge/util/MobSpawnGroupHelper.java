@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings.EntityCategory;
 import com.khorn.terraincontrol.logging.LogMarker;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
@@ -101,7 +102,10 @@ public final class MobSpawnGroupHelper
             {
                 // The .toLowerCase() is just a safeguard so that we get
                 // notified if this.af is no longer the biome name
-                TerrainControl.log(LogMarker.WARN, "Mob type {} not found", mobGroup.getInternalName());
+            	if(TerrainControl.getPluginConfig().SpawnLog)
+            	{
+            		TerrainControl.log(LogMarker.WARN, "Mob type {} not found", mobGroup.getInternalName());
+            	}
             }
         }
         return biomeList;
@@ -113,14 +117,20 @@ public final class MobSpawnGroupHelper
      * @param mobName The mob name.
      * @return The entity class, or null if not found.
      */
-    static Class<? extends EntityLiving> toMinecraftClass(String mobName)
+    @SuppressWarnings("unchecked")
+	static Class<? extends EntityLiving> toMinecraftClass(String mobName)
     {
+    	return (Class<? extends EntityLiving>) EntityList.NAME_TO_CLASS.get(mobName); // Quick fix
+    	
+    	// TODO: This code was causing exceptions when used with Biome Bundle, fix it?
+    	/*
         Class<? extends Entity> clazz = EntityList.NAME_TO_CLASS.get(mobName);
         if (EntityLiving.class.isAssignableFrom(clazz))
         {
             return clazz.asSubclass(EntityLiving.class);
         }
         return null;
+        */
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.khorn.terraincontrol.forge;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -11,7 +10,7 @@ import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
-import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.server.MinecraftServer;
@@ -21,16 +20,19 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -48,8 +50,20 @@ public final class WorldLoader
     public final HashMap<String, ForgeWorld> worlds = new HashMap<String, ForgeWorld>();
 
     WorldLoader(File configsDir)
-    {
-        this.configsDir = Preconditions.checkNotNull(configsDir, "configsDir");
+    {        
+        File dataFolder;
+        try
+        {
+            Field minecraftDir = Loader.class.getDeclaredField("minecraftDir");
+            minecraftDir.setAccessible(true);
+            dataFolder = new File((File) minecraftDir.get(null), "mods" + File.separator + "TerrainControl");
+        } catch (Throwable e)
+        {
+            dataFolder = new File("mods" + File.separator + "TerrainControl");
+            System.out.println("Could not reflect the Minecraft directory, save location may be unpredicatble.");
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
+        }
+        this.configsDir = dataFolder;
     }
 
     public ForgeWorld getWorld(String name)
@@ -123,6 +137,7 @@ public final class WorldLoader
             TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", worldToRemove.getName());
             this.configMap.remove(worldToRemove.getName());
             TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + worldToRemove.getName());
+            worldToRemove.unRegisterBiomes();
             this.worlds.remove(worldToRemove.getName());
         }
     }
@@ -131,6 +146,7 @@ public final class WorldLoader
     {
         TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
         TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + world.getName());
+        world.unRegisterBiomes();
         this.worlds.remove(world.getName());
     }
 
@@ -224,9 +240,9 @@ public final class WorldLoader
         for (ForgeWorld worldToRemove : worldsToRemove)
         {
             TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", worldToRemove.getName());
-            markBiomeIdsAsFree(worldToRemove);
             this.configMap.remove(worldToRemove.getName());
             TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + worldToRemove.getName());
+            worldToRemove.unRegisterBiomes();
             this.worlds.remove(worldToRemove.getName());
         }
     }
@@ -237,27 +253,83 @@ public final class WorldLoader
         TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
         TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + world.getName());
         this.worlds.remove(world.getName());
-        markBiomeIdsAsFree(world);
+        world.unRegisterBiomes();
     }
-
-    /**
-     * "Evil" method that forces Forge to reuse the biome ids that we used. On
-     * singleplayer this is required to be able to properly load another world
-     * with custom biomes.
-     * @param world The world to unload.
-     */
-    @SideOnly(Side.CLIENT)
-    private void markBiomeIdsAsFree(ForgeWorld world)
+    
+    public static void clearBiomeDictionary()
     {
-        // Retrieves the FMLControlledNamespacedRegistry's availabilityMap for the biome registry
-        BitSet biomeIdsInUse = ReflectionHelper.getValueInFieldOfType(Biome.REGISTRY, BitSet.class);
-        Collection<Integer> customBiomeIds = world.getConfigs().getWorldConfig().customBiomeGenerationIds.values();
-        for (Integer id : customBiomeIds)
-        {
-            // Allow other worlds to reuse this id
-            biomeIdsInUse.clear(id);
-        }
+    	// TODO: This will remove all BiomeDict info, including non-TC biomes' BiomeDict info and may cause problems for other mods/worlds.
+    	
+		try {
+			Field[] fields = BiomeDictionary.class.getDeclaredFields();
+			for(Field field : fields)
+			{
+				Class<?> fieldClass = field.getType();
+				if(fieldClass.isArray())
+				{
+			        field.setAccessible(true);			        
+			        field.set(null, Array.newInstance(field.getType().getComponentType(), Array.getLength(field.get(null))));
+				}
+				if(fieldClass.getSuperclass().equals(java.util.AbstractMap.class))
+				{
+			        field.setAccessible(true);			        
+			        field.set(null, new HashMap());
+				}
+			}
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
     }
+		
+    // TODO: Should this be client only?? Like markBiomeIdsAsFree?
+    // TODO: This will break multi-world support? It might remove vanilla-id biomes added by other worlds? 
+    public static void unRegisterDefaultBiomes()
+	{
+		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
+		// Unregister default biomes so they can be replaced by TC biomes (this allows us to fully customise the biomes)
+		for(DefaultBiome defaultBiome : DefaultBiome.values())
+		{
+			biomeRegistryAvailabiltyMap.set(defaultBiome.Id, false); // This should be enough to make Forge re-use the biome id
+		}
+		
+		clearBiomeDictionary();
+	}
+	
+	public static BitSet getBiomeRegistryAvailabiltyMap()
+	{
+		BitSet biomeRegistryAvailabiltyMap = null;
+		try {
+			Field[] fields = Biome.REGISTRY.getClass().getDeclaredFields();
+			for(Field field : fields)
+			{
+				Class<?> fieldClass = field.getType();
+				if(fieldClass.equals(BitSet.class))
+				{
+					field.setAccessible(true);
+					biomeRegistryAvailabiltyMap = (BitSet) field.get(Biome.REGISTRY);
+			        break;
+				}
+			}
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return biomeRegistryAvailabiltyMap;
+	}
 
     @SideOnly(Side.CLIENT)
     public void registerClientWorld(WorldClient mcWorld, DataInputStream wrappedStream) throws IOException

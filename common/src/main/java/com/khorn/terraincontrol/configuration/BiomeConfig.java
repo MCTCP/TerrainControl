@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.BiomeConfigFinder.BiomeConfigStub;
 import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix.ReplacedBlocksInstruction;
 import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
@@ -112,6 +113,26 @@ public class BiomeConfig extends ConfigFile
     public boolean strongholdsEnabled;
     public boolean oceanMonumentsEnabled;
     public boolean netherFortressesEnabled;
+           
+    // Forge Biome Dict Id
+    
+    public String biomeDictId;
+    
+	// Mob spawning and mob inheritance (also used to inherit modded mobs from vanilla biomes for Forge))
+
+	public String inheritMobsBiomeName;
+	public boolean inheritMobsBiomeNameProcessed = false;
+    
+    // Spawn Config
+    public List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
+    public List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
+    public List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
+    public List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
+	
+    public List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
+    public List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+    public List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+    public List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
 
     public enum VillageType
     {
@@ -146,18 +167,28 @@ public class BiomeConfig extends ConfigFile
     public StandardBiomeTemplate defaultSettings;
     public WorldConfig worldConfig;
 
-    // Spawn Config
-    public List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
-    public List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
-    public List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
-    public List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
-
-    public BiomeConfig(BiomeLoadInstruction loadInstruction, SettingsMap settings, WorldConfig worldConfig)
+    public BiomeConfig(BiomeLoadInstruction loadInstruction, BiomeConfigStub biomeConfigStub, SettingsMap settings, WorldConfig worldConfig)
     {
-        super(loadInstruction.getBiomeName());
+        super(loadInstruction.getBiomeName());                
+        
+        // Mob inheritance
+        // Mob spawning data was already loaded seperately before the rest of the biomeconfig to make inheritance work properly
+        // Forge: If this is a vanilla biome then mob spawning settings have been inherited from vanilla MC biomes 
+        // This includes any mobs added to vanilla biomes by other mods when MC started.
+        
+        spawnMonsters.addAll(biomeConfigStub.spawnMonsters);
+        spawnCreatures.addAll(biomeConfigStub.spawnCreatures);
+        spawnWaterCreatures.addAll(biomeConfigStub.spawnWaterCreatures);
+        spawnAmbientCreatures.addAll(biomeConfigStub.spawnAmbientCreatures);
+        
+        spawnMonstersMerged.addAll(biomeConfigStub.spawnMonstersMerged);
+        spawnCreaturesMerged.addAll(biomeConfigStub.spawnCreaturesMerged);
+        spawnWaterCreaturesMerged.addAll(biomeConfigStub.spawnWaterCreaturesMerged);
+        spawnAmbientCreaturesMerged.addAll(biomeConfigStub.spawnAmbientCreaturesMerged);
+        
         this.worldConfig = worldConfig;
         this.defaultSettings = loadInstruction.getBiomeTemplate();
-
+        
         this.renameOldSettings(settings);
         this.readConfigSettings(settings);
 
@@ -187,7 +218,6 @@ public class BiomeConfig extends ConfigFile
             this.cooledLavaBlock = this.configCooledLavaBlock;
             this.riverWaterLevel = this.configRiverWaterLevel;
         }
-
     }
 
     /**
@@ -234,6 +264,7 @@ public class BiomeConfig extends ConfigFile
     protected void readConfigSettings(SettingsMap settings)
     {
         this.biomeExtends = settings.getSetting(BiomeStandardValues.BIOME_EXTENDS);
+    	
         this.doResourceInheritance = settings.getSetting(BiomeStandardValues.RESOURCE_INHERITANCE);
         this.biomeSize = settings.getSetting(BiomeStandardValues.BIOME_SIZE, defaultSettings.defaultSize);
         this.biomeRarity = settings.getSetting(BiomeStandardValues.BIOME_RARITY, defaultSettings.defaultRarity);
@@ -305,23 +336,10 @@ public class BiomeConfig extends ConfigFile
         this.mineshaftsRarity = settings.getSetting(BiomeStandardValues.MINESHAFT_RARITY);
         this.mineshaftType = settings.getSetting(BiomeStandardValues.MINESHAFT_TYPE, defaultSettings.defaultMineshaftType);
         this.rareBuildingType = settings.getSetting(BiomeStandardValues.RARE_BUILDING_TYPE, defaultSettings.defaultRareBuildingType);
-
-        if (this.defaultSettings.isCustomBiome)
-        {
-            // Modifying only works in custom biomes, so let the config file
-            // reflect that
-            this.spawnMonsters = settings.getSetting(BiomeStandardValues.SPAWN_MONSTERS, defaultSettings.defaultMonsters);
-            this.spawnCreatures = settings.getSetting(BiomeStandardValues.SPAWN_CREATURES, defaultSettings.defaultCreatures);
-            this.spawnWaterCreatures = settings.getSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, defaultSettings.defaultWaterCreatures);
-            this.spawnAmbientCreatures = settings.getSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, defaultSettings.defaultAmbientCreatures);
-        } else
-        {
-            this.spawnMonsters = defaultSettings.defaultMonsters;
-            this.spawnCreatures = defaultSettings.defaultCreatures;
-            this.spawnWaterCreatures = defaultSettings.defaultWaterCreatures;
-            this.spawnAmbientCreatures = defaultSettings.defaultAmbientCreatures;
-        }
-
+        
+        this.biomeDictId = settings.getSetting(BiomeStandardValues.BIOME_DICT_ID, defaultSettings.defaultBiomeDictId);       
+    	this.inheritMobsBiomeName = settings.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, defaultSettings.defaultInheritMobsBiomeName);
+                
         this.readCustomObjectSettings(settings);
         this.readResourceSettings(settings);
         this.heightMatrix = new double[this.worldConfig.worldHeightCap / TerrainShapeBase.PIECE_Y_SIZE + 1];
@@ -801,6 +819,32 @@ public class BiomeConfig extends ConfigFile
 
         writer.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.spawnAmbientCreatures,
                 "The ambient creatures (only bats in vanila) that spawn in this biome");
+        
+        // PG Settings
+        
+        writer.putSetting(BiomeStandardValues.BIOME_DICT_ID, this.biomeDictId,
+	        "Forge Biome Dictionary ID used by other mods to identify a biome and place",
+	        "modded blocks, items and mobs in it.",
+	        "This will only work for modded items/blocks/mobs that are placed in biomes",
+	        "while chunks are being generated. Most mods that add mods add their mobs to",
+	        "biomes' internal mob list when MC starts and let MC's mob spawning mechanics",
+	        "handle the actual spawning. This means that when TC creates new biomes",
+	        "when it generates a world other mods do not add their mobs to those biomes.",
+	        "This can be solved by using the InheritMobsBiomeName setting to inherit a",
+	        "a mob list from a vanilla biome.",
+	        "NOTE: Only works for biomes with id's under < 255 (non-virtual biomes).",
+	        "For virtual biomes the BiomeDictId is inherited via ReplaceToBiomeName."
+		);
+        
+        writer.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, inheritMobsBiomeName,
+		    "Inherit the internal mobs list of another biome. Inherited mobs can be ",
+		    "overridden using the SpawnMonsters, SpawnCreatures, SpawnWaterCreatures",
+		    "and SpawnAmbientCreatures settings. Any mob type defined using those settings",
+		    "will override inherited mob settings for the same mob.",
+		    "Use this setting to inherit modded mobs from vanilla biomes (see also: BiomeDictId)"        		
+		);
+        
+        // /PG
     }
 
     private void writeCustomObjects(SettingsMap writer)
@@ -1001,6 +1045,16 @@ public class BiomeConfig extends ConfigFile
         stream.writeBoolean(this.grassColorIsMultiplier);
         stream.writeInt(this.foliageColor);
         stream.writeBoolean(this.foliageColorIsMultiplier);
-    }
+        
+        // TODO: Why exactly do all these need to be sent to the client? (Forge SP stuff?)
+        
+        writeStringToStream(stream, WeightedMobSpawnGroup.toJson(this.spawnMonstersMerged));
+        writeStringToStream(stream, WeightedMobSpawnGroup.toJson(this.spawnCreaturesMerged));
+        writeStringToStream(stream, WeightedMobSpawnGroup.toJson(this.spawnWaterCreaturesMerged));
+        writeStringToStream(stream, WeightedMobSpawnGroup.toJson(this.spawnAmbientCreaturesMerged));
+        
+        writeStringToStream(stream, this.biomeDictId);
 
+        writeStringToStream(stream, this.inheritMobsBiomeName);
+    }
 }

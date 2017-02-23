@@ -204,9 +204,10 @@ public final class ServerConfigProvider implements ConfigProvider
 
             // Inheritance
             processInheritance(biomeConfigStubs, biomeConfigStub, 0);
+            processMobInheritance(biomeConfigStubs, biomeConfigStub, 0);
 
             // Settings reading
-            BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getLoadInstructions(), biomeConfigStub.getSettings(), worldConfig);
+            BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getLoadInstructions(), biomeConfigStub, biomeConfigStub.getSettings(), worldConfig);
             loadedBiomes.put(biomeConfigStub.getBiomeName(), biomeConfig);
 
             // Settings writing
@@ -288,7 +289,7 @@ public final class ServerConfigProvider implements ConfigProvider
             }
 
             // Create biome
-            LocalBiome biome = world.createBiomeFor(biomeConfig, new BiomeIds(requestedGenerationId, requestedSavedId));
+            LocalBiome biome = world.createBiomeFor(biomeConfig, new BiomeIds(requestedGenerationId, requestedSavedId), this);
 
             int generationId = biome.getIds().getGenerationId();
 
@@ -334,7 +335,7 @@ public final class ServerConfigProvider implements ConfigProvider
         }
         return loadedBiomeNames.toString();
     }
-
+    
     private void processInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth)
     {
         if (biomeConfigStub.biomeExtendsProcessed)
@@ -379,7 +380,67 @@ public final class ServerConfigProvider implements ConfigProvider
 
         // Done
         biomeConfigStub.biomeExtendsProcessed = true;
-    }
+    }    
+
+    private void processMobInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth)
+    {
+        if (biomeConfigStub.inheritMobsBiomeNameProcessed)
+        {
+            // Already processed earlier
+            return;
+        }
+        
+        String stubInheritMobsBiomeName = biomeConfigStub.getSettings().getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, biomeConfigStub.getLoadInstructions().getBiomeTemplate().defaultInheritMobsBiomeName);
+        
+        if(stubInheritMobsBiomeName != null && stubInheritMobsBiomeName.length() > 0)
+        {
+            String[] inheritMobsBiomeNames = stubInheritMobsBiomeName.split(",");
+	        for(String inheritMobsBiomeName : inheritMobsBiomeNames)
+	        {
+	            if (inheritMobsBiomeName.isEmpty())
+	            {
+	                // Not extending anything
+	                biomeConfigStub.inheritMobsBiomeNameProcessed = true;
+	                return;
+	            }
+	            
+		        // This biome inherits mobs from another biome
+		        BiomeConfigStub inheritMobsBiomeConfig = biomeConfigStubs.get(inheritMobsBiomeName);
+		        if (inheritMobsBiomeConfig == null)
+		        {
+		            TerrainControl.log(LogMarker.WARN, "The biome {} tried to inherit mobs from the biome {}, but that biome doesn't exist.", new Object[] { biomeConfigStub.getFile().getName(), inheritMobsBiomeName});
+		            continue;
+		        }
+		        
+		        // Check for too much recursion
+		        if (currentDepth > MAX_INHERITANCE_DEPTH)
+		        {
+		            TerrainControl.log(LogMarker.FATAL, "The biome {} cannot inherit mobs from biome {} - too much configs processed already! Cyclical inheritance?", new Object[] { biomeConfigStub.getFile().getName(), inheritMobsBiomeConfig.getFile().getName()});
+		        }
+		        
+		        // BiomeConfigStubs is unique per world so if there is a duplicate biome name it must be a TC biome with the same name as a vanilla biome
+		        if(inheritMobsBiomeConfig == biomeConfigStub)
+		        {
+		        	// Get the mobs that spawn in this vanilla biome (this will also inherit any mobs added to vanilla biomes by mods when MC started).
+		        	world.mergeVanillaBiomeMobSpawnSettings(biomeConfigStub);
+		        	
+			        continue;
+		        }
+		        
+		        if (!inheritMobsBiomeConfig.inheritMobsBiomeNameProcessed)
+		        {
+		            // This biome has not been processed yet, do that first
+		            processMobInheritance(biomeConfigStubs, inheritMobsBiomeConfig, currentDepth + 1);
+		        }
+		
+		        // Merge the two
+		        biomeConfigStub.mergeMobs(inheritMobsBiomeConfig);
+	        }
+	        
+	        // Done
+	        biomeConfigStub.inheritMobsBiomeNameProcessed = true;
+        }
+    }    
 
     private String correctOldBiomeConfigFolder(File settingsDir)
     {

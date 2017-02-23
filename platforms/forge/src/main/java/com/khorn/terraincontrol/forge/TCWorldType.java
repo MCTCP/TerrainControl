@@ -1,10 +1,13 @@
 package com.khorn.terraincontrol.forge;
 
+import java.io.File;
+
 import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.TCBiomeProvider;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
@@ -35,7 +38,7 @@ public class TCWorldType extends WorldType
     {
         return true;
     }
-
+    
     @Override
     public BiomeProvider getBiomeProvider(World mcWorld)
     {
@@ -45,12 +48,29 @@ public class TCWorldType extends WorldType
             return super.getBiomeProvider(mcWorld);
         }
 
+        // Create dirs for a new world if necessary
+        File worldDirectory = new File(TerrainControl.getEngine().getTCDataFolder(), "worlds" + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName());
+
+        if (!worldDirectory.exists())
+        {
+            System.out.println("TerrainControl: settings does not exist, creating defaults");
+
+            if (!worldDirectory.mkdirs())
+                System.out.println("TerrainControl: cant create folder " + worldDirectory.getAbsolutePath());
+        }
+        
+        File worldObjectsDir = new File(TerrainControl.getEngine().getTCDataFolder(), "worlds" + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName() + File.separator + WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
+        worldObjectsDir.mkdirs();
+        
+        File worldBiomesDir = new File(TerrainControl.getEngine().getTCDataFolder(), "worlds" + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName() + File.separator + WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME);
+        worldBiomesDir.mkdirs();
+        
         ForgeWorld world = this.worldLoader.getOrCreateForgeWorld(mcWorld);
         if (world == null)
         {
             return super.getBiomeProvider(mcWorld);
         }
-
+                
         Class<? extends BiomeGenerator> biomeGenClass = world.getConfigs().getWorldConfig().biomeMode;
         BiomeGenerator biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeGenClass, world);
         BiomeProvider biomeProvider = this.createBiomeProvider(world, biomeGenerator);
@@ -85,7 +105,7 @@ public class TCWorldType extends WorldType
         }
 
         return biomeProvider;
-    }
+    }   
 
     @Override
     public IChunkGenerator getChunkGenerator(World mcWorld, String generatorOptions)

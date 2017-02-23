@@ -40,7 +40,9 @@ public class BiomeStandardValues extends Settings
             BIOME_CONFIG_EXTENSION = stringSetting("BiomeConfigExtension", ".bc"),
             BIOME_EXTENDS = stringSetting("BiomeExtends", ""),
             RIVER_BIOME = stringSetting("RiverBiome", "River"),
-            REPLACE_TO_BIOME_NAME = stringSetting("ReplaceToBiomeName", "");
+            REPLACE_TO_BIOME_NAME = stringSetting("ReplaceToBiomeName", ""),
+    		BIOME_DICT_ID = stringSetting("BiomeDictId", ""),
+			INHERIT_MOBS_BIOME_NAME = stringSetting("InheritMobsBiomeName", "");
 
     public static final Setting<Integer>
             BIOME_SIZE = intSetting("BiomeSize", 5, 0, 20),

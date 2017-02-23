@@ -72,3 +72,4 @@ Thumbs.db
 .DS_Store
 *.lock
 *.launch
+*.jar

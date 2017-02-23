@@ -148,8 +148,10 @@ public final class MobSpawnGroupHelper
             {
                 // The .toLowerCase() is just a safeguard so that we get
                 // notified if this.af is no longer the biome name
-                TerrainControl.log(LogMarker.WARN, "Mob type {} not found",
-                        mobGroup.getInternalName());
+            	if(TerrainControl.getPluginConfig().SpawnLog)
+            	{
+            		TerrainControl.log(LogMarker.WARN, "Mob type {} not found", mobGroup.getInternalName());
+            	}
             }
         }
         return biomeList;
