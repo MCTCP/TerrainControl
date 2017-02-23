@@ -11,6 +11,7 @@ import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.configuration.BiomeConfigFinder.BiomeConfigStub;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
+import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
@@ -916,7 +917,7 @@ public class BukkitWorld implements LocalWorld
         return new MojangStructurePart(name, mojangStructurePart);
     }
 
-    // Below methods are only used by Forge (yeah that violates the interface segregation principle, don't care...)
+    // Below methods are only used by Forge (yes that violates the interface segregation principle, I know, don't care...)
     
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
@@ -927,4 +928,10 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub) { }
 
+    // TODO: Forge only atm, someome make a Bukkit implementation plx!
+    
+	@Override
+	public void SpawnEntity(EntityFunction entityData) {
+		// TODO Auto-generated method stub
+	}
 }

@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.BiomeConfigFinder.BiomeConfigStub;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
+import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
@@ -229,6 +230,7 @@ public interface LocalWorld
      */
     public int getHeightScale();
     
-    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub);   
+    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub);
 
+	void SpawnEntity(EntityFunction entityData);
 }

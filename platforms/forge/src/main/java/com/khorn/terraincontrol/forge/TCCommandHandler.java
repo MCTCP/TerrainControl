@@ -9,13 +9,16 @@ import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.util.CommandHelper;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -73,7 +76,9 @@ final class TCCommandHandler implements ICommand
                         new TextComponentString("/tc worldinfo - Show author and description information for this world."));
                 sender.addChatMessage(
                         new TextComponentString("/tc biome (-f, -s, -d, -m) - Show biome information for any biome at the player's coordinates."));
-            } else if (argString[0].equals("worldinfo"))
+                sender.addChatMessage(
+                		new TextComponentString("/tc entities - Show a list of entities that can be spawned inside BO3's using the Entity() tag."));
+            } else if (argString[0].equals("worldinfo") || argString[0].equals("world"))
             {
                 LocalWorld localWorld = this.worldLoader.getWorld(sender.getEntityWorld());
                 if (localWorld != null)
@@ -87,6 +92,30 @@ final class TCCommandHandler implements ICommand
                     sender.addChatMessage(
                             new TextComponentString(PluginStandardValues.PLUGIN_NAME + " is not enabled for this world."));
                 }
+                
+            } else if (argString[0].equals("entities"))
+            {                
+	    		TerrainControl.log(LogMarker.INFO, "-- Entities List --");
+	    		sender.addChatMessage(new TextComponentString("-- Entities List --"));
+	    		sender.addChatMessage(new TextComponentString("Some of these, like ThrownPotion, FallingSand, Mob and Painting may crash the game so be sure to test your BO3 in single player."));
+    			EnumCreatureType[] aenumcreaturetype = EnumCreatureType.values();
+	    		for(String entry : EntityList.NAME_TO_CLASS.keySet())
+	        	{
+	    			String msg = entry;
+	    		    for (int k3 = 0; k3 < aenumcreaturetype.length; ++k3)
+	    		    {
+	    		        EnumCreatureType enumcreaturetype = aenumcreaturetype[k3];
+	    		        if(enumcreaturetype.getCreatureClass().isAssignableFrom(EntityList.NAME_TO_CLASS.get(entry)))
+	    		        {
+	    		        	msg += " (" + enumcreaturetype.name() + ")";
+	    		        }
+	    		    }
+
+	        		TerrainControl.log(LogMarker.INFO, msg);
+	        		sender.addChatMessage(new TextComponentString("- " + msg));
+	        	}
+	    		TerrainControl.log(LogMarker.INFO, "----");
+	    		
             } else if (argString[0].equals("biome"))
             {
                 BlockPos pos = sender.getPosition();

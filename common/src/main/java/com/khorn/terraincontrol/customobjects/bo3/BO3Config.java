@@ -10,6 +10,7 @@ import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.khorn.terraincontrol.util.BoundingBox;
 import com.khorn.terraincontrol.util.MaterialSet;
+import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultStructurePart;
 
 import java.io.File;
@@ -59,6 +60,8 @@ public class BO3Config extends ConfigFile
     public BranchFunction[][] branches = new BranchFunction[4][];
 
     public BoundingBox[] boundingBoxes = new BoundingBox[4];
+    
+    public EntityFunction[][] entityFunctions = new EntityFunction[4][];
 
     /**
      * Creates a BO3Config from a file.
@@ -205,6 +208,7 @@ public class BO3Config extends ConfigFile
         List<BO3PlaceableFunction> tempBlocksList = new ArrayList<BO3PlaceableFunction>();
         List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
         List<BranchFunction> tempBranchesList = new ArrayList<BranchFunction>();
+        List<EntityFunction> tempEntitiesList = new ArrayList<EntityFunction>();
 
         for (ConfigFunction<BO3Config> res : reader.getConfigFunctions(this, true))
         {
@@ -222,6 +226,9 @@ public class BO3Config extends ConfigFile
             } else if (res instanceof BranchFunction)
             {
                 tempBranchesList.add((BranchFunction) res);
+            } else if (res instanceof EntityFunction)
+            {
+                tempEntitiesList.add((EntityFunction) res);
             }
         }
 
@@ -230,6 +237,7 @@ public class BO3Config extends ConfigFile
         bo3Checks[0] = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
         branches[0] = tempBranchesList.toArray(new BranchFunction[tempBranchesList.size()]);
         boundingBoxes[0] = box;
+        entityFunctions[0] = tempEntitiesList.toArray(new EntityFunction[tempEntitiesList.size()]);
     }
 
     public void writeResources(SettingsMap writer)
@@ -284,6 +292,19 @@ public class BO3Config extends ConfigFile
                 "WeightedBranch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]][MaxChanceOutOf])",
                 "MaxChanceOutOf - The chance all branches have to spawn out of, assumed to be 100 when left blank");
         writer.addConfigFunctions(Arrays.asList(branches[0]));
+        
+        // EntityFunctions
+        writer.bigTitle("EntityFunctions",
+                "An EntityFunction spawns an entity instead of a block. The entity is spawned only once when the BO3 is spawned.",
+                "Entities are persistent by default so they don't de-spawn when no player is near, they are only unloaded.",
+                "Usage: Entity(x,y,z,mobName,groupSize,NameTagOrNBTFileName) or Entity(x,y,z,mobName,groupSize)",		
+                "Use /tc entities to get a list of entities that can be used as mobName, this includes entities added by other mods.",
+                "NameTagOrNBTFileName can be either a nametag for the mob or an nbt file (such as mymobinfo.nbt or mymobinfo.txt).",
+                "When using a text file you can use the same mob spawning parameters used with the /summon command to equip the",
+                "entity and give it custom attributes etc. You can copy the DATA part of a summon command including surrounding ",
+                "curly braces to a .txt file, for instance for: \"/summon Skeleton x y z {DATA}\"");
+        
+        writer.addConfigFunctions(Arrays.asList(branches[0]));
     }
 
     @Override
@@ -324,8 +345,19 @@ public class BO3Config extends ConfigFile
                 branches[i][j] = branches[i - 1][j].rotate();
             }
             // Bounding box
-            boundingBoxes[i] = boundingBoxes[i - 1].rotate();
+            boundingBoxes[i] = boundingBoxes[i - 1].rotate();            
+            
+            // EntityFunction
+            entityFunctions[i] = new EntityFunction[entityFunctions[i - 1].length];
+            for (int j = 0; j < entityFunctions[i].length; j++)
+            {
+            	entityFunctions[i][j] = entityFunctions[i - 1][j].rotate();
+            }
         }
     }
-
+    
+    public EntityFunction[] getEntityData(Rotation rotation)
+    {
+    	return entityFunctions[rotation.getRotationId()];
+    }    
 }

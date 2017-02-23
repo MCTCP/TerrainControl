@@ -16,7 +16,7 @@ public class CustomObjectCoordinate
     private final CustomObject object;
     private final Rotation rotation;
     private final int x;
-    private final int y;
+    private int y;
     private final int z;
 
     public CustomObjectCoordinate(CustomObject object, Rotation rotation, int x, int y, int z)
@@ -60,7 +60,7 @@ public class CustomObjectCoordinate
 
     boolean spawnWithChecks(LocalWorld world, StructurePartSpawnHeight height, Random random)
     {
-        int y = height.getCorrectY(world, x, this.y, z);
+        y = height.getCorrectY(world, x, this.y, z);
         if (!object.canSpawnAt(world, rotation, x, y, z))
         {
             return false;

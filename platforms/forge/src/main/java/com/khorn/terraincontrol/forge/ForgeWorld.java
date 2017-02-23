@@ -6,6 +6,7 @@ import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.configuration.BiomeConfigFinder.BiomeConfigStub;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings.EntityCategory;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
+import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import com.khorn.terraincontrol.forge.generator.ChunkProvider;
@@ -24,7 +25,14 @@ import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -978,4 +986,181 @@ public class ForgeWorld implements LocalWorld
 		
 		WorldLoader.clearBiomeDictionary();
 	}
+	
+    @Override
+    public void SpawnEntity(EntityFunction entityData)
+    {
+    	Random rand = new Random();
+    	
+		String mobTypeName = entityData.mobName;
+		int groupSize = entityData.groupSize;
+		String nameTag = entityData.nameTagOrNBTFileName;
+
+        Class<?> entityClass = null;
+        
+        for(String entry : EntityList.NAME_TO_CLASS.keySet())
+        {
+        	if(entry.toLowerCase().replace("entity", "").equals(mobTypeName.toLowerCase().replace("entity", "")))
+        	{
+            	entityClass = EntityList.NAME_TO_CLASS.get(entry);
+        		break;
+        	}
+        }
+        	                                
+        if(entityClass == null)
+        {
+        	TerrainControl.log(LogMarker.INFO, "Could not find entity: " + mobTypeName);
+        	return;
+        }
+
+        Entity entityliving = null;        		
+        
+        if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
+        {        	        
+        	NBTTagCompound nbttagcompound = new NBTTagCompound();
+	        
+	        try
+	        {
+	            NBTBase nbtbase = JsonToNBT.getTagFromJson(entityData.getMetaData());
+	
+	            if (!(nbtbase instanceof NBTTagCompound))
+	            {
+	            	throw new NotImplementedException(); // Not a valid tag
+	            }
+	
+	            nbttagcompound = (NBTTagCompound)nbtbase;
+	        }
+	        catch (NBTException nbtexception)
+	        {
+	        	TerrainControl.log(LogMarker.INFO, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	        	return;
+	        }		                                            
+	        
+	        nbttagcompound.setString("id", entityData.mobName);
+	        entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
+        } else {        
+	        try
+	        {
+	            entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
+	        }
+	        catch (Exception exception)
+	        {	                                    		
+	            exception.printStackTrace();
+	            return;
+	        }	    
+        }
+        
+        if(entityliving != null)
+        {
+            EnumCreatureType creatureType = EnumCreatureType.MONSTER;
+            if(!entityliving.isCreatureType(creatureType, false))
+            {
+            	creatureType = EnumCreatureType.CREATURE;
+            	if(!entityliving.isCreatureType(creatureType, false))
+            	{
+            		creatureType = EnumCreatureType.AMBIENT;
+            		if(!entityliving.isCreatureType(creatureType, false))
+            		{
+                		creatureType = EnumCreatureType.WATER_CREATURE;
+                		if(!entityliving.isCreatureType(creatureType, false))
+                		{
+                        	creatureType = EnumCreatureType.CREATURE;
+                		}
+            		}
+            	}                                    	
+            }
+            
+            int j1 = entityData.x;
+            int k1 = entityData.y;
+            int l1 = entityData.z;
+            
+            Material material = world.getBlockState(new BlockPos(j1, k1, l1)).getMaterial();
+            if (!world.isBlockNormalCube(new BlockPos(j1, k1, l1), false) && (creatureType == EnumCreatureType.WATER_CREATURE && material == Material.WATER || material == Material.AIR ))
+            {					                            						                            	                                  			                                    	
+	            float f = (float)j1 + 0.5F;
+	            float f1 = (float)k1;
+	            float f2 = (float)l1 + 0.5F;
+	            
+	            entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F);                               
+	           
+	            if(entityliving instanceof EntityLiving)
+	            {	
+	            	for(int r = 0; r < groupSize; r++)
+	            	{                                    		
+	            		if(r != 0)
+	            		{
+	            	        if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
+	            	        {        	        
+	            	        	NBTTagCompound nbttagcompound = new NBTTagCompound();			                                   
+	            		        
+	            		        try
+	            		        {
+	            		            NBTBase nbtbase = JsonToNBT.getTagFromJson(entityData.getMetaData());
+	            		
+	            		            if (!(nbtbase instanceof NBTTagCompound))
+	            		            {
+	            		            	throw new NotImplementedException(); // Not a valid tag
+	            		            }
+	            		
+	            		            nbttagcompound = (NBTTagCompound)nbtbase;
+	            		        }
+	            		        catch (NBTException nbtexception)
+	            		        {
+	            		        	TerrainControl.log(LogMarker.INFO, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	            		        	return;
+	            		        }		                                            
+	            		        
+	            		        nbttagcompound.setString("id", entityData.mobName);
+	            		        entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
+	            	        } else {        
+	            		        try
+	            		        {
+	            		            entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
+	            		        }
+	            		        catch (Exception exception)
+	            		        {	                                    		
+	            		            exception.printStackTrace();
+	            		            return;
+	            		        }	    
+	            	        }                                			                                                                                        
+	                        entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F);
+	            		}	
+	            		
+	        			((EntityLiving) entityliving).setCustomNameTag(mobTypeName.replace("entity", "").substring(0, 1).toUpperCase() + mobTypeName.toLowerCase().replace("entity", "").substring(1));
+	                    
+	            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
+	            		{
+	        				if(nameTag != null && nameTag.length() > 0)
+	        				{
+	        					((EntityLiving) entityliving).setCustomNameTag(nameTag);
+	        				}
+	            		}
+	    				
+						((EntityLiving) entityliving).enablePersistence(); // <- makes sure mobs don't de-spawn
+	            		
+	            		world.spawnEntityInWorld(entityliving);
+	            	}
+	            } else {                    					                                                						                                                                                    					                                                
+	            	for(int r = 0; r < groupSize; r++)
+	            	{                                    		
+	            		if(r != 0)
+	            		{
+	                        try
+	                        {
+	                        	entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
+	                        }
+	                        catch (Exception exception)
+	                        {
+	                            exception.printStackTrace();
+	                            return;
+	                        }
+	                        entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F);                      
+	            		}					                                                	
+	            		
+	            		world.spawnEntityInWorld(entityliving);
+	            	}						                                                	
+	            }
+            }
+		}
+    }
 }

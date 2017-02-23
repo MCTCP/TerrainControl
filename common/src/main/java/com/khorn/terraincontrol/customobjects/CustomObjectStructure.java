@@ -1,11 +1,16 @@
 package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.customobjects.bo3.BO3;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Config;
+import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.helpers.RandomHelper;
 
 import java.util.*;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Represents a collection of all {@link CustomObject}s in a structure. It is
@@ -97,7 +102,34 @@ public class CustomObjectStructure
         {
             for (CustomObjectCoordinate coordObject : objectsInChunk)
             {
-                coordObject.spawnWithChecks(world, height, random);
+                if(coordObject.spawnWithChecks(world, height, random))
+                {
+                    BO3 bo3 = ((BO3)coordObject.getObject());
+                    if(bo3 == null)
+                    {
+                    	throw new NotImplementedException();
+                    }
+                                
+                    BO3Config objectConfig = bo3.getSettings();
+                	
+                	EntityFunction[] entityDataInObject = objectConfig.getEntityData(coordObject.getRotation());
+                	for(int i = 0; i < entityDataInObject.length; i++)
+                	{                		
+                		EntityFunction newEntityData = new EntityFunction(objectConfig);   
+                		
+                    	newEntityData.y = coordObject.getY() + entityDataInObject[i].y;
+        	        	
+                    	newEntityData.x = coordObject.getX() + entityDataInObject[i].x;
+                    	newEntityData.z = coordObject.getZ() + entityDataInObject[i].z;
+                    	
+                    	newEntityData.mobName = entityDataInObject[i].mobName;
+                    	newEntityData.groupSize = entityDataInObject[i].groupSize;
+                    	newEntityData.nameTagOrNBTFileName = entityDataInObject[i].nameTagOrNBTFileName;
+                    	newEntityData.originalNameTagOrNBTFileName = entityDataInObject[i].originalNameTagOrNBTFileName;
+                		
+                		world.SpawnEntity(newEntityData);
+                	}                	
+                }
             }
         }
     }
