@@ -8,11 +8,14 @@ import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
+import com.khorn.terraincontrol.forge.gui.GuiHandler;
+import com.khorn.terraincontrol.forge.gui.TCGuiCreateWorld;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.init.Biomes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.util.IntIdentityHashBiMap;
@@ -21,6 +24,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
@@ -136,7 +140,6 @@ public final class WorldLoader
         {
             TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", worldToRemove.getName());
             this.configMap.remove(worldToRemove.getName());
-            TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + worldToRemove.getName());
             worldToRemove.unRegisterBiomes();
             this.worlds.remove(worldToRemove.getName());
         }
@@ -145,7 +148,6 @@ public final class WorldLoader
     public void unloadWorld(ForgeWorld world)
     {
         TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-        TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + world.getName());
         world.unRegisterBiomes();
         this.worlds.remove(world.getName());
     }
@@ -189,9 +191,24 @@ public final class WorldLoader
             world = new ForgeWorld(worldName);
             ServerConfigProvider config = this.configMap.get(worldName);
             if (config == null)
-            {
+            {            	
                 TerrainControl.log(LogMarker.INFO, "Loading configs for world \"{}\"..", world.getName());
                 config = new ServerConfigProvider(worldConfigsFolder, world);
+                                
+                // If this is a new world use the pre-generator and world border settings from world creation menu
+                if(GuiHandler.lastGuiOpened.equals(TCGuiCreateWorld.class))
+                {
+	    			if(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius > -1)
+	    			{
+	    				config.getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius;
+	    			}
+	    			if(((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius > -1)
+	    			{
+	    				config.getWorldConfig().WorldBorderRadius = ((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius;    				
+	    			}
+	    			config.saveWorldConfig();
+                }
+                
                 // Remove fake biome to avoid Forge detecting it on restart and causing level.dat to be restored
                 Iterator<Map.Entry<ResourceLocation, Biome>> iterator = Biome.REGISTRY.registryObjects.entrySet().iterator();
                 while (iterator.hasNext())
@@ -219,7 +236,6 @@ public final class WorldLoader
                 Biome.REGISTRY.underlyingIntegerMap = underlyingIntegerMap;
             }
             world.provideConfigs(config);
-            TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds add " + worldName);
             this.worlds.put(worldName, world);
         }
 
@@ -241,7 +257,6 @@ public final class WorldLoader
         {
             TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", worldToRemove.getName());
             this.configMap.remove(worldToRemove.getName());
-            TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + worldToRemove.getName());
             worldToRemove.unRegisterBiomes();
             this.worlds.remove(worldToRemove.getName());
         }
@@ -251,7 +266,6 @@ public final class WorldLoader
     public void unloadClientWorld(ForgeWorld world)
     {
         TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-        TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds remove " + world.getName());
         this.worlds.remove(world.getName());
         world.unRegisterBiomes();
     }
@@ -259,6 +273,12 @@ public final class WorldLoader
     public static void clearBiomeDictionary()
     {
     	// TODO: This will remove all BiomeDict info, including non-TC biomes' BiomeDict info and may cause problems for other mods/worlds.
+    	   
+    	// Hell and Sky are the only vanilla biome not overridden by a TC biome in the Forge Biome Registry when
+    	// ForgeBiomes are created. We won't be re-registering them to the BiomeDict when the biomes 
+    	// are created so restore their BiomeDictionary info here after clearing the BiomeDictionary.
+    	Type[] hellTypes = BiomeDictionary.getTypesForBiome(Biomes.HELL);
+    	Type[] skyTypes = BiomeDictionary.getTypesForBiome(Biomes.SKY);
     	
 		try {
 			Field[] fields = BiomeDictionary.class.getDeclaredFields();
@@ -285,7 +305,10 @@ public final class WorldLoader
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
+		
+		BiomeDictionary.registerBiomeType(Biomes.HELL, hellTypes);
+		BiomeDictionary.registerBiomeType(Biomes.SKY, skyTypes);
     }
 		
     // TODO: Should this be client only?? Like markBiomeIdsAsFree?
@@ -296,6 +319,11 @@ public final class WorldLoader
 		// Unregister default biomes so they can be replaced by TC biomes (this allows us to fully customise the biomes)
 		for(DefaultBiome defaultBiome : DefaultBiome.values())
 		{
+			// Make an exception for the hell and sky biomes. 
+			// The hell and end chunk providers refer specifically to 
+			// Biomes.HELL and Biomes.SKY and query the biome registry
+			// for them. Other biomes are not referred to in this way.
+			if(defaultBiome.Name.equals("Hell") || defaultBiome.Name.equals("Sky")) { continue; }
 			biomeRegistryAvailabiltyMap.set(defaultBiome.Id, false); // This should be enough to make Forge re-use the biome id
 		}
 		
@@ -337,7 +365,6 @@ public final class WorldLoader
         ForgeWorld world = new ForgeWorld(ConfigFile.readStringFromStream(wrappedStream));
         ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world);
         world.provideClientConfigs(mcWorld, configs);
-        TerrainControl.log(LogMarker.INFO, "WorldLoader.worlds add " + world.getName());
         this.worlds.put(world.getName(), world);
     }
 }

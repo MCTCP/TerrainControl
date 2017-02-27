@@ -2,36 +2,18 @@ package com.khorn.terraincontrol.forge.gui;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.client.AnvilConverterException;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiCreateWorld;
-import net.minecraft.client.gui.GuiListWorldSelection;
-import net.minecraft.client.gui.GuiListWorldSelectionEntry;
 import net.minecraft.client.gui.GuiWorldSelection;
-import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiSlot;
-import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.gui.GuiYesNoCallback;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.storage.ISaveFormat;
-import net.minecraft.world.storage.ISaveHandler;
-import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -42,7 +24,6 @@ public class TCGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
 {
 	// Taken from net.minecraft.client.gui.GuiWorldSelection. Changed confirmClicked and disabled rename button
 	
-    private static final Logger LOGGER = LogManager.getLogger();
     /** The screen to return to when this closes (always Main Menu). */
     protected GuiScreen prevScreen;
     protected String title = "Select world";
@@ -72,7 +53,6 @@ public class TCGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
 		super.confirmClicked(ok, worldId);
 
 		// Check for world settings for this world
-		boolean bExists = false;
         File TCWorldsDirectory = new File(TerrainControl.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
         if(TCWorldsDirectory.exists() && TCWorldsDirectory.isDirectory())
         {

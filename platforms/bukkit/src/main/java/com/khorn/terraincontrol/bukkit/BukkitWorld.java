@@ -917,18 +917,18 @@ public class BukkitWorld implements LocalWorld
         return new MojangStructurePart(name, mojangStructurePart);
     }
 
-    // Below methods are only used by Forge (yes that violates the interface segregation principle, I know, don't care...)
+    // Forge only (yes that violates the interface segregation principle, I know)
     
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
     {
     	return createBiomeFor(biomeConfig, biomeIds);
-    }
+	}
 
     @Override
     public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub) { }
-
-    // TODO: Forge only atm, someome make a Bukkit implementation plx!
+    
+    // TODO: Forge only atm, someone make a Bukkit implementation plx!
     
 	@Override
 	public void SpawnEntity(EntityFunction entityData) {

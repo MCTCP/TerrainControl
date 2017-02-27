@@ -26,10 +26,12 @@ public class PluginStandardValues extends Settings
      * Name of the plugin, "TerrainControl".
      */
     public static final String PLUGIN_NAME = "TerrainControl";
-    
-    
-    /**
-     * Shows detailed information about mob and BO3 spawning that is useful for TC world devs.
-     */
+        
     public static final Setting<Boolean> SPAWN_LOG = booleanSetting("SpawnLog", false);
+    
+    public static final Setting<Boolean> CARTOGRAPHER = booleanSetting("Cartographer", false);
+    
+    public static final Setting<Integer> CARTOGRAPHER_HEIGHT_OFFSET = intSetting("CartographerHeightOffset", 100, -255, 255);
+    
+    public static final Setting<Integer> PREGENERATOR_MAX_CHUNKS_PER_TICK = intSetting("PregeneratorMaxChunksPerTick", 1, 1, Integer.MAX_VALUE);   
 }

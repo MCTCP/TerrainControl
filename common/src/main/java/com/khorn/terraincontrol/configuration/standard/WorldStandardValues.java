@@ -117,8 +117,7 @@ public class WorldStandardValues extends Settings
             MINESHAFTS_ENABLED = booleanSetting("MineshaftsEnabled", true),
             RARE_BUILDINGS_ENABLED = booleanSetting("RareBuildingsEnabled", true),
             OCEAN_MONUMENTS_ENABLED = booleanSetting("OceanMonumentsEnabled", true),
-            POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),
-    		PREGENERATION_SAFE_MODE = booleanSetting("PreGenerationSafeMode", true);
+            POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false);
 
     public static final Setting<LocalMaterialData>
             WATER_BLOCK = new MaterialSetting("WaterBlock", DefaultMaterial.STATIONARY_WATER),

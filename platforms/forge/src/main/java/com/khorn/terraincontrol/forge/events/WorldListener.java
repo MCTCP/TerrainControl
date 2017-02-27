@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge.events;
 
+import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.forge.WorldLoader;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
@@ -18,6 +20,12 @@ public class WorldListener
         this.worldLoader = worldLoader;
     }
 
+	@SubscribeEvent
+	public void onWorldSave(WorldEvent.Save event)
+	{
+		((ForgeEngine)TerrainControl.getEngine()).getPregenerator().SavePreGeneratorData(event.getWorld());
+	}
+    
     // TODO: This method should not be called by DimensionManager when switching dimensions (main -> nether -> main). Find out why it is being called
     @SubscribeEvent
     public void onWorldUnload(WorldEvent.Unload event)
@@ -30,6 +38,7 @@ public class WorldListener
         }
         if(mcWorld.provider.getDimension() == 0) // Temporary fix, this may break multi-world support (I assume it uses dimensions to load other worlds?) 
         {
+        	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().SavePreGeneratorData(mcWorld);
         	this.worldLoader.unloadWorld(forgeWorld);
         }
     }

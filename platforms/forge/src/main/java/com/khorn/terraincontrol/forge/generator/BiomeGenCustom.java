@@ -11,8 +11,12 @@ import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
+import net.minecraft.init.Biomes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,7 +113,7 @@ public class BiomeGenCustom extends Biome
             forgeEngine.registerForgeBiome(MAX_TC_BIOME_ID, maxTcBiomeKey,
                     new BiomeGenCustom(biomeConfig, new BiomeIds(MAX_TC_BIOME_ID, MAX_TC_BIOME_ID)));
         }
-
+       
         if (biomeIds.isVirtual())
         {
             // Virtual biomes hack: register, then let original biome overwrite
@@ -156,6 +160,34 @@ public class BiomeGenCustom extends Biome
     {
         return "BiomeGenCustom of " + getBiomeName();
     }
+   
+    // Fix for swamp colors (there's a custom noise applied to swamp colors)
+    // TODO: Make these colors configurable via the BiomeConfig
+    @SideOnly(Side.CLIENT)
+    public int getGrassColorAtPos(BlockPos pos)
+    {
+    	if(this.getBiomeName().equals("Swampland"))
+    	{
+	        double d0 = GRASS_COLOR_NOISE.getValue((double)pos.getX() * 0.0225D, (double)pos.getZ() * 0.0225D);
+	        return d0 < -0.1D ? 5011004 : 6975545;
+    	} else {
+    		return super.getGrassColorAtPos(pos);
+    	}
+    }
+    
+    // Fix for swamp colors (there's a custom noise applied to swamp colors)
+    // TODO: Make these colors configurable via the BiomeConfig
+    @SideOnly(Side.CLIENT)
+    public int getFoliageColorAtPos(BlockPos pos)
+    {
+    	if(this.getBiomeName().equals("Swampland"))
+    	{
+    		return 6975545;
+    	} else {
+    		return super.getFoliageColorAtPos(pos);
+    	}
+    }
+
    
     // Adds the mobs to the internal list
     protected void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)//, boolean improvedMobSpawning)
