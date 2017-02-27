@@ -295,6 +295,7 @@ public class BO3Config extends ConfigFile
         
         // EntityFunctions
         writer.bigTitle("EntityFunctions",
+        		"Forge only (this may have changed, check for updates).",
                 "An EntityFunction spawns an entity instead of a block. The entity is spawned only once when the BO3 is spawned.",
                 "Entities are persistent by default so they don't de-spawn when no player is near, they are only unloaded.",
                 "Usage: Entity(x,y,z,mobName,groupSize,NameTagOrNBTFileName) or Entity(x,y,z,mobName,groupSize)",		
@@ -304,7 +305,7 @@ public class BO3Config extends ConfigFile
                 "entity and give it custom attributes etc. You can copy the DATA part of a summon command including surrounding ",
                 "curly braces to a .txt file, for instance for: \"/summon Skeleton x y z {DATA}\"");
         
-        writer.addConfigFunctions(Arrays.asList(branches[0]));
+        writer.addConfigFunctions(Arrays.asList(entityFunctions[0]));
     }
 
     @Override

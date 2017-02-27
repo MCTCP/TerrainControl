@@ -125,6 +125,12 @@ public final class ServerConfigProvider implements ConfigProvider
 
         return settingsMap;
     }
+    
+    public void saveWorldConfig()
+    {
+    	File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
+    	FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.SettingsMode);
+    }
 
     private void loadBiomes(SettingsMap worldConfigSettings)
     {

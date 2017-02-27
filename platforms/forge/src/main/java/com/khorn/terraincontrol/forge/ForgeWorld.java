@@ -29,6 +29,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTBase;
@@ -122,12 +123,18 @@ public class ForgeWorld implements LocalWorld
           
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
-    {
+    {    	
+		// Make an exception for the hell and sky biomes. 
+		// The hell and end chunk providers refer specifically to 
+		// Biomes.HELL and Biomes.SKY and query the biome registry
+		// for them. Other biomes are not referred to in this way.
+    	if(biomeConfig.getName().equals("Hell")) { return new ForgeBiome(Biomes.HELL, biomeConfig, new BiomeIds(8,8)); }
+    	if(biomeConfig.getName().equals("Sky")) { return new ForgeBiome(Biomes.SKY, biomeConfig, new BiomeIds(9,9)); }
+    	
     	// Always try to register biomes and create Biome Configs. Biomes with id's > 255 are registered
     	// only for biome -> id queries, any (saved)id -> biome query will return the ReplaceToBiomeName biome.
     	    	
-        int savedId = biomeIds.getSavedId();
-        Biome existingBiome = Biome.getBiome(savedId);
+        Biome existingBiome = Biome.getBiome(biomeIds.getSavedId());
     	Biome biome = BiomeGenCustom.getOrCreateBiome(biomeConfig, biomeIds);
         int requestedGenerationId = biomeIds.getGenerationId();
         int allocatedGenerationId = Biome.REGISTRY.underlyingIntegerMap.getId(biome);
@@ -180,7 +187,7 @@ public class ForgeWorld implements LocalWorld
         
     	Type[] typeArr = new Type[types.size()];
 		types.toArray(typeArr);
-    	BiomeDictionary.registerBiomeType(biome, typeArr);  
+    	BiomeDictionary.registerBiomeType(biome, typeArr);
     }
     
     private ArrayList<Type> getTypesList(String[] typearr)
@@ -980,7 +987,12 @@ public class ForgeWorld implements LocalWorld
 		BitSet biomeRegistryAvailabiltyMap = WorldLoader.getBiomeRegistryAvailabiltyMap();
 	    // Unregister only the biomes registered by this world
 		for(LocalBiome localBiome : this.biomeNames.values())
-		{			
+		{	
+			// Make an exception for the hell and sky biomes. 
+			// The hell and end chunk providers refer specifically to 
+			// Biomes.HELL and Biomes.SKY and query the biome registry
+			// for them. Other biomes are not referred to in this way.
+			if(localBiome.getName().equals("Hell") || localBiome.getName().equals("Sky")) { continue; }
 			biomeRegistryAvailabiltyMap.set(localBiome.getIds().getSavedId(), false); // This should be enough to make Forge re-use the biome id
 		}
 		
@@ -1163,4 +1175,23 @@ public class ForgeWorld implements LocalWorld
             }
 		}
     }
+    
+    public BlockPos getSpawnPoint()
+    {    	
+    	return new BlockPos(world.provider.getSpawnPoint().getX(), world.provider.getSpawnPoint().getY(), world.provider.getSpawnPoint().getZ());
+    }
+    
+	public boolean IsInsideWorldBorder(ChunkCoordinate chunk)
+	{
+		BlockPos spawnPoint = getSpawnPoint();
+    	ChunkCoordinate spawnChunk = ChunkCoordinate.fromBlockCoords(spawnPoint.getX(), spawnPoint.getZ());		
+		return
+			((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius == 0 ||
+			(
+				chunk.getChunkX() >= spawnChunk.getChunkX() - (((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius - 1)
+				&& chunk.getChunkX() <= spawnChunk.getChunkX() + (((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius - 1)
+				&& chunk.getChunkZ() >= spawnChunk.getChunkZ() - (((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius - 1)
+				&& chunk.getChunkZ() <= spawnChunk.getChunkZ() + (((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius - 1)
+			);
+	}
 }

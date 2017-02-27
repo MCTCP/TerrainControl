@@ -185,7 +185,6 @@ public class WorldConfig extends ConfigFile
     public String author;
     public String description;
 
-	public boolean PreGenerationSafeMode;
 	public int PreGenerationRadius;
 	public int WorldBorderRadius;
     public String worldSeed;
@@ -212,29 +211,32 @@ public class WorldConfig extends ConfigFile
         this.readConfigSettings(settingsReader);
         // Clamp Settings to acceptable values
         this.correctSettings();
-        
-        // Check biome ids, These are the names from the worldConfig file
-        // Corrects any instances of incorrect biome id.
-        for (Iterator<Entry<String, Integer>> it = customBiomeGenerationIds.entrySet().iterator(); it.hasNext();)
-        {
-            Entry<String, Integer> entry = it.next();
-
-            // Check name
-            String biomeName = entry.getKey();
-            if (DefaultBiome.Contain(biomeName))
-            {
-                TerrainControl.log(LogMarker.WARN, "CustomBiomes only accepts custom biomes,"
-                        + " {} is a vanilla biome. Removing it from the list.", biomeName);
-                it.remove();
-                continue;
-            }
-
-            // Check id
-            int biomeId = entry.getValue();
-            if (biomeId == -1)
-            {
-                entry.setValue(world.getFreeBiomeId());
-            }
+                
+        if(world != null) // If world is null then this method was called from WorldCreationMenu and only needs pre-generator and worldborder settings. TODO: Make this prettier?
+        {        
+	        // Check biome ids, These are the names from the worldConfig file
+	        // Corrects any instances of incorrect biome id.
+	        for (Iterator<Entry<String, Integer>> it = customBiomeGenerationIds.entrySet().iterator(); it.hasNext();)
+	        {
+	            Entry<String, Integer> entry = it.next();
+	
+	            // Check name
+	            String biomeName = entry.getKey();
+	            if (DefaultBiome.Contain(biomeName))
+	            {
+	                TerrainControl.log(LogMarker.WARN, "CustomBiomes only accepts custom biomes,"
+	                        + " {} is a vanilla biome. Removing it from the list.", biomeName);
+	                it.remove();
+	                continue;
+	            }
+	
+	            // Check id
+	            int biomeId = entry.getValue();
+	            if (biomeId == -1)
+	            {
+	                entry.setValue(world.getFreeBiomeId());
+	            }
+	        }
         }
     }
 
@@ -495,7 +497,6 @@ public class WorldConfig extends ConfigFile
         this.description = reader.getSetting(WorldStandardValues.DESCRIPTION);
         
         this.PreGenerationRadius = reader.getSetting(WorldStandardValues.PREGENERATION_RADIUS);
-        this.PreGenerationSafeMode = reader.getSetting(WorldStandardValues.PREGENERATION_SAFE_MODE);
         this.WorldBorderRadius = reader.getSetting(WorldStandardValues.WORLD_BORDER_RADIUS);
         
         this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED);
@@ -1011,34 +1012,18 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.MIN_TEMPERATURE, this.minTemperature);
         writer.putSetting(WorldStandardValues.MAX_TEMPERATURE, this.maxTemperature);
         
-        
-        
-                
-        
-        
         writer.bigTitle("World Seed");        
         writer.putSetting(WorldStandardValues.WORLD_SEED, this.worldSeed,
 	        "The seed that will be used for this world unless it is overriden in the world creation menu.",
 	        "Leave blank for a random seed."
     	);
         
-        writer.bigTitle("Pre-generation safe mode");
-        writer.putSetting(WorldStandardValues.PREGENERATION_SAFE_MODE, this.PreGenerationSafeMode,
-            "Disabling safe mode can greatly increase pre-generation speed",
-    		"but increases memory usage and may require server reboots during",
-    		"pre-generation. This is recommended only for installations with",
-    		"more than 2GB memory. Pre-generation will automatically resume",
-    		"when entering the world after a server reboot.",               
-    		"Defaults to: true",
-    		"This property is used only by the Minecraft Worlds mod"
-		);
-        
         writer.bigTitle("Pre-generation radius");        
         writer.putSetting(WorldStandardValues.PREGENERATION_RADIUS, this.PreGenerationRadius,
 	        "This is the radius in chunks around the spawn chunk within which chunks will automatically be spawned (uses a rectangle, not a circle around the spawn location!",
 			"Defaults to: 0 (disabled)",
 			"This property is used only by the Minecraft Worlds mod"        		
-		);  
+		);
         
         writer.bigTitle("World border radius");        
         writer.putSetting(WorldStandardValues.WORLD_BORDER_RADIUS, this.WorldBorderRadius,

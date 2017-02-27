@@ -111,7 +111,13 @@ public class TCPlugin
         };
         MinecraftForge.EVENT_BUS.register(new BiomeColorsListener(getBiomeConfig));
 
-        MinecraftForge.EVENT_BUS.register(new GuiHandler());  
+        // Register server tick handler for pre-generation of worlds
+        MinecraftForge.EVENT_BUS.register(new ServerEventListener());
+                
+        MinecraftForge.EVENT_BUS.register(new GuiHandler());
+        
+        // Register KeyBoardEventListener for toggling pre-generator in-game UI using F3
+        MinecraftForge.EVENT_BUS.register(new KeyBoardEventListener());
         
         // Register to our own events, so that they can be fired again as Forge events.
         engine.registerEventHandler(new TCToForgeEventConverter(), EventPriority.CANCELABLE);

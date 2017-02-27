@@ -15,20 +15,27 @@ import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.util.CommandHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.util.ChunkCoordinate;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
+import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 final class TCCommandHandler implements ICommand
 {
@@ -68,36 +75,59 @@ final class TCCommandHandler implements ICommand
 
         if (!mcWorld.isRemote) // Server side
         {
+            ForgeWorld world = (ForgeWorld)CommandHelper.getWorld(sender, "");
+
+            if (world == null)
+            {
+            	sender.addChatMessage(new TextComponentString(""));
+                sender.addChatMessage(
+                        new TextComponentTranslation(ERROR_COLOR + "TerrainControl is not enabled for this world."));
+                return;
+            }           
+        	
+            BlockPos pos = sender.getPosition();
+            int x = pos.getX();
+            int y = pos.getY();
+            int z = pos.getZ();
+            
             if (argString == null || argString.length == 0)
             {
+        		sender.addChatMessage(new TextComponentString(""));
                 sender.addChatMessage(new TextComponentString("-- TerrainControl --"));
+                sender.addChatMessage(new TextComponentString(""));
                 sender.addChatMessage(new TextComponentString("Commands:"));
                 sender.addChatMessage(
-                        new TextComponentString("/tc worldinfo - Show author and description information for this world."));
+                        new TextComponentString(MESSAGE_COLOR + "/tc worldinfo " + VALUE_COLOR + "Show author and description information for this world."));
                 sender.addChatMessage(
-                        new TextComponentString("/tc biome (-f, -s, -d, -m) - Show biome information for any biome at the player's coordinates."));
+                        new TextComponentString(MESSAGE_COLOR + "/tc biome (-f, -s, -d, -m) " + VALUE_COLOR + "Show biome information for the biome at the player's coordinates."));
                 sender.addChatMessage(
-                		new TextComponentString("/tc entities - Show a list of entities that can be spawned inside BO3's using the Entity() tag."));
-            } else if (argString[0].equals("worldinfo") || argString[0].equals("world"))
+                		new TextComponentString(MESSAGE_COLOR + "/tc entities " + VALUE_COLOR + "Show a list of entities that can be spawned inside BO3's using the Entity() tag."));
+                sender.addChatMessage(
+                		new TextComponentString(MESSAGE_COLOR + "/tc cartographer " + VALUE_COLOR + "Teleports the player to the center of the Cartographer map. /tc map does the same thing."));
+                sender.addChatMessage(
+                		new TextComponentString(MESSAGE_COLOR + "/tc cartographer -tp " + VALUE_COLOR + "Teleports the player the location they are standing on on the Cartographer map. Area must exist and have been populated. /tc map -tp does the same thing."));
+                sender.addChatMessage(new TextComponentString(""));
+                sender.addChatMessage(new TextComponentString("Tips:"));
+        		sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "- Check out TerrainControl.ini for optional features."));
+        		sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "- When using the pre-generator open the chat window so you can background MC without pausing the game."));
+            }
+            else if (argString[0].equals("worldinfo") || argString[0].equals("world"))
             {
-                LocalWorld localWorld = this.worldLoader.getWorld(sender.getEntityWorld());
-                if (localWorld != null)
-                {
-                    WorldConfig worldConfig = localWorld.getConfigs().getWorldConfig();
-                    sender.addChatMessage(new TextComponentString("-- World info --"));
-                    sender.addChatMessage(new TextComponentString("Author: " + worldConfig.author));
-                    sender.addChatMessage(new TextComponentString("Description: " + worldConfig.description));
-                } else
-                {
-                    sender.addChatMessage(
-                            new TextComponentString(PluginStandardValues.PLUGIN_NAME + " is not enabled for this world."));
-                }
-                
-            } else if (argString[0].equals("entities"))
+                WorldConfig worldConfig = world.getConfigs().getWorldConfig();
+        		sender.addChatMessage(new TextComponentString(""));
+                sender.addChatMessage(new TextComponentString("-- World info --"));
+                sender.addChatMessage(new TextComponentString(""));
+                sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "Author: " + VALUE_COLOR + worldConfig.author));
+                sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "Description: " + VALUE_COLOR + worldConfig.description));
+            }
+            else if (argString[0].equals("entities"))
             {                
+        		sender.addChatMessage(new TextComponentString(""));
 	    		TerrainControl.log(LogMarker.INFO, "-- Entities List --");
 	    		sender.addChatMessage(new TextComponentString("-- Entities List --"));
-	    		sender.addChatMessage(new TextComponentString("Some of these, like ThrownPotion, FallingSand, Mob and Painting may crash the game so be sure to test your BO3 in single player."));
+	    		sender.addChatMessage(new TextComponentString(""));
+	    		sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "Some of these, like ThrownPotion, FallingSand, Mob and Painting may crash the game so be sure to test your BO3 in single player."));
+	    		sender.addChatMessage(new TextComponentString(""));
     			EnumCreatureType[] aenumcreaturetype = EnumCreatureType.values();
 	    		for(String entry : EntityList.NAME_TO_CLASS.keySet())
 	        	{
@@ -107,40 +137,90 @@ final class TCCommandHandler implements ICommand
 	    		        EnumCreatureType enumcreaturetype = aenumcreaturetype[k3];
 	    		        if(enumcreaturetype.getCreatureClass().isAssignableFrom(EntityList.NAME_TO_CLASS.get(entry)))
 	    		        {
-	    		        	msg += " (" + enumcreaturetype.name() + ")";
+	    		        	msg += VALUE_COLOR + " (" + enumcreaturetype.name() + ")";
 	    		        }
 	    		    }
-
 	        		TerrainControl.log(LogMarker.INFO, msg);
-	        		sender.addChatMessage(new TextComponentString("- " + msg));
+	        		sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "- " + msg));
 	        	}
 	    		TerrainControl.log(LogMarker.INFO, "----");
-	    		
-            } else if (argString[0].equals("biome"))
+            }
+            else if (argString[0].equals("cartographer") || argString[0].equals("map"))
             {
-                BlockPos pos = sender.getPosition();
-                int x = pos.getX();
-                int y = pos.getY();
-                int z = pos.getZ();
-
-                LocalWorld world = CommandHelper.getWorld(sender, "");
-
-                if (world == null)
-                {
+    			if(Minecraft.getMinecraft().thePlayer.dimension != 0)
+    			{
+    				sender.addChatMessage(new TextComponentString(""));
                     sender.addChatMessage(
-                            new TextComponentTranslation(ERROR_COLOR + "TerrainControl is not enabled for this world."));
-                    return;
+                            new TextComponentTranslation(ERROR_COLOR + "Cartographer is not available for this dimension."));
+    				return;
+    			}
+    			if(!TerrainControl.getPluginConfig().Cartographer)
+    			{
+    				sender.addChatMessage(new TextComponentString(""));
+                    sender.addChatMessage(
+                            new TextComponentTranslation(ERROR_COLOR + "Cartographer is not enabled in TerrainControl.ini."));
+    				return;
+    			}           
+                
+    			BlockPos spawnPoint =  world.getSpawnPoint();
+    			
+                if (CommandHelper.containsArgument(argString, "-tp"))
+                {
+                	// TP player to the location they are standing on on the map
+                	                	
+                	WorldServer worldServer = null;                	                	                	
+                	Minecraft mc = Minecraft.getMinecraft();
+                	if (mc.isIntegratedServerRunning())
+                	{
+                	    worldServer = mc.getIntegratedServer().worldServerForDimension(mc.thePlayer.dimension);
+                	} else {
+                	    worldServer = ((EntityPlayer)sender.getCommandSenderEntity()).getServer().getServer().worldServerForDimension(mc.thePlayer.dimension);
+                	}
+                	
+                	ChunkCoordinate spawnChunk = ChunkCoordinate.fromBlockCoords(spawnPoint.getX(), spawnPoint.getZ());
+                	int newX = spawnChunk.getBlockXCenter() + ((x - spawnChunk.getBlockXCenter()) * 16);
+                	int newZ = spawnChunk.getBlockZCenter() + ((z - spawnChunk.getBlockZCenter()) * 16);
+                	int newY = world.getHighestBlockYAt(newX, newZ);                	
+                	ChunkCoordinate destinationChunk = ChunkCoordinate.fromBlockCoords(newX, newZ);
+                	
+                	// Only allow existing and populated chunks as destination	                	
+                	if(
+            			worldServer.getChunkProvider().chunkExists(destinationChunk.getChunkX(), destinationChunk.getChunkZ()) &&
+            			worldServer.getChunkProvider().provideChunk(destinationChunk.getChunkX(), destinationChunk.getChunkZ()).isTerrainPopulated()
+        			)
+                	{
+                		((EntityPlayer)sender.getCommandSenderEntity()).setPositionAndUpdate(newX, newY, newZ);
+                	}
+                } else {
+                	// TP player to the center of the map
+                	ChunkCoordinate spawnChunk = ChunkCoordinate.fromBlockCoords(spawnPoint.getX(), spawnPoint.getZ());
+                	int newX = spawnChunk.getBlockXCenter();
+                	int newZ = spawnChunk.getBlockZCenter();
+                	int newY = world.getHighestBlockYAt(newX, newZ);
+                	((EntityPlayer)sender.getCommandSenderEntity()).setPositionAndUpdate(newX, newY, newZ);
                 }
+            } 
+            else if (argString[0].equals("biome"))
+            {
+    			if(Minecraft.getMinecraft().thePlayer.dimension != 0)
+    			{
+    				sender.addChatMessage(new TextComponentString(""));
+                    sender.addChatMessage(
+                            new TextComponentTranslation(ERROR_COLOR + "Biome information is not available for this dimension."));
+    				return;
+    			}            	
 
                 LocalBiome biome = world.getBiome(x, z);
                 BiomeIds biomeIds = biome.getIds();
+                sender.addChatMessage(new TextComponentString(""));
                 sender.addChatMessage(
                         new TextComponentTranslation(MESSAGE_COLOR + "According to the biome generator, you are in the " + VALUE_COLOR + biome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biomeIds.getGenerationId()));
 
                 if (CommandHelper.containsArgument(argString, "-f"))
                 {
+                	sender.addChatMessage(new TextComponentString(""));
                     sender.addChatMessage(
-                            new TextComponentTranslation(MESSAGE_COLOR + "The base temperature of this biome is " + VALUE_COLOR + biome.getBiomeConfig().biomeTemperature + MESSAGE_COLOR + ", \nat your height it is " + VALUE_COLOR + biome.getTemperatureAt(
+                            new TextComponentTranslation(MESSAGE_COLOR + "The base temperature of this biome is " + VALUE_COLOR + biome.getBiomeConfig().biomeTemperature + MESSAGE_COLOR + ", \n" + MESSAGE_COLOR + " at your height it is " + VALUE_COLOR + biome.getTemperatureAt(
                                     x, y, z)));
                 }
 
@@ -150,10 +230,12 @@ final class TCCommandHandler implements ICommand
                     {
                         LocalBiome savedBiome = world.getSavedBiome(x, z);
                         BiomeIds savedIds = savedBiome.getIds();
+                        sender.addChatMessage(new TextComponentString(""));
                         sender.addChatMessage(
                                 new TextComponentTranslation(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + savedIds.getSavedId()));
                     } catch (BiomeNotFoundException e)
                     {
+                    	sender.addChatMessage(new TextComponentString(""));
                         sender.addChatMessage(
                                 new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
                     }
@@ -175,11 +257,13 @@ final class TCCommandHandler implements ICommand
             				} else {
             					typesString += ", " + type.name();
             				}
-            			}                          
+            			}
+            			sender.addChatMessage(new TextComponentString(""));
                         sender.addChatMessage(
                                 new TextComponentTranslation(MESSAGE_COLOR + "BiomeDict: " + VALUE_COLOR + typesString));
                     } catch (BiomeNotFoundException e)
                     {
+                    	sender.addChatMessage(new TextComponentString(""));
                         sender.addChatMessage(
                                 new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
                     }
@@ -191,7 +275,9 @@ final class TCCommandHandler implements ICommand
                     {
 	                	ForgeBiome calculatedBiome = (ForgeBiome)world.getCalculatedBiome(x, z);
 	                	
-	                    sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "-- Biome mob spawning settings --"));
+	                	sender.addChatMessage(new TextComponentString(""));
+	                    sender.addChatMessage(new TextComponentTranslation("-- Biome mob spawning settings --"));
+	                    sender.addChatMessage(new TextComponentTranslation(""));
 		            	for(EnumCreatureType creatureType : EnumCreatureType.values())
 		            	{
 		            		sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + creatureType.name() + ": "));
@@ -206,6 +292,7 @@ final class TCCommandHandler implements ICommand
 		            	}
 	                } catch (BiomeNotFoundException e)
 	                {
+	                	sender.addChatMessage(new TextComponentString(""));
 	                    sender.addChatMessage(
 	                            new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
 	                }
@@ -214,6 +301,7 @@ final class TCCommandHandler implements ICommand
                 return;
             } else
             {
+            	sender.addChatMessage(new TextComponentString(""));
                 sender.addChatMessage(new TextComponentString("Unknown command. Type /tc for a list of commands."));
             }
         }
