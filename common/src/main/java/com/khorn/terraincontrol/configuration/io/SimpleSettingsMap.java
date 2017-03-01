@@ -95,10 +95,13 @@ public final class SimpleSettingsMap implements SettingsMap
             result.add(function);
             if (function instanceof ErroredFunction)
             {
-                TerrainControl.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}",
-                        functionName, this.name,
-                        configFunctionLine.getLineNumber(),
-                        ((ErroredFunction<?>) function).error);
+            	if(TerrainControl.getPluginConfig().SpawnLog)
+            	{
+	                TerrainControl.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}",
+	                        functionName, this.name,
+	                        configFunctionLine.getLineNumber(),
+	                        ((ErroredFunction<?>) function).error);
+            	}
             }
         }
 

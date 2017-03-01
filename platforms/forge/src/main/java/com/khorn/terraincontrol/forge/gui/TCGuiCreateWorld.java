@@ -236,7 +236,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             				selectedWorldConfig = GuiHandler.worlds.get(worldDir.getName());
             				if(GuiHandler.selectedWorldName == null || !GuiHandler.selectedWorldName.equals(GuiHandler.worldName))
             				{	
-            					((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius = selectedWorldConfig.PreGenerationRadius;
+            					((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(selectedWorldConfig.PreGenerationRadius);
             					((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = selectedWorldConfig.WorldBorderRadius;
             					GuiHandler.seed = selectedWorldConfig.worldSeed;
             					
@@ -268,7 +268,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             {
             	worldNameHelpText2 = "Using existing settings";
             	
-                txtPregenRadius.setText(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius + "");		                
+                txtPregenRadius.setText(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius() + "");		                
                 txtWorldBorderRadius.setText(((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius + "");;
             	           	
                 txtSeed.setText(GuiHandler.seed);
@@ -359,7 +359,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                     	}
                 		selectedWorldConfig = GuiHandler.worlds.get(GuiHandler.selectedWorldName);
 						
-                		((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius = selectedWorldConfig.PreGenerationRadius;
+                		((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(selectedWorldConfig.PreGenerationRadius);
                 		((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = selectedWorldConfig.WorldBorderRadius;
     					GuiHandler.seed = selectedWorldConfig.worldSeed;
     					
@@ -378,7 +378,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 	                	
 	                	GuiHandler.seed = "";
 	                	((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = 0;
-	                	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius = 0;
+	                	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(0);
                 	}
                 	
 					// Create new world dir?
@@ -448,7 +448,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 					
 					GuiHandler.seed = "";
 					((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = 0;
-					((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius = 0;
+					((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(0);
 					
 					GuiHandler.gameModeString = "survival";
 					GuiHandler.hardCore = false;
@@ -524,10 +524,10 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             txtPregenRadius.textboxKeyTyped(p_73869_1_, p_73869_2_);
             try
             {
-            	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius = Integer.parseInt(txtPregenRadius.getText());
+            	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(Integer.parseInt(txtPregenRadius.getText()));
             } catch(NumberFormatException ex)
             {
-            	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius = 0; 
+            	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(0); 
             }
         }
         else if (txtWorldBorderRadius.isFocused())
@@ -762,7 +762,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     				}
     			}
     			
-    			if(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius > 0 && fastcraftEnabled)
+    			if(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius() > 0 && fastcraftEnabled)
     			{
 					GuiYesNo guiyesno = askModCompatContinue(this, fastcraftEnabled, biomesOPlentyEnabled);
 					this.mc.displayGuiScreen(guiyesno);
@@ -919,7 +919,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                        
         // Pre-generation radius
         this.txtPregenRadius = new GuiTextField(20, this.fontRendererObj, this.width / 2 - 164, 159, 50, 20);
-        this.txtPregenRadius.setText(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius + "");
+        this.txtPregenRadius.setText(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius() + "");
                 
         // World border
         this.txtWorldBorderRadius = new GuiTextField(21, this.fontRendererObj, this.width / 2 - 164 + 210, 159, 50, 20);

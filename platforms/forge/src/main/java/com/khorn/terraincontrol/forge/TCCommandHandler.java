@@ -10,6 +10,7 @@ import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
@@ -103,9 +104,11 @@ final class TCCommandHandler implements ICommand
                 sender.addChatMessage(
                 		new TextComponentString(MESSAGE_COLOR + "/tc entities " + VALUE_COLOR + "Show a list of entities that can be spawned inside BO3's using the Entity() tag."));
                 sender.addChatMessage(
-                		new TextComponentString(MESSAGE_COLOR + "/tc cartographer " + VALUE_COLOR + "Teleports the player to the center of the Cartographer map. /tc map does the same thing."));
+                		new TextComponentString(MESSAGE_COLOR + "/tc cartographer " + VALUE_COLOR + "Teleports the player to the center of the Cartographer map. Same as /tc map."));
                 sender.addChatMessage(
-                		new TextComponentString(MESSAGE_COLOR + "/tc cartographer -tp " + VALUE_COLOR + "Teleports the player the location they are standing on on the Cartographer map. Area must exist and have been populated. /tc map -tp does the same thing."));
+                		new TextComponentString(MESSAGE_COLOR + "/tc cartographer -tp " + VALUE_COLOR + "Teleports the player the location they are standing on on the Cartographer map. Area must exist and have been populated. Same as /tc map -tp."));
+                sender.addChatMessage(
+                		new TextComponentString(MESSAGE_COLOR + "/tc pregenerator -r <radius> " + VALUE_COLOR + "Sets the pre-generation radius to <radius> chunks. Same as /tc pregen -r <radius>."));
                 sender.addChatMessage(new TextComponentString(""));
                 sender.addChatMessage(new TextComponentString("Tips:"));
         		sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "- Check out TerrainControl.ini for optional features."));
@@ -119,6 +122,28 @@ final class TCCommandHandler implements ICommand
                 sender.addChatMessage(new TextComponentString(""));
                 sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "Author: " + VALUE_COLOR + worldConfig.author));
                 sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "Description: " + VALUE_COLOR + worldConfig.description));
+            }
+            else if (argString[0].equals("pregenerator") || argString[0].equals("pregen"))
+            {
+            	if (CommandHelper.containsArgument(argString, "-r") && argString.length > 2)
+            	{
+            		int radius = 0;
+            		try
+            		{
+            			radius = Integer.parseInt(argString[2]);
+            		} catch(java.lang.NumberFormatException ex)
+            		{
+            			sender.addChatMessage(
+                                new TextComponentTranslation(ERROR_COLOR + "\"" + argString[2] + "\" could not be parsed as a number."));
+            			return;
+            		}
+	                int newRadius = world.getConfigs().getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(radius);	                
+	                ((ServerConfigProvider)world.getConfigs()).saveWorldConfig();
+	                
+        			sender.addChatMessage(
+                            new TextComponentTranslation(MESSAGE_COLOR + "Pre-generator radius set to " + VALUE_COLOR + newRadius + MESSAGE_COLOR + "."));
+        			return;
+            	}
             }
             else if (argString[0].equals("entities"))
             {                

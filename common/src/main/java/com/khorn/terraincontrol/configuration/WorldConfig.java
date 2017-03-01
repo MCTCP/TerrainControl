@@ -212,6 +212,8 @@ public class WorldConfig extends ConfigFile
         // Clamp Settings to acceptable values
         this.correctSettings();
                 
+        ArrayList<Integer> usedIds = new ArrayList<Integer>();
+        
         if(world != null) // If world is null then this method was called from WorldCreationMenu and only needs pre-generator and worldborder settings. TODO: Make this prettier?
         {        
 	        // Check biome ids, These are the names from the worldConfig file
@@ -221,6 +223,7 @@ public class WorldConfig extends ConfigFile
 	            Entry<String, Integer> entry = it.next();
 	
 	            // Check name
+	            
 	            String biomeName = entry.getKey();
 	            if (DefaultBiome.Contain(biomeName))
 	            {
@@ -231,7 +234,25 @@ public class WorldConfig extends ConfigFile
 	            }
 	
 	            // Check id
+	            
 	            int biomeId = entry.getValue();
+	            if(!((biomeId > 39 && biomeId < 129) || (biomeId > 167)))
+	            {
+	                TerrainControl.log(LogMarker.WARN, "CustomBiomes cannot use vanilla biome id's (0-39 and 129-167) . " 
+                		+ "Removing biome " + biomeName + " from the list.");
+	                it.remove();
+	                continue;
+	            }
+	            
+	            if(usedIds.contains(biomeId))
+	            {
+	                TerrainControl.log(LogMarker.WARN, "CustomBiomes contains two biomes with id " 
+                		+ biomeId + ". Removing biome " + biomeName + " from the list.");
+	                it.remove();
+	                continue;
+	            }
+	            usedIds.add(biomeId);
+	            
 	            if (biomeId == -1)
 	            {
 	                entry.setValue(world.getFreeBiomeId());
@@ -1043,6 +1064,15 @@ public class WorldConfig extends ConfigFile
         for (Iterator<Entry<String, Integer>> it = cbi.iterator(); it.hasNext();)
         {
             Entry<String, Integer> entry = it.next();
+    		if(!((entry.getValue() > 39 && entry.getValue() < 129) || (entry.getValue() > 167)))
+        	{
+    			// Skip custom biomes with vanilla id's. 
+    			// Forge adds these to the custom biomes list 
+    			// to make vanilla biomes fully customisable
+    			// but the vanilla biome id's shouldn't actually
+    			// be written to the WorldConfig.ini file
+    			continue;
+        	}
             output.add(entry.getKey() + ":" + entry.getValue());
         }
         writer.putSetting(WorldStandardValues.CUSTOM_BIOMES, output,

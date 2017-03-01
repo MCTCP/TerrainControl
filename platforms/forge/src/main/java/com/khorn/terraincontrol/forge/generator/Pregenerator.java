@@ -34,9 +34,26 @@ import com.khorn.terraincontrol.util.ChunkCoordinate;
 
 public class Pregenerator
 {    
-	public int PregenerationRadius;
-	    
-    public void resetPregenerator()
+	private int pregenerationRadius;
+	
+	public int getPregenerationRadius()
+	{
+		return pregenerationRadius;
+	}
+	
+	int newRadius = 0;
+	public int setPregenerationRadius(int radius)
+	{
+		if(!preGeneratorIsRunning || (radius > cycle && radius > 0))
+		{
+			pregenerationRadius = radius;
+		} else {
+			pregenerationRadius = cycle;
+		}
+		return pregenerationRadius;
+	}
+
+	public void resetPregenerator()
     {
 		left = 0;
 		right = 0;
@@ -52,7 +69,7 @@ public class Pregenerator
 		startTime = System.currentTimeMillis();		
     }	
 	
-	boolean PreGeneratorIsRunning;	    
+	boolean preGeneratorIsRunning;	    
 	boolean processing = false;
 	
     int radius = 0;
@@ -101,7 +118,8 @@ public class Pregenerator
 					
 					if(world == null)
 					{
-						TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load LocalWorld for world \"" + worldServer.getWorldInfo().getWorldName() + "\"");
+						TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load LocalWorld for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
+						processing = false;
 						return; // May be unloading / shutting down
 					}
 					
@@ -109,16 +127,18 @@ public class Pregenerator
 					
 					if(configProvider == null)
 					{
-						TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load world settings for world \"" + worldServer.getWorldInfo().getWorldName() + "\"");
-						throw new NotImplementedException();						
+						TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load world settings for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
+						processing = false;
+						return; // May be unloading / shutting down (?)
 					}
 					
 					WorldConfig worldConfig = configProvider.getWorldConfig();
 					
 					if(worldConfig == null)
 					{
-						TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load worldConfig for world \"" + worldServer.getWorldInfo().getWorldName() + "\"");
-						throw new NotImplementedException();
+						TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load worldConfig for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
+						processing = false;
+						return; // May be unloading / shutting down (?)
 					}
 
 					if(worldConfig.PreGenerationRadius > 0)
@@ -158,7 +178,7 @@ public class Pregenerator
 	        currentX = -radius;
 	        currentZ = -radius;				    	
         	
-			PreGeneratorIsRunning = true;
+			preGeneratorIsRunning = true;
 	    	pregenerationWorld = worldServer.getWorldInfo().getWorldName();	    	
 	    	      	
     		// Spawn all chunks within the pre-generation radius 
@@ -354,7 +374,7 @@ public class Pregenerator
 			
 			SavePreGeneratorData(worldServer);					
         }
-        PreGeneratorIsRunning = false;
+        preGeneratorIsRunning = false;
 	}
 	
 	void Pause(WorldServer worldServer)
@@ -438,7 +458,7 @@ public class Pregenerator
 	    	Minecraft mc = Minecraft.getMinecraft();
 	    	mc.gameSettings.showDebugInfo = false;
 	    	
-	    	if(PreGeneratorIsRunning && preGeneratorProgressStatus != "Done")
+	    	if(preGeneratorIsRunning && preGeneratorProgressStatus != "Done")
 	    	{
 		    	FontRenderer fontRenderer = mc.fontRendererObj;
 		    	
@@ -478,7 +498,7 @@ public class Pregenerator
 
 	public void ToggleIngameUI()
 	{ 
-		if(PreGeneratorIsRunning && preGeneratorProgressStatus != "Done" || menuOpen)
+		if(preGeneratorIsRunning && preGeneratorProgressStatus != "Done" || menuOpen)
 		{
 			if(menuOpen)
 			{
@@ -502,7 +522,7 @@ public class Pregenerator
     
 	public void SavePreGeneratorData(World world)
 	{	
-		if(PreGeneratorIsRunning)
+		if(preGeneratorIsRunning)
 		{
 			File pregeneratedChunksFile = new File(world.getSaveHandler().getWorldDirectory() + "/TerrainControl/PregeneratedChunks.txt");		
 			if(pregeneratedChunksFile.exists())

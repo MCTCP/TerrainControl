@@ -133,11 +133,12 @@ public class ForgeWorld implements LocalWorld
     	
     	// Always try to register biomes and create Biome Configs. Biomes with id's > 255 are registered
     	// only for biome -> id queries, any (saved)id -> biome query will return the ReplaceToBiomeName biome.
-    	    	
+        
         Biome existingBiome = Biome.getBiome(biomeIds.getSavedId());
     	Biome biome = BiomeGenCustom.getOrCreateBiome(biomeConfig, biomeIds);
         int requestedGenerationId = biomeIds.getGenerationId();
         int allocatedGenerationId = Biome.REGISTRY.underlyingIntegerMap.getId(biome);
+                
         if (requestedGenerationId != allocatedGenerationId)
         {
         	// When creating the ForgeBiome later in this method use the actual id's
@@ -148,10 +149,10 @@ public class ForgeWorld implements LocalWorld
                 throw new RuntimeException("Could not allocate the requested id " + requestedGenerationId + " for biome " + biomeConfig.getName() + ". All available id's under 256 have been allocated\n"
                     + ". To proceed, adjust your WorldConfig or use the ReplaceToBiomeName feature to make the biome virtual.");
             }
-            TerrainControl.log(LogMarker.INFO, "Asked to register {} with id {}, but succeeded with id {}",
+            TerrainControl.log(LogMarker.DEBUG, "Asked to register {} with id {}, but succeeded with id {}",
                     biomeConfig.getName(), requestedGenerationId, allocatedGenerationId);
         } else {
-            TerrainControl.log(LogMarker.INFO, "Registered {} with id {}",
+            TerrainControl.log(LogMarker.DEBUG, "Registered {} with id {}",
                     biomeConfig.getName(), allocatedGenerationId);
         }
 

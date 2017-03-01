@@ -198,9 +198,9 @@ public final class WorldLoader
                 // If this is a new world use the pre-generator and world border settings from world creation menu
                 if(GuiHandler.lastGuiOpened.equals(TCGuiCreateWorld.class))
                 {
-	    			if(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius > -1)
+	    			if(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius() > -1)
 	    			{
-	    				config.getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().PregenerationRadius;
+	    				config.getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius();
 	    			}
 	    			if(((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius > -1)
 	    			{
