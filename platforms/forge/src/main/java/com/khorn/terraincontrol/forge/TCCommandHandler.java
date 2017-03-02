@@ -5,20 +5,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.util.CommandHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EntityList;
@@ -31,25 +27,16 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
-import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 final class TCCommandHandler implements ICommand
 {
     private final List<String> aliases = Arrays.asList("tc");
-    private final WorldLoader worldLoader;
     public static final TextFormatting ERROR_COLOR = TextFormatting.RED;
     public static final TextFormatting MESSAGE_COLOR = TextFormatting.GREEN;
     public static final TextFormatting VALUE_COLOR = TextFormatting.DARK_GREEN;
-
-    TCCommandHandler(WorldLoader worldLoader)
-    {
-        this.worldLoader = Preconditions.checkNotNull(worldLoader);
-    }
 
     @Override
     public String getCommandName()
@@ -77,7 +64,7 @@ final class TCCommandHandler implements ICommand
         if (!mcWorld.isRemote) // Server side
         {
             ForgeWorld world = (ForgeWorld)CommandHelper.getWorld(sender, "");
-
+                        
             if (world == null)
             {
             	sender.addChatMessage(new TextComponentString(""));
@@ -112,7 +99,7 @@ final class TCCommandHandler implements ICommand
                 sender.addChatMessage(new TextComponentString(""));
                 sender.addChatMessage(new TextComponentString("Tips:"));
         		sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "- Check out TerrainControl.ini for optional features."));
-        		sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "- When using the pre-generator open the chat window so you can background MC without pausing the game."));
+        		sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "- When using the pre-generator in single player open the chat window so you can background MC without pausing the game."));
             }
             else if (argString[0].equals("worldinfo") || argString[0].equals("world"))
             {
@@ -137,7 +124,7 @@ final class TCCommandHandler implements ICommand
                                 new TextComponentTranslation(ERROR_COLOR + "\"" + argString[2] + "\" could not be parsed as a number."));
             			return;
             		}
-	                int newRadius = world.getConfigs().getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(radius);	                
+	                int newRadius = world.getConfigs().getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(radius, mcWorld);
 	                ((ServerConfigProvider)world.getConfigs()).saveWorldConfig();
 	                
         			sender.addChatMessage(
@@ -152,7 +139,7 @@ final class TCCommandHandler implements ICommand
 	    		sender.addChatMessage(new TextComponentString("-- Entities List --"));
 	    		sender.addChatMessage(new TextComponentString(""));
 	    		sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "Some of these, like ThrownPotion, FallingSand, Mob and Painting may crash the game so be sure to test your BO3 in single player."));
-	    		sender.addChatMessage(new TextComponentString(""));
+    			sender.addChatMessage(new TextComponentString(""));
     			EnumCreatureType[] aenumcreaturetype = EnumCreatureType.values();
 	    		for(String entry : EntityList.NAME_TO_CLASS.keySet())
 	        	{
@@ -172,7 +159,7 @@ final class TCCommandHandler implements ICommand
             }
             else if (argString[0].equals("cartographer") || argString[0].equals("map"))
             {
-    			if(Minecraft.getMinecraft().thePlayer.dimension != 0)
+    			if(((EntityPlayer)sender).dimension != 0)
     			{
     				sender.addChatMessage(new TextComponentString(""));
                     sender.addChatMessage(
@@ -193,14 +180,7 @@ final class TCCommandHandler implements ICommand
                 {
                 	// TP player to the location they are standing on on the map
                 	                	
-                	WorldServer worldServer = null;                	                	                	
-                	Minecraft mc = Minecraft.getMinecraft();
-                	if (mc.isIntegratedServerRunning())
-                	{
-                	    worldServer = mc.getIntegratedServer().worldServerForDimension(mc.thePlayer.dimension);
-                	} else {
-                	    worldServer = ((EntityPlayer)sender.getCommandSenderEntity()).getServer().getServer().worldServerForDimension(mc.thePlayer.dimension);
-                	}
+                	WorldServer worldServer = ((EntityPlayer)sender.getCommandSenderEntity()).getServer().getServer().worldServerForDimension(((EntityPlayer)sender).dimension);
                 	
                 	ChunkCoordinate spawnChunk = ChunkCoordinate.fromBlockCoords(spawnPoint.getX(), spawnPoint.getZ());
                 	int newX = spawnChunk.getBlockXCenter() + ((x - spawnChunk.getBlockXCenter()) * 16);
@@ -227,7 +207,7 @@ final class TCCommandHandler implements ICommand
             } 
             else if (argString[0].equals("biome"))
             {
-    			if(Minecraft.getMinecraft().thePlayer.dimension != 0)
+    			if(((EntityPlayer)sender).dimension != 0)
     			{
     				sender.addChatMessage(new TextComponentString(""));
                     sender.addChatMessage(
@@ -302,9 +282,9 @@ final class TCCommandHandler implements ICommand
 	                	
 	                	sender.addChatMessage(new TextComponentString(""));
 	                    sender.addChatMessage(new TextComponentTranslation("-- Biome mob spawning settings --"));
-	                    sender.addChatMessage(new TextComponentTranslation(""));
 		            	for(EnumCreatureType creatureType : EnumCreatureType.values())
 		            	{
+			    			sender.addChatMessage(new TextComponentString(""));
 		            		sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + creatureType.name() + ": "));
 			    			ArrayList<SpawnListEntry> creatureList = (ArrayList<SpawnListEntry>)calculatedBiome.biomeBase.getSpawnableList(creatureType);
 			    			if(creatureList != null && creatureList.size() > 0)

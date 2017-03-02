@@ -193,21 +193,12 @@ public final class WorldLoader
             if (config == null)
             {            	
                 TerrainControl.log(LogMarker.INFO, "Loading configs for world \"{}\"..", world.getName());
-                config = new ServerConfigProvider(worldConfigsFolder, world);
-                                
-                // If this is a new world use the pre-generator and world border settings from world creation menu
-                if(GuiHandler.lastGuiOpened.equals(TCGuiCreateWorld.class))
+                config = new ServerConfigProvider(worldConfigsFolder, world);               
+               
+                try // Client side only
                 {
-	    			if(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius() > -1)
-	    			{
-	    				config.getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius();
-	    			}
-	    			if(((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius > -1)
-	    			{
-	    				config.getWorldConfig().WorldBorderRadius = ((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius;    				
-	    			}
-	    			config.saveWorldConfig();
-                }
+                	applyWorldCreationMenuSettings(config);
+                } catch(NoSuchMethodError ex) { }
                 
                 // Remove fake biome to avoid Forge detecting it on restart and causing level.dat to be restored
                 Iterator<Map.Entry<ResourceLocation, Biome>> iterator = Biome.REGISTRY.registryObjects.entrySet().iterator();
@@ -240,6 +231,24 @@ public final class WorldLoader
         }
 
         return world;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    private void applyWorldCreationMenuSettings(ServerConfigProvider config)
+    {
+        // If this is a new world use the pre-generator and world border settings from world creation menu
+    	if(GuiHandler.lastGuiOpened.equals(TCGuiCreateWorld.class))
+    	{
+			if(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius() > -1)
+			{
+				config.getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius();
+			}
+			if(((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius > -1)
+			{
+				config.getWorldConfig().WorldBorderRadius = ((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius;    				
+			}
+			config.saveWorldConfig();
+    	}
     }
 
     @SideOnly(Side.CLIENT)

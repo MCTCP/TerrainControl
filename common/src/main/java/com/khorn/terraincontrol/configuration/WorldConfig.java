@@ -236,9 +236,9 @@ public class WorldConfig extends ConfigFile
 	            // Check id
 	            
 	            int biomeId = entry.getValue();
-	            if(!((biomeId > 39 && biomeId < 129) || (biomeId > 167)))
+	            if(!((biomeId > 39 && biomeId < 127) || (biomeId > 167)))
 	            {
-	                TerrainControl.log(LogMarker.WARN, "CustomBiomes cannot use vanilla biome id's (0-39 and 129-167) . " 
+	                TerrainControl.log(LogMarker.WARN, "CustomBiomes cannot use vanilla biome id's (0-39 and 127-167) . " 
                 		+ "Removing biome " + biomeName + " from the list.");
 	                it.remove();
 	                continue;
@@ -1064,7 +1064,7 @@ public class WorldConfig extends ConfigFile
         for (Iterator<Entry<String, Integer>> it = cbi.iterator(); it.hasNext();)
         {
             Entry<String, Integer> entry = it.next();
-    		if(!((entry.getValue() > 39 && entry.getValue() < 129) || (entry.getValue() > 167)))
+    		if(!((entry.getValue() > 39 && entry.getValue() < 127) || (entry.getValue() > 167)))
         	{
     			// Skip custom biomes with vanilla id's. 
     			// Forge adds these to the custom biomes list 
@@ -1090,7 +1090,7 @@ public class WorldConfig extends ConfigFile
                 "but the server can think it is another biome with the same id. This will cause saplings,",
                 "snowfall and mobs to work as in the other biome.",
                 "",
-                "The available ids range from 0 to 1023 and the ids 0-39 and 129-167 are taken by vanilla.",
+                "The available ids range from 0 to 1023 and the ids 0-39 and 127-167 are taken by vanilla.",
                 "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome.");
     }
 

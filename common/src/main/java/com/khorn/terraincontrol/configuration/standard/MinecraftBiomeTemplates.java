@@ -10,7 +10,6 @@ import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Class to hold all default settings of all default biomes.

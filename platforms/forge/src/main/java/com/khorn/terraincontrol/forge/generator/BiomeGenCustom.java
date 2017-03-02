@@ -11,7 +11,6 @@ import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
-import net.minecraft.init.Biomes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -89,7 +88,17 @@ public class BiomeGenCustom extends Biome
     {
         // This is a custom biome, get or register it
         String biomeNameForRegistry = StringHelper.toComputerFriendlyName(biomeConfig.getName());
-        ResourceLocation registryKey = new ResourceLocation(PluginStandardValues.PLUGIN_NAME.toLowerCase(), biomeNameForRegistry);
+        
+        int generationId = biomeIds.getGenerationId();
+        String resourceDomain = PluginStandardValues.PLUGIN_NAME.toLowerCase();
+        // 0-39 and 127-167 are vanilla biomes so register them as such   
+        // so that biomes are properly recognised by non-modded clients
+        if((generationId >= 0 && generationId <= 39) || (generationId >= 127 && generationId <= 167))
+        {
+        	resourceDomain = "minecraft";
+        }
+        
+        ResourceLocation registryKey = new ResourceLocation(resourceDomain, biomeNameForRegistry);
 
         // Check if registered earlier
         Biome alreadyRegisteredBiome = Biome.REGISTRY.registryObjects.get(registryKey);

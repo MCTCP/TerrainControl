@@ -40,15 +40,44 @@ public class Pregenerator
 	{
 		return pregenerationRadius;
 	}
-	
-	int newRadius = 0;
+
+	/**
+	 * Sets the pre-generation radius (in chunks) for the world.
+	 * Radius cannot be smaller than currently pre-generated area.
+	 * @param radius The desired radius.
+	 * @return The radius value that was set for the pregenerator.
+	 */
 	public int setPregenerationRadius(int radius)
 	{
+		return setPregenerationRadius(radius, null);
+	}
+	
+	/**
+	 * Sets the pre-generation radius (in chunks) for the world.
+	 * Radius cannot be smaller than currently pre-generated area.
+	 * @param radius The desired radius.
+	 * @param world Used to save pregenerator data to file.
+	 * @return The radius value that was set for the pregenerator.
+	 */
+	public int setPregenerationRadius(int radius, World world)
+	{
+		if(pregenerationRadius == 0)
+		{
+			// Reset start time in case this method 
+			// starts pre-generation in this world
+			// for the first time and no start time 
+			// info was saved previously.
+			resetPregenerator(); 
+		}
 		if(!preGeneratorIsRunning || (radius > cycle && radius > 0))
 		{
 			pregenerationRadius = radius;
 		} else {
 			pregenerationRadius = cycle;
+		}
+		if(world != null)
+		{
+			this.SavePreGeneratorData(world);
 		}
 		return pregenerationRadius;
 	}
@@ -66,7 +95,7 @@ public class Pregenerator
 		iTop = Integer.MIN_VALUE;
 		iBottom = Integer.MIN_VALUE;
 		
-		startTime = System.currentTimeMillis();		
+		startTime = System.currentTimeMillis();
     }	
 	
 	boolean preGeneratorIsRunning;	    
@@ -517,6 +546,12 @@ public class Pregenerator
         return bytes / 1024L / 1024L;
     }
 	
+    public void shutDown(World world)
+    {
+    	SavePreGeneratorData(world);
+    	preGeneratorIsRunning = false;
+    }
+    
     // Saving / Loading
     // TODO: It's crude but it works, feel free to improve
     

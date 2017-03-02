@@ -123,7 +123,7 @@ public class ForgeWorld implements LocalWorld
           
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
-    {    	
+    {      	
 		// Make an exception for the hell and sky biomes. 
 		// The hell and end chunk providers refer specifically to 
 		// Biomes.HELL and Biomes.SKY and query the biome registry

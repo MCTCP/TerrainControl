@@ -8,11 +8,9 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorNewOctaves;
-import com.khorn.terraincontrol.generator.resource.CustomStructureGen;
 import com.khorn.terraincontrol.generator.resource.Resource;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Arrays;
 import java.util.Random;

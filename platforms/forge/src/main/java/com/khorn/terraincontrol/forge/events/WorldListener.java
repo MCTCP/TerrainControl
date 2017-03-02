@@ -38,7 +38,7 @@ public class WorldListener
         }
         if(mcWorld.provider.getDimension() == 0) // Temporary fix, this may break multi-world support (I assume it uses dimensions to load other worlds?) 
         {
-        	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().SavePreGeneratorData(mcWorld);
+        	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().shutDown(mcWorld);
         	this.worldLoader.unloadWorld(forgeWorld);
         }
     }

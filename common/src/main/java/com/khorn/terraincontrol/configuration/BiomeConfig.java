@@ -175,16 +175,19 @@ public class BiomeConfig extends ConfigFile
         // Mob spawning data was already loaded seperately before the rest of the biomeconfig to make inheritance work properly
         // Forge: If this is a vanilla biome then mob spawning settings have been inherited from vanilla MC biomes 
         // This includes any mobs added to vanilla biomes by other mods when MC started.
-        
-        spawnMonsters.addAll(biomeConfigStub.spawnMonsters);
-        spawnCreatures.addAll(biomeConfigStub.spawnCreatures);
-        spawnWaterCreatures.addAll(biomeConfigStub.spawnWaterCreatures);
-        spawnAmbientCreatures.addAll(biomeConfigStub.spawnAmbientCreatures);
-        
-        spawnMonstersMerged.addAll(biomeConfigStub.spawnMonstersMerged);
-        spawnCreaturesMerged.addAll(biomeConfigStub.spawnCreaturesMerged);
-        spawnWaterCreaturesMerged.addAll(biomeConfigStub.spawnWaterCreaturesMerged);
-        spawnAmbientCreaturesMerged.addAll(biomeConfigStub.spawnAmbientCreaturesMerged);
+                
+        if(biomeConfigStub != null)
+        {
+	        spawnMonsters.addAll(biomeConfigStub.spawnMonsters);
+	        spawnCreatures.addAll(biomeConfigStub.spawnCreatures);
+	        spawnWaterCreatures.addAll(biomeConfigStub.spawnWaterCreatures);
+	        spawnAmbientCreatures.addAll(biomeConfigStub.spawnAmbientCreatures);
+	        
+	        spawnMonstersMerged.addAll(biomeConfigStub.spawnMonstersMerged);
+	        spawnCreaturesMerged.addAll(biomeConfigStub.spawnCreaturesMerged);
+	        spawnWaterCreaturesMerged.addAll(biomeConfigStub.spawnWaterCreaturesMerged);
+	        spawnAmbientCreaturesMerged.addAll(biomeConfigStub.spawnAmbientCreaturesMerged);
+        }
         
         this.worldConfig = worldConfig;
         this.defaultSettings = loadInstruction.getBiomeTemplate();

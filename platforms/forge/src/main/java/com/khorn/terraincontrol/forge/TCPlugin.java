@@ -147,7 +147,7 @@ public class TCPlugin
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event)
     {
-        event.registerServerCommand(new TCCommandHandler(this.worldLoader));
+        event.registerServerCommand(new TCCommandHandler());
     }
 
 }

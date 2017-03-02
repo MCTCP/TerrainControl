@@ -382,7 +382,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                 	}
                 	
 					// Create new world dir?
-                	GuiHandler.worldName = GuiHandler.selectedWorldName;						
+                	GuiHandler.worldName = GuiHandler.selectedWorldName;
 					txtWorldName.setText(GuiHandler.worldName != null ?GuiHandler.worldName : "");						
                 }
                 
