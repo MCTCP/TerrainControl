@@ -46,7 +46,7 @@ public class SpawnCommand extends BaseCommand
 
         if (spawnObject == null)
         {
-            sender.sendMessage(ERROR_COLOR + "Object not found, use '/tc list' to list the available ones.");
+            sender.sendMessage(ERROR_COLOR + "Object not found, use '/otg list' to list the available ones.");
             return true;
         }
 

@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.util.helpers;
 import java.lang.reflect.Field;
 
 /**
- * Implementations of Terrain Control can use methods in this class to make
+ * Implementations of Open Terrain Generator can use methods in this class to make
  * using reflection easier. Reflection should be avoided where possible, but
  * when dealing with Minecraft there's sometimes no other option.
  */

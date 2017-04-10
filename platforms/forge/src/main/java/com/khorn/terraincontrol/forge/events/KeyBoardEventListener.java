@@ -26,7 +26,7 @@ public class KeyBoardEventListener
 	{
 		if(!registered)
 		{
-			keyBinding = new KeyBinding("TC Pregenerator HUD toggle", Keyboard.KEY_F3, "TerrainControl");
+			keyBinding = new KeyBinding("OTG Pregenerator HUD toggle", Keyboard.KEY_F3, "OpenTerrainGenerator");
 			ClientRegistry.registerKeyBinding(keyBinding);
 			registered = true;
 		}

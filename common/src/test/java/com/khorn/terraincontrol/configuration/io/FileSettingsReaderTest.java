@@ -15,7 +15,7 @@ import java.util.Iterator;
 public class FileSettingsReaderTest
 {
 
-    public String fileContentsString = "Author: TerrainControl\n"
+    public String fileContentsString = "Author: OpenTerrainGenerator\n"
             + "\n"
             + "Description:    File to test setting reading\n";
 
@@ -29,12 +29,12 @@ public class FileSettingsReaderTest
         reader.readIntoMap(settingsMap, fileContents);
 
         // Test normat retrieval
-        assertEquals("TerrainControl", settingsMap.getSetting(WorldStandardValues.AUTHOR));
+        assertEquals("OpenTerrainGenerator", settingsMap.getSetting(WorldStandardValues.AUTHOR));
         assertEquals("File to test setting reading", settingsMap.getSetting(WorldStandardValues.DESCRIPTION));
 
         // Test iterating over raw settings
         Iterator<RawSettingValue> it = settingsMap.getRawSettings().iterator();
-        assertEquals("Author: TerrainControl", it.next().getRawValue());
+        assertEquals("Author: OpenTerrainGenerator", it.next().getRawValue());
         assertEquals("Description:    File to test setting reading", it.next().getRawValue());
     }
 

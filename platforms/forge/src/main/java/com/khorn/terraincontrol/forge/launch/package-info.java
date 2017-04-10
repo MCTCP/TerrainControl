@@ -1,4 +1,4 @@
 /**
- * These classes allow you to launch TerrainControl from your IDE.
+ * These classes allow you to launch OpenTerrainGenerator from your IDE.
  */
 package com.khorn.terraincontrol.forge.launch;

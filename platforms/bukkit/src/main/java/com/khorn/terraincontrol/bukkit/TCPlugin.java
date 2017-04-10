@@ -33,7 +33,7 @@ public class TCPlugin extends JavaPlugin
     public TCCommandExecutor commandExecutor;
 
     /*
-     * Debug setting. Set it to true to make Terrain Control try to disable
+     * Debug setting. Set it to true to make Open Terrain Generator try to disable
      * itself. However, terrain generators aren't cleaned up properly by
      * Bukkit, so this won't really work until that bug is fixed.
      */
@@ -68,11 +68,11 @@ public class TCPlugin extends JavaPlugin
             // Reload "handling"
             // (worlds are already loaded and TC didn't clean up itself)
             TerrainControl.log(LogMarker.FATAL, Arrays.asList(
-                    "The server was just /reloaded! Terrain Control has problems handling this, ",
+                    "The server was just /reloaded! Open Terrain Generator has problems handling this, ",
                     "as old parts from before the reload have not been cleaned up. ",
                     "Unexpected things may happen! Please restart the server! ",
                     "In the future, instead of /reloading, please restart the server, ",
-                    "or reload a plugin using it's built-in command (like /tc reload), ",
+                    "or reload a plugin using it's built-in command (like /otg reload), ",
                     "or use a plugin managing plugin that can reload one plugin at a time."));
             setEnabled(false);
         } else
@@ -116,7 +116,7 @@ public class TCPlugin extends JavaPlugin
     {
         if (worldName.isEmpty())
         {
-            TerrainControl.log(LogMarker.DEBUG, "Ignoring empty world name. Is some generator plugin checking if \"TerrainControl\" is a valid world name?");
+            TerrainControl.log(LogMarker.DEBUG, "Ignoring empty world name. Is some generator plugin checking if \"OpenTerrainGenerator\" is a valid world name?");
             return new TCChunkGenerator(this);
         }
 

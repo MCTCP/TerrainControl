@@ -86,7 +86,7 @@ public class ListCommand extends BaseCommand
             }
         }
 
-        this.ListMessage(sender, pluginList, page, "Global objects", "Use /tc list -w [world] for world objects");
+        this.ListMessage(sender, pluginList, page, "Global objects", "Use /otg list -w [world] for world objects");
 
         return true;
 

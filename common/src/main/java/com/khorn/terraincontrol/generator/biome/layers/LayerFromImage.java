@@ -30,7 +30,9 @@ public class LayerFromImage extends Layer
         xOffset = config.imageXOffset;
         zOffset = config.imageZOffset;
         this.imageMode = config.imageMode;
-        this.fillBiome = world.getBiomeByName(config.imageFillBiome).getIds().getGenerationId();
+        
+    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+    	this.fillBiome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(config.imageFillBiome).getIds().getGenerationId() : world.getBiomeByNameOrNull(config.imageFillBiome).getIds().getGenerationId();
 
         // Read from file
         try

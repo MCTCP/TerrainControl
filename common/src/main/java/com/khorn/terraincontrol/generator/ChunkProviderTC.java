@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.generator;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -302,9 +303,11 @@ public class ChunkProviderTC
             {
                 // The following code is executed for each column in the chunk
 
+            	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+            	LocalBiome biome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(this.biomeArray[(x + z * CHUNK_X_SIZE)]) : this.configProvider.getBiomeByIdOrNull(this.biomeArray[(x + z * CHUNK_X_SIZE)]);
+
                 // Get the current biome config and some properties
-                final BiomeConfig biomeConfig = this.configProvider.getBiomeByIdOrNull(
-                        this.biomeArray[(x + z * CHUNK_X_SIZE)]).getBiomeConfig();
+                final BiomeConfig biomeConfig = biome.getBiomeConfig();
 
                 biomeConfig.surfaceAndGroundControl.spawn(generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 
@@ -355,8 +358,12 @@ public class ChunkProviderTC
             {
 
                 final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))];
-                final BiomeConfig biomeConfig = this.configProvider.getBiomeByIdOrNull(biomeId).getBiomeConfig();
 
+                // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+                LocalBiome biome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(biomeId) : this.configProvider.getBiomeByIdOrNull(biomeId);
+
+                final BiomeConfig biomeConfig = biome.getBiomeConfig();
+            	
                 double noiseHeight = this.noise6[i2D] / 8000.0D;
                 if (noiseHeight < 0.0D)
                 {
@@ -502,7 +509,7 @@ public class ChunkProviderTC
         for (int nextX = -lookRadius; nextX <= lookRadius; nextX++)
         {
             for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
-            {
+            {                      	
                 final BiomeConfig nextBiomeConfig = toBiomeConfig(
                         this.biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
 
@@ -626,7 +633,9 @@ public class ChunkProviderTC
      */
     private BiomeConfig toBiomeConfig(int id)
     {
-        return this.configProvider.getBiomeByIdOrNull(id).getBiomeConfig();
+    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+    	LocalBiome biome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(id) : this.configProvider.getBiomeByIdOrNull(id);
+        return biome.getBiomeConfig();
     }
 
 }

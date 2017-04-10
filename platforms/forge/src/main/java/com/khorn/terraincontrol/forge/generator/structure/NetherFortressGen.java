@@ -2,8 +2,9 @@ package com.khorn.terraincontrol.forge.generator.structure;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.forge.util.WorldHelper;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
+
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityMagmaCube;
 import net.minecraft.entity.monster.EntityPigZombie;
@@ -12,6 +13,8 @@ import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.gen.structure.MapGenNetherBridge;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
+
+import com.khorn.terraincontrol.forge.ForgeEngine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +54,7 @@ public class NetherFortressGen extends MapGenStructure
                 return false;
             } else
             {
-                LocalWorld world = WorldHelper.toLocalWorld(this.worldObj);
+                LocalWorld world = ((ForgeEngine)TerrainControl.getEngine()).getWorld(this.worldObj);
                 LocalBiome biome = world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
                 if (!biome.getBiomeConfig().netherFortressesEnabled)
                 {

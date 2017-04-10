@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.WorldLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import net.minecraft.client.Minecraft;
@@ -13,10 +14,10 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 import java.io.DataInputStream;
@@ -30,10 +31,12 @@ public class ClientNetworkEventListener
     {
         this.worldLoader = Preconditions.checkNotNull(worldLoader);
     }
-
+    
     @SubscribeEvent
     public void onPacketReceive(ClientCustomPacketEvent event)
-    {
+    {    	
+    	TerrainControl.log(LogMarker.INFO, "onPacketReceive");
+    	
         // Ignore if packet was local
         if (event.getManager().isLocalChannel())
         {
@@ -69,8 +72,7 @@ public class ClientNetworkEventListener
                 }
 
                 TerrainControl.log(LogMarker.INFO, "Config received from server");
-            } else
-            {
+            } else {
                 // Server or client is outdated
                 if (serverProtocolVersion > PluginStandardValues.ProtocolVersion)
                 {
@@ -109,10 +111,10 @@ public class ClientNetworkEventListener
         Minecraft.getMinecraft().thePlayer.addChatMessage(chat);
     }
 
-    @SubscribeEvent
-    public void onDisconnect(ClientDisconnectionFromServerEvent event)
+    //@SubscribeEvent
+    //public void onDisconnect(ClientDisconnectionFromServerEvent event)
     {
-        this.worldLoader.onQuitFromServer();
+        //this.worldLoader.onQuitFromServer();
     }
 
 }

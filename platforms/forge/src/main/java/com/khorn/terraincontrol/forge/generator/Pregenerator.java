@@ -22,6 +22,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import com.google.common.base.Strings;
@@ -29,6 +30,8 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.ForgeEngine;
+import com.khorn.terraincontrol.forge.TCWorldType;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 
@@ -98,7 +101,7 @@ public class Pregenerator
 		startTime = System.currentTimeMillis();
     }	
 	
-	boolean preGeneratorIsRunning;	    
+	boolean preGeneratorIsRunning;
 	boolean processing = false;
 	
     int radius = 0;
@@ -123,6 +126,8 @@ public class Pregenerator
 	
 	int lastWorldHash = 0;
 	
+	int spawnedThisTick = 0;
+	
 	// In-game UI
 	String pregenerationWorld = "";
 	String preGeneratorProgressStatus = "";
@@ -137,17 +142,16 @@ public class Pregenerator
 		{
 			processing = true;
 
-			MinecraftServer mcServer = FMLCommonHandler.instance().getMinecraftServerInstance();
-			
+			MinecraftServer mcServer = FMLCommonHandler.instance().getMinecraftServerInstance();			
 			for(WorldServer worldServer : mcServer.worldServers)
-			{				
-				if(worldServer.getWorldInfo().getTerrainType() == WorldType.parseWorldType("TerrainControl") && worldServer.provider.isSurfaceWorld())
+			{
+				if(worldServer.getWorldInfo().getTerrainType() instanceof TCWorldType && worldServer.provider.getDimension() == 0)
 				{					
-					LocalWorld world = TerrainControl.getWorld(worldServer.getWorldInfo().getWorldName());					
+					LocalWorld world = ((ForgeEngine)TerrainControl.getEngine()).getWorld(worldServer);				
 					
 					if(world == null)
 					{
-						TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load LocalWorld for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
+						//TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load LocalWorld for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
 						processing = false;
 						return; // May be unloading / shutting down
 					}
@@ -156,7 +160,7 @@ public class Pregenerator
 					
 					if(configProvider == null)
 					{
-						TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load world settings for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
+						//TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load world settings for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
 						processing = false;
 						return; // May be unloading / shutting down (?)
 					}
@@ -165,7 +169,7 @@ public class Pregenerator
 					
 					if(worldConfig == null)
 					{
-						TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load worldConfig for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
+						//TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load worldConfig for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
 						processing = false;
 						return; // May be unloading / shutting down (?)
 					}
@@ -221,7 +225,7 @@ public class Pregenerator
     		boolean bottomEdgeFound = false;
     			
     		int maxSpawnPerTick = TerrainControl.getPluginConfig().PregeneratorMaxChunksPerTick;
-    		int spawnedThisTick = 0;
+    		spawnedThisTick = 0;
 
     		BlockPos spawnPoint = worldServer.getSpawnPoint();
     		ChunkCoordinate spawnChunk = ChunkCoordinate.fromBlockCoords(spawnPoint.getX(), spawnPoint.getZ());
@@ -257,7 +261,6 @@ public class Pregenerator
 		    				
 							PreGenerateChunk(currentX, currentZ, worldServer);
 							
-							spawnedThisTick++;
 			    			if(spawnedThisTick >= maxSpawnPerTick)
 			    			{
 			    				if(i == bottom)
@@ -296,7 +299,6 @@ public class Pregenerator
 							
 							PreGenerateChunk(currentX, currentZ, worldServer);
 							
-		    				spawnedThisTick++;
 			    			if(spawnedThisTick >= maxSpawnPerTick)
 			    			{
 			    				if(i == bottom)
@@ -335,7 +337,6 @@ public class Pregenerator
 							
 							PreGenerateChunk(currentX, currentZ, worldServer);
 							
-							spawnedThisTick++;
 			    			if(spawnedThisTick >= maxSpawnPerTick)
 			    			{
 			    				if(i == right)
@@ -374,7 +375,6 @@ public class Pregenerator
 							
 							PreGenerateChunk(currentX, currentZ, worldServer);
 							
-		    				spawnedThisTick++;
 			    			if(spawnedThisTick >= maxSpawnPerTick)
 			    			{
 			    				if(i == right)
@@ -430,10 +430,11 @@ public class Pregenerator
 			)
 		)
 		{
+			spawnedThisTick++;
         	chunkProvider.provideChunk(currentX, currentZ).needsSaving(true);
         	chunkProvider.provideChunk(currentX, currentZ + 1).needsSaving(true);
         	chunkProvider.provideChunk(currentX + 1, currentZ).needsSaving(true);
-        	chunkProvider.provideChunk(currentX + 1, currentZ + 1).needsSaving(true);			
+        	chunkProvider.provideChunk(currentX + 1, currentZ + 1).needsSaving(true);
 		}
 	}
 	
@@ -559,7 +560,7 @@ public class Pregenerator
 	{	
 		if(preGeneratorIsRunning)
 		{
-			File pregeneratedChunksFile = new File(world.getSaveHandler().getWorldDirectory() + "/TerrainControl/PregeneratedChunks.txt");		
+			File pregeneratedChunksFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/PregeneratedChunks.txt");		
 			if(pregeneratedChunksFile.exists())
 			{
 				pregeneratedChunksFile.delete();
@@ -593,7 +594,7 @@ public class Pregenerator
 
 	void LoadPreGeneratorData(WorldServer worldServer)
 	{				
-		File pregeneratedChunksFile = new File(worldServer.getSaveHandler().getWorldDirectory() + "/TerrainControl/PregeneratedChunks.txt");				
+		File pregeneratedChunksFile = new File(worldServer.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/PregeneratedChunks.txt");				
 		String[] pregeneratedChunksFileValues = {};
 		if(pregeneratedChunksFile.exists())
 		{

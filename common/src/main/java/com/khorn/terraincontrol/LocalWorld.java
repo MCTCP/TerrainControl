@@ -13,6 +13,7 @@ import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
@@ -54,11 +55,13 @@ public interface LocalWorld
 
     public int getFreeBiomeId();
 
+    public ArrayList<LocalBiome> getAllBiomes();
+    
     public LocalBiome getBiomeById(int id) throws BiomeNotFoundException;
 
     public LocalBiome getBiomeByIdOrNull(int id);
 
-    public LocalBiome getBiomeByName(String name) throws BiomeNotFoundException;
+    public LocalBiome getBiomeByNameOrNull(String name);
 
     public Collection<? extends BiomeLoadInstruction> getDefaultBiomes();
 

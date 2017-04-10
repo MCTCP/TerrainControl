@@ -299,7 +299,7 @@ public class BO3Config extends ConfigFile
                 "An EntityFunction spawns an entity instead of a block. The entity is spawned only once when the BO3 is spawned.",
                 "Entities are persistent by default so they don't de-spawn when no player is near, they are only unloaded.",
                 "Usage: Entity(x,y,z,mobName,groupSize,NameTagOrNBTFileName) or Entity(x,y,z,mobName,groupSize)",		
-                "Use /tc entities to get a list of entities that can be used as mobName, this includes entities added by other mods.",
+                "Use /otg entities to get a list of entities that can be used as mobName, this includes entities added by other mods.",
                 "NameTagOrNBTFileName can be either a nametag for the mob or an nbt file (such as mymobinfo.nbt or mymobinfo.txt).",
                 "When using a text file you can use the same mob spawning parameters used with the /summon command to equip the",
                 "entity and give it custom attributes etc. You can copy the DATA part of a summon command including surrounding ",

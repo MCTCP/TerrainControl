@@ -14,7 +14,7 @@ public interface CustomObjectLoader
     public CustomObject loadFromFile(String objectName, File file);
 
     /**
-     * Called whenever Terrain Control is being shut down / reloaded.
+     * Called whenever Open Terrain Generator is being shut down / reloaded.
      */
     public void onShutdown();
 }

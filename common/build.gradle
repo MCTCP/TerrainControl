@@ -1,10 +1,10 @@
-// Build script for the Common parts of Terrain Control
+// Build script for the Common parts of OpenTerrainGenerator
 
 apply plugin: 'java'
 
 // Project properties
-archivesBaseName = "terraincontrol-common"
-description = "Core files of TerrainControl"
+archivesBaseName = "openterraingenerator-common"
+description = "Core files of OpenTerrainGenerator"
 
 repositories
 {

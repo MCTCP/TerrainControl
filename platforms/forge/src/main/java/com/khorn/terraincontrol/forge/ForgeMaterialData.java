@@ -28,7 +28,7 @@ public class ForgeMaterialData implements LocalMaterialData
         {
             return ForgeMaterialData.ofMinecraftBlock(block);
         }
-
+        
         try
         {
             // Try block(:data) syntax

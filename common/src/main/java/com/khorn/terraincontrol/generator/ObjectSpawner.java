@@ -92,7 +92,7 @@ public class ObjectSpawner
 	        
 			processing = false;
 		} else {			
-			TerrainControl.log(LogMarker.INFO,"Error, minecraft engine attempted to populate two chunks at once! Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to Debug in mods/TerrainControl/TerranControl.ini file for a stack trace.");
+			TerrainControl.log(LogMarker.INFO,"Error, minecraft engine attempted to populate two chunks at once! Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to Debug in mods/OpenTerrainGenerator/TerranControl.ini file for a stack trace.");
 			TerrainControl.log(LogMarker.DEBUG, Arrays.toString(Thread.currentThread().getStackTrace()));
 		}
     }

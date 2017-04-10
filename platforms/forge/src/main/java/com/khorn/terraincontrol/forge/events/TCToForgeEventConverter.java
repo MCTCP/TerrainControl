@@ -24,12 +24,12 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Translates TerrainControl events into MinecraftForge terrain events.
+ * Translates OpenTerrainGenerator events into MinecraftForge terrain events.
  */
 public class TCToForgeEventConverter extends EventHandler
 {
     /*
-     * Forge uses the *block* x and z, Terrain Control and Forge Modloader use
+     * Forge uses the *block* x and z, Open Terrain Generator and Forge Modloader use
      * *chunk* x and z. Be very careful on which one you use.
      *
      * Implementations of these events in the world (may be useful as testing

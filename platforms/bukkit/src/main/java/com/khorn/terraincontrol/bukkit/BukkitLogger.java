@@ -10,8 +10,8 @@ import org.apache.logging.log4j.LogManager;
  */
 final class BukkitLogger extends Logger
 {
-    private final String logPrefix = "[" + PluginStandardValues.PLUGIN_NAME + "] ";
-    private final org.apache.logging.log4j.Logger logger = LogManager.getLogger(PluginStandardValues.PLUGIN_NAME);
+    private final String logPrefix = "[" + PluginStandardValues.PLUGIN_NAME_SHORT + "] ";
+    private final org.apache.logging.log4j.Logger logger = LogManager.getLogger(PluginStandardValues.PLUGIN_NAME_SHORT);
 
     BukkitLogger(java.util.logging.Logger logger)
     {

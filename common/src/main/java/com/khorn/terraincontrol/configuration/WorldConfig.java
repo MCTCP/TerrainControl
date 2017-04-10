@@ -40,6 +40,9 @@ public class WorldConfig extends ConfigFile
     public List<String> IsleBiomes = new ArrayList<String>();
     public List<String> BorderBiomes = new ArrayList<String>();
 
+    // Dimensions
+    public List<String> Dimensions = new ArrayList<String>();
+    
     // For old biome generator
     public double oldBiomeSize;
 
@@ -188,6 +191,9 @@ public class WorldConfig extends ConfigFile
 	public int PreGenerationRadius;
 	public int WorldBorderRadius;
     public String worldSeed;
+    
+    public boolean Cartographer;
+    public boolean DimensionsEnabled;
     
     /**
      * Creates a WorldConfig from the WorldConfig.ini file found in the given
@@ -409,6 +415,9 @@ public class WorldConfig extends ConfigFile
         this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS);
         this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS);
 
+        // Dimensions 
+        this.Dimensions = reader.getSetting(WorldStandardValues.DIMENSIONS);
+        
         // Biome Groups
         readBiomeGroups(reader);
 
@@ -521,6 +530,11 @@ public class WorldConfig extends ConfigFile
         this.WorldBorderRadius = reader.getSetting(WorldStandardValues.WORLD_BORDER_RADIUS);
         
         this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED);
+        
+        this.Cartographer = reader.getSetting(WorldStandardValues.CARTOGRAPHER);
+        
+        this.DimensionsEnabled = reader.getSetting(WorldStandardValues.DIMENSIONSENABLED);
+        
     }
 
     private void readBiomeGroups(SettingsMap reader)
@@ -604,9 +618,7 @@ public class WorldConfig extends ConfigFile
             {
                 System.out.println("Wrong custom biome id settings: '" + biome + "'");
             }
-
         }
-
     }
 
     @Override
@@ -646,7 +658,7 @@ public class WorldConfig extends ConfigFile
                 "For old maps two more modes are available:",
                 "   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes",
                 "   OldGenerator - Minecraft Beta 1.7.3 biome generator");
-
+        
         // Custom biomes
         writer.bigTitle("Custom biomes");
 
@@ -878,7 +890,7 @@ public class WorldConfig extends ConfigFile
                     "If the setting is set at 1, the setting will vanish from the config file. Readd it",
                     "manually with another value and it will be back.",
                     "",
-                    "When using the UseWorld or UseBiome keyword for spawning custom objects, Terrain Control",
+                    "When using the UseWorld or UseBiome keyword for spawning custom objects, Open Terrain Generator",
                     "spawns one of the possible custom objects. There is of course a chance that",
                     "the chosen object cannot spawn. This setting tells TC how many times it should",
                     "try to spawn that object.",
@@ -887,7 +899,7 @@ public class WorldConfig extends ConfigFile
 
         // Structures
         writer.bigTitle("Structures",
-                "Generate-structures in the server.properties file is ignored by Terrain Control. Use these settings instead.",
+                "Generate-structures in the server.properties file is ignored by Open Terrain Generator. Use these settings instead.",
                 "");
 
         // Strongholds
@@ -959,7 +971,7 @@ public class WorldConfig extends ConfigFile
 
         // Visual settings
         writer.bigTitle("Visual settings",
-                "Warning: this section will work only for players with the single version of Terrain Control installed.");
+                "Warning: this section will work only for players with the single version of Open Terrain Generator installed.");
 
         writer.putSetting(WorldStandardValues.WORLD_FOG, this.WorldFog,
                 "World fog color");
@@ -1051,7 +1063,16 @@ public class WorldConfig extends ConfigFile
 	        "This is the radius in chunks around the spawn chunk within which chunks will have blocks spawned (uses a rectangle, not a circle around the spawn location!)",
 			"Defaults to: 0 (disabled)",
 			"This property is used only by the Minecraft Worlds mod"
-		);        		
+		);
+        
+        // Dimensions
+        writer.bigTitle("Dimension");
+        writer.putSetting(WorldStandardValues.DIMENSIONSENABLED, this.DimensionsEnabled,
+                "Enables /otg dim commands and quartz portals for creating and travelling to other dimensions with seperate worlds.");
+        writer.putSetting(WorldStandardValues.DIMENSIONS, this.Dimensions,
+                "Dimensions that should be loaded for this world at world creation (requires DimensionsEnabled: true. A world directory of the same name must be present in mods/OpenTerrainGenerator/worlds/");
+        writer.putSetting(WorldStandardValues.CARTOGRAPHER, this.Cartographer,
+                "Currently in development, the Cartographer is a miniature version of the world (1/16th scale) that can be used to view the world (including players) and teleport players and items. Setting this to true loads and updates the Cartographer world map in the Cartographer dimension (does not require DimensionsEnabled: true). The Cartographer can be reached via a Quartz portal with a chiseled quartz base. The mods/OpenTerrainGenerator/worlds/Cartographer directory must be present (if you also have OTG-Cartographer.jar in your mods directory the worlds/Cartographer should be created automatically).");
     }
 
     private void WriteCustomBiomes(SettingsMap writer)
@@ -1076,7 +1097,7 @@ public class WorldConfig extends ConfigFile
             output.add(entry.getKey() + ":" + entry.getValue());
         }
         writer.putSetting(WorldStandardValues.CUSTOM_BIOMES, output,
-                "You need to register your custom biomes here. This setting will make Terrain Control",
+                "You need to register your custom biomes here. This setting will make Open Terrain Generator",
                 "generate setting files for them. However, it won't place them in the world automatically.",
                 "See the settings for your BiomeMode below on how to add them to the world.",
                 "",
@@ -1091,7 +1112,8 @@ public class WorldConfig extends ConfigFile
                 "snowfall and mobs to work as in the other biome.",
                 "",
                 "The available ids range from 0 to 1023 and the ids 0-39 and 127-167 are taken by vanilla.",
-                "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome.");
+                "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome.",
+				"The Cartographer feature for Forge uses biome id 888.");
     }
 
     public double getFractureHorizontal()

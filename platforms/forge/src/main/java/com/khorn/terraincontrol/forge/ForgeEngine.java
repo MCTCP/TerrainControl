@@ -1,17 +1,25 @@
 package com.khorn.terraincontrol.forge;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.Map;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.forge.generator.Pregenerator;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 public class ForgeEngine extends TerrainControlEngine
@@ -20,7 +28,7 @@ public class ForgeEngine extends TerrainControlEngine
 	
 	protected Pregenerator pregenerator;
 
-    protected WorldLoader worldLoader;
+	protected WorldLoader worldLoader;
 
     protected Map<ResourceLocation, Biome> biomeMap;
 
@@ -40,16 +48,118 @@ public class ForgeEngine extends TerrainControlEngine
         Biome.REGISTRY.underlyingIntegerMap.put(biome, id);
         Biome.REGISTRY.inverseObjectRegistry.put(biome, resourceLocation);
     }
+    
+    public void unRegisterForgeBiome(ResourceLocation resourceLocation)
+    {
+		TerrainControl.log(LogMarker.DEBUG, "Unregistering biome " + resourceLocation.toString());
+    	
+    	Biome biome = Biome.REGISTRY.registryObjects.get(resourceLocation);
+    	
+		BitSet biomeRegistryAvailabiltyMap = ((ForgeEngine)TerrainControl.getEngine()).worldLoader.getBiomeRegistryAvailabiltyMap();
+		try
+		{
+			biomeRegistryAvailabiltyMap.set(Biome.getIdForBiome(biome), false); // This should be enough to make Forge re-use the biome id
+		}
+		catch(IndexOutOfBoundsException ex)
+		{
+			// This can happen when:
+			// A. The dimension was unloaded automatically because noone was in it and then the world was unloaded because the server shut down.
+			// B. The dimensions was unloaded automatically because noone was in it and then deleted and recreated.
+			
+			// This can happen when a world was deleted and recreated and the index was set as "can be re-used" but when re-registering the biomes
+			// it wasn't set back to "used" because it looked like the biome registry already had the biome properly registered.
+			
+			TerrainControl.log(LogMarker.ERROR, "Could not unregister " + biome.getBiomeName());
+			throw new NotImplementedException();
+			
+			//biomeRegistryAvailabiltyMap.set(localBiome.getIds().getSavedId(), false); // This should be enough to make Forge re-use the biome id
+		}
+        
+        Biome.REGISTRY.registryObjects.remove(resourceLocation);
+        Biome.REGISTRY.underlyingIntegerMap.put(null, Biome.REGISTRY.getIDForObject(biome));
+        Biome.REGISTRY.inverseObjectRegistry.remove(biome);
+    }
 
+    public WorldLoader getWorldLoader()
+    {
+    	return worldLoader;
+    }
+    
     public Pregenerator getPregenerator()
     {
     	return pregenerator;
     }
+
+    public boolean getCartographerEnabled()
+    {   	
+    	return getOverWorld().getConfigs().getWorldConfig().Cartographer;
+    }
+
+    public boolean getDimensionsEnabled()
+    { 	
+    	return getOverWorld().getConfigs().getWorldConfig().DimensionsEnabled;
+    }
     
+    public ForgeWorld getOverWorld()
+    {
+		ArrayList<LocalWorld> allWorlds = getAllWorlds();
+		for(LocalWorld world : allWorlds)
+		{
+			if(((ForgeWorld)world).getWorld().provider.getDimension() == 0)
+			{
+				return (ForgeWorld)world;
+			}
+		}
+    	throw new NotImplementedException();
+    }
+    
+    public LocalWorld getWorld(World world)
+    {
+    	if(world.provider.getDimension() > 1)
+    	{
+			if(world.provider.getDimensionType().getSuffix().equals("OTG"))
+	    	{
+				LocalWorld localWorld = this.worldLoader.getWorld(world.provider.getDimensionType().getName());
+				if(localWorld == null)
+				{
+					return this.worldLoader.getUnloadedWorld(world.provider.getDimensionType().getName());
+				}
+	    		return this.worldLoader.getWorld(world.provider.getDimensionType().getName());
+	    	}
+			//else if (world.provider.getDimension() == 0 || world.provider.getDimension() > 1)
+			//{
+				//throw new NotImplementedException();
+			//}
+    	}
+        return this.worldLoader.getWorld(world.getWorldInfo().getWorldName());
+    }
+        
     @Override
     public LocalWorld getWorld(String name)
     {
         return this.worldLoader.getWorld(name);
+    }
+    
+    @Override
+    public LocalWorld getUnloadedWorld(String name)
+    {
+    	return this.worldLoader.getUnloadedWorld(name);
+    }
+
+    public ArrayList<ForgeWorld> getUnloadedWorlds()
+    {
+    	ArrayList<ForgeWorld> unloadedWorlds = new ArrayList();
+    	unloadedWorlds.addAll(this.worldLoader.unloadedWorlds.values());
+    	return unloadedWorlds;
+    }
+    
+    @Override
+    public ArrayList<LocalWorld> getAllWorlds()
+    {
+    	ArrayList<LocalWorld> worlds = new ArrayList<LocalWorld>();
+    	worlds.addAll(this.worldLoader.worlds.values());
+    	worlds.addAll(this.worldLoader.unloadedWorlds.values());
+    	return worlds;
     }
 
     @Override

@@ -28,7 +28,7 @@ public class ReloadCommand extends BaseCommand
         BukkitWorld world = (BukkitWorld) this.getWorld(sender, args.size() > 0 ? args.get(0) : "");
         if (world == null)
         {
-            sender.sendMessage(ERROR_COLOR + "World not found. Either you are not in a world with Terrain Control, or you are the console.");
+            sender.sendMessage(ERROR_COLOR + "World not found. Either you are not in a world with Open Terrain Generator, or you are the console.");
             return false;
         }
 

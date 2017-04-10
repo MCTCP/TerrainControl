@@ -190,6 +190,24 @@ public class BO3 implements CustomObject
                 oeh.addBlock((BlockFunction) block);
             }
         }
+
+        EntityFunction[] entities = settings.entityFunctions[rotation.getRotationId()];
+        for (EntityFunction entity : entities)
+        {
+    		EntityFunction newEntityData = new EntityFunction(null);   
+    		
+        	newEntityData.y = y + entity.y;
+        	newEntityData.x = x + entity.x;
+        	newEntityData.z = z + entity.z;
+        	
+        	newEntityData.mobName = entity.mobName;
+        	newEntityData.groupSize = entity.groupSize;
+        	newEntityData.nameTagOrNBTFileName = entity.nameTagOrNBTFileName;
+        	newEntityData.originalNameTagOrNBTFileName = entity.originalNameTagOrNBTFileName;
+        	
+        	world.SpawnEntity(newEntityData);
+        }
+        
         oeh.extrude(world, random, x, y, z);
         return true;
     }

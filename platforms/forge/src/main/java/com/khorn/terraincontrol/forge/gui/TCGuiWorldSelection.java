@@ -31,8 +31,8 @@ public class TCGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
     private String worldVersTooltip;
     private GuiButton deleteButton;
     private GuiButton selectButton;
-    private GuiButton renameButton;
-    private GuiButton copyButton;
+    //private GuiButton renameButton;
+    //private GuiButton copyButton;
     private TCGuiListWorldSelection selectionList;
 	
     public TCGuiWorldSelection(GuiScreen screenIn)
@@ -186,15 +186,17 @@ public class TCGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
     public void postInit()
     {
         this.selectButton = this.addButton(new GuiButton(1, this.width / 2 - 154, this.height - 52, 150, 20, I18n.format("selectWorld.select", new Object[0])));
-        this.addButton(new GuiButton(3, this.width / 2 + 4, this.height - 52, 150, 20, I18n.format("selectWorld.create", new Object[0])));
-        this.renameButton = this.addButton(new GuiButton(4, this.width / 2 - 154, this.height - 28, 72, 20, I18n.format("selectWorld.edit", new Object[0])));
-        this.deleteButton = this.addButton(new GuiButton(2, this.width / 2 - 76, this.height - 28, 72, 20, I18n.format("selectWorld.delete", new Object[0])));
-        this.copyButton = this.addButton(new GuiButton(5, this.width / 2 + 4, this.height - 28, 72, 20, I18n.format("selectWorld.recreate", new Object[0])));
-        this.addButton(new GuiButton(0, this.width / 2 + 82, this.height - 28, 72, 20, I18n.format("gui.cancel", new Object[0])));
+        					this.addButton(new GuiButton(3, this.width / 2 + 4, this.height - 52, 150, 20, I18n.format("selectWorld.create", new Object[0])));
+        //this.renameButton = this.addButton(new GuiButton(4, this.width / 2 - 154, this.height - 28, 72, 20, I18n.format("selectWorld.edit", new Object[0])));
+        //this.deleteButton = this.addButton(new GuiButton(2, this.width / 2 - 76, this.height - 28, 72, 20, I18n.format("selectWorld.delete", new Object[0])));
+        this.deleteButton = this.addButton(new GuiButton(2, this.width / 2 - 154, this.height - 28, 150, 20, I18n.format("selectWorld.delete", new Object[0])));
+        //this.copyButton = this.addButton(new GuiButton(5, this.width / 2 + 4, this.height - 28, 72, 20, I18n.format("selectWorld.recreate", new Object[0])));
+        					//this.addButton(new GuiButton(0, this.width / 2 + 82, this.height - 28, 72, 20, I18n.format("gui.cancel", new Object[0])));
+        					this.addButton(new GuiButton(0, this.width / 2 + 4, this.height - 28, 150, 20, I18n.format("gui.cancel", new Object[0])));
         this.selectButton.enabled = false;
         this.deleteButton.enabled = false;
-        this.renameButton.enabled = false;
-        this.copyButton.enabled = false;
+        //this.renameButton.enabled = false;
+        //this.copyButton.enabled = false;
     }
 	
     /**
@@ -245,6 +247,6 @@ public class TCGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
         this.selectButton.enabled = flag;
         this.deleteButton.enabled = flag;
         //this.renameButton.enabled = flag;
-        this.copyButton.enabled = flag;
+        //this.copyButton.enabled = flag;
     }
 }

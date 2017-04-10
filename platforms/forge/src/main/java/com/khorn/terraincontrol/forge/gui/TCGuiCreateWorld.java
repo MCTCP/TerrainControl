@@ -146,13 +146,13 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         	}
         }
         
-        btnavailableWorld1.enabled = !btnavailableWorld1.displayString.equals("") && !btnavailableWorld1.displayString.equals(GuiHandler.worldName);
-       	btnavailableWorld2.enabled = !btnavailableWorld2.displayString.equals("") && !btnavailableWorld2.displayString.equals(GuiHandler.worldName);
-    	btnavailableWorld3.enabled = !btnavailableWorld3.displayString.equals("") && !btnavailableWorld3.displayString.equals(GuiHandler.worldName);
+        btnavailableWorld1.enabled = !btnavailableWorld1.displayString.equals("") && !btnavailableWorld1.displayString.equals(GuiHandler.worldName) && !btnavailableWorld1.displayString.equals("Cartographer");
+       	btnavailableWorld2.enabled = !btnavailableWorld2.displayString.equals("") && !btnavailableWorld2.displayString.equals(GuiHandler.worldName) && !btnavailableWorld2.displayString.equals("Cartographer");
+    	btnavailableWorld3.enabled = !btnavailableWorld3.displayString.equals("") && !btnavailableWorld3.displayString.equals(GuiHandler.worldName) && !btnavailableWorld3.displayString.equals("Cartographer");
     	        	
-    	btnavailableWorldDelete1.enabled = !btnavailableWorld1.displayString.equals("");
-    	btnavailableWorldDelete2.enabled = !btnavailableWorld2.displayString.equals("");
-    	btnavailableWorldDelete3.enabled = !btnavailableWorld3.displayString.equals("");
+    	btnavailableWorldDelete1.enabled = !btnavailableWorld1.displayString.equals("") || btnavailableWorld1.displayString.equals("Cartographer");
+    	btnavailableWorldDelete2.enabled = !btnavailableWorld2.displayString.equals("") || btnavailableWorld2.displayString.equals("Cartographer");
+    	btnavailableWorldDelete3.enabled = !btnavailableWorld3.displayString.equals("") || btnavailableWorld3.displayString.equals("Cartographer");
     	
         if(worldNames.size() > 3)
         {
@@ -389,7 +389,8 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 				updateWorldName();
 				updateButtons();
 			}
-			this.mc.displayGuiScreen(new TCGuiCreateWorld(new TCGuiSelectCreateWorldMode()));
+			//this.mc.displayGuiScreen(new TCGuiCreateWorld(new TCGuiSelectCreateWorldMode()));
+			this.mc.displayGuiScreen(new TCGuiCreateWorld(new TCGuiWorldSelection(null)));
 		}
 		else if(askModCompatContinue)
 		{
@@ -398,7 +399,8 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 				((ForgeEngine)TerrainControl.getEngine()).getPregenerator().resetPregenerator();
 				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
 			} else {
-				this.mc.displayGuiScreen(new TCGuiCreateWorld(new TCGuiSelectCreateWorldMode()));
+				//this.mc.displayGuiScreen(new TCGuiCreateWorld(new TCGuiSelectCreateWorldMode()));
+				this.mc.displayGuiScreen(new TCGuiCreateWorld(new TCGuiWorldSelection(null)));
 			}
 		}
 		else if(selectingWorldName)
@@ -483,26 +485,23 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     	selectingWorldName = false;
     	askModCompatContinue = false;
     	
-        String s1 = "Delete the TerrainControl world settings for '" + worldName + "'?";
+        String s1 = "Delete the OpenTerrainGenerator world settings for '" + worldName + "'?";
         String s2 = "This will also delete any world (directory) named '" + worldName + "'";
         String s3 = "Delete";
         String s4 = "Cancel";
         GuiYesNo guiyesno = new GuiYesNo(p_152129_0_, s1, s2, s3, s4, 0);
         return guiyesno;
     }
-    	    	    	    
+
     boolean askModCompatContinue = false;  
-    public GuiYesNo askModCompatContinue(GuiYesNoCallback p_152129_0_, boolean fastcraftEnabled, boolean biomesOPlentyEnabled)
+    public GuiYesNo askModCompatContinue(GuiYesNoCallback p_152129_0_, boolean customMobSpawnerEnabled, boolean biomesOPlentyEnabled)
     {
     	askDeleteSettings = false;
-    	selectingWorldName = false;	    	
+    	selectingWorldName = false;
     	askModCompatContinue = true;
     	
-    	String bop = "Biomes o' plenty may cause crashes. ";
-    	String fc = "FastCraft detected, pre-generator";
-    	
-        String s1 = biomesOPlentyEnabled ? bop + (fastcraftEnabled ? fc : "") : (fastcraftEnabled ? fc : "");
-        String s2 = fastcraftEnabled ? "progress screen disabled. Use the launcher log instead." : "";
+        String s1 = "Warning: " + (biomesOPlentyEnabled ? " Biomes o' plenty may cause crashes." : "") + (customMobSpawnerEnabled ? " CustomMobSpawner may break mob spawning." : "");
+        String s2 = "It is recommended that you disable or remove " + (customMobSpawnerEnabled && biomesOPlentyEnabled ? "these mods." : "this mod.");
         String s3 = "Continue";
         String s4 = "Back";
         GuiYesNo guiyesno = new GuiYesNo(p_152129_0_, s1, s2, s3, s4, 0);
@@ -675,11 +674,11 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                 isaveformat.flushCache();
                 isaveformat.deleteWorldDirectory(GuiHandler.worldName);
                 
-                WorldType.parseWorldType("TerrainControl").onGUICreateWorldPress();
+                WorldType.parseWorldType("OTG").onGUICreateWorldPress();
                 
                 GameType gametype = GameType.getByName(GuiHandler.gameModeString);                    
-                worldsettings = new WorldSettings(i, gametype, true, GuiHandler.hardCore, WorldType.parseWorldType("TerrainControl"));
-                worldsettings.setGeneratorOptions("TerrainControl");
+                worldsettings = new WorldSettings(i, gametype, true, GuiHandler.hardCore, WorldType.parseWorldType("OTG"));
+                worldsettings.setGeneratorOptions("OpenTerrainGenerator");
 
                 if(GuiHandler.bonusChest)
                 {
@@ -744,32 +743,27 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                 	}
             	}
                                     
-    			boolean fastcraftEnabled = false;
     			boolean biomesOPlentyEnabled = false;
+    			boolean customMobSpawnerEnabled = false;
     			for (ModContainer mod : Loader.instance().getActiveModList())
     			{
-    				if(mod.getName().toLowerCase().equals("fastcraft"))
-    				{
-    					fastcraftEnabled = true;
-    				}
     				if(mod.getName().toLowerCase().equals("biomes o' plenty"))
     				{
     					biomesOPlentyEnabled = true;
     				}
-    				if(fastcraftEnabled && biomesOPlentyEnabled)
+    				if(mod.getName().toLowerCase().equals("drzhark's customspawner"))
+    				{
+    					customMobSpawnerEnabled = true;
+    				}
+    				if(biomesOPlentyEnabled && customMobSpawnerEnabled)
     				{
     					break;
     				}
     			}
     			
-    			if(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius() > 0 && fastcraftEnabled)
-    			{
-					GuiYesNo guiyesno = askModCompatContinue(this, fastcraftEnabled, biomesOPlentyEnabled);
-					this.mc.displayGuiScreen(guiyesno);
-    			}
-    			else if(biomesOPlentyEnabled)
+    			if(biomesOPlentyEnabled || customMobSpawnerEnabled)
             	{
-					GuiYesNo guiyesno = askModCompatContinue(this, false, biomesOPlentyEnabled);
+					GuiYesNo guiyesno = askModCompatContinue(this, customMobSpawnerEnabled, biomesOPlentyEnabled);
 					this.mc.displayGuiScreen(guiyesno);        				
 				} else {				
 					((ForgeEngine)TerrainControl.getEngine()).getPregenerator().resetPregenerator();
@@ -950,7 +944,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         this.drawDefaultBackground();
         
         // Create new world title
-        this.drawCenteredString(this.fontRendererObj, I18n.format("Create a new TerrainControl world", new Object[0]), this.width / 2, 10, -1);
+        this.drawCenteredString(this.fontRendererObj, I18n.format("Create a new OpenTerrainGenerator world", new Object[0]), this.width / 2, 10, -1);
 
         // World name
         this.drawString(this.fontRendererObj, I18n.format("selectWorld.enterName", new Object[0]), this.width / 2 - 164, 30, -6250336);

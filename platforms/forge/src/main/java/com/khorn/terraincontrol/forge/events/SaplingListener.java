@@ -2,12 +2,13 @@ package com.khorn.terraincontrol.forge.events;
 
 import java.util.Random;
 
-import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
-import com.khorn.terraincontrol.forge.WorldLoader;
+import com.khorn.terraincontrol.forge.ForgeEngine;
+import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.resource.SaplingGen;
 import com.khorn.terraincontrol.generator.resource.SaplingType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -152,23 +153,16 @@ public class SaplingListener
         }
     }
 
-    private final WorldLoader worldLoader;
-
-    public SaplingListener(WorldLoader worldLoader)
-    {
-        this.worldLoader = Preconditions.checkNotNull(worldLoader);
-    }
-
     @SubscribeEvent
     public void onSaplingGrow(SaplingGrowTreeEvent event)
     {
         World world = event.getWorld();
-        LocalWorld localWorld = this.worldLoader.getWorld(world);
+        LocalWorld localWorld = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getWorld(world);
         BlockPos blockPos = event.getPos();
 
         if (localWorld == null)
         {
-            // World not managed by Terrain Control
+            // World not managed by Open Terrain Generator
             return;
         }
 
@@ -243,10 +237,10 @@ public class SaplingListener
     @SubscribeEvent
     public void onBonemealUse(BonemealEvent event)
     {
-        LocalWorld localWorld = this.worldLoader.getWorld(event.getWorld());
+        LocalWorld localWorld = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getWorld(event.getWorld());
         if (localWorld == null)
         {
-            // World not managed by Terrain Control
+            // World not managed by Open Terrain Generator
             return;
         }
 

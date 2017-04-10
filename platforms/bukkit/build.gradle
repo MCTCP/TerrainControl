@@ -1,10 +1,10 @@
-// Build script for Terrain Control for Bukkit
+// Build script for OpenTerrainGenerator for Bukkit
 
 apply plugin: 'java'
 
 // Project properties
-archivesBaseName = "terraincontrol-bukkit"
-description = "TerrainControl for Bukkit"
+archivesBaseName = "openterraingenerator-bukkit"
+description = "Open Terrain Generator for Bukkit"
 ext.bukkitVersion = "1.10.2-R0.1-SNAPSHOT"
 
 repositories
@@ -51,7 +51,7 @@ processResources
     }
 }
 
-// Include all Terrain Control files in the jar
+// Include all Open Terrain Generator files in the jar
 jar
 {
     destinationDir = new File(project.buildDir, "distributions")

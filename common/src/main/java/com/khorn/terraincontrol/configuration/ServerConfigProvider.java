@@ -55,7 +55,7 @@ public final class ServerConfigProvider implements ConfigProvider
 
     /**
      * Holds all biomes that aren't virtual. These need to be sent to all
-     * players on the server that have Terrain Control installed.
+     * players on the server that have Open Terrain Generator installed.
      */
     private final Collection<LocalBiome> savedBiomes = new HashSet<LocalBiome>();
 
@@ -74,25 +74,46 @@ public final class ServerConfigProvider implements ConfigProvider
         this.settingsDir = settingsDir;
         this.world = world;
         this.biomes = new LocalBiome[world.getMaxBiomesCount()];
-
-        loadSettings();
+        
+        loadSettings(false);
     }
 
+    public ServerConfigProvider(File settingsDir, LocalWorld world, CustomObjectCollection customObjects)
+    {
+        this.settingsDir = settingsDir;
+        this.world = world;
+        this.biomes = new LocalBiome[world.getMaxBiomesCount()];
+        
+        this.customObjects = customObjects;
+        
+        loadSettings(true);    
+    }
+    
     /**
      * Loads all settings. Expects the biomes array to be empty (filled with
      * nulls), the savedBiomes collection to be empty and the biomesCount
      * field to be zero.
      */
-    private void loadSettings()
+    private void loadSettings(boolean loadCustomObjects)
     {
-        loadCustomObjects();
-
-        SettingsMap worldConfigSettings = loadWorldConfig();
-        loadBiomes(worldConfigSettings);
-
-        // We have to wait for the loading in order to get things like
-        // temperature
-        worldConfig.biomeGroupManager.processBiomeData(world);
+    	if(loadCustomObjects)
+    	{	    	
+	        SettingsMap worldConfigSettings = loadWorldConfig();
+	        loadBiomes(worldConfigSettings);
+	
+	        // We have to wait for the loading in order to get things like
+	        // temperature
+	        worldConfig.biomeGroupManager.processBiomeData(world);
+    	} else {    		
+	        loadCustomObjects();
+	
+	        SettingsMap worldConfigSettings = loadWorldConfig();
+	        loadBiomes(worldConfigSettings);
+	
+	        // We have to wait for the loading in order to get things like
+	        // temperature
+	        worldConfig.biomeGroupManager.processBiomeData(world);
+    	}
     }
 
     private void loadCustomObjects()
@@ -136,9 +157,9 @@ public final class ServerConfigProvider implements ConfigProvider
     {
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);
-        // TerrainControl/worlds/<WorldName>/<WorldBiomes/
+        // OpenTerrainGenerator/worlds/<WorldName>/<WorldBiomes/
         biomeDirs.add(new File(settingsDir, correctOldBiomeConfigFolder(settingsDir)));
-        // TerrainControl/GlobalBiomes/
+        // OpenTerrainGenerator/GlobalBiomes/
         biomeDirs.add(new File(TerrainControl.getEngine().getTCDataFolder(), PluginStandardValues.BiomeConfigDirectoryName));
 
         FileHelper.makeFolders(biomeDirs);
@@ -176,7 +197,7 @@ public final class ServerConfigProvider implements ConfigProvider
     {
         return worldConfig;
     }
-
+    
     @Override
     public LocalBiome getBiomeByIdOrNull(int id)
     {
@@ -191,12 +212,12 @@ public final class ServerConfigProvider implements ConfigProvider
     public void reload()
     {
         // Clear biome collections
-        Arrays.fill(this.biomes, null);
+        Arrays.fill(this.biomes, null);        
         this.savedBiomes.clear();
         this.biomesCount = 0;
 
         // Load again
-        loadSettings();
+        loadSettings(true);
     }
 
     private Map<String, BiomeConfig> readAndWriteSettings(SettingsMap worldConfigSettings, Map<String, BiomeConfigStub> biomeConfigStubs)
@@ -300,6 +321,7 @@ public final class ServerConfigProvider implements ConfigProvider
             int generationId = biome.getIds().getGenerationId();
 
             this.biomes[generationId] = biome;
+            
             // Update WorldConfig with actual id
             worldConfig.customBiomeGenerationIds.put(biome.getName(), generationId);
 
@@ -334,6 +356,22 @@ public final class ServerConfigProvider implements ConfigProvider
             }
         }
 
+        // Forge dimensions are seperate worlds that can share biome configs so 
+        // use the highest maxSmoothRadius of any of the loaded worlds.
+        // Worlds loaded before this one will not use biomes from this world
+        // so no need to change their this.worldConfig.maxSmoothRadius
+        ArrayList<LocalWorld> worlds = TerrainControl.getAllWorlds();
+        if(worlds != null)
+        {
+	        for(LocalWorld world : worlds)
+	        {
+	            if (this.worldConfig.maxSmoothRadius < world.getConfigs().getWorldConfig().maxSmoothRadius)
+	            {
+	                this.worldConfig.maxSmoothRadius = world.getConfigs().getWorldConfig().maxSmoothRadius;
+	            }
+	        }
+        }
+        
         if (this.biomesCount > 0)
         {
             // Remove last ", "

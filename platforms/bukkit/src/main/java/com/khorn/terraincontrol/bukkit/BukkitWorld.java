@@ -22,10 +22,90 @@ import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
-import net.minecraft.server.v1_10_R1.*;
+import net.minecraft.server.v1_10_R1.AxisAlignedBB;
+import net.minecraft.server.v1_10_R1.BiomeBase;
+import net.minecraft.server.v1_10_R1.Block;
+import net.minecraft.server.v1_10_R1.BlockHalfTransparent;
+import net.minecraft.server.v1_10_R1.BlockLeaves;
+import net.minecraft.server.v1_10_R1.BlockLeaves1;
+import net.minecraft.server.v1_10_R1.BlockLog1;
+import net.minecraft.server.v1_10_R1.BlockPosition;
+import net.minecraft.server.v1_10_R1.BlockWood;
+import net.minecraft.server.v1_10_R1.Blocks;
+import net.minecraft.server.v1_10_R1.Chunk;
+import net.minecraft.server.v1_10_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_10_R1.ChunkGenerator;
+import net.minecraft.server.v1_10_R1.ChunkProviderServer;
+import net.minecraft.server.v1_10_R1.ChunkSection;
+import net.minecraft.server.v1_10_R1.DataConverter;
+import net.minecraft.server.v1_10_R1.DataConverterRegistry;
+import net.minecraft.server.v1_10_R1.DataConverterTypes;
+import net.minecraft.server.v1_10_R1.DefinedStructure;
+import net.minecraft.server.v1_10_R1.DefinedStructureManager;
+import net.minecraft.server.v1_10_R1.DimensionManager;
+import net.minecraft.server.v1_10_R1.Entity;
+import net.minecraft.server.v1_10_R1.EntityFallingBlock;
+import net.minecraft.server.v1_10_R1.EntityHanging;
+import net.minecraft.server.v1_10_R1.EntityLightning;
+import net.minecraft.server.v1_10_R1.EntityOcelot;
+import net.minecraft.server.v1_10_R1.EntityTippedArrow;
+import net.minecraft.server.v1_10_R1.EnumCreatureType;
+import net.minecraft.server.v1_10_R1.EnumDirection;
+import net.minecraft.server.v1_10_R1.IBlockData;
+import net.minecraft.server.v1_10_R1.ITileEntity;
+import net.minecraft.server.v1_10_R1.Material;
+import net.minecraft.server.v1_10_R1.MinecraftKey;
+import net.minecraft.server.v1_10_R1.NBTBase;
+import net.minecraft.server.v1_10_R1.NBTTagCompound;
+import net.minecraft.server.v1_10_R1.SpawnerCreature;
+import net.minecraft.server.v1_10_R1.TileEntity;
+import net.minecraft.server.v1_10_R1.World;
+import net.minecraft.server.v1_10_R1.WorldChunkManager;
+import net.minecraft.server.v1_10_R1.WorldGenAcaciaTree;
+import net.minecraft.server.v1_10_R1.WorldGenBigTree;
+import net.minecraft.server.v1_10_R1.WorldGenDungeons;
+import net.minecraft.server.v1_10_R1.WorldGenForest;
+import net.minecraft.server.v1_10_R1.WorldGenForestTree;
+import net.minecraft.server.v1_10_R1.WorldGenFossils;
+import net.minecraft.server.v1_10_R1.WorldGenGroundBush;
+import net.minecraft.server.v1_10_R1.WorldGenHugeMushroom;
+import net.minecraft.server.v1_10_R1.WorldGenJungleTree;
+import net.minecraft.server.v1_10_R1.WorldGenMegaTree;
+import net.minecraft.server.v1_10_R1.WorldGenStronghold;
+import net.minecraft.server.v1_10_R1.WorldGenSwampTree;
+import net.minecraft.server.v1_10_R1.WorldGenTaiga1;
+import net.minecraft.server.v1_10_R1.WorldGenTaiga2;
+import net.minecraft.server.v1_10_R1.WorldGenTrees;
+import net.minecraft.server.v1_10_R1.WorldServer;
 
+import net.minecraft.server.v1_10_R1.EntityLiving;
+
+import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_10_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftAmbient;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftAnimals;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftComplexLivingEntity;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftFlying;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftGolem;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftMonster;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftSlime;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftWaterMob;
 import org.bukkit.craftbukkit.v1_10_R1.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.LightningStrike;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -119,6 +199,17 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
+    public ArrayList<LocalBiome> getAllBiomes()
+    {
+    	ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>();
+		for(LocalBiome biome : this.settings.getBiomeArray())
+		{
+			biomes.add(biome);
+		}
+    	return biomes;
+    }
+    
+    @Override
     public BukkitBiome getBiomeById(int id) throws BiomeNotFoundException
     {
         LocalBiome biome = settings.getBiomeByIdOrNull(id);
@@ -136,14 +227,9 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome getBiomeByName(String name) throws BiomeNotFoundException
+    public LocalBiome getBiomeByNameOrNull(String name)
     {
-        LocalBiome biome = biomeNames.get(name);
-        if (biome == null)
-        {
-            throw new BiomeNotFoundException(name, biomeNames.keySet());
-        }
-        return biome;
+        return biomeNames.get(name);
     }
 
     @Override
@@ -348,7 +434,7 @@ public class BukkitWorld implements LocalWorld
         if (this.chunkCache == null)
         {
             // Blocks requested outside population step
-            // (Tree growing, /tc spawn, etc.)
+            // (Tree growing, /otg spawn, etc.)
            return world.getChunkAt(chunkX, chunkZ); 
         }
 
@@ -603,7 +689,7 @@ public class BukkitWorld implements LocalWorld
         if (this.chunkCache == null && settings.getWorldConfig().populationBoundsCheck)
         {
             throw new IllegalStateException("Chunk is not being populated."
-                    + " This may be a bug in Terrain Control, but it may also be"
+                    + " This may be a bug in Open Terrain Generator, but it may also be"
                     + " another mod that is poking in unloaded chunks. Set"
                     + " PopulationBoundsCheck to false in the WorldConfig to"
                     + " disable this error.");
@@ -916,8 +1002,556 @@ public class BukkitWorld implements LocalWorld
         }
         return new MojangStructurePart(name, mojangStructurePart);
     }
+        
+	@Override
+	public void SpawnEntity(EntityFunction entityData)
+	{
+    	Random rand = new Random();
 
-    // Forge only (yes that violates the interface segregation principle, I know)
+		String mobTypeName = entityData.mobName;
+		int groupSize = entityData.groupSize;
+		String nameTag = entityData.nameTagOrNBTFileName;
+
+		EntityType entityType;
+		try
+		{
+			entityType = EntityType.valueOf(mobTypeName.toUpperCase());	    		
+		}
+		catch(IllegalArgumentException ex)
+		{
+			TerrainControl.log(LogMarker.INFO, "Could not find entity: " + mobTypeName);
+			return;
+		}
+
+		if (entityType == EntityType.PLAYER)
+		{
+			return;
+		}
+		
+		Entity entityLiving = getEntity(entityType.getEntityClass());	
+		org.bukkit.entity.Entity bukkitEntityLiving = entityLiving.getBukkitEntity();	
+		
+        if(entityLiving != null)
+        {       	
+			EnumCreatureType creatureType = EnumCreatureType.CREATURE;
+			
+			// MONSTER
+			if(
+				bukkitEntityLiving instanceof CraftComplexLivingEntity || // Dragon			
+				bukkitEntityLiving instanceof CraftSlime || // Slime/Magma
+				bukkitEntityLiving instanceof CraftMonster ||
+				bukkitEntityLiving instanceof CraftFlying // Ghast			
+			)
+			{
+				creatureType = EnumCreatureType.CREATURE;
+			}
+			
+			// AMBIENT
+			if(
+				bukkitEntityLiving instanceof CraftAmbient // Bat
+			)
+			{
+				creatureType = EnumCreatureType.AMBIENT;
+			}
+			
+			// CREATURE
+			if(
+				bukkitEntityLiving instanceof CraftAnimals || // Creature
+				bukkitEntityLiving instanceof CraftVillager ||
+				bukkitEntityLiving instanceof CraftGolem
+			)
+			{
+				creatureType = EnumCreatureType.CREATURE;
+			}
+			
+			// WATERCREATURE
+			if(
+				bukkitEntityLiving instanceof CraftWaterMob
+			)
+			{
+				creatureType = EnumCreatureType.WATER_CREATURE;
+			}
+            
+            int j1 = entityData.x;
+            int k1 = entityData.y;
+            int l1 = entityData.z;
+            
+            int x = entityData.x;
+            int y = entityData.y;
+            int z = entityData.z;
+            
+            CraftBlock block = (CraftBlock) world.getWorld().getBlockAt(new Location(world.getWorld(), x, y, z));
+            org.bukkit.Material material = block.getType();            
+
+            boolean isOutsideBuildHeight = y < 0 || y >= 256;
+            boolean isOpaque = material.isTransparent() ? false : material.isSolid();
+            boolean isFullCube = material != org.bukkit.Material.STEP;
+            boolean canProvidePower = block.isBlockPowered();
+            boolean isBlockNormalCube = !isOutsideBuildHeight && isOpaque && isFullCube && !canProvidePower;
+                        
+            if (!isBlockNormalCube && (creatureType == EnumCreatureType.WATER_CREATURE && material == org.bukkit.Material.WATER || material == org.bukkit.Material.AIR ))
+            {					                            						                            	                                  			                                    	
+	            float f = (float)j1 + 0.5F;
+	            float f1 = (float)k1;
+	            float f2 = (float)l1 + 0.5F;                              
+	           
+	            if(entityLiving instanceof EntityLiving)
+	            {	
+	            	for(int r = 0; r < groupSize; r++)
+	            	{  	
+            			CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
+	            		
+            			entity.setCustomName(mobTypeName.replace("entity", "").substring(0, 1).toUpperCase() + mobTypeName.toLowerCase().replace("entity", "").substring(1));
+	                    
+	            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
+	            		{
+	        				if(nameTag != null && nameTag.length() > 0)
+	        				{
+	        					entity.setCustomName(nameTag);
+	        				}
+	            		}
+	            		
+						//((EntityLiving) entityliving).enablePersistence(); // <- makes sure mobs don't de-spawn
+	            		            			            			
+	            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
+	           			{
+	           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
+	           			}
+	            	}
+	            } else {                    					                                                						                                                                                    					                                                
+	            	for(int r = 0; r < groupSize; r++)
+	            	{                                    		
+	            		CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
+	           			
+	            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
+	           			{
+	           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
+	           			}
+	            	}						                                                	
+	            }
+            }
+		}
+	}
+	
+	private void applyMetaData(CraftEntity entity, String mobName, String metaDataString)
+	{
+    	NBTTagCompound nbttagcompound = new NBTTagCompound();
+
+        try
+        {
+            NBTBase nbtbase = JsonToNBT.getTagFromJson(metaDataString);
+
+            if (!(nbtbase instanceof NBTTagCompound))
+            {
+            	throw new NotImplementedException(); // Not a valid tag
+            }
+
+            nbttagcompound = (NBTTagCompound)nbtbase;
+        }
+        catch (NBTException nbtexception)
+        {
+        	TerrainControl.log(LogMarker.INFO, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
+        	return;
+        }		                                            
+
+        nbttagcompound.setString("id", mobName);        
+
+		Entity nmsEntity = ((CraftEntity)entity).getHandle();
+
+		NBTTagCompound originalTag = new NBTTagCompound();
+		nmsEntity.c(originalTag);
+
+		NBTBase originalPos = originalTag.get("Pos");
+		NBTBase originalRot = originalTag.get("Rotation");
+
+		NBTBase originalUUIDLeast = originalTag.get("UUIDLeast");
+		NBTBase originalUUIDMost = originalTag.get("UUIDMost");
+
+		nbttagcompound.set("Pos", originalPos);
+		nbttagcompound.set("Rotation", originalRot);
+		nbttagcompound.set("UUIDLeast", originalUUIDLeast);
+		nbttagcompound.set("UUIDMost", originalUUIDMost);
+
+		nmsEntity.f(nbttagcompound);
+		nmsEntity.recalcPosition();
+	}
+	
+	private Entity getEntity(Class<? extends org.bukkit.entity.Entity> clazz)
+	{
+		Entity entity = null;
+		
+		double x = 0;
+		double y = 0;
+		double z = 0;
+		
+		if (org.bukkit.entity.Boat.class.isAssignableFrom(clazz))
+		{
+			entity = new net.minecraft.server.v1_10_R1.EntityBoat(world, x, y, z);
+		}
+		else if (FallingBlock.class.isAssignableFrom(clazz))
+		{
+			entity = new EntityFallingBlock(world, x, y, z, world.getType(new BlockPosition(x, y, z)));
+		}
+		else if (org.bukkit.entity.Projectile.class.isAssignableFrom(clazz))
+		{
+			if (org.bukkit.entity.Snowball.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntitySnowball(world, x, y, z);
+			}
+			else if (org.bukkit.entity.Egg.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityEgg(world, x, y, z);
+			}
+			else if (Arrow.class.isAssignableFrom(clazz))
+			{
+				if (org.bukkit.entity.TippedArrow.class.isAssignableFrom(clazz))
+				{
+					entity = new EntityTippedArrow(world);
+					((EntityTippedArrow)entity).setType(org.bukkit.craftbukkit.v1_10_R1.potion.CraftPotionUtil.fromBukkit(new org.bukkit.potion.PotionData(org.bukkit.potion.PotionType.WATER, false, false)));
+				}
+				else if (org.bukkit.entity.SpectralArrow.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntitySpectralArrow(world);
+				} else {
+					entity = new EntityTippedArrow(world);
+				}
+			}
+			else if (org.bukkit.entity.ThrownExpBottle.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityThrownExpBottle(world);
+			}
+			else if (org.bukkit.entity.EnderPearl.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityEnderPearl(world);
+			}
+			else if (org.bukkit.entity.ThrownPotion.class.isAssignableFrom(clazz))
+			{
+				if (org.bukkit.entity.LingeringPotion.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityPotion(world, x, y, z, CraftItemStack.asNMSCopy(new ItemStack(org.bukkit.Material.LINGERING_POTION, 1)));
+				} else {
+					entity = new net.minecraft.server.v1_10_R1.EntityPotion(world, x, y, z, CraftItemStack.asNMSCopy(new ItemStack(org.bukkit.Material.SPLASH_POTION, 1)));
+				}
+			}
+			else if (org.bukkit.entity.Fireball.class.isAssignableFrom(clazz))
+			{
+				if (org.bukkit.entity.SmallFireball.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntitySmallFireball(world);
+				}
+				else if (org.bukkit.entity.WitherSkull.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityWitherSkull(world);
+				}
+				else if (org.bukkit.entity.DragonFireball.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityDragonFireball(world);
+				} else {
+					entity = new net.minecraft.server.v1_10_R1.EntityLargeFireball(world);
+				}
+			}
+			else if (org.bukkit.entity.ShulkerBullet.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityShulkerBullet(world);
+			}
+		}
+		else if (org.bukkit.entity.Minecart.class.isAssignableFrom(clazz))
+		{
+			if (org.bukkit.entity.minecart.PoweredMinecart.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityMinecartFurnace(world, x, y, z);
+			}
+			else if (org.bukkit.entity.minecart.StorageMinecart.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityMinecartChest(world, x, y, z);
+			}
+			else if (org.bukkit.entity.minecart.ExplosiveMinecart.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityMinecartTNT(world, x, y, z);
+			}
+			else if (org.bukkit.entity.minecart.HopperMinecart.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityMinecartHopper(world, x, y, z);
+			}
+			else if (org.bukkit.entity.minecart.SpawnerMinecart.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityMinecartMobSpawner(world, x, y, z);
+			}
+			else if (org.bukkit.entity.minecart.CommandMinecart.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityMinecartCommandBlock(world, x, y, z);
+			} else {
+				entity = new net.minecraft.server.v1_10_R1.EntityMinecartRideable(world, x, y, z);
+			}
+		}
+		else if (org.bukkit.entity.EnderSignal.class.isAssignableFrom(clazz))
+		{
+			entity = new net.minecraft.server.v1_10_R1.EntityEnderSignal(world, x, y, z);
+		}
+		else if (org.bukkit.entity.EnderCrystal.class.isAssignableFrom(clazz))
+		{
+			entity = new net.minecraft.server.v1_10_R1.EntityEnderCrystal(world);
+		}
+		else if (LivingEntity.class.isAssignableFrom(clazz))
+		{
+			if (org.bukkit.entity.Chicken.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityChicken(world);
+			}
+			else if (org.bukkit.entity.Cow.class.isAssignableFrom(clazz))
+			{
+				if (org.bukkit.entity.MushroomCow.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityMushroomCow(world);
+				} else {
+					entity = new net.minecraft.server.v1_10_R1.EntityCow(world);
+				}
+			}
+			else if (org.bukkit.entity.Golem.class.isAssignableFrom(clazz))
+			{
+				if (org.bukkit.entity.Snowman.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntitySnowman(world);
+				}
+				else if (org.bukkit.entity.IronGolem.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityIronGolem(world);
+				}
+				else if (org.bukkit.entity.Shulker.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityShulker(world);
+				}
+			} 
+			else if (org.bukkit.entity.Creeper.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityCreeper(world);
+			}
+			else if (org.bukkit.entity.Ghast.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityGhast(world);
+			}
+			else if (org.bukkit.entity.Pig.class.isAssignableFrom(clazz))
+			{
+				entity = new net.minecraft.server.v1_10_R1.EntityPig(world);
+			}
+			else if (!Player.class.isAssignableFrom(clazz))
+			{
+				if (org.bukkit.entity.Sheep.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntitySheep(world);
+				}
+				else if (org.bukkit.entity.Horse.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityHorse(world);
+				}
+				else if (org.bukkit.entity.Skeleton.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntitySkeleton(world);
+				}
+				else if (org.bukkit.entity.Slime.class.isAssignableFrom(clazz))
+				{
+					if (org.bukkit.entity.MagmaCube.class.isAssignableFrom(clazz))
+					{
+						entity = new net.minecraft.server.v1_10_R1.EntityMagmaCube(world);
+					} else {
+						entity = new net.minecraft.server.v1_10_R1.EntitySlime(world);
+					}
+				}
+				else if (org.bukkit.entity.Spider.class.isAssignableFrom(clazz))
+				{
+					if (org.bukkit.entity.CaveSpider.class.isAssignableFrom(clazz))
+					{
+						entity = new net.minecraft.server.v1_10_R1.EntityCaveSpider(world);
+					} else {
+						entity = new net.minecraft.server.v1_10_R1.EntitySpider(world);
+					}
+				}
+				else if (org.bukkit.entity.Squid.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntitySquid(world);
+				}
+				else if (org.bukkit.entity.Tameable.class.isAssignableFrom(clazz))
+				{
+					if (org.bukkit.entity.Wolf.class.isAssignableFrom(clazz))
+					{
+						entity = new net.minecraft.server.v1_10_R1.EntityWolf(world);
+					}
+					else if (org.bukkit.entity.Ocelot.class.isAssignableFrom(clazz))
+					{
+						entity = new EntityOcelot(world);
+					}
+				}
+				else if (org.bukkit.entity.PigZombie.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityPigZombie(world);
+				}
+				else if (org.bukkit.entity.Zombie.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityZombie(world);
+				}
+				else if (org.bukkit.entity.Giant.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityGiantZombie(world);
+				}
+				else if (org.bukkit.entity.Silverfish.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntitySilverfish(world);
+				}
+				else if (org.bukkit.entity.Enderman.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityEnderman(world);
+				}
+				else if (org.bukkit.entity.Blaze.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityBlaze(world);
+				}
+				else if (org.bukkit.entity.Villager.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityVillager(world);
+				}
+				else if (org.bukkit.entity.Witch.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityWitch(world);
+				}
+				else if (org.bukkit.entity.Wither.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityWither(world);
+				}
+				else if (org.bukkit.entity.ComplexLivingEntity.class.isAssignableFrom(clazz))
+				{
+					if (org.bukkit.entity.EnderDragon.class.isAssignableFrom(clazz))
+					{
+						entity = new net.minecraft.server.v1_10_R1.EntityEnderDragon(world);
+					}
+				}
+				else if (org.bukkit.entity.Ambient.class.isAssignableFrom(clazz))
+				{
+					if (org.bukkit.entity.Bat.class.isAssignableFrom(clazz))
+					{
+						entity = new net.minecraft.server.v1_10_R1.EntityBat(world);
+					}
+				}
+				else if (org.bukkit.entity.Rabbit.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityRabbit(world);
+				}
+				else if (org.bukkit.entity.Endermite.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityEndermite(world);
+				}
+				else if (org.bukkit.entity.Guardian.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityGuardian(world);
+				}
+				else if (org.bukkit.entity.ArmorStand.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityArmorStand(world, x, y, z);
+				}
+				else if (org.bukkit.entity.PolarBear.class.isAssignableFrom(clazz))
+				{
+					entity = new net.minecraft.server.v1_10_R1.EntityPolarBear(world);
+				}
+			}
+		}
+		/*
+		else if (org.bukkit.entity.Hanging.class.isAssignableFrom(clazz))
+		{
+			org.bukkit.block.Block block = getBlockAt(location);
+			BlockFace face = BlockFace.SELF;
+	
+			int width = 16;
+			int height = 16;
+			  
+			if (org.bukkit.entity.ItemFrame.class.isAssignableFrom(clazz))
+			{
+				width = 12;
+				height = 12;
+			}
+			else if (org.bukkit.entity.LeashHitch.class.isAssignableFrom(clazz))
+			{
+				width = 9;
+				height = 9;
+			}
+			  
+			BlockFace[] faces = { BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH };
+			BlockPosition pos = new BlockPosition((int)x, (int)y, (int)z);
+			for (BlockFace dir : faces)
+			{
+				net.minecraft.server.v1_10_R1.Block nmsBlock = org.bukkit.craftbukkit.v1_10_R1.util.CraftMagicNumbers.getBlock(block.getRelative(dir));
+				if ((nmsBlock.getBlockData().getMaterial().isBuildable()) || (net.minecraft.server.v1_10_R1.BlockDiodeAbstract.isDiode(nmsBlock.getBlockData())))
+				{
+					boolean taken = false;
+					AxisAlignedBB bb = EntityHanging.calculateBoundingBox(null, pos, CraftBlock.blockFaceToNotch(dir).opposite(), width, height);
+					List<net.minecraft.server.v1_10_R1.Entity> list = world.getEntities(null, bb);
+					for (Iterator<net.minecraft.server.v1_10_R1.Entity> it = list.iterator(); (!taken) && (it.hasNext());)
+					{
+						net.minecraft.server.v1_10_R1.Entity e = (net.minecraft.server.v1_10_R1.Entity)it.next();
+						if ((e instanceof EntityHanging))
+						{
+							taken = true;
+						}
+					}
+			      
+					if (!taken)
+					{
+						face = dir;
+						break;
+					}
+			    }
+		  	}
+			  
+			if (org.bukkit.entity.LeashHitch.class.isAssignableFrom(clazz))
+			{
+			    entity = new net.minecraft.server.v1_10_R1.EntityLeash(world, new BlockPosition((int)x, (int)y, (int)z));
+			    attachedToPlayer = true;
+			} else {
+			    com.google.common.base.Preconditions.checkArgument(face != BlockFace.SELF, "Cannot spawn hanging entity for %s at %s (no free face)", new Object[] { clazz.getName(), location });
+			    
+			    EnumDirection dir = CraftBlock.blockFaceToNotch(face).opposite();
+			    if (org.bukkit.entity.Painting.class.isAssignableFrom(clazz))
+			    {
+			      entity = new net.minecraft.server.v1_10_R1.EntityPainting(world, new BlockPosition((int)x, (int)y, (int)z), dir);
+			    }
+			    else if (org.bukkit.entity.ItemFrame.class.isAssignableFrom(clazz))
+			    {
+			      entity = new net.minecraft.server.v1_10_R1.EntityItemFrame(world, new BlockPosition((int)x, (int)y, (int)z), dir);
+			    }
+			}
+			  
+			if ((entity != null) && (!((EntityHanging)entity).survives()))
+			{
+			    throw new IllegalArgumentException("Cannot spawn hanging entity for " + clazz.getName() + " at " + location);
+			}
+		}
+		*/
+		else if (org.bukkit.entity.TNTPrimed.class.isAssignableFrom(clazz))
+		{
+			entity = new net.minecraft.server.v1_10_R1.EntityTNTPrimed(world, x, y, z, null);
+		}
+		else if (org.bukkit.entity.ExperienceOrb.class.isAssignableFrom(clazz))
+		{
+			entity = new net.minecraft.server.v1_10_R1.EntityExperienceOrb(world, x, y, z, 0);
+		}
+		else if (org.bukkit.entity.Weather.class.isAssignableFrom(clazz))
+		{
+			if (LightningStrike.class.isAssignableFrom(clazz))
+			{
+				entity = new EntityLightning(world, x, y, z, false);
+			}
+		}
+		else if (org.bukkit.entity.Firework.class.isAssignableFrom(clazz))
+		{
+			entity = new net.minecraft.server.v1_10_R1.EntityFireworks(world, x, y, z, null);
+		}
+		else if (org.bukkit.entity.AreaEffectCloud.class.isAssignableFrom(clazz))
+		{
+			entity = new net.minecraft.server.v1_10_R1.EntityAreaEffectCloud(world, x, y, z);
+		}
+				  
+		return entity;
+	}
+	
+    // Forge only TODO: Shouldn't really be here, clean this up. 
     
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
@@ -927,11 +1561,4 @@ public class BukkitWorld implements LocalWorld
 
     @Override
     public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub) { }
-    
-    // TODO: Forge only atm, someone make a Bukkit implementation plx!
-    
-	@Override
-	public void SpawnEntity(EntityFunction entityData) {
-		// TODO Auto-generated method stub
-	}
 }

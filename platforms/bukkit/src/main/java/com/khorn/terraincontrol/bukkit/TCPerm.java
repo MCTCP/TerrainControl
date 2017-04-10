@@ -14,6 +14,6 @@ public enum TCPerm
 
     TCPerm(final String permissionNode)
     {
-        this.node = "tc." + permissionNode;
+        this.node = "otg." + permissionNode;
     }
 }

@@ -6,14 +6,17 @@ import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
 import com.khorn.terraincontrol.generator.ObjectSpawner;
 import com.khorn.terraincontrol.generator.biome.OutputType;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
@@ -66,7 +69,7 @@ public class ChunkProvider implements IChunkGenerator
 	        
 	        // This is a bit of a hack fix, see fixSpawnChunk() for more info
 	        // TODO: Fix this properly
-    		if(firstRun && (TerrainControl.getPluginConfig().Cartographer || world.getConfigs().getWorldConfig().WorldBorderRadius > 0))
+    		if(firstRun && (((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() || world.getConfigs().getWorldConfig().WorldBorderRadius > 0))
     		{
     			firstRun = false;
     			spawnChunk = chunkCoord;
@@ -106,7 +109,11 @@ public class ChunkProvider implements IChunkGenerator
         for (int i = 0; i < chunkBiomeArray.length; i++)
         {
             int generationId = this.biomeIntArray[i];
-            chunkBiomeArray[i] = (byte) configProvider.getBiomeByIdOrNull(generationId).getIds().getSavedId();
+               
+            // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+            LocalBiome biome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(generationId) : configProvider.getBiomeByIdOrNull(generationId);
+        	
+        	chunkBiomeArray[i] = (byte) biome.getIds().getSavedId();
         }
     }
 
@@ -125,18 +132,13 @@ public class ChunkProvider implements IChunkGenerator
         
         // This is a bit of a hack fix, see fixSpawnChunk() for more info
         // TODO: Fix this properly
-        if(TerrainControl.getPluginConfig().Cartographer || world.getConfigs().getWorldConfig().WorldBorderRadius > 0)
+        if(((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() || world.getConfigs().getWorldConfig().WorldBorderRadius > 0)
         {
         	fixSpawnChunk();
         }
         
         this.spawner.populate(chunkCoord);       
         
-        if(TerrainControl.getPluginConfig().Cartographer)
-        {
-        	Cartographer.CreateBlockWorldMapAtSpawn(world, chunkCoord);
-        }
-
         BlockSand.fallInstantly = false;
         BlockGravel.fallInstantly = false;
     }    
@@ -180,6 +182,7 @@ public class ChunkProvider implements IChunkGenerator
     {
         // recreateStructures
         WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
+           
         if (worldConfig.mineshaftsEnabled)
         {
             this.world.mineshaftGen.generate(this.world.getWorld(), chunkX, chunkZ, null);

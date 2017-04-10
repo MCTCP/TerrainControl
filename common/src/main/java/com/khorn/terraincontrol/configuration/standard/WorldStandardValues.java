@@ -117,7 +117,10 @@ public class WorldStandardValues extends Settings
             MINESHAFTS_ENABLED = booleanSetting("MineshaftsEnabled", true),
             RARE_BUILDINGS_ENABLED = booleanSetting("RareBuildingsEnabled", true),
             OCEAN_MONUMENTS_ENABLED = booleanSetting("OceanMonumentsEnabled", true),
-            POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false);
+            POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),            
+    		CARTOGRAPHER = booleanSetting("Cartographer", false),
+			DIMENSIONSENABLED = booleanSetting("DimensionsEnabled", false)
+            ;
 
     public static final Setting<LocalMaterialData>
             WATER_BLOCK = new MaterialSetting("WaterBlock", DefaultMaterial.STATIONARY_WATER),
@@ -133,7 +136,8 @@ public class WorldStandardValues extends Settings
                     "Mesa (Bryce)", "Mega Taiga Hills", "Mega Spruce Taiga Hills"),
             BORDER_BIOMES = stringListSetting("BorderBiomes",
                     "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga"),
-            CUSTOM_BIOMES = stringListSetting("CustomBiomes");
+            CUSTOM_BIOMES = stringListSetting("CustomBiomes"),
+            DIMENSIONS = stringListSetting("Dimensions");
 
     public static final Setting<Double>
             OLD_BIOME_SIZE = doubleSetting("OldBiomeSize", 1.5, 0.1, 10),

@@ -767,7 +767,7 @@ public class MinecraftBiomeTemplates
 
             // Minecraft has chosen sand and stained clay as the surface and
             // ground blocks. It then places hardcoded grass and dirt.
-            // Terrain Control does it the other way round: it places
+            // Open Terrain Generator does it the other way round: it places
             // hardcoded sand and stained clay and lets the user change the
             // grass and dirt blocks.
             this.defaultSurfaceBlock = DefaultMaterial.GRASS;

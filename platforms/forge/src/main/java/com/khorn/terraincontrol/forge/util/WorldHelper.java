@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.forge.util;
 
-import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.forge.TCWorldType;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 
 import net.minecraft.world.World;
@@ -10,23 +9,10 @@ import net.minecraftforge.common.DimensionManager;
 
 public abstract class WorldHelper
 {
-
-    /**
-     * Returns the LocalWorld of the Minecraft world. Returns null if there is
-     * no world.
-     *
-     * @param world The Minecraft world.
-     * @return The LocalWorld, or null if there is none.
-     */
-    public static LocalWorld toLocalWorld(World world)
-    {
-        return TerrainControl.getWorld(getName(world));
-    }
-
     public static boolean isVanillaWorld(World world)
     {
         int dimensionId = world.provider.getDimension();
-        // If vanilla, return overworld
+        // If vanilla or TC, return overworld
         if (dimensionId == 0 || dimensionId == 1 || dimensionId == -1)
         {
             return true;
@@ -58,13 +44,19 @@ public abstract class WorldHelper
      */
     public static String getName(World world)
     {
+        if(world.getWorldInfo().getTerrainType() instanceof TCWorldType && world.provider.getDimension() > 1)
+        {
+        	// This dimension was created by TC, use the given dimension name
+        	return DimensionManager.getProviderType(world.provider.getDimension()).getName();
+        }
+    	
         World defaultWorld = DimensionManager.getWorld(0);
         // If vanilla or we are dealing with an implementation that supports
         // multiple save handlers, return the world name
         if (isVanillaWorld(world) || (defaultWorld != null && world.getWorldInfo() != null && world.getSaveHandler() != defaultWorld.getSaveHandler()))
         {
             return world.getWorldInfo().getWorldName();
-        }
+        }       
 
         // This is the best we can do for Forge
         return world.provider.getSaveFolder();
@@ -73,5 +65,4 @@ public abstract class WorldHelper
     private WorldHelper()
     {
     }
-
 }

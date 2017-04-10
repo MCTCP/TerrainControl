@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.generator.biome.layers;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
@@ -19,13 +20,18 @@ public class LayerMixWithRiver extends Layer
 
         for (int id = 0; id < this.riverBiomes.length; id++)
         {
-            LocalBiome biome = configs.getBiomeByIdOrNull(id);
-
+            // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+            LocalBiome biome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(id) : configs.getBiomeByIdOrNull(id);
+            
             if (biome == null || biome.getBiomeConfig().riverBiome.isEmpty())
+            {
                 this.riverBiomes[id] = -1;
-            else
-                this.riverBiomes[id] = world.getBiomeByName(biome.getBiomeConfig().riverBiome).getIds().getGenerationId();
-
+            } else {
+            	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+            	this.riverBiomes[id] = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(biome.getBiomeConfig().riverBiome).getIds().getGenerationId() : world.getBiomeByNameOrNull(biome.getBiomeConfig().riverBiome).getIds().getGenerationId();
+            	
+                //this.riverBiomes[id] = world.getBiomeByName(biome.getBiomeConfig().riverBiome).getIds().getGenerationId();
+            }
         }
     }
 
@@ -80,8 +86,10 @@ public class LayerMixWithRiver extends Layer
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
-                if (worldConfig.riversEnabled && (currentRiver & RiverBits) != 0
-                        && !this.configs.getBiomeByIdOrNull(cachedId).getBiomeConfig().riverBiome.isEmpty())
+                // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+                LocalBiome biome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(cachedId) : this.configs.getBiomeByIdOrNull(cachedId);
+                
+                if (worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !biome.getBiomeConfig().riverBiome.isEmpty())
                     currentPiece = this.riverBiomes[cachedId];
                 else
                     currentPiece = cachedId;
@@ -152,8 +160,11 @@ public class LayerMixWithRiver extends Layer
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
+                // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+                LocalBiome biome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(cachedId) : this.configs.getBiomeByIdOrNull(cachedId);
+                
                 if (worldConfig.riversEnabled && (currentRiver & RiverBits) != 0
-                        && !this.configs.getBiomeByIdOrNull(cachedId).getBiomeConfig().riverBiome.isEmpty())
+                        && !biome.getBiomeConfig().riverBiome.isEmpty())
                     currentPiece = 1;
                 else
                     currentPiece = 0;

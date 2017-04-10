@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GuiHandler implements IGuiHandler
 {		
 	// TODO: Remove these static fields and use instance fields or pass as method parameters where possible.
-	public static boolean selecting;
+	//public static boolean selecting;
 	public static String newWorldName = null;	
 	public static String worldName;
 	public static String selectedWorldName = null;
@@ -47,15 +47,16 @@ public class GuiHandler implements IGuiHandler
     @SubscribeEvent
     public void openGui(GuiOpenEvent event)
     {
-    	if (event.getGui() instanceof GuiCreateWorld && lastGuiOpened.equals(TCGuiWorldSelection.class) && !selecting)
+    	if (event.getGui() instanceof GuiCreateWorld && lastGuiOpened.equals(TCGuiWorldSelection.class))// && !selecting)
         {
-            event.setGui(new TCGuiSelectCreateWorldMode());
+            //event.setGui(new TCGuiSelectCreateWorldMode());
+    		event.setGui(new TCGuiCreateWorld(new TCGuiWorldSelection(null)));
         }
         else if (event.getGui() instanceof GuiWorldSelection)
         {
             event.setGui(new TCGuiWorldSelection(new GuiMainMenu()));
         }
-        selecting = false;
+        //selecting = false;
         if(event.getGui() != null)
         {
         	lastGuiOpened = event.getGui().getClass();

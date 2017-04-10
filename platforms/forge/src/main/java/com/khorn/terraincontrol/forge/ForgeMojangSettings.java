@@ -1,12 +1,17 @@
 package com.khorn.terraincontrol.forge;
 
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
+import com.khorn.terraincontrol.logging.LogMarker;
+
 import net.minecraft.world.biome.Biome;
 
 import java.util.List;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Gets some default settings from the BiomeBase instance. The settings in the
@@ -27,7 +32,16 @@ public final class ForgeMojangSettings implements MojangSettings
      */
     public static MojangSettings fromId(int biomeId)
     {
-        return fromBiomeBase(Biome.getBiome(biomeId));
+    	Biome baseBiome = Biome.getBiome(biomeId);
+    	if(baseBiome != null)
+    	{
+    		return fromBiomeBase(baseBiome);
+    	}
+    	if(!ForgeWorld.vanillaBiomesCached || ForgeWorld.vanillaBiomes[biomeId] == null)
+    	{
+    		throw new NotImplementedException();
+    	}    	
+    	return fromBiomeBase(ForgeWorld.vanillaBiomes[biomeId]);
     }
 
     /**
@@ -62,7 +76,7 @@ public final class ForgeMojangSettings implements MojangSettings
     @Override
     public float getSurfaceHeight()
     {
-        return this.biomeBase.getBaseHeight();
+    	return this.biomeBase.getBaseHeight();
     }
 
     @Override

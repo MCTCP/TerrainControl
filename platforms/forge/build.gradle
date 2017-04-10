@@ -1,4 +1,4 @@
-// Build script for Terrain Control for Forge
+// Build script for OpenTerrainGenerator for Forge
 
 buildscript
 {
@@ -25,8 +25,8 @@ buildscript
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 // Project properties
-archivesBaseName = "terraincontrol-forge"
-description = "TerrainControl for Minecraft Forge"
+archivesBaseName = "openterraingenerator-forge"
+description = "OpenTerrainGenerator for Minecraft Forge"
 ext.forgeVersion = "1.10.2-12.18.3.2185"
 minecraft.version = ext.forgeVersion
 minecraft.runDir = "run"
@@ -67,7 +67,7 @@ processResources
     }
 }
 
-// Include all Terrain Control files in the jar
+// Include all Open Terrain Generator files in the jar
 jar
 {
     destinationDir = new File(project.buildDir, "distributions")
@@ -78,6 +78,6 @@ jar
     }
     manifest
     {
-        attributes 'FMLAT': 'terraincontrol_at.cfg'
+        attributes 'FMLAT': 'openterraingenerator_at.cfg'
     }
 }

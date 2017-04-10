@@ -8,12 +8,12 @@ import org.apache.logging.log4j.LogManager;
 /**
  * CImplementation of {@link Logger} for Forge.
  *
- * <p>Note that Forge (unlike Bukkit) automatically adds the TerrainControl
+ * <p>Note that Forge (unlike Bukkit) automatically adds the OpenTerrainGenerator
  * prefix, so we don't need to do that ourselves.</p>
  */
 final class ForgeLogger extends Logger
 {
-    private org.apache.logging.log4j.Logger logger = LogManager.getLogger(PluginStandardValues.PLUGIN_NAME);
+    private org.apache.logging.log4j.Logger logger = LogManager.getLogger(PluginStandardValues.PLUGIN_NAME_SHORT);
 
     @Override
     public void log(LogMarker level, String message, Object... params)

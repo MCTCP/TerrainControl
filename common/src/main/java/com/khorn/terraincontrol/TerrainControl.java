@@ -15,13 +15,17 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class TerrainControl
 {	
+	// TODO: This shouldn't be needed ideally
+	public static boolean isForge = false;
+	
     /**
-     * The engine that powers Terrain Control.
+     * The engine that powers Open Terrain Generator.
      */
     private static TerrainControlEngine engine;
 
@@ -90,28 +94,6 @@ public class TerrainControl
     }
 
     /**
-     * Convienence method to quickly get the biome name at the given
-     * coordinates. Will return null if the world isn't loaded by Terrain
-     * Control.
-     * <p>
-     * @param worldName The world name.
-     * @param x         The block x in the world.
-     * @param z         The block z in the world.
-     * @return The biome name, or null if the world isn't managed by Terrain
-     *         Control.
-     */
-    public static String getBiomeName(String worldName, int x, int z)
-    {
-        LocalWorld world = getWorld(worldName);
-        if (world == null)
-        {
-            // World isn't loaded by Terrain Control
-            return null;
-        }
-        return world.getSavedBiome(x, z).getName();
-    }
-
-    /**
      * Returns the Resource manager.
      * <p>
      * @return The Resource manager.
@@ -176,6 +158,54 @@ public class TerrainControl
     public static LocalWorld getWorld(String name)
     {
         return engine.getWorld(name);
+    }
+    
+    public static LocalWorld getUnloadedWorld(String name)
+    {
+    	return engine.getUnloadedWorld(name);
+    }
+       
+    public static LocalBiome getBiomeAllWorlds(int id)
+    {
+    	//TerrainControl.log(LogMarker.INFO, "getBiomeAllWorlds id");
+    	
+        ArrayList<LocalWorld> worlds = getAllWorlds();
+        if(worlds != null)
+        {
+	        for(LocalWorld world : worlds)
+	        {
+	        	LocalBiome biome = world.getBiomeByIdOrNull(id);
+	        	if(biome != null)
+	        	{
+	        		return biome;
+	        	}
+	        }
+        }    	
+        return null;
+    }
+
+    public static LocalBiome getBiomeAllWorlds(String name)
+    {
+    	//TerrainControl.log(LogMarker.INFO, "getBiomeAllWorlds name");
+    	
+        ArrayList<LocalWorld> worlds = getAllWorlds();
+        if(worlds != null)
+        {
+	        for(LocalWorld world : worlds)
+	        {
+	        	LocalBiome biome = world.getBiomeByNameOrNull(name);
+	        	if(biome != null)
+	        	{
+	        		return biome;
+	        	}
+	        }
+        }    	
+        return null;
+    }
+    
+    public static ArrayList<LocalWorld> getAllWorlds()
+    {
+        return engine.getAllWorlds();
     }
 
     /**

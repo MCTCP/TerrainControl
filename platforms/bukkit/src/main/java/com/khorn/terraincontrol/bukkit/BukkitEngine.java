@@ -6,9 +6,11 @@ import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+
 import net.minecraft.server.v1_10_R1.Block;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class BukkitEngine extends TerrainControlEngine
 {
@@ -121,5 +123,19 @@ public class BukkitEngine extends TerrainControlEngine
     {
         return BukkitMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
     }
+	
+    @Override
+    public ArrayList<LocalWorld> getAllWorlds()
+    {
+    	ArrayList<LocalWorld> worlds = new ArrayList<LocalWorld>();
+    	worlds.addAll(plugin.worlds.values());
+    	return worlds;
+    }
 
+    // Only used for Forge atm TODO: Put in Forge layer only, not common?
+	@Override
+	public LocalWorld getUnloadedWorld(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

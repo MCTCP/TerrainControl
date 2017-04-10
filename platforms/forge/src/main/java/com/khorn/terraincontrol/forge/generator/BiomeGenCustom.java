@@ -1,12 +1,14 @@
 package com.khorn.terraincontrol.forge.generator;
 
 import com.khorn.terraincontrol.BiomeIds;
+import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.ForgeEngine;
+import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
@@ -18,7 +20,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Used for all custom biomes.
@@ -40,7 +45,10 @@ public class BiomeGenCustom extends Biome
         this.skyColor = config.skyColor;
           
         // TODO: Is clearing really necessary here?
-        
+        // Don't use the TC default values for mob spawning for Forge, 
+        // instead we'll copy mobs lists from the vanilla biomes so we 
+        // also get mobs added by other mods.
+        // These mobs should be included in config's mob lists.
         this.spawnableMonsterList.clear();
         this.spawnableCreatureList.clear();
         this.spawnableCaveCreatureList.clear();
@@ -84,31 +92,57 @@ public class BiomeGenCustom extends Biome
         }
     }
 
-    public static Biome getOrCreateBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
+    public static Biome getOrCreateBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, boolean isMainWorld)
     {
-        // This is a custom biome, get or register it
-        String biomeNameForRegistry = StringHelper.toComputerFriendlyName(biomeConfig.getName());
+        // If this biome should replace a vanilla biome then use the vanilla biome's resourcelocation to register the biome.
+        ResourceLocation registryKey = ForgeWorld.vanillaResouceLocations.get(biomeIds.getGenerationId());
+    	if(registryKey == null)
+    	{   
+	        int generationId = biomeIds.getGenerationId();
+    		
+	        // This is a custom biome, get or register it
+	        String biomeNameForRegistry = StringHelper.toComputerFriendlyName(biomeConfig.getName());                      
+	        String resourceDomain = PluginStandardValues.PLUGIN_NAME.toLowerCase();
+	        // 0-39 and 127-167 are vanilla biomes so register them as such   
+	        // so that biomes are properly recognised by non-modded clients
+	        if((generationId >= 0 && generationId <= 39) || (generationId >= 127 && generationId <= 167))
+	        {	        	
+	        	//resourceDomain = "minecraft";
+	        	throw new NotImplementedException();
+	        }
+	        
+	        registryKey = new ResourceLocation(resourceDomain, biomeNameForRegistry);
+    	}
         
-        int generationId = biomeIds.getGenerationId();
-        String resourceDomain = PluginStandardValues.PLUGIN_NAME.toLowerCase();
-        // 0-39 and 127-167 are vanilla biomes so register them as such   
-        // so that biomes are properly recognised by non-modded clients
-        if((generationId >= 0 && generationId <= 39) || (generationId >= 127 && generationId <= 167))
-        {
-        	resourceDomain = "minecraft";
-        }
-        
-        ResourceLocation registryKey = new ResourceLocation(resourceDomain, biomeNameForRegistry);
-
         // Check if registered earlier
         Biome alreadyRegisteredBiome = Biome.REGISTRY.registryObjects.get(registryKey);
         if (alreadyRegisteredBiome != null)
         {
-            return alreadyRegisteredBiome;
+        	if(isMainWorld) // Override Vanilla biomes
+        	{       		        		
+        		((ForgeEngine)TerrainControl.getEngine()).unRegisterForgeBiome(registryKey);
+        	} else {
+        		return alreadyRegisteredBiome;
+        	}
+        	/*
+        	else {
+	        	
+        		if(1 == 1) { throw new NotImplementedException(); }
+        		
+	        	// Even if the biome is present in registryObjects it may be because the biome was added and removed earlier (only possible for other dimensions) 
+	        	// and only its availability was set to "can re-use". If so set the availability back to "used"
+	        	// TODO: Is alreadyRegisteredBiome really a reference to the same biome object? Need to replace it with new?        	
+	    		BitSet biomeRegistryAvailabiltyMap = ((ForgeEngine)TerrainControl.getEngine()).getWorldLoader().getBiomeRegistryAvailabiltyMap();
+				biomeRegistryAvailabiltyMap.set(Biome.getIdForBiome(alreadyRegisteredBiome), true); // Set back to "used" so it doesn't get overridden
+
+        		return alreadyRegisteredBiome;
+        	}
+        	*/
         }
 
         // No existing biome, create new one
-        BiomeGenCustom customBiome = new BiomeGenCustom(biomeConfig, biomeIds);
+        BiomeGenCustom customBiome = new BiomeGenCustom(biomeConfig, biomeIds);              
+        
         int savedBiomeId = biomeIds.getSavedId();
         ForgeEngine forgeEngine = ((ForgeEngine) TerrainControl.getEngine());
 
@@ -138,15 +172,15 @@ public class BiomeGenCustom extends Biome
                 forgeEngine.registerForgeBiome(biomeIds.getGenerationId(), registryKey, customBiome);
                 TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
                         biomeIds.getGenerationId());
-            } else
-            {
+            } else {
                 ResourceLocation existingBiomeKey = Biome.REGISTRY.inverseObjectRegistry.get(existingBiome);
                 forgeEngine.registerForgeBiome(biomeIds.getSavedId(), registryKey, customBiome);
                 forgeEngine.registerForgeBiome(biomeIds.getSavedId(), existingBiomeKey, existingBiome);
                 TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
                         biomeIds.getGenerationId());
             }
-        } else if (savedBiomeId < 256 && !biomeIds.isVirtual())
+        }
+        else if (savedBiomeId < 256 && !biomeIds.isVirtual())
         {
             // Normal insertion
             Biome.REGISTRY.register(savedBiomeId, registryKey, customBiome);
@@ -175,7 +209,7 @@ public class BiomeGenCustom extends Biome
     @SideOnly(Side.CLIENT)
     public int getGrassColorAtPos(BlockPos pos)
     {
-    	if(this.getBiomeName().equals("Swampland"))
+    	if(this.getBiomeName().equals("Swampland") || this.getBiomeName().equals("Swampland M"))
     	{
 	        double d0 = GRASS_COLOR_NOISE.getValue((double)pos.getX() * 0.0225D, (double)pos.getZ() * 0.0225D);
 	        return d0 < -0.1D ? 5011004 : 6975545;
@@ -189,17 +223,16 @@ public class BiomeGenCustom extends Biome
     @SideOnly(Side.CLIENT)
     public int getFoliageColorAtPos(BlockPos pos)
     {
-    	if(this.getBiomeName().equals("Swampland"))
+    	if(this.getBiomeName().equals("Swampland") || this.getBiomeName().equals("Swampland M"))
     	{
     		return 6975545;
     	} else {
     		return super.getFoliageColorAtPos(pos);
     	}
     }
-
    
     // Adds the mobs to the internal list
-    protected void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)//, boolean improvedMobSpawning)
+    public void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)//, boolean improvedMobSpawning)
     {    
     	List<SpawnListEntry> newList = new ArrayList<SpawnListEntry>();
     	List<SpawnListEntry> newListParent = new ArrayList<SpawnListEntry>();

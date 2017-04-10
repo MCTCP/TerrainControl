@@ -1,21 +1,17 @@
 [
 {
-  "modid": "terraincontrol",
-  "name": "TerrainControl",
-  "description": "Advanced custom world generator. Based on R-T-B's PhoenixTerrainMod, which itself is based on Bucyruss' BiomeTerrainMod.",
-  "url": "http://forum.mctcp.com/",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "modid": "openterraingenerator",
+  "name": "Open Terrain Generator",
+  "description": "Advanced custom world generator. A fork of TerrainControl, which is based on  R-T-B's PhoenixTerrainMod, which is based on Bucyruss' BiomeTerrainMod.",
+  "version": "",
+  "credits" : "Code by PeeGee85, graphics and websites by MCPitman and LordSmellyPants. Based on TerrainControl by Khorn, RutgerKok and Timethor.",
+  "mcversion": "",
+  "url": "https://biomebundle.wixsite.com/openterraingen",
   "updateUrl": "",
-  "authors": [
-    "Khorn",
-    "Olof Cayorion Larsson"
-  ],
-  "credits": "",
-  "logoFile": "/tclogo.png",
+  "authors": [ "PeeGee85 (Rik Lubking)", "RutgerKok", "TimeThor", "BloodMC", "Khorn", "Olof Cayorion Larsson"], 
+  "logoFile": "OTGlogo.png",
   "screenshots": [
-  ],
-  
+  ],  
   "dependencies": [
      
   ]

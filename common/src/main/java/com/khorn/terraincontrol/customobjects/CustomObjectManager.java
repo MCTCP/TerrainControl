@@ -15,7 +15,7 @@ import java.util.Map;
  * the global objects. World objects are stored in the WorldConfig class.
  * <p />
  * 
- * Terrain Control supports multiple types of custom objects. By default, it
+ * Open Terrain Generator supports multiple types of custom objects. By default, it
  * supports BO2s, BO3s and a number of special "objects" like trees and
  * UseWorld.
  * <p />

@@ -1,15 +1,15 @@
 # Compiling
-Thanks for your interest in compiling TerrainControl.
+Thanks for your interest in compiling OpenTerrainGenerator.
 
 ## Before you start
-First of all, you need to obtain a copy of the source of TerrainControl. Clone
+First of all, you need to obtain a copy of the source of OpenTerrainGenerator. Clone
 it using Git, or download it as a [ZIP file][].
 
 You also need to have the [JDK][JDK 7] installed. You will need version 7 or
 newer.
 
 ## Creating JAR files
-Run the command `./gradlew install` in the TerrainControl directory. If that
+Run the command `./gradlew install` in the OpenTerrainGenerator directory. If that
 doesn't work, you probably need to make the file executable by running
 `chmod +x gradlew`. You can then try the above command again.
 
@@ -20,12 +20,12 @@ on both in `releases/build/distributions`.
 ## Eclipse
 First of all, ForgeGradle and Eclipse are not the best friends. Sometimes, you'll
 find out that things don't work anymore. When things do work however, you have a
-nice test environment where you can quickly make changes to TerrainControl.
+nice test environment where you can quickly make changes to OpenTerrainGenerator.
 
 ### Before you start
 Normally, you'd just use the import option of Eclipse. However, ForgeGradle
 requires us to run another command first. Run the command
-`./gradlew setupDecompWorkspace` in the TerrainControl directory. This command
+`./gradlew setupDecompWorkspace` in the OpenTerrainGenerator directory. This command
 decompiles Minecraft, so that you can quickly jump to the Minecraft source code
 from Eclipse.
 
@@ -37,11 +37,11 @@ Make sure you have a recent version of Eclipse installed. Eclipse Neon should
 work, and the slightly older Eclipse Mars.1 should work too. Older versions,
 including the original Eclipse Mars release, will not work.
 
-To import TerrainControl, use `File` -> `Import` -> `Gradle` -> `Gradle Project`
-and import the TerrainControl directory.
+To import OpenTerrainGenerator, use `File` -> `Import` -> `Gradle` -> `Gradle Project`
+and import the OpenTerrainGenerator directory.
 
 ### Running the Forge client or server
-In the Forge version of TerrainControl two classes are included to help you run
+In the Forge version of OpenTerrainGenerator two classes are included to help you run
 the project from your IDE. Click `Run` -> `Edit Configurations...` -> `+`
 -> `Application`. Use `forge` as the module (for the classpath) and use either
 the `com.khorn.terraincontrol.forge.launch.TCLaunchForgeClient` or the
@@ -67,13 +67,13 @@ reset everything.
 
 ## IntelliJ
 First, we need a decompiled version of Minecraft, this makes it much easier to
-create mods. Run `./gradlew setupDecompWorkspace` in the TerrainControl
+create mods. Run `./gradlew setupDecompWorkspace` in the OpenTerrainGenerator
 directory. You will need to rerun this command every time the Forge version
-TerrainControl is built against changes.
+OpenTerrainGenerator is built against changes.
 
 Now import the project as a Gradle project into IntelliJ.
 
-To launch the Forge client version of TerrainControl from your IDE, click `Run`
+To launch the Forge client version of OpenTerrainGenerator from your IDE, click `Run`
 -> `Edit Configurations...` -> `+` -> `Application`. Choose a name, use
 `com.khorn.terraincontrol.forge.launch.TCLaunchForgeClient` as the main
 class and select `forge` for the option `Use classpath of module`.

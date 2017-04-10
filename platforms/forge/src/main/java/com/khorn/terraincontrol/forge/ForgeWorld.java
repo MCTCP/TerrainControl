@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.configuration.BiomeConfigFinder.BiomeConfigStub;
+import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings.EntityCategory;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
@@ -18,6 +19,7 @@ import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
+import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
@@ -42,9 +44,15 @@ import net.minecraft.util.datafix.DataFixesManager;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.GameType;
+import net.minecraft.world.ServerWorldEventHandler;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.WorldServerMulti;
+import net.minecraft.world.WorldSettings;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
@@ -52,11 +60,16 @@ import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
+import net.minecraft.world.storage.DerivedWorldInfo;
+import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.*;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -64,11 +77,11 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public class ForgeWorld implements LocalWorld
 {
     private ChunkProvider generator;
-    private World world;
+    public World world;
     private ConfigProvider settings;
     private CustomObjectStructureCache structureCache;
     private String name;
-    private long seed;
+    public long seed;
     private BiomeGenerator biomeGenerator;
     private DataFixer dataFixer;
 
@@ -76,7 +89,7 @@ public class ForgeWorld implements LocalWorld
     private static final int MAX_SAVED_BIOMES_COUNT = 255;
     private static final int STANDARD_WORLD_HEIGHT = 128;
 
-    private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
+    public HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
     public StrongholdGen strongholdGen;
     public VillageGen villageGen;
@@ -107,58 +120,111 @@ public class ForgeWorld implements LocalWorld
 
     private Chunk[] chunkCache;
 
-    private static Biome[] vanillaBiomes = new Biome[MAX_BIOMES_COUNT];    
-    private static boolean vanillaBiomesCached = false;
+    public static HashMap<Integer, ResourceLocation> vanillaResouceLocations = new HashMap<Integer, ResourceLocation>();   
+    public static Biome[] vanillaBiomes = new Biome[MAX_BIOMES_COUNT];    
+    public static boolean vanillaBiomesCached = false;
     
-    public ForgeWorld(String _name)
+    public boolean isMainWorld = false;
+    
+    public ForgeWorld(String _name, boolean isMainWorld)
     {
+    	TerrainControl.log(LogMarker.INFO, "Creating world \"" + _name + "\"");
+    	
         this.name = _name;
+        this.isMainWorld = isMainWorld;
 
         cacheVanillaBiomes();
-    	WorldLoader.unRegisterDefaultBiomes(); 
         
-        // Clear the BiomeDictionary (it will be refilled when biomes are loaded in createBiomeFor)
-    	WorldLoader.clearBiomeDictionary();
+        // If this is the main world (which should be the first world to be generated)
+        // cache the vanilla biomes and clear the biome registry and dictionary
+        if(isMainWorld) 
+        {	       	
+        	// Default settings are not restored on world unload / server quit because this was causing problems 
+        	// (unloading dimensions while their worlds were still ticking etc)
+        	// Unload all world and biomes here instead.
+        	
+        	TCDimensionManager.UnloadAllCustomDimensionData();
+        	
+        	((ForgeEngine)TerrainControl.getEngine()).worldLoader.unloadAllWorlds();
+        	
+	        ((ForgeEngine)TerrainControl.getEngine()).worldLoader.unRegisterDefaultBiomes();
+	        
+	        ((ForgeEngine)TerrainControl.getEngine()).worldLoader.unRegisterTCBiomes();
+	        
+	        // Clear the BiomeDictionary (it will be refilled when biomes are loaded in createBiomeFor)
+	    	((ForgeEngine)TerrainControl.getEngine()).worldLoader.clearBiomeDictionary(null);
+	    	
+	    	//TCDimensionManager.LoadCustomDimensionData();
+
+	    	TCDimensionManager.RemoveTCDims();
+        }
     }
           
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
-    {      	
+    {  	
+    	// When creating custom dimensions don't override biomes that already exist in other worlds
+        if(!isMainWorld)
+        {
+        	//BiomeConfig existingBiomeConfig = ((ForgeEngine)TerrainControl.getEngine()).worldLoader.getConfig(biomeConfig.getName());
+        	LocalBiome existingBiome = TerrainControl.getBiomeAllWorlds(biomeConfig.getName());
+        	if(existingBiome != null && existingBiome.getBiomeConfig() != null)
+        	{
+        		biomeConfig = existingBiome.getBiomeConfig();
+        	}
+        }
+    	
 		// Make an exception for the hell and sky biomes. 
 		// The hell and end chunk providers refer specifically to 
 		// Biomes.HELL and Biomes.SKY and query the biome registry
 		// for them. Other biomes are not referred to in this way.
-    	if(biomeConfig.getName().equals("Hell")) { return new ForgeBiome(Biomes.HELL, biomeConfig, new BiomeIds(8,8)); }
-    	if(biomeConfig.getName().equals("Sky")) { return new ForgeBiome(Biomes.SKY, biomeConfig, new BiomeIds(9,9)); }
+    	if(biomeConfig.getName().equals("Hell"))
+    	{
+    		ForgeBiome forgeBiome = new ForgeBiome(Biomes.HELL, biomeConfig, new BiomeIds(8,8));
+    		this.biomeNames.put("Hell", forgeBiome);
+    		return forgeBiome;
+		}
+    	if(biomeConfig.getName().equals("Sky"))
+    	{
+    		ForgeBiome forgeBiome = new ForgeBiome(Biomes.SKY, biomeConfig, new BiomeIds(9,9));
+    		this.biomeNames.put("Sky", forgeBiome);
+    		return forgeBiome;
+		}    
     	
-    	// Always try to register biomes and create Biome Configs. Biomes with id's > 255 are registered
-    	// only for biome -> id queries, any (saved)id -> biome query will return the ReplaceToBiomeName biome.
-        
-        Biome existingBiome = Biome.getBiome(biomeIds.getSavedId());
-    	Biome biome = BiomeGenCustom.getOrCreateBiome(biomeConfig, biomeIds);
-        int requestedGenerationId = biomeIds.getGenerationId();
-        int allocatedGenerationId = Biome.REGISTRY.underlyingIntegerMap.getId(biome);
-                
-        if (requestedGenerationId != allocatedGenerationId)
-        {
-        	// When creating the ForgeBiome later in this method use the actual id's
-        	biomeIds = new BiomeIds(requestedGenerationId, allocatedGenerationId);
-        	
-            if (requestedGenerationId < 256 && allocatedGenerationId >= 256)
-            {
-                throw new RuntimeException("Could not allocate the requested id " + requestedGenerationId + " for biome " + biomeConfig.getName() + ". All available id's under 256 have been allocated\n"
-                    + ". To proceed, adjust your WorldConfig or use the ReplaceToBiomeName feature to make the biome virtual.");
-            }
-            TerrainControl.log(LogMarker.DEBUG, "Asked to register {} with id {}, but succeeded with id {}",
-                    biomeConfig.getName(), requestedGenerationId, allocatedGenerationId);
-        } else {
-            TerrainControl.log(LogMarker.DEBUG, "Registered {} with id {}",
-                    biomeConfig.getName(), allocatedGenerationId);
-        }
-
-        ForgeBiome forgeBiome = new ForgeBiome(biome, biomeConfig, biomeIds);
-        
-        registerBiomeInBiomeDictionary(biome, existingBiome, biomeConfig, configProvider);
+    	ForgeBiome forgeBiome = (ForgeBiome)TerrainControl.getBiomeAllWorlds(biomeConfig.getName());
+    	Biome biome = BiomeGenCustom.getOrCreateBiome(biomeConfig, biomeIds, isMainWorld);
+    	
+    	if(forgeBiome == null)
+    	{
+	    	// Always try to register biomes and create Biome Configs. Biomes with id's > 255 are registered
+	    	// only for biome -> id queries, any (saved)id -> biome query will return the ReplaceToBiomeName biome.
+	        
+	        Biome existingBiome = Biome.getBiome(biomeIds.getSavedId());              
+	    	//Biome biome = BiomeGenCustom.getOrCreateBiome(biomeConfig, biomeIds);
+	        int requestedGenerationId = biomeIds.getGenerationId();
+	        int allocatedGenerationId = Biome.REGISTRY.underlyingIntegerMap.getId(biome);       
+	        
+	        if (requestedGenerationId != allocatedGenerationId)
+	        {
+	        	// When creating the ForgeBiome later in this method use the actual id's
+	        	biomeIds = new BiomeIds(requestedGenerationId, allocatedGenerationId);
+	        	
+	            if (requestedGenerationId < 256 && allocatedGenerationId >= 256)
+	            {
+	                throw new RuntimeException("Could not allocate the requested id " + requestedGenerationId + " for biome " + biomeConfig.getName() + ". All available id's under 256 have been allocated\n"
+	                    + ". To proceed, adjust your WorldConfig or use the ReplaceToBiomeName feature to make the biome virtual.");
+	            }
+	            TerrainControl.log(LogMarker.DEBUG, "Asked to register {} with id {}, but succeeded with id {}",
+	                    biomeConfig.getName(), requestedGenerationId, allocatedGenerationId);
+	        } else {
+	            TerrainControl.log(LogMarker.DEBUG, "Registered {} with id {}",
+	                    biomeConfig.getName(), allocatedGenerationId);
+	        }
+	
+	        forgeBiome = new ForgeBiome(biome, biomeConfig, biomeIds);
+	        
+	        registerBiomeInBiomeDictionary(biome, existingBiome, biomeConfig, configProvider);
+    	}
         
         this.biomeNames.put(biome.getBiomeName(), forgeBiome);
         return forgeBiome;
@@ -174,6 +240,11 @@ public class ForgeWorld implements LocalWorld
         {
         	// Inherit from an existing biome        	
     		LocalBiome replaceToBiome = configProvider.getBiomeByIdOrNull(Biome.getIdForBiome(sourceBiome != null ? sourceBiome : biome));
+            // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+        	if(replaceToBiome == null)
+        	{
+        		replaceToBiome = TerrainControl.getBiomeAllWorlds(Biome.getIdForBiome(sourceBiome != null ? sourceBiome : biome));
+        	}
     		if(replaceToBiome != null && replaceToBiome.getBiomeConfig().biomeDictId != null)
     		{
     			types = getTypesList(replaceToBiome.getBiomeConfig().biomeDictId.split(","));
@@ -235,16 +306,22 @@ public class ForgeWorld implements LocalWorld
     	throw new NotImplementedException();
         //return nextBiomeId++;
     }
-
+    
+    @Override
+    public ArrayList<LocalBiome> getAllBiomes()
+    {
+    	ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>();
+		for(LocalBiome biome : this.settings.getBiomeArray())
+		{
+			biomes.add(biome);
+		}
+    	return biomes;
+    }
+    
     @Override
     public ForgeBiome getBiomeById(int id) throws BiomeNotFoundException
     {
-        LocalBiome biome = this.settings.getBiomeByIdOrNull(id);
-        if (biome == null)
-        {
-            throw new BiomeNotFoundException(id, Arrays.asList(this.settings.getBiomeArray()));
-        }
-        return (ForgeBiome) biome;
+    	throw new NotImplementedException();
     }
 
     @Override
@@ -252,18 +329,13 @@ public class ForgeWorld implements LocalWorld
     {
         return (ForgeBiome) this.settings.getBiomeByIdOrNull(id);
     }
-
+    
     @Override
-    public LocalBiome getBiomeByName(String name) throws BiomeNotFoundException
-    {
-        LocalBiome biome = this.biomeNames.get(name);
-        if (biome == null)
-        {
-            throw new BiomeNotFoundException(name, this.biomeNames.keySet());
-        }
-        return biome;
+    public LocalBiome getBiomeByNameOrNull(String name)
+    {     
+        return this.biomeNames.get(name);
     }
-
+    
     @Override
     public Collection<BiomeLoadInstruction> getDefaultBiomes()
     {
@@ -468,7 +540,7 @@ public class ForgeWorld implements LocalWorld
         if (this.chunkCache == null)
         {
             // Blocks requested outside population step
-            // (Tree growing, /tc spawn, etc.)
+            // (Tree growing, /otg spawn, etc.)
             return this.world.getChunkFromChunkCoords(chunkX, chunkZ);
         }
 
@@ -639,7 +711,7 @@ public class ForgeWorld implements LocalWorld
     {
         if (this.chunkCache != null && this.settings.getWorldConfig().populationBoundsCheck)
         {
-            throw new IllegalStateException("Chunk is already being populated." + " This may be a bug in Terrain Control, but it may also be" + " another mod that is poking in unloaded chunks. Set" + " PopulationBoundsCheck to false in the WorldConfig to" + " disable this error.");
+            throw new IllegalStateException("Chunk is already being populated." + " This may be a bug in Open Terrain Generator, but it may also be" + " another mod that is poking in unloaded chunks. Set" + " PopulationBoundsCheck to false in the WorldConfig to" + " disable this error.");
         }
 
         // Initialize cache
@@ -687,7 +759,7 @@ public class ForgeWorld implements LocalWorld
         if (this.chunkCache == null && this.settings.getWorldConfig().populationBoundsCheck)
         {
             throw new IllegalStateException("Chunk is not being populated."
-                    + " This may be a bug in Terrain Control, but it may also be"
+                    + " This may be a bug in Open Terrain Generator, but it may also be"
                     + " another mod that is poking in unloaded chunks. Set"
                     + " PopulationBoundsCheck to false in the WorldConfig to"
                     + " disable this error.");
@@ -774,9 +846,70 @@ public class ForgeWorld implements LocalWorld
                 "server configs must be provided first");
 
         ServerConfigProvider configs = (ServerConfigProvider) this.settings;
-
+        
+        // Custom dimension settings
+        // world is unique for this dimension however its worldinfo 
+        // was derived from the main world and has the same seed
+        // configure the correct seed for this dimension.
+		// If the world is a TCWorldServerMulti then it was created
+		// by a console command and has already had its seed set
+        if(!isMainWorld && !(world instanceof TCWorldServerMulti))
+        {
+        	// TODO: Use seed from Dimensions.txt instead
+            long seedIn = (long) Math.floor((Math.random() * Long.MAX_VALUE));
+            if(configs.getWorldConfig().worldSeed != null && configs.getWorldConfig().worldSeed.trim().length() > 0)
+            {
+                try
+                {
+                	seedIn = configs.getWorldConfig().worldSeed == null || configs.getWorldConfig().worldSeed.trim().length() == 0 ? (long) Math.floor((Math.random() * Long.MAX_VALUE)) : Long.parseLong(configs.getWorldConfig().worldSeed);
+                }
+            	catch(NumberFormatException ex)
+                {
+            		TerrainControl.log(LogMarker.ERROR, "WorldConfig for world \"" + world.getWorldInfo().getWorldName() + "\" has value \"" + configs.getWorldConfig().worldSeed + "\" for worldSeed which cannot be parsed as a number. Using a random seed instead.");
+                }
+            }
+            
+    		GameType gameType = world.getWorldInfo().getGameType();
+    		boolean enableMapFeatures = world.getWorldInfo().isMapFeaturesEnabled(); // Whether the map features (e.g. strongholds) generation is enabled or disabled.
+    		boolean hardcoreMode = world.getWorldInfo().isHardcoreModeEnabled();
+    		WorldType worldTypeIn = world.getWorldType();
+    		
+    		String generatorOptions = world.getWorldInfo().getGeneratorOptions();
+    		boolean enableCommands = world.getWorldInfo().areCommandsAllowed();
+    	
+    		WorldSettings settings = new WorldSettings(seedIn, gameType, enableMapFeatures, hardcoreMode, worldTypeIn);
+    		settings.setGeneratorOptions(generatorOptions);
+    		if(enableCommands) { settings.enableCommands(); }
+    		
+    		WorldInfo worldInfo = new WorldInfo(settings, world.getWorldInfo().getWorldName());        	
+        	
+    		try {
+    			Field[] fields = World.class.getDeclaredFields();
+    			for(Field field : fields)
+    			{
+    				Class<?> fieldClass = field.getType();  				
+    				if(fieldClass.equals(net.minecraft.world.storage.WorldInfo.class))
+    				{
+    			        field.setAccessible(true);			        
+    			        field.set(world, worldInfo);
+    			        break;
+    				}    				
+    			}
+    		} catch (SecurityException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		} catch (IllegalArgumentException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		} catch (IllegalAccessException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+        }
+        //
+        
         this.world = world;
-        this.seed = world.getSeed();
+        this.seed = world.getWorldInfo().getSeed();
         world.setSeaLevel(configs.getWorldConfig().waterLevelMax);
 
         this.structureCache = new CustomObjectStructureCache(this);
@@ -831,7 +964,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome getCalculatedBiome(int x, int z)
     {
-        return getBiomeById(this.biomeGenerator.getBiome(x, z));
+    	return TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(this.biomeGenerator.getBiome(x, z)) : getBiomeById(this.biomeGenerator.getBiome(x, z));
     }
 
     @Override
@@ -858,7 +991,8 @@ public class ForgeWorld implements LocalWorld
     	} else {
     		biomeId = Biome.getIdForBiome(biome); // Non-TC biomes don't have a generationId, only a saved id
     	}
-    	ForgeBiome forgeBiome = getBiomeById(biomeId);
+    	//ForgeBiome forgeBiome = getBiomeById(biomeId);
+    	ForgeBiome forgeBiome = (ForgeBiome) TerrainControl.getBiomeAllWorlds(biomeId);
     	
         return forgeBiome;
     }
@@ -949,6 +1083,18 @@ public class ForgeWorld implements LocalWorld
 	            int biomeId = defaultBiome.Id;
 	            Biome oldBiome = Biome.getBiome(biomeId);
 	            vanillaBiomes[biomeId] = oldBiome;
+	            
+	            // Cache resource locations for default/vanilla biomes so we can use these 
+	            // to replace the biomes in the biome registry later.
+	    		for(ResourceLocation ob : Biome.REGISTRY.registryObjects.keySet())
+	    		{
+	    			int vanillaBiomeId = Biome.getIdForBiome(Biome.REGISTRY.getObject(ob));
+	    			if(biomeId == vanillaBiomeId)
+	    			{
+	    				vanillaResouceLocations.put(vanillaBiomeId, ob);
+	    				break;
+	    			}	    			
+	    		}
 	        }
 	        vanillaBiomesCached = true;
         }
@@ -985,24 +1131,43 @@ public class ForgeWorld implements LocalWorld
 	
 	public void unRegisterBiomes()
 	{		
-		BitSet biomeRegistryAvailabiltyMap = WorldLoader.getBiomeRegistryAvailabiltyMap();
-	    // Unregister only the biomes registered by this world
+		String breakpoint = "";
+		
+		// Unregister only the biomes registered by this world
 		for(LocalBiome localBiome : this.biomeNames.values())
-		{	
+		{			
 			// Make an exception for the hell and sky biomes. 
 			// The hell and end chunk providers refer specifically to 
 			// Biomes.HELL and Biomes.SKY and query the biome registry
 			// for them. Other biomes are not referred to in this way.
-			if(localBiome.getName().equals("Hell") || localBiome.getName().equals("Sky")) { continue; }
-			biomeRegistryAvailabiltyMap.set(localBiome.getIds().getSavedId(), false); // This should be enough to make Forge re-use the biome id
+			if(localBiome.getName().equals("Hell") || localBiome.getName().equals("Sky")) { continue; }			
+			
+			if(((ForgeEngine)TerrainControl.getEngine()).worldLoader.isConfigUnique(localBiome.getBiomeConfig().getName()))
+			{			
+		        //int generationId = localBiome.getIds().getGenerationId();
+		        
+		        // 0-39 and 127-167 are vanilla biomes   
+		        //if((generationId >= 0 && generationId <= 39) || (generationId >= 127 && generationId <= 167))
+		        {
+		        	// Don't unregister vanilla biomes (there will always be a dimension that uses them) 
+		        	//continue;
+		        }
+		        
+		        String biomeNameForRegistry = StringHelper.toComputerFriendlyName(localBiome.getName());                      
+		        String resourceDomain = PluginStandardValues.PLUGIN_NAME.toLowerCase();		        
+		        ResourceLocation registryKey = new ResourceLocation(resourceDomain, biomeNameForRegistry);
+		        ((ForgeEngine)TerrainControl.getEngine()).unRegisterForgeBiome(registryKey);
+			}
 		}
 		
-		WorldLoader.clearBiomeDictionary();
+		((ForgeEngine)TerrainControl.getEngine()).worldLoader.clearBiomeDictionary(this);
 	}
 	
     @Override
     public void SpawnEntity(EntityFunction entityData)
     {
+    	TerrainControl.log(LogMarker.INFO, "SpawnEntity " + entityData.x + " " + entityData.y + " " + entityData.z + " " + entityData.mobName);
+    	
     	Random rand = new Random();
     	
 		String mobTypeName = entityData.mobName;
@@ -1033,7 +1198,7 @@ public class ForgeWorld implements LocalWorld
         	NBTTagCompound nbttagcompound = new NBTTagCompound();
 	        
 	        try
-	        {
+	        {	        	
 	            NBTBase nbtbase = JsonToNBT.getTagFromJson(entityData.getMetaData());
 	
 	            if (!(nbtbase instanceof NBTTagCompound))
@@ -1157,7 +1322,7 @@ public class ForgeWorld implements LocalWorld
 	            	for(int r = 0; r < groupSize; r++)
 	            	{                                    		
 	            		if(r != 0)
-	            		{
+	            		{	            			
 	                        try
 	                        {
 	                        	entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });

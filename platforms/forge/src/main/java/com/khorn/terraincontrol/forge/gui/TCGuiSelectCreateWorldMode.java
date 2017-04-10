@@ -30,7 +30,7 @@ public class TCGuiSelectCreateWorldMode extends GuiScreen
     public void initGui()
     {
     	super.initGui();
-        this.buttonList.add(this.terrainControl = new GuiButton(0, this.width / 2 - 100, this.height / 2 - 32, "TerrainControl"));
+        this.buttonList.add(this.terrainControl = new GuiButton(0, this.width / 2 - 100, this.height / 2 - 32, "OpenTerrainGenerator"));
         this.buttonList.add(this.vanilla = new GuiButton(1, this.width / 2 - 100, this.height / 2 - 4, "Vanilla"));
         this.buttonList.add(this.cancel = new GuiButton(2, this.width / 2 - 100, this.height / 2 + 24, "Cancel"));
     }
@@ -56,7 +56,7 @@ public class TCGuiSelectCreateWorldMode extends GuiScreen
             }
             if (button == this.vanilla)
             {
-            	GuiHandler.selecting = true;
+            	//GuiHandler.selecting = true;
                 //Main.packetHandler.sendToServer(...);
                 this.mc.displayGuiScreen(new GuiCreateWorld(this));
                 if (this.mc.currentScreen == null)

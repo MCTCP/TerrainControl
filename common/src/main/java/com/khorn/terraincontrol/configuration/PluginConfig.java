@@ -79,8 +79,6 @@ public final class PluginConfig extends ConfigFile
         this.LogLevel = reader.getSetting(PluginStandardValues.LogLevel);
         this.biomeConfigExtension = reader.getSetting(BiomeStandardValues.BIOME_CONFIG_EXTENSION);
         this.SpawnLog = reader.getSetting(PluginStandardValues.SPAWN_LOG);
-        this.Cartographer = reader.getSetting(PluginStandardValues.CARTOGRAPHER);
-        this.CartographerHeightOffset = reader.getSetting(PluginStandardValues.CARTOGRAPHER_HEIGHT_OFFSET);
         this.PregeneratorMaxChunksPerTick = reader.getSetting(PluginStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK);
     }
 
@@ -131,15 +129,7 @@ public final class PluginConfig extends ConfigFile
 
         writer.putSetting(PluginStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK, this.PregeneratorMaxChunksPerTick,
 		        "The number of chunks the pre-generator is allowed to generate for each server tick.",
-		        "Higher numbers make pre-generation faster but increase memory usage and will cause lag.");
-        
-        writer.putSetting(PluginStandardValues.CARTOGRAPHER, this.Cartographer,
-        		 "Currently in development, the Cartographer is a miniature version of the world (1/16th scale)",
-        		 "that spawns at the spawn point and grows larger each time a chunk in the world is generated.",
-        		 "handy for TC map makers when combined with the pre-generator to get a quick overview of a world.");
-        
-        writer.putSetting(PluginStandardValues.CARTOGRAPHER_HEIGHT_OFFSET,this. CartographerHeightOffset,
-        		"The Cartographer spawns at the height of the spawn point + the CartographerHeightOffset.");
+		        "Higher numbers make pre-generation faster but increase memory usage and will cause lag.");       
     }
 
     public LogLevels getLogLevel()
@@ -151,16 +141,6 @@ public final class PluginConfig extends ConfigFile
 	 * Shows detailed information about mob and BO3 spawning that is useful for TC world devs.
 	 */
 	public boolean SpawnLog = false;    
-	
-	/**
-	 * Forge only: Spawns the Cartographer world map above the spawn point
-	 */
-	public boolean Cartographer = false;
-	
-	/**
-	 * Forge only: The Cartographer map is spawned at the highest block at the spawn point + CartographerHeightOffset
-	 */
-	public int CartographerHeightOffset = 50;
 
 	/**
 	 * Forge only: This is the number of chunks the pre-generator generates each server tick.

@@ -24,7 +24,7 @@ public class HelpCommand extends BaseCommand
         List<String> lines = new ArrayList<String>();
         for (BaseCommand command : plugin.commandExecutor.commandHashMap.values())
         {
-            lines.add(MESSAGE_COLOR + "/tc " + command.usage + " - " + command.getHelp());
+            lines.add(MESSAGE_COLOR + "/otg " + command.usage + " - " + command.getHelp());
         }
 
         int page = 1;

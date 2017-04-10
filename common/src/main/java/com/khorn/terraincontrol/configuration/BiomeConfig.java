@@ -457,7 +457,7 @@ public class BiomeConfig extends ConfigFile
                 "Doesn`t work on Ocean and River (frozen versions too) biomes when not added as normal biome.");
 
         writer.putSetting(BiomeStandardValues.BIOME_COLOR, this.biomeColor,
-                "The hexadecimal color value of this biome. Used in the output of the /tc map command,",
+                "The hexadecimal color value of this biome. Used in the output of the /otg map command,",
                 "and used in the input of BiomeMode: FromImage.");
 
         if (this.defaultSettings.isCustomBiome)
@@ -635,7 +635,7 @@ public class BiomeConfig extends ConfigFile
                 "Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes");
 
         writer.bigTitle("Visuals and weather",
-                "Most of the settings here only have an effect on players with the client version of Terrain Control installed.");
+                "Most of the settings here only have an effect on players with the client version of Open Terrain Generator installed.");
 
         writer.putSetting(BiomeStandardValues.BIOME_TEMPERATURE, this.biomeTemperature,
                 "Biome temperature. Float value from 0.0 to 2.0.",
@@ -812,16 +812,28 @@ public class BiomeConfig extends ConfigFile
         }
 
         writer.putSetting(BiomeStandardValues.SPAWN_MONSTERS, this.spawnMonsters,
-                "The monsters (skeletons, zombies, etc.) that spawn in this biome");
+                "The monsters (skeletons, zombies, etc.) that spawn in this biome",
+                "For instance [{\"mob\": \"Spider\", \"weight\": 100, \"min\": 4, \"max\": 4}, {\"mob\": \"Zombie\", \"weight\": 100, \"min\": 4, \"max\": 4}]",
+                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types."
+                );
 
         writer.putSetting(BiomeStandardValues.SPAWN_CREATURES, this.spawnCreatures,
-                "The friendly creatures (cows, pigs, etc.) that spawn in this biome");
+                "The friendly creatures (cows, pigs, etc.) that spawn in this biome",
+                "For instance [{\"mob\": \"Sheep\", \"weight\": 12, \"min\": 4, \"max\": 4}, {\"mob\": \"Pig\", \"weight\": 10, \"min\": 4, \"max\": 4}]",
+                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types."
+                );
 
         writer.putSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, this.spawnWaterCreatures,
-                "The water creatures (only squids in vanilla) that spawn in this biome");
+                "The water creatures (only squids in vanilla) that spawn in this biome",
+                "For instance [{\"mob\": \"Squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]",
+                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types."
+                );
 
         writer.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.spawnAmbientCreatures,
-                "The ambient creatures (only bats in vanila) that spawn in this biome");
+                "The ambient creatures (only bats in vanila) that spawn in this biome",
+                "For instance [{\"mob\": \"Bat\", \"weight\": 10, \"min\": 8, \"max\": 8}]",
+                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types."
+                );
         
         // PG Settings
         

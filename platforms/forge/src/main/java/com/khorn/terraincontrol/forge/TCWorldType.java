@@ -10,7 +10,6 @@ import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.TCBiomeProvider;
-import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 
@@ -24,11 +23,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TCWorldType extends WorldType
 {
 
-    private final WorldLoader worldLoader;
+    public final WorldLoader worldLoader;
 
     public TCWorldType(WorldLoader worldLoader)
     {
-        super(PluginStandardValues.PLUGIN_NAME);
+        super(PluginStandardValues.PLUGIN_NAME_SHORT);
         this.worldLoader = Preconditions.checkNotNull(worldLoader, "worldLoader");
     }
 
@@ -53,10 +52,10 @@ public class TCWorldType extends WorldType
 
         if (!worldDirectory.exists())
         {
-            System.out.println("TerrainControl: settings does not exist, creating defaults");
+            System.out.println("OpenTerrainGenerator: settings does not exist, creating defaults");
 
             if (!worldDirectory.mkdirs())
-                System.out.println("TerrainControl: cant create folder " + worldDirectory.getAbsolutePath());
+                System.out.println("OpenTerrainGenerator: cant create folder " + worldDirectory.getAbsolutePath());
         }
         
         File worldObjectsDir = new File(TerrainControl.getEngine().getTCDataFolder(), "worlds" + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName() + File.separator + WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
@@ -110,7 +109,7 @@ public class TCWorldType extends WorldType
     @Override
     public IChunkGenerator getChunkGenerator(World mcWorld, String generatorOptions)
     {
-        ForgeWorld world = this.worldLoader.getWorld(WorldHelper.getName(mcWorld));
+        ForgeWorld world = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getWorld(mcWorld);
         if (world != null && world.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
         {
             return world.getChunkGenerator();
@@ -120,8 +119,8 @@ public class TCWorldType extends WorldType
 
     @Override
     public int getMinimumSpawnHeight(World mcWorld)
-    {
-        LocalWorld world = this.worldLoader.getWorld(mcWorld);
+    {    	
+        LocalWorld world = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getWorld(mcWorld);
         if (world == null)
         {
             // MCPC+ has an interesting load order sometimes

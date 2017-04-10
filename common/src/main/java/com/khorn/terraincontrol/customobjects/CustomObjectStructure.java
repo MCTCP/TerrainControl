@@ -104,6 +104,8 @@ public class CustomObjectStructure
             {
                 if(coordObject.spawnWithChecks(world, height, random))
                 {
+                	// SpawnEntity happens in spawnforced so that it works for customobject too
+                	/*
                     BO3 bo3 = ((BO3)coordObject.getObject());
                     if(bo3 == null)
                     {
@@ -128,7 +130,8 @@ public class CustomObjectStructure
                     	newEntityData.originalNameTagOrNBTFileName = entityDataInObject[i].originalNameTagOrNBTFileName;
                 		
                 		world.SpawnEntity(newEntityData);
-                	}                	
+                	}
+                	*/                	
                 }
             }
         }

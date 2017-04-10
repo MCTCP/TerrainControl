@@ -68,7 +68,7 @@ public abstract class EventHandler
     }
 
     /**
-     * Called whenever Terrain Control starts to populate a chunk. Cannot be
+     * Called whenever Open Terrain Generator starts to populate a chunk. Cannot be
      * cancelled.
      *
      * @param world          The world where the population occurred.
@@ -83,7 +83,7 @@ public abstract class EventHandler
     }
 
     /**
-     * Called whenever Terrain Control is done populating a chunk. Cannot be
+     * Called whenever Open Terrain Generator is done populating a chunk. Cannot be
      * cancelled.
      *
      * @param world          The world where the population occurred.

@@ -56,7 +56,7 @@ public class MapWriter implements Runnable
      * Gets the colors of all biomes, indexed by biome id.
      * 
      * @param world The world to get the colors from. Doesn't have to be
-     *            managed by Terrain Control.
+     *            managed by Open Terrain Generator
      * @return The colors, indexed by biome id.
      */
     private int[] getColors(World world)
@@ -203,7 +203,7 @@ public class MapWriter implements Runnable
      * 
      * @param biome The biome to get the temperature from.
      * @param world The world the biome is in. May be null if the world isn't
-     *            managed by Terrain Control.
+     *            managed by Open Terrain Generator
      * @return The temperature color.
      */
     private Color getBiomeTemperatureColor(BiomeBase biome, LocalWorld world)

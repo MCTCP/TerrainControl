@@ -5,7 +5,7 @@ import com.khorn.terraincontrol.generator.biome.layers.Layer;
 import com.khorn.terraincontrol.generator.biome.layers.LayerFactory;
 
 /**
- * This is the normal biome mode, which has all of Terrain Control's features.
+ * This is the normal biome mode, which has all of Open Terrain Generator's features.
  */
 public class BeforeGroupsBiomeGenerator extends LayeredBiomeGenerator
 {

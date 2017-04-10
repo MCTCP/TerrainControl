@@ -32,8 +32,8 @@ public abstract class BaseCommand
     /**
      * Gets the {@link LocalWorld} the sender has provided. If the sender
      * provided an empty string, the current world of the sender is returned.
-     * This may be null if the sender is not in a world loaded by Terrain
-     * Control. If the sender provided a non-empty string, but Terrain Control
+     * This may be null if the sender is not in a world loaded by Open Terrain
+     * Generator. If the sender provided a non-empty string, but Open Terrain Generator
      * has no world loaded with that name, null will be returned.
      * 
      * @param sender

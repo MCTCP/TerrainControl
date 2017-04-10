@@ -5,8 +5,8 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
-import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.forge.ForgeEngine;
 
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureComponent;
@@ -34,11 +34,11 @@ public class VillageStart extends StructureStart
         StructureVillagePieces.Start startPiece = new StructureVillagePieces.Start(world.getBiomeProvider(), 0, random, startX, startZ, villagePieces, size);
 
         // Apply the villageType setting
-        LocalWorld worldTC = WorldHelper.toLocalWorld(world);
+        LocalWorld worldTC = ((ForgeEngine)TerrainControl.getEngine()).getWorld(world);
         
         if(worldTC == null)
         {
-        	worldTC = WorldHelper.toLocalWorld(world);
+        	worldTC = ((ForgeEngine)TerrainControl.getEngine()).getWorld(world);
         	throw new NotImplementedException();
         }
         

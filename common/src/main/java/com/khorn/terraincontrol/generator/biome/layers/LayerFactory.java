@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 /**
  * Class responsible for creating instances of {@link Layer} tailored towards
  * biome modes.
@@ -201,7 +203,14 @@ public final class LayerFactory
                     boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
-                        int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
+                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+                    	int islandIn = 0;                   	
+                    	
+                    	// TODO: this works for forge but not for bukkit, does that make sense?...
+                    	LocalBiome islandInBiome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(islandInName) : world.getBiomeByNameOrNull(islandInName);
+            			islandIn = islandInBiome.getIds().getGenerationId();
+                    	
+                        //int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
                         if (islandIn == DefaultBiome.OCEAN.Id)
                         {
                         	inOcean = true;
@@ -220,7 +229,14 @@ public final class LayerFactory
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)
                     {
-                        int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
+                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+                    	int replaceFrom = 0;                   	
+                    	
+                    	// TODO: this works for forge but not for bukkit, does that make sense?...
+                    	LocalBiome replaceFromBiome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(replaceFromName) : world.getBiomeByNameOrNull(replaceFromName);                  	
+            			replaceFrom = replaceFromBiome.getIds().getGenerationId();
+                    	
+                        //int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
                         layerBiomeBorder.addBiome(biome, replaceFrom, world);
 
                     }
@@ -344,8 +360,16 @@ public final class LayerFactory
                     boolean[] biomeCanSpawnIn = new boolean[1024];
                     boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
-                    {
-                        int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
+                    {            
+                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+                    	                    
+                    	int islandIn = 0;
+                    	
+                    	// TODO: this works for forge but not for bukkit, does that make sense?...
+                    	LocalBiome islandInBiome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(islandInName) : world.getBiomeByNameOrNull(islandInName);
+            			islandIn = islandInBiome.getIds().getGenerationId();
+                    	
+                        //int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
                         if (islandIn == DefaultBiome.OCEAN.Id)
                         {
                         	inOcean = true;
@@ -365,7 +389,14 @@ public final class LayerFactory
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)
                     {
-                        int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
+                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+                    	int replaceFrom = 0;                   	
+                    	
+                    	// TODO: this works for forge but not for bukkit, does that make sense?...
+                    	LocalBiome replaceFromBiome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(replaceFromName) : world.getBiomeByNameOrNull(replaceFromName);
+            			replaceFrom = replaceFromBiome.getIds().getGenerationId();                    	
+                    	
+                        //int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
                         layerBiomeBorder.addBiome(biome, replaceFrom, world);
                     }
                 }

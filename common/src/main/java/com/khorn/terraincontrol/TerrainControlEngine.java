@@ -193,6 +193,10 @@ public abstract class TerrainControlEngine
      */
     public abstract LocalWorld getWorld(String name);
 
+    public abstract LocalWorld getUnloadedWorld(String name);
+    
+    public abstract ArrayList<LocalWorld> getAllWorlds();
+
     public void onShutdown()
     {
         // Shutdown all loaders

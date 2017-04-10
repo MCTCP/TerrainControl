@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.generator.biome.layers;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 
 public class LayerBiomeBorder extends Layer
@@ -23,7 +24,8 @@ public class LayerBiomeBorder extends Layer
 
         for (int i = 0; i < this.bordersFrom[replaceFrom].length; i++)
         {
-            LocalBiome biome = world.getBiomeByIdOrNull(i);
+        	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+        	LocalBiome biome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(i) : world.getBiomeByIdOrNull(i);            
             this.bordersFrom[replaceFrom][i] = biome == null || !replaceTo.getBiomeConfig().notBorderNear.contains(biome.getName());
         }
         this.bordersTo[replaceFrom] = replaceTo.getIds().getGenerationId();

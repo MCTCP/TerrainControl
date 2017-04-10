@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.forge.generator;
 import java.util.List;
 import java.util.Random;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
@@ -33,13 +34,14 @@ public class TCBiomeProvider extends BiomeProvider
     @Override
     public Biome getBiome(BlockPos blockPos)
     {
-        return this.localWorld.getBiomeById(this.biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
+        return TerrainControl.isForge ? ((ForgeBiome)TerrainControl.getBiomeAllWorlds(this.biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ()))).getHandle() : this.localWorld.getBiomeById(this.biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
     }
 
     @Override
     public Biome getBiome(BlockPos pos, Biome defaultOption)
     {
-        ForgeBiome biome = this.localWorld.getBiomeByIdOrNull(this.biomeGenerator.getBiome(pos.getX(), pos.getZ()));
+        // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+        ForgeBiome biome = TerrainControl.isForge ? (ForgeBiome) TerrainControl.getBiomeAllWorlds(this.biomeGenerator.getBiome(pos.getX(), pos.getZ())) : this.localWorld.getBiomeByIdOrNull(this.biomeGenerator.getBiome(pos.getX(), pos.getZ()));
         if (biome != null)
         {
             return biome.getHandle();
@@ -61,7 +63,7 @@ public class TCBiomeProvider extends BiomeProvider
         // Replaces ids with BiomeBases
         for (int i = 0; i < width * height; i++)
         {
-            paramArrayOfBiomeBase[i] = this.localWorld.getBiomeById(arrayOfInt[i]).getHandle();
+            paramArrayOfBiomeBase[i] = TerrainControl.isForge ? ((ForgeBiome)TerrainControl.getBiomeAllWorlds(arrayOfInt[i])).getHandle() : this.localWorld.getBiomeById(arrayOfInt[i]).getHandle();
         }
 
         return paramArrayOfBiomeBase;
@@ -80,7 +82,7 @@ public class TCBiomeProvider extends BiomeProvider
         // Replace ids with BiomeBases
         for (int i = 0; i < width * length; i++)
         {
-            listToReuse[i] = this.localWorld.getBiomeById(arrayOfInt[i]).getHandle();
+            listToReuse[i] = TerrainControl.isForge ? ((ForgeBiome)TerrainControl.getBiomeAllWorlds(arrayOfInt[i])).getHandle() : this.localWorld.getBiomeById(arrayOfInt[i]).getHandle();
         }
 
         return listToReuse;

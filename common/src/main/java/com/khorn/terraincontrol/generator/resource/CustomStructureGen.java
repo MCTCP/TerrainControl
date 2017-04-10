@@ -35,9 +35,10 @@ public class CustomStructureGen extends Resource
             {
                 throw new InvalidConfigException("No custom object found with the name " + args.get(i));
             }
-            if (object.getBranches(Rotation.NORTH).length == 0)
+            // Who cares if the object has no branches? Doesn't help anything to forbid it?
+            //if (object.getBranches(Rotation.NORTH).length == 0)
             {
-                throw new InvalidConfigException("The object " + args.get(i) + " isn't a structure: it has no branches");
+                //throw new InvalidConfigException("The object " + args.get(i) + " isn't a structure: it has no branches");
             }
             objects.add(object);
             objectNames.add(args.get(i));

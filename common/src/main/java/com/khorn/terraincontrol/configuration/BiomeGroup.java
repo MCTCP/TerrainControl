@@ -94,7 +94,10 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
             Entry<String, LocalBiome> entry = it.next();
             String biomeName = entry.getKey();
 
-            LocalBiome localBiome = world.getBiomeByName(biomeName);
+        	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
+            //LocalBiome localBiome = TerrainControl.isForge ? TerrainControl.getBiomeAllWorlds(biomeName) : world.getBiomeByNameOrNull(biomeName);
+            
+            LocalBiome localBiome = world.getBiomeByNameOrNull(biomeName);
             entry.setValue(localBiome);
 
             BiomeConfig biomeConfig = localBiome.getBiomeConfig();
