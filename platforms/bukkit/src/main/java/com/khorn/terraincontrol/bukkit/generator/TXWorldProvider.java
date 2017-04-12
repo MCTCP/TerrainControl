@@ -20,8 +20,9 @@ public class TXWorldProvider extends WorldProviderNormal
         this.localWorld = localWorld;
         this.oldWorldProvider = oldWorldProvider;
         this.a(localWorld.getWorld());
-        this.d = oldWorldProvider.l();
-        this.e = oldWorldProvider.m();
+        this.d = oldWorldProvider.l(); // doesWaterVaporize
+        this.f = oldWorldProvider.m(); // hasSkyLight
+        this.e = oldWorldProvider.n(); // hasNoSky (see https://github.com/ModCoderPack/MCPBot-Issues/issues/330)
     }
 
     @Override
