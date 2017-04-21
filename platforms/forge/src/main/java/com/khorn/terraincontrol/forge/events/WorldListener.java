@@ -1,9 +1,10 @@
 package com.khorn.terraincontrol.forge.events;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.forge.WorldLoader;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
-
+import com.khorn.terraincontrol.logging.LogMarker;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -28,6 +29,7 @@ public class WorldListener
             return;
         }
 
-        this.worldLoader.unloadWorld(forgeWorld);
+        //this.worldLoader.unloadWorld(forgeWorld);
+        TerrainControl.log(LogMarker.INFO, "Why would we need to unload world \"{}\"?", forgeWorld.getName());
     }
 }
