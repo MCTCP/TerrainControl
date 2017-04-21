@@ -33,7 +33,7 @@ class EnumSetting<T extends Enum<T>> extends Setting<T>
     @Override
     public T read(String string) throws InvalidConfigException
     {
-        for (T enumValue : enumValues)
+        for (T enumValue : this.enumValues)
         {
             if (enumValue.name().equalsIgnoreCase(string))
             {

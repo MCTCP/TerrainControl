@@ -22,5 +22,5 @@ public interface Branch
      * @param z      Z coordinate of the origin of the object.
      * @return The CustomObjectCoordinate of this branch.
      */
-    public CustomObjectCoordinate toCustomObjectCoordinate(LocalWorld world, Random random, int x, int y, int z);
+    CustomObjectCoordinate toCustomObjectCoordinate(LocalWorld world, Random random, int x, int y, int z);
 }

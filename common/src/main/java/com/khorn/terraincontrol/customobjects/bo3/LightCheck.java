@@ -24,11 +24,11 @@ public class LightCheck extends BO3Check
     {
         super(config);
         assureSize(5, args);
-        x = readInt(args.get(0), -100, 100);
-        y = readInt(args.get(1), -100, 100);
-        z = readInt(args.get(2), -100, 100);
-        minLightLevel = readInt(args.get(3), 0, 16);
-        maxLightLevel = readInt(args.get(4), minLightLevel, 16);
+        this.x = readInt(args.get(0), -100, 100);
+        this.y = readInt(args.get(1), -100, 100);
+        this.z = readInt(args.get(2), -100, 100);
+        this.minLightLevel = readInt(args.get(3), 0, 16);
+        this.maxLightLevel = readInt(args.get(4), this.minLightLevel, 16);
     }
 
     private LightCheck(BO3Config config)
@@ -40,7 +40,7 @@ public class LightCheck extends BO3Check
     public boolean preventsSpawn(LocalWorld world, int x, int y, int z)
     {
         int lightLevel = world.getLightLevel(x, y, z);
-        if (lightLevel < minLightLevel || lightLevel > maxLightLevel)
+        if (lightLevel < this.minLightLevel || lightLevel > this.maxLightLevel)
         {
             // Out of bounds
             return true;
@@ -52,7 +52,7 @@ public class LightCheck extends BO3Check
     @Override
     public String toString()
     {
-        return "LightCheck(" + x + ',' + y + ',' + z + ',' + minLightLevel + ',' + maxLightLevel + ')';
+        return "LightCheck(" + x + ',' + y + ',' + z + ',' + this.minLightLevel + ',' + this.maxLightLevel + ')';
     }
 
     @Override
@@ -62,8 +62,8 @@ public class LightCheck extends BO3Check
         rotatedCheck.x = z;
         rotatedCheck.y = y;
         rotatedCheck.z = -x;
-        rotatedCheck.minLightLevel = minLightLevel;
-        rotatedCheck.maxLightLevel = maxLightLevel;
+        rotatedCheck.minLightLevel = this.minLightLevel;
+        rotatedCheck.maxLightLevel = this.maxLightLevel;
 
         return rotatedCheck;
     }

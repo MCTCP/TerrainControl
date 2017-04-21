@@ -23,13 +23,11 @@ public class SmallLakeGen extends Resource
     {
         super(biomeConfig);
         assureSize(5, args);
-        material = readMaterial(args.get(0));
-        frequency = readInt(args.get(1), 1, 100);
-        rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH,
-                TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(4), minAltitude,
-                TerrainControl.WORLD_HEIGHT);
+        this.material = readMaterial(args.get(0));
+        this.frequency = readInt(args.get(1), 1, 100);
+        this.rarity = readRarity(args.get(2));
+        this.minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        this.maxAltitude = readInt(args.get(4), this.minAltitude, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override
@@ -72,7 +70,7 @@ public class SmallLakeGen extends Resource
     @Override
     public String toString()
     {
-        return "SmallLake(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
+        return "SmallLake(" + this.material + "," + this.frequency + "," + this.rarity + "," + this.minAltitude + "," + this.maxAltitude + ")";
     }
 
     @Override
@@ -87,7 +85,7 @@ public class SmallLakeGen extends Resource
         x -= 8;
         z -= 8;
 
-        int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
+        int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
 
         // Search any free space
         while ((y > 5) && (world.isEmpty(x, y, z)))
@@ -99,7 +97,7 @@ public class SmallLakeGen extends Resource
         // y = floor
         y -= 4;
 
-        synchronized (BooleanBuffer)
+        synchronized (this.BooleanBuffer)
         {
             LocalMaterialData air = TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0);
             boolean[] BooleanBuffer = new boolean[2048];

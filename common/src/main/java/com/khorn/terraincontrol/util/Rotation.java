@@ -6,7 +6,6 @@ import java.util.Random;
 
 /**
  * An enum to help with CustomObject rotation.
- *
  */
 public enum Rotation
 {
@@ -17,7 +16,7 @@ public enum Rotation
 
     private final int ROTATION_ID;
 
-    private Rotation(int id)
+    Rotation(int id)
     {
         this.ROTATION_ID = id;
     }

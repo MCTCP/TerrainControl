@@ -39,7 +39,7 @@ public abstract class ConfigFile
      */
     public SettingsMap getSettingsAsMap()
     {
-        SettingsMap settingsMap = new SimpleSettingsMap(configName, false);
+        SettingsMap settingsMap = new SimpleSettingsMap(this.configName, false);
         writeConfigSettings(settingsMap);
         return settingsMap;
     }
@@ -161,7 +161,7 @@ public abstract class ConfigFile
      */
     public String getName()
     {
-        return configName;
+        return this.configName;
     }
 
 }

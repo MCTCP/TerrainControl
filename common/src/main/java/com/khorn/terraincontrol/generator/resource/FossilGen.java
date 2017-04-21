@@ -17,13 +17,13 @@ public final class FossilGen extends Resource
         super(biomeConfig);
         assureSize(1, args);
 
-        rarity = readRarity(args.get(0));
+        this.rarity = readRarity(args.get(0));
     }
 
     @Override
     public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
     {
-        return;
+        // Left blank, as process(..) already handles this.
     }
 
     @Override
@@ -55,7 +55,7 @@ public final class FossilGen extends Resource
     @Override
     public String toString()
     {
-        return "Fossil(" + rarity + ")";
+        return "Fossil(" + this.rarity + ")";
     }
 
     @Override

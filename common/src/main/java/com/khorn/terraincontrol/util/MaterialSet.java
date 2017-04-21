@@ -91,10 +91,10 @@ public class MaterialSet
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (allMaterials ? 1231 : 1237);
-        result = prime * result + (allNonSolidMaterials ? 1231 : 1237);
-        result = prime * result + (allSolidMaterials ? 1231 : 1237);
-        result = prime * result + materials.hashCode();
+        result = prime * result + (this.allMaterials ? 1231 : 1237);
+        result = prime * result + (this.allNonSolidMaterials ? 1231 : 1237);
+        result = prime * result + (this.allSolidMaterials ? 1231 : 1237);
+        result = prime * result + this.materials.hashCode();
         return result;
     }
 
@@ -114,19 +114,19 @@ public class MaterialSet
             return false;
         }
         MaterialSet other = (MaterialSet) obj;
-        if (allMaterials != other.allMaterials)
+        if (this.allMaterials != other.allMaterials)
         {
             return false;
         }
-        if (allNonSolidMaterials != other.allNonSolidMaterials)
+        if (this.allNonSolidMaterials != other.allNonSolidMaterials)
         {
             return false;
         }
-        if (allSolidMaterials != other.allSolidMaterials)
+        if (this.allSolidMaterials != other.allSolidMaterials)
         {
             return false;
         }
-        if (!materials.equals(other.materials))
+        if (!this.materials.equals(other.materials))
         {
             return false;
         }
@@ -141,8 +141,8 @@ public class MaterialSet
     public void add(MaterialSetEntry entry)
     {
         // Add the appropriate hashCode
-        intSetUpToDate = false;
-        materials.add(entry);
+        this.intSetUpToDate = false;
+        this.materials.add(entry);
     }
 
     /**
@@ -151,23 +151,23 @@ public class MaterialSet
      */
     private void updateIntSet()
     {
-        if (intSetUpToDate)
+        if (this.intSetUpToDate)
         {
             // Already up to date
             return;
         }
 
         // Update the int set
-        materialIntSet = new int[materials.size()];
+        this.materialIntSet = new int[this.materials.size()];
         int i = 0;
-        for (MaterialSetEntry entry : materials)
+        for (MaterialSetEntry entry : this.materials)
         {
-            materialIntSet[i] = entry.hashCode();
+            this.materialIntSet[i] = entry.hashCode();
             i++;
         }
         // Sort int set so that we can use Arrays.binarySearch
-        Arrays.sort(materialIntSet);
-        intSetUpToDate = true;
+        Arrays.sort(this.materialIntSet);
+        this.intSetUpToDate = true;
     }
 
     /**
@@ -183,15 +183,15 @@ public class MaterialSet
         {
             return false;
         }
-        if (allMaterials && !material.isAir())
+        if (this.allMaterials && !material.isAir())
         {
             return true;
         }
-        if (allSolidMaterials && material.isSolid())
+        if (this.allSolidMaterials && material.isSolid())
         {
             return true;
         }
-        if (allNonSolidMaterials && !material.isSolid())
+        if (this.allNonSolidMaterials && !material.isSolid())
         {
             return true;
         }
@@ -200,11 +200,11 @@ public class MaterialSet
         updateIntSet();
 
         // Check if the material is included
-        if (Arrays.binarySearch(materialIntSet, material.hashCodeWithoutBlockData()) >= 0)
+        if (Arrays.binarySearch(this.materialIntSet, material.hashCodeWithoutBlockData()) >= 0)
         {
             return true;
         }
-        if (Arrays.binarySearch(materialIntSet, material.hashCode()) >= 0)
+        if (Arrays.binarySearch(this.materialIntSet, material.hashCode()) >= 0)
         {
             return true;
         }
@@ -212,7 +212,7 @@ public class MaterialSet
     }
 
     /**
-     * Returns a comma (",") seperated list of all materials in this set.
+     * Returns a comma (",") separated list of all materials in this set.
      * Keywords are left intact. No brackets ("[" or "]") are used at the
      * begin and end of the string.
      *
@@ -222,24 +222,24 @@ public class MaterialSet
     public String toString()
     {
         // Check if all materials are included
-        if (allMaterials)
+        if (this.allMaterials)
         {
             return ALL_MATERIALS;
         }
 
         StringBuilder builder = new StringBuilder();
         // Check for solid materials
-        if (allSolidMaterials)
+        if (this.allSolidMaterials)
         {
             builder.append(SOLID_MATERIALS).append(',');
         }
         // Check for non-solid materials
-        if (allNonSolidMaterials)
+        if (this.allNonSolidMaterials)
         {
             builder.append(NON_SOLID_MATERIALS).append(',');
         }
         // Add all other materials
-        for (MaterialSetEntry material : materials)
+        for (MaterialSetEntry material : this.materials)
         {
             builder.append(material.toString()).append(',');
         }

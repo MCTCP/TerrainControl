@@ -46,7 +46,7 @@ public class BranchNode implements Comparable<BranchNode>
      */
     public double getChance()
     {
-        return chance;
+        return this.chance;
     }
 
     /**
@@ -54,7 +54,7 @@ public class BranchNode implements Comparable<BranchNode>
      */
     public Rotation getRotation()
     {
-        return rotation;
+        return this.rotation;
     }
 
     /**
@@ -62,7 +62,7 @@ public class BranchNode implements Comparable<BranchNode>
      */
     public CustomObject getCustomObject()
     {
-        return customObject;
+        return this.customObject;
     }
 
     /**
@@ -70,7 +70,7 @@ public class BranchNode implements Comparable<BranchNode>
      */
     public String toBranchString()
     {
-        return ',' + customObject.getName() + ',' + rotation.name() + ',' + chance;
+        return ',' + this.customObject.getName() + ',' + this.rotation.name() + ',' + this.chance;
     }
 
     @Override

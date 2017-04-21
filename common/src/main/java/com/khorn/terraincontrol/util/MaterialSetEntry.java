@@ -35,20 +35,20 @@ public class MaterialSetEntry
     @Override
     public int hashCode()
     {
-        if (includesBlockData)
+        if (this.includesBlockData)
         {
-            return material.hashCode();
+            return this.material.hashCode();
         } else
         {
-            return material.hashCodeWithoutBlockData();
+            return this.material.hashCodeWithoutBlockData();
         }
     }
 
     @Override
     public String toString()
     {
-        String output = material.toString();
-        if (includesBlockData && material.getBlockData() == 0)
+        String output = this.material.toString();
+        if (this.includesBlockData && this.material.getBlockData() == 0)
         {
             // Turn things like "WOOL" back into "WOOL:0" (material.toString
             // never includes "*:0")
@@ -65,14 +65,14 @@ public class MaterialSetEntry
      */
     public MaterialSetEntry rotate()
     {
-        if (!includesBlockData)
+        if (!this.includesBlockData)
         {
             // Don't rotate block data
-            return new MaterialSetEntry(material, false);
+            return new MaterialSetEntry(this.material, false);
         } else
         {
             // Actually rotate block data, to maintain check correctness
-            return new MaterialSetEntry(material.rotate(), true);
+            return new MaterialSetEntry(this.material.rotate(), true);
         }
     }
 }

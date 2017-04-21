@@ -22,24 +22,24 @@ public class RandomBlockFunction extends BO3PlaceableFunction
     {
         super(config);
         assureSize(5, args);
-        x = readInt(args.get(0), -100, 100);
-        y = readInt(args.get(1), -100, 100);
-        z = readInt(args.get(2), -100, 100);
+        this.x = readInt(args.get(0), -100, 100);
+        this.y = readInt(args.get(1), -100, 100);
+        this.z = readInt(args.get(2), -100, 100);
 
         // Now read the random parts
         int i = 3;
         int size = args.size();
 
         // The arrays are a little bit too large, just to be sure
-        blocks = new LocalMaterialData[size / 2 + 1];
-        blockChances = new byte[size / 2 + 1];
-        metaDataNames = new String[size / 2 + 1];
-        metaDataTags = new NamedBinaryTag[size / 2 + 1];
+        this.blocks = new LocalMaterialData[size / 2 + 1];
+        this.blockChances = new byte[size / 2 + 1];
+        this.metaDataNames = new String[size / 2 + 1];
+        this.metaDataTags = new NamedBinaryTag[size / 2 + 1];
 
         while (i < size)
         {
             // Parse block id and data
-            blocks[blockCount] = readMaterial(args.get(i));
+            this.blocks[blockCount] = readMaterial(args.get(i));
 
             // Parse chance and metadata
             i++;
@@ -58,8 +58,8 @@ public class RandomBlockFunction extends BO3PlaceableFunction
                 NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().directory);
                 if (metaData != null)
                 {
-                    metaDataNames[blockCount] = args.get(i);
-                    metaDataTags[blockCount] = metaData;
+                    this.metaDataNames[blockCount] = args.get(i);
+                    this.metaDataTags[blockCount] = metaData;
                 }
 
                 // Get the chance
@@ -68,11 +68,11 @@ public class RandomBlockFunction extends BO3PlaceableFunction
                 {
                     throw new InvalidConfigException("Missing chance parameter");
                 }
-                blockChances[blockCount] = (byte) readInt(args.get(i), 1, 100);
+                this.blockChances[this.blockCount] = (byte) readInt(args.get(i), 1, 100);
             }
 
             i++;
-            blockCount++;
+            this.blockCount++;
         }
     }
 
@@ -85,14 +85,14 @@ public class RandomBlockFunction extends BO3PlaceableFunction
     public String toString()
     {
         String text = "RandomBlock(" + x + "," + y + "," + z;
-        for (int i = 0; i < blockCount; i++)
+        for (int i = 0; i < this.blockCount; i++)
         {
-            if (metaDataTags[i] == null)
+            if (this.metaDataTags[i] == null)
             {
-                text += "," + blocks[i] + "," + blockChances[i];
+                text += "," + this.blocks[i] + "," + this.blockChances[i];
             } else
             {
-                text += "," + blocks[i] + "," + metaDataNames[i] + "," + blockChances[i];
+                text += "," + this.blocks[i] + "," + this.metaDataNames[i] + "," + this.blockChances[i];
             }
         }
         return text + ")";
@@ -105,15 +105,15 @@ public class RandomBlockFunction extends BO3PlaceableFunction
         rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
-        rotatedBlock.blockCount = blockCount;
-        rotatedBlock.blocks = new LocalMaterialData[blockCount];
-        for (int i = 0; i < blockCount; i++)
+        rotatedBlock.blockCount = this.blockCount;
+        rotatedBlock.blocks = new LocalMaterialData[this.blockCount];
+        for (int i = 0; i < this.blockCount; i++)
         {
-            rotatedBlock.blocks[i] = blocks[i].rotate();
+            rotatedBlock.blocks[i] = this.blocks[i].rotate();
         }
-        rotatedBlock.blockChances = blockChances;
-        rotatedBlock.metaDataTags = metaDataTags;
-        rotatedBlock.metaDataNames = metaDataNames;
+        rotatedBlock.blockChances = this.blockChances;
+        rotatedBlock.metaDataTags = this.metaDataTags;
+        rotatedBlock.metaDataNames = this.metaDataNames;
 
         return rotatedBlock;
     }
@@ -121,14 +121,14 @@ public class RandomBlockFunction extends BO3PlaceableFunction
     @Override
     public void spawn(LocalWorld world, Random random, int x, int y, int z)
     {
-        for (int i = 0; i < blockCount; i++)
+        for (int i = 0; i < this.blockCount; i++)
         {
-            if (random.nextInt(100) < blockChances[i])
+            if (random.nextInt(100) < this.blockChances[i])
             {
-                world.setBlock(x, y, z, blocks[i]);
-                if (metaDataTags[i] != null)
+                world.setBlock(x, y, z, this.blocks[i]);
+                if (this.metaDataTags[i] != null)
                 {
-                    world.attachMetadata(x, y, z, metaDataTags[i]);
+                    world.attachMetadata(x, y, z, this.metaDataTags[i]);
                 }
                 break;
             }
@@ -143,6 +143,6 @@ public class RandomBlockFunction extends BO3PlaceableFunction
             return false;
         }
         RandomBlockFunction block = (RandomBlockFunction) other;
-        return block.x == x && block.y == y && block.z == z;
+        return block.x == this.x && block.y == this.y && block.z == this.z;
     }
 }

@@ -270,7 +270,7 @@ public enum DefaultMaterial
      *            prevent snowfall. Note: this isn't always equal to what
      *            Minecraft calls solid.
      */
-    private DefaultMaterial(int id, boolean solid)
+    DefaultMaterial(int id, boolean solid)
     {
         this.id = id;
         this.solid = solid;
@@ -281,7 +281,7 @@ public enum DefaultMaterial
      * 
      * @param id Id of the material.
      */
-    private DefaultMaterial(int id)
+    DefaultMaterial(int id)
     {
         this.id = id;
         this.solid = true;
@@ -300,7 +300,7 @@ public enum DefaultMaterial
 
     /**
      * Gets whether this material is solid. Materials that aren't solid are
-     * nonexistant for {@link LocalWorld#getSolidHeight(int, int)}. Note: this
+     * nonexistent for {@link LocalWorld#getSolidHeight(int, int)}. Note: this
      * isn't always equal to what Minecraft calls solid.
      * 
      * @return boolean Whether or not the material is considered solid

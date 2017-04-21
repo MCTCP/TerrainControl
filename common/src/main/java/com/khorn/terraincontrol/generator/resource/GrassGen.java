@@ -14,7 +14,7 @@ import java.util.Random;
 
 public class GrassGen extends Resource
 {
-    public static enum GroupOption
+    public enum GroupOption
     {
         Grouped,
         NotGrouped
@@ -40,11 +40,11 @@ public class GrassGen extends Resource
             // Test whether the second argument is the data value (deprecated)
             readInt(secondArgument, 0, 16);
             // If yes, parse it
-            plant = PlantType.getPlant(args.get(0) + ":" + secondArgument);
+            this.plant = PlantType.getPlant(args.get(0) + ":" + secondArgument);
         } catch (InvalidConfigException e)
         {
             // Nope, second argument is not a number
-            plant = PlantType.getPlant(args.get(0));
+            this.plant = PlantType.getPlant(args.get(0));
             if (secondArgument.equalsIgnoreCase(GroupOption.Grouped.toString()))
             {
                 this.groupOption = GroupOption.Grouped;
@@ -55,11 +55,11 @@ public class GrassGen extends Resource
 
         // Not used for terrain generation, they are used by the Forge
         // implementation to fire Forge events
-        material = plant.getBottomMaterial();
+        this.material = this.plant.getBottomMaterial();
 
-        frequency = readInt(args.get(2), 1, 500);
-        rarity = readRarity(args.get(3));
-        sourceBlocks = readMaterials(args, 4);
+        this.frequency = readInt(args.get(2), 1, 500);
+        this.rarity = readRarity(args.get(3));
+        this.sourceBlocks = readMaterials(args, 4);
     }
 
     @Override
@@ -102,7 +102,8 @@ public class GrassGen extends Resource
     @Override
     public String toString()
     {
-        return "Grass(" + plant.getName() + "," + groupOption + "," + frequency + "," + rarity + makeMaterials(sourceBlocks) + ")";
+        return "Grass(" + this.plant.getName() + "," + this.groupOption + "," + this.frequency
+            + "," + this.rarity + makeMaterials(this.sourceBlocks) + ")";
     }
 
     @Override
@@ -132,14 +133,14 @@ public class GrassGen extends Resource
             // Try to place grass
             // Because of the changed y position, only one in four attempts
             // will have success
-            for (int i = 0; i < frequency * 4; i++)
+            for (int i = 0; i < this.frequency * 4; i++)
             {
                 int x = centerX + random.nextInt(8) - random.nextInt(8);
                 int y = centerY + random.nextInt(4) - random.nextInt(4);
                 int z = centerZ + random.nextInt(8) - random.nextInt(8);
                 if (world.isEmpty(x, y, z) && this.sourceBlocks.contains(world.getMaterial (x, y - 1, z)))
                 {
-                    plant.spawn(world, x, y, z);
+                    this.plant.spawn(world, x, y, z);
                 }
 
             }
@@ -149,7 +150,7 @@ public class GrassGen extends Resource
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        switch (groupOption)
+        switch (this.groupOption)
         {
             case Grouped:
                 spawnGrouped(world, random, chunkCoord);
@@ -162,9 +163,9 @@ public class GrassGen extends Resource
 
     protected void spawnNotGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
-        for (int t = 0; t < frequency; t++)
+        for (int t = 0; t < this.frequency; t++)
         {
-            if (random.nextInt(100) >= rarity)
+            if (random.nextInt(100) >= this.rarity)
                 continue;
             int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
@@ -175,9 +176,9 @@ public class GrassGen extends Resource
                     .isMaterial(DefaultMaterial.LEAVES_2)) && (y > 0))
                 y--;
 
-            if ((!world.isEmpty(x, y + 1, z)) || (!sourceBlocks.contains(world.getMaterial(x, y, z))))
+            if ((!world.isEmpty(x, y + 1, z)) || (!this.sourceBlocks.contains(world.getMaterial(x, y, z))))
                 continue;
-            plant.spawn(world, x, y + 1, z);
+            this.plant.spawn(world, x, y + 1, z);
         }
     }
 

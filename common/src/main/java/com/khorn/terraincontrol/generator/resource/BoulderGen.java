@@ -21,14 +21,12 @@ public class BoulderGen extends Resource
         super(config);
         assureSize(6, args);
 
-        material = readMaterial(args.get(0));
-        frequency = readInt(args.get(1), 1, 5000);
-        rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH,
-                TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(4), minAltitude,
-                TerrainControl.WORLD_HEIGHT);
-        sourceBlocks = readMaterials(args, 5);
+        this.material = readMaterial(args.get(0));
+        this.frequency = readInt(args.get(1), 1, 5000);
+        this.rarity = readRarity(args.get(2));
+        this.minAltitude = readInt(args.get(3), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        this.maxAltitude = readInt(args.get(4), this.minAltitude, TerrainControl.WORLD_HEIGHT);
+        this.sourceBlocks = readMaterials(args, 5);
     }
 
     @Override
@@ -42,7 +40,7 @@ public class BoulderGen extends Resource
         while (y > 3)
         {
             LocalMaterialData material = world.getMaterial(x, y - 1, z);
-            if (sourceBlocks.contains(material)) {
+            if (this.sourceBlocks.contains(material)) {
                 break;
             }
             y--;
@@ -86,7 +84,8 @@ public class BoulderGen extends Resource
     @Override
     public String toString()
     {
-        return "Boulder(" + material + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
+        return "Boulder(" + this.material + "," + this.frequency + "," + this.rarity + "," + this.minAltitude
+            + "," + this.maxAltitude + makeMaterials(this.sourceBlocks) + ")";
     }
 
     @Override

@@ -39,7 +39,7 @@ public class MinecraftObjectFunction extends BO3PlaceableFunction
     @Override
     public String toString()
     {
-        return "MinecraftObject(" + x + ',' + y + ',' + z + ',' + structurePart + ')';
+        return "MinecraftObject(" + x + ',' + y + ',' + z + ',' + this.structurePart + ')';
     }
 
     @Override
@@ -49,7 +49,7 @@ public class MinecraftObjectFunction extends BO3PlaceableFunction
         rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
-        rotatedBlock.rotation = rotation.next();
+        rotatedBlock.rotation = this.rotation.next();
 
         return rotatedBlock;
     }
@@ -57,8 +57,8 @@ public class MinecraftObjectFunction extends BO3PlaceableFunction
     @Override
     public void spawn(LocalWorld world, Random random, int x, int y, int z)
     {
-        SpawnableObject object = world.getMojangStructurePart(structurePart.getPath());
-        object.spawnForced(world, random, rotation, x, y, z);
+        SpawnableObject object = world.getMojangStructurePart(this.structurePart.getPath());
+        object.spawnForced(world, random, this.rotation, x, y, z);
     }
 
     @Override

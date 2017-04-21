@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Information about the unparsed value of a setting. It contains what was found
- * in a config file: the line nubmer, the setting value and the comments.
+ * in a config file: the line number, the setting value and the comments.
  */
 public final class RawSettingValue
 {
@@ -90,7 +90,7 @@ public final class RawSettingValue
      */
     public int getLineNumber()
     {
-        return line;
+        return this.line;
     }
 
     /**
@@ -99,7 +99,7 @@ public final class RawSettingValue
      */
     public String getRawValue()
     {
-        return value;
+        return this.value;
     }
 
     /**
@@ -108,7 +108,7 @@ public final class RawSettingValue
      */
     public ValueType getType()
     {
-        return valueType;
+        return this.valueType;
     }
 
     /**
@@ -123,9 +123,7 @@ public final class RawSettingValue
             // No change in comments
             return this;
         }
-
-        List<String> commentsList = Collections.unmodifiableList(Arrays.asList(comments));
-        return new RawSettingValue(value, valueType, line, commentsList);
+        return new RawSettingValue(this.value, this.valueType, this.line, Collections.unmodifiableList(Arrays.asList(comments)));
     }
 
     /**
@@ -140,7 +138,7 @@ public final class RawSettingValue
         {
             throw new IllegalArgumentException("Invalid line number: " + lineNumber);
         }
-        return new RawSettingValue(this.value, valueType, lineNumber, this.comments);
+        return new RawSettingValue(this.value, this.valueType, lineNumber, this.comments);
     }
 
 }

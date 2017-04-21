@@ -7,7 +7,7 @@ public class LogicHelper
      * Returns true if both objects are equal. If both objects are null, this
      * method returns true. If one of the objects is null, this method returns
      * false. If no objects are null, this method returns true if
-     * <code>o1.equals(o2)</code>.
+     * {@code o1.equals(o2)}.
      * 
      * 
      * The benefit of this method over {@link Object#equals(Object)} is that

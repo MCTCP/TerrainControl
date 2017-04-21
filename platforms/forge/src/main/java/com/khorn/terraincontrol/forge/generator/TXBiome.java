@@ -145,7 +145,7 @@ public class TXBiome extends Biome
     protected void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)
     {
         internalList.clear();
-        internalList.addAll(MobSpawnGroupHelper.toMinecraftlist(configList));
+        internalList.addAll(MobSpawnGroupHelper.toMinecraftList(configList));
     }
 
     // Sky color from Temp

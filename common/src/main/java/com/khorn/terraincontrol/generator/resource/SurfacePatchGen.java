@@ -30,13 +30,13 @@ public class SurfacePatchGen extends Resource
         super(biomeConfig);
         assureSize(4, args);
 
-        material = readMaterial(args.get(0));
-        decorationAboveReplacements = readMaterial(args.get(1));
-        minAltitude = readInt(args.get(2), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(3), minAltitude, TerrainControl.WORLD_HEIGHT);
-        sourceBlocks = readMaterials(args, 4);
-        random = new Random(2345L);
-        noiseGen = new NoiseGeneratorOldOctaves(random, 1);
+        this.material = readMaterial(args.get(0));
+        this.decorationAboveReplacements = readMaterial(args.get(1));
+        this.minAltitude = readInt(args.get(2), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        this.maxAltitude = readInt(args.get(3), this.minAltitude, TerrainControl.WORLD_HEIGHT);
+        this.sourceBlocks = readMaterials(args, 4);
+        this.random = new Random(2345L);
+        this.noiseGen = new NoiseGeneratorOldOctaves(this.random, 1);
     }
 
     @Override
@@ -55,19 +55,19 @@ public class SurfacePatchGen extends Resource
             return false;
         }
         SurfacePatchGen other = (SurfacePatchGen) obj;
-        if (!decorationAboveReplacements.equals(other.decorationAboveReplacements))
+        if (!this.decorationAboveReplacements.equals(other.decorationAboveReplacements))
         {
             return false;
         }
-        if (maxAltitude != other.maxAltitude)
+        if (this.maxAltitude != other.maxAltitude)
         {
             return false;
         }
-        if (minAltitude != other.minAltitude)
+        if (this.minAltitude != other.minAltitude)
         {
             return false;
         }
-        if (!sourceBlocks.equals(other.sourceBlocks))
+        if (!this.sourceBlocks.equals(other.sourceBlocks))
         {
             return false;
         }
@@ -85,10 +85,10 @@ public class SurfacePatchGen extends Resource
     {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((decorationAboveReplacements == null) ? 0 : decorationAboveReplacements.hashCode());
-        result = prime * result + maxAltitude;
-        result = prime * result + minAltitude;
-        result = prime * result + ((sourceBlocks == null) ? 0 : sourceBlocks.hashCode());
+        result = prime * result + ((this.decorationAboveReplacements == null) ? 0 : this.decorationAboveReplacements.hashCode());
+        result = prime * result + this.maxAltitude;
+        result = prime * result + this.minAltitude;
+        result = prime * result + ((this.sourceBlocks == null) ? 0 : this.sourceBlocks.hashCode());
         return result;
     }
 
@@ -107,28 +107,28 @@ public class SurfacePatchGen extends Resource
     @Override
     public String toString()
     {
-        return "SurfacePatch(" + material + "," + decorationAboveReplacements + ","
-                + minAltitude + "," + maxAltitude + "," + sourceBlocks + ")";
+        return "SurfacePatch(" + this.material + "," + this.decorationAboveReplacements + ","
+                + this.minAltitude + "," + this.maxAltitude + "," + this.sourceBlocks + ")";
     }
 
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
         int y = world.getHighestBlockYAt(x, z) - 1;
-        if (y < minAltitude || y > maxAltitude)
+        if (y < this.minAltitude || y > this.maxAltitude)
             return;
 
-        double yNoise = noiseGen.getYNoise(x * 0.25D, z * 0.25D);
+        double yNoise = this.noiseGen.getYNoise(x * 0.25D, z * 0.25D);
         if (yNoise > 0.0D)
         {
             LocalMaterialData materialAtLocation = world.getMaterial(x, y, z);
-            if (sourceBlocks.contains(materialAtLocation))
+            if (this.sourceBlocks.contains(materialAtLocation))
             {
-                world.setBlock(x, y, z, material);
+                world.setBlock(x, y, z, this.material);
 
                 if (yNoise < 0.12D)
                 {
-                    world.setBlock(x, y + 1, z, decorationAboveReplacements);
+                    world.setBlock(x, y + 1, z, this.decorationAboveReplacements);
                 }
             }
         }

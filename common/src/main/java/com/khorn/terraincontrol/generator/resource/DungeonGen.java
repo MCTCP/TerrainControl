@@ -21,10 +21,10 @@ public class DungeonGen extends Resource
         super(biomeConfig);
         assureSize(4, args);
 
-        frequency = readInt(args.get(0), 1, 100);
-        rarity = readRarity(args.get(1));
-        minAltitude = readInt(args.get(2), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(3), minAltitude, TerrainControl.WORLD_HEIGHT);
+        this.frequency = readInt(args.get(0), 1, 100);
+        this.rarity = readRarity(args.get(1));
+        this.minAltitude = readInt(args.get(2), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        this.maxAltitude = readInt(args.get(3), this.minAltitude, TerrainControl.WORLD_HEIGHT);
     }
 
     @Override
@@ -68,13 +68,14 @@ public class DungeonGen extends Resource
     @Override
     public String toString()
     {
-        return "Dungeon(" + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + ")";
+        return "Dungeon(" + this.frequency + "," + this.rarity + "," +
+            this.minAltitude + "," + this.maxAltitude + ")";
     }
 
     @Override
     public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
     {
-        int y = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
+        int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
         world.placeDungeon(random, x, y, z);
     }
 

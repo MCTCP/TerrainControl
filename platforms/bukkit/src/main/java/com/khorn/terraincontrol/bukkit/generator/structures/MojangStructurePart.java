@@ -10,9 +10,8 @@ import net.minecraft.server.v1_11_R1.*;
 import java.util.Random;
 
 /**
- * Makes a Minecraft {@link DefinedStructure} useable as a
+ * Makes a Minecraft {@link DefinedStructure} usable as a
  * {@link SpawnableObject}.
- *
  */
 public final class MojangStructurePart implements SpawnableObject
 {
@@ -37,7 +36,7 @@ public final class MojangStructurePart implements SpawnableObject
         DefinedStructureInfo spawnSettings = new DefinedStructureInfo().a(rotationMc) // withRotation
                 .a(new ChunkCoordIntPair(blockPos)) // inChunk
                 .a(random); // withRandom
-        spawnObject.a(worldMc, blockPos, spawnSettings, 4);
+        this.spawnObject.a(worldMc, blockPos, spawnSettings, 4);
         return true;
     }
 
@@ -61,7 +60,7 @@ public final class MojangStructurePart implements SpawnableObject
     @Override
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
 }

@@ -25,13 +25,13 @@ class FloatSetting extends Setting<Float>
     @Override
     public Float getDefaultValue()
     {
-        return defaultValue;
+        return this.defaultValue;
     }
 
     @Override
     public Float read(String string) throws InvalidConfigException
     {
-        return (float) StringHelper.readDouble(string, minValue, maxValue);
+        return (float) StringHelper.readDouble(string, this.minValue, this.maxValue);
     }
 
 }

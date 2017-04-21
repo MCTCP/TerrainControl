@@ -78,7 +78,6 @@ public final class WorldLoader
      * is the desired world type. As a workaround, we tentatively
      * load the configs if a config folder exists in the usual
      * location.
-     * @param server The Minecraft server.
      */
     public void onServerAboutToLoad()
     {

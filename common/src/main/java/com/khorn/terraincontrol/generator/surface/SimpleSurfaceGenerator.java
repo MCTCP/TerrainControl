@@ -108,7 +108,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         if ((surfaceBlocksCount == 0) && (currentGroundBlock.isMaterial(DefaultMaterial.SAND)))
                         {
                             surfaceBlocksCount = generatingChunk.random.nextInt(4);
-                            currentGroundBlock = sandstone;
+                            currentGroundBlock = this.sandstone;
                         }
                     }
                 }

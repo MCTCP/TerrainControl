@@ -41,7 +41,7 @@ public class RavinesGen extends TerrainGenBase
         float f3 = 1.0F;
         for (int j = 0; ; j++)
         {
-            if (j >= worldSettings.worldHeightCap)
+            if (j >= this.worldSettings.worldHeightCap)
                 break;
             if ((j == 0) || (localRandom.nextInt(3) == 0))
             {
@@ -105,8 +105,8 @@ public class RavinesGen extends TerrainGenBase
 
             if (maxY < 1)
                 maxY = 1;
-            if (minY > worldSettings.worldHeightCap - 8)
-                minY = worldSettings.worldHeightCap - 8;
+            if (minY > this.worldSettings.worldHeightCap - 8)
+                minY = this.worldSettings.worldHeightCap - 8;
 
             if (i2 < 0)
                 i2 = 0;
@@ -122,7 +122,7 @@ public class RavinesGen extends TerrainGenBase
                     {
                         if (localY < 0)
                             continue;
-                        if (localY < worldSettings.worldHeightCap)
+                        if (localY < this.worldSettings.worldHeightCap)
                         {
                             LocalMaterialData materialAtPosition = generatingChunkBuffer.getBlock(localX, localY, localZ);
                             if (materialAtPosition.isMaterial(DefaultMaterial.WATER)
@@ -145,7 +145,7 @@ public class RavinesGen extends TerrainGenBase
                 double d9 = (localX + generatingChunk.getBlockX() + 0.5D - paramDouble1) / d3;
                 for (int localZ = i2; localZ < i3; localZ++)
                 {
-                    LocalBiome biome = world.getBiome(localZ + generatingChunk.getBlockX(), localX + generatingChunk.getBlockZ());
+                    LocalBiome biome = this.world.getBiome(localZ + generatingChunk.getBlockX(), localX + generatingChunk.getBlockZ());
                     BiomeConfig biomeConfig = biome.getBiomeConfig();
                     double d10 = (localZ + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
                     boolean grassFound = false;
@@ -168,9 +168,8 @@ public class RavinesGen extends TerrainGenBase
                                     } else
                                     {
                                         generatingChunkBuffer.setBlock(localX, localY, localZ, air);
-                                        if ((grassFound != false)
-                                                && (generatingChunkBuffer.getBlock(localX, localY - 1, localZ)
-                                                        .isMaterial(DefaultMaterial.DIRT)))
+                                        if ((grassFound)
+                                                && (generatingChunkBuffer.getBlock(localX, localY - 1, localZ).isMaterial(DefaultMaterial.DIRT)))
                                         {
                                             generatingChunkBuffer.setBlock(localX, localY - 1, localZ, biomeConfig.surfaceBlock);
                                         }

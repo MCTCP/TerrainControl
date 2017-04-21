@@ -7,9 +7,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Rutger on 11-3-2016.
- */
 public class ReflectionHelperTest
 {
     // Just an easy to follow class hierarchy:

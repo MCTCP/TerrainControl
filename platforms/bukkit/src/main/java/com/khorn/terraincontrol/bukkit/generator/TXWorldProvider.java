@@ -28,7 +28,7 @@ public class TXWorldProvider extends WorldProviderNormal
     @Override
     public int getSeaLevel()
     {
-        return localWorld.getConfigs().getWorldConfig().waterLevelMax;
+        return this.localWorld.getConfigs().getWorldConfig().waterLevelMax;
     }
 
     /**
@@ -39,6 +39,6 @@ public class TXWorldProvider extends WorldProviderNormal
      */
     public WorldProvider getOldWorldProvider()
     {
-        return oldWorldProvider;
+        return this.oldWorldProvider;
     }
 }

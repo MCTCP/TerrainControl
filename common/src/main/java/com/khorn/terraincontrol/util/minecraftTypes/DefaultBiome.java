@@ -166,7 +166,7 @@ public enum DefaultBiome
      */
     private static DefaultBiome[] lookupID;
 
-    private DefaultBiome(int i, String name, Class<? extends MinecraftBiomeTemplate> defaultSettings)
+    DefaultBiome(int i, String name, Class<? extends MinecraftBiomeTemplate> defaultSettings)
     {
         this.Id = i;
         this.Name = name;
@@ -187,7 +187,7 @@ public enum DefaultBiome
     /**
      * Returns a DefaultBiome object with the given biome ID
      * 
-     * @param id the ID of the DeafultBiome that is to be returned
+     * @param id the ID of the DefaultBiome that is to be returned
      * @return A DefaultBiome with the given ID
      */
     public static DefaultBiome getBiome(int id)
@@ -206,14 +206,14 @@ public enum DefaultBiome
         try
         {
             StandardBiomeTemplate template = (StandardBiomeTemplate) defaultSettingsClass.getConstructors()[0].newInstance(mojangSettings, maxWorldHeight);
-            return new BiomeLoadInstruction(Name, Id, template);
+            return new BiomeLoadInstruction(this.Name, this.Id, template);
         } catch (Exception e)
         {
             TerrainControl.log(LogMarker.FATAL, "Failed to create default biome");
             TerrainControl.printStackTrace(LogMarker.FATAL, e);
 
             // Use the standard settings for custom biomes
-            return new BiomeLoadInstruction(Name, Id, new StandardBiomeTemplate(maxWorldHeight));
+            return new BiomeLoadInstruction(this.Name, this.Id, new StandardBiomeTemplate(maxWorldHeight));
         }
     }
 

@@ -192,10 +192,10 @@ public class WeightedMobSpawnGroup
     {
         int prime = 31;
         int result = 1;
-        result = prime * result + max;
-        result = prime * result + min;
-        result = prime * result + mob.hashCode();
-        result = prime * result + weight;
+        result = prime * result + this.max;
+        result = prime * result + this.min;
+        result = prime * result + this.mob.hashCode();
+        result = prime * result + this.weight;
         return result;
     }
 
@@ -215,11 +215,11 @@ public class WeightedMobSpawnGroup
             return false;
         }
         WeightedMobSpawnGroup other = (WeightedMobSpawnGroup) obj;
-        if (max != other.max || min != other.min || weight != other.weight)
+        if (this.max != other.max || this.min != other.min || this.weight != other.weight)
         {
             return false;
         }
-        if (!mob.equals(other.mob))
+        if (!this.mob.equals(other.mob))
         {
             return false;
         }

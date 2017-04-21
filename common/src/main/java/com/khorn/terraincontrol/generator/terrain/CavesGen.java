@@ -239,12 +239,14 @@ public class CavesGen extends TerrainGenBase
         {
             return true;
         }
-        // TODO: add red sandstone case in Minecraft 1.8
+        if (material.isMaterial(DefaultMaterial.RED_SANDSTONE))
+        {
+            return true;
+        }
         if (material.isMaterial(DefaultMaterial.SNOW))
         {
             return true;
         }
-
         return false;
     }
 
@@ -264,7 +266,7 @@ public class CavesGen extends TerrainGenBase
             double y;
 
             if (this.worldSettings.evenCaveDistribution)
-                y = RandomHelper.numberInRange(random, this.worldSettings.caveMinAltitude, this.worldSettings.caveMaxAltitude);
+                y = RandomHelper.numberInRange(this.random, this.worldSettings.caveMinAltitude, this.worldSettings.caveMaxAltitude);
             else
                 y = this.random.nextInt(this.random.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude + 1) + 1) + this.worldSettings.caveMinAltitude;
 

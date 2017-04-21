@@ -58,20 +58,20 @@ version            - contains a string of the current version of the file struct
 spawnOnBlockType   - contains a list of integer values of the block ids this object can spawn on.
 spawnSunlight      - a flag if this object can spawn on sunlit ground
 spawnDarkness      - a flag if this object can spawn in total darkness
-spawnWater         - a flag if this object can spawn under water. (Note if the object is tall enough, it might portrude from the water)
+spawnWater         - a flag if this object can spawn under water. (Note if the object is tall enough, it might protrude from the water)
 spawnLava          - a flag if this object can spawn under lava.
-underFill          - a flag to determin if the object should have its base filled underneath of any gaps after placing. The gaps will be filled with the block specified in spawnOnBlockType.
-needsFoundation    - a flag to determin if the object requires a preexisting foundation. If this is false, the object MIGHT spawn floating.
-dig                - a flag to determin if the object should dig out the sides of its area. This will reduce the frequency bailout chance drasticly.
-rarity             - a 1 to 100 chance the object will spawn in any given chunk. However, each whole 100 value represents a spawn attempt, then the remainin is a precentage again (ex: rarity=320 means that there will be 3 spawn attempts plus a 20% chance of a 4th)
-collisionPercentage- a 1 to 100 percent of the total object that is allowed to collide with the terrain. With the dig flag set to flase, collsion blocks are removed, with the dig flag of true, collsion blocks from the object will override terrain.
+underFill          - a flag to determine if the object should have its base filled underneath of any gaps after placing. The gaps will be filled with the block specified in spawnOnBlockType.
+needsFoundation    - a flag to determine if the object requires a preexisting foundation. If this is false, the object MIGHT spawn floating.
+dig                - a flag to determine if the object should dig out the sides of its area. This will reduce the frequency bailout chance drastically.
+rarity             - a 1 to 100 chance the object will spawn in any given chunk. However, each whole 100 value represents a spawn attempt, then the remaining is a percentage again (ex: rarity=320 means that there will be 3 spawn attempts plus a 20% chance of a 4th)
+collisionPercentage- a 1 to 100 percent of the total object that is allowed to collide with the terrain. With the dig flag set to false, collision blocks are removed, with the dig flag of true, collision blocks from the object will override terrain.
 spawnElevationMin  - an integer indicating the minimum elevation the base of the object can spawn at.
 spawnElevationMax  - an integer indicating the maximum elevation the base of the object can spawn at.
-randomRotation     - a flag to determin if the object can be rotated randomly 0, 90, 180 or 270 degrees on placing. A branch block will be oriented based on the branch direction, however with this flag set, it can appear in any direction.
+randomRotation     - a flag to determine if the object can be rotated randomly 0, 90, 180 or 270 degrees on placing. A branch block will be oriented based on the branch direction, however with this flag set, it can appear in any direction.
 groupId            - a string containing the group id this object belongs to. Objects with the same groupId can spawn near each other. (If group ID is absent, or "", no other group information needs to be loaded, or saved to file)
-tree               - a flag to determin if this object should grow from saplings
-branch             - a flag to determin if this object should spawn from branch blocks
-diggingBranch      - a flag to determin if the branch block is allowed to override existing blocks in the object. If false if the branch would overlap the existing object, it fails to be added, and the branch fails completely.
+tree               - a flag to determine if this object should grow from saplings
+branch             - a flag to determine if this object should spawn from branch blocks
+diggingBranch      - a flag to determine if the branch block is allowed to override existing blocks in the object. If false if the branch would overlap the existing object, it fails to be added, and the branch fails completely.
 branchLimit        - The maximum number of branches a single object can have before the branch engine stops adding branches
 groupFrequencyMin  - The minimum number of objects from a group that are attempted to be placed near each other.
 groupFrequencyMax  - The maximum number of objects from a group that are attempted to be placed near each other. (groupFrequency is calculated for each normal frequency attempt!, so be careful about setting your numbers too high)
@@ -100,7 +100,7 @@ It is the block ID of the given block. Air blocks do not need to be specified, b
 
 A <otpion> is:
 <int>
-This is the extra data stored in the block id. It is used for setting meta block data. Forexample, Crop age is based on option values 0 - 7
+This is the extra data stored in the block id. It is used for setting meta block data. For example, Crop age is based on option values 0 - 7
 
 
 A <branch> is:
@@ -114,6 +114,6 @@ If an object would try to replace a bedrock block, it will fail to be placed.
 if max(Z) - min(Z) >= 128, the object will not be able to be placed. Even objects that have large heights (deltaZ > 32) are unlikely to be placed.
 
 Notes on branch spawning:
--Branch blocks that are adjacent to each other, are considered 1 branch region. The block closest to the origin takes precidence for deciding direction and probability. Other branch block info is ignored. (Diagonally adjacent blocks do not count) When replacing these adjacent branch blocks, you should replace all of them at the same time with (if any) from the branch object.
+-Branch blocks that are adjacent to each other, are considered 1 branch region. The block closest to the origin takes precedence for deciding direction and probability. Other branch block info is ignored. (Diagonally adjacent blocks do not count) When replacing these adjacent branch blocks, you should replace all of them at the same time with (if any) from the branch object.
 -When a branch object is spawned from a branch block, it is rotated so that it's north is the direction specified in the branch block. (Then if random rotation is in effect, then it is rotated further)
 

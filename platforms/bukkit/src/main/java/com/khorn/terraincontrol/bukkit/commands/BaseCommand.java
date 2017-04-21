@@ -109,7 +109,7 @@ public abstract class BaseCommand
     public String getHelp()
     {
         String ret = "do that";
-        Permission permission = Bukkit.getPluginManager().getPermission(perm);
+        Permission permission = Bukkit.getPluginManager().getPermission(this.perm);
         if (permission != null)
         {
             String desc = permission.getDescription();

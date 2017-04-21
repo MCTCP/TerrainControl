@@ -223,10 +223,10 @@ public class BiomeConfig extends ConfigFile
 
     public SaplingGen getSaplingGen(SaplingType type)
     {
-        SaplingGen gen = saplingGrowers.get(type);
+        SaplingGen gen = this.saplingGrowers.get(type);
         if (gen == null && type.growsTree())
         {
-            gen = saplingGrowers.get(SaplingType.All);
+            gen = this.saplingGrowers.get(SaplingType.All);
         }
         return gen;
     }
@@ -382,18 +382,18 @@ public class BiomeConfig extends ConfigFile
 
     private void readCustomObjectSettings(SettingsMap settings)
     {
-        biomeObjects = new ArrayList<CustomObject>();
-        biomeObjectStrings = new ArrayList<String>();
+        this.biomeObjects = new ArrayList<CustomObject>();
+        this.biomeObjectStrings = new ArrayList<String>();
 
         // Read from BiomeObjects setting
         List<String> customObjectStrings = settings.getSetting(BiomeStandardValues.BIOME_OBJECTS);
         for (String customObjectString : customObjectStrings)
         {
-            CustomObject object = worldConfig.worldObjects.parseCustomObject(customObjectString);
+            CustomObject object = this.worldConfig.worldObjects.parseCustomObject(customObjectString);
             if (object != null && !(object instanceof UseBiome))
             {
-                biomeObjects.add(object);
-                biomeObjectStrings.add(customObjectString);
+                this.biomeObjects.add(object);
+                this.biomeObjectStrings.add(customObjectString);
             }
         }
     }
@@ -436,7 +436,7 @@ public class BiomeConfig extends ConfigFile
                 "  100 rarity mean 1/6 chance than other ( with 6 default normal biomes).",
                 "  50 rarity mean 1/11 chance than other",
                 "For isle biomes see the " + BiomeStandardValues.BIOME_RARITY_WHEN_ISLE + " setting below.",
-                "Doesn`t work on Ocean and River (frozen versions too) biomes when not added as normal biome.");
+                "Doesn't work on Ocean and River (frozen versions too) biomes when not added as normal biome.");
 
         writer.putSetting(BiomeStandardValues.BIOME_COLOR, this.biomeColor,
                 "The hexadecimal color value of this biome. Used in the output of the /tc map command,",
@@ -513,7 +513,7 @@ public class BiomeConfig extends ConfigFile
                 "If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.");
 
         writer.putSetting(BiomeStandardValues.MAX_AVERAGE_DEPTH, this.maxAverageDepth,
-                "If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the ottom of the ocean) will fall before leveling off when it begins to decrease in elevation. ",
+                "If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the bottom of the ocean) will fall before leveling off when it begins to decrease in elevation. ",
                 "If the value is less than 0, then it will cause the terrain to either fall to a lesser depth before leveling out or increase in height if the value is a large enough negative.");
 
         writer.putSetting(BiomeStandardValues.VOLATILITY_1, this.volatilityRaw1,
@@ -538,7 +538,7 @@ public class BiomeConfig extends ConfigFile
 
         writer.bigTitle("Rivers",
                 "There are two different river systems - the standard one and the improved one.",
-                "See the ImprovedRivers settting in the WorldConfig. Both modes have different",
+                "See the ImprovedRivers setting in the WorldConfig. Both modes have different",
                 "river settings, so carefully read the headers to know which settings you can use.",
                 "");
 
@@ -591,7 +591,7 @@ public class BiomeConfig extends ConfigFile
                 "Alternatively, you can use Mesa, MesaForest or MesaBryce to get blocks",
                 "like the blocks found in the Mesa biomes.");
 
-        writer.putSetting(BiomeStandardValues.REPLACED_BLOCKS, replacedBlocks,
+        writer.putSetting(BiomeStandardValues.REPLACED_BLOCKS, this.replacedBlocks,
                 "Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])",
                 "Example :",
                 "  ReplacedBlocks: (GRASS,DIRT,100,127),(GRAVEL,GLASS)",
@@ -610,7 +610,7 @@ public class BiomeConfig extends ConfigFile
                 "Block used as water in WaterLevelMax");
 
         writer.putSetting(BiomeStandardValues.ICE_BLOCK, this.configIceBlock,
-                "Block used as ice. Ice only spawns if the BiomeTemperture is low enough.");
+                "Block used as ice. Ice only spawns if the BiomeTemperature is low enough.");
 
         writer.putSetting(WorldStandardValues.COOLED_LAVA_BLOCK, this.cooledLavaBlock,
                 "Block used as cooled or frozen lava.",
@@ -730,38 +730,38 @@ public class BiomeConfig extends ConfigFile
         this.writeCustomObjects(writer);
 
         writer.bigTitle("Structures",
-                "Here you can change, enable or disable the stuctures.",
+                "Here you can change, enable or disable the structures.",
                 "If you have disabled the structure in the WorldConfig, it won't spawn,",
                 "regardless of these settings.");
 
-        writer.putSetting(BiomeStandardValues.STRONGHOLDS_ENABLED, strongholdsEnabled,
+        writer.putSetting(BiomeStandardValues.STRONGHOLDS_ENABLED, this.strongholdsEnabled,
                 "Disables strongholds for this biome. If there is no suitable biome nearby,",
                 "Minecraft will ignore this setting.");
 
-        writer.putSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, oceanMonumentsEnabled,
+        writer.putSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, this.oceanMonumentsEnabled,
                 "Whether an Ocean Monument can be placed in this biome.");
 
-        writer.putSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, netherFortressesEnabled,
+        writer.putSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, this.netherFortressesEnabled,
                 "Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
 
-        writer.putSetting(BiomeStandardValues.MANSIONS_ENABLED, mansionsEnabled,
+        writer.putSetting(BiomeStandardValues.MANSIONS_ENABLED, this.mansionsEnabled,
                 "Whether Woodland Mansions are enabled in this biome.");
 
-        writer.putSetting(BiomeStandardValues.VILLAGE_TYPE, villageType,
+        writer.putSetting(BiomeStandardValues.VILLAGE_TYPE, this.villageType,
                 "The village type in this biome. Can be wood, sandstone or disabled.");
 
-        writer.putSetting(BiomeStandardValues.MINESHAFT_TYPE, mineshaftType,
+        writer.putSetting(BiomeStandardValues.MINESHAFT_TYPE, this.mineshaftType,
                 "The mineshaft type in this biome. Can be normal, mesa or disabled.");
 
-        writer.putSetting(BiomeStandardValues.MINESHAFT_RARITY, mineshaftsRarity,
+        writer.putSetting(BiomeStandardValues.MINESHAFT_RARITY, this.mineshaftsRarity,
                 "The mineshaft rarity from 0 to 100. 0 = no mineshafts, 1 = default rarity, 100 = a wooden chaos.",
                 "Note that mineshafts will never spawn, regardless of this setting, if ",
                 BiomeStandardValues.MINESHAFT_TYPE + " was set to " + MineshaftType.disabled);
 
-        writer.putSetting(BiomeStandardValues.RARE_BUILDING_TYPE, rareBuildingType,
+        writer.putSetting(BiomeStandardValues.RARE_BUILDING_TYPE, this.rareBuildingType,
                 "The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut, igloo or disabled.");
 
-        if (defaultSettings.isCustomBiome)
+        if (this.defaultSettings.isCustomBiome)
         {
             writer.bigTitle("Mob spawning",
                     "This is where you configure mob spawning. Mobs spawn in groups,",
@@ -780,7 +780,7 @@ public class BiomeConfig extends ConfigFile
                     "For example: {\"mob\": \"Ocelot\", \"weight\": 10, \"min\": 2, \"max\": 6}",
                     "For example: {\"mob\": \"MushroomCow\", \"weight\": 5, \"min\": 2, \"max\": 2}",
                     "A json list of mobgroups looks like this: [mobgroup, mobgroup, mobgroup...]",
-                    "This would be an ampty list: []",
+                    "This would be an empty list: []",
                     "You can validate your json here: http://jsonlint.com/",
                     "",
                     "There are four categories of mobs: monsters, creatures, water creatures and ambient creatures.",
@@ -806,16 +806,15 @@ public class BiomeConfig extends ConfigFile
                 "The water creatures (only squids in vanilla) that spawn in this biome");
 
         writer.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.spawnAmbientCreatures,
-                "The ambient creatures (only bats in vanila) that spawn in this biome");
+                "The ambient creatures (only bats in vanilla) that spawn in this biome");
     }
 
     private void writeCustomObjects(SettingsMap writer)
     {
-        List<String> objectStrings = new ArrayList<String>(biomeObjectStrings.size());
-        for (String objectString : biomeObjectStrings)
-        {
-            objectStrings.add(objectString);
-        }
+        List<String> objectStrings = new ArrayList<String>(this.biomeObjectStrings.size());
+
+        objectStrings.addAll(this.biomeObjectStrings);
+
         writer.putSetting(BiomeStandardValues.BIOME_OBJECTS, objectStrings,
                 "These objects will spawn when using the UseBiome keyword.");
     }
@@ -862,10 +861,10 @@ public class BiomeConfig extends ConfigFile
                 settings.addConfigFunctions(Arrays.<ConfigFunction<?>> asList(
                         Resource.createResource(this, SmallLakeGen.class,
                                 DefaultMaterial.WATER, 4, 7, 8,
-                                worldConfig.worldHeightCap),
+                            this.worldConfig.worldHeightCap),
                         Resource.createResource(this, SmallLakeGen.class,
                                 DefaultMaterial.LAVA, 2, 3, 8,
-                                worldConfig.worldHeightCap - 8)));
+                            this.worldConfig.worldHeightCap - 8)));
             }
         }
 
@@ -918,7 +917,7 @@ public class BiomeConfig extends ConfigFile
                     String rest = replacedBlock.split("=")[1];
                     LocalMaterialData to;
                     int minHeight = 0;
-                    int maxHeight = worldConfig.worldHeightCap;
+                    int maxHeight = this.worldConfig.worldHeightCap;
 
                     int start = rest.indexOf('(');
                     int end = rest.indexOf(')');
@@ -939,7 +938,7 @@ public class BiomeConfig extends ConfigFile
                 }
             }
 
-            ReplacedBlocksMatrix replacedBlocks = ReplacedBlocksMatrix.createEmptyMatrix(worldConfig.worldHeightCap);
+            ReplacedBlocksMatrix replacedBlocks = ReplacedBlocksMatrix.createEmptyMatrix(this.worldConfig.worldHeightCap);
             replacedBlocks.setInstructions(output);
             settings.putSetting(BiomeStandardValues.REPLACED_BLOCKS, replacedBlocks);
         }
@@ -948,19 +947,19 @@ public class BiomeConfig extends ConfigFile
         // set to true
         if (settings.getSetting(BiomeStandardValues.SPAWN_MONSTERS_ADD_DEFAULTS, false))
         {
-            addDefaultMobGroups(settings, BiomeStandardValues.SPAWN_MONSTERS, defaultSettings.defaultMonsters);
+            addDefaultMobGroups(settings, BiomeStandardValues.SPAWN_MONSTERS, this.defaultSettings.defaultMonsters);
         }
         if (settings.getSetting(BiomeStandardValues.SPAWN_CREATURES_ADD_DEFAULTS, false))
         {
-            addDefaultMobGroups(settings, BiomeStandardValues.SPAWN_CREATURES, defaultSettings.defaultCreatures);
+            addDefaultMobGroups(settings, BiomeStandardValues.SPAWN_CREATURES, this.defaultSettings.defaultCreatures);
         }
         if (settings.getSetting(BiomeStandardValues.SPAWN_WATER_CREATURES_ADD_DEFAULTS, false))
         {
-            addDefaultMobGroups(settings, BiomeStandardValues.SPAWN_WATER_CREATURES, defaultSettings.defaultWaterCreatures);
+            addDefaultMobGroups(settings, BiomeStandardValues.SPAWN_WATER_CREATURES, this.defaultSettings.defaultWaterCreatures);
         }
         if (settings.getSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES_ADD_DEFAULTS, false))
         {
-            addDefaultMobGroups(settings, BiomeStandardValues.SPAWN_AMBIENT_CREATURES, defaultSettings.defaultAmbientCreatures);
+            addDefaultMobGroups(settings, BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.defaultSettings.defaultAmbientCreatures);
         }
 
         // *WhenBorder, *WhenIsle

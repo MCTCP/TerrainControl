@@ -25,13 +25,13 @@ class LongSetting extends Setting<Long>
     @Override
     public Long getDefaultValue()
     {
-        return defaultValue;
+        return this.defaultValue;
     }
 
     @Override
     public Long read(String string) throws InvalidConfigException
     {
-        return StringHelper.readLong(string, minValue, maxValue);
+        return StringHelper.readLong(string, this.minValue, this.maxValue);
     }
 
 }

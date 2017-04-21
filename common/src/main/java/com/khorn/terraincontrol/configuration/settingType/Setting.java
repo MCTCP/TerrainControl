@@ -54,8 +54,8 @@ public abstract class Setting<T>
      * a round trip <code>T value = setting.read(setting.write(oldValue))
      * </code> must produce a a value that is equal to oldValue.
      *
-     * <p>The default implementation simply calls <code>String.valueOf(value)
-     * </code>, but more sophisticated approaches can be made.
+     * <p>The default implementation simply calls {@code String.valueOf(value)
+     * }, but more sophisticated approaches can be made.
      * @param value The setting.
      * @return The value.
      */

@@ -91,18 +91,18 @@ public class MapWriter implements Runnable
     {
         if (MapWriter.isWorking)
         {
-            sender.sendMessage(BaseCommand.ERROR_COLOR + "Another instance of map writer is running");
+            this.sender.sendMessage(BaseCommand.ERROR_COLOR + "Another instance of map writer is running");
             return;
         }
 
         MapWriter.isWorking = true;
-        int height = size;
-        int width = size;
+        int height = this.size;
+        int width = this.size;
         LocalWorld localWorld = WorldHelper.toLocalWorld(world);
 
         int[] colors = this.getColors(world);
 
-        sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Generating map...");
+        this.sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Generating map...");
 
         BiomeBase[] biomeBuffer = new BiomeBase[256];
         long time = System.currentTimeMillis();
@@ -126,11 +126,11 @@ public class MapWriter implements Runnable
 
                 if (time2 > time + 2000L)
                 {
-                    sender.sendMessage(BaseCommand.MESSAGE_COLOR + ((x + height / 2) * 100 / height) + "%");
+                    this.sender.sendMessage(BaseCommand.MESSAGE_COLOR + ((x + height / 2) * 100 / height) + "%");
                     time = time2;
                 }
 
-                biomeBuffer = world.getWorldChunkManager().getBiomeBlock(biomeBuffer, offsetX + x * 16, offsetZ + z * 16, 16, 16);
+                biomeBuffer = world.getWorldChunkManager().getBiomeBlock(biomeBuffer, offsetX + x * 16, this.offsetZ + z * 16, 16, 16);
                 for (int x1 = 0; x1 < 16; x1++)
                 {
                     for (int z1 = 0; z1 < 16; z1++)
@@ -181,10 +181,10 @@ public class MapWriter implements Runnable
         try
         {
             // Write biome colors
-            ImageIO.write(biomeImage, "png", new File(label + world.worldData.getName() + "_biome.png"));
+            ImageIO.write(biomeImage, "png", new File(this.label + this.world.worldData.getName() + "_biome.png"));
 
             // Write temperatures
-            ImageIO.write(temperatureImage, "png", new File(label + world.worldData.getName() + "_temperature.png"));
+            ImageIO.write(temperatureImage, "png", new File(this.label + this.world.worldData.getName() + "_temperature.png"));
 
             sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Done");
         } catch (IOException e)

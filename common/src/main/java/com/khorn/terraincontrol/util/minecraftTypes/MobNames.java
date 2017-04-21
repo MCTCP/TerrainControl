@@ -104,7 +104,7 @@ public enum MobNames
     private String[] aliases;
     private String internalMinecraftName;
 
-    private MobNames(String internalMinecraftName, String... aliases)
+    MobNames(String internalMinecraftName, String... aliases)
     {
         this.internalMinecraftName = internalMinecraftName;
         this.aliases = aliases;

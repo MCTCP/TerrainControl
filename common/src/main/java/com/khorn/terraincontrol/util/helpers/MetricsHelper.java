@@ -6,7 +6,6 @@ import com.khorn.terraincontrol.generator.biome.*;
 
 /**
  * Counts how much each biome mode is used.
- *
  */
 public abstract class MetricsHelper
 {

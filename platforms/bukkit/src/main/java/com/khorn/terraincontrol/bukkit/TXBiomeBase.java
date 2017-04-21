@@ -23,7 +23,7 @@ public class TXBiomeBase extends BiomeBase
     public final int generationId;
 
     /**
-     * Mojang made the methods on BiomeBase.a protected (so only accessable for
+     * Mojang made the methods on BiomeBase.a protected (so only accessible for
      * classes in the package net.minecraft.world.biome package and for
      * subclasses of BiomeBase.a). To get around this, we have to subclass
      * BiomeBase.a.
@@ -181,6 +181,6 @@ public class TXBiomeBase extends BiomeBase
     protected void addMobs(List<BiomeMeta> internalList, List<WeightedMobSpawnGroup> configList)
     {
         internalList.clear();
-        internalList.addAll(MobSpawnGroupHelper.toMinecraftlist(configList));
+        internalList.addAll(MobSpawnGroupHelper.toMinecraftList(configList));
     }
 }

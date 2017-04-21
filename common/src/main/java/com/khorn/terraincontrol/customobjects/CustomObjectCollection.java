@@ -73,10 +73,10 @@ public class CustomObjectCollection implements Iterable<CustomObject>
     public void addLoadedObject(CustomObject object)
     {
         String lowerCaseName = object.getName().toLowerCase();
-        if (!objectsByName.containsKey(lowerCaseName))
+        if (!this.objectsByName.containsKey(lowerCaseName))
         {
-            objectsByName.put(lowerCaseName, object);
-            objects.add(object);
+            this.objectsByName.put(lowerCaseName, object);
+            this.objects.add(object);
         }
     }
 
@@ -143,11 +143,11 @@ public class CustomObjectCollection implements Iterable<CustomObject>
      */
     public CustomObject getRandomObject(Random random)
     {
-        if (objects.isEmpty())
+        if (this.objects.isEmpty())
         {
             return null;
         }
-        return objects.get(random.nextInt(objects.size()));
+        return this.objects.get(random.nextInt(this.objects.size()));
     }
 
     /**
@@ -157,17 +157,17 @@ public class CustomObjectCollection implements Iterable<CustomObject>
      */
     public CustomObject getObjectByName(String name)
     {
-        CustomObject object = objectsByName.get(name.toLowerCase());
-        if (object == null && fallback != null)
+        CustomObject object = this.objectsByName.get(name.toLowerCase());
+        if (object == null && this.fallback != null)
         {
-            return fallback.getObjectByName(name);
+            return this.fallback.getObjectByName(name);
         }
         return object;
     }
 
     /**
-     * Parses a string in the format <code>name(setting1=foo,setting2=bar)
-     * </code>. The object is retrieved using {@link #getObjectByName(String)}.
+     * Parses a string in the format {@code name(setting1=foo,setting2=bar)
+     * }. The object is retrieved using {@link #getObjectByName(String)}.
      * If the object doesn't exist this method will return null. Otherwise, it
      * will apply the given parameters (if any) to a copy of the object, and
      * it will return this modified copy.

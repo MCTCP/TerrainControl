@@ -105,14 +105,14 @@ public class FrozenSurfaceHelper
      * @param thawedMaterial The material to be checked and if passed, frozen
      * @param frozenMaterial The material to freeze the thawed material to if checks pass
      * @param check1 The first material to check for
-     * @param check2 The second meterial to check for
+     * @param check2 The second material to check for
      */
     private void freezeType(int x, int y, int z, LocalMaterialData thawedMaterial, LocalMaterialData frozenMaterial, DefaultMaterial check1, DefaultMaterial check2)
     {
         if ((thawedMaterial.isMaterial(check1) || thawedMaterial.isMaterial(check2)) && !frozenMaterial.isMaterial(check1) && !frozenMaterial.isMaterial(check2))
         {
-            world.setBlock(x, y, z, frozenMaterial);
-            if (worldConfig.fullyFreezeLakes && this.currentPropagationSize < this.maxPropagationSize)
+            this.world.setBlock(x, y, z, frozenMaterial);
+            if (this.worldConfig.fullyFreezeLakes && this.currentPropagationSize < this.maxPropagationSize)
             {
                 propagateFreeze(x, y, z);
             }
@@ -142,7 +142,7 @@ public class FrozenSurfaceHelper
         {
             this.setSnowFallAtLocation(x, y--, z, snowHeight, materialToSnowOn);
         }
-        if (worldConfig.betterSnowFall) {
+        if (this.worldConfig.betterSnowFall) {
             do
             {
                 materialToSnowAt = world.getMaterial(x, --y, z);
@@ -154,7 +154,7 @@ public class FrozenSurfaceHelper
                 }
                 if (!materialToSnowAt.isAir())
                 {
-                    ++decreaseFactor;
+                    ++this.decreaseFactor;
                 }
             } while (!materialToSnowAt.isSolid() && y > 0);
         }
@@ -172,7 +172,7 @@ public class FrozenSurfaceHelper
     {
         int snowHeightOnLeaves = MathHelper.clamp(MathHelper.ceil(MathHelper.sqrt(baseSnowHeight)), 0, baseSnowHeight);
         LocalMaterialData snowMass;
-        if (worldConfig.betterSnowFall && (materialToSnowOn.isMaterial(DefaultMaterial.LEAVES) || materialToSnowOn.isMaterial(DefaultMaterial.LEAVES_2)))
+        if (this.worldConfig.betterSnowFall && (materialToSnowOn.isMaterial(DefaultMaterial.LEAVES) || materialToSnowOn.isMaterial(DefaultMaterial.LEAVES_2)))
         {
             // Snow Layer(s) for trees
             snowMass = TerrainControl.toLocalMaterialData(DefaultMaterial.SNOW, MathHelper.clamp(snowHeightOnLeaves, 0, 8));
@@ -210,7 +210,7 @@ public class FrozenSurfaceHelper
      */
     private void propagationHelper(int x, int y, int z)
     {
-        if (world.getHighestBlockYAt(x, z)-1 > y && this.currentPropagationSize < this.maxPropagationSize)
+        if (this.world.getHighestBlockYAt(x, z)-1 > y && this.currentPropagationSize < this.maxPropagationSize)
         {
             this.freezeLiquid(x, y, z);
         }

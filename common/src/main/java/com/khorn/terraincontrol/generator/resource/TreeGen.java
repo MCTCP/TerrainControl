@@ -25,11 +25,11 @@ public class TreeGen extends Resource
         super(biomeConfig);
         assureSize(3, args);
 
-        frequency = readInt(args.get(0), 1, 100);
+        this.frequency = readInt(args.get(0), 1, 100);
 
-        trees = new ArrayList<CustomObject>();
-        treeNames = new ArrayList<String>();
-        treeChances = new ArrayList<Integer>();
+        this.trees = new ArrayList<CustomObject>();
+        this.treeNames = new ArrayList<String>();
+        this.treeChances = new ArrayList<Integer>();
 
         for (int i = 1; i < args.size() - 1; i += 2)
         {
@@ -37,17 +37,15 @@ public class TreeGen extends Resource
                     args.get(i));
             if (object == null)
             {
-                throw new InvalidConfigException("Custom object " + args.get(
-                        i) + " not found!");
+                throw new InvalidConfigException("Custom object " + args.get(i) + " not found!");
             }
             if (!object.canSpawnAsTree())
             {
-                throw new InvalidConfigException("Custom object " + args.get(
-                        i) + " is not a tree!");
+                throw new InvalidConfigException("Custom object " + args.get(i) + " is not a tree!");
             }
-            trees.add(object);
-            treeNames.add(args.get(i));
-            treeChances.add(readInt(args.get(i + 1), 1, 100));
+            this.trees.add(object);
+            this.treeNames.add(args.get(i));
+            this.treeChances.add(readInt(args.get(i + 1), 1, 100));
         }
     }
 
@@ -108,10 +106,10 @@ public class TreeGen extends Resource
     @Override
     public String toString()
     {
-        String output = "Tree(" + frequency;
-        for (int i = 0; i < treeNames.size(); i++)
+        String output = "Tree(" + this.frequency;
+        for (int i = 0; i < this.treeNames.size(); i++)
         {
-            output += "," + treeNames.get(i) + "," + treeChances.get(i);
+            output += "," + this.treeNames.get(i) + "," + this.treeChances.get(i);
         }
         return output + ")";
     }
@@ -125,7 +123,7 @@ public class TreeGen extends Resource
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        for (int i = 0; i < frequency; i++)
+        for (int i = 0; i < this.frequency; i++)
         {
             spawnTree(world, random, chunkCoord);
         }
@@ -133,7 +131,7 @@ public class TreeGen extends Resource
 
     private void spawnTree(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
-        for (int treeKind = 0; treeKind < trees.size(); treeKind++)
+        for (int treeKind = 0; treeKind < this.trees.size(); treeKind++)
         {
             if (random.nextInt(100) >= treeChances.get(treeKind))
             {
@@ -144,7 +142,7 @@ public class TreeGen extends Resource
             int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
             int y = world.getHighestBlockYAt(x, z);
-            CustomObject tree = trees.get(treeKind);
+            CustomObject tree = this.trees.get(treeKind);
             Rotation rotation = Rotation.getRandomRotation(random);
 
             if (!tree.canSpawnAt(world, rotation, x, y, z))

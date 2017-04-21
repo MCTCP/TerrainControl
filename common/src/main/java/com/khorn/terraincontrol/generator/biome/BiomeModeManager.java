@@ -45,11 +45,11 @@ public class BiomeModeManager
      */
     public Class<? extends BiomeGenerator> getBiomeManager(String name)
     {
-        for (String key : registered.keySet())
+        for (String key : this.registered.keySet())
         {
             if (key.equalsIgnoreCase(name))
             {
-                return registered.get(key);
+                return this.registered.get(key);
             }
         }
         // Fall back on normal mode
@@ -103,7 +103,7 @@ public class BiomeModeManager
      */
     public String getName(Class<? extends BiomeGenerator> clazz)
     {
-        for (Entry<String, Class<? extends BiomeGenerator>> entry : registered.entrySet())
+        for (Entry<String, Class<? extends BiomeGenerator>> entry : this.registered.entrySet())
         {
             if (entry.getValue().equals(clazz))
             {

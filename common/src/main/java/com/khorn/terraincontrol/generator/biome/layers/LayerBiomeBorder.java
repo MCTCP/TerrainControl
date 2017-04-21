@@ -43,17 +43,17 @@ public class LayerBiomeBorder extends Layer
                 int selection = childInts[(xi + 1 + (zi + 1) * (xSize + 2))];
 
                 int biomeId = getBiomeFromLayer(selection);
-                if (bordersFrom[biomeId] != null)
+                if (this.bordersFrom[biomeId] != null)
                 {
                     int northCheck = getBiomeFromLayer(childInts[(xi + 1 + (zi) * (xSize + 2))]);
                     int southCheck = getBiomeFromLayer(childInts[(xi + 1 + (zi + 2) * (xSize + 2))]);
                     int eastCheck = getBiomeFromLayer(childInts[(xi + 2 + (zi + 1) * (xSize + 2))]);
                     int westCheck = getBiomeFromLayer(childInts[(xi + (zi + 1) * (xSize + 2))]);
                     
-                    boolean[] biomeFrom = bordersFrom[biomeId];
+                    boolean[] biomeFrom = this.bordersFrom[biomeId];
                     if (biomeFrom[northCheck] && biomeFrom[eastCheck] && biomeFrom[westCheck] && biomeFrom[southCheck])
                         if ((northCheck != biomeId) || (eastCheck != biomeId) || (westCheck != biomeId) || (southCheck != biomeId))
-                            selection = (selection & (IslandBit | RiverBits | IceBit)) | LandBit | bordersTo[biomeId];
+                            selection = (selection & (IslandBit | RiverBits | IceBit)) | LandBit | this.bordersTo[biomeId];
                 }
 
                 thisInts[(xi + zi * xSize)] = selection;

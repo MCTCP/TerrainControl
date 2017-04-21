@@ -98,7 +98,7 @@ class CachedBiomeGenerator extends BiomeGenerator
 
         this.lastCleanupTime = currentTime;
 
-        for (Iterator<Entry<ChunkCoordinate, CachedBiomeGenerator.Block>> it = cacheMap.entrySet().iterator(); it.hasNext();)
+        for (Iterator<Entry<ChunkCoordinate, CachedBiomeGenerator.Block>> it = this.cacheMap.entrySet().iterator(); it.hasNext();)
         {
             Entry<ChunkCoordinate, CachedBiomeGenerator.Block> entry = it.next();
             CachedBiomeGenerator.Block block = entry.getValue();
@@ -131,7 +131,7 @@ class CachedBiomeGenerator extends BiomeGenerator
 
         if (block == null)
         {
-            block = new CachedBiomeGenerator.Block(generator, chunkCoord);
+            block = new CachedBiomeGenerator.Block(this.generator, chunkCoord);
             this.cacheMap.put(chunkCoord, block);
         }
 
@@ -154,19 +154,19 @@ class CachedBiomeGenerator extends BiomeGenerator
             System.arraycopy(cachedBiomes, 0, biomeArray, 0, xSize * zSize);
             return biomeArray;
         }
-        return generator.getBiomes(biomeArray, x, z, xSize, zSize, type);
+        return this.generator.getBiomes(biomeArray, x, z, xSize, zSize, type);
     }
 
     @Override
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int xSize, int zSize, OutputType type)
     {
-        return generator.getBiomesUnZoomed(biomeArray, x, z, xSize, zSize, type);
+        return this.generator.getBiomesUnZoomed(biomeArray, x, z, xSize, zSize, type);
     }
 
     @Override
     public boolean canGenerateUnZoomed()
     {
-        return generator.canGenerateUnZoomed();
+        return this.generator.canGenerateUnZoomed();
     }
 
     /**
@@ -189,6 +189,6 @@ class CachedBiomeGenerator extends BiomeGenerator
     @Override
     public BiomeGenerator unwrap()
     {
-        return generator.unwrap();
+        return this.generator.unwrap();
     }
 }

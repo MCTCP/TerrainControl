@@ -93,10 +93,10 @@ public class ForgeMaterialData implements LocalMaterialData
     }
 
     /**
-     * Gets a {@code BukkitMaterialData} of the given id and data.
+     * Gets a {@code ForgeMaterialData} of the given id and data.
      * @param id   The block id.
      * @param data The block data.
-     * @return The {@code BukkitMateialData} instance.
+     * @return The {@code ForgeMaterialData} instance.
      */
     @SuppressWarnings("deprecation")
     private static ForgeMaterialData ofIds(int id, int data)
@@ -107,10 +107,10 @@ public class ForgeMaterialData implements LocalMaterialData
     }
 
     /**
-     * Gets a {@code BukkitMaterialData} of the given material and data.
+     * Gets a {@code ForgeMaterialData} of the given material and data.
      * @param material The material.
      * @param data     The block data.
-     * @return The {@code BukkitMateialData} instance.
+     * @return The {@code ForgeMaterialData} instance.
      */
     static ForgeMaterialData ofDefaultMaterial(DefaultMaterial material, int data)
     {
@@ -118,10 +118,10 @@ public class ForgeMaterialData implements LocalMaterialData
     }
 
     /**
-     * Gets a {@code BukkitMaterialData} of the given Minecraft block. The
+     * Gets a {@code ForgeMaterialData} of the given Minecraft block. The
      * default block data (usually 0) will be used.
      * @param block The material.
-     * @return The {@code BukkitMateialData} instance.
+     * @return The {@code ForgeMaterialData} instance.
      */
     static ForgeMaterialData ofMinecraftBlock(Block block)
     {
@@ -129,9 +129,9 @@ public class ForgeMaterialData implements LocalMaterialData
     }
 
     /**
-     * Gets a {@code BukkitMaterialData} of the given Minecraft blockData.
+     * Gets a {@code ForgeMaterialData} of the given Minecraft blockData.
      * @param blockData The material an data.
-     * @return The {@code BukkitMateialData} instance.
+     * @return The {@code ForgeMaterialData} instance.
      */
     public static ForgeMaterialData ofMinecraftBlockState(IBlockState blockData)
     {

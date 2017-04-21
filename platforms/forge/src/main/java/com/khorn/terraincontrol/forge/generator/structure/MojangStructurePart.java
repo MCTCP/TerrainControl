@@ -15,7 +15,7 @@ import net.minecraft.world.gen.structure.template.PlacementSettings;
 import net.minecraft.world.gen.structure.template.Template;
 
 /**
- * Makes a Minecraft {@link Template} useable as a
+ * Makes a Minecraft {@link Template} usable as a
  * {@link SpawnableObject}.
  *
  */

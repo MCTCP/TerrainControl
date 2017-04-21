@@ -8,7 +8,7 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import java.util.*;
 
 /**
- * Manages a collection of biome groups that are accesible by their name and
+ * Manages a collection of biome groups that are accessible by their name and
  * id.
  *
  */
@@ -35,7 +35,7 @@ public final class BiomeGroupManager
     {
         if (isRoomForMoreGroups())
         {
-            BiomeGroup existingWithSameName = nameToGroup.get(newGroup.getName());
+            BiomeGroup existingWithSameName = this.nameToGroup.get(newGroup.getName());
             if (existingWithSameName != null)
             {
                 TerrainControl.log(LogMarker.WARN, "Two biome groups have the same name \"{}\". Removing the second one.",
@@ -46,8 +46,8 @@ public final class BiomeGroupManager
                 int newGroupId = getNextGroupId();
                 newGroup.setGroupId(newGroupId);
 
-                nameToGroup.put(newGroup.getName(), newGroup);
-                idToGroup.put(newGroupId, newGroup);
+                this.nameToGroup.put(newGroup.getName(), newGroup);
+                this.idToGroup.put(newGroupId, newGroup);
             }
         } else
         {
@@ -83,7 +83,7 @@ public final class BiomeGroupManager
      */
     public BiomeGroup getGroupById(int groupId)
     {
-        return idToGroup.get(groupId);
+        return this.idToGroup.get(groupId);
     }
 
     /**
@@ -93,7 +93,7 @@ public final class BiomeGroupManager
      */
     public BiomeGroup getGroupByName(String name)
     {
-        return nameToGroup.get(name);
+        return this.nameToGroup.get(name);
     }
 
     /**
@@ -102,7 +102,7 @@ public final class BiomeGroupManager
      */
     public Collection<BiomeGroup> getGroups()
     {
-        return idToGroup.values();
+        return this.idToGroup.values();
     }
 
     /**
@@ -112,7 +112,7 @@ public final class BiomeGroupManager
      */
     public int getGroupCount()
     {
-        return idToGroup.size();
+        return this.idToGroup.size();
     }
 
     /**
@@ -123,7 +123,7 @@ public final class BiomeGroupManager
      */
     public boolean hasNoGroups()
     {
-        return idToGroup.isEmpty();
+        return this.idToGroup.isEmpty();
     }
 
     public SortedMap<Integer, BiomeGroup> getGroupDepthMap(int depth)
@@ -138,7 +138,7 @@ public final class BiomeGroupManager
                 map.put(this.cumulativeGroupRarity, group);
             }
         }
-        if (cumulativeGroupRarity < map.size() * 100)
+        if (this.cumulativeGroupRarity < map.size() * 100)
         {
             map.put(map.size() * 100, null);
         }
@@ -180,7 +180,7 @@ public final class BiomeGroupManager
 
     public void processBiomeData(LocalWorld world)
     {
-        for (BiomeGroup entry : idToGroup.values())
+        for (BiomeGroup entry : this.idToGroup.values())
         {
             entry.processBiomeData(world);
         }
@@ -193,7 +193,7 @@ public final class BiomeGroupManager
      */
     public void filterBiomes(Set<String> customBiomeNames)
     {
-        for (Iterator<BiomeGroup> it = idToGroup.values().iterator(); it.hasNext();)
+        for (Iterator<BiomeGroup> it = this.idToGroup.values().iterator(); it.hasNext();)
         {
             BiomeGroup group = it.next();
             group.filterBiomes(customBiomeNames);

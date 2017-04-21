@@ -12,22 +12,22 @@ public class NoiseGeneratorPerlin
 
     public NoiseGeneratorPerlin(Random random)
     {
-        permutations = new int[512];
-        xCoord = random.nextDouble() * 256D;
-        yCoord = random.nextDouble() * 256D;
-        zCoord = random.nextDouble() * 256D;
+        this.permutations = new int[512];
+        this.xCoord = random.nextDouble() * 256D;
+        this.yCoord = random.nextDouble() * 256D;
+        this.zCoord = random.nextDouble() * 256D;
         for (int i = 0; i < 256; i++)
         {
-            permutations[i] = i;
+            this.permutations[i] = i;
         }
 
         for (int j = 0; j < 256; j++)
         {
             int k = random.nextInt(256 - j) + j;
-            int l = permutations[j];
-            permutations[j] = permutations[k];
-            permutations[k] = l;
-            permutations[j + 256] = permutations[j];
+            int l = this.permutations[j];
+            this.permutations[j] = this.permutations[k];
+            this.permutations[k] = l;
+            this.permutations[j + 256] = this.permutations[j];
         }
     }
 
@@ -97,16 +97,16 @@ public class NoiseGeneratorPerlin
                     if (i7 == 0 || k7 != i2)
                     {
                         i2 = k7;
-                        int j2 = permutations[i6] + k7;
-                        int k2 = permutations[j2] + l6;
-                        int l2 = permutations[j2 + 1] + l6;
-                        int i3 = permutations[i6 + 1] + k7;
-                        int k3 = permutations[i3] + l6;
-                        int l3 = permutations[i3 + 1] + l6;
-                        d13 = lerp(d22, grad(permutations[k2], d20, d26, d24), grad(permutations[k3], d20 - 1.0D, d26, d24));
-                        d15 = lerp(d22, grad(permutations[l2], d20, d26 - 1.0D, d24), grad(permutations[l3], d20 - 1.0D, d26 - 1.0D, d24));
-                        d16 = lerp(d22, grad(permutations[k2 + 1], d20, d26, d24 - 1.0D), grad(permutations[k3 + 1], d20 - 1.0D, d26, d24 - 1.0D));
-                        d18 = lerp(d22, grad(permutations[l2 + 1], d20, d26 - 1.0D, d24 - 1.0D), grad(permutations[l3 + 1], d20 - 1.0D, d26 - 1.0D, d24 - 1.0D));
+                        int j2 = this.permutations[i6] + k7;
+                        int k2 = this.permutations[j2] + l6;
+                        int l2 = this.permutations[j2 + 1] + l6;
+                        int i3 = this.permutations[i6 + 1] + k7;
+                        int k3 = this.permutations[i3] + l6;
+                        int l3 = this.permutations[i3 + 1] + l6;
+                        d13 = lerp(d22, grad(this.permutations[k2], d20, d26, d24), grad(this.permutations[k3], d20 - 1.0D, d26, d24));
+                        d15 = lerp(d22, grad(this.permutations[l2], d20, d26 - 1.0D, d24), grad(this.permutations[l3], d20 - 1.0D, d26 - 1.0D, d24));
+                        d16 = lerp(d22, grad(this.permutations[k2 + 1], d20, d26, d24 - 1.0D), grad(this.permutations[k3 + 1], d20 - 1.0D, d26, d24 - 1.0D));
+                        d18 = lerp(d22, grad(this.permutations[l2 + 1], d20, d26 - 1.0D, d24 - 1.0D), grad(this.permutations[l3 + 1], d20 - 1.0D, d26 - 1.0D, d24 - 1.0D));
                     }
                     double d28 = lerp(d27, d13, d15);
                     double d29 = lerp(d27, d16, d18);
@@ -143,12 +143,12 @@ public class NoiseGeneratorPerlin
                 int l5 = j5 & 0xff;
                 d19 -= j5;
                 double d21 = d19 * d19 * d19 * (d19 * (d19 * 6D - 15D) + 10D);
-                int l = permutations[k4];
-                int j1 = permutations[l] + l5;
-                int k1 = permutations[k4 + 1];
-                int l1 = permutations[k1] + l5;
-                double d9 = lerp(d17, func_4110_a(permutations[j1], d14, d19), grad(permutations[l1], d14 - 1.0D, 0.0D, d19));
-                double d11 = lerp(d17, grad(permutations[j1 + 1], d14, 0.0D, d19 - 1.0D), grad(permutations[l1 + 1], d14 - 1.0D, 0.0D, d19 - 1.0D));
+                int l = this.permutations[k4];
+                int j1 = this.permutations[l] + l5;
+                int k1 = this.permutations[k4 + 1];
+                int l1 = this.permutations[k1] + l5;
+                double d9 = lerp(d17, func_4110_a(this.permutations[j1], d14, d19), grad(this.permutations[l1], d14 - 1.0D, 0.0D, d19));
+                double d11 = lerp(d17, grad(this.permutations[j1 + 1], d14, 0.0D, d19 - 1.0D), grad(this.permutations[l1 + 1], d14 - 1.0D, 0.0D, d19 - 1.0D));
                 double d23 = lerp(d21, d9, d11);
                 NoiseArray[j3++] += d23 * d12;
             }

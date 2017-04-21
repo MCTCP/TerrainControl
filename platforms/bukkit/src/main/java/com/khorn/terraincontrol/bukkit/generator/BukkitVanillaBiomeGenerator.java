@@ -43,35 +43,35 @@ public class BukkitVanillaBiomeGenerator extends VanillaBiomeGenerator {
     @Override
     public int[] getBiomesUnZoomed(int[] biomeArray, int x, int z, int xSize, int zSize, OutputType outputType)
     {
-        biomeGenBaseArray = worldChunkManager.getBiomes(biomeGenBaseArray, x, z, xSize, zSize);
+        this.biomeGenBaseArray = worldChunkManager.getBiomes(this.biomeGenBaseArray, x, z, xSize, zSize);
         if (biomeArray == null || biomeArray.length < xSize * zSize)
             biomeArray = new int[xSize * zSize];
         for (int i = 0; i < xSize * zSize; i++)
-            biomeArray[i] = WorldHelper.getSavedId(biomeGenBaseArray[i]);
+            biomeArray[i] = WorldHelper.getSavedId(this.biomeGenBaseArray[i]);
         return biomeArray;
     }
 
     @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int xSize, int z_size, OutputType outputType)
     {
-        biomeGenBaseArray = worldChunkManager.a(biomeGenBaseArray, x, z, xSize, z_size, true);
+        this.biomeGenBaseArray = this.worldChunkManager.a(this.biomeGenBaseArray, x, z, xSize, z_size, true);
         if (biomeArray == null || biomeArray.length < xSize * z_size)
             biomeArray = new int[xSize * z_size];
         for (int i = 0; i < xSize * z_size; i++)
-            biomeArray[i] = WorldHelper.getSavedId(biomeGenBaseArray[i]);
+            biomeArray[i] = WorldHelper.getSavedId(this.biomeGenBaseArray[i]);
         return biomeArray;
     }
 
     @Override
     public int getBiome(int x, int z)
     {
-        return WorldHelper.getSavedId(worldChunkManager.getBiome(new BlockPosition(x, 0, z)));
+        return WorldHelper.getSavedId(this.worldChunkManager.getBiome(new BlockPosition(x, 0, z)));
     }
 
     @Override
     public void cleanupCache()
     {
-        worldChunkManager.b();
+        this.worldChunkManager.b();
     }
 
     @Override

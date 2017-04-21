@@ -22,7 +22,7 @@ public class TXMansionGen extends StructureGenerator
 
     public TXMansionGen(ServerConfigProvider configs)
     {
-        biomeList = new ArrayList<BiomeBase>();
+        this.biomeList = new ArrayList<BiomeBase>();
 
         for (LocalBiome biome : configs.getBiomeArray())
         {
@@ -30,7 +30,7 @@ public class TXMansionGen extends StructureGenerator
                 continue;
             if (biome.getBiomeConfig().mansionsEnabled)
             {
-                biomeList.add(((BukkitBiome) biome).getHandle());
+                this.biomeList.add(((BukkitBiome) biome).getHandle());
             }
         }
 
@@ -63,24 +63,24 @@ public class TXMansionGen extends StructureGenerator
         int var4 = var2;
         if (var1 < 0)
         {
-            var3 = var1 - (maxDistance - 1);
+            var3 = var1 - (this.maxDistance - 1);
         }
 
         if (var2 < 0)
         {
-            var4 = var2 - (maxDistance - 1);
+            var4 = var2 - (this.maxDistance - 1);
         }
 
-        int var5 = var3 / maxDistance;
-        int var6 = var4 / maxDistance;
+        int var5 = var3 / this.maxDistance;
+        int var6 = var4 / this.maxDistance;
         Random var7 = this.g.a(var5, var6, 10387319);
-        var5 *= maxDistance;
-        var6 *= maxDistance;
-        var5 += (var7.nextInt(maxDistance - minDistance + 1) + var7.nextInt(maxDistance - minDistance + 1)) / 2;
-        var6 += (var7.nextInt(maxDistance - minDistance + 1) + var7.nextInt(maxDistance - minDistance + 1)) / 2;
+        var5 *= this.maxDistance;
+        var6 *= this.maxDistance;
+        var5 += (var7.nextInt(this.maxDistance - this.minDistance + 1) + var7.nextInt(this.maxDistance - this.minDistance + 1)) / 2;
+        var6 += (var7.nextInt(this.maxDistance - this.minDistance + 1) + var7.nextInt(this.maxDistance - this.minDistance + 1)) / 2;
         if (var1 == var5 && var2 == var6)
         {
-            boolean var8 = this.g.getWorldChunkManager().a(var1 * 16 + 8, var2 * 16 + 8, 32, biomeList);
+            boolean var8 = this.g.getWorldChunkManager().a(var1 * 16 + 8, var2 * 16 + 8, 32, this.biomeList);
             if (var8)
             {
                 return true;
@@ -94,7 +94,7 @@ public class TXMansionGen extends StructureGenerator
     public BlockPosition getNearestGeneratedFeature(World var1, BlockPosition blockPos, boolean var3)
     {
         this.g = var1;
-        return a(var1, this, blockPos, maxDistance, minDistance - 1, 10387319, true, 100, var3);
+        return a(var1, this, blockPos, this.maxDistance, this.minDistance - 1, 10387319, true, 100, var3);
     }
 
     @Override

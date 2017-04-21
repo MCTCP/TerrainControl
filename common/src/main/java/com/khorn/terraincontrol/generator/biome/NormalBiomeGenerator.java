@@ -18,7 +18,7 @@ public class NormalBiomeGenerator extends LayeredBiomeGenerator
     @Override
     protected Layer[] initLayers()
     {
-        return LayerFactory.createNormal(world);
+        return LayerFactory.createNormal(this.world);
     }
 
 }

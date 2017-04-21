@@ -50,43 +50,43 @@ public final class BukkitMojangSettings implements MojangSettings
     @Override
     public float getTemperature()
     {
-        return biomeBase.getTemperature();
+        return this.biomeBase.getTemperature();
     }
 
     @Override
     public float getWetness()
     {
-        return biomeBase.getHumidity();
+        return this.biomeBase.getHumidity();
     }
 
     @Override
     public float getSurfaceHeight()
     {
-        return biomeBase.j();
+        return this.biomeBase.j();
     }
 
     @Override
     public float getSurfaceVolatility()
     {
-        return biomeBase.m();
+        return this.biomeBase.m();
     }
 
     @Override
     public LocalMaterialData getSurfaceBlock()
     {
-        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.r);
+        return BukkitMaterialData.ofMinecraftBlockData(this.biomeBase.r);
     }
 
     @Override
     public LocalMaterialData getGroundBlock()
     {
-        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.s);
+        return BukkitMaterialData.ofMinecraftBlockData(this.biomeBase.s);
     }
 
     @Override
     public List<WeightedMobSpawnGroup> getMobSpawnGroup(EntityCategory mobType)
     {
-        return MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, mobType);
+        return MobSpawnGroupHelper.getListFromMinecraftBiome(this.biomeBase, mobType);
     }
 
 }

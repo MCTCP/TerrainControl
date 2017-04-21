@@ -70,7 +70,7 @@ public final class MobSpawnGroupHelper
 
     /**
      * Converts a BiomeMeta collection to a WeightedMobSpawnGroup list. This
-     * method is the inverse of {@link #toMinecraftlist(Collection)}.
+     * method is the inverse of {@link #toMinecraftList(Collection)}.
      * @param biomeMetas The BiomeMeta collection.
      * @return The WeightedMobSpawnGroup list.
      */
@@ -90,7 +90,7 @@ public final class MobSpawnGroupHelper
      * @param weightedMobSpawnGroups The WeighedMobSpawnGroup collection.
      * @return The BiomeMeta list.
      */
-    public static List<SpawnListEntry> toMinecraftlist(Collection<WeightedMobSpawnGroup> weightedMobSpawnGroups)
+    public static List<SpawnListEntry> toMinecraftList(Collection<WeightedMobSpawnGroup> weightedMobSpawnGroups)
     {
         List<SpawnListEntry> biomeList = new ArrayList<SpawnListEntry>();
         for (WeightedMobSpawnGroup mobGroup : weightedMobSpawnGroups)

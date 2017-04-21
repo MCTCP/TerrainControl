@@ -12,10 +12,10 @@ public class HelpCommand extends BaseCommand
     public HelpCommand(TXPlugin _plugin)
     {
         super(_plugin);
-        name = "help";
-        perm = TCPerm.CMD_HELP.node;
-        usage = "help";
-        workOnConsole = false;
+        this.name = "help";
+        this.perm = TCPerm.CMD_HELP.node;
+        this.usage = "help";
+        this.workOnConsole = false;
     }
 
     @Override

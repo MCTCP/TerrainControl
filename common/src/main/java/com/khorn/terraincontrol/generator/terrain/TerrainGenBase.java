@@ -25,8 +25,8 @@ public abstract class TerrainGenBase
     {
         this.world = world;
         this.random.setSeed(this.world.getSeed());
-        worldLong1 = this.random.nextLong();
-        worldLong2 = this.random.nextLong();
+        this.worldLong1 = this.random.nextLong();
+        this.worldLong2 = this.random.nextLong();
     }
 
     public void generate(ChunkBuffer chunkBuffer)
@@ -39,8 +39,8 @@ public abstract class TerrainGenBase
         for (int x = chunkX - i; x <= chunkX + i; x++)
             for (int z = chunkZ - i; z <= chunkZ + i; z++)
             {
-                long l3 = x * worldLong1;
-                long l4 = z * worldLong2;
+                long l3 = x * this.worldLong1;
+                long l4 = z * this.worldLong2;
                 this.random.setSeed(l3 ^ l4 ^ this.world.getSeed());
                 generateChunk(ChunkCoordinate.fromChunkCoords(x, z), chunkBuffer);
             }

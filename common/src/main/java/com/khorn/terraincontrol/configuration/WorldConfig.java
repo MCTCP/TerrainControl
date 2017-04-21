@@ -215,7 +215,7 @@ public class WorldConfig extends ConfigFile
 
         // Check biome ids, These are the names from the worldConfig file
         // Corrects any instances of incorrect biome id.
-        for (Iterator<Entry<String, Integer>> it = customBiomeGenerationIds.entrySet().iterator(); it.hasNext();)
+        for (Iterator<Entry<String, Integer>> it = this.customBiomeGenerationIds.entrySet().iterator(); it.hasNext();)
         {
             Entry<String, Integer> entry = it.next();
 
@@ -302,47 +302,46 @@ public class WorldConfig extends ConfigFile
     @Override
     protected void correctSettings()
     {
-        LandSize = lowerThanOrEqualTo(LandSize, GenerationDepth);
-        LandFuzzy = lowerThanOrEqualTo(LandFuzzy, GenerationDepth - LandSize);
+        this.LandSize = lowerThanOrEqualTo(this.LandSize, this.GenerationDepth);
+        this.LandFuzzy = lowerThanOrEqualTo(this.LandFuzzy, this.GenerationDepth - this.LandSize);
 
-        riverRarity = lowerThanOrEqualTo(riverRarity, GenerationDepth);
-        riverSize = lowerThanOrEqualTo(riverSize, GenerationDepth - riverRarity);
+        this.riverRarity = lowerThanOrEqualTo(this.riverRarity, this.GenerationDepth);
+        this.riverSize = lowerThanOrEqualTo(this.riverSize, this.GenerationDepth - this.riverRarity);
 
-        biomeGroupManager.filterBiomes(customBiomeGenerationIds.keySet());
-        IsleBiomes = filterBiomes(IsleBiomes, customBiomeGenerationIds.keySet());
-        BorderBiomes = filterBiomes(BorderBiomes, customBiomeGenerationIds.keySet());
+        this.biomeGroupManager.filterBiomes(this.customBiomeGenerationIds.keySet());
+        this.IsleBiomes = filterBiomes(this.IsleBiomes, this.customBiomeGenerationIds.keySet());
+        this.BorderBiomes = filterBiomes(this.BorderBiomes, this.customBiomeGenerationIds.keySet());
 
-        if (biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
+        if (this.biomeMode == TerrainControl.getBiomeModeManager().FROM_IMAGE)
         {
-            File mapFile = new File(settingsDir, imageFile);
+            File mapFile = new File(this.settingsDir, this.imageFile);
             if (!mapFile.exists())
             {
                 TerrainControl.log(LogMarker.WARN, "Biome map file not found. Switching BiomeMode to Normal");
-                biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
+                this.biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
             }
         }
 
-        imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || customBiomeGenerationIds.keySet().contains(imageFillBiome)) ? imageFillBiome : WorldStandardValues.IMAGE_FILL_BIOME.getDefaultValue();
+        this.imageFillBiome = (DefaultBiome.Contain(this.imageFillBiome) || this.customBiomeGenerationIds.keySet().contains(this.imageFillBiome)) ? this.imageFillBiome : WorldStandardValues.IMAGE_FILL_BIOME.getDefaultValue();
 
-        maxMoisture = higherThan(maxMoisture, minMoisture);
-        maxTemperature = higherThan(maxTemperature, minTemperature);
+        this.maxMoisture = higherThan(this.maxMoisture, this.minMoisture);
+        this.maxTemperature = higherThan(this.maxTemperature, this.minTemperature);
 
-        caveMaxAltitude = higherThanOrEqualTo(caveMaxAltitude, caveMinAltitude);
-        caveSystemPocketMaxSize = higherThanOrEqualTo(caveSystemPocketMaxSize, caveSystemPocketMinSize);
-        ravineMaxAltitude = higherThanOrEqualTo(ravineMaxAltitude, ravineMinAltitude);
-        ravineMaxLength = higherThanOrEqualTo(ravineMaxLength, ravineMinLength);
+        this.caveMaxAltitude = higherThanOrEqualTo(this.caveMaxAltitude, this.caveMinAltitude);
+        this.caveSystemPocketMaxSize = higherThanOrEqualTo(this.caveSystemPocketMaxSize, this.caveSystemPocketMinSize);
+        this.ravineMaxAltitude = higherThanOrEqualTo(this.ravineMaxAltitude, this.ravineMinAltitude);
+        this.ravineMaxLength = higherThanOrEqualTo(this.ravineMaxLength, this.ravineMinLength);
 
-        waterLevelMax = higherThanOrEqualTo(waterLevelMax, waterLevelMin);
+        this.waterLevelMax = higherThanOrEqualTo(this.waterLevelMax, this.waterLevelMin);
 
-        maximumDistanceBetweenRareBuildings = higherThanOrEqualTo(maximumDistanceBetweenRareBuildings, minimumDistanceBetweenRareBuildings);
-        maximumDistanceBetweenMansions = higherThanOrEqualTo(maximumDistanceBetweenMansions, minimumDistanceBetweenMansions);
-        oceanMonumentRandomOffset = lowerThanOrEqualTo(oceanMonumentRandomOffset, oceanMonumentGridSize);
+        this.maximumDistanceBetweenRareBuildings = higherThanOrEqualTo(this.maximumDistanceBetweenRareBuildings, this.minimumDistanceBetweenRareBuildings);
+        this.maximumDistanceBetweenMansions = higherThanOrEqualTo(this.maximumDistanceBetweenMansions, this.minimumDistanceBetweenMansions);
+        this.oceanMonumentRandomOffset = lowerThanOrEqualTo(this.oceanMonumentRandomOffset, this.oceanMonumentGridSize);
 
-        if (biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && ModeTerrain != TerrainMode.OldGenerator)
+        if (this.biomeMode == TerrainControl.getBiomeModeManager().OLD_GENERATOR && this.ModeTerrain != TerrainMode.OldGenerator)
         {
             TerrainControl.log(LogMarker.WARN, "Old biome generator works only with old terrain generator!");
-            biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
-
+            this.biomeMode = TerrainControl.getBiomeModeManager().NORMAL;
         }
     }
 
@@ -360,7 +359,7 @@ public class WorldConfig extends ConfigFile
         this.worldHeightScaleBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS);
         this.worldHeightScaleBits = lowerThanOrEqualTo(this.worldHeightScaleBits, this.worldHeightCapBits);
         this.worldHeightScale = 1 << this.worldHeightScaleBits;
-        this.waterLevelMax = worldHeightCap / 2 - 1;
+        this.waterLevelMax = this.worldHeightCap / 2 - 1;
 
         // Biome placement
         this.GenerationDepth = reader.getSetting(WorldStandardValues.GENERATION_DEPTH);
@@ -414,13 +413,13 @@ public class WorldConfig extends ConfigFile
         this.WorldFog = reader.getSetting(WorldStandardValues.WORLD_FOG);
         this.WorldNightFog = reader.getSetting(WorldStandardValues.WORLD_NIGHT_FOG);
 
-        this.WorldFogR = ((WorldFog & 0xFF0000) >> 16) / 255F;
-        this.WorldFogG = ((WorldFog & 0xFF00) >> 8) / 255F;
-        this.WorldFogB = (WorldFog & 0xFF) / 255F;
+        this.WorldFogR = ((this.WorldFog & 0xFF0000) >> 16) / 255F;
+        this.WorldFogG = ((this.WorldFog & 0xFF00) >> 8) / 255F;
+        this.WorldFogB = (this.WorldFog & 0xFF) / 255F;
 
-        this.WorldNightFogR = ((WorldNightFog & 0xFF0000) >> 16) / 255F;
-        this.WorldNightFogG = ((WorldNightFog & 0xFF00) >> 8) / 255F;
-        this.WorldNightFogB = (WorldNightFog & 0xFF) / 255F;
+        this.WorldNightFogR = ((this.WorldNightFog & 0xFF0000) >> 16) / 255F;
+        this.WorldNightFogG = ((this.WorldNightFog & 0xFF00) >> 8) / 255F;
+        this.WorldNightFogB = (this.WorldNightFog & 0xFF) / 255F;
 
         // Structures
         this.strongholdsEnabled = reader.getSetting(WorldStandardValues.STRONGHOLDS_ENABLED);
@@ -513,7 +512,7 @@ public class WorldConfig extends ConfigFile
             {
                 if (res instanceof BiomeGroup)
                 {
-                    biomeGroupManager.registerGroup((BiomeGroup) res);
+                    this.biomeGroupManager.registerGroup((BiomeGroup) res);
                 }
             }
         }
@@ -555,7 +554,6 @@ public class WorldConfig extends ConfigFile
 
     private void readCustomBiomes(SettingsMap reader)
     {
-
         List<String> biomes = reader.getSetting(WorldStandardValues.CUSTOM_BIOMES);
 
         for (String biome : biomes)
@@ -571,10 +569,10 @@ public class WorldConfig extends ConfigFile
                 if (keys.length == 2)
                 {
                     int generationBiomeId = Integer.parseInt(keys[1]);
-                    customBiomeGenerationIds.put(keys[0], generationBiomeId);
+                    this.customBiomeGenerationIds.put(keys[0], generationBiomeId);
                 } else
                 {
-                    customBiomeGenerationIds.put(keys[0], -1);
+                    this.customBiomeGenerationIds.put(keys[0], -1);
                 }
 
             } catch (NumberFormatException e)
@@ -615,7 +613,7 @@ public class WorldConfig extends ConfigFile
                 "   Default - use default terrain generator",
                 "   OldGenerator - Minecraft Beta 1.7.3-like land generator");
 
-        writer.putSetting(WorldStandardValues.BIOME_MODE, TerrainControl.getBiomeModeManager().getName(biomeMode),
+        writer.putSetting(WorldStandardValues.BIOME_MODE, TerrainControl.getBiomeModeManager().getName(this.biomeMode),
                 "Possible biome modes:",
                 "   Normal - use all features",
                 "   FromImage - get biomes from image file",
@@ -756,7 +754,7 @@ public class WorldConfig extends ConfigFile
 
         writer.putSetting(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS, this.worldHeightScaleBits,
                 "Scales the height of the world. Adding 1 to this doubles the",
-                "height of the terrain, substracting 1 to this halves the height",
+                "height of the terrain, subtracting 1 to this halves the height",
                 "of the terrain. Values must be between 5 and 8, inclusive.");
 
         writer.putSetting(WorldStandardValues.WORLD_HEIGHT_CAP_BITS, this.worldHeightCapBits,
@@ -851,8 +849,8 @@ public class WorldConfig extends ConfigFile
             // Write the old objectSpawnRatio
 
             writer.putSetting(WorldStandardValues.OBJECT_SPAWN_RATIO, this.objectSpawnRatio,
-                    "LEGACY setting for compability with old worlds. This setting should be kept at 1.",
-                    "If the setting is set at 1, the setting will vanish from the config file. Readd it",
+                    "LEGACY setting for compatibility with old worlds. This setting should be kept at 1.",
+                    "If the setting is set at 1, the setting will vanish from the config file. Read it",
                     "manually with another value and it will be back.",
                     "",
                     "When using the UseWorld or UseBiome keyword for spawning custom objects, Terrain Control",
@@ -936,7 +934,7 @@ public class WorldConfig extends ConfigFile
                 "May not be smaller than 0, and may not be larger than " + WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE + ".");
 
         // Custom structures
-        writer.smallTitle("Custom structues");
+        writer.smallTitle("Custom structures");
 
         writer.putSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius,
                 "Maximum radius of custom structures in chunks. Custom structures are spawned by",

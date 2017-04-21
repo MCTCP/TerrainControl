@@ -19,7 +19,7 @@ import java.util.Random;
 
 public class TXVillageStart extends StructureStart
 {
-    // well ... thats what it does
+    // well ... that's what it does
     private boolean hasMoreThanTwoComponents = false;
 
     public TXVillageStart(World world, Random random, int chunkX, int chunkZ, int size)

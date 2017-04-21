@@ -57,20 +57,20 @@ public class ObjectExtrusionHelper
      */
     public void addBlock(BlockFunction block)
     {
-        if (extrudeMode != BO3Settings.ExtrudeMode.None)
+        if (this.extrudeMode != BO3Settings.ExtrudeMode.None)
         {
-            if (extrudeMode == BO3Settings.ExtrudeMode.BottomDown && block.y < blockExtrusionY)
+            if (this.extrudeMode == BO3Settings.ExtrudeMode.BottomDown && block.y < blockExtrusionY)
             {
-                blocksToExtrude.clear();
-                blockExtrusionY = block.y;
-            } else if (extrudeMode == BO3Settings.ExtrudeMode.TopUp && block.y > blockExtrusionY)
+                this.blocksToExtrude.clear();
+                this.blockExtrusionY = block.y;
+            } else if (this.extrudeMode == BO3Settings.ExtrudeMode.TopUp && block.y > this.blockExtrusionY)
             {
-                blocksToExtrude.clear();
-                blockExtrusionY = block.y;
+                this.blocksToExtrude.clear();
+                this.blockExtrusionY = block.y;
             }
-            if (block.y == blockExtrusionY)
+            if (block.y == this.blockExtrusionY)
             {
-                blocksToExtrude.add(block);
+                this.blocksToExtrude.add(block);
             }
         }
     }
@@ -87,20 +87,20 @@ public class ObjectExtrusionHelper
      */
     public void extrude(LocalWorld world, Random random, int x, int y, int z)
     {
-        for (BlockFunction block : blocksToExtrude)
+        for (BlockFunction block : this.blocksToExtrude)
         {
-            if (extrudeMode == BO3Settings.ExtrudeMode.BottomDown)
+            if (this.extrudeMode == BO3Settings.ExtrudeMode.BottomDown)
             {
                 for (int yi = y + block.y - 1;
-                     yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
+                     yi > this.extrudeMode.getEndingHeight() && this.extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
                      --yi)
                 {
                     block.spawn(world, random, x + block.x, yi, z + block.z);
                 }
-            } else if (extrudeMode == BO3Settings.ExtrudeMode.TopUp)
+            } else if (this.extrudeMode == BO3Settings.ExtrudeMode.TopUp)
             {
                 for (int yi = y + block.y + 1;
-                     yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
+                     yi < this.extrudeMode.getEndingHeight() && this.extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
                      ++yi)
                 {
                     block.spawn(world, random, x + block.x, yi, z + block.z);
@@ -108,6 +108,5 @@ public class ObjectExtrusionHelper
             }
         }
     }
-
 
 }

@@ -44,7 +44,6 @@ public final class PluginConfig extends ConfigFile
 
     public PluginConfig(SettingsMap settingsReader)
     {
-
         super(settingsReader.getName());
 
         this.renameOldSettings(settingsReader);
@@ -124,7 +123,7 @@ public final class PluginConfig extends ConfigFile
 
     public LogLevels getLogLevel()
     {
-        return LogLevel;
+        return this.LogLevel;
     }
 
 }

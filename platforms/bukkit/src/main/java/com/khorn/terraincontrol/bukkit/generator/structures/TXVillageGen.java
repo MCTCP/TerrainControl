@@ -35,19 +35,19 @@ public class TXVillageGen extends StructureGenerator
 
     public TXVillageGen(ServerConfigProvider configs)
     {
-        size = configs.getWorldConfig().villageSize;
-        distance = configs.getWorldConfig().villageDistance;
-        minimumDistance = 8;
+        this.size = configs.getWorldConfig().villageSize;
+        this.distance = configs.getWorldConfig().villageDistance;
+        this.minimumDistance = 8;
 
         // Add all village biomes to the list
-        villageSpawnBiomes = new ArrayList<BiomeBase>();
+        this.villageSpawnBiomes = new ArrayList<BiomeBase>();
         for (LocalBiome biome : configs.getBiomeArray())
         {
             if (biome == null)
                 continue;
             if (biome.getBiomeConfig().villageType != VillageType.disabled)
             {
-                villageSpawnBiomes.add(((BukkitBiome) biome).getHandle());
+                this.villageSpawnBiomes.add(((BukkitBiome) biome).getHandle());
             }
         }
     }
@@ -84,7 +84,7 @@ public class TXVillageGen extends StructureGenerator
         j1 += random.nextInt(this.distance - this.minimumDistance);
         if (k == i1 && l == j1)
         {
-            boolean flag = this.g.getWorldChunkManager().a(k * 16 + 8, l * 16 + 8, 0, villageSpawnBiomes);
+            boolean flag = this.g.getWorldChunkManager().a(k * 16 + 8, l * 16 + 8, 0, this.villageSpawnBiomes);
 
             if (flag)
             {
@@ -109,7 +109,7 @@ public class TXVillageGen extends StructureGenerator
 
     public static class VillageStart extends StructureStart
     {
-        // well ... thats what it does
+        // well ... that's what it does
         private boolean hasMoreThanTwoComponents = false;
 
         public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)

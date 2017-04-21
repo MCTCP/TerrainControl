@@ -104,7 +104,7 @@ public class BO2 extends ConfigFile implements CustomObject
     @Override
     public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
     {
-        enable(settingsMap);
+        enable(this.settingsMap);
     }
 
     private void enable(SettingsMap settings)
@@ -116,7 +116,7 @@ public class BO2 extends ConfigFile implements CustomObject
     @Override
     public boolean canSpawnAsTree()
     {
-        return tree;
+        return this.tree;
     }
 
     @Override
@@ -128,7 +128,7 @@ public class BO2 extends ConfigFile implements CustomObject
     @Override
     public boolean canRotateRandomly()
     {
-        return randomRotation;
+        return this.randomRotation;
     }
 
     /**
@@ -137,7 +137,7 @@ public class BO2 extends ConfigFile implements CustomObject
      */
     public File getFile()
     {
-        return file;
+        return this.file;
     }
 
     @Override
@@ -151,7 +151,7 @@ public class BO2 extends ConfigFile implements CustomObject
             if (world.isEmpty(x + point.x, y + point.y, z + point.z))
             {
                 world.setBlock((x + point.x), y + point.y, z + point.z, point.material);
-            } else if (dig)
+            } else if (this.dig)
             {
                 world.setBlock((x + point.x), y + point.y, z + point.z, point.material);
             }
@@ -163,37 +163,37 @@ public class BO2 extends ConfigFile implements CustomObject
     public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {
         // Basic checks
-        if (world.isEmpty(x, y - 5, z) && (needsFoundation))
+        if (world.isEmpty(x, y - 5, z) && (this.needsFoundation))
             return false;
 
         LocalMaterialData checkBlock = world.getMaterial(x, y + 2, z);
-        if (!spawnWater)
+        if (!this.spawnWater)
         {
             if (checkBlock.equals(DefaultMaterial.WATER) || checkBlock.equals(DefaultMaterial.STATIONARY_WATER))
                 return false;
         }
-        if (!spawnLava)
+        if (!this.spawnLava)
         {
             if (checkBlock.equals(DefaultMaterial.LAVA) || checkBlock.equals(DefaultMaterial.STATIONARY_LAVA))
                 return false;
         }
 
         int checkLight = world.getLightLevel(x, y + 2, z);
-        if (!spawnSunlight)
+        if (!this.spawnSunlight)
         {
             if (checkLight > 8)
                 return false;
         }
-        if (!spawnDarkness)
+        if (!this.spawnDarkness)
         {
             if (checkLight < 9)
                 return false;
         }
 
-        if ((y < spawnElevationMin) || (y > spawnElevationMax))
+        if ((y < this.spawnElevationMin) || (y > this.spawnElevationMax))
             return false;
 
-        if (!spawnOnBlockType.contains(world.getMaterial(x, y - 1, z)))
+        if (!this.spawnOnBlockType.contains(world.getMaterial(x, y - 1, z)))
             return false;
 
         ObjectCoordinate[] objData = this.data[rotation.getRotationId()];
@@ -206,12 +206,12 @@ public class BO2 extends ConfigFile implements CustomObject
             if (!world.isLoaded((x + point.x), (y + point.y), (z + point.z)))
                 return false;
 
-            if (!dig)
+            if (!this.dig)
             {
-                if (collisionBlockType.contains(world.getMaterial((x + point.x), (y + point.y), (z + point.z))))
+                if (this.collisionBlockType.contains(world.getMaterial((x + point.x), (y + point.y), (z + point.z))))
                 {
                     faultCounter++;
-                    if (faultCounter > (objData.length * (collisionPercentage / 100)))
+                    if (faultCounter > (objData.length * (this.collisionPercentage / 100)))
                     {
                         return false;
                     }
@@ -232,31 +232,31 @@ public class BO2 extends ConfigFile implements CustomObject
     protected boolean spawn(LocalWorld world, Random random, int x, int z)
     {
         int y;
-        if (spawnAboveGround)
+        if (this.spawnAboveGround)
             y = world.getSolidHeight(x, z);
-        else if (spawnUnderGround)
+        else if (this.spawnUnderGround)
         {
             int solidHeight = world.getSolidHeight(x, z);
-            if (solidHeight < 1 || solidHeight <= spawnElevationMin)
+            if (solidHeight < 1 || solidHeight <= this.spawnElevationMin)
                 return false;
-            if (solidHeight > spawnElevationMax)
-                solidHeight = spawnElevationMax;
-            y = random.nextInt(solidHeight - spawnElevationMin) + spawnElevationMin;
+            if (solidHeight > this.spawnElevationMax)
+                solidHeight = this.spawnElevationMax;
+            y = random.nextInt(solidHeight - this.spawnElevationMin) + this.spawnElevationMin;
         } else
             y = world.getHighestBlockYAt(x, z);
 
         if (y < 0)
             return false;
 
-        Rotation rotation = randomRotation ? Rotation.getRandomRotation(random) : Rotation.NORTH;
+        Rotation rotation = this.randomRotation ? Rotation.getRandomRotation(random) : Rotation.NORTH;
 
         if (!canSpawnAt(world, rotation, x, y, z))
             return false;
 
         boolean objectSpawned = spawnForced(world, random, rotation, x, y, z);
 
-//        if (objectSpawned)
-//            GenerateCustomObjectFromGroup(world, random, x, y, z);
+        //if (objectSpawned)
+        //    GenerateCustomObjectFromGroup(world, random, x, y, z);
 
         return objectSpawned;
     }
@@ -265,11 +265,11 @@ public class BO2 extends ConfigFile implements CustomObject
     public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
     {
 
-        if (branch)
+        if (this.branch)
             return false;
 
         int randomRoll = rand.nextInt(100);
-        int ObjectRarity = rarity;
+        int ObjectRarity = this.rarity;
         boolean objectSpawned = false;
 
         while (randomRoll < ObjectRarity)
@@ -289,8 +289,7 @@ public class BO2 extends ConfigFile implements CustomObject
     public CustomObject applySettings(SettingsMap extraSettings)
     {
         extraSettings.setFallback(this.settingsMap);
-        BO2 bo2WithSettings = new BO2(extraSettings, file);
-        return bo2WithSettings;
+        return new BO2(extraSettings, file);
     }
 
     @Override
@@ -370,22 +369,22 @@ public class BO2 extends ConfigFile implements CustomObject
                 coordinates.add(buffer);
         }
 
-        data[0] = new ObjectCoordinate[coordinates.size()];
-        data[1] = new ObjectCoordinate[coordinates.size()];
-        data[2] = new ObjectCoordinate[coordinates.size()];
-        data[3] = new ObjectCoordinate[coordinates.size()];
+        this.data[0] = new ObjectCoordinate[coordinates.size()];
+        this.data[1] = new ObjectCoordinate[coordinates.size()];
+        this.data[2] = new ObjectCoordinate[coordinates.size()];
+        this.data[3] = new ObjectCoordinate[coordinates.size()];
 
         for (int i = 0; i < coordinates.size(); i++)
         {
             ObjectCoordinate coordinate = coordinates.get(i);
 
-            data[0][i] = coordinate;
+            this.data[0][i] = coordinate;
             coordinate = coordinate.Rotate();
-            data[1][i] = coordinate;
+            this.data[1][i] = coordinate;
             coordinate = coordinate.Rotate();
-            data[2][i] = coordinate;
+            this.data[2][i] = coordinate;
             coordinate = coordinate.Rotate();
-            data[3][i] = coordinate;
+            this.data[3][i] = coordinate;
         }
 
     }
@@ -393,7 +392,7 @@ public class BO2 extends ConfigFile implements CustomObject
     @Override
     public boolean hasPreferenceToSpawnIn(LocalBiome biome)
     {
-        return spawnInBiome.contains(biome.getName()) || spawnInBiome.contains("All");
+        return this.spawnInBiome.contains(biome.getName()) || this.spawnInBiome.contains("All");
     }
 
     @Override

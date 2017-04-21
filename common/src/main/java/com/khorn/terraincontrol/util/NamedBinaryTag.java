@@ -157,70 +157,70 @@ public class NamedBinaryTag
         switch (type)
         {
             case TAG_End:
-                if (value != null)
+                if (this.value != null)
                     throw new IllegalArgumentException();
                 break;
             case TAG_Byte:
-                if (!(value instanceof Byte))
+                if (!(this.value instanceof Byte))
                     throw new IllegalArgumentException();
                 break;
             case TAG_Short:
-                if (!(value instanceof Short))
+                if (!(this.value instanceof Short))
                     throw new IllegalArgumentException();
                 break;
             case TAG_Int:
-                if (!(value instanceof Integer))
+                if (!(this.value instanceof Integer))
                     throw new IllegalArgumentException();
                 break;
             case TAG_Long:
-                if (!(value instanceof Long))
+                if (!(this.value instanceof Long))
                     throw new IllegalArgumentException();
                 break;
             case TAG_Float:
-                if (!(value instanceof Float))
+                if (!(this.value instanceof Float))
                     throw new IllegalArgumentException();
                 break;
             case TAG_Double:
-                if (!(value instanceof Double))
+                if (!(this.value instanceof Double))
                     throw new IllegalArgumentException();
                 break;
             case TAG_Byte_Array:
-                if (!(value instanceof byte[]))
+                if (!(this.value instanceof byte[]))
                     throw new IllegalArgumentException();
             case TAG_String:
-                if (!(value instanceof String))
+                if (!(this.value instanceof String))
                     throw new IllegalArgumentException();
                 break;
             case TAG_List:
-                if (value instanceof Type)
+                if (this.value instanceof Type)
                 {
-                    this.listType = (Type) value;
-                    value = new NamedBinaryTag[0];
+                    this.listType = (Type) this.value;
+                    this.value = new NamedBinaryTag[0];
                 } else
                 {
-                    if (!(value instanceof NamedBinaryTag[]))
+                    if (!(this.value instanceof NamedBinaryTag[]))
                         throw new IllegalArgumentException();
-                    this.listType = (((NamedBinaryTag[]) value)[0]).getType();
+                    this.listType = (((NamedBinaryTag[]) this.value)[0]).getType();
                 }
                 break;
             case TAG_Compound:
-                if (!(value instanceof NamedBinaryTag[]))
+                if (!(this.value instanceof NamedBinaryTag[]))
                     throw new IllegalArgumentException();
                 break;
             case TAG_Int_Array:
-                if (!(value instanceof int[]))
+                if (!(this.value instanceof int[]))
                     throw new IllegalArgumentException();
                 break;
             default:
                 throw new IllegalArgumentException();
         }
 
-        value = newValue;
+        this.value = newValue;
     }
 
     public Type getListType()
     {
-        return listType;
+        return this.listType;
     }
 
     /**
@@ -229,16 +229,16 @@ public class NamedBinaryTag
      */
     public void addTag(NamedBinaryTag tag)
     {
-        if (type != Type.TAG_List && type != Type.TAG_Compound)
+        if (this.type != Type.TAG_List && this.type != Type.TAG_Compound)
             throw new RuntimeException();
-        NamedBinaryTag[] subtags = (NamedBinaryTag[]) value;
+        NamedBinaryTag[] subtags = (NamedBinaryTag[]) this.value;
 
         int index = subtags.length;
 
         // For TAG_Compund entries, we need to add the tag BEFORE the end,
         // or the new tag gets placed after the TAG_End, messing up the data.
         // TAG_End MUST be kept at the very end of the TAG_Compound.
-        if (type == Type.TAG_Compound)
+        if (this.type == Type.TAG_Compound)
             index--;
         insertTag(tag, index);
     }
@@ -250,11 +250,11 @@ public class NamedBinaryTag
      */
     public void insertTag(NamedBinaryTag tag, int index)
     {
-        if (type != Type.TAG_List && type != Type.TAG_Compound)
+        if (this.type != Type.TAG_List && this.type != Type.TAG_Compound)
             throw new RuntimeException();
-        NamedBinaryTag[] subtags = (NamedBinaryTag[]) value;
+        NamedBinaryTag[] subtags = (NamedBinaryTag[]) this.value;
         if (subtags.length > 0)
-            if (type == Type.TAG_List && tag.getType() != getListType())
+            if (this.type == Type.TAG_List && tag.getType() != getListType())
                 throw new IllegalArgumentException();
         if (index > subtags.length)
             throw new IndexOutOfBoundsException();
@@ -262,7 +262,7 @@ public class NamedBinaryTag
         System.arraycopy(subtags, 0, newValue, 0, index);
         newValue[index] = tag;
         System.arraycopy(subtags, index, newValue, index + 1, subtags.length - index);
-        value = newValue;
+        this.value = newValue;
     }
 
     /**
@@ -273,15 +273,15 @@ public class NamedBinaryTag
      */
     public NamedBinaryTag removeTag(int index)
     {
-        if (type != Type.TAG_List && type != Type.TAG_Compound)
+        if (this.type != Type.TAG_List && type != Type.TAG_Compound)
             throw new RuntimeException();
-        NamedBinaryTag[] subtags = (NamedBinaryTag[]) value;
+        NamedBinaryTag[] subtags = (NamedBinaryTag[]) this.value;
         NamedBinaryTag victim = subtags[index];
         NamedBinaryTag[] newValue = new NamedBinaryTag[subtags.length - 1];
         System.arraycopy(subtags, 0, newValue, 0, index);
         index++;
         System.arraycopy(subtags, index, newValue, index - 1, subtags.length - index);
-        value = newValue;
+        this.value = newValue;
         return victim;
     }
 
@@ -293,11 +293,11 @@ public class NamedBinaryTag
      */
     public void removeSubTag(NamedBinaryTag tag)
     {
-        if (type != Type.TAG_List && type != Type.TAG_Compound)
+        if (this.type != Type.TAG_List && this.type != Type.TAG_Compound)
             throw new RuntimeException();
         if (tag == null)
             return;
-        NamedBinaryTag[] subtags = (NamedBinaryTag[]) value;
+        NamedBinaryTag[] subtags = (NamedBinaryTag[]) this.value;
         for (int i = 0; i < subtags.length; i++)
         {
             if (subtags[i] == tag)
@@ -371,7 +371,7 @@ public class NamedBinaryTag
      */
     public static NamedBinaryTag readFrom(InputStream is, boolean compressed) throws IOException
     {
-        DataInputStream dis = null;
+        DataInputStream dis;
         if (compressed)
         {
             dis = new DataInputStream(new GZIPInputStream(is));
@@ -475,9 +475,10 @@ public class NamedBinaryTag
         dos.writeByte(type.ordinal());
         if (type != Type.TAG_End)
         {
-            dos.writeUTF(name);
+            dos.writeUTF(this.name);
             writePayload(dos);
         }
+        //noinspection Since15
         gzos.flush();
         gzos.close();
     }
@@ -489,33 +490,33 @@ public class NamedBinaryTag
             case TAG_End:
                 break;
             case TAG_Byte:
-                dos.writeByte((Byte) value);
+                dos.writeByte((Byte) this.value);
                 break;
             case TAG_Short:
-                dos.writeShort((Short) value);
+                dos.writeShort((Short) this.value);
                 break;
             case TAG_Int:
-                dos.writeInt((Integer) value);
+                dos.writeInt((Integer) this.value);
                 break;
             case TAG_Long:
-                dos.writeLong((Long) value);
+                dos.writeLong((Long) this.value);
                 break;
             case TAG_Float:
-                dos.writeFloat((Float) value);
+                dos.writeFloat((Float) this.value);
                 break;
             case TAG_Double:
-                dos.writeDouble((Double) value);
+                dos.writeDouble((Double) this.value);
                 break;
             case TAG_Byte_Array:
-                byte[] ba = (byte[]) value;
+                byte[] ba = (byte[]) this.value;
                 dos.writeInt(ba.length);
                 dos.write(ba);
                 break;
             case TAG_String:
-                dos.writeUTF((String) value);
+                dos.writeUTF((String) this.value);
                 break;
             case TAG_List:
-                NamedBinaryTag[] list = (NamedBinaryTag[]) value;
+                NamedBinaryTag[] list = (NamedBinaryTag[]) this.value;
                 dos.writeByte(getListType().ordinal());
                 dos.writeInt(list.length);
                 for (NamedBinaryTag tt : list)
@@ -524,7 +525,7 @@ public class NamedBinaryTag
                 }
                 break;
             case TAG_Compound:
-                NamedBinaryTag[] subtags = (NamedBinaryTag[]) value;
+                NamedBinaryTag[] subtags = (NamedBinaryTag[]) this.value;
                 for (NamedBinaryTag st : subtags)
                 {
                     Type type = st.getType();
@@ -537,7 +538,7 @@ public class NamedBinaryTag
                 }
                 break;
             case TAG_Int_Array:
-                int[] ia = (int[]) value;
+                int[] ia = (int[]) this.value;
                 dos.writeInt(ia.length);
                 for (int anIa : ia)
                 {

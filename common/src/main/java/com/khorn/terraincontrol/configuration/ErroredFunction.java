@@ -21,9 +21,8 @@ public final class ErroredFunction<T> extends ConfigFunction<T>
     @Override
     public String toString()
     {
-        return "## INVALID " + name.toUpperCase() + " - " + error + " ##" + System.getProperty(
-                "line.separator") + name + "(" + StringHelper.join(args,
-                        ",") + ")";
+        return "## INVALID " + this.name.toUpperCase() + " - " + this.error + " ##" +
+            System.getProperty("line.separator") + this.name + "(" + StringHelper.join(this.args, ",") + ")";
     }
 
     @Override

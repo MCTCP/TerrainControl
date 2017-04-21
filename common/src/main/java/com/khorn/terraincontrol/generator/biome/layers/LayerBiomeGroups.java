@@ -37,7 +37,7 @@ public class LayerBiomeGroups extends Layer
 
                 if ((currentPiece & LandBit) != 0 && (currentPiece & BiomeGroupBits) == 0)    // land without biome group
                 {
-                    SortedMap<Integer, BiomeGroup> possibleGroups = biomeGroupManager.getGroupDepthMap(depth);
+                    SortedMap<Integer, BiomeGroup> possibleGroups = this.biomeGroupManager.getGroupDepthMap(this.depth);
                     int newGroupRarity = nextGroupInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleGroups)*entropy);
                         //>>	Spawn the biome based on the rarity spectrum
                         for (Entry<Integer, BiomeGroup> group : possibleGroups.entrySet())
@@ -47,7 +47,7 @@ public class LayerBiomeGroups extends Layer
                                 if (group.getValue() != null){
                                     currentPiece |= (group.getValue().getGroupId() << BiomeGroupShift) |
                                                     //>>	If the average temp of the group is cold
-                                                    ((group.getValue().isColdGroup() && freezeGroups) ? IceBit : 0);
+                                                    ((group.getValue().isColdGroup() && this.freezeGroups) ? IceBit : 0);
                                 }
                                 break;
                             }

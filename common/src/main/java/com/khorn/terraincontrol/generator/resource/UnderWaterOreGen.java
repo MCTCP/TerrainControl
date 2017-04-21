@@ -18,11 +18,11 @@ public class UnderWaterOreGen extends Resource
     {
         super(biomeConfig);
         assureSize(5, args);
-        material = readMaterial(args.get(0));
-        size = readInt(args.get(1), 1, 8);
-        frequency = readInt(args.get(2), 1, 100);
-        rarity = readRarity(args.get(3));
-        sourceBlocks = readMaterials(args, 4);
+        this.material = readMaterial(args.get(0));
+        this.size = readInt(args.get(1), 1, 8);
+        this.frequency = readInt(args.get(2), 1, 100);
+        this.rarity = readRarity(args.get(3));
+        this.sourceBlocks = readMaterials(args, 4);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class UnderWaterOreGen extends Resource
     @Override
     public String toString()
     {
-        return "UnderWaterOre(" + material + "," + size + "," + frequency + "," + rarity + makeMaterials(sourceBlocks) + ")";
+        return "UnderWaterOre(" + this.material + "," + this.size + "," + this.frequency + "," + this.rarity + makeMaterials(this.sourceBlocks) + ")";
     }
 
     @Override
@@ -86,9 +86,9 @@ public class UnderWaterOreGen extends Resource
                     for (int y = firstSolidBlock - two; y <= firstSolidBlock + two; y++)
                     {
                         LocalMaterialData sourceBlock = world.getMaterial(currentX, y, currentZ);
-                        if (sourceBlocks.contains(sourceBlock))
+                        if (this.sourceBlocks.contains(sourceBlock))
                         {
-                            world.setBlock(currentX, y, currentZ, material);
+                            world.setBlock(currentX, y, currentZ, this.material);
                         }
                     }
                 }

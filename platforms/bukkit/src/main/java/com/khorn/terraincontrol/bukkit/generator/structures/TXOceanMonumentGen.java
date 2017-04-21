@@ -44,7 +44,7 @@ public class TXOceanMonumentGen extends StructureGenerator
                 continue;
             }
 
-            monumentSpawnBiomes.add(((BukkitBiome) biome).getHandle());
+            this.monumentSpawnBiomes.add(((BukkitBiome) biome).getHandle());
         }
     }
 
@@ -56,7 +56,7 @@ public class TXOceanMonumentGen extends StructureGenerator
 
     public List<BiomeBase.BiomeMeta> getMobs()
     {
-        return mobList;
+        return this.mobList;
     }
 
     @Override
@@ -94,7 +94,7 @@ public class TXOceanMonumentGen extends StructureGenerator
         structureChunkZ += (random.nextInt(this.randomOffset + 1) + random.nextInt(this.randomOffset + 1)) / 2;
         if (originalChunkX == structureChunkX && originalChunkZ == structureChunkZ)
         {
-            boolean flag = this.g.getWorldChunkManager().a(originalChunkX * 16 + 8, originalChunkZ * 16 + 8, 29, monumentSpawnBiomes);
+            boolean flag = this.g.getWorldChunkManager().a(originalChunkX * 16 + 8, originalChunkZ * 16 + 8, 29, this.monumentSpawnBiomes);
 
             if (flag)
             {

@@ -41,7 +41,7 @@ class MaterialSetSetting extends Setting<MaterialSet>
         try
         {
             MaterialSet blocks = new MaterialSet();
-            for (String blockName : defaultValues)
+            for (String blockName : this.defaultValues)
             {
                 blocks.parseAndAdd(blockName);
             }

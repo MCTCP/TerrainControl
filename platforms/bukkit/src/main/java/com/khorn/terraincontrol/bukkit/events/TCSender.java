@@ -28,9 +28,9 @@ public class TCSender
         // Send the configs
         World world = player.getWorld();
 
-        if (plugin.worlds.containsKey(world.getName()))
+        if (this.plugin.worlds.containsKey(world.getName()))
         {
-            ConfigProvider configs = plugin.worlds.get(world.getName()).getConfigs();
+            ConfigProvider configs = this.plugin.worlds.get(world.getName()).getConfigs();
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream stream = new DataOutputStream(outputStream);
@@ -47,7 +47,7 @@ public class TCSender
 
             byte[] data = outputStream.toByteArray();
 
-            player.sendPluginMessage(plugin, PluginStandardValues.ChannelName, data);
+            player.sendPluginMessage(this.plugin, PluginStandardValues.ChannelName, data);
         }
     }
 

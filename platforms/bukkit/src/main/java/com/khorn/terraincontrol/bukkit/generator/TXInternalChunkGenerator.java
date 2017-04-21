@@ -25,20 +25,19 @@ public class TXInternalChunkGenerator extends CustomChunkGenerator
 
     public List<BiomeBase.BiomeMeta> getMobsFor(EnumCreatureType type, BlockPosition position)
     {
-        WorldConfig worldConfig = localWorld.getConfigs().getWorldConfig();
-        BiomeBase biomebase = localWorld.getWorld().getBiome(position);
-        if (type == EnumCreatureType.MONSTER
-                && worldConfig.rareBuildingsEnabled
-                && localWorld.rareBuildingGen.isWitchHutAt(position))
+        WorldConfig worldConfig = this.localWorld.getConfigs().getWorldConfig();
+        BiomeBase biomebase = this.localWorld.getWorld().getBiome(position);
+        if (type == EnumCreatureType.MONSTER && worldConfig.rareBuildingsEnabled
+                && this.localWorld.rareBuildingGen.isWitchHutAt(position))
         {
-            return localWorld.rareBuildingGen.getWitchHutMobs();
+            return this.localWorld.rareBuildingGen.getWitchHutMobs();
         }
 
         if (type == EnumCreatureType.MONSTER
                 && worldConfig.oceanMonumentsEnabled
-                && localWorld.oceanMonumentGen.a(localWorld.getWorld(), position))
+                && this.localWorld.oceanMonumentGen.a(this.localWorld.getWorld(), position))
         {
-            return localWorld.oceanMonumentGen.getMobs();
+            return this.localWorld.oceanMonumentGen.getMobs();
         }
 
         return biomebase.getMobs(type);
@@ -47,36 +46,36 @@ public class TXInternalChunkGenerator extends CustomChunkGenerator
     @Override
     public BlockPosition findNearestMapFeature(World mcWorld, String type, BlockPosition position, boolean bool)
     {
-        WorldConfig worldConfig = localWorld.getConfigs().getWorldConfig();
+        WorldConfig worldConfig = this.localWorld.getConfigs().getWorldConfig();
 
         if (type.equals(StructureNames.MANSION))
         {
             if (worldConfig.mansionsEnabled)
-                return localWorld.mansionGen.getNearestGeneratedFeature(mcWorld, position, bool);
+                return this.localWorld.mansionGen.getNearestGeneratedFeature(mcWorld, position, bool);
         } else if (type.equals(StructureNames.MINESHAFT))
         {
             if (worldConfig.mineshaftsEnabled)
-                return localWorld.mineshaftGen.getNearestGeneratedFeature(mcWorld, position, bool);
+                return this.localWorld.mineshaftGen.getNearestGeneratedFeature(mcWorld, position, bool);
         } else if (type.equals(StructureNames.NETHER_FORTRESS))
         {
             if (worldConfig.netherFortressesEnabled)
-                return localWorld.netherFortressGen.getNearestGeneratedFeature(mcWorld, position, bool);
+                return this.localWorld.netherFortressGen.getNearestGeneratedFeature(mcWorld, position, bool);
         } else if (type.equals(StructureNames.OCEAN_MONUMENT))
         {
             if (worldConfig.oceanMonumentsEnabled)
-                return localWorld.oceanMonumentGen.getNearestGeneratedFeature(mcWorld, position, bool);
+                return this.localWorld.oceanMonumentGen.getNearestGeneratedFeature(mcWorld, position, bool);
         } else if (type.equals(StructureNames.RARE_BUILDING))
         {
             if (worldConfig.rareBuildingsEnabled)
-                return localWorld.rareBuildingGen.getNearestGeneratedFeature(mcWorld, position, bool);
+                return this.localWorld.rareBuildingGen.getNearestGeneratedFeature(mcWorld, position, bool);
         } else if (type.equals(StructureNames.STRONGHOLD))
         {
             if (worldConfig.strongholdsEnabled)
-                return localWorld.strongholdGen.getNearestGeneratedFeature(mcWorld, position, bool);
+                return this.localWorld.strongholdGen.getNearestGeneratedFeature(mcWorld, position, bool);
         } else if (type.equals(StructureNames.VILLAGE))
         {
             if (worldConfig.villagesEnabled)
-                return localWorld.villageGen.getNearestGeneratedFeature(mcWorld, position, bool);
+                return this.localWorld.villageGen.getNearestGeneratedFeature(mcWorld, position, bool);
         }
         return null;
     }

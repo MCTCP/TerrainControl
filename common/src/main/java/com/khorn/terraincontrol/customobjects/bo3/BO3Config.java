@@ -88,82 +88,82 @@ public class BO3Config extends ConfigFile
                 "If you add this object correctly to your BiomeConfigs, it will spawn in the world.",
                 "");
 
-        writer.putSetting(BO3Settings.AUTHOR, author,
+        writer.putSetting(BO3Settings.AUTHOR, this.author,
                 "This is the creator of this BO3 object");
 
-        writer.putSetting(BO3Settings.DESCRIPTION, description,
+        writer.putSetting(BO3Settings.DESCRIPTION, this.description,
                 "A short description of this BO3 object");
 
         writer.putSetting(BO3Settings.VERSION, "3",
                 "The BO3 version, don't change this! It can be used by external applications to do a version check.");
 
-        writer.putSetting(WorldStandardValues.SETTINGS_MODE, settingsMode,
+        writer.putSetting(WorldStandardValues.SETTINGS_MODE, this.settingsMode,
                 "The settings mode, WriteAll, WriteWithoutComments or WriteDisable. See WorldConfig.");
 
         // Main settings
         writer.bigTitle("Main settings");
 
-        writer.putSetting(BO3Settings.TREE, tree,
+        writer.putSetting(BO3Settings.TREE, this.tree,
                 "This needs to be set to true to spawn the object in the Tree and Sapling resources.");
 
-        writer.putSetting(BO3Settings.FREQUENCY, frequency,
+        writer.putSetting(BO3Settings.FREQUENCY, this.frequency,
                 "The frequency of the BO3 from 1 to 200. Tries this many times to spawn this BO3 when using the CustomObject(...) resource.",
                 "Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
 
-        writer.putSetting(BO3Settings.RARITY, rarity,
+        writer.putSetting(BO3Settings.RARITY, this.rarity,
                 "The rarity of the BO3 from 0 to 100. Each spawn attempt has rarity% chance to succeed when using the CustomObject(...) resource.",
                 "Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
 
-        writer.putSetting(BO3Settings.ROTATE_RANDOMLY, rotateRandomly,
+        writer.putSetting(BO3Settings.ROTATE_RANDOMLY, this.rotateRandomly,
                 "If you set this to true, the BO3 will be placed with a random rotation.");
 
-        writer.putSetting(BO3Settings.SPAWN_HEIGHT, spawnHeight,
+        writer.putSetting(BO3Settings.SPAWN_HEIGHT, this.spawnHeight,
                 "The spawn height of the BO3 - atMinY, randomY, highestBlock or highestSolidBlock.");
 
-        writer.putSetting(BO3Settings.SPAWN_HEIGHT_OFFSET, spawnHeightOffset,
+        writer.putSetting(BO3Settings.SPAWN_HEIGHT_OFFSET, this.spawnHeightOffset,
                 "The offset from the spawn height to spawn this BO3",
                 "Ex. SpawnHeight = highestSolidBlock, SpawnHeightOffset = 3; This object will spawn 3 blocks above the highest solid block");
 
-        writer.putSetting(BO3Settings.SPAWN_HEIGHT_VARIANCE, spawnHeightVariance,
+        writer.putSetting(BO3Settings.SPAWN_HEIGHT_VARIANCE, this.spawnHeightVariance,
                 "A random amount to offset the spawn location from the spawn offset height",
                 "Ex. SpawnHeightOffset = 3, SpawnHeightVariance = 3; This object will spawn 3 to 6 blocks above the original spot it would have spawned");
 
         writer.smallTitle("Height Limits for the BO3.");
 
-        writer.putSetting(BO3Settings.MIN_HEIGHT, minHeight,
+        writer.putSetting(BO3Settings.MIN_HEIGHT, this.minHeight,
                 "When in randomY mode used as the minimum Y or in atMinY mode as the actual Y to spawn this BO3 at.");
 
-        writer.putSetting(BO3Settings.MAX_HEIGHT, maxHeight,
+        writer.putSetting(BO3Settings.MAX_HEIGHT, this.maxHeight,
                 "When in randomY mode used as the maximum Y to spawn this BO3 at.");
 
         writer.smallTitle("Extrusion settings");
 
-        writer.putSetting(BO3Settings.EXTRUDE_MODE, extrudeMode,
+        writer.putSetting(BO3Settings.EXTRUDE_MODE, this.extrudeMode,
                 "The style of extrusion you wish to use - BottomDown, TopUp, None (Default)");
 
-        writer.putSetting(BO3Settings.EXTRUDE_THROUGH_BLOCKS, extrudeThroughBlocks,
+        writer.putSetting(BO3Settings.EXTRUDE_THROUGH_BLOCKS, this.extrudeThroughBlocks,
                 "The blocks to extrude your BO3 through");
 
-        writer.putSetting(BO3Settings.MAX_BRANCH_DEPTH, maxBranchDepth,
-                "Objects can have other objects attacthed to it: branches. Branches can also",
+        writer.putSetting(BO3Settings.MAX_BRANCH_DEPTH, this.maxBranchDepth,
+                "Objects can have other objects attached to it: branches. Branches can also",
                 "have branches attached to it, which can also have branches, etc. This is the",
                 "maximum branch depth for this objects.");
 
-        writer.putSetting(BO3Settings.EXCLUDED_BIOMES, excludedBiomes,
+        writer.putSetting(BO3Settings.EXCLUDED_BIOMES, this.excludedBiomes,
                 "When spawned with the UseWorld keyword, this BO3 should NOT spawn in the following biomes.",
                 "If you write the BO3 name directly in the BiomeConfigs, this will be ignored.");
 
         // Sourceblock
         writer.bigTitle("Source block settings");
 
-        writer.putSetting(BO3Settings.SOURCE_BLOCKS, sourceBlocks,
+        writer.putSetting(BO3Settings.SOURCE_BLOCKS, this.sourceBlocks,
                 "The block(s) the BO3 should spawn in.");
 
-        writer.putSetting(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK, maxPercentageOutsideSourceBlock,
+        writer.putSetting(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK, this.maxPercentageOutsideSourceBlock,
                 "The maximum percentage of the BO3 that can be outside the SourceBlock.",
                 "The BO3 won't be placed on a location with more blocks outside the SourceBlock than this percentage.");
 
-        writer.putSetting(BO3Settings.OUTSIDE_SOURCE_BLOCK, outsideSourceBlock,
+        writer.putSetting(BO3Settings.OUTSIDE_SOURCE_BLOCK, this.outsideSourceBlock,
                 "What to do when a block is about to be placed outside the SourceBlock? (dontPlace, placeAnyway)");
 
         // Blocks and other things
@@ -173,27 +173,27 @@ public class BO3Config extends ConfigFile
     @Override
     protected void readConfigSettings(SettingsMap reader)
     {
-        author = reader.getSetting(BO3Settings.AUTHOR);
-        description = reader.getSetting(BO3Settings.DESCRIPTION);
-        settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE);
+        this.author = reader.getSetting(BO3Settings.AUTHOR);
+        this.description = reader.getSetting(BO3Settings.DESCRIPTION);
+        this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE);
 
-        tree = reader.getSetting(BO3Settings.TREE);
-        frequency = reader.getSetting(BO3Settings.FREQUENCY);
-        rarity = reader.getSetting(BO3Settings.RARITY);
-        rotateRandomly = reader.getSetting(BO3Settings.ROTATE_RANDOMLY);
-        spawnHeight = reader.getSetting(BO3Settings.SPAWN_HEIGHT);
-        spawnHeightOffset = reader.getSetting(BO3Settings.SPAWN_HEIGHT_OFFSET);
-        spawnHeightVariance = reader.getSetting(BO3Settings.SPAWN_HEIGHT_VARIANCE);
-        extrudeMode = reader.getSetting(BO3Settings.EXTRUDE_MODE);
-        extrudeThroughBlocks = reader.getSetting(BO3Settings.EXTRUDE_THROUGH_BLOCKS);
-        minHeight = reader.getSetting(BO3Settings.MIN_HEIGHT);
-        maxHeight = reader.getSetting(BO3Settings.MAX_HEIGHT);
-        maxBranchDepth = reader.getSetting(BO3Settings.MAX_BRANCH_DEPTH);
-        excludedBiomes = new ArrayList<String>(reader.getSetting(BO3Settings.EXCLUDED_BIOMES));
+        this.tree = reader.getSetting(BO3Settings.TREE);
+        this.frequency = reader.getSetting(BO3Settings.FREQUENCY);
+        this.rarity = reader.getSetting(BO3Settings.RARITY);
+        this.rotateRandomly = reader.getSetting(BO3Settings.ROTATE_RANDOMLY);
+        this.spawnHeight = reader.getSetting(BO3Settings.SPAWN_HEIGHT);
+        this.spawnHeightOffset = reader.getSetting(BO3Settings.SPAWN_HEIGHT_OFFSET);
+        this.spawnHeightVariance = reader.getSetting(BO3Settings.SPAWN_HEIGHT_VARIANCE);
+        this.extrudeMode = reader.getSetting(BO3Settings.EXTRUDE_MODE);
+        this.extrudeThroughBlocks = reader.getSetting(BO3Settings.EXTRUDE_THROUGH_BLOCKS);
+        this.minHeight = reader.getSetting(BO3Settings.MIN_HEIGHT);
+        this.maxHeight = reader.getSetting(BO3Settings.MAX_HEIGHT);
+        this.maxBranchDepth = reader.getSetting(BO3Settings.MAX_BRANCH_DEPTH);
+        this.excludedBiomes = new ArrayList<String>(reader.getSetting(BO3Settings.EXCLUDED_BIOMES));
 
-        sourceBlocks = reader.getSetting(BO3Settings.SOURCE_BLOCKS);
-        maxPercentageOutsideSourceBlock = reader.getSetting(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK);
-        outsideSourceBlock = reader.getSetting(BO3Settings.OUTSIDE_SOURCE_BLOCK);
+        this.sourceBlocks = reader.getSetting(BO3Settings.SOURCE_BLOCKS);
+        this.maxPercentageOutsideSourceBlock = reader.getSetting(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK);
+        this.outsideSourceBlock = reader.getSetting(BO3Settings.OUTSIDE_SOURCE_BLOCK);
 
         // Read the config functions
         readConfigFunctions(reader);
@@ -226,10 +226,10 @@ public class BO3Config extends ConfigFile
         }
 
         // Store the blocks
-        blocks[0] = tempBlocksList.toArray(new BO3PlaceableFunction[tempBlocksList.size()]);
-        bo3Checks[0] = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
-        branches[0] = tempBranchesList.toArray(new BranchFunction[tempBranchesList.size()]);
-        boundingBoxes[0] = box;
+        this.blocks[0] = tempBlocksList.toArray(new BO3PlaceableFunction[tempBlocksList.size()]);
+        this.bo3Checks[0] = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
+        this.branches[0] = tempBranchesList.toArray(new BranchFunction[tempBranchesList.size()]);
+        this.boundingBoxes[0] = box;
     }
 
     public void writeResources(SettingsMap writer)
@@ -247,7 +247,7 @@ public class BO3Config extends ConfigFile
                 " MinecraftObject(0,0,0," + DefaultStructurePart.IGLOO_BOTTOM.getPath() + ")",
                 " spawns the bottom part of an igloo.");
 
-        writer.addConfigFunctions(Arrays.asList(blocks[0]));
+        writer.addConfigFunctions(Arrays.asList(this.blocks[0]));
 
         // BO3Checks
         writer.bigTitle("BO3 checks",
@@ -283,13 +283,13 @@ public class BO3Config extends ConfigFile
                 "Weighted Branches spawn branches with a dependent chance of spawning.",
                 "WeightedBranch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]][MaxChanceOutOf])",
                 "MaxChanceOutOf - The chance all branches have to spawn out of, assumed to be 100 when left blank");
-        writer.addConfigFunctions(Arrays.asList(branches[0]));
+        writer.addConfigFunctions(Arrays.asList(this.branches[0]));
     }
 
     @Override
     protected void correctSettings()
     {
-        maxHeight = higherThanOrEqualTo(maxHeight, minHeight);
+        this.maxHeight = higherThanOrEqualTo(this.maxHeight, this.minHeight);
     }
 
     @Override
@@ -306,25 +306,25 @@ public class BO3Config extends ConfigFile
         for (int i = 1; i < 4; i++)
         {
             // Blocks (blocks[i - 1] is previous rotation)
-            blocks[i] = new BO3PlaceableFunction[blocks[i - 1].length];
-            for (int j = 0; j < blocks[i].length; j++)
+            this.blocks[i] = new BO3PlaceableFunction[this.blocks[i - 1].length];
+            for (int j = 0; j < this.blocks[i].length; j++)
             {
-                blocks[i][j] = blocks[i - 1][j].rotate();
+                this.blocks[i][j] = this.blocks[i - 1][j].rotate();
             }
             // BO3 checks
-            bo3Checks[i] = new BO3Check[bo3Checks[i - 1].length];
-            for (int j = 0; j < bo3Checks[i].length; j++)
+            this.bo3Checks[i] = new BO3Check[this.bo3Checks[i - 1].length];
+            for (int j = 0; j < this.bo3Checks[i].length; j++)
             {
-                bo3Checks[i][j] = bo3Checks[i - 1][j].rotate();
+                this.bo3Checks[i][j] = this.bo3Checks[i - 1][j].rotate();
             }
             // Branches
-            branches[i] = new BranchFunction[branches[i - 1].length];
-            for (int j = 0; j < branches[i].length; j++)
+            this.branches[i] = new BranchFunction[this.branches[i - 1].length];
+            for (int j = 0; j < this.branches[i].length; j++)
             {
-                branches[i][j] = branches[i - 1][j].rotate();
+                this.branches[i][j] = this.branches[i - 1][j].rotate();
             }
             // Bounding box
-            boundingBoxes[i] = boundingBoxes[i - 1].rotate();
+            this.boundingBoxes[i] = this.boundingBoxes[i - 1].rotate();
         }
     }
 

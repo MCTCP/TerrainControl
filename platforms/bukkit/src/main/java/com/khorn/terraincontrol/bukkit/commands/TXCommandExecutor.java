@@ -28,10 +28,10 @@ public class TXCommandExecutor implements CommandExecutor
     {
         ArrayList<String> arg = new ArrayList<String>(Arrays.asList(strings));
 
-        BaseCommand cmd = helpCommand;
-        if (!arg.isEmpty() && commandHashMap.containsKey(arg.get(0)))
+        BaseCommand cmd = this.helpCommand;
+        if (!arg.isEmpty() && this.commandHashMap.containsKey(arg.get(0)))
         {
-            cmd = commandHashMap.get(arg.get(0));
+            cmd = this.commandHashMap.get(arg.get(0));
             arg.remove(0);
         }
 

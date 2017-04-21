@@ -18,7 +18,7 @@ public class BeforeGroupsBiomeGenerator extends LayeredBiomeGenerator
     @Override
     protected Layer[] initLayers()
     {
-        return LayerFactory.createBeforeGroups(world);
+        return LayerFactory.createBeforeGroups(this.world);
     }
 
 }

@@ -15,7 +15,7 @@ package com.khorn.terraincontrol.util;
  * 
  * <p>Note that the max coords of the bounding box are exclusive. This means
  * that a box of (0, 0, 0) to (1, 1, 1) contains only one block, not 8. This is
- * unlike Minecraft's boundig box, where that box would include 8 blocks. Our
+ * unlike Minecraft's bounding box, where that box would include 8 blocks. Our
  * design allows us to calculate the width/height/depth of the box using simple
  * calculations like {@code maxX - minX}.
  */
@@ -51,12 +51,12 @@ public final class BoundingBox implements Cloneable
         try
         {
             BoundingBox cloned = (BoundingBox) super.clone();
-            cloned.minX = minX;
-            cloned.minY = minY;
-            cloned.minZ = minZ;
-            cloned.maxX = maxX;
-            cloned.maxY = maxY;
-            cloned.maxZ = maxZ;
+            cloned.minX = this.minX;
+            cloned.minY = this.minY;
+            cloned.minZ = this.minZ;
+            cloned.maxX = this.maxX;
+            cloned.maxY = this.maxY;
+            cloned.maxZ = this.maxZ;
             return cloned;
         } catch (CloneNotSupportedException e)
         {
@@ -71,12 +71,12 @@ public final class BoundingBox implements Cloneable
     public BoundingBox rotate()
     {
         BoundingBox cloned = new BoundingBox();
-        cloned.minX = minZ;
-        cloned.minY = minY;
-        cloned.minZ = -minX;
-        cloned.maxX = maxZ;
-        cloned.maxY = maxY;
-        cloned.maxZ = -maxX;
+        cloned.minX = this.minZ;
+        cloned.minY = this.minY;
+        cloned.minZ = -this.minX;
+        cloned.maxX = this.maxZ;
+        cloned.maxY = this.maxY;
+        cloned.maxZ = -this.maxX;
         return cloned;
     }
 
@@ -97,26 +97,26 @@ public final class BoundingBox implements Cloneable
             return;
         }
 
-        if (x < minX)
+        if (x < this.minX)
         {
-            minX = x;
-        } else if (x >= maxX)
+            this.minX = x;
+        } else if (x >= this.maxX)
         {
-            maxX = x + 1;
+            this.maxX = x + 1;
         }
-        if (y < minY)
+        if (y < this.minY)
         {
-            minY = y;
-        } else if (y >= maxY)
+            this.minY = y;
+        } else if (y >= this.maxY)
         {
-            maxY = y + 1;
+            this.maxY = y + 1;
         }
-        if (z < minZ)
+        if (z < this.minZ)
         {
-            minZ = z;
-        } else if (z >= maxZ)
+            this.minZ = z;
+        } else if (z >= this.maxZ)
         {
-            maxZ = z + 1;
+            this.maxZ = z + 1;
         }
     }
 
@@ -134,7 +134,7 @@ public final class BoundingBox implements Cloneable
      */
     public boolean isEmpty()
     {
-        return minX == maxX || minY == maxY || minZ == maxZ;
+        return this.minX == this.maxX || this.minY == this.maxY || this.minZ == this.maxZ;
     }
 
     /**
@@ -147,12 +147,12 @@ public final class BoundingBox implements Cloneable
      */
     private void setToOneBlockVolume(int x, int y, int z)
     {
-        minX = x;
-        maxX = x + 1;
-        minY = y;
-        maxY = y + 1;
-        minZ = z;
-        maxZ = z + 1;
+        this.minX = x;
+        this.maxX = x + 1;
+        this.minY = y;
+        this.maxY = y + 1;
+        this.minZ = z;
+        this.maxZ = z + 1;
     }
 
     /**
@@ -161,7 +161,7 @@ public final class BoundingBox implements Cloneable
      */
     public int getMinX()
     {
-        return minX;
+        return this.minX;
     }
 
     /**
@@ -170,7 +170,7 @@ public final class BoundingBox implements Cloneable
      */
     public int getMinY()
     {
-        return minY;
+        return this.minY;
     }
 
     /**
@@ -179,7 +179,7 @@ public final class BoundingBox implements Cloneable
      */
     public int getMinZ()
     {
-        return minZ;
+        return this.minZ;
     }
 
     /**
@@ -188,7 +188,7 @@ public final class BoundingBox implements Cloneable
      */
     public int getWidth()
     {
-        return maxX - minX;
+        return this.maxX - this.minX;
     }
 
     /**
@@ -197,7 +197,7 @@ public final class BoundingBox implements Cloneable
      */
     public int getHeight()
     {
-        return maxY - minY;
+        return this.maxY - this.minY;
     }
 
     /**
@@ -206,7 +206,7 @@ public final class BoundingBox implements Cloneable
      */
     public int getDepth()
     {
-        return maxZ - minZ;
+        return this.maxZ - this.minZ;
     }
 
     @Override
@@ -214,20 +214,20 @@ public final class BoundingBox implements Cloneable
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + maxX;
-        result = prime * result + maxY;
-        result = prime * result + maxZ;
-        result = prime * result + minX;
-        result = prime * result + minY;
-        result = prime * result + minZ;
+        result = prime * result + this.maxX;
+        result = prime * result + this.maxY;
+        result = prime * result + this.maxZ;
+        result = prime * result + this.minX;
+        result = prime * result + this.minY;
+        result = prime * result + this.minZ;
         return result;
     }
 
     @Override
     public String toString()
     {
-        return "BoundingBox[minX=" + minX + ", minY=" + minY + ", minZ=" + minZ + ", width=" + getWidth() + ", height="
-                + getHeight() + ", depth=" + getDepth() + "]";
+        return "BoundingBox[minX=" + this.minX + ", minY=" + this.minY + ", minZ=" + this.minZ + ", width=" + getWidth()
+            + ", height=" + getHeight() + ", depth=" + getDepth() + "]";
     }
 
     @Override
@@ -246,27 +246,27 @@ public final class BoundingBox implements Cloneable
             return false;
         }
         BoundingBox other = (BoundingBox) obj;
-        if (maxX != other.maxX)
+        if (this.maxX != other.maxX)
         {
             return false;
         }
-        if (maxY != other.maxY)
+        if (this.maxY != other.maxY)
         {
             return false;
         }
-        if (maxZ != other.maxZ)
+        if (this.maxZ != other.maxZ)
         {
             return false;
         }
-        if (minX != other.minX)
+        if (this.minX != other.minX)
         {
             return false;
         }
-        if (minY != other.minY)
+        if (this.minY != other.minY)
         {
             return false;
         }
-        if (minZ != other.minZ)
+        if (this.minZ != other.minZ)
         {
             return false;
         }

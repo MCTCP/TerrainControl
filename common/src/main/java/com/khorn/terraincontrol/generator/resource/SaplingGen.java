@@ -36,15 +36,15 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         super(biomeConfig);
         assureSize(3, args);
 
-        saplingType = SaplingType.get(args.get(0));
-        if (saplingType == null)
+        this.saplingType = SaplingType.get(args.get(0));
+        if (this.saplingType == null)
         {
             throw new InvalidConfigException("Unknown sapling type " + args.get(0));
         }
 
-        trees = new ArrayList<CustomObject>();
-        treeNames = new ArrayList<String>();
-        treeChances = new ArrayList<Integer>();
+        this.trees = new ArrayList<CustomObject>();
+        this.treeNames = new ArrayList<String>();
+        this.treeChances = new ArrayList<Integer>();
 
         for (int i = 1; i < args.size() - 1; i += 2)
         {
@@ -57,9 +57,9 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
             {
                 throw new InvalidConfigException("Custom object " + args.get(i) + " is not a tree!");
             }
-            trees.add(object);
-            treeNames.add(args.get(i));
-            treeChances.add(readInt(args.get(i + 1), 1, 100));
+            this.trees.add(object);
+            this.treeNames.add(args.get(i));
+            this.treeChances.add(readInt(args.get(i + 1), 1, 100));
         }
     }
 
@@ -85,9 +85,9 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
             CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(
                     treeName);
 
-            trees.add(object);
-            treeNames.add(treeName);
-            treeChances.add(chance);
+            this.trees.add(object);
+            this.treeNames.add(treeName);
+            this.treeChances.add(chance);
         }
     }
 
@@ -130,11 +130,11 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
      */
     public boolean growSapling(LocalWorld world, Random random, boolean isWideTree, int x, int y, int z)
     {
-        for (int treeNumber = 0; treeNumber < trees.size(); treeNumber++)
+        for (int treeNumber = 0; treeNumber < this.trees.size(); treeNumber++)
         {
-            if (random.nextInt(100) < treeChances.get(treeNumber))
+            if (random.nextInt(100) < this.treeChances.get(treeNumber))
             {
-                CustomObject tree = trees.get(treeNumber);
+                CustomObject tree = this.trees.get(treeNumber);
                 Rotation rotation = tree.canRotateRandomly() ? Rotation.getRandomRotation(random) : Rotation.NORTH;
 
                 // Correct spawn location for rotated wide trees
@@ -171,17 +171,17 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
     @Override
     public boolean isAnalogousTo(ConfigFunction<BiomeConfig> other)
     {
-        return other.getClass().equals(getClass()) && saplingType.equals(((SaplingGen)other).saplingType);
+        return other.getClass().equals(getClass()) && this.saplingType.equals(((SaplingGen)other).saplingType);
     }
 
     @Override
     public String toString()
     {
-        String output = "Sapling(" + saplingType;
+        String output = "Sapling(" + this.saplingType;
 
-        for (int i = 0; i < treeNames.size(); i++)
+        for (int i = 0; i < this.treeNames.size(); i++)
         {
-            output += "," + treeNames.get(i) + "," + treeChances.get(i);
+            output += "," + this.treeNames.get(i) + "," + treeChances.get(i);
         }
         return output + ")";
     }

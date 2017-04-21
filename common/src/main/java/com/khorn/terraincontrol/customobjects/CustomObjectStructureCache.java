@@ -27,18 +27,18 @@ public class CustomObjectStructureCache
     public void reload(LocalWorld world)
     {
         this.world = world;
-        structureCache.clear();
+        this.structureCache.clear();
     }
 
     public CustomObjectStructure getStructureStart(int chunkX, int chunkZ)
     {
         ChunkCoordinate coord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
-        CustomObjectStructure structureStart = structureCache.get(coord);
+        CustomObjectStructure structureStart = this.structureCache.get(coord);
 
         // Clear cache if needed
-        if (structureCache.size() > 400)
+        if (this.structureCache.size() > 400)
         {
-            structureCache.clear();
+            this.structureCache.clear();
         }
 
         if (structureStart != null)
@@ -54,7 +54,7 @@ public class CustomObjectStructureCache
             if (customObject != null)
             {
                 structureStart = new CustomObjectStructure(world, customObject);
-                structureCache.put(coord, structureStart);
+                this.structureCache.put(coord, structureStart);
                 return structureStart;
             } // TODO Maybe also store that no structure was here?
         }
