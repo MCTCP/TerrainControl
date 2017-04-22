@@ -9,7 +9,7 @@ You also need to have the [JDK][JDK 7] installed. You will need version 7 or
 newer.
 
 ## Creating JAR files
-Run the command `./gradlew install` in the OpenTerrainGenerator directory. If that
+Run the command `./gradlew install` and/or `./gradlew build` in the OpenTerrainGenerator directory. If that
 doesn't work, you probably need to make the file executable by running
 `chmod +x gradlew`. You can then try the above command again.
 
