@@ -3,22 +3,17 @@ package com.khorn.terraincontrol.forge.generator;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
 import com.khorn.terraincontrol.generator.ObjectSpawner;
 import com.khorn.terraincontrol.generator.biome.OutputType;
-import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
-import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.block.BlockGravel;
 import net.minecraft.block.BlockSand;
@@ -32,7 +27,6 @@ import net.minecraft.world.chunk.IChunkGenerator;
 
 public class ChunkProvider implements IChunkGenerator
 {
-
     private ForgeWorld world;
     private World worldHandle;
     private boolean TestMode = false;
@@ -60,36 +54,18 @@ public class ChunkProvider implements IChunkGenerator
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ)
     {
+    	ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
+    	
     	Chunk chunk = new Chunk(this.worldHandle, chunkX, chunkZ);
-		if(world.IsInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ)))
+		if(world.IsInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
     	{
-	        ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
 	        ForgeChunkBuffer chunkBuffer = new ForgeChunkBuffer(chunkCoord);
 	        this.generator.generate(chunkBuffer);
-	        
-	        // This is a bit of a hack fix, see fixSpawnChunk() for more info
-	        // TODO: Fix this properly
-    		if(firstRun && (((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() || world.getConfigs().getWorldConfig().WorldBorderRadius > 0))
-    		{
-    			firstRun = false;
-    			spawnChunk = chunkCoord;
-    			for(int x = 0; x < 15; x++)
-    			{
-    				for(int z = 0; z < 15; z++)
-    				{	    					
-    					originalBlocks.add(chunkBuffer.getBlock(x, 63, z));
-    					originalBlocks.add(chunkBuffer.getBlock(x, 64, z));    					
-    					
-    					chunkBuffer.setBlock(x, 63, z, TerrainControl.toLocalMaterialData(DefaultMaterial.GRASS, 0));
-    					chunkBuffer.setBlock(x, 64, z, TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0));
-    				}
-    			}
-    		}
-	        
+	        	        
 	        chunk = chunkBuffer.toChunk(this.worldHandle);
 	        fillBiomeArray(chunk);
-	        chunk.generateSkylightMap();
-    	}
+	        chunk.generateSkylightMap();	        
+    	}    		
 
         return chunk;
     }
@@ -120,7 +96,7 @@ public class ChunkProvider implements IChunkGenerator
     @Override
     public void populate(int chunkX, int chunkZ)
     {      
-    	if(this.TestMode || !world.IsInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ)))
+    	if(this.TestMode || !world.IsInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), true))
         {
             return;
         }
@@ -128,14 +104,7 @@ public class ChunkProvider implements IChunkGenerator
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
         
         BlockSand.fallInstantly = true;
-        BlockGravel.fallInstantly = true;
-        
-        // This is a bit of a hack fix, see fixSpawnChunk() for more info
-        // TODO: Fix this properly
-        if(((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() || world.getConfigs().getWorldConfig().WorldBorderRadius > 0)
-        {
-        	fixSpawnChunk();
-        }
+        BlockGravel.fallInstantly = true;        
         
         this.spawner.populate(chunkCoord);       
         
@@ -218,48 +187,5 @@ public class ChunkProvider implements IChunkGenerator
         // spawns in existing chunks of their customized ocean biome changing the spawn settings of ocean monuments makes them spawn
         // at different positions, so extra monuments will be spawned in old chunks
         return false;
-    }
-    
-    // This is a bit of a hack fix. MC can change the default spawn location when creating a new world 
-    // which is a problem for the world borders and cartographer. This code fools MC into thinking that 
-    // the first chunk it requests is a suitable spawn point by filling it with a 16x16 layer of grass
-    // The original blocks are restored later. This can result in players spawning in oceans etc.
-    // Only used when World Borders and/or Cartographer are enabled.
-    // TODO: Fix this properly a.s.a.p.
-    
-    boolean firstRun = true; // The first run is used by MC to check for suitable locations for the spawn location. For some reason the spawn location must be on grass.
-    ArrayList<LocalMaterialData> originalBlocks = new ArrayList<LocalMaterialData>(); // Don't need to store coords, will place the blocks back in the same order we got them
-    ChunkCoordinate spawnChunk;
-    boolean spawnChunkFixed = false;
-    
-    private void fixSpawnChunk()
-    {
-    	if(!spawnChunkFixed && !firstRun)
-    	{    		
-    		spawnChunkFixed = true;
-			int i = 0;			
-			for(int x = 0; x < 15; x++)
-			{
-				for(int z = 0; z < 15; z++)
-				{
-					if(!originalBlocks.get(i).toDefaultMaterial().equals(DefaultMaterial.AIR) || !originalBlocks.get(i + 1).toDefaultMaterial().equals(DefaultMaterial.AIR))
-					{
-						world.setBlock(spawnChunk.getBlockX() + x, 63, spawnChunk.getBlockZ() + z, originalBlocks.get(i));
-						world.setBlock(spawnChunk.getBlockX() + x, 64, spawnChunk.getBlockZ() + z, originalBlocks.get(i + 1));
-					} else {
-						for(int h = 62; h > 0; h++)
-						{
-							if(!world.getMaterial(spawnChunk.getBlockX() + x, h, spawnChunk.getBlockZ() + z).toDefaultMaterial().equals(DefaultMaterial.AIR))
-							{
-								world.setBlock(spawnChunk.getBlockX() + x, 63, spawnChunk.getBlockZ() + z, originalBlocks.get(i));
-								world.setBlock(spawnChunk.getBlockX() + x, 64, spawnChunk.getBlockZ() + z, originalBlocks.get(i + 1));								
-								break;
-							}
-						}
-					}
-					i += 2;
-				}
-			}
-    	}
-    }
+    }    
 }

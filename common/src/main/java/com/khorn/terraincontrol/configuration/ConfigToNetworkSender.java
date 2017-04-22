@@ -25,7 +25,7 @@ public final class ConfigToNetworkSender
      * @param stream         Stream to write to.
      * @throws IOException If an IO error occurs.
      */
-    public static void send(ConfigProvider configProvider, DataOutput stream) throws IOException
+    public static void send(ConfigProvider configProvider, DataOutput stream, boolean isSinglePlayer) throws IOException
     {
         WorldConfig worldConfig = configProvider.getWorldConfig();
         LocalBiome[] biomes = configProvider.getBiomeArray();
@@ -61,7 +61,7 @@ public final class ConfigToNetworkSender
             ConfigFile.writeStringToStream(stream, biome.getName());
             stream.writeInt(biome.getIds().getSavedId());
         }
-
+        
         // BiomeConfigs
         stream.writeInt(nonVirtualBiomes.size());
         for (LocalBiome biome : nonVirtualBiomes)
@@ -71,7 +71,7 @@ public final class ConfigToNetworkSender
                 continue;
             }
             stream.writeInt(biome.getIds().getSavedId());
-            biome.getBiomeConfig().writeToStream(stream);
+            biome.getBiomeConfig().writeToStream(stream, isSinglePlayer);
         }
     }
 }

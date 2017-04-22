@@ -21,16 +21,19 @@ import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.monster.EntityGuardian;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.JsonToNBT;
@@ -38,19 +41,19 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.DataFixesManager;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.DimensionType;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.GameType;
-import net.minecraft.world.ServerWorldEventHandler;
+import net.minecraft.world.IWorldEventListener;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldServerMulti;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
@@ -60,15 +63,12 @@ import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
-import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -156,13 +156,13 @@ public class ForgeWorld implements LocalWorld
 	    	
 	    	//TCDimensionManager.LoadCustomDimensionData();
 
-	    	TCDimensionManager.RemoveTCDims();
+	    	TCDimensionManager.RemoveTCDims();	    	    
         }
     }
           
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
-    {  	
+    {  	    	
     	// When creating custom dimensions don't override biomes that already exist in other worlds
         if(!isMainWorld)
         {
@@ -189,7 +189,13 @@ public class ForgeWorld implements LocalWorld
     		ForgeBiome forgeBiome = new ForgeBiome(Biomes.SKY, biomeConfig, new BiomeIds(9,9));
     		this.biomeNames.put("Sky", forgeBiome);
     		return forgeBiome;
-		}    
+		}
+    	if(biomeConfig.getName().equals("The Void"))
+    	{
+    		ForgeBiome forgeBiome = new ForgeBiome(Biomes.VOID, biomeConfig, new BiomeIds(9,9));
+    		this.biomeNames.put("The Void", forgeBiome);
+    		return forgeBiome;
+		}
     	
     	ForgeBiome forgeBiome = (ForgeBiome)TerrainControl.getBiomeAllWorlds(biomeConfig.getName());
     	Biome biome = BiomeGenCustom.getOrCreateBiome(biomeConfig, biomeIds, isMainWorld);
@@ -632,7 +638,7 @@ public class ForgeWorld implements LocalWorld
 
     @Override
     public void setBlock(int x, int y, int z, LocalMaterialData material)
-    {
+    {    	
         /*
          * This method usually breaks on every Minecraft update. Always check
          * whether the names are still correct. Often, you'll also need to
@@ -644,30 +650,44 @@ public class ForgeWorld implements LocalWorld
             return;
         }
 
+        DefaultMaterial defaultMaterial = material.toDefaultMaterial();
+        
+        if(defaultMaterial.equals(DefaultMaterial.DIODE_BLOCK_ON))
+        {
+        	material = ForgeMaterialData.ofDefaultMaterial(DefaultMaterial.DIODE_BLOCK_OFF, material.getBlockData());
+        }
+        else if(defaultMaterial.equals(DefaultMaterial.REDSTONE_COMPARATOR_OFF))
+        {
+        	material = ForgeMaterialData.ofDefaultMaterial(DefaultMaterial.REDSTONE_COMPARATOR_OFF, material.getBlockData());
+        }
+        
         IBlockState newState = ((ForgeMaterialData) material).internalBlock();
-
+        
+        BlockPos pos = new BlockPos(x, y, z);
+        
+        //DefaultMaterial defaultMaterial = material.toDefaultMaterial();
+                
         // Get chunk from (faster) custom cache
         Chunk chunk = this.getChunk(x, y, z);
 
         if (chunk == null)
         {
             // Chunk is unloaded
-            return;
+            //return;
+            throw new NotImplementedException();
         }
-
-        BlockPos pos = new BlockPos(x, y, z);
 
         IBlockState oldState = this.world.getBlockState(pos);
         int oldLight = oldState.getLightValue(this.world, pos);
         int oldOpacity = oldState.getLightOpacity(this.world, pos);
-
+        
         IBlockState iblockstate = chunk.setBlockState(pos, newState);
-
+       
         if (iblockstate == null)
         {
-            return;
+        	return; // Happens when block to place is the same as block being placed? TODO: Is that the only time this happens?
         }
-
+        
         // Relight and update players
         if (newState.getLightOpacity(this.world, pos) != oldOpacity || newState.getLightValue(this.world, pos) != oldLight)
         {
@@ -675,10 +695,10 @@ public class ForgeWorld implements LocalWorld
             this.world.checkLight(pos);
             this.world.theProfiler.endSection();
         }
-
-        this.world.markAndNotifyBlock(pos, chunk, iblockstate, newState, 2);
+        
+        this.world.markAndNotifyBlock(pos, chunk, iblockstate, newState, 2);       
     }
-
+    
     @Override
     public int getHighestBlockYAt(int x, int z)
     {
@@ -1014,8 +1034,7 @@ public class ForgeWorld implements LocalWorld
         if (tileEntity != null)
         {
             tileEntity.readFromNBT(nmsTag);
-        } else
-        {
+        } else {
             TerrainControl.log(LogMarker.DEBUG,
                     "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x,
                     y, z, getMaterial(x, y, z));
@@ -1130,17 +1149,15 @@ public class ForgeWorld implements LocalWorld
 	}
 	
 	public void unRegisterBiomes()
-	{		
-		String breakpoint = "";
-		
+	{
 		// Unregister only the biomes registered by this world
 		for(LocalBiome localBiome : this.biomeNames.values())
-		{			
+		{		    	
 			// Make an exception for the hell and sky biomes. 
 			// The hell and end chunk providers refer specifically to 
 			// Biomes.HELL and Biomes.SKY and query the biome registry
 			// for them. Other biomes are not referred to in this way.
-			if(localBiome.getName().equals("Hell") || localBiome.getName().equals("Sky")) { continue; }			
+			if(localBiome.getName().equals("The Void") || localBiome.getName().equals("The End") || localBiome.getName().equals("Hell") || localBiome.getName().equals("Sky")) { continue; }			
 			
 			if(((ForgeEngine)TerrainControl.getEngine()).worldLoader.isConfigUnique(localBiome.getBiomeConfig().getName()))
 			{			
@@ -1165,9 +1182,7 @@ public class ForgeWorld implements LocalWorld
 	
     @Override
     public void SpawnEntity(EntityFunction entityData)
-    {
-    	TerrainControl.log(LogMarker.INFO, "SpawnEntity " + entityData.x + " " + entityData.y + " " + entityData.z + " " + entityData.mobName);
-    	
+    {    	
     	Random rand = new Random();
     	
 		String mobTypeName = entityData.mobName;
@@ -1187,7 +1202,7 @@ public class ForgeWorld implements LocalWorld
         	                                
         if(entityClass == null)
         {
-        	TerrainControl.log(LogMarker.INFO, "Could not find entity: " + mobTypeName);
+        	TerrainControl.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
         	return;
         }
 
@@ -1203,14 +1218,15 @@ public class ForgeWorld implements LocalWorld
 	
 	            if (!(nbtbase instanceof NBTTagCompound))
 	            {
-	            	throw new NotImplementedException(); // Not a valid tag
+		        	TerrainControl.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+		        	return;
 	            }
 	
 	            nbttagcompound = (NBTTagCompound)nbtbase;
 	        }
 	        catch (NBTException nbtexception)
 	        {
-	        	TerrainControl.log(LogMarker.INFO, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	        	TerrainControl.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
 	        	return;
 	        }		                                            
 	        
@@ -1252,8 +1268,10 @@ public class ForgeWorld implements LocalWorld
             int k1 = entityData.y;
             int l1 = entityData.z;
             
+            boolean isWaterMob = entityliving instanceof EntityGuardian;
+            
             Material material = world.getBlockState(new BlockPos(j1, k1, l1)).getMaterial();
-            if (!world.isBlockNormalCube(new BlockPos(j1, k1, l1), false) && (creatureType == EnumCreatureType.WATER_CREATURE && material == Material.WATER || material == Material.AIR ))
+            if (!world.isBlockNormalCube(new BlockPos(j1, k1, l1), false) && (((creatureType == EnumCreatureType.WATER_CREATURE || isWaterMob) && material == Material.WATER) || material == Material.AIR))
             {					                            						                            	                                  			                                    	
 	            float f = (float)j1 + 0.5F;
 	            float f1 = (float)k1;
@@ -1277,14 +1295,15 @@ public class ForgeWorld implements LocalWorld
 	            		
 	            		            if (!(nbtbase instanceof NBTTagCompound))
 	            		            {
-	            		            	throw new NotImplementedException(); // Not a valid tag
+		            		        	TerrainControl.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+		            		        	return;
 	            		            }
 	            		
 	            		            nbttagcompound = (NBTTagCompound)nbtbase;
 	            		        }
 	            		        catch (NBTException nbtexception)
 	            		        {
-	            		        	TerrainControl.log(LogMarker.INFO, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	            		        	TerrainControl.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
 	            		        	return;
 	            		        }		                                            
 	            		        
@@ -1303,18 +1322,16 @@ public class ForgeWorld implements LocalWorld
 	            	        }                                			                                                                                        
 	                        entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F);
 	            		}	
-	            		
-	        			((EntityLiving) entityliving).setCustomNameTag(mobTypeName.replace("entity", "").substring(0, 1).toUpperCase() + mobTypeName.toLowerCase().replace("entity", "").substring(1));
-	                    
+
 	            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
 	            		{
-	        				if(nameTag != null && nameTag.length() > 0)
+	            			if(nameTag != null && nameTag.length() > 0)
 	        				{
 	        					((EntityLiving) entityliving).setCustomNameTag(nameTag);
 	        				}
 	            		}
-	    				
-						((EntityLiving) entityliving).enablePersistence(); // <- makes sure mobs don't de-spawn
+	            		
+    					((EntityLiving) entityliving).enablePersistence(); // <- makes sure mobs don't de-spawn
 	            		
 	            		world.spawnEntityInWorld(entityliving);
 	            	}
@@ -1342,12 +1359,20 @@ public class ForgeWorld implements LocalWorld
 		}
     }
     
-    public BlockPos getSpawnPoint()
-    {    	
-    	return new BlockPos(world.provider.getSpawnPoint().getX(), world.provider.getSpawnPoint().getY(), world.provider.getSpawnPoint().getZ());
+    @Override
+    public ChunkCoordinate getSpawnChunk()
+    {
+    	BlockPos spawnPos = getSpawnPoint();
+    	return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
     }
     
-	public boolean IsInsideWorldBorder(ChunkCoordinate chunk)
+    public BlockPos getSpawnPoint()
+    {    	
+    	BlockPos spawnPos = world.provider.getSpawnPoint(); 
+    	return new BlockPos(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
+    }
+    
+	public boolean IsInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources)
 	{
 		BlockPos spawnPoint = getSpawnPoint();
     	ChunkCoordinate spawnChunk = ChunkCoordinate.fromBlockCoords(spawnPoint.getX(), spawnPoint.getZ());		
@@ -1355,9 +1380,9 @@ public class ForgeWorld implements LocalWorld
 			((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius == 0 ||
 			(
 				chunk.getChunkX() >= spawnChunk.getChunkX() - (((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius - 1)
-				&& chunk.getChunkX() <= spawnChunk.getChunkX() + (((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius - 1)
+				&& chunk.getChunkX() <= spawnChunk.getChunkX() + (((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius - 1) - (spawningResources ? 1 : 0) // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
 				&& chunk.getChunkZ() >= spawnChunk.getChunkZ() - (((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius - 1)
-				&& chunk.getChunkZ() <= spawnChunk.getChunkZ() + (((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius - 1)
+				&& chunk.getChunkZ() <= spawnChunk.getChunkZ() + (((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius - 1) - (spawningResources ? 1 : 0) // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
 			);
 	}
 }

@@ -28,7 +28,6 @@ import java.util.HashMap;
 
 public class TCPlugin extends JavaPlugin
 {
-
     public TCListener listener;
     public TCCommandExecutor commandExecutor;
 

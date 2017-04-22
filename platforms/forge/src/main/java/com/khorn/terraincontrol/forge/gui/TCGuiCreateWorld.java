@@ -8,12 +8,15 @@ import java.util.Random;
 import org.apache.commons.io.FileUtils;
 import org.lwjgl.input.Keyboard;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
 import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.ForgeEngine;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiErrorScreen;
@@ -93,7 +96,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         {
         	for(File worldDir : TCWorldsDirectory.listFiles())
         	{
-        		if(worldDir.isDirectory())
+        		if(worldDir.isDirectory() && !worldDir.getName().toLowerCase().trim().startsWith("dim-"))
         		{
         			worldNames.add(worldDir.getName());
         			if(!GuiHandler.worlds.containsKey(worldDir.getName()))
@@ -146,13 +149,13 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         	}
         }
         
-        btnavailableWorld1.enabled = !btnavailableWorld1.displayString.equals("") && !btnavailableWorld1.displayString.equals(GuiHandler.worldName) && !btnavailableWorld1.displayString.equals("Cartographer");
-       	btnavailableWorld2.enabled = !btnavailableWorld2.displayString.equals("") && !btnavailableWorld2.displayString.equals(GuiHandler.worldName) && !btnavailableWorld2.displayString.equals("Cartographer");
-    	btnavailableWorld3.enabled = !btnavailableWorld3.displayString.equals("") && !btnavailableWorld3.displayString.equals(GuiHandler.worldName) && !btnavailableWorld3.displayString.equals("Cartographer");
+        btnavailableWorld1.enabled = !btnavailableWorld1.displayString.equals("") && !btnavailableWorld1.displayString.equals(GuiHandler.worldName);
+       	btnavailableWorld2.enabled = !btnavailableWorld2.displayString.equals("") && !btnavailableWorld2.displayString.equals(GuiHandler.worldName);
+    	btnavailableWorld3.enabled = !btnavailableWorld3.displayString.equals("") && !btnavailableWorld3.displayString.equals(GuiHandler.worldName);
     	        	
-    	btnavailableWorldDelete1.enabled = !btnavailableWorld1.displayString.equals("") || btnavailableWorld1.displayString.equals("Cartographer");
-    	btnavailableWorldDelete2.enabled = !btnavailableWorld2.displayString.equals("") || btnavailableWorld2.displayString.equals("Cartographer");
-    	btnavailableWorldDelete3.enabled = !btnavailableWorld3.displayString.equals("") || btnavailableWorld3.displayString.equals("Cartographer");
+    	btnavailableWorldDelete1.enabled = !btnavailableWorld1.displayString.equals("");
+    	btnavailableWorldDelete2.enabled = !btnavailableWorld2.displayString.equals("");
+    	btnavailableWorldDelete3.enabled = !btnavailableWorld3.displayString.equals("");
     	
         if(worldNames.size() > 3)
         {
@@ -350,7 +353,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                         {
                         	for(File worldDir : TCWorldsDirectory.listFiles())
                         	{
-                        		if(worldDir.isDirectory())
+                        		if(worldDir.isDirectory() && !worldDir.getName().toLowerCase().startsWith("dim-"))
                         		{
                         			GuiHandler.selectedWorldName = worldDir.getName();
                         			break;
@@ -358,8 +361,9 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                         	}
                     	}
                 		selectedWorldConfig = GuiHandler.worlds.get(GuiHandler.selectedWorldName);
-						
-                		((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(selectedWorldConfig.PreGenerationRadius);
+						                		
+            			((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(selectedWorldConfig.PreGenerationRadius);
+
                 		((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = selectedWorldConfig.WorldBorderRadius;
     					GuiHandler.seed = selectedWorldConfig.worldSeed;
     					
@@ -370,8 +374,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     						GuiHandler.gameModeString = worldInfo.getGameType().getName();
     						GuiHandler.hardCore = worldInfo.isHardcoreModeEnabled();
     						GuiHandler.allowCheats = worldInfo.areCommandsAllowed();
-    					}
-    					
+    					}    					
                 	} else {
                 		GuiHandler.selectedWorldName = null;
 	                	selectedWorldConfig = null;

@@ -9,6 +9,9 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.forge.ForgeEngine;
 
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeDesert;
+import net.minecraft.world.biome.BiomeSavanna;
+import net.minecraft.world.biome.BiomeTaiga;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.gen.structure.StructureVillagePieces;
@@ -32,7 +35,7 @@ public class VillageStart extends StructureStart
         int startX = (chunkX << 4) + 2;
         int startZ = (chunkZ << 4) + 2;
         StructureVillagePieces.Start startPiece = new StructureVillagePieces.Start(world.getBiomeProvider(), 0, random, startX, startZ, villagePieces, size);
-
+        
         // Apply the villageType setting
         LocalWorld worldTC = ((ForgeEngine)TerrainControl.getEngine()).getWorld(world);
         
@@ -47,7 +50,12 @@ public class VillageStart extends StructureStart
         if (config != null)
         {
             // Ignore removed custom biomes
-            changeToSandstoneVillage(startPiece, config.villageType == VillageType.sandstone);
+        	// Normal village = 0
+            // Desert village = 1
+            // Savanna village = 2
+        	// Taiga village = 3
+        	
+        	changeVillageType(startPiece, config.villageType == VillageType.wood ? 0 : config.villageType == VillageType.sandstone ? 1 : config.villageType == VillageType.savanna ? 2 : config.villageType == VillageType.taiga ? 3 : 0);
         }
 
         this.components.add(startPiece);
@@ -97,16 +105,17 @@ public class VillageStart extends StructureStart
      * @param sandstoneVillage Whether the village should be a sandstone
      *                         village.
      */
-    private void changeToSandstoneVillage(StructureVillagePieces.Start subject, boolean sandstoneVillage)
+    private void changeVillageType(StructureVillagePieces.Start subject, int villageType)
     {
-        for (Field field : StructureVillagePieces.Start.class.getFields())
-        {
-            if (field.getType().toString().equals("boolean"))
+    	for (Field field : net.minecraft.world.gen.structure.StructureVillagePieces.Village.class.getDeclaredFields())
+    	{
+        	String fieldName = field.getName();
+            if (fieldName.equals("structureType") || fieldName.equals("field_189928_h")) // field_189928_h may have to be updated for newer versions of mc/forge (> 1.10.2), see http://export.mcpbot.bspk.rs/ for obfuscated method/field names.
             {
                 try
                 {
                     field.setAccessible(true);
-                    field.setBoolean(subject, sandstoneVillage);
+                    field.setInt(subject, villageType);
                     break;
                 } catch (Exception e)
                 {

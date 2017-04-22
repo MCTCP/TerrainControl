@@ -3,13 +3,16 @@ package com.khorn.terraincontrol.forge.generator;
 import java.util.List;
 import java.util.Random;
 
+import com.google.common.collect.Lists;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeBiome;
+import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
+import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
@@ -21,7 +24,7 @@ import net.minecraft.world.gen.structure.MapGenVillage;
  * allowing us to use custom biome generators.
  */
 public class TCBiomeProvider extends BiomeProvider
-{
+{   
     private final BiomeGenerator biomeGenerator;
     private final ForgeWorld localWorld;
 
@@ -30,7 +33,7 @@ public class TCBiomeProvider extends BiomeProvider
         this.localWorld = world;
         this.biomeGenerator = biomeGenerator;
     }
-
+    
     @Override
     public Biome getBiome(BlockPos blockPos)
     {
@@ -117,9 +120,11 @@ public class TCBiomeProvider extends BiomeProvider
         return true;
     }
 
+    private static List<Biome> forbiddenBiomes = Lists.newArrayList(Biomes.HELL, Biomes.SKY, Biomes.VOID);
+    
     @Override
     public BlockPos findBiomePosition(int x, int z, int range, List<Biome> biomes, Random random)
-    {
+    {       	
         int i = x - range >> 2;
         int j = z - range >> 2;
         int k = x + range >> 2;
@@ -129,18 +134,25 @@ public class TCBiomeProvider extends BiomeProvider
         int i1 = m - j + 1;
         int[] arrayOfInt = this.biomeGenerator.getBiomesUnZoomed(null, i, j, n, i1, OutputType.DEFAULT_FOR_WORLD);
         BlockPos blockPos = null;
-        int i2 = 0;
+        int i2 = 0;       
+        
         for (int i3 = 0; i3 < arrayOfInt.length; i3++)
         {
             if (arrayOfInt[i3] >= DefaultBiome.values().length)
+            {
                 continue;
+            }
+            
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            Biome localBiomeBase = Biome.getBiome(arrayOfInt[i3]);
-            if ((!biomes.contains(localBiomeBase)) || ((blockPos != null) && (random.nextInt(i2 + 1) != 0)))
-                continue;
-            blockPos = new BlockPos(i4, 0, i5);
-            i2++;
+            Biome localBiomeBase = Biome.getBiome(arrayOfInt[i3]);            
+            if (
+        		!forbiddenBiomes.contains(localBiomeBase) && 
+        		!(blockPos != null && random.nextInt(i2 + 1) != 0))
+            {
+                blockPos = new BlockPos(i4, 0, i5);
+                i2++;
+            }
         }
 
         return blockPos;

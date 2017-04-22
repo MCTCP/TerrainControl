@@ -13,6 +13,7 @@ import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -21,6 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.List;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -60,7 +62,7 @@ public class BiomeGenCustom extends Biome
         addMobs(this.spawnableWaterCreatureList, config.spawnWaterCreaturesMerged);//, improvedMobSpawning);
         addMobs(this.spawnableCaveCreatureList, config.spawnAmbientCreaturesMerged);//, improvedMobSpawning);
     }
-
+    
     /**
      * Extension of BiomeProperties so that we are able to access the protected
      * methods.
@@ -258,6 +260,13 @@ public class BiomeGenCustom extends Biome
     	newList.addAll(newListParent);
     	
         internalList.clear();
-        internalList.addAll(newList);
+        
+        for(SpawnListEntry spe : newList)
+        {
+        	if(spe.itemWeight > 0 && spe.maxGroupCount > 0)
+        	{
+        		internalList.add(spe);		
+        	}
+        }              
     }
 }

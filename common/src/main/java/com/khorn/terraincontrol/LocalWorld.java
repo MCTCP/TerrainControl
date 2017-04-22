@@ -236,4 +236,6 @@ public interface LocalWorld
     public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub);
 
 	void SpawnEntity(EntityFunction entityData);
+
+	public ChunkCoordinate getSpawnChunk();
 }

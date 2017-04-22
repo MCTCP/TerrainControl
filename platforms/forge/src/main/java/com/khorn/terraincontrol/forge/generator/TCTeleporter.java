@@ -149,18 +149,16 @@ public class TCTeleporter
 	// Players
 	
 	public static Entity changeDimension(int dimensionIn, EntityPlayerMP _this)
-    {
-		TerrainControl.log(LogMarker.DEBUG, "CHANGING DIMENSION " + dimensionIn);
-		
+    {		
     	DimensionType dimType = DimensionManager.getProviderType(dimensionIn);
-    	if(dimType.getName().equals("Cartographer"))
+    	if(dimType.getName().equals("DIM-Cartographer"))
     	{
-    		ForgeWorld cartographerWorld = (ForgeWorld)TerrainControl.getWorld("Cartographer");
+    		ForgeWorld cartographerWorld = (ForgeWorld)TerrainControl.getWorld("DIM-Cartographer");
     		
     		if(cartographerWorld == null)
     		{
     			DimensionManager.initDimension(Cartographer.CartographerDimension);
-    			cartographerWorld = (ForgeWorld)TerrainControl.getWorld("Cartographer");
+    			cartographerWorld = (ForgeWorld)TerrainControl.getWorld("DIM-Cartographer");
     		}
     		if(cartographerWorld == null)
     		{

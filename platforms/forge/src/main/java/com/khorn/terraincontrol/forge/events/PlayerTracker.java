@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.forge.events;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
@@ -11,7 +10,6 @@ import com.khorn.terraincontrol.configuration.ConfigToNetworkSender;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeWorld;
-import com.khorn.terraincontrol.forge.WorldLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
 
 import io.netty.buffer.ByteBuf;
@@ -28,7 +26,6 @@ public class PlayerTracker
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
-    	TerrainControl.log(LogMarker.DEBUG, "onPlayerLogin");
         // Server-side - called whenever a player logs in
         // I couldn't find a way to detect if the client has OpenTerrainGenerator,
         // so for now the configs are sent anyway.
@@ -56,7 +53,7 @@ public class PlayerTracker
         try
         {
             stream.writeInt(PluginStandardValues.ProtocolVersion);
-            ConfigToNetworkSender.send(configs, stream);
+            ConfigToNetworkSender.send(configs, stream, event.player.getServer().isSinglePlayer());
         } catch (IOException e)
         {
             TerrainControl.printStackTrace(LogMarker.FATAL, e);

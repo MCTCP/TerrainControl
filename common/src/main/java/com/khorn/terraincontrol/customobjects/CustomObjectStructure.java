@@ -102,37 +102,7 @@ public class CustomObjectStructure
         {
             for (CustomObjectCoordinate coordObject : objectsInChunk)
             {
-                if(coordObject.spawnWithChecks(world, height, random))
-                {
-                	// SpawnEntity happens in spawnforced so that it works for customobject too
-                	/*
-                    BO3 bo3 = ((BO3)coordObject.getObject());
-                    if(bo3 == null)
-                    {
-                    	throw new NotImplementedException();
-                    }
-                                
-                    BO3Config objectConfig = bo3.getSettings();
-                	
-                	EntityFunction[] entityDataInObject = objectConfig.getEntityData(coordObject.getRotation());
-                	for(int i = 0; i < entityDataInObject.length; i++)
-                	{                		
-                		EntityFunction newEntityData = new EntityFunction(objectConfig);   
-                		
-                    	newEntityData.y = coordObject.getY() + entityDataInObject[i].y;
-        	        	
-                    	newEntityData.x = coordObject.getX() + entityDataInObject[i].x;
-                    	newEntityData.z = coordObject.getZ() + entityDataInObject[i].z;
-                    	
-                    	newEntityData.mobName = entityDataInObject[i].mobName;
-                    	newEntityData.groupSize = entityDataInObject[i].groupSize;
-                    	newEntityData.nameTagOrNBTFileName = entityDataInObject[i].nameTagOrNBTFileName;
-                    	newEntityData.originalNameTagOrNBTFileName = entityDataInObject[i].originalNameTagOrNBTFileName;
-                		
-                		world.SpawnEntity(newEntityData);
-                	}
-                	*/                	
-                }
+                coordObject.spawnWithChecks(world, height, random);
             }
         }
     }

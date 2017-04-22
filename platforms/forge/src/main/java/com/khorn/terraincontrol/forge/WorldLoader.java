@@ -12,11 +12,13 @@ import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import com.khorn.terraincontrol.forge.gui.GuiHandler;
 import com.khorn.terraincontrol.forge.gui.TCGuiCreateWorld;
+import com.khorn.terraincontrol.forge.gui.TCGuiWorldSelection;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Biomes;
 import net.minecraft.server.MinecraftServer;
@@ -274,14 +276,11 @@ public final class WorldLoader
 
     public void onServerStopped()
     {
-    	TerrainControl.log(LogMarker.DEBUG, "onServerStopped");
         unloadAllWorlds();
     }
 
     public void unloadAllWorlds()
-    {
-    	TerrainControl.log(LogMarker.DEBUG, "unloadAllWorlds");
-    	
+    {    	
     	ArrayList<ForgeWorld> worldsToRemove = new ArrayList<ForgeWorld>();
         for (ForgeWorld world : this.worlds.values())
         {
@@ -294,11 +293,11 @@ public final class WorldLoader
         {
             TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", worldToRemove.getName());
             //this.configMap.remove(worldToRemove.getName());
-            this.configHolderMap.remove(worldToRemove.getName());
             worldToRemove.unRegisterBiomes();
             this.worlds.remove(worldToRemove.getName());
         }
         
+        this.configHolderMap.clear();
         this.unloadedWorlds.clear();
     }
 
@@ -341,8 +340,6 @@ public final class WorldLoader
     @Nullable
     public ForgeWorld getOrCreateForgeWorld(String worldName, boolean isMainWorld)
     {
-    	//World world1 = DimensionManager.getWorld(0);
-        //File worldConfigsFolder = this.getWorldDir(world1 != null ? WorldHelper.getName(world1) : worldName);
     	File worldConfigsFolder = this.getWorldDir(worldName);
         if (!worldConfigsFolder.exists())
         {
@@ -435,8 +432,13 @@ public final class WorldLoader
 			}
 			config.saveWorldConfig();
     	}
+    	else if(GuiHandler.lastGuiOpened.equals(TCGuiWorldSelection.class))
+    	{
+    		((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = config.getWorldConfig().WorldBorderRadius;
+    	}
     }
 
+    /*
     @SideOnly(Side.CLIENT)
     public void onQuitFromServer()
     {        
@@ -472,6 +474,7 @@ public final class WorldLoader
         this.unloadedWorlds.remove(world.getName());
         world.unRegisterBiomes();
     }
+    */
     
     public void clearBiomeDictionary(ForgeWorld world)
     {
@@ -541,22 +544,20 @@ public final class WorldLoader
 
     public void unRegisterDefaultBiomes()
 	{
-    	String breakpoint = "";
-    	
 		//BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
 		// Unregister default biomes so they can be replaced by TC biomes (this allows us to fully customise the biomes)
 		for(DefaultBiome defaultBiome : DefaultBiome.values())
-		{
+		{ 		    				
 			// Make an exception for the hell and sky biomes. 
 			// The hell and end chunk providers refer specifically to 
 			// Biomes.HELL and Biomes.SKY and query the biome registry
 			// for them. Other biomes are not referred to in this way.
-			if(defaultBiome.Name.equals("Hell") || defaultBiome.Name.equals("Sky")) { continue; }
+			if(defaultBiome.Name.equals("The Void") || defaultBiome.Name.equals("Hell") || defaultBiome.Name.equals("Sky")) { continue; }
 			
 	        ResourceLocation registryKey = ForgeWorld.vanillaResouceLocations.get(defaultBiome.Id);
 			((ForgeEngine)TerrainControl.getEngine()).unRegisterForgeBiome(registryKey);
 			
-			//TerrainControl.log(LogMarker.DEBUG, "Unregistering " + defaultBiome.Name);
+			//TerrainControl.log(LogMarker.INFO, "Unregistering " + defaultBiome.Name);
 			
 			//biomeRegistryAvailabiltyMap.set(defaultBiome.Id, false); // This should be enough to make Forge re-use the biome id
 		}
@@ -572,13 +573,18 @@ public final class WorldLoader
 			{
 				continue;
 			}
-			
+				    	
 			// Make an exception for the hell and sky biomes. 
 			// The hell and end chunk providers refer specifically to 
 			// Biomes.HELL and Biomes.SKY and query the biome registry
 			// for them. Other biomes are not referred to in this way.
 			
-			if(biome.getValue().getBiomeName().equals("Hell") || biome.getValue().getBiomeName().equals("Sky"))
+			if(
+				biome.getValue().getBiomeName().equals("The End") || 
+				biome.getValue().getBiomeName().equals("The Void") || 
+				biome.getValue().getBiomeName().equals("Hell") || 
+				biome.getValue().getBiomeName().equals("Sky")
+			)
 			{
 				continue;
 			}
@@ -621,10 +627,8 @@ public final class WorldLoader
     @SideOnly(Side.CLIENT)
     public void registerClientWorld(WorldClient mcWorld, DataInputStream wrappedStream) throws IOException
     {
-    	TerrainControl.log(LogMarker.INFO, "registerClientWorld");
-    	
         ForgeWorld world = new ForgeWorld(ConfigFile.readStringFromStream(wrappedStream), mcWorld.provider.getDimension() == 0);
-        ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world);
+        ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world, Minecraft.getMinecraft().isSingleplayer());
         world.provideClientConfigs(mcWorld, configs);
         this.worlds.put(world.getName(), world);
         this.unloadedWorlds.remove(world.getName());

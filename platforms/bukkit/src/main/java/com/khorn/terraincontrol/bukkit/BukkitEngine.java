@@ -3,12 +3,14 @@ package com.khorn.terraincontrol.bukkit;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControlEngine;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.server.v1_10_R1.Block;
 
+import java.io.DataOutput;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -133,9 +135,10 @@ public class BukkitEngine extends TerrainControlEngine
     }
 
     // Only used for Forge atm TODO: Put in Forge layer only, not common?
+    
 	@Override
-	public LocalWorld getUnloadedWorld(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public LocalWorld getUnloadedWorld(String name) { return null; }
+
+	@Override
+	public void addPlatformSpecificDataToPacket(DataOutput stream, BiomeConfig config, boolean isSinglePlayer) { }
 }

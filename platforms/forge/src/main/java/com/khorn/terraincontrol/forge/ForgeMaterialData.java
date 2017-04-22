@@ -3,8 +3,10 @@ package com.khorn.terraincontrol.forge;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.BlockHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
@@ -142,7 +144,7 @@ public class ForgeMaterialData implements LocalMaterialData
 
     private ForgeMaterialData(IBlockState blockData)
     {
-        this.blockData = blockData;
+        this.blockData = blockData;        
     }
 
     @Override

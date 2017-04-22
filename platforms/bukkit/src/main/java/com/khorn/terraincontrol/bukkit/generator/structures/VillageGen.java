@@ -1,15 +1,18 @@
 package com.khorn.terraincontrol.bukkit.generator.structures;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 
@@ -126,7 +129,12 @@ public class VillageGen extends StructureGenerator
             if (biome != null)
             {
                 // Ignore removed custom biomes
-                changeToSandstoneVillage(startPiece, biome.getBiomeConfig().villageType == VillageType.sandstone);
+            	// Normal village = 0
+                // Desert village = 1
+                // Savanna village = 2
+            	// Taiga village = 3
+            	
+            	changeVillageType(startPiece, biome.getBiomeConfig().villageType == VillageType.wood ? 0 : biome.getBiomeConfig().villageType == VillageType.sandstone ? 1 : biome.getBiomeConfig().villageType == VillageType.savanna ? 2 : biome.getBiomeConfig().villageType == VillageType.taiga ? 3 : 0);
             }
 
             this.a.add(startPiece);
@@ -183,9 +191,26 @@ public class VillageGen extends StructureGenerator
          * @param sandstoneVillage Whether the village should be a sandstone
          *            village.
          */
-        private void changeToSandstoneVillage(WorldGenVillageStartPiece subject, boolean sandstoneVillage)
-        {
-            ReflectionHelper.setValueInFieldOfType(subject, boolean.class, sandstoneVillage);
+        private void changeVillageType(WorldGenVillageStartPiece subject, int villageType)
+        {                       
+            Class villageClass = WorldGenVillageStartPiece.class.getSuperclass().getSuperclass();            
+        	for (Field field : villageClass.getDeclaredFields())
+        	{
+            	String fieldName = field.getName();
+                if (fieldName.equals("structureType") || fieldName.equals("h")) // "h" may have to be updated for newer versions of mc(> 1.10.2), see http://export.mcpbot.bspk.rs/ for obfuscated method/field names.
+                {
+                    try
+                    {
+                        field.setAccessible(true);
+                        field.setInt(subject, villageType);
+                        break;
+                    } catch (Exception e)
+                    {
+                        TerrainControl.log(LogMarker.FATAL, "Cannot make village a sandstone village!");
+                        TerrainControl.printStackTrace(LogMarker.FATAL, e);
+                    }
+                }
+            }
         }
 
         @Override

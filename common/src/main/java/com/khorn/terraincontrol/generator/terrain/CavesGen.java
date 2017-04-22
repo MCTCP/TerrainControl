@@ -211,12 +211,7 @@ public class CavesGen extends TerrainGenBase
     }
 
     protected boolean isSuitableBlock(LocalMaterialData material, LocalMaterialData materialAbove, LocalBiome biome)
-    {
-    	if(biome == null)
-    	{
-    		String breakpoint = "";
-    	}
-    	
+    {    	
         BiomeConfig biomeConfig = biome.getBiomeConfig();
         if (material.equals(biomeConfig.stoneBlock))
         {

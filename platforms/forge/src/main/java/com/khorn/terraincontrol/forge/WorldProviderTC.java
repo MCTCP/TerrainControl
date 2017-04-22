@@ -41,7 +41,7 @@ public class WorldProviderTC extends WorldProvider
     	if(dimType == null)
     	{
     		dimType = DimensionManager.getProviderType(this.worldObj.provider.getDimension());
-    		isCartographer = dimType.getName().equals("Cartographer");
+    		isCartographer = dimType.getName().equals("DIM-Cartographer");
     	}
     	return isCartographer;
 	}
@@ -52,7 +52,7 @@ public class WorldProviderTC extends WorldProvider
     	if(dimType == null)
     	{
     		dimType = DimensionManager.getProviderType(this.worldObj.provider.getDimension());
-    		isCartographer = dimType.getName().equals("Cartographer");
+    		isCartographer = dimType.getName().equals("DIM-Cartographer");
     	}
     	
     	// Some mods (like Optifine) crash if the dimensionType returned is not one of the default ones.

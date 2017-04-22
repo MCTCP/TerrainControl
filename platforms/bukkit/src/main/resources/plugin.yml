@@ -1,7 +1,7 @@
 name: OpenTerrainGenerator
-version: ${version}
-description: Advanced custom world generator.
-authors: ['Khorn', 'Olof Cayorion Larsson']
+version: 1.10.2 v14
+description: Generate anything! This mod is a fork of TerrainControl by Khorn, RutgerKok and Timethor.
+authors: ['Khorn', 'Olof Cayorion Larsson', 'RutgerKok', 'PeeGee85']
 main: com.khorn.terraincontrol.bukkit.TCPlugin
 load: startup
 commands:

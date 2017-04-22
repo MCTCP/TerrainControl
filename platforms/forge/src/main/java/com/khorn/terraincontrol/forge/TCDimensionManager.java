@@ -171,7 +171,7 @@ public class TCDimensionManager
     }
     
     // Saving / Loading
-    // TODO: It's crude but it works, feel free to improve
+    // TODO: It's crude but it works, can improve later
     
 	public static void SaveDimensionData()
 	{	
@@ -215,7 +215,7 @@ public class TCDimensionManager
         	dimensionDataFile.getParentFile().mkdirs();
         	writer = new BufferedWriter(new FileWriter(dimensionDataFile));
             writer.write(stringbuilder.toString());
-            TerrainControl.log(LogMarker.INFO, "Custom dimension data saved");
+            TerrainControl.log(LogMarker.DEBUG, "Custom dimension data saved");
         }
         catch (IOException e)
         {
@@ -354,7 +354,7 @@ public class TCDimensionManager
 				    {
 				    	dimensionDataFileValues = stringbuilder.toString().split(",");
 				    }
-				    TerrainControl.log(LogMarker.INFO, "Custom dimension data loaded");
+				    TerrainControl.log(LogMarker.DEBUG, "Custom dimension data loaded");
 				} finally {
 					reader.close();
 				}
@@ -402,7 +402,6 @@ public class TCDimensionManager
 			if(orderedDimensions.containsKey(i))
 			{
 				DimensionData dimData = orderedDimensions.get(i);
-				TerrainControl.log(LogMarker.DEBUG, "DIM ORDER: " + dimData.dimensionName + " : " + dimData.dimensionOrder);
 			}
 		}
 		
@@ -415,7 +414,7 @@ public class TCDimensionManager
 				if(!DimensionManager.isDimensionRegistered(dimData.dimensionId))
 				{	
 					DimensionManager.registerDimension(dimData.dimensionId, DimensionType.register(dimData.dimensionName, "OTG", dimData.dimensionId, WorldProviderTC.class, dimData.keepLoaded));
-					if(dimData.dimensionName.equals("Cartographer"))
+					if(dimData.dimensionName.equals("DIM-Cartographer"))
 					{
 						Cartographer.CartographerDimension = dimData.dimensionId;
 					}

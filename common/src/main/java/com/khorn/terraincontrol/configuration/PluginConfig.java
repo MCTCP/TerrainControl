@@ -69,7 +69,6 @@ public final class PluginConfig extends ConfigFile
                     this.biomeConfigExtension, newExtension);
             this.biomeConfigExtension = newExtension;
         }
-
     }
 
     @Override

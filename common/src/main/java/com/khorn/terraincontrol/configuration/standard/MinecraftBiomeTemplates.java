@@ -181,13 +181,15 @@ public class MinecraftBiomeTemplates
             this.defaultGrass = 10;
             this.defaultColor = 0x0B6659;
             this.defaultTree = new Object[] {10, TreeType.Taiga1, 35, TreeType.Taiga2, 100};
-
+            
             // Place taiga on the border of Mega Taiga
             this.defaultBorder.add(DefaultBiome.MEGA_TAIGA.Name);
             this.defaultNotBorderNear.add(DefaultBiome.MEGA_SPRUCE_TAIGA.Name);
             this.defaultNotBorderNear.add(DefaultBiome.MEGA_TAIGA_HILLS.Name);
             this.defaultNotBorderNear.add(DefaultBiome.MEGA_SPRUCE_TAIGA_HILLS.Name);
             this.defaultSizeWhenBorder = 6;
+
+            this.defaultVillageType = VillageType.taiga;
             
             this.defaultInheritMobsBiomeName = "Taiga";            
             this.defaultBiomeDictId = "COLD, CONIFEROUS, FOREST";
@@ -454,7 +456,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.clearDefaultBorder();
-
+           
             this.defaultSizeWhenIsle = 6;
             this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.TAIGA.Name);
@@ -624,7 +626,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.clearDefaultBorder();
-
+            
             this.defaultColor = 0x31554A;
             this.defaultRarity = 35;
             this.defaultRareBuildingType = RareBuildingType.igloo;
@@ -639,7 +641,7 @@ public class MinecraftBiomeTemplates
         public ColdTaigaHills(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-
+            
             this.defaultColor = 0x243F36;
             this.defaultSizeWhenIsle = 6;
             this.defaultRarityWhenIsle = 97;
@@ -665,6 +667,8 @@ public class MinecraftBiomeTemplates
             this.defaultLargeFerns = 60;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.DIRT + ":2", DefaultMaterial.DIRT, -0.95,
                     DefaultMaterial.DIRT + ":1", DefaultMaterial.DIRT, 1.75};
+            
+            this.defaultVillageType = VillageType.taiga;
             
             this.defaultInheritMobsBiomeName = "Mega Taiga";            
             this.defaultBiomeDictId = "COLD, CONIFEROUS, FOREST";
@@ -714,6 +718,8 @@ public class MinecraftBiomeTemplates
             this.defaultDoubleGrass = 4;
             this.defaultDandelions = 4;
             this.defaultTree = new Object[] {1, TreeType.Acacia, 80, TreeType.Tree, 100};
+            
+            this.defaultVillageType = VillageType.savanna;
             
             this.defaultInheritMobsBiomeName = "Savanna";            
             this.defaultBiomeDictId = "HOT, SAVANNA, PLAINS, SPARSE";

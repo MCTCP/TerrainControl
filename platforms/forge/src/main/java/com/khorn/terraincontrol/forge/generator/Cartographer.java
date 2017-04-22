@@ -65,11 +65,11 @@ public class Cartographer
 				destinationCoordinateCache = null;
 				
 				ForgeWorld world = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getWorld(worldServer);
-				ForgeWorld cartographerWorld = (ForgeWorld)TerrainControl.getWorld("Cartographer");			
+				ForgeWorld cartographerWorld = (ForgeWorld)TerrainControl.getWorld("DIM-Cartographer");			
 	    		if(cartographerWorld == null)
 	    		{
 	    			DimensionManager.initDimension(Cartographer.CartographerDimension);
-	    			cartographerWorld = (ForgeWorld)TerrainControl.getWorld("Cartographer");
+	    			cartographerWorld = (ForgeWorld)TerrainControl.getWorld("DIM-Cartographer");
 	    		}
 	    		if(cartographerWorld == null)
 	    		{
@@ -229,11 +229,11 @@ public class Cartographer
 		ArrayList<Entity> entities = new ArrayList<Entity>();
 		entities.add(player);
 		
-		ForgeWorld cartographerWorld = (ForgeWorld)TerrainControl.getWorld("Cartographer");
+		ForgeWorld cartographerWorld = (ForgeWorld)TerrainControl.getWorld("DIM-Cartographer");
 		if(cartographerWorld == null)
 		{
 			DimensionManager.initDimension(Cartographer.CartographerDimension);
-			cartographerWorld = (ForgeWorld)TerrainControl.getWorld("Cartographer");
+			cartographerWorld = (ForgeWorld)TerrainControl.getWorld("DIM-Cartographer");
 		}
 		if(cartographerWorld == null)
 		{
@@ -367,11 +367,6 @@ public class Cartographer
     	ArrayList<EntityPlayer> playersInChunk = new ArrayList<EntityPlayer>();
     	for(EntityPlayer player : overWorld.getWorld().playerEntities)
     	{
-    		if(player.dimension != 0)
-    		{
-    			throw new NotImplementedException();
-    		}
-    		
     		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)player.posX, (int)player.posZ);
     		
             xDiff = destinationChunk.getChunkX() - playerChunk.getChunkX();
@@ -418,11 +413,11 @@ public class Cartographer
 		{		
 			ForgeWorld world = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getWorld(worldServer);
     	  	
-			ForgeWorld cartographerWorld = (ForgeWorld) TerrainControl.getWorld("Cartographer");
+			ForgeWorld cartographerWorld = (ForgeWorld) TerrainControl.getWorld("DIM-Cartographer");
     		if(cartographerWorld == null)
     		{
     			DimensionManager.initDimension(Cartographer.CartographerDimension);
-    			cartographerWorld = (ForgeWorld)TerrainControl.getWorld("Cartographer");
+    			cartographerWorld = (ForgeWorld)TerrainControl.getWorld("DIM-Cartographer");
     		}
     		if(cartographerWorld == null)
     		{
@@ -1174,11 +1169,11 @@ public class Cartographer
 
 	public static void CreateCartographerDimension()
 	{
-    	if(((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() && !TCDimensionManager.isDimensionNameRegistered("Cartographer"))
+    	if(((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() && !TCDimensionManager.isDimensionNameRegistered("DIM-Cartographer"))
     	{
-    		CartographerDimension = TCDimensionManager.createDimension("Cartographer", false, true, false);
+    		CartographerDimension = TCDimensionManager.createDimension("DIM-Cartographer", false, true, false);
 
-    		ForgeWorld world = (ForgeWorld) TerrainControl.getWorld("Cartographer");
+    		ForgeWorld world = (ForgeWorld) TerrainControl.getWorld("DIM-Cartographer");
     		
 			world.getWorld().getGameRules().setOrCreateGameRule("doEntityDrops", "false");
 			world.getWorld().getGameRules().setOrCreateGameRule("doFireTick", "false");

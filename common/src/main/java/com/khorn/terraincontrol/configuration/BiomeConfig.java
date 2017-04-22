@@ -26,6 +26,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class BiomeConfig extends ConfigFile
 {
     public String biomeExtends;
@@ -138,7 +140,9 @@ public class BiomeConfig extends ConfigFile
     {
         disabled,
         wood,
-        sandstone
+        sandstone,
+        taiga,
+        savanna
     }
 
     public VillageType villageType;
@@ -763,7 +767,7 @@ public class BiomeConfig extends ConfigFile
                 "Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
 
         writer.putSetting(BiomeStandardValues.VILLAGE_TYPE, villageType,
-                "The village type in this biome. Can be wood, sandstone or disabled.");
+                "The village type in this biome. Can be wood, sandstone, taiga, savanna or disabled.");
 
         writer.putSetting(BiomeStandardValues.MINESHAFT_TYPE, mineshaftType,
                 "The mineshaft type in this biome. Can be normal, mesa or disabled.");
@@ -802,8 +806,7 @@ public class BiomeConfig extends ConfigFile
                     "In custom biomes, you can add your own mobgroups in the lists below. In the vanilla biomes,",
                     "your changes are ignored.",
                     "");
-        } else
-        {
+        } else {
             writer.bigTitle("Mob spawning",
                     "It's not possible to change mob spawns in vanilla biomes. These",
                     "are the values used by vanilla for this biome. They are read-only:",
@@ -1038,8 +1041,7 @@ public class BiomeConfig extends ConfigFile
         }
     }
 
-    private void addDefaultMobGroups(SettingsMap settings, Setting<List<WeightedMobSpawnGroup>> mobSetting,
-            List<WeightedMobSpawnGroup> defaultGroups)
+    private void addDefaultMobGroups(SettingsMap settings, Setting<List<WeightedMobSpawnGroup>> mobSetting, List<WeightedMobSpawnGroup> defaultGroups)
     {
         List<WeightedMobSpawnGroup> emptyList = Collections.emptyList();
         List<WeightedMobSpawnGroup> groups = new ArrayList<WeightedMobSpawnGroup>();
@@ -1048,7 +1050,7 @@ public class BiomeConfig extends ConfigFile
         settings.putSetting(mobSetting, groups);
     }
 
-    public void writeToStream(DataOutput stream) throws IOException
+    public void writeToStream(DataOutput stream, boolean isSinglePlayer) throws IOException
     {
         writeStringToStream(stream, getName());
 
@@ -1060,16 +1062,14 @@ public class BiomeConfig extends ConfigFile
         stream.writeBoolean(this.grassColorIsMultiplier);
         stream.writeInt(this.foliageColor);
         stream.writeBoolean(this.foliageColorIsMultiplier);
-        
-        // TODO: Why exactly do all these need to be sent to the client? (Forge SP stuff?)
-        
-        writeStringToStream(stream, WeightedMobSpawnGroup.toJson(this.spawnMonstersMerged));
-        writeStringToStream(stream, WeightedMobSpawnGroup.toJson(this.spawnCreaturesMerged));
-        writeStringToStream(stream, WeightedMobSpawnGroup.toJson(this.spawnWaterCreaturesMerged));
-        writeStringToStream(stream, WeightedMobSpawnGroup.toJson(this.spawnAmbientCreaturesMerged));
-        
-        writeStringToStream(stream, this.biomeDictId);
 
-        writeStringToStream(stream, this.inheritMobsBiomeName);
+        writeStringToStream(stream, this.biomeDictId);
+        
+        if(isSinglePlayer) // Forge SP seems to handle some part of mob spawning on the client so need to send mob spawning info.
+        {             
+	        writeStringToStream(stream, this.inheritMobsBiomeName);
+        }
+        
+        TerrainControl.getEngine().addPlatformSpecificDataToPacket(stream, this, isSinglePlayer);
     }
 }

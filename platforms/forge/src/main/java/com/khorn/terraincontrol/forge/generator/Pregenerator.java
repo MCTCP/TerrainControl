@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -19,10 +18,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.minecraft.world.gen.ChunkProviderServer;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import com.google.common.base.Strings;
@@ -63,7 +60,7 @@ public class Pregenerator
 	 * @return The radius value that was set for the pregenerator.
 	 */
 	public int setPregenerationRadius(int radius, World world)
-	{
+	{		
 		if(pregenerationRadius == 0)
 		{
 			// Reset start time in case this method 
@@ -82,6 +79,7 @@ public class Pregenerator
 		{
 			this.SavePreGeneratorData(world);
 		}
+		
 		return pregenerationRadius;
 	}
 
@@ -177,18 +175,12 @@ public class Pregenerator
 					if(worldConfig.PreGenerationRadius > 0)
 					{
 						Pregenerate(worldServer, worldConfig.PreGenerationRadius);
+					} else {
+						preGeneratorIsRunning = false;
 					}
 				}
 			}
 			processing = false;
-		} else {
-			// TODO: Remove processing checks and NotImplementedException after verifying that 
-			// this A. Never happens or B. Happens and is not an error so can be ignored.
-			if(processing)
-			{
-				TerrainControl.log(LogMarker.ERROR, "Server ticked while previous server tick was still being processed. This should not happen!");
-				throw new NotImplementedException();
-			}
 		}
 	}
 	
@@ -298,7 +290,7 @@ public class Pregenerator
 							spawned++;
 							
 							PreGenerateChunk(currentX, currentZ, worldServer);
-							
+						
 			    			if(spawnedThisTick >= maxSpawnPerTick)
 			    			{
 			    				if(i == bottom)
@@ -399,24 +391,37 @@ public class Pregenerator
     			iTop = Integer.MIN_VALUE;		    			
 			}
 
-			UpdateProgressMessage();
+			UpdateProgressMessage(false);
 			
-			SavePreGeneratorData(worldServer);					
+			SavePreGeneratorData(worldServer);
         }
         preGeneratorIsRunning = false;
 	}
 	
 	void Pause(WorldServer worldServer)
 	{
-		// Pre-generation cycle cannot be completed.
-		// Save progress so we can continue and retry on the next server tick.
-		cycle -= 1;
-		processing = false;
+		if(spawned == total) // Done spawning
+		{
+    		// Cycle completed, reset cycle progress
+			iLeft = Integer.MIN_VALUE;
+			iBottom = Integer.MIN_VALUE;
+			iRight = Integer.MIN_VALUE;
+			iTop = Integer.MIN_VALUE;
+			
+			UpdateProgressMessage(false);
+			
+			SavePreGeneratorData(worldServer);
+		} else {		
+			// Pre-generation cycle cannot be completed.
+			// Save progress so we can continue and retry on the next server tick.
+			cycle -= 1;
+			processing = false;
+		}
 	}
 	
 	void PreGenerateChunk(int currentX, int currentZ, WorldServer worldServer)
 	{
-		UpdateProgressMessage();
+		UpdateProgressMessage(true);
 		
 		ChunkProviderServer chunkProvider = worldServer.getChunkProvider();
 		
@@ -438,8 +443,18 @@ public class Pregenerator
 		}
 	}
 	
-	void UpdateProgressMessage ()	
-	{
+	static long lastMessage = System.currentTimeMillis();
+	void UpdateProgressMessage (boolean loggingCanBeIgnored)	
+	{	
+		boolean dontLog = false;
+		// Show progress update max once per second
+		if(loggingCanBeIgnored = true && System.currentTimeMillis() - lastMessage < 1000l)
+		{
+			dontLog = true;
+		} else {
+			lastMessage = System.currentTimeMillis();
+		}
+		
 		long elapsedTime = System.currentTimeMillis() - startTime;
 
 		int hours = (int)Math.floor(elapsedTime / 1000d / 60d / 60d);
@@ -469,14 +484,20 @@ public class Pregenerator
 			preGeneratorProgress = (int)Math.round(((spawned / (double)(total)) * 100)) + "";
 			progressScreenElapsedTime = sElapsedTime;
 			progressScreenEstimatedTime = estimatedTime;
-			TerrainControl.log(LogMarker.INFO, "Pre-generating chunk X" + currentX + " Z" + currentZ + ". Radius: " + radius + " Spawned: " + (int)spawned + "/" + (int)total + " " + (int)Math.round(((spawned / (double)(total)) * 100)) + "% done. Elapsed: " + sElapsedTime + " ETA: " + estimatedTime + memoryUsage);	
+			if(!dontLog)
+			{
+				TerrainControl.log(LogMarker.INFO, "Pre-generating chunk X" + currentX + " Z" + currentZ + ". Radius: " + radius + " Spawned: " + (int)spawned + "/" + (int)total + " " + (int)Math.round(((spawned / (double)(total)) * 100)) + "% done. Elapsed: " + sElapsedTime + " ETA: " + estimatedTime + memoryUsage);
+			}
 		} else {
 			preGeneratorProgressStatus = "Done";
 			preGeneratorProgress = "";
 			progressScreenElapsedTime = "";
 			progressScreenEstimatedTime = "";
-			progressScreenWorldSizeInBlocks = 0;			
-			TerrainControl.log(LogMarker.INFO, "Pre-generating chunks done for world " + pregenerationWorld + ", " + ((int)spawned) + " chunks spawned in " + sElapsedTime);
+			progressScreenWorldSizeInBlocks = 0;
+			if(!dontLog)
+			{
+				TerrainControl.log(LogMarker.INFO, "Pre-generating chunks done for world " + pregenerationWorld + ", " + ((int)spawned) + " chunks spawned in " + sElapsedTime);
+			}
 		}
 	}
 	
@@ -549,15 +570,18 @@ public class Pregenerator
 	
     public void shutDown(World world)
     {
-    	SavePreGeneratorData(world);
-    	preGeneratorIsRunning = false;
+    	if(preGeneratorIsRunning)
+    	{
+	    	SavePreGeneratorData(world);
+	    	preGeneratorIsRunning = false;
+    	}
     }
     
     // Saving / Loading
-    // TODO: It's crude but it works, feel free to improve
+    // TODO: It's crude but it works, can improve later
     
 	public void SavePreGeneratorData(World world)
-	{	
+	{			
 		if(preGeneratorIsRunning)
 		{
 			File pregeneratedChunksFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/PregeneratedChunks.txt");		
@@ -575,7 +599,7 @@ public class Pregenerator
 	        	pregeneratedChunksFile.getParentFile().mkdirs();
 	        	writer = new BufferedWriter(new FileWriter(pregeneratedChunksFile));
 	            writer.write(stringbuilder.toString());
-	            TerrainControl.log(LogMarker.INFO, "Pre-generator data saved");
+	            TerrainControl.log(LogMarker.DEBUG, "Pre-generator data saved");
 	        }
 	        catch (IOException e)
 	        {
@@ -613,7 +637,7 @@ public class Pregenerator
 				    {
 				    	pregeneratedChunksFileValues = stringbuilder.toString().split(",");
 				    }
-				    TerrainControl.log(LogMarker.INFO, "Pre-generator data loaded");
+				    TerrainControl.log(LogMarker.DEBUG, "Pre-generator data loaded");
 				} finally {
 					reader.close();
 				}

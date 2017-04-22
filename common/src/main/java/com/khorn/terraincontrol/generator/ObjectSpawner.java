@@ -7,10 +7,14 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.bo3.BO3;
+import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.khorn.terraincontrol.generator.noise.NoiseGeneratorNewOctaves;
 import com.khorn.terraincontrol.generator.resource.Resource;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -59,11 +63,44 @@ public class ObjectSpawner
 	        this.rand.setSeed(resourcesSeed);
 	        long l1 = this.rand.nextLong() / 2L * 2L + 1L;
 	        long l2 = this.rand.nextLong() / 2L * 2L + 1L;
-	        this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
-	
-	        // Generate structures
-	        boolean hasVillage = world.placeDefaultStructures(rand, chunkCoord);
-	
+	        this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);	
+	        
+	        ChunkCoordinate spawnChunk = this.world.getSpawnChunk();
+	        
+	        boolean hasVillage = false;
+	        
+	        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().BO3AtSpawn != null && this.world.getConfigs().getWorldConfig().BO3AtSpawn.trim().length() > 0)
+	        {
+	        	CustomObject customObject = this.world.getConfigs().getCustomObjects().getObjectByName(this.world.getConfigs().getWorldConfig().BO3AtSpawn);
+	        	if(customObject != null)
+	        	{
+	        		if(customObject instanceof BO3)
+	        		{
+	        			int y = 1;
+	        			
+	        			if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.highestBlock)
+	        			{
+	        				 y = this.world.getHighestBlockYAt(spawnChunk.getBlockXCenter(), spawnChunk.getBlockZCenter()) - 1;
+	        			}
+	        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock)
+	        			{
+	        				y = this.world.getSolidHeight(spawnChunk.getBlockXCenter(), spawnChunk.getBlockZCenter()) - 1;
+	        			}
+	        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.randomY)
+	        			{
+	        				y = (int) (((BO3)customObject).getSettings().minHeight + (Math.random() * (((BO3)customObject).getSettings().maxHeight - ((BO3)customObject).getSettings().minHeight)));
+	        			}
+
+	        			y += ((BO3)customObject).getSettings().spawnHeightOffset;
+	        			
+	        			((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockXCenter(), y, spawnChunk.getBlockZCenter());	
+	        		}	        			        	
+	        	}
+	        } else {	       
+		        // Generate structures
+		        hasVillage = world.placeDefaultStructures(rand, chunkCoord);	
+	        }
+	        
 	        // Mark population started
 	        world.startPopulation(chunkCoord);
 	        TerrainControl.firePopulationStartEvent(world, rand, hasVillage, chunkCoord);
@@ -92,7 +129,7 @@ public class ObjectSpawner
 	        
 			processing = false;
 		} else {			
-			TerrainControl.log(LogMarker.INFO,"Error, minecraft engine attempted to populate two chunks at once! Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to Debug in mods/OpenTerrainGenerator/TerranControl.ini file for a stack trace.");
+			TerrainControl.log(LogMarker.DEBUG,"Error, minecraft engine attempted to populate two chunks at once! Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to Debug in mods/OpenTerrainGenerator/TerranControl.ini file for a stack trace. (Update: The recently added multi-dimension features may be causing this log message occasionally, will fix a.s.a.p).");
 			TerrainControl.log(LogMarker.DEBUG, Arrays.toString(Thread.currentThread().getStackTrace()));
 		}
     }

@@ -483,7 +483,7 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
              * @return an {@link NBTBase} which can be safely cast to the type represented by this class.
              */
             public NBTBase parse() throws NBTException
-            {
+            {            	
                 try
                 {
                     if (DOUBLE.matcher(this.jsonValue).matches())

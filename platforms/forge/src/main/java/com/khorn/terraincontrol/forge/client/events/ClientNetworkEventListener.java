@@ -34,9 +34,7 @@ public class ClientNetworkEventListener
     
     @SubscribeEvent
     public void onPacketReceive(ClientCustomPacketEvent event)
-    {    	
-    	TerrainControl.log(LogMarker.INFO, "onPacketReceive");
-    	
+    {    	    	    
         // Ignore if packet was local
         if (event.getManager().isLocalChannel())
         {

@@ -51,16 +51,18 @@ public class WorldStandardValues extends Settings
             IMAGE_FILL_BIOME = stringSetting("ImageFillBiome", "Ocean"),
             AUTHOR = stringSetting("Author", "Unknown"),
             DESCRIPTION = stringSetting("Description", "No description given"),
-    		WORLD_SEED = stringSetting("WorldSeed", "");
+    		WORLD_SEED = stringSetting("WorldSeed", ""),
+			BO3_AT_SPAWN = stringSetting("BO3AtSpawn", "")
+    		;
 
     public static final Setting<Integer>
             WORLD_HEIGHT_SCALE_BITS = intSetting("WorldHeightScaleBits", 7, 5, 8),
             WORLD_HEIGHT_CAP_BITS = intSetting("WorldHeightCapBits", 8, 5, 8),
             GENERATION_DEPTH = intSetting("GenerationDepth", 10, 1, 20),
             BIOME_RARITY_SCALE = intSetting("BiomeRarityScale", 100, 1, Integer.MAX_VALUE),
-            LAND_RARITY = intSetting("LandRarity", 97, 1, 100),
+            LAND_RARITY = intSetting("LandRarity", 99, 1, 100),
             LAND_SIZE = intSetting("LandSize", 0, 0, 20),
-            LAND_FUZZY = intSetting("LandFuzzy", 6, 0, 20),
+            LAND_FUZZY = intSetting("LandFuzzy", 5, 0, 20),
             ICE_RARITY = intSetting("IceRarity", 90, 1, 100),
             ICE_SIZE = intSetting("IceSize", 3, 0, 20),
             RIVER_RARITY = intSetting("RiverRarity", 4, 0, 20),

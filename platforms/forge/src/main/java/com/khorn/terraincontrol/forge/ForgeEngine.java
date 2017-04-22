@@ -1,6 +1,8 @@
 package com.khorn.terraincontrol.forge;
 
+import java.io.DataOutput;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -12,19 +14,24 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
+import com.khorn.terraincontrol.configuration.BiomeConfig;
+import com.khorn.terraincontrol.configuration.ConfigFile;
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.forge.generator.Pregenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 public class ForgeEngine extends TerrainControlEngine
 {
-	public int WorldBorderRadius; // Find a better place for this (It's Forge only so shouldn't be in TerrainControl.java)
+	public int WorldBorderRadius;
 	
 	protected Pregenerator pregenerator;
 
@@ -131,7 +138,13 @@ public class ForgeEngine extends TerrainControlEngine
 				//throw new NotImplementedException();
 			//}
     	}
-        return this.worldLoader.getWorld(world.getWorldInfo().getWorldName());
+    	LocalWorld localWorld = this.worldLoader.getWorld(world.getWorldInfo().getWorldName());
+		if(localWorld == null)
+		{
+			return this.worldLoader.getUnloadedWorld(world.getWorldInfo().getWorldName());
+		}
+    			
+        return localWorld;
     }
         
     @Override
@@ -185,4 +198,25 @@ public class ForgeEngine extends TerrainControlEngine
     {
         return ForgeMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
     }
+
+	@Override
+	public void addPlatformSpecificDataToPacket(DataOutput stream, BiomeConfig config, boolean isSinglePlayer)
+	{
+        // TODO: Why exactly do all these need to be sent to the client? (Forge SP stuff?)				
+		if(isSinglePlayer)
+		{        	        
+			try
+			{
+				ConfigFile.writeStringToStream(stream, WeightedMobSpawnGroup.toJson(config.spawnMonstersMerged));
+				ConfigFile.writeStringToStream(stream, WeightedMobSpawnGroup.toJson(config.spawnCreaturesMerged));
+				ConfigFile.writeStringToStream(stream, WeightedMobSpawnGroup.toJson(config.spawnWaterCreaturesMerged));
+				ConfigFile.writeStringToStream(stream, WeightedMobSpawnGroup.toJson(config.spawnAmbientCreaturesMerged));
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+				throw new NotImplementedException();
+			}
+		}
+	}
 }

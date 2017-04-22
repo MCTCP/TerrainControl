@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
@@ -24,6 +26,11 @@ public class MineshaftGen extends MapGenStructure
         if (this.rand.nextInt(80) < Math.max(Math.abs(chunkX), Math.abs(chunkZ)))
         {        	        	
             LocalWorld world = ((ForgeEngine)TerrainControl.getEngine()).getWorld(this.worldObj);
+            if(world == null)
+            {
+            	world = ((ForgeEngine)TerrainControl.getEngine()).getWorld(this.worldObj);
+            	throw new NotImplementedException();
+            }            
             LocalBiome biome = world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
             BiomeConfig biomeConfig = biome.getBiomeConfig();
             if (biomeConfig.mineshaftType == MineshaftType.disabled)

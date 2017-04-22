@@ -22,10 +22,8 @@ import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
-import net.minecraft.server.v1_10_R1.AxisAlignedBB;
 import net.minecraft.server.v1_10_R1.BiomeBase;
 import net.minecraft.server.v1_10_R1.Block;
-import net.minecraft.server.v1_10_R1.BlockHalfTransparent;
 import net.minecraft.server.v1_10_R1.BlockLeaves;
 import net.minecraft.server.v1_10_R1.BlockLeaves1;
 import net.minecraft.server.v1_10_R1.BlockLog1;
@@ -45,12 +43,10 @@ import net.minecraft.server.v1_10_R1.DefinedStructureManager;
 import net.minecraft.server.v1_10_R1.DimensionManager;
 import net.minecraft.server.v1_10_R1.Entity;
 import net.minecraft.server.v1_10_R1.EntityFallingBlock;
-import net.minecraft.server.v1_10_R1.EntityHanging;
 import net.minecraft.server.v1_10_R1.EntityLightning;
 import net.minecraft.server.v1_10_R1.EntityOcelot;
 import net.minecraft.server.v1_10_R1.EntityTippedArrow;
 import net.minecraft.server.v1_10_R1.EnumCreatureType;
-import net.minecraft.server.v1_10_R1.EnumDirection;
 import net.minecraft.server.v1_10_R1.IBlockData;
 import net.minecraft.server.v1_10_R1.ITileEntity;
 import net.minecraft.server.v1_10_R1.Material;
@@ -77,11 +73,9 @@ import net.minecraft.server.v1_10_R1.WorldGenTaiga1;
 import net.minecraft.server.v1_10_R1.WorldGenTaiga2;
 import net.minecraft.server.v1_10_R1.WorldGenTrees;
 import net.minecraft.server.v1_10_R1.WorldServer;
-
 import net.minecraft.server.v1_10_R1.EntityLiving;
 
 import org.bukkit.Location;
-import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_10_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftAmbient;
@@ -90,6 +84,7 @@ import org.bukkit.craftbukkit.v1_10_R1.entity.CraftComplexLivingEntity;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftFlying;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftGolem;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftGuardian;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftMonster;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftSlime;
@@ -956,8 +951,7 @@ public class BukkitWorld implements LocalWorld
         if (tileEntity != null)
         {
             tileEntity.a(nmsTag); // tileEntity.load
-        } else
-        {
+        } else {
             TerrainControl.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}",
                     nmsTag.getString("id"), x, y, z, getMaterial(x, y, z));
         }
@@ -1019,7 +1013,7 @@ public class BukkitWorld implements LocalWorld
 		}
 		catch(IllegalArgumentException ex)
 		{
-			TerrainControl.log(LogMarker.INFO, "Could not find entity: " + mobTypeName);
+			TerrainControl.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
 			return;
 		}
 
@@ -1089,7 +1083,9 @@ public class BukkitWorld implements LocalWorld
             boolean canProvidePower = block.isBlockPowered();
             boolean isBlockNormalCube = !isOutsideBuildHeight && isOpaque && isFullCube && !canProvidePower;
                         
-            if (!isBlockNormalCube && (creatureType == EnumCreatureType.WATER_CREATURE && material == org.bukkit.Material.WATER || material == org.bukkit.Material.AIR ))
+            boolean isWaterMob = bukkitEntityLiving instanceof CraftGuardian;
+            
+            if (!isBlockNormalCube && (((creatureType == EnumCreatureType.WATER_CREATURE || isWaterMob) && material == org.bukkit.Material.WATER) || material == org.bukkit.Material.AIR))
             {					                            						                            	                                  			                                    	
 	            float f = (float)j1 + 0.5F;
 	            float f1 = (float)k1;
@@ -1100,23 +1096,24 @@ public class BukkitWorld implements LocalWorld
 	            	for(int r = 0; r < groupSize; r++)
 	            	{  	
             			CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
-	            		
-            			entity.setCustomName(mobTypeName.replace("entity", "").substring(0, 1).toUpperCase() + mobTypeName.toLowerCase().replace("entity", "").substring(1));
-	                    
-	            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
-	            		{
-	        				if(nameTag != null && nameTag.length() > 0)
-	        				{
-	        					entity.setCustomName(nameTag);
-	        				}
-	            		}
-	            		
-						//((EntityLiving) entityliving).enablePersistence(); // <- makes sure mobs don't de-spawn
-	            		            			            			
+	            			            		            			            			
 	            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
 	           			{
 	           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
 	           			}
+	            		
+	            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
+	            		{
+	            			if(nameTag != null && nameTag.length() > 0)
+	        				{
+	            				entity.setCustomName(nameTag);
+	        				}
+	            		}
+	            			            		
+	            		if(entity instanceof CraftLivingEntity)
+	            		{
+	            			((CraftLivingEntity) entity).setRemoveWhenFarAway(false); // <- makes sure mobs don't de-spawn
+	            		}
 	            	}
 	            } else {                    					                                                						                                                                                    					                                                
 	            	for(int r = 0; r < groupSize; r++)
@@ -1143,7 +1140,8 @@ public class BukkitWorld implements LocalWorld
 
             if (!(nbtbase instanceof NBTTagCompound))
             {
-            	throw new NotImplementedException(); // Not a valid tag
+            	TerrainControl.log(LogMarker.INFO, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
+            	return;
             }
 
             nbttagcompound = (NBTTagCompound)nbtbase;
@@ -1561,4 +1559,12 @@ public class BukkitWorld implements LocalWorld
 
     @Override
     public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub) { }
+        
+    @Override
+    public ChunkCoordinate getSpawnChunk()
+    {
+    	BlockPosition spawnPos = world.getSpawn();
+    	
+    	return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
+    }    
 }

@@ -36,11 +36,7 @@ public final class ForgeMojangSettings implements MojangSettings
     	if(baseBiome != null)
     	{
     		return fromBiomeBase(baseBiome);
-    	}
-    	if(!ForgeWorld.vanillaBiomesCached || ForgeWorld.vanillaBiomes[biomeId] == null)
-    	{
-    		throw new NotImplementedException();
-    	}    	
+    	}  	
     	return fromBiomeBase(ForgeWorld.vanillaBiomes[biomeId]);
     }
 

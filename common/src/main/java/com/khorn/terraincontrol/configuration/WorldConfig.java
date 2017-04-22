@@ -195,6 +195,9 @@ public class WorldConfig extends ConfigFile
     public boolean Cartographer;
     public boolean DimensionsEnabled;
     
+    public String BO3AtSpawn;
+    
+    
     /**
      * Creates a WorldConfig from the WorldConfig.ini file found in the given
      * directory.
@@ -531,6 +534,8 @@ public class WorldConfig extends ConfigFile
         
         this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED);
         
+        this.BO3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN);
+        
         this.Cartographer = reader.getSetting(WorldStandardValues.CARTOGRAPHER);
         
         this.DimensionsEnabled = reader.getSetting(WorldStandardValues.DIMENSIONSENABLED);
@@ -558,26 +563,26 @@ public class WorldConfig extends ConfigFile
 
     private void createDefaultBiomeGroups()
     {
-        BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL, 0, 97,
+        BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL, 0, 100,
                 Arrays.asList("Forest", "Roofed Forest", "Extreme Hills", "Plains",
                         "Birch Forest", "Swampland", "Flower Forest", "Roofed Forest M",
                         "Extreme Hills+", "Sunflower Plains", "Birch Forest M", "Swampland M"));
         this.biomeGroupManager.registerGroup(normalGroup);
 
-        BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE, 3, 90,
+        BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE, 2, 40,
                 Arrays.asList("Ice Plains", "Cold Taiga", "Ice Plains Spikes", "Cold Taiga M"));
         this.biomeGroupManager.registerGroup(iceGroup);
 
-        BiomeGroup hotGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.HOT, 0, 97,
+        BiomeGroup hotGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.HOT, 1, 98,
                 Arrays.asList("Desert", "Savanna", "Plains", "Desert M", "Savanna M", "Sunflower Plains"));
         this.biomeGroupManager.registerGroup(hotGroup);
 
-        BiomeGroup coldGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.COLD, 0, 97,
+        BiomeGroup coldGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.COLD, 0, 100,
                 Arrays.asList("Forest", "Extreme Hills", "Taiga", "Plains",
                         "Flower Forest", "Extreme Hills+", "Taiga M", "Sunflower Plains"));
         this.biomeGroupManager.registerGroup(coldGroup);
 
-        BiomeGroup mesaGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.MESA, 1, 40,
+        BiomeGroup mesaGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.MESA, 2, 40,
                 Arrays.asList("Mesa"));
         this.biomeGroupManager.registerGroup(mesaGroup);
 
@@ -1050,19 +1055,22 @@ public class WorldConfig extends ConfigFile
 	        "The seed that will be used for this world unless it is overriden in the world creation menu.",
 	        "Leave blank for a random seed."
     	);
+
+        writer.bigTitle("BO3 at spawn");        
+        writer.putSetting(WorldStandardValues.BO3_AT_SPAWN, this.BO3AtSpawn,
+	        "This BO3 will be spawned at the world's spawn point as a CustomObject."
+    	);
         
         writer.bigTitle("Pre-generation radius");        
         writer.putSetting(WorldStandardValues.PREGENERATION_RADIUS, this.PreGenerationRadius,
 	        "This is the radius in chunks around the spawn chunk within which chunks will automatically be spawned (uses a rectangle, not a circle around the spawn location!",
-			"Defaults to: 0 (disabled)",
-			"This property is used only by the Minecraft Worlds mod"        		
+			"Defaults to: 0 (disabled)"        		
 		);
         
         writer.bigTitle("World border radius");        
         writer.putSetting(WorldStandardValues.WORLD_BORDER_RADIUS, this.WorldBorderRadius,
 	        "This is the radius in chunks around the spawn chunk within which chunks will have blocks spawned (uses a rectangle, not a circle around the spawn location!)",
-			"Defaults to: 0 (disabled)",
-			"This property is used only by the Minecraft Worlds mod"
+			"Defaults to: 0 (disabled)"
 		);
         
         // Dimensions
@@ -1072,7 +1080,7 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.DIMENSIONS, this.Dimensions,
                 "Dimensions that should be loaded for this world at world creation (requires DimensionsEnabled: true. A world directory of the same name must be present in mods/OpenTerrainGenerator/worlds/");
         writer.putSetting(WorldStandardValues.CARTOGRAPHER, this.Cartographer,
-                "Currently in development, the Cartographer is a miniature version of the world (1/16th scale) that can be used to view the world (including players) and teleport players and items. Setting this to true loads and updates the Cartographer world map in the Cartographer dimension (does not require DimensionsEnabled: true). The Cartographer can be reached via a Quartz portal with a chiseled quartz base. The mods/OpenTerrainGenerator/worlds/Cartographer directory must be present (if you also have OTG-Cartographer.jar in your mods directory the worlds/Cartographer should be created automatically).");
+                "Currently in development, the Cartographer is a miniature version of the world (1/16th scale) that can be used to view the world (including players) and teleport players and items. Setting this to true loads and updates the Cartographer world map in the Cartographer dimension (does not require DimensionsEnabled: true). The Cartographer can be reached via a Quartz portal with a chiseled quartz base. The mods/OpenTerrainGenerator/worlds/DIM-Cartographer directory must be present (if you also have OTG-Cartographer.jar in your mods directory worlds/DIM-Cartographer should be created automatically).");
     }
 
     private void WriteCustomBiomes(SettingsMap writer)

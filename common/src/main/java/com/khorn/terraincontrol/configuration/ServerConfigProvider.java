@@ -54,16 +54,10 @@ public final class ServerConfigProvider implements ConfigProvider
     private LocalBiome[] biomes;
 
     /**
-     * Holds all biomes that aren't virtual. These need to be sent to all
-     * players on the server that have Open Terrain Generator installed.
-     */
-    private final Collection<LocalBiome> savedBiomes = new HashSet<LocalBiome>();
-
-    /**
      * The number of loaded biomes.
      */
     private int biomesCount;
-
+    
     /**
      * Loads the settings from the given directory for the given world.
      * @param settingsDir The directory to load from.
@@ -213,7 +207,6 @@ public final class ServerConfigProvider implements ConfigProvider
     {
         // Clear biome collections
         Arrays.fill(this.biomes, null);        
-        this.savedBiomes.clear();
         this.biomesCount = 0;
 
         // Load again
@@ -324,12 +317,6 @@ public final class ServerConfigProvider implements ConfigProvider
             
             // Update WorldConfig with actual id
             worldConfig.customBiomeGenerationIds.put(biome.getName(), generationId);
-
-            // If not virtual, add to saved biomes set
-            if (!biome.getIds().isVirtual())
-            {
-                savedBiomes.add(biome);
-            }
 
             // Indexing ReplacedBlocks
             if (!this.worldConfig.BiomeConfigsHaveReplacement)

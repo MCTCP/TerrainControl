@@ -36,7 +36,7 @@ public final class ClientConfigProvider implements ConfigProvider
      */
     private LocalBiome[] biomes;
 
-    public ClientConfigProvider(DataInputStream stream, LocalWorld world) throws IOException
+    public ClientConfigProvider(DataInputStream stream, LocalWorld world, boolean isSinglePlayer) throws IOException
     {
         // We need a valid CustomObjects object with things like the trees in
         // it, so that the configs can load without errors
@@ -76,68 +76,60 @@ public final class ClientConfigProvider implements ConfigProvider
             biomeReader.putSetting(BiomeStandardValues.GRASS_COLOR, stream.readInt());
             biomeReader.putSetting(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER, stream.readBoolean());
             biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR, stream.readInt());
-            biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, stream.readBoolean());
-                        
-            // TODO: Are these really necessary? (animals seem to be spawning on Forge SP when they shouldnt be without this)
+            biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, stream.readBoolean());           
+                       
+            // TODO: Are these really necessary? <-- Maybe only for Forge SP?
             
-            try
+        	String biomeDictId = ConfigFile.readStringFromStream(stream);            
+        	biomeReader.putSetting(BiomeStandardValues.BIOME_DICT_ID, biomeDictId); // <-- This might be used even in MP by client mods?
+                    	            
+            // TODO: Are these really necessary? Forge SP seems to handle some part of mob spawning on the client, without this code mobs are spawning when they shouldn't. 
+                    	
+            if(isSinglePlayer)
             {
-	            String spawnMonsters = ConfigFile.readStringFromStream(stream);
-	            try {
-					biomeReader.putSetting(BiomeStandardValues.SPAWN_MONSTERS, WeightedMobSpawnGroup.fromJson(spawnMonsters));
-				} catch (InvalidConfigException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            } catch(EOFException ex) { }
-            
-            try
-            {
-	            String spawnCreatures = ConfigFile.readStringFromStream(stream);
-	            try {
-					biomeReader.putSetting(BiomeStandardValues.SPAWN_CREATURES, WeightedMobSpawnGroup.fromJson(spawnCreatures));
-				} catch (InvalidConfigException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            } catch(EOFException ex) { }            
-
-            try
-            {
-	            String spawnWaterCreatures = ConfigFile.readStringFromStream(stream);
-	            try {
-					biomeReader.putSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, WeightedMobSpawnGroup.fromJson(spawnWaterCreatures));
-				} catch (InvalidConfigException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            } catch(EOFException ex) { }
-            
-            try
-            {
-	            String spawnAmbientCreatures = ConfigFile.readStringFromStream(stream);
-	            try {
-					biomeReader.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, WeightedMobSpawnGroup.fromJson(spawnAmbientCreatures));
-				} catch (InvalidConfigException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            } catch(EOFException ex) { }
-
-            // TODO: Are these really necessary?
-            
-            try
-            {
-                String biomeDictId = ConfigFile.readStringFromStream(stream);            
-                biomeReader.putSetting(BiomeStandardValues.BIOME_DICT_ID, biomeDictId);
-            } catch(EOFException ex) { }            
-            
-            try
-            {
-                String inheritedMobsBiomeName = ConfigFile.readStringFromStream(stream);            
+                String inheritedMobsBiomeName = ConfigFile.readStringFromStream(stream);
                 biomeReader.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, inheritedMobsBiomeName);
-            } catch(EOFException ex) { }            
-
+            	
+	            String spawnMonsters = ConfigFile.readStringFromStream(stream);
+	            try
+	            {
+					biomeReader.putSetting(BiomeStandardValues.SPAWN_MONSTERS, WeightedMobSpawnGroup.fromJson(spawnMonsters));
+				}
+	            catch (InvalidConfigException e)
+	            {
+					e.printStackTrace();
+				}
+	            
+	            String spawnCreatures = ConfigFile.readStringFromStream(stream);
+	            try
+	            {
+					biomeReader.putSetting(BiomeStandardValues.SPAWN_CREATURES, WeightedMobSpawnGroup.fromJson(spawnCreatures));
+				}
+	            catch (InvalidConfigException e)
+	            {
+					e.printStackTrace();
+				}
+	
+	            String spawnWaterCreatures = ConfigFile.readStringFromStream(stream);
+	            try
+	            {
+					biomeReader.putSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, WeightedMobSpawnGroup.fromJson(spawnWaterCreatures));
+				}
+	            catch (InvalidConfigException e)
+	            {
+					e.printStackTrace();
+				}
+	
+	            String spawnAmbientCreatures = ConfigFile.readStringFromStream(stream);
+	            try
+	            {
+					biomeReader.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, WeightedMobSpawnGroup.fromJson(spawnAmbientCreatures));
+				}
+	            catch (InvalidConfigException e)
+	            {
+					e.printStackTrace();
+				}           
+            }           
             
             BiomeLoadInstruction instruction = new BiomeLoadInstruction(biomeName, id, defaultSettings);
             BiomeConfig config = new BiomeConfig(instruction, null, biomeReader, worldConfig);

@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol;
 
+import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
 import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
@@ -16,6 +17,7 @@ import com.khorn.terraincontrol.logging.Logger;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
+import java.io.DataOutput;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -311,5 +313,6 @@ public abstract class TerrainControlEngine
      * @return The materialData.
      */
     public abstract LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData);
-
+    
+	public abstract void addPlatformSpecificDataToPacket(DataOutput stream, BiomeConfig config, boolean isSinglePlayer);
 }

@@ -2,7 +2,6 @@ package com.khorn.terraincontrol.forge;
 
 import com.google.common.base.Function;
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
@@ -33,7 +32,6 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -41,9 +39,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", acceptableRemoteVersions = "*", version = "PG 1")
+@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", acceptableRemoteVersions = "*", version = "v14")
 public class TCPlugin
 {
 	public TCPlugin()
@@ -81,8 +77,7 @@ public class TCPlugin
         if (event.getSide() == Side.CLIENT)
         {
             ClientNetworkEventListener networkHandler = new ClientNetworkEventListener(this.worldLoader);
-            FMLEventChannel eventDrivenChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(
-                    PluginStandardValues.ChannelName);
+            FMLEventChannel eventDrivenChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PluginStandardValues.ChannelName);
             eventDrivenChannel.register(networkHandler);
             MinecraftForge.EVENT_BUS.register(networkHandler);
         }
@@ -150,6 +145,7 @@ public class TCPlugin
     @SideOnly(Side.CLIENT)
     private void registerDimensions()
     {
+    	// TODO: LOL! This is a really lazy hack fix but it should work for now, improve this a.s.a.p.
         for(int i = 2; i < 100; i++)
         {
         	if(!DimensionManager.isDimensionRegistered(i))
@@ -171,13 +167,6 @@ public class TCPlugin
     public void onDedicatedServerPostInit(FMLPostInitializationEvent event)
     {
         this.worldLoader.onServerAboutToLoad(null);
-    } 
-
-    @SideOnly(Side.SERVER)
-    @EventHandler
-    public void onDedicatedServerStopped(FMLServerStoppingEvent event)
-    {
-        this.worldLoader.onServerStopped();
     }
 
     @EventHandler
@@ -220,53 +209,8 @@ public class TCPlugin
 		    	    	}
 		            }	 
         		}
-	            
-        		/*
-        		for(LocalWorld localWorld : TerrainControl.getAllWorlds())
-        		{    
-        			if(((ForgeWorld)localWorld).getWorld().provider.getDimension() != 0)
-        			{
-        				DimensionManager.unloadWorld(((ForgeWorld)localWorld).getWorld().provider.getDimension());
-        			}
-        		}
-        		*/
-        		
-	            /*
-	            MinecraftServer server = event.getServer();
-	            
-	            for (int dim : net.minecraftforge.common.DimensionManager.getStaticDimensionIDs())
-	            {
-	            	if(dim >= 2)
-	            	{
-		                WorldServer world = (WorldServer)(new WorldServerMulti(server, server.isavehandler, dim, overWorld, server.theProfiler)).init();
-		                world.addEventListener(new ServerWorldEventHandler(server, world));
-		                if (!server.isSinglePlayer())
-		                {
-		                    world.getWorldInfo().setGameType(server.getGameType());
-		                }
-		                net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.world.WorldEvent.Load(world));
-	            	}
-	            }
-	            */
-	            
-	            // Load custom dims here.            
-	            
-	            //TCDimensionManager.LoadCustomDimensionData();
+	                       
 	            TCDimensionManager.SaveDimensionData();
-	            
-	            /*
-	            for (int dim : net.minecraftforge.common.DimensionManager.getStaticDimensionIDs())
-	            {
-	                WorldServer world = (dim == 0 ? overWorld : (WorldServer)(new WorldServerMulti(this, isavehandler, dim, overWorld, this.theProfiler)).init());
-	                world.addEventListener(new ServerWorldEventHandler(this, world));
-	                if (!this.isSinglePlayer())
-	                {
-	                    world.getWorldInfo().setGameType(getGameType());
-	                }
-	                net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.world.WorldEvent.Load(world));
-	            }
-	            */
-	            
 			}
         }
     }

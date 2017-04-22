@@ -141,6 +141,7 @@ final class TCCommandHandler implements ICommand
             		world = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getWorld(DimensionManager.getWorld(0));
             		
 	                int newRadius = world.getConfigs().getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(radius, world.getWorld());
+	                
 	                ((ServerConfigProvider)world.getConfigs()).saveWorldConfig();
 	                
         			sender.addChatMessage(
@@ -301,12 +302,7 @@ final class TCCommandHandler implements ICommand
 				            			e.printStackTrace();
 				            		}
 				            		
-				            		if(dimensionMap != null)
-				            		{
-				            			dimensionMap.clear(existingDim);
-				            		} else {
-				            			throw new NotImplementedException();
-				            		}
+			            			dimensionMap.clear(existingDim);
 				            		
 			        				// This biome was unregistered via a console command, delete its world data
 			        				File dimensionSaveDir = new File(world.getWorld().getSaveHandler().getWorldDirectory() + "/DIM" + existingDim);
