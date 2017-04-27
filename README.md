@@ -26,7 +26,7 @@ To learn more, check out <a href="https://biomebundle.wixsite.com/openterraingen
 * [Compilation](./COMPILING.md) instructions for command-line, Eclipse and IntelliJ
 * [Version history](https://github.com/MCTCP/TerrainControl/wiki/Version-history)
 
-## This branch (OpenTerrainGenerator) is developed by PeeGee85 (aka PG85)
+# OpenTerrainGenerator is developed by PeeGee85 (aka PG85)
 
 ## Original TerrainControl developers and maintainers
 * <a href="https://github.com/rutgerkok">Rutger Kok</a>
