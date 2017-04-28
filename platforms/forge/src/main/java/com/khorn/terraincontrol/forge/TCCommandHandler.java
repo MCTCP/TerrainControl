@@ -11,8 +11,6 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
@@ -97,18 +95,16 @@ final class TCCommandHandler implements ICommand
                         new TextComponentString(MESSAGE_COLOR + "/otg biome (-f, -s, -d, -m) " + VALUE_COLOR + "Show biome information for the biome at the player's coordinates."));
                 sender.addChatMessage(
                 		new TextComponentString(MESSAGE_COLOR + "/otg entities " + VALUE_COLOR + "Show a list of entities that can be spawned inside BO3's using the Entity() tag."));
-                //sender.addChatMessage(
-                		//new TextComponentString(MESSAGE_COLOR + "/otg cartographer " + VALUE_COLOR + "Teleports the player to the center of the Cartographer map. Same as /otg map."));
                 sender.addChatMessage(
-                		new TextComponentString(MESSAGE_COLOR + "/otg pregenerator <radius> " + VALUE_COLOR + "Sets the pre-generation radius to <radius> chunks. Same as /otg pregen <radius>."));
+                		new TextComponentString(MESSAGE_COLOR + "/otg pregen <radius> " + VALUE_COLOR + "Sets the pre-generation radius to <radius> chunks. Same as /otg pregenerator <radius>."));
                 sender.addChatMessage(
-                		new TextComponentString(MESSAGE_COLOR + "/otg dimension " + VALUE_COLOR + "Shows the name and id of the dimension the player is currently in. Same as /otg dim."));
+                		new TextComponentString(MESSAGE_COLOR + "/otg dim " + VALUE_COLOR + "Shows the name and id of the dimension the player is currently in. Same as /otg dimension."));
                 sender.addChatMessage(
-                		new TextComponentString(MESSAGE_COLOR + "/otg dimension -l " + VALUE_COLOR + "Shows a list of all dimensions. Same as /otg dim -l."));
+                		new TextComponentString(MESSAGE_COLOR + "/otg dim -l " + VALUE_COLOR + "Shows a list of all dimensions. Same as /otg dimension -l."));
                 sender.addChatMessage(
-                		new TextComponentString(MESSAGE_COLOR + "/otg dimension -c <dimension name> " + VALUE_COLOR + "Creates a dimension using world and biome configs from mods/OpenTerrainGenerator/worlds/<dimension name>. Custom dimensions can be accessed via a quartz portal. Biome names must be unique across dimensions. Same as /otg dim -c <dimension name>"));
+                		new TextComponentString(MESSAGE_COLOR + "/otg dim -c <dimension name> " + VALUE_COLOR + "Creates a dimension using world and biome configs from mods/OpenTerrainGenerator/worlds/<dimension name>. Custom dimensions can be accessed via a quartz portal. Biome names must be unique across dimensions. Same as /otg dimension -c <dimension name>"));
                 sender.addChatMessage(
-                		new TextComponentString(MESSAGE_COLOR + "/otg dimension -d <dimension name> " + VALUE_COLOR + "Deletes the specified dimension. Dimension must be unloaded (dimensions unload automatically when no players are inside, this may take a minute). Same as /otg dim -d <dimension name>"));
+                		new TextComponentString(MESSAGE_COLOR + "/otg dim -d <dimension name> " + VALUE_COLOR + "Deletes the specified dimension. Dimension must be unloaded (dimensions unload automatically when no players are inside, this may take a minute). Same as /otg dimension -d <dimension name>"));
                 sender.addChatMessage(new TextComponentString(""));
                 sender.addChatMessage(new TextComponentString("Tips:"));
         		sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "- Check out OpenTerrainGenerator.ini and each world's WorldConfig.ini for optional features."));
@@ -243,11 +239,6 @@ final class TCCommandHandler implements ICommand
 							if(DimensionManager.isDimensionRegistered(i))
 							{
 								DimensionType dimensionType = DimensionManager.getProviderType(i);
-								
-								//if(!dimensionType.getSuffix().equals("OTG") && (i == 0 || i > 1))
-								//{
-									//throw new NotImplementedException();
-								//}
 								
 								if(dimensionType.getSuffix().equals("OTG") && dimensionType.getName().equals(dimName))
 								{
@@ -468,7 +459,7 @@ final class TCCommandHandler implements ICommand
 			    			{
 			    				for(SpawnListEntry spawnListEntry : creatureList)
 			    				{
-			    					sender.addChatMessage(new TextComponentTranslation(VALUE_COLOR + "{\"mob\": \"" + spawnListEntry.entityClass + "\", \"weight\": " + spawnListEntry.itemWeight + ", \"min\": " + spawnListEntry.minGroupCount + ", \"max\": " + spawnListEntry.maxGroupCount + "}"));
+			    					sender.addChatMessage(new TextComponentTranslation(VALUE_COLOR + "{\"mob\": \"" + spawnListEntry.entityClass.getName() + "\", \"weight\": " + spawnListEntry.itemWeight + ", \"min\": " + spawnListEntry.minGroupCount + ", \"max\": " + spawnListEntry.maxGroupCount + "}"));
 			    				}
 			    			}
 		            	}

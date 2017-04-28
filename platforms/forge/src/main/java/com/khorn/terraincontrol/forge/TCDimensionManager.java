@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.generator.Cartographer;
@@ -44,11 +42,6 @@ public class TCDimensionManager
 			if(DimensionManager.isDimensionRegistered(i))
 			{
 				DimensionType dimensionType = DimensionManager.getProviderType(i);
-				
-				//if(!dimensionType.getSuffix().equals("OTG") && (i == 0 || i > 1))
-				//{
-					//throw new NotImplementedException();
-				//}
 				
 				if(dimensionType.getSuffix().equals("OTG") && dimensionType.getName().equals(dimensionName))
 				{
@@ -198,7 +191,7 @@ public class TCDimensionManager
 					}
 					if(forgeWorld == null)
 					{
-						throw new NotImplementedException();
+						return; // If another mod added a dimension
 					}
 					
 					if(forgeWorld != null)
@@ -268,11 +261,6 @@ public class TCDimensionManager
 			if(DimensionManager.isDimensionRegistered(i))
 			{				
 				DimensionType dimType = DimensionManager.getProviderType(i);
-				
-				//if(dimType != null && !dimType.getSuffix().equals("OTG") && (i == 0 || i > 1))
-				//{
-					//throw new NotImplementedException();
-				//}
 				
 				if(dimType != null && dimType.getSuffix().equals("OTG"))
 				{

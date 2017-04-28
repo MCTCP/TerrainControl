@@ -398,11 +398,11 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 		else if(askModCompatContinue)
 		{
 			if(ok)
-			{		
+			{
+				DeleteWorldFiles();
 				((ForgeEngine)TerrainControl.getEngine()).getPregenerator().resetPregenerator();
 				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
 			} else {
-				//this.mc.displayGuiScreen(new TCGuiCreateWorld(new TCGuiSelectCreateWorldMode()));
 				this.mc.displayGuiScreen(new TCGuiCreateWorld(new TCGuiWorldSelection(null)));
 			}
 		}
@@ -503,7 +503,7 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     	selectingWorldName = false;
     	askModCompatContinue = true;
     	
-        String s1 = "Warning: " + (biomesOPlentyEnabled ? " Biomes o' plenty may cause crashes." : "") + (customMobSpawnerEnabled ? " CustomMobSpawner may break mob spawning." : "");
+        String s1 = "Warning: " + (biomesOPlentyEnabled ? " Biomes o' plenty may cause crashes." : "") + (customMobSpawnerEnabled ? " CustomMobSpawner may break OTG mob spawning." : "");
         String s2 = "It is recommended that you disable or remove " + (customMobSpawnerEnabled && biomesOPlentyEnabled ? "these mods." : "this mod.");
         String s3 = "Continue";
         String s4 = "Back";
@@ -691,62 +691,8 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                 {
                 	worldsettings.enableCommands();
                 }                                  
-                
-                // Clear existing pre-generator and structurecache data
-                // Do this here in the Forge layer instead of in common since this only applies to Forge atm.
-                File TCWorldsDirectory = new File(TerrainControl.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
-                if(TCWorldsDirectory.exists() && TCWorldsDirectory.isDirectory())
-                {
-                	for(File worldDir : TCWorldsDirectory.listFiles())
-                	{
-                		if(worldDir.isDirectory())
-                		{
-                			if(GuiHandler.worldName.equals(worldDir.getName()))
-                			{
-                				
-                				File StructureDataDirectory = new File(worldDir.getAbsolutePath() + "/StructureData");
-                                if (StructureDataDirectory.exists())
-                                {
-                                	deleteRecursive(StructureDataDirectory);
-                                }
 
-                                File structureDataFile = new File(worldDir.getAbsolutePath() + "/StructureData.txt");
-                                if (structureDataFile.exists())
-                                {
-                                	deleteRecursive(structureDataFile);
-                                }
-                                
-                                File nullChunksFile = new File(worldDir.getAbsolutePath() + "/NullChunks.txt");
-                                if (nullChunksFile.exists())
-                                {
-                                	deleteRecursive(nullChunksFile);
-                                }
-                                
-                                File spawnedStructuresFile = new File(worldDir.getAbsolutePath() + "/SpawnedStructures.txt");
-                                if (spawnedStructuresFile.exists())
-                                {
-                                	deleteRecursive(spawnedStructuresFile);
-                                }
-
-                                File chunkProviderPopulatedChunksFile = new File(worldDir.getAbsolutePath() + "/ChunkProviderPopulatedChunks.txt");
-                                if (chunkProviderPopulatedChunksFile.exists())
-                                {
-                                	deleteRecursive(chunkProviderPopulatedChunksFile);
-                                }
-
-                                File pregeneratedChunksFile = new File(worldDir.getAbsolutePath() + "/PregeneratedChunks.txt");
-                                if (pregeneratedChunksFile.exists())
-                                {
-                                	deleteRecursive(pregeneratedChunksFile);
-                                }                    				
-                				
-                				break;
-                			}
-                		}
-                	}
-            	}
-                                    
-    			boolean biomesOPlentyEnabled = false;
+                boolean biomesOPlentyEnabled = false;
     			boolean customMobSpawnerEnabled = false;
     			for (ModContainer mod : Loader.instance().getActiveModList())
     			{
@@ -768,7 +714,8 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             	{
 					GuiYesNo guiyesno = askModCompatContinue(this, customMobSpawnerEnabled, biomesOPlentyEnabled);
 					this.mc.displayGuiScreen(guiyesno);        				
-				} else {				
+				} else {									
+					DeleteWorldFiles();
 					((ForgeEngine)TerrainControl.getEngine()).getPregenerator().resetPregenerator();
     				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
     			}
@@ -828,6 +775,63 @@ public class TCGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 				this.mc.displayGuiScreen(guiRenameWorld);
             }
         }
+    }
+    
+    private void DeleteWorldFiles()
+    {
+        // Clear existing pre-generator and structurecache data
+        // Do this here in the Forge layer instead of in common since this only applies to Forge atm.
+        File TCWorldsDirectory = new File(TerrainControl.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
+        if(TCWorldsDirectory.exists() && TCWorldsDirectory.isDirectory())
+        {
+        	for(File worldDir : TCWorldsDirectory.listFiles())
+        	{
+        		if(worldDir.isDirectory())
+        		{
+        			if(GuiHandler.worldName.equals(worldDir.getName()))
+        			{
+        				
+        				File StructureDataDirectory = new File(worldDir.getAbsolutePath() + "/StructureData");
+                        if (StructureDataDirectory.exists())
+                        {
+                        	deleteRecursive(StructureDataDirectory);
+                        }
+
+                        File structureDataFile = new File(worldDir.getAbsolutePath() + "/StructureData.txt");
+                        if (structureDataFile.exists())
+                        {
+                        	deleteRecursive(structureDataFile);
+                        }
+                        
+                        File nullChunksFile = new File(worldDir.getAbsolutePath() + "/NullChunks.txt");
+                        if (nullChunksFile.exists())
+                        {
+                        	deleteRecursive(nullChunksFile);
+                        }
+                        
+                        File spawnedStructuresFile = new File(worldDir.getAbsolutePath() + "/SpawnedStructures.txt");
+                        if (spawnedStructuresFile.exists())
+                        {
+                        	deleteRecursive(spawnedStructuresFile);
+                        }
+
+                        File chunkProviderPopulatedChunksFile = new File(worldDir.getAbsolutePath() + "/ChunkProviderPopulatedChunks.txt");
+                        if (chunkProviderPopulatedChunksFile.exists())
+                        {
+                        	deleteRecursive(chunkProviderPopulatedChunksFile);
+                        }
+
+                        File pregeneratedChunksFile = new File(worldDir.getAbsolutePath() + "/PregeneratedChunks.txt");
+                        if (pregeneratedChunksFile.exists())
+                        {
+                        	deleteRecursive(pregeneratedChunksFile);
+                        }                    				
+        				
+        				break;
+        			}
+        		}
+        	}
+    	}
     }
 
     private void updateButtons()

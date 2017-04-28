@@ -147,12 +147,12 @@ public class ForgeWorld implements LocalWorld
         	
         	((ForgeEngine)TerrainControl.getEngine()).worldLoader.unloadAllWorlds();
         	
+	        // Clear the BiomeDictionary (it will be refilled when biomes are loaded in createBiomeFor)
+	    	((ForgeEngine)TerrainControl.getEngine()).worldLoader.clearBiomeDictionary(null);
+        	
 	        ((ForgeEngine)TerrainControl.getEngine()).worldLoader.unRegisterDefaultBiomes();
 	        
 	        ((ForgeEngine)TerrainControl.getEngine()).worldLoader.unRegisterTCBiomes();
-	        
-	        // Clear the BiomeDictionary (it will be refilled when biomes are loaded in createBiomeFor)
-	    	((ForgeEngine)TerrainControl.getEngine()).worldLoader.clearBiomeDictionary(null);
 	    	
 	    	//TCDimensionManager.LoadCustomDimensionData();
 

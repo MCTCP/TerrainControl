@@ -42,6 +42,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -477,9 +478,7 @@ public final class WorldLoader
     */
     
     public void clearBiomeDictionary(ForgeWorld world)
-    {
-    	// TODO: This will remove non-TC biomes' BiomeDict info and may cause problems for other mods/worlds.
-    	   
+    {    	   
     	// Hell and Sky are the only vanilla biome not overridden by a TC biome in the Forge Biome Registry when
     	// ForgeBiomes are created. We won't be re-registering them to the BiomeDict when the biomes 
     	// are created so restore their BiomeDictionary info here after clearing the BiomeDictionary.
@@ -487,6 +486,20 @@ public final class WorldLoader
     	Type[] skyTypes = BiomeDictionary.getTypesForBiome(Biomes.SKY);
     	    
     	HashMap<Biome, Type[]> typesToRestore = new HashMap<Biome, Type[]>();
+    	    	    	
+    	// Don't remove any biomedict info for biomes added by other mods
+    	for(Entry<ResourceLocation, Biome> biome : Biome.REGISTRY.registryObjects.entrySet())
+    	{
+    		String resourceDomain = biome.getKey().getResourceDomain();
+    		
+    		if(!(resourceDomain.startsWith("minecraft") && !resourceDomain.startsWith("openterraingenerator")))
+    		{
+				if(!typesToRestore.containsKey(biome.getValue()))
+				{
+					typesToRestore.put(biome.getValue(), BiomeDictionary.isBiomeRegistered(biome.getValue()) ? BiomeDictionary.getTypesForBiome(biome.getValue()) : new Type[0]);
+				}
+    		}    		
+    	}
     	
     	// When unloading a custom dimension only unregister that dimension's biomes
     	if(world != null)
@@ -506,7 +519,7 @@ public final class WorldLoader
     			}
     		}
     	}
-    	
+    	   	
 		try {
 			Field[] fields = BiomeDictionary.class.getDeclaredFields();
 			for(Field field : fields)
@@ -514,7 +527,7 @@ public final class WorldLoader
 				Class<?> fieldClass = field.getType();
 				if(fieldClass.isArray())
 				{
-			        field.setAccessible(true);			        
+			        field.setAccessible(true);
 			        field.set(null, Array.newInstance(field.getType().getComponentType(), Array.getLength(field.get(null))));
 				}
 				if(fieldClass.getSuperclass().equals(java.util.AbstractMap.class))

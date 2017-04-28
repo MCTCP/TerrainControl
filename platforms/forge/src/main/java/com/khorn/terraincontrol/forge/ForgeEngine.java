@@ -99,12 +99,14 @@ public class ForgeEngine extends TerrainControlEngine
 
     public boolean getCartographerEnabled()
     {   	
-    	return getOverWorld().getConfigs().getWorldConfig().Cartographer;
+    	ForgeWorld world = getOverWorld(); // If overworld is null then the overworld is not an OTG world
+    	return world == null ? false : world.getConfigs().getWorldConfig().Cartographer;
     }
 
     public boolean getDimensionsEnabled()
     { 	
-    	return getOverWorld().getConfigs().getWorldConfig().DimensionsEnabled;
+    	ForgeWorld world = getOverWorld(); // If overworld is null then the overworld is not an OTG world    	
+    	return world == null ? false : world.getConfigs().getWorldConfig().DimensionsEnabled;
     }
     
     public ForgeWorld getOverWorld()
@@ -112,12 +114,12 @@ public class ForgeEngine extends TerrainControlEngine
 		ArrayList<LocalWorld> allWorlds = getAllWorlds();
 		for(LocalWorld world : allWorlds)
 		{
-			if(((ForgeWorld)world).getWorld().provider.getDimension() == 0)
+			if(((ForgeWorld)world).getWorld() != null && ((ForgeWorld)world).getWorld().provider != null && ((ForgeWorld)world).getWorld().provider.getDimension() == 0)
 			{
 				return (ForgeWorld)world;
 			}
 		}
-    	throw new NotImplementedException();
+		return null;
     }
     
     public LocalWorld getWorld(World world)
@@ -133,10 +135,6 @@ public class ForgeEngine extends TerrainControlEngine
 				}
 	    		return this.worldLoader.getWorld(world.provider.getDimensionType().getName());
 	    	}
-			//else if (world.provider.getDimension() == 0 || world.provider.getDimension() > 1)
-			//{
-				//throw new NotImplementedException();
-			//}
     	}
     	LocalWorld localWorld = this.worldLoader.getWorld(world.getWorldInfo().getWorldName());
 		if(localWorld == null)

@@ -17,11 +17,14 @@ public class ServerEventListener
 		{
 			((ForgeEngine)TerrainControl.getEngine()).getPregenerator().ProcessTick();
 			
-			boolean cartographerEnabled = ((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled();	
-
-			if(cartographerEnabled)
-			{			
-				Cartographer.UpdateWorldMap();
+			if(((ForgeEngine)TerrainControl.getEngine()).getOverWorld() != null) // If overworld is null then the overworld is not an OTG world
+			{
+				boolean cartographerEnabled = ((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled();	
+	
+				if(cartographerEnabled)
+				{			
+					Cartographer.UpdateWorldMap();
+				}
 			}
 		}
 	}

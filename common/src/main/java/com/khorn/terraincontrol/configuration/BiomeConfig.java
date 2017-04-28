@@ -817,25 +817,29 @@ public class BiomeConfig extends ConfigFile
         writer.putSetting(BiomeStandardValues.SPAWN_MONSTERS, this.spawnMonsters,
                 "The monsters (skeletons, zombies, etc.) that spawn in this biome",
                 "For instance [{\"mob\": \"Spider\", \"weight\": 100, \"min\": 4, \"max\": 4}, {\"mob\": \"Zombie\", \"weight\": 100, \"min\": 4, \"max\": 4}]",
-                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types."
+                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types.",
+                "Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome."
                 );
 
         writer.putSetting(BiomeStandardValues.SPAWN_CREATURES, this.spawnCreatures,
                 "The friendly creatures (cows, pigs, etc.) that spawn in this biome",
                 "For instance [{\"mob\": \"Sheep\", \"weight\": 12, \"min\": 4, \"max\": 4}, {\"mob\": \"Pig\", \"weight\": 10, \"min\": 4, \"max\": 4}]",
-                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types."
+                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types.",
+                "Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome."
                 );
 
         writer.putSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, this.spawnWaterCreatures,
                 "The water creatures (only squids in vanilla) that spawn in this biome",
                 "For instance [{\"mob\": \"Squid\", \"weight\": 10, \"min\": 4, \"max\": 4}]",
-                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types."
+                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types.",
+                "Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome."
                 );
 
         writer.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, this.spawnAmbientCreatures,
                 "The ambient creatures (only bats in vanila) that spawn in this biome",
                 "For instance [{\"mob\": \"Bat\", \"weight\": 10, \"min\": 8, \"max\": 8}]",
-                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types."
+                "Use the \"/otg entities\" console command to get a list of possible mobs and mob types.",
+                "Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome."
                 );
         
         // PG Settings
