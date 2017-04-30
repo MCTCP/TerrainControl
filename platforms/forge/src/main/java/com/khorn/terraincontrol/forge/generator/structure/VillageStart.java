@@ -9,9 +9,6 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.forge.ForgeEngine;
 
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeDesert;
-import net.minecraft.world.biome.BiomeSavanna;
-import net.minecraft.world.biome.BiomeTaiga;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.gen.structure.StructureVillagePieces;
@@ -20,8 +17,6 @@ import net.minecraft.world.gen.structure.StructureVillagePieces.PieceWeight;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class VillageStart extends StructureStart
 {
@@ -42,7 +37,7 @@ public class VillageStart extends StructureStart
         if(worldTC == null)
         {
         	worldTC = ((ForgeEngine)TerrainControl.getEngine()).getWorld(world);
-        	throw new NotImplementedException();
+        	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
         }
         
         LocalBiome currentBiome = worldTC.getBiome(startX, startZ);

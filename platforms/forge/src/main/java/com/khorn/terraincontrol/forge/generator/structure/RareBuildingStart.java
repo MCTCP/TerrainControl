@@ -12,8 +12,6 @@ import net.minecraft.world.gen.structure.StructureStart;
 
 import java.util.Random;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 public class RareBuildingStart extends StructureStart
 {
     public RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
@@ -22,7 +20,7 @@ public class RareBuildingStart extends StructureStart
         if(localWorld == null)
         {
         	localWorld = ((ForgeEngine)TerrainControl.getEngine()).getWorld(world);
-        	throw new NotImplementedException();
+        	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
         }
         BiomeConfig biomeConfig = localWorld.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8).getBiomeConfig();
         StructureComponent building;

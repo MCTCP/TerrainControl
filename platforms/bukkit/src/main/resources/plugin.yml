@@ -1,5 +1,5 @@
 name: OpenTerrainGenerator
-version: 1.10.2 v14
+version: 1.10.2 v17
 description: Generate anything! This mod is a fork of TerrainControl by Khorn, RutgerKok and Timethor.
 authors: ['Khorn', 'Olof Cayorion Larsson', 'RutgerKok', 'PeeGee85']
 main: com.khorn.terraincontrol.bukkit.TCPlugin

@@ -1,7 +1,5 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;

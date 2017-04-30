@@ -27,7 +27,6 @@ import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -41,16 +40,13 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.DataFixesManager;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.GameType;
-import net.minecraft.world.IWorldEventListener;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldServer;
@@ -71,8 +67,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.lang.reflect.Field;
 import java.util.*;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class ForgeWorld implements LocalWorld
 {
@@ -138,31 +132,27 @@ public class ForgeWorld implements LocalWorld
         // If this is the main world (which should be the first world to be generated)
         // cache the vanilla biomes and clear the biome registry and dictionary
         if(isMainWorld) 
-        {	       	
+        {	         	
         	// Default settings are not restored on world unload / server quit because this was causing problems 
         	// (unloading dimensions while their worlds were still ticking etc)
         	// Unload all world and biomes here instead.
         	
-        	TCDimensionManager.UnloadAllCustomDimensionData();
-        	
-        	((ForgeEngine)TerrainControl.getEngine()).worldLoader.unloadAllWorlds();
-        	
+        	TCDimensionManager.UnloadAllCustomDimensionData();       	
+        	((ForgeEngine)TerrainControl.getEngine()).worldLoader.unloadAllWorlds();       	
 	        // Clear the BiomeDictionary (it will be refilled when biomes are loaded in createBiomeFor)
-	    	((ForgeEngine)TerrainControl.getEngine()).worldLoader.clearBiomeDictionary(null);
-        	
-	        ((ForgeEngine)TerrainControl.getEngine()).worldLoader.unRegisterDefaultBiomes();
-	        
+	    	((ForgeEngine)TerrainControl.getEngine()).worldLoader.clearBiomeDictionary(null);	    	
+	        ((ForgeEngine)TerrainControl.getEngine()).worldLoader.unRegisterDefaultBiomes();	        
 	        ((ForgeEngine)TerrainControl.getEngine()).worldLoader.unRegisterTCBiomes();
-	    	
+	    		        
 	    	//TCDimensionManager.LoadCustomDimensionData();
 
-	    	TCDimensionManager.RemoveTCDims();	    	    
+	    	TCDimensionManager.RemoveTCDims();
         }
     }
           
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
-    {  	    	
+    {  	      	
     	// When creating custom dimensions don't override biomes that already exist in other worlds
         if(!isMainWorld)
         {
@@ -172,7 +162,7 @@ public class ForgeWorld implements LocalWorld
         	{
         		biomeConfig = existingBiome.getBiomeConfig();
         	}
-        }
+        }        
     	
 		// Make an exception for the hell and sky biomes. 
 		// The hell and end chunk providers refer specifically to 
@@ -181,19 +171,19 @@ public class ForgeWorld implements LocalWorld
     	if(biomeConfig.getName().equals("Hell"))
     	{
     		ForgeBiome forgeBiome = new ForgeBiome(Biomes.HELL, biomeConfig, new BiomeIds(8,8));
-    		this.biomeNames.put("Hell", forgeBiome);
+    		this.biomeNames.put("Hell", forgeBiome);    		
     		return forgeBiome;
 		}
     	if(biomeConfig.getName().equals("Sky"))
     	{
     		ForgeBiome forgeBiome = new ForgeBiome(Biomes.SKY, biomeConfig, new BiomeIds(9,9));
-    		this.biomeNames.put("Sky", forgeBiome);
+    		this.biomeNames.put("Sky", forgeBiome);    		
     		return forgeBiome;
 		}
     	if(biomeConfig.getName().equals("The Void"))
     	{
     		ForgeBiome forgeBiome = new ForgeBiome(Biomes.VOID, biomeConfig, new BiomeIds(9,9));
-    		this.biomeNames.put("The Void", forgeBiome);
+    		this.biomeNames.put("The Void", forgeBiome);            
     		return forgeBiome;
 		}
     	
@@ -220,11 +210,9 @@ public class ForgeWorld implements LocalWorld
 	                throw new RuntimeException("Could not allocate the requested id " + requestedGenerationId + " for biome " + biomeConfig.getName() + ". All available id's under 256 have been allocated\n"
 	                    + ". To proceed, adjust your WorldConfig or use the ReplaceToBiomeName feature to make the biome virtual.");
 	            }
-	            TerrainControl.log(LogMarker.DEBUG, "Asked to register {} with id {}, but succeeded with id {}",
-	                    biomeConfig.getName(), requestedGenerationId, allocatedGenerationId);
+	            TerrainControl.log(LogMarker.TRACE, "Asked to register {} with id {}, but succeeded with id {}", biomeConfig.getName(), requestedGenerationId, allocatedGenerationId);
 	        } else {
-	            TerrainControl.log(LogMarker.DEBUG, "Registered {} with id {}",
-	                    biomeConfig.getName(), allocatedGenerationId);
+	            TerrainControl.log(LogMarker.TRACE, "Registered {} with id {}", biomeConfig.getName(), allocatedGenerationId);
 	        }
 	
 	        forgeBiome = new ForgeBiome(biome, biomeConfig, biomeIds);
@@ -233,11 +221,12 @@ public class ForgeWorld implements LocalWorld
     	}
         
         this.biomeNames.put(biome.getBiomeName(), forgeBiome);
+        
         return forgeBiome;
     }
     
     private void registerBiomeInBiomeDictionary(Biome biome, Biome sourceBiome, BiomeConfig biomeConfig, ConfigProvider configProvider)
-    {
+    {        	
         // Add inherited BiomeDictId's for replaceToBiomeName. Biome dict id's are stored twice, 
         // there is 1 list of biomedict types per biome id and one list of biomes (not id's) per biome dict type.
     	
@@ -283,7 +272,7 @@ public class ForgeWorld implements LocalWorld
 		        }
 		        catch(Exception ex)
 		        {
-		        	TerrainControl.log(LogMarker.INFO, "Error: Can't find BiomeDictId: \"" + typeString + "\".");
+		        	TerrainControl.log(LogMarker.WARN, "Can't find BiomeDictId: \"" + typeString + "\".");
 		        }
 		        if(type != null)
 		        {
@@ -309,7 +298,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getFreeBiomeId()
     {
-    	throw new NotImplementedException();
+    	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
         //return nextBiomeId++;
     }
     
@@ -327,7 +316,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public ForgeBiome getBiomeById(int id) throws BiomeNotFoundException
     {
-    	throw new NotImplementedException();
+    	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
     }
 
     @Override
@@ -674,7 +663,7 @@ public class ForgeWorld implements LocalWorld
         {
             // Chunk is unloaded
             //return;
-            throw new NotImplementedException();
+        	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
         }
 
         IBlockState oldState = this.world.getBlockState(pos);
@@ -1149,10 +1138,10 @@ public class ForgeWorld implements LocalWorld
 	}
 	
 	public void unRegisterBiomes()
-	{
+	{		
 		// Unregister only the biomes registered by this world
 		for(LocalBiome localBiome : this.biomeNames.values())
-		{		    	
+		{				
 			// Make an exception for the hell and sky biomes. 
 			// The hell and end chunk providers refer specifically to 
 			// Biomes.HELL and Biomes.SKY and query the biome registry

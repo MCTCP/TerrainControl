@@ -599,7 +599,7 @@ public class Pregenerator
 	        	pregeneratedChunksFile.getParentFile().mkdirs();
 	        	writer = new BufferedWriter(new FileWriter(pregeneratedChunksFile));
 	            writer.write(stringbuilder.toString());
-	            TerrainControl.log(LogMarker.DEBUG, "Pre-generator data saved");
+	            TerrainControl.log(LogMarker.TRACE, "Pre-generator data saved");
 	        }
 	        catch (IOException e)
 	        {
@@ -637,7 +637,7 @@ public class Pregenerator
 				    {
 				    	pregeneratedChunksFileValues = stringbuilder.toString().split(",");
 				    }
-				    TerrainControl.log(LogMarker.DEBUG, "Pre-generator data loaded");
+				    TerrainControl.log(LogMarker.TRACE, "Pre-generator data loaded");
 				} finally {
 					reader.close();
 				}

@@ -1,13 +1,11 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.Branch;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.Rotation;
 
 import java.util.*;
@@ -92,19 +90,15 @@ public class BranchFunction extends BO3Function implements Branch
     @Override
     public CustomObjectCoordinate toCustomObjectCoordinate(LocalWorld world, Random random, int x, int y, int z)
     {
-        TerrainControl.log(LogMarker.TRACE, "Branch:");
         for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
         {
             BranchNode branch = it.next();
             double randomChance = random.nextDouble() * (totalChance != -1 ? totalChance : 100);
-            TerrainControl.log(LogMarker.TRACE, "  Needed: {} Obtained: {}", branch.getChance(), randomChance);
             if (randomChance < branch.getChance())
             {
-                TerrainControl.log(LogMarker.TRACE, "  Successful Spawn");
                 return new CustomObjectCoordinate(branch.getCustomObject(), branch.getRotation(), x + this.x, y + this.y, z + this.z);
             }
         }
-        TerrainControl.log(LogMarker.TRACE, "  No Spawn");
         return null;
     }
 
@@ -132,9 +126,6 @@ public class BranchFunction extends BO3Function implements Branch
             if (object == null)
             {
                 throw new InvalidConfigException("The " + this.getConfigName() + " `" + args.get(i) + "` was not found. Make sure to place it in the same directory.");
-            } else
-            {
-                TerrainControl.log(LogMarker.TRACE, "{} Initialized", (Object) object.getName());
             }
             double branchChance = readDouble(args.get(i + 2), 0, Double.MAX_VALUE);
             if (accumulateChances)
@@ -147,10 +138,8 @@ public class BranchFunction extends BO3Function implements Branch
                 branches.add(new BranchNode(Rotation.getRotation(args.get(i + 1)), branchChance, object));
             }
         }
-        TerrainControl.log(LogMarker.TRACE, "{}:{}", args.size(), i);
         if (i < args.size())
         {
-            TerrainControl.log(LogMarker.TRACE, "{} TotalChance set.", (Object) this.getConfigName());
             totalChance = readDouble(args.get(i), 0, Double.MAX_VALUE);
         }
         return cumulativeChance;

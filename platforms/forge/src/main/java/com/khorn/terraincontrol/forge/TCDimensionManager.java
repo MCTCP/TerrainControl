@@ -208,7 +208,7 @@ public class TCDimensionManager
         	dimensionDataFile.getParentFile().mkdirs();
         	writer = new BufferedWriter(new FileWriter(dimensionDataFile));
             writer.write(stringbuilder.toString());
-            TerrainControl.log(LogMarker.DEBUG, "Custom dimension data saved");
+            TerrainControl.log(LogMarker.TRACE, "Custom dimension data saved");
         }
         catch (IOException e)
         {
@@ -309,7 +309,7 @@ public class TCDimensionManager
 			
 			//if(dimType != null && !dimType.getSuffix().equals("OTG") && (dimId > 1))
 			//{
-				//throw new NotImplementedException();
+				//throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
 			//}
 			
 			if(dimType != null && dimType.getSuffix().equals("OTG"))
@@ -342,7 +342,7 @@ public class TCDimensionManager
 				    {
 				    	dimensionDataFileValues = stringbuilder.toString().split(",");
 				    }
-				    TerrainControl.log(LogMarker.DEBUG, "Custom dimension data loaded");
+				    TerrainControl.log(LogMarker.TRACE, "Custom dimension data loaded");
 				} finally {
 					reader.close();
 				}
@@ -384,15 +384,7 @@ public class TCDimensionManager
 			}
 		}
 		// Recreate dimensions in the correct order		
-		
-		for(int i = 0; i <= highestOrder; i++)
-		{
-			if(orderedDimensions.containsKey(i))
-			{
-				DimensionData dimData = orderedDimensions.get(i);
-			}
-		}
-		
+				
 		for(int i = 0; i <= highestOrder; i++)
 		{
 			if(orderedDimensions.containsKey(i))

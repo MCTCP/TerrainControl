@@ -124,7 +124,7 @@ public class NBTHelper
                     listTag.addTag(getNBTFromNMSTagCompound(null, nmsListTag.get(i)));
                     break;
                 default:
-                    TerrainControl.log(LogMarker.INFO, "Cannot convert list subtype {} from it's NMS value", new Object[] {listType});
+                    TerrainControl.log(LogMarker.DEBUG, "Cannot convert list subtype {} from it's NMS value", new Object[] {listType});
                     break;
             }
         }

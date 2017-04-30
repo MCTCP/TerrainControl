@@ -317,9 +317,8 @@ public final class BiomeConfigFinder
         if (toRename.renameTo(newFile))
         {
             return newFile;
-        } else
-        {
-            TerrainControl.log(LogMarker.INFO, "Failed to rename biome file {} to {}",
+        } else {
+            TerrainControl.log(LogMarker.WARN, "Failed to rename biome file {} to {}",
                     new Object[] {toRename.getAbsolutePath(), newFile.getAbsolutePath()});
             return toRename;
         }

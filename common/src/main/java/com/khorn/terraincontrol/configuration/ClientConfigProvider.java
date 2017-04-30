@@ -13,7 +13,6 @@ import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 

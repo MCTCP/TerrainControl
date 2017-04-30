@@ -14,7 +14,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
@@ -69,7 +68,7 @@ public class ClientNetworkEventListener
                     this.worldLoader.registerClientWorld(worldMC, wrappedStream);
                 }
 
-                TerrainControl.log(LogMarker.INFO, "Config received from server");
+                TerrainControl.log(LogMarker.TRACE, "Config received from server");
             } else {
                 // Server or client is outdated
                 if (serverProtocolVersion > PluginStandardValues.ProtocolVersion)

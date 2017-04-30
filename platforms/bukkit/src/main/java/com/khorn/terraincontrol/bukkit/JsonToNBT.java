@@ -19,9 +19,6 @@ import net.minecraft.server.v1_10_R1.NBTTagLong;
 import net.minecraft.server.v1_10_R1.NBTTagShort;
 import net.minecraft.server.v1_10_R1.NBTTagString;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
 {
     private static final Pattern INT_ARRAY_MATCHER = Pattern.compile("\\[[-+\\d|,\\s]+\\]");
@@ -134,7 +131,6 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
 
                 if (s1.length() > 0)
                 {
-                    boolean flag1 = false;
                     jsontonbt$compound.tagList.add(getTagFromNameValue(s1, false));
                 }
 
@@ -165,7 +161,6 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
 
                 if (s.length() > 0)
                 {
-                    boolean flag = true;
                     jsontonbt$list.tagList.add(getTagFromNameValue(s, true));
                 }
 

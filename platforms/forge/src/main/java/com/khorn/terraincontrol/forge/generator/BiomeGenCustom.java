@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.forge.generator;
 
 import com.khorn.terraincontrol.BiomeIds;
-import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
@@ -13,7 +12,6 @@ import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
 
-import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -21,11 +19,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
 import java.util.List;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Used for all custom biomes.
@@ -109,8 +103,8 @@ public class BiomeGenCustom extends Biome
 	        // so that biomes are properly recognised by non-modded clients
 	        if((generationId >= 0 && generationId <= 39) || (generationId >= 127 && generationId <= 167))
 	        {	        	
-	        	//resourceDomain = "minecraft";
-	        	throw new NotImplementedException();
+	        	//resourceDomain = "minecraft";	        	
+	        	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
 	        }
 	        
 	        registryKey = new ResourceLocation(resourceDomain, biomeNameForRegistry);
@@ -129,7 +123,7 @@ public class BiomeGenCustom extends Biome
         	/*
         	else {
 	        	
-        		if(1 == 1) { throw new NotImplementedException(); }
+        		if(1 == 1) { throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash."); }
         		
 	        	// Even if the biome is present in registryObjects it may be because the biome was added and removed earlier (only possible for other dimensions) 
 	        	// and only its availability was set to "can re-use". If so set the availability back to "used"
@@ -172,13 +166,13 @@ public class BiomeGenCustom extends Biome
                 // custom biome that is loaded after this virtual biome, so it
                 // will soon be registered
                 forgeEngine.registerForgeBiome(biomeIds.getGenerationId(), registryKey, customBiome);
-                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
+                TerrainControl.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
                         biomeIds.getGenerationId());
             } else {
                 ResourceLocation existingBiomeKey = Biome.REGISTRY.inverseObjectRegistry.get(existingBiome);
                 forgeEngine.registerForgeBiome(biomeIds.getSavedId(), registryKey, customBiome);
                 forgeEngine.registerForgeBiome(biomeIds.getSavedId(), existingBiomeKey, existingBiome);
-                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
+                TerrainControl.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
                         biomeIds.getGenerationId());
             }
         }
@@ -186,7 +180,7 @@ public class BiomeGenCustom extends Biome
         {
             // Normal insertion
             Biome.REGISTRY.register(savedBiomeId, registryKey, customBiome);
-            TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
+            TerrainControl.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
                     biomeIds.getGenerationId());
         }
         

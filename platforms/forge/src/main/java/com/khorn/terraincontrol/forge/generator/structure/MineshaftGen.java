@@ -1,14 +1,11 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeConfig.MineshaftType;
 import com.khorn.terraincontrol.forge.ForgeEngine;
-import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 
@@ -16,7 +13,6 @@ import net.minecraft.world.gen.structure.MapGenMineshaft;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureMineshaftStart;
 import net.minecraft.world.gen.structure.StructureStart;
-import net.minecraftforge.common.DimensionManager;
 
 public class MineshaftGen extends MapGenStructure
 {
@@ -29,7 +25,7 @@ public class MineshaftGen extends MapGenStructure
             if(world == null)
             {
             	world = ((ForgeEngine)TerrainControl.getEngine()).getWorld(this.worldObj);
-            	throw new NotImplementedException();
+            	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
             }            
             LocalBiome biome = world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
             BiomeConfig biomeConfig = biome.getBiomeConfig();

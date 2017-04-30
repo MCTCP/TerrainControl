@@ -100,8 +100,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.util.*;
 
 public class BukkitWorld implements LocalWorld
@@ -1140,7 +1138,7 @@ public class BukkitWorld implements LocalWorld
 
             if (!(nbtbase instanceof NBTTagCompound))
             {
-            	TerrainControl.log(LogMarker.INFO, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
+            	TerrainControl.log(LogMarker.DEBUG, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
             	return;
             }
 
@@ -1148,7 +1146,7 @@ public class BukkitWorld implements LocalWorld
         }
         catch (NBTException nbtexception)
         {
-        	TerrainControl.log(LogMarker.INFO, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
+        	TerrainControl.log(LogMarker.DEBUG, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
         	return;
         }		                                            
 

@@ -41,16 +41,14 @@ public final class BiomeGroupManager
                 TerrainControl.log(LogMarker.WARN, "Two biome groups have the same name \"{}\". Removing the second one.",
                         newGroup.getName());
                 TerrainControl.printStackTrace(LogMarker.WARN, new Exception());
-            } else
-            {
+            } else {
                 int newGroupId = getNextGroupId();
                 newGroup.setGroupId(newGroupId);
 
                 nameToGroup.put(newGroup.getName(), newGroup);
                 idToGroup.put(newGroupId, newGroup);
             }
-        } else
-        {
+        } else {
             TerrainControl.log(LogMarker.WARN, "Biome group \"{}\" could not be added. Max biome group count reached.", newGroup.getName());
         }
     }

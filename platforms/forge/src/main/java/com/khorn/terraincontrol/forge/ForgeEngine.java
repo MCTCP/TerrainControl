@@ -5,10 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.Map;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
@@ -23,8 +20,6 @@ import com.khorn.terraincontrol.forge.generator.Pregenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -51,6 +46,8 @@ public class ForgeEngine extends TerrainControlEngine
     // surpassing 255.
     public void registerForgeBiome(int id, ResourceLocation resourceLocation, Biome biome)
     {
+    	TerrainControl.log(LogMarker.TRACE, "Registering biome " + resourceLocation.toString());
+    	
         Biome.REGISTRY.registryObjects.put(resourceLocation, biome);
         Biome.REGISTRY.underlyingIntegerMap.put(biome, id);
         Biome.REGISTRY.inverseObjectRegistry.put(biome, resourceLocation);
@@ -58,7 +55,7 @@ public class ForgeEngine extends TerrainControlEngine
     
     public void unRegisterForgeBiome(ResourceLocation resourceLocation)
     {
-		TerrainControl.log(LogMarker.DEBUG, "Unregistering biome " + resourceLocation.toString());
+		TerrainControl.log(LogMarker.TRACE, "Unregistering biome " + resourceLocation.toString());
     	
     	Biome biome = Biome.REGISTRY.registryObjects.get(resourceLocation);
     	
@@ -77,7 +74,7 @@ public class ForgeEngine extends TerrainControlEngine
 			// it wasn't set back to "used" because it looked like the biome registry already had the biome properly registered.
 			
 			TerrainControl.log(LogMarker.ERROR, "Could not unregister " + biome.getBiomeName());
-			throw new NotImplementedException();
+			throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
 			
 			//biomeRegistryAvailabiltyMap.set(localBiome.getIds().getSavedId(), false); // This should be enough to make Forge re-use the biome id
 		}
@@ -213,7 +210,7 @@ public class ForgeEngine extends TerrainControlEngine
 			catch (IOException e)
 			{
 				e.printStackTrace();
-				throw new NotImplementedException();
+				throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
 			}
 		}
 	}

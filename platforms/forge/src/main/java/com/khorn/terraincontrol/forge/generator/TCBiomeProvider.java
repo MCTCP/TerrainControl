@@ -6,7 +6,6 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeBiome;
-import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.generator.biome.OutputType;

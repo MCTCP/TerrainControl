@@ -3,7 +3,6 @@ package com.khorn.terraincontrol.forge.events;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.generator.Cartographer;
-import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 
 import net.minecraft.client.Minecraft;

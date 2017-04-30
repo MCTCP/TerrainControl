@@ -183,7 +183,7 @@ public final class ServerConfigProvider implements ConfigProvider
         String loadedBiomeNames = indexSettings(loadedBiomes);
 
         TerrainControl.log(LogMarker.INFO, "{} biomes Loaded", biomesCount);
-        TerrainControl.log(LogMarker.DEBUG, "{}", loadedBiomeNames);
+        TerrainControl.log(LogMarker.TRACE, "{}", loadedBiomeNames);
     }
 
     @Override

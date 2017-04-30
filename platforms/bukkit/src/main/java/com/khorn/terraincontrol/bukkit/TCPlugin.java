@@ -115,7 +115,7 @@ public class TCPlugin extends JavaPlugin
     {
         if (worldName.isEmpty())
         {
-            TerrainControl.log(LogMarker.DEBUG, "Ignoring empty world name. Is some generator plugin checking if \"OpenTerrainGenerator\" is a valid world name?");
+            TerrainControl.log(LogMarker.TRACE, "Ignoring empty world name. Is some generator plugin checking if \"OpenTerrainGenerator\" is a valid world name?");
             return new TCChunkGenerator(this);
         }
 
@@ -123,11 +123,11 @@ public class TCPlugin extends JavaPlugin
         BukkitWorld world = worlds.get(worldName);
         if (world != null)
         {
-            TerrainControl.log(LogMarker.DEBUG, "Already enabled for ''{}''", (Object) worldName);
+            TerrainControl.log(LogMarker.TRACE, "Already enabled for ''{}''", (Object) worldName);
             return world.getChunkGenerator();
         }
 
-        TerrainControl.log(LogMarker.INFO, "Starting to enable world ''{}''...", (Object) worldName);
+        TerrainControl.log(LogMarker.TRACE, "Starting to enable world ''{}''...", (Object) worldName);
 
         // Create BukkitWorld instance
         BukkitWorld localWorld = new BukkitWorld(worldName);

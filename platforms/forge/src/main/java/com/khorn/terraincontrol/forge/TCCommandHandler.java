@@ -137,11 +137,10 @@ final class TCCommandHandler implements ICommand
             		world = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getWorld(DimensionManager.getWorld(0));
             		
 	                int newRadius = world.getConfigs().getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(radius, world.getWorld());
-	                
+	                	                
 	                ((ServerConfigProvider)world.getConfigs()).saveWorldConfig();
 	                
-        			sender.addChatMessage(
-                            new TextComponentTranslation(MESSAGE_COLOR + "Pre-generator radius set to " + VALUE_COLOR + newRadius + MESSAGE_COLOR + "."));
+        			sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "Pre-generator radius set to " + VALUE_COLOR + newRadius + MESSAGE_COLOR + "."));
         			return;
             	}
             }
@@ -186,13 +185,11 @@ final class TCCommandHandler implements ICommand
         		{
             		sender.addChatMessage(new TextComponentString(""));
         			sender.addChatMessage(new TextComponentString("-- Dimensions --"));
-        			TerrainControl.log(LogMarker.INFO, "-- Dimensions --");
         			sender.addChatMessage(new TextComponentString(""));
         			
             		int dimId = sender.getEntityWorld().provider.getDimension();
             		DimensionType dimension = DimensionManager.getProviderType(dimId);
 	    			sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "Currently in dimension " + VALUE_COLOR + dimension.getName() + MESSAGE_COLOR + " at id " + VALUE_COLOR + dimId + MESSAGE_COLOR + "."));
-	    			TerrainControl.log(LogMarker.INFO, "Currently in dimension " + dimension.getName() + " at id " + dimId + ".");
 	    			sender.addChatMessage(new TextComponentString(""));
 	    			
         			for(int i = -1; i < Long.SIZE << 4; i++)
@@ -202,7 +199,6 @@ final class TCCommandHandler implements ICommand
 							DimensionType dimensionType = DimensionManager.getProviderType(i);
 	    		        	String msg = VALUE_COLOR + dimensionType.getName() + MESSAGE_COLOR + " at id " + VALUE_COLOR + i + (TerrainControl.getUnloadedWorld(dimensionType.getName()) == null ? MESSAGE_COLOR + " (loaded)" : VALUE_COLOR +  " (unloaded)");
 	    		        	sender.addChatMessage(new TextComponentString(MESSAGE_COLOR + "- " + msg));
-	    	        		TerrainControl.log(LogMarker.INFO, msg.replace("§2", "").replace("§a", "").replace("§", ""));
 						}
 					}
         		} else {
@@ -211,8 +207,7 @@ final class TCCommandHandler implements ICommand
 	            		int dimId = sender.getEntityWorld().provider.getDimension();
 	            		DimensionType dimension = DimensionManager.getProviderType(dimId);
 	            		sender.addChatMessage(new TextComponentString(""));
-		    			sender.addChatMessage(
-		                        new TextComponentTranslation(MESSAGE_COLOR + "Currently in dimension " + VALUE_COLOR + dimension.getName() + MESSAGE_COLOR + " at id " + VALUE_COLOR + dimId + MESSAGE_COLOR + "."));
+		    			sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "Currently in dimension " + VALUE_COLOR + dimension.getName() + MESSAGE_COLOR + " at id " + VALUE_COLOR + dimId + MESSAGE_COLOR + "."));
 	            	} else {
 		            	String dimName = argString[2];
 		            	if(argString.length > 3)
@@ -228,8 +223,7 @@ final class TCCommandHandler implements ICommand
 						if(mainWorldName.toLowerCase().trim().equals(dimName.toLowerCase().trim()))
 						{
 		    				sender.addChatMessage(new TextComponentString(""));
-		                    sender.addChatMessage(
-		                            new TextComponentTranslation(ERROR_COLOR + "Dimension name cannot be the same as world name."));
+		                    sender.addChatMessage(new TextComponentTranslation(ERROR_COLOR + "Dimension name cannot be the same as world name."));
 		                    return;
 						}
 		            	
@@ -309,13 +303,11 @@ final class TCCommandHandler implements ICommand
 										}
 			        				}
 				            		
-					    			sender.addChatMessage(
-					                        new TextComponentTranslation(MESSAGE_COLOR + "Deleted dimension " + VALUE_COLOR + dimName + MESSAGE_COLOR + " at id " + VALUE_COLOR + existingDim + MESSAGE_COLOR + "."));
+					    			sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "Deleted dimension " + VALUE_COLOR + dimName + MESSAGE_COLOR + " at id " + VALUE_COLOR + existingDim + MESSAGE_COLOR + "."));
 					    			
 					    			TCDimensionManager.SaveDimensionData();
 		            			} else {
-		        	    			sender.addChatMessage(
-		        	                        new TextComponentTranslation(ERROR_COLOR + "Cannot delete dimension " + VALUE_COLOR + dimName + ERROR_COLOR + ", it is currently loaded. Dimensions are unloaded automatically if no players are inside (this may take a minute)."));
+		        	    			sender.addChatMessage(new TextComponentTranslation(ERROR_COLOR + "Cannot delete dimension " + VALUE_COLOR + dimName + ERROR_COLOR + ", it is currently loaded. Dimensions are unloaded automatically if no players are inside (this may take a minute)."));
 		            			}
 		            		}
 		            	}
@@ -325,20 +317,17 @@ final class TCCommandHandler implements ICommand
 	        				if(!worldConfigFile.exists())
 	        				{
 			    				sender.addChatMessage(new TextComponentString(""));
-			                    sender.addChatMessage(
-			                            new TextComponentTranslation(ERROR_COLOR + "Could not create dimension, mods/OpenTerrainGenerator/worlds/" + dimName + " could not be found or does not contain a WorldConfig.ini file."));
+			                    sender.addChatMessage(new TextComponentTranslation(ERROR_COLOR + "Could not create dimension, mods/OpenTerrainGenerator/worlds/" + dimName + " could not be found or does not contain a WorldConfig.ini file."));
 	        				} else {
 	        					
 	        					sender.addChatMessage(new TextComponentString(""));
-				    			sender.addChatMessage(
-				                        new TextComponentTranslation(MESSAGE_COLOR + "Creating new dimension..."));
+				    			sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "Creating new dimension..."));
 	        					
 								int newDimId = TCDimensionManager.createDimension(dimName, false, true, true);
 								ForgeWorld createdWorld = (ForgeWorld) TerrainControl.getWorld(dimName);								
 								DimensionManager.unloadWorld(createdWorld.getWorld().provider.getDimension());
 				        		
-				    			sender.addChatMessage(
-				                        new TextComponentTranslation(MESSAGE_COLOR + "Created dimension " + VALUE_COLOR + dimName + MESSAGE_COLOR + " at id " + VALUE_COLOR + newDimId + MESSAGE_COLOR + "."));
+				    			sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "Created dimension " + VALUE_COLOR + dimName + MESSAGE_COLOR + " at id " + VALUE_COLOR + newDimId + MESSAGE_COLOR + "."));
 	        				}
 		            	}
 	            	}
@@ -378,23 +367,19 @@ final class TCCommandHandler implements ICommand
             	if(!(sender.getEntityWorld().getWorldInfo().getTerrainType() instanceof TCWorldType))
     			{
     				sender.addChatMessage(new TextComponentString(""));
-                    sender.addChatMessage(
-                            new TextComponentTranslation(ERROR_COLOR + "Biome information is not available for this dimension."));
+                    sender.addChatMessage(new TextComponentTranslation(ERROR_COLOR + "Biome information is not available for this dimension."));
     				return;
     			}
 
                 LocalBiome biome = world.getBiome(x, z);
                 BiomeIds biomeIds = biome.getIds();
                 sender.addChatMessage(new TextComponentString(""));
-                sender.addChatMessage(
-                        new TextComponentTranslation(MESSAGE_COLOR + "According to the biome generator, you are in the " + VALUE_COLOR + biome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biomeIds.getGenerationId()));
+                sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "According to the biome generator, you are in the " + VALUE_COLOR + biome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biomeIds.getGenerationId()));
 
                 if (CommandHelper.containsArgument(argString, "-f"))
                 {
                 	sender.addChatMessage(new TextComponentString(""));
-                    sender.addChatMessage(
-                            new TextComponentTranslation(MESSAGE_COLOR + "The base temperature of this biome is " + VALUE_COLOR + biome.getBiomeConfig().biomeTemperature + MESSAGE_COLOR + ", \n" + MESSAGE_COLOR + " at your height it is " + VALUE_COLOR + biome.getTemperatureAt(
-                                    x, y, z)));
+                    sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "The base temperature of this biome is " + VALUE_COLOR + biome.getBiomeConfig().biomeTemperature + MESSAGE_COLOR + ", \n" + MESSAGE_COLOR + " at your height it is " + VALUE_COLOR + biome.getTemperatureAt(x, y, z)));
                 }
 
                 if (CommandHelper.containsArgument(argString, "-s"))
@@ -404,18 +389,16 @@ final class TCCommandHandler implements ICommand
                         LocalBiome savedBiome = world.getSavedBiome(x, z);
                         BiomeIds savedIds = savedBiome.getIds();
                         sender.addChatMessage(new TextComponentString(""));
-                        sender.addChatMessage(
-                                new TextComponentTranslation(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + savedIds.getSavedId()));
+                        sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + savedIds.getSavedId()));
                     } catch (BiomeNotFoundException e)
                     {
                     	sender.addChatMessage(new TextComponentString(""));
-                        sender.addChatMessage(
-                                new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
+                        sender.addChatMessage(new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
                     }
                 }
                 
                 if (CommandHelper.containsArgument(argString, "-d"))
-                {
+                {                	
                     try
                     {
                         ForgeBiome savedBiome = (ForgeBiome)world.getSavedBiome(x, z);
@@ -432,13 +415,11 @@ final class TCCommandHandler implements ICommand
             				}
             			}
             			sender.addChatMessage(new TextComponentString(""));
-                        sender.addChatMessage(
-                                new TextComponentTranslation(MESSAGE_COLOR + "BiomeDict: " + VALUE_COLOR + typesString));
+                        sender.addChatMessage(new TextComponentTranslation(MESSAGE_COLOR + "BiomeDict: " + VALUE_COLOR + typesString));
                     } catch (BiomeNotFoundException e)
                     {
                     	sender.addChatMessage(new TextComponentString(""));
-                        sender.addChatMessage(
-                                new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
+                        sender.addChatMessage(new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
                     }
                 }
                 
@@ -463,17 +444,16 @@ final class TCCommandHandler implements ICommand
 			    				}
 			    			}
 		            	}
-	                } catch (BiomeNotFoundException e)
+	                }
+                    catch (BiomeNotFoundException e)
 	                {
 	                	sender.addChatMessage(new TextComponentString(""));
-	                    sender.addChatMessage(
-	                            new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
+	                    sender.addChatMessage(new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
 	                }
                 }
 
                 return;
-            } else
-            {
+            } else {
             	sender.addChatMessage(new TextComponentString(""));
                 sender.addChatMessage(new TextComponentString("Unknown command. Type /otg for a list of commands."));
             }

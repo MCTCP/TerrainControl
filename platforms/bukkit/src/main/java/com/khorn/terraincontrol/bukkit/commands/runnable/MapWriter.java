@@ -65,7 +65,7 @@ public class MapWriter implements Runnable
         LocalWorld bukkitWorld = WorldHelper.toLocalWorld(world);
         if (bukkitWorld == null)
         {
-            TerrainControl.log(LogMarker.WARN, "BukkitWorld is null :: Make sure you add `{}` to bukkit.yml", (Object) world.getWorld()
+            TerrainControl.log(LogMarker.ERROR, "BukkitWorld is null :: Make sure you add `{}` to bukkit.yml", (Object) world.getWorld()
                     .getName());
             return defaultColors;
         }

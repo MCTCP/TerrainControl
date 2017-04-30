@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import net.minecraft.block.BlockSkull;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAreaEffectCloud;
@@ -73,7 +72,7 @@ public class Cartographer
 	    		}
 	    		if(cartographerWorld == null)
 	    		{
-	    			throw new NotImplementedException();
+	    			throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
 	    		}
 				
 				if(world == null || cartographerWorld == null || cartographerWorld == world)
@@ -237,7 +236,7 @@ public class Cartographer
 		}
 		if(cartographerWorld == null)
 		{
-			throw new NotImplementedException();
+			throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
 		}
 		
 		return TeleportEntityFromMap(cartographerWorld, entities, false);
@@ -421,7 +420,7 @@ public class Cartographer
     		}
     		if(cartographerWorld == null)
     		{
-    			throw new NotImplementedException();
+    			throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
     		}
     	  	
 	    	if(world == null || cartographerWorld == null || world == cartographerWorld)

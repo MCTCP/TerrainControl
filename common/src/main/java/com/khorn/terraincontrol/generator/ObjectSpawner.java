@@ -21,7 +21,6 @@ import java.util.Random;
 
 public class ObjectSpawner
 {
-
     private final ConfigProvider configProvider;
     private final Random rand;
     private final LocalWorld world;
@@ -51,7 +50,7 @@ public class ObjectSpawner
 	        // Null check
 	        if (biome == null)
 	        {
-	            TerrainControl.log(LogMarker.DEBUG, "Unknown biome at {},{}  (chunk {}). Population failed.", x + 15, z + 15, chunkCoord);
+	            TerrainControl.log(LogMarker.WARN, "Unknown biome at {},{}  (chunk {}). Could not populate chunk.", x + 15, z + 15, chunkCoord);
 	            return;
 	        }
 	        
@@ -129,8 +128,8 @@ public class ObjectSpawner
 	        
 			processing = false;
 		} else {			
-			TerrainControl.log(LogMarker.DEBUG,"Error, minecraft engine attempted to populate two chunks at once! Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to Debug in mods/OpenTerrainGenerator/TerranControl.ini file for a stack trace. (Update: The recently added multi-dimension features may be causing this log message occasionally, will fix a.s.a.p).");
-			TerrainControl.log(LogMarker.DEBUG, Arrays.toString(Thread.currentThread().getStackTrace()));
+			TerrainControl.log(LogMarker.TRACE,"Error, minecraft engine attempted to populate two chunks at once! Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to Debug in mods/OpenTerrainGenerator/TerranControl.ini file for a stack trace. (Update: The recently added multi-dimension features may be causing this log message occasionally, will fix a.s.a.p).");
+			TerrainControl.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));
 		}
     }
 

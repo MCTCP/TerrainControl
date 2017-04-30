@@ -103,7 +103,7 @@ public class CustomBiome extends BiomeBase
                 // custom biome that is loaded after this virtual biome, so it
                 // will soon be registered
                 BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeKey, customBiome);
-                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+                TerrainControl.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
             } else
             {
                 MinecraftKey existingBiomeKey = BiomeBase.REGISTRY_ID.b(existingBiome);
@@ -114,14 +114,14 @@ public class CustomBiome extends BiomeBase
                 // if(existingBiome instanceof CustomBiome) {
                 //     existingBiomeName = String.valueOf(((CustomBiome) existingBiome).generationId);
                 // }
-                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId() /*, existingBiomeName*/ );
+                TerrainControl.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId() /*, existingBiomeName*/ );
             }
         } else
         {
             // Normal insertion
             BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeKey, customBiome);
 
-            TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+            TerrainControl.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
         }
 
         // Add biome to Bukkit enum if it's not there yet

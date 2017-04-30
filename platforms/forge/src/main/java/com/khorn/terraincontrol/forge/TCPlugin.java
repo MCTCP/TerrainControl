@@ -153,21 +153,7 @@ public class TCPlugin
         		DimensionManager.registerDimension(i, DimensionType.register("OTGDim", "OTG", i, WorldProviderTC.class, false));
         	}
         }    	
-    }
-    
-    @SideOnly(Side.CLIENT)
-    @EventHandler
-    public void onIntegratedServerAboutToStart(FMLServerAboutToStartEvent event)
-    {
-        this.worldLoader.onServerAboutToLoad(event.getServer().getWorldName());
-    }
-
-    @SideOnly(Side.SERVER)
-    @EventHandler
-    public void onDedicatedServerPostInit(FMLPostInitializationEvent event)
-    {
-        this.worldLoader.onServerAboutToLoad(null);
-    }
+    }   
 
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event)

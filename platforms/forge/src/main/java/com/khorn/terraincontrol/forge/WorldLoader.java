@@ -7,7 +7,6 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ClientConfigProvider;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
-import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
 import com.khorn.terraincontrol.forge.gui.GuiHandler;
@@ -15,14 +14,11 @@ import com.khorn.terraincontrol.forge.gui.TCGuiCreateWorld;
 import com.khorn.terraincontrol.forge.gui.TCGuiWorldSelection;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
-import com.khorn.terraincontrol.util.helpers.StringHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Biomes;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.util.IntIdentityHashBiMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -30,7 +26,6 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -42,15 +37,12 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Responsible for loading and unloading the world.
@@ -120,114 +112,6 @@ public final class WorldLoader
     	}    	
     	return true;
     }
-
-    /*
-    public LocalBiome getBiomeById(int id)
-    {
-    	// Check if config alread exists for main world
-    	// Otherwise check other existing dimensions
-    	
-    	for(ForgeWorld world : this.worlds.values())
-    	{
-    		if(world.isMainWorld)
-    		{
-				LocalBiome bc = world.getBiomeByIdLocal(id);
-        		if(bc != null)
-        		{
-        			return bc;
-        		}
-    		}
-    	}    	
-    	for(ForgeWorld world : this.worlds.values())
-    	{
-    		if(!world.isMainWorld)
-    		{
-	    		LocalBiome bc = world.getBiomeByIdLocal(id);
-	    		if(bc != null)
-	    		{
-	    			return bc;
-	    		}
-    		}
-    	}
-    	return null;
-    }
-    
-    public LocalBiome getBiome(String name)
-    {
-    	// Check if config alread exists for main world
-    	// Otherwise check other existing dimensions
-    	
-    	for(ForgeWorld world : this.worlds.values())
-    	{
-    		if(world.isMainWorld)
-    		{
-    			try
-    			{
-	        		LocalBiome bc = world.getBiomeByNameLocal(name);
-	        		if(bc != null)
-	        		{
-	        			return bc;
-	        		}
-    			}
-    			catch(BiomeNotFoundException ex) { }
-    		}
-    	}    	
-    	for(ForgeWorld world : this.worlds.values())
-    	{
-    		if(!world.isMainWorld)
-    		{
-    			try
-    			{
-		    		LocalBiome bc = world.getBiomeByNameLocal(name);
-		    		if(bc != null)
-		    		{
-		    			return bc;
-		    		}
-    			}
-    			catch(BiomeNotFoundException ex) { }
-    		}
-    	}
-        return null;
-    }
-    
-    public BiomeConfig getConfig(String name)
-    {
-    	// Check if config alread exists for main world
-    	// Otherwise check other existing dimensions
-    	
-    	for(ForgeWorld world : this.worlds.values())
-    	{
-    		if(world.isMainWorld)
-    		{
-    			try
-    			{
-	        		LocalBiome bc = world.getBiomeByName(name);
-	        		if(bc != null)
-	        		{
-	        			return bc.getBiomeConfig();
-	        		}
-    			}
-    			catch(BiomeNotFoundException ex) { }
-    		}
-    	}    	
-    	for(ForgeWorld world : this.worlds.values())
-    	{
-    		if(!world.isMainWorld)
-    		{
-    			try
-    			{
-		    		LocalBiome bc = world.getBiomeByName(name);
-		    		if(bc != null)
-		    		{
-		    			return bc.getBiomeConfig();
-		    		}
-    			}
-    			catch(BiomeNotFoundException ex) { }
-    		}
-    	}
-        return null;
-    }
-    */
     
     public File getConfigsFolder()
     {
@@ -237,42 +121,6 @@ public final class WorldLoader
     protected File getWorldDir(String worldName)
     {
         return new File(this.configsDir, "worlds/" + worldName);
-    }
-
-    /**
-     * For a dedicated server, we need to register custom biomes
-     * really early, even before we can know that TerrainControl
-     * is the desired world type. As a workaround, we tentatively
-     * load the configs if a config folder exists in the usual
-     * location.
-     * @param server The Minecraft server.
-     */
-    public void onServerAboutToLoad(String worldName)
-    {    	                
-        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-        if (server == null || !server.isDedicatedServer())
-        {
-            // Registry works differently on singleplayer
-            // We cannot load things yet
-            return;
-        }
-        
-        worldName = ((DedicatedServer) server).getStringProperty("level-name", "");
-        if(worldName == null)
-        {
-        	throw new NotImplementedException();
-        }
-        
-        if (worldName.isEmpty())
-        {
-            return;
-        }
-        ForgeWorld forgeWorld = this.getOrCreateForgeWorld(worldName, true);
-        if (forgeWorld == null)
-        {
-            // TerrainControl is probably not enabled for this world
-            return;
-        }
     }
 
     public void onServerStopped()
@@ -311,14 +159,14 @@ public final class WorldLoader
     {
     	// Used when dimensions are unloaded.
     	
-        //TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-        //this.configMap.remove(world.getName());
-        //if(unRegisterBiomes)
+        TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
+
+        ForgeWorld loadedWorld = this.worlds.get(world.getName());
+        if(loadedWorld != null) // For some reason Forge MP server unloads overworld twice on shutdown(?)
         {
-        	//world.unRegisterBiomes();
+            this.unloadedWorlds.put(world.getName(), this.worlds.get(world.getName()));
+            this.worlds.remove(world.getName());
         }
-        this.unloadedWorlds.put(world.getName(), this.worlds.get(world.getName()));
-        this.worlds.remove(world.getName());        
     }
 
     @Nullable
@@ -326,7 +174,7 @@ public final class WorldLoader
     {
     	if(!(mcWorld.getWorldInfo().getTerrainType() instanceof TCWorldType))
     	{
-    		throw new NotImplementedException();
+    		throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
     	}
     	
         ForgeWorld forgeWorld = this.getOrCreateForgeWorld(WorldHelper.getName(mcWorld), mcWorld.provider.getDimension() == 0);
@@ -350,7 +198,7 @@ public final class WorldLoader
 
         ForgeWorld world = this.getWorld(worldName);
         if (world == null)
-        {
+        {        	
             world = new ForgeWorld(worldName, isMainWorld);
             ServerConfigProvider config = null;//this.configMap.get(worldName);
             if (config == null)
@@ -413,7 +261,7 @@ public final class WorldLoader
             this.worlds.put(worldName, world);
             this.unloadedWorlds.remove(worldName);
         }
-
+        
         return world;
     }
     
@@ -438,47 +286,9 @@ public final class WorldLoader
     		((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = config.getWorldConfig().WorldBorderRadius;
     	}
     }
-
-    /*
-    @SideOnly(Side.CLIENT)
-    public void onQuitFromServer()
-    {        
-    	TerrainControl.log(LogMarker.INFO, "onQuitFromServer");
-    	
-    	ArrayList<ForgeWorld> worldsToRemove = new ArrayList<ForgeWorld>();
-        for (ForgeWorld world : this.worlds.values())
-        {
-            if (world != null)
-            {
-            	worldsToRemove.add(world);
-            }
-        }
-        for (ForgeWorld worldToRemove : worldsToRemove)
-        {
-            TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", worldToRemove.getName());
-            //this.configMap.remove(worldToRemove.getName());
-            this.configHolderMap.remove(worldToRemove.getName());
-			worldToRemove.unRegisterBiomes();
-            this.worlds.remove(worldToRemove.getName());
-        }
-        
-        this.unloadedWorlds.clear();
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void unloadClientWorld(ForgeWorld world)
-    {
-    	TerrainControl.log(LogMarker.INFO, "unloadClientWorld");
-    	
-        TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-        this.worlds.remove(world.getName());
-        this.unloadedWorlds.remove(world.getName());
-        world.unRegisterBiomes();
-    }
-    */
     
     public void clearBiomeDictionary(ForgeWorld world)
-    {    	   
+    {    
     	// Hell and Sky are the only vanilla biome not overridden by a TC biome in the Forge Biome Registry when
     	// ForgeBiomes are created. We won't be re-registering them to the BiomeDict when the biomes 
     	// are created so restore their BiomeDictionary info here after clearing the BiomeDictionary.
@@ -556,11 +366,11 @@ public final class WorldLoader
     }
 
     public void unRegisterDefaultBiomes()
-	{
+	{    	
 		//BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
 		// Unregister default biomes so they can be replaced by TC biomes (this allows us to fully customise the biomes)
 		for(DefaultBiome defaultBiome : DefaultBiome.values())
-		{ 		    				
+		{ 			
 			// Make an exception for the hell and sky biomes. 
 			// The hell and end chunk providers refer specifically to 
 			// Biomes.HELL and Biomes.SKY and query the biome registry
@@ -577,7 +387,7 @@ public final class WorldLoader
 	}
     
     public void unRegisterTCBiomes()
-	{
+	{    	
 		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
 		// Unregister default biomes so they can be replaced by TC biomes (this allows us to fully customise the biomes)
 		for(Entry<ResourceLocation, Biome> biome : Biome.REGISTRY.registryObjects.entrySet())
@@ -602,14 +412,14 @@ public final class WorldLoader
 				continue;
 			}
 			
-			TerrainControl.log(LogMarker.DEBUG, "Unregistering " + biome.getValue().getBiomeName());
+			TerrainControl.log(LogMarker.TRACE, "Unregistering " + biome.getValue().getBiomeName());
 			
 			biomeRegistryAvailabiltyMap.set(Biome.getIdForBiome(biome.getValue()), false); // This should be enough to make Forge re-use the biome id
 		}
 	}       
 	
 	public BitSet getBiomeRegistryAvailabiltyMap()
-	{
+	{		
 		BitSet biomeRegistryAvailabiltyMap = null;
 		try {
 			Field[] fields = Biome.REGISTRY.getClass().getDeclaredFields();

@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 /**
  * Class responsible for creating instances of {@link Layer} tailored towards
  * biome modes.

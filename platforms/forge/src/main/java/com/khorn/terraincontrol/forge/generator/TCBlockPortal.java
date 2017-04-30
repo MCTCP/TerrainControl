@@ -4,8 +4,6 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
 import java.lang.reflect.Field;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeEngine;
 
@@ -56,7 +54,7 @@ public class TCBlockPortal
 				}
 				//else if (i == 0 || i > 1)
 				//{
-					//throw new NotImplementedException();
+					//throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
 				//}
 			}
 		}

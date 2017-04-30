@@ -1,16 +1,11 @@
 package com.khorn.terraincontrol.customobjects;
 
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.customobjects.bo3.BO3;
-import com.khorn.terraincontrol.customobjects.bo3.BO3Config;
-import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.helpers.RandomHelper;
 
 import java.util.*;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Represents a collection of all {@link CustomObject}s in a structure. It is

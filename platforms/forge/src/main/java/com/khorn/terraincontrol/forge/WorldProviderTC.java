@@ -228,9 +228,7 @@ public class WorldProviderTC extends WorldProvider
     protected void generateLightBrightnessTable()
     {
     	if(IsCartographer())
-    	{
-	        float f = 0.1F;
-	
+    	{	
 	        for (int i = 0; i <= 15; ++i)
 	        {
 	            //float f1 = 1.0F - (float)i / 15.0F;

@@ -26,8 +26,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 public class BiomeConfig extends ConfigFile
 {
     public String biomeExtends;

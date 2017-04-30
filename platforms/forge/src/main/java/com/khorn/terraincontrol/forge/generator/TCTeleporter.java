@@ -5,13 +5,10 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import java.lang.reflect.Field;
 import java.util.Random;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeWorld;
-import com.khorn.terraincontrol.logging.LogMarker;
 
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
@@ -21,7 +18,6 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.server.SPacketChangeGameState;
 import net.minecraft.network.play.server.SPacketEffect;
 import net.minecraft.network.play.server.SPacketEntityEffect;
 import net.minecraft.network.play.server.SPacketPlayerAbilities;
@@ -29,14 +25,12 @@ import net.minecraft.network.play.server.SPacketRespawn;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
-import net.minecraft.stats.AchievementList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.Teleporter;
-import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -162,7 +156,7 @@ public class TCTeleporter
     		}
     		if(cartographerWorld == null)
     		{
-    			throw new NotImplementedException();
+    			throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
     		}
     		
     		BlockPos cartographerSpawnPoint = cartographerWorld.getSpawnPoint();
@@ -337,7 +331,6 @@ public class TCTeleporter
     
     public static boolean placeInExistingPortal(WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
     {
-        int i = 128;
         double d0 = -1.0D;
         int j = MathHelper.floor_double(entityIn.posX);
         int k = MathHelper.floor_double(entityIn.posZ);
@@ -481,8 +474,6 @@ public class TCTeleporter
 	            int i = MathHelper.floor_double(entityIn.posX);
 	            int j = MathHelper.floor_double(entityIn.posY) - 1;
 	            int k = MathHelper.floor_double(entityIn.posZ);
-	            int l = 1;
-	            int i1 = 0;
 	
 	            for (int j1 = -2; j1 <= 2; ++j1)
 	            {
@@ -509,7 +500,6 @@ public class TCTeleporter
     
     public static boolean makePortal(WorldServer destinationWorld, Entity entityIn, Teleporter _this)
     {
-        int i = 16;
         double d0 = -1.0D;
         int j = MathHelper.floor_double(entityIn.posX);
         int k = MathHelper.floor_double(entityIn.posY);
