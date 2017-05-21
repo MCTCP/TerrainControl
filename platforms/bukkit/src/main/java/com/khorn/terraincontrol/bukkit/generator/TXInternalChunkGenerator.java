@@ -4,8 +4,11 @@ import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_11_R1.*;
-import org.bukkit.craftbukkit.v1_11_R1.generator.CustomChunkGenerator;
+import net.minecraft.server.v1_12_R1.BiomeBase;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.EnumCreatureType;
+import net.minecraft.server.v1_12_R1.World;
+import org.bukkit.craftbukkit.v1_12_R1.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.util.List;
@@ -23,6 +26,7 @@ public class TXInternalChunkGenerator extends CustomChunkGenerator
         this.localWorld = world;
     }
 
+    @Override
     public List<BiomeBase.BiomeMeta> getMobsFor(EnumCreatureType type, BlockPosition position)
     {
         WorldConfig worldConfig = localWorld.getConfigs().getWorldConfig();

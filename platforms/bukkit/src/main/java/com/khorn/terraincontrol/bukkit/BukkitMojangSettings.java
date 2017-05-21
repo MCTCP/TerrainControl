@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.bukkit.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings;
-import net.minecraft.server.v1_11_R1.BiomeBase;
+import net.minecraft.server.v1_12_R1.BiomeBase;
 
 import java.util.List;
 
@@ -74,13 +74,13 @@ public final class BukkitMojangSettings implements MojangSettings
     @Override
     public LocalMaterialData getSurfaceBlock()
     {
-        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.r);
+        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.q);
     }
 
     @Override
     public LocalMaterialData getGroundBlock()
     {
-        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.s);
+        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.r);
     }
 
     @Override

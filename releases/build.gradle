@@ -46,26 +46,27 @@ def addToZip(File source, ZipOutputStream destination, Set<String> alreadyAddedF
     inputStream.close()
 }
 
-task createReleaseJar <<
-{
-    File forgeFile = getJarFile(project(":platforms:forge"))
-    File bukkitFile = getJarFile(project(":platforms:bukkit"))
-    File ourFile = getJarFile(project)
-
-    if (forgeFile.exists() && bukkitFile.exists())
-    {
-        ourFile.getParentFile().mkdirs()
-        ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(ourFile))
-        Set<String> alreadyAddedFiles = new HashSet<String>()
-
-        addToZip(forgeFile, outputStream, alreadyAddedFiles)
-        addToZip(bukkitFile, outputStream, alreadyAddedFiles)
-
-        outputStream.close()
-    } else
-    {
-        println(" Skipping the release jar, as the Bukkit or Forge file failed")
-		println(" Forge exists: " + forgeFile.exists())
-		println(" Bukkit exists: " + bukkitFile.exists())
+task createReleaseJar {
+	doLast {
+	    File forgeFile = getJarFile(project(":platforms:forge"))
+	    File bukkitFile = getJarFile(project(":platforms:bukkit"))
+	    File ourFile = getJarFile(project)
+	
+	    if (forgeFile.exists() && bukkitFile.exists())
+	    {
+	        ourFile.getParentFile().mkdirs()
+	        ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(ourFile))
+	        Set<String> alreadyAddedFiles = new HashSet<String>()
+	
+	        addToZip(forgeFile, outputStream, alreadyAddedFiles)
+	        addToZip(bukkitFile, outputStream, alreadyAddedFiles)
+	
+	        outputStream.close()
+	    } else
+	    {
+	        println(" Skipping the release jar, as the Bukkit or Forge file failed")
+			println(" Forge exists: " + forgeFile.exists())
+			println(" Bukkit exists: " + bukkitFile.exists())
+	    }
     }
 }

@@ -1,7 +1,10 @@
 package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.*;
-import com.khorn.terraincontrol.bukkit.generator.*;
+import com.khorn.terraincontrol.bukkit.generator.BukkitVanillaBiomeGenerator;
+import com.khorn.terraincontrol.bukkit.generator.TXChunkGenerator;
+import com.khorn.terraincontrol.bukkit.generator.TXInternalChunkGenerator;
+import com.khorn.terraincontrol.bukkit.generator.TXWorldChunkManager;
 import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.*;
@@ -16,9 +19,9 @@ import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
-import net.minecraft.server.v1_11_R1.*;
-import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_11_R1.generator.CustomChunkGenerator;
+import net.minecraft.server.v1_12_R1.*;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.generator.CustomChunkGenerator;
 
 import java.util.*;
 
@@ -702,14 +705,6 @@ public class BukkitWorld implements LocalWorld
         // for the first time or reloading
         this.world = mcWorld;
 
-        // Inject our own WorldProvider
-        if (mcWorld.worldProvider.getDimensionManager().equals(DimensionManager.OVERWORLD))
-        {
-            // Only replace the worldProvider if it's the overworld
-            // Replacing other dimensions causes a lot of glitches
-            mcWorld.worldProvider = new TXWorldProvider(this, this.world.worldProvider);
-        }
-
         // Inject our own BiomeManager (called WorldChunkManager)
         Class<? extends BiomeGenerator> biomeModeClass = this.settings.getWorldConfig().biomeMode;
         biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeModeClass, this);
@@ -815,12 +810,6 @@ public class BukkitWorld implements LocalWorld
      */
     public void disable()
     {
-        // Restore old world provider if replaced
-        if (world.worldProvider instanceof TXWorldProvider)
-        {
-            world.worldProvider = ((TXWorldProvider) world.worldProvider).getOldWorldProvider();
-        }
-
         // Restore vanilla chunk generator
         this.injectInternalChunkGenerator(new CustomChunkGenerator(world, getSeed(), generator));
     }

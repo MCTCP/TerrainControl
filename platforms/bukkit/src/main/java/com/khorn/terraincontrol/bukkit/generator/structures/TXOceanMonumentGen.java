@@ -4,8 +4,8 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.bukkit.BukkitBiome;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_11_R1.*;
-import net.minecraft.server.v1_11_R1.WorldGenMonument.WorldGenMonumentStart;
+import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.WorldGenMonument.WorldGenMonumentStart;
 
 import java.util.ArrayList;
 import java.util.Arrays;

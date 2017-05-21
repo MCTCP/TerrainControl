@@ -13,10 +13,10 @@ import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 
-import net.minecraft.server.v1_11_R1.*;
-import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillagePieceWeight;
-import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillageRoadPiece;
-import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillageStartPiece;
+import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.WorldGenVillagePieces.WorldGenVillagePieceWeight;
+import net.minecraft.server.v1_12_R1.WorldGenVillagePieces.WorldGenVillageRoadPiece;
+import net.minecraft.server.v1_12_R1.WorldGenVillagePieces.WorldGenVillageStartPiece;
 
 public class TXVillageGen extends StructureGenerator
 {

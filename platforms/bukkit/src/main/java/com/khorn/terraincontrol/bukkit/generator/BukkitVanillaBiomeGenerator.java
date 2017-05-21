@@ -4,9 +4,9 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
-import net.minecraft.server.v1_11_R1.BiomeBase;
-import net.minecraft.server.v1_11_R1.BlockPosition;
-import net.minecraft.server.v1_11_R1.WorldChunkManager;
+import net.minecraft.server.v1_12_R1.BiomeBase;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.WorldChunkManager;
 
 /**
  * A biome generator that gets its information from Mojang's WorldChunkManager.

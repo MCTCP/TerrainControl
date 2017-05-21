@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.bukkit.util;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
-import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_12_R1.*;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -109,13 +109,13 @@ public class NBTHelper
             switch (listType)
             {
                 case TAG_Int_Array:
-                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.c(i)));
+                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.d(i)));
                     break;
                 case TAG_Float:
-                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.e(i)));
+                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.g(i)));
                     break;
                 case TAG_Double:
-                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.d(i)));
+                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.f(i)));
                     break;
                 case TAG_String:
                     listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.getString(i)));
