@@ -186,30 +186,18 @@ public class ForgeMaterialData implements LocalMaterialData
     public String getName()
     {
         Block block = this.blockData.getBlock();
-        DefaultMaterial defaultMaterial = toDefaultMaterial();
-
         byte data = getBlockData();
+
         boolean nonDefaultData = !block.getDefaultState().equals(this.blockData);
         // Note that the above line is not equivalent to data != 0, as for
         // example pumpkins have a default data value of 2
 
-        if (defaultMaterial == DefaultMaterial.UNKNOWN_BLOCK)
+        if (nonDefaultData)
         {
-            // Use Minecraft's name
-            if (nonDefaultData)
-            {
-                return Block.REGISTRY.getNameForObject(this.blockData.getBlock()) + ":" + data;
-            }
-            return Block.REGISTRY.getNameForObject(this.blockData.getBlock()).toString();
-        } else
-        {
-            // Use our name
-            if (nonDefaultData)
-            {
-                return defaultMaterial.name() + ":" + getBlockData();
-            }
-            return defaultMaterial.name();
+            return Block.REGISTRY.getNameForObject(this.blockData.getBlock()) + ":" + data;
         }
+        return Block.REGISTRY.getNameForObject(this.blockData.getBlock()).toString();
+
     }
 
     @Override
