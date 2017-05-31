@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.bo3.BO3;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.Rotation;
 
@@ -147,12 +148,23 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
                     spawnZ += offset[1];
                 }
 
-                if (tree.spawnForced(world, random, rotation, spawnX, y, spawnZ))
+                if(tree instanceof BO3)
                 {
-                    // Success!
-                    return true;
+                    if(((BO3) tree).spawn(world, random, spawnX, spawnZ))
+                    {
+                        // Success!
+                        return true;
+                    }
                 }
-            }
+                else
+                {
+                    if (tree.spawnForced(world, random, rotation, spawnX, y, spawnZ))
+                    {
+                        // Success!
+                        return true;
+                    }
+                }
+              }
         }
         return false;
     }
