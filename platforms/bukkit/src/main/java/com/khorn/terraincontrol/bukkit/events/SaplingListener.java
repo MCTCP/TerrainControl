@@ -1,12 +1,16 @@
 package com.khorn.terraincontrol.bukkit.events;
 
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.bukkit.BukkitMaterialData;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.resource.SaplingGen;
 import com.khorn.terraincontrol.generator.resource.SaplingType;
+import net.minecraft.server.v1_12_R1.Blocks;
+import net.minecraft.server.v1_12_R1.IBlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.TreeType;
@@ -46,6 +50,9 @@ class SaplingListener
             return;
         }
 
+        // Get sapling material
+        LocalMaterialData sapling = world.getMaterial(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
         // Adjust position for bigger saplings
         boolean wideTrunk = saplingType.requiresFourSaplings();
         if (wideTrunk)
@@ -59,25 +66,56 @@ class SaplingListener
         }
 
         // Get generator
-        SaplingGen sapling = biomeConfig.getSaplingGen(saplingType);
-        if (sapling == null)
+        SaplingGen saplingGen = biomeConfig.getSaplingGen(saplingType);
+        if (saplingGen == null)
         {
             return;
         }
 
+        // Remove saplings
+        BukkitMaterialData air = BukkitMaterialData.ofMinecraftBlock(Blocks.AIR);
+        int saplingX = location.getBlockX();
+        int saplingY = location.getBlockY();
+        int saplingZ = location.getBlockZ();
+        if (wideTrunk)
+        {
+            world.setBlock(saplingX, saplingY, saplingZ, air);
+            world.setBlock(saplingX + 1, saplingY, saplingZ, air);
+            world.setBlock(saplingX, saplingY, saplingZ + 1, air);
+            world.setBlock(saplingX + 1, saplingY, saplingZ + 1, air);
+        } else
+        {
+            world.setBlock(saplingX, saplingY, saplingZ, air);
+        }
+
         // Try 10 times to spawn tree
-        boolean success = false;
+        boolean saplingGrown = false;
         Random random = new Random();
         for (int i = 0; i < 10; i++)
         {
-            if (sapling.growSapling(world, random, wideTrunk, location.getBlockX(), location.getBlockY(), location.getBlockZ()))
+            if (saplingGen.growSapling(world, random, wideTrunk, location.getBlockX(), location.getBlockY(), location.getBlockZ()))
             {
-                success = true;
+                saplingGrown = true;
                 break;
             }
         }
 
-        if (success)
+        if (!saplingGrown)
+        {
+            // Restore sapling
+            if (wideTrunk)
+            {
+                world.setBlock(saplingX, saplingY, saplingZ, sapling);
+                world.setBlock(saplingX + 1, saplingY, saplingZ, sapling);
+                world.setBlock(saplingX, saplingY, saplingZ + 1, sapling);
+                world.setBlock(saplingX + 1, saplingY, saplingZ + 1, sapling);
+            } else
+            {
+                world.setBlock(saplingX, saplingY, saplingZ, sapling);
+            }
+        }
+
+        if (saplingGrown)
         {
             // Just spawned the tree, clear the blocks list to prevent
             // Bukkit spawning another tree
