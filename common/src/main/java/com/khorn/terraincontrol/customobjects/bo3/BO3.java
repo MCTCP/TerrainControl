@@ -214,13 +214,17 @@ public class BO3 implements CustomObject
         {
             y = world.getSolidHeight(x, z);
         }
-        // Offset by static and random settings values
-        y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
-        y =  MathHelper.clamp(y, TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+
+        // Check spawn point before getting offset and variance
         if (!canSpawnAt(world, rotation, x, y, z))
         {
             return false;
         }
+
+        // Offset by static and random settings values
+        y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
+        y =  MathHelper.clamp(y, TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+
         return spawnForced(world, random, rotation, x, y, z);
     }
 
