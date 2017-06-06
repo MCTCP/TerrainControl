@@ -1,11 +1,11 @@
 // Information for all projects
 
 // The default tasks for all projects
-defaultTasks 'removeOldReleases', 'build', 'createReleaseJar', 'install'
+defaultTasks 'clean', 'build', 'createReleaseJar', 'install'
 
 allprojects
 {
-    version = "1.10.2-v17"
+    version = "1.11.2-v5"
     group = "com.khorn.terraincontrol"
 
     // Version of the shadow plugin
@@ -33,16 +33,4 @@ subprojects
 
     // Generate a pom.xml, upload to local Maven repository
     apply plugin: 'maven'
-}
-
-task removeOldReleases <<
-{
-    allprojects
-    {
-        File distributionsFolder = new File(project.buildDir, "distributions")
-        if (distributionsFolder.exists())
-        {
-            distributionsFolder.deleteDir()
-        }
-    }
 }

@@ -2,9 +2,10 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.bukkit.generator.BukkitVanillaBiomeGenerator;
-import com.khorn.terraincontrol.bukkit.generator.TCChunkGenerator;
-import com.khorn.terraincontrol.bukkit.generator.TCWorldChunkManager;
-import com.khorn.terraincontrol.bukkit.generator.TCWorldProvider;
+import com.khorn.terraincontrol.bukkit.generator.TXChunkGenerator;
+import com.khorn.terraincontrol.bukkit.generator.TXInternalChunkGenerator;
+import com.khorn.terraincontrol.bukkit.generator.TXWorldChunkManager;
+import com.khorn.terraincontrol.bukkit.generator.TXWorldProvider;
 import com.khorn.terraincontrol.bukkit.generator.structures.*;
 import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.*;
@@ -22,76 +23,74 @@ import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
-import net.minecraft.server.v1_10_R1.BiomeBase;
-import net.minecraft.server.v1_10_R1.Block;
-import net.minecraft.server.v1_10_R1.BlockLeaves;
-import net.minecraft.server.v1_10_R1.BlockLeaves1;
-import net.minecraft.server.v1_10_R1.BlockLog1;
-import net.minecraft.server.v1_10_R1.BlockPosition;
-import net.minecraft.server.v1_10_R1.BlockWood;
-import net.minecraft.server.v1_10_R1.Blocks;
-import net.minecraft.server.v1_10_R1.Chunk;
-import net.minecraft.server.v1_10_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_10_R1.ChunkGenerator;
-import net.minecraft.server.v1_10_R1.ChunkProviderServer;
-import net.minecraft.server.v1_10_R1.ChunkSection;
-import net.minecraft.server.v1_10_R1.DataConverter;
-import net.minecraft.server.v1_10_R1.DataConverterRegistry;
-import net.minecraft.server.v1_10_R1.DataConverterTypes;
-import net.minecraft.server.v1_10_R1.DefinedStructure;
-import net.minecraft.server.v1_10_R1.DefinedStructureManager;
-import net.minecraft.server.v1_10_R1.DimensionManager;
-import net.minecraft.server.v1_10_R1.Entity;
-import net.minecraft.server.v1_10_R1.EntityFallingBlock;
-import net.minecraft.server.v1_10_R1.EntityLightning;
-import net.minecraft.server.v1_10_R1.EntityOcelot;
-import net.minecraft.server.v1_10_R1.EntityTippedArrow;
-import net.minecraft.server.v1_10_R1.EnumCreatureType;
-import net.minecraft.server.v1_10_R1.IBlockData;
-import net.minecraft.server.v1_10_R1.ITileEntity;
-import net.minecraft.server.v1_10_R1.Material;
-import net.minecraft.server.v1_10_R1.MinecraftKey;
-import net.minecraft.server.v1_10_R1.NBTBase;
-import net.minecraft.server.v1_10_R1.NBTTagCompound;
-import net.minecraft.server.v1_10_R1.SpawnerCreature;
-import net.minecraft.server.v1_10_R1.TileEntity;
-import net.minecraft.server.v1_10_R1.World;
-import net.minecraft.server.v1_10_R1.WorldChunkManager;
-import net.minecraft.server.v1_10_R1.WorldGenAcaciaTree;
-import net.minecraft.server.v1_10_R1.WorldGenBigTree;
-import net.minecraft.server.v1_10_R1.WorldGenDungeons;
-import net.minecraft.server.v1_10_R1.WorldGenForest;
-import net.minecraft.server.v1_10_R1.WorldGenForestTree;
-import net.minecraft.server.v1_10_R1.WorldGenFossils;
-import net.minecraft.server.v1_10_R1.WorldGenGroundBush;
-import net.minecraft.server.v1_10_R1.WorldGenHugeMushroom;
-import net.minecraft.server.v1_10_R1.WorldGenJungleTree;
-import net.minecraft.server.v1_10_R1.WorldGenMegaTree;
-import net.minecraft.server.v1_10_R1.WorldGenStronghold;
-import net.minecraft.server.v1_10_R1.WorldGenSwampTree;
-import net.minecraft.server.v1_10_R1.WorldGenTaiga1;
-import net.minecraft.server.v1_10_R1.WorldGenTaiga2;
-import net.minecraft.server.v1_10_R1.WorldGenTrees;
-import net.minecraft.server.v1_10_R1.WorldServer;
-import net.minecraft.server.v1_10_R1.EntityLiving;
+import net.minecraft.server.v1_11_R1.BiomeBase;
+import net.minecraft.server.v1_11_R1.Block;
+import net.minecraft.server.v1_11_R1.BlockLeaves;
+import net.minecraft.server.v1_11_R1.BlockLeaves1;
+import net.minecraft.server.v1_11_R1.BlockLog1;
+import net.minecraft.server.v1_11_R1.BlockPosition;
+import net.minecraft.server.v1_11_R1.BlockWood;
+import net.minecraft.server.v1_11_R1.Blocks;
+import net.minecraft.server.v1_11_R1.Chunk;
+import net.minecraft.server.v1_11_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_11_R1.ChunkGenerator;
+import net.minecraft.server.v1_11_R1.ChunkProviderServer;
+import net.minecraft.server.v1_11_R1.ChunkSection;
+import net.minecraft.server.v1_11_R1.DataConverter;
+import net.minecraft.server.v1_11_R1.DataConverterRegistry;
+import net.minecraft.server.v1_11_R1.DataConverterTypes;
+import net.minecraft.server.v1_11_R1.DefinedStructure;
+import net.minecraft.server.v1_11_R1.DefinedStructureManager;
+import net.minecraft.server.v1_11_R1.DimensionManager;
+import net.minecraft.server.v1_11_R1.Entity;
+import net.minecraft.server.v1_11_R1.EntityFallingBlock;
+import net.minecraft.server.v1_11_R1.EntityLightning;
+import net.minecraft.server.v1_11_R1.EntityOcelot;
+import net.minecraft.server.v1_11_R1.EntityTippedArrow;
+import net.minecraft.server.v1_11_R1.EnumCreatureType;
+import net.minecraft.server.v1_11_R1.IBlockData;
+import net.minecraft.server.v1_11_R1.ITileEntity;
+import net.minecraft.server.v1_11_R1.Material;
+import net.minecraft.server.v1_11_R1.MinecraftKey;
+import net.minecraft.server.v1_11_R1.NBTBase;
+import net.minecraft.server.v1_11_R1.NBTTagCompound;
+import net.minecraft.server.v1_11_R1.SpawnerCreature;
+import net.minecraft.server.v1_11_R1.TileEntity;
+import net.minecraft.server.v1_11_R1.World;
+import net.minecraft.server.v1_11_R1.WorldChunkManager;
+import net.minecraft.server.v1_11_R1.WorldGenAcaciaTree;
+import net.minecraft.server.v1_11_R1.WorldGenBigTree;
+import net.minecraft.server.v1_11_R1.WorldGenDungeons;
+import net.minecraft.server.v1_11_R1.WorldGenForest;
+import net.minecraft.server.v1_11_R1.WorldGenForestTree;
+import net.minecraft.server.v1_11_R1.WorldGenFossils;
+import net.minecraft.server.v1_11_R1.WorldGenGroundBush;
+import net.minecraft.server.v1_11_R1.WorldGenHugeMushroom;
+import net.minecraft.server.v1_11_R1.WorldGenJungleTree;
+import net.minecraft.server.v1_11_R1.WorldGenMegaTree;
+import net.minecraft.server.v1_11_R1.WorldGenStronghold;
+import net.minecraft.server.v1_11_R1.WorldGenSwampTree;
+import net.minecraft.server.v1_11_R1.WorldGenTaiga1;
+import net.minecraft.server.v1_11_R1.WorldGenTaiga2;
+import net.minecraft.server.v1_11_R1.WorldGenTrees;
+import net.minecraft.server.v1_11_R1.WorldServer;
+import net.minecraft.server.v1_11_R1.EntityLiving;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_10_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftAmbient;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftAnimals;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftComplexLivingEntity;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftFlying;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftGolem;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftGuardian;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftMonster;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftSlime;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftWaterMob;
-import org.bukkit.craftbukkit.v1_10_R1.generator.CustomChunkGenerator;
-import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_11_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftAmbient;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftAnimals;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftComplexLivingEntity;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftFlying;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftGolem;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftGuardian;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftMonster;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftSlime;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftWaterMob;
+import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
@@ -99,6 +98,8 @@ import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_11_R1.generator.CustomChunkGenerator;
 
 import java.util.*;
 
@@ -107,7 +108,7 @@ public class BukkitWorld implements LocalWorld
     // Initially false, set to true when enabled once
     private boolean initialized;
 
-    private TCChunkGenerator generator;
+    private TXChunkGenerator generator;
     private WorldServer world;
     private ServerConfigProvider settings;
     private CustomObjectStructureCache structureCache;
@@ -123,12 +124,13 @@ public class BukkitWorld implements LocalWorld
 
     private final Map<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
-    public StrongholdGen strongholdGen;
-    public VillageGen villageGen;
-    public MineshaftGen mineshaftGen;
-    public RareBuildingGen pyramidsGen;
-    public NetherFortressGen netherFortressGen;
-    public OceanMonumentGen oceanMonumentGen;
+    public TXStrongholdGen strongholdGen;
+    public TXVillageGen villageGen;
+    public TXMineshaftGen mineshaftGen;
+    public TXRareBuildingGen rareBuildingGen;
+    public TXNetherFortressGen netherFortressGen;
+    public TXOceanMonumentGen oceanMonumentGen;
+    public TXMansionGen mansionGen;
 
     private WorldGenDungeons dungeon;
     private WorldGenFossils fossil;
@@ -253,11 +255,13 @@ public class BukkitWorld implements LocalWorld
         if (worldConfig.villagesEnabled && dry)
             this.villageGen.a(this.world, chunkX, chunkZ, null);
         if (worldConfig.rareBuildingsEnabled)
-            this.pyramidsGen.a(this.world, chunkX, chunkZ, null);
+        	this.rareBuildingGen.a(this.world, chunkX, chunkZ, null);
         if (worldConfig.netherFortressesEnabled)
             this.netherFortressGen.a(this.world, chunkX, chunkZ, null);
         if (worldConfig.oceanMonumentsEnabled)
             this.oceanMonumentGen.a(this.world, chunkX, chunkZ, null);
+        if (worldConfig.woodLandMansionsEnabled)
+        	this.mansionGen.a(this.world, chunkX, chunkZ, null);
     }
 
     @Override
@@ -338,12 +342,14 @@ public class BukkitWorld implements LocalWorld
         if (worldConfig.villagesEnabled)
             villageGenerated = this.villageGen.a(this.world, random, chunkIntPair);
         if (worldConfig.rareBuildingsEnabled)
-            this.pyramidsGen.a(this.world, random, chunkIntPair);
+            this.rareBuildingGen.a(this.world, random, chunkIntPair);
         if (worldConfig.netherFortressesEnabled)
             this.netherFortressGen.a(this.world, random, chunkIntPair);
         if (worldConfig.oceanMonumentsEnabled)
             this.oceanMonumentGen.a(this.world, random, chunkIntPair);
-
+        if (worldConfig.woodLandMansionsEnabled)
+        	this.mansionGen.a(this.world, random, chunkIntPair);
+        
         return villageGenerated;
     }
 
@@ -559,8 +565,8 @@ public class BukkitWorld implements LocalWorld
                 }
             }
 
-            // Update client
-            world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2);
+            // Notify world: (2 | 16) == update client, don't update observers
+            world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2 | 16);
         } catch (Throwable t)
         {
             String populatingChunkInfo = this.chunkCache == null? "(no chunk)" :
@@ -732,7 +738,7 @@ public class BukkitWorld implements LocalWorld
         return settings.getWorldConfig().worldHeightScale;
     }
 
-    public TCChunkGenerator getChunkGenerator()
+    public TXChunkGenerator getChunkGenerator()
     {
         return this.generator;
     }
@@ -787,7 +793,7 @@ public class BukkitWorld implements LocalWorld
         {
             // Only replace the worldProvider if it's the overworld
             // Replacing other dimensions causes a lot of glitches
-            mcWorld.worldProvider = new TCWorldProvider(this, this.world.worldProvider);
+            mcWorld.worldProvider = new TXWorldProvider(this, this.world.worldProvider);
         }
 
         // Inject our own BiomeManager (called WorldChunkManager)
@@ -809,15 +815,16 @@ public class BukkitWorld implements LocalWorld
             {
                 case Normal:
                 case OldGenerator:
-                    this.strongholdGen = new StrongholdGen(settings);
-                    this.villageGen = new VillageGen(settings);
-                    this.mineshaftGen = new MineshaftGen();
-                    this.pyramidsGen = new RareBuildingGen(settings);
-                    this.netherFortressGen = new NetherFortressGen();
-                    this.oceanMonumentGen = new OceanMonumentGen(settings);
+                    this.strongholdGen = new TXStrongholdGen(settings);
+                    this.villageGen = new TXVillageGen(settings);
+                    this.mineshaftGen = new TXMineshaftGen();
+                    this.rareBuildingGen = new TXRareBuildingGen(settings);
+                    this.mansionGen = new TXMansionGen(settings);
+                    this.netherFortressGen = new TXNetherFortressGen();
+                    this.oceanMonumentGen = new TXOceanMonumentGen(settings);
 
                     // Inject our own ChunkGenerator
-                    injectStrongholdGenerator(this.strongholdGen);
+                    injectInternalChunkGenerator(new TXInternalChunkGenerator(this, generator));
                 case NotGenerate:
                 case TerrainTest:
                     this.generator.onInitialize(this);
@@ -874,16 +881,17 @@ public class BukkitWorld implements LocalWorld
         {
             // Let Minecraft's biome generator depend on ours
             ReflectionHelper.setValueInFieldOfType(this.world.worldProvider,
-                    WorldChunkManager.class, new TCWorldChunkManager(this, biomeGenerator));
+                    WorldChunkManager.class, new TXWorldChunkManager(this, biomeGenerator));
         }
     }
 
-    private void injectStrongholdGenerator(WorldGenStronghold strongholdGen)
+    private void injectInternalChunkGenerator(CustomChunkGenerator chunkGenerator)
     {
         ChunkProviderServer chunkProvider = this.world.getChunkProviderServer();
-        ChunkGenerator chunkGenerator = ReflectionHelper.getValueInFieldOfType(chunkProvider, ChunkGenerator.class);
-        if (chunkGenerator instanceof CustomChunkGenerator) {
-            ReflectionHelper.setValueInFieldOfType(chunkGenerator, WorldGenStronghold.class, strongholdGen);
+        ChunkGenerator oldChunkGenerator = chunkProvider.chunkGenerator;
+        if (oldChunkGenerator instanceof CustomChunkGenerator)
+        {
+        	ReflectionHelper.setValueInFieldOfType(chunkProvider, ChunkGenerator.class, chunkGenerator);
         }
     }
 
@@ -893,16 +901,16 @@ public class BukkitWorld implements LocalWorld
     public void disable()
     {
         // Restore old world provider if replaced
-        if (world.worldProvider instanceof TCWorldProvider)
+        if (world.worldProvider instanceof TXWorldProvider)
         {
-            world.worldProvider = ((TCWorldProvider) world.worldProvider).getOldWorldProvider();
+            world.worldProvider = ((TXWorldProvider) world.worldProvider).getOldWorldProvider();
         }
 
-        // Restore vanilla stronghold generator
-        this.injectStrongholdGenerator(new WorldGenStronghold());
+        // Restore vanilla chunk generator
+        this.injectInternalChunkGenerator(new CustomChunkGenerator(world, getSeed(), generator));
     }
 
-    public void setChunkGenerator(TCChunkGenerator _generator)
+    public void setChunkGenerator(TXChunkGenerator _generator)
     {
         this.generator = _generator;
     }
@@ -1006,13 +1014,18 @@ public class BukkitWorld implements LocalWorld
 
 		EntityType entityType;
 		try
-		{
-			entityType = EntityType.valueOf(mobTypeName.toUpperCase());	    		
+		{			
+			entityType = EntityType.valueOf(mobTypeName.toUpperCase());
 		}
 		catch(IllegalArgumentException ex)
 		{
-			TerrainControl.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
-			return;
+			entityType = EntityType.fromName(mobTypeName);
+			
+			if(entityType == null)
+			{
+				TerrainControl.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
+				return;
+			}
 		}
 
 		if (entityType == EntityType.PLAYER)
@@ -1021,7 +1034,9 @@ public class BukkitWorld implements LocalWorld
 		}
 		
 		Entity entityLiving = getEntity(entityType.getEntityClass());	
-		org.bukkit.entity.Entity bukkitEntityLiving = entityLiving.getBukkitEntity();	
+		org.bukkit.entity.Entity bukkitEntityLiving = entityLiving.getBukkitEntity();
+		        
+		boolean isWaterMob = bukkitEntityLiving instanceof CraftGuardian;
 		
         if(entityLiving != null)
         {       	
@@ -1032,10 +1047,10 @@ public class BukkitWorld implements LocalWorld
 				bukkitEntityLiving instanceof CraftComplexLivingEntity || // Dragon			
 				bukkitEntityLiving instanceof CraftSlime || // Slime/Magma
 				bukkitEntityLiving instanceof CraftMonster ||
-				bukkitEntityLiving instanceof CraftFlying // Ghast			
+				bukkitEntityLiving instanceof CraftFlying // Ghast
 			)
 			{
-				creatureType = EnumCreatureType.CREATURE;
+				creatureType = EnumCreatureType.MONSTER;
 			}
 			
 			// AMBIENT
@@ -1081,18 +1096,16 @@ public class BukkitWorld implements LocalWorld
             boolean canProvidePower = block.isBlockPowered();
             boolean isBlockNormalCube = !isOutsideBuildHeight && isOpaque && isFullCube && !canProvidePower;
                         
-            boolean isWaterMob = bukkitEntityLiving instanceof CraftGuardian;
-            
-            if (!isBlockNormalCube && (((creatureType == EnumCreatureType.WATER_CREATURE || isWaterMob) && material == org.bukkit.Material.WATER) || material == org.bukkit.Material.AIR))
-            {					                            						                            	                                  			                                    	
+            if (!isBlockNormalCube && (((creatureType == EnumCreatureType.WATER_CREATURE || isWaterMob) && (material == org.bukkit.Material.WATER || material == org.bukkit.Material.STATIONARY_WATER)) || material == org.bukkit.Material.AIR))
+            {           	
 	            float f = (float)j1 + 0.5F;
 	            float f1 = (float)k1;
 	            float f2 = (float)l1 + 0.5F;                              
 	           
 	            if(entityLiving instanceof EntityLiving)
-	            {	
+	            {
 	            	for(int r = 0; r < groupSize; r++)
-	            	{  	
+	            	{ 
             			CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
 	            			            		            			            			
 	            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
@@ -1107,13 +1120,13 @@ public class BukkitWorld implements LocalWorld
 	            				entity.setCustomName(nameTag);
 	        				}
 	            		}
-	            			            		
+	            		
 	            		if(entity instanceof CraftLivingEntity)
 	            		{
 	            			((CraftLivingEntity) entity).setRemoveWhenFarAway(false); // <- makes sure mobs don't de-spawn
 	            		}
 	            	}
-	            } else {                    					                                                						                                                                                    					                                                
+	            } else { 
 	            	for(int r = 0; r < groupSize; r++)
 	            	{                                    		
 	            		CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
@@ -1182,7 +1195,7 @@ public class BukkitWorld implements LocalWorld
 		
 		if (org.bukkit.entity.Boat.class.isAssignableFrom(clazz))
 		{
-			entity = new net.minecraft.server.v1_10_R1.EntityBoat(world, x, y, z);
+			entity = new net.minecraft.server.v1_11_R1.EntityBoat(world, x, y, z);
 		}
 		else if (FallingBlock.class.isAssignableFrom(clazz))
 		{
@@ -1192,185 +1205,185 @@ public class BukkitWorld implements LocalWorld
 		{
 			if (org.bukkit.entity.Snowball.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntitySnowball(world, x, y, z);
+				entity = new net.minecraft.server.v1_11_R1.EntitySnowball(world, x, y, z);
 			}
 			else if (org.bukkit.entity.Egg.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityEgg(world, x, y, z);
+				entity = new net.minecraft.server.v1_11_R1.EntityEgg(world, x, y, z);
 			}
 			else if (Arrow.class.isAssignableFrom(clazz))
 			{
 				if (org.bukkit.entity.TippedArrow.class.isAssignableFrom(clazz))
 				{
 					entity = new EntityTippedArrow(world);
-					((EntityTippedArrow)entity).setType(org.bukkit.craftbukkit.v1_10_R1.potion.CraftPotionUtil.fromBukkit(new org.bukkit.potion.PotionData(org.bukkit.potion.PotionType.WATER, false, false)));
+					((EntityTippedArrow)entity).setType(org.bukkit.craftbukkit.v1_11_R1.potion.CraftPotionUtil.fromBukkit(new org.bukkit.potion.PotionData(org.bukkit.potion.PotionType.WATER, false, false)));
 				}
 				else if (org.bukkit.entity.SpectralArrow.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntitySpectralArrow(world);
+					entity = new net.minecraft.server.v1_11_R1.EntitySpectralArrow(world);
 				} else {
 					entity = new EntityTippedArrow(world);
 				}
 			}
 			else if (org.bukkit.entity.ThrownExpBottle.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityThrownExpBottle(world);
+				entity = new net.minecraft.server.v1_11_R1.EntityThrownExpBottle(world);
 			}
 			else if (org.bukkit.entity.EnderPearl.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityEnderPearl(world);
+				entity = new net.minecraft.server.v1_11_R1.EntityEnderPearl(world);
 			}
 			else if (org.bukkit.entity.ThrownPotion.class.isAssignableFrom(clazz))
 			{
 				if (org.bukkit.entity.LingeringPotion.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityPotion(world, x, y, z, CraftItemStack.asNMSCopy(new ItemStack(org.bukkit.Material.LINGERING_POTION, 1)));
+					entity = new net.minecraft.server.v1_11_R1.EntityPotion(world, x, y, z, CraftItemStack.asNMSCopy(new ItemStack(org.bukkit.Material.LINGERING_POTION, 1)));
 				} else {
-					entity = new net.minecraft.server.v1_10_R1.EntityPotion(world, x, y, z, CraftItemStack.asNMSCopy(new ItemStack(org.bukkit.Material.SPLASH_POTION, 1)));
+					entity = new net.minecraft.server.v1_11_R1.EntityPotion(world, x, y, z, CraftItemStack.asNMSCopy(new ItemStack(org.bukkit.Material.SPLASH_POTION, 1)));
 				}
 			}
 			else if (org.bukkit.entity.Fireball.class.isAssignableFrom(clazz))
 			{
 				if (org.bukkit.entity.SmallFireball.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntitySmallFireball(world);
+					entity = new net.minecraft.server.v1_11_R1.EntitySmallFireball(world);
 				}
 				else if (org.bukkit.entity.WitherSkull.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityWitherSkull(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityWitherSkull(world);
 				}
 				else if (org.bukkit.entity.DragonFireball.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityDragonFireball(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityDragonFireball(world);
 				} else {
-					entity = new net.minecraft.server.v1_10_R1.EntityLargeFireball(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityLargeFireball(world);
 				}
 			}
 			else if (org.bukkit.entity.ShulkerBullet.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityShulkerBullet(world);
+				entity = new net.minecraft.server.v1_11_R1.EntityShulkerBullet(world);
 			}
 		}
 		else if (org.bukkit.entity.Minecart.class.isAssignableFrom(clazz))
 		{
 			if (org.bukkit.entity.minecart.PoweredMinecart.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityMinecartFurnace(world, x, y, z);
+				entity = new net.minecraft.server.v1_11_R1.EntityMinecartFurnace(world, x, y, z);
 			}
 			else if (org.bukkit.entity.minecart.StorageMinecart.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityMinecartChest(world, x, y, z);
+				entity = new net.minecraft.server.v1_11_R1.EntityMinecartChest(world, x, y, z);
 			}
 			else if (org.bukkit.entity.minecart.ExplosiveMinecart.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityMinecartTNT(world, x, y, z);
+				entity = new net.minecraft.server.v1_11_R1.EntityMinecartTNT(world, x, y, z);
 			}
 			else if (org.bukkit.entity.minecart.HopperMinecart.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityMinecartHopper(world, x, y, z);
+				entity = new net.minecraft.server.v1_11_R1.EntityMinecartHopper(world, x, y, z);
 			}
 			else if (org.bukkit.entity.minecart.SpawnerMinecart.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityMinecartMobSpawner(world, x, y, z);
+				entity = new net.minecraft.server.v1_11_R1.EntityMinecartMobSpawner(world, x, y, z);
 			}
 			else if (org.bukkit.entity.minecart.CommandMinecart.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityMinecartCommandBlock(world, x, y, z);
+				entity = new net.minecraft.server.v1_11_R1.EntityMinecartCommandBlock(world, x, y, z);
 			} else {
-				entity = new net.minecraft.server.v1_10_R1.EntityMinecartRideable(world, x, y, z);
+				entity = new net.minecraft.server.v1_11_R1.EntityMinecartRideable(world, x, y, z);
 			}
 		}
 		else if (org.bukkit.entity.EnderSignal.class.isAssignableFrom(clazz))
 		{
-			entity = new net.minecraft.server.v1_10_R1.EntityEnderSignal(world, x, y, z);
+			entity = new net.minecraft.server.v1_11_R1.EntityEnderSignal(world, x, y, z);
 		}
 		else if (org.bukkit.entity.EnderCrystal.class.isAssignableFrom(clazz))
 		{
-			entity = new net.minecraft.server.v1_10_R1.EntityEnderCrystal(world);
+			entity = new net.minecraft.server.v1_11_R1.EntityEnderCrystal(world);
 		}
 		else if (LivingEntity.class.isAssignableFrom(clazz))
 		{
 			if (org.bukkit.entity.Chicken.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityChicken(world);
+				entity = new net.minecraft.server.v1_11_R1.EntityChicken(world);
 			}
 			else if (org.bukkit.entity.Cow.class.isAssignableFrom(clazz))
 			{
 				if (org.bukkit.entity.MushroomCow.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityMushroomCow(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityMushroomCow(world);
 				} else {
-					entity = new net.minecraft.server.v1_10_R1.EntityCow(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityCow(world);
 				}
 			}
 			else if (org.bukkit.entity.Golem.class.isAssignableFrom(clazz))
 			{
 				if (org.bukkit.entity.Snowman.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntitySnowman(world);
+					entity = new net.minecraft.server.v1_11_R1.EntitySnowman(world);
 				}
 				else if (org.bukkit.entity.IronGolem.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityIronGolem(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityIronGolem(world);
 				}
 				else if (org.bukkit.entity.Shulker.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityShulker(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityShulker(world);
 				}
 			} 
 			else if (org.bukkit.entity.Creeper.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityCreeper(world);
+				entity = new net.minecraft.server.v1_11_R1.EntityCreeper(world);
 			}
 			else if (org.bukkit.entity.Ghast.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityGhast(world);
+				entity = new net.minecraft.server.v1_11_R1.EntityGhast(world);
 			}
 			else if (org.bukkit.entity.Pig.class.isAssignableFrom(clazz))
 			{
-				entity = new net.minecraft.server.v1_10_R1.EntityPig(world);
+				entity = new net.minecraft.server.v1_11_R1.EntityPig(world);
 			}
 			else if (!Player.class.isAssignableFrom(clazz))
 			{
 				if (org.bukkit.entity.Sheep.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntitySheep(world);
+					entity = new net.minecraft.server.v1_11_R1.EntitySheep(world);
 				}
 				else if (org.bukkit.entity.Horse.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityHorse(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityHorse(world);
 				}
 				else if (org.bukkit.entity.Skeleton.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntitySkeleton(world);
+					entity = new net.minecraft.server.v1_11_R1.EntitySkeleton(world);
 				}
 				else if (org.bukkit.entity.Slime.class.isAssignableFrom(clazz))
 				{
 					if (org.bukkit.entity.MagmaCube.class.isAssignableFrom(clazz))
 					{
-						entity = new net.minecraft.server.v1_10_R1.EntityMagmaCube(world);
+						entity = new net.minecraft.server.v1_11_R1.EntityMagmaCube(world);
 					} else {
-						entity = new net.minecraft.server.v1_10_R1.EntitySlime(world);
+						entity = new net.minecraft.server.v1_11_R1.EntitySlime(world);
 					}
 				}
 				else if (org.bukkit.entity.Spider.class.isAssignableFrom(clazz))
 				{
 					if (org.bukkit.entity.CaveSpider.class.isAssignableFrom(clazz))
 					{
-						entity = new net.minecraft.server.v1_10_R1.EntityCaveSpider(world);
+						entity = new net.minecraft.server.v1_11_R1.EntityCaveSpider(world);
 					} else {
-						entity = new net.minecraft.server.v1_10_R1.EntitySpider(world);
+						entity = new net.minecraft.server.v1_11_R1.EntitySpider(world);
 					}
 				}
 				else if (org.bukkit.entity.Squid.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntitySquid(world);
+					entity = new net.minecraft.server.v1_11_R1.EntitySquid(world);
 				}
 				else if (org.bukkit.entity.Tameable.class.isAssignableFrom(clazz))
 				{
 					if (org.bukkit.entity.Wolf.class.isAssignableFrom(clazz))
 					{
-						entity = new net.minecraft.server.v1_10_R1.EntityWolf(world);
+						entity = new net.minecraft.server.v1_11_R1.EntityWolf(world);
 					}
 					else if (org.bukkit.entity.Ocelot.class.isAssignableFrom(clazz))
 					{
@@ -1379,76 +1392,78 @@ public class BukkitWorld implements LocalWorld
 				}
 				else if (org.bukkit.entity.PigZombie.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityPigZombie(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityPigZombie(world);
 				}
 				else if (org.bukkit.entity.Zombie.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityZombie(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityZombie(world);
 				}
 				else if (org.bukkit.entity.Giant.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityGiantZombie(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityGiantZombie(world);
 				}
 				else if (org.bukkit.entity.Silverfish.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntitySilverfish(world);
+					entity = new net.minecraft.server.v1_11_R1.EntitySilverfish(world);
 				}
 				else if (org.bukkit.entity.Enderman.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityEnderman(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityEnderman(world);
 				}
 				else if (org.bukkit.entity.Blaze.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityBlaze(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityBlaze(world);
 				}
 				else if (org.bukkit.entity.Villager.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityVillager(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityVillager(world);
 				}
 				else if (org.bukkit.entity.Witch.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityWitch(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityWitch(world);
 				}
 				else if (org.bukkit.entity.Wither.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityWither(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityWither(world);
 				}
 				else if (org.bukkit.entity.ComplexLivingEntity.class.isAssignableFrom(clazz))
 				{
 					if (org.bukkit.entity.EnderDragon.class.isAssignableFrom(clazz))
 					{
-						entity = new net.minecraft.server.v1_10_R1.EntityEnderDragon(world);
+						entity = new net.minecraft.server.v1_11_R1.EntityEnderDragon(world);
 					}
 				}
 				else if (org.bukkit.entity.Ambient.class.isAssignableFrom(clazz))
 				{
 					if (org.bukkit.entity.Bat.class.isAssignableFrom(clazz))
 					{
-						entity = new net.minecraft.server.v1_10_R1.EntityBat(world);
+						entity = new net.minecraft.server.v1_11_R1.EntityBat(world);
 					}
 				}
 				else if (org.bukkit.entity.Rabbit.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityRabbit(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityRabbit(world);
 				}
 				else if (org.bukkit.entity.Endermite.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityEndermite(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityEndermite(world);
 				}
 				else if (org.bukkit.entity.Guardian.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityGuardian(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityGuardian(world);
 				}
 				else if (org.bukkit.entity.ArmorStand.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityArmorStand(world, x, y, z);
+					entity = new net.minecraft.server.v1_11_R1.EntityArmorStand(world, x, y, z);
 				}
 				else if (org.bukkit.entity.PolarBear.class.isAssignableFrom(clazz))
 				{
-					entity = new net.minecraft.server.v1_10_R1.EntityPolarBear(world);
+					entity = new net.minecraft.server.v1_11_R1.EntityPolarBear(world);
 				}
 			}
 		}
+		
+		//TODO: Does this need to be re-enabled??
 		/*
 		else if (org.bukkit.entity.Hanging.class.isAssignableFrom(clazz))
 		{
@@ -1522,11 +1537,11 @@ public class BukkitWorld implements LocalWorld
 		*/
 		else if (org.bukkit.entity.TNTPrimed.class.isAssignableFrom(clazz))
 		{
-			entity = new net.minecraft.server.v1_10_R1.EntityTNTPrimed(world, x, y, z, null);
+			entity = new net.minecraft.server.v1_11_R1.EntityTNTPrimed(world, x, y, z, null);
 		}
 		else if (org.bukkit.entity.ExperienceOrb.class.isAssignableFrom(clazz))
 		{
-			entity = new net.minecraft.server.v1_10_R1.EntityExperienceOrb(world, x, y, z, 0);
+			entity = new net.minecraft.server.v1_11_R1.EntityExperienceOrb(world, x, y, z, 0);
 		}
 		else if (org.bukkit.entity.Weather.class.isAssignableFrom(clazz))
 		{
@@ -1537,11 +1552,11 @@ public class BukkitWorld implements LocalWorld
 		}
 		else if (org.bukkit.entity.Firework.class.isAssignableFrom(clazz))
 		{
-			entity = new net.minecraft.server.v1_10_R1.EntityFireworks(world, x, y, z, null);
+			entity = new net.minecraft.server.v1_11_R1.EntityFireworks(world, x, y, z, null);
 		}
 		else if (org.bukkit.entity.AreaEffectCloud.class.isAssignableFrom(clazz))
 		{
-			entity = new net.minecraft.server.v1_10_R1.EntityAreaEffectCloud(world, x, y, z);
+			entity = new net.minecraft.server.v1_11_R1.EntityAreaEffectCloud(world, x, y, z);
 		}
 				  
 		return entity;

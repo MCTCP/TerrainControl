@@ -4,16 +4,16 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
-import net.minecraft.server.v1_10_R1.BiomeBase;
-import net.minecraft.server.v1_10_R1.BlockPosition;
-import net.minecraft.server.v1_10_R1.WorldChunkManager;
+import net.minecraft.server.v1_11_R1.BiomeBase;
+import net.minecraft.server.v1_11_R1.BlockPosition;
+import net.minecraft.server.v1_11_R1.WorldChunkManager;
 
 /**
  * A biome generator that gets its information from Mojang's WorldChunkManager.
  *
  * <p>
  * This can be somewhat dangerous, because a subclass for WorldChunkManager,
- * {@link TCWorldChunkManager}, gets its information from a BiomeGenerator. This
+ * {@link TXWorldChunkManager}, gets its information from a BiomeGenerator. This
  * would cause infinite recursion. To combat this, a check has been added to
  * {@link #setWorldChunkManager(WorldChunkManager)}.
  *
@@ -29,7 +29,7 @@ public class BukkitVanillaBiomeGenerator extends VanillaBiomeGenerator {
 
     public void setWorldChunkManager(WorldChunkManager worldChunkManager)
     {
-        if (worldChunkManager instanceof TCWorldChunkManager)
+        if (worldChunkManager instanceof TXWorldChunkManager)
         {
             // TCWorldChunkManager is unusable, as it just asks the
             // BiomeGenerator for the biomes, creating an infinite loop

@@ -85,7 +85,7 @@ public final class PluginConfig extends ConfigFile
     protected void writeConfigSettings(SettingsMap writer)
     {
         // The modes
-        writer.bigTitle("The TerrainControl Plugin Config File ");
+        writer.bigTitle("The Open Terrain Generator Config File ");
 
         writer.putSetting(WorldStandardValues.SETTINGS_MODE, this.SettingsMode,
                 "How this config file will be treated.",

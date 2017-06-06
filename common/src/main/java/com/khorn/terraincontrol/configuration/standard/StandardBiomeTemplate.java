@@ -79,6 +79,7 @@ public class StandardBiomeTemplate
     public int defaultFoliageColor = 0xFFFFFF;
     public boolean defaultStrongholds = true;
     public boolean defaultOceanMonuments = false;
+    public boolean defaultWoodlandMansions = false;
     public VillageType defaultVillageType = VillageType.disabled;
     public RareBuildingType defaultRareBuildingType = RareBuildingType.disabled;
     public MineshaftType defaultMineshaftType = MineshaftType.normal;
@@ -138,6 +139,10 @@ public class StandardBiomeTemplate
         resources.add(Resource.createResource(config, SmallLakeGen.class, DefaultMaterial.LAVA, SmallLakeLavaFrequency,
                 SmallLakeLavaRarity, SmallLakeMinAltitude, SmallLakeMaxAltitude));
 
+        // Small underground lava lakes
+        resources.add(Resource.createResource(config, SmallLakeGen.class, DefaultMaterial.LAVA, SmallLakeLavaFrequency2,
+                SmallLakeLavaRarity2, SmallLakeMinAltitude2, SmallLakeMaxAltitude2));
+        
         // Underground lakes
         resources.add(Resource
                 .createResource(config, UndergroundLakeGen.class, undergroundLakeMinSize, undergroundLakeMaxSize, undergroundLakeFrequency,

@@ -1,21 +1,25 @@
 package com.khorn.terraincontrol.forge.events;
 
+import java.util.ArrayList;
+
+import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeMaterialData;
+import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.forge.generator.Cartographer;
-import com.khorn.terraincontrol.forge.generator.TCBlockPortal;
-import com.khorn.terraincontrol.forge.generator.TCTeleporter;
+import com.khorn.terraincontrol.forge.generator.TXBlockPortal;
+import com.khorn.terraincontrol.forge.generator.TXTeleporter;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -25,20 +29,12 @@ public class EntityTravelToDimensionListener
 	public void entityTravelToDimension(EntityTravelToDimensionEvent e)
 	{	
 		boolean cartographerEnabled = ((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled();
-		boolean dimensionsEnabled = ((ForgeEngine)TerrainControl.getEngine()).getDimensionsEnabled();		
 
-		if(cartographerEnabled || dimensionsEnabled)
-		{
-			// TODO: This will disallow any dimension travelling by entities?
-			if(!(e.getEntity() instanceof EntityPlayer))
-			{
-				e.setCanceled(true); // Don't tp to nether
-				return;
-			}
-			
+		if(e.getDimension() == -1)
+		{							
 			// If going to the nether
-			if(e.getDimension() == -1 && e.getEntity() instanceof EntityPlayer)
-			{
+			//if(e.getEntity() instanceof EntityPlayer)
+			{					
 				// Make sure the player is above a portal block so we can check if this is a Quartz portal
 				if(!ForgeMaterialData.ofMinecraftBlockState(e.getEntity().getEntityWorld().getBlockState(e.getEntity().getPosition())).toDefaultMaterial().equals(DefaultMaterial.PORTAL))
 				{
@@ -46,11 +42,11 @@ public class EntityTravelToDimensionListener
 					e.setCanceled(true);
 					return;
 				}
-				
-				EntityPlayer sender = ((EntityPlayer)e.getEntity());
+
+				Entity sender = e.getEntity();
 				BlockPos playerPos = new BlockPos(sender.getPosition());
 				World world = sender.getEntityWorld();
-				
+
 				BlockPos pos = new BlockPos(sender.getPosition());
 				IBlockState blockState = world.getBlockState(pos);
 				while(!blockState.getMaterial().isSolid() && pos.getY() > 0)
@@ -58,46 +54,63 @@ public class EntityTravelToDimensionListener
 					pos = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
 					blockState = world.getBlockState(pos);
 				}
+
+				ArrayList<LocalWorld> forgeWorlds = ((ForgeEngine)TerrainControl.getEngine()).getAllWorlds();
+				int destinationDim = 0;
+				boolean bPortalMaterialFound = false;
 				
-				if(
-					pos.getY() > 0 && 
-					(
-						blockState.getBlock() == Blocks.QUARTZ_BLOCK || 
-						blockState.getBlock() == Blocks.QUARTZ_STAIRS || 
-						blockState.getBlock() == Blocks.GLOWSTONE || 
-						(
-							(
-								blockState.getBlock() == Blocks.STONE_SLAB2 || 
-								blockState.getBlock() == Blocks.STONE_SLAB || 
-								blockState.getBlock() == Blocks.DOUBLE_STONE_SLAB2 || 
-								blockState.getBlock() == Blocks.DOUBLE_STONE_SLAB
-							) && 
-							(byte) blockState.getBlock().getMetaFromState(blockState) == 7
-						)
-					)
-				)
-				{	
-					e.setCanceled(true); // Don't tp to nether								
-					
+				ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(blockState);
+									
+				for(LocalWorld localWorld : forgeWorlds)
+				{
+					ForgeWorld forgeWorld = (ForgeWorld)localWorld;
+					ArrayList<LocalMaterialData> portalMaterials = forgeWorld.getConfigs().getWorldConfig().DimensionPortalMaterials;
+				
+					boolean bIsPortalMaterial = false;	
+					for(LocalMaterialData portalMaterial : portalMaterials)
+					{
+						if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+						{
+							bIsPortalMaterial = true;
+							bPortalMaterialFound = true;
+							break;
+						}
+					}
+					if(bIsPortalMaterial)
+					{
+						if(forgeWorld.getWorld().provider.getDimension() != e.getEntity().dimension)
+						{
+							destinationDim = forgeWorld.getWorld().provider.getDimension();
+							break;
+						} else {
+							// Portal material is the same as this dim's own material, default to OverWorld.
+							destinationDim = 0;
+						}
+					}
+				}
+				
+				if(!bPortalMaterialFound && !material.toDefaultMaterial().equals(DefaultMaterial.OBSIDIAN))
+				{
+					// No custom dimensions exist, destroy the portal
+					e.getEntity().getEntityWorld().setBlockToAir(e.getEntity().getPosition());
+					e.setCanceled(true); // Don't tp to nether
+					return;
+				}
+
+				if(pos.getY() > 0 && bPortalMaterialFound)
+				{
+					e.setCanceled(true); // Don't tp to nether
+
 					int originDimension = e.getEntity().dimension;
-					int newDimension = e.getEntity().dimension + 1;
-					
+					int newDimension = destinationDim;
+
 					// If the Cartographer dimension is enabled and this is a chiseled quartz block then tp to Cartographer
 					boolean isCartographerPortal = cartographerEnabled && blockState.getBlock() == Blocks.QUARTZ_BLOCK && (byte) blockState.getBlock().getMetaFromState(blockState) == 1;
 					if(isCartographerPortal)
 					{
 						newDimension = Cartographer.CartographerDimension;
-					} else {									
-						while(newDimension == 1 || !DimensionManager.isDimensionRegistered(newDimension) || (cartographerEnabled && newDimension == Cartographer.CartographerDimension))
-						{
-							newDimension++;
-							if(newDimension > Long.SIZE << 4)
-							{
-								newDimension = 0;
-							}
-						}
 					}
-	
+
 					if(newDimension == 0 && e.getEntity().dimension == 0)
 					{
 						// No custom dimensions exist, destroy the portal
@@ -106,10 +119,14 @@ public class EntityTravelToDimensionListener
 					}
 									
 					// Register the portal to the world's portals list
-			    	TCBlockPortal.placeInExistingPortal(playerPos);
+			    	TXBlockPortal.placeInExistingPortal(originDimension, playerPos);
 			    		
-			    	TCTeleporter.changeDimension(newDimension, ((EntityPlayerMP)e.getEntity()));
-			    	//((EntityPlayerMP)e.getEntity()).changeDimension(newDimension);
+    				if(e.getEntity() instanceof EntityPlayerMP)
+    				{
+    					TXTeleporter.changeDimension(newDimension, (EntityPlayerMP)e.getEntity());
+					} else {
+						TXTeleporter.changeDimension(newDimension, e.getEntity());
+    				}
 					
 			    	// If coming from main world then update Cartographer map at last player position (should remove head+banner from Cartographer map)
 					if(originDimension == 0 && cartographerEnabled)

@@ -32,5 +32,4 @@ public class MaterialSetting extends Setting<LocalMaterialData>
     {
         return TerrainControl.readMaterial(string);
     }
-
 }

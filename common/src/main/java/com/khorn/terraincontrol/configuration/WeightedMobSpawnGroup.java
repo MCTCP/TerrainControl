@@ -35,11 +35,6 @@ public class WeightedMobSpawnGroup
         return MobNames.toInternalName(this.mob);
     }
 
-    public String getConfigName()
-    {
-        return this.mob;
-    }
-
     public int getWeight()
     {
         return this.weight;
@@ -168,8 +163,8 @@ public class WeightedMobSpawnGroup
      */
     private void toJson(StringBuilder json)
     {
-        json.append("{\"mob\": \"");
-        json.append(getConfigName());
+        json.append("{\"mob\": \"");             
+        json.append(getInternalName());
         json.append("\", \"weight\": ");
         json.append(getWeight());
         json.append(", \"min\": ");

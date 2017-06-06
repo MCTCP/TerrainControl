@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.bukkit.events;
 
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,13 +15,13 @@ import org.bukkit.event.world.WorldUnloadEvent;
 
 public class TCListener implements Listener
 {
-    private final TCPlugin tcPlugin;
+    private final TXPlugin txPlugin;
     private final TCSender tcSender;
     private final SaplingListener saplingListener;
 
-    public TCListener(TCPlugin plugin)
+    public TCListener(TXPlugin plugin)
     {
-        this.tcPlugin = plugin;
+        this.txPlugin = plugin;
         this.tcSender = new TCSender(plugin);
         this.saplingListener = new SaplingListener();
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
@@ -30,13 +30,13 @@ public class TCListener implements Listener
     @EventHandler(priority = EventPriority.HIGH)
     public void onWorldInit(WorldInitEvent event)
     {
-        this.tcPlugin.onWorldInit(event.getWorld());
+        this.txPlugin.onWorldInit(event.getWorld());
     }
 
     @EventHandler
     public void onWorldUnload(WorldUnloadEvent event)
     {
-        this.tcPlugin.onWorldUnload(event.getWorld());
+        this.txPlugin.onWorldUnload(event.getWorld());
     }
 
     @EventHandler(priority = EventPriority.NORMAL)

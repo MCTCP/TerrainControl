@@ -39,8 +39,8 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeWorld;
-import com.khorn.terraincontrol.forge.TCDimensionManager;
-import com.khorn.terraincontrol.forge.TCWorldType;
+import com.khorn.terraincontrol.forge.TXDimensionManager;
+import com.khorn.terraincontrol.forge.TXWorldType;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.NamedBinaryTag.Type;
@@ -57,7 +57,7 @@ public class Cartographer
 	public static void UpdateWorldMap()
 	{	
 		WorldServer worldServer = DimensionManager.getWorld(0);
-		if(((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() && worldServer.getWorldInfo().getTerrainType() instanceof TCWorldType)
+		if(((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() && worldServer.getWorldInfo().getTerrainType() instanceof TXWorldType)
 		{		
 			if(System.currentTimeMillis() - lastUpdateTime > 1000) // Once per second
 			{
@@ -210,15 +210,12 @@ public class Cartographer
 			        				{
 			        					CreateBlockWorldMapAtSpawn(realChunkCoord, false);
 			        				}
-		        					//derp++;
 			        			}
 							}
 						}
 		    		}
 		    	}
 		    	destinationCoordinateCache = null;
-				
-				//TerrainControl.log(LogMarker.INFO, "lastUpdateTime took " + (System.currentTimeMillis() - lastUpdateTime) + " ms " + derp + " chunks");
 			}
 		}
 	}
@@ -281,7 +278,7 @@ public class Cartographer
 		// Check existing portals, players and spawn
 
 		WorldServer overWorldServer = DimensionManager.getWorld(0);
-		if(!(overWorldServer.getWorldInfo().getTerrainType() instanceof TCWorldType))
+		if(!(overWorldServer.getWorldInfo().getTerrainType() instanceof TXWorldType))
 		{
 			return false;
 		}
@@ -311,9 +308,9 @@ public class Cartographer
     				entity.setPositionAndUpdate(newX, newY, newZ);
     				if(entity instanceof EntityPlayerMP)
     				{
-    					TCTeleporter.changeDimension(0, (EntityPlayerMP)entity);
+    					TXTeleporter.changeDimension(0, (EntityPlayerMP)entity);
 					} else {
-						TCTeleporter.changeDimension(0, entity);
+						TXTeleporter.changeDimension(0, entity);
     				}
     			}
     		}
@@ -354,9 +351,9 @@ public class Cartographer
 			entity.setPositionAndUpdate(newX, newY, newZ);
 			if(entity instanceof EntityPlayerMP)
 			{
-				TCTeleporter.changeDimension(0, (EntityPlayerMP)entity);
+				TXTeleporter.changeDimension(0, (EntityPlayerMP)entity);
 			} else {
-				TCTeleporter.changeDimension(0, entity);
+				TXTeleporter.changeDimension(0, entity);
 			}
 			return true;
 		}
@@ -391,9 +388,9 @@ public class Cartographer
 			entity.setPositionAndUpdate(newX, newY, newZ);
 			if(entity instanceof EntityPlayerMP)
 			{
-				TCTeleporter.changeDimension(0, (EntityPlayerMP)entity);
+				TXTeleporter.changeDimension(0, (EntityPlayerMP)entity);
 			} else {
-				TCTeleporter.changeDimension(0, entity);
+				TXTeleporter.changeDimension(0, entity);
 			}
 			return true;
 		}
@@ -408,7 +405,7 @@ public class Cartographer
     public static void CreateBlockWorldMapAtSpawn(ChunkCoordinate chunkCoord, boolean unloading)
     {
 		WorldServer worldServer = DimensionManager.getWorld(0);
-		if(worldServer.getWorldInfo().getTerrainType() instanceof TCWorldType)
+		if(worldServer.getWorldInfo().getTerrainType() instanceof TXWorldType)
 		{		
 			ForgeWorld world = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getWorld(worldServer);
     	  	
@@ -705,7 +702,7 @@ public class Cartographer
 						cartographerWorld.attachMetadata(pos.getX(), pos.getY(), pos.getZ(), tag);
 						cartographerWorld.getWorld().setBlockState(pos, Blocks.SKULL.getDefaultState().withProperty(BlockSkull.FACING, EnumFacing.UP), 11);
 						
-		                int rotation = (MathHelper.floor_double((double)((player.rotationYaw - 180) * 16.0F / 360.0F) + 0.5D) & 15);
+		                int rotation = (MathHelper.floor((double)((player.rotationYaw - 180) * 16.0F / 360.0F) + 0.5D) & 15);
 		                TileEntity tileentity = cartographerWorld.getWorld().getTileEntity(pos);
 		                TileEntitySkull tileentityskull = (TileEntitySkull)tileentity;
 		                tileentityskull.setSkullRotation(rotation);
@@ -714,7 +711,7 @@ public class Cartographer
 	
 		    	// Put banner on top of player heads
 		    	
-	            int rotation = (MathHelper.floor_double((double)(playersInChunk.get(0).rotationYaw * 16.0F / 360.0F) + 0.5D) & 15);
+	            int rotation = (MathHelper.floor((double)(playersInChunk.get(0).rotationYaw * 16.0F / 360.0F) + 0.5D) & 15);
 	            NamedBinaryTag tag = new NamedBinaryTag(Type.TAG_List, "BlockEntityTag", new NamedBinaryTag[] { new NamedBinaryTag(Type.TAG_Int, "Base", chunkCoord.equals(spawnChunk) ? 15 : portalInChunk ? 13 : 10) });
 		    	cartographerWorld.setBlock(newX, baseHeight + heightDiff + playerSignHeightOffset + 1 - minY, newZ, TerrainControl.toLocalMaterialData(DefaultMaterial.STANDING_BANNER, rotation));
 		    	cartographerWorld.attachMetadata(newX, baseHeight + heightDiff + playerSignHeightOffset + 1 - minY, newZ, tag);
@@ -1168,9 +1165,9 @@ public class Cartographer
 
 	public static void CreateCartographerDimension()
 	{
-    	if(((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() && !TCDimensionManager.isDimensionNameRegistered("DIM-Cartographer"))
+    	if(((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() && !TXDimensionManager.isDimensionNameRegistered("DIM-Cartographer"))
     	{
-    		CartographerDimension = TCDimensionManager.createDimension("DIM-Cartographer", false, true, false);
+    		CartographerDimension = TXDimensionManager.createDimension("DIM-Cartographer", false, true, false);
 
     		ForgeWorld world = (ForgeWorld) TerrainControl.getWorld("DIM-Cartographer");
     		

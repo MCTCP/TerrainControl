@@ -143,6 +143,7 @@ public class WorldConfig extends ConfigFile
     // Other structures
     public boolean mineshaftsEnabled;
     public boolean netherFortressesEnabled;
+    public boolean woodLandMansionsEnabled;
 
     // Terrain
     public boolean oldTerrainGenerator;
@@ -193,10 +194,80 @@ public class WorldConfig extends ConfigFile
     public String worldSeed;
     
     public boolean Cartographer;
-    public boolean DimensionsEnabled;
+    public ArrayList<LocalMaterialData> DimensionPortalMaterials;
+    public String dimensionBelow;
+    public String dimensionAbove;
     
-    public String BO3AtSpawn;
+    public String BO3AtSpawn;    
     
+	// Game rules for worlds used as dimensions with Forge // TODO: Apply to overworld too?
+	
+    public String commandBlockOutput; // Whether command blocks should notify admins when they perform commands
+    public String disableElytraMovementCheck; // Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).
+    public String doDaylightCycle; // Whether the day-night cycle and moon phases progress
+    public String doEntityDrops; // Whether entities that are not mobs should have drops
+    public String doFireTick; // Whether fire should spread and naturally extinguish
+    //public String doLimitedCrafting; // Whether players should only be able to craft recipes that they've unlocked first
+    public String doMobLoot; // Whether mobs should drop items
+    public String doMobSpawning; // Whether mobs should naturally spawn. Does not affect monster spawners.
+    public String doTileDrops; // Whether blocks should have drops
+    public String doWeatherCycle; // Whether the weather will change
+    //public String gameLoopFunction = "true"; // The function to run every game tick // TODO: Implement for 1.12
+    public String keepInventory; // Whether the player should keep items in their inventory after death
+    public String logAdminCommands; // Whether to log admin commands to server log
+    //public String maxCommandChainLength = "65536"; // Determines the number at which the chain command block acts as a "chain". // TODO: Implement for 1.12
+    public String maxEntityCramming; // The maximum number of other pushable entities a mob or player can push, before taking 3 doublehearts suffocation damage per half-second. Setting to 0 disables the rule. Damage affects survival-mode or adventure-mode players, and all mobs but bats. Pushable entities include non-spectator-mode players, any mob except bats, as well as boats and minecarts.
+    public String mobGriefing; // Whether creepers, zombies, endermen, ghasts, withers, ender dragons, rabbits, sheep, and villagers should be able to change blocks and whether villagers, zombies, skeletons, and zombie pigmen can pick up items
+    public String naturalRegeneration; // Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)
+    public String randomTickSpeed; // How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks 
+    public String reducedDebugInfo; // Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.
+    public String sendCommandFeedback; // Whether the feedback from commands executed by a player should show up in chat. Also affects the default behavior of whether command blocks store their output text
+    public String showDeathMessages; // Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies.
+    public String spawnRadius; // The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.
+    public String spectatorsGenerateChunks; // Whether players in spectator mode can generate chunks	
+	
+    // World provider settings for worlds used as dimensions with Forge : TODO: Apply to overworld too?
+    
+	public String welcomeMessage; // A message to display to the user when they transfer to this dimension.
+	public String departMessage; // A Message to display to the user when they transfer out of this dimension.
+	//public boolean isHellWorld = false; // DoesWaterVaporize sets this
+	public boolean hasNoSky; // A boolean that tells if a world does not have a sky. Used in calculating weather and skylight. Also affects GetActualHeight(), hasNoSky = true worlds are seen as 128 height worlds, which affects nether portal placement/detection.
+	public boolean isSurfaceWorld; // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames. 
+	public boolean canCoordinateBeSpawn; // Will check if the x, z position specified is alright to be set as the map spawn point
+	public boolean canRespawnHere; // True if the player can respawn in this dimension (true = overworld, false = nether).
+	
+	public boolean doesWaterVaporize; // True for nether, any water that is placed vaporises.
+	
+	public boolean doesXZShowFog; // Returns true if the given X,Z coordinate should show environmental fog. True for Nether.
+	
+	public boolean useCustomFogColor = false;
+	public double fogColorRed;
+	public double fogColorGreen;
+	public double fogColorBlue;
+	
+	public boolean isSkyColored; // Is set to false for End (black sky?)
+	
+	//public int averageGroundlevel; // Affects spawn point location and village spawning. Should be equal to sea level + 1(?)
+	
+	//public int horizonHeight; // Returns horizon height for use in rendering the sky. Should be equal to sea level(?)
+	
+	public int cloudHeight;
+	
+    public boolean canDoLightning;
+    
+    public boolean canDoRainSnowIce;
+    
+    //public boolean canMineBlock; // If set to false players are unable to mine blocks
+    
+    public boolean isNightWorld; // Sky is always moon and stars but light levels are same as day, used for Cartographer
+    
+    public double voidFogYFactor; // A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.
+    
+    public boolean shouldMapSpin; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
+    
+    public boolean canDropChunk; // Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.
+    
+	//
     
     /**
      * Creates a WorldConfig from the WorldConfig.ini file found in the given
@@ -417,9 +488,6 @@ public class WorldConfig extends ConfigFile
         this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED);
         this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS);
         this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS);
-
-        // Dimensions 
-        this.Dimensions = reader.getSetting(WorldStandardValues.DIMENSIONS);
         
         // Biome Groups
         readBiomeGroups(reader);
@@ -470,6 +538,8 @@ public class WorldConfig extends ConfigFile
         this.minimumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
         this.maximumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
 
+        this.woodLandMansionsEnabled = reader.getSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED);
+        
         this.oceanMonumentsEnabled = reader.getSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED);
         this.oceanMonumentRandomOffset = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET);
         this.oceanMonumentGridSize = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE);
@@ -528,18 +598,88 @@ public class WorldConfig extends ConfigFile
 
         this.author = reader.getSetting(WorldStandardValues.AUTHOR);
         this.description = reader.getSetting(WorldStandardValues.DESCRIPTION);
-        
+
         this.PreGenerationRadius = reader.getSetting(WorldStandardValues.PREGENERATION_RADIUS);
         this.WorldBorderRadius = reader.getSetting(WorldStandardValues.WORLD_BORDER_RADIUS);
-        
+
         this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED);
-        
+
         this.BO3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN);
-        
+
         this.Cartographer = reader.getSetting(WorldStandardValues.CARTOGRAPHER);
         
-        this.DimensionsEnabled = reader.getSetting(WorldStandardValues.DIMENSIONSENABLED);
+        this.DimensionPortalMaterials = reader.getSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS);
         
+        // Dimensions
+        this.Dimensions = reader.getSetting(WorldStandardValues.DIMENSIONS);
+        
+        this.dimensionBelow = reader.getSetting(WorldStandardValues.DIMENSIONBELOW);
+        this.dimensionAbove = reader.getSetting(WorldStandardValues.DIMENSIONABOVE);
+        
+        this.commandBlockOutput = reader.getSetting(WorldStandardValues.commandBlockOutput).toString(); // "true"; // Whether command blocks should notify admins when they perform commands
+        this.disableElytraMovementCheck = reader.getSetting(WorldStandardValues.disableElytraMovementCheck).toString(); // "false"; // Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).
+        this.doDaylightCycle = reader.getSetting(WorldStandardValues.doDaylightCycle).toString(); // "true"; // Whether the day-night cycle and moon phases progress
+        this.doEntityDrops = reader.getSetting(WorldStandardValues.doEntityDrops).toString(); // "true"; // Whether entities that are not mobs should have drops
+        this.doFireTick = reader.getSetting(WorldStandardValues.doFireTick).toString(); // "true"; // Whether fire should spread and naturally extinguish
+        //this.doLimitedCrafting = reader.getSetting(WorldStandardValues.doLimitedCrafting).toString(); // "false"; // Whether players should only be able to craft recipes that they've unlocked first // TODO: Implement for 1.12
+        this.doMobLoot = reader.getSetting(WorldStandardValues.doMobLoot).toString(); // "true"; // Whether mobs should drop items
+        this.doMobSpawning = reader.getSetting(WorldStandardValues.doMobSpawning).toString(); // "true"; // Whether mobs should naturally spawn. Does not affect monster spawners.
+        this.doTileDrops = reader.getSetting(WorldStandardValues.doTileDrops).toString(); // "true"; // Whether blocks should have drops
+        this.doWeatherCycle = reader.getSetting(WorldStandardValues.doWeatherCycle).toString(); // "true"; // Whether the weather will change
+        //public String gameLoopFunction = "true"; // The function to run every game tick // TODO: Implement for 1.12
+        this.keepInventory = reader.getSetting(WorldStandardValues.keepInventory).toString(); // "false"; // Whether the player should keep items in their inventory after death
+        this.logAdminCommands = reader.getSetting(WorldStandardValues.logAdminCommands).toString(); // "true"; // Whether to log admin commands to server log
+        //public String maxCommandChainLength = "65536"; // Determines the number at which the chain command block acts as a "chain". // TODO: Implement for 1.12
+        this.maxEntityCramming = reader.getSetting(WorldStandardValues.maxEntityCramming).toString(); // "24"; // The maximum number of other pushable entities a mob or player can push, before taking 3 doublehearts suffocation damage per half-second. Setting to 0 disables the rule. Damage affects survival-mode or adventure-mode players, and all mobs but bats. Pushable entities include non-spectator-mode players, any mob except bats, as well as boats and minecarts.
+        this.mobGriefing = reader.getSetting(WorldStandardValues.mobGriefing).toString(); // "true"; // Whether creepers, zombies, endermen, ghasts, withers, ender dragons, rabbits, sheep, and villagers should be able to change blocks and whether villagers, zombies, skeletons, and zombie pigmen can pick up items
+        this.naturalRegeneration = reader.getSetting(WorldStandardValues.naturalRegeneration).toString(); // "true"; // Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)
+        this.randomTickSpeed = reader.getSetting(WorldStandardValues.randomTickSpeed).toString(); // "3"; // How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks 
+        this.reducedDebugInfo = reader.getSetting(WorldStandardValues.reducedDebugInfo).toString(); // "false"; // Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.
+        this.sendCommandFeedback = reader.getSetting(WorldStandardValues.sendCommandFeedback).toString(); // "true"; // Whether the feedback from commands executed by a player should show up in chat. Also affects the default behavior of whether command blocks store their output text
+        this.showDeathMessages = reader.getSetting(WorldStandardValues.showDeathMessages).toString(); // "true"; // Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies.
+        this.spawnRadius = reader.getSetting(WorldStandardValues.spawnRadius).toString(); // "10"; // The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.
+        this.spectatorsGenerateChunks = reader.getSetting(WorldStandardValues.spectatorsGenerateChunks).toString(); // "true"; // Whether players in spectator mode can generate chunks	
+    	
+        // World provider settings for worlds used as dimensions with Forge : TODO: Apply to overworld too?
+        
+        this.welcomeMessage = reader.getSetting(WorldStandardValues.welcomeMessage); // ""; // A message to display to the user when they transfer to this dimension.
+        this.departMessage = reader.getSetting(WorldStandardValues.departMessage); // A Message to display to the user when they transfer out of this dimension.
+        //public boolean isHellWorld = false; // DoesWaterVaporize sets this
+        this.hasNoSky = reader.getSetting(WorldStandardValues.hasNoSky); // false; // A boolean that tells if a world does not have a sky. Used in calculating weather and skylight. Also affects GetActualHeight(), hasNoSky = true worlds are seen as 128 height worlds, which affects nether portal placement/detection.
+        this.isSurfaceWorld = reader.getSetting(WorldStandardValues.isSurfaceWorld); // true; // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames. 
+        this.canCoordinateBeSpawn = reader.getSetting(WorldStandardValues.canCoordinateBeSpawn); // false; // Will check if the x, z position specified is alright to be set as the map spawn point
+        this.canRespawnHere = reader.getSetting(WorldStandardValues.canRespawnHere); // true; // True if the player can respawn in this dimension (true = overworld, false = nether).
+    	
+        this.doesWaterVaporize = reader.getSetting(WorldStandardValues.doesWaterVaporize); // false; // True for nether, any water that is placed vaporises.
+    	
+        this.doesXZShowFog = reader.getSetting(WorldStandardValues.doesXZShowFog); // false; // Returns true if the given X,Z coordinate should show environmental fog. True for Nether.
+    	
+        this.useCustomFogColor = reader.getSetting(WorldStandardValues.useCustomFogColor); // false
+        this.fogColorRed = reader.getSetting(WorldStandardValues.fogColorRed); // 0.20000000298023224D;
+        this.fogColorGreen = reader.getSetting(WorldStandardValues.fogColorGreen); // 0.029999999329447746D;
+        this.fogColorBlue = reader.getSetting(WorldStandardValues.fogColorBlue); // 0.029999999329447746D;
+    	
+        this.isSkyColored = reader.getSetting(WorldStandardValues.isSkyColored); // true; // Is set to false for End (black sky?)
+    	
+        //this.averageGroundlevel = reader.getSetting(WorldStandardValues.averageGroundlevel); // 0; // Affects spawn point location and village spawning. Should be equal to sea level + 1(?)
+    	
+        //this.horizonHeight = reader.getSetting(WorldStandardValues.horizonHeight); // 0; // Returns horizon height for use in rendering the sky. Should be equal to sea level(?)
+    	
+        this.cloudHeight = reader.getSetting(WorldStandardValues.cloudHeight); // 0;
+    	
+        this.canDoLightning = reader.getSetting(WorldStandardValues.canDoLightning); // false;
+        
+        this.canDoRainSnowIce = reader.getSetting(WorldStandardValues.canDoRainSnowIce); // false;
+        
+        //this.canMineBlock = reader.getSetting(WorldStandardValues.canMineBlock); // false; // If set to false players are unable to mine blocks
+        
+        this.isNightWorld = reader.getSetting(WorldStandardValues.isNightWorld); // false;
+        
+        this.voidFogYFactor = reader.getSetting(WorldStandardValues.voidFogYFactor); // 0.03125D; // A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.
+        
+        this.shouldMapSpin = reader.getSetting(WorldStandardValues.shouldMapSpin); // false; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
+        
+        this.canDropChunk = reader.getSetting(WorldStandardValues.canDropChunk); // true; // // Determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.        
     }
 
     private void readBiomeGroups(SettingsMap reader)
@@ -563,7 +703,7 @@ public class WorldConfig extends ConfigFile
 
     private void createDefaultBiomeGroups()
     {
-        BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL, 0, 100,
+        BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL, 0, 98,
                 Arrays.asList("Forest", "Roofed Forest", "Extreme Hills", "Plains",
                         "Birch Forest", "Swampland", "Flower Forest", "Roofed Forest M",
                         "Extreme Hills+", "Sunflower Plains", "Birch Forest M", "Swampland M"));
@@ -577,7 +717,7 @@ public class WorldConfig extends ConfigFile
                 Arrays.asList("Desert", "Savanna", "Plains", "Desert M", "Savanna M", "Sunflower Plains"));
         this.biomeGroupManager.registerGroup(hotGroup);
 
-        BiomeGroup coldGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.COLD, 0, 100,
+        BiomeGroup coldGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.COLD, 0, 98,
                 Arrays.asList("Forest", "Extreme Hills", "Taiga", "Plains",
                         "Flower Forest", "Extreme Hills+", "Taiga M", "Sunflower Plains"));
         this.biomeGroupManager.registerGroup(coldGroup);
@@ -947,6 +1087,12 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.maximumDistanceBetweenRareBuildings,
                 "The maximum distance between rare buildings in chunks.");
 
+        // Woodland Mansions
+        writer.smallTitle("Woodland Mansions");
+        
+        writer.putSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, this.woodLandMansionsEnabled,
+                "Whether woodland mansions are enabled.");
+        
         // Ocean monuments
         writer.smallTitle("Ocean monuments");
 
@@ -1075,12 +1221,112 @@ public class WorldConfig extends ConfigFile
         
         // Dimensions
         writer.bigTitle("Dimension");
-        writer.putSetting(WorldStandardValues.DIMENSIONSENABLED, this.DimensionsEnabled,
-                "Enables /otg dim commands and quartz portals for creating and travelling to other dimensions with seperate worlds.");
         writer.putSetting(WorldStandardValues.DIMENSIONS, this.Dimensions,
-                "Dimensions that should be loaded for this world at world creation (requires DimensionsEnabled: true. A world directory of the same name must be present in mods/OpenTerrainGenerator/worlds/");
+                "Dimensions that should be loaded for this world at world creation. A world directory of the same name must be present in mods/OpenTerrainGenerator/worlds/");
+        writer.putSetting(WorldStandardValues.DIMENSIONBELOW, this.dimensionBelow,
+                "When a player goes below Y 0, they will be teleported to this dimension. The dimension must be registered either via Dimensions in the worldconfig or via the /otg dim -c <dimname> console command.");
+        writer.putSetting(WorldStandardValues.DIMENSIONABOVE, this.dimensionAbove,
+        		"When a player goes above Y 255, they will be teleported to this dimension. The dimension must be registered either via Dimensions in the worldconfig or via the /otg dim -c <dimname> console command.");
+        writer.putSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS, this.DimensionPortalMaterials,
+                "A comma seperated list of blocks, dimension portals made of one or more of these blocks will lead to this world.",
+                "For blocks that have rotation such as stairs be sure to add all rotations (0,1,2,3,4,5,6,7), for instance: QUARTZ_STAIRS:0, QUARTZ_STAIRS:1, QUARTZ_STAIRS:2 etc.",
+                "For blocks that have rotation such as QUARTZ_STAIRS, \"QUARTZ_STAIRS\" is the same as \"QUARTZ_STAIRS:3\"."
+        		);
+        
         writer.putSetting(WorldStandardValues.CARTOGRAPHER, this.Cartographer,
-                "Currently in development, the Cartographer is a miniature version of the world (1/16th scale) that can be used to view the world (including players) and teleport players and items. Setting this to true loads and updates the Cartographer world map in the Cartographer dimension (does not require DimensionsEnabled: true). The Cartographer can be reached via a Quartz portal with a chiseled quartz base. The mods/OpenTerrainGenerator/worlds/DIM-Cartographer directory must be present (if you also have OTG-Cartographer.jar in your mods directory worlds/DIM-Cartographer should be created automatically).");
+                "Currently in development, the Cartographer is a miniature version of the world (1/16th scale) that can be used to view the world (including players) and teleport players and items. Setting this to true loads and updates the Cartographer world map in the Cartographer dimension. The Cartographer can be reached via a Quartz portal with a chiseled quartz base. The mods/OpenTerrainGenerator/worlds/DIM-Cartographer directory must be present (if you also have OTG-Cartographer.jar in your mods directory worlds/DIM-Cartographer should be created automatically).");
+        
+        writer.smallTitle("Game rules (dimensions only)", "Game rules for dimensions (these do not work for the overworld at the moment). These settings are still in development and may be subject to change in upcoming releases.", "");
+        
+        writer.putSetting(WorldStandardValues.commandBlockOutput, Boolean.parseBoolean(this.commandBlockOutput), 
+        		"Whether command blocks should notify admins when they perform commands");
+        writer.putSetting(WorldStandardValues.disableElytraMovementCheck, Boolean.parseBoolean(this.disableElytraMovementCheck),
+        		"Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).");
+        writer.putSetting(WorldStandardValues.doDaylightCycle, Boolean.parseBoolean(this.doDaylightCycle),
+        		"Whether the day-night cycle and moon phases progress");
+        writer.putSetting(WorldStandardValues.doEntityDrops, Boolean.parseBoolean(this.doEntityDrops),
+        		"Whether entities that are not mobs should have drops");
+        writer.putSetting(WorldStandardValues.doFireTick, Boolean.parseBoolean(this.doFireTick),
+        		"Whether fire should spread and naturally extinguish");
+        //writer.putSetting(WorldStandardValues.doLimitedCrafting, Boolean.parseBoolean(this.doLimitedCrafting),
+        		//"Whether players should only be able to craft recipes that they've unlocked first");
+        writer.putSetting(WorldStandardValues.doMobLoot, Boolean.parseBoolean(this.doMobLoot),
+        		"Whether mobs should drop items");
+        writer.putSetting(WorldStandardValues.doMobSpawning, Boolean.parseBoolean(this.doMobSpawning),
+        		"Whether mobs should naturally spawn. Does not affect monster spawners.");
+        writer.putSetting(WorldStandardValues.doTileDrops, Boolean.parseBoolean(this.doTileDrops),
+        		"Whether blocks should have drops");
+        writer.putSetting(WorldStandardValues.doWeatherCycle, Boolean.parseBoolean(this.doWeatherCycle),
+        		"Whether the weather will change");
+        //public String gameLoopFunction = "true"; // The function to run every game tick // TODO: Implement for 1.12
+        writer.putSetting(WorldStandardValues.keepInventory, Boolean.parseBoolean(this.keepInventory),
+        		"Whether the player should keep items in their inventory after death");
+        writer.putSetting(WorldStandardValues.logAdminCommands, Boolean.parseBoolean(this.logAdminCommands),
+        		"Whether to log admin commands to server log");
+        //public String maxCommandChainLength = "65536"; // Determines the number at which the chain command block acts as a "chain". // TODO: Implement for 1.12
+        writer.putSetting(WorldStandardValues.maxEntityCramming, Integer.parseInt(this.maxEntityCramming),
+        		"The maximum number of other pushable entities a mob or player can push, before taking 3 doublehearts suffocation damage per half-second. Setting to 0 disables the rule. Damage affects survival-mode or adventure-mode players, and all mobs but bats. Pushable entities include non-spectator-mode players, any mob except bats, as well as boats and minecarts.");
+        writer.putSetting(WorldStandardValues.mobGriefing, Boolean.parseBoolean(this.mobGriefing),
+        		"Whether creepers, zombies, endermen, ghasts, withers, ender dragons, rabbits, sheep, and villagers should be able to change blocks and whether villagers, zombies, skeletons, and zombie pigmen can pick up items");
+        writer.putSetting(WorldStandardValues.naturalRegeneration, Boolean.parseBoolean(this.naturalRegeneration),
+        		"Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)");
+        writer.putSetting(WorldStandardValues.randomTickSpeed, Integer.parseInt(this.randomTickSpeed),
+        		"How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks"); 
+        writer.putSetting(WorldStandardValues.reducedDebugInfo, Boolean.parseBoolean(this.reducedDebugInfo),
+        		"Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.");
+        writer.putSetting(WorldStandardValues.sendCommandFeedback, Boolean.parseBoolean(this.sendCommandFeedback),
+        		"Whether the feedback from commands executed by a player should show up in chat. Also affects the default behavior of whether command blocks store their output text");
+        writer.putSetting(WorldStandardValues.showDeathMessages, Boolean.parseBoolean(this.showDeathMessages),
+        		"Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies");
+        writer.putSetting(WorldStandardValues.spawnRadius, Integer.parseInt(this.spawnRadius),
+        		"The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.");
+        writer.putSetting(WorldStandardValues.spectatorsGenerateChunks, Boolean.parseBoolean(this.spectatorsGenerateChunks),
+        		"Whether players in spectator mode can generate chunks");	
+    	
+        // World provider settings for worlds used as dimensions with Forge : TODO: Apply to overworld too?
+        writer.smallTitle("World provider settings (dimensions only)", "World provider settings for dimensions (these do not work for the overworld at the moment). These settings are still in development and may be subject to change in upcoming releases.", "");
+        
+        writer.putSetting(WorldStandardValues.welcomeMessage, this.welcomeMessage, 
+        		"A message to display to the user when they transfer to this dimension.");
+        writer.putSetting(WorldStandardValues.departMessage, this.departMessage,
+        		"A Message to display to the user when they transfer out of this dimension.");
+    	//public boolean isHellWorld = false; // DoesWaterVaporize sets this
+        writer.putSetting(WorldStandardValues.hasNoSky, this.hasNoSky,
+        		"A boolean that tells if a world does not have a sky. Used in calculating weather and skylight. Also affects GetActualHeight(), hasNoSky = true worlds are seen as 128 height worlds, which affects nether portal placement/detection.");
+        writer.putSetting(WorldStandardValues.isSurfaceWorld, this.isSurfaceWorld,
+        		"Returns 'true' if in the \"main surface world\", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames."); 
+        writer.putSetting(WorldStandardValues.canCoordinateBeSpawn, this.canCoordinateBeSpawn,
+        		"Will check if the x, z position specified is alright to be set as the map spawn point.");
+        writer.putSetting(WorldStandardValues.canRespawnHere, this.canRespawnHere,
+        		"True if the player can respawn in this dimension (true = overworld, false = nether).");    	
+        writer.putSetting(WorldStandardValues.doesWaterVaporize, this.doesWaterVaporize,
+        		"True for nether, any water that is placed vaporises.");    	
+        writer.putSetting(WorldStandardValues.doesXZShowFog, this.doesXZShowFog,
+        		"Returns true if the given X,Z coordinate should show environmental fog. True for Nether.");
+        writer.putSetting(WorldStandardValues.useCustomFogColor, this.useCustomFogColor, 
+        		"Set this to true if you want to use the fog color settings below.");        
+        writer.putSetting(WorldStandardValues.fogColorRed, this.fogColorRed);
+        writer.putSetting(WorldStandardValues.fogColorGreen, this.fogColorGreen);
+        writer.putSetting(WorldStandardValues.fogColorBlue, this.fogColorBlue);
+        writer.putSetting(WorldStandardValues.isSkyColored, this.isSkyColored,
+        		"Is set to false for End (black sky?)");    	
+        //writer.putSetting(WorldStandardValues.averageGroundlevel, this.averageGroundlevel,
+        		//"Affects spawn point location and village spawning. Should be equal to sea level + 1(?)");    	
+        //writer.putSetting(WorldStandardValues.horizonHeight, this.horizonHeight,
+        		//"Returns horizon height for use in rendering the sky. Should be equal to sea level(?)");    	
+        writer.putSetting(WorldStandardValues.cloudHeight, this.cloudHeight);
+        writer.putSetting(WorldStandardValues.canDoLightning, this.canDoLightning);        
+        writer.putSetting(WorldStandardValues.canDoRainSnowIce, this.canDoRainSnowIce);        
+        //writer.putSetting(WorldStandardValues.canMineBlock, this.canMineBlock,
+        		//"If set to false players are unable to mine blocks");        
+        writer.putSetting(WorldStandardValues.isNightWorld, this.isNightWorld,
+        		"If true then the sky will be locked at midnight with the moon and stars above but the world will be lit as if it were day time. Useful for space dimensions.");
+        writer.putSetting(WorldStandardValues.voidFogYFactor, this.voidFogYFactor, 
+        		"A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.");        
+        writer.putSetting(WorldStandardValues.shouldMapSpin, this.shouldMapSpin, 
+        		"Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.");                
+        writer.putSetting(WorldStandardValues.canDropChunk, this.canDropChunk, 
+        		"Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.");               
     }
 
     private void WriteCustomBiomes(SettingsMap writer)

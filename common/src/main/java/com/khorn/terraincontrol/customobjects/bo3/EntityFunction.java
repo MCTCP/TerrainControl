@@ -17,7 +17,6 @@ public class EntityFunction extends BO3Function
 {
     public EntityFunction(BO3Config holder) {
 		super(holder);
-		// TODO Auto-generated constructor stub
 	}
 
 	public int x;
@@ -97,11 +96,9 @@ public class EntityFunction extends BO3Function
     					reader.close();
     				}				
     			} catch (FileNotFoundException e1) {
-    				// TODO Auto-generated catch block
     				e1.printStackTrace();
     			}
     			catch (IOException e1) {
-    				// TODO Auto-generated catch block
     				e1.printStackTrace();
     			}
     	    }    		

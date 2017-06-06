@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
 import com.khorn.terraincontrol.bukkit.TCPerm;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public class HelpCommand extends BaseCommand
 {
-    public HelpCommand(TCPlugin _plugin)
+    public HelpCommand(TXPlugin _plugin)
     {
         super(_plugin);
         name = "help";

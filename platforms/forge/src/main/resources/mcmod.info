@@ -4,10 +4,10 @@
   "name": "Open Terrain Generator",
   "url": "https://www.openterraingenerator.com/",
   "description": "                          Team OTG:\\n                     PeeGee85 (code)\\n               MC_Pitman & LordSmellyPants\n                (graphics, web, community)\\n\\n          This mod is a fork of TerrainControl\n           by Khorn, RutgerKok and Timethor.\\n\\n                  - Generate anything! -\\n",
-  "version": "1.10.2 v17",
+  "version": "1.11.2 v5",
   "credits" : "Team OTG",
   "authors": [ "PeeGee85", "Khorn", "RutgerKok", "BloodMC", "TimeThor", "Olof Cayorion Larsson"],   
-  "mcversion": "1.10.2",
+  "mcversion": "1.11.2",
   "updateUrl": "",
   "logoFile": "OTGlogo.png",
   "screenshots": [

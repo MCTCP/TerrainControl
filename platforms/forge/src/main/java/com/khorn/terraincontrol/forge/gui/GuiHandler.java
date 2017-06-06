@@ -46,13 +46,13 @@ public class GuiHandler implements IGuiHandler
     @SubscribeEvent
     public void openGui(GuiOpenEvent event)
     {
-    	if (event.getGui() instanceof GuiCreateWorld && lastGuiOpened.equals(TCGuiWorldSelection.class))
+    	if (event.getGui() instanceof GuiCreateWorld && lastGuiOpened.equals(TXGuiWorldSelection.class))
         {
-    		event.setGui(new TCGuiCreateWorld(new TCGuiWorldSelection(null)));
+    		event.setGui(new TXGuiCreateWorld(new TXGuiWorldSelection(null)));
         }
         else if (event.getGui() instanceof GuiWorldSelection)
         {
-            event.setGui(new TCGuiWorldSelection(new GuiMainMenu()));
+            event.setGui(new TXGuiWorldSelection(new GuiMainMenu()));
         }
         if(event.getGui() != null)
         {

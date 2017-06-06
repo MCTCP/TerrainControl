@@ -112,6 +112,7 @@ public class BiomeConfig extends ConfigFile
     // Structures
     public boolean strongholdsEnabled;
     public boolean oceanMonumentsEnabled;
+    public boolean woodLandMansionsEnabled;
     public boolean netherFortressesEnabled;
            
     // Forge Biome Dict Id
@@ -336,6 +337,7 @@ public class BiomeConfig extends ConfigFile
 
         this.strongholdsEnabled = settings.getSetting(BiomeStandardValues.STRONGHOLDS_ENABLED, defaultSettings.defaultStrongholds);
         this.oceanMonumentsEnabled = settings.getSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, defaultSettings.defaultOceanMonuments);
+        this.woodLandMansionsEnabled = settings.getSetting(BiomeStandardValues.WOODLAND_MANSIONS_ENABLED, defaultSettings.defaultWoodlandMansions);
         this.netherFortressesEnabled = settings.getSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, true);
         this.villageType = settings.getSetting(BiomeStandardValues.VILLAGE_TYPE, defaultSettings.defaultVillageType);
         this.mineshaftsRarity = settings.getSetting(BiomeStandardValues.MINESHAFT_RARITY);
@@ -758,6 +760,9 @@ public class BiomeConfig extends ConfigFile
                 "Disables strongholds for this biome. If there is no suitable biome nearby,",
                 "Minecraft will ignore this setting.");
 
+        writer.putSetting(BiomeStandardValues.WOODLAND_MANSIONS_ENABLED, woodLandMansionsEnabled,
+        		"Whether a Woodland Mansion can be placed in this biome.");
+        
         writer.putSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, oceanMonumentsEnabled,
                 "Whether an Ocean Monument can be placed in this biome.");
 
@@ -1066,12 +1071,5 @@ public class BiomeConfig extends ConfigFile
         stream.writeBoolean(this.foliageColorIsMultiplier);
 
         writeStringToStream(stream, this.biomeDictId);
-        
-        if(isSinglePlayer) // Forge SP seems to handle some part of mob spawning on the client so need to send mob spawning info.
-        {             
-	        writeStringToStream(stream, this.inheritMobsBiomeName);
-        }
-        
-        TerrainControl.getEngine().addPlatformSpecificDataToPacket(stream, this, isSinglePlayer);
     }
 }

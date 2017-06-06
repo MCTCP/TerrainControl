@@ -30,9 +30,9 @@ public class TerrainControl
     private static TerrainControlEngine engine;
 
     /**
-     * The amount of different block ids that are supported. 4096 on Minecraft.
+     * The amount of different block ids that are supported. 4096 on Minecraft. 65535 with NotEnoughId's mod 
      */
-    public static final int SUPPORTED_BLOCK_IDS = 4096;
+    public static final int SUPPORTED_BLOCK_IDS = 65535;//4096; // TODO: Test if this creates lag
 
     /**
      * The world depth that the engine supports. Not the actual depth the
@@ -128,6 +128,22 @@ public class TerrainControl
      */
     public static LocalMaterialData readMaterial(String name) throws InvalidConfigException
     {
+    	// Spigot interprets snow as SNOW_LAYER and that's how TC has always seen it too so keep it that way (even though minecraft:snow is actually a snow block).
+    	if(name.toLowerCase().equals("snow"))
+    	{
+    		name = "SNOW_LAYER";
+    	}
+    	// Spigot interprets water as FLOWING_WATER and that's how TC has always seen it too so keep it that way (even though minecraft:water is actually stationary water).
+    	if(name.toLowerCase().equals("water"))
+    	{
+    		name = "FLOWING_WATER";
+    	}
+    	// Spigot interprets lava as FLOWING_LAVA and that's how TC has always seen it too so keep it that way (even though minecraft:lava is actually stationary lava).
+    	if(name.toLowerCase().equals("lava"))
+    	{
+    		name = "FLOWING_LAVA";
+    	}
+    	
         return engine.readMaterial(name);
     }
 

@@ -1,8 +1,6 @@
 package com.khorn.terraincontrol.forge;
 
-import java.io.DataOutput;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Map;
@@ -11,9 +9,6 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
-import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.configuration.ConfigFile;
-import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.forge.generator.Pregenerator;
@@ -54,7 +49,7 @@ public class ForgeEngine extends TerrainControlEngine
     }
     
     public void unRegisterForgeBiome(ResourceLocation resourceLocation)
-    {
+    {    	    
 		TerrainControl.log(LogMarker.TRACE, "Unregistering biome " + resourceLocation.toString());
     	
     	Biome biome = Biome.REGISTRY.registryObjects.get(resourceLocation);
@@ -62,7 +57,13 @@ public class ForgeEngine extends TerrainControlEngine
 		BitSet biomeRegistryAvailabiltyMap = ((ForgeEngine)TerrainControl.getEngine()).worldLoader.getBiomeRegistryAvailabiltyMap();
 		try
 		{
-			biomeRegistryAvailabiltyMap.set(Biome.getIdForBiome(biome), false); // This should be enough to make Forge re-use the biome id
+			int biomeId = Biome.getIdForBiome(biome);
+			// If this biome uses replaceToBiomeName and has an id > 255 then it is not actually registered in the biome id 
+			// registry and biomeId will be 0. Check if biomeId is actually registered to this biome.
+			if(Biome.getBiomeForId(biomeId) == biome)
+			{
+				biomeRegistryAvailabiltyMap.set(biomeId, false); // This should be enough to make Forge re-use the biome id
+			}
 		}
 		catch(IndexOutOfBoundsException ex)
 		{
@@ -79,8 +80,16 @@ public class ForgeEngine extends TerrainControlEngine
 			//biomeRegistryAvailabiltyMap.set(localBiome.getIds().getSavedId(), false); // This should be enough to make Forge re-use the biome id
 		}
         
+		int biomeId = Biome.REGISTRY.getIDForObject(biome);	
         Biome.REGISTRY.registryObjects.remove(resourceLocation);
-        Biome.REGISTRY.underlyingIntegerMap.put(null, Biome.REGISTRY.getIDForObject(biome));
+        
+		// If this biome uses replaceToBiomeName and has an id > 255 then it is not actually registered in the biome id 
+		// registry and biomeId will be 0. Check if biomeId is actually registered to this biome.
+		if(Biome.REGISTRY.getObjectById(biomeId) == biome)
+		{
+			Biome.REGISTRY.underlyingIntegerMap.put(null, biomeId);
+		}
+        
         Biome.REGISTRY.inverseObjectRegistry.remove(biome);
     }
 
@@ -98,12 +107,6 @@ public class ForgeEngine extends TerrainControlEngine
     {   	
     	ForgeWorld world = getOverWorld(); // If overworld is null then the overworld is not an OTG world
     	return world == null ? false : world.getConfigs().getWorldConfig().Cartographer;
-    }
-
-    public boolean getDimensionsEnabled()
-    { 	
-    	ForgeWorld world = getOverWorld(); // If overworld is null then the overworld is not an OTG world    	
-    	return world == null ? false : world.getConfigs().getWorldConfig().DimensionsEnabled;
     }
     
     public ForgeWorld getOverWorld()
@@ -156,18 +159,13 @@ public class ForgeEngine extends TerrainControlEngine
 
     public ArrayList<ForgeWorld> getUnloadedWorlds()
     {
-    	ArrayList<ForgeWorld> unloadedWorlds = new ArrayList();
-    	unloadedWorlds.addAll(this.worldLoader.unloadedWorlds.values());
-    	return unloadedWorlds;
+    	return this.worldLoader.getUnloadedWorlds();
     }
     
     @Override
     public ArrayList<LocalWorld> getAllWorlds()
     {
-    	ArrayList<LocalWorld> worlds = new ArrayList<LocalWorld>();
-    	worlds.addAll(this.worldLoader.worlds.values());
-    	worlds.addAll(this.worldLoader.unloadedWorlds.values());
-    	return worlds;
+    	return this.worldLoader.getAllWorlds();
     }
 
     @Override
@@ -193,25 +191,4 @@ public class ForgeEngine extends TerrainControlEngine
     {
         return ForgeMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
     }
-
-	@Override
-	public void addPlatformSpecificDataToPacket(DataOutput stream, BiomeConfig config, boolean isSinglePlayer)
-	{
-        // TODO: Why exactly do all these need to be sent to the client? (Forge SP stuff?)				
-		if(isSinglePlayer)
-		{        	        
-			try
-			{
-				ConfigFile.writeStringToStream(stream, WeightedMobSpawnGroup.toJson(config.spawnMonstersMerged));
-				ConfigFile.writeStringToStream(stream, WeightedMobSpawnGroup.toJson(config.spawnCreaturesMerged));
-				ConfigFile.writeStringToStream(stream, WeightedMobSpawnGroup.toJson(config.spawnWaterCreaturesMerged));
-				ConfigFile.writeStringToStream(stream, WeightedMobSpawnGroup.toJson(config.spawnAmbientCreaturesMerged));
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-				throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
-			}
-		}
-	}
 }

@@ -10,7 +10,6 @@ import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
-import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -57,11 +56,11 @@ public final class ClientConfigProvider implements ConfigProvider
             int id = stream.readInt();
             worldConfig.customBiomeGenerationIds.put(biomeName, id);
         }
-
+        
         // BiomeConfigs
         StandardBiomeTemplate defaultSettings = new StandardBiomeTemplate(worldConfig.worldHeightCap);
         biomes = new LocalBiome[world.getMaxBiomesCount()];
-
+        
         count = stream.readInt();
         while (count-- > 0)
         {
@@ -77,59 +76,11 @@ public final class ClientConfigProvider implements ConfigProvider
             biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR, stream.readInt());
             biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, stream.readBoolean());           
                        
-            // TODO: Are these really necessary? <-- Maybe only for Forge SP?
+            // TODO: Are these really necessary? <-- Maybe only for Forge SP? <-- In ClientNetworkEventListener for Forge SP packet is ignored so this doesn't actually do anything??
             
         	String biomeDictId = ConfigFile.readStringFromStream(stream);            
         	biomeReader.putSetting(BiomeStandardValues.BIOME_DICT_ID, biomeDictId); // <-- This might be used even in MP by client mods?
-                    	            
-            // TODO: Are these really necessary? Forge SP seems to handle some part of mob spawning on the client, without this code mobs are spawning when they shouldn't. 
-                    	
-            if(isSinglePlayer)
-            {
-                String inheritedMobsBiomeName = ConfigFile.readStringFromStream(stream);
-                biomeReader.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, inheritedMobsBiomeName);
-            	
-	            String spawnMonsters = ConfigFile.readStringFromStream(stream);
-	            try
-	            {
-					biomeReader.putSetting(BiomeStandardValues.SPAWN_MONSTERS, WeightedMobSpawnGroup.fromJson(spawnMonsters));
-				}
-	            catch (InvalidConfigException e)
-	            {
-					e.printStackTrace();
-				}
-	            
-	            String spawnCreatures = ConfigFile.readStringFromStream(stream);
-	            try
-	            {
-					biomeReader.putSetting(BiomeStandardValues.SPAWN_CREATURES, WeightedMobSpawnGroup.fromJson(spawnCreatures));
-				}
-	            catch (InvalidConfigException e)
-	            {
-					e.printStackTrace();
-				}
-	
-	            String spawnWaterCreatures = ConfigFile.readStringFromStream(stream);
-	            try
-	            {
-					biomeReader.putSetting(BiomeStandardValues.SPAWN_WATER_CREATURES, WeightedMobSpawnGroup.fromJson(spawnWaterCreatures));
-				}
-	            catch (InvalidConfigException e)
-	            {
-					e.printStackTrace();
-				}
-	
-	            String spawnAmbientCreatures = ConfigFile.readStringFromStream(stream);
-	            try
-	            {
-					biomeReader.putSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES, WeightedMobSpawnGroup.fromJson(spawnAmbientCreatures));
-				}
-	            catch (InvalidConfigException e)
-	            {
-					e.printStackTrace();
-				}           
-            }           
-            
+                        
             BiomeLoadInstruction instruction = new BiomeLoadInstruction(biomeName, id, defaultSettings);
             BiomeConfig config = new BiomeConfig(instruction, null, biomeReader, worldConfig);
 

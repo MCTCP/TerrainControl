@@ -86,7 +86,14 @@ public class BO3Loader implements CustomObjectLoader
                 streamForUncompressed = new FileInputStream(path);
                 // Get the tag
                 metadata = NamedBinaryTag.readFrom(streamForUncompressed, false);
-            } catch (IOException corruptFile)
+            }             
+            catch (java.lang.ArrayIndexOutOfBoundsException corruptFile)
+            {
+                TerrainControl.log(LogMarker.FATAL, "Failed to read NBT meta file: ", e.getMessage());
+                TerrainControl.printStackTrace(LogMarker.FATAL, corruptFile);
+                return null;
+            }
+            catch (IOException corruptFile)
             {
                 TerrainControl.log(LogMarker.FATAL, "Failed to read NBT meta file: ", e.getMessage());
                 TerrainControl.printStackTrace(LogMarker.FATAL, corruptFile);
@@ -100,28 +107,31 @@ public class BO3Loader implements CustomObjectLoader
             tryToClose(stream);
         }
 
-        // The file can be structured in two ways:
-        // 1. chest.nbt with all the contents directly in it
-        // 2. chest.nbt with a Compound tag in it with all the data
-
-        // Check for type 1 by searching for an id tag
-        NamedBinaryTag idTag = metadata.getTag("id");
-        if (idTag != null)
+        if(metadata != null)
         {
-            // Found id tag, so return the root tag
-            return metadata;
-        }
-        // No id tag found, so check for type 2
-        if (metadata.getValue() instanceof NamedBinaryTag[])
-        {
-            NamedBinaryTag[] subtag = (NamedBinaryTag[]) metadata.getValue();
-            if (subtag.length != 0)
-            {
-                return subtag[0];
-            }
+	        // The file can be structured in two ways:
+	        // 1. chest.nbt with all the contents directly in it
+	        // 2. chest.nbt with a Compound tag in it with all the data
+	
+	        // Check for type 1 by searching for an id tag
+	        NamedBinaryTag idTag = metadata.getTag("id");
+	        if (idTag != null)
+	        {
+	            // Found id tag, so return the root tag
+	            return metadata;
+	        }
+	        // No id tag found, so check for type 2
+	        if (metadata.getValue() instanceof NamedBinaryTag[])
+	        {
+	            NamedBinaryTag[] subtag = (NamedBinaryTag[]) metadata.getValue();
+	            if (subtag.length != 0)
+	            {
+	                return subtag[0];
+	            }
+	        }
         }
         // Unknown/bad structure
-        TerrainControl.log(LogMarker.WARN, "Structure of NBT file is incorrect: ");
+        TerrainControl.log(LogMarker.WARN, "Structure of NBT file is incorrect: " + path);
         return null;
     }
 

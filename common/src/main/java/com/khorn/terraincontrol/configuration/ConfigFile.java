@@ -140,7 +140,7 @@ public abstract class ConfigFile
 
     public static void writeStringToStream(DataOutput stream, String value) throws IOException
     {
-        byte[] bytes = ("S:" + (value == null ? "" : value)).getBytes();
+        byte[] bytes = (value == null ? "" : value).getBytes();
         stream.writeShort(bytes.length);
         stream.write(bytes);
     }
@@ -149,9 +149,11 @@ public abstract class ConfigFile
     {
         byte[] chars = new byte[stream.readShort()];
         if (stream.read(chars, 0, chars.length) != chars.length)
+        {
             throw new EOFException();
+        }
 
-        return new String(chars).replace("S:", "");
+        return new String(chars);
     }
 
     /**

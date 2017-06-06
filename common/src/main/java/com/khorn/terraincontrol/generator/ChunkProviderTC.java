@@ -141,7 +141,6 @@ public class ChunkProviderTC
         {
             this.localWorld.prepareDefaultStructures(x, z, dry);
         }
-
     }
 
     protected void generateTerrain(ChunkBuffer chunkBuffer)

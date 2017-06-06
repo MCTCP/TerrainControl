@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit.events;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.ConfigToNetworkSender;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
@@ -16,11 +16,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class TCSender
-{
-    
-    private TCPlugin plugin;
+{   
+    private TXPlugin plugin;
 
-    public TCSender(TCPlugin plugin)
+    public TCSender(TXPlugin plugin)
     {
         this.plugin = plugin;
     }
@@ -41,7 +40,7 @@ public class TCSender
             try
             {
                 stream.writeInt(PluginStandardValues.ProtocolVersion);
-                ConfigToNetworkSender.send(configs, stream, false);
+                ConfigToNetworkSender.writeConfigsToStream(configs, stream, false);
                 stream.flush();
             } catch (IOException e)
             {
@@ -53,5 +52,4 @@ public class TCSender
             player.sendPluginMessage(plugin, PluginStandardValues.ChannelName, data);
         }
     }
-
 }

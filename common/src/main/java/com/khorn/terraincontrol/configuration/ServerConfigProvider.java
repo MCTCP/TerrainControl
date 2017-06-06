@@ -160,7 +160,8 @@ public final class ServerConfigProvider implements ConfigProvider
 
         // Build a set of all biomes to load
         Collection<BiomeLoadInstruction> biomesToLoad = new HashSet<BiomeLoadInstruction>();
-        biomesToLoad.addAll(world.getDefaultBiomes());
+        Collection<? extends BiomeLoadInstruction> defaultBiomes = world.getDefaultBiomes();
+        biomesToLoad.addAll(defaultBiomes);
 
         // This adds all custombiomes that have been listed in WorldConfig to
         // the arrayList
@@ -220,7 +221,7 @@ public final class ServerConfigProvider implements ConfigProvider
         for (BiomeConfigStub biomeConfigStub : biomeConfigStubs.values())
         {
             // Allow to let world settings influence biome settings
-            biomeConfigStub.getSettings().setFallback(worldConfigSettings);
+            //biomeConfigStub.getSettings().setFallback(worldConfigSettings); // TODO: Make sure this can be removed safely
 
             // Inheritance
             processInheritance(biomeConfigStubs, biomeConfigStub, 0);
@@ -278,7 +279,7 @@ public final class ServerConfigProvider implements ConfigProvider
         // Now that all settings are loaded, we can index them,
         // cross-reference between biomes, etc.
         for (BiomeConfig biomeConfig : loadedBiomeList)
-        {
+        {        	
             // Statistics of the loaded biomes
             this.biomesCount++;
             loadedBiomeNames.append(biomeConfig.getName());

@@ -34,7 +34,8 @@ public class BiomeStandardValues extends Settings
             DISABLE_BIOME_HEIGHT = booleanSetting("DisableBiomeHeight", false),
             STRONGHOLDS_ENABLED = WorldStandardValues.STRONGHOLDS_ENABLED,
             NETHER_FORTRESSES_ENABLED = WorldStandardValues.NETHER_FORTRESSES_ENABLED,
-            OCEAN_MONUMENTS_ENABLED = WorldStandardValues.OCEAN_MONUMENTS_ENABLED;
+            OCEAN_MONUMENTS_ENABLED = WorldStandardValues.OCEAN_MONUMENTS_ENABLED,
+    		WOODLAND_MANSIONS_ENABLED = WorldStandardValues.WOODLAND_MANSIONS_ENABLED;
 
     public static final Setting<String>
             BIOME_CONFIG_EXTENSION = stringSetting("BiomeConfigExtension", ".bc"),
@@ -133,6 +134,11 @@ public class BiomeStandardValues extends Settings
     public static final int SmallLakeMinAltitude = 8;
     public static final int SmallLakeMaxAltitude = 119;
 
+    public static final int SmallLakeLavaFrequency2 = 2;
+    public static final int SmallLakeLavaRarity2 = 8;
+    public static final int SmallLakeMinAltitude2 = 6;
+    public static final int SmallLakeMaxAltitude2 = 50;
+    
     public static final int undergroundLakeFrequency = 2;
     public static final int undergroundLakeRarity = 5;
     public static final int undergroundLakeMinSize = 50;

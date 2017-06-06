@@ -4,7 +4,7 @@ import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 
 import org.bukkit.Location;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class BiomeCommand extends BaseCommand
 {
-    public BiomeCommand(TCPlugin _plugin)
+    public BiomeCommand(TXPlugin _plugin)
     {
         super(_plugin);
         name = "biome";

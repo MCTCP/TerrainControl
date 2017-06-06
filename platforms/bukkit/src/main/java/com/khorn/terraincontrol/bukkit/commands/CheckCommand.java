@@ -2,7 +2,7 @@ package com.khorn.terraincontrol.bukkit.commands;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.bukkit.TCPerm;
-import com.khorn.terraincontrol.bukkit.TCPlugin;
+import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.bukkit.util.WorldHelper;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import org.bukkit.Bukkit;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class CheckCommand extends BaseCommand
 {
-    public CheckCommand(TCPlugin _plugin)
+    public CheckCommand(TXPlugin _plugin)
     {
         super(_plugin);
         name = "check";

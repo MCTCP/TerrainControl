@@ -27,10 +27,10 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 // Project properties
 archivesBaseName = "openterraingenerator-forge"
 description = "OpenTerrainGenerator for Minecraft Forge"
-ext.forgeVersion = "1.10.2-12.18.3.2185"
+ext.forgeVersion = "1.11.2-13.20.0.2228"
 minecraft.version = ext.forgeVersion
 minecraft.runDir = "run"
-minecraft.mappings = "snapshot_20161111"
+minecraft.mappings = "snapshot_20170430"
 
 repositories
 {

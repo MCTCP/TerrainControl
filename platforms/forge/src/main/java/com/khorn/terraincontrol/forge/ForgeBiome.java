@@ -3,7 +3,7 @@ package com.khorn.terraincontrol.forge;
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
-import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
+import com.khorn.terraincontrol.forge.generator.TXBiome;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -21,7 +21,7 @@ public class ForgeBiome implements LocalBiome
         this.biomeBase = biome;
         this.biomeIds = biomeIds;
         this.biomeConfig = biomeConfig;
-        if (biome instanceof BiomeGenCustom)
+        if (biome instanceof TXBiome)
         {
             this.isCustom = true;
         } else

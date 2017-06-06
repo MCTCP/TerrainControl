@@ -11,8 +11,3 @@ repositories
     mavenLocal()
     mavenCentral()
 }
-
-dependencies
-{
-    testCompile 'junit:junit:4+'
-}

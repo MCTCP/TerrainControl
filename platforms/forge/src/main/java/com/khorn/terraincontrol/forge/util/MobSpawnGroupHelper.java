@@ -5,15 +5,20 @@ import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.MojangSettings.EntityCategory;
 import com.khorn.terraincontrol.logging.LogMarker;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Methods for conversion between mob lists in Minecraft and in the plugin.
@@ -93,14 +98,11 @@ public final class MobSpawnGroupHelper
         for (WeightedMobSpawnGroup mobGroup : weightedMobSpawnGroups)
         {
             Class<? extends EntityLiving> entityClass = toMinecraftClass(mobGroup.getInternalName());
+            
             if (entityClass != null)
             {
-                biomeList.add(
-                        new SpawnListEntry(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
-            } else
-            {
-                // The .toLowerCase() is just a safeguard so that we get
-                // notified if this.af is no longer the biome name
+                biomeList.add(new SpawnListEntry(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
+            } else {           	
             	if(TerrainControl.getPluginConfig().SpawnLog)
             	{
             		TerrainControl.log(LogMarker.WARN, "Mob type {} not found", mobGroup.getInternalName());
@@ -119,7 +121,18 @@ public final class MobSpawnGroupHelper
     @SuppressWarnings("unchecked")
 	static Class<? extends EntityLiving> toMinecraftClass(String mobName)
     {
-    	return (Class<? extends EntityLiving>) EntityList.NAME_TO_CLASS.get(mobName); // Quick fix
+    	Set<ResourceLocation> mobNames = EntityList.getEntityNameList();
+    	for(ResourceLocation mobName1 : mobNames)
+    	{
+    		if(mobName1.getResourcePath().toLowerCase().trim().replace("entity","").replace("_","").equals(mobName.toLowerCase().trim().replace("entity","").replace("_","")))
+    		{
+    			return (Class<? extends EntityLiving>) EntityList.getClass(mobName1);
+    		}
+    	}
+    	
+    	return null;
+    	
+    	//return (Class<? extends EntityLiving>) EntityList.NAME_TO_CLASS.get(mobName); // Quick fix
     	
     	// TODO: This code was causing exceptions when used with Biome Bundle, fix it?
     	/*
@@ -137,8 +150,14 @@ public final class MobSpawnGroupHelper
      * @param entityClass The entity class.
      * @return The entity name, or null if not found.
      */
-    private static String fromMinecraftClass(Class<?> entityClass)
+    private static String fromMinecraftClass(Class<? extends Entity> entityClass)
     {
-        return EntityList.CLASS_TO_NAME.get(entityClass);
+    	EntityEntry entry = EntityRegistry.getEntry(entityClass);
+        if (entry != null)
+        {
+        	return entry.getName();
+        }
+	
+        return null;
     }
 }

@@ -13,7 +13,7 @@ import net.minecraft.world.biome.BiomeProvider;
  *
  * <p>
  * This can be somewhat dangerous, because a subclass for WorldChunkManager,
- * {@link TCBiomeProvider}, gets its information from a BiomeGenerator. This
+ * {@link TXBiomeProvider}, gets its information from a BiomeGenerator. This
  * would cause infinite recursion. To combat this, a check has been added to
  * {@link #setBiomeProvider(BiomeProvider)}.
  *
@@ -77,7 +77,7 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator
      */
     public void setBiomeProvider(BiomeProvider biomeProvider)
     {
-        if (biomeProvider instanceof TCBiomeProvider)
+        if (biomeProvider instanceof TXBiomeProvider)
         {
             // TCBiomeProvider is unusable, as it just asks the
             // BiomeGenerator for the biomes, creating an infinite loop

@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.forge.util;
 
-import com.khorn.terraincontrol.forge.TCWorldType;
-import com.khorn.terraincontrol.forge.generator.BiomeGenCustom;
+import com.khorn.terraincontrol.forge.TXWorldType;
+import com.khorn.terraincontrol.forge.generator.TXBiome;
 
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -30,9 +30,9 @@ public abstract class WorldHelper
      */
     public static int getGenerationId(Biome biomeBase)
     {
-        if (biomeBase instanceof BiomeGenCustom)
+        if (biomeBase instanceof TXBiome)
         {
-            return ((BiomeGenCustom) biomeBase).generationId;
+            return ((TXBiome) biomeBase).generationId;
         }
         return Biome.getIdForBiome(biomeBase);
     }
@@ -44,7 +44,7 @@ public abstract class WorldHelper
      */
     public static String getName(World world)
     {
-        if(world.getWorldInfo().getTerrainType() instanceof TCWorldType && world.provider.getDimension() > 1)
+        if(world.getWorldInfo().getTerrainType() instanceof TXWorldType && world.provider.getDimension() > 1)
         {
         	// This dimension was created by TC, use the given dimension name
         	return DimensionManager.getProviderType(world.provider.getDimension()).getName();

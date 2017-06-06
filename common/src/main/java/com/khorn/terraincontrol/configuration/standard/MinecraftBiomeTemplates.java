@@ -615,6 +615,8 @@ public class MinecraftBiomeTemplates
             this.defaultTallFlowers = 1;
             this.defaultPoppies = 4;
             
+            this.defaultWoodlandMansions = true;
+            
             this.defaultInheritMobsBiomeName = "Roofed Forest";            
             this.defaultBiomeDictId = "SPOOKY, DENSE, FOREST";
         }

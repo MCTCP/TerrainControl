@@ -40,6 +40,11 @@ including the original Eclipse Mars release, will not work.
 To import OpenTerrainGenerator, use `File` -> `Import` -> `Gradle` -> `Gradle Project`
 and import the OpenTerrainGenerator directory.
 
+**Please note:** As of Nov. 2016 there is a [bug] in the latest release of Buildship (the eclipse plugin that manages 
+gradle) that may generate an `Unsupported method: HierarchicalEclipseProject.getIdentifier()` error when attempting to 
+import the project into Eclipse. If this is a case, you need to manually update Buildship to a later version. To do so, 
+click `Help` -> `Install New Software` and input this url: http://download.eclipse.org/buildship/updates/e46/milestones/2.x/.
+
 ### Running the Forge client or server
 In the Forge version of OpenTerrainGenerator two classes are included to help you run
 the project from your IDE. Click `Run` -> `Edit Configurations...` -> `+`
@@ -85,3 +90,4 @@ To launch the server version, repeat the above steps, but use the main class
 [ZIP file]: https://github.com/MCTCP/TerrainControl/archive/master.zip
 [JDK 7]: http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 [Eclipse formatting settings]: https://dl.dropboxusercontent.com/u/23288978/terraincontrol/TerrainControl.xml
+[bug]: https://bugs.eclipse.org/bugs/show_bug.cgi?id=507423

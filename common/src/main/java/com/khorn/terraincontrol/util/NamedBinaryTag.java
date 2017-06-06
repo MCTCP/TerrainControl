@@ -381,14 +381,21 @@ public class NamedBinaryTag
         }
 
         byte type = dis.readByte();
-        NamedBinaryTag tag;
+        NamedBinaryTag tag = null;
 
         if (type == 0)
         {
             tag = new NamedBinaryTag(Type.TAG_End, null, null);
         } else
         {
-            tag = new NamedBinaryTag(Type.values()[type], dis.readUTF(), readPayload(dis, type));
+        	try
+        	{
+        		tag = new NamedBinaryTag(Type.values()[type], dis.readUTF(), readPayload(dis, type));
+        	}
+        	catch(IndexOutOfBoundsException ex)
+        	{
+        		// Incorrect NBT structure, NBT may need to be updated for use with this MC version. MC 1.11.2 changed nbt data structure for chests. 
+        	}
         }
 
         dis.close();

@@ -25,7 +25,7 @@ public final class ConfigToNetworkSender
      * @param stream         Stream to write to.
      * @throws IOException If an IO error occurs.
      */
-    public static void send(ConfigProvider configProvider, DataOutput stream, boolean isSinglePlayer) throws IOException
+    public static void writeConfigsToStream(ConfigProvider configProvider, DataOutput stream, boolean isSinglePlayer) throws IOException
     {
         WorldConfig worldConfig = configProvider.getWorldConfig();
         LocalBiome[] biomes = configProvider.getBiomeArray();
@@ -68,7 +68,7 @@ public final class ConfigToNetworkSender
         {
             if (biome == null)
             {
-                continue;
+            	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
             }
             stream.writeInt(biome.getIds().getSavedId());
             biome.getBiomeConfig().writeToStream(stream, isSinglePlayer);
