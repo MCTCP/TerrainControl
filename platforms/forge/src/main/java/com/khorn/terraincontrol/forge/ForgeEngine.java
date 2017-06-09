@@ -16,8 +16,11 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+
+import net.minecraftforge.common.DimensionManager;
 
 public class ForgeEngine extends TerrainControlEngine
 {
@@ -120,6 +123,19 @@ public class ForgeEngine extends TerrainControlEngine
 			}
 		}
 		return null;
+    }
+    
+    public ForgeWorld getWorldByDimId(int dimensionId)
+    {
+    	ForgeWorld forgeWorld;
+    	if(dimensionId == 0)
+    	{
+    		forgeWorld = ((ForgeEngine)TerrainControl.getEngine()).getOverWorld();
+    	} else {
+        	DimensionType dimType = DimensionManager.getProviderType(dimensionId);
+    		forgeWorld = (ForgeWorld)TerrainControl.getWorld(dimType.getName());
+    	}
+    	return forgeWorld;
     }
     
     public LocalWorld getWorld(World world)

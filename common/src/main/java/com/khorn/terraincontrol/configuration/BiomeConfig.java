@@ -292,8 +292,7 @@ public class BiomeConfig extends ConfigFile
         if (this.defaultSettings.isCustomBiome)
         {
             this.replaceToBiomeName = settings.getSetting(BiomeStandardValues.REPLACE_TO_BIOME_NAME);
-        } else
-        {
+        } else {
             this.replaceToBiomeName = "";
         }
 

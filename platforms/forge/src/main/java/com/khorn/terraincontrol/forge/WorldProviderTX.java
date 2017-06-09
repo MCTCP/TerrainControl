@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.forge;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
+import com.khorn.terraincontrol.logging.LogMarker;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -48,7 +49,7 @@ public class WorldProviderTX extends WorldProvider
 		WorldConfig worldConfig = GetWorldConfig();
 		return worldConfig != null ? worldConfig.departMessage : WorldStandardValues.departMessage.getDefaultValue();
     }
-	
+
 	DimensionType dimType = null;
     public DimensionType getDimensionType()
     {
@@ -77,8 +78,8 @@ public class WorldProviderTX extends WorldProvider
      // {@link #hasNoSky} appropriately.
     protected void init()
     {
-        //this.hasSkyLight = true;
         // Creates a new world chunk manager for WorldProvider
+    	this.hasSkyLight = true;
         this.biomeProvider = TXPlugin.txWorldType.getBiomeProvider(world);
     }
     
@@ -123,7 +124,7 @@ public class WorldProviderTX extends WorldProvider
     {
         return super.getRespawnDimension(player);
     }
-    
+
     // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
     // @param entity The entity holding the map, playername, or frame-ENTITYID
     // @param x X Position
@@ -220,9 +221,9 @@ public class WorldProviderTX extends WorldProvider
     @Override
     public int getAverageGroundLevel()
     {
-    	//WorldConfig worldConfig = GetWorldConfig();
-        //return worldConfig != null ? worldConfig.averageGroundlevel : this.worldObj.getSeaLevel() + 1;
-    	return this.world.getSeaLevel() + 1;
+    	WorldConfig worldConfig = GetWorldConfig();
+    	TerrainControl.log(LogMarker.INFO, "getAverageGroundLevel " + (worldConfig.waterLevelMax + 1));
+   		return worldConfig != null ? worldConfig.waterLevelMax + 1 : this.world.getSeaLevel() + 1;
     }
     
     // Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used
@@ -253,6 +254,7 @@ public class WorldProviderTX extends WorldProvider
     	}
     }
        
+       
 	@Override
     public WorldBorder createWorldBorder()
     {
@@ -271,13 +273,13 @@ public class WorldProviderTX extends WorldProvider
     		return super.calculateCelestialAngle(worldTime, partialTicks);
     	}
     }
-    
+
     @Override
     public double getHorizon()
     {    
-    	//WorldConfig worldConfig = GetWorldConfig();
-   		//return worldConfig != null ? worldConfig.horizonHeight : WorldStandardValues.horizonHeight.getDefaultValue();
-    	return this.world.getSeaLevel();
+    	WorldConfig worldConfig = GetWorldConfig();
+    	TerrainControl.log(LogMarker.INFO, "getHorizon " + (worldConfig.waterLevelMax));
+    	return worldConfig != null ? worldConfig.waterLevelMax : this.world.getSeaLevel();
     }
         
     @Override
@@ -295,14 +297,12 @@ public class WorldProviderTX extends WorldProvider
     }
       
     // This only affects lillies, glass bottles and a few other unimportant things?
-    /*
-    @Override
-    public boolean canMineBlock(net.minecraft.entity.player.EntityPlayer player, BlockPos pos)
-    {
-    	WorldConfig worldConfig = GetWorldConfig();
-    	return worldConfig != null ? worldConfig.canMineBlock && super.canMineBlock(player, pos) : super.canMineBlock(player, pos);
-    } 
-    */   
+    //@Override
+    //public boolean canMineBlock(net.minecraft.entity.player.EntityPlayer player, BlockPos pos)
+    //{
+    	//WorldConfig worldConfig = GetWorldConfig();
+    	//return worldConfig != null ? worldConfig.canMineBlock && super.canMineBlock(player, pos) : super.canMineBlock(player, pos);
+    //}
     
     @Override
     public boolean doesWaterVaporize()
@@ -311,10 +311,20 @@ public class WorldProviderTX extends WorldProvider
     	return worldConfig != null ? worldConfig.doesWaterVaporize : WorldStandardValues.doesWaterVaporize.getDefaultValue(); 
     }
     
+    // For 1.10.2 hasNoSky and hasSkyLight were the same thing, controlled via hasNoSky
+    
     @Override
     public boolean hasNoSky()
     {
-    	return  super.hasNoSky();
+    	WorldConfig worldConfig = GetWorldConfig();
+    	return worldConfig != null ? !worldConfig.hasSkyLight : !WorldStandardValues.hasSkyLight.getDefaultValue();
+    }   
+    
+    @Override
+    public boolean hasSkyLight()
+    {
+    	WorldConfig worldConfig = GetWorldConfig();
+    	return worldConfig != null ? worldConfig.hasSkyLight : WorldStandardValues.hasSkyLight.getDefaultValue();
     }    
     
     @SideOnly(Side.CLIENT)
@@ -322,166 +332,5 @@ public class WorldProviderTX extends WorldProvider
     public net.minecraftforge.client.IRenderHandler getSkyRenderer()
     {
     	return super.getSkyRenderer();
-    }
+    }	
 }
-
-
-/*
-package com.khorn.terraincontrol.forge;
-
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.chunk.IChunkGenerator;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-public class WorldProviderTX extends WorldProvider
-{
-	//private CartographerSkyRenderer cartographerSkyRenderer = new CartographerSkyRenderer();
-	
-	public WorldProviderTX()
-	{
-	    //this.isHellWorld = true;
-	    //this.hasNoSky = true;
-		//this.setSkyRenderer(new CartographerSkyRenderer());
-	}
-
-	@Override
-    public String getWelcomeMessage()
-    {
-		if(IsCartographer())
-		{
-			return "Welcome traveller, to the Cartographer, the hub between worlds. From here you can observe the world and transport living things and items to any place you desire.";
-		} else {
-			return "Entering dimension " + dimType.getName();
-		}
-    }
-	
-	boolean isCartographer;
-	boolean IsCartographer()
-	{
-    	if(dimType == null)
-    	{
-    		dimType = DimensionManager.getProviderType(this.world.provider.getDimension());
-    		isCartographer = dimType.getName().equals("DIM-Cartographer");
-    	}
-    	return isCartographer;
-	}
-	
-	DimensionType dimType = null;
-    public DimensionType getDimensionType()
-    {
-    	if(dimType == null)
-    	{
-    		dimType = DimensionManager.getProviderType(this.world.provider.getDimension());
-    		isCartographer = dimType.getName().equals("DIM-Cartographer");
-    	}
-    	
-    	// Some mods (like Optifine) crash if the dimensionType returned is not one of the default ones.
-    	// We can't use DimensionType.OVERWORLD though or the ChunkProdivderServer.unloadQueuedChunks won't unload this dimension
-    	// This seems to be called often so may cause client lag :(.
-    	StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-    	if(stackTrace.length > 2)
-    	{
-    		String className = stackTrace[2].getClassName().toLowerCase();
-	    	if(className.contains("customcolors"))
-	    	{
-	    		return DimensionType.OVERWORLD;
-	    	}
-    	}
-    	
-        return dimType;
-    }
-    
-    public void init()
-    {
-    	// TODO: Make sure this gets called
-        this.hasSkyLight = true;
-        this.biomeProvider = TXPlugin.txWorldType.getBiomeProvider(world);
-    }
-    
-    @Override
-    public IChunkGenerator createChunkGenerator()
-    {
-    	return TXPlugin.txWorldType.getChunkGenerator(world, world.getWorldInfo().getGeneratorOptions());
-    }
-
-    public boolean isSurfaceWorld()
-    {
-        return true;
-    }
-    
-    public boolean canCoordinateBeSpawn(int x, int z)
-    {
-        return false;
-    }
-    
-    public boolean canRespawnHere()
-    {
-    	return true;
-    }    
-    
-    @SideOnly(Side.CLIENT)
-    public float getCloudHeight()
-    {
-    	if(IsCartographer())
-    	{
-    		return -8.0F;
-    	} else {
-    		return super.getCloudHeight();
-    	}
-    }    
-
-    protected void generateLightBrightnessTable()
-    {
-    	if(IsCartographer())
-    	{	
-	        for (int i = 0; i <= 15; ++i)
-	        {
-	            //float f1 = 1.0F - (float)i / 15.0F;
-	        	float f1 = 0.0F;
-	            this.lightBrightnessTable[i] = (1.0F - f1) / (f1 * 3.0F + 1.0F) * 0.9F + 0.1F;
-	        }
-    	} else {
-    		super.generateLightBrightnessTable();
-    	}
-    }
-    
-    public float calculateCelestialAngle(long worldTime, float partialTicks)
-    {
-    	if(IsCartographer())
-    	{
-    		return 0.49837038f;
-    	} else {
-    		return super.calculateCelestialAngle(worldTime, partialTicks);
-    	}
-    }      
-    
-    @Override
-    public double getHorizon()
-    {
-   		return IsCartographer() ? 4.0d : super.getHorizon();
-    	//return super.getHorizon();
-    }
-    
-    @Override
-    public boolean canDoLightning(net.minecraft.world.chunk.Chunk chunk)
-    {
-        return IsCartographer() ? false : super.canDoLightning(chunk);
-    }
-    
-    @Override
-    public boolean canDoRainSnowIce(net.minecraft.world.chunk.Chunk chunk)
-    {
-    	return IsCartographer() ? false : super.canDoRainSnowIce(chunk);
-    }
-    
-    @Override
-    public boolean canMineBlock(net.minecraft.entity.player.EntityPlayer player, BlockPos pos)
-    {
-        return IsCartographer() ? false : super.canMineBlock(player, pos);
-    }    
-}
-*/

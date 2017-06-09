@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ClientConfigProvider;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
+import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 import com.khorn.terraincontrol.forge.generator.TXBiome;
 import com.khorn.terraincontrol.forge.gui.GuiHandler;
@@ -654,7 +655,58 @@ public final class WorldLoader
     			// Create WorldConfig
     			wrappedStream.readInt();
     			wrappedStream.readInt();
+    			
+    	        // TODO: Probably not all of these are required on the client
+    			wrappedStream.readInt();
 
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        //this.doLimitedCrafting = reader.getSetting(WorldStandardValues.doLimitedCrafting).toString();
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        //public String gameLoopFunction = "true";
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        //public String maxCommandChainLength = "65536";
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream); 
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        ConfigFile.readStringFromStream(wrappedStream);
+    	        //public boolean isHellWorld = false;
+    	        wrappedStream.readBoolean();
+    	        wrappedStream.readBoolean();
+    	        //this.canCoordinateBeSpawn = reader.getSetting(WorldStandardValues.canCoordinateBeSpawn);
+    	        wrappedStream.readBoolean();
+    	        wrappedStream.readBoolean();
+    	        wrappedStream.readBoolean();
+    	        wrappedStream.readBoolean();
+    	        wrappedStream.readDouble();
+    	        wrappedStream.readDouble();
+    	        wrappedStream.readDouble();
+    	        wrappedStream.readBoolean();
+    	        //this.averageGroundlevel = reader.getSetting(WorldStandardValues.averageGroundlevel);
+    	        //this.horizonHeight = reader.getSetting(WorldStandardValues.horizonHeight);
+    	        wrappedStream.readInt();
+    	        wrappedStream.readBoolean();
+    	        wrappedStream.readBoolean();
+    	        //this.canMineBlock = reader.getSetting(WorldStandardValues.canMineBlock);
+    	        wrappedStream.readBoolean();
+    	        wrappedStream.readDouble();
+    	        wrappedStream.readBoolean();
+    	        wrappedStream.readBoolean();
+    			
     			// Custom biomes + ids
     			int count = wrappedStream.readInt();
     	        while (count-- > 0)

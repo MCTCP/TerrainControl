@@ -69,8 +69,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.lang.reflect.Field;
 import java.util.*;
 
-import javax.annotation.Nullable;
-
 public class ForgeWorld implements LocalWorld
 {
 	public int clientDimensionId = 0;
@@ -1214,19 +1212,26 @@ public class ForgeWorld implements LocalWorld
 	
     @Override
     public void SpawnEntity(EntityFunction entityData)
-    {    	
+    {
+    	if(TerrainControl.getPluginConfig().SpawnLog)
+    	{
+    		TerrainControl.log(LogMarker.INFO, "Attempting to spawn BO3 Entity() " + entityData.groupSize + " x " + entityData.mobName + " at " + entityData.x + " " + entityData.y + " " + entityData.z);
+    	}
+    	
     	Random rand = new Random();
     	
 		String mobTypeName = entityData.mobName;
 		int groupSize = entityData.groupSize;
 		String nameTag = entityData.nameTagOrNBTFileName;
-
+		ResourceLocation entityResourceLocation = null;
+		
         Class<?> entityClass = null;
         
         for(ResourceLocation entry : EntityList.getEntityNameList())
         {
         	if(entry.getResourcePath().toLowerCase().trim().replace("entity", "").replace("_", "").equals(mobTypeName.toLowerCase().replace("entity", "").replace("_", "")))
         	{
+        		entityResourceLocation = entry;
             	entityClass = EntityList.getClass(entry);
         		break;
         	}
@@ -1260,11 +1265,11 @@ public class ForgeWorld implements LocalWorld
 	        {
 	        	TerrainControl.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
 	        	return;
-	        }		                                            
+	        }
 	        
-	        nbttagcompound.setString("id", entityData.mobName);
+	        nbttagcompound.setString("id", entityResourceLocation.getResourcePath());        
 	        entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
-        } else {        
+        } else {
 	        try
 	        {
 	            entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
@@ -1339,7 +1344,7 @@ public class ForgeWorld implements LocalWorld
 	            		        	return;
 	            		        }		                                            
 	            		        
-	            		        nbttagcompound.setString("id", entityData.mobName);
+	            		        nbttagcompound.setString("id", entityResourceLocation.getResourcePath());
 	            		        entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
 	            	        } else {        
 	            		        try
@@ -1365,7 +1370,12 @@ public class ForgeWorld implements LocalWorld
 	            		
     					((EntityLiving) entityliving).enablePersistence(); // <- makes sure mobs don't de-spawn
 	            		
-	            		world.spawnEntity(entityliving);
+    			    	if(TerrainControl.getPluginConfig().SpawnLog)
+    			    	{
+    			    		TerrainControl.log(LogMarker.INFO, "Spawned OK");
+    			    	}
+    					
+    					world.spawnEntity(entityliving);
 	            	}
 	            } else {                    					                                                						                                                                                    					                                                
 	            	for(int r = 0; r < groupSize; r++)
@@ -1382,7 +1392,12 @@ public class ForgeWorld implements LocalWorld
 	                            return;
 	                        }
 	                        entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F);                      
-	            		}					                                                	
+	            		}		
+	            		
+    			    	if(TerrainControl.getPluginConfig().SpawnLog)
+    			    	{
+    			    		TerrainControl.log(LogMarker.INFO, "Spawned OK");
+    			    	}
 	            		
 	            		world.spawnEntity(entityliving);
 	            	}						                                                	

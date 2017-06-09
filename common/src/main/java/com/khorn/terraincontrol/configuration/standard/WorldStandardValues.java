@@ -135,7 +135,8 @@ public class WorldStandardValues extends Settings
     		WOODLAND_MANSIONS_ENABLED = booleanSetting("WoodLandMansionsEnabled", true),            		
             POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),            
     		CARTOGRAPHER = booleanSetting("Cartographer", false),
-    		    		
+    		    	
+			teleportToSpawnOnly = booleanSetting("TeleportToSpawnOnly", false),
 			commandBlockOutput = booleanSetting("CommandBlockOutput", true),
 			disableElytraMovementCheck = booleanSetting("DisableElytraMovementCheck", false),
 			doDaylightCycle = booleanSetting("DoDaylightCycle", true),
@@ -153,9 +154,9 @@ public class WorldStandardValues extends Settings
 			sendCommandFeedback = booleanSetting("SendCommandFeedback", true),
 			showDeathMessages = booleanSetting("ShowDeathMessages", true),
 			spectatorsGenerateChunks = booleanSetting("SpectatorsGenerateChunks", true),
-			hasNoSky = booleanSetting("HasNoSky", false),
+			hasSkyLight = booleanSetting("HasSkyLight", true),
 			isSurfaceWorld = booleanSetting("IsSurfaceWorld", true),
-			canCoordinateBeSpawn = booleanSetting("CanCoordinateBeSpawn", false),
+			//canCoordinateBeSpawn = booleanSetting("CanCoordinateBeSpawn", false),
 			canRespawnHere = booleanSetting("CanRespawnHere", true),
 			doesWaterVaporize = booleanSetting("DoesWaterVaporize", false),
 			doesXZShowFog = booleanSetting("DoesXZShowFog", false),

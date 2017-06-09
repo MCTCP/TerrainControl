@@ -116,24 +116,22 @@ public class TXTeleporter
 	
 	public static Entity changeDimension(int dimensionIn, EntityPlayerMP _this, boolean createPortal)
     {		
-    	DimensionType dimType = DimensionManager.getProviderType(dimensionIn);
-    	if(dimType.getName().equals("DIM-Cartographer"))
-    	{
-    		ForgeWorld cartographerWorld = (ForgeWorld)TerrainControl.getWorld("DIM-Cartographer");
+		ForgeWorld forgeWorld = ((ForgeEngine)TerrainControl.getEngine()).getWorldByDimId(dimensionIn);
+		if(forgeWorld == null)
+		{
+			DimensionManager.initDimension(dimensionIn);    			
+			forgeWorld = ((ForgeEngine)TerrainControl.getEngine()).getWorldByDimId(dimensionIn);
+		}
+		if(forgeWorld == null)
+		{
+			throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
+		}
 
-    		if(cartographerWorld == null)
-    		{
-    			DimensionManager.initDimension(Cartographer.CartographerDimension);
-    			cartographerWorld = (ForgeWorld)TerrainControl.getWorld("DIM-Cartographer");
-    		}
-    		if(cartographerWorld == null)
-    		{
-    			throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
-    		}
-
-    		BlockPos cartographerSpawnPoint = cartographerWorld.getSpawnPoint();
-    		_this.setLocationAndAngles(cartographerSpawnPoint.getX(), 125, cartographerSpawnPoint.getZ(), 0, 0);
-    	}
+		if(forgeWorld.getConfigs().getWorldConfig().teleportToSpawnOnly)
+		{
+			BlockPos forgeWorldSpawnPoint = forgeWorld.getSpawnPoint();
+			_this.setLocationAndAngles(forgeWorldSpawnPoint.getX(), 256, forgeWorldSpawnPoint.getZ(), 0, 0);
+		}
 
         if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(_this, dimensionIn)) return _this;
 

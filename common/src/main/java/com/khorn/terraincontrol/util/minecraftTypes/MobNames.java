@@ -10,6 +10,8 @@ import java.util.Map;
  */
 public enum MobNames
 {
+	//See: net.minecraft.entity.EntityList for internal mob names list
+	
     BAT("bat", "bat"),
     BLAZE("blaze", "blaze"),
     CAVE_SPIDER("cave_spider", "cavespider"),
@@ -33,7 +35,6 @@ public enum MobNames
     MOOSHROOM("mooshroom", "mushroomcow", "mooshroom"),
     OCELOT("ocelot", "ozelot", "ocelot"),
     PIG("pig", "pig"),
-    PIG_ZOMBIE("pig_zombie", "pigzombie"),
     POLAR_BEAR("polar_bear", "polarbear"),
     RABBIT("rabbit", "rabbit"),
     SHEEP("sheep", "sheep"),
@@ -56,7 +57,7 @@ public enum MobNames
     WOLF("wolf", "wolf"),
     ZOMBIE("zombie", "zombie"),
     ZOMBIE_HORSE("zombie_horse", "zombiehorse"),
-    ZOMBIE_PIGMAN("zombie_pigman", "zombiepigman"),
+    ZOMBIE_PIGMAN("zombie_pigman", "zombiepigman", "pig_zombie", "pigzombie"),
     ZOMBIE_VILLAGER("zombie_villager", "zombievillager");
 
     // Contains all aliases (alias, internalName)
