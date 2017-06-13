@@ -143,17 +143,25 @@ final class TXCommandHandler implements ICommand
     			EnumCreatureType[] aenumcreaturetype = EnumCreatureType.values();
 	    		for(ResourceLocation entry : EntityList.getEntityNameList())
 	        	{
-	    			String msg = entry.getResourcePath();
-	    		    for (int k3 = 0; k3 < aenumcreaturetype.length; ++k3)
-	    		    {
-	    		        EnumCreatureType enumcreaturetype = aenumcreaturetype[k3];
-	    		        if(enumcreaturetype.getCreatureClass().isAssignableFrom(EntityList.getClass(entry)))
-	    		        {
-	    		        	msg += VALUE_COLOR + " (" + enumcreaturetype.name() + ")";
-	    		        }
-	    		    }
-	        		TerrainControl.log(LogMarker.INFO, msg.replace("§2", "").replace("§", "").replace("§a", ""));
-	        		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- " + msg));
+    		        if(EntityList.getClass(entry) != null)
+    		        {
+		    			String msg = entry.getResourcePath();
+		    		    for (int k3 = 0; k3 < aenumcreaturetype.length; ++k3)
+		    		    {
+		    		        EnumCreatureType enumcreaturetype = aenumcreaturetype[k3];
+		    		        if(enumcreaturetype.getCreatureClass().isAssignableFrom(EntityList.getClass(entry)))
+		    		        {
+		    		        	msg += VALUE_COLOR + " (" + enumcreaturetype.name() + ")";
+		    		        }
+		    		    }
+		        		TerrainControl.log(LogMarker.INFO, msg.replace("§2", "").replace("§", "").replace("§a", ""));
+		        		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- " + msg));
+    		        } else {
+    		        	// This can happen for LIGHTNING_BOLT since it appears to be added to the 
+    		        	// getEntityNameList list but doesn't actually have an entity registered
+    		        	// TODO: Find out how lightning bolt is supposed to work and make sure
+    		        	// all other entities are registered properly (including ones added by other mods).
+    		        }
 	        	}
 	    		TerrainControl.log(LogMarker.INFO, "----");
             }

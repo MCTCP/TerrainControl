@@ -23,7 +23,7 @@ public enum MobNames
     ENDER_DRAGON("ender_dragon", "enderdragon"),
     ENDERMAN("enderman", "enderman"),
     ENDERMITE("endermite", "endermite"),
-    EVOCATION_ILLAGER("evocation_illager", "evocationillager"),
+    EVOCATION_ILLAGER("evocation_illager", "evocationillager", "evoker"),
     GHAST("ghast", "ghast"),
     GIANT("giant", "giant", "giantzombie", "zombiegiant"),
     GUARDIAN("guardian", "guardian"),
@@ -50,7 +50,7 @@ public enum MobNames
     VEX("vex", "vex"),    
     VILLAGER("villager", "villager"),
     VILLAGER_GOLEM("villager_golem", "villagergolem", "irongolem"),
-    VINDICATION_ILLAGER("vindication_illager", "vindicationillager"),
+    VINDICATION_ILLAGER("vindication_illager", "vindicationillager", "vindicator"),
     WITCH("witch", "witch"),
     WITHER("wither", "witherboss", "wither"),
     WITHER_SKELETON("wither_skeleton", "witherskeleton"),
@@ -59,7 +59,7 @@ public enum MobNames
     ZOMBIE_HORSE("zombie_horse", "zombiehorse"),
     ZOMBIE_PIGMAN("zombie_pigman", "zombiepigman", "pig_zombie", "pigzombie"),
     ZOMBIE_VILLAGER("zombie_villager", "zombievillager");
-
+   
     // Contains all aliases (alias, internalName)
     private static Map<String, String> mobAliases = new HashMap<String, String>();
 

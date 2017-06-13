@@ -55,7 +55,12 @@ public final class MobSpawnGroupHelper
      */
     private static WeightedMobSpawnGroup fromMinecraftGroup(Biome.SpawnListEntry biomeMeta)
     {
-        return new WeightedMobSpawnGroup(fromMinecraftClass(biomeMeta.entityClass), biomeMeta.itemWeight, biomeMeta.minGroupCount, biomeMeta.maxGroupCount);
+    	String mobName = fromMinecraftClass(biomeMeta.entityClass);
+    	if(mobName == null)
+    	{
+    		return null;
+    	}
+        return new WeightedMobSpawnGroup(mobName, biomeMeta.itemWeight, biomeMeta.minGroupCount, biomeMeta.maxGroupCount);
     }
 
     /**
@@ -81,7 +86,11 @@ public final class MobSpawnGroupHelper
         List<WeightedMobSpawnGroup> result = new ArrayList<WeightedMobSpawnGroup>();
         for (SpawnListEntry meta : biomeMetas)
         {
-            result.add(fromMinecraftGroup(meta));
+        	WeightedMobSpawnGroup wMSG = fromMinecraftGroup(meta);
+        	if(wMSG != null)
+        	{
+        		result.add(wMSG);	
+        	}            
         }
         return result;
     }
@@ -124,7 +133,7 @@ public final class MobSpawnGroupHelper
     	Set<ResourceLocation> mobNames = EntityList.getEntityNameList();
     	for(ResourceLocation mobName1 : mobNames)
     	{
-    		if(mobName1.getResourcePath().toLowerCase().trim().replace("entity","").replace("_","").equals(mobName.toLowerCase().trim().replace("entity","").replace("_","")))
+    		if(mobName1.getResourcePath().toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(mobName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","")))
     		{
     			return (Class<? extends EntityLiving>) EntityList.getClass(mobName1);
     		}
@@ -158,6 +167,7 @@ public final class MobSpawnGroupHelper
         	return entry.getName();
         }
 	
+		TerrainControl.log(LogMarker.DEBUG, "No EntityRegistry entry found for class: " + entityClass);
         return null;
     }
 }

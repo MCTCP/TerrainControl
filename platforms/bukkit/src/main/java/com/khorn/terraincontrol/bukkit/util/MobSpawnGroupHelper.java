@@ -149,7 +149,7 @@ public final class MobSpawnGroupHelper
      * @return The entity class, or null if not found.
      */
     static Class<? extends EntityInsentient> toMinecraftClass(String mobName)
-    {
+    {    	
 		Class<? extends Entity> clazz = EntityTypes.b.get(new MinecraftKey(mobName));
 		if (clazz == null)
 		{

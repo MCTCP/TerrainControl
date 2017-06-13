@@ -222,7 +222,6 @@ public class WorldProviderTX extends WorldProvider
     public int getAverageGroundLevel()
     {
     	WorldConfig worldConfig = GetWorldConfig();
-    	TerrainControl.log(LogMarker.INFO, "getAverageGroundLevel " + (worldConfig.waterLevelMax + 1));
    		return worldConfig != null ? worldConfig.waterLevelMax + 1 : this.world.getSeaLevel() + 1;
     }
     
@@ -278,7 +277,6 @@ public class WorldProviderTX extends WorldProvider
     public double getHorizon()
     {    
     	WorldConfig worldConfig = GetWorldConfig();
-    	TerrainControl.log(LogMarker.INFO, "getHorizon " + (worldConfig.waterLevelMax));
     	return worldConfig != null ? worldConfig.waterLevelMax : this.world.getSeaLevel();
     }
         

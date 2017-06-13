@@ -476,12 +476,13 @@ public class TXDimensionManager
 				}
 			}
 		}
-	}
-
-	private static Hashtable<Integer, DimensionType> oldDims;
+	}	
+	
+	private static Hashtable<Integer, Object> oldDims;
 	public static void RemoveTCDims()
-	{
-    	Hashtable<Integer, DimensionType> dimensions = null;
+	{	
+    	Hashtable dimensions = null;  	
+   	
 		try
 		{
 			Field[] fields = DimensionManager.class.getDeclaredFields();
@@ -495,9 +496,9 @@ public class TXDimensionManager
 					if(fieldAsHashTable.values().size() > 0)
 					{
 						Object value = fieldAsHashTable.values().toArray()[0];																
-						if(value instanceof DimensionType)
+						if(value instanceof DimensionType || !(value instanceof WorldServer)) // Forge 1.11.2 - 13.20.0.2228 uses DimensionType, Forge 1.11.2 - 13.20.0.2315 uses Dimension
 						{							
-							dimensions = (Hashtable<Integer, DimensionType>) field.get(new DimensionManager());
+							dimensions = fieldAsHashTable;
 					        break;
 						}
 					}
@@ -516,21 +517,26 @@ public class TXDimensionManager
 		{
 			e.printStackTrace();
 		}
-    	
-		oldDims = new Hashtable<Integer, DimensionType>();
+		    	
+		oldDims = new Hashtable<Integer, Object>();
 		for(int i = 2; i < Long.SIZE << 4; i++)
 		{
-			if(dimensions.containsKey(i) && dimensions.get(i).getSuffix().equals("OTG"))
+			if(DimensionManager.isDimensionRegistered(i))
 			{
-				oldDims.put(i, dimensions.get(i));
-				dimensions.remove(i);
+				DimensionType type = DimensionManager.getProviderType(i);
+				if(type.getSuffix().equals("OTG"))
+				{
+					oldDims.put(i, dimensions.get(i));
+					dimensions.remove(i);
+				}
 			}
-		} 
+		}	
 	}
 	
 	public static HashMap<Integer, String> GetAllOTGDimensions()
 	{
-    	Hashtable<Integer, DimensionType> dimensions = null;
+    	Hashtable dimensions = null;  	
+       	
 		try
 		{
 			Field[] fields = DimensionManager.class.getDeclaredFields();
@@ -544,9 +550,9 @@ public class TXDimensionManager
 					if(fieldAsHashTable.values().size() > 0)
 					{
 						Object value = fieldAsHashTable.values().toArray()[0];																
-						if(value instanceof DimensionType)
+						if(value instanceof DimensionType || !(value instanceof WorldServer)) // Forge 1.11.2 - 13.20.0.2228 uses DimensionType, Forge 1.11.2 - 13.20.0.2315 uses Dimension
 						{							
-							dimensions = (Hashtable<Integer, DimensionType>) field.get(new DimensionManager());
+							dimensions = fieldAsHashTable;
 					        break;
 						}
 					}
@@ -570,9 +576,13 @@ public class TXDimensionManager
 		
 		for(int i = 2; i < Long.SIZE << 4; i++)
 		{
-			if(dimensions.containsKey(i) && dimensions.get(i).getSuffix().equals("OTG"))
+			if(DimensionManager.isDimensionRegistered(i))
 			{
-				otgDims.put(new Integer(dimensions.get(i).getId()), dimensions.get(i).getName());
+				DimensionType type = DimensionManager.getProviderType(i);
+				if(type.getSuffix().equals("OTG"))
+				{
+					otgDims.put(new Integer(type.getId()), type.getName());
+				}
 			}
 		}
 		
@@ -581,7 +591,8 @@ public class TXDimensionManager
 	
 	public static void ReAddTCDims()
 	{
-    	Hashtable<Integer, DimensionType> dimensions = null;
+    	Hashtable dimensions = null;  	
+       	
 		try
 		{
 			Field[] fields = DimensionManager.class.getDeclaredFields();
@@ -595,9 +606,9 @@ public class TXDimensionManager
 					if(fieldAsHashTable.values().size() > 0)
 					{
 						Object value = fieldAsHashTable.values().toArray()[0];																
-						if(value instanceof DimensionType)
+						if(value instanceof DimensionType || !(value instanceof WorldServer)) // Forge 1.11.2 - 13.20.0.2228 uses DimensionType, Forge 1.11.2 - 13.20.0.2315 uses Dimension
 						{							
-							dimensions = (Hashtable<Integer, DimensionType>) field.get(new DimensionManager());
+							dimensions = fieldAsHashTable;
 					        break;
 						}
 					}
@@ -617,10 +628,10 @@ public class TXDimensionManager
 			e.printStackTrace();
 		}
     	
-		for(Entry<Integer, DimensionType> oldDim : oldDims.entrySet())
+		for(Entry<Integer, Object> oldDim : oldDims.entrySet())
 		{
 			dimensions.put(oldDim.getKey(), oldDim.getValue());
-		}		
-		oldDims = new Hashtable<Integer, DimensionType>();
+		}
+		oldDims = new Hashtable<Integer, Object>();
 	}
 }

@@ -26,7 +26,8 @@ public class WeightedMobSpawnGroup
         this.max = max;
     }
 
-    public WeightedMobSpawnGroup(MobNames mobName, int weight, int min, int max) {
+    public WeightedMobSpawnGroup(MobNames mobName, int weight, int min, int max)
+    {
         this(mobName.getInternalName(), weight, min, max);
     }
 
