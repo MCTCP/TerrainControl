@@ -875,8 +875,7 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         this.buttonList.clear();
         
         // World name
-        this.txtWorldName = new GuiTextField(30, this.fontRenderer, this.width / 2 - 164, 45, 160, 20); //left, top, width, height           
-        this.txtWorldName.setText(GuiHandler.selectedWorldName != null ? GuiHandler.selectedWorldName : GuiHandler.worldName != null ? GuiHandler.worldName : I18n.format("selectWorld.newWorld", new Object[0]));
+        this.txtWorldName = new GuiTextField(30, this.fontRenderer, this.width / 2 - 164, 45, 160, 20); //left, top, width, height        
         this.txtWorldName.setEnabled(false);
         
         // Seed
@@ -914,7 +913,7 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         this.buttonList.add(btnavailableWorldDelete3);
         
         FillAvailableWorlds();
-                       
+                               
         // Pre-generation radius
         this.txtPregenRadius = new GuiTextField(20, this.fontRenderer, this.width / 2 - 164, 159, 50, 20);
         this.txtPregenRadius.setText(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius() + "");
@@ -935,6 +934,22 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         btnCreateWorld = new GuiButton(0, this.width / 2 - 166, 213, 164, 20, I18n.format("selectWorld.create", new Object[0]));
         this.buttonList.add(btnCreateWorld);
         this.buttonList.add(new GuiButton(1, this.width / 2 + 2, 213, 164, 20, I18n.format("gui.cancel", new Object[0])));
+               
+    	if(GuiHandler.selectedWorldName != null)
+		{
+    		this.txtWorldName.setText(GuiHandler.selectedWorldName); 
+		}
+		else if (GuiHandler.worldName != null)
+		{
+			this.txtWorldName.setText(GuiHandler.worldName);
+		} else {
+    		if(btnavailableWorld1.displayString.length() > 0 && !btnavailableWorld1.displayString.equalsIgnoreCase(""))
+    		{
+    			this.txtWorldName.setText(btnavailableWorld1.displayString);
+			} else {
+				this.txtWorldName.setText(I18n.format("selectWorld.newWorld", new Object[0]));
+			}
+		}
         
         this.updateWorldName();
         this.updateButtons();
