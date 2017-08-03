@@ -80,7 +80,7 @@ public class TXNetherFortressGen extends MapGenStructure
     }
     
 	@Override
-    public BlockPos getClosestStrongholdPos(World worldIn, BlockPos pos, boolean p_180706_3_)
+    public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean p_180706_3_)
     {
         int j = pos.getX() >> 4;
         int k = pos.getZ() >> 4;

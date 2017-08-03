@@ -108,7 +108,10 @@ public class WorldStandardValues extends Settings
     		maxEntityCramming = intSetting("MaxEntityCramming", 24, 0, 999999),
 			randomTickSpeed = intSetting("RandomTickSpeed", 3, 0, 999999),
 			spawnRadius = intSetting("SpawnRadius", 10, 0, 999999),
-			cloudHeight = intSetting("CloudHeight", 128, 0, 999999)          
+			cloudHeight = intSetting("CloudHeight", 128, 0, 999999),
+			
+    		DIMENSIONBELOWHEIGHT = intSetting("DimensionAboveHeight", 0, -999999, 999999),
+    		DIMENSIONABOVEHEIGHT = intSetting("DimensionBelowHeight", 256, -999999, 999999)
             ;
 
     public static final Setting<Boolean>

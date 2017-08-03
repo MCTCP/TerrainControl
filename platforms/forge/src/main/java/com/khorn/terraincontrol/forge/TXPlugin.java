@@ -9,7 +9,8 @@ import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.client.events.ClientNetworkEventListener;
-import com.khorn.terraincontrol.forge.client.events.DimensionSyncChannelHandler;
+import com.khorn.terraincontrol.forge.dimensions.DimensionSyncChannelHandler;
+import com.khorn.terraincontrol.forge.dimensions.TXDimensionManager;
 import com.khorn.terraincontrol.forge.events.*;
 import com.khorn.terraincontrol.forge.generator.Cartographer;
 import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
@@ -20,9 +21,14 @@ import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 
+import net.minecraft.util.datafix.DataFixesManager;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.storage.AnvilSaveConverter;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
+import net.minecraft.world.storage.ISaveFormat;
+import net.minecraft.world.storage.ISaveHandler;
+import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
@@ -36,9 +42,10 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.EnumMap;
 
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", acceptableRemoteVersions = "*", version = "v5")
+@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", acceptableRemoteVersions = "*", version = "v7")
 public class TXPlugin
 {
 	public TXPlugin()
@@ -102,7 +109,6 @@ public class TXPlugin
                 LocalBiome biome = null;
                 try
                 {
-                    //biome = world.getBiomeByName(input.getBiomeName());
                 	biome = TerrainControl.getBiomeAllWorlds(input.getBiomeName());
                 }
                 catch (BiomeNotFoundException e)
@@ -140,7 +146,42 @@ public class TXPlugin
     	
         // Register ChunkLoadListener for updating Cartographer map
         MinecraftForge.EVENT_BUS.register(new ChunkEventListener());
+        
+        FixWorlds();
     }
+    
+    // If a world was created with OTG, then used without OTG and then used with OTG again then the WorldType 
+    // will have been set back to vanilla, put it back to TXWorldType.
+    private void FixWorlds()    
+    {  	
+        File savesFolder;
+        try
+        {
+            Field minecraftDir = Loader.class.getDeclaredField("minecraftDir");
+            minecraftDir.setAccessible(true);
+            savesFolder = new File((File) minecraftDir.get(null), "saves");
+        }
+        catch (Throwable e)
+        {
+            System.out.println("Could not reflect the Minecraft directory, save location may be unpredicatble.");
+            TerrainControl.printStackTrace(LogMarker.FATAL, e);
+            return;
+        }
+    	
+    	ISaveFormat saveLoader = new AnvilSaveConverter(savesFolder, DataFixesManager.createFixer());
+    	
+    	for(String folderName : savesFolder.list())
+    	{
+	        ISaveHandler isavehandler = saveLoader.getSaveLoader(folderName, false);
+	        WorldInfo worldInfo = isavehandler.loadWorldInfo();
+	        
+	        if(worldInfo != null && !(worldInfo.getTerrainType() instanceof TXWorldType))
+	        {
+		        worldInfo.setTerrainType(txWorldType);
+	            isavehandler.saveWorldInfo(worldInfo);
+	        }
+    	}
+    }    
     
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event)

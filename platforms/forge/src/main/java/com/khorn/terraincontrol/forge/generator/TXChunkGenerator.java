@@ -42,7 +42,7 @@ public class TXChunkGenerator implements IChunkGenerator
     private int[] biomeIntArray;
 
     public TXChunkGenerator(ForgeWorld _world)
-    {
+    {   	   	
         this.world = _world;
         this.worldHandle = _world.getWorld();
 
@@ -54,7 +54,7 @@ public class TXChunkGenerator implements IChunkGenerator
 
     private ForgeChunkBuffer chunkBuffer;
     @Override
-    public Chunk provideChunk(int chunkX, int chunkZ)
+    public Chunk generateChunk(int chunkX, int chunkZ)
     {
     	ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
     	
@@ -96,8 +96,8 @@ public class TXChunkGenerator implements IChunkGenerator
     {
         byte[] chunkBiomeArray = chunk.getBiomeArray();
         ConfigProvider configProvider = this.world.getConfigs();
-        this.biomeIntArray = this.world.getBiomeGenerator().getBiomes(this.biomeIntArray, chunk.xPosition * CHUNK_X_SIZE,
-                chunk.zPosition * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
+        this.biomeIntArray = this.world.getBiomeGenerator().getBiomes(this.biomeIntArray, chunk.x * CHUNK_X_SIZE,
+                chunk.z * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
 
         for (int i = 0; i < chunkBiomeArray.length; i++)
         {
@@ -194,15 +194,39 @@ public class TXChunkGenerator implements IChunkGenerator
     {
         return false;
     } 	
-
+    
     @Override
-    public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos blockPos, boolean p_180513_4_)
+    public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos blockPos, boolean p_180513_4_)
     {
-        // Gets the nearest stronghold
-        if (("Stronghold".equals(structureName)) && (this.world.strongholdGen != null))
-        {
-            return this.world.strongholdGen.getClosestStrongholdPos(worldIn, blockPos, p_180513_4_);
-        }
+    	//if(!this.mapFeaturesEnabled == null)
+    	{
+	        // Gets the nearest stronghold
+	        if (("Stronghold".equals(structureName)) && (this.world.strongholdGen != null))
+	        {
+	            return this.world.strongholdGen.getNearestStructurePos(worldIn, blockPos, p_180513_4_);
+	        }
+	        if (("Mansion".equals(structureName)) && (this.world.woodLandMansionGen != null))
+	        {
+	            return this.world.woodLandMansionGen.getNearestStructurePos(worldIn, blockPos, p_180513_4_);
+	        }
+	        if (("Monument".equals(structureName)) && (this.world.oceanMonumentGen != null))
+	        {
+	            return this.world.oceanMonumentGen.getNearestStructurePos(worldIn, blockPos, p_180513_4_);
+	        }
+	        if (("Village".equals(structureName)) && (this.world.villageGen != null))
+	        {
+	            return this.world.villageGen.getNearestStructurePos(worldIn, blockPos, p_180513_4_);
+	        }
+	        if (("Mineshaft".equals(structureName)) && (this.world.mineshaftGen != null))
+	        {
+	            return this.world.mineshaftGen.getNearestStructurePos(worldIn, blockPos, p_180513_4_);
+	        }
+	        if (("Temple".equals(structureName)) && (this.world.rareBuildingGen != null))
+	        {
+	            return this.world.rareBuildingGen.getNearestStructurePos(worldIn, blockPos, p_180513_4_);
+	        }
+    	}
+    	
         return null;
     }
 }

@@ -9,6 +9,8 @@ import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
+import com.khorn.terraincontrol.forge.dimensions.TXDimensionManager;
+import com.khorn.terraincontrol.forge.dimensions.WorldProviderTX;
 import com.khorn.terraincontrol.forge.generator.TXBiome;
 import com.khorn.terraincontrol.forge.gui.GuiHandler;
 import com.khorn.terraincontrol.forge.gui.TXGuiCreateWorld;

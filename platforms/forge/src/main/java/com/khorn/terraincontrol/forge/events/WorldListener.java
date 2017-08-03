@@ -4,8 +4,8 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeWorld;
-import com.khorn.terraincontrol.forge.TXDimensionManager;
 import com.khorn.terraincontrol.forge.TXWorldType;
+import com.khorn.terraincontrol.forge.dimensions.TXDimensionManager;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;

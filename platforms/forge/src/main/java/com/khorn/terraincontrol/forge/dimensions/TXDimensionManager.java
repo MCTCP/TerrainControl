@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.forge;
+package com.khorn.terraincontrol.forge.dimensions;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,6 +19,9 @@ import org.apache.commons.io.FileUtils;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
+import com.khorn.terraincontrol.forge.ForgeEngine;
+import com.khorn.terraincontrol.forge.ForgeWorld;
+import com.khorn.terraincontrol.forge.TXWorldServerMulti;
 import com.khorn.terraincontrol.forge.generator.Cartographer;
 import com.khorn.terraincontrol.logging.LogMarker;
 
@@ -46,7 +49,7 @@ public class TXDimensionManager
 			{
 				DimensionType dimensionType = DimensionManager.getProviderType(i);
 				
-				if(dimensionType.getSuffix().equals("OTG") && dimensionType.getName().equals(dimensionName))
+				if(dimensionType.getSuffix() != null && dimensionType.getSuffix().equals("OTG") && dimensionType.getName().equals(dimensionName))
 				{
     				return true;
 				}
@@ -98,7 +101,7 @@ public class TXDimensionManager
 		
 		world.unRegisterBiomes();
 		
-		((ForgeEngine)TerrainControl.getEngine()).worldLoader.RemoveUnloadedWorld(world.getName());
+		((ForgeEngine)TerrainControl.getEngine()).getWorldLoader().RemoveUnloadedWorld(world.getName());
 
 		TXDimensionManager.UnloadCustomDimensionData(dimToRemove);
 
@@ -334,7 +337,7 @@ public class TXDimensionManager
 			{				
 				DimensionType dimType = DimensionManager.getProviderType(i);
 				
-				if(dimType != null && dimType.getSuffix().equals("OTG"))
+				if(dimType != null && dimType.getSuffix() != null && dimType.getSuffix().equals("OTG"))
 				{
 					DimensionManager.unregisterDimension(i);
 					dimensionMap.clear(i);
@@ -524,7 +527,7 @@ public class TXDimensionManager
 			if(DimensionManager.isDimensionRegistered(i))
 			{
 				DimensionType type = DimensionManager.getProviderType(i);
-				if(type.getSuffix().equals("OTG"))
+				if(type.getSuffix() != null && type.getSuffix().equals("OTG"))
 				{
 					oldDims.put(i, dimensions.get(i));
 					dimensions.remove(i);
@@ -579,7 +582,7 @@ public class TXDimensionManager
 			if(DimensionManager.isDimensionRegistered(i))
 			{
 				DimensionType type = DimensionManager.getProviderType(i);
-				if(type.getSuffix().equals("OTG"))
+				if(type.getSuffix() != null && type.getSuffix().equals("OTG"))
 				{
 					otgDims.put(new Integer(type.getId()), type.getName());
 				}

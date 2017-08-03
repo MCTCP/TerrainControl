@@ -111,8 +111,8 @@ public class CavesGen extends TerrainGenBase
             int m = MathHelper.floor(x - d3) - generatingChunk.getBlockX() - 1;
             int n = MathHelper.floor(x + d3) - generatingChunk.getBlockX() + 1;
 
-            int i1 = MathHelper.floor(y - d4) - 1;
-            int i2 = MathHelper.floor(y + d4) + 1;
+            int maxDepth = MathHelper.floor(y - d4) - 1;
+            int minDepth = MathHelper.floor(y + d4) + 1;
 
             int i3 = MathHelper.floor(z - d3) - generatingChunk.getBlockZ() - 1;
             int i4 = MathHelper.floor(z + d3) - generatingChunk.getBlockZ() + 1;
@@ -126,13 +126,13 @@ public class CavesGen extends TerrainGenBase
                 n = 16;
             }
 
-            if (i1 < 1)
+            if (maxDepth < 1)
             {
-                i1 = 1;
+                maxDepth = 1;
             }
-            if (i2 > this.worldSettings.worldHeightCap - 8)
+            if (minDepth > this.worldSettings.worldHeightCap - 8)
             {
-                i2 = this.worldSettings.worldHeightCap - 8;
+                minDepth = this.worldSettings.worldHeightCap - 8;
             }
             if (i3 < 0)
             {
@@ -149,18 +149,21 @@ public class CavesGen extends TerrainGenBase
             {
                 for (int local_z = i3; (!waterFound) && (local_z < i4); local_z++)
                 {
-                    for (int local_y = i2 + 1; (!waterFound) && (local_y >= i1 - 1); local_y--)
+                    for (int local_y = minDepth + 1; (!waterFound) && (local_y >= maxDepth - 1); local_y--)
                     {
                         if (local_y >= 0 && local_y < this.worldSettings.worldHeightCap)
                         {
                             LocalMaterialData material = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
-                            if (material.isMaterial(DefaultMaterial.WATER) || material.isMaterial(DefaultMaterial.STATIONARY_WATER))
+                            if (
+                        		material.isMaterial(DefaultMaterial.WATER) || 
+                        		material.isMaterial(DefaultMaterial.STATIONARY_WATER)
+                    		)
                             {
                                 waterFound = true;
                             }
-                            if ((local_y != i1 - 1) && (local_x != m) && (local_x != n - 1) && (local_z != i3) && (local_z != i4 - 1))
+                            if ((local_y != maxDepth - 1) && (local_x != m) && (local_x != n - 1) && (local_z != i3) && (local_z != i4 - 1))
                             {
-                                local_y = i1;
+                                local_y = maxDepth;
                             }
                         }
                     }
@@ -180,35 +183,34 @@ public class CavesGen extends TerrainGenBase
                     LocalBiome biome = this.world.getBiome(local_x + generatingChunk.getBlockX(), local_z + generatingChunk.getBlockZ());
                     double d10 = (local_z + generatingChunk.getBlockZ() + 0.5D - z) / d3;
 
-                    boolean grassFound = false;
+                    boolean surfaceBlockFound = false;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
-                        for (int local_y = i2; local_y > i1; local_y--)
+                        for (int currentDepth = minDepth; currentDepth > maxDepth; currentDepth--)
                         {
-                            double d11 = ((local_y - 1) + 0.5D - y) / d4;
+                            double d11 = ((currentDepth - 1) + 0.5D - y) / d4;
                             if ((d11 > -0.7D) && (d9 * d9 + d11 * d11 + d10 * d10 < 1.0D))
                             {
-                                LocalMaterialData material = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
-                                LocalMaterialData materialAbove = generatingChunkBuffer.getBlock(local_x, local_y + 1, local_z);
-                                if (material.isMaterial(DefaultMaterial.GRASS) || material.isMaterial(DefaultMaterial.MYCEL))
+                                LocalMaterialData material = generatingChunkBuffer.getBlock(local_x, currentDepth, local_z);
+                                LocalMaterialData materialAbove = generatingChunkBuffer.getBlock(local_x, currentDepth + 1, local_z);
+                                if (!surfaceBlockFound && material.isMaterial(biome.getBiomeConfig().surfaceBlock.toDefaultMaterial()))
                                 {
-                                    grassFound = true;
+                                	surfaceBlockFound = true;
                                 }
                                 if (this.isSuitableBlock(material, materialAbove, biome))
                                 {
-                                    //if (local_y - 1 < 10)
-                                    //{
-                                        //generatingChunkBuffer.setBlock(local_x, local_y, local_z, lava);
-                                    //} else {
-                                        generatingChunkBuffer.setBlock(local_x, local_y, local_z, air);
-
-                                        // If grass was just deleted, try to
-                                        // move it down
-                                        if (grassFound && (generatingChunkBuffer.getBlock(local_x, local_y - 1, local_z).isMaterial(DefaultMaterial.DIRT)))
-                                        {
-                                            generatingChunkBuffer.setBlock(local_x, local_y - 1, local_z, biome.getBiomeConfig().surfaceBlock);
-                                        }
-                                    //}
+                                    generatingChunkBuffer.setBlock(local_x, currentDepth, local_z, air);
+                                    LocalMaterialData block = generatingChunkBuffer.getBlock(local_x, currentDepth - 1, local_z);
+                                    
+                                    // If grass was just deleted, try to move it down
+                                    if (
+                                		surfaceBlockFound && 
+                                		!block.isLiquid() &&
+                                		!block.isMaterial(DefaultMaterial.BEDROCK)
+                            		)
+                                    {
+                                        generatingChunkBuffer.setBlock(local_x, currentDepth - 1, local_z, biome.getBiomeConfig().surfaceBlock);
+                                    }
                                 }
                             }
                         }

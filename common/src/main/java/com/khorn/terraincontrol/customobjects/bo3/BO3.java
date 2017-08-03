@@ -211,6 +211,11 @@ public class BO3 implements CustomObject
         oeh.extrude(world, random, x, y, z);
         return true;
     }
+    
+    public boolean SpawnAsTree(LocalWorld world, Random random, int x, int z)
+    {
+    	return spawn(world, random, x, z);
+    }    
 
     protected boolean spawn(LocalWorld world, Random random, int x, int z)
     {

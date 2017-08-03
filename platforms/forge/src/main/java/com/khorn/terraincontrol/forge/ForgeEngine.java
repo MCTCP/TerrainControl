@@ -142,7 +142,7 @@ public class ForgeEngine extends TerrainControlEngine
     {
     	if(world.provider.getDimension() > 1)
     	{
-			if(world.provider.getDimensionType().getSuffix().equals("OTG"))
+			if(world.provider.getDimensionType().getSuffix() != null && world.provider.getDimensionType().getSuffix().equals("OTG"))
 	    	{
 				LocalWorld localWorld = this.worldLoader.getWorld(world.provider.getDimensionType().getName());
 				if(localWorld == null)

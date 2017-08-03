@@ -25,7 +25,7 @@ public class ChunkEventListener
 			{
 				if(event.getWorld().provider.getDimension() == 0)
 				{
-					Cartographer.CreateBlockWorldMapAtSpawn(ChunkCoordinate.fromChunkCoords(event.getChunk().xPosition, event.getChunk().zPosition), true);
+					Cartographer.CreateBlockWorldMapAtSpawn(ChunkCoordinate.fromChunkCoords(event.getChunk().x, event.getChunk().z), true);
 				}
 			}
 		}

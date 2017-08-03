@@ -7,12 +7,12 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigToNetworkSender;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
-import com.khorn.terraincontrol.forge.DimensionData;
 import com.khorn.terraincontrol.forge.ForgeEngine;
-import com.khorn.terraincontrol.forge.OTGDimensionInfo;
-import com.khorn.terraincontrol.forge.TXDimensionManager;
 import com.khorn.terraincontrol.forge.TXPlugin;
-import com.khorn.terraincontrol.forge.client.events.DimensionSyncPacket;
+import com.khorn.terraincontrol.forge.dimensions.DimensionData;
+import com.khorn.terraincontrol.forge.dimensions.DimensionSyncPacket;
+import com.khorn.terraincontrol.forge.dimensions.OTGDimensionInfo;
+import com.khorn.terraincontrol.forge.dimensions.TXDimensionManager;
 import com.khorn.terraincontrol.logging.LogMarker;
 
 import io.netty.buffer.ByteBuf;
@@ -63,6 +63,11 @@ public class PlayerTracker
         	
 			LocalWorld localWorld = ((ForgeEngine)TerrainControl.getEngine()).getOverWorld();
 
+			if(localWorld == null)
+			{
+				throw new RuntimeException("Could not find the OTG overworld. Worlds must be created via OTG, you cannot use pre-existing (non-OTG) worlds with OTG.");
+			}
+			
 			// Overworld (dim 0)
 	        try
 	        {

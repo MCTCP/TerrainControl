@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.bukkit;
 
 public enum TCPerm
 {
+	CMD_TP("cmd.tp"),
     CMD_BIOME("cmd.biome"),
     CMD_CHECK("cmd.check"),
     CMD_HELP("cmd.help"),

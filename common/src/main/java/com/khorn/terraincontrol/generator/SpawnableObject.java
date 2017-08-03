@@ -25,7 +25,7 @@ public interface SpawnableObject
      * @return Whether the attempt was successful. (It should never fail, but you never know.)
      */
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);
-
+    
     /**
      * Returns the name of this object.
      *

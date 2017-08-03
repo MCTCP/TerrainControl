@@ -1,9 +1,11 @@
-package com.khorn.terraincontrol.forge;
+package com.khorn.terraincontrol.forge.dimensions;
 
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.forge.ForgeEngine;
+import com.khorn.terraincontrol.forge.ForgeWorld;
+import com.khorn.terraincontrol.forge.TXPlugin;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -307,16 +309,7 @@ public class WorldProviderTX extends WorldProvider
     {
     	WorldConfig worldConfig = GetWorldConfig();
     	return worldConfig != null ? worldConfig.doesWaterVaporize : WorldStandardValues.doesWaterVaporize.getDefaultValue(); 
-    }
-    
-    // For 1.10.2 hasNoSky and hasSkyLight were the same thing, controlled via hasNoSky
-    
-    @Override
-    public boolean hasNoSky()
-    {
-    	WorldConfig worldConfig = GetWorldConfig();
-    	return worldConfig != null ? !worldConfig.hasSkyLight : !WorldStandardValues.hasSkyLight.getDefaultValue();
-    }   
+    }    
     
     @Override
     public boolean hasSkyLight()

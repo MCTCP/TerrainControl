@@ -198,6 +198,9 @@ public class WorldConfig extends ConfigFile
     public String dimensionBelow;
     public String dimensionAbove;
     
+    public int dimensionBelowHeight;
+    public int dimensionAboveHeight;
+    
     public String BO3AtSpawn;    
     
     public boolean teleportToSpawnOnly; // If this is set to true then portals to this dimension will always teleport players to the world's spawn point.
@@ -617,6 +620,9 @@ public class WorldConfig extends ConfigFile
         
         this.dimensionBelow = reader.getSetting(WorldStandardValues.DIMENSIONBELOW);
         this.dimensionAbove = reader.getSetting(WorldStandardValues.DIMENSIONABOVE);
+        
+        this.dimensionBelowHeight = reader.getSetting(WorldStandardValues.DIMENSIONBELOWHEIGHT);
+        this.dimensionAboveHeight = reader.getSetting(WorldStandardValues.DIMENSIONABOVEHEIGHT);
         
         this.teleportToSpawnOnly = reader.getSetting(WorldStandardValues.teleportToSpawnOnly);
         
@@ -1231,6 +1237,10 @@ public class WorldConfig extends ConfigFile
                 "When a player goes below Y 0, they will be teleported to this dimension. The dimension must be registered either via Dimensions in the worldconfig or via the /otg dim -c <dimname> console command.");
         writer.putSetting(WorldStandardValues.DIMENSIONABOVE, this.dimensionAbove,
         		"When a player goes above Y 255, they will be teleported to this dimension. The dimension must be registered either via Dimensions in the worldconfig or via the /otg dim -c <dimname> console command.");
+        writer.putSetting(WorldStandardValues.DIMENSIONBELOWHEIGHT, this.dimensionBelowHeight,
+                "The Y coordinate (height) for the DimensionBelow setting.");
+        writer.putSetting(WorldStandardValues.DIMENSIONABOVEHEIGHT, this.dimensionAboveHeight,
+        		"The Y coordinate (height) for the DimensionAbove setting.");        
         writer.putSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS, this.DimensionPortalMaterials,
                 "A comma seperated list of blocks, dimension portals made of one or more of these blocks will lead to this world.",
                 "For blocks that have rotation such as stairs be sure to add all rotations (0,1,2,3,4,5,6,7), for instance: QUARTZ_STAIRS:0, QUARTZ_STAIRS:1, QUARTZ_STAIRS:2 etc.",

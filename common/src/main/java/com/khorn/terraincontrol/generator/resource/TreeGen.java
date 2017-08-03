@@ -5,6 +5,8 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
+import com.khorn.terraincontrol.customobjects.bo2.BO2;
+import com.khorn.terraincontrol.customobjects.bo3.BO3;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
@@ -143,20 +145,39 @@ public class TreeGen extends Resource
 
             int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-            int y = world.getHighestBlockYAt(x, z);
             CustomObject tree = trees.get(treeKind);
-            Rotation rotation = Rotation.getRandomRotation(random);
 
-            if (!tree.canSpawnAt(world, rotation, x, y, z))
+            if(tree instanceof BO2)
             {
-                // Try another tree
-                continue;
+	            if (((BO2)tree).SpawnAsTree(world, random, x, z))
+	            {
+	                // Success!
+	                return;
+	            }
             }
-
-            if (tree.spawnForced(world, random, rotation, x, y, z))
+            else if(tree instanceof BO3)
             {
-                // Success!
-                return;
+	            if (((BO3)tree).SpawnAsTree(world, random, x, z))
+	            {
+	                // Success!
+	                return;
+	            }        
+            } else {
+
+                int y = world.getHighestBlockYAt(x, z);
+                Rotation rotation = Rotation.getRandomRotation(random);
+
+                if (!tree.canSpawnAt(world, rotation, x, y, z))
+                {
+                    // Try another tree
+                    continue;
+                }
+            	
+	            if (tree.spawnForced(world, random, rotation, x, y, z))
+	            {
+	                // Success!
+	                return;
+	            }            	
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.generator.terrain;
 
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
@@ -24,7 +23,7 @@ public class RavinesGen extends TerrainGenBase
         this.worldSettings = wrk;
     }
 
-    protected void a(long paramLong, ChunkBuffer generatingChunkBuffer, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
+    protected void placeBlocks(long paramLong, ChunkBuffer generatingChunkBuffer, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
     {
         Random localRandom = new Random(paramLong);
 
@@ -95,8 +94,8 @@ public class RavinesGen extends TerrainGenBase
             int k = MathHelper.floor(paramDouble1 - d3) - generatingChunk.getBlockX() - 1;
             int m = MathHelper.floor(paramDouble1 + d3) - generatingChunk.getBlockX() + 1;
 
-            int maxY = MathHelper.floor(paramDouble2 - d4) - 1;
-            int minY = MathHelper.floor(paramDouble2 + d4) + 1;
+            int maxDepth = MathHelper.floor(paramDouble2 - d4) - 1;
+            int minDepth = MathHelper.floor(paramDouble2 + d4) + 1;
 
             int i2 = MathHelper.floor(paramDouble3 - d3) - generatingChunk.getBlockZ() - 1;
             int i3 = MathHelper.floor(paramDouble3 + d3) - generatingChunk.getBlockZ() + 1;
@@ -109,13 +108,13 @@ public class RavinesGen extends TerrainGenBase
             {
                 m = 16;
             }
-            if (maxY < 1)
+            if (maxDepth < 1)
             {
-                maxY = 1;
+                maxDepth = 1;
             }
-            if (minY > worldSettings.worldHeightCap - 8)
+            if (minDepth > worldSettings.worldHeightCap - 8)
             {
-                minY = worldSettings.worldHeightCap - 8;
+                minDepth = worldSettings.worldHeightCap - 8;
             }
 
             if (i2 < 0)
@@ -132,7 +131,7 @@ public class RavinesGen extends TerrainGenBase
             {
                 for (int localZ = i2; (i4 == 0) && (localZ < i3); localZ++)
                 {
-                    for (int localY = minY + 1; (i4 == 0) && (localY >= maxY - 1); localY--)
+                    for (int localY = minDepth + 1; (i4 == 0) && (localY >= maxDepth - 1); localY--)
                     {
                         if (localY < 0)
                         {
@@ -140,14 +139,17 @@ public class RavinesGen extends TerrainGenBase
                         }
                         if (localY < worldSettings.worldHeightCap)
                         {
-                            LocalMaterialData materialAtPosition = generatingChunkBuffer.getBlock(localX, localY, localZ);
-                            if (materialAtPosition.isMaterial(DefaultMaterial.WATER) || materialAtPosition.isMaterial(DefaultMaterial.STATIONARY_WATER))
+                            DefaultMaterial materialAtPosition = generatingChunkBuffer.getBlock(localX, localY, localZ).toDefaultMaterial();
+                            if (
+                        		materialAtPosition == DefaultMaterial.WATER || 
+                        		materialAtPosition == DefaultMaterial.STATIONARY_WATER
+                    		)
                             {
                                 i4 = 1;
                             }
-                            if ((localY != maxY - 1) && (localX != k) && (localX != m - 1) && (localZ != i2) && (localZ != i3 - 1))
+                            if ((localY != maxDepth - 1) && (localX != k) && (localX != m - 1) && (localZ != i2) && (localZ != i3 - 1))
                             {
-                                localY = maxY;
+                                localY = maxDepth;
                             }
                         }
                     }
@@ -165,35 +167,46 @@ public class RavinesGen extends TerrainGenBase
                     LocalBiome biome = world.getBiome(localZ + generatingChunk.getBlockX(), localX + generatingChunk.getBlockZ());
                     BiomeConfig biomeConfig = biome.getBiomeConfig();
                     double d10 = (localZ + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
-                    boolean grassFound = false;
+                    boolean surfaceBlockFound = false;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
-                        for (int localY = minY; localY >= maxY; localY--)
+                    	// If surfaceBlock is found then replace the bottom block with surfaceblock
+                        for (int currentDepth = minDepth; currentDepth >= maxDepth; currentDepth--)
                         {
-                            double d11 = ((localY - 1) + 0.5D - paramDouble2) / d4;
-                            if ((d9 * d9 + d10 * d10) * this.a[localY - 1] + d11 * d11 / 6.0D < 1.0D)
+                            double d11 = ((currentDepth - 1) + 0.5D - paramDouble2) / d4;
+                            if ((d9 * d9 + d10 * d10) * this.a[currentDepth - 1] + d11 * d11 / 6.0D < 1.0D)
                             {
-                                LocalMaterialData material = generatingChunkBuffer.getBlock(localX, localY, localZ);
-                                if (material.isMaterial(DefaultMaterial.GRASS))
+                                DefaultMaterial material = generatingChunkBuffer.getBlock(localX, currentDepth, localZ).toDefaultMaterial();
+                                
+                                if (!surfaceBlockFound && material == biomeConfig.surfaceBlock.toDefaultMaterial())
                                 {
-                                    grassFound = true;
+                                	surfaceBlockFound = true;
                                 }
-                                if (material.equals(biomeConfig.surfaceBlock) || material.equals(biomeConfig.groundBlock) || material.equals(biomeConfig.stoneBlock) || material.isMaterial(DefaultMaterial.DIRT) || material.isMaterial(DefaultMaterial.HARD_CLAY) || material.isMaterial(DefaultMaterial.GRASS))
+                                
+                                
+                                if (
+                                	material != DefaultMaterial.BEDROCK &&
+                                	material != DefaultMaterial.AIR
+                        		)
+                                {                               	
+                                    generatingChunkBuffer.setBlock(localX, currentDepth, localZ, air);
+                                }
+                                
+                                DefaultMaterial block = generatingChunkBuffer.getBlock(localX, currentDepth - 1, localZ).toDefaultMaterial();
+                                if (
+                            		surfaceBlockFound &&
+                            		(
+	                                	block != DefaultMaterial.BEDROCK &&
+										block != DefaultMaterial.WATER &&
+										block != DefaultMaterial.STATIONARY_WATER &&
+										block != DefaultMaterial.LAVA &&
+										block != DefaultMaterial.STATIONARY_LAVA &&
+										block != DefaultMaterial.MAGMA &&
+										block != DefaultMaterial.AIR
+                    				)
+                                )
                                 {
-                                    //if (localY - 1 < 10)
-                                    //{
-                                        //generatingChunkBuffer.setBlock(localX, localY, localZ, lava);
-                                    //} else {
-                                        generatingChunkBuffer.setBlock(localX, localY, localZ, air);
-                                        LocalMaterialData block = generatingChunkBuffer.getBlock(localX, localY - 1, localZ);
-                                        if (
-                                    		(grassFound != false)
-                                            && (block.isMaterial(DefaultMaterial.DIRT) || block.isMaterial(DefaultMaterial.HARD_CLAY))
-                                        )
-                                        {
-                                            generatingChunkBuffer.setBlock(localX, localY - 1, localZ, biomeConfig.surfaceBlock);
-                                        }
-                                    //}
+                                    generatingChunkBuffer.setBlock(localX, currentDepth - 1, localZ, biomeConfig.surfaceBlock);
                                 }
                             }
                         }
@@ -228,7 +241,7 @@ public class RavinesGen extends TerrainGenBase
 
             int size = RandomHelper.numberInRange(random, this.worldSettings.ravineMinLength, this.worldSettings.ravineMaxLength);
 
-            a(this.random.nextLong(), generatingChunkBuffer, d1, d2, d3, f3, f1, f2, size, this.worldSettings.ravineDepth);
+            placeBlocks(this.random.nextLong(), generatingChunkBuffer, d1, d2, d3, f3, f1, f2, size, this.worldSettings.ravineDepth);
         }
     }
 }

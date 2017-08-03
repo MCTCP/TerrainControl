@@ -13,11 +13,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.forge.TXWorldType;
+import com.khorn.terraincontrol.forge.dimensions.TXTeleporter;
 import com.khorn.terraincontrol.forge.generator.Cartographer;
-import com.khorn.terraincontrol.forge.generator.TXTeleporter;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 
 public class ServerEventListener
@@ -62,16 +63,18 @@ public class ServerEventListener
 	
     public void tryTeleportPlayer(EntityPlayer player)
 	{
-		// Going down
-		if(player.getPosition().getY() < 0)
+		ForgeWorld playerWorld = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getWorld(player.world);
+		WorldConfig worldConfig = playerWorld.getConfigs().getWorldConfig();
+		
+		// DimensionBelow
+		if(playerWorld != null && worldConfig.dimensionBelow != null && worldConfig.dimensionBelow.trim().length() > 0)
 		{
-    		ForgeWorld playerWorld = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getWorld(player.world);
-    		if(playerWorld != null && playerWorld.getConfigs().getWorldConfig().dimensionBelow != null && playerWorld.getConfigs().getWorldConfig().dimensionBelow.trim().length() > 0)
-    		{
-				ForgeWorld destinationWorld = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getWorld(playerWorld.getConfigs().getWorldConfig().dimensionBelow);
+			if(player.getPosition().getY() < worldConfig.dimensionBelowHeight)
+			{
+				ForgeWorld destinationWorld = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getWorld(worldConfig.dimensionBelow);
 				if(destinationWorld == null)
 				{
-    				destinationWorld = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getUnloadedWorld(playerWorld.getConfigs().getWorldConfig().dimensionBelow);						
+					destinationWorld = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getUnloadedWorld(worldConfig.dimensionBelow);						
 				}
 				
 				if(destinationWorld != null) // Dimension does not exist
@@ -83,22 +86,23 @@ public class ServerEventListener
 						player.setPositionAndUpdate(player.getPosition().getX(), 254, player.getPosition().getZ());
 					} else {
 						TeleportPlayerToDimension(playerWorld.getWorld().provider.getDimension(), destinationWorld.getWorld().provider.getDimension(), player);
+						return;
 					}
 				}
-    		}
+			}
 		}
-		// Going up
-		else if(player.getPosition().getY() > 255)
+		
+		// DimensionAbove
+		if(playerWorld != null && worldConfig.dimensionAbove != null && worldConfig.dimensionAbove.trim().length() > 0)
 		{
-    		ForgeWorld playerWorld = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getWorld(player.world);
-    		if(playerWorld != null && playerWorld.getConfigs().getWorldConfig().dimensionAbove != null && playerWorld.getConfigs().getWorldConfig().dimensionAbove.trim().length() > 0)
-    		{
-				ForgeWorld destinationWorld = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getWorld(playerWorld.getConfigs().getWorldConfig().dimensionAbove);
+			if(player.getPosition().getY() > worldConfig.dimensionAboveHeight)
+			{
+				ForgeWorld destinationWorld = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getWorld(worldConfig.dimensionAbove);
 				if(destinationWorld == null)
 				{
-    				destinationWorld = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getUnloadedWorld(playerWorld.getConfigs().getWorldConfig().dimensionAbove);						
+					destinationWorld = (ForgeWorld)((ForgeEngine)TerrainControl.getEngine()).getUnloadedWorld(worldConfig.dimensionAbove);						
 				}
-			
+				
 				if(destinationWorld != null) // Dimension does not exist
 				{
 					if(destinationWorld != playerWorld)
@@ -106,7 +110,7 @@ public class ServerEventListener
 						TeleportPlayerToDimension(playerWorld.getWorld().provider.getDimension(), destinationWorld.getWorld().provider.getDimension(), player);	
 					}
 				}
-    		}
+			}
 		}
 	}
 	

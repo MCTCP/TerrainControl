@@ -50,6 +50,7 @@ public class TXCommandExecutor implements CommandExecutor
         this.AddCommand(new ReloadCommand(plugin));
         this.AddCommand(new ListCommand(plugin));
         this.AddCommand(new CheckCommand(plugin));
+        this.AddCommand(new TPCommand(plugin));
         this.AddCommand(new BiomeCommand(plugin));
         this.AddCommand(new SpawnCommand(plugin));
         this.AddCommand(new MapCommand(plugin));

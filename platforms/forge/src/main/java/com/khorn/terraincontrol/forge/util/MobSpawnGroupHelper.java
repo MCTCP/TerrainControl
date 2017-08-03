@@ -13,7 +13,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraftforge.fml.common.registry.EntityEntry;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -111,14 +110,33 @@ public final class MobSpawnGroupHelper
             if (entityClass != null)
             {
                 biomeList.add(new SpawnListEntry(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
-            } else {           	
-            	if(TerrainControl.getPluginConfig().SpawnLog)
+            } else {
+            	
+            	entityClass = getEntityByClassName(mobGroup.getInternalName());
+            
+            	if(entityClass == null && TerrainControl.getPluginConfig().SpawnLog)
             	{
             		TerrainControl.log(LogMarker.WARN, "Mob type {} not found", mobGroup.getInternalName());
             	}
             }
         }
         return biomeList;
+    }
+    
+    private static Class<? extends EntityLiving> getEntityByClassName(String mobClassName)
+    {
+    	List<EntityEntry> entityClasses = net.minecraftforge.fml.common.registry.ForgeRegistries.ENTITIES.getValues();
+    	Class<? extends EntityLiving> mob = null;
+    	for(EntityEntry entityClass : entityClasses)
+    	{
+    		String entityName = entityClass.getEntityClass().getSimpleName();
+    		if(entityName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(mobClassName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","")))
+    		{
+    			mob = (Class<? extends EntityLiving>) entityClass.getEntityClass();
+    			break;
+    		}
+    	}
+    	return mob;
     }
 
     /**
@@ -131,27 +149,22 @@ public final class MobSpawnGroupHelper
 	static Class<? extends EntityLiving> toMinecraftClass(String mobName)
     {
     	Set<ResourceLocation> mobNames = EntityList.getEntityNameList();
+    	Class<? extends EntityLiving> mob = null;
     	for(ResourceLocation mobName1 : mobNames)
     	{
     		if(mobName1.getResourcePath().toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(mobName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","")))
     		{
-    			return (Class<? extends EntityLiving>) EntityList.getClass(mobName1);
+    			mob = (Class<? extends EntityLiving>) EntityList.getClass(mobName1);
+    			break;
     		}
     	}
     	
-    	return null;
+    	if(mob == null)
+    	{
+    		mob = getEntityByClassName(mobName);
+    	}
     	
-    	//return (Class<? extends EntityLiving>) EntityList.NAME_TO_CLASS.get(mobName); // Quick fix
-    	
-    	// TODO: This code was causing exceptions when used with Biome Bundle, fix it?
-    	/*
-        Class<? extends Entity> clazz = EntityList.NAME_TO_CLASS.get(mobName);
-        if (EntityLiving.class.isAssignableFrom(clazz))
-        {
-            return clazz.asSubclass(EntityLiving.class);
-        }
-        return null;
-        */
+    	return mob;
     }
 
     /**
@@ -161,12 +174,12 @@ public final class MobSpawnGroupHelper
      */
     private static String fromMinecraftClass(Class<? extends Entity> entityClass)
     {
-    	EntityEntry entry = EntityRegistry.getEntry(entityClass);
-        if (entry != null)
-        {
-        	return entry.getName();
-        }
-	
+    	ResourceLocation mobName = EntityList.getKey(entityClass);
+    	if(mobName != null)
+    	{
+    		return mobName.getResourcePath();
+    	}
+
 		TerrainControl.log(LogMarker.DEBUG, "No EntityRegistry entry found for class: " + entityClass);
         return null;
     }

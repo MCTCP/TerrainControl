@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.forge;
+package com.khorn.terraincontrol.forge.dimensions;
 
 public class DimensionData
 {

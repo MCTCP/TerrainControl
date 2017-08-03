@@ -229,6 +229,11 @@ public class BO2 extends ConfigFile implements CustomObject
         return true;
     }
 
+    public boolean SpawnAsTree(LocalWorld world, Random random, int x, int z)
+    {
+    	return spawn(world, random, x, z);
+    } 
+    
     protected boolean spawn(LocalWorld world, Random random, int x, int z)
     {
         int y;

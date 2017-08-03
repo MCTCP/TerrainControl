@@ -1,13 +1,14 @@
 package com.khorn.terraincontrol.forge.events;
 
 import com.khorn.terraincontrol.forge.TXWorldType;
+import com.khorn.terraincontrol.forge.dimensions.TXBlockPortal;
 import com.khorn.terraincontrol.forge.generator.Cartographer;
-import com.khorn.terraincontrol.forge.generator.TXBlockPortal;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -18,10 +19,14 @@ public class RightClickBlockListener
 	{
 		if(!event.getWorld().isRemote) // Server side only
 		{
+			DimensionType dimType = DimensionManager.getProviderType(event.getEntity().dimension);			
 			if(
 				(
 					event.getEntity().dimension == 0 ||
-					DimensionManager.getProviderType(event.getEntity().dimension).getSuffix().equals("OTG")					
+					(
+						dimType.getSuffix() != null &&
+						dimType.getSuffix().equals("OTG")
+					)
 				) &&
 				event.getItemStack() != null && 
 				event.getItemStack().getItem() != null && 

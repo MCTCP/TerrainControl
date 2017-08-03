@@ -1,4 +1,4 @@
-package com.khorn.terraincontrol.forge.client.events;
+package com.khorn.terraincontrol.forge.dimensions;
 
 import java.io.DataInputStream;
 
