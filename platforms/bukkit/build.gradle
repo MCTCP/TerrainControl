@@ -5,7 +5,7 @@ apply plugin: 'java'
 // Project properties
 archivesBaseName = "terraincontrol-bukkit"
 description = "TerrainControl for Bukkit"
-ext.bukkitVersion = "1.12-pre5-SNAPSHOT"
+ext.bukkitVersion = "1.12.1-R0.1-SNAPSHOT"
 
 repositories
 {
