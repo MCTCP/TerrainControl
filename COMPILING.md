@@ -49,8 +49,8 @@ click `Help` -> `Install New Software` and input this url: http://download.eclip
 In the Forge version of OpenTerrainGenerator two classes are included to help you run
 the project from your IDE. Click `Run` -> `Edit Configurations...` -> `+`
 -> `Application`. Use `forge` as the module (for the classpath) and use either
-the `com.khorn.terraincontrol.forge.launch.TCLaunchForgeClient` or the
-`com.khorn.terraincontrol.forge.launch.TCLaunchForgeServer` class and
+the `com.pg85.otg.forge.launch.TCLaunchForgeClient` or the
+`com.pg85.otg.forge.launch.TCLaunchForgeServer` class and
 press the Run button in the menu bar to run the Forge client or server.
 
 ### Formatting the source code
@@ -80,11 +80,11 @@ Now import the project as a Gradle project into IntelliJ.
 
 To launch the Forge client version of OpenTerrainGenerator from your IDE, click `Run`
 -> `Edit Configurations...` -> `+` -> `Application`. Choose a name, use
-`com.khorn.terraincontrol.forge.launch.TCLaunchForgeClient` as the main
+`com.pg85.otg.forge.launch.TCLaunchForgeClient` as the main
 class and select `forge` for the option `Use classpath of module`.
 
 To launch the server version, repeat the above steps, but use the main class
-`com.khorn.terraincontrol.forge.launch.TCLaunchForgeServer`.
+`com.pg85.otg.forge.launch.TCLaunchForgeServer`.
 
 
 [ZIP file]: https://github.com/MCTCP/TerrainControl/archive/master.zip

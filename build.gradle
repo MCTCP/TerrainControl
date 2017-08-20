@@ -6,7 +6,7 @@ defaultTasks 'clean', 'build', 'createReleaseJar', 'install'
 allprojects
 {
     version = "1.11.2 - v8"
-    group = "com.khorn.terraincontrol"
+    group = "com.pg85.otg"
 
     // Version of the shadow plugin
     ext.shadowVersion = '1.2.1'
