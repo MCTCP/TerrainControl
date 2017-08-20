@@ -13,7 +13,7 @@ import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
 import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.forge.ForgeEngine;
+import com.khorn.terraincontrol.forge.util.IOHelper;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiErrorScreen;
@@ -80,9 +80,9 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         this.txtWorldBorderRadius.updateCursorCounter();
         this.txtPregenRadius.updateCursorCounter();
     }
-    
+
     WorldConfig selectedWorldConfig = null;
-            
+
     private void FillAvailableWorlds()
     {
     	GuiHandler.worlds.clear();
@@ -100,7 +100,7 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         			{
         		        File worldConfigFile = new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
         		        SettingsMap settingsMap = FileSettingsReader.read(worldDir.getName(), worldConfigFile);
-        		        WorldConfig worldConfig = new WorldConfig(worldDir, settingsMap, null, null); // TODO: Make sure passing null doesn't break CustomObjects?
+        		        WorldConfig worldConfig = new WorldConfig(worldDir, settingsMap, null);
                         GuiHandler.worlds.put(worldDir.getName(), worldConfig);
         			}
         		}
@@ -235,13 +235,14 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             			{
             				selectedWorldConfig = GuiHandler.worlds.get(worldDir.getName());
             				if(GuiHandler.selectedWorldName == null || !GuiHandler.selectedWorldName.equals(GuiHandler.worldName))
-            				{	
-            					((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(selectedWorldConfig.PreGenerationRadius);
-            					((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = selectedWorldConfig.WorldBorderRadius;
+            				{
+            					GuiHandler.PregenerationRadius = selectedWorldConfig.PreGenerationRadius;
+            					GuiHandler.WorldBorderRadius = selectedWorldConfig.WorldBorderRadius;            					
+            					
             					GuiHandler.seed = selectedWorldConfig.worldSeed;
-            					
+
             					WorldInfo worldInfo = this.mc.getSaveLoader().getWorldInfo(GuiHandler.worldName);
-            					
+
             					if(worldInfo != null)
             					{
             						GuiHandler.seed = worldInfo.getSeed() + "";
@@ -268,9 +269,9 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             {
             	worldNameHelpText2 = "Using existing settings";
             	
-                txtPregenRadius.setText(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius() + "");		                
-                txtWorldBorderRadius.setText(((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius + "");;
-            	           	
+                txtPregenRadius.setText(GuiHandler.PregenerationRadius + "");
+                txtWorldBorderRadius.setText(GuiHandler.WorldBorderRadius + "");
+            	
                 txtSeed.setText(GuiHandler.seed);
             } else {
             	GuiHandler.selectedWorldName = null;
@@ -330,7 +331,7 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 	            	{
 	            		if(worldDir.isDirectory() && worldDir.getName().equals(worldNameToDelete))
 	            		{
-	            			deleteRecursive(worldDir);
+            				IOHelper.deleteRecursive(worldDir);
 	            			break;
 	            		}
 	            	}
@@ -359,9 +360,9 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                     	}
                 		selectedWorldConfig = GuiHandler.worlds.get(GuiHandler.selectedWorldName);
 						                		
-            			((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(selectedWorldConfig.PreGenerationRadius);
-
-                		((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = selectedWorldConfig.WorldBorderRadius;
+                		GuiHandler.PregenerationRadius = selectedWorldConfig.PreGenerationRadius;
+                		GuiHandler.WorldBorderRadius = selectedWorldConfig.WorldBorderRadius;
+                		
     					GuiHandler.seed = selectedWorldConfig.worldSeed;
     					
     					WorldInfo worldInfo = this.mc.getSaveLoader().getWorldInfo(GuiHandler.selectedWorldName);        					
@@ -376,9 +377,9 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                 		GuiHandler.selectedWorldName = null;
 	                	selectedWorldConfig = null;
 	                	
-	                	GuiHandler.seed = "";
-	                	((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = 0;
-	                	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(0);
+	                	GuiHandler.seed = "";                	
+	                	GuiHandler.WorldBorderRadius = 0;
+	                	GuiHandler.PregenerationRadius = 0;	                	
                 	}
                 	
 					// Create new world dir?
@@ -389,15 +390,13 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 				updateWorldName();
 				updateButtons();
 			}
-			//this.mc.displayGuiScreen(new TCGuiCreateWorld(new TCGuiSelectCreateWorldMode()));
 			this.mc.displayGuiScreen(new TXGuiCreateWorld(new TXGuiWorldSelection(null)));
 		}
 		else if(askModCompatContinue)
 		{
 			if(ok)
 			{
-				DeleteWorldFiles();
-				((ForgeEngine)TerrainControl.getEngine()).getPregenerator().resetPregenerator();
+				DeleteWorldFiles(GuiHandler.worldName);
 				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
 			} else {
 				this.mc.displayGuiScreen(new TXGuiCreateWorld(new TXGuiWorldSelection(null)));
@@ -418,7 +417,7 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 		            	{
 		            		if(worldDir.isDirectory() && worldDir.getName().equals(worldNameToDelete))
 		            		{
-		            			deleteRecursive(worldDir);
+		            			IOHelper.deleteRecursive(worldDir);
 		            			break;
 		            		}
 		            	}
@@ -448,9 +447,9 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 					GuiHandler.worldName = GuiHandler.newWorldName;
 					txtWorldName.setText(GuiHandler.newWorldName);
 					
-					GuiHandler.seed = "";
-					((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = 0;
-					((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(0);
+					GuiHandler.seed = "";				
+					GuiHandler.WorldBorderRadius = 0;
+					GuiHandler.PregenerationRadius = 0;
 					
 					GuiHandler.gameModeString = "survival";
 					GuiHandler.hardCore = false;
@@ -463,20 +462,6 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 			}
 		}
     }
-	
-	public static void deleteRecursive(File folder) {
-	    File[] files = folder.listFiles();
-	    if(files!=null) { //some JVMs return null for empty dirs
-	        for(File f: files) {
-	            if(f.isDirectory()) {
-	            	deleteRecursive(f);
-	            } else {
-	                f.delete();
-	            }
-	        }
-	    }
-	    folder.delete();
-	}
 	
 	boolean askDeleteSettings = false;	
     public GuiYesNo askDeleteSettings(GuiYesNoCallback p_152129_0_, String worldName)
@@ -523,10 +508,10 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             txtPregenRadius.textboxKeyTyped(p_73869_1_, p_73869_2_);
             try
             {
-            	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(Integer.parseInt(txtPregenRadius.getText()));
+            	GuiHandler.PregenerationRadius = Integer.parseInt(txtPregenRadius.getText());
             } catch(NumberFormatException ex)
             {
-            	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(0); 
+            	GuiHandler.PregenerationRadius = 0;
             }
         }
         else if (txtWorldBorderRadius.isFocused())
@@ -534,12 +519,13 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             txtWorldBorderRadius.textboxKeyTyped(p_73869_1_, p_73869_2_);
             try
             {
-            	((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = Integer.parseInt(txtWorldBorderRadius.getText());
-            } catch(NumberFormatException ex)
-            {
-            	((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = 0; 
+            	GuiHandler.WorldBorderRadius = Integer.parseInt(txtWorldBorderRadius.getText());
             }
-        }        
+            catch(NumberFormatException ex)
+            {
+            	GuiHandler.WorldBorderRadius = 0;
+            }
+        }
 
         if (p_73869_2_ == 28 || p_73869_2_ == 156)
         {
@@ -712,8 +698,7 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 					GuiYesNo guiyesno = askModCompatContinue(this, customMobSpawnerEnabled, biomesOPlentyEnabled);
 					this.mc.displayGuiScreen(guiyesno);        				
 				} else {									
-					DeleteWorldFiles();
-					((ForgeEngine)TerrainControl.getEngine()).getPregenerator().resetPregenerator();
+					DeleteWorldFiles(GuiHandler.worldName);
     				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
     			}
             }
@@ -774,54 +759,71 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         }
     }
     
-    private void DeleteWorldFiles()
+    private void DeleteWorldFiles(String worldFolderName)
     {
+    	File TCWorldsDirectory = new File(TerrainControl.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
+    	DeleteWorldFiles(TCWorldsDirectory, worldFolderName);    	     
+        
+        ISaveFormat isaveformat = this.mc.getSaveLoader();
+        isaveformat.flushCache();
+        isaveformat.deleteWorldDirectory(worldFolderName);
+    }
+    
+    private void DeleteWorldFiles(File TCWorldsDirectory, String WorldName)
+    {
+    	// TODO: This is for legacy worlds only, the files are stored in the world saves directory now. Remove this?
+    	
         // Clear existing pre-generator and structurecache data
         // Do this here in the Forge layer instead of in common since this only applies to Forge atm.
-        File TCWorldsDirectory = new File(TerrainControl.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
+   	
         if(TCWorldsDirectory.exists() && TCWorldsDirectory.isDirectory())
         {
         	for(File worldDir : TCWorldsDirectory.listFiles())
         	{
         		if(worldDir.isDirectory())
         		{
-        			if(GuiHandler.worldName.equals(worldDir.getName()))
-        			{
-        				
+        			if(WorldName.equals(worldDir.getName()))
+        			{       				
         				File StructureDataDirectory = new File(worldDir.getAbsolutePath() + "/StructureData");
                         if (StructureDataDirectory.exists())
                         {
-                        	deleteRecursive(StructureDataDirectory);
+                        	IOHelper.deleteRecursive(StructureDataDirectory);
                         }
 
+                        File dimensionsDataFile = new File(worldDir.getAbsolutePath() + "/Dimensions.txt");
+                        if (dimensionsDataFile.exists())
+                        {
+                        	IOHelper.deleteRecursive(dimensionsDataFile);
+                        }
+                        
                         File structureDataFile = new File(worldDir.getAbsolutePath() + "/StructureData.txt");
                         if (structureDataFile.exists())
                         {
-                        	deleteRecursive(structureDataFile);
+                        	IOHelper.deleteRecursive(structureDataFile);
                         }
                         
                         File nullChunksFile = new File(worldDir.getAbsolutePath() + "/NullChunks.txt");
                         if (nullChunksFile.exists())
                         {
-                        	deleteRecursive(nullChunksFile);
+                        	IOHelper.deleteRecursive(nullChunksFile);
                         }
                         
                         File spawnedStructuresFile = new File(worldDir.getAbsolutePath() + "/SpawnedStructures.txt");
                         if (spawnedStructuresFile.exists())
                         {
-                        	deleteRecursive(spawnedStructuresFile);
+                        	IOHelper.deleteRecursive(spawnedStructuresFile);
                         }
 
                         File chunkProviderPopulatedChunksFile = new File(worldDir.getAbsolutePath() + "/ChunkProviderPopulatedChunks.txt");
                         if (chunkProviderPopulatedChunksFile.exists())
                         {
-                        	deleteRecursive(chunkProviderPopulatedChunksFile);
+                        	IOHelper.deleteRecursive(chunkProviderPopulatedChunksFile);
                         }
 
                         File pregeneratedChunksFile = new File(worldDir.getAbsolutePath() + "/PregeneratedChunks.txt");
                         if (pregeneratedChunksFile.exists())
                         {
-                        	deleteRecursive(pregeneratedChunksFile);
+                        	IOHelper.deleteRecursive(pregeneratedChunksFile);
                         }                    				
         				
         				break;
@@ -914,13 +916,30 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         
         FillAvailableWorlds();
                                
+        String worldName = "";        
+    	if(GuiHandler.selectedWorldName != null)
+		{
+    		worldName = GuiHandler.selectedWorldName; 
+		}
+		else if (GuiHandler.worldName != null)
+		{
+			worldName = GuiHandler.worldName;
+		} else {
+    		if(btnavailableWorld1.displayString.length() > 0 && !btnavailableWorld1.displayString.equalsIgnoreCase(""))
+    		{
+    			worldName = btnavailableWorld1.displayString;
+			} else {
+				worldName = I18n.format("selectWorld.newWorld", new Object[0]);
+			}
+		}
+        
         // Pre-generation radius
         this.txtPregenRadius = new GuiTextField(20, this.fontRenderer, this.width / 2 - 164, 159, 50, 20);
-        this.txtPregenRadius.setText(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius() + "");
+        this.txtPregenRadius.setText(GuiHandler.PregenerationRadius + "");
                 
         // World border
         this.txtWorldBorderRadius = new GuiTextField(21, this.fontRenderer, this.width / 2 - 164 + 210, 159, 50, 20);
-        this.txtWorldBorderRadius.setText(((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius + "");
+        this.txtWorldBorderRadius.setText(GuiHandler.WorldBorderRadius + "");
         
         btnGameMode = new GuiButton(11, this.width / 2 - 166, 188, 122, 20, I18n.format("selectWorld.gameMode", new Object[0]));
         btnAllowCheats = new GuiButton(12, this.width / 2 - 39, 188, 100, 20, I18n.format("selectWorld.allowCommands", new Object[0]));
@@ -934,23 +953,9 @@ public class TXGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         btnCreateWorld = new GuiButton(0, this.width / 2 - 166, 213, 164, 20, I18n.format("selectWorld.create", new Object[0]));
         this.buttonList.add(btnCreateWorld);
         this.buttonList.add(new GuiButton(1, this.width / 2 + 2, 213, 164, 20, I18n.format("gui.cancel", new Object[0])));
-               
-    	if(GuiHandler.selectedWorldName != null)
-		{
-    		this.txtWorldName.setText(GuiHandler.selectedWorldName); 
-		}
-		else if (GuiHandler.worldName != null)
-		{
-			this.txtWorldName.setText(GuiHandler.worldName);
-		} else {
-    		if(btnavailableWorld1.displayString.length() > 0 && !btnavailableWorld1.displayString.equalsIgnoreCase(""))
-    		{
-    			this.txtWorldName.setText(btnavailableWorld1.displayString);
-			} else {
-				this.txtWorldName.setText(I18n.format("selectWorld.newWorld", new Object[0]));
-			}
-		}
-        
+   	
+    	this.txtWorldName.setText(worldName);
+   	
         this.updateWorldName();
         this.updateButtons();
     }

@@ -4,41 +4,75 @@ import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.ConfigFile;
-import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
-import com.khorn.terraincontrol.configuration.io.RawSettingValue;
-import com.khorn.terraincontrol.configuration.io.SettingsMap;
-import com.khorn.terraincontrol.customobjects.Branch;
+import com.khorn.terraincontrol.configuration.CustomObjectConfigFile;
+import com.khorn.terraincontrol.configuration.io.SettingsReaderOTGPlus;
+import com.khorn.terraincontrol.configuration.io.SettingsWriterOTGPlus;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
-import com.khorn.terraincontrol.customobjects.StructurePartSpawnHeight;
 import com.khorn.terraincontrol.util.BoundingBox;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.MaterialSet;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.Rotation;
-import com.khorn.terraincontrol.util.helpers.RandomHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 /**
  * The good old BO2.
  */
-public class BO2 extends ConfigFile implements CustomObject
+public class BO2 extends CustomObjectConfigFile implements CustomObject
 {
-    /**
-     * It's annoying that we have to keep all raw BO2 settings in memory. The
-     * reason is that our config writing system doesn't support the BO2 syntax,
-     * so we can't simply use the output of
-     * {@link #writeConfigSettings(SettingsMap)}, as we do for other configs.
-     */
-    private final SettingsMap settingsMap;
-    private final File file;
+	// OTG+
+		   
+    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
+    {
+	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
+	    if(blocksToReplace != null && blocksToReplace.size() > 0)
+	    {
+	    	LocalMaterialData targetBlock = blocksToReplace.get(material);
+	    	if(targetBlock != null)
+	    	{
+	    		material = targetBlock;	    		
+	    	}
+	    }
+	    world.setBlock(x, y, z, material, metaDataTag, false);
+    }
+    
+    public BO2(SettingsReaderOTGPlus reader)
+    {
+        super(reader);
+    }    
 
+    @Override
+    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
+    {
+        enable();
+    }
+
+    private void enable()
+    {
+        readConfigSettings();
+        correctSettings();
+    }
+    
+    @Override
+    public CustomObject applySettings(SettingsReaderOTGPlus extraSettings)
+    {
+        extraSettings.setFallbackReader(this.reader);
+        BO2 bo2WithSettings = new BO2(extraSettings);
+        bo2WithSettings.enable();
+        return bo2WithSettings;
+    }
+    
+	//
+	
     public ObjectCoordinate[][] data = new ObjectCoordinate[4][];
 
     public BO2[] groupObjects = null;
@@ -77,42 +111,6 @@ public class BO2 extends ConfigFile implements CustomObject
 
     public int branchLimit;
 
-    /**
-     * Creates a BO2 from a file.
-     * @param objectName Name of the object.
-     * @param file The file to read the settings from.
-     */
-    public BO2(String objectName, File file)
-    {
-        super(objectName);
-        this.file = file;
-        this.settingsMap = FileSettingsReader.read(objectName, file);
-    }
-
-    /**
-     * Creates a BO2, ignoring the settings in the file.
-     * @param settings The actual settings.
-     * @param file The file that appears in {@link #getFile()}.
-     */
-    private BO2(SettingsMap settings, File file)
-    {
-        super(settings.getName());
-        this.file = file;
-        this.settingsMap = settings;
-    }
-
-    @Override
-    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
-    {
-        enable(settingsMap);
-    }
-
-    private void enable(SettingsMap settings)
-    {
-        readConfigSettings(settings);
-        correctSettings();
-    }
-
     @Override
     public boolean canSpawnAsTree()
     {
@@ -130,16 +128,7 @@ public class BO2 extends ConfigFile implements CustomObject
     {
         return randomRotation;
     }
-
-    /**
-     * Gets the file that this BO2 was read from.
-     * @return The file.
-     */
-    public File getFile()
-    {
-        return file;
-    }
-
+    
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
@@ -148,75 +137,125 @@ public class BO2 extends ConfigFile implements CustomObject
         // Spawn
         for (ObjectCoordinate point : data)
         {
-            if (world.isEmpty(x + point.x, y + point.y, z + point.z))
+            if (world.isNullOrAir(x + point.x, y + point.y, z + point.z, false))
             {
-                world.setBlock((x + point.x), y + point.y, z + point.z, point.material);
-            } else if (dig)
+                setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false);
+            }
+            else if (dig)
             {
-                world.setBlock((x + point.x), y + point.y, z + point.z, point.material);
+                setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false);
             }
         }
         return true;
     }
 
     @Override
-    public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
+    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
+    	throw new RuntimeException();
+    }
+    
+    private boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
+    {    	
         // Basic checks
-        if (world.isEmpty(x, y - 5, z) && (needsFoundation))
+    	
+        if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)  // Isn't this already done before this method is called?
+        {
             return false;
-
-        LocalMaterialData checkBlock = world.getMaterial(x, y + 2, z);
+        }
+    	
+        if ((y < spawnElevationMin) || (y > spawnElevationMax))
+        {
+            return false;
+        }
+    	
+        if (!spawnOnBlockType.contains(world.getMaterial(x, y - 1, z, false)))
+        {
+            return false;
+        }
+        
+        if (needsFoundation && world.isNullOrAir(x, y - 5, z, false))
+        {
+            return false;
+        }
+        
+        LocalMaterialData checkBlock = !spawnWater || !spawnLava ? world.getMaterial(x, y + 2, z, false) : null;
         if (!spawnWater)
         {
             if (checkBlock.equals(DefaultMaterial.WATER) || checkBlock.equals(DefaultMaterial.STATIONARY_WATER))
+            {
                 return false;
+            }
         }
         if (!spawnLava)
         {
             if (checkBlock.equals(DefaultMaterial.LAVA) || checkBlock.equals(DefaultMaterial.STATIONARY_LAVA))
+            {
                 return false;
+            }
         }
 
-        int checkLight = world.getLightLevel(x, y + 2, z);
+        int checkLight = !spawnSunlight || !spawnDarkness ? world.getLightLevel(x, y + 2, z) : 0;
         if (!spawnSunlight)
         {
             if (checkLight > 8)
+            {
                 return false;
+            }
         }
         if (!spawnDarkness)
         {
             if (checkLight < 9)
+            {
                 return false;
-        }
-
-        if ((y < spawnElevationMin) || (y > spawnElevationMax))
-            return false;
-
-        if (!spawnOnBlockType.contains(world.getMaterial(x, y - 1, z)))
-            return false;
-
+            }
+        }        
+        
         ObjectCoordinate[] objData = this.data[rotation.getRotationId()];
 
-        // Check all blocks
-        int faultCounter = 0;
-
+        HashSet<ChunkCoordinate> loadedChunks = new HashSet<ChunkCoordinate>();
+        ChunkCoordinate chunkCoord;        
         for (ObjectCoordinate point : objData)
         {
-            if (!world.isLoaded((x + point.x), (y + point.y), (z + point.z)))
-                return false;
-
-            if (!dig)
+            if (y + point.y < TerrainControl.WORLD_DEPTH || y + point.y >= TerrainControl.WORLD_HEIGHT)
             {
-                if (collisionBlockType.contains(world.getMaterial((x + point.x), (y + point.y), (z + point.z))))
-                {
-                    faultCounter++;
-                    if (faultCounter > (objData.length * (collisionPercentage / 100)))
-                    {
-                        return false;
-                    }
-                }
+                return false;
             }
+        	
+        	chunkCoord = ChunkCoordinate.fromBlockCoords((x + point.x), (z + point.z));
+    		
+        	if(!loadedChunks.contains(chunkCoord))
+    		{        		
+	            if (!world.isLoaded((x + point.x), (y + point.y), (z + point.z)))
+	            {
+	                // Cannot spawn BO2, part of world is not loaded
+	                return false;
+	            }
+	            loadedChunks.add(chunkCoord);
+    		}
+        }
+
+        if(!((int)collisionPercentage < 100))
+        {
+        	throw new RuntimeException();
+        }
+        
+        if (!dig && (int)collisionPercentage < 100)
+        {
+	        // Check all blocks
+	        int faultCounter = 0;
+	        int maxBlocksOutsideSourceBlock = (int)Math.ceil(objData.length * (collisionPercentage / 100.0));
+	        for (ObjectCoordinate point : objData)
+	        {
+	            if (collisionBlockType.contains(world.getMaterial((x + point.x), (y + point.y), (z + point.z), false)))
+	            {
+	                faultCounter++;
+	                if (faultCounter > maxBlocksOutsideSourceBlock)
+	                {
+	                    return false;
+	                }
+	            }
+	        }
         }
 
         // Call event
@@ -227,36 +266,47 @@ public class BO2 extends ConfigFile implements CustomObject
         }
 
         return true;
-    }
+    }    
 
-    public boolean SpawnAsTree(LocalWorld world, Random random, int x, int z)
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
     {
-    	return spawn(world, random, x, z);
+   		return spawn(world, random, x, z);
     } 
     
     protected boolean spawn(LocalWorld world, Random random, int x, int z)
     {
         int y;
         if (spawnAboveGround)
+        {
             y = world.getSolidHeight(x, z);
+        }
         else if (spawnUnderGround)
         {
             int solidHeight = world.getSolidHeight(x, z);
             if (solidHeight < 1 || solidHeight <= spawnElevationMin)
+            {
                 return false;
+            }
             if (solidHeight > spawnElevationMax)
+            {
                 solidHeight = spawnElevationMax;
+            }
             y = random.nextInt(solidHeight - spawnElevationMin) + spawnElevationMin;
-        } else
+        } else {
             y = world.getHighestBlockYAt(x, z);
+        }
 
         if (y < 0)
+        {
             return false;
+        }
 
         Rotation rotation = randomRotation ? Rotation.getRandomRotation(random) : Rotation.NORTH;
 
         if (!canSpawnAt(world, rotation, x, y, z))
+        {
             return false;
+        }
 
         boolean objectSpawned = spawnForced(world, random, rotation, x, y, z);
 
@@ -269,21 +319,22 @@ public class BO2 extends ConfigFile implements CustomObject
     @Override
     public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
     {
-
         if (branch)
+        {
             return false;
+        }
 
         int randomRoll = rand.nextInt(100);
         int ObjectRarity = rarity;
         boolean objectSpawned = false;
-
+        
         while (randomRoll < ObjectRarity)
         {
             ObjectRarity -= 100;
 
             int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-
+            
             objectSpawned = spawn(world, rand, x, z);
         }
 
@@ -291,61 +342,53 @@ public class BO2 extends ConfigFile implements CustomObject
     }
 
     @Override
-    public CustomObject applySettings(SettingsMap extraSettings)
-    {
-        extraSettings.setFallback(this.settingsMap);
-        BO2 bo2WithSettings = new BO2(extraSettings, file);
-        return bo2WithSettings;
-    }
-
-    @Override
-    protected void writeConfigSettings(SettingsMap writer)
+    protected void writeConfigSettings(SettingsWriterOTGPlus writer) throws IOException
     {
         // It doesn't write.
     }
 
     @Override
-    protected void readConfigSettings(SettingsMap reader)
+    protected void readConfigSettings()
     {
-        this.version = reader.getSetting(BO2Settings.VERSION);
+        this.version = readSettings(BO2Settings.VERSION);
 
-        this.spawnOnBlockType = reader.getSetting(BO2Settings.SPAWN_ON_BLOCK_TYPE);
-        this.collisionBlockType = reader.getSetting(BO2Settings.COLLISTION_BLOCK_TYPE);
+        this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE);
+        this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE);
 
-        this.spawnInBiome = reader.getSetting(BO2Settings.SPAWN_IN_BIOME);
+        this.spawnInBiome = readSettings(BO2Settings.SPAWN_IN_BIOME);
 
-        this.spawnSunlight = reader.getSetting(BO2Settings.SPAWN_SUNLIGHT);
-        this.spawnDarkness = reader.getSetting(BO2Settings.SPAWN_DARKNESS);
-        this.spawnWater = reader.getSetting(BO2Settings.SPAWN_WATER);
-        this.spawnLava = reader.getSetting(BO2Settings.SPAWN_LAVA);
-        this.spawnAboveGround = reader.getSetting(BO2Settings.SPAWN_ABOVE_GROUND);
-        this.spawnUnderGround = reader.getSetting(BO2Settings.SPAWN_UNDER_GROUND);
+        this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT);
+        this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS);
+        this.spawnWater = readSettings(BO2Settings.SPAWN_WATER);
+        this.spawnLava = readSettings(BO2Settings.SPAWN_LAVA);
+        this.spawnAboveGround = readSettings(BO2Settings.SPAWN_ABOVE_GROUND);
+        this.spawnUnderGround = readSettings(BO2Settings.SPAWN_UNDER_GROUND);
 
-        this.underFill = reader.getSetting(BO2Settings.UNDER_FILL);
+        this.underFill = readSettings(BO2Settings.UNDER_FILL);
 
-        this.randomRotation = reader.getSetting(BO2Settings.RANDON_ROTATION);
-        this.dig = reader.getSetting(BO2Settings.DIG);
-        this.tree = reader.getSetting(BO2Settings.TREE);
-        this.branch = reader.getSetting(BO2Settings.BRANCH);
-        this.diggingBranch = reader.getSetting(BO2Settings.DIGGING_BRANCH);
-        this.needsFoundation = reader.getSetting(BO2Settings.NEEDS_FOUNDATION);
-        this.rarity = reader.getSetting(BO2Settings.RARITY);
-        this.collisionPercentage = reader.getSetting(BO2Settings.COLLISION_PERCENTAGE);
-        this.spawnElevationMin = reader.getSetting(BO2Settings.SPAWN_ELEVATION_MIN);
-        this.spawnElevationMax = reader.getSetting(BO2Settings.SPAWN_ELEVATION_MAX);
+        this.randomRotation = readSettings(BO2Settings.RANDON_ROTATION);
+        this.dig = readSettings(BO2Settings.DIG);
+        this.tree = readSettings(BO2Settings.TREE);
+        this.branch = readSettings(BO2Settings.BRANCH);
+        this.diggingBranch = readSettings(BO2Settings.DIGGING_BRANCH);
+        this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION);
+        this.rarity = readSettings(BO2Settings.RARITY);
+        this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE);
+        this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN);
+        this.spawnElevationMax = readSettings(BO2Settings.SPAWN_ELEVATION_MAX);
 
-        this.groupFrequencyMin = reader.getSetting(BO2Settings.GROUP_FREQUENCY_MIN);
-        this.groupFrequencyMax = reader.getSetting(BO2Settings.GROUP_FREQUENCY_MAX);
-        this.groupSeparationMin = reader.getSetting(BO2Settings.GROUP_SEPERATION_MIN);
-        this.groupSeparationMax = reader.getSetting(BO2Settings.GROUP_SEPERATION_MAX);
+        this.groupFrequencyMin = readSettings(BO2Settings.GROUP_FREQUENCY_MIN);
+        this.groupFrequencyMax = readSettings(BO2Settings.GROUP_FREQUENCY_MAX);
+        this.groupSeparationMin = readSettings(BO2Settings.GROUP_SEPERATION_MIN);
+        this.groupSeparationMax = readSettings(BO2Settings.GROUP_SEPERATION_MAX);
         // >> Is this not used anymore? Netbeans finds no references to it
         // >> Nothing other than this line references BO2Settings.groupId
         // either...
-        this.groupId = reader.getSetting(BO2Settings.GROUP_ID);
+        this.groupId = readSettings(BO2Settings.GROUP_ID);
 
-        this.branchLimit = reader.getSetting(BO2Settings.BRANCH_LIMIT);
+        this.branchLimit = readSettings(BO2Settings.BRANCH_LIMIT);
 
-        this.readCoordinates(reader);
+        this.readCoordinates();
     }
 
     @Override
@@ -355,15 +398,17 @@ public class BO2 extends ConfigFile implements CustomObject
     }
 
     @Override
-    protected void renameOldSettings(SettingsMap reader)
+    protected void renameOldSettings()
     {
         // Stub method
     }
 
-    private void readCoordinates(SettingsMap reader)
+    private void readCoordinates()
     {
         ArrayList<ObjectCoordinate> coordinates = new ArrayList<ObjectCoordinate>();
 
+        // TODO: Reimplement this?       
+        /*
         for (RawSettingValue line : reader.getRawSettings())
         {
             String[] lineSplit = line.getRawValue().split(":", 2);
@@ -373,6 +418,15 @@ public class BO2 extends ConfigFile implements CustomObject
             ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(lineSplit[0], lineSplit[1]);
             if (buffer != null)
                 coordinates.add(buffer);
+        }
+        */
+        for (Entry<String, String> line : reader.getRawSettings())
+        {
+            ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(line.getKey(), line.getValue());
+            if (buffer != null)
+            {
+                coordinates.add(buffer);
+            }
         }
 
         data[0] = new ObjectCoordinate[coordinates.size()];
@@ -407,41 +461,10 @@ public class BO2 extends ConfigFile implements CustomObject
         // We just
         return BoundingBox.newEmptyBox();
     }
-
-    @Override
-    public Branch[] getBranches(Rotation rotation)
-    {
-        return new Branch[0];
-    }
-
+    
     @Override
     public int getMaxBranchDepth()
     {
         return 0;
     }
-
-    @Override
-    public StructurePartSpawnHeight getStructurePartSpawnHeight()
-    {
-        return StructurePartSpawnHeight.PROVIDED;
-    }
-
-    @Override
-    public boolean hasBranches()
-    {
-        return false;
-    }
-
-    @Override
-    public CustomObjectCoordinate makeCustomObjectCoordinate(Random random, int chunkX, int chunkZ)
-    {
-        if (rarity > random.nextDouble() * 100.0)
-        {
-            Rotation rotation = Rotation.getRandomRotation(random);
-            int height = RandomHelper.numberInRange(random, this.spawnElevationMin, this.spawnElevationMax);
-            return new CustomObjectCoordinate(this, rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16));
-        }
-        return null;
-    }
-
 }

@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.util.helpers;
 
 import com.khorn.terraincontrol.configuration.ConfigFunction;
+import com.khorn.terraincontrol.configuration.CustomObjectConfigFunction;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,7 +9,36 @@ import java.util.List;
 
 public class InheritanceHelper
 {
-
+	// OTG+
+	
+    public static final <T, C extends CustomObjectConfigFunction<T>> List<C> mergeListsCustomObject(Collection<? extends C> childList, Collection<? extends C> parentList)
+    {
+        List<C> returnList = new ArrayList<C>(childList);
+        for (C parentFunction : parentList)
+        {
+            if (!hasAnalogousFunction(parentFunction, childList))
+            {
+                returnList.add(parentFunction);
+            }
+        }
+        return returnList;
+    }	
+    
+    private static final <T, C extends CustomObjectConfigFunction<T>> boolean hasAnalogousFunction(C function, Collection<? extends C> list)
+    {
+        for (C toCheck : list)
+        {
+            if (function.isAnalogousTo(toCheck))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+	//
+	
+	
     private InheritanceHelper()
     {
     }
@@ -26,8 +56,7 @@ public class InheritanceHelper
      * @param <C>        Type implementing the config functions.
      * @return The merged list.
      */
-    public static final <T, C extends ConfigFunction<T>> List<C> mergeLists(
-            Collection<? extends C> childList, Collection<? extends C> parentList)
+    public static final <T, C extends ConfigFunction<T>> List<C> mergeLists(Collection<? extends C> childList, Collection<? extends C> parentList)
     {
         List<C> returnList = new ArrayList<C>(childList);
         for (C parentFunction : parentList)

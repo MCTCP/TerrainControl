@@ -87,11 +87,15 @@ public class SmallLakeGen extends Resource
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
         // Search any free space
-        while ((y > 5) && (world.isEmpty(x, y, z)))
+        while ((y > 5) && (world.isNullOrAir(x, y, z, false)))
+        {
             y--;
+        }
 
         if (y <= 4)
+        {
             return;
+        }
 
         // y = floor
         y -= 4;
@@ -112,7 +116,9 @@ public class SmallLakeGen extends Resource
                 double d6 = rand.nextDouble() * (16.0D - d3 - 2.0D) + 1.0D + d3 / 2.0D;
 
                 for (int k = 1; k < 15; k++)
+                {
                     for (int m = 1; m < 15; m++)
+                    {
                         for (int n = 1; n < 7; n++)
                         {
                             double d7 = (k - d4) / (d1 / 2.0D);
@@ -120,9 +126,13 @@ public class SmallLakeGen extends Resource
                             double d9 = (m - d6) / (d3 / 2.0D);
                             double d10 = d7 * d7 + d8 * d8 + d9 * d9;
                             if (d10 >= 1.0D)
+                            {
                                 continue;
+                            }
                             BooleanBuffer[((k * 16 + m) * 8 + n)] = true;
                         }
+                    }
+                }
             }
             int i1;
             int i2;
@@ -136,15 +146,18 @@ public class SmallLakeGen extends Resource
 
                         if (flag)
                         {
-                            LocalMaterialData localMaterialData = world.getMaterial(x + j, y + i2, z + i1);
+                            LocalMaterialData localMaterialData = world.getMaterial(x + j, y + i2, z + i1, false);
                             if ((i2 >= 4) && (localMaterialData.isLiquid()))
+                            {
                                 return;
-                            if ((i2 < 4) && (!localMaterialData.isSolid()) && !world.getMaterial(x + j, y + i2, z + i1).equals(material))
+                            }
+                            if ((i2 < 4) && (!localMaterialData.isSolid()) && !world.getMaterial(x + j, y + i2, z + i1, false).equals(material))
+                            {
                                 return;
+                            }
                         }
                     }
                 }
-
             }
 
             for (int j = 0; j < 16; j++)
@@ -155,7 +168,7 @@ public class SmallLakeGen extends Resource
                     {
                         if (BooleanBuffer[((j * 16 + i1) * 8 + i2)])
                         {
-                            world.setBlock(x + j, y + i2, z + i1, material);
+                            world.setBlock(x + j, y + i2, z + i1, material, null, false);
                             BooleanBuffer[((j * 16 + i1) * 8 + i2)] = false;
                         }
                     }
@@ -163,7 +176,7 @@ public class SmallLakeGen extends Resource
                     {
                         if (BooleanBuffer[((j * 16 + i1) * 8 + i2)])
                         {
-                            world.setBlock(x + j, y + i2, z + i1, air);
+                            world.setBlock(x + j, y + i2, z + i1, air, null, false);
                             BooleanBuffer[((j * 16 + i1) * 8 + i2)] = false;
                         }
                     }
@@ -171,6 +184,5 @@ public class SmallLakeGen extends Resource
             }
 
         }
-    }
-    
+    }    
 }

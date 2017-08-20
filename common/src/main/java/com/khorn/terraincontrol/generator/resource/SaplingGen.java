@@ -48,16 +48,6 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
 
         for (int i = 1; i < args.size() - 1; i += 2)
         {
-            CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(args.get(i));
-            if (object == null)
-            {
-                throw new InvalidConfigException("Custom object " + args.get(i) + " not found!");
-            }
-            if (!object.canSpawnAsTree())
-            {
-                throw new InvalidConfigException("Custom object " + args.get(i) + " is not a tree!");
-            }
-            trees.add(object);
             treeNames.add(args.get(i));
             treeChances.add(readInt(args.get(i + 1), 1, 100));
         }
@@ -82,10 +72,7 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         {
             String treeName = typesAndChances[i].toString();
             int chance = ((Number) typesAndChances[i + 1]).intValue();
-            CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(
-                    treeName);
-
-            trees.add(object);
+            
             treeNames.add(treeName);
             treeChances.add(chance);
         }

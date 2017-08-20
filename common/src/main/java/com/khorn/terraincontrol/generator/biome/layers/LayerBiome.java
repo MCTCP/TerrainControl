@@ -10,7 +10,6 @@ import java.util.SortedMap;
 
 public class LayerBiome extends Layer
 {
-
     private BiomeGroupManager manager;
     private int depth;
     private double freezeTemp;
@@ -50,7 +49,8 @@ public class LayerBiome extends Layer
                         {
                             if (newBiomeRarity < biome.getKey())
                             {
-                                if (biome.getValue() != null){
+                                if (biome.getValue() != null)
+                                {
                                     currentPiece |= biome.getValue().getIds().getGenerationId() |
                                                     //>>	Set IceBit based on Biome Temperature
                                                     (biome.getValue().getBiomeConfig().biomeTemperature <= freezeTemp ? IceBit : 0);
@@ -65,5 +65,4 @@ public class LayerBiome extends Layer
         }
         return thisInts;
     }
-
 }

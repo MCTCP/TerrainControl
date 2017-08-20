@@ -42,7 +42,8 @@ public class MaterialListSetting extends Setting<ArrayList<LocalMaterialData>>
     	ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
     	for(String materialName : materialNames)
     	{
-    		materials.add(TerrainControl.readMaterial(materialName.trim()));
+    		LocalMaterialData material = TerrainControl.readMaterial(materialName.trim());
+			materials.add(material);
     	}
         return materials;
     }

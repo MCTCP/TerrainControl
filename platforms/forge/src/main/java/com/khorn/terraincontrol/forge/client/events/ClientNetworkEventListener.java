@@ -30,12 +30,17 @@ public class ClientNetworkEventListener
         this.worldLoader = worldLoader;
     }
     
-    // Only used when receiving packets from Spigot/Bukkit servers
+    public ClientNetworkEventListener()
+    {
+    	this.worldLoader = null;
+	}
+
+	// Only used when receiving packets from Spigot/Bukkit servers
     // Forge servers use a synchronous message channel for packet sending to ensure the packets with dimension and world data arrive before the world is loaded.
     // This is necessary for the multi-dimension features. See: DimensionSyncChannelHandler and PlayerTracker.onConnectionCreated()
     @SubscribeEvent
     public void onPacketReceive(ClientCustomPacketEvent event)
-    {    	    	    
+    {    	    	  
         // Ignore if packet was local
         if (event.getManager().isLocalChannel())
         {
@@ -55,7 +60,7 @@ public class ClientNetworkEventListener
             int clientProtocolVersion = PluginStandardValues.ProtocolVersion;
             if (serverProtocolVersion == clientProtocolVersion)
             {
-                // Server sent config
+                // Spigot server sent config
                 WorldClient worldMC = FMLClientHandler.instance().getClient().world;
 
                 if (stream.readableBytes() > 4 && worldMC != null) // TODO: If worldMC == null, there's a problem, don't just ignore the packet?
@@ -69,7 +74,7 @@ public class ClientNetworkEventListener
 
                     this.worldLoader.registerClientWorldBukkit(worldMC, wrappedStream);
                 }
-
+           	
                 TerrainControl.log(LogMarker.TRACE, "Config received from server");
             } else {
                 // Server or client is outdated

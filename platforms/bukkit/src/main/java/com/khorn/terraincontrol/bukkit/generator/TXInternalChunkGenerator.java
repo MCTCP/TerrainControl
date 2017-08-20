@@ -17,7 +17,6 @@ import org.bukkit.generator.ChunkGenerator;
 
 public class TXInternalChunkGenerator extends CustomChunkGenerator
 {
-
     private final BukkitWorld localWorld;
 
     public TXInternalChunkGenerator(BukkitWorld world, ChunkGenerator generator)

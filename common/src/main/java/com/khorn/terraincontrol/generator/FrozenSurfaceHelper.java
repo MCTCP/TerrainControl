@@ -82,7 +82,7 @@ public class FrozenSurfaceHelper
         LocalBiome biome = world.getBiome(x, z);
         if (biome != null)
         {
-            LocalMaterialData materialToFreeze = world.getMaterial(x, y, z);
+            LocalMaterialData materialToFreeze = world.getMaterial(x, y, z, false);
             if (materialToFreeze.isLiquid())
             {
                 // Water & Stationary Water => IceBlock
@@ -111,10 +111,11 @@ public class FrozenSurfaceHelper
     {
         if ((thawedMaterial.isMaterial(check1) || thawedMaterial.isMaterial(check2)) && !frozenMaterial.isMaterial(check1) && !frozenMaterial.isMaterial(check2))
         {
-            world.setBlock(x, y, z, frozenMaterial);
+            world.setBlock(x, y, z, frozenMaterial, null, false);
             if (worldConfig.fullyFreezeLakes && this.currentPropagationSize < this.maxPropagationSize)
             {
                 propagateFreeze(x, y, z);
+                this.currentPropagationSize++;
             }
         }
 
@@ -136,8 +137,8 @@ public class FrozenSurfaceHelper
         float tempAtBlockToFreeze = biome.getTemperatureAt(x, y, z);
         int snowHeight = biomeConfig.getSnowHeight(tempAtBlockToFreeze);
         // Decreased snow amounts for leaves
-        LocalMaterialData materialToSnowAt = world.getMaterial(x, y, z);
-        LocalMaterialData materialToSnowOn = world.getMaterial(x, y - 1, z);
+        LocalMaterialData materialToSnowAt = world.getMaterial(x, y, z, false);
+        LocalMaterialData materialToSnowOn = world.getMaterial(x, y - 1, z, false);
         if (materialToSnowAt.isAir() && materialToSnowOn.canSnowFallOn())
         {
             this.setSnowFallAtLocation(x, y--, z, snowHeight, materialToSnowOn);
@@ -145,8 +146,8 @@ public class FrozenSurfaceHelper
         if (worldConfig.betterSnowFall) {
             do
             {
-                materialToSnowAt = world.getMaterial(x, --y, z);
-                materialToSnowOn = world.getMaterial(x, y - 1, z);
+                materialToSnowAt = world.getMaterial(x, --y, z, false);
+                materialToSnowOn = world.getMaterial(x, y - 1, z, false);
                 if (materialToSnowAt.isAir() && materialToSnowOn.canSnowFallOn())
                 {
                     this.setSnowFallAtLocation(x, y--, z, snowHeight, materialToSnowOn);
@@ -181,7 +182,7 @@ public class FrozenSurfaceHelper
             // Basic Snow Layer(s)
             snowMass = TerrainControl.toLocalMaterialData(DefaultMaterial.SNOW, MathHelper.clamp(baseSnowHeight - decreaseFactor, 0, 8));
         }
-        world.setBlock(x, y, z, snowMass);
+        world.setBlock(x, y, z, snowMass, null, false);
     }
 
     /**

@@ -147,12 +147,15 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
         for (Iterator<String> it = this.biomes.keySet().iterator(); it.hasNext();)
         {
             String biomeName = it.next();
-            if (DefaultBiome.Contain(biomeName) || customBiomeNames.contains(biomeName))
+            if(biomeName != null && biomeName.trim().length() > 0)
             {
-                continue;
+	            if (DefaultBiome.Contain(biomeName) || customBiomeNames.contains(biomeName))
+	            {
+	                continue;
+	            }
+	            // Invalid biome name, remove
+	            TerrainControl.log(LogMarker.WARN, "Invalid biome name {} in biome group {}", biomeName, this.name);
             }
-            // Invalid biome name, remove
-            TerrainControl.log(LogMarker.WARN, "Invalid biome name {} in biome group {}", biomeName, this.name);
             it.remove();
         }
     }

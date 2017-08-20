@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
+import com.khorn.terraincontrol.configuration.CustomObjectConfigFunction;
 
 /**
  * Represents a check - something that can prevent the BO3 from spawning if this
@@ -9,7 +10,6 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
  */
 public abstract class BO3Check extends BO3Function
 {
-
     /** 
      * X position relative to the object origin.
      */
@@ -22,11 +22,6 @@ public abstract class BO3Check extends BO3Function
      * Z position relative to the object origin.
      */
     public int z;
-
-    public BO3Check(BO3Config holder)
-    {
-        super(holder);
-    }
 
     /**
      * Returns whether this check would prevent spawning at the given position.
@@ -48,7 +43,7 @@ public abstract class BO3Check extends BO3Function
      * whether the classes and coordinates are the same.
      */
     @Override
-    public boolean isAnalogousTo(ConfigFunction<BO3Config> other)
+    public boolean isAnalogousTo(CustomObjectConfigFunction<BO3Config> other)
     {
         if(!getClass().equals(other.getClass())) {
             return false;

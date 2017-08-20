@@ -100,4 +100,9 @@ public final class GeneratingChunk
         return false;
     }
 
+    public long getSeed()
+    {
+        // TODO Auto-generated method stub
+        return 0;
+    }   
 }

@@ -8,10 +8,11 @@ import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
+import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.io.File;
 import java.util.*;
@@ -19,6 +20,38 @@ import java.util.Map.Entry;
 
 public class WorldConfig extends ConfigFile
 {
+	// OTG+
+	
+	public boolean IsOTGPlus;
+	
+	private List<ReplaceBlocks> replaceBlocksList = null;
+    private HashMap<DefaultMaterial,LocalMaterialData> replaceBlocksDict = null;
+    public HashMap<DefaultMaterial,LocalMaterialData> getReplaceBlocksDict()
+    {
+    	if(replaceBlocksDict != null)
+    	{
+    		return replaceBlocksDict;
+    	}
+    	if(replaceBlocksDict == null && replaceBlocksList != null)
+    	{
+    		replaceBlocksDict = new HashMap<DefaultMaterial,LocalMaterialData>();
+    		for(ReplaceBlocks blockNames : replaceBlocksList)
+    		{
+    			try {
+    				// TODO: If the block is unknown it will return the ReplaceUnknownBlockWithMaterial instead.
+    				// This can cause unexpected results like wrong blocks being replaced when ReplaceUnknownBlockWithMaterial is used as sourceBlock or targetBlock.
+					replaceBlocksDict.put(TerrainControl.readMaterial(blockNames.sourceBlock).toDefaultMaterial(), TerrainControl.readMaterial(blockNames.targetBlock));
+				} catch (InvalidConfigException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		}
+    	}
+    	return replaceBlocksDict;
+    }	
+	
+	//
+	
     public final File settingsDir;
     private final Comparator<Entry<String, Integer>> CBV = new Comparator<Entry<String, Integer>>()
     {
@@ -30,9 +63,6 @@ public class WorldConfig extends ConfigFile
     };
 
     public Map<String, Integer> customBiomeGenerationIds = new HashMap<String, Integer>();
-
-    // Holds all world CustomObjects.
-    public final CustomObjectCollection worldObjects;
 
     // Biome Groups and special biome lists
     public BiomeGroupManager biomeGroupManager;
@@ -283,12 +313,11 @@ public class WorldConfig extends ConfigFile
      * @param world          The LocalWorld instance of the world.
      * @param customObjects  The customs objects of the world.
      */
-    public WorldConfig(File settingsDir, SettingsMap settingsReader, LocalWorld world, CustomObjectCollection customObjects)
+    public WorldConfig(File settingsDir, SettingsMap settingsReader, LocalWorld world)
     {
         super(settingsReader.getName());
 
         this.settingsDir = settingsDir;
-        this.worldObjects = customObjects;
 
         // Fix older names
         this.renameOldSettings(settingsReader);
@@ -456,6 +485,11 @@ public class WorldConfig extends ConfigFile
     @Override
     protected void readConfigSettings(SettingsMap reader)
     {
+    	// OTG+
+    	this.IsOTGPlus = reader.getSetting(WorldStandardValues.IS_OTG_PLUS);
+    	this.replaceBlocksList = reader.getSetting(WorldStandardValues.REPLACE_BLOCKS_LIST);
+    	//
+    	
         // Main modes
         this.SettingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE);
         this.ModeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE);
@@ -747,7 +781,6 @@ public class WorldConfig extends ConfigFile
 
     private void readCustomBiomes(SettingsMap reader)
     {
-
         List<String> biomes = reader.getSetting(WorldStandardValues.CUSTOM_BIOMES);
 
         for (String biome : biomes)
@@ -987,7 +1020,6 @@ public class WorldConfig extends ConfigFile
 
         if (this.populateUsingSavedBiomes)
         {
-
             writer.putSetting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES, this.populateUsingSavedBiomes,
                     "Advanced setting, only written to this file when set to true.",
                     "If it is set to true the biome populator will use the biome ids present in the",
@@ -1119,12 +1151,32 @@ public class WorldConfig extends ConfigFile
                 "May not be smaller than 0, and may not be larger than " + WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE + ".");
 
         // Custom structures
-        writer.smallTitle("Custom structues");
-
+        writer.smallTitle("Custom structures and objects");
+        
+        // OTG+
+        
+        writer.putSetting(WorldStandardValues.IS_OTG_PLUS, this.IsOTGPlus,
+                "Set this to true to use advanced (OTG+) features for CustomStructure().",
+                "This includes collision detection, fine control over structure distribution, advanced branching mechanics for",
+                "procedurally generated structures, smoothing areas, extremely large structures, settings for blending structures",
+                "with surrounding terrain, etc.",
+        		"When this is enabled BO3's used with CustomStructure() must have IsOTGPlus:true set or they will be ignored.",
+        		"When this is disabled BO3's used with CustomStructure() should have IsOTGPlus:false set (the default value) ",
+        		"or they will be ignored. Defaults to false."
+		);
+                
+        writer.putSetting(WorldStandardValues.REPLACE_BLOCKS_LIST, this.replaceBlocksList,
+        "A list of blocks that will be replaced in all BO2's/BO3's",
+        "For instance: [{\"BEACON\":\"AIR\"},{\"DIAMOND_BLOCK\":\"AIR\"}]",
+        "Defaults to: []"
+		);
+        
+        //
+        
         writer.putSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius,
                 "Maximum radius of custom structures in chunks. Custom structures are spawned by",
-                "the CustomStructure resource in the biome configuration files.");
-
+                "the CustomStructure resource in the biome configuration files. Only used when IsOTGPlus:false.");
+        
         // Other structures
         writer.smallTitle("Other structures");
         writer.putSetting(WorldStandardValues.MINESHAFTS_ENABLED, this.mineshaftsEnabled);
@@ -1343,7 +1395,7 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.shouldMapSpin, this.shouldMapSpin, 
         		"Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.");                
         writer.putSetting(WorldStandardValues.canDropChunk, this.canDropChunk, 
-        		"Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.");               
+        		"Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.");       
     }
 
     private void WriteCustomBiomes(SettingsMap writer)

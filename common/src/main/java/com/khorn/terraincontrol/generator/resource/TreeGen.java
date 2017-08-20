@@ -18,6 +18,23 @@ import java.util.Random;
 
 public class TreeGen extends Resource
 {
+	// OTG+
+	
+    private List<CustomObject> getTrees(String worldName)
+    {
+    	if(trees.size() == 0 && treeNames.size() > 0)
+    	{
+	        for (int i = 0; i < treeNames.size(); i++)
+	        {	        	
+	        	//trees.add(TerrainControl.getCustomObjectManager().getGlobalObjects().parseCustomObject(treeNames.get(i), worldName));
+	        	trees.add(TerrainControl.getCustomObjectManager().getGlobalObjects().getObjectByName(treeNames.get(i), worldName));
+	        }
+    	}
+    	return trees;
+    }	
+	
+	//
+	
     private final List<Integer> treeChances;
     private final List<String> treeNames;
     private final List<CustomObject> trees;
@@ -35,19 +52,6 @@ public class TreeGen extends Resource
 
         for (int i = 1; i < args.size() - 1; i += 2)
         {
-            CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(
-                    args.get(i));
-            if (object == null)
-            {
-                throw new InvalidConfigException("Custom object " + args.get(
-                        i) + " not found!");
-            }
-            if (!object.canSpawnAsTree())
-            {
-                throw new InvalidConfigException("Custom object " + args.get(
-                        i) + " is not a tree!");
-            }
-            trees.add(object);
             treeNames.add(args.get(i));
             treeChances.add(readInt(args.get(i + 1), 1, 100));
         }
@@ -123,62 +127,54 @@ public class TreeGen extends Resource
     {
         // Left blank, as process() already handles this
     }
-
+    
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
-    {
+    {    	   	
         for (int i = 0; i < frequency; i++)
-        {
-            spawnTree(world, random, chunkCoord);
-        }
-    }
+        {        	
+            for (int treeNumber = 0; treeNumber < treeNames.size(); treeNumber++)
+            {           	            
+                if (random.nextInt(100) < treeChances.get(treeNumber))
+                {                	
+                    int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+                    int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);               	
+                    
+                    CustomObject tree = getTrees(world.getName()).get(treeNumber);                   
+                   
+                    if(tree == null)
+                    {
+                		if(TerrainControl.getPluginConfig().SpawnLog)
+                		{
+                			BiomeConfig biomeConfig = world.getBiome(chunkCoord.getChunkX() * 16 + 15, chunkCoord.getChunkZ() * 16 + 15).getBiomeConfig();
+                			TerrainControl.log(LogMarker.WARN, "Error: Could not find BO3 for Tree in biome " + biomeConfig.getName() + ". BO3: " + treeNames.get(treeNumber));
+                		}
+                		//continue;
+                		throw new RuntimeException();
+                    }
+                    
+                    if(tree instanceof BO2 || tree instanceof BO3)
+                    {   
+                		if(
+            				(tree instanceof BO2 && ((BO2)tree).spawnAsTree(world, random, x, z)) ||
+            				(tree instanceof BO3 && ((BO3)tree).spawnAsTree(world, random, x, z))
+        				)
+                		{
+        	                // Success!
+        	                break;
+                		}
+                    } else {
+                        int y = world.getHighestBlockYAt(x, z);
+                        Rotation rotation = Rotation.getRandomRotation(random);
 
-    private void spawnTree(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
-    {
-        for (int treeKind = 0; treeKind < trees.size(); treeKind++)
-        {
-            if (random.nextInt(100) >= treeChances.get(treeKind))
-            {
-                // Try another tree
-                continue;
-            }
-
-            int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-            int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-            CustomObject tree = trees.get(treeKind);
-
-            if(tree instanceof BO2)
-            {
-	            if (((BO2)tree).SpawnAsTree(world, random, x, z))
-	            {
-	                // Success!
-	                return;
-	            }
-            }
-            else if(tree instanceof BO3)
-            {
-	            if (((BO3)tree).SpawnAsTree(world, random, x, z))
-	            {
-	                // Success!
-	                return;
-	            }        
-            } else {
-
-                int y = world.getHighestBlockYAt(x, z);
-                Rotation rotation = Rotation.getRandomRotation(random);
-
-                if (!tree.canSpawnAt(world, rotation, x, y, z))
-                {
-                    // Try another tree
-                    continue;
+                        if (tree.trySpawnAt(world, random, rotation, x, y, z))
+                        {
+        	                // Success!
+                        	break;
+                        }                    
+                    }
                 }
-            	
-	            if (tree.spawnForced(world, random, rotation, x, y, z))
-	            {
-	                // Success!
-	                return;
-	            }            	
             }
-        }
+        }    		
     }
 }

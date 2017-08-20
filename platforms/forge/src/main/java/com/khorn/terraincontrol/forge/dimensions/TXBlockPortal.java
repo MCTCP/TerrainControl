@@ -405,7 +405,7 @@ public class TXBlockPortal
 				if(fieldClass.equals(Long2ObjectMap.class))
 				{
 					field.setAccessible(true);
-					destinationCoordinateCache = (Long2ObjectMap) field.get(_this);
+					destinationCoordinateCache = (Long2ObjectMap<Teleporter.PortalPosition>) field.get(_this);
 			        break;
 				}
 			}

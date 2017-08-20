@@ -4,7 +4,11 @@ import org.lwjgl.input.Keyboard;
 
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeEngine;
+import com.khorn.terraincontrol.forge.ForgeWorld;
+import com.khorn.terraincontrol.forge.gui.GuiHandler;
+import com.khorn.terraincontrol.forge.gui.PregeneratorUI;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -24,18 +28,26 @@ public class KeyBoardEventListener
 	@SideOnly(Side.CLIENT)
 	public void onKeyInput(KeyInputEvent event)
 	{
-		if(!registered)
+		if(Minecraft.getMinecraft().isIntegratedServerRunning())
 		{
-			keyBinding = new KeyBinding("OTG Pregenerator HUD toggle", Keyboard.KEY_F3, "OpenTerrainGenerator");
-			ClientRegistry.registerKeyBinding(keyBinding);
-			registered = true;
-		}
-		
-		if (FMLClientHandler.instance().getClient().inGameHasFocus)
-		{
-			if (keyBinding.isPressed())
+			if(!registered)
 			{
-				((ForgeEngine)TerrainControl.getEngine()).getPregenerator().ToggleIngameUI();
+				keyBinding = new KeyBinding("OTG Pregenerator HUD toggle", Keyboard.KEY_F3, "OpenTerrainGenerator");
+				ClientRegistry.registerKeyBinding(keyBinding);
+				registered = true;
+			}
+			
+			if (FMLClientHandler.instance().getClient().inGameHasFocus)
+			{
+				if (keyBinding.isPressed())
+				{
+					ForgeWorld world = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getWorld(GuiHandler.selectedWorldName);
+					if(world == null)
+					{
+						world = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getUnloadedWorld(GuiHandler.selectedWorldName);
+					}
+					PregeneratorUI.ToggleIngameUI();
+				}
 			}
 		}
 	}

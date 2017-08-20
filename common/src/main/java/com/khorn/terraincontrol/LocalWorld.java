@@ -7,18 +7,45 @@ import com.khorn.terraincontrol.configuration.BiomeConfigFinder.BiomeConfigStub;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
+import com.khorn.terraincontrol.customobjects.bo3.BlockFunction;
+import com.khorn.terraincontrol.generator.ObjectSpawner;
 import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
 public interface LocalWorld
 {
+	// OTG+
+	
+    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow);
+	
+	public ObjectSpawner getObjectSpawner();
+
+	boolean IsInsidePregeneratedRegion(ChunkCoordinate chunk, boolean includeBorder);
+
+	boolean IsInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources);
+
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isOTPLus);
+		
+	public WorldSession GetWorldSession();
+
+	public void DeleteWorldSessionData();
+	
+	public String getWorldSettingsName();
+	
+	public File getWorldSaveDir();
+	
+	public int getDimensionId();
+	
+	//
+	
 
     // Biome init
     /**
@@ -169,35 +196,24 @@ public interface LocalWorld
     public void endPopulation();
 
     // Blocks
-    public LocalMaterialData getMaterial(int x, int y, int z);
-
-    public boolean isEmpty(int x, int y, int z);
-
-    public void setBlock(int x, int y, int z, LocalMaterialData material);
-
-    public void attachMetadata(int x, int y, int z, NamedBinaryTag tag);
-
-    @SuppressWarnings("UnusedDeclaration")
+    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea);
+    
+    public boolean isNullOrAir(int x, int y, int z, boolean allowOutsidePopulatingArea);
+    
     public NamedBinaryTag getMetadata(int x, int y, int z);
 
     public int getLiquidHeight(int x, int z);
 
     /**
-     * Returns the block above the highest solid block.
-     * @param x Block x.
-     * @param z Block z.
      * @return The y location of the block above the highest solid block.
      */
     public int getSolidHeight(int x, int z);
 
     /**
-     * Returns the block above the highest block.
-     * @param x Block x.
-     * @param z Block z.
      * @return The y location of the block above the highest block.
      */
     public int getHighestBlockYAt(int x, int z);
-
+    
     public int getLightLevel(int x, int y, int z);
 
     public boolean isLoaded(int x, int y, int z);
@@ -238,4 +254,6 @@ public interface LocalWorld
 	void SpawnEntity(EntityFunction entityData);
 
 	public ChunkCoordinate getSpawnChunk();
+
+	public BlockFunction[] getBlockColumn(int x, int z);
 }

@@ -1,7 +1,6 @@
 package com.khorn.terraincontrol.configuration;
 
 import com.khorn.terraincontrol.LocalBiome;
-import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 
 /**
  * Provides the configuration objects of a world. This includes:
@@ -41,11 +40,4 @@ public interface ConfigProvider
      * method does nothing.
      */
     void reload();
-
-    /**
-     * Gets all custom objects of this world.
-     * @return All custom objects.
-     */
-    CustomObjectCollection getCustomObjects();
-
 }

@@ -2,25 +2,29 @@ package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.configuration.ConfigFunction;
+import com.khorn.terraincontrol.configuration.CustomObjectConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 
 import java.util.List;
 import java.util.Random;
 
-public class RandomBlockFunction extends BO3PlaceableFunction
+public class RandomBlockFunction extends BlockFunction
 {
-    public LocalMaterialData[] blocks;
-    public byte[] blockChances;
-    public String[] metaDataNames;
-    public NamedBinaryTag[] metaDataTags;
+    LocalMaterialData[] blocks;
+    byte[] blockChances;
+    String[] metaDataNames;
+    NamedBinaryTag[] metaDataTags;
 
     public int blockCount = 0;
 
+    public RandomBlockFunction()
+    {
+    	super();
+	}    
+    
     public RandomBlockFunction(BO3Config config, List<String> args) throws InvalidConfigException
     {
-        super(config);
         assureSize(5, args);
         x = readInt(args.get(0), -100, 100);
         y = readInt(args.get(1), -100, 100);
@@ -55,7 +59,7 @@ public class RandomBlockFunction extends BO3PlaceableFunction
                 // Maybe it's a NBT file?
 
                 // Get the file
-                NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().directory);
+                NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().getFile());
                 if (metaData != null)
                 {
                     metaDataNames[blockCount] = args.get(i);
@@ -74,11 +78,6 @@ public class RandomBlockFunction extends BO3PlaceableFunction
             i++;
             blockCount++;
         }
-    }
-
-    private RandomBlockFunction(BO3Config config)
-    {
-        super(config);
     }
 
     @Override
@@ -101,7 +100,7 @@ public class RandomBlockFunction extends BO3PlaceableFunction
     @Override
     public RandomBlockFunction rotate()
     {
-        RandomBlockFunction rotatedBlock = new RandomBlockFunction(getHolder());
+        RandomBlockFunction rotatedBlock = new RandomBlockFunction();
         rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
@@ -119,24 +118,20 @@ public class RandomBlockFunction extends BO3PlaceableFunction
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int y, int z)
+    public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean allowOutsidePopulatingArea)
     {
         for (int i = 0; i < blockCount; i++)
         {
             if (random.nextInt(100) < blockChances[i])
             {
-                world.setBlock(x, y, z, blocks[i]);
-                if (metaDataTags[i] != null)
-                {
-                    world.attachMetadata(x, y, z, metaDataTags[i]);
-                }
+                world.setBlock(x, y, z, blocks[i], metaDataTags[i], allowOutsidePopulatingArea);
                 break;
             }
         }
     }
 
     @Override
-    public boolean isAnalogousTo(ConfigFunction<BO3Config> other)
+    public boolean isAnalogousTo(CustomObjectConfigFunction<BO3Config> other)
     {
         if (!getClass().equals(other.getClass()))
         {
@@ -144,5 +139,5 @@ public class RandomBlockFunction extends BO3PlaceableFunction
         }
         RandomBlockFunction block = (RandomBlockFunction) other;
         return block.x == x && block.y == y && block.z == z;
-    }
+    }    
 }

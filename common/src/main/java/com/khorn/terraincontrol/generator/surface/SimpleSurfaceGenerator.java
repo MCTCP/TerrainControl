@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.generator.surface;
 import static com.khorn.terraincontrol.util.ChunkCoordinate.CHUNK_Y_SIZE;
 
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
@@ -20,6 +21,12 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
     private final LocalMaterialData air = TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0);
     private final LocalMaterialData sandstone = TerrainControl.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
 
+    @Override
+    public LocalMaterialData getCustomBlockData(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+    {
+    	return null;
+    }
+    
     @Override
     public void spawn(GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
     {

@@ -14,6 +14,11 @@ public class TXBlockPopulator extends BlockPopulator
 {
     private ObjectSpawner spawner;
 
+    public ObjectSpawner getObjectSpawner()
+    {    	
+    	return spawner;
+    }
+    
     public TXBlockPopulator(BukkitWorld world)
     {
         this.spawner = new ObjectSpawner(world.getConfigs(), world);

@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectCoordinate;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructure;
+import com.khorn.terraincontrol.customobjects.StructuredCustomObject;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
@@ -17,38 +18,40 @@ import java.util.Random;
 
 public class CustomStructureGen extends Resource
 {
-    private List<CustomObject> objects;
-    private List<Double> objectChances;
-    private List<String> objectNames;
+	// OTG+
+	
+    public List<StructuredCustomObject> getObjects(String worldName)
+    {
+    	if(objects.isEmpty() && !objectNames.isEmpty())
+    	{
+            for (int i = 0; i < objectNames.size(); i ++)
+            {
+                //CustomObject object = TerrainControl.getCustomObjectManager().getGlobalObjects().parseCustomObject(objectNames.get(i), worldName);
+            	CustomObject object = TerrainControl.getCustomObjectManager().getGlobalObjects().getObjectByName(objectNames.get(i), worldName);
+            	objects.add((StructuredCustomObject) object);
+            }
+    	}
+    	return objects;
+    }
+
+	//
+	
+    private List<StructuredCustomObject> objects;
+    public List<Double> objectChances;
+    public List<String> objectNames;
 
     public CustomStructureGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
-        objects = new ArrayList<CustomObject>();
+        objects = new ArrayList<StructuredCustomObject>();
         objectNames = new ArrayList<String>();
         objectChances = new ArrayList<Double>();
         for (int i = 0; i < args.size() - 1; i += 2)
         {
-            CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(args.get(i));
-            if (object == null || !object.canSpawnAsObject())
-            {
-                throw new InvalidConfigException("No custom object found with the name " + args.get(i));
-            }
-            // Who cares if the object has no branches? Doesn't help anything to forbid it?
-            //if (object.getBranches(Rotation.NORTH).length == 0)
-            {
-                //throw new InvalidConfigException("The object " + args.get(i) + " isn't a structure: it has no branches");
-            }
-            objects.add(object);
             objectNames.add(args.get(i));
             objectChances.add(readRarity(args.get(i + 1)));
         }
 
-        // Inject ourselves in the BiomeConfig
-        if (getHolder().structureGen != null)
-        {
-            throw new InvalidConfigException("There can only be one CustomStructure resource in each BiomeConfig");
-        }
         getHolder().structureGen = this;
     }
 
@@ -58,31 +61,37 @@ public class CustomStructureGen extends Resource
         // Left blank, as spawnInChunk(..) already handles this.
     }
 
+    // Only used for OTG CustomStructure
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        // Find all structures that reach this chunk, and spawn them
-        int searchRadius = world.getConfigs().getWorldConfig().maximumCustomStructureRadius;
-
-        int currentChunkX = chunkCoord.getChunkX();
-        int currentChunkZ = chunkCoord.getChunkZ();
-        for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)
-        {
-            for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
-            {
-                CustomObjectStructure structureStart = world.getStructureCache().getStructureStart(searchChunkX, searchChunkZ);
-                if (structureStart != null)
-                {
-                    structureStart.spawnForChunk(chunkCoord);
-                }
-            }
-        }
+    	if(world.getConfigs().getWorldConfig().IsOTGPlus)
+    	{
+    		throw new RuntimeException();
+    	} else {
+	        // Find all structures that reach this chunk, and spawn them
+	        int searchRadius = world.getConfigs().getWorldConfig().maximumCustomStructureRadius;
+	
+	        int currentChunkX = chunkCoord.getChunkX();
+	        int currentChunkZ = chunkCoord.getChunkZ();
+	        for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)
+	        {
+	            for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
+	            {
+	                CustomObjectStructure structureStart = world.getStructureCache().getStructureStart(searchChunkX, searchChunkZ);
+	                if (structureStart != null)
+	                {
+	                    structureStart.spawnForChunk(chunkCoord);
+	                }
+	            }
+	        }
+    	}
     }
 
     @Override
     public String toString()
     {
-        if (objects.isEmpty())
+        if (objectNames.isEmpty())
         {
             return "CustomStructure()";
         }
@@ -94,17 +103,27 @@ public class CustomStructureGen extends Resource
         return output + ")";
     }
 
-    public CustomObjectCoordinate getRandomObjectCoordinate(Random random, int chunkX, int chunkZ)
+    public CustomObjectCoordinate getRandomObjectCoordinate(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        if (objects.isEmpty())
+        if (objectNames.isEmpty())
         {
             return null;
-        }
-        for (int objectNumber = 0; objectNumber < objects.size(); objectNumber++)
+        }        
+        for (int objectNumber = 0; objectNumber < getObjects(world.getName()).size(); objectNumber++)
         {
             if (random.nextDouble() * 100.0 < objectChances.get(objectNumber))
             {
-                return objects.get(objectNumber).makeCustomObjectCoordinate(random, chunkX, chunkZ);
+            	StructuredCustomObject object = getObjects(world.getName()).get(objectNumber);
+            	if(object != null)
+            	{
+            		return object.makeCustomObjectCoordinate(world, random, chunkX, chunkZ);
+            	} else {
+            		if(TerrainControl.getPluginConfig().SpawnLog)
+            		{
+            			BiomeConfig biomeConfig = world.getBiome(chunkX * 16 + 15, chunkZ * 16 + 15).getBiomeConfig();
+            			TerrainControl.log(LogMarker.WARN, "Error: Could not find BO3 for CustomStructure in biome " + biomeConfig.getName() + ". BO3: " + objectNames.get(objectNumber));
+            		}
+            	}
             }
         }
         return null;

@@ -54,8 +54,9 @@ public class PlantType
         PlantType plantType = LOOKUP_MAP.get(name);
         if (plantType == null)
         {
+        	LocalMaterialData material = TerrainControl.readMaterial(name);
             // Fall back on block name + data
-            plantType = new PlantType(TerrainControl.readMaterial(name));
+            plantType = new PlantType(material);
         }
         return plantType;
     }
@@ -149,10 +150,10 @@ public class PlantType
      */
     public void spawn(LocalWorld world, int x, int y, int z)
     {
-        world.setBlock(x, y, z, bottomBlock);
+        world.setBlock(x, y, z, bottomBlock, null, false);
         if (topBlock != null)
         {
-            world.setBlock(x, y + 1, z, topBlock);
+            world.setBlock(x, y + 1, z, topBlock, null, false);
         }
     }
 

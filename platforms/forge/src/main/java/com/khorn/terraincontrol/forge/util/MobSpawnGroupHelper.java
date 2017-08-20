@@ -146,7 +146,7 @@ public final class MobSpawnGroupHelper
      * @return The entity class, or null if not found.
      */
     @SuppressWarnings("unchecked")
-	static Class<? extends EntityLiving> toMinecraftClass(String mobName)
+	public static Class<? extends EntityLiving> toMinecraftClass(String mobName)
     {
     	Set<ResourceLocation> mobNames = EntityList.getEntityNameList();
     	Class<? extends EntityLiving> mob = null;

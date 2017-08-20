@@ -41,7 +41,7 @@ public class BoulderGen extends Resource
 
         while (y > 3)
         {
-            LocalMaterialData material = world.getMaterial(x, y - 1, z);
+            LocalMaterialData material = world.getMaterial(x, y - 1, z, false);
             if (sourceBlocks.contains(material)) {
                 break;
             }
@@ -71,7 +71,7 @@ public class BoulderGen extends Resource
                         float f4 = i3 - y;
                         if (f2 * f2 + f3 * f3 + f4 * f4 <= f1 * f1)
                         {
-                            world.setBlock(i1, i3, i2, this.material);
+                            world.setBlock(i1, i3, i2, this.material, null, false);
                         }
                     }
                 }

@@ -11,6 +11,17 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
  */
 public interface LocalMaterialData
 {
+	// OTG+
+	
+    /**
+     * Gets whether this material can be used as an anchor point for a smooth area    
+     * 
+     * @return True if this material is a solid block, false if it is a tile-entity, half-slab, stairs(?), water, wood or leaves
+     */
+    public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater);
+	
+	//
+	
 
     /**
      * Gets the name of this material. If a {@link #toDefaultMaterial()

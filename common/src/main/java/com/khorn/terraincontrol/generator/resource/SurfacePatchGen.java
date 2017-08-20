@@ -121,14 +121,14 @@ public class SurfacePatchGen extends Resource
         double yNoise = noiseGen.getYNoise(x * 0.25D, z * 0.25D);
         if (yNoise > 0.0D)
         {
-            LocalMaterialData materialAtLocation = world.getMaterial(x, y, z);
+            LocalMaterialData materialAtLocation = world.getMaterial(x, y, z, false);
             if (sourceBlocks.contains(materialAtLocation))
             {
-                world.setBlock(x, y, z, material);
+                world.setBlock(x, y, z, material, null, false);
 
                 if (yNoise < 0.12D)
                 {
-                    world.setBlock(x, y + 1, z, decorationAboveReplacements);
+                    world.setBlock(x, y + 1, z, decorationAboveReplacements, null, false);
                 }
             }
         }

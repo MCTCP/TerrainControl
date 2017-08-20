@@ -4,6 +4,7 @@ import static com.khorn.terraincontrol.TerrainControl.WORLD_DEPTH;
 import static com.khorn.terraincontrol.TerrainControl.WORLD_HEIGHT;
 
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.configuration.ReplaceBlocks;
 import com.khorn.terraincontrol.configuration.WorldConfig.ConfigMode;
 import com.khorn.terraincontrol.configuration.WorldConfig.ImageMode;
 import com.khorn.terraincontrol.configuration.WorldConfig.ImageOrientation;
@@ -43,6 +44,7 @@ public class WorldStandardValues extends Settings
     }
 
     public static final Setting<ConfigMode> SETTINGS_MODE = enumSetting("SettingsMode", ConfigMode.WriteAll);
+    public static final Setting<ConfigMode> SETTINGS_MODE_BO3 = enumSetting("SettingsMode", ConfigMode.WriteDisable);
     public static final Setting<TerrainMode> TERRAIN_MODE = enumSetting("TerrainMode", TerrainMode.Normal);
     public static final Setting<ImageMode> IMAGE_MODE = enumSetting("ImageMode", ImageMode.Mirror);
     public static final Setting<ImageOrientation> IMAGE_ORIENTATION = enumSetting("ImageOrientation", ImageOrientation.West);
@@ -169,7 +171,8 @@ public class WorldStandardValues extends Settings
 			isNightWorld = booleanSetting("IsNightWorld", false),
 			shouldMapSpin = booleanSetting("ShouldMapSpin", false),
 			canDropChunk = booleanSetting("CanDropChunk", true),
-			useCustomFogColor = booleanSetting("UseCustomFogColor", false)
+			useCustomFogColor = booleanSetting("UseCustomFogColor", false),
+			IS_OTG_PLUS = booleanSetting("IsOTGPlus", false)
             ;
 
     public static final Setting<LocalMaterialData>
@@ -180,6 +183,9 @@ public class WorldStandardValues extends Settings
 
     public static final Setting<ArrayList<LocalMaterialData>>
     		DIMENSION_PORTAL_MATERIALS = new MaterialListSetting("DimensionPortalMaterials", new DefaultMaterial[] { DefaultMaterial.QUARTZ_BLOCK });
+    
+    public static final Setting<List<ReplaceBlocks>> 
+			REPLACE_BLOCKS_LIST = replaceBlocksListSetting("ReplaceBlocksList");    
     
     public static final Setting<List<String>>
             ISLE_BIOMES = stringListSetting("IsleBiomes", "Deep Ocean", "MushroomIsland",

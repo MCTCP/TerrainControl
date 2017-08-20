@@ -1,14 +1,11 @@
 package com.khorn.terraincontrol.forge;
 
-import com.google.common.collect.Maps;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ClientConfigProvider;
 import com.khorn.terraincontrol.configuration.ConfigFile;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
-import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 import com.khorn.terraincontrol.forge.dimensions.TXDimensionManager;
 import com.khorn.terraincontrol.forge.dimensions.WorldProviderTX;
 import com.khorn.terraincontrol.forge.generator.TXBiome;
@@ -58,10 +55,18 @@ import javax.annotation.Nullable;
 public final class WorldLoader
 {	
     private final File configsDir;
-    //private final Map<String, ServerConfigProvider> configMap = Maps.newHashMap();
-    private final Map<String, CustomObjectCollection> configHolderMap = Maps.newHashMap();
     private final HashMap<String, ForgeWorld> worlds = new HashMap<String, ForgeWorld>();
     private final HashMap<String, ForgeWorld> unloadedWorlds = new HashMap<String, ForgeWorld>();
+    
+    public ArrayList<LocalWorld> getAllLoadedWorlds()
+    {
+    	ArrayList<LocalWorld> allWorlds = new ArrayList<LocalWorld>();    	
+    	synchronized(worlds)
+    	{
+			allWorlds.addAll(worlds.values());
+    	}
+    	return allWorlds;
+    }
     
     public ArrayList<LocalWorld> getAllWorlds()
     {
@@ -107,6 +112,8 @@ public final class WorldLoader
     {
     	synchronized(unloadedWorlds)
     	{
+    		ForgeWorld forgeWorld = unloadedWorlds.get(worldName);
+    		forgeWorld.DeleteWorldSessionData();
     		unloadedWorlds.remove(worldName);
     	}
     }
@@ -220,7 +227,6 @@ public final class WorldLoader
 		            this.worlds.remove(worldToRemove.getName());
 		        }
 		        
-		        this.configHolderMap.clear();
 		        synchronized(this.unloadedWorlds)
 		        {
 		        	this.unloadedWorlds.clear();
@@ -261,19 +267,10 @@ public final class WorldLoader
     	{
     		throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
     	}
+
+    	String worldName = WorldHelper.getName(mcWorld);
+    	boolean isMainWorld = mcWorld.provider.getDimension() == 0;
     	
-        ForgeWorld forgeWorld = this.getOrCreateForgeWorld(WorldHelper.getName(mcWorld), mcWorld.provider.getDimension() == 0);
-        if (forgeWorld != null && forgeWorld.getWorld() == null)
-        {
-            forgeWorld.provideWorldInstance((WorldServer) mcWorld);
-        }
-
-        return forgeWorld;
-    }
-
-    @Nullable
-    public ForgeWorld getOrCreateForgeWorld(String worldName, boolean isMainWorld)
-    {
     	File worldConfigsFolder = this.getWorldDir(worldName);
         if (!worldConfigsFolder.exists())
         {
@@ -289,17 +286,8 @@ public final class WorldLoader
             if (config == null)
             {
                 TerrainControl.log(LogMarker.INFO, "Loading configs for world \"{}\"..", world.getName());
-                
-                // Restore cached custom objects if this is a dimension that is being re-loaded.
-                // TODO: Also cache worldconfig and biomes? <- Couldn't get this to work (crashes on dim reload).
-                CustomObjectCollection customObjects = this.configHolderMap.get(worldName);
-                if(customObjects != null)
-                {
-                	config = new ServerConfigProvider(worldConfigsFolder, world, customObjects);
-                	TerrainControl.log(LogMarker.INFO, customObjects.getAll().size() + " world custom objects restored from cache.");
-                } else {
-                	config = new ServerConfigProvider(worldConfigsFolder, world);	
-                }
+
+                config = new ServerConfigProvider(worldConfigsFolder, world);
 
                 if(isMainWorld)
                 {
@@ -337,9 +325,12 @@ public final class WorldLoader
                 }
                 Biome.REGISTRY.underlyingIntegerMap = underlyingIntegerMap;
             }
-            world.provideConfigs(config);
+            world.provideConfigs(config);           
             
-            this.configHolderMap.put(worldName, config.getCustomObjects());
+            if (world != null && world.getWorld() == null)
+            {
+            	world.provideWorldInstance((WorldServer) mcWorld);
+            }
             
             synchronized(this.worlds)
             {
@@ -360,19 +351,14 @@ public final class WorldLoader
         // If this is a new world use the pre-generator and world border settings from world creation menu
     	if(GuiHandler.lastGuiOpened.equals(TXGuiCreateWorld.class))
     	{
-			if(((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius() > -1)
-			{
-				config.getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().getPregenerationRadius();
-			}
-			if(((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius > -1)
-			{
-				config.getWorldConfig().WorldBorderRadius = ((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius;    				
-			}
+			config.getWorldConfig().PreGenerationRadius = GuiHandler.PregenerationRadius;
+			config.getWorldConfig().WorldBorderRadius = GuiHandler.WorldBorderRadius;
 			config.saveWorldConfig();
     	}
     	else if(GuiHandler.lastGuiOpened.equals(TXGuiWorldSelection.class))
     	{
-    		((ForgeEngine)TerrainControl.getEngine()).WorldBorderRadius = config.getWorldConfig().WorldBorderRadius;
+    		GuiHandler.PregenerationRadius = config.getWorldConfig().PreGenerationRadius;
+    		GuiHandler.WorldBorderRadius = config.getWorldConfig().WorldBorderRadius;
     	}
     }
     
@@ -436,7 +422,7 @@ public final class WorldLoader
 				if(fieldClass.equals(java.util.Map.class))
 				{
 			        field.setAccessible(true);
-			        Map biomeRegistryAvailabiltyMap = (HashMap)field.get(BiomeDictionary.class);
+			        HashMap biomeRegistryAvailabiltyMap = (HashMap)field.get(BiomeDictionary.class);
 			        biomeRegistryAvailabiltyMap.clear();
 				}
 			}
@@ -600,8 +586,9 @@ public final class WorldLoader
     	int worldCount = wrappedStream.readInt();
     	HashMap<Integer, String> dimsToRemove = TXDimensionManager.GetAllOTGDimensions(); // TODO: use String[] instead?
     	boolean isSinglePlayer = Minecraft.getMinecraft().isSingleplayer();
+    	
     	for(int i = 0; i < worldCount; i++)
-    	{    		
+    	{    		       	
     		int dimensionId = wrappedStream.readInt(); // TODO: Create dimensions on client? Is that even necessary, creating worlds should be enough?
     		
     		Integer integerToRemove = 0;
@@ -651,89 +638,9 @@ public final class WorldLoader
 	            	}
 	            }
     		} else {
-   			    			
+   			        
     			// World already exists, read the data from the stream but don't create a world.
-
-    			// Create WorldConfig
-    			wrappedStream.readInt();
-    			wrappedStream.readInt();
-    			
-    	        // TODO: Probably not all of these are required on the client
-    			wrappedStream.readInt();
-
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        //this.doLimitedCrafting = reader.getSetting(WorldStandardValues.doLimitedCrafting).toString();
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        //public String gameLoopFunction = "true";
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        //public String maxCommandChainLength = "65536";
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream); 
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        ConfigFile.readStringFromStream(wrappedStream);
-    	        //public boolean isHellWorld = false;
-    	        wrappedStream.readBoolean();
-    	        wrappedStream.readBoolean();
-    	        //this.canCoordinateBeSpawn = reader.getSetting(WorldStandardValues.canCoordinateBeSpawn);
-    	        wrappedStream.readBoolean();
-    	        wrappedStream.readBoolean();
-    	        wrappedStream.readBoolean();
-    	        wrappedStream.readBoolean();
-    	        wrappedStream.readDouble();
-    	        wrappedStream.readDouble();
-    	        wrappedStream.readDouble();
-    	        wrappedStream.readBoolean();
-    	        //this.averageGroundlevel = reader.getSetting(WorldStandardValues.averageGroundlevel);
-    	        //this.horizonHeight = reader.getSetting(WorldStandardValues.horizonHeight);
-    	        wrappedStream.readInt();
-    	        wrappedStream.readBoolean();
-    	        wrappedStream.readBoolean();
-    	        //this.canMineBlock = reader.getSetting(WorldStandardValues.canMineBlock);
-    	        wrappedStream.readBoolean();
-    	        wrappedStream.readDouble();
-    	        wrappedStream.readBoolean();
-    	        wrappedStream.readBoolean();
-    			
-    			// Custom biomes + ids
-    			int count = wrappedStream.readInt();
-    	        while (count-- > 0)
-    	        {
-    	            ConfigFile.readStringFromStream(wrappedStream);
-    	            wrappedStream.readInt();
-    	        }
-    	        
-    	        // BiomeConfigs    	        
-    	        count = wrappedStream.readInt();
-    	        while (count-- > 0)
-    	        {
-    	            wrappedStream.readInt();
-    	            ConfigFile.readStringFromStream(wrappedStream);
-    	            wrappedStream.readFloat();
-    	            wrappedStream.readFloat();
-    	            wrappedStream.readInt();
-    	            wrappedStream.readInt();
-    	            wrappedStream.readInt();
-    	            wrappedStream.readBoolean();
-    	            wrappedStream.readInt();
-    	            wrappedStream.readBoolean();           
-    	                       
-    	        	ConfigFile.readStringFromStream(wrappedStream);
-    	        }
+    			new ClientConfigProvider(wrappedStream, new ForgeWorld(), isSinglePlayer);
     		}
     	}
     	

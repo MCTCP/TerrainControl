@@ -11,10 +11,8 @@ import java.util.TreeMap;
  * 
  * @see LocalMaterialData
  */
-@SuppressWarnings({"UnusedDeclaration"})
 public enum DefaultMaterial
 {
-
     AIR(0, false),
     STONE(1),
     GRASS(2),

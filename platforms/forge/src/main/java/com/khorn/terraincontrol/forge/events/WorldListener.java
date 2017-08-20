@@ -4,6 +4,7 @@ import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeWorld;
+import com.khorn.terraincontrol.forge.ForgeWorldSession;
 import com.khorn.terraincontrol.forge.TXWorldType;
 import com.khorn.terraincontrol.forge.dimensions.TXDimensionManager;
 
@@ -34,7 +35,13 @@ public class WorldListener
 	@SubscribeEvent
 	public void onWorldSave(WorldEvent.Save event)
 	{
-		((ForgeEngine)TerrainControl.getEngine()).getPregenerator().SavePreGeneratorData(event.getWorld());
+		ForgeWorld world = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getWorld(event.getWorld());
+		if(world != null)
+		{
+			((ForgeWorldSession)world.GetWorldSession()).getPregenerator().SavePregeneratorData();
+		} else {
+			// This is not an OTG world.
+		}
 	}
 	
     // TODO: This method should not be called by DimensionManager when switching dimensions (main -> nether -> main). Find out why it is being called
@@ -81,7 +88,7 @@ public class WorldListener
 		        		
 		        		if(mcWorld.provider.getDimension() == 0)
 		        		{
-			        		((ForgeEngine)TerrainControl.getEngine()).getPregenerator().shutDown(mcWorld);
+		        			((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator().shutDown();
 		        			
 		        			// Unregister any currently unloaded custom dimensions	        			
 		        			for(ForgeWorld unloadedWorld : ((ForgeEngine)TerrainControl.getEngine()).getUnloadedWorlds())
@@ -112,7 +119,7 @@ public class WorldListener
     	LocalWorld world = ((ForgeEngine) TerrainControl.getEngine()).getWorld(event.getWorld());
     	if(world != null)
     	{
-	        if(((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() || world.getConfigs().getWorldConfig().WorldBorderRadius > 0 || (world.getConfigs().getWorldConfig().BO3AtSpawn != null && world.getConfigs().getWorldConfig().BO3AtSpawn.trim().length() > 0))
+	        if(((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled() || world.GetWorldSession().getWorldBorderRadius() > 0 || (world.getConfigs().getWorldConfig().BO3AtSpawn != null && world.getConfigs().getWorldConfig().BO3AtSpawn.trim().length() > 0))
 	        {
 	        	event.setCanceled(true);
 	        }        

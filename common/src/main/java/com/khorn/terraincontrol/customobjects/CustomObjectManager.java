@@ -1,9 +1,7 @@
 package com.khorn.terraincontrol.customobjects;
 
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.bo2.BO2Loader;
 import com.khorn.terraincontrol.customobjects.bo3.BO3Loader;
-import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.util.Collections;
@@ -40,8 +38,8 @@ import java.util.Map;
  */
 public class CustomObjectManager
 {
-
-    private final Map<String, CustomObjectLoader> loaders;
+    public final Map<String, CustomObjectLoader> loaders;
+    
     private final CustomObjectCollection globalCustomObjects;
 
     public CustomObjectManager()
@@ -53,24 +51,19 @@ public class CustomObjectManager
         registerCustomObjectLoader("bo2", new BO2Loader());
         registerCustomObjectLoader("bo3", new BO3Loader());
 
+        //this.globalCustomObjects = new CustomObjectCollection();
         this.globalCustomObjects = new CustomObjectCollection();
-
+        
         // Put some default CustomObjects
         for (TreeType type : TreeType.values())
         {
             registerGlobalObject(new TreeObject(type));
         }
-        registerGlobalObject(new UseWorld());
-        registerGlobalObject(new UseBiome());
-        registerGlobalObject(new UseWorldAll());
-        registerGlobalObject(new UseBiomeAll());
     }
-
-    public void loadGlobalObjects()
+    
+    public void ReloadCustomObjectFiles()
     {
-        // Load all global objects (they can overwrite special objects)
-        this.globalCustomObjects.load(this.loaders, TerrainControl.getEngine().getGlobalObjectsDirectory());
-        TerrainControl.log(LogMarker.INFO, "{} Global custom objects loaded", globalCustomObjects.getAll().size());
+    	this.globalCustomObjects.ReloadCustomObjectFiles();
     }
 
     /**
@@ -93,9 +86,9 @@ public class CustomObjectManager
      */
     public void registerGlobalObject(CustomObject object)
     {
-        globalCustomObjects.addLoadedObject(object);
+    	globalCustomObjects.addLoadedGlobalObject(object);
     }
-
+        
     /**
      * Gets all global objects.
      * @return The global objects.
@@ -113,8 +106,8 @@ public class CustomObjectManager
     public Map<String, CustomObjectLoader> getObjectLoaders()
     {
         return Collections.unmodifiableMap(loaders);
-    }
-
+    }    
+    
     /**
      * Calls the {@link CustomObjectLoader#onShutdown()} method of each
      * loader, then unloads them.
@@ -126,6 +119,5 @@ public class CustomObjectManager
             loader.onShutdown();
         }
         loaders.clear();
-    }
-
+    }  
 }

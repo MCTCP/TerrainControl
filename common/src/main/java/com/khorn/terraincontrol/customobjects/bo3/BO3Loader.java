@@ -1,7 +1,7 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
+import com.khorn.terraincontrol.configuration.CustomObjectConfigFunctionsManager;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -22,7 +22,7 @@ public class BO3Loader implements CustomObjectLoader
     public BO3Loader()
     {
         // Register BO3 ConfigFunctions
-        ConfigFunctionsManager registry = TerrainControl.getConfigFunctionsManager();
+        CustomObjectConfigFunctionsManager registry = TerrainControl.getCustomObjectConfigFunctionsManager();
         registry.registerConfigFunction("Block", BlockFunction.class);
         registry.registerConfigFunction("B", BlockFunction.class);
         registry.registerConfigFunction("Branch", BranchFunction.class);
@@ -41,6 +41,12 @@ public class BO3Loader implements CustomObjectLoader
         registry.registerConfigFunction("LC", LightCheck.class);
         registry.registerConfigFunction("Entity", EntityFunction.class);
         registry.registerConfigFunction("E", EntityFunction.class);
+        registry.registerConfigFunction("Particle", ParticleFunction.class);
+        registry.registerConfigFunction("P", ParticleFunction.class);
+        registry.registerConfigFunction("Spawner", SpawnerFunction.class);
+        registry.registerConfigFunction("S", SpawnerFunction.class);
+        registry.registerConfigFunction("ModData", ModDataFunction.class);
+        registry.registerConfigFunction("MD", ModDataFunction.class);
     }
 
     @Override
@@ -51,7 +57,7 @@ public class BO3Loader implements CustomObjectLoader
 
     public static NamedBinaryTag loadMetadata(String name, File bo3Folder)
     {
-        String path = bo3Folder + File.separator + name;
+        String path = bo3Folder.getParent() + File.separator + name;
 
         if (loadedTags.containsKey(path))
         {

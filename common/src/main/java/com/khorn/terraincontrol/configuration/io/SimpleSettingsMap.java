@@ -65,8 +65,7 @@ public final class SimpleSettingsMap implements SettingsMap
     {
         for (ConfigFunction<?> function : functions)
         {
-            RawSettingValue value = RawSettingValue.create(ValueType.FUNCTION,
-                    function.toString());
+            RawSettingValue value = RawSettingValue.create(ValueType.FUNCTION, function.toString());
 
             configFunctions.add(value);
             settingsCache.put(nextDummyKey(), value);

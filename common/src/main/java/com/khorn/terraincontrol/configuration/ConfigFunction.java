@@ -121,7 +121,8 @@ public abstract class ConfigFunction<T>
      */
     protected final LocalMaterialData readMaterial(String string) throws InvalidConfigException
     {
-        return TerrainControl.readMaterial(string);
+    	LocalMaterialData material = TerrainControl.readMaterial(string);    		
+        return material;
     }
 
     /**

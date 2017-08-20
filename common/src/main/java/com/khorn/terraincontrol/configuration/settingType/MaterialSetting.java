@@ -30,6 +30,7 @@ public class MaterialSetting extends Setting<LocalMaterialData>
     @Override
     public LocalMaterialData read(String string) throws InvalidConfigException
     {
-        return TerrainControl.readMaterial(string);
+    	LocalMaterialData material = TerrainControl.readMaterial(string);
+        return material;
     }
 }

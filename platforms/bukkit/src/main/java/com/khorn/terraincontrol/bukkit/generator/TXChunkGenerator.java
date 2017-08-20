@@ -4,7 +4,9 @@ import com.khorn.terraincontrol.bukkit.BukkitWorld;
 import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkProviderTC;
+import com.khorn.terraincontrol.generator.ObjectSpawner;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;
@@ -15,12 +17,13 @@ import java.util.List;
 import java.util.Random;
 
 public class TXChunkGenerator extends ChunkGenerator
-{
+{	
     private ChunkProviderTC chunkProviderTC;
+    // Why does the chunk generator require multiple block populators, each with their own ObjectSpawner instance? For multiple dims??
     private ArrayList<BlockPopulator> BlockPopulator = new ArrayList<BlockPopulator>();
     private boolean NotGenerate = false;
     private TXPlugin plugin;
-
+   
     public TXChunkGenerator(TXPlugin _plugin)
     {
         this.plugin = _plugin;
@@ -60,11 +63,19 @@ public class TXChunkGenerator extends ChunkGenerator
             this.NotGenerate = true;
     }
 
+    public ObjectSpawner getObjectSpawner()
+    {
+    	if (this.chunkProviderTC == null)
+    	{
+    		throw new RuntimeException();
+    	}
+        return ((TXBlockPopulator)this.BlockPopulator.get(0)).getObjectSpawner();
+    }
+    
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
         makeSureWorldIsInitialized(world);
-
         return this.BlockPopulator;
     }
 

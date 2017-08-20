@@ -1,10 +1,12 @@
 package com.khorn.terraincontrol.bukkit.commands;
 
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.bukkit.TCPerm;
 import com.khorn.terraincontrol.bukkit.TXPlugin;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.util.Rotation;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -42,17 +44,22 @@ public class SpawnCommand extends BaseCommand
         CustomObject spawnObject = null;
 
         if (bukkitWorld != null)
-            spawnObject = bukkitWorld.getConfigs().getCustomObjects().parseCustomObject(args.get(0));
+        {
+            //spawnObject = TerrainControl.getCustomObjectManager().getGlobalObjects().parseCustomObject(args.get(0), args.size() > 1 ? args.get(1) : "");
+        	spawnObject = TerrainControl.getCustomObjectManager().getGlobalObjects().getObjectByName(args.get(0), args.size() > 1 ? args.get(1) : "");
+        }
 
         if (spawnObject == null)
         {
-            sender.sendMessage(ERROR_COLOR + "Object not found, use '/otg list' to list the available ones.");
+            sender.sendMessage(ERROR_COLOR + "Object not found.");
             return true;
         }
 
         Block block = this.getWatchedBlock(me, true);
         if (block == null)
+        {
             return true;
+        }
         
         if (spawnObject.spawnForced(bukkitWorld, random, Rotation.NORTH, block.getX(), block.getY(), block.getZ()))
         {

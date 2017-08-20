@@ -1,6 +1,6 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
-import com.khorn.terraincontrol.configuration.ConfigFunction;
+import com.khorn.terraincontrol.configuration.CustomObjectConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 
 import java.io.BufferedReader;
@@ -15,10 +15,6 @@ import java.util.List;
  */
 public class EntityFunction extends BO3Function
 {
-    public EntityFunction(BO3Config holder) {
-		super(holder);
-	}
-
 	public int x;
     public int y;
     public int z;
@@ -29,13 +25,13 @@ public class EntityFunction extends BO3Function
     public String originalNameTagOrNBTFileName = "";
     public String nameTag = "";
     
-    public EntityFunction(BO3Config config, List<String> args) throws InvalidConfigException
+    @Override
+    public void load(List<String> args) throws InvalidConfigException
     {
-    	super(config);
         assureSize(5, args);
         // Those limits are arbitrary, LocalWorld.setBlock will limit it
         // correctly based on what chunks can be accessed
-        x = readInt(args.get(0), -100, 100);
+		x = readInt(args.get(0), -100, 100);
         y = readInt(args.get(1), -1000, 1000);
         z = readInt(args.get(2), -100, 100);
         mobName = args.get(3);
@@ -43,18 +39,17 @@ public class EntityFunction extends BO3Function
         
         if(args.size() > 5)
         {
-    		nameTagOrNBTFileName = args.get(5);
-    		originalNameTagOrNBTFileName = nameTagOrNBTFileName;
+    		originalNameTagOrNBTFileName = args.get(5);
         }
         
-        if(nameTagOrNBTFileName != null && nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt"))
+        if(originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt"))
         {
-        	nameTagOrNBTFileName = getHolder().directory.getAbsolutePath() + File.separator + nameTagOrNBTFileName;
+        	nameTagOrNBTFileName = getHolder().getFile().getParentFile().getAbsolutePath() + File.separator + originalNameTagOrNBTFileName;
         }
     }
 
     @Override
-    public String toString()
+    public String makeString()
     {
         return "Entity(" + x + ',' + y + ',' + z + ',' + mobName + ',' + groupSize + (originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.length() > 0 ? ',' + originalNameTagOrNBTFileName : "") + ')';
     }
@@ -62,12 +57,13 @@ public class EntityFunction extends BO3Function
     @Override
     public EntityFunction rotate()
     {
-    	EntityFunction rotatedBlock = new EntityFunction(getHolder());
+    	EntityFunction rotatedBlock = new EntityFunction();
         rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.mobName = mobName;
         rotatedBlock.groupSize = groupSize;
+        rotatedBlock.originalNameTagOrNBTFileName = originalNameTagOrNBTFileName;
         rotatedBlock.nameTagOrNBTFileName = nameTagOrNBTFileName;
     	
         return rotatedBlock;
@@ -109,13 +105,13 @@ public class EntityFunction extends BO3Function
     }    
 
     @Override
-    public boolean isAnalogousTo(ConfigFunction<BO3Config> other)
+    public boolean isAnalogousTo(CustomObjectConfigFunction<BO3Config> other)
     {
         if(!getClass().equals(other.getClass()))
         {
             return false;
         }
         EntityFunction block = (EntityFunction) other;
-        return block.x == x && block.y == y && block.z == z && block.mobName.equalsIgnoreCase(mobName) && block.groupSize == groupSize && block.nameTagOrNBTFileName == nameTagOrNBTFileName;
+        return block.x == x && block.y == y && block.z == z && block.mobName.equalsIgnoreCase(mobName) && block.groupSize == groupSize && block.originalNameTagOrNBTFileName == originalNameTagOrNBTFileName;
     }
 }

@@ -79,6 +79,9 @@ public final class PluginConfig extends ConfigFile
         this.biomeConfigExtension = reader.getSetting(BiomeStandardValues.BIOME_CONFIG_EXTENSION);
         this.SpawnLog = reader.getSetting(PluginStandardValues.SPAWN_LOG);
         this.PregeneratorMaxChunksPerTick = reader.getSetting(PluginStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK);
+        
+        this.ReplaceUnknownBlockWithMaterial = reader.getSetting(PluginStandardValues.REPLACE_UNKNOWN_BLOCK_WITH_MATERIAL);        
+        this.DeveloperMode = reader.getSetting(PluginStandardValues.DEVELOPER_MODE);
     }
 
     @Override
@@ -123,12 +126,28 @@ public final class PluginConfig extends ConfigFile
                 "Defaults to: .bc");         
         
         writer.putSetting(PluginStandardValues.SPAWN_LOG, this.SpawnLog,
-		        "Shows detailed information about mob and BO3 spawning that is useful for TC world devs.",
+		        "Shows detailed information about BO3 and mob/entity spawning that is useful for OTG world devs. Use higher log levels to see more information (TRACE is the highest).",
 		        "Defaults to: false");
+        
+        writer.smallTitle("Developer mode");
+        writer.putSetting(PluginStandardValues.DEVELOPER_MODE, this.DeveloperMode,
+        		"Clears the BO2/BO3 cache whenever a world or dimension is unloaded (similar to using /otg unloadbo3s and recreating a world).",
+        		"Defaults to: false"
+		);         
 
         writer.putSetting(PluginStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK, this.PregeneratorMaxChunksPerTick,
 		        "The number of chunks the pre-generator is allowed to generate for each server tick.",
-		        "Higher numbers make pre-generation faster but increase memory usage and will cause lag.");       
+		        "Higher numbers make pre-generation faster but increase memory usage and will cause lag.");
+                
+        // TODO: Implement this?
+        /*
+        writer.smallTitle("Replace unknown blocks with material:");
+        
+        writer.putSetting(PluginStandardValues.REPLACE_UNKNOWN_BLOCK_WITH_MATERIAL, this.ReplaceUnknownBlockWithMaterial,
+        		"If a block with an unrecognised block name/id tries to spawn it is replaced with this material.",
+        		"Defaults to: LOG"
+		);
+		*/
     }
 
     public LogLevels getLogLevel()
@@ -136,11 +155,15 @@ public final class PluginConfig extends ConfigFile
         return LogLevel;
     }
 
+    public String ReplaceUnknownBlockWithMaterial = null;
+    
 	/**
 	 * Shows detailed information about mob and BO3 spawning that is useful for TC world devs.
 	 */
 	public boolean SpawnLog = false;    
 
+    public boolean DeveloperMode = false;
+	
 	/**
 	 * Forge only: This is the number of chunks the pre-generator generates each server tick.
 	 * Higher values make pre-generation faster but can cause lag and increased memory usage.

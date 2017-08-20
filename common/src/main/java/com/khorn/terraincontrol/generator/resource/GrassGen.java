@@ -122,8 +122,7 @@ public class GrassGen extends Resource
             LocalMaterialData id;
 
             // Fix y position
-            while (((id = world.getMaterial(centerX, centerY, centerZ)).isAir() || id.isMaterial(DefaultMaterial.LEAVES) || id
-                    .isMaterial(DefaultMaterial.LEAVES_2)) && (centerY > 0))
+            while (((id = world.getMaterial(centerX, centerY, centerZ, false)).isAir() || id.isMaterial(DefaultMaterial.LEAVES) || id.isMaterial(DefaultMaterial.LEAVES_2)) && (centerY > 0))
             {
                 centerY--;
             }
@@ -137,7 +136,7 @@ public class GrassGen extends Resource
                 int x = centerX + random.nextInt(8) - random.nextInt(8);
                 int y = centerY + random.nextInt(4) - random.nextInt(4);
                 int z = centerZ + random.nextInt(8) - random.nextInt(8);
-                if (world.isEmpty(x, y, z) && this.sourceBlocks.contains(world.getMaterial (x, y - 1, z)))
+                if (world.isNullOrAir(x, y, z, false) && this.sourceBlocks.contains(world.getMaterial(x, y - 1, z, false)))
                 {
                     plant.spawn(world, x, y, z);
                 }
@@ -171,11 +170,11 @@ public class GrassGen extends Resource
             int y = world.getHighestBlockYAt(x, z);
 
             LocalMaterialData material;
-            while (((material = world.getMaterial(x, y, z)).isAir() || material.isMaterial(DefaultMaterial.LEAVES) || material
+            while (((material = world.getMaterial(x, y, z, false)).isAir() || material.isMaterial(DefaultMaterial.LEAVES) || material
                     .isMaterial(DefaultMaterial.LEAVES_2)) && (y > 0))
                 y--;
 
-            if ((!world.isEmpty(x, y + 1, z)) || (!sourceBlocks.contains(world.getMaterial(x, y, z))))
+            if ((!world.isNullOrAir(x, y + 1, z, false)) || (!sourceBlocks.contains(world.getMaterial(x, y, z, false))))
                 continue;
             plant.spawn(world, x, y + 1, z);
         }

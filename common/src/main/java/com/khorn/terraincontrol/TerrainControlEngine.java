@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol;
 
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
+import com.khorn.terraincontrol.configuration.CustomObjectConfigFunctionsManager;
 import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.configuration.io.FileSettingsReader;
 import com.khorn.terraincontrol.configuration.io.FileSettingsWriter;
@@ -23,10 +24,19 @@ import java.util.Random;
 
 public abstract class TerrainControlEngine
 {
+	// OTG+
+	
+    public void ReloadCustomObjectFiles()
+    {
+    	this.customObjectManager.ReloadCustomObjectFiles();
+    }
+		    
+    //      	
 
     private BiomeModeManager biomeManagers;
     private List<EventHandler> cancelableEventHandlers = new ArrayList<EventHandler>(5);
     private ConfigFunctionsManager configFunctionsManager;
+    private CustomObjectConfigFunctionsManager customObjectConfigFunctionsManager;
     private CustomObjectManager customObjectManager;
     private List<EventHandler> monitoringEventHandlers = new ArrayList<EventHandler>(5);
     private PluginConfig pluginConfig;
@@ -124,7 +134,7 @@ public abstract class TerrainControlEngine
     public BiomeModeManager getBiomeModeManager()
     {
         return biomeManagers;
-    }
+    }   
 
     /**
      * Returns the Resource manager.
@@ -136,6 +146,18 @@ public abstract class TerrainControlEngine
     {
         return configFunctionsManager;
     }
+    
+    /**
+     * Returns the Resource manager for Custom objects.
+     * <p/>
+     * <p>
+     * @return The Resource manager for Custom objects.
+     */
+    public CustomObjectConfigFunctionsManager getCustomObjectConfigFunctionsManager()
+    {
+        return customObjectConfigFunctionsManager;
+    }
+    
 
     /**
      * Returns the CustomObject manager, with hooks to spawn CustomObjects.
@@ -205,6 +227,7 @@ public abstract class TerrainControlEngine
         // Null out values to help the garbage collector
         customObjectManager = null;
         configFunctionsManager = null;
+        customObjectConfigFunctionsManager = null;
         biomeManagers = null;
         pluginConfig = null;
         cancelableEventHandlers.clear();
@@ -217,6 +240,7 @@ public abstract class TerrainControlEngine
     {
         // Start the engine
         configFunctionsManager = new ConfigFunctionsManager();
+        customObjectConfigFunctionsManager = new CustomObjectConfigFunctionsManager();
         customObjectManager = new CustomObjectManager();
         biomeManagers = new BiomeModeManager();
 
@@ -227,6 +251,22 @@ public abstract class TerrainControlEngine
         FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.SettingsMode);
         logger.setLevel(pluginConfig.getLogLevel().getLevel());
 
+        File globalObjectsDir = new File(getTCDataFolder(), PluginStandardValues.BO_DirectoryName);
+        if(!globalObjectsDir.exists())
+        {
+        	globalObjectsDir.mkdirs();
+        }
+        File globalBiomesDir = new File(getTCDataFolder(), PluginStandardValues.BiomeConfigDirectoryName);
+        if(!globalBiomesDir.exists())
+        {
+        	globalBiomesDir.mkdirs();
+        }
+        File worldsDir = new File(getTCDataFolder(), "worlds");
+        if(!worldsDir.exists())
+        {
+        	worldsDir.mkdirs();
+        }        
+        
         // Fire start event
         for (EventHandler handler : cancelableEventHandlers)
         {
@@ -236,10 +276,6 @@ public abstract class TerrainControlEngine
         {
             handler.onStart();
         }
-
-        // Load global objects after the event has been fired, so that custom
-        // object types are also taken into account
-        customObjectManager.loadGlobalObjects();
     }
 
     /**
@@ -310,5 +346,5 @@ public abstract class TerrainControlEngine
      * @param blockData       The block data.
      * @return The materialData.
      */
-    public abstract LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData);
+    public abstract LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData);    
 }

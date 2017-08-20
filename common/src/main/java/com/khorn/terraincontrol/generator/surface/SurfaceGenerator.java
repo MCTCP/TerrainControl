@@ -1,5 +1,7 @@
 package com.khorn.terraincontrol.generator.surface;
 
+import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.generator.ChunkBuffer;
 import com.khorn.terraincontrol.generator.GeneratingChunk;
@@ -35,5 +37,7 @@ public interface SurfaceGenerator
      * @return The settings as a string.
      */
     String toString();
+
+	LocalMaterialData getCustomBlockData(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld);
 
 }

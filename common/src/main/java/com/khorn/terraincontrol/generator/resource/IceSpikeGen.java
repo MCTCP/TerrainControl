@@ -95,11 +95,11 @@ public class IceSpikeGen extends Resource
     {
         int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
 
-        while ((world.isEmpty(x, y, z)) && (y > 2))
+        while ((world.isNullOrAir(x, y, z, false)) && (y > 2))
         {
             y--;
         }
-        if (!this.sourceBlocks.contains(world.getMaterial(x, y, z)))
+        if (!this.sourceBlocks.contains(world.getMaterial(x, y, z, false)))
         {
             return;
         }
@@ -115,10 +115,10 @@ public class IceSpikeGen extends Resource
                 {
                     for (int deltaY = y - one; deltaY <= y + one; deltaY++)
                     {
-                        LocalMaterialData localBlock = world.getMaterial(actualX, deltaY, actualZ);
+                        LocalMaterialData localBlock = world.getMaterial(actualX, deltaY, actualZ, false);
                         if (this.sourceBlocks.contains(localBlock))
                         {
-                            world.setBlock(actualX, deltaY, actualZ, this.material);
+                            world.setBlock(actualX, deltaY, actualZ, this.material, null, false);
                         }
                     }
                 }
@@ -129,12 +129,12 @@ public class IceSpikeGen extends Resource
     public void spawnSpike(LocalWorld par1World, Random random, int x, int z, boolean hugeSpike)
     {
         int y = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
-        while (par1World.isEmpty(x, y, z) && y > 2)
+        while (par1World.isNullOrAir(x, y, z, false) && y > 2)
         {
             --y;
         }
 
-        if (!sourceBlocks.contains(par1World.getMaterial(x, y, z)))
+        if (!sourceBlocks.contains(par1World.getMaterial(x, y, z, false)))
         {
             return;
         }
@@ -167,20 +167,20 @@ public class IceSpikeGen extends Resource
 
                     if ((var11 == 0 && var13 == 0 || var12 * var12 + var14 * var14 <= var9 * var9) && (var11 != -var10 && var11 != var10 && var13 != -var10 && var13 != var10 || random.nextFloat() <= 0.75F))
                     {
-                        LocalMaterialData sourceBlock = par1World.getMaterial(x + var11, y + var8, z + var13);
+                        LocalMaterialData sourceBlock = par1World.getMaterial(x + var11, y + var8, z + var13, false);
 
                         if (sourceBlock.isAir() || sourceBlocks.contains(sourceBlock))
                         {
-                            par1World.setBlock(x + var11, y + var8, z + var13, this.material);
+                            par1World.setBlock(x + var11, y + var8, z + var13, this.material, null, false);
                         }
 
                         if (var8 != 0 && var10 > 1)
                         {
-                            sourceBlock = par1World.getMaterial(x + var11, y - var8, z + var13);
+                            sourceBlock = par1World.getMaterial(x + var11, y - var8, z + var13, false);
 
                             if (sourceBlock.isAir() || sourceBlocks.contains(sourceBlock))
                             {
-                                par1World.setBlock(x + var11, y - var8, z + var13, this.material);
+                                par1World.setBlock(x + var11, y - var8, z + var13, this.material, null, false);
                             }
                         }
                     }
@@ -216,11 +216,11 @@ public class IceSpikeGen extends Resource
                 {
                     if (var11 > 50)
                     {
-                        LocalMaterialData var18 = par1World.getMaterial(x + var16, var11, z + var10);
+                        LocalMaterialData var18 = par1World.getMaterial(x + var16, var11, z + var10, false);
 
                         if (var18.isAir() || sourceBlocks.contains(var18) || var18.equals(this.material))
                         {
-                            par1World.setBlock(x + var16, var11, z + var10, this.material);
+                            par1World.setBlock(x + var16, var11, z + var10, this.material, null, false);
                             --var11;
                             --var17;
 

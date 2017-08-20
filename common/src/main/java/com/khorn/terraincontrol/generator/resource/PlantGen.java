@@ -88,9 +88,11 @@ public class PlantGen extends Resource
         {
             int j = x + rand.nextInt(8) - rand.nextInt(8);
             int k = y + rand.nextInt(4) - rand.nextInt(4);
-            int m = z + rand.nextInt(8) - rand.nextInt(8);
-            if ((!world.isEmpty(j, k, m)) || (!sourceBlocks.contains(world.getMaterial(j, k - 1, m))))
+            int m = z + rand.nextInt(8) - rand.nextInt(8);            
+            if ((!world.isNullOrAir(j, k, m, false)) || (!sourceBlocks.contains(world.getMaterial(j, k - 1, m, false))))
+            {
                 continue;
+            }
 
             plant.spawn(world, j, k, m);
         }

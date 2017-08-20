@@ -16,6 +16,24 @@ import java.util.Random;
 
 public class CustomObjectGen extends Resource
 {
+	// OTG+
+	
+    public List<CustomObject> getObjects(String worldName)
+    {
+    	if(objects.isEmpty() && !objectNames.isEmpty())
+    	{
+            for (int i = 0; i < objectNames.size(); i ++)
+            {
+                //CustomObject object = TerrainControl.getCustomObjectManager().getGlobalObjects().parseCustomObject(objectNames.get(i), worldName);
+            	CustomObject object = TerrainControl.getCustomObjectManager().getGlobalObjects().getObjectByName(objectNames.get(i), worldName);
+            	objects.add(object);	              	
+            }
+    	}
+    	return objects;
+    }
+	
+	//
+	
     private List<CustomObject> objects;
     private List<String> objectNames;
 
@@ -32,12 +50,6 @@ public class CustomObjectGen extends Resource
         objectNames = new ArrayList<String>();
         for (String arg : args)
         {
-            CustomObject object = getHolder().worldConfig.worldObjects.parseCustomObject(arg);
-            if (object == null || !object.canSpawnAsObject())
-            {
-                throw new InvalidConfigException("No custom object found with the name " + arg);
-            }
-            objects.add(object);
             objectNames.add(arg);
         }
     }
@@ -51,9 +63,12 @@ public class CustomObjectGen extends Resource
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        for (CustomObject object : objects)
+        for (CustomObject object : getObjects(world.getName()))
         {
-            object.process(world, random, chunkCoord);
+        	if(object != null) // if null then BO2/BO3 file could not be found
+        	{
+        		object.process(world, random, chunkCoord);
+        	}
         }
     }
 

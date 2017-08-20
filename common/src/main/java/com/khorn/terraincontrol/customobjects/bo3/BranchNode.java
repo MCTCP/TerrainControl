@@ -1,6 +1,8 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
 
+import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.util.Rotation;
 
@@ -11,6 +13,18 @@ import com.khorn.terraincontrol.util.Rotation;
  */
 public class BranchNode implements Comparable<BranchNode>
 {
+	// TODO: implement proper get / set? 
+	
+	/**
+	 * The max branch depth of the branch given to it by its parent
+	 * Used to make certain branches longer than others
+	 */
+	int branchDepth;
+	
+	/**
+	 * Whether this branch should only spawn at the end of the branch that added it.
+	 */	
+	boolean isRequiredBranch;
 
     /**
      * The rotation of a branch
@@ -24,22 +38,39 @@ public class BranchNode implements Comparable<BranchNode>
      * The branch with associated rotation and chance values
      */
     private CustomObject customObject;
+    public String customObjectName;
 
     /**
      * Creates an instance of BranchNode with given rotation, chance, and branch
      * fields
      * <p/>
      * 
+     * @param branchDepth The max branch depth of the branch. Only the max branch depth of the first branch part is used when spawning a branch structure! 
      * @param rotation The rotation of the branch
      * @param chance The spawn chance of the branch
      * @param branch The branch
      */
-    public BranchNode(Rotation rotation, double chance, CustomObject branch)
+    public BranchNode(int branchDepth, boolean isRequiredBranch, Rotation rotation, double chance, CustomObject customObject, String customObjectName)
+    {
+    	this.branchDepth = branchDepth;
+        this.rotation = rotation;
+        this.chance = chance;
+        
+        this.customObjectName = customObject != null ? customObject.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;
+        this.customObject = customObject;
+        
+        this.isRequiredBranch = isRequiredBranch;
+    }
+    
+    // Non-OTG+
+    public BranchNode(Rotation rotation, double chance, CustomObject branch, String customObjectName)
     {
         this.rotation = rotation;
         this.chance = chance;
         this.customObject = branch;
+        this.customObjectName = branch != null ? branch.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;
     }
+    //
 
     /**
      * @return the spawn chance of the branch
@@ -55,14 +86,22 @@ public class BranchNode implements Comparable<BranchNode>
     public Rotation getRotation()
     {
         return rotation;
-    }
-
+    } 
+        
     /**
      * @return the branch CustomObject
      */
-    public CustomObject getCustomObject()
+    public CustomObject getCustomObject(boolean lazyLoad, LocalWorld world)
     {
-        return customObject;
+    	if(customObject != null || !lazyLoad)
+    	{
+    		return customObject;
+    	}
+    	
+    	customObject = TerrainControl.getCustomObjectManager().getGlobalObjects().getObjectByName(customObjectName, world.getName());
+    	customObjectName = customObject != null ? customObject.getName() : null;
+    	
+		return customObject;
     }
 
     /**
@@ -70,7 +109,7 @@ public class BranchNode implements Comparable<BranchNode>
      */
     public String toBranchString()
     {
-        return ',' + customObject.getName() + ',' + rotation.name() + ',' + chance;
+        return ',' + customObjectName + ',' + rotation.name() + ',' + chance + ',' + branchDepth;
     }
 
     @Override

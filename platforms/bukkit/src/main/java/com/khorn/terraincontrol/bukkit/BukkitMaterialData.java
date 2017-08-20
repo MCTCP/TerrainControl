@@ -250,4 +250,14 @@ public final class BukkitMaterialData implements LocalMaterialData
         return Block.getById(getBlockId()) instanceof BlockFalling;
     }
 
+    // OTG+
+    
+	@Override
+	public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
+	{
+		// TODO: Implement this
+		return false;
+	}
+	
+	//
 }

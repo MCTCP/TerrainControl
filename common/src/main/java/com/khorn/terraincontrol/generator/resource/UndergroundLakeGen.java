@@ -110,10 +110,12 @@ public class UndergroundLakeGen extends Resource
             double verticalSize = (MathHelper.sin(i * 3.141593F / size) + 1.0F) * verticalSizeMultiplier + 1.0D;
 
             for (int xLake = (int) (xAdjusted - horizontalSize / 2.0D); xLake <= (int) (xAdjusted + horizontalSize / 2.0D); xLake++)
+            {
                 for (int yLake = (int) (yAdjusted - verticalSize / 2.0D); yLake <= (int) (yAdjusted + verticalSize / 2.0D); yLake++)
+                {
                     for (int zLake = (int) (zAdjusted - horizontalSize / 2.0D); zLake <= (int) (zAdjusted + horizontalSize / 2.0D); zLake++)
                     {
-                        LocalMaterialData material = world.getMaterial(xLake, yLake, zLake);
+                        LocalMaterialData material = world.getMaterial(xLake, yLake, zLake, false);
                         if (material.isAir() || material.isMaterial(DefaultMaterial.BEDROCK))
                         {
                             // Don't replace air or bedrock
@@ -124,19 +126,21 @@ public class UndergroundLakeGen extends Resource
                         double yBounds = (yLake + 0.5D - yAdjusted) / (verticalSize / 2.0D);
                         double zBounds = (zLake + 0.5D - zAdjusted) / (horizontalSize / 2.0D);
                         if (xBounds * xBounds + yBounds * yBounds + zBounds * zBounds >= 1.0D)
+                        {
                             continue;
-                        LocalMaterialData materialBelow = world.getMaterial(xLake, yLake - 1, zLake);
+                        }
+                        LocalMaterialData materialBelow = world.getMaterial(xLake, yLake - 1, zLake, false);
                         if (materialBelow.isAir())
                         {
                             // Air block, also set position above to air
-                            world.setBlock(xLake, yLake, zLake, materialBelow);
-                        } else
-                        {
+                            world.setBlock(xLake, yLake, zLake, materialBelow, null, false);
+                        } else {
                             // Not air, set position above to water
-                            world.setBlock(xLake, yLake, zLake, material);
+                            world.setBlock(xLake, yLake, zLake, material, null, false);
                         }
                     }
+                }
+            }
         }
     }
-
 }

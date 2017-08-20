@@ -12,8 +12,10 @@ import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.configuration.BiomeConfigFinder.BiomeConfigStub;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
+import com.khorn.terraincontrol.customobjects.bo3.BlockFunction;
 import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
+import com.khorn.terraincontrol.generator.ObjectSpawner;
 import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
@@ -68,7 +70,6 @@ import net.minecraft.server.v1_11_R1.WorldGenGroundBush;
 import net.minecraft.server.v1_11_R1.WorldGenHugeMushroom;
 import net.minecraft.server.v1_11_R1.WorldGenJungleTree;
 import net.minecraft.server.v1_11_R1.WorldGenMegaTree;
-import net.minecraft.server.v1_11_R1.WorldGenStronghold;
 import net.minecraft.server.v1_11_R1.WorldGenSwampTree;
 import net.minecraft.server.v1_11_R1.WorldGenTaiga1;
 import net.minecraft.server.v1_11_R1.WorldGenTaiga2;
@@ -102,6 +103,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_11_R1.generator.CustomChunkGenerator;
 
+import java.io.File;
 import java.util.*;
 
 public class BukkitWorld implements LocalWorld
@@ -158,6 +160,7 @@ public class BukkitWorld implements LocalWorld
     public BukkitWorld(String _name)
     {
         this.name = _name;
+        this.WorldSession = new BukkitWorldSession(this);
     }
     
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
@@ -465,7 +468,7 @@ public class BukkitWorld implements LocalWorld
     {
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            LocalMaterialData material = getMaterial(x, y, z);
+            LocalMaterialData material = getMaterial(x, y, z, false);
             if (material.isLiquid())
             {
                 return y + 1;
@@ -483,7 +486,7 @@ public class BukkitWorld implements LocalWorld
     {
         for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
         {
-            LocalMaterialData material = getMaterial(x, y, z);
+            LocalMaterialData material = getMaterial(x, y, z, false);
             if (material.isSolid())
             {
                 return y + 1;
@@ -493,18 +496,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public boolean isEmpty(int x, int y, int z)
-    {
-        Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null)
-        {
-            return true;
-        }
-        return chunk.a(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
-    }
-
-    @Override
-    public LocalMaterialData getMaterial(int x, int y, int z)
+    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea)
     {
         Chunk chunk = this.getChunk(x, y, z);
         if (chunk == null || y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
@@ -516,7 +508,7 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void setBlock(int x, int y, int z, LocalMaterialData material)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean allowOutsidePopulatingArea)
     {
         /*
          * This method usually breaks on every Minecraft update. Always check
@@ -941,8 +933,7 @@ public class BukkitWorld implements LocalWorld
         return getBiomeById(savedId);
     }
 
-    @Override
-    public void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
+    void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
     {
         // Convert NamedBinaryTag to a native nms tag
         NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
@@ -960,7 +951,7 @@ public class BukkitWorld implements LocalWorld
             tileEntity.a(nmsTag); // tileEntity.load
         } else {
             TerrainControl.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}",
-                    nmsTag.getString("id"), x, y, z, getMaterial(x, y, z));
+                    nmsTag.getString("id"), x, y, z, getMaterial(x, y, z, false));
         }
     }
 
@@ -1660,5 +1651,93 @@ public class BukkitWorld implements LocalWorld
     	BlockPosition spawnPos = world.getSpawn();
     	
     	return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
-    }    
+    }
+
+    // OTG+    
+
+	@Override
+	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+	{
+		// TODO Implement this
+		throw new RuntimeException();
+	}
+
+	@Override
+	public ObjectSpawner getObjectSpawner()
+	{	
+		return this.generator.getObjectSpawner();
+	}
+
+	@Override
+	public boolean IsInsidePregeneratedRegion(ChunkCoordinate chunk, boolean includeBorder)
+	{
+		// TODO Implement this
+		return false;
+	}
+
+	@Override
+	public boolean IsInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources)
+	{
+		// TODO Implement this
+		return true;
+	}
+
+	@Override
+	public BlockFunction[] getBlockColumn(int x, int z)
+	{
+		// TODO Implement this
+		throw new RuntimeException();
+	}
+	
+	BukkitWorldSession WorldSession;
+    @Override
+	public WorldSession GetWorldSession()
+	{
+    	// TODO Implement this properly (for particles)
+		return WorldSession;
+	}
+
+	@Override
+	public String getWorldSettingsName()
+	{
+		// TODO: Make sure this returns the correct name
+		return this.getWorld().getWorldData().getName();
+	}
+
+	@Override
+	public File getWorldSaveDir()
+	{
+		// TODO: Make sure this returns the correct directory
+		return this.getWorld().getDataManager().getDirectory();
+	}
+
+	@Override
+	public int getDimensionId()
+	{
+		return this.getWorld().worldProvider.getDimensionManager().getDimensionID();
+	}
+
+	@Override
+	public void DeleteWorldSessionData()
+	{
+		// TODO Implement this (for spawners and particles)
+		throw new RuntimeException();
+	}
+
+	@Override
+	public boolean isNullOrAir(int x, int y, int z, boolean allowOutsidePopulatingArea)
+	{
+    	if (y >= TerrainControl.WORLD_HEIGHT || y < TerrainControl.WORLD_DEPTH)
+    	{
+        	return true;
+    	}
+    	
+        Chunk chunk = this.getChunk(x, y, z);
+        if (chunk == null)
+        {
+            return true;
+        }
+    	
+        return chunk.a(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
+	}
 }

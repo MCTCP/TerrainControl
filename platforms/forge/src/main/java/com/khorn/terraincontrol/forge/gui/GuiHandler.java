@@ -2,10 +2,9 @@ package com.khorn.terraincontrol.forge.gui;
 
 import java.util.HashMap;
 
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.ForgeEngine;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiCreateWorld;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
@@ -32,14 +31,20 @@ public class GuiHandler implements IGuiHandler
     public static boolean bonusChest = false;;
     public static HashMap<String,WorldConfig> worlds = new HashMap<String, WorldConfig>();
     public static int pageNumber = 0;
-	
+    
+    public static int WorldBorderRadius = 0;
+    public static int PregenerationRadius = 0;   
+    
     public static Class<? extends GuiScreen> lastGuiOpened = null;
     
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void renderGameOverLay(RenderGameOverlayEvent.Post event)
     {
-    	((ForgeEngine)TerrainControl.getEngine()).getPregenerator().ShowInGameUI();
+    	if(Minecraft.getMinecraft().isIntegratedServerRunning())
+    	{
+    		PregeneratorUI.ShowInGameUI();
+    	}
     }
     
     @SideOnly(Side.CLIENT)

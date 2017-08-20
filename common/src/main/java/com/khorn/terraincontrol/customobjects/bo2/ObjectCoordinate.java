@@ -72,7 +72,9 @@ public class ObjectCoordinate
     {
         String[] coordinates = key.split(",", 3);
         if (coordinates.length != 3)
+        {
             return null;
+        }
 
         try
         {
@@ -98,18 +100,16 @@ public class ObjectCoordinate
 
             return newCoordinate;
 
-        } catch (NumberFormatException e)
+        }
+        catch (NumberFormatException e)
         {
             return null;
 
-        } catch (InvalidConfigException e)
+        }
+        catch (InvalidConfigException e)
         {
             return null;
             
         }
-
-
     }
-
-
 }

@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol;
 
 import com.khorn.terraincontrol.configuration.ConfigFunctionsManager;
+import com.khorn.terraincontrol.configuration.CustomObjectConfigFunctionsManager;
 import com.khorn.terraincontrol.configuration.PluginConfig;
 import com.khorn.terraincontrol.customobjects.CustomObject;
 import com.khorn.terraincontrol.customobjects.CustomObjectManager;
@@ -16,11 +17,12 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 public class TerrainControl
-{	
+{
 	// TODO: This shouldn't be needed ideally
 	public static boolean isForge = false;
 	
@@ -104,6 +106,16 @@ public class TerrainControl
     }
 
     /**
+     * Returns the Resource manager.
+     * <p>
+     * @return The Resource manager.
+     */
+    public static CustomObjectConfigFunctionsManager getCustomObjectConfigFunctionsManager()
+    {
+        return engine.getCustomObjectConfigFunctionsManager();
+    }    
+    
+    /**
      * Returns the CustomObject manager, with hooks to spawn CustomObjects.
      * <p>
      * @return The CustomObject manager.
@@ -121,13 +133,26 @@ public class TerrainControl
     public static TerrainControlEngine getEngine()
     {
         return engine;
-    }
-
+    }   
+    
+    static HashMap<String, LocalMaterialData> cachedMaterials = new HashMap<String, LocalMaterialData>();
+    
     /**
      * @see TerrainControlEngine#readMaterial(String)
      */
     public static LocalMaterialData readMaterial(String name) throws InvalidConfigException
-    {
+    {    	
+    	// TODO: Make sure it won't cause problems to return the same material object multiple times, is it not changed anywhere?
+    	LocalMaterialData material = cachedMaterials.get(name);
+    	if(material != null)
+    	{
+    		return material;
+    	}
+    	else if(cachedMaterials.containsKey(material))
+    	{
+    		throw new InvalidConfigException("Cannot read block: " + name);
+    	}
+    	
     	// Spigot interprets snow as SNOW_LAYER and that's how TC has always seen it too so keep it that way (even though minecraft:snow is actually a snow block).
     	if(name.toLowerCase().equals("snow"))
     	{
@@ -144,7 +169,19 @@ public class TerrainControl
     		name = "FLOWING_LAVA";
     	}
     	
-        return engine.readMaterial(name);
+    	try
+    	{
+    		material = engine.readMaterial(name);
+    	}
+    	catch(InvalidConfigException ex)
+    	{
+    		cachedMaterials.put(name, null);
+    		throw ex;
+    	}
+    	
+    	cachedMaterials.put(name, material);    	
+    	
+        return material;
     }
 
     /**

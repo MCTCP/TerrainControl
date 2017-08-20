@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.configuration.standard;
 
+import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.BiomeConfig.MineshaftType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.BiomeConfig.VillageType;
@@ -42,10 +43,10 @@ public class MinecraftBiomeTemplates
             // Remove default mobs for vanilla biomes, these will be inherited
             // TODO: Check if this breaks Bukkit mob spawning
             
-            this.defaultCreatures = new ArrayList();
-            this.defaultMonsters = new ArrayList();
-            this.defaultWaterCreatures = new ArrayList();
-            this.defaultAmbientCreatures = new ArrayList();
+            this.defaultCreatures = new ArrayList<WeightedMobSpawnGroup>();
+            this.defaultMonsters = new ArrayList<WeightedMobSpawnGroup>();
+            this.defaultWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
+            this.defaultAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
             
             //this.defaultMonsters = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.MONSTER);
             //this.defaultCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.CREATURE);

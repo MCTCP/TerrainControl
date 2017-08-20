@@ -12,8 +12,6 @@ import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
-import com.khorn.terraincontrol.customobjects.CustomObjectLoader;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.FileHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
@@ -38,11 +36,9 @@ import java.util.Map.Entry;
  */
 public final class ServerConfigProvider implements ConfigProvider
 {
-
     private static final int MAX_INHERITANCE_DEPTH = 15;
     private LocalWorld world;
     private File settingsDir;
-    private CustomObjectCollection customObjects;
     private WorldConfig worldConfig;
 
     /**
@@ -69,18 +65,7 @@ public final class ServerConfigProvider implements ConfigProvider
         this.world = world;
         this.biomes = new LocalBiome[world.getMaxBiomesCount()];
         
-        loadSettings(false);
-    }
-
-    public ServerConfigProvider(File settingsDir, LocalWorld world, CustomObjectCollection customObjects)
-    {
-        this.settingsDir = settingsDir;
-        this.world = world;
-        this.biomes = new LocalBiome[world.getMaxBiomesCount()];
-        
-        this.customObjects = customObjects;
-        
-        loadSettings(true);    
+        loadSettings();
     }
     
     /**
@@ -88,54 +73,21 @@ public final class ServerConfigProvider implements ConfigProvider
      * nulls), the savedBiomes collection to be empty and the biomesCount
      * field to be zero.
      */
-    private void loadSettings(boolean loadCustomObjects)
+    private void loadSettings()
     {
-    	if(loadCustomObjects)
-    	{	    	
-	        SettingsMap worldConfigSettings = loadWorldConfig();
-	        loadBiomes(worldConfigSettings);
-	
-	        // We have to wait for the loading in order to get things like
-	        // temperature
-	        worldConfig.biomeGroupManager.processBiomeData(world);
-    	} else {    		
-	        loadCustomObjects();
-	
-	        SettingsMap worldConfigSettings = loadWorldConfig();
-	        loadBiomes(worldConfigSettings);
-	
-	        // We have to wait for the loading in order to get things like
-	        // temperature
-	        worldConfig.biomeGroupManager.processBiomeData(world);
-    	}
-    }
+        SettingsMap worldConfigSettings = loadWorldConfig();
+        loadBiomes(worldConfigSettings);
 
-    private void loadCustomObjects()
-    {
-        File worldObjectsDir = new File(settingsDir, WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
-
-        // Migrate folders
-        File oldWorldObjectsDir = new File(settingsDir, "BOBPlugins");
-        if (!FileHelper.migrateFolder(oldWorldObjectsDir, worldObjectsDir))
-        {
-            TerrainControl.log(LogMarker.WARN, "Failed to move old world"
-                    + " custom objects from {} to {} in world {}."
-                    + " Please move the old objects manually.",
-                    oldWorldObjectsDir.getName(), worldObjectsDir.getName(), world.getName());
-        }
-
-        Map<String, CustomObjectLoader> objectLoaders = TerrainControl.getCustomObjectManager().getObjectLoaders();
-
-        customObjects = new CustomObjectCollection(objectLoaders, worldObjectsDir);
-        customObjects.setFallback(TerrainControl.getCustomObjectManager().getGlobalObjects());
-        TerrainControl.log(LogMarker.INFO, "{} world custom objects loaded.", customObjects.getAll().size());
+        // We have to wait for the loading in order to get things like
+        // temperature
+        worldConfig.biomeGroupManager.processBiomeData(world);
     }
 
     private SettingsMap loadWorldConfig()
     {
         File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
         SettingsMap settingsMap = FileSettingsReader.read(world.getName(), worldConfigFile);
-        this.worldConfig = new WorldConfig(settingsDir, settingsMap, world, customObjects);
+        this.worldConfig = new WorldConfig(settingsDir, settingsMap, world);
         FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.SettingsMode);
 
         return settingsMap;
@@ -169,8 +121,7 @@ public final class ServerConfigProvider implements ConfigProvider
         {
             String biomeName = entry.getKey();
             int generationId = entry.getValue();
-            biomesToLoad.add(new BiomeLoadInstruction(biomeName, generationId, new StandardBiomeTemplate(
-                    worldConfig.worldHeightScale)));
+            biomesToLoad.add(new BiomeLoadInstruction(biomeName, generationId, new StandardBiomeTemplate(worldConfig.worldHeightScale)));
         }
 
         // Load all files
@@ -211,7 +162,7 @@ public final class ServerConfigProvider implements ConfigProvider
         this.biomesCount = 0;
 
         // Load again
-        loadSettings(true);
+        loadSettings();
     }
 
     private Map<String, BiomeConfig> readAndWriteSettings(SettingsMap worldConfigSettings, Map<String, BiomeConfigStub> biomeConfigStubs)
@@ -498,11 +449,4 @@ public final class ServerConfigProvider implements ConfigProvider
     {
         return this.biomes;
     }
-
-    @Override
-    public CustomObjectCollection getCustomObjects()
-    {
-        return customObjects;
-    }
-
 }

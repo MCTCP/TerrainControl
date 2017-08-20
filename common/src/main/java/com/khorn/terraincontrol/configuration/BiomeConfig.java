@@ -11,7 +11,6 @@ import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObject;
-import com.khorn.terraincontrol.customobjects.UseBiome;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
 import com.khorn.terraincontrol.generator.resource.*;
 import com.khorn.terraincontrol.generator.surface.SimpleSurfaceGenerator;
@@ -393,8 +392,7 @@ public class BiomeConfig extends ConfigFile
                 {
                     SaplingGen sapling = (SaplingGen) res;
                     this.saplingGrowers.put(sapling.saplingType, sapling);
-                } else
-                {
+                } else {
                     this.resourceSequence.add(res);
                 }
             }
@@ -403,19 +401,13 @@ public class BiomeConfig extends ConfigFile
 
     private void readCustomObjectSettings(SettingsMap settings)
     {
-        biomeObjects = new ArrayList<CustomObject>();
         biomeObjectStrings = new ArrayList<String>();
 
         // Read from BiomeObjects setting
         List<String> customObjectStrings = settings.getSetting(BiomeStandardValues.BIOME_OBJECTS);
         for (String customObjectString : customObjectStrings)
         {
-            CustomObject object = worldConfig.worldObjects.parseCustomObject(customObjectString);
-            if (object != null && !(object instanceof UseBiome))
-            {
-                biomeObjects.add(object);
-                biomeObjectStrings.add(customObjectString);
-            }
+            biomeObjectStrings.add(customObjectString);
         }
     }
 
@@ -987,11 +979,11 @@ public class BiomeConfig extends ConfigFile
                     if (start != -1 && end != -1)
                     {   // Found height settings
                         String[] ranges = rest.substring(start + 1, end).split("-");
-                        to = TerrainControl.readMaterial(rest.substring(0, start));
+                        to = TerrainControl.readMaterial(rest.substring(0, start));                     
                         minHeight = StringHelper.readInt(ranges[0], minHeight, maxHeight);
                         maxHeight = StringHelper.readInt(ranges[1], minHeight, maxHeight);
-                    } else
-                    {   // No height settings
+                    } else {
+                    	// No height settings
                         to = TerrainControl.readMaterial(rest);
                     }
 

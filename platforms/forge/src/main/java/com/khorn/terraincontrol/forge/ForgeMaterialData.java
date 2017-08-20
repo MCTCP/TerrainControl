@@ -10,37 +10,85 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
  * 
  */
 public class ForgeMaterialData implements LocalMaterialData
-{
-
+{	
+	// OTG+
+	
+    @Override
+    public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
+    {    	
+    	return 
+			getName().toLowerCase().equals("ice") ||
+			getName().toLowerCase().equals("packed_ice") ||
+			(isSolid() || (!ignoreWater && isLiquid())) && 
+			(allowWood || !getName().toLowerCase().startsWith("log")) &&
+			!getName().toLowerCase().contains("lily");    	
+    }
+	
+	//	
+	
     public static ForgeMaterialData ofString(String input) throws InvalidConfigException
     {
         // Try parsing as an internal Minecraft name
         // This is so that things like "minecraft:stone" aren't parsed
         // as the block "minecraft" with data "stone", but instead as the
         // block "minecraft:stone" with no block data.
-        net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(input);
+    	
+    	// Used in BO3's as placeholder/detector block.
+    	if(input.toLowerCase().equals("blank"))
+    	{
+    		return ForgeMaterialData.ofDefaultMaterial(DefaultMaterial.UNKNOWN_BLOCK, 0);
+    	}
+    	
+    	String newInput = input;
+   	
+        net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(newInput);
         if (block != null)
         {
-            return ForgeMaterialData.ofMinecraftBlock(block);
+        	// Some old apps exported schematics/bo3's exported "STAIRS" without metadata (for instance "STAIRS:0").
+        	// However, the default rotation has changed so fix this by adding the correct metadata.
+        	
+        	if(    			
+    			block == Blocks.PORTAL ||
+				block == Blocks.DISPENSER ||
+    			block == Blocks.ACACIA_STAIRS ||
+        		block == Blocks.BIRCH_STAIRS ||
+        		block == Blocks.BRICK_STAIRS ||
+        		block == Blocks.DARK_OAK_STAIRS ||
+        		block == Blocks.JUNGLE_STAIRS ||
+        		block == Blocks.NETHER_BRICK_STAIRS ||
+        		block == Blocks.OAK_STAIRS ||
+        		block == Blocks.PURPUR_STAIRS ||
+        		block == Blocks.QUARTZ_STAIRS ||
+        		block == Blocks.RED_SANDSTONE_STAIRS ||
+        		block == Blocks.SANDSTONE_STAIRS ||
+        		block == Blocks.SPRUCE_STAIRS ||
+        		block == Blocks.STONE_BRICK_STAIRS ||
+        		block == Blocks.STONE_STAIRS
+    		)
+        	{
+        		newInput = input + ":0"; // TODO: Shouldn't this be 3? This appears to fix the problem for the dungeon dimension but I still see it in BB, double check? 
+        	} else {        	
+	            return ForgeMaterialData.ofMinecraftBlock(block);
+        	}
         }
-        
+
         try
         {
             // Try block(:data) syntax
-            return getMaterial0(input);
+            return getMaterial0(newInput);
         } catch (NumberFormatException e)
         {
             throw new InvalidConfigException("Unknown material: " + input);
         }
     }
 
-    @SuppressWarnings("deprecation")
     private static ForgeMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
     {
         String blockName = input;
@@ -66,6 +114,34 @@ public class ForgeMaterialData implements LocalMaterialData
             if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
             {
                 block = Block.getBlockById(defaultMaterial.id);
+                
+            	// Some old apps exported schematics/bo3's exported "STAIRS" without metadata (for instance "STAIRS:0").
+            	// However, the default rotation has changed so fix this by adding the correct metadata.
+            	
+            	if( 
+        			blockData == -1 &&
+        			(
+    					block == Blocks.PORTAL ||
+    					block == Blocks.DISPENSER ||
+	        			block == Blocks.ACACIA_STAIRS ||
+	            		block == Blocks.BIRCH_STAIRS ||
+	            		block == Blocks.BRICK_STAIRS ||
+	            		block == Blocks.DARK_OAK_STAIRS ||
+	            		block == Blocks.JUNGLE_STAIRS ||
+	            		block == Blocks.NETHER_BRICK_STAIRS ||
+	            		block == Blocks.OAK_STAIRS ||
+	            		block == Blocks.PURPUR_STAIRS ||
+	            		block == Blocks.QUARTZ_STAIRS ||
+	            		block == Blocks.RED_SANDSTONE_STAIRS ||
+	            		block == Blocks.SANDSTONE_STAIRS ||
+	            		block == Blocks.SPRUCE_STAIRS ||
+	            		block == Blocks.STONE_BRICK_STAIRS ||
+	            		block == Blocks.STONE_STAIRS
+            		)
+        		)
+            	{
+            		blockData = 0; // TODO: Shouldn't this be 3? This appears to fix the problem for the dungeon dimension but I still see it in BB, double check?
+            	}
             }
         }
 
@@ -76,15 +152,15 @@ public class ForgeMaterialData implements LocalMaterialData
             {
                 // Use default
                 return ForgeMaterialData.ofMinecraftBlock(block);
-            } else
-            {
+            } else {
                 // Use specified data
                 try
                 {
                     return ForgeMaterialData.ofMinecraftBlockState(block.getStateFromMeta(blockData));
-                } catch (IllegalArgumentException e)
-                {
-                    throw new InvalidConfigException("Illegal block data for the block type, cannot use " + input);
+                }
+                catch (IllegalArgumentException e)
+                {   
+                	throw new InvalidConfigException("Illegal block data for the block type, cannot use " + input);
                 }
             }
         }
@@ -125,7 +201,7 @@ public class ForgeMaterialData implements LocalMaterialData
      * @return The {@code BukkitMateialData} instance.
      */
     static ForgeMaterialData ofMinecraftBlock(Block block)
-    {
+    {   	    	
         return ofMinecraftBlockState(block.getDefaultState());
     }
 
@@ -143,7 +219,7 @@ public class ForgeMaterialData implements LocalMaterialData
 
     private ForgeMaterialData(IBlockState blockData)
     {
-        this.blockData = blockData;        
+        this.blockData = blockData;
     }
 
     @Override

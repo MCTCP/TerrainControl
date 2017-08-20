@@ -31,9 +31,9 @@ public class AboveWaterGen extends Resource
             int j = x + rand.nextInt(8) - rand.nextInt(8);
             int k = y + rand.nextInt(4) - rand.nextInt(4);
             int m = z + rand.nextInt(8) - rand.nextInt(8);
-            if (!world.isEmpty(j, k, m) || !world.getMaterial(j, k - 1, m).isLiquid())
+            if (!world.isNullOrAir(j, k, m, false) || !world.getMaterial(j, k - 1, m, false).isLiquid())
                 continue;
-            world.setBlock(j, k, m, material);
+            world.setBlock(j, k, m, material, null, false);
         }
     }
 

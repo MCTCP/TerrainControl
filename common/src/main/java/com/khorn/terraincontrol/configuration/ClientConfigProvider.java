@@ -3,13 +3,11 @@ package com.khorn.terraincontrol.configuration;
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
-import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.io.SettingsMap;
 import com.khorn.terraincontrol.configuration.io.SimpleSettingsMap;
 import com.khorn.terraincontrol.configuration.standard.BiomeStandardValues;
 import com.khorn.terraincontrol.configuration.standard.StandardBiomeTemplate;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
-import com.khorn.terraincontrol.customobjects.CustomObjectCollection;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -23,7 +21,6 @@ import java.io.IOException;
  */
 public final class ClientConfigProvider implements ConfigProvider
 {
-    private CustomObjectCollection customObjects;
     private WorldConfig worldConfig;
 
     /**
@@ -36,12 +33,6 @@ public final class ClientConfigProvider implements ConfigProvider
 
     public ClientConfigProvider(DataInputStream stream, LocalWorld world, boolean isSinglePlayer) throws IOException
     {
-        // We need a valid CustomObjects object with things like the trees in
-        // it, so that the configs can load without errors
-        // An empty CustomObjects instance with the global objects as fallback
-        // would work just as well
-        this.customObjects = TerrainControl.getCustomObjectManager().getGlobalObjects();
-
         // Create WorldConfig
         SettingsMap worldSettingsReader = new SimpleSettingsMap(world.getName(), false);
         worldSettingsReader.putSetting(WorldStandardValues.WORLD_FOG, stream.readInt());
@@ -115,7 +106,7 @@ public final class ClientConfigProvider implements ConfigProvider
         
         worldSettingsReader.putSetting(WorldStandardValues.canDropChunk, stream.readBoolean()); // true; // // Determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.                
         
-        worldConfig = new WorldConfig(new File("."), worldSettingsReader, world, customObjects);
+        worldConfig = new WorldConfig(new File("."), worldSettingsReader, world);
 
         // Custom biomes + ids
         int count = stream.readInt();
@@ -185,11 +176,4 @@ public final class ClientConfigProvider implements ConfigProvider
     {
         return this.biomes;
     }
-
-    @Override
-    public CustomObjectCollection getCustomObjects()
-    {
-        return this.customObjects;
-    }
-
 }

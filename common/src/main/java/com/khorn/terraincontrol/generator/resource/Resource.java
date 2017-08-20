@@ -143,8 +143,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
     public final void process(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         // Fire event
-        if (!TerrainControl.fireResourceProcessEvent(this, world,
-                random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ()))
+        if (!TerrainControl.fireResourceProcessEvent(this, world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ()))
         {
             return;
         }
@@ -188,11 +187,12 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
         for (int t = 0; t < frequency; t++)
         {
             if (random.nextDouble() * 100.0 > rarity)
+            {
                 continue;
+            }
             int x = chunkX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
             spawn(world, random, false, x, z);
         }
     }
-
 }

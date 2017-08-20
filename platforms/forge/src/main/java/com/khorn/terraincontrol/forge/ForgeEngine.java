@@ -11,7 +11,6 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
-import com.khorn.terraincontrol.forge.generator.Pregenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
@@ -19,15 +18,32 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-
 import net.minecraftforge.common.DimensionManager;
 
 public class ForgeEngine extends TerrainControlEngine
 {
-	public int WorldBorderRadius;
+	// OTG+
 	
-	protected Pregenerator pregenerator;
-
+    public void onSave(World world)
+    {
+    	//TerrainControl.log(LogMarker.INFO, "ForgeEngine onSave");    	
+    	ForgeWorld forgeWorld = (ForgeWorld) getWorld(world);
+    	if(forgeWorld != null && forgeWorld.getObjectSpawner().saveRequired && !forgeWorld.GetWorldSession().getPreGeneratorIsRunning())
+    	{
+    		forgeWorld.getStructureCache().SaveToDisk();
+    	}
+    }
+    
+    public void ProcessPregeneratorTick()
+    {
+    	for(LocalWorld world : getAllWorlds())
+    	{
+    		((ForgeWorldSession)world.GetWorldSession()).getPregenerator().ProcessTick();
+    	}
+    }
+    
+	//
+    
 	protected WorldLoader worldLoader;
 
     protected Map<ResourceLocation, Biome> biomeMap;
@@ -36,7 +52,6 @@ public class ForgeEngine extends TerrainControlEngine
     {
         super(new ForgeLogger());
         this.worldLoader = worldLoader;
-        pregenerator = new Pregenerator();
     }
 
     // Used to bypass Forge's API in order to properly register a virtual biome
@@ -99,13 +114,8 @@ public class ForgeEngine extends TerrainControlEngine
     public WorldLoader getWorldLoader()
     {
     	return worldLoader;
-    }
+    }   
     
-    public Pregenerator getPregenerator()
-    {
-    	return pregenerator;
-    }
-
     public boolean getCartographerEnabled()
     {   	
     	ForgeWorld world = getOverWorld(); // If overworld is null then the overworld is not an OTG world

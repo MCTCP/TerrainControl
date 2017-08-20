@@ -79,7 +79,7 @@ public class MaterialSet
         }
 
         LocalMaterialData material = TerrainControl.readMaterial(input);
-
+        
         boolean checkIncludesBlockData = StringHelper.specifiesBlockData(input);
 
         // Add to set

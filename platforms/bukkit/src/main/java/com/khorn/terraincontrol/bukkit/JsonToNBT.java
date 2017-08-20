@@ -45,7 +45,7 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
     {
         int i = 0;
         boolean flag = false;
-        Stack<Character> stack = new Stack();
+        Stack<Character> stack = new Stack<Character>();
 
         for (int j = 0; j < str.length(); ++j)
         {
@@ -219,7 +219,7 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
 
     private static String locateValueAt(String str, int index) throws NBTException
     {
-        Stack<Character> stack = new Stack();
+        Stack<Character> stack = new Stack<Character>();
         int i = index + 1;
         boolean flag = false;
         boolean flag1 = false;

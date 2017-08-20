@@ -38,18 +38,18 @@ class MaterialSetSetting extends Setting<MaterialSet>
     @Override
     public MaterialSet getDefaultValue()
     {
-        try
-        {
-            MaterialSet blocks = new MaterialSet();
-            for (String blockName : defaultValues)
-            {
-                blocks.parseAndAdd(blockName);
-            }
-            return blocks;
+    	try
+    	{
+	        MaterialSet blocks = new MaterialSet();
+	        for (String blockName : defaultValues)
+	        {
+	            blocks.parseAndAdd(blockName);
+	        }
+	        return blocks;
         } catch (InvalidConfigException e)
         {
             throw new AssertionError(e);
-        }
+        }        
     }
 
     @Override

@@ -45,29 +45,29 @@ public class CactusGen extends Resource
             int cactusZ = z + rand.nextInt(8) - rand.nextInt(8);
 
             // Check position
-            if (!world.isEmpty(cactusX, cactusBaseY, cactusZ))
+            if (!world.isNullOrAir(cactusX, cactusBaseY, cactusZ, false))
                 continue;
 
             // Check foundation
-            LocalMaterialData foundationMaterial = world.getMaterial(cactusX, cactusBaseY - 1, cactusZ);
+            LocalMaterialData foundationMaterial = world.getMaterial(cactusX, cactusBaseY - 1, cactusZ, false);
             if (!sourceBlocks.contains(foundationMaterial))
                 continue;
 
             // Check neighbors
-            if (!world.isEmpty(cactusX - 1, cactusBaseY, cactusZ))
+            if (!world.isNullOrAir(cactusX - 1, cactusBaseY, cactusZ, false))
                 continue;
-            if (!world.isEmpty(cactusX + 1, cactusBaseY, cactusZ))
+            if (!world.isNullOrAir(cactusX + 1, cactusBaseY, cactusZ, false))
                 continue;
-            if (!world.isEmpty(cactusX, cactusBaseY, cactusZ + 1))
+            if (!world.isNullOrAir(cactusX, cactusBaseY, cactusZ + 1, false))
                 continue;
-            if (!world.isEmpty(cactusX, cactusBaseY, cactusZ + 1))
+            if (!world.isNullOrAir(cactusX, cactusBaseY, cactusZ + 1, false))
                 continue;
 
             // Spawn cactus
             int cactusHeight = 1 + rand.nextInt(rand.nextInt(3) + 1);
             for (int dY = 0; dY < cactusHeight; dY++)
             {
-                world.setBlock(cactusX, cactusBaseY + dY, cactusZ, material);
+                world.setBlock(cactusX, cactusBaseY + dY, cactusZ, material, null, false);
             }
         }
     }

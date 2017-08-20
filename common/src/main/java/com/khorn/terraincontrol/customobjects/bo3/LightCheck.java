@@ -20,22 +20,6 @@ public class LightCheck extends BO3Check
      */
     public int maxLightLevel;
 
-    public LightCheck(BO3Config config, List<String> args) throws InvalidConfigException
-    {
-        super(config);
-        assureSize(5, args);
-        x = readInt(args.get(0), -100, 100);
-        y = readInt(args.get(1), -100, 100);
-        z = readInt(args.get(2), -100, 100);
-        minLightLevel = readInt(args.get(3), 0, 16);
-        maxLightLevel = readInt(args.get(4), minLightLevel, 16);
-    }
-
-    private LightCheck(BO3Config config)
-    {
-        super(config);
-    }
-
     @Override
     public boolean preventsSpawn(LocalWorld world, int x, int y, int z)
     {
@@ -50,7 +34,18 @@ public class LightCheck extends BO3Check
     }
 
     @Override
-    public String toString()
+    public void load(List<String> args) throws InvalidConfigException
+    {
+        assureSize(5, args);
+		x = readInt(args.get(0), -100, 100);
+        y = readInt(args.get(1), -100, 100);
+        z = readInt(args.get(2), -100, 100);
+        minLightLevel = readInt(args.get(3), 0, 16);
+        maxLightLevel = readInt(args.get(4), minLightLevel, 16);			
+    }
+
+    @Override
+    public String makeString()
     {
         return "LightCheck(" + x + ',' + y + ',' + z + ',' + minLightLevel + ',' + maxLightLevel + ')';
     }
@@ -58,7 +53,7 @@ public class LightCheck extends BO3Check
     @Override
     public BO3Check rotate()
     {
-        LightCheck rotatedCheck = new LightCheck(getHolder());
+        LightCheck rotatedCheck = new LightCheck();
         rotatedCheck.x = z;
         rotatedCheck.y = y;
         rotatedCheck.z = -x;

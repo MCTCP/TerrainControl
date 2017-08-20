@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.configuration.settingType;
 
 import com.khorn.terraincontrol.LocalMaterialData;
+import com.khorn.terraincontrol.configuration.ReplaceBlocks;
 import com.khorn.terraincontrol.configuration.ReplacedBlocksMatrix;
 import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.generator.surface.SurfaceGenerator;
@@ -19,6 +20,15 @@ import java.util.List;
  */
 public abstract class Settings
 {
+	// OTG+
+	
+    protected static final Setting<List<ReplaceBlocks>> replaceBlocksListSetting(String name)
+    {
+        return new ReplaceBlocksListSetting(name);
+    }    
+	
+	//	
+	
     /**
      * Creates a setting that can be {@code true} or {@code false}.
      * @param name         Name of the setting.

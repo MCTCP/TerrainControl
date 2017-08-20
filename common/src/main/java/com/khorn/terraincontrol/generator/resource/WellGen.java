@@ -87,12 +87,12 @@ public class WellGen extends Resource
     {
         int y = random.nextInt(maxAltitude - minAltitude) + minAltitude;
 
-        while (world.isEmpty(x, y, z) && y > minAltitude)
+        while (world.isNullOrAir(x, y, z, false) && y > minAltitude)
         {
             --y;
         }
 
-        LocalMaterialData sourceBlock = world.getMaterial(x, y, z);
+        LocalMaterialData sourceBlock = world.getMaterial(x, y, z, false);
 
         if (!sourceBlocks.contains(sourceBlock))
         {
@@ -105,7 +105,7 @@ public class WellGen extends Resource
         {
             for (j = -2; j <= 2; ++j)
             {
-                if (world.isEmpty(x + i, y - 1, z + j) && world.isEmpty(x + i, y - 2, z + j))
+                if (world.isNullOrAir(x + i, y - 1, z + j, false) && world.isNullOrAir(x + i, y - 2, z + j, false))
                 {
                     return;
                 }
@@ -118,16 +118,16 @@ public class WellGen extends Resource
             {
                 for (int var9 = -2; var9 <= 2; ++var9)
                 {
-                    world.setBlock(x + j, y + i, z + var9, material);
+                    world.setBlock(x + j, y + i, z + var9, material, null, false);
                 }
             }
         }
 
-        world.setBlock(x, y, z, water);
-        world.setBlock(x - 1, y, z, water);
-        world.setBlock(x + 1, y, z, water);
-        world.setBlock(x, y, z - 1, water);
-        world.setBlock(x, y, z + 1, water);
+        world.setBlock(x, y, z, water, null, false);
+        world.setBlock(x - 1, y, z, water, null, false);
+        world.setBlock(x + 1, y, z, water, null, false);
+        world.setBlock(x, y, z - 1, water, null, false);
+        world.setBlock(x, y, z + 1, water, null, false);
 
         for (i = -2; i <= 2; ++i)
         {
@@ -135,15 +135,15 @@ public class WellGen extends Resource
             {
                 if (i == -2 || i == 2 || j == -2 || j == 2)
                 {
-                    world.setBlock(x + i, y + 1, z + j, material);
+                    world.setBlock(x + i, y + 1, z + j, material, null, false);
                 }
             }
         }
 
-        world.setBlock(x + 2, y + 1, z, slab);
-        world.setBlock(x - 2, y + 1, z, slab);
-        world.setBlock(x, y + 1, z + 2, slab);
-        world.setBlock(x, y + 1, z - 2, slab);
+        world.setBlock(x + 2, y + 1, z, slab, null, false);
+        world.setBlock(x - 2, y + 1, z, slab, null, false);
+        world.setBlock(x, y + 1, z + 2, slab, null, false);
+        world.setBlock(x, y + 1, z - 2, slab, null, false);
 
         for (i = -1; i <= 1; ++i)
         {
@@ -151,20 +151,20 @@ public class WellGen extends Resource
             {
                 if (i == 0 && j == 0)
                 {
-                    world.setBlock(x + i, y + 4, z + j, material);
+                    world.setBlock(x + i, y + 4, z + j, material, null, false);
                 } else
                 {
-                    world.setBlock(x + i, y + 4, z + j, slab);
+                    world.setBlock(x + i, y + 4, z + j, slab, null, false);
                 }
             }
         }
 
         for (i = 1; i <= 3; ++i)
         {
-            world.setBlock(x - 1, y + i, z - 1, material);
-            world.setBlock(x - 1, y + i, z + 1, material);
-            world.setBlock(x + 1, y + i, z - 1, material);
-            world.setBlock(x + 1, y + i, z + 1, material);
+            world.setBlock(x - 1, y + i, z - 1, material, null, false);
+            world.setBlock(x - 1, y + i, z + 1, material, null, false);
+            world.setBlock(x + 1, y + i, z - 1, material, null, false);
+            world.setBlock(x + 1, y + i, z + 1, material, null, false);
         }
     }
 

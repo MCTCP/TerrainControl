@@ -78,40 +78,40 @@ public class LiquidGen extends Resource
     {
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
-        if (!sourceBlocks.contains(world.getMaterial(x, y + 1, z)))
+        if (!sourceBlocks.contains(world.getMaterial(x, y + 1, z, false)))
             return;
-        if (!sourceBlocks.contains(world.getMaterial(x, y - 1, z)))
+        if (!sourceBlocks.contains(world.getMaterial(x, y - 1, z, false)))
             return;
 
-        if (!world.isEmpty(x, y, z) && (!sourceBlocks.contains(world.getMaterial(x, y, z))))
+        if (!world.isNullOrAir(x, y, z, false) && (!sourceBlocks.contains(world.getMaterial(x, y, z, false))))
             return;
 
         int i = 0;
         int j = 0;
 
-        LocalMaterialData tempBlock = world.getMaterial(x - 1, y, z);
+        LocalMaterialData tempBlock = world.getMaterial(x - 1, y, z, false);
 
         i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
         j = (tempBlock.isAir()) ? j + 1 : j;
 
-        tempBlock = world.getMaterial(x + 1, y, z);
+        tempBlock = world.getMaterial(x + 1, y, z, false);
 
         i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
         j = (tempBlock.isAir()) ? j + 1 : j;
 
-        tempBlock = world.getMaterial(x, y, z - 1);
+        tempBlock = world.getMaterial(x, y, z - 1, false);
 
         i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
         j = (tempBlock.isAir()) ? j + 1 : j;
 
-        tempBlock = world.getMaterial(x, y, z + 1);
+        tempBlock = world.getMaterial(x, y, z + 1, false);
 
         i = (sourceBlocks.contains(tempBlock)) ? i + 1 : i;
         j = (tempBlock.isAir()) ? j + 1 : j;
 
         if ((i == 3) && (j == 1))
         {
-            world.setBlock(x, y, z, material);
+            world.setBlock(x, y, z, material, null, false);
         }
     }
 

@@ -9,7 +9,7 @@ import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.events.EventPriority;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.client.events.ClientNetworkEventListener;
-import com.khorn.terraincontrol.forge.dimensions.DimensionSyncChannelHandler;
+import com.khorn.terraincontrol.forge.client.events.ClientTickHandler;
 import com.khorn.terraincontrol.forge.dimensions.TXDimensionManager;
 import com.khorn.terraincontrol.forge.events.*;
 import com.khorn.terraincontrol.forge.generator.Cartographer;
@@ -17,6 +17,8 @@ import com.khorn.terraincontrol.forge.generator.ForgeVanillaBiomeGenerator;
 import com.khorn.terraincontrol.forge.generator.structure.TXRareBuildingStart;
 import com.khorn.terraincontrol.forge.generator.structure.TXVillageStart;
 import com.khorn.terraincontrol.forge.gui.GuiHandler;
+import com.khorn.terraincontrol.forge.network.CommonProxy;
+import com.khorn.terraincontrol.forge.network.PacketDispatcher;
 import com.khorn.terraincontrol.generator.biome.VanillaBiomeGenerator;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
@@ -34,20 +36,30 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.network.FMLEmbeddedChannel;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.EnumMap;
 
 @Mod(modid = "openterraingenerator", name = "Open Terrain Generator", acceptableRemoteVersions = "*", version = "v7")
 public class TXPlugin
 {
+	public static final String MOD_ID = "openterraingenerator";
+	
+	@SidedProxy(clientSide="com.khorn.terraincontrol.forge.network.ClientProxy", serverSide="com.khorn.terraincontrol.forge.network.CommonProxy")
+	public static CommonProxy proxy;
+	
+	@Instance("OTG")
+    public static TXPlugin instance;
+	
 	public TXPlugin()
 	{
 		TerrainControl.isForge = true;
@@ -56,7 +68,7 @@ public class TXPlugin
     private WorldLoader worldLoader;
     public static TXWorldType txWorldType;    
     
-    public static EnumMap<Side, FMLEmbeddedChannel> channels;
+    //public static EnumMap<Side, FMLEmbeddedChannel> channels;
 
     @EventHandler
     public void load(FMLInitializationEvent event)
@@ -81,16 +93,18 @@ public class TXPlugin
         MapGenStructureIO.registerStructure(TXRareBuildingStart.class, StructureNames.RARE_BUILDING);
         MapGenStructureIO.registerStructure(TXVillageStart.class, StructureNames.VILLAGE);
 
-        // Register listening channel for listening to received configs.
+        // Register listening channel for listening to received configs. <- Spigot only?
         if (event.getSide() == Side.CLIENT)
-        {
+        {       	
             ClientNetworkEventListener networkHandler = new ClientNetworkEventListener(this.worldLoader);
             FMLEventChannel eventDrivenChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PluginStandardValues.ChannelName);
             eventDrivenChannel.register(networkHandler);
             MinecraftForge.EVENT_BUS.register(networkHandler);
         }        
-        
-        channels = NetworkRegistry.INSTANCE.newChannel("OTGChannel", DimensionSyncChannelHandler.instance);
+                
+        //channels = NetworkRegistry.INSTANCE.newChannel("OTGDimensionSync", DimensionSyncChannelHandler.instance);
+        //channels = NetworkRegistry.INSTANCE.newChannel("OTGParticlesAndSpawners", ParticleAndSpawnerChannelHandler.instance);
+        PacketDispatcher.registerPackets();
         
         // Register player tracker, for sending configs.
         MinecraftForge.EVENT_BUS.register(new PlayerTracker());
@@ -100,6 +114,9 @@ public class TXPlugin
         MinecraftForge.TERRAIN_GEN_BUS.register(saplingListener);
         MinecraftForge.EVENT_BUS.register(saplingListener);
 
+        MinecraftForge.EVENT_BUS.register(new SaveServerHandler());
+        MinecraftForge.EVENT_BUS.register(new UnloadServerHandler());
+        
         // Register colorizer, for biome colors
         Function<Biome, BiomeConfig> getBiomeConfig = new Function<Biome, BiomeConfig>()
         {
@@ -129,6 +146,8 @@ public class TXPlugin
 
         // Register server tick handler for pre-generation of worlds
         MinecraftForge.EVENT_BUS.register(new ServerEventListener());
+        
+        MinecraftForge.EVENT_BUS.register(new ClientTickHandler());
 
         MinecraftForge.EVENT_BUS.register(new GuiHandler());
 
@@ -224,4 +243,22 @@ public class TXPlugin
 			}
         }
     }
+    
+    @EventHandler
+    public void preInit(FMLPreInitializationEvent e)
+    {
+        proxy.preInit(e);
+    }
+
+    @EventHandler
+    public void init(FMLInitializationEvent e)
+    {
+        proxy.init(e);
+    }
+
+    @EventHandler
+    public void postInit(FMLPostInitializationEvent e)
+    {
+        proxy.postInit(e);
+    }    
 }

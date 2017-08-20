@@ -7,50 +7,76 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.minecraft.world.gen.ChunkProviderServer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import com.google.common.base.Strings;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
-import com.khorn.terraincontrol.forge.ForgeEngine;
-import com.khorn.terraincontrol.forge.TXWorldType;
+import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 
 public class Pregenerator
 {    
-	private int pregenerationRadius;
+	ForgeWorld world;
 	
+	boolean processing = false;
+	
+	ChunkCoordinate preGeneratorCenterPoint;
+	
+    int currentX;
+    int currentZ;    
+    
+    long startTime = System.currentTimeMillis();
+
+	int pregenerationRadius;
+    	
+	int cycle = 0;
+	
+	int left = 0;
+	int right = 0;
+	int top = 0;
+	int bottom = 0;
+	
+	int iLeft = Integer.MIN_VALUE;
+	int iRight = Integer.MIN_VALUE;
+	int iTop = Integer.MIN_VALUE;
+	int iBottom = Integer.MIN_VALUE;
+	
+	int spawned = 1;
+	double total;
+	
+	int spawnedThisTick = 0;
+		
+	boolean pregeneratorIsRunning;	
+	
+	int maxSpawnPerTick;
+	
+	// In-game UI
+	public String pregenerationWorld = "";
+	public String preGeneratorProgressStatus = "";
+	public String preGeneratorProgress = "";
+	public String progressScreenElapsedTime = "";
+	public String progressScreenEstimatedTime = "";
+	public int progressScreenWorldSizeInBlocks;
+		
+	public Pregenerator(LocalWorld world)
+	{
+		this.world = (ForgeWorld)world;
+				
+		LoadPregeneratorData();
+		
+		maxSpawnPerTick = TerrainControl.getPluginConfig().PregeneratorMaxChunksPerTick;
+    	pregenerationWorld = world.getConfigs().getWorldConfig().getName();
+	}
+		
 	public int getPregenerationRadius()
 	{
-		return pregenerationRadius;
-	}
-
-	/**
-	 * Sets the pre-generation radius (in chunks) for the world.
-	 * Radius cannot be smaller than currently pre-generated area.
-	 * @param radius The desired radius.
-	 * @return The radius value that was set for the pregenerator.
-	 */
-	public int setPregenerationRadius(int radius)
-	{
-		return setPregenerationRadius(radius, null);
-	}
+		return pregenerationRadius; 
+	}	
 	
 	/**
 	 * Sets the pre-generation radius (in chunks) for the world.
@@ -59,17 +85,9 @@ public class Pregenerator
 	 * @param world Used to save pregenerator data to file.
 	 * @return The radius value that was set for the pregenerator.
 	 */
-	public int setPregenerationRadius(int radius, World world)
+	public int setPregenerationRadius(int radius)
 	{		
-		if(pregenerationRadius == 0)
-		{
-			// Reset start time in case this method 
-			// starts pre-generation in this world
-			// for the first time and no start time 
-			// info was saved previously.
-			resetPregenerator(); 
-		}
-		if(!preGeneratorIsRunning || (radius > cycle && radius > 0))
+		if(radius > cycle && radius > 0)
 		{
 			pregenerationRadius = radius;
 		} else {
@@ -77,134 +95,65 @@ public class Pregenerator
 		}
 		if(world != null)
 		{
-			this.SavePreGeneratorData(world);
+			this.SavePregeneratorData();
 		}
+				
+    	total = (pregenerationRadius * 2 + 1) * (pregenerationRadius * 2 + 1);
 		
 		return pregenerationRadius;
 	}
-
-	public void resetPregenerator()
-    {
-		left = 0;
-		right = 0;
-		top = 0;
-		bottom = 0;
-		spawned = 1;
-		cycle = 0;
-		iLeft = Integer.MIN_VALUE;
-		iRight = Integer.MIN_VALUE;
-		iTop = Integer.MIN_VALUE;
-		iBottom = Integer.MIN_VALUE;
 		
-		startTime = System.currentTimeMillis();
-    }	
-	
-	boolean preGeneratorIsRunning;
-	boolean processing = false;
-	
-    int radius = 0;
-    int currentX;
-    int currentZ;    
-    
-    long startTime;
-    
-	int spawned = 1;
-	double total;
-
-	int left = 0;
-	int right = 0;
-	int top = 0;
-	int bottom = 0;
-	int cycle = 0;
-	
-	int iLeft = Integer.MIN_VALUE;
-	int iRight = Integer.MIN_VALUE;
-	int iTop = Integer.MIN_VALUE;
-	int iBottom = Integer.MIN_VALUE;
-	
-	int lastWorldHash = 0;
-	
-	int spawnedThisTick = 0;
-	
-	// In-game UI
-	String pregenerationWorld = "";
-	String preGeneratorProgressStatus = "";
-	String preGeneratorProgress = "";
-	String progressScreenElapsedTime = "";
-	String progressScreenEstimatedTime = "";
-	int progressScreenWorldSizeInBlocks;
-	
-	public void ProcessTick()
+	public int getPregenerationBorderLeft()
 	{
+		return left; 
+	}
+	
+	public int getPregenerationBorderRight()
+	{
+		return right; 
+	}
+	
+	public int getPregenerationBorderTop()
+	{
+		return top; 
+	}
+	
+	public int getPregenerationBorderBottom()
+	{
+		return bottom; 
+	}
+	
+	public ChunkCoordinate getPregenerationCenterPoint()
+	{
+		return preGeneratorCenterPoint; 
+	}
+	
+	public boolean getPregeneratorIsRunning()
+	{
+		return pregeneratorIsRunning; 
+	}	
+
+	public void ProcessTick()
+	{		
 		if(!processing)
 		{
 			processing = true;
-
-			MinecraftServer mcServer = FMLCommonHandler.instance().getMinecraftServerInstance();			
-			for(WorldServer worldServer : mcServer.worlds)
-			{
-				if(worldServer.getWorldInfo().getTerrainType() instanceof TXWorldType && worldServer.provider.getDimension() == 0)
-				{					
-					LocalWorld world = ((ForgeEngine)TerrainControl.getEngine()).getWorld(worldServer);				
-					
-					if(world == null)
-					{
-						//TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load LocalWorld for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
-						processing = false;
-						return; // May be unloading / shutting down
-					}
-					
-					ConfigProvider configProvider = world.getConfigs();
-					
-					if(configProvider == null)
-					{
-						//TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load world settings for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
-						processing = false;
-						return; // May be unloading / shutting down (?)
-					}
-					
-					WorldConfig worldConfig = configProvider.getWorldConfig();
-					
-					if(worldConfig == null)
-					{
-						//TerrainControl.log(LogMarker.INFO, "Error: Server tick thread failed to load worldConfig for world \"" + worldServer.getWorldInfo().getWorldName() + "\", cannot start pre-generation.");
-						processing = false;
-						return; // May be unloading / shutting down (?)
-					}
-
-					if(worldConfig.PreGenerationRadius > 0)
-					{
-						Pregenerate(worldServer, worldConfig.PreGenerationRadius);
-					} else {
-						preGeneratorIsRunning = false;
-					}
-				}
-			}
+												
+			Pregenerate();
+			
 			processing = false;
 		}
 	}
-	
-	void Pregenerate(WorldServer worldServer, int pregenerationRadius)
-	{	
-		// Load any saved pre-generator data and/or set the default values
-		// Don't load the same world each tick
-		if(worldServer.hashCode() != lastWorldHash)
-		{
-			LoadPreGeneratorData(worldServer);
-		}
-		lastWorldHash = worldServer.hashCode();	
-		
-    	radius = pregenerationRadius;
-    	total = (radius * 2 + 1) * (radius * 2 + 1);
-		
+
+	void Pregenerate()
+	{		
     	// Check if there are chunks that need to be pre-generated
-        if(spawned < total && radius > 0)
-        {			    	
-	        currentX = -radius;
-	        currentZ = -radius;				    	
+        if(spawned < total && pregenerationRadius > 0)
+        {
+    		pregeneratorIsRunning = true;
         	
-			preGeneratorIsRunning = true;
-	    	pregenerationWorld = worldServer.getWorldInfo().getWorldName();	    	
+	        currentX = -pregenerationRadius;
+	        currentZ = -pregenerationRadius;        	
 	    	      	
     		// Spawn all chunks within the pre-generation radius 
             // Spawn chunks in a rectangle around a center block. 
@@ -215,25 +164,22 @@ public class Pregenerator
     		boolean rightEdgeFound = false;
     		boolean topEdgeFound = false;
     		boolean bottomEdgeFound = false;
-    			
-    		int maxSpawnPerTick = TerrainControl.getPluginConfig().PregeneratorMaxChunksPerTick;
+   			
     		spawnedThisTick = 0;
 
-    		BlockPos spawnPoint = worldServer.getSpawnPoint();
-    		ChunkCoordinate spawnChunk = ChunkCoordinate.fromBlockCoords(spawnPoint.getX(), spawnPoint.getZ());
-    		int spawnChunkX = spawnChunk.getChunkX();
-    		int spawnChunkZ = spawnChunk.getChunkZ();
+    		int spawnChunkX = preGeneratorCenterPoint.getChunkX();
+    		int spawnChunkZ = preGeneratorCenterPoint.getChunkZ();
     		
 			// This cycle might be stopped at any point because of the max chunks per server tick.
 			// Progress within a cycle is tracked using iTop, iBottom, iLeft, iRight
 			while(!(leftEdgeFound && rightEdgeFound && topEdgeFound && bottomEdgeFound))
 			{ 				
 	    		// TODO: Since the first cycle is cycle 1, the centermost chunk (at the spawnpoint) wont be pregenerated.
-	    		// Probably doesnt matter though since that chunk shouldve been populated automatically when the server started
+	    		// Probably doesnt matter though since MC shouldve populates the chunk automatically on server start
 				cycle += 1;			
 				
 	    		// Check Right
-	    		if(right >= radius)
+	    		if(right >= pregenerationRadius)
 	    		{
 	    			rightEdgeFound = true;
 	    		}
@@ -251,7 +197,7 @@ public class Pregenerator
 							iRight = i;
 		    				spawned++;
 		    				
-							PreGenerateChunk(currentX, currentZ, worldServer);
+							PreGenerateChunk(currentX, currentZ);
 							
 			    			if(spawnedThisTick >= maxSpawnPerTick)
 			    			{
@@ -259,7 +205,7 @@ public class Pregenerator
 			    				{
 			    					right++;
 			    				}
-			    				Pause(worldServer);
+			    				Pause();
 			    				return;
 			    			}
 						}
@@ -271,7 +217,7 @@ public class Pregenerator
 	    		}	    		
 	    		
         		// Check Left
-	    		if(left >= radius)
+	    		if(left >= pregenerationRadius)
 	    		{
 	    			leftEdgeFound = true;
 	    		}
@@ -289,7 +235,7 @@ public class Pregenerator
 							iLeft = i;
 							spawned++;
 							
-							PreGenerateChunk(currentX, currentZ, worldServer);
+							PreGenerateChunk(currentX, currentZ);
 						
 			    			if(spawnedThisTick >= maxSpawnPerTick)
 			    			{
@@ -297,7 +243,7 @@ public class Pregenerator
 			    				{
 			    					left++;
 			    				}
-			    				Pause(worldServer);
+			    				Pause();
 			    				return;
 			    			}
 						}
@@ -309,7 +255,7 @@ public class Pregenerator
 	    		}	    		
 				 
         		// Check Bottom
-	    		if(bottom >= radius)
+	    		if(bottom >= pregenerationRadius)
 	    		{
 	    			bottomEdgeFound = true;
 	    		}
@@ -327,7 +273,7 @@ public class Pregenerator
 							iBottom = i;
 							spawned++;
 							
-							PreGenerateChunk(currentX, currentZ, worldServer);
+							PreGenerateChunk(currentX, currentZ);
 							
 			    			if(spawnedThisTick >= maxSpawnPerTick)
 			    			{
@@ -335,7 +281,7 @@ public class Pregenerator
 			    				{
 			    					bottom++;
 			    				}
-			    				Pause(worldServer);
+			    				Pause();
 			    				return;
 			    			}
 						}
@@ -347,7 +293,7 @@ public class Pregenerator
 	    		}
 
         		// Check Top
-	    		if(top >= radius)
+	    		if(top >= pregenerationRadius)
 	    		{
 	    			topEdgeFound = true;
 	    		}
@@ -365,7 +311,7 @@ public class Pregenerator
 							iTop = i;
 							spawned++;
 							
-							PreGenerateChunk(currentX, currentZ, worldServer);
+							PreGenerateChunk(currentX, currentZ);
 							
 			    			if(spawnedThisTick >= maxSpawnPerTick)
 			    			{
@@ -373,7 +319,7 @@ public class Pregenerator
 			    				{
 			    					top++;
 			    				}
-			    				Pause(worldServer);
+			    				Pause();
 			    				return;
 			    			}
 						}
@@ -390,15 +336,13 @@ public class Pregenerator
     			iRight = Integer.MIN_VALUE;
     			iTop = Integer.MIN_VALUE;		    			
 			}
-
-			UpdateProgressMessage(false);
 			
-			SavePreGeneratorData(worldServer);
+			SavePregeneratorData();
         }
-        preGeneratorIsRunning = false;
+        pregeneratorIsRunning = false;
 	}
 	
-	void Pause(WorldServer worldServer)
+	void Pause()
 	{
 		if(spawned == total) // Done spawning
 		{
@@ -408,9 +352,7 @@ public class Pregenerator
 			iRight = Integer.MIN_VALUE;
 			iTop = Integer.MIN_VALUE;
 			
-			UpdateProgressMessage(false);
-			
-			SavePreGeneratorData(worldServer);
+			SavePregeneratorData();
 		} else {		
 			// Pre-generation cycle cannot be completed.
 			// Save progress so we can continue and retry on the next server tick.
@@ -419,17 +361,17 @@ public class Pregenerator
 		}
 	}
 	
-	void PreGenerateChunk(int currentX, int currentZ, WorldServer worldServer)
+	void PreGenerateChunk(int currentX, int currentZ)
 	{
 		UpdateProgressMessage(true);
 		
-		ChunkProviderServer chunkProvider = worldServer.getChunkProvider();
+		ChunkProviderServer chunkProvider = (ChunkProviderServer) world.getWorld().getChunkProvider();
 		
         if (
         	!(
 	    		(
     				chunkProvider.chunkExists(currentX, currentZ) || 
-					RegionFileCache.createOrLoadRegionFile(worldServer.getChunkSaveLocation(), currentX, currentZ).chunkExists(currentX & 0x1F, currentZ & 0x1F)
+					RegionFileCache.createOrLoadRegionFile(((WorldServer)world.getWorld()).getChunkSaveLocation(), currentX, currentZ).chunkExists(currentX & 0x1F, currentZ & 0x1F)
 				) && 
 				chunkProvider.provideChunk(currentX, currentZ).isPopulated()
 			)
@@ -443,155 +385,97 @@ public class Pregenerator
 		}
 	}
 	
-	static long lastMessage = System.currentTimeMillis();
+	long lastMessage = System.currentTimeMillis();
 	void UpdateProgressMessage (boolean loggingCanBeIgnored)	
-	{	
-		boolean dontLog = false;
-		// Show progress update max once per second
-		if(loggingCanBeIgnored = true && System.currentTimeMillis() - lastMessage < 1000l)
-		{
-			dontLog = true;
-		} else {
-			lastMessage = System.currentTimeMillis();
-		}
-		
-		long elapsedTime = System.currentTimeMillis() - startTime;
-
-		int hours = (int)Math.floor(elapsedTime / 1000d / 60d / 60d);
-		int minutes = (int)Math.floor(elapsedTime / 1000d / 60d) - (hours * 60);
-		int seconds = (int)Math.floor(elapsedTime / 1000d) - (minutes * 60) - (hours * 60 * 60);
-		
-		String sElapsedTime = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
-
-		double eTA = (total / spawned) * elapsedTime - elapsedTime;
-
-		hours = (int)Math.floor(eTA / 1000d / 60d / 60d);
-		minutes = (int)Math.floor(eTA / 1000d / 60d) - (hours * 60);
-		seconds = (int)Math.floor(eTA / 1000d) - (minutes * 60) - (hours * 60 * 60);
-
-		String estimatedTime = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
-
+	{			
 		if(spawned < total)
 		{
+			boolean dontLog = false;
+			// Show progress update max once per second
+			if(loggingCanBeIgnored = true && System.currentTimeMillis() - lastMessage < 1000l)
+			{
+				dontLog = true;
+			} else {
+				lastMessage = System.currentTimeMillis();
+			}
+
+			long elapsedTime = System.currentTimeMillis() - startTime;
+			int hours = (int)Math.floor(elapsedTime / 1000d / 60d / 60d);
+			int minutes = (int)Math.floor(elapsedTime / 1000d / 60d) - (hours * 60);
+			int seconds = (int)Math.floor(elapsedTime / 1000d) - (minutes * 60) - (hours * 60 * 60);	
+			String sElapsedTime = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+			
+			double eTA = (total / spawned) * elapsedTime - elapsedTime;
+	
+			hours = (int)Math.floor(eTA / 1000d / 60d / 60d);
+			minutes = (int)Math.floor(eTA / 1000d / 60d) - (hours * 60);
+			seconds = (int)Math.floor(eTA / 1000d) - (minutes * 60) - (hours * 60 * 60);
+	
+			String estimatedTime = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+
 	        long i = Runtime.getRuntime().maxMemory();
 	        long j = Runtime.getRuntime().totalMemory();
 	        long k = Runtime.getRuntime().freeMemory();
 	        long l = j - k;
 	        String memoryUsage = " Mem: " + Long.valueOf(l * 100L / i) + "% " + Long.valueOf(BytesToMb(l)) + " / " +  Long.valueOf(BytesToMb(i)) + " MB ";
 	        
-	        progressScreenWorldSizeInBlocks = (radius * 2 + 1) * 16;
+	        progressScreenWorldSizeInBlocks = (pregenerationRadius * 2 + 1) * 16;
 			preGeneratorProgressStatus = (int)spawned + "/" + (int)total; 
 			preGeneratorProgress = (int)Math.round(((spawned / (double)(total)) * 100)) + "";
 			progressScreenElapsedTime = sElapsedTime;
 			progressScreenEstimatedTime = estimatedTime;
 			if(!dontLog)
 			{
-				TerrainControl.log(LogMarker.INFO, "Pre-generating chunk X" + currentX + " Z" + currentZ + ". Radius: " + radius + " Spawned: " + (int)spawned + "/" + (int)total + " " + (int)Math.round(((spawned / (double)(total)) * 100)) + "% done. Elapsed: " + sElapsedTime + " ETA: " + estimatedTime + memoryUsage);
+				TerrainControl.log(LogMarker.INFO, "Pre-generating world \"" + pregenerationWorld + "\" chunk X" + currentX + " Z" + currentZ + ". Radius: " + pregenerationRadius + " Spawned: " + (int)spawned + "/" + (int)total + " " + (int)Math.round(((spawned / (double)(total)) * 100)) + "% done. Elapsed: " + sElapsedTime + " ETA: " + estimatedTime + memoryUsage);
 			}
 		} else {
+			
+			long elapsedTime = System.currentTimeMillis() - startTime;
+			int hours = (int)Math.floor(elapsedTime / 1000d / 60d / 60d);
+			int minutes = (int)Math.floor(elapsedTime / 1000d / 60d) - (hours * 60);
+			int seconds = (int)Math.floor(elapsedTime / 1000d) - (minutes * 60) - (hours * 60 * 60);	
+			String sElapsedTime = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+			
 			preGeneratorProgressStatus = "Done";
 			preGeneratorProgress = "";
 			progressScreenElapsedTime = "";
 			progressScreenEstimatedTime = "";
 			progressScreenWorldSizeInBlocks = 0;
-			if(!dontLog)
-			{
-				TerrainControl.log(LogMarker.INFO, "Pre-generating chunks done for world " + pregenerationWorld + ", " + ((int)spawned) + " chunks spawned in " + sElapsedTime);
-			}
+			TerrainControl.log(LogMarker.INFO, "Pre-generating chunks done for world " + pregenerationWorld + ", " + ((int)spawned) + " chunks spawned in " + sElapsedTime);
 		}
 	}
-	
-	public boolean menuOpen = true;
-	public void ShowInGameUI()
-	{
-		if(menuOpen)
-		{
-	    	Minecraft mc = Minecraft.getMinecraft();
-	    	mc.gameSettings.showDebugInfo = false;
-	    	
-	    	if(preGeneratorIsRunning && preGeneratorProgressStatus != "Done")
-	    	{
-		    	FontRenderer fontRenderer = mc.fontRenderer;
-		    	
-		        GlStateManager.pushMatrix();
-		        
-		        List<String> list = new ArrayList<String>();       
-		        
-		        list.add("Generating \"" + pregenerationWorld + "\" " + (progressScreenWorldSizeInBlocks > 0 ? "(" + progressScreenWorldSizeInBlocks + "x" + progressScreenWorldSizeInBlocks  + " blocks)" : ""));        
-				list.add("Progress: " + preGeneratorProgress + "%");
-				list.add("Chunks: " + preGeneratorProgressStatus);
-				list.add("Elapsed: " + progressScreenElapsedTime);
-				list.add("Estimated: " + progressScreenEstimatedTime);
-		        
-		        long i = Runtime.getRuntime().maxMemory();
-		        long j = Runtime.getRuntime().totalMemory();
-		        long k = Runtime.getRuntime().freeMemory();
-		        long l = j - k;
-		        list.add("Memory: " + Long.valueOf(BytesToMb(l)) + "/" +  Long.valueOf(BytesToMb(i)) + " MB");
 		
-		        for (int zi = 0; zi < list.size(); ++zi)
-		        {
-		            String s = (String)list.get(zi);
-		
-		            if (!Strings.isNullOrEmpty(s))
-		            {
-		                int zj = fontRenderer.FONT_HEIGHT;
-		                int zk = fontRenderer.getStringWidth(s);
-		                int zi1 = 2 + zj * zi;
-		                Gui.drawRect(1, zi1 - 1, 2 + zk + 1, zi1 + zj - 1, -1873784752); // TODO: Make semi-transparent
-		                fontRenderer.drawString(s, 2, zi1, 14737632);
-		            }
-		        }
-		        GlStateManager.popMatrix();
-	    	}
-		}
-	}	
-
-	public void ToggleIngameUI()
-	{ 
-		if(preGeneratorIsRunning && preGeneratorProgressStatus != "Done" || menuOpen)
-		{
-			if(menuOpen)
-			{
-				Minecraft.getMinecraft().gameSettings.showDebugInfo = false;
-				menuOpen = false;
-			}
-			else if(!Minecraft.getMinecraft().gameSettings.showDebugInfo)
-			{			
-				menuOpen = true;
-			}
-		}
-	}
-	
     private long BytesToMb(long bytes)
     {
         return bytes / 1024L / 1024L;
     }
 	
-    public void shutDown(World world)
+    public void shutDown()
     {
-    	if(preGeneratorIsRunning)
+    	if(pregeneratorIsRunning)
     	{
-	    	SavePreGeneratorData(world);
-	    	preGeneratorIsRunning = false;
+	    	SavePregeneratorData();
+	    	pregeneratorIsRunning = false;
     	}
     }
     
     // Saving / Loading
     // TODO: It's crude but it works, can improve later
     
-	public void SavePreGeneratorData(World world)
-	{			
-		if(preGeneratorIsRunning)
-		{
-			File pregeneratedChunksFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/PregeneratedChunks.txt");		
+	public void SavePregeneratorData()
+	{
+		if(pregeneratorIsRunning)
+		{	
+			int dimensionId = world.getDimensionId();
+			File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "PregeneratedChunks.txt");
+			
 			if(pregeneratedChunksFile.exists())
 			{
 				pregeneratedChunksFile.delete();
 			}		
 			
 			StringBuilder stringbuilder = new StringBuilder();
-			stringbuilder.append(spawned + "," + left + "," + top + "," + right + "," + bottom + "," + cycle + "," + (System.currentTimeMillis() - startTime) + "," + iTop + "," + iBottom + "," + iLeft + "," + iRight);		
+			stringbuilder.append(spawned + "," + left + "," + top + "," + right + "," + bottom + "," + cycle + "," + (System.currentTimeMillis() - startTime) + "," + iTop + "," + iBottom + "," + iLeft + "," + iRight + "," + pregenerationRadius + "," + preGeneratorCenterPoint.getChunkX() + "," + preGeneratorCenterPoint.getChunkZ());		
 			
 			BufferedWriter writer = null;
 	        try
@@ -616,16 +500,20 @@ public class Pregenerator
 		}
 	}
 
-	void LoadPreGeneratorData(WorldServer worldServer)
-	{				
-		File pregeneratedChunksFile = new File(worldServer.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/PregeneratedChunks.txt");				
+	void LoadPregeneratorData()
+	{
+		int dimensionId = world.getDimensionId();
+		File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "PregeneratedChunks.txt");	
+				
 		String[] pregeneratedChunksFileValues = {};
 		if(pregeneratedChunksFile.exists())
 		{
-			try {
+			try
+			{
 				StringBuilder stringbuilder = new StringBuilder();
 				BufferedReader reader = new BufferedReader(new FileReader(pregeneratedChunksFile));
-				try {
+				try
+				{
 					String line = reader.readLine();
 	
 				    while (line != null)
@@ -642,10 +530,13 @@ public class Pregenerator
 					reader.close();
 				}
 				
-			} catch (FileNotFoundException e1) {
+			}
+			catch (FileNotFoundException e1)
+			{
 				e1.printStackTrace();
 			}
-			catch (IOException e1) {
+			catch (IOException e1)
+			{
 				e1.printStackTrace();
 			}
 		}
@@ -666,6 +557,34 @@ public class Pregenerator
 			iBottom = Integer.parseInt(pregeneratedChunksFileValues[8]);
 			iLeft = Integer.parseInt(pregeneratedChunksFileValues[9]);
 			iRight = Integer.parseInt(pregeneratedChunksFileValues[10]);
+			
+			pregenerationRadius = Integer.parseInt(pregeneratedChunksFileValues[11]);
+			
+			preGeneratorCenterPoint = ChunkCoordinate.fromChunkCoords(Integer.parseInt(pregeneratedChunksFileValues[12]), Integer.parseInt(pregeneratedChunksFileValues[13]));
+			
+	    	total = (pregenerationRadius * 2 + 1) * (pregenerationRadius * 2 + 1);
+		} else {
+			spawned = 1;
+
+			left = 0;
+			top = 0;
+			right = 0;
+			bottom = 0;
+
+			cycle = 0;
+			startTime = System.currentTimeMillis();
+
+			iTop = Integer.MIN_VALUE;
+			iBottom = Integer.MIN_VALUE;
+			iLeft = Integer.MIN_VALUE;
+			iRight = Integer.MIN_VALUE;
+			
+			preGeneratorCenterPoint = world.getSpawnChunk();
+					
+			WorldConfig worldConfig = world.getConfigs().getWorldConfig();
+			this.setPregenerationRadius(worldConfig.PreGenerationRadius);		
+			
+			SavePregeneratorData();
 		}
 	}
 }

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.khorn.terraincontrol.BiomeIds;
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.configuration.WorldConfig;
@@ -15,8 +16,11 @@ import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeWorld;
+import com.khorn.terraincontrol.forge.ForgeWorldSession;
+import com.khorn.terraincontrol.forge.TXPlugin;
 import com.khorn.terraincontrol.forge.TXWorldType;
 import com.khorn.terraincontrol.forge.dimensions.TXDimensionManager;
+import com.khorn.terraincontrol.forge.generator.Pregenerator;
 import com.khorn.terraincontrol.forge.util.CommandHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
@@ -27,6 +31,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -39,6 +44,8 @@ import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.registry.GameData;
 
 public final class TXCommandHandler implements ICommand
 {
@@ -58,11 +65,10 @@ public final class TXCommandHandler implements ICommand
         {
             ForgeWorld world = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getWorld(mcWorld);
                         
-            if (world == null && !((argString[0].equals("dimension") || argString[0].equals("dim")) && argString.length < 3))
+            if (world == null && (argString.length == 0 || !((argString[0].equals("dimension") || argString[0].equals("dim")) && argString.length < 3)))
             {
             	sender.sendMessage(new TextComponentString(""));
-                sender.sendMessage(
-                        new TextComponentTranslation(ERROR_COLOR + "OpenTerrainGenerator is not enabled for this world."));
+                sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "OpenTerrainGenerator is not enabled for this world."));
                 return;
             }
         	
@@ -70,6 +76,21 @@ public final class TXCommandHandler implements ICommand
             int playerX = pos.getX();
             int playerY = pos.getY();
             int playerZ = pos.getZ();
+            
+    		if(argString != null && argString.length > 0 && argString[0].equals("summon"))
+			{
+    			int radius = 1;
+    			if(argString.length > 1)
+    			{
+    				radius = Integer.parseInt(argString[1]);	
+    			}
+				if(radius > 50)
+				{
+					radius = 50;
+					TerrainControl.log(LogMarker.INFO, "Error in summon call: Parameter radius can be no higher than 50. Radius was set to 50.");
+				}
+    			argString = new String[] { "GetModData", "OTG", radius + "" };
+			}
             
             if (argString == null || argString.length == 0)
             {
@@ -79,27 +100,61 @@ public final class TXCommandHandler implements ICommand
                 sender.sendMessage(new TextComponentString("Commands:"));
                 sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg worldinfo " + VALUE_COLOR + "Show author and description information for this world."));
                 sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg biome <-f, -s, -d, -m> " + VALUE_COLOR + "Show biome information for the biome at the player's coordinates."));
+               	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg bo3 " + VALUE_COLOR + "Show author and description information for any structure at the player's coordinates."));
+
                 if(isOp)
                 {
-                    sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg tp <biome name or id> " + VALUE_COLOR + "Show biome information for the biome at the player's coordinates."));                	
-                }                
-                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg entities " + VALUE_COLOR + "Show a list of entities that can be spawned inside BO3's using the Entity() tag."));
-                if(isOp)
-                {                
-	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen <radius> " + VALUE_COLOR + "Sets the pre-generation radius to <radius> chunks. Same as /otg pregenerator <radius>."));
+                    sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg tp <biome name or id> " + VALUE_COLOR + "Teleport to the nearest biome with the given name or id (max distance 16000 blocks)."));                	               
+                	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen " + VALUE_COLOR + "Shows the status of any currently active pre-generators. Same as /otg pregenerator."));
+	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen <radius> " + VALUE_COLOR + "Sets the pre-generation radius for the curren world to <radius> chunks. Same as /otg pregenerator <radius>."));
+	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen <radius> <dimension id> " + VALUE_COLOR + "Sets the pre-generation radius for dimension <dimension id> to <radius> chunks. Same as /otg pregenerator <radius> <dimension id>."));
                 }
+                
                 sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg dim " + VALUE_COLOR + "Shows the name and id of the dimension the player is currently in. Same as /otg dimension."));
-                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg dim -l " + VALUE_COLOR + "Shows a list of all dimensions. Same as /otg dimension -l."));
+                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg dim -l " + VALUE_COLOR + "Shows a list of all dimensions. Same as /otg dimension -l."));                
                 if(isOp)
                 {                
 	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg dim -c <dimension name> " + VALUE_COLOR + "Creates a dimension using world and biome configs from mods/OpenTerrainGenerator/worlds/<dimension name>. Custom dimensions can be accessed via a quartz portal. Biome names must be unique across dimensions. Same as /otg dimension -c <dimension name>"));
 	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg dim -d <dimension name> " + VALUE_COLOR + "Deletes the specified dimension. Dimension must be unloaded (dimensions unload automatically when no players are inside, this may take a minute). Same as /otg dimension -d <dimension name>"));
                 }
+
+				if(isOp)
+				{
+					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg blocks " + VALUE_COLOR + "Show a list of block names that can be spawned inside BO3's with the Block() tag and used in biome- and world-configs."));
+	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg entities " + VALUE_COLOR + "Show a list of entities that can be spawned inside BO3's using the Entity() tag."));
+					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg unloadbo3s " + VALUE_COLOR + "Unloads all loaded BO2/BO3 files, use this to refresh BO2's/BO3's after editing them."));
+					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg GetModData <ModName> <Radius> " + VALUE_COLOR + "Sends any ModData() tags in BO3's within the specified <Radius> in chunks to the specified <ModName>. Some OTG mob spawning commands can be used this way. Be sure to set up ModData() tags in your BO3 to make this work."));					
+					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg summon <Radius> " + VALUE_COLOR + "Shorthand for /mcw GetModData OTG <Radius>. Used to summon mobs and entities that are configured to spawn inside BO3's."));
+				}               
+                
                 sender.sendMessage(new TextComponentString(""));
                 sender.sendMessage(new TextComponentString("Tips:"));
         		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- Check out OpenTerrainGenerator.ini and each world's WorldConfig.ini for optional features."));
         		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- When using the pre-generator in single player open the chat window so you can background MC without pausing the game."));
+        		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- When using the pre-generator in single player press F3 to toggle the pre-generator HUD showing the pre-generator status."));
+        		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- When using the pre-generator in multiplayer use the /otg pregen command to see the pre-generator status."));
             }
+        	else if(argString[0].equals("blocks") && isOp)
+        	{        		
+	    		TerrainControl.log(LogMarker.INFO, "-- Blocks List --");
+	    		sender.sendMessage(new TextComponentString("-- Blocks List --"));
+	    		
+	    		Set<ResourceLocation>  as = GameData.getBlockRegistry().getKeys();
+	    		for(ResourceLocation blockAlias : as)
+	    		{
+	    			TerrainControl.log(LogMarker.INFO, blockAlias + "");
+	    			sender.sendMessage(new TextComponentString(blockAlias + ""));
+	    		}
+	    		
+	    		TerrainControl.log(LogMarker.INFO, "----");
+        	}
+        	else if(argString[0].equals("unloadbo3s") && isOp)
+        	{        		
+	    		TerrainControl.log(LogMarker.INFO, "Unloading BO3's");
+	    		TerrainControl.getEngine().ReloadCustomObjectFiles();
+	    		TerrainControl.log(LogMarker.INFO, "BO3's unloaded");
+	    		sender.sendMessage(new TextComponentString("BO3's unloaded"));
+        	}
             else if (isOp && argString[0].equals("tp") && argString.length > 1)
             {
             	String biomeName = "";
@@ -146,7 +201,7 @@ public final class TXCommandHandler implements ICommand
         									)
         								)                						
                 						{
-                							((Entity)sender).setPositionAndUpdate(chunkCoord.getBlockXCenter(), world.getHighestBlockYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter()), chunkCoord.getBlockZCenter());
+                							((Entity)sender).setPositionAndUpdate(chunkCoord.getBlockXCenter(), world.getHighestBlockYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter(), true, true, false, false), chunkCoord.getBlockZCenter());
                 							return;
                 						}
                 					}
@@ -169,6 +224,42 @@ public final class TXCommandHandler implements ICommand
             }
             else if (isOp && (argString[0].equals("pregenerator") || argString[0].equals("pregen")))
             {
+            	if (argString.length == 1)
+            	{
+        			boolean isRunningAndNotDone = false;
+        			ArrayList<Pregenerator> pregenerators = new ArrayList<Pregenerator>();
+        			for(LocalWorld localWorld : TerrainControl.getAllWorlds())
+        			{
+        				ForgeWorld forgeWorld = (ForgeWorld)localWorld;			
+        				Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator();
+        				if(pregenerator.getPregeneratorIsRunning() && pregenerator.preGeneratorProgressStatus != "Done")
+        				{
+        					isRunningAndNotDone = true;
+        					pregenerators.add(pregenerator);
+        				}
+        			}
+        			       	    	
+        	    	if(isRunningAndNotDone)
+        	    	{       		        
+        		        for(Pregenerator pregenerator : pregenerators)
+        		        {		        
+        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Generating \"" + VALUE_COLOR + pregenerator.pregenerationWorld + "\" " + MESSAGE_COLOR + (pregenerator.progressScreenWorldSizeInBlocks > 0 ? "(" + pregenerator.progressScreenWorldSizeInBlocks + "x" + pregenerator.progressScreenWorldSizeInBlocks  + " blocks)" : "")));        
+        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Progress: " + VALUE_COLOR + pregenerator.preGeneratorProgress + "%"));
+        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Chunks: " + VALUE_COLOR + pregenerator.preGeneratorProgressStatus));
+        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Elapsed: " + VALUE_COLOR + pregenerator.progressScreenElapsedTime));
+        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Estimated: " + VALUE_COLOR + pregenerator.progressScreenEstimatedTime));
+        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "---"));
+        		        }
+        		        
+        		        long i = Runtime.getRuntime().maxMemory();
+        		        long j = Runtime.getRuntime().totalMemory();
+        		        long k = Runtime.getRuntime().freeMemory();
+        		        long l = j - k;
+        		        sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Memory: " + VALUE_COLOR + Long.valueOf(BytesToMb(l)) + "/" +  Long.valueOf(BytesToMb(i)) + " MB"));
+        	    	} else {
+        	    		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "No pre-generator is currently running."));
+        	    	}
+            	}
             	if (argString.length > 1)
             	{
             		int radius = 0;
@@ -180,12 +271,45 @@ public final class TXCommandHandler implements ICommand
             			sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "\"" + argString[1] + "\" could not be parsed as a number."));
             			return;
             		}
-            		
-            		world = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getWorld(DimensionManager.getWorld(0));
-            		
-	                int newRadius = world.getConfigs().getWorldConfig().PreGenerationRadius = ((ForgeEngine)TerrainControl.getEngine()).getPregenerator().setPregenerationRadius(radius, world.getWorld());
+            		 
+            		int dimensionId = 0;
+                	if (argString.length > 2)
+                	{
+                		try
+                		{
+                			dimensionId = Integer.parseInt(argString[2]);
+                		}
+                		catch(java.lang.NumberFormatException ex)
+                		{
+                			sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "\"" + argString[1] + "\" could not be parsed as a number."));
+                			return;
+                		}
+                	}
+                	
+                	ForgeWorld targetWorld = world;
+                	
+                	if(!DimensionManager.isDimensionRegistered(dimensionId))
+                	{
+            			sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Dimension with id \"" + dimensionId + "\" does not exist."));
+            			return;                		
+                	} else {                		
+                		targetWorld = ((ForgeEngine)TerrainControl.getEngine()).getWorldByDimId(dimensionId);
+                		if(targetWorld == null)
+                		{
+                			DimensionManager.initDimension(dimensionId);    			
+                			targetWorld = ((ForgeEngine)TerrainControl.getEngine()).getWorldByDimId(dimensionId);
+                		}
+                		if(targetWorld == null)
+                		{
+                			sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Could not find OTG world for dimension with id \"" + dimensionId + "\"."));
+                			return; 
+                		}
+                	}
+                	
+                	targetWorld.GetWorldSession().setPregenerationRadius(radius);            		
+	                int newRadius = targetWorld.getConfigs().getWorldConfig().PreGenerationRadius = targetWorld.GetWorldSession().getPregenerationRadius(); 
 	                	                
-	                ((ServerConfigProvider)world.getConfigs()).saveWorldConfig();
+	                ((ServerConfigProvider)targetWorld.getConfigs()).saveWorldConfig();
 	                
         			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Pre-generator radius set to " + VALUE_COLOR + newRadius + MESSAGE_COLOR + "."));
         			return;
@@ -287,8 +411,7 @@ public final class TXCommandHandler implements ICommand
 								if(CommandHelper.containsArgument(argString, "-c"))
 								{
 				    				sender.sendMessage(new TextComponentString(""));
-				                    sender.sendMessage(
-				                            new TextComponentTranslation(ERROR_COLOR + "Dimension '" + dimName + "' already exists."));
+				                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Dimension '" + dimName + "' already exists."));
 				    				return;
 								}
 							}							
@@ -306,7 +429,7 @@ public final class TXCommandHandler implements ICommand
 	            				ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)TerrainControl.getEngine()).getUnloadedWorld(dimName);		            				
 	            				TXDimensionManager.DeleteDimension(existingDim, forgeWorld, server, true);			        			
 	            				
-				    			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Deleted dimension " + VALUE_COLOR + dimName + MESSAGE_COLOR + " at id " + VALUE_COLOR + existingDim + MESSAGE_COLOR + "."));					    		
+				    			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Deleted dimension " + VALUE_COLOR + dimName + MESSAGE_COLOR + " at id " + VALUE_COLOR + existingDim + MESSAGE_COLOR + "."));					    						    							    			
 				    			
 				    			PlayerTracker.SendAllWorldAndBiomeConfigsToAllPlayers(sender.getServer());
 				    			
@@ -328,7 +451,7 @@ public final class TXCommandHandler implements ICommand
 			    			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Creating new dimension..."));
         					
 							int newDimId = TXDimensionManager.createDimension(dimName, false, true, true);
-							ForgeWorld createdWorld = (ForgeWorld) TerrainControl.getWorld(dimName);								
+							ForgeWorld createdWorld = (ForgeWorld) TerrainControl.getWorld(dimName);					
 							DimensionManager.unloadWorld(createdWorld.getWorld().provider.getDimension());
 			        		
 			    			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Created dimension " + VALUE_COLOR + dimName + MESSAGE_COLOR + " at id " + VALUE_COLOR + newDimId + MESSAGE_COLOR + "."));
@@ -458,12 +581,67 @@ public final class TXCommandHandler implements ICommand
                 }
 
                 return;
-            } else {
+            }
+        	else if(argString[0].toLowerCase().trim().equals("bo3") || argString[0].toLowerCase().trim().equals("bo3info"))
+        	{                
+    			String structureInfo = world.GetWorldSession().GetStructureInfoAt(sender.getPosition().getX(),sender.getPosition().getZ());       		
+        		
+    			if(structureInfo.length() > 0)
+    			{
+	    			for(String messagePart : structureInfo.split("\r\n"))
+	    			{
+	    				sender.sendMessage(new TextComponentTranslation(messagePart));
+	    			}   
+        		} else {
+        			sender.sendMessage(new TextComponentTranslation("There's nothing here."));
+        		}
+        	}            
+        	else if(argString[0].equals("GetModData") && argString.length > 1)
+        	{
+        		if (!(sender instanceof EntityPlayer) || isOp) // If the request was made by a player then check if the player is opped 
+        		{        			
+	        		if(argString.length == 2)
+	        		{
+	            		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
+	        			FMLInterModComms.sendRuntimeMessage(TXPlugin.instance, argString[1], "GetModData", sender.getEntityWorld().getWorldInfo().getWorldName() + "," + chunkCoord.getChunkX() + "," + chunkCoord.getChunkZ());
+	        		}
+	        		else if(argString.length == 3)
+	        		{
+	        			try
+	        			{
+	        				ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
+	        				int radius = Integer.parseInt(argString[2]);
+	        				if(radius > 50)
+	        				{
+	        					radius = 50;
+	        					TerrainControl.log(LogMarker.INFO, "Error in GetModData call: Parameter radius can be no higher than 50. Radius was set to 50.");
+	        				}
+	        				for(int x = -radius; x <= radius; x++)
+	        				{
+	        					for(int z = -radius; z <= radius; z++)
+	        					{
+	        		        		ChunkCoordinate chunkCoord2 = ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + x, chunkCoord.getChunkZ() + z);
+	    		        			FMLInterModComms.sendRuntimeMessage(TXPlugin.instance, argString[1], "GetModData", sender.getEntityWorld().getWorldInfo().getWorldName() + "," + chunkCoord2.getChunkX() + "," + chunkCoord2.getChunkZ());
+	        					}
+	        				}
+	        			}
+	        			catch(NumberFormatException ex)
+	        			{
+	        				TerrainControl.log(LogMarker.INFO, "Error in GetModData call: value \"" + argString[2] + "\" was expected to be a number");
+	        			}
+	        		}
+        		}
+        	} else {
             	sender.sendMessage(new TextComponentString(""));
                 sender.sendMessage(new TextComponentString("Unknown command. Type /otg for a list of commands."));
             }
         }
-    }   
+    }
+    
+    private static long BytesToMb(long bytes)
+    {
+        return bytes / 1024L / 1024L;
+    }
 
     @Override
     public boolean isUsernameIndex(String[] var1, int var2)

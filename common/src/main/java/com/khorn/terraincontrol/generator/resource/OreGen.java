@@ -27,10 +27,8 @@ public class OreGen extends Resource
         maxSize = readInt(args.get(1), 1, 128);
         frequency = readInt(args.get(2), 1, 100);
         rarity = readRarity(args.get(3));
-        minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH,
-                TerrainControl.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(5), minAltitude,
-                TerrainControl.WORLD_HEIGHT);
+        minAltitude = readInt(args.get(4), TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(5), minAltitude, TerrainControl.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 6);
     }
 
@@ -91,7 +89,7 @@ public class OreGen extends Resource
 
         double d5 = y + rand.nextInt(3) - 2;
         double d6 = y + rand.nextInt(3) - 2;
-
+        
         for (int i = 0; i < maxSize; i++)
         {
             float iFactor = (float) i / (float) maxSize;
@@ -109,8 +107,8 @@ public class OreGen extends Resource
 
             int n = MathHelper.floor(d7 + d11 / 2.0D);
             int i1 = MathHelper.floor(d8 + d12 / 2.0D);
-            int i2 = MathHelper.floor(d9 + d11 / 2.0D);
-
+            int i2 = MathHelper.floor(d9 + d11 / 2.0D);            
+            
             for (int i3 = j; i3 <= n; i3++)
             {
                 double d13 = (i3 + 0.5D - d7) / (d11 / 2.0D);
@@ -123,10 +121,11 @@ public class OreGen extends Resource
                         {
                             for (int i5 = m; i5 <= i2; i5++)
                             {
-                                double d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);
-                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(world.getMaterial(i3, i4, i5)))
+                                double d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);     
+                                
+                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(world.getMaterial(i3, i4, i5, false)))
                                 {
-                                    world.setBlock(i3, i4, i5, material);
+                                    world.setBlock(i3, i4, i5, material, null, false);
                                 }
                             }
                         }
@@ -135,5 +134,4 @@ public class OreGen extends Resource
             }
         }
     }
-
 }

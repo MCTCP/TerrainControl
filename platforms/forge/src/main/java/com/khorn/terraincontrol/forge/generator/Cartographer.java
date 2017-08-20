@@ -255,7 +255,7 @@ public class Cartographer
 					if(fieldClass.equals(Long2ObjectMap.class))
 					{
 						field.setAccessible(true);
-						destinationCoordinateCache = (Long2ObjectMap) field.get(worldserver1.getDefaultTeleporter());
+						destinationCoordinateCache = (Long2ObjectMap<Teleporter.PortalPosition>) field.get(worldserver1.getDefaultTeleporter());
 				        break;
 					}
 				}
@@ -456,7 +456,7 @@ public class Cartographer
 	    	{
 	    		//if(highestBlockY < minY || highestBlockY > maxY) // Don't count the Cartographer itself
 	    		{
-		    		LocalMaterialData materialToReplace = world.getMaterial(chunkCoord.getBlockXCenter(), highestBlockY, chunkCoord.getBlockZCenter());
+		    		LocalMaterialData materialToReplace = world.getMaterial(chunkCoord.getBlockXCenter(), highestBlockY, chunkCoord.getBlockZCenter(), true);
 		    		
 		    		// For trees/water/lava/ice/fire/wood the top block is wool or glass, for everything else it's clay
 		        	DefaultMaterial replaceByMaterialTop = replaceByMaterial;
@@ -577,7 +577,7 @@ public class Cartographer
 	    	
 	    	// Set top block
 	    	int newY = baseHeight + heightDiff - minY;
-	    	cartographerWorld.setBlock(newX, newY, newZ, topMaterial);
+	    	cartographerWorld.setBlock(newX, newY, newZ, topMaterial, null, true);
 	   		
 	    	// Set blocks above
 	    	while(newY < maxY - minY)
@@ -585,9 +585,9 @@ public class Cartographer
 	    		newY++;
 	    		if(playerInRange || portalInRange)
 	    		{
-		    		if(!cartographerWorld.isEmpty(newX, newY, newZ))
+		    		if(!cartographerWorld.isNullOrAir(newX, newY, newZ, true))
 		    		{
-		    			cartographerWorld.setBlock(newX, newY, newZ, TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0));
+		    			cartographerWorld.setBlock(newX, newY, newZ, TerrainControl.toLocalMaterialData(DefaultMaterial.AIR, 0), null, true);
 		    		}
 	    		}
 	    	}
@@ -597,7 +597,7 @@ public class Cartographer
 	    	while(newY > 0)
 	    	{
 	    		newY--;
-	   			cartographerWorld.setBlock(newX, newY, newZ, material);
+	   			cartographerWorld.setBlock(newX, newY, newZ, material, null, true);
 	    	}	   		    	       
 	    	
 	    	// Banner colors
@@ -621,17 +621,15 @@ public class Cartographer
 	    	// Put a banner at spawn
 	    	if(chunkCoord.equals(spawnChunk))
 	    	{
-	    		cartographerWorld.setBlock(newX, newY, newZ, TerrainControl.toLocalMaterialData(DefaultMaterial.STANDING_BANNER, 0));
 	            NamedBinaryTag tag = new NamedBinaryTag(Type.TAG_List, "BlockEntityTag", new NamedBinaryTag[] { new NamedBinaryTag(Type.TAG_Int, "Base", 15) });
-	            cartographerWorld.attachMetadata(newX, newY, newZ, tag);
+	    		cartographerWorld.setBlock(newX, newY, newZ, TerrainControl.toLocalMaterialData(DefaultMaterial.STANDING_BANNER, 0), tag, true);
 	    		//cartographerWorld.setBlock(spawnChunk.getBlockX() + chunkCoord.getChunkX(), newY - 1, spawnChunk.getBlockZ() + chunkCoord.getChunkZ(), TerrainControl.toLocalMaterialData(DefaultMaterial.GLOWSTONE, 0));
 			}
 	    	// Put a banner at each portal
 	   		else if(portalInChunk)
 			{
-	    		cartographerWorld.setBlock(newX, newY, newZ, TerrainControl.toLocalMaterialData(DefaultMaterial.STANDING_BANNER, 0));
-	            NamedBinaryTag tag = new NamedBinaryTag(Type.TAG_List, "BlockEntityTag", new NamedBinaryTag[] { new NamedBinaryTag(Type.TAG_Int, "Base", 13) });
-	            cartographerWorld.attachMetadata(newX, newY, newZ, tag);
+	   			NamedBinaryTag tag = new NamedBinaryTag(Type.TAG_List, "BlockEntityTag", new NamedBinaryTag[] { new NamedBinaryTag(Type.TAG_Int, "Base", 13) });
+	    		cartographerWorld.setBlock(newX, newY, newZ, TerrainControl.toLocalMaterialData(DefaultMaterial.STANDING_BANNER, 0), tag, true);	            
 	    		//cartographerWorld.setBlock(destPosX, newY - 1, destPosZ, TerrainControl.toLocalMaterialData(DefaultMaterial.GLOWSTONE, 0));
 			}
 	    	// Animals TODO: Animal textures on custom player head cause lots of lag, find a solution
@@ -677,7 +675,7 @@ public class Cartographer
 	    	// Fog of war
 	   		else if((unloading && !portalInRange && !spawnInRange) || (!playerInRange && !portalInRange && !spawnInRange ))
 	    	{
-	    		cartographerWorld.setBlock(newX, newY, newZ, TerrainControl.toLocalMaterialData(DefaultMaterial.STAINED_GLASS, 15));
+	    		cartographerWorld.setBlock(newX, newY, newZ, TerrainControl.toLocalMaterialData(DefaultMaterial.STAINED_GLASS, 15), null, true);
 	    	}
 	    	    	
 	    	// Place player heads
@@ -699,8 +697,7 @@ public class Cartographer
 			    			    					
 						BlockPos pos = new BlockPos(newX, newY, newZ);
 		
-						cartographerWorld.setBlock(pos.getX(), pos.getY(), pos.getZ(), playerHead);
-						cartographerWorld.attachMetadata(pos.getX(), pos.getY(), pos.getZ(), tag);
+						cartographerWorld.setBlock(pos.getX(), pos.getY(), pos.getZ(), playerHead, tag, true);
 						cartographerWorld.getWorld().setBlockState(pos, Blocks.SKULL.getDefaultState().withProperty(BlockSkull.FACING, EnumFacing.UP), 11);
 						
 		                int rotation = (MathHelper.floor((double)((player.rotationYaw - 180) * 16.0F / 360.0F) + 0.5D) & 15);
@@ -714,8 +711,7 @@ public class Cartographer
 		    	
 	            int rotation = (MathHelper.floor((double)(playersInChunk.get(0).rotationYaw * 16.0F / 360.0F) + 0.5D) & 15);
 	            NamedBinaryTag tag = new NamedBinaryTag(Type.TAG_List, "BlockEntityTag", new NamedBinaryTag[] { new NamedBinaryTag(Type.TAG_Int, "Base", chunkCoord.equals(spawnChunk) ? 15 : portalInChunk ? 13 : 10) });
-		    	cartographerWorld.setBlock(newX, baseHeight + heightDiff + playerSignHeightOffset + 1 - minY, newZ, TerrainControl.toLocalMaterialData(DefaultMaterial.STANDING_BANNER, rotation));
-		    	cartographerWorld.attachMetadata(newX, baseHeight + heightDiff + playerSignHeightOffset + 1 - minY, newZ, tag);
+		    	cartographerWorld.setBlock(newX, baseHeight + heightDiff + playerSignHeightOffset + 1 - minY, newZ, TerrainControl.toLocalMaterialData(DefaultMaterial.STANDING_BANNER, rotation), tag, true);
 		    	
 	    		//playerSignHeightOffset = 2;
 	    		

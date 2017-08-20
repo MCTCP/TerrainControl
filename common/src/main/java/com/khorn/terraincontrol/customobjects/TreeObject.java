@@ -3,10 +3,11 @@ package com.khorn.terraincontrol.customobjects;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControl;
-import com.khorn.terraincontrol.configuration.io.SettingsMap;
+import com.khorn.terraincontrol.configuration.io.SettingsReaderOTGPlus;
 import com.khorn.terraincontrol.configuration.settingType.Setting;
 import com.khorn.terraincontrol.configuration.settingType.Settings;
 import com.khorn.terraincontrol.generator.SpawnableObject;
+import com.khorn.terraincontrol.util.BoundingBox;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
@@ -22,8 +23,32 @@ import java.util.Random;
  * to accept {@link SpawnableObject}s instead of {@link CustomObject}s, so that
  * all the extra methods are no longer needed.
  */
-public class TreeObject extends SimpleObject
+public class TreeObject implements CustomObject
 {
+    // Non-OTG+
+    @Override
+    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    {
+        if (y < minHeight || y > maxHeight)
+        {
+            return false;
+        }
+        
+        return spawnForced(world, random, rotation, x, y, z);
+    }
+    
+    @Override
+    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
+    {
+        // A tree has no frequency or rarity, so spawn it once in the chunk
+        int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+        int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+                
+        int y = world.getHighestBlockYAt(x, z);
+        return trySpawnAt(world, random, Rotation.NORTH, x, y, z);
+    }
+    //
+	
     private static class TreeSettings extends Settings
     {
         static final Setting<Integer> MIN_HEIGHT = intSetting("MinHeight",
@@ -47,7 +72,7 @@ public class TreeObject extends SimpleObject
         // Stub method
     }
 
-    public TreeObject(TreeType type, SettingsMap settings)
+    public TreeObject(TreeType type, SettingsReaderOTGPlus settings)
     {
         this.type = type;
         this.minHeight = settings.getSetting(TreeSettings.MIN_HEIGHT, TreeSettings.MIN_HEIGHT.getDefaultValue());
@@ -79,21 +104,13 @@ public class TreeObject extends SimpleObject
     }
 
     @Override
-    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
-    {
-        // A tree has no frequency or rarity, so spawn it once in the chunk
-        int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-        int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-        int y = world.getHighestBlockYAt(x, z);
-        if (canSpawnAt(world, Rotation.NORTH, x, y, z))
-        {
-            return spawnForced(world, random, Rotation.NORTH, x, y, z);
-        }
-        return false;
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
+    {      	
+    	throw new RuntimeException(); // Fix this properly, re-do the abstraction/inheritance for BO2/BO3/TreeObject/MCObject/CustomObject
     }
 
     @Override
-    public CustomObject applySettings(SettingsMap settings)
+    public CustomObject applySettings(SettingsReaderOTGPlus settings)
     {
         return new TreeObject(type, settings);
     }
@@ -103,15 +120,25 @@ public class TreeObject extends SimpleObject
     {
         return true;
     }
-
+    
     @Override
-    public boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
+    public boolean canRotateRandomly()
     {
-        if (y < minHeight || y > maxHeight)
-        {
-            return false;
-        }
-        return true;
+        // Trees cannot be rotated
+        return false;
     }
-
+    
+    // TODO: Clean up inheritance for CustomObject, these methods shouldn't be here
+    
+    @Override
+    public int getMaxBranchDepth()
+    {
+    	throw new RuntimeException();
+    }    
+    
+	@Override
+	public BoundingBox getBoundingBox(Rotation rotation)
+	{
+		return BoundingBox.newEmptyBox();
+	}
 }

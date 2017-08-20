@@ -29,7 +29,11 @@ public class PluginStandardValues extends Settings
     
     public static final String PLUGIN_NAME_SHORT = "OTG";
         
+    public static final Setting<String> REPLACE_UNKNOWN_BLOCK_WITH_MATERIAL = stringSetting("ReplaceUnknownBlockWithMaterial", "LOG");
+    
     public static final Setting<Boolean> SPAWN_LOG = booleanSetting("SpawnLog", false);
+    
+    public static final Setting<Boolean> DEVELOPER_MODE = booleanSetting("DeveloperMode", false);
     
     public static final Setting<Integer> PREGENERATOR_MAX_CHUNKS_PER_TICK = intSetting("PregeneratorMaxChunksPerTick", 1, 1, Integer.MAX_VALUE);   
 }

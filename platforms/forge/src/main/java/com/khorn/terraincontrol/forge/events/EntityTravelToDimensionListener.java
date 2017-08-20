@@ -27,7 +27,7 @@ public class EntityTravelToDimensionListener
 {
 	@SubscribeEvent
 	public void entityTravelToDimension(EntityTravelToDimensionEvent e)
-	{	
+	{			
 		boolean cartographerEnabled = ((ForgeEngine)TerrainControl.getEngine()).getCartographerEnabled();
 
 		if(e.getDimension() == -1)

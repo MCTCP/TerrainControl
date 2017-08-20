@@ -85,10 +85,10 @@ public class UnderWaterOreGen extends Resource
                 {
                     for (int y = firstSolidBlock - two; y <= firstSolidBlock + two; y++)
                     {
-                        LocalMaterialData sourceBlock = world.getMaterial(currentX, y, currentZ);
+                        LocalMaterialData sourceBlock = world.getMaterial(currentX, y, currentZ, false);
                         if (sourceBlocks.contains(sourceBlock))
                         {
-                            world.setBlock(currentX, y, currentZ, material);
+                            world.setBlock(currentX, y, currentZ, material, null, false);
                         }
                     }
                 }

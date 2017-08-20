@@ -8,42 +8,52 @@ import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigToNetworkSender;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.forge.ForgeEngine;
-import com.khorn.terraincontrol.forge.TXPlugin;
 import com.khorn.terraincontrol.forge.dimensions.DimensionData;
-import com.khorn.terraincontrol.forge.dimensions.DimensionSyncPacket;
 import com.khorn.terraincontrol.forge.dimensions.OTGDimensionInfo;
 import com.khorn.terraincontrol.forge.dimensions.TXDimensionManager;
+import com.khorn.terraincontrol.forge.network.DimensionSyncPacket;
+import com.khorn.terraincontrol.forge.network.PacketDispatcher;
+import com.khorn.terraincontrol.forge.network.ParticlesPacket;
 import com.khorn.terraincontrol.logging.LogMarker;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.NetworkManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-import net.minecraftforge.fml.common.network.FMLOutboundHandler;
-import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
-import net.minecraftforge.fml.relauncher.Side;
 
 public class PlayerTracker
 {
     @SubscribeEvent
     public void onConnectionCreated(FMLNetworkEvent.ServerConnectionFromClientEvent event)
-    {
-    	SendWorldAndBiomeConfigs(event.getManager(), true);
+    {   	
+		ByteBuf nettyBuffer = createWorldAndBiomeConfigsPacket();
+		if(nettyBuffer != null)
+		{
+			PacketDispatcher.sendTo(new DimensionSyncPacket(nettyBuffer), event.getManager());
+	    	// Reset particles in case the player just switched worlds.
+	    	PacketDispatcher.sendTo(new ParticlesPacket(), event.getManager());
+		} else {
+			TerrainControl.log(LogMarker.WARN, "Could not find an OTG overworld, OTG is disabled. It is currently not possible to use OTG with a non-OTG overworld. To enable OTG make sure that level-type=OTG is configured in the server.properties file.");
+		}
     }
 
+    // Used when creating / deleting dimensions
     public static void SendAllWorldAndBiomeConfigsToAllPlayers(MinecraftServer server)
     {
-    	for(EntityPlayerMP player : server.getPlayerList().getPlayers())
-    	{
-    		SendWorldAndBiomeConfigs(player.connection.netManager, server.isSinglePlayer());
-    	}
+		ByteBuf nettyBuffer = createWorldAndBiomeConfigsPacket();
+		if(nettyBuffer != null)
+		{
+	    	for(EntityPlayerMP player : server.getPlayerList().getPlayers())
+	    	{
+	        	PacketDispatcher.sendTo(new DimensionSyncPacket(nettyBuffer), (EntityPlayerMP) player);
+	    	}
+		}
     }
     
-    private static void SendWorldAndBiomeConfigs(NetworkManager networkManager, boolean isSinglePlayer)
+    private static ByteBuf createWorldAndBiomeConfigsPacket()
     {
         // Make sure worlds are sent in the correct order.
         
@@ -57,6 +67,7 @@ public class PlayerTracker
         try
         {
         	stream.writeInt(PluginStandardValues.ProtocolVersion);
+        	stream.writeInt(0); // 0 == Normal packet
         	stream.writeInt(otgDimData.orderedDimensions.size() + 1); // Number of worlds in this packet
         	   		
     		// Send worldconfig and biomeconfigs for each world.
@@ -65,7 +76,8 @@ public class PlayerTracker
 
 			if(localWorld == null)
 			{
-				throw new RuntimeException("Could not find the OTG overworld. Worlds must be created via OTG, you cannot use pre-existing (non-OTG) worlds with OTG.");
+				// This is not an OTG world.
+				return null;
 			}
 			
 			// Overworld (dim 0)
@@ -107,13 +119,6 @@ public class PlayerTracker
 			e1.printStackTrace();
 		}
         
-        // Make the packet        
-    	DimensionSyncPacket packet = new DimensionSyncPacket();
-    	// Send dimensions to client
-    	packet.setData(nettyBuffer);
-        
-        TXPlugin.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.DISPATCHER);
-        TXPlugin.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(networkManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).get());
-        TXPlugin.channels.get(Side.SERVER).writeOutbound(packet);
+        return nettyBuffer;
     }
 }

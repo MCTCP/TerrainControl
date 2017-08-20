@@ -2,9 +2,11 @@ package com.khorn.terraincontrol.bukkit;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.server.v1_11_R1.Block;
@@ -14,7 +16,6 @@ import java.util.ArrayList;
 
 public class BukkitEngine extends TerrainControlEngine
 {
-
     private final TXPlugin plugin;
 
     public BukkitEngine(TXPlugin plugin)
@@ -61,8 +62,7 @@ public class BukkitEngine extends TerrainControlEngine
         } catch (NumberFormatException e)
         {
             throw new InvalidConfigException("Unknown material: " + input);
-        }
-
+        }    
     }
 
     @SuppressWarnings("deprecation")
@@ -109,7 +109,8 @@ public class BukkitEngine extends TerrainControlEngine
                     return BukkitMaterialData.ofMinecraftBlockData(block.fromLegacyData(blockData));
                 } catch (IllegalArgumentException e)
                 {
-                    throw new InvalidConfigException("Illegal block data for the block type, cannot use " + input);
+                	TerrainControl.log(LogMarker.WARN, "Illegal block data for the block type, cannot use " + input);
+                    return null;
                 }
             }
         }
@@ -135,5 +136,8 @@ public class BukkitEngine extends TerrainControlEngine
     // Only used for Forge atm TODO: Put in Forge layer only, not common?
     
 	@Override
-	public LocalWorld getUnloadedWorld(String name) { return null; }
+	public LocalWorld getUnloadedWorld(String name)
+	{
+		return null;
+	}
 }

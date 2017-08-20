@@ -18,7 +18,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Methods for conversion between mob lists in Minecraft and in the plugin.

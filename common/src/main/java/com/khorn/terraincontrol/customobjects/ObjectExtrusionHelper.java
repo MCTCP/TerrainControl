@@ -92,18 +92,18 @@ public class ObjectExtrusionHelper
             if (extrudeMode == BO3Settings.ExtrudeMode.BottomDown)
             {
                 for (int yi = y + block.y - 1;
-                     yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
+                     yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z, false));
                      --yi)
                 {
-                    block.spawn(world, random, x + block.x, yi, z + block.z);
+                	world.setBlock(x + block.x, yi, z + block.z, block.material, block.metaDataTag, false);
                 }
             } else if (extrudeMode == BO3Settings.ExtrudeMode.TopUp)
             {
                 for (int yi = y + block.y + 1;
-                     yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z));
+                     yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z, false));
                      ++yi)
                 {
-                    block.spawn(world, random, x + block.x, yi, z + block.z);
+                	world.setBlock(x + block.x, yi, z + block.z, block.material, block.metaDataTag, false);
                 }
             }
         }

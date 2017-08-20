@@ -100,11 +100,13 @@ public class TXDimensionManager
 		}
 		
 		world.unRegisterBiomes();
-		
+			
 		((ForgeEngine)TerrainControl.getEngine()).getWorldLoader().RemoveUnloadedWorld(world.getName());
 
 		TXDimensionManager.UnloadCustomDimensionData(dimToRemove);
 
+		world.DeleteWorldSessionData();
+		
 		BitSet dimensionMap = null;
 		try {
 			Field[] fields = DimensionManager.class.getDeclaredFields();
@@ -537,44 +539,7 @@ public class TXDimensionManager
 	}
 	
 	public static HashMap<Integer, String> GetAllOTGDimensions()
-	{
-    	Hashtable dimensions = null;  	
-       	
-		try
-		{
-			Field[] fields = DimensionManager.class.getDeclaredFields();
-			for(Field field : fields)
-			{
-				Class<?> fieldClass = field.getType();
-				if(fieldClass.equals(Hashtable.class))
-				{
-					field.setAccessible(true);
-					Hashtable fieldAsHashTable = (Hashtable) field.get(new DimensionManager());
-					if(fieldAsHashTable.values().size() > 0)
-					{
-						Object value = fieldAsHashTable.values().toArray()[0];																
-						if(value instanceof DimensionType || !(value instanceof WorldServer)) // Forge 1.11.2 - 13.20.0.2228 uses DimensionType, Forge 1.11.2 - 13.20.0.2315 uses Dimension
-						{							
-							dimensions = fieldAsHashTable;
-					        break;
-						}
-					}
-				}
-			}
-		}
-		catch (SecurityException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalArgumentException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
-		
+	{	
 		HashMap<Integer, String> otgDims = new HashMap<Integer, String>();
 		
 		for(int i = 2; i < Long.SIZE << 4; i++)

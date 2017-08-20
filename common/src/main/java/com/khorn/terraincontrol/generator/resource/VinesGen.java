@@ -47,19 +47,19 @@ public class VinesGen extends Resource
             default:
                 return false;
             case 1:
-                sourceBlock = world.getMaterial(x, y + 1, z);
+                sourceBlock = world.getMaterial(x, y + 1, z, false);
                 break;
             case 2:
-                sourceBlock = world.getMaterial(x, y, z + 1);
+                sourceBlock = world.getMaterial(x, y, z + 1, false);
                 break;
             case 3:
-                sourceBlock = world.getMaterial(x, y, z - 1);
+                sourceBlock = world.getMaterial(x, y, z - 1, false);
                 break;
             case 5:
-                sourceBlock = world.getMaterial(x - 1, y, z);
+                sourceBlock = world.getMaterial(x - 1, y, z, false);
                 break;
             case 4:
-                sourceBlock = world.getMaterial(x + 1, y, z);
+                sourceBlock = world.getMaterial(x + 1, y, z, false);
                 break;
         }
         return sourceBlock.isSolid();
@@ -111,12 +111,12 @@ public class VinesGen extends Resource
 
         while (y <= maxAltitude)
         {
-            if (world.isEmpty(_x, y, _z))
+            if (world.isNullOrAir(_x, y, _z, false))
             {
                 for (int direction = 2; direction <= 5; direction++)
                     if (canPlace(world, _x, y, _z, direction))
                     {
-                        world.setBlock(_x, y, _z, TerrainControl.toLocalMaterialData(DefaultMaterial.VINE, 1 << d[OPPOSITE_FACING[direction]]));
+                        world.setBlock(_x, y, _z, TerrainControl.toLocalMaterialData(DefaultMaterial.VINE, 1 << d[OPPOSITE_FACING[direction]]), null, false);
                         break;
                     }
             } else

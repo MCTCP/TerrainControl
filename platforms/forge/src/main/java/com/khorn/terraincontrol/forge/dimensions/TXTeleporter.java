@@ -13,7 +13,8 @@ import com.khorn.terraincontrol.forge.ForgeEngine;
 import com.khorn.terraincontrol.forge.ForgeMaterialData;
 import com.khorn.terraincontrol.forge.ForgeWorld;
 import com.khorn.terraincontrol.forge.generator.Cartographer;
-import com.khorn.terraincontrol.logging.LogMarker;
+import com.khorn.terraincontrol.forge.network.PacketDispatcher;
+import com.khorn.terraincontrol.forge.network.ParticlesPacket;
 
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
@@ -34,7 +35,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -100,7 +100,7 @@ public class TXTeleporter
         }
     }	
     
-    private static void copyDataFromOld(Entity entityIn, Entity _this)
+    static void copyDataFromOld(Entity entityIn, Entity _this)
     {
         NBTTagCompound nbttagcompound = entityIn.writeToNBT(new NBTTagCompound());
         nbttagcompound.removeTag("Dimension");
@@ -149,15 +149,18 @@ public class TXTeleporter
         
         changePlayerDimension(_this, dimensionIn, _this.mcServer.getPlayerList(), createPortal);
         _this.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
+        
+        PacketDispatcher.sendTo(new ParticlesPacket(), _this); // Clear particles
+        
         return _this;
     }
     
-    public static void changePlayerDimension(EntityPlayerMP player, int dimensionIn, PlayerList _this, boolean createPortal)
+    static void changePlayerDimension(EntityPlayerMP player, int dimensionIn, PlayerList _this, boolean createPortal)
     {    	    	
         transferPlayerToDimension(player, dimensionIn, _this.getServerInstance().getWorld(dimensionIn).getDefaultTeleporter(), _this, createPortal);
     }
 
-    public static void transferPlayerToDimension(EntityPlayerMP player, int dimensionIn, net.minecraft.world.Teleporter teleporter, PlayerList _this, boolean createPortal)
+    static void transferPlayerToDimension(EntityPlayerMP player, int dimensionIn, net.minecraft.world.Teleporter teleporter, PlayerList _this, boolean createPortal)
     {
         int i = player.dimension;
         WorldServer worldserver = _this.getServerInstance().getWorld(player.dimension);
@@ -182,7 +185,7 @@ public class TXTeleporter
         net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerChangedDimensionEvent(player, i, dimensionIn);
     }
     
-    public static void transferEntityToWorld(Entity entityIn, int lastDimension, WorldServer oldWorldIn, WorldServer toWorldIn, net.minecraft.world.Teleporter teleporter, boolean createPortal)
+    static void transferEntityToWorld(Entity entityIn, int lastDimension, WorldServer oldWorldIn, WorldServer toWorldIn, net.minecraft.world.Teleporter teleporter, boolean createPortal)
     {
     	double entityPosY = entityIn.getPosition().getY();
         net.minecraft.world.WorldProvider pOld = oldWorldIn.provider;
@@ -245,7 +248,7 @@ public class TXTeleporter
         entityIn.setWorld(toWorldIn);
     }
     
-	private static Long2ObjectMap<Teleporter.PortalPosition> getPortals(int dimensionId)
+	static Long2ObjectMap<Teleporter.PortalPosition> getPortals(int dimensionId)
 	{
 		Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = null;
 
@@ -259,7 +262,7 @@ public class TXTeleporter
 				if(fieldClass.equals(Long2ObjectMap.class))
 				{
 					field.setAccessible(true);
-					destinationCoordinateCache = (Long2ObjectMap) field.get(worldserver1.getDefaultTeleporter());
+					destinationCoordinateCache = (Long2ObjectMap<Teleporter.PortalPosition>) field.get(worldserver1.getDefaultTeleporter());
 			        break;
 				}
 			}
@@ -274,7 +277,7 @@ public class TXTeleporter
 		return destinationCoordinateCache;
 	}
     
-    public static boolean placeInExistingPortal(WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
+    static boolean placeInExistingPortal(WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
     {
         double d0 = -1.0D;
         int j = MathHelper.floor(entityIn.posX);
@@ -460,7 +463,7 @@ public class TXTeleporter
         }
     }
     
-    public static void placeInPortal(ForgeMaterialData portalMaterial, WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
+    static void placeInPortal(ForgeMaterialData portalMaterial, WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
     {
         if (destinationWorld.provider.getDimensionType().getId() != 1) // If not End
         {
@@ -470,38 +473,11 @@ public class TXTeleporter
             	placeInExistingPortal(destinationWorld, entityIn, rotationYaw, _this);
             }
         } else {
-        	if (1 == 1)
-        	{
-        		throw new RuntimeException("DOH!"); // TODO: Does this ever happen?
-        	}
-            int i = MathHelper.floor(entityIn.posX);
-            int j = MathHelper.floor(entityIn.posY) - 1;
-            int k = MathHelper.floor(entityIn.posZ);
-
-            for (int j1 = -2; j1 <= 2; ++j1)
-            {
-                for (int k1 = -2; k1 <= 2; ++k1)
-                {
-                    for (int l1 = -1; l1 < 3; ++l1)
-                    {
-                        int i2 = i + k1 * 1 + j1 * 0;
-                        int j2 = j + l1;
-                        int k2 = k + k1 * 0 - j1 * 1;
-                        boolean flag = l1 < 0;	                        	                        
-                        
-                        destinationWorld.setBlockState(new BlockPos(i2, j2, k2), flag ? portalMaterial.internalBlock() : Blocks.AIR.getDefaultState());
-                    }
-                }
-            }
-
-            entityIn.setLocationAndAngles((double)i, (double)j + 1, (double)k, entityIn.rotationYaw, 0.0F);
-            entityIn.motionX = 0.0D;
-            entityIn.motionY = 0.0D;
-            entityIn.motionZ = 0.0D;
+    		throw new RuntimeException("DOH!"); // TODO: Does this ever happen?
         }
     }
     
-    public static boolean makePortal(ForgeMaterialData portalMaterial, WorldServer destinationWorld, Entity entityIn, Teleporter _this)
+    static boolean makePortal(ForgeMaterialData portalMaterial, WorldServer destinationWorld, Entity entityIn, Teleporter _this)
     {
         double d0 = -1.0D;
         int j = MathHelper.floor(entityIn.posX);

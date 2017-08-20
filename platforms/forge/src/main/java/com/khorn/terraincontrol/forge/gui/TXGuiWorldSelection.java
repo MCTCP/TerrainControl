@@ -18,6 +18,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.khorn.terraincontrol.TerrainControl;
+import com.khorn.terraincontrol.forge.util.IOHelper;
 
 @SideOnly(Side.CLIENT)
 public class TXGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
@@ -52,6 +53,8 @@ public class TXGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
 		// Delete world
 		super.confirmClicked(ok, worldId);
 
+    	// TODO: This is for legacy worlds only, the files are stored in the world saves directory now. Remove this?
+		
 		// Check for world settings for this world
         File TCWorldsDirectory = new File(TerrainControl.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
         if(TCWorldsDirectory.exists() && TCWorldsDirectory.isDirectory())
@@ -64,37 +67,43 @@ public class TXGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
     				File StructureDataDirectory = new File(worldDir.getAbsolutePath() + "/StructureData");
                     if (StructureDataDirectory.exists())
                     {
-                    	deleteRecursive(StructureDataDirectory);
+                    	IOHelper.deleteRecursive(StructureDataDirectory);
                     }
 
+                    File dimensionsDataFile = new File(worldDir.getAbsolutePath() + "/Dimensions.txt");
+                    if (dimensionsDataFile.exists())
+                    {
+                    	IOHelper.deleteRecursive(dimensionsDataFile);
+                    }
+                    
                     File structureDataFile = new File(worldDir.getAbsolutePath() + "/StructureData.txt");
                     if (structureDataFile.exists())
                     {
-                    	deleteRecursive(structureDataFile);
+                    	IOHelper.deleteRecursive(structureDataFile);
                     }
                     
                     File nullChunksFile = new File(worldDir.getAbsolutePath() + "/NullChunks.txt");
                     if (nullChunksFile.exists())
                     {
-                    	deleteRecursive(nullChunksFile);
+                    	IOHelper.deleteRecursive(nullChunksFile);
                     }
                     
                     File spawnedStructuresFile = new File(worldDir.getAbsolutePath() + "/SpawnedStructures.txt");
                     if (spawnedStructuresFile.exists())
                     {
-                    	deleteRecursive(spawnedStructuresFile);
+                    	IOHelper.deleteRecursive(spawnedStructuresFile);
                     }
 
                     File chunkProviderPopulatedChunksFile = new File(worldDir.getAbsolutePath() + "/ChunkProviderPopulatedChunks.txt");
                     if (chunkProviderPopulatedChunksFile.exists())
                     {
-                    	deleteRecursive(chunkProviderPopulatedChunksFile);
+                    	IOHelper.deleteRecursive(chunkProviderPopulatedChunksFile);
                     }
 
                     File pregeneratedChunksFile = new File(worldDir.getAbsolutePath() + "/PregeneratedChunks.txt");
                     if (pregeneratedChunksFile.exists())
                     {
-                    	deleteRecursive(pregeneratedChunksFile);
+                    	IOHelper.deleteRecursive(pregeneratedChunksFile);
                     }                    				
     			}
     			break;
@@ -102,20 +111,6 @@ public class TXGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
     	}            
 		this.mc.displayGuiScreen(new GuiWorldSelection(new GuiMainMenu()));
     }
-
-	public static void deleteRecursive(File folder) {
-	    File[] files = folder.listFiles();
-	    if(files!=null) { //some JVMs return null for empty dirs
-	        for(File f: files) {
-	            if(f.isDirectory()) {
-	            	deleteRecursive(f);
-	            } else {
-	                f.delete();
-	            }
-	        }
-	    }
-	    folder.delete();
-	}
     
     /**
      * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
