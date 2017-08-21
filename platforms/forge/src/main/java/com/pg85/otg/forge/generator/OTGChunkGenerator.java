@@ -214,7 +214,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 			// This can also happen when the server decides to provide and/or
 			// populate a chunk that has already been provided/populated before,
 			// which seems like a bug.	        	
-        	//throw new NotImplementedException();
+        	//throw new RuntimeException();
         }
     
         fixSpawnChunk();

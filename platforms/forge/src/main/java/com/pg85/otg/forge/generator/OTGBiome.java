@@ -197,7 +197,7 @@ public class OTGBiome extends Biome
     @Override
     public String toString()
     {
-        return "TXBiome of " + getBiomeName();
+        return "OTGBiome of " + getBiomeName();
     }
    
     // Fix for swamp colors (there's a custom noise applied to swamp colors)

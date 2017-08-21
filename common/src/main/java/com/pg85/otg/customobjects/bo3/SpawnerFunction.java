@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 /**
  * Represents a block in a BO3.
  */
@@ -267,7 +265,7 @@ public class SpawnerFunction extends BO3Function
      */
     public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean markBlockForUpdate)
     {
-    	throw new NotImplementedException(); 
+    	throw new RuntimeException(); 
     }
 
     @Override

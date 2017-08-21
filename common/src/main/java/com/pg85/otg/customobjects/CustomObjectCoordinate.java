@@ -76,7 +76,6 @@ public class CustomObjectCoordinate
     		if(object == null)
     		{
     			OTG.log(LogMarker.ERROR, "Could not find BO2/BO3 " + BO3Name + " in GlobalObjects or WorldObjects directory.");
-    			//throw new NotImplementedException();
     		}
 			BO3Name = object != null ? object.getName() : BO3Name;
     		

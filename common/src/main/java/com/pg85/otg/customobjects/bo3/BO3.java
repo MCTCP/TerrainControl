@@ -52,9 +52,7 @@ public class BO3 implements StructuredCustomObject
      * @param extraSettings The settings to override
      */
     public BO3(BO3 oldObject, SettingsReaderOTGPlus extraSettings)
-    {
-    	//throw new NotImplementedException();
-    	    	
+    {    	    	
         try
         {                
 			this.settings = new BO3Config(extraSettings, null);

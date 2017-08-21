@@ -319,8 +319,7 @@ public class ObjectSpawner
 				//world.replaceBlocks(chunkCoord); // <-- causes nullreference exception when getChunk returns null
 				
 				OTG.log(LogMarker.INFO,"Error, minecraft engine attempted to populate two chunks at once! Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC/OTG resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to TRACE in mods/OpenTerrainGenerator/OTG.ini file for a stack trace.");
-				OTG.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));
-				//throw new NotImplementedException(); // Enable this when debugging				
+				OTG.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));			
 			} else {
 				OTG.log(LogMarker.TRACE,"Error, minecraft engine attempted to populate two chunks at once! Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other OTG resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to Trace in mods/OpenTerrainGenerator/OTG.ini file for a stack trace. (Update: The recently added multi-dimension features may be causing this log message occasionally, will fix a.s.a.p).");
 				OTG.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));

@@ -555,7 +555,7 @@ public class ServerEventListener
 					StringBuilder sb = new StringBuilder();
         			for(ParticleFunction particleData : particleDataForOTGPerPlayer)
         			{
-        				sb.append(particleData.makeString());
+        				sb.append(particleData.makeStringForPacket());
         			}
         			
 					try

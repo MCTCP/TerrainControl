@@ -1179,6 +1179,7 @@ public class BO3Config extends CustomObjectConfigFile
         writer.comment("isRequiredBranch - If this is set to true then at least one of the branches in this BO3 must spawn at these x,y,z coordinates. If no branch can spawn there then this BO3 fails to spawn and its branch is rolled back.");
         writer.comment("isRequiredBranch:true branches must spawn or the current branch is rolled back entirely. This is useful for grouping BO3's that must spawn together, for instance a single room made of multiple BO3's/branches.");
         writer.comment("If all parts of the room are connected together via isRequiredBranch:true branches then either the entire room will spawns or no part of it will spawn.");
+        writer.comment("*Note: When isRequiredBranch:true only one BO3 can be added per Branch() and it will automatically have a rarity of 100.0.");
         writer.comment("isRequiredBranch:false branches are used to make optional parts of structures, for instance the middle section of a tunnel that has a beginning, middle and end BO3/branch and can have a variable length by repeating the middle BO3/branch.");
         writer.comment("By making the start and end branches isRequiredBranch:true and the middle branch isRequiredbranch:false you can make it so that either:");
 		writer.comment("A. A tunnel spawns with at least a beginning and end branch");
@@ -1193,6 +1194,7 @@ public class BO3Config extends CustomObjectConfigFile
         writer.comment("Weighted Branches spawn branches with a dependent chance of spawning.");
         writer.comment("When IsOTGPlus is set to false: WeightedBranch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]][MaxChanceOutOf])");
         writer.comment("When IsOTGPlus is set to true: WeightedBranch(x,y,z,isRequiredBranch,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]][MaxChanceOutOf],branchDepth)");
+        writer.comment("*Note: isRequiredBranch must be set to false. It is not possible to use isRequiredBranch:true with WeightedBranch() since isRequired:true branches must spawn and automatically have a rarity of 100.0.");
         writer.comment("MaxChanceOutOf - The chance all branches have to spawn out of, assumed to be 100 when left blank");
         
         if(!isOTGPlus)

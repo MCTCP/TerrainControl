@@ -981,16 +981,8 @@ public class ForgeWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, z, true);
         if (chunk == null)
         {
-        	int y = generator.getHighestBlockYInUnloadedChunk(x,z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
-        	//OTG.log(LogMarker.INFO, "returned" + y);
-        	if(y == -1)
-        	{
-        		//throw new NotImplementedException(); // This can happen in sky worlds. Enable this for testing only
-        	}
-        	        	
+        	int y = generator.getHighestBlockYInUnloadedChunk(x,z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);        	        	
         	return y;
-        	//throw new NotImplementedException();
-            //return -1;
         }
        
 		// Get internal coordinates for block in chunk

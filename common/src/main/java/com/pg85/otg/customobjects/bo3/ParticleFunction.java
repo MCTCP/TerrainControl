@@ -7,8 +7,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 import java.util.List;
 import java.util.Random;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 /**
  * Represents a block in a BO3.
  */
@@ -68,6 +66,11 @@ public class ParticleFunction extends BO3Function
     {
     	return "Particle(" + x + ',' + y + ',' + z + ',' + particleName + ',' + interval + ',' + velocityX + ',' + velocityY + ',' + velocityZ + ')';
     }
+
+    public String makeStringForPacket()
+    {
+    	return "Particle(" + x + ',' + y + ',' + z + ',' + particleName + ',' + interval + ',' + velocityX + ',' + velocityY + ',' + velocityZ + ',' + velocityXSet + ',' + velocityYSet + ',' + velocityZSet + ')';
+    }
     
     @Override
     public ParticleFunction rotate()
@@ -106,7 +109,7 @@ public class ParticleFunction extends BO3Function
      */
     public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean markBlockForUpdate)
     {
-    	throw new NotImplementedException(); 
+    	throw new RuntimeException(); 
     }
 
     @Override

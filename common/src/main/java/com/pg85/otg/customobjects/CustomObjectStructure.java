@@ -162,27 +162,7 @@ public class CustomObjectStructure
 				{
 					BO3.y += startY;
 				}
-			}
-
-			//OTG.log(LogMarker.INFO, "STARTY: " + startY);
-			
-			/*
-			if(currentlyTryingToSpawnBranch != null)
-			{
-				for(BranchDataItem branch : currentlyTryingToSpawnBranch.getChildren(false))
-				{
-					branch.Branch.y += startY;	
-				}				
-			}
-			
-			for(BranchDataItem branch : AllBranchesBranchData) // Apparently the CustomObjectCoordinates in branch.Branch are the same as those in ObjectsToSpawn(?)
-			{
-				if(branch.Branch != Start)
-				{
-					branch.Branch.y += startY;
-				}
-			}
-			*/			
+			}		
 			
 			Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn2 = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
 			SmoothingAreasToSpawn2.putAll(SmoothingAreasToSpawn);
@@ -248,13 +228,7 @@ public class CustomObjectStructure
 			
 			// Only detect Y or material of source block if necessary to prevent chunk loading
 			// if this BO3 is being plotted in a chunk that has not yet been populated.
-			
-			// Remove this to improve performance, enable for testing
-			//if(CheckSpawnRequirementsAndCollisions(new BranchDataItem(World, Random, null, Start, null, 0, 0, false), false).size() > 0)
-			{
-				//throw new IllegalArgumentException("Structure could not be plotted at these coordinates");				
-			}
-			
+					
 			// Need to know the height if this structure can only spawn at a certain height
 			if((((BO3)Start.getObject()).getSettings().spawnHeight == SpawnHeightEnum.highestBlock || ((BO3)Start.getObject()).getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock) && (World.getConfigs().getWorldConfig().disableBedrock || ((BO3)Start.getObject()).getSettings().minHeight > 1 || ((BO3)Start.getObject()).getSettings().maxHeight < 256))
 			{
@@ -418,83 +392,34 @@ public class CustomObjectStructure
 						
 			for(ChunkCoordinate chunkCoord : ObjectsToSpawn.keySet())
 			{
-				//if(World.getStructureCache().structureCache.containsKey(chunkCoord) && World.getStructureCache().structureCache.get(chunkCoord) != this)
-				//{
-					//OTG.log(LogMarker.INFO, "Initialised " + world.getPregeneratorInitialised() + " Running " + world.getPregeneratorIsRunning() +  " L" + world.getPregeneratedBorderLeft() + " R" + world.getPregeneratedBorderRight() + " T" + world.getPregeneratedBorderTop() + " B" + world.getPregeneratedBorderBottom());
-					//OTG.log(LogMarker.INFO, "Error at Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". " + (!World.getStructureCache().structureCache.containsKey(chunkCoord) ? (world.IsInsidePregeneratedRegion(chunkCoord, true) ? "Inside pregenned region" : "Not plotted") : World.getStructureCache().structureCache.get(chunkCoord) == null ? "Plotted and spawned" : World.getStructureCache().structureCache.get(chunkCoord).Start != null ? World.getStructureCache().structureCache.get(chunkCoord).Start.BO3Name : "Trees"));
-					//throw new NotImplementedException();
-				//} else {
-					//OTG.log(LogMarker.INFO, "Added BO3 at Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". " + this.Start.BO3Name);
-				//}
-				
-				// Disabled to improve performance, enable for testing
-				//if(!World.getObjectSpawner().IsInsidePregeneratedRegion(chunkCoord) && !World.getStructureCache().structureCache.containsKey(chunkCoord))
-				//{
-					World.getStructureCache().structureCache.put(chunkCoord, this);
-					//World.getStructureCache().DelayedChunks.remove(chunkCoord);					
-					World.getStructureCache().structuresPerChunk.put(chunkCoord, new ArrayList<String>());
-					// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
-					if(World.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
-					{
-						CustomObjectStructure existingObject = World.getStructureCache().worldInfoChunks.get(chunkCoord);
-						this.modData.addAll(existingObject.modData);
-						this.particleData.addAll(existingObject.particleData);
-						this.spawnerData.addAll(existingObject.spawnerData);						
-					}
-					World.getStructureCache().worldInfoChunks.put(chunkCoord, this);
-				//} else {
-					//throw new NotImplementedException();
-				//}
-					
-				//String structureString = "";
-				//for(CustomObjectCoordinate structure : ObjectsToSpawn.get(chunkCoord))
+				World.getStructureCache().structureCache.put(chunkCoord, this);			
+				World.getStructureCache().structuresPerChunk.put(chunkCoord, new ArrayList<String>());
+				// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
+				if(World.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
 				{
-					//structureString += structure.BO3Name + ", ";
+					CustomObjectStructure existingObject = World.getStructureCache().worldInfoChunks.get(chunkCoord);
+					this.modData.addAll(existingObject.modData);
+					this.particleData.addAll(existingObject.particleData);
+					this.spawnerData.addAll(existingObject.spawnerData);						
 				}
-						
-				//OTG.log(LogMarker.INFO, "Added X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + " " + structureString);
+				World.getStructureCache().worldInfoChunks.put(chunkCoord, this);
 			}	
 			
 			for(ChunkCoordinate chunkCoord : SmoothingAreasToSpawn.keySet())
 			{
-				//if(World.getStructureCache().structureCache.containsKey(chunkCoord) && World.getStructureCache().structureCache.get(chunkCoord) != this)
-				//{
-					//OTG.log(LogMarker.INFO, "Initialised " + world.getPregeneratorInitialised() + " Running " + world.getPregeneratorIsRunning() +  " L" + world.getPregeneratedBorderLeft() + " R" + world.getPregeneratedBorderRight() + " T" + world.getPregeneratedBorderTop() + " B" + world.getPregeneratedBorderBottom());
-					//OTG.log(LogMarker.INFO, "Error at Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". " + (!World.getStructureCache().structureCache.containsKey(chunkCoord) ? (world.IsInsidePregeneratedRegion(chunkCoord, true) ? "Inside pregenned region" : "Not plotted") : World.getStructureCache().structureCache.get(chunkCoord) == null ? "Plotted and spawned" : World.getStructureCache().structureCache.get(chunkCoord).Start != null ? World.getStructureCache().structureCache.get(chunkCoord).Start.BO3Name : "Trees"));
-					//throw new NotImplementedException();
-				//} else {
-					//OTG.log(LogMarker.INFO, "Added BO3 smoothing area at Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". " + this.Start.BO3Name);
-				//}
-				
-				// Disabled to improve performance, enable for testing
-				//if(!World.getObjectSpawner().IsInsidePregeneratedRegion(chunkCoord) && !World.getStructureCache().structureCache.containsKey(chunkCoord))
-				//{
-					World.getStructureCache().structureCache.put(chunkCoord, this);
-					//World.getStructureCache().DelayedChunks.remove(chunkCoord);
-					World.getStructureCache().structuresPerChunk.put(chunkCoord, new ArrayList<String>());
-					// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
-					if(World.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
-					{
-						CustomObjectStructure existingObject = World.getStructureCache().worldInfoChunks.get(chunkCoord);
-						this.modData.addAll(existingObject.modData);
-						this.particleData.addAll(existingObject.particleData);
-						this.spawnerData.addAll(existingObject.spawnerData);						
-					}					
-					World.getStructureCache().worldInfoChunks.put(chunkCoord, this);
-				//}
-				//else if(World.getStructureCache().structureCache.get(chunkCoord).Start != this.Start)
-				//{					
-					//throw new NotImplementedException();
-				//}
-				//OTG.log(LogMarker.INFO, "Added X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + " smoothing area");
+				World.getStructureCache().structureCache.put(chunkCoord, this);
+				World.getStructureCache().structuresPerChunk.put(chunkCoord, new ArrayList<String>());
+				// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
+				if(World.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
+				{
+					CustomObjectStructure existingObject = World.getStructureCache().worldInfoChunks.get(chunkCoord);
+					this.modData.addAll(existingObject.modData);
+					this.particleData.addAll(existingObject.particleData);
+					this.spawnerData.addAll(existingObject.spawnerData);						
+				}					
+				World.getStructureCache().worldInfoChunks.put(chunkCoord, this);
 			}			
 			
-			// Disabled to improve performance, enable for testing
-			//if((ObjectsToSpawn.size() > 0 || SmoothingAreasToSpawn.size() > 0) && !World.getStructureCache().structureCache.containsKey(new ChunkCoordinate(Start.getChunkX(), Start.getChunkZ())))
-			{				
-				//throw new NotImplementedException();
-			}
-													
 			if(ObjectsToSpawn.size() > 0)
 			{
 				IsSpawned = true;
@@ -521,9 +446,7 @@ public class CustomObjectStructure
      * @throws InvalidConfigException 
      */
     public Object[] GetMinimumSize() throws InvalidConfigException
-    {
-    	//OTG.log(LogMarker.INFO, "GetMinimumSize");
-    	    	
+    {    	    	
     	if(
 			((BO3)Start.getObject()).getSettings().MinimumSizeTop != -1 &&
 			((BO3)Start.getObject()).getSettings().MinimumSizeBottom != -1 &&
@@ -587,12 +510,9 @@ public class CustomObjectStructure
     	((BO3)Start.getObject()).getSettings().MinimumSizeLeft = Math.abs(startChunk.getChunkX() - left.getChunkX()) + smoothingRadiusInChunks;
     	
     	Object[] returnValue = { ((BO3)Start.getObject()).getSettings().MinimumSizeTop, ((BO3)Start.getObject()).getSettings().MinimumSizeRight, ((BO3)Start.getObject()).getSettings().MinimumSizeBottom, ((BO3)Start.getObject()).getSettings().MinimumSizeLeft };
-
-    	//OTG.log(LogMarker.INFO, Start.getObject(World.getName()).getName() + " minimum size in chunks X " + (Math.abs(left.getChunkX() - right.getChunkX()) + (smoothingRadiusInChunks * 2) + 1) + " Z " + (Math.abs(top.getChunkZ() - bottom.getChunkZ()) + (smoothingRadiusInChunks * 2) + 1));
     	
     	if(OTG.getPluginConfig().SpawnLog)
     	{
-    		//OTG.log(LogMarker.INFO, Start.getObject(World.getName()).getName() + " minimum size calculated: "  + ObjectsToSpawn.size());
     		OTG.log(LogMarker.DEBUG, "");
         	OTG.log(LogMarker.DEBUG, Start.getObject().getName() + " minimum size: Width " + ((Integer)returnValue[1] + (Integer)returnValue[3] + 1) + " Length " + ((Integer)returnValue[0] + (Integer)returnValue[2] + 1) + " top " + (Integer)returnValue[0] + " right " + (Integer)returnValue[1] + " bottom " + (Integer)returnValue[2] + " left " + (Integer)returnValue[3]);
     	}
@@ -680,7 +600,7 @@ public class CustomObjectStructure
                 			                			
                 			if(block != null)
                 			{
-                            	//if(1 == 1) { throw new NotImplementedException();}
+                            	//if(1 == 1) { throw new RuntimeException();}
                 				
                                 bFoundNeighbour1 = false;
                                 bFoundNeighbour2 = false;
@@ -1526,7 +1446,7 @@ public class CustomObjectStructure
                 
                 if(smoothRadius == 0 && blockCoordsAndNeighbours.length < 15)
                 {
-                	//throw new NotImplementedException();
+                	//throw new RuntimeException();
                 }
                 
                 // If this block is a non-outer-corner block (it does not have the smoothInDirection boolean set to true for 2 neighbouring sides)

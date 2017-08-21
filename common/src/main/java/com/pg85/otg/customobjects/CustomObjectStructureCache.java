@@ -1233,15 +1233,8 @@ public class CustomObjectStructureCache
 		Map<ChunkCoordinate, CustomObjectStructure> loadedStructures = LoadStructuresFile();
 		
 		for(Map.Entry<ChunkCoordinate, CustomObjectStructure> loadedStructure : loadedStructures.entrySet())
-		{
-			//OTG.log(LogMarker.INFO, "Loading structure at chunk X" + loadedStructure.getKey().getChunkX() + " Z" + loadedStructure.getKey().getChunkZ() + " " + loadedStructure.getValue().Start.BO3Name);
-			
+		{			
 			structuresLoaded += 1;
-			
-			//if(worldInfoChunks.containsKey(loadedStructure.getKey())) // Only used for testing, remove for performance
-			{
-				//throw new NotImplementedException();
-			}
 			
 			if(loadedStructure == null)
 			{
@@ -1310,7 +1303,6 @@ public class CustomObjectStructureCache
 				structureCache.remove(chunkCoord);
 				if(!world.IsInsidePregeneratedRegion(chunkCoord, true))
 				{
-					//OTG.log(LogMarker.INFO, "Loaded null chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
 					structureCache.put(chunkCoord, null); // This chunk has been completely populated and spawned
 				} else {
 					
