@@ -96,11 +96,12 @@ public class TXBiome extends Biome
         // ArrayList. RegistryID arrays are not correctly (but randomly!) copied
         // when resized which will cause the ReplaceToBiomeName feature not to
         // work properly.
-        if (Biome.getBiome(MAX_TC_BIOME_ID) == null)
+        if (Biome.REGISTRY.underlyingIntegerMap.get(MAX_TC_BIOME_ID) == null)
         {
             ResourceLocation maxTcBiomeKey = new ResourceLocation(PluginStandardValues.PLUGIN_NAME.toLowerCase(), "null");
-            forgeEngine.registerForgeBiome(MAX_TC_BIOME_ID, maxTcBiomeKey,
-                    new TXBiome(biomeConfig, new BiomeIds(MAX_TC_BIOME_ID, MAX_TC_BIOME_ID)));
+            TXBiome dummyBiome = new TXBiome(biomeConfig, new BiomeIds(MAX_TC_BIOME_ID, MAX_TC_BIOME_ID));
+            forgeEngine.registerForgeBiome(MAX_TC_BIOME_ID, maxTcBiomeKey, dummyBiome);
+            dummyBiome.setRegistryName(maxTcBiomeKey);
         }
 
         if (biomeIds.isVirtual())
@@ -109,7 +110,7 @@ public class TXBiome extends Biome
             // In this way, the id --> biome mapping returns the original biome,
             // and the biome --> id mapping returns savedBiomeId for both the
             // original and custom biome
-            Biome existingBiome = Biome.getBiomeForId(savedBiomeId);
+            Biome existingBiome = Biome.getBiome(savedBiomeId);
             if (existingBiome == null)
             {
                 // Original biome not yet registered. This is because it's a
@@ -129,15 +130,23 @@ public class TXBiome extends Biome
         } else if (savedBiomeId < 256 && !biomeIds.isVirtual())
         {
             // Normal insertion
-            Biome.REGISTRY.register(savedBiomeId, registryKey, customBiome);
+            forgeEngine.registerForgeBiome(savedBiomeId, registryKey, customBiome);
             TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
                     biomeIds.getGenerationId());
         }
 
+        if (customBiome.getRegistryName() == null) {
+            customBiome.setRegistryName(registryKey);
+        }
+
+        // Temporarily register TC biome with Forge to bypass registry check
+        forgeEngine.getBiomeMap().put(customBiome.getRegistryName(), customBiome);
         if (!BiomeDictionary.hasAnyType(customBiome)) {
             // register custom biome with Forge's BiomeDictionary
             BiomeDictionary.makeBestGuess(customBiome);
         }
+        // Remove biome from forge registry
+        forgeEngine.getBiomeMap().remove(customBiome.getRegistryName());
         return customBiome;
     }
 

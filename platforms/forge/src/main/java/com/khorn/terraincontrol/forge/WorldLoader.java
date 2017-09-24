@@ -175,7 +175,7 @@ public final class WorldLoader
                 {
                     Map.Entry<ResourceLocation, Biome> mapEntry = iterator.next();
                     Biome biome = mapEntry.getValue();
-                    int biomeId = Biome.getIdForBiome(biome);
+                    int biomeId = Biome.REGISTRY.underlyingIntegerMap.getId(biome);
                     if (biomeId == TXBiome.MAX_TC_BIOME_ID)
                     {
                         iterator.remove();
@@ -186,7 +186,7 @@ public final class WorldLoader
                 while (biomeIterator.hasNext())
                 {
                     Biome biome = biomeIterator.next();
-                    int biomeId = Biome.getIdForBiome(biome);
+                    int biomeId = Biome.REGISTRY.underlyingIntegerMap.getId(biome);
                     if (biomeId == TXBiome.MAX_TC_BIOME_ID)
                     {
                         continue;

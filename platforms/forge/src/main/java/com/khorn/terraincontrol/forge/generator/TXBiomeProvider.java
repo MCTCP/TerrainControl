@@ -134,7 +134,7 @@ public class TXBiomeProvider extends BiomeProvider
                 continue;
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            Biome localBiomeBase = Biome.getBiome(arrayOfInt[i3]);
+            Biome localBiomeBase = Biome.REGISTRY.underlyingIntegerMap.get(arrayOfInt[i3]);
             if ((!biomes.contains(localBiomeBase)) || ((blockPos != null) && (random.nextInt(i2 + 1) != 0)))
                 continue;
             blockPos = new BlockPos(i4, 0, i5);
