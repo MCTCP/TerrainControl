@@ -170,7 +170,7 @@ public class ForgeWorld implements LocalWorld
         LocalBiome biome = this.biomeNames.get(name);
         if (biome == null)
         {
-            throw new BiomeNotFoundException(name, this.biomeNames.keySet());
+            TerrainControl.log(LogMarker.INFO, "No biome found with name '" + name + "'. Skipping...");
         }
         return biome;
     }

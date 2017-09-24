@@ -2,8 +2,10 @@ package com.khorn.terraincontrol.customobjects.bo3;
 
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 
 import java.util.List;
@@ -52,14 +54,18 @@ public class RandomBlockFunction extends BO3PlaceableFunction
                 blockChances[blockCount] = (byte) readInt(args.get(i), 1, 100);
             } catch (InvalidConfigException e)
             {
-                // Maybe it's a NBT file?
-
-                // Get the file
-                NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().directory);
-                if (metaData != null)
-                {
-                    metaDataNames[blockCount] = args.get(i);
-                    metaDataTags[blockCount] = metaData;
+                if (args.get(i).isEmpty()) {
+                    TerrainControl.log(LogMarker.ERROR, "Found empty RandomBlock argument in config {} with args {}.", config.getName(), args);
+                } else {
+                    // Maybe it's a NBT file?
+    
+                    // Get the file
+                    NamedBinaryTag metaData = BO3Loader.loadMetadata(args.get(i), this.getHolder().directory);
+                    if (metaData != null)
+                    {
+                        metaDataNames[blockCount] = args.get(i);
+                        metaDataTags[blockCount] = metaData;
+                    }
                 }
 
                 // Get the chance
