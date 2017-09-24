@@ -11,7 +11,6 @@ import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.generator.TXBiome;
 import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
-import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.server.MinecraftServer;
@@ -28,8 +27,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.BitSet;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -210,7 +207,7 @@ public final class WorldLoader
             if (world != null)
             {
                 TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-                markBiomeIdsAsFree(world);
+                world.unload();
                 this.configMap.remove(world.getName());
                 this.worlds.remove(world.getName());
             }
@@ -222,26 +219,7 @@ public final class WorldLoader
     {
         TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
         this.worlds.remove(world.getName());
-        markBiomeIdsAsFree(world);
-    }
-
-    /**
-     * "Evil" method that forces Forge to reuse the biome ids that we used. On
-     * singleplayer this is required to be able to properly load another world
-     * with custom biomes.
-     * @param world The world to unload.
-     */
-    @SideOnly(Side.CLIENT)
-    private void markBiomeIdsAsFree(ForgeWorld world)
-    {
-        // Retrieves the FMLControlledNamespacedRegistry's availabilityMap for the biome registry
-        BitSet biomeIdsInUse = ReflectionHelper.getValueInFieldOfType(Biome.REGISTRY, BitSet.class);
-        Collection<Integer> customBiomeIds = world.getConfigs().getWorldConfig().customBiomeGenerationIds.values();
-        for (Integer id : customBiomeIds)
-        {
-            // Allow other worlds to reuse this id
-            biomeIdsInUse.clear(id);
-        }
+        world.unload();
     }
 
     @SideOnly(Side.CLIENT)

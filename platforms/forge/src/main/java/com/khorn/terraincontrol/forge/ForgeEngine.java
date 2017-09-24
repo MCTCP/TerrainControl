@@ -49,7 +49,9 @@ public class ForgeEngine extends TerrainControlEngine
         Biome.REGISTRY.registryObjects.put(resourceLocation, biome);
         Biome.REGISTRY.underlyingIntegerMap.put(biome, id);
         Biome.REGISTRY.inverseObjectRegistry.put(biome, resourceLocation);
-        this.biomeAvailabilityMap.set(id);
+        if (id >= 0 && id < 256) { 
+            this.biomeAvailabilityMap.set(id);
+        }
     }
 
     @Override
@@ -84,5 +86,9 @@ public class ForgeEngine extends TerrainControlEngine
 
     public BiMap<ResourceLocation, Biome> getBiomeMap() {
         return this.biomeRegistryMap;
+    }
+
+    public BitSet getBiomeAvailabilityMap() {
+        return this.biomeAvailabilityMap;
     }
 }

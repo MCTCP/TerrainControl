@@ -845,4 +845,21 @@ public class ForgeWorld implements LocalWorld
         long i = ChunkPos.asLong(chunkX, chunkZ);
         return (Chunk) chunkProviderServer.id2ChunkMap.get(i);
     }
+
+    /**
+     * "Evil" method that forces Forge to reuse the biome ids that we used. On
+     * singleplayer this is required to be able to properly load another world
+     * with custom biomes.
+     */
+    @SideOnly(Side.CLIENT)
+    public void unload() {
+        final BitSet biomeAvailabilityMap = ((ForgeEngine) TerrainControl.getEngine()).getBiomeAvailabilityMap();
+        for (LocalBiome biome : this.biomeNames.values()) {
+            final ForgeBiome forgeBiome = (ForgeBiome) biome;
+            final int savedId = forgeBiome.getIds().getSavedId();
+            if (forgeBiome.isCustom() && !forgeBiome.getIds().isVirtual()) {
+                biomeAvailabilityMap.clear(savedId);
+            }
+        }
+    }
 }
