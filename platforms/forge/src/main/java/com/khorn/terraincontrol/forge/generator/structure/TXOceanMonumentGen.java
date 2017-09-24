@@ -107,7 +107,7 @@ public class TXOceanMonumentGen extends MapGenStructure
     }
 
     @Override
-    public BlockPos getClosestStrongholdPos(World worldIn, BlockPos pos, boolean p_180706_3_)
+    public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean p_180706_3_)
     {
         this.world = worldIn;
         return findNearestStructurePosBySpacing(worldIn, this, pos, this.gridSize, this.gridSize - this.randomOffset - 1, 10387313, true, 100, p_180706_3_);

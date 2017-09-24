@@ -91,7 +91,7 @@ public class TXPlugin
                 {
                     try
                     {
-                        biome = world.getBiomeByName(input.getBiomeName());
+                        biome = world.getBiomeByName(input.biomeName);
                         break;
                     } catch (BiomeNotFoundException e)
                     {

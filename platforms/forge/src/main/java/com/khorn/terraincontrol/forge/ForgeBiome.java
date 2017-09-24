@@ -39,7 +39,7 @@ public class ForgeBiome implements LocalBiome
     @Override
     public String getName()
     {
-        return this.biomeBase.getBiomeName();
+        return this.biomeBase.biomeName;
     }
 
     public Biome getHandle()
