@@ -27,7 +27,7 @@ public final class ForgeMojangSettings implements MojangSettings
      */
     public static MojangSettings fromId(int biomeId)
     {
-        return fromBiomeBase(Biome.getBiome(biomeId));
+        return fromBiomeBase(Biome.getBiomeForId(biomeId));
     }
 
     /**

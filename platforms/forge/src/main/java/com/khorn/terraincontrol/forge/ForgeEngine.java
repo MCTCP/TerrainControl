@@ -1,8 +1,9 @@
 package com.khorn.terraincontrol.forge;
 
 import java.io.File;
-import java.util.Map;
+import java.lang.reflect.Field;
 
+import com.google.common.collect.BiMap;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControlEngine;
@@ -12,18 +13,27 @@ import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class ForgeEngine extends TerrainControlEngine
 {
 
     protected WorldLoader worldLoader;
 
-    protected Map<ResourceLocation, Biome> biomeMap;
+    private BiMap<ResourceLocation, Biome> biomeRegistryMap;
 
+    @SuppressWarnings("unchecked")
     public ForgeEngine(WorldLoader worldLoader)
     {
         super(new ForgeLogger());
         this.worldLoader = worldLoader;
+        try {
+            Field f = ForgeRegistries.BIOMES.getClass().getDeclaredField("names");
+            f.setAccessible(true);
+            this.biomeRegistryMap = (BiMap<ResourceLocation, Biome>) f.get(ForgeRegistries.BIOMES);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     // Used to bypass Forge's API in order to properly register a virtual biome
@@ -64,5 +74,9 @@ public class ForgeEngine extends TerrainControlEngine
     public LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
     {
         return ForgeMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
+    }
+
+    public BiMap<ResourceLocation, Biome> getBiomeMap() {
+        return this.biomeRegistryMap;
     }
 }
