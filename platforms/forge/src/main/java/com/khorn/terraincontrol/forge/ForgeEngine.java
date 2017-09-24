@@ -2,6 +2,7 @@ package com.khorn.terraincontrol.forge;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.BitSet;
 
 import com.google.common.collect.BiMap;
 import com.khorn.terraincontrol.LocalMaterialData;
@@ -21,6 +22,7 @@ public class ForgeEngine extends TerrainControlEngine
     protected WorldLoader worldLoader;
 
     private BiMap<ResourceLocation, Biome> biomeRegistryMap;
+    private BitSet biomeAvailabilityMap;
 
     @SuppressWarnings("unchecked")
     public ForgeEngine(WorldLoader worldLoader)
@@ -31,6 +33,9 @@ public class ForgeEngine extends TerrainControlEngine
             Field f = ForgeRegistries.BIOMES.getClass().getDeclaredField("names");
             f.setAccessible(true);
             this.biomeRegistryMap = (BiMap<ResourceLocation, Biome>) f.get(ForgeRegistries.BIOMES);
+            f = ForgeRegistries.BIOMES.getClass().getDeclaredField("availabilityMap");
+            f.setAccessible(true);
+            this.biomeAvailabilityMap = (BitSet) f.get(ForgeRegistries.BIOMES);
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -44,6 +49,7 @@ public class ForgeEngine extends TerrainControlEngine
         Biome.REGISTRY.registryObjects.put(resourceLocation, biome);
         Biome.REGISTRY.underlyingIntegerMap.put(biome, id);
         Biome.REGISTRY.inverseObjectRegistry.put(biome, resourceLocation);
+        this.biomeAvailabilityMap.set(id);
     }
 
     @Override
