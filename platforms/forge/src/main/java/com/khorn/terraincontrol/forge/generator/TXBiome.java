@@ -158,7 +158,7 @@ public class TXBiome extends Biome
     @Override
     public String toString()
     {
-        return "BiomeGenCustom of " + getBiomeName();
+        return "BiomeGenCustom of " + this.biomeName;
     }
 
 }

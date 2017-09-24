@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.IChunkGenerator;
 
 public class TXChunkGenerator implements IChunkGenerator
 {
@@ -51,7 +51,7 @@ public class TXChunkGenerator implements IChunkGenerator
     }
 
     @Override
-    public Chunk provideChunk(int chunkX, int chunkZ)
+    public Chunk generateChunk(int chunkX, int chunkZ)
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
         ForgeChunkBuffer chunkBuffer = new ForgeChunkBuffer(chunkCoord);
@@ -74,7 +74,7 @@ public class TXChunkGenerator implements IChunkGenerator
         byte[] chunkBiomeArray = chunk.getBiomeArray();
         ConfigProvider configProvider = this.world.getConfigs();
         this.biomeIntArray = this.world.getBiomeGenerator().getBiomes(this.biomeIntArray,
-                chunk.xPosition * CHUNK_X_SIZE, chunk.zPosition * CHUNK_Z_SIZE,
+                chunk.x * CHUNK_X_SIZE, chunk.z * CHUNK_Z_SIZE,
                 CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
 
         for (int i = 0; i < chunkBiomeArray.length; i++)
@@ -118,12 +118,12 @@ public class TXChunkGenerator implements IChunkGenerator
     }
 
     @Override
-    public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position, boolean flag)
+    public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean flag)
     {
         // Gets the nearest stronghold
         if (("Stronghold".equals(structureName)) && (this.world.strongholdGen != null))
         {
-            return this.world.strongholdGen.getClosestStrongholdPos(worldIn, position, flag);
+            return this.world.strongholdGen.getNearestStructurePos(worldIn, position, flag);
         }
         return null;
     }
@@ -161,6 +161,37 @@ public class TXChunkGenerator implements IChunkGenerator
 
     @Override
     public boolean generateStructures(Chunk chunkIn, int x, int z) {
+        return false;
+    }
+
+    @Override
+    public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos)
+    {
+        WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
+        if (worldConfig.mineshaftsEnabled)
+        {
+            return this.world.mineshaftGen.isInsideStructure(pos);
+        }
+        if (worldConfig.villagesEnabled)
+        {
+            return this.world.villageGen.isInsideStructure(pos);
+        }
+        if (worldConfig.strongholdsEnabled)
+        {
+            return this.world.strongholdGen.isInsideStructure(pos);
+        }
+        if (worldConfig.rareBuildingsEnabled)
+        {
+            return this.world.rareBuildingGen.isInsideStructure(pos);
+        }
+        if (worldConfig.netherFortressesEnabled)
+        {
+            return this.world.netherFortressGen.isInsideStructure(pos);
+        }
+        if (worldConfig.oceanMonumentsEnabled)
+        {
+            return this.world.oceanMonumentGen.isInsideStructure(pos);
+        }
         return false;
     }
 

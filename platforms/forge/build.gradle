@@ -18,7 +18,7 @@ buildscript
     }
     dependencies
     {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 
@@ -27,10 +27,10 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 // Project properties
 archivesBaseName = "terraincontrol-forge"
 description = "TerrainControl for Minecraft Forge"
-ext.forgeVersion = "1.11-13.19.1.2199"
+ext.forgeVersion = "1.12.2-14.23.0.2489"
 minecraft.version = ext.forgeVersion
 minecraft.runDir = "run"
-minecraft.mappings = "snapshot_20161129"
+minecraft.mappings = "snapshot_20170624"
 
 repositories
 {
@@ -41,7 +41,6 @@ repositories
 dependencies
 {
     compile project(':common')
-    compile 'com.google.guava:guava:17.0'
 }
 
 // Replace text in mcmod.info

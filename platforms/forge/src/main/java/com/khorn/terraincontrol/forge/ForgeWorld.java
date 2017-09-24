@@ -66,6 +66,7 @@ public class ForgeWorld implements LocalWorld
 
     private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
+    public TXMansionGen mansionGen;
     public TXStrongholdGen strongholdGen;
     public TXVillageGen villageGen;
     public TXMineshaftGen mineshaftGen;
@@ -124,7 +125,7 @@ public class ForgeWorld implements LocalWorld
         }
 
         ForgeBiome forgeBiome = new ForgeBiome(biome, biomeConfig, biomeIds);
-        this.biomeNames.put(biome.getBiomeName(), forgeBiome);
+        this.biomeNames.put(biome.biomeName, forgeBiome);
         return forgeBiome;
     }
 
@@ -206,6 +207,8 @@ public class ForgeWorld implements LocalWorld
             this.netherFortressGen.generate(this.world, chunkX, chunkZ, null);
         if (worldConfig.oceanMonumentsEnabled)
             this.oceanMonumentGen.generate(this.world, chunkX, chunkZ, null);
+        if (worldConfig.mansionsEnabled)
+            this.mansionGen.generate(this.world, chunkX, chunkZ, null);
     }
 
     @Override
@@ -291,6 +294,8 @@ public class ForgeWorld implements LocalWorld
             this.netherFortressGen.generateStructure(this.world, rand, chunkCoordIntPair);
         if (worldConfig.oceanMonumentsEnabled)
             this.oceanMonumentGen.generateStructure(this.world, rand, chunkCoordIntPair);
+        if (worldConfig.mansionsEnabled)
+            this.mansionGen.generateStructure(this.world, rand, chunkCoordIntPair);
 
         return isVillagePlaced;
     }
@@ -318,8 +323,8 @@ public class ForgeWorld implements LocalWorld
     {
         int endXInChunk = startXInChunk + size;
         int endZInChunk = startZInChunk + size;
-        int worldStartX = rawChunk.xPosition * 16;
-        int worldStartZ = rawChunk.zPosition * 16;
+        int worldStartX = rawChunk.x * 16;
+        int worldStartZ = rawChunk.z * 16;
 
         ExtendedBlockStorage[] sectionsArray = rawChunk.getBlockStorageArray();
 
@@ -384,8 +389,8 @@ public class ForgeWorld implements LocalWorld
 
         // Restrict to chunks we are currently populating
         Chunk topLeftCachedChunk = this.chunkCache[0];
-        int indexX = (chunkX - topLeftCachedChunk.xPosition);
-        int indexZ = (chunkZ - topLeftCachedChunk.zPosition);
+        int indexX = (chunkX - topLeftCachedChunk.x);
+        int indexZ = (chunkZ - topLeftCachedChunk.z);
         if ((indexX == 0 || indexX == 1) && (indexZ == 0 || indexZ == 1))
         {
             return this.chunkCache[indexX | (indexZ << 1)];
@@ -509,9 +514,9 @@ public class ForgeWorld implements LocalWorld
         // Relight and update players
         if (newState.getLightOpacity(this.world, pos) != oldOpacity || newState.getLightValue(this.world, pos) != oldLight)
         {
-            this.world.theProfiler.startSection("checkLight");
+            this.world.profiler.startSection("checkLight");
             this.world.checkLight(pos);
-            this.world.theProfiler.endSection();
+            this.world.profiler.endSection();
         }
 
         // Notify world: (2 | 16) == update client, don't update observers
@@ -563,7 +568,7 @@ public class ForgeWorld implements LocalWorld
 
     private Chunk[] getChunkCache(ChunkCoordinate topLeft)
     {
-        if (this.chunkCache == null || !topLeft.coordsMatch(this.chunkCache[0].xPosition, this.chunkCache[0].zPosition))
+        if (this.chunkCache == null || !topLeft.coordsMatch(this.chunkCache[0].x, this.chunkCache[0].z))
         {
             // Cache is invalid, most likely because two chunks are being populated at once
             if (this.settings.getWorldConfig().populationBoundsCheck)
@@ -700,7 +705,7 @@ public class ForgeWorld implements LocalWorld
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
         this.strongholdGen = new TXStrongholdGen(configs);
-
+        this.mansionGen = new TXMansionGen(configs);
         this.villageGen = new TXVillageGen(configs);
         this.mineshaftGen = new TXMineshaftGen();
         this.rareBuildingGen = new TXRareBuildingGen(configs);
