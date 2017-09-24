@@ -201,7 +201,11 @@ public final class LayerFactory
                     boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
-                        int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
+                        final LocalBiome localBiome = world.getBiomeByName(islandInName);
+                        if (localBiome == null) {
+                            continue;
+                        }
+                        int islandIn = localBiome.getIds().getGenerationId();
                         if (islandIn == DefaultBiome.OCEAN.Id)
                         {
                         	inOcean = true;
@@ -220,7 +224,11 @@ public final class LayerFactory
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)
                     {
-                        int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
+                        final LocalBiome localBiome = world.getBiomeByName(replaceFromName);
+                        if (localBiome == null) {
+                            continue;
+                        }
+                        int replaceFrom = localBiome.getIds().getGenerationId();
                         layerBiomeBorder.addBiome(biome, replaceFrom, world);
 
                     }
@@ -345,7 +353,11 @@ public final class LayerFactory
                     boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
-                        int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
+                        final LocalBiome localBiome = world.getBiomeByName(islandInName);
+                        if (localBiome == null) {
+                            continue;
+                        }
+                        int islandIn = localBiome.getIds().getGenerationId();
                         if (islandIn == DefaultBiome.OCEAN.Id)
                         {
                         	inOcean = true;
@@ -365,7 +377,11 @@ public final class LayerFactory
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)
                     {
-                        int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
+                        final LocalBiome localBiome = world.getBiomeByName(replaceFromName);
+                        if (localBiome == null) {
+                            continue;
+                        }
+                        int replaceFrom = localBiome.getIds().getGenerationId();
                         layerBiomeBorder.addBiome(biome, replaceFrom, world);
                     }
                 }

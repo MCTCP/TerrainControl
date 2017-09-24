@@ -95,6 +95,10 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
             String biomeName = entry.getKey();
 
             LocalBiome localBiome = world.getBiomeByName(biomeName);
+            if (localBiome == null) {
+                it.remove();
+                continue;
+            }
             entry.setValue(localBiome);
 
             BiomeConfig biomeConfig = localBiome.getBiomeConfig();
