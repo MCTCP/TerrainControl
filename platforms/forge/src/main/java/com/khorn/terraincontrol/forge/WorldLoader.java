@@ -102,20 +102,8 @@ public final class WorldLoader
 
     public void onServerStopped()
     {
-        unloadAllWorlds();
-    }
-
-    public void unloadAllWorlds()
-    {
-        for (ForgeWorld world : this.worlds.values())
-        {
-            if (world != null)
-            {
-                TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-                this.configMap.remove(world.getName());
-                this.worlds.remove(world.getName());
-            }
-        }
+        this.configMap.clear();
+        this.worlds.clear();
     }
 
     public void unloadWorld(ForgeWorld world)
@@ -206,20 +194,11 @@ public final class WorldLoader
         {
             if (world != null)
             {
-                TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
                 world.unload();
-                this.configMap.remove(world.getName());
-                this.worlds.remove(world.getName());
             }
         }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void unloadClientWorld(ForgeWorld world)
-    {
-        TerrainControl.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-        this.worlds.remove(world.getName());
-        world.unload();
+        this.configMap.clear();
+        this.worlds.clear();
     }
 
     @SideOnly(Side.CLIENT)
