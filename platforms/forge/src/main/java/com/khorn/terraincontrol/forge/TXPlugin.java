@@ -44,8 +44,6 @@ public class TXPlugin
         // This is the place where the mod starts loading
         File configsDir = new File(Loader.instance().getConfigDir(), "TerrainControl");
         this.worldLoader = new WorldLoader(configsDir);
-        // Register World listener for tracking world unloads and loads.
-        MinecraftForge.EVENT_BUS.register(new WorldListener(this.worldLoader));
 
         // Create the world type. WorldType registers itself in the constructor
         // - that is Mojang code, so don't blame me
