@@ -24,8 +24,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.datafix.DataFixer;
-import net.minecraft.util.datafix.DataFixesManager;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -39,12 +37,11 @@ import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.*;
-
-import javax.annotation.Nullable;
 
 public class ForgeWorld implements LocalWorld
 {
@@ -56,7 +53,6 @@ public class ForgeWorld implements LocalWorld
     private String name;
     private long seed;
     private BiomeGenerator biomeGenerator;
-    private DataFixer dataFixer;
 
     private static int nextBiomeId = 0;
 
@@ -700,7 +696,6 @@ public class ForgeWorld implements LocalWorld
         world.setSeaLevel(configs.getWorldConfig().waterLevelMax);
 
         this.structureCache = new CustomObjectStructureCache(this);
-        this.dataFixer = DataFixesManager.createFixer();
 
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
@@ -783,8 +778,7 @@ public class ForgeWorld implements LocalWorld
         nmsTag.setInteger("z", z);
         // Update to current Minecraft format (maybe we want to do this at
         // server startup instead, and then save the result?)
-        // TODO: Use datawalker instead
-        //nmsTag = this.dataFixer.process(FixTypes.BLOCK_ENTITY, nmsTag, -1);
+        nmsTag = FMLCommonHandler.instance().getDataFixer().process(FixTypes.BLOCK_ENTITY, nmsTag);
         // Add that data to the current tile entity in the world
         TileEntity tileEntity = this.world.getTileEntity(new BlockPos(x, y, z));
         if (tileEntity != null)
